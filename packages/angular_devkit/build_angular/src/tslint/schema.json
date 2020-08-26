@@ -43,7 +43,7 @@
     "format": {
       "type": "string",
       "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).",
-      "default": "prose",
+      "default": "stylish",
       "anyOf": [
         {
           "enum": [

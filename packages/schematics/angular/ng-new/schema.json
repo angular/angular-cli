@@ -18,11 +18,6 @@
       },
       "x-prompt": "What name would you like to use for the new workspace and initial project?"
     },
-    "experimentalIvy": {
-      "description": "EXPERIMENTAL: When true, creates a new app that uses the Ivy rendering engine.",
-      "type": "boolean",
-      "default": false
-    },
     "skipInstall": {
       "description": "When true, does not install dependency packages.",
       "type": "boolean",
@@ -58,10 +53,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "name",
-            "email"
-          ]
+          "required": ["name", "email"]
         }
       ],
       "default": true
@@ -75,18 +67,21 @@
       "description": "When true, includes styles inline in the component TS file. By default, an external styles file is created and referenced in the component TS file.",
       "type": "boolean",
       "default": false,
-      "alias": "s"
+      "alias": "s",
+      "x-user-analytics": 9
     },
     "inlineTemplate": {
       "description": "When true, includes template inline in the component TS file. By default, an external template file is created and referenced in the component TS file.",
       "type": "boolean",
       "default": false,
-      "alias": "t"
+      "alias": "t",
+      "x-user-analytics": 10
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the initial project.",
       "enum": ["Emulated", "Native", "None", "ShadowDom"],
-      "type": "string"
+      "type": "string",
+      "x-user-analytics": 11
     },
     "version": {
       "type": "string",
@@ -99,8 +94,7 @@
     "routing": {
       "type": "boolean",
       "description": "When true, generates a routing module for the initial project.",
-      "default": false,
-      "x-prompt": "Would you like to add Angular routing?"
+      "x-user-analytics": 17
     },
     "prefix": {
       "type": "string",
@@ -113,44 +107,42 @@
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
-      "default": "css",
-      "enum": [
-        "css",
-        "scss",
-        "sass",
-        "less",
-        "styl"
-      ],
-      "x-prompt": {
-        "message": "Which stylesheet format would you like to use?",
-        "type": "list",
-        "items": [
-          { "value": "css",  "label": "CSS    (.css )" },
-          { "value": "sass", "label": "Sass   (.scss) [ http://sass-lang.com   ]" },
-          { "value": "less", "label": "Less   (.less) [ http://lesscss.org     ]" },
-          { "value": "styl", "label": "Stylus (.styl) [ http://stylus-lang.com ]" }
-        ]
-      }
+      "enum": ["css", "scss", "sass", "less", "styl"],
+      "x-user-analytics": 5
     },
     "skipTests": {
       "description": "When true, does not generate \"spec.ts\" test files for the new project. ",
       "type": "boolean",
       "default": false,
-      "alias": "S"
+      "alias": "S",
+      "x-user-analytics": 12
     },
     "createApplication": {
-      "description": "When true (the default), creates a new initial app project in the src folder of the new workspace. When false, creates an empty workspace with no initial app. You can then use the generate application command so that all apps are created in the projects folder.",
+      "description": "When true (the default), creates a new initial application project in the src folder of the new workspace. When false, creates an empty workspace with no initial app. You can then use the generate application command so that all apps are created in the projects folder.",
       "type": "boolean",
       "default": true
     },
     "minimal": {
-      "description": "When true, creates a project without any testing frameworks. (Use for learning purposes only.)",
+      "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": 14
+    },
+    "strict": {
+      "description": "Creates a workspace with stricter type checking and build optimization options.",
       "type": "boolean",
       "default": false
+    },
+    "legacyBrowsers": {
+      "type": "boolean",
+      "description": "Add support for legacy browsers like Internet Explorer using differential loading.",
+      "default": false
+    },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "cnpm"]
     }
   },
-  "required": [
-    "name",
-    "version"
-  ]
+  "required": ["name", "version"]
 }

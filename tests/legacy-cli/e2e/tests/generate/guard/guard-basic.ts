@@ -1,19 +1,16 @@
 import {join} from 'path';
 import {ng} from '../../../utils/process';
-import {expectFileToExist} from '../../../utils/fs';
+import {expectFileToExist, expectFileToMatch} from '../../../utils/fs';
 
 
-export default function() {
+export default async function() {
   // Does not create a sub directory.
   const guardDir = join('src', 'app');
 
-  return ng('generate', 'guard', 'test-guard')
-    .then(() => expectFileToExist(guardDir))
-    .then(() => expectFileToExist(join(guardDir, 'test-guard.guard.ts')))
-    .then(() => expectFileToExist(join(guardDir, 'test-guard.guard.spec.ts')));
-
-
-    // Try to run the unit tests.
-    // TODO: Enable once schematic is updated for rxjs 6
-    // .then(() => ng('test', '--watch=false'));
+  await ng('generate', 'guard', 'test-guard');
+  await expectFileToExist(guardDir);
+  await expectFileToExist(join(guardDir, 'test-guard.guard.ts'));
+  await expectFileToMatch(join(guardDir, 'test-guard.guard.ts'), /implements CanActivate/);
+  await expectFileToExist(join(guardDir, 'test-guard.guard.spec.ts'));
+  await ng('test', '--watch=false');
 }

@@ -19,7 +19,7 @@ export declare const aggregateMetrics: (m1: Metric | AggregatedMetric, m2: Metri
 
 export declare type BenchmarkReporter = (command: Command, groups: MetricGroup[]) => void;
 
-export declare type Capture = (process: MonitoredProcess) => Observable<MetricGroup>;
+export declare type Capture = (stats: Observable<AggregatedProcessStats>) => Observable<MetricGroup>;
 
 export declare class Command {
     args: string[];
@@ -40,7 +40,8 @@ export declare class LocalMonitoredProcess implements MonitoredProcess {
     stats$: Observable<AggregatedProcessStats>;
     stderr$: Observable<Buffer>;
     stdout$: Observable<Buffer>;
-    constructor(command: Command);
+    constructor(command: Command, useProcessTime?: boolean);
+    resetElapsedTimer(): void;
     run(): Observable<number>;
 }
 
@@ -88,4 +89,12 @@ export interface RunBenchmarkOptions {
     logger?: logging.Logger;
     reporters: BenchmarkReporter[];
     retries?: number;
+}
+
+export declare function runBenchmarkWatch({ command, captures, reporters, iterations, retries, logger, watchMatcher, watchTimeout, watchCommand, }: RunBenchmarkWatchOptions): Observable<MetricGroup[]>;
+
+export interface RunBenchmarkWatchOptions extends RunBenchmarkOptions {
+    watchCommand: Command;
+    watchMatcher: string;
+    watchTimeout?: number;
 }

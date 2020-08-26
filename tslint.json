@@ -9,6 +9,13 @@
     "dist/etc/rules",
     "node_modules/tslint-sonarts/lib/rules"
   ],
+  "linterOptions": {
+    "format": "codeFrame",
+    "exclude": [
+      "dist-schema/**",
+      "**/third_party/**"
+    ]
+  },
   "rules": {
     // ==================================================================================================
     // custom rules defined in etc/rules/**
@@ -35,6 +42,8 @@
     "no-unthrown-error": true,
     "no-use-of-empty-return-value": true,
     "no-useless-increment": true,
+    "no-invalid-await": true,
+    "prefer-promise-shorthand": true,
 
     //These rules are part of the code smell detection section of tslint-sonarts
     "no-dead-store": true,
@@ -50,7 +59,13 @@
     "no-string-throw": true,
     "encoding": true,
     "no-floating-promises": true,
-    "no-implicit-dependencies": true,
+    "no-implicit-dependencies": [
+      true,
+      // Specs can depend on the package they are testing.
+      // This is a workaround, we should instead have a dedicated
+      // tslint config only for specs.
+      ["@angular-devkit/build-angular"]
+    ],
     "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
     "align": [
       true,
@@ -59,7 +74,7 @@
       "parameters",
       "statements"
     ],
-    "max-line-length": [true, 100],
+    "max-line-length": [true, 140],
     "no-inferrable-types": true,
     "class-name": true,
     "comment-format": [
@@ -79,6 +94,8 @@
     "no-eval": true,
     "no-any": true,
     "no-arg": true,
+    "no-debugger": true,
+    "no-console": true,
     "no-internal-module": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": true,

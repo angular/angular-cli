@@ -6,12 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+export * from './build-browser-features';
 export * from './default-progress';
+export * from './delete-output-dir';
 export * from './run-module-as-observable-fork';
 export * from './normalize-file-replacements';
 export * from './normalize-asset-patterns';
 export * from './normalize-source-maps';
 export * from './normalize-optimization';
 export * from './normalize-builder-schema';
-export * from './normalize-karma-schema';
-export * from './normalize-webpack-server-schema';
+export * from './url';
+export * from './workers';

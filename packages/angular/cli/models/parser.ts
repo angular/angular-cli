@@ -16,7 +16,7 @@ export class ParseArgumentException extends BaseException {
     public readonly parsed: Arguments,
     public readonly ignored: string[],
   ) {
-    super(`One or more errors occured while parsing arguments:\n  ${comments.join('\n  ')}`);
+    super(`One or more errors occurred while parsing arguments:\n  ${comments.join('\n  ')}`);
   }
 }
 
@@ -84,10 +84,8 @@ function _coerce(str: string | undefined, o: Option | null, v?: Value): Value | 
     // enum. If there's no enum, just return the first one that matches.
     for (const type of types) {
       const maybeResult = _coerceType(str, type, v);
-      if (maybeResult !== undefined) {
-        if (!o.enum || o.enum.includes(maybeResult)) {
-          return maybeResult;
-        }
+      if (maybeResult !== undefined && (!o.enum || o.enum.includes(maybeResult))) {
+        return maybeResult;
       }
     }
 
@@ -159,11 +157,9 @@ function _assignOption(
         value = nextArg;
         let shouldShift = true;
 
-        if (value && value.startsWith('-')) {
+        if (value && value.startsWith('-') && _coerce(undefined, maybeOption) !== undefined) {
           // Verify if not having a value results in a correct parse, if so don't shift.
-          if (_coerce(undefined, maybeOption) !== undefined) {
-            shouldShift = false;
-          }
+          shouldShift = false;
         }
 
         // Only absorb it if it leads to a better value.
@@ -194,7 +190,7 @@ function _assignOption(
     const v = _coerce(value, option, parsedOptions[option.name]);
     if (v !== undefined) {
       if (parsedOptions[option.name] !== v) {
-        if (parsedOptions[option.name] !== undefined) {
+        if (parsedOptions[option.name] !== undefined && option.type !== OptionType.Array) {
           warnings.push(
             `Option ${JSON.stringify(option.name)} was already specified with value `
             + `${JSON.stringify(parsedOptions[option.name])}. The new value ${JSON.stringify(v)} `
@@ -203,11 +199,6 @@ function _assignOption(
         }
 
         parsedOptions[option.name] = v;
-
-        if (option.deprecated !== undefined && option.deprecated !== false) {
-          warnings.push(`Option ${JSON.stringify(option.name)} is deprecated${
-            typeof option.deprecated == 'string' ? ': ' + option.deprecated : '.'}`);
-        }
       }
     } else {
       let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;
@@ -269,7 +260,9 @@ export function parseFreeFormArguments(args: string[]): Arguments {
     }
   }
 
-  parsedOptions['--'] = leftovers;
+  if (leftovers.length) {
+    parsedOptions['--'] = leftovers;
+  }
 
   return parsedOptions;
 }

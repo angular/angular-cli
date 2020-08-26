@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -14,8 +14,7 @@ import {
   Tree,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
-import { Observable, from as observableFrom, of } from 'rxjs';
-import { map, mergeMap, reduce, switchMap } from 'rxjs/operators';
+import * as npa from 'npm-package-arg';
 import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';
 import { NpmRepositoryPackageJson } from './npm-package-json';
@@ -113,18 +112,24 @@ function _validateForwardPeerDependencies(
   name: string,
   infoMap: Map<string, PackageInfo>,
   peers: {[name: string]: string},
+  peersMeta: { [name: string]: { optional?: boolean }},
   logger: logging.LoggerApi,
+  next: boolean,
 ): boolean {
+  let validationFailed = false;
   for (const [peer, range] of Object.entries(peers)) {
     logger.debug(`Checking forward peer ${peer}...`);
     const maybePeerInfo = infoMap.get(peer);
+    const isOptional = peersMeta[peer] && !!peersMeta[peer].optional;
     if (!maybePeerInfo) {
-      logger.error([
-        `Package ${JSON.stringify(name)} has a missing peer dependency of`,
-        `${JSON.stringify(peer)} @ ${JSON.stringify(range)}.`,
-      ].join(' '));
+      if (!isOptional) {
+        logger.warn([
+          `Package ${JSON.stringify(name)} has a missing peer dependency of`,
+          `${JSON.stringify(peer)} @ ${JSON.stringify(range)}.`,
+        ].join(' '));
+      }
 
-      return true;
+      continue;
     }
 
     const peerVersion = maybePeerInfo.target && maybePeerInfo.target.packageJson.version
@@ -132,18 +137,19 @@ function _validateForwardPeerDependencies(
       : maybePeerInfo.installed.version;
 
     logger.debug(`  Range intersects(${range}, ${peerVersion})...`);
-    if (!semver.satisfies(peerVersion, range)) {
+    if (!semver.satisfies(peerVersion, range, { includePrerelease: next || undefined })) {
       logger.error([
         `Package ${JSON.stringify(name)} has an incompatible peer dependency to`,
         `${JSON.stringify(peer)} (requires ${JSON.stringify(range)},`,
         `would install ${JSON.stringify(peerVersion)})`,
       ].join(' '));
 
-      return true;
+      validationFailed = true;
+      continue;
     }
   }
 
-  return false;
+  return validationFailed;
 }
 
 
@@ -152,6 +158,7 @@ function _validateReversePeerDependencies(
   version: string,
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
+  next: boolean,
 ) {
   for (const [installed, installedInfo] of infoMap.entries()) {
     const installedLogger = logger.createChild(installed);
@@ -168,7 +175,7 @@ function _validateReversePeerDependencies(
       // Override the peer version range if it's whitelisted.
       const extendedRange = _updatePeerVersion(infoMap, peer, range);
 
-      if (!semver.satisfies(version, extendedRange)) {
+      if (!semver.satisfies(version, extendedRange, { includePrerelease: next || undefined })) {
         logger.error([
           `Package ${JSON.stringify(installed)} has an incompatible peer dependency to`,
           `${JSON.stringify(name)} (requires`,
@@ -187,6 +194,7 @@ function _validateReversePeerDependencies(
 function _validateUpdatePackages(
   infoMap: Map<string, PackageInfo>,
   force: boolean,
+  next: boolean,
   logger: logging.LoggerApi,
 ): void {
   logger.debug('Updating the following packages:');
@@ -206,15 +214,19 @@ function _validateUpdatePackages(
     const pkgLogger = logger.createChild(name);
     logger.debug(`${name}...`);
 
-    const peers = target.packageJson.peerDependencies || {};
-    peerErrors = _validateForwardPeerDependencies(name, infoMap, peers, pkgLogger) || peerErrors;
+    const { peerDependencies = {}, peerDependenciesMeta = {} } = target.packageJson;
+    peerErrors = _validateForwardPeerDependencies(name, infoMap, peerDependencies,
+      peerDependenciesMeta, pkgLogger, next) || peerErrors;
     peerErrors
-      = _validateReversePeerDependencies(name, target.version, infoMap, pkgLogger)
+      = _validateReversePeerDependencies(name, target.version, infoMap, pkgLogger, next)
       || peerErrors;
   });
 
   if (!force && peerErrors) {
-    throw new SchematicsException(`Incompatible peer dependencies found. See above.`);
+    throw new SchematicsException(tags.stripIndents
+      `Incompatible peer dependencies found.
+      Peer dependency warnings when installing dependencies means that those dependencies might not work correctly together.
+      You can use the '--force' option to ignore incompatible peer dependencies and instead address these warnings later.`);
   }
 }
 
@@ -225,7 +237,8 @@ function _performUpdate(
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
   migrateOnly: boolean,
-): Observable<void> {
+  migrateExternal: boolean,
+): void {
   const packageJsonContent = tree.read('/package.json');
   if (!packageJsonContent) {
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
@@ -289,6 +302,8 @@ function _performUpdate(
       installTask = [context.addTask(new NodePackageInstallTask())];
     }
 
+    const externalMigrations: {}[] = [];
+
     // Run the migrate schematics with the list of packages to use. The collection contains
     // version information and we need to do this post installation. Please note that the
     // migration COULD fail and leave side effects on disk.
@@ -304,6 +319,17 @@ function _performUpdate(
         : ''
       ) + target.updateMetadata.migrations;
 
+      if (migrateExternal) {
+        externalMigrations.push({
+          package: name,
+          collection,
+          from: installed.version,
+          to: target.version,
+        });
+
+        return;
+      }
+
       context.addTask(new RunSchematicTask('@schematics/update', 'migrate', {
           package: name,
           collection,
@@ -313,9 +339,12 @@ function _performUpdate(
         installTask,
       );
     });
-  }
 
-  return of<void>(undefined);
+    if (externalMigrations.length > 0) {
+      // tslint:disable-next-line: no-any
+      (global as any).externalMigrations = externalMigrations;
+    }
+  }
 }
 
 function _migrateOnly(
@@ -325,12 +354,12 @@ function _migrateOnly(
   to?: string,
 ) {
   if (!info) {
-    return of<void>();
+    return;
   }
 
   const target = info.installed;
   if (!target || !target.updateMetadata.migrations) {
-    return of<void>(undefined);
+    return;
   }
 
   const collection = (
@@ -346,8 +375,6 @@ function _migrateOnly(
       to: to || target.version,
     }),
   );
-
-  return of<void>(undefined);
 }
 
 function _getUpdateMetadata(
@@ -467,7 +494,7 @@ function _usageMessage(
         command += ' --next';
       }
 
-      return [name, `${info.installed.version} -> ${version}`, command];
+      return [name, `${info.installed.version} -> ${version} `, command];
     })
     .filter(x => x !== null)
     .sort((a, b) => a && b ? a[0].localeCompare(b[0]) : 0);
@@ -475,7 +502,7 @@ function _usageMessage(
   if (packagesToUpdate.length == 0) {
     logger.info('We analyzed your package.json and everything seems to be in order. Good work!');
 
-    return of<void>(undefined);
+    return;
   }
 
   logger.info(
@@ -503,11 +530,7 @@ function _usageMessage(
     logger.info('  ' + fields.map((x, i) => x.padEnd(pads[i])).join(''));
   });
 
-  logger.info('\n');
-  logger.info('There might be additional packages that are outdated.');
-  logger.info('Run "ng update --all" to try to update all at the same time.\n');
-
-  return of<void>(undefined);
+  return;
 }
 
 
@@ -528,7 +551,7 @@ function _buildPackageInfo(
 
   // Find out the currently installed version. Either from the package.json or the node_modules/
   // TODO: figure out a way to read package-lock.json and/or yarn.lock.
-  let installedVersion: string | undefined;
+  let installedVersion: string | undefined | null;
   const packageContent = tree.read(`/node_modules/${name}/package.json`);
   if (packageContent) {
     const content = JSON.parse(packageContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
@@ -539,6 +562,12 @@ function _buildPackageInfo(
     installedVersion = semver.maxSatisfying(
       Object.keys(npmPackageJson.versions),
       packageJsonRange,
+    );
+  }
+
+  if (!installedVersion) {
+    throw new SchematicsException(
+      `An unexpected error happened; could not determine version for package ${name}.`,
     );
   }
 
@@ -712,6 +741,7 @@ function _addPeerDependencies(
   packages: Map<string, VersionRange>,
   allDependencies: ReadonlyMap<string, VersionRange>,
   npmPackageJson: NpmRepositoryPackageJson,
+  npmPackageJsonMap: Map<string, NpmRepositoryPackageJson>,
   logger: logging.LoggerApi,
 ): void {
   const maybePackage = packages.get(npmPackageJson.name);
@@ -732,9 +762,19 @@ function _addPeerDependencies(
   const error = false;
 
   for (const [peer, range] of Object.entries(packageJson.peerDependencies || {})) {
-    if (!packages.has(peer)) {
-      packages.set(peer, range as VersionRange);
+    if (packages.has(peer)) {
+      continue;
     }
+
+    const peerPackageJson = npmPackageJsonMap.get(peer);
+    if (peerPackageJson) {
+      const peerInfo = _buildPackageInfo(tree, packages, allDependencies, peerPackageJson, logger);
+      if (semver.satisfies(peerInfo.installed.version, range)) {
+        continue;
+      }
+    }
+
+    packages.set(peer, range as VersionRange);
   }
 
   if (error) {
@@ -743,7 +783,7 @@ function _addPeerDependencies(
 }
 
 
-function _getAllDependencies(tree: Tree): Map<string, VersionRange> {
+function _getAllDependencies(tree: Tree): Array<readonly [string, VersionRange]> {
   const packageJsonContent = tree.read('/package.json');
   if (!packageJsonContent) {
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
@@ -756,11 +796,11 @@ function _getAllDependencies(tree: Tree): Map<string, VersionRange> {
     throw new SchematicsException('package.json could not be parsed: ' + e.message);
   }
 
-  return new Map<string, VersionRange>([
-    ...Object.entries(packageJson.peerDependencies || {}),
-    ...Object.entries(packageJson.devDependencies || {}),
-    ...Object.entries(packageJson.dependencies || {}),
-  ] as [string, VersionRange][]);
+  return [
+    ...Object.entries(packageJson.peerDependencies || {}) as Array<[string, VersionRange]>,
+    ...Object.entries(packageJson.devDependencies || {}) as Array<[string, VersionRange]>,
+    ...Object.entries(packageJson.dependencies || {}) as Array<[string, VersionRange]>,
+  ];
 }
 
 function _formatVersion(version: string | undefined) {
@@ -781,6 +821,16 @@ function _formatVersion(version: string | undefined) {
   return version;
 }
 
+/**
+ * Returns whether or not the given package specifier (the value string in a
+ * `package.json` dependency) is hosted in the NPM registry.
+ * @throws When the specifier cannot be parsed.
+ */
+function isPkgFromRegistry(name: string, specifier: string): boolean {
+  const result = npa.resolve(name, specifier);
+
+  return !!result.registry;
+}
 
 export default function(options: UpdateSchema): Rule {
   if (!options.packages) {
@@ -802,101 +852,103 @@ export default function(options: UpdateSchema): Rule {
 
   options.from = _formatVersion(options.from);
   options.to = _formatVersion(options.to);
+  const usingYarn = options.packageManager === 'yarn';
 
-  return (tree: Tree, context: SchematicContext) => {
+  return async (tree: Tree, context: SchematicContext) => {
     const logger = context.logger;
-    const allDependencies = _getAllDependencies(tree);
-    const packages = _buildPackageList(options, allDependencies, logger);
-    const usingYarn = options.packageManager === 'yarn';
+    const npmDeps = new Map(_getAllDependencies(tree).filter(([name, specifier]) => {
+      try {
+        return isPkgFromRegistry(name, specifier);
+      } catch {
+        // Abort on failure because package.json is malformed.
+        throw new SchematicsException(
+          `Failed to parse dependency "${name}" with specifier "${specifier}"`
+              + ` from package.json. Is the specifier malformed?`);
+      }
+    }));
+    const packages = _buildPackageList(options, npmDeps, logger);
 
-    return observableFrom([...allDependencies.keys()]).pipe(
-      // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
-      // try to parallelize as many as possible.
-      mergeMap(depName => getNpmPackageJson(
-        depName,
-        logger,
-        { registryUrl: options.registry, usingYarn, verbose: options.verbose },
-      )),
+    // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
+    // try to parallelize as many as possible.
+    const allPackageMetadata = await Promise.all(Array.from(npmDeps.keys()).map(depName => getNpmPackageJson(
+      depName,
+      logger,
+      { registryUrl: options.registry, usingYarn, verbose: options.verbose },
+    )));
 
-      // Build a map of all dependencies and their packageJson.
-      reduce<NpmRepositoryPackageJson, Map<string, NpmRepositoryPackageJson>>(
-        (acc, npmPackageJson) => {
-          // If the package was not found on the registry. It could be private, so we will just
-          // ignore. If the package was part of the list, we will error out, but will simply ignore
-          // if it's either not requested (so just part of package.json. silently) or if it's a
-          // `--all` situation. There is an edge case here where a public package peer depends on a
-          // private one, but it's rare enough.
-          if (!npmPackageJson.name) {
-            if (packages.has(npmPackageJson.requestedName)) {
-              if (options.all) {
-                logger.warn(`Package ${JSON.stringify(npmPackageJson.requestedName)} was not `
-                  + 'found on the registry. Skipping.');
-              } else {
-                throw new SchematicsException(
-                  `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
-                  + 'registry. Cannot continue as this may be an error.');
-              }
+    // Build a map of all dependencies and their packageJson.
+    const npmPackageJsonMap = allPackageMetadata.reduce(
+      (acc, npmPackageJson) => {
+        // If the package was not found on the registry. It could be private, so we will just
+        // ignore. If the package was part of the list, we will error out, but will simply ignore
+        // if it's either not requested (so just part of package.json. silently) or if it's a
+        // `--all` situation. There is an edge case here where a public package peer depends on a
+        // private one, but it's rare enough.
+        if (!npmPackageJson.name) {
+          if (npmPackageJson.requestedName && packages.has(npmPackageJson.requestedName)) {
+            if (options.all) {
+              logger.warn(`Package ${JSON.stringify(npmPackageJson.requestedName)} was not `
+                + 'found on the registry. Skipping.');
+            } else {
+              throw new SchematicsException(
+                `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
+                + 'registry. Cannot continue as this may be an error.');
             }
-          } else {
-            acc.set(npmPackageJson.name, npmPackageJson);
           }
-
-          return acc;
-        },
-        new Map<string, NpmRepositoryPackageJson>(),
-      ),
-
-      map(npmPackageJsonMap => {
-        // Augment the command line package list with packageGroups and forward peer dependencies.
-        // Each added package may uncover new package groups and peer dependencies, so we must
-        // repeat this process until the package list stabilizes.
-        let lastPackagesSize;
-        do {
-          lastPackagesSize = packages.size;
-          npmPackageJsonMap.forEach((npmPackageJson) => {
-            _addPackageGroup(tree, packages, allDependencies, npmPackageJson, logger);
-            _addPeerDependencies(tree, packages, allDependencies, npmPackageJson, logger);
-          });
-        } while (packages.size > lastPackagesSize);
-
-        // Build the PackageInfo for each module.
-        const packageInfoMap = new Map<string, PackageInfo>();
-        npmPackageJsonMap.forEach((npmPackageJson) => {
-          packageInfoMap.set(
-            npmPackageJson.name,
-            _buildPackageInfo(tree, packages, allDependencies, npmPackageJson, logger),
-          );
-        });
-
-        return packageInfoMap;
-      }),
-
-      switchMap(infoMap => {
-        // Now that we have all the information, check the flags.
-        if (packages.size > 0) {
-          if (options.migrateOnly && options.from && options.packages) {
-            return _migrateOnly(
-              infoMap.get(options.packages[0]),
-              context,
-              options.from,
-              options.to,
-            );
-          }
-
-          const sublog = new logging.LevelCapLogger(
-            'validation',
-            logger.createChild(''),
-            'warn',
-          );
-          _validateUpdatePackages(infoMap, !!options.force, sublog);
-
-          return _performUpdate(tree, context, infoMap, logger, !!options.migrateOnly);
         } else {
-          return _usageMessage(options, infoMap, logger);
+          // If a name is present, it is assumed to be fully populated
+          acc.set(npmPackageJson.name, npmPackageJson as NpmRepositoryPackageJson);
         }
-      }),
 
-      switchMap(() => of(tree)),
+        return acc;
+      },
+      new Map<string, NpmRepositoryPackageJson>(),
     );
+
+    // Augment the command line package list with packageGroups and forward peer dependencies.
+    // Each added package may uncover new package groups and peer dependencies, so we must
+    // repeat this process until the package list stabilizes.
+    let lastPackagesSize;
+    do {
+      lastPackagesSize = packages.size;
+      npmPackageJsonMap.forEach((npmPackageJson) => {
+        _addPackageGroup(tree, packages, npmDeps, npmPackageJson, logger);
+        _addPeerDependencies(tree, packages, npmDeps, npmPackageJson, npmPackageJsonMap, logger);
+      });
+    } while (packages.size > lastPackagesSize);
+
+    // Build the PackageInfo for each module.
+    const packageInfoMap = new Map<string, PackageInfo>();
+    npmPackageJsonMap.forEach((npmPackageJson) => {
+      packageInfoMap.set(
+        npmPackageJson.name,
+        _buildPackageInfo(tree, packages, npmDeps, npmPackageJson, logger),
+      );
+    });
+
+    // Now that we have all the information, check the flags.
+    if (packages.size > 0) {
+      if (options.migrateOnly && options.from && options.packages) {
+        _migrateOnly(
+          packageInfoMap.get(options.packages[0]),
+          context,
+          options.from,
+          options.to,
+        );
+
+        return;
+      }
+
+      const sublog = new logging.LevelCapLogger(
+        'validation',
+        logger.createChild(''),
+        'warn',
+      );
+      _validateUpdatePackages(packageInfoMap, !!options.force, !!options.next, sublog);
+
+      _performUpdate(tree, context, packageInfoMap, logger, !!options.migrateOnly, !!options.migrateExternal);
+    } else {
+      _usageMessage(options, packageInfoMap, logger);
+    }
   };
 }

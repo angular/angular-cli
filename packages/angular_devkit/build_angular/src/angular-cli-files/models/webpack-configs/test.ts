@@ -10,58 +10,48 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
-import { getSourceMapDevTool } from './utils';
-
-
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('istanbul-instrumenter-loader')
- *
- */
+import { getSourceMapDevTool, isPolyfillsEntry } from './utils';
 
 export function getTestConfig(
   wco: WebpackConfigOptions<WebpackTestOptions>,
 ): webpack.Configuration {
-  const { root, buildOptions, sourceRoot: include } = wco;
+  const {
+    buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap },
+    root,
+    sourceRoot,
+  } = wco;
 
-  const extraRules: webpack.Rule[] = [];
-  const extraPlugins: webpack.Plugin[] = [];
+  const extraRules: webpack.RuleSetRule[] = [];
+  const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
 
-  // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
-  if (buildOptions.codeCoverage) {
-    const codeCoverageExclude = buildOptions.codeCoverageExclude;
+  if (codeCoverage) {
     const exclude: (string | RegExp)[] = [
-      /\.(e2e|spec)\.ts$/,
+      /\.(e2e|spec)\.tsx?$/,
       /node_modules/,
     ];
 
     if (codeCoverageExclude) {
-      codeCoverageExclude.forEach((excludeGlob: string) => {
-        const excludeFiles = glob
+      for (const excludeGlob of codeCoverageExclude) {
+        glob
           .sync(path.join(root, excludeGlob), { nodir: true })
-          .map(file => path.normalize(file));
-        exclude.push(...excludeFiles);
-      });
+          .forEach((file) => exclude.push(path.normalize(file)));
+      }
     }
 
     extraRules.push({
-      test: /\.(js|ts)$/,
-      loader: 'istanbul-instrumenter-loader',
+      test: /\.(jsx?|tsx?)$/,
+      loader: require.resolve('@jsdevtools/coverage-istanbul-loader'),
       options: { esModules: true },
       enforce: 'post',
       exclude,
-      include,
+      include: sourceRoot,
     });
   }
 
-  if (wco.buildOptions.sourceMap) {
-    const { styles, scripts } = wco.buildOptions.sourceMap;
-
+  if (sourceMap.scripts || sourceMap.styles) {
     extraPlugins.push(getSourceMapDevTool(
-      styles || false,
-      scripts || false,
+      sourceMap.scripts,
+      sourceMap.styles,
       false,
       true,
     ));
@@ -70,14 +60,11 @@ export function getTestConfig(
   return {
     mode: 'development',
     resolve: {
-      mainFields: [
-        ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main',
-      ],
+      mainFields: ['es2015', 'browser', 'module', 'main'],
     },
-    devtool: buildOptions.sourceMap ? false : 'eval',
+    devtool: false,
     entry: {
-      main: path.resolve(root, buildOptions.main),
+      main: path.resolve(root, main),
     },
     module: {
       rules: extraRules,
@@ -85,23 +72,17 @@ export function getTestConfig(
     plugins: extraPlugins,
     optimization: {
       splitChunks: {
-        chunks: ((chunk: { name: string }) => chunk.name !== 'polyfills'),
+        chunks: (chunk) => !isPolyfillsEntry(chunk.name),
         cacheGroups: {
           vendors: false,
-          vendor: {
+          defaultVendors: {
             name: 'vendor',
-            chunks: 'initial',
-            test: (module: { nameForCondition?: () => string }, chunks: { name: string }[]) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills');
-            },
+            chunks: (chunk) => chunk.name === 'main',
+            enforce: true,
+            test: /[\\/]node_modules[\\/]/,
           },
         },
       },
     },
-    // Webpack typings don't yet include the function form for 'chunks',
-    // or the built-in vendors cache group.
-  } as {} as webpack.Configuration;
+  };
 }

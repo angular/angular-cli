@@ -27,7 +27,7 @@
     "projects": {
       "type": "object",
       "patternProperties": {
-        "^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$": {
+        "^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$": {
           "$ref": "#/definitions/project"
         }
       },
@@ -58,13 +58,12 @@
             "versionMismatch": {
               "description": "Show a warning when the global version is newer than the local one.",
               "type": "boolean"
-            },
-            "typescriptMismatch": {
-              "description": "Show a warning when the TypeScript version is incompatible.",
-              "type": "boolean",
-              "x-deprecated": true
             }
           }
+        },
+        "analytics": {
+          "type": ["boolean", "string"],
+          "description": "Share anonymous usage data with the Angular Team at Google."
         }
       },
       "additionalProperties": false
@@ -81,6 +80,12 @@
               "type": "string",
               "default": "Default",
               "alias": "c"
+            },
+            "displayBlock": {
+              "description": "Specifies if the style will contain `:host { display: block; }`.",
+              "type": "boolean",
+              "default": false,
+              "alias": "b"
             },
             "entryComponent": {
               "type": "boolean",
@@ -130,16 +135,6 @@
               "description": "Flag to skip the module import.",
               "default": false
             },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
-            "styleext": {
-              "description": "The file extension to be used for style files.",
-              "type": "string",
-              "default": "css"
-            },
             "style": {
               "description": "The file extension or preprocessor to use for style files.",
               "type": "string",
@@ -157,6 +152,11 @@
               "enum": ["Emulated", "Native", "None", "ShadowDom"],
               "type": "string",
               "alias": "v"
+            },
+            "skipTests": {
+              "type": "boolean",
+              "description": "When true, does not create test files.",
+              "default": false
             }
           }
         },
@@ -194,11 +194,6 @@
               "type": "boolean",
               "description": "Flag to skip the module import.",
               "default": false
-            },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
             },
             "skipTests": {
               "type": "boolean",
@@ -247,11 +242,6 @@
               "default": true,
               "description": "Flag to indicate if a directory is created."
             },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
             "skipTests": {
               "type": "boolean",
               "description": "When true, does not create test files.",
@@ -266,11 +256,6 @@
               "type": "boolean",
               "default": true,
               "description": "Flag to indicate if a directory is created."
-            },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
             },
             "skipTests": {
               "type": "boolean",
@@ -298,11 +283,6 @@
         "@schematics/angular:class": {
           "type": "object",
           "properties": {
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
             "skipTests": {
               "type": "boolean",
               "description": "When true, does not create test files.",
@@ -337,6 +317,9 @@
         "root": {
           "type": "string",
           "description": "Root of the project files."
+        },
+        "i18n": {
+          "$ref": "#/definitions/project/definitions/i18n"
         },
         "sourceRoot": {
           "type": "string",
@@ -394,6 +377,89 @@
         "^[a-z]{1,3}-.*": {}
       },
       "definitions": {
+        "i18n": {
+          "description": "Project i18n options",
+          "type": "object",
+          "properties": {
+            "sourceLocale": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "Specifies the source locale of the application.",
+                  "default": "en-US",
+                  "$comment": "IETF BCP 47 language tag (simplified)",
+                  "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+                },
+                {
+                  "type": "object",
+                  "description": "Localization options to use for the source locale",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Specifies the locale code of the source locale",
+                      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+                    },
+                    "baseHref": {
+                      "type": "string",
+                      "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "locales": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Localization file to use for i18n"
+                    },
+                    {
+                      "type": "array",
+                      "description": "Localization files to use for i18n",
+                      "items": {
+                        "type": "string",
+                        "uniqueItems": true
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "description": "Localization options to use for the locale",
+                      "properties": {
+                        "translation": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "description": "Localization file to use for i18n"
+                            },
+                            {
+                              "type": "array",
+                              "description": "Localization files to use for i18n",
+                              "items": {
+                                "type": "string",
+                                "uniqueItems": true
+                              }
+                            }
+                          ]
+                        },
+                        "baseHref": {
+                          "type": "string",
+                          "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "target": {
           "oneOf": [
             {
@@ -548,7 +614,7 @@
       "type": "null",
       "definitions": {
         "appShell": {
-          "description": "App Shell target options for Build Facade.",
+          "description": "App Shell target options for Architect.",
           "type": "object",
           "properties": {
             "browserTarget": {
@@ -580,7 +646,7 @@
           "additionalProperties": false
         },
         "browser": {
-          "title": "Webpack browser schema for Build Facade.",
+          "title": "Webpack browser schema for Architect.",
           "description": "Browser target options",
           "properties": {
             "assets": {
@@ -714,16 +780,6 @@
                 }
               ]
             },
-            "vendorSourceMap": {
-              "type": "boolean",
-              "description": "Resolve vendor packages sourcemaps.",
-              "default": false
-            },
-            "evalSourceMap": {
-              "type": "boolean",
-              "description": "Output in-file eval sourcemaps.",
-              "default": false
-            },
             "vendorChunk": {
               "type": "boolean",
               "description": "Use a separate bundle containing only vendor libraries.",
@@ -752,21 +808,26 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
+            "localize": {
+              "$ref": "#/definitions/buildersOptions/localize"
+            },
+            "i18nMissingTranslation": {
+              "$ref": "#/definitions/buildersOptions/missingTranslation"
+            },
             "i18nFile": {
               "type": "string",
-              "description": "Localization file to use for i18n."
+              "description": "Localization file to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0."
             },
             "i18nFormat": {
               "type": "string",
-              "description": "Format of the localization file specified with --i18n-file."
+              "description": "Format of the localization file specified with --i18n-file.",
+              "x-deprecated": "Deprecated since 9.0."
             },
             "i18nLocale": {
               "type": "string",
-              "description": "Locale to use for i18n."
-            },
-            "i18nMissingTranslation": {
-              "type": "string",
-              "description": "How to handle missing translations for i18n."
+              "description": "Locale to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0."
             },
             "extractCss": {
               "type": "boolean",
@@ -800,8 +861,7 @@
             },
             "preserveSymlinks": {
               "type": "boolean",
-              "description": "Do not use the real path when resolving modules.",
-              "default": false
+              "description": "Do not use the real path when resolving modules."
             },
             "extractLicenses": {
               "type": "boolean",
@@ -837,14 +897,32 @@
               "type": "string",
               "description": "Path to ngsw-config.json."
             },
-            "skipAppShell": {
-              "type": "boolean",
-              "description": "Flag to prevent building an app shell.",
-              "default": false
-            },
             "index": {
-              "type": "string",
-              "description": "The name of the index HTML file."
+              "description": "Configures the generation of the application's HTML index.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "The path of a file to use for the application's HTML index. The filename of the specified path will be used for the generated file and will be created in the root of the application's configured output path."
+                },
+                {
+                  "type": "object",
+                  "description": "",
+                  "properties": {
+                    "input": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The path of a file to use for the application's generated HTML index."
+                    },
+                    "output": {
+                      "type": "string",
+                      "minLength": 1,
+                      "default": "index.html",
+                      "description": "The output path of the application's generated HTML index file. The full provided path will be used and will be considered relative to the application's configured output path."
+                    }
+                  },
+                  "required": ["input"]
+                }
+              ]
             },
             "statsJson": {
               "type": "boolean",
@@ -872,16 +950,37 @@
               },
               "default": []
             },
-            "es5BrowserSupport": {
-              "description": "Enables conditionally loaded ES2015 polyfills.",
-              "type": "boolean",
-              "default": false
-            },
             "rebaseRootRelativeCssUrls": {
               "description": "Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only for compatibility and transition. The behavior of this option is non-standard and will be removed in the next major release.",
               "type": "boolean",
               "default": false,
               "x-deprecated": true
+            },
+            "webWorkerTsConfig": {
+              "type": "string",
+              "description": "TypeScript configuration for Web Worker modules."
+            },
+            "crossOrigin": {
+              "type": "string",
+              "description": "Define the crossorigin attribute setting of elements that provide CORS support.",
+              "default": "none",
+              "enum": [
+                "none",
+                "anonymous",
+                "use-credentials"
+              ]
+            },
+            "experimentalRollupPass": {
+              "type": "boolean",
+              "description": "Concatenate modules with Rollup before bundling them with Webpack.",
+              "default": false
+            },
+            "allowedCommonJsDependencies": {
+              "description": "A list of CommonJS packages that are allowed to be used without a build time warning.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           "additionalProperties": false,
@@ -977,6 +1076,11 @@
                       "type": "boolean",
                       "description": "If the bundle will be lazy loaded.",
                       "default": false
+                    },
+                    "inject": {
+                      "type": "boolean",
+                      "description": "If the bundle will be referenced in the HTML file.",
+                      "default": true
                     }
                   },
                   "additionalProperties": false,
@@ -1001,6 +1105,7 @@
                     "allScript",
                     "any",
                     "anyScript",
+                    "anyComponentStyle",
                     "bundle",
                     "initial"
                   ]
@@ -1046,7 +1151,7 @@
           }
         },
         "devServer": {
-          "description": "Dev Server target options for Build Facade.",
+          "description": "Dev Server target options for Architect.",
           "type": "object",
           "properties": {
             "browserTarget": {
@@ -1094,6 +1199,14 @@
             "publicHost": {
               "type": "string",
               "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."
+            },
+            "allowedHosts": {
+              "type": "array",
+              "description": "Whitelist of hosts that are allowed to access the dev server.",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
             },
             "servePath": {
               "type": "string",
@@ -1182,15 +1295,6 @@
                 }
               ]
             },
-            "vendorSourceMap": {
-              "type": "boolean",
-              "description": "When true, resolve vendor packages sourcemaps.",
-              "default": false
-            },
-            "evalSourceMap": {
-              "type": "boolean",
-              "description": "When true, output in-file eval sourcemaps."
-            },
             "vendorChunk": {
               "type": "boolean",
               "description": "When true, use a separate bundle containing only vendor libraries."
@@ -1219,14 +1323,14 @@
           "additionalProperties": false
         },
         "extracti18n": {
-          "description": "Extract i18n target options for Build Facade.",
+          "description": "Extract i18n target options for Architect.",
           "type": "object",
           "properties": {
             "browserTarget": {
               "type": "string",
               "description": "Target to extract from."
             },
-            "i18nFormat": {
+            "format": {
               "type": "string",
               "description": "Output format for the generated file.",
               "default": "xlf",
@@ -1239,9 +1343,28 @@
                 "xliff2"
               ]
             },
+            "i18nFormat": {
+              "type": "string",
+              "description": "Output format for the generated file.",
+              "default": "xlf",
+              "x-deprecated": "Use 'format' option instead.",
+              "enum": [
+                "xmb",
+                "xlf",
+                "xlif",
+                "xliff",
+                "xlf2",
+                "xliff2"
+              ]
+            },
             "i18nLocale": {
               "type": "string",
-              "description": "Specifies the source language of the application."
+              "description": "Specifies the source language of the application.",
+              "x-deprecated": "Use 'i18n' project level sub-option 'sourceLocale' instead."
+            },
+            "ivy": {
+              "type": "boolean",
+              "description": "Use Ivy compiler to extract translations."
             },
             "progress": {
               "type": "boolean",
@@ -1260,7 +1383,7 @@
           "additionalProperties": false
         },
         "karma": {
-          "description": "Karma target options for Build Facade.",
+          "description": "Karma target options for Architect.",
           "type": "object",
           "properties": {
             "main": {
@@ -1368,8 +1491,7 @@
             },
             "preserveSymlinks": {
               "type": "boolean",
-              "description": "Do not use the real path when resolving modules.",
-              "default": false
+              "description": "Do not use the real path when resolving modules."
             },
             "browsers": {
               "type": "string",
@@ -1435,6 +1557,10 @@
               "items": {
                 "type": "string"
               }
+            },
+            "webWorkerTsConfig": {
+              "type": "string",
+              "description": "TypeScript configuration for Web Worker modules."
             }
           },
           "additionalProperties": false,
@@ -1494,6 +1620,11 @@
                       "type": "boolean",
                       "description": "If the bundle will be lazy loaded.",
                       "default": false
+                    },
+                    "inject": {
+                      "type": "boolean",
+                      "description": "If the bundle will be referenced in the HTML file.",
+                      "default": true
                     }
                   },
                   "additionalProperties": false,
@@ -1510,7 +1641,7 @@
           }
         },
         "protractor": {
-          "description": "Protractor target options for Build Facade.",
+          "description": "Protractor target options for Architect.",
           "type": "object",
           "properties": {
             "protractorConfig": {
@@ -1520,6 +1651,15 @@
             "devServerTarget": {
               "type": "string",
               "description": "Dev server target to run tests against."
+            },
+            "grep": {
+              "type": "string",
+              "description": "Execute specs whose names match the pattern, which is internally compiled to a RegExp."
+            },
+            "invertGrep": {
+              "type": "boolean",
+              "description": "Invert the selection specified by the 'grep' option.",
+              "default": false
             },
             "specs": {
               "type": "array",
@@ -1533,11 +1673,6 @@
             "suite": {
               "type": "string",
               "description": "Override suite in the protractor config."
-            },
-            "elementExplorer": {
-              "type": "boolean",
-              "description": "Start Protractor's Element Explorer for debugging.",
-              "default": false
             },
             "webdriverUpdate": {
               "type": "boolean",
@@ -1667,26 +1802,6 @@
                 }
               ]
             },
-            "vendorSourceMap": {
-              "type": "boolean",
-              "description": "Resolve vendor packages sourcemaps.",
-              "default": false
-            },
-            "evalSourceMap": {
-              "type": "boolean",
-              "description": "Output in-file eval sourcemaps.",
-              "default": false
-            },
-            "vendorChunk": {
-              "type": "boolean",
-              "description": "Use a separate bundle containing only vendor libraries.",
-              "default": true
-            },
-            "commonChunk": {
-              "type": "boolean",
-              "description": "Use a separate bundle containing code used across multiple bundles.",
-              "default": true
-            },
             "verbose": {
               "type": "boolean",
               "description": "Adds more details to output logging.",
@@ -1697,21 +1812,26 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
+            "localize": {
+              "$ref": "#/definitions/buildersOptions/localize"
+            },
             "i18nFile": {
               "type": "string",
-              "description": "Localization file to use for i18n."
+              "description": "Localization file to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nFormat": {
               "type": "string",
-              "description": "Format of the localization file specified with --i18n-file."
+              "description": "Format of the localization file specified with --i18n-file.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nLocale": {
               "type": "string",
-              "description": "Locale to use for i18n."
+              "description": "Locale to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nMissingTranslation": {
-              "type": "string",
-              "description": "How to handle missing translations for i18n."
+              "$ref": "#/definitions/buildersOptions/missingTranslation"
             },
             "outputHashing": {
               "type": "string",
@@ -1731,8 +1851,7 @@
             },
             "preserveSymlinks": {
               "type": "boolean",
-              "description": "Do not use the real path when resolving modules.",
-              "default": false
+              "description": "Do not use the real path when resolving modules."
             },
             "extractLicenses": {
               "type": "boolean",
@@ -1750,13 +1869,28 @@
               "default": true
             },
             "bundleDependencies": {
-              "type": "string",
-              "description": "Available on server platform only. Which external dependencies to bundle into the module. By default, all of node_modules will be kept as requires.",
-              "default": "none",
-              "enum": [
-                "none",
-                "all"
+              "description": "Available on server platform only. Which external dependencies to bundle into the module. By default, all of node_modules will be bundled.",
+              "default": true,
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "all"
+                  ]
+                }
               ]
+            },
+            "externalDependencies": {
+              "description": "Exclude the listed external dependencies from being bundled into the bundle. Instead, the created bundle relies on these dependencies to be available during runtime.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": []
             },
             "statsJson": {
               "type": "boolean",
@@ -1818,7 +1952,7 @@
           }
         },
         "tslint": {
-          "description": "TSlint target options for Build Facade.",
+          "description": "TSlint target options for Architect.",
           "type": "object",
           "properties": {
             "tslintConfig": {
@@ -1860,7 +1994,7 @@
             "format": {
               "type": "string",
               "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist, codeFrame).",
-              "default": "prose",
+              "default": "stylish",
               "anyOf": [
                 {
                   "enum": [
@@ -1900,6 +2034,31 @@
           },
           "additionalProperties": false
         }
+      }
+    },
+    "buildersOptions": {
+      "missingTranslation": {
+        "type": "string",
+        "description": "How to handle missing translations for i18n.",
+        "enum": ["warning", "error", "ignore"],
+        "default": "warning"
+      },
+      "localize": {
+        "oneOf": [
+          {
+            "type": "boolean",
+            "description": "Translate all locales."
+          },
+          {
+            "type": "array",
+            "description": "List of locales ID's to translate.",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+            }
+          }
+        ]
       }
     }
   }

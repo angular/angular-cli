@@ -26,8 +26,8 @@ export interface ModuleOptions {
   routingModuleExt?: string;
 }
 
-const MODULE_EXT = '.module.ts';
-const ROUTING_MODULE_EXT = '-routing.module.ts';
+export const MODULE_EXT = '.module.ts';
+export const ROUTING_MODULE_EXT = '-routing.module.ts';
 
 /**
  * Find the module referred by a set of options passed to the schematics.
@@ -100,8 +100,9 @@ export function findModule(host: Tree, generateDir: string,
     if (filteredMatches.length == 1) {
       return join(dir.path, filteredMatches[0]);
     } else if (filteredMatches.length > 1) {
-      throw new Error('More than one module matches. Use skip-import option to skip importing '
-        + 'the component into the closest module.');
+      throw new Error(
+          'More than one module matches. Use the skip-import option to skip importing ' +
+          'the component into the closest module or use the module option to specify a module.');
     }
 
     dir = dir.parent;
@@ -130,7 +131,8 @@ export function buildRelativePath(from: string, to: string): string {
   fromParts.pop();
   const toFileName = toParts.pop();
 
-  const relativePath = relative(normalize(fromParts.join('/')), normalize(toParts.join('/')));
+  const relativePath = relative(normalize(fromParts.join('/') || '/'),
+   normalize(toParts.join('/') || '/'));
   let pathPrefix = '';
 
   // Set the path prefix for same dir or child dir, parent dir starts with `..`

@@ -6,18 +6,60 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// TODO: remove this commented AJV require.
-// We don't actually require AJV, but there is a bug with NPM and peer dependencies that is
-// whose workaround is to depend on AJV.
-// See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
-// We need to add a require here to satisfy the dependency checker.
-// require('ajv');
+export * from './transforms';
 
-export * from './app-shell';
-export * from './browser';
-export * from './dev-server';
-export * from './extract-i18n';
-export * from './karma';
-export * from './protractor';
-export * from './server';
-export * from './tslint';
+export {
+  AssetPattern,
+  AssetPatternClass as AssetPatternObject,
+  Budget,
+  CrossOrigin,
+  ExtraEntryPoint,
+  ExtraEntryPointClass as ExtraEntryPointObject,
+  FileReplacement,
+  OptimizationClass as OptimizationObject,
+  OptimizationUnion,
+  OutputHashing,
+  Schema as BrowserBuilderOptions,
+  SourceMapClass as SourceMapObject,
+  SourceMapUnion,
+  StylePreprocessorOptions,
+  Type,
+} from './browser/schema';
+
+export {
+  buildWebpackBrowser as executeBrowserBuilder,
+  BrowserBuilderOutput,
+} from './browser';
+
+export {
+  serveWebpackBrowser as executeDevServerBuilder,
+  DevServerBuilderOptions,
+  DevServerBuilderOutput,
+} from './dev-server';
+
+export {
+  execute as executeExtractI18nBuilder,
+  ExtractI18nBuilderOptions,
+} from './extract-i18n';
+
+export {
+  execute as executeKarmaBuilder,
+  KarmaBuilderOptions,
+  KarmaConfigOptions,
+} from './karma';
+
+export {
+  execute as executeProtractorBuilder,
+  ProtractorBuilderOptions,
+} from './protractor';
+
+export {
+  execute as executeServerBuilder,
+  ServerBuilderOptions,
+  ServerBuilderOutput,
+} from './server';
+
+export {
+  execute as executeNgPackagrBuilder,
+  NgPackagrBuilderOptions,
+} from './ng-packagr';

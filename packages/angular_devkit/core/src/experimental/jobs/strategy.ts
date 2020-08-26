@@ -11,12 +11,13 @@ import { JsonValue } from '../../json';
 import {
   JobDescription,
   JobHandler,
-  JobHandlerContext, JobInboundMessage,
+  JobHandlerContext,
+  JobInboundMessage,
   JobOutboundMessage,
   JobOutboundMessageKind,
 } from './api';
 
-const stableStringify = require('fast-json-stable-stringify');
+import stableStringify = require('fast-json-stable-stringify');
 
 export namespace strategy {
 
@@ -70,7 +71,6 @@ export namespace strategy {
     O extends JsonValue = JsonValue,
   >(replayMessages = false): JobStrategy<A, I, O> {
     let inboundBus = new Subject<JobInboundMessage<I>>();
-    let runContext: JobHandlerContext | null = null;
     let run: Observable<JobOutboundMessage<O>> | null = null;
     let state: JobOutboundMessage<O> | null = null;
 
@@ -107,7 +107,6 @@ export namespace strategy {
           ),
           replayMessages ? shareReplay() : share(),
         );
-        runContext = context;
 
         return run;
       };

@@ -8,15 +8,15 @@ const collectionPath = path.join(__dirname, '../collection.json');
 
 
 describe('my-full-schematic', () => {
-  it('requires required option', () => {
+  it('requires required option', async () => {
     // We test that
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    expect(() => runner.runSchematic('my-full-schematic', {}, Tree.empty())).toThrow();
+    await expectAsync(runner.runSchematicAsync('my-full-schematic', {}, Tree.empty()).toPromise()).toBeRejected();
   });
 
-  it('works', () => {
+  it('works', async () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    const tree = runner.runSchematic('my-full-schematic', { name: 'str' }, Tree.empty());
+    const tree = await runner.runSchematicAsync('my-full-schematic', { name: 'str' }, Tree.empty()).toPromise();
 
     // Listing files
     expect(tree.files.sort()).toEqual(['/allo', '/hola', '/test1', '/test2']);

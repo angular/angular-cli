@@ -5,22 +5,117 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Budget } from '../../browser/schema';
+import * as webpack from 'webpack';
+import { ProcessBundleFile, ProcessBundleResult } from '../../../src/utils/process-bundle';
+import { Budget, Type } from '../../browser/schema';
+import { formatSize } from '../utilities/stats';
 
-export interface Compilation {
-  assets: { [name: string]: { size: () => number } };
-  chunks: { name: string, files: string[], isOnlyInitial: () => boolean }[];
-  warnings: string[];
-  errors: string[];
-}
-
-export interface Size {
+interface Size {
   size: number;
   label?: string;
 }
 
-export function calculateSizes(budget: Budget, compilation: Compilation): Size[] {
-  const calculatorMap = {
+interface Threshold {
+  limit: number;
+  type: ThresholdType;
+  severity: ThresholdSeverity;
+}
+
+enum ThresholdType {
+  Max = 'maximum',
+  Min = 'minimum',
+}
+
+export enum ThresholdSeverity {
+  Warning = 'warning',
+  Error = 'error',
+}
+
+enum DifferentialBuildType {
+  // FIXME: this should match the actual file suffix and not hardcoded.
+  ORIGINAL = 'es2015',
+  DOWNLEVEL = 'es5',
+}
+
+export function* calculateThresholds(budget: Budget): IterableIterator<Threshold> {
+  if (budget.maximumWarning) {
+    yield {
+      limit: calculateBytes(budget.maximumWarning, budget.baseline, 1),
+      type: ThresholdType.Max,
+      severity: ThresholdSeverity.Warning,
+    };
+  }
+
+  if (budget.maximumError) {
+    yield {
+      limit: calculateBytes(budget.maximumError, budget.baseline, 1),
+      type: ThresholdType.Max,
+      severity: ThresholdSeverity.Error,
+    };
+  }
+
+  if (budget.minimumWarning) {
+    yield {
+      limit: calculateBytes(budget.minimumWarning, budget.baseline, -1),
+      type: ThresholdType.Min,
+      severity: ThresholdSeverity.Warning,
+    };
+  }
+
+  if (budget.minimumError) {
+    yield {
+      limit: calculateBytes(budget.minimumError, budget.baseline, -1),
+      type: ThresholdType.Min,
+      severity: ThresholdSeverity.Error,
+    };
+  }
+
+  if (budget.warning) {
+    yield {
+      limit: calculateBytes(budget.warning, budget.baseline, -1),
+      type: ThresholdType.Min,
+      severity: ThresholdSeverity.Warning,
+    };
+
+    yield {
+      limit: calculateBytes(budget.warning, budget.baseline, 1),
+      type: ThresholdType.Max,
+      severity: ThresholdSeverity.Warning,
+    };
+  }
+
+  if (budget.error) {
+    yield {
+      limit: calculateBytes(budget.error, budget.baseline, -1),
+      type: ThresholdType.Min,
+      severity: ThresholdSeverity.Error,
+    };
+
+    yield {
+      limit: calculateBytes(budget.error, budget.baseline, 1),
+      type: ThresholdType.Max,
+      severity: ThresholdSeverity.Error,
+    };
+  }
+}
+
+/**
+ * Calculates the sizes for bundles in the budget type provided.
+ */
+function calculateSizes(
+  budget: Budget,
+  stats: webpack.Stats.ToJsonOutput,
+  processResults: ProcessBundleResult[],
+): Size[] {
+  if (budget.type === Type.AnyComponentStyle) {
+    // Component style size information is not available post-build, this must
+    // be checked mid-build via the `AnyComponentStyleBudgetChecker` plugin.
+    throw new Error('Can not calculate size of AnyComponentStyle. Use `AnyComponentStyleBudgetChecker` instead.');
+  }
+
+  type NonComponentStyleBudgetTypes = Exclude<Budget['type'], Type.AnyComponentStyle>;
+  type CalculatorTypes = { new(budget: Budget, chunks: Chunk[], assets: Asset[], processResults: ProcessBundleResult[]): Calculator };
+  const calculatorMap: Record<NonComponentStyleBudgetTypes, CalculatorTypes> = {
     all: AllCalculator,
     allScript: AllScriptCalculator,
     any: AnyCalculator,
@@ -28,16 +123,64 @@ export function calculateSizes(budget: Budget, compilation: Compilation): Size[]
     bundle: BundleCalculator,
     initial: InitialCalculator,
   };
+
   const ctor = calculatorMap[budget.type];
-  const calculator = new ctor(budget, compilation);
+  const {chunks, assets} = stats;
+  if (!chunks) {
+    throw new Error('Webpack stats output did not include chunk information.');
+  }
+  if (!assets) {
+    throw new Error('Webpack stats output did not include asset information.');
+  }
+
+  const calculator = new ctor(budget, chunks, assets, processResults);
 
   return calculator.calculate();
 }
 
-export abstract class Calculator {
-  constructor (protected budget: Budget, protected compilation: Compilation) {}
+type ArrayElement<T> = T extends Array<infer U> ? U : never;
+type Chunk = ArrayElement<Exclude<webpack.Stats.ToJsonOutput['chunks'], undefined>>;
+type Asset = ArrayElement<Exclude<webpack.Stats.ToJsonOutput['assets'], undefined>>;
+abstract class Calculator {
+  constructor (
+    protected budget: Budget,
+    protected chunks: Chunk[],
+    protected assets: Asset[],
+    protected processResults: ProcessBundleResult[],
+  ) {}
 
   abstract calculate(): Size[];
+
+  /** Calculates the size of the given chunk for the provided build type. */
+  protected calculateChunkSize(
+    chunk: Chunk,
+    buildType: DifferentialBuildType,
+  ): number {
+    // Look for a process result containing different builds for this chunk.
+    const processResult = this.processResults
+        .find((processResult) => processResult.name === chunk.id.toString());
+
+    if (processResult) {
+      // Found a differential build, use the correct size information.
+      const processResultFile = getDifferentialBuildResult(
+        processResult, buildType);
+
+      return processResultFile && processResultFile.size || 0;
+    } else {
+      // No differential builds, get the chunk size by summing its assets.
+      return chunk.files
+          .filter(file => !file.endsWith('.map'))
+          .map(file => {
+            const asset = this.assets.find((asset) => asset.name === file);
+            if (!asset) {
+              throw new Error(`Could not find asset for file: ${file}`);
+            }
+
+            return asset.size;
+          })
+          .reduce((l, r) => l + r, 0);
+    }
+  }
 }
 
 /**
@@ -45,29 +188,54 @@ export abstract class Calculator {
  */
 class BundleCalculator extends Calculator {
   calculate() {
-    const size: number = this.compilation.chunks
-      .filter(chunk => chunk.name === this.budget.name)
-      .reduce((files, chunk) => [...files, ...chunk.files], [])
-      .map((file: string) => this.compilation.assets[file].size())
-      .reduce((total: number, size: number) => total + size, 0);
+    const budgetName = this.budget.name;
+    if (!budgetName) {
+      return [];
+    }
 
-    return [{size, label: this.budget.name}];
+    // The chunk may or may not have differential builds. Compute the size for
+    // each then check afterwards if they are all the same.
+    const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
+      const size = this.chunks
+          .filter(chunk => chunk.names.indexOf(budgetName) !== -1)
+          .map(chunk => this.calculateChunkSize(chunk, buildType))
+          .reduce((l, r) => l + r, 0);
+
+      return {size, label: `bundle ${this.budget.name}-${buildType}`};
+    });
+
+    // If this bundle was not actually generated by a differential build, then
+    // merge the results into a single value.
+    if (allEquivalent(buildSizes.map((buildSize) => buildSize.size))) {
+      return mergeDifferentialBuildSizes(buildSizes, budgetName);
+    } else {
+      return buildSizes;
+    }
   }
 }
 
 /**
- * The sum of all initial chunks (marked as initial by webpack).
+ * The sum of all initial chunks (marked as initial).
  */
 class InitialCalculator extends Calculator {
   calculate() {
-    const initialChunks = this.compilation.chunks.filter(chunk => chunk.isOnlyInitial());
-    const size: number = initialChunks
-      .reduce((files, chunk) => [...files, ...chunk.files], [])
-      .filter((file: string) => !file.endsWith('.map'))
-      .map((file: string) => this.compilation.assets[file].size())
-      .reduce((total: number, size: number) => total + size, 0);
+    const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
+      return {
+        label: `bundle initial-${buildType}`,
+        size: this.chunks
+            .filter(chunk => chunk.initial)
+            .map(chunk => this.calculateChunkSize(chunk, buildType))
+            .reduce((l, r) => l + r, 0),
+      };
+    });
 
-    return [{size, label: 'initial'}];
+    // If this bundle was not actually generated by a differential build, then
+    // merge the results into a single value.
+    if (allEquivalent(buildSizes.map((buildSize) => buildSize.size))) {
+      return mergeDifferentialBuildSizes(buildSizes, 'initial');
+    } else {
+      return buildSizes;
+    }
   }
 }
 
@@ -76,10 +244,9 @@ class InitialCalculator extends Calculator {
  */
 class AllScriptCalculator extends Calculator {
   calculate() {
-    const size: number = Object.keys(this.compilation.assets)
-      .filter(key => key.endsWith('.js'))
-      .map(key => this.compilation.assets[key])
-      .map(asset => asset.size())
+    const size = this.assets
+      .filter(asset => asset.name.endsWith('.js'))
+      .map(asset => asset.size)
       .reduce((total: number, size: number) => total + size, 0);
 
     return [{size, label: 'total scripts'}];
@@ -91,9 +258,9 @@ class AllScriptCalculator extends Calculator {
  */
 class AllCalculator extends Calculator {
   calculate() {
-    const size: number = Object.keys(this.compilation.assets)
-      .filter(key => !key.endsWith('.map'))
-      .map(key => this.compilation.assets[key].size())
+    const size = this.assets
+      .filter(asset => !asset.name.endsWith('.map'))
+      .map(asset => asset.size)
       .reduce((total: number, size: number) => total + size, 0);
 
     return [{size, label: 'total'}];
@@ -105,16 +272,12 @@ class AllCalculator extends Calculator {
  */
 class AnyScriptCalculator extends Calculator {
   calculate() {
-    return Object.keys(this.compilation.assets)
-      .filter(key => key.endsWith('.js'))
-      .map(key => {
-        const asset = this.compilation.assets[key];
-
-        return {
-          size: asset.size(),
-          label: key,
-        };
-      });
+    return this.assets
+      .filter(asset => asset.name.endsWith('.js'))
+      .map(asset => ({
+        size: asset.size,
+        label: asset.name,
+      }));
   }
 }
 
@@ -123,23 +286,19 @@ class AnyScriptCalculator extends Calculator {
  */
 class AnyCalculator extends Calculator {
   calculate() {
-    return Object.keys(this.compilation.assets)
-      .filter(key => !key.endsWith('.map'))
-      .map(key => {
-        const asset = this.compilation.assets[key];
-
-        return {
-          size: asset.size(),
-          label: key,
-        };
-      });
+    return this.assets
+      .filter(asset => !asset.name.endsWith('.map'))
+      .map(asset => ({
+        size: asset.size,
+        label: asset.name,
+      }));
   }
 }
 
 /**
  * Calculate the bytes given a string value.
  */
-export function calculateBytes(
+function calculateBytes(
   input: string,
   baseline?: string,
   factor: 1 | -1 = 1,
@@ -172,4 +331,91 @@ export function calculateBytes(
   }
 
   return baselineBytes + value * factor;
+}
+
+export function* checkBudgets(
+  budgets: Budget[],
+  webpackStats: webpack.Stats.ToJsonOutput,
+  processResults: ProcessBundleResult[],
+): IterableIterator<{ severity: ThresholdSeverity, message: string }> {
+  // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker`.
+  const computableBudgets = budgets.filter((budget) => budget.type !== Type.AnyComponentStyle);
+
+  for (const budget of computableBudgets) {
+    const sizes = calculateSizes(budget, webpackStats, processResults);
+    for (const { size, label } of sizes) {
+      yield* checkThresholds(calculateThresholds(budget), size, label);
+    }
+  }
+}
+
+export function* checkThresholds(thresholds: IterableIterator<Threshold>, size: number, label?: string):
+    IterableIterator<{ severity: ThresholdSeverity, message: string }> {
+  for (const threshold of thresholds) {
+    switch (threshold.type) {
+      case ThresholdType.Max: {
+        if (size <= threshold.limit) {
+          continue;
+        }
+
+        const sizeDifference = formatSize(size - threshold.limit);
+        yield {
+          severity: threshold.severity,
+          message: `${label} exceeded maximum budget. Budget ${
+            formatSize(threshold.limit)} was not met by ${
+            sizeDifference} with a total of ${formatSize(size)}.`,
+        };
+        break;
+      }
+      case ThresholdType.Min: {
+        if (size >= threshold.limit) {
+          continue;
+        }
+
+        const sizeDifference = formatSize(threshold.limit - size);
+        yield {
+          severity: threshold.severity,
+          message: `${label} failed to meet minimum budget. Budget ${
+            formatSize(threshold.limit)} was not met by ${
+            sizeDifference} with a total of ${formatSize(size)}.`,
+        };
+        break;
+      } default: {
+        throw new Error(`Unexpected threshold type: ${ThresholdType[threshold.type]}`);
+      }
+    }
+  }
+}
+
+/** Returns the {@link ProcessBundleFile} for the given {@link DifferentialBuildType}. */
+function getDifferentialBuildResult(
+    processResult: ProcessBundleResult, buildType: DifferentialBuildType):
+    ProcessBundleFile|null {
+  switch (buildType) {
+    case DifferentialBuildType.ORIGINAL: return processResult.original || null;
+    case DifferentialBuildType.DOWNLEVEL: return processResult.downlevel || null;
+  }
+}
+
+/**
+ * Merges the given differential builds into a single, non-differential value.
+ *
+ * Preconditions: All the sizes should be equivalent, or else they represent
+ * differential builds.
+ */
+function mergeDifferentialBuildSizes(buildSizes: Size[], mergeLabel: string): Size[] {
+  if (buildSizes.length === 0) {
+    return [];
+  }
+
+  // Only one size.
+  return [{
+    label: mergeLabel,
+    size: buildSizes[0].size,
+  }];
+}
+
+/** Returns whether or not all items in the list are equivalent to each other. */
+function allEquivalent<T>(items: Iterable<T>): boolean {
+  return new Set(items).size < 2;
 }

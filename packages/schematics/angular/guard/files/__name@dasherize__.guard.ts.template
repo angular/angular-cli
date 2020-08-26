@@ -7,13 +7,20 @@ import { Observable } from 'rxjs';
 })
 export class <%= classify(name) %>Guard implements <%= implementations %> {
   <% if (implements.includes('CanActivate')) { %>canActivate(
-    next: ActivatedRouteSnapshot,
+    route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return true;
   }
   <% } %><% if (implements.includes('CanActivateChild')) { %>canActivateChild(
-    next: ActivatedRouteSnapshot,
+    childRoute: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanDeactivate')) { %>canDeactivate(
+    component: unknown,
+    currentRoute: ActivatedRouteSnapshot,
+    currentState: RouterStateSnapshot,
+    nextState?: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return true;
   }
   <% } %><% if (implements.includes('CanLoad')) { %>canLoad(

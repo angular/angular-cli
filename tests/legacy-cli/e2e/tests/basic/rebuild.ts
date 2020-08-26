@@ -11,12 +11,6 @@ import {request} from '../../utils/http';
 const validBundleRegEx = /: Compiled successfully./;
 
 export default function() {
-  if (process.platform.startsWith('win')) {
-    return Promise.resolve();
-  }
-
-  const lazyChunkRegExp = /lazy-module\.js/g;
-
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
@@ -24,7 +18,7 @@ export default function() {
     // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
     // the file, otherwise rebuilds can be too fast and fail CI.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
       writeFile('src/app/app.module.ts', `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
@@ -43,7 +37,7 @@ export default function() {
             FormsModule,
             HttpClientModule,
             RouterModule.forRoot([
-              { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
+              { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) }
             ])
           ],
           providers: [],
@@ -55,13 +49,13 @@ export default function() {
     // Count the bundles.
     .then((results) => {
       const stdout = results[0].stdout;
-      if (!lazyChunkRegExp.test(stdout)) {
+      if (!/(lazy-module|0)\.js/g.test(stdout)) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })
     // Change multiple files and check that all of them are invalidated and recompiled.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
       writeMultipleFiles({
         'src/app/app.module.ts': `
           import { BrowserModule } from '@angular/platform-browser';
@@ -103,6 +97,34 @@ export default function() {
         `
       })
     ]))
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
+      writeMultipleFiles({
+        'src/app/app.module.ts': `
+
+          import { BrowserModule } from '@angular/platform-browser';
+          import { NgModule } from '@angular/core';
+
+          import { AppComponent } from './app.component';
+
+          @NgModule({
+            declarations: [
+              AppComponent
+            ],
+            imports: [
+              BrowserModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+          })
+          export class AppModule { }
+
+          console.log('$$_E2E_GOLDEN_VALUE_1');
+          export let X = '$$_E2E_GOLDEN_VALUE_2';
+          console.log('File changed with no import/export changes');
+        `,
+      }),
+    ]))
     .then(() => wait(2000))
     .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
@@ -116,7 +138,7 @@ export default function() {
         throw new Error('Expected golden value 3.');
       }
     })
-    .then(() => killAllProcesses(), (err: any) => {
+    .then(() => killAllProcesses(), (err: unknown) => {
       killAllProcesses();
       throw err;
     });

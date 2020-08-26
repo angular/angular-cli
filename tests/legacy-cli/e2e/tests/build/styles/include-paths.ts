@@ -8,9 +8,6 @@ import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
-  // TODO(architect): The compat layer doesn't yet process `includePaths`.
-  return;
-
   return Promise.resolve()
     .then(() => createDir('src/style-paths'))
     .then(() => writeMultipleFiles({

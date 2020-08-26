@@ -8,9 +8,10 @@
 // tslint:disable:no-big-function
 
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { HostTree } from '@angular-devkit/schematics';
+import { HostTree, SchematicsException } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { map } from 'rxjs/operators';
+import { EMPTY } from 'rxjs'; // tslint:disable-line: no-implicit-dependencies
+import { catchError, map } from 'rxjs/operators'; // tslint:disable-line: no-implicit-dependencies
 import * as semver from 'semver';
 import { angularMajorCompatGuarantee } from './index';
 
@@ -74,6 +75,45 @@ describe('@schematics/update', () => {
       }),
     ).toPromise().then(done, done.fail);
   }, 45000);
+
+  it('ignores dependencies not hosted on the NPM registry', done => {
+    const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
+      '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "@angular-devkit-tests/update-base": "file:update-base-1.0.0.tgz"
+        }
+      }`,
+    })));
+
+    schematicRunner.runSchematicAsync('update', { all: true }, tree).pipe(
+      map(t => {
+        const packageJson = JSON.parse(t.readContent('/package.json'));
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-base'])
+            .toBe('file:update-base-1.0.0.tgz');
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 45000);
+
+  it('emits SchematicsException when given an invalid dependency', done => {
+    const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
+      '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "//": "'abc://' is not a valid protocol for NPM.",
+          "@angular-devkit-tests/update-base": "abc://foo.tgz"
+        }
+      }`,
+    })));
+
+    schematicRunner.runSchematicAsync('update', { all: true }, tree).pipe(
+      catchError(err => {
+        expect(err instanceof SchematicsException).toBe(true);
+
+        return EMPTY;
+      }),
+    ).toPromise().then(done, done.fail);
+  });
 
   it('respects existing tilde and caret ranges', done => {
     // Add ranges.
@@ -359,6 +399,39 @@ describe('@schematics/update', () => {
             }),
           },
         ]);
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 45000);
+
+  it('validates peer dependencies', done => {
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    const dependencies = packageJson['dependencies'];
+    // TODO: when we start using a local npm registry for test packages, add a package that includes
+    // a optional peer dependency and a non-optional one for this test. Use it instead of
+    // @angular-devkit/build-angular, whose optional peerdep is @angular/localize and non-optional
+    // are typescript and @angular/compiler-cli.
+    dependencies['@angular-devkit/build-angular'] = '0.900.0-next.1';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    const messages: string[] = [];
+    schematicRunner.logger.subscribe(x => messages.push(x.message));
+    const hasPeerdepMsg = (dep: string) =>
+      messages.some(str => str.includes(`missing peer dependency of "${dep}"`));
+
+    schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit/build-angular'],
+      next: true,
+    }, appTree).pipe(
+      map(() => {
+        expect(hasPeerdepMsg('@angular/compiler-cli'))
+          .toBeTruthy(`Should show @angular/compiler-cli message.`);
+        expect(hasPeerdepMsg('typescript')).toBeTruthy(`Should show typescript message.`);
+        expect(hasPeerdepMsg('@angular/localize'))
+          .toBeFalsy(`Should not show @angular/localize message.`);
       }),
     ).toPromise().then(done, done.fail);
   }, 45000);

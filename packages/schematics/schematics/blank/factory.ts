@@ -102,7 +102,9 @@ export default function (options: Schema): Rule {
     try {
       const packageJsonContent = tree.read('/package.json');
       if (packageJsonContent) {
-        const packageJson = JSON.parse(packageJsonContent.toString('utf-8'));
+        // In google3 the return value of JSON.parse() must be immediately typed,
+        // otherwise it defaults to `any`, which is prohibited.
+        const packageJson = JSON.parse(packageJsonContent.toString('utf-8')) as never;
         if ('schematics' in packageJson) {
           const p = normalize(packageJson['schematics']);
           if (tree.exists(p)) {

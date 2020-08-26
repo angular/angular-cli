@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-export * from './request';
+export * from './testing-architect-host';
 export * from './test-project-host';
 export * from './test-logger';
-export * from './run-target-spec';

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
-import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceBootstrap } from './replace_bootstrap';
+import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('replace_bootstrap', () => {
@@ -26,7 +26,6 @@ describe('@ngtools/webpack transformers', () => {
         platformBrowserDynamic().bootstrapModule(AppModule);
       `;
 
-      // tslint:disable:max-line-length
       const output = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { environment } from './environments/environment';
@@ -39,7 +38,6 @@ describe('@ngtools/webpack transformers', () => {
         }
         __NgCli_bootstrap_2.platformBrowser().bootstrapModuleFactory(__NgCli_bootstrap_1.AppModuleNgFactory);
       `;
-      // tslint:enable:max-line-length
 
       const { program, compilerHost } = createTypescriptContext(input);
       const transformer = replaceBootstrap(
@@ -52,7 +50,7 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should replace bootstrap for Ivy without referencing ngFactory', () => {
+    it('should replace bootstrap without referencing ngFactory when useFactories is false', () => {
       const input = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -87,7 +85,7 @@ describe('@ngtools/webpack transformers', () => {
         () => true,
         () => ({ path: '/project/src/app/app.module', className: 'AppModule' }),
         () => program.getTypeChecker(),
-        true,
+        false,
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 

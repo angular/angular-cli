@@ -5,7 +5,7 @@ All prompts can safely be allowed to default.
 
 * The new workspace folder is given the specified project name, and contains configuration files at the top level.
 
-* By default, the files for a new initial app (with the same name as the workspace) are placed in the `src/` subfolder. A corresponding end-to-end test app is placed in the `e2e/` subfolder.
+* By default, the files for a new initial app (with the same name as the workspace) are placed in the `src/` subfolder. Corresponding end-to-end tests are placed in the `e2e/` subfolder.
 
 * The new app's configuration appears in the `projects` section of the `angular.json` workspace configuration file, under its project name.
 

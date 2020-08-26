@@ -1,163 +1,100 @@
 import { normalize } from 'path';
-
-import { updateJsonFile, updateTsConfig } from '../../utils/project';
-import {
-  expectFileToMatch,
-  writeFile,
-  replaceInFile,
-  prependToFile,
-  appendToFile,
-} from '../../utils/fs';
-import { ng, silentNpm, exec } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';
-import { readNgVersion } from '../../utils/version';
-import { expectToFail } from '../../utils/utils';
+import { appendToFile, expectFileToMatch, writeFile } from '../../utils/fs';
+import { exec, ng, silentNpm } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 
-export default function () {
-  let platformServerVersion = readNgVersion();
-  let httpVersion = readNgVersion();
+const snapshots = require('../../ng-snapshot/package.json');
 
-  if (getGlobalVariable('argv')['ng-snapshots']) {
-    platformServerVersion = 'github:angular/platform-server-builds';
-    httpVersion = 'github:angular/http-builds';
-  }
+export default async function () {
+  const argv = getGlobalVariable('argv');
+  const veEnabled = argv['ve'];
 
-  // Skip this test in Angular 2/4.
-  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
-    return Promise.resolve();
-  }
+  // @nguniversal/express-engine currently relies on ^0.1000.0 of @angular-devkit/architect
+  // which is not present in the local package registry and not semver compatible with 0.1001.0+
+  const { stdout: stdout1 } = await silentNpm('pack', '@angular-devkit/architect@0.1000', '--registry=https://registry.npmjs.org');
+  await silentNpm('publish', stdout1.trim(), '--registry=http://localhost:4873', '--tag=minor');
 
-  return Promise.resolve()
-    .then(() => updateJsonFile('package.json', packageJson => {
+  // @nguniversal/express-engine currently relies on ^10.0.0 of @angular-devkit/core
+  // which is not present in the local package registry and not semver compatible prerelease version of 10.1.0
+  const { stdout: stdout2 } = await silentNpm('pack', '@angular-devkit/core@10.0', '--registry=https://registry.npmjs.org');
+  await silentNpm('publish', stdout2.trim(), '--registry=http://localhost:4873', '--tag=minor');
+
+  await ng('add', '@nguniversal/express-engine');
+
+  const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
+  if (isSnapshotBuild) {
+    const packagesToInstall = [];
+    await updateJsonFile('package.json', (packageJson) => {
       const dependencies = packageJson['dependencies'];
-      dependencies['@angular/platform-server'] = platformServerVersion;
-      // ServerModule depends on @angular/http regardless the app's dependency.
-      dependencies['@angular/http'] = httpVersion;
-    }))
-    .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
-      appArchitect['server'] = {
-        builder: '@angular-devkit/build-angular:server',
-        options: {
-          outputPath: 'dist/test-project-server',
-          main: 'src/main.server.ts',
-          tsConfig: 'src/tsconfig.server.json',
-        },
-      };
-    }))
-    .then(() => writeFile('./src/tsconfig.server.json', `
-      {
-        "extends": "../tsconfig.json",
-        "compilerOptions": {
-          "outDir": "../dist-server",
-          "baseUrl": "./",
-          "module": "commonjs",
-          "types": []
-        },
-        "exclude": [
-          "test.ts",
-          "**/*.spec.ts"
-        ],
-        "angularCompilerOptions": {
-          "entryModule": "app/app.server.module#AppServerModule"
+      // Iterate over all of the packages to update them to the snapshot version.
+      for (const [name, version] of Object.entries(snapshots.dependencies)) {
+        if (name in dependencies && dependencies[name] !== version) {
+          packagesToInstall.push(version);
         }
       }
-    `))
-    .then(() => writeFile('./src/main.server.ts', `
-      import { enableProdMode } from '@angular/core';
+    });
 
-      import { environment } from './environments/environment';
+    for (const pkg of packagesToInstall) {
+      await silentNpm('install', pkg);
+    }
+  }
 
-      if (environment.production) {
-        enableProdMode();
-      }
+  if (veEnabled) {
+    // todo: https://github.com/angular/angular-cli/issues/15851
+    // We need to fix the 'export_ngfactory' transformer as with the
+    // new universal approach the factory is not exported.
+    await appendToFile(
+      './src/main.server.ts',
+      `export { AppServerModuleNgFactory } from './app/app.server.module.ngfactory'`,
+    );
 
-      export { AppServerModule } from './app/app.server.module';
-    `))
-    .then(() => writeFile('./src/app/app.server.module.ts', `
-      import { NgModule } from '@angular/core';
-      import { BrowserModule } from '@angular/platform-browser';
-      import { ServerModule } from '@angular/platform-server';
+    await writeFile(
+      './server.ts',
+      ` import 'zone.js/dist/zone-node';
+        import * as fs from 'fs';
+        import { AppServerModuleNgFactory, renderModuleFactory } from './src/main.server';
 
-      import { AppModule } from './app.module';
-      import { AppComponent } from './app.component';
+        renderModuleFactory(AppServerModuleNgFactory, {
+          url: '/',
+          document: '<app-root></app-root>'
+        }).then(html => {
+          fs.writeFileSync('dist/test-project/server/index.html', html);
+        });
+        `,
+    );
+  } else {
+    await writeFile(
+      './server.ts',
+      ` import 'zone.js/dist/zone-node';
+        import * as fs from 'fs';
+        import { AppServerModule, renderModule } from './src/main.server';
 
-      @NgModule({
-        imports: [
-          AppModule,
-          BrowserModule.withServerTransition(\{ appId: 'app' \}),
-          ServerModule,
-        ],
-        bootstrap: [AppComponent],
-      })
-      export class AppServerModule {}
-    `))
-    .then(() => silentNpm('install'))
-    // This part of the test requires a non-aot build, which isn't available anymore.
-    // .then(() => ng('run', 'test-project:server'))
-    // // files were created successfully
-    // .then(() => expectFileToMatch('dist/test-project-server/main.js',
-    //   /exports.*AppServerModule/))
-    // .then(() => writeFile('./index.js', `
-    //   require('zone.js/dist/zone-node');
-    //   require('reflect-metadata');
-    //   const fs = require('fs');
-    //   const \{ AppServerModule \} = require('./dist/test-project-server/main');
-    //   const \{ renderModule \} = require('@angular/platform-server');
+        renderModule(AppServerModule, {
+          url: '/',
+          document: '<app-root></app-root>'
+        }).then(html => {
+          fs.writeFileSync('dist/test-project/server/index.html', html);
+        });
+        `,
+    );
+  }
 
-    //   renderModule(AppServerModule, \{
-    //     url: '/',
-    //     document: '<app-root></app-root>'
-    //   \}).then(html => \{
-    //     fs.writeFileSync('dist/test-project-server/index.html', html);
-    //   \});
-    // `))
-    // .then(() => exec(normalize('node'), 'index.js'))
-    // .then(() => expectFileToMatch('dist/test-project-server/index.html',
-    //   new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
-    .then(() => ng('run', 'test-project:server'))
-    // files were created successfully
-    .then(() => expectFileToMatch('dist/test-project-server/main.js',
-      /exports.*AppServerModuleNgFactory/))
-    .then(() => writeFile('./index.js', `
-      require('zone.js/dist/zone-node');
-      require('reflect-metadata');
-      const fs = require('fs');
-      const \{ AppServerModuleNgFactory \} = require('./dist/test-project-server/main');
-      const \{ renderModuleFactory \} = require('@angular/platform-server');
 
-      renderModuleFactory(AppServerModuleNgFactory, \{
-        url: '/',
-        document: '<app-root></app-root>'
-      \}).then(html => \{
-        fs.writeFileSync('dist/test-project-server/index.html', html);
-      \});
-    `))
-    .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/test-project-server/index.html',
-      /<h2.*>Here are some links to help you start: <\/h2>/))
-    .then(() => expectFileToMatch('./dist/test-project-server/main.js',
-      /require\(["']@angular\/[^"']*["']\)/))
+  await ng('run', 'test-project:server:production', '--optimization', 'false');
 
-    // Check externals.
-    .then(() => prependToFile('./src/app/app.server.module.ts', `
-      import 'zone.js/dist/zone-node';
-      import 'reflect-metadata';
-    `)
-      .then(() => appendToFile('./src/app/app.server.module.ts', `
-      import * as fs from 'fs';
-      import { renderModule } from '@angular/platform-server';
+  await expectFileToMatch('dist/test-project/server/main.js', veEnabled ? /exports.*AppServerModuleNgFactory/ : /exports.*AppServerModule/);
+  await exec(normalize('node'), 'dist/test-project/server/main.js');
+  await expectFileToMatch(
+    'dist/test-project/server/index.html',
+    /<p.*>Here are some links to help you get started:<\/p>/,
+  );
 
-      renderModule(AppModule, \{
-        url: '/',
-        document: '<app-root></app-root>'
-      \}).then(html => \{
-        fs.writeFileSync('dist/test-project-server/index.html', html);
-      \});
-    `)))
-    // This part of the test requires a non-aot build, which isn't available anymore.
-    // .then(() => ng('run', 'test-project:server', '--bundle-dependencies=all'))
-    // .then(() => expectToFail(() => expectFileToMatch('./dist/test-project-server/main.js',
-    //   /require\(["']@angular\/[^"']*["']\)/)))
-    // .then(() => exec(normalize('node'), 'dist/test-project-server/main.js'));
+  // works with optimization and bundleDependencies enabled
+  await ng('run', 'test-project:server:production', '--optimization', '--bundleDependencies');
+  await exec(normalize('node'), 'dist/test-project/server/main.js');
+  await expectFileToMatch(
+    'dist/test-project/server/index.html',
+    /<p.*>Here are some links to help you get started:<\/p>/,
+  );
 }

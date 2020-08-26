@@ -5,21 +5,24 @@
 // Due to an obscure Mac bug, do not start this title with any symbol.
 try {
   process.title = 'ng ' + Array.from(process.argv).slice(2).join(' ');
-} catch(_) {
+} catch (_) {
   // If an error happened above, use the most basic title.
   process.title = 'ng';
 }
 
-// Some older versions of Node do not support let or const.
-var version = process.version.substr(1).split('.');
-if (Number(version[0]) < 8 || (Number(version[0]) === 8 && Number(version[1]) < 9)) {
-  process.stderr.write(
-    'You are running version ' + process.version + ' of Node.js, which is not supported by Angular CLI v6.\n' +
-    'The official Node.js version that is supported is 8.9 and greater.\n\n' +
-    'Please visit https://nodejs.org/en/ to find instructions on how to update Node.js.\n'
+// This node version check ensures that extremely old versions of node are not used.
+// These may not support ES2015 features such as const/let/async/await/etc.
+// These would then crash with a hard to diagnose error message.
+// tslint:disable-next-line: no-var-keyword
+var version = process.versions.node.split('.').map(part => Number(part));
+if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 13)) {
+  console.error(
+    'Node.js version ' + process.version + ' detected.\n' +
+    'The Angular CLI requires a minimum Node.js version of either v10.13 or v12.0.\n\n' +
+    'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n'
   );
 
-  process.exit(3);
+  process.exitCode = 3;
+} else {
+  require('../lib/init');
 }
-
-require('../lib/init');

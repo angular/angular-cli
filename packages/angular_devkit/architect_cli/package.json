@@ -2,6 +2,7 @@
   "name": "@angular-devkit/architect-cli",
   "version": "0.0.0",
   "description": "Angular Architect CLI",
+  "experimental": true,
   "bin": {
     "architect": "./bin/architect.js"
   },
@@ -14,11 +15,12 @@
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "@types/progress": "^2.0.3",
-    "ascii-progress": "^1.0.5",
-    "minimist": "1.2.0",
-    "progress": "^2.0.3",
-    "rxjs": "6.3.3",
+    "minimist": "1.2.5",
+    "progress": "2.0.3",
+    "rxjs": "6.6.2",
     "symbol-observable": "1.2.0"
+  },
+  "devDependencies": {
+    "@types/progress": "2.0.3"
   }
 }

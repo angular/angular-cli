@@ -1,8 +1,15 @@
+import { getGlobalVariable } from '../../utils/env';
+import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import {expectFileToMatch} from '../../utils/fs';
 
-export default function() {
-  return ng('build', '--aot=true')
-    .then(() => expectFileToMatch('dist/test-project/main.js',
-      /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/));
+export default async function () {
+  await ng('build', '--aot=true');
+
+  if (getGlobalVariable('argv')['ve']) {
+    await expectFileToMatch('dist/test-project/main.js',
+      /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
+  } else {
+    await expectFileToMatch('dist/test-project/main.js',
+      /platformBrowser.*bootstrapModule.*AppModule/);
+  }
 }

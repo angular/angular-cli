@@ -11,20 +11,29 @@ import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
+import * as rimraf from 'rimraf';
 import { packages } from '../lib/packages';
 import buildSchema from './build-schema';
 
 const minimatch = require('minimatch');
 const tar = require('tar');
 
-const gitIgnore = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
-  .split('\n')
+const gitIgnoreFiles = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
+  .split('\n');
+const gitIgnore = gitIgnoreFiles
   .map(line => line.replace(/#.*/, ''))
+  .filter((line) => !line.startsWith('!'))
   .filter(line => !line.match(/^\s*$/));
+const gitIgnoreExcept = gitIgnoreFiles
+  .filter((line) => line.startsWith('!'))
+  .map((line) => line.substr(1));
 
-
-function _gitIgnoreMatch(p: string) {
+function _gitIgnoreMatch(p: string): boolean {
   p = path.relative(path.dirname(__dirname), p);
+
+  if (gitIgnoreExcept.some((line) => minimatch(p, line))) {
+    return false;
+  }
 
   return gitIgnore.some(line => minimatch(p, line));
 }
@@ -124,20 +133,10 @@ function _rm(p: string) {
   fs.unlinkSync(p);
 }
 
-
-function _rimraf(p: string) {
-  glob.sync(path.join(p, '**/*'), { dot: true, nodir: true })
-    .forEach(p => fs.unlinkSync(p));
-  glob.sync(path.join(p, '**/*'), { dot: true })
-    .sort((a, b) => b.length - a.length)
-    .forEach(p => fs.rmdirSync(p));
-}
-
-
 function _clean(logger: logging.Logger) {
   logger.info('Cleaning...');
   logger.info('  Removing dist/...');
-  _rimraf(path.join(__dirname, '../dist'));
+  rimraf.sync(path.join(__dirname, '../dist'));
 }
 
 
@@ -197,12 +196,7 @@ function _build(logger: logging.Logger) {
 }
 
 
-async function _bazel(logger: logging.Logger) {
-  // TODO: undo this when we fully support bazel on windows.
-  // logger.info('Bazel build...');
-  // _exec('bazel', ['build', '//packages/...'], {}, logger);
-}
-
+// tslint:disable-next-line:no-big-function
 export default async function(
   argv: { local?: boolean, snapshot?: boolean },
   logger: logging.Logger,
@@ -210,7 +204,6 @@ export default async function(
   _clean(logger);
 
   const sortedPackages = _sortPackages();
-  await _bazel(logger);
   await buildSchema({}, logger);
   _build(logger);
 
@@ -220,7 +213,7 @@ export default async function(
     packageLogger.info(packageName);
     const pkg = packages[packageName];
     _recursiveCopy(pkg.build, pkg.dist, logger);
-    _rimraf(pkg.build);
+    rimraf.sync(pkg.build);
   }
 
   logger.info('Merging bazel-bin/ with dist/');
@@ -232,7 +225,7 @@ export default async function(
     if (fs.existsSync(bazelBinPath)) {
       packageLogger.info(packageName);
       _recursiveCopy(bazelBinPath, pkg.dist, logger);
-      _rimraf(bazelBinPath);
+      rimraf.sync(bazelBinPath);
     }
   }
 
@@ -262,8 +255,13 @@ export default async function(
           return true;
         }
 
+        // Ignore in package test files.
+        if (fileName.startsWith('test/') || fileName.startsWith('test\\')) {
+          return false;
+        }
+
         // Remove Bazel files from NPM.
-        if (fileName.endsWith('BUILD')) {
+        if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
           return false;
         }
 
@@ -367,9 +365,18 @@ export default async function(
 
     for (const depName of Object.keys(packages)) {
       const v = packages[depName].version;
-      for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
-        const obj = packageJson[depKey] as JsonObject | null;
-        if (obj && obj[depName]) {
+      for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies', 'ng-update']) {
+        let obj: JsonObject | null;
+        if (depKey === 'ng-update') {
+          const updateObject = packageJson[depKey] as JsonObject | null;
+          if (!updateObject) {
+            continue;
+          }
+          obj = updateObject['packageGroup'] as JsonObject | null;
+        } else {
+          obj = packageJson[depKey] as JsonObject | null;
+        }
+        if (obj && typeof obj === 'object' && obj[depName]) {
           if (argv.local) {
             obj[depName] = packages[depName].tar;
           } else if (argv.snapshot) {
@@ -397,8 +404,10 @@ export default async function(
   const tarLogger = logger.createChild('license');
   Object.keys(packages).forEach(pkgName => {
     const pkg = packages[pkgName];
-    tarLogger.info(`${pkgName} => ${pkg.tar}`);
-    _tar(pkg.tar, pkg.dist);
+    if (!pkg.private) {
+      tarLogger.info(`${pkgName} => ${pkg.tar}`);
+      _tar(pkg.tar, pkg.dist);
+    }
   });
 
   logger.info(`Done.`);

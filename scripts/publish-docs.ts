@@ -5,11 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable: no-console
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 
+// tslint:disable: no-implicit-dependencies
 const temp = require('temp');
 
 function die(message = 'Unknown error.') {
@@ -55,7 +57,6 @@ function listAllFiles(directory: string) {
 
   return list;
 }
-
 
 export default async function() {
   console.log(`Documentation Path: ${docsRoot}`);

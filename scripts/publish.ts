@@ -10,17 +10,23 @@ import { logging, tags } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import * as semver from 'semver';
 import { packages } from '../lib/packages';
+import { wombat } from '../lib/registries';
 import build from './build';
-
 
 export interface PublishArgs {
   tag?: string;
+  tagCheck?: boolean;
   branchCheck?: boolean;
   versionCheck?: boolean;
+  registry?: string;
 }
 
-
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
+  if (process.platform.startsWith('win')) {
+    args.unshift('/c', command);
+    command = 'cmd.exe';
+  }
+
   const { status, error, stderr, stdout } = spawnSync(command, args, { ...opts });
 
   if (status != 0) {
@@ -36,6 +42,24 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   }
 }
 
+/** Returns whether or not the given tag is valid to be used. */
+function _tagCheck(tag: string) {
+  if (tag === 'latest') {
+    return; // Valid
+  }
+  if (tag === 'next') {
+    return; // Valid
+  }
+  if (/v\d+-lts/.test(tag)) {
+    return; // Valid
+  }
+
+  throw new Error(tags.oneLine`
+    --tag should be "latest", "next", or "vX-lts". Use \`--no-tagCheck false\`
+    to skip this check if necessary.
+  `);
+}
+
 
 function _branchCheck(args: PublishArgs, logger: logging.Logger) {
   logger.info('Checking branch...');
@@ -46,7 +70,8 @@ function _branchCheck(args: PublishArgs, logger: logging.Logger) {
     case 'master':
       if (args.tag !== 'next') {
         throw new Error(tags.oneLine`
-          Releasing from master requires a next tag. Use --branchCheck=false to skip this check.
+          Releasing from master requires a next tag. Use --no-branchCheck to
+          skip this check.
         `);
       }
   }
@@ -69,18 +94,43 @@ function _versionCheck(args: PublishArgs, logger: logging.Logger) {
   if (betaOrRc && args.tag !== 'next') {
     throw new Error(tags.oneLine`
       Releasing version ${JSON.stringify(version)} requires a next tag.
-      Use --versionCheck=false to skip this check.
+      Use --no-versionCheck to skip this check.
     `);
   }
+
+  Object.keys(packages).forEach((name: string) => {
+    if (packages[name].version.indexOf('+') >= 0) {
+      throw new Error(tags.oneLine`
+        Releasing a version with a + in it means that the latest commit is not tagged properly.
+        Version found: ${JSON.stringify(packages[name].version)}
+      `);
+    }
+  });
 }
 
 export default async function (args: PublishArgs, logger: logging.Logger) {
-  if (args.branchCheck === undefined || args.branchCheck === true) {
+  const { tag } = args;
+  if (!tag) {
+    // NPM requires that all releases have a tag associated, defaulting to
+    // `latest`, so there is no way to allow a publish without a tag.
+    // https://github.com/npm/npm/issues/10625#issuecomment-162106553
+    throw new Error('--tag is required.');
+  }
+
+  if (args.tagCheck ?? true) {
+    _tagCheck(tag);
+  }
+
+  if (args.branchCheck ?? true) {
     _branchCheck(args, logger);
   }
-  if (args.versionCheck === undefined || args.versionCheck === true) {
+
+  if (args.versionCheck ?? true) {
     _versionCheck(args, logger);
   }
+
+  // If no registry is provided, the wombat proxy should be used.
+  const registry = args.registry ?? wombat;
 
   logger.info('Building...');
   await build({}, logger.createChild('build'));
@@ -97,7 +147,9 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
       .then(() => {
         logger.info(name);
 
-        return _exec('npm', ['publish'].concat(args.tag ? ['--tag', args.tag] : []), {
+        const publishArgs = [ 'publish', '--tag', tag, '--registry', registry ];
+
+        return _exec('npm', publishArgs, {
           cwd: pkg.dist,
         }, logger);
       })

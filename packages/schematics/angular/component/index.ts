@@ -7,6 +7,7 @@
  */
 import { strings } from '@angular-devkit/core';
 import {
+  FileOperator,
   Rule,
   SchematicsException,
   Tree,
@@ -14,12 +15,13 @@ import {
   applyTemplates,
   chain,
   filter,
+  forEach,
   mergeWith,
   move,
   noop,
   url,
 } from '@angular-devkit/schematics';
-import * as ts from 'typescript';
+import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
   addDeclarationToModule,
   addEntryComponentToModule,
@@ -29,9 +31,9 @@ import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
 import { validateHtmlSelector, validateName } from '../utility/validation';
-import { Schema as ComponentOptions, Style } from './schema';
+import { buildDefaultPath, getWorkspace } from '../utility/workspace';
+import { Schema as ComponentOptions } from './schema';
 
 function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
   const text = host.read(modulePath);
@@ -49,15 +51,18 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
       return host;
     }
 
+    options.type = options.type != null ? options.type : 'Component';
+
     const modulePath = options.module;
     const source = readIntoSourceFile(host, modulePath);
 
     const componentPath = `/${options.path}/`
                           + (options.flat ? '' : strings.dasherize(options.name) + '/')
                           + strings.dasherize(options.name)
-                          + '.component';
+                          + (options.type ? '.' : '')
+                          + strings.dasherize(options.type);
     const relativePath = buildRelativePath(modulePath, componentPath);
-    const classifiedName = strings.classify(`${options.name}Component`);
+    const classifiedName = strings.classify(options.name) + strings.classify(options.type);
     const declarationChanges = addDeclarationToModule(source,
                                                       modulePath,
                                                       classifiedName,
@@ -77,7 +82,7 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
 
       const exportRecorder = host.beginUpdate(modulePath);
       const exportChanges = addExportToModule(source, modulePath,
-                                              strings.classify(`${options.name}Component`),
+                                              strings.classify(options.name) + strings.classify(options.type),
                                               relativePath);
 
       for (const change of exportChanges) {
@@ -95,7 +100,7 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
       const entryComponentRecorder = host.beginUpdate(modulePath);
       const entryComponentChanges = addEntryComponentToModule(
         source, modulePath,
-        strings.classify(`${options.name}Component`),
+        strings.classify(options.name) + strings.classify(options.type),
         relativePath);
 
       for (const change of entryComponentChanges) {
@@ -125,43 +130,43 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
 
 
 export default function (options: ComponentOptions): Rule {
-  return (host: Tree) => {
-    if (!options.project) {
-      throw new SchematicsException('Option (project) is required.');
-    }
-    const project = getProject(host, options.project);
+  return async (host: Tree) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(options.project as string);
 
-    if (options.path === undefined) {
+    if (options.path === undefined && project) {
       options.path = buildDefaultPath(project);
     }
 
     options.module = findModuleFromOptions(host, options);
 
-    const parsedPath = parseName(options.path, options.name);
+    const parsedPath = parseName(options.path as string, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-    options.selector = options.selector || buildSelector(options, project.prefix);
-
-    // todo remove these when we remove the deprecations
-    options.style = (
-      options.style && options.style !== Style.Css
-        ? options.style : options.styleext as Style
-    ) || Style.Css;
-    options.skipTests = options.skipTests || !options.spec;
+    options.selector = options.selector || buildSelector(options, project && project.prefix || '');
 
     validateName(options.name);
     validateHtmlSelector(options.selector);
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
-      options.inlineStyle ? filter(path => !path.endsWith('.__styleExt__.template')) : noop(),
+      options.inlineStyle ? filter(path => !path.endsWith('.__style__.template')) : noop(),
       options.inlineTemplate ? filter(path => !path.endsWith('.html.template')) : noop(),
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
-        styleExt: styleToFileExtention(options.style),
       }),
+      !options.type ? forEach((file => {
+        if (!!file.path.match(new RegExp('..'))) {
+          return {
+            content: file.content,
+            path: file.path.replace('..', '.'),
+          };
+        } else {
+          return file;
+        }
+      }) as FileOperator) : noop(),
       move(parsedPath.path),
     ]);
 
@@ -171,13 +176,4 @@ export default function (options: ComponentOptions): Rule {
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
-}
-
-export function styleToFileExtention(style: Style | undefined): string {
-  switch (style) {
-    case Style.Sass:
-      return 'scss';
-    default:
-      return style || 'css';
-  }
 }

@@ -1,0 +1,28 @@
+<%
+const breakingChanges = [];
+
+for (const commit of commits) {
+    const breakingChange = commit.notes.find(c => c.title === 'BREAKING CHANGE');
+    if (breakingChange) {
+        breakingChanges.push({
+            scope: commit.scope,
+            subject: commit.subject,
+            shortSha: commit.hash.slice(0, 7),
+            hash: commit.hash,
+            breakingText: breakingChange.text,
+        });
+    }
+}
+
+if (breakingChanges.length) {
+%>
+
+# Breaking Changes
+    <% for (const commit of breakingChanges) { %>
+
+<h3>
+    <%= `${commit.scope ? commit.scope + ': ' : ''}` %><%= commit.subject %> (<a href="https://github.com/angular/angular-cli/commit/<%= commit.hash %>"><%= commit.shortSha %></a>)
+</h3>
+<%= commit.breakingText %>
+    <% }%>
+<% }%>

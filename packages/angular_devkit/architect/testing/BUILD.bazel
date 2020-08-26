@@ -1,0 +1,27 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("//tools:defaults.bzl", "ts_library")
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "testing",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = ["**/*_spec.ts"],
+    ),
+    module_name = "@angular-devkit/architect/testing",
+    module_root = "index.d.ts",
+    deps = [
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "@npm//@types/node",
+        "@npm//rxjs",
+    ],
+)

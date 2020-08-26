@@ -5,10 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { strings, tags } from '@angular-devkit/core';
+import { join, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -18,123 +17,67 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
-import { getWorkspace, updateWorkspace } from '../utility/config';
-import { getProject } from '../utility/project';
-import {
-  Builders,
-   ProjectType,
-  WorkspaceProject,
-  WorkspaceSchema,
-} from '../utility/workspace-models';
+import { JSONFile } from '../utility/json-file';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
 
-function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    let projectRoot = options.projectRoot !== undefined
-      ? options.projectRoot
-      : `${workspace.newProjectRoot}/${options.name}`;
+function addScriptsToPackageJson(): Rule {
+  return host => {
+    const pkgJson = new JSONFile(host, 'package.json');
+    const e2eScriptPath = ['scripts', 'e2e'];
 
-    if (projectRoot !== '' && !projectRoot.endsWith('/')) {
-      projectRoot += '/';
+    if (!pkgJson.get(e2eScriptPath)) {
+      pkgJson.modify(e2eScriptPath, 'ng e2e', false);
     }
-
-    if (getProject(workspace, options.name)) {
-      throw new SchematicsException(`Project name "${options.name}" already exists.`);
-    }
-
-    const project: WorkspaceProject = {
-      root: projectRoot,
-      projectType: ProjectType.Application,
-      prefix: '',
-      architect: {
-        e2e: {
-          builder: Builders.Protractor,
-          options: {
-            protractorConfig: `${projectRoot}protractor.conf.js`,
-            devServerTarget: `${options.relatedAppName}:serve`,
-          },
-          configurations: {
-            production: {
-              devServerTarget: `${options.relatedAppName}:serve:production`,
-            },
-          },
-        },
-        lint: {
-          builder: Builders.TsLint,
-          options: {
-            tsConfig: `${projectRoot}tsconfig.e2e.json`,
-            exclude: [
-              '**/node_modules/**',
-            ],
-          },
-        },
-      },
-    };
-
-    workspace.projects[options.name] = project;
-
-    return updateWorkspace(workspace);
   };
-}
-const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
-const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];
-
-function getRegExpFailPosition(str: string): number | null {
-  const parts = str.indexOf('-') >= 0 ? str.split('-') : [str];
-  const matched: string[] = [];
-
-  parts.forEach(part => {
-    if (part.match(projectNameRegexp)) {
-      matched.push(part);
-    }
-  });
-
-  const compare = matched.join('-');
-
-  return (str !== compare) ? compare.length : null;
-}
-
-function validateProjectName(projectName: string) {
-  const errorIndex = getRegExpFailPosition(projectName);
-  if (errorIndex !== null) {
-    const firstMessage = tags.oneLine`
-      Project name "${projectName}" is not valid. New project names must
-      start with a letter, and must contain only alphanumeric characters or dashes.
-      When adding a dash the segment after the dash must also start with a letter.
-    `;
-    const msg = tags.stripIndent`
-      ${firstMessage}
-      ${projectName}
-      ${Array(errorIndex + 1).join(' ') + '^'}
-    `;
-    throw new SchematicsException(msg);
-  } else if (unsupportedProjectNames.indexOf(projectName) !== -1) {
-    throw new SchematicsException(`Project name "${projectName}" is not a supported name.`);
-  }
-
 }
 
 export default function (options: E2eOptions): Rule {
-  return (host: Tree) => {
-    validateProjectName(options.name);
+  return async (host: Tree) => {
+    const appProject = options.relatedAppName;
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(appProject);
+    if (!project) {
+      throw new SchematicsException(`Project name "${appProject}" doesn't not exist.`);
+    }
 
-    const workspace = getWorkspace(host);
-    const appDir = options.projectRoot !== undefined
-      ? options.projectRoot
-      : `${workspace.newProjectRoot}/${options.name}`;
+    const root = join(normalize(project.root), 'e2e');
+
+    project.targets.add({
+      name: 'e2e',
+      builder: Builders.Protractor,
+      options: {
+        protractorConfig: `${root}/protractor.conf.js`,
+        devServerTarget: `${options.relatedAppName}:serve`,
+      },
+      configurations: {
+        production: {
+          devServerTarget: `${options.relatedAppName}:serve:production`,
+        },
+      },
+    });
+
+    const e2eTsConfig = `${root}/tsconfig.json`;
+    const lintTarget = project.targets.get('lint');
+    if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
+      lintTarget.options.tsConfig =
+        lintTarget.options.tsConfig.concat(e2eTsConfig);
+    }
 
     return chain([
-      addAppToWorkspaceFile(options, workspace),
+      updateWorkspace(workspace),
       mergeWith(
         apply(url('./files'), [
           applyTemplates({
             utils: strings,
             ...options,
-            'dot': '.',
-            appDir,
+            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
           }),
-          move(appDir),
+          move(root),
         ])),
+      addScriptsToPackageJson(),
     ]);
   };
 }

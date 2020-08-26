@@ -27,7 +27,7 @@ export namespace test {
 
   export class TestHost extends SimpleMemoryHost {
     protected _records: TestLogRecord[] = [];
-    protected _sync: SyncDelegateHost<{}>;
+    protected _sync: SyncDelegateHost<{}>|null = null;
 
     constructor(map: { [path: string]: string } = {}) {
       super();

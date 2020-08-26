@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import { EMPTY, Observable, concat, from as observableFrom, throwError } from 'rxjs';
+import * as path from 'path';
+import { Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
 import {
   concatMap,
   ignoreElements,
@@ -38,8 +39,24 @@ interface ChokidarWatcher {
   close(): void;
 }
 
-const { FSWatcher }: { FSWatcher: ChokidarWatcher } = require('chokidar');
-
+// This will only be initialized if the watch() method is called.
+// Otherwise chokidar appears only in type positions, and shouldn't be referenced
+// in the JavaScript output.
+let FSWatcher: ChokidarWatcher;
+function loadFSWatcher() {
+  if (!FSWatcher) {
+    try {
+      // tslint:disable-next-line:no-implicit-dependencies
+      FSWatcher = require('chokidar').FSWatcher;
+    } catch (e) {
+      if (e.code !== 'MODULE_NOT_FOUND') {
+        throw new Error('As of angular-devkit version 8.0, the "chokidar" package ' +
+            'must be installed in order to use watch() features.');
+      }
+      throw e;
+    }
+  }
+}
 
 type FsFunction0<R> = (cb: (err?: Error, result?: R) => void) => void;
 type FsFunction1<R, T1> = (p1: T1, cb: (err?: Error, result?: R) => void) => void;
@@ -128,13 +145,13 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
             ),
             observableFrom(allDirs).pipe(
               concatMap(p => _callFs(fs.rmdir, getSystemPath(p))),
-              map(() => {}),
             ),
           );
         } else {
           return _callFs(fs.unlink, getSystemPath(path));
         }
       }),
+      map(() => undefined),
     );
   }
 
@@ -143,8 +160,8 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return _callFs(fs.readdir, getSystemPath(path)).pipe(
-      map(names => names.map(name => fragment(name))),
+    return _callFs<string[], string>(fs.readdir, getSystemPath(path)).pipe(
+      map((names) => names.map(name => fragment(name))),
     );
   }
 
@@ -165,7 +182,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
   }
   isFile(path: Path): Observable<boolean> {
     return _callFs(fs.stat, getSystemPath(path)).pipe(
-      map(stat => stat.isDirectory()),
+      map(stat => stat.isFile()),
     );
   }
 
@@ -180,6 +197,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     _options?: virtualFs.HostWatchOptions,
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>(obs => {
+      loadFSWatcher();
       const watcher = new FSWatcher({ persistent: true }).add(getSystemPath(path));
 
       watcher
@@ -268,7 +286,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
         // fixed.
         if (isDir) {
           const dirPaths = fs.readdirSync(getSystemPath(path));
-          const rmDirComplete = new Observable((obs) => {
+          const rmDirComplete = new Observable<void>((obs) => {
             try {
               fs.rmdirSync(getSystemPath(path));
               obs.complete();
@@ -288,7 +306,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
             return throwError(err);
           }
 
-          return EMPTY;
+          return of(undefined);
         }
       }),
     );
@@ -299,6 +317,10 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
       // TODO: remove this try+catch when issue https://github.com/ReactiveX/rxjs/issues/3740 is
       // fixed.
       try {
+        const toSystemPath = getSystemPath(to);
+        if (!fs.existsSync(path.dirname(toSystemPath))) {
+            fs.mkdirSync(path.dirname(toSystemPath), { recursive: true });
+        }
         fs.renameSync(getSystemPath(from), getSystemPath(to));
         obs.next();
         obs.complete();
@@ -365,6 +387,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>(obs => {
       const opts = { persistent: false };
+      loadFSWatcher();
       const watcher = new FSWatcher(opts).add(getSystemPath(path));
 
       watcher

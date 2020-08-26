@@ -1,10 +1,10 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/spec",
     "types": [
-      "jasmine",
-      "node"
+      "jasmine"
     ]
   },
   "files": [

@@ -78,4 +78,7 @@ export interface ArchitectHost<BuilderInfoT extends BuilderInfo = BuilderInfo> {
   getWorkspaceRoot(): Promise<string>;
 
   getOptionsForTarget(target: Target): Promise<json.JsonObject | null>;
+
+  getProjectMetadata(projectName: string): Promise<json.JsonObject | null>;
+  getProjectMetadata(target: Target): Promise<json.JsonObject | null>;
 }

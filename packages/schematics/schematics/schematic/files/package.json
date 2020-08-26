@@ -15,9 +15,11 @@
   "dependencies": {
     "@angular-devkit/core": "^<%= coreVersion %>",
     "@angular-devkit/schematics": "^<%= schematicsVersion %>",
-    "@types/jasmine": "^3.0.0",
-    "@types/node": "^8.0.31",
-    "jasmine": "^3.0.0",
-    "typescript": "~3.2.2"
+    "typescript": "~4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^12.11.1",
+    "@types/jasmine": "~3.5.0",
+    "jasmine": "^3.5.0"
   }
 }

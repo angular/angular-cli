@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, isObservable } from '@angular-devkit/core';
-import { Observable, of as observableOf, throwError } from 'rxjs';
+import { BaseException, isPromise } from '@angular-devkit/core';
+import { Observable, from, isObservable, of as observableOf, throwError } from 'rxjs';
 import { defaultIfEmpty, last, mergeMap, tap } from 'rxjs/operators';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
@@ -74,17 +74,17 @@ export function callSource(source: Source, context: SchematicContext): Observabl
 
 export function callRule(
   rule: Rule,
-  input: Observable<Tree>,
+  input: Tree | Observable<Tree>,
   context: SchematicContext,
 ): Observable<Tree> {
-  return input.pipe(mergeMap(inputTree => {
+  return (isObservable(input) ? input : observableOf(input)).pipe(mergeMap(inputTree => {
     const result = rule(inputTree, context);
 
     if (!result) {
       return observableOf(inputTree);
     } else if (typeof result == 'function') {
       // This is considered a Rule, chain the rule and return its output.
-      return callRule(result, observableOf(inputTree), context);
+      return callRule(result, inputTree, context);
     } else if (isObservable(result)) {
       // Only return the last Tree, and make sure it's a Tree.
       return result.pipe(
@@ -93,6 +93,17 @@ export function callRule(
         tap(inner => {
           if (!inner || !(TreeSymbol in inner)) {
             throw new InvalidRuleResultException(inner);
+          }
+        }),
+      );
+    } else if (isPromise(result)) {
+      return from(result).pipe(
+        mergeMap(inner => {
+          if (typeof inner === 'function') {
+            // This is considered a Rule, chain the rule and return its output.
+            return callRule(inner, inputTree, context);
+          } else {
+            return observableOf(inputTree);
           }
         }),
       );

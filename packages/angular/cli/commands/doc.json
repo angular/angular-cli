@@ -25,6 +25,18 @@
           "type": "boolean",
           "default": false,
           "description": "When true, searches all of angular.io. Otherwise, searches only API reference documentation."
+        },
+        "version" : {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 4
+            },
+            {
+              "enum": [2, "next"]
+            }
+          ],
+          "description": "Contains the version of Angular to use for the documentation. If not provided, the command uses your current Angular core version."
         }
       },
       "required": [

@@ -9,15 +9,13 @@ import { logging } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import * as path from 'path';
-import { EMPTY, Observable, from } from 'rxjs';
-import { catchError, shareReplay } from 'rxjs/operators';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
 const ini = require('ini');
 const lockfile = require('@yarnpkg/lockfile');
 const pacote = require('pacote');
 
-const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
+const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
 let npmrc: { [key: string]: string };
 
 
@@ -108,7 +106,7 @@ export function getNpmPackageJson(
     usingYarn?: boolean;
     verbose?: boolean;
   },
-): Observable<Partial<NpmRepositoryPackageJson>> {
+): Promise<Partial<NpmRepositoryPackageJson>> {
   const cachedResponse = npmPackageJsonCache.get(packageName);
   if (cachedResponse) {
     return cachedResponse;
@@ -126,24 +124,21 @@ export function getNpmPackageJson(
     }
   }
 
-  const resultPromise = pacote.packument(
+  const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(
     packageName,
     {
-      'full-metadata': true,
+      fullMetadata: true,
       ...npmrc,
       ...(options && options.registryUrl ? { registry: options.registryUrl } : {}),
     },
   );
 
   // TODO: find some way to test this
-  const response = from<NpmRepositoryPackageJson>(resultPromise).pipe(
-    shareReplay(),
-    catchError(err => {
-      logger.warn(err.message || err);
+  const response = resultPromise.catch((err) => {
+    logger.warn(err.message || err);
 
-      return EMPTY;
-    }),
-  );
+    return { requestedName: packageName };
+  });
   npmPackageJsonCache.set(packageName, response);
 
   return response;

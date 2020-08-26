@@ -6,190 +6,172 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  BuildEvent,
-  Builder,
-  BuilderConfiguration,
   BuilderContext,
+  BuilderOutput,
+  createBuilder,
+  targetFromTargetString,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, join, normalize, resolve, virtualFs } from '@angular-devkit/core';
-import { Observable, forkJoin, from, merge, of, throwError } from 'rxjs';
-import { concatMap, map, switchMap } from 'rxjs/operators';
-import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
+import { JsonObject, normalize, resolve } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import * as fs from 'fs';
+import * as path from 'path';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
+import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { BuildWebpackServerSchema } from '../server/schema';
-import { BuildWebpackAppShellSchema } from './schema';
+import { ServerBuilderOutput } from '../server';
+import { Schema as BuildWebpackAppShellSchema } from './schema';
 
+async function _renderUniversal(
+  options: BuildWebpackAppShellSchema,
+  context: BuilderContext,
+  browserResult: BrowserBuilderOutput,
+  serverResult: ServerBuilderOutput,
+): Promise<BrowserBuilderOutput> {
+  // Get browser target options.
+  const browserTarget = targetFromTargetString(options.browserTarget);
+  const rawBrowserOptions = await context.getTargetOptions(browserTarget);
+  const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
+  const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderSchema>(
+    rawBrowserOptions,
+    browserBuilderName,
+  );
 
-export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
+  // Initialize zone.js
+  const root = context.workspaceRoot;
+  const zonePackage = require.resolve('zone.js', { paths: [root] });
+  await import(zonePackage);
 
-  constructor(public context: BuilderContext) { }
-
-  run(builderConfig: BuilderConfiguration<BuildWebpackAppShellSchema>): Observable<BuildEvent> {
-    const options = builderConfig.options;
-
-    return new Observable<BuildEvent>(obs => {
-      let success = true;
-      const subscription = merge(
-        this.build(options.serverTarget, {}),
-        // Never run the browser target in watch mode.
-        // If service worker is needed, it will be added in this.renderUniversal();
-        this.build(options.browserTarget, { watch: false, serviceWorker: false }),
-      ).subscribe((event: BuildEvent) => {
-        // TODO: once we support a better build event, add support for merging two event streams
-        // together.
-        success = success && event.success;
-      }, error => {
-        obs.error(error);
-      }, () => {
-        obs.next({ success });
-        obs.complete();
-      });
-
-      // Allow subscriptions to us to unsubscribe from each builds at the same time.
-      return () => subscription.unsubscribe();
-    }).pipe(
-      switchMap(event => {
-        if (!event.success) {
-          return of(event);
-        }
-
-        return this.renderUniversal(options);
-      }),
-    );
+  const host = new NodeJsSyncHost();
+  const projectName = context.target && context.target.project;
+  if (!projectName) {
+    throw new Error('The builder requires a target.');
   }
 
-  build(targetString: string, overrides: {}) {
-    const architect = this.context.architect;
-    const [project, target, configuration] = targetString.split(':');
+  const projectMetadata = await context.getProjectMetadata(projectName);
+  const projectRoot = resolve(
+    normalize(root),
+    normalize((projectMetadata.root as string) || ''),
+  );
 
-    // Override browser build watch setting.
-    const builderConfig = architect.getBuilderConfiguration<{}>({
-      project,
-      target,
-      configuration,
-      overrides,
-    });
+  for (const outputPath of browserResult.outputPaths) {
+    const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
+    const browserIndexOutputPath = path.join(outputPath, 'index.html');
+    const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
+    const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
 
-    return architect.run(builderConfig, this.context);
+    const {
+      AppServerModule,
+      AppServerModuleNgFactory,
+      renderModule,
+      renderModuleFactory,
+    } = await import(serverBundlePath);
+
+    let renderModuleFn: (module: unknown, options: {}) => Promise<string>;
+    let AppServerModuleDef: unknown;
+
+    if (renderModuleFactory && AppServerModuleNgFactory) {
+      renderModuleFn = renderModuleFactory;
+      AppServerModuleDef = AppServerModuleNgFactory;
+    } else if (renderModule && AppServerModule) {
+      renderModuleFn = renderModule;
+      AppServerModuleDef = AppServerModule;
+    } else {
+      throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
+    }
+
+    // Load platform server module renderer
+    const renderOpts = {
+      document: indexHtml,
+      url: options.route,
+    };
+
+    const html = await renderModuleFn(AppServerModuleDef, renderOpts);
+    // Overwrite the client index file.
+    const outputIndexPath = options.outputIndexPath
+      ? path.join(root, options.outputIndexPath)
+      : browserIndexOutputPath;
+
+    fs.writeFileSync(outputIndexPath, html);
+
+    if (browserOptions.serviceWorker) {
+      await augmentAppWithServiceWorker(
+        host,
+        normalize(root),
+        projectRoot,
+        normalize(outputPath),
+        browserOptions.baseHref || '/',
+        browserOptions.ngswConfigPath,
+      );
+    }
   }
 
-  getServerModuleBundlePath(options: BuildWebpackAppShellSchema) {
-    const architect = this.context.architect;
+  return browserResult;
+}
 
-    return new Observable<Path>(obs => {
-      if (options.appModuleBundle) {
-        obs.next(join(this.context.workspace.root, options.appModuleBundle));
+async function _getServerModuleBundlePath(
+  options: BuildWebpackAppShellSchema,
+  context: BuilderContext,
+  serverResult: ServerBuilderOutput,
+  browserLocaleDirectory: string,
+) {
+  if (options.appModuleBundle) {
+    return path.join(context.workspaceRoot, options.appModuleBundle);
+  } else {
+    const { baseOutputPath = '' } = serverResult;
+    const outputPath = path.join(baseOutputPath, browserLocaleDirectory);
 
-        return obs.complete();
-      } else {
-        const [project, target, configuration] = options.serverTarget.split(':');
-        const builderConfig = architect.getBuilderConfiguration<BuildWebpackServerSchema>({
-          project,
-          target,
-          configuration,
-        });
+    if (!fs.existsSync(outputPath)) {
+      throw new Error(`Could not find server output directory: ${outputPath}.`);
+    }
 
-        return architect.getBuilderDescription(builderConfig).pipe(
-          concatMap(description => architect.validateBuilderOptions(builderConfig, description)),
-          switchMap(config => {
-            const outputPath = join(this.context.workspace.root, config.options.outputPath);
+    const files = fs.readdirSync(outputPath, 'utf8');
+    const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?(?:bundle\.)?js$/;
+    const maybeMain = files.filter(x => re.test(x))[0];
 
-            return this.context.host.list(outputPath).pipe(
-              switchMap(files => {
-                const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?(?:bundle\.)?js$/;
-                const maybeMain = files.filter(x => re.test(x))[0];
-
-                if (!maybeMain) {
-                  return throwError(new Error('Could not find the main bundle.'));
-                } else {
-                  return of(join(outputPath, maybeMain));
-                }
-              }),
-            );
-          }),
-        ).subscribe(obs);
-      }
-    });
-  }
-
-  getBrowserBuilderConfig(options: BuildWebpackAppShellSchema) {
-    const architect = this.context.architect;
-    const [project, target, configuration] = options.browserTarget.split(':');
-    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>({
-      project,
-      target,
-      configuration,
-    });
-
-    return architect.getBuilderDescription(builderConfig).pipe(
-      concatMap(description => architect.validateBuilderOptions(builderConfig, description)),
-    );
-  }
-
-  renderUniversal(options: BuildWebpackAppShellSchema): Observable<BuildEvent> {
-    let browserOptions: BrowserBuilderSchema;
-    let projectRoot: Path;
-
-    return forkJoin(
-      this.getBrowserBuilderConfig(options).pipe(
-        switchMap(config => {
-          browserOptions = config.options;
-          projectRoot = resolve(this.context.workspace.root, config.root);
-          const browserIndexOutputPath = join(normalize(browserOptions.outputPath), 'index.html');
-          const path = join(this.context.workspace.root, browserIndexOutputPath);
-
-          return this.context.host.read(path).pipe(
-            map<virtualFs.FileBuffer, [Path, virtualFs.FileBuffer]>(x => {
-              return [browserIndexOutputPath, x];
-            }),
-          );
-        }),
-      ),
-      this.getServerModuleBundlePath(options),
-    ).pipe(
-      switchMap(([[browserIndexOutputPath, indexContent], serverBundlePath]) => {
-        const root = this.context.workspace.root;
-        requireProjectModule(getSystemPath(root), 'zone.js/dist/zone-node');
-
-        const renderModuleFactory = requireProjectModule(
-          getSystemPath(root),
-          '@angular/platform-server',
-        ).renderModuleFactory;
-        const AppServerModuleNgFactory = require(
-          getSystemPath(serverBundlePath),
-        ).AppServerModuleNgFactory;
-        const indexHtml = virtualFs.fileBufferToString(indexContent);
-        const outputIndexPath = join(root, options.outputIndexPath || browserIndexOutputPath);
-
-        // Render to HTML and overwrite the client index file.
-        return from(
-          renderModuleFactory(AppServerModuleNgFactory, {
-            document: indexHtml,
-            url: options.route,
-          })
-          .then(async (html: string) => {
-            await this.context.host
-              .write(outputIndexPath, virtualFs.stringToFileBuffer(html))
-              .toPromise();
-
-            if (browserOptions.serviceWorker) {
-              await augmentAppWithServiceWorker(
-                this.context.host,
-                root,
-                projectRoot,
-                join(root, browserOptions.outputPath),
-                browserOptions.baseHref || '/',
-                browserOptions.ngswConfigPath,
-              );
-            }
-
-            return { success: true };
-          }),
-        );
-      }),
-    );
+    if (!maybeMain) {
+      throw new Error('Could not find the main bundle.');
+    } else {
+      return path.join(outputPath, maybeMain);
+    }
   }
 }
 
-export default AppShellBuilder;
+async function _appShellBuilder(
+  options: JsonObject & BuildWebpackAppShellSchema,
+  context: BuilderContext,
+): Promise<BuilderOutput> {
+  const browserTarget = targetFromTargetString(options.browserTarget);
+  const serverTarget = targetFromTargetString(options.serverTarget);
+
+  // Never run the browser target in watch mode.
+  // If service worker is needed, it will be added in _renderUniversal();
+  const browserTargetRun = await context.scheduleTarget(browserTarget, {
+    watch: false,
+    serviceWorker: false,
+  });
+  const serverTargetRun = await context.scheduleTarget(serverTarget, {
+    watch: false,
+  });
+
+  try {
+    const [browserResult, serverResult] = await Promise.all([
+      browserTargetRun.result as unknown as BrowserBuilderOutput,
+      serverTargetRun.result as unknown as ServerBuilderOutput,
+    ]);
+
+    if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
+      return browserResult;
+    } else if (serverResult.success === false) {
+      return serverResult;
+    }
+
+    return await _renderUniversal(options, context, browserResult, serverResult);
+  } catch (err) {
+    return { success: false, error: err.message };
+  } finally {
+    // Just be good citizens and stop those jobs.
+    await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
+  }
+}
+
+export default createBuilder(_appShellBuilder);

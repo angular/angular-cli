@@ -5,163 +5,175 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import {
-  BuildEvent,
-  Builder,
-  BuilderConfiguration,
-  BuilderContext,
-} from '@angular-devkit/architect';
-import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
-import * as fs from 'fs';
-import { Observable, of } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
-import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
-import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
+import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { getSystemPath, join, normalize } from '@angular-devkit/core';
+import { dirname, resolve } from 'path';
+import { Observable, from } from 'rxjs';
+import { defaultIfEmpty, switchMap } from 'rxjs/operators';
+import * as webpack from 'webpack';
 import {
   getCommonConfig,
-  getNonAotTestConfig,
+  getNonAotConfig,
   getStylesConfig,
   getTestConfig,
+  getWorkerConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
-import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { NormalizedKarmaBuilderSchema, defaultProgress, normalizeKarmaSchema } from '../utils';
-import { KarmaBuilderSchema } from './schema';
-const webpackMerge = require('webpack-merge');
+import { SingleTestTransformLoader } from '../angular-cli-files/plugins/single-test-transform';
+import { findTests } from '../angular-cli-files/utilities/find-tests';
+import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
+import { assertCompatibleAngularVersion } from '../utils/version';
+import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
+import { Schema as KarmaBuilderOptions } from './schema';
 
+// tslint:disable-next-line:no-implicit-dependencies
+export type KarmaConfigOptions = import('karma').ConfigOptions & {
+  buildWebpack?: unknown;
+  configFile?: string;
+};
 
-export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
-  constructor(public context: BuilderContext) { }
-
-  run(builderConfig: BuilderConfiguration<KarmaBuilderSchema>): Observable<BuildEvent> {
-    const root = this.context.workspace.root;
-    const projectRoot = resolve(root, builderConfig.root);
-    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
-
-    const options = normalizeKarmaSchema(
-      host,
-      root,
-      resolve(root, builderConfig.root),
-      builderConfig.sourceRoot,
-      builderConfig.options,
-    );
-
-    return of(null).pipe(
-      concatMap(() => new Observable(obs => {
-        const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
-        const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));
-
-        // TODO: adjust options to account for not passing them blindly to karma.
-        // const karmaOptions: any = Object.assign({}, options);
-        // tslint:disable-next-line:no-any
-        const karmaOptions: any = {};
-
-        if (options.watch !== undefined) {
-          karmaOptions.singleRun = !options.watch;
-        }
-
-        // Convert browsers from a string to an array
-        if (options.browsers) {
-          karmaOptions.browsers = options.browsers.split(',');
-        }
-
-        if (options.reporters) {
-          // Split along commas to make it more natural, and remove empty strings.
-          const reporters = options.reporters
-            .reduce<string[]>((acc, curr) => acc.concat(curr.split(/,/)), [])
-            .filter(x => !!x);
-
-          if (reporters.length > 0) {
-            karmaOptions.reporters = reporters;
-          }
-        }
-
-        const sourceRoot = builderConfig.sourceRoot && resolve(root, builderConfig.sourceRoot);
-
-        karmaOptions.buildWebpack = {
-          root: getSystemPath(root),
-          projectRoot: getSystemPath(projectRoot),
-          options,
-          webpackConfig: this.buildWebpackConfig(root, projectRoot, sourceRoot, host, options),
-          // Pass onto Karma to emit BuildEvents.
-          successCb: () => obs.next({ success: true }),
-          failureCb: () => obs.next({ success: false }),
-          // Workaround for https://github.com/karma-runner/karma/issues/3154
-          // When this workaround is removed, user projects need to be updated to use a Karma
-          // version that has a fix for this issue.
-          toJSON: () => { },
-          logger: this.context.logger,
-        };
-
-        // TODO: inside the configs, always use the project root and not the workspace root.
-        // Until then we pretend the app root is relative (``) but the same as `projectRoot`.
-        karmaOptions.buildWebpack.options.root = '';
-
-        // Assign additional karmaConfig options to the local ngapp config
-        karmaOptions.configFile = karmaConfig;
-
-        // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(karmaOptions, () => obs.complete());
-        const karmaStartPromise = karmaServer.start();
-
-        // Cleanup, signal Karma to exit.
-        return () => {
-          // Karma only has the `stop` method start with 3.1.1, so we must defensively check.
-          if (karmaServer.stop && typeof karmaServer.stop === 'function') {
-            return karmaStartPromise.then(() => karmaServer.stop());
-          }
-        };
-      })),
-    );
-  }
-
-  buildWebpackConfig(
-    root: Path,
-    projectRoot: Path,
-    sourceRoot: Path | undefined,
-    host: virtualFs.Host<fs.Stats>,
-    options: NormalizedKarmaBuilderSchema,
-  ) {
-    let wco: WebpackConfigOptions;
-
-    const tsConfigPath = getSystemPath(resolve(root, normalize(options.tsConfig)));
-    const tsConfig = readTsconfig(tsConfigPath);
-
-    const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
-
-    const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
-      && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-
-    const compatOptions: typeof wco['buildOptions'] = {
-      ...options as {} as typeof wco['buildOptions'],
-      // Some asset logic inside getCommonConfig needs outputPath to be set.
-      outputPath: '',
-    };
-
-    wco = {
-      root: getSystemPath(root),
-      logger: this.context.logger,
-      projectRoot: getSystemPath(projectRoot),
-      sourceRoot: sourceRoot && getSystemPath(sourceRoot),
-      // TODO: use only this.options, it contains all flags and configs items already.
-      buildOptions: compatOptions,
-      tsConfig,
-      tsConfigPath,
-      supportES2015,
-    };
-
-    wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
-
-    const webpackConfigs: {}[] = [
+async function initialize(
+  options: KarmaBuilderOptions,
+  context: BuilderContext,
+  webpackConfigurationTransformer?: ExecutionTransformer<webpack.Configuration>,
+  // tslint:disable-next-line:no-implicit-dependencies
+): Promise<[typeof import('karma'), webpack.Configuration]> {
+  const { config } = await generateBrowserWebpackConfigFromContext(
+    // only two properties are missing:
+    // * `outputPath` which is fixed for tests
+    // * `budgets` which might be incorrect due to extra dev libs
+    { ...((options as unknown) as BrowserBuilderOptions), outputPath: '', budgets: undefined },
+    context,
+    wco => [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getNonAotTestConfig(wco, host),
+      getNonAotConfig(wco),
       getTestConfig(wco),
-    ];
+      getWorkerConfig(wco),
+    ],
+  );
 
-    return webpackMerge(webpackConfigs);
-  }
+  // tslint:disable-next-line:no-implicit-dependencies
+  const karma = await import('karma');
+
+  return [
+    karma,
+    webpackConfigurationTransformer ? await webpackConfigurationTransformer(config) : config,
+  ];
 }
 
-export default KarmaBuilder;
+export function execute(
+  options: KarmaBuilderOptions,
+  context: BuilderContext,
+  transforms: {
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+    // The karma options transform cannot be async without a refactor of the builder implementation
+    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
+  } = {},
+): Observable<BuilderOutput> {
+  // Check Angular version.
+  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+
+  return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
+    switchMap(
+      ([karma, webpackConfig]) =>
+        new Observable<BuilderOutput>(subscriber => {
+          const karmaOptions: KarmaConfigOptions = {};
+
+          if (options.watch !== undefined) {
+            karmaOptions.singleRun = !options.watch;
+          }
+
+          // Convert browsers from a string to an array
+          if (options.browsers) {
+            karmaOptions.browsers = options.browsers.split(',');
+          }
+
+          if (options.reporters) {
+            // Split along commas to make it more natural, and remove empty strings.
+            const reporters = options.reporters
+              .reduce<string[]>((acc, curr) => acc.concat(curr.split(',')), [])
+              .filter(x => !!x);
+
+            if (reporters.length > 0) {
+              karmaOptions.reporters = reporters;
+            }
+          }
+
+          // prepend special webpack loader that will transform test.ts
+          if (options.include && options.include.length > 0) {
+            const mainFilePath = getSystemPath(
+              join(normalize(context.workspaceRoot), options.main),
+            );
+            const files = findTests(options.include, dirname(mainFilePath), context.workspaceRoot);
+            // early exit, no reason to start karma
+            if (!files.length) {
+              subscriber.error(
+                `Specified patterns: "${options.include.join(', ')}" did not match any spec files`,
+              );
+
+              return;
+            }
+
+            // Get the rules and ensure the Webpack configuration is setup properly
+            const rules = webpackConfig.module?.rules || [];
+            if (!webpackConfig.module) {
+              webpackConfig.module = { rules };
+            } else if (!webpackConfig.module.rules) {
+              webpackConfig.module.rules = rules;
+            }
+
+            rules.unshift({
+              test: mainFilePath,
+              use: {
+                // cannot be a simple path as it differs between environments
+                loader: SingleTestTransformLoader,
+                options: {
+                  files,
+                  logger: context.logger,
+                },
+              },
+            });
+          }
+
+          // Assign additional karmaConfig options to the local ngapp config
+          karmaOptions.configFile = resolve(context.workspaceRoot, options.karmaConfig);
+
+          karmaOptions.buildWebpack = {
+            options,
+            webpackConfig,
+            // Pass onto Karma to emit BuildEvents.
+            successCb: () => subscriber.next({ success: true }),
+            failureCb: () => subscriber.next({ success: false }),
+            // Workaround for https://github.com/karma-runner/karma/issues/3154
+            // When this workaround is removed, user projects need to be updated to use a Karma
+            // version that has a fix for this issue.
+            toJSON: () => {},
+            logger: context.logger,
+          };
+
+          // Complete the observable once the Karma server returns.
+          const karmaServer = new karma.Server(
+            transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
+            () => subscriber.complete(),
+          );
+          // karma typings incorrectly define start's return value as void
+          // tslint:disable-next-line:no-use-of-empty-return-value
+          const karmaStart = (karmaServer.start() as unknown) as Promise<void>;
+
+          // Cleanup, signal Karma to exit.
+          return () => {
+            // Karma only has the `stop` method start with 3.1.1, so we must defensively check.
+            const karmaServerWithStop = (karmaServer as unknown) as { stop: () => Promise<void> };
+            if (typeof karmaServerWithStop.stop === 'function') {
+              return karmaStart.then(() => karmaServerWithStop.stop());
+            }
+          };
+        }),
+    ),
+    defaultIfEmpty({ success: false }),
+  );
+}
+
+export { KarmaBuilderOptions };
+export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);

@@ -1,8 +1,7 @@
 import * as path from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { exec, execAndWaitForOutputToMatch, silentNpm } from '../../utils/process';
-
-const packages = require('../../../../../lib/packages').packages;
+import { rimraf } from '../../utils/fs';
 
 export default async function () {
   // setup
@@ -11,21 +10,31 @@ export default async function () {
     return;
   }
 
-  const startCwd = process.cwd();
-  await silentNpm('install', '-g', packages['@angular-devkit/schematics-cli'].tar, '--unsafe-perm');
+  await silentNpm(
+    'install',
+    '-g',
+    '@angular-devkit/schematics-cli',
+    '--registry=http://localhost:4873',
+  );
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 
-  // create blank schematic
-  await exec('schematics', 'schematic', '--name', 'test-schematic');
+  const startCwd = process.cwd();
+  const schematicPath = path.join(startCwd, 'test-schematic');
 
-  process.chdir(path.join(startCwd, 'test-schematic'));
-  await execAndWaitForOutputToMatch(
-    'schematics',
-    ['.:', '--list-schematics'],
-    /my-full-schematic/,
-  );
+  try {
+    // create blank schematic
+    await exec('schematics', 'schematic', '--name', 'test-schematic');
 
-  // restore path
-  process.chdir(startCwd);
+    process.chdir(path.join(startCwd, 'test-schematic'));
+    await execAndWaitForOutputToMatch(
+      'schematics',
+      ['.:', '--list-schematics'],
+      /my-full-schematic/,
+    );
 
+  } finally {
+    // restore path
+    process.chdir(startCwd);
+    await rimraf(schematicPath);
+  }
 }

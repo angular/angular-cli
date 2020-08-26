@@ -8,13 +8,13 @@
     "core"
   ],
   "dependencies": {
-    "ajv": "6.9.1",
-    "chokidar": "2.1.2",
-    "fast-json-stable-stringify": "2.0.0",
-    "rxjs": "6.3.3",
+    "ajv": "6.12.4",
+    "fast-json-stable-stringify": "2.1.0",
+    "magic-string": "0.25.7",
+    "rxjs": "6.6.2",
     "source-map": "0.7.3"
   },
   "devDependencies": {
-    "seedrandom": "^2.4.4"
+    "seedrandom": "^3.0.0"
   }
 }

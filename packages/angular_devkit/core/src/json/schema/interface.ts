@@ -69,6 +69,7 @@ export interface SchemaValidator {
 
 export interface SchemaFormatter {
   readonly async: boolean;
+  // TODO should be unknown remove before next major release
   // tslint:disable-next-line:no-any
   validate(data: any): boolean | Observable<boolean>;
 }
@@ -84,13 +85,11 @@ export interface SmartDefaultProvider<T> {
 
 export interface SchemaKeywordValidator {
   (
-    // tslint:disable-next-line:no-any
     data: JsonValue,
     schema: JsonValue,
     parent: JsonObject | JsonArray | undefined,
     parentProperty: string | number | undefined,
     pointer: JsonPointer,
-    // tslint:disable-next-line:no-any
     rootData: JsonValue,
   ): boolean | Observable<boolean>;
 }
@@ -100,8 +99,7 @@ export interface PromptDefinition {
   type: string;
   message: string;
   default?: string | string[] | number | boolean | null;
-  priority: number;
-  validator?: (value: string) => boolean | string | Promise<boolean | string>;
+  validator?: (value: JsonValue) => boolean | string | Promise<boolean | string>;
 
   items?: Array<string | { value: JsonValue, label: string }>;
 
@@ -118,6 +116,7 @@ export interface SchemaRegistry {
   addFormat(format: SchemaFormat): void;
   addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
   usePromptProvider(provider: PromptProvider): void;
+  useXDeprecatedProvider(onUsage: (message: string) => void): void;
 
   /**
    * Add a transformation step before the validation of any Json.

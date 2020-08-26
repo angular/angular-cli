@@ -72,6 +72,23 @@ $ benchmark -- node fibonacci.js 40
 [benchmark]   Peak Memory usage: 22.34 MB (22.32, 22.34, 22.34, 22.35, 22.35)
 ```
 
+## Example in watch mode
+
+`watch-script` accepts a node script when using the CLI. When using the API you can provide a `Command` instance. 
+
+```
+benchmark --verbose --watch-timeout 10000 --watch-matcher "Compiled successfully" --watch-script watch-script.js -- ng serve
+[benchmark] Benchmarking process over 5 iterations, with up to 5 retries.
+[benchmark]   ng serve (at D:\sandbox\latest-project)
+[benchmark] Process Stats
+[benchmark]   Elapsed Time: 470.40 ms (820.00, 557.00, 231.00, 509.00, 235.00)
+[benchmark]   Average Process usage: 2.00 process(es) (2.00, 2.00, 2.00, 2.00, 2.00)
+[benchmark]   Peak Process usage: 2.00 process(es) (2.00, 2.00, 2.00, 2.00, 2.00)
+[benchmark]   Average CPU usage: 33.77 % (31.27, 0.00, 101.70, 35.90, 0.00)
+[benchmark]   Peak CPU usage: 59.72 % (125.10, 0.00, 101.70, 71.80, 0.00)
+[benchmark]   Average Memory usage: 665.49 MB (619.84, 657.17, 669.47, 685.19, 695.76)
+[benchmark]   Peak Memory usage: 672.44 MB (639.87, 661.04, 669.47, 689.66, 702.14)
+```
 
 ## API Usage
 

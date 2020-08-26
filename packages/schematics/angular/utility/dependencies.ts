@@ -5,16 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstObject, JsonParseMode, parseJsonAst } from '@angular-devkit/core';
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import {
-  appendPropertyInAstObject,
-  findPropertyInAstObject,
-  insertPropertyInAstObjectInOrder,
- } from './json-utils';
+import { Tree } from '@angular-devkit/schematics';
+import { JSONFile } from './json-file';
 
-
-const pkgJsonPath = '/package.json';
+const PKG_JSON_PATH = '/package.json';
 export enum NodeDependencyType {
   Default = 'dependencies',
   Dev = 'devDependencies',
@@ -29,79 +23,45 @@ export interface NodeDependency {
   overwrite?: boolean;
 }
 
-export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency): void {
-  const packageJsonAst = _readPackageJson(tree);
-  const depsNode = findPropertyInAstObject(packageJsonAst, dependency.type);
-  const recorder = tree.beginUpdate(pkgJsonPath);
-  if (!depsNode) {
-    // Haven't found the dependencies key, add it to the root of the package.json.
-    appendPropertyInAstObject(recorder, packageJsonAst, dependency.type, {
-      [dependency.name]: dependency.version,
-    }, 2);
-  } else if (depsNode.kind === 'object') {
-    // check if package already added
-    const depNode = findPropertyInAstObject(depsNode, dependency.name);
+const ALL_DEPENDENCY_TYPE = [
+  NodeDependencyType.Default,
+  NodeDependencyType.Dev,
+  NodeDependencyType.Optional,
+  NodeDependencyType.Peer,
+];
 
-    if (!depNode) {
-      // Package not found, add it.
-      insertPropertyInAstObjectInOrder(
-        recorder,
-        depsNode,
-        dependency.name,
-        dependency.version,
-        4,
-      );
-    } else if (dependency.overwrite) {
-      // Package found, update version if overwrite.
-      const { end, start } = depNode;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertRight(start.offset, JSON.stringify(dependency.version));
-    }
+export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency, pkgJsonPath = PKG_JSON_PATH): void {
+  const json = new JSONFile(tree, pkgJsonPath);
+
+  const { overwrite, type, name, version } = dependency;
+  const path = [type, name];
+  if (overwrite || !json.get(path)) {
+    json.modify(path, version);
   }
-
-  tree.commitUpdate(recorder);
 }
 
-export function getPackageJsonDependency(tree: Tree, name: string): NodeDependency | null {
-  const packageJson = _readPackageJson(tree);
-  let dep: NodeDependency | null = null;
-  [
-    NodeDependencyType.Default,
-    NodeDependencyType.Dev,
-    NodeDependencyType.Optional,
-    NodeDependencyType.Peer,
-  ].forEach(depType => {
-    if (dep !== null) {
-      return;
-    }
-    const depsNode = findPropertyInAstObject(packageJson, depType);
-    if (depsNode !== null && depsNode.kind === 'object') {
-      const depNode = findPropertyInAstObject(depsNode, name);
-      if (depNode !== null && depNode.kind === 'string') {
-        const version = depNode.value;
-        dep = {
-          type: depType,
-          name: name,
-          version: version,
-        };
-      }
-    }
-  });
+export function removePackageJsonDependency(tree: Tree, name: string, pkgJsonPath = PKG_JSON_PATH): void {
+  const json = new JSONFile(tree, pkgJsonPath);
 
-  return dep;
+  for (const depType of ALL_DEPENDENCY_TYPE) {
+    json.remove([depType, name]);
+  }
 }
 
-function _readPackageJson(tree: Tree): JsonAstObject {
-  const buffer = tree.read(pkgJsonPath);
-  if (buffer === null) {
-    throw new SchematicsException('Could not read package.json.');
-  }
-  const content = buffer.toString();
+export function getPackageJsonDependency(tree: Tree, name: string, pkgJsonPath = PKG_JSON_PATH): NodeDependency | null {
+  const json = new JSONFile(tree, pkgJsonPath);
 
-  const packageJson = parseJsonAst(content, JsonParseMode.Strict);
-  if (packageJson.kind != 'object') {
-    throw new SchematicsException('Invalid package.json. Was expecting an object');
+  for (const depType of ALL_DEPENDENCY_TYPE) {
+    const version = json.get([depType, name]);
+
+    if (typeof version === 'string') {
+      return {
+        type: depType,
+        name: name,
+        version,
+      };
+    }
   }
 
-  return packageJson;
+  return null;
 }

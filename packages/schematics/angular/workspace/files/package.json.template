@@ -6,8 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -19,7 +18,6 @@
     "@angular/platform-browser": "<%= latestVersions.Angular %>",
     "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
     "@angular/router": "<%= latestVersions.Angular %>",
-    "core-js": "^2.5.4",
     "rxjs": "<%= latestVersions.RxJs %>",
     "tslib": "<%= latestVersions.TsLib %>",
     "zone.js": "<%= latestVersions.ZoneJs %>"
@@ -27,21 +25,20 @@
   "devDependencies": {
     "@angular/cli": "<%= '~' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",
-    "@angular/language-service": "<%= latestVersions.Angular %>",
-    "@types/node": "~8.9.4",<% if (!minimal) { %>
-    "@types/jasmine": "~3.3.8",
+    "@types/node": "^12.11.1",<% if (!minimal) { %>
+    "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
-    "codelyzer": "~4.5.0",
-    "jasmine-core": "~2.99.1",
-    "jasmine-spec-reporter": "~4.2.1",
-    "karma": "~4.0.0",
-    "karma-chrome-launcher": "~2.2.0",
-    "karma-coverage-istanbul-reporter": "~2.0.1",
-    "karma-jasmine": "~2.0.1",
-    "karma-jasmine-html-reporter": "^1.4.0",
-    "protractor": "~5.4.0",<% } %>
-    "ts-node": "~7.0.0",
-    "tslint": "~5.11.0",
+    "codelyzer": "^6.0.0",
+    "jasmine-core": "~3.6.0",
+    "jasmine-spec-reporter": "~5.0.0",
+    "karma": "~5.0.0",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage-istanbul-reporter": "~3.0.2",
+    "karma-jasmine": "~4.0.0",
+    "karma-jasmine-html-reporter": "^1.5.0",
+    "protractor": "~7.0.0",<% } %>
+    "ts-node": "~8.3.0",
+    "tslint": "~6.1.0",
     "typescript": "<%= latestVersions.TypeScript %>"
   }
 }

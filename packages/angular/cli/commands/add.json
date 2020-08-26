@@ -18,6 +18,23 @@
             "$source": "argv",
             "index": 0
           }
+        },
+        "registry": {
+          "description": "The NPM registry to use.",
+          "type": "string",
+          "oneOf": [
+            {
+              "format": "uri"
+            },
+            {
+              "format": "hostname"
+            }
+          ]
+        },
+        "verbose": {
+          "description": "Display additional details about internal operations during execution.",
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [

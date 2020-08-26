@@ -9,7 +9,6 @@ import { Observable, of as observableOf, throwError } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { Url } from 'url';
 import {
-  Collection,
   CollectionDescription,
   EngineHost,
   RuleFactory,
@@ -94,7 +93,7 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
     return ((observableOf(options) as any)
       .pipe(...this._hosts
-        .map(host => mergeMap(opt => host.transformOptions(schematic, opt, context))),
+        .map(host => mergeMap((opt: {}) => host.transformOptions(schematic, opt, context))),
       )
     ) as {} as Observable<ResultT>;
   }
@@ -107,15 +106,6 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     });
 
     return result;
-  }
-
-  /**
-   * @deprecated Use `listSchematicNames`.
-   */
-  listSchematics(
-    collection: Collection<FallbackCollectionDescription, FallbackSchematicDescription>,
-  ): string[] {
-    return this.listSchematicNames(collection.description);
   }
 
   listSchematicNames(collection: CollectionDescription<FallbackCollectionDescription>): string[] {

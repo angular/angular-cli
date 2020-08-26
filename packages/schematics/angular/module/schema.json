@@ -30,13 +30,18 @@
     "routing": {
       "type": "boolean",
       "description": "When true, creates a routing module.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 17
     },
     "routingScope": {
       "enum": ["Child", "Root"],
       "type": "string",
       "description": "The scope for the new routing module.",
       "default": "Child"
+    },
+    "route": {
+      "type": "string",
+      "description": "The route path for a lazy-loaded module. When supplied, creates a component in the new module, and adds the route to that component in the `Routes` array declared in the module provided in the `--module` option."
     },
     "flat": {
       "type": "boolean",
@@ -57,7 +62,8 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the module."
+      "description": "When true, applies lint fixes after generating the module.",
+      "x-user-analytics": 15
     }
   },
   "required": [

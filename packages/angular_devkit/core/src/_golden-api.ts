@@ -9,7 +9,7 @@
 export * from './exception/exception';
 
  // Start experimental namespace
-export * from './workspace/index';
+export * from './experimental/workspace/index';
 // End experimental namespace
 
 // Start json namespace
@@ -51,3 +51,11 @@ export * from './utils/lang';
 export * from './virtual-fs/path';
 export * from './virtual-fs/host/index';
 // End virtualFs namespace
+
+// Start workspace namespace
+export * from './workspace/index';
+// End workspace namespace
+
+// Start analytics namespace
+export * from './analytics/index';
+// End analytics namespace

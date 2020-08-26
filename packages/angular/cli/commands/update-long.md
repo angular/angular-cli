@@ -1,7 +1,17 @@
-Perform a basic update to v7 of the core framework and CLI by running the following command.
+Perform a basic update to the current stable release of the core framework and CLI by running the following command.
 
 ```
 ng update @angular/cli @angular/core
 ```
+
+To update to the next beta or pre-release version, use the `--next=true` option.
+
+To update from one major version to another, use the format
+`ng update @angular/cli@^<major_version> @angular/core@^<major_version>`.
+
+We recommend that you always update to the latest patch version, as it contains fixes we released since the initial major release.
+For example, use the following command to take the latest 9.x.x version and use that to update.
+
+`ng update @angular/cli@^9 @angular/core@^9`
 
 For detailed information and guidance on updating your application, see the interactive [Angular Update Guide](https://update.angular.io/).

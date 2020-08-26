@@ -8,6 +8,7 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { main } from './main';
+
 // tslint:disable-next-line:no-implicit-dependencies
 const temp = require('temp');
 
@@ -26,6 +27,8 @@ class MockWriteStream {
 describe('benchmark binary', () => {
   const benchmarkScript = require.resolve(join(__dirname, './test/fibonacci.js'));
   const exitCodeOneScript = require.resolve(join(__dirname, './test/exit-code-one.js'));
+  const benchmarkWatchScript = require.resolve(join(__dirname, './test/watch-test-cmd.js'));
+  const watchTriggerScript = require.resolve(join(__dirname, './test/watch-test-script.js'));
   const outputFileRoot = temp.mkdirSync('benchmark-binary-spec-');
   const outputFile = join(outputFileRoot, 'output.log');
   let stdout: MockWriteStream, stderr: MockWriteStream;
@@ -142,4 +145,51 @@ describe('benchmark binary', () => {
     stdout.lines.forEach(line => expect(line).toMatch(/^\[abc\]/));
     expect(res).toEqual(0);
   });
+
+  it('uses watch-script and watch-matcher', async () => {
+    const args = [
+      '--watch-matcher',
+      'Complete',
+      '--watch-script',
+      watchTriggerScript,
+      '--',
+      'node',
+      benchmarkWatchScript,
+    ];
+    const res = await main({ args, stdout, stderr });
+    expect(stdout.lines).toContain('[benchmark] Process Stats\n');
+    expect(res).toEqual(0);
+  }, 30000);
+
+  it('should not fail with exit code', async () => {
+    const args = [
+      '--watch-matcher',
+      'Complete',
+      '--watch-script',
+      watchTriggerScript,
+      '--',
+      'node',
+      exitCodeOneScript,
+    ];
+    const res = await main({ args, stdout, stderr });
+    expect(stderr.lines).toContain('[benchmark] Maximum number of retries (5) for command was exceeded.\n');
+    expect(res).toEqual(1);
+  });
+
+  it('should error when watch-timeout is exceeded', async () => {
+    const args = [
+      '--watch-timeout',
+      '250',
+      '--watch-matcher',
+      'Wrong Match',
+      '--watch-script',
+      watchTriggerScript,
+      '--',
+      'node',
+      benchmarkWatchScript,
+    ];
+    const res = await main({ args, stdout, stderr });
+    expect(stderr.lines).toContain('[benchmark] Timeout has occurred\n');
+    expect(res).toEqual(1);
+  }, 30000);
 });

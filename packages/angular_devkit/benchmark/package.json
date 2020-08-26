@@ -10,15 +10,15 @@
     "benchmark"
   ],
   "engines": {
-    "node": ">= 8.9.0",
-    "npm": ">= 5.5.1"
+    "node": ">= 10.13.0",
+    "npm": ">= 6.2.0"
   },
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "minimist": "1.2.0",
-    "pidusage": "2.0.17",
-    "pidtree": "0.3.0",
-    "rxjs": "6.3.3",
+    "minimist": "1.2.5",
+    "pidusage": "2.0.21",
+    "pidtree": "0.5.0",
+    "rxjs": "6.6.2",
     "tree-kill": "^1.2.0"
   }
 }

@@ -19,5 +19,17 @@ export default function() {
         throw new Error(`Expected "true", received "${JSON.stringify(stdout)}".`);
       }
     })
-    .then(() => ng('config', 'schematics.@schematics/angular.component.inlineStyle', 'false'));
+    .then(() => ng('config', 'schematics.@schematics/angular.component.inlineStyle', 'false'))
+    .then(() => ng('config', `projects.test-project.architect.build.options.assets[0]`))
+    .then(({ stdout }) => {
+      if (!stdout.includes('src/favicon.ico')) {
+        throw new Error(`Expected "src/favicon.ico", received "${JSON.stringify(stdout)}".`);
+      }
+    })
+    .then(() => ng('config', `projects["test-project"].architect.build.options.assets[0]`))
+    .then(({ stdout }) => {
+      if (!stdout.includes('src/favicon.ico')) {
+        throw new Error(`Expected "src/favicon.ico", received "${JSON.stringify(stdout)}".`);
+      }
+    });
 }

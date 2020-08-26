@@ -7,11 +7,12 @@
  */
 import * as ajv from 'ajv';
 import * as http from 'http';
-import { Observable, from, of, throwError } from 'rxjs';
+import * as https from 'https';
+import { Observable, from, isObservable, of, throwError } from 'rxjs';
 import { concatMap, map, switchMap, tap } from 'rxjs/operators';
 import * as Url from 'url';
 import { BaseException } from '../../exception/exception';
-import { PartiallyOrderedSet, deepCopy, isObservable } from '../../utils';
+import { PartiallyOrderedSet, deepCopy } from '../../utils';
 import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../interface';
 import {
   JsonPointer,
@@ -28,6 +29,7 @@ import {
   SmartDefaultProvider,
 } from './interface';
 import { JsonSchema } from './schema';
+import { getTypesOfSchema } from './utility';
 import { visitJson, visitJsonSchema } from './visitor';
 
 // This interface should be exported from ajv, but they only export the class and not the type.
@@ -56,6 +58,7 @@ export class SchemaValidationException extends BaseException {
   ) {
     if (!errors || errors.length === 0) {
       super('Schema validation failed.');
+      this.errors = [];
 
       return;
     }
@@ -143,7 +146,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
     // If none are found, handle using http client.
     return new Promise<JsonObject>((resolve, reject) => {
-      http.get(uri, res => {
+      const url = new Url.URL(uri);
+      const client = url.protocol === 'https:' ? https : http;
+      client.get(url, res => {
         if (!res.statusCode || res.statusCode >= 300) {
           // Consume the rest of the data to free memory.
           res.resume();
@@ -190,7 +195,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
   protected _resolver(
     ref: string,
-    validate: ajv.ValidateFunction,
+    validate?: ajv.ValidateFunction,
   ): { context?: ajv.ValidateFunction, schema?: JsonObject } {
     if (!validate || !validate.refs || !validate.refVal || !ref) {
       return {};
@@ -392,10 +397,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             switchMap(updatedData => {
               const result = validate.call(validationContext, updatedData);
 
-              return typeof result == 'boolean'
+              return typeof result === 'boolean'
                 ? of([updatedData, result])
                 : from((result as Promise<boolean>)
-                  .then(r => [updatedData, true])
+                  .then(() => [updatedData, true])
                   .catch((err: Error | AjvValidationError) => {
                     if ((err as AjvValidationError).ajv) {
                       validate.errors = (err as AjvValidationError).errors;
@@ -406,7 +411,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                     return Promise.reject(err);
                   }));
             }),
-            switchMap(([data, valid]: [JsonValue, boolean]) => {
+            switchMap(([data, valid]) => {
               if (valid) {
                 let result = of(data);
 
@@ -426,7 +431,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 return of([data, valid]);
               }
             }),
-            map(([data, valid]: [JsonValue, boolean]) => {
+            map(([data, valid]) => {
               if (valid) {
                 return { data, success: true } as SchemaValidatorResult;
               }
@@ -443,8 +448,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   }
 
   addFormat(format: SchemaFormat): void {
-    // tslint:disable-next-line:no-any
-    const validate = (data: any) => {
+    const validate = (data: unknown) => {
       const result = format.formatter.validate(data);
 
       if (typeof result == 'boolean') {
@@ -457,9 +461,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._ajv.addFormat(format.name, {
       async: format.formatter.async,
       validate,
-    // AJV typings list `compare` as required, but it is optional.
-    // tslint:disable-next-line:no-any
-    } as any);
+    });
   }
 
   addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>) {
@@ -518,7 +520,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._ajv.addKeyword('x-prompt', {
       errors: false,
       valid: true,
-      compile: (schema, parentSchema: JsonObject, it) => {
+      compile: (schema, parentSchema, it) => {
         const compilationSchemInfo = this._currentCompilationSchemaInfo;
         if (!compilationSchemInfo) {
           return () => true;
@@ -539,21 +541,37 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           items = schema.items;
         }
 
+        const propertyTypes = getTypesOfSchema(parentSchema as JsonObject);
         if (!type) {
-          if (parentSchema.type === 'boolean') {
+          if (propertyTypes.size === 1 && propertyTypes.has('boolean')) {
             type = 'confirmation';
-          } else if (Array.isArray(parentSchema.enum)) {
+          } else if (Array.isArray((parentSchema as JsonObject).enum)) {
+            type = 'list';
+          } else if (
+            propertyTypes.size === 1 &&
+            propertyTypes.has('array') &&
+            (parentSchema as JsonObject).items &&
+            Array.isArray(((parentSchema as JsonObject).items as JsonObject).enum)
+          ) {
             type = 'list';
           } else {
             type = 'input';
           }
         }
 
-        if (type === 'list' && !items) {
-          if (Array.isArray(parentSchema.enum)) {
-            type = 'list';
+        let multiselect;
+        if (type === 'list') {
+          multiselect =
+            schema.multiselect === undefined
+              ? propertyTypes.size === 1 && propertyTypes.has('array')
+              : schema.multiselect;
+
+          const enumValues = multiselect
+            ? (parentSchema as JsonObject).items && ((parentSchema as JsonObject).items as JsonObject).enum
+            : (parentSchema as JsonObject).enum;
+          if (!items && Array.isArray(enumValues)) {
             items = [];
-            for (const value of parentSchema.enum) {
+            for (const value of enumValues) {
               if (typeof value == 'string') {
                 items.push(value);
               } else if (typeof value == 'object') {
@@ -569,23 +587,20 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           id: path,
           type,
           message,
-          priority: 0,
           raw: schema,
           items,
-          multiselect: type === 'list' ? schema.multiselect : false,
-          default: typeof parentSchema.default == 'object' ? undefined : parentSchema.default,
-          async validator(data: string) {
-            const result = it.self.validate(parentSchema, data);
-            if (typeof result === 'boolean') {
-              return result;
-            } else {
-              try {
-                await result;
-
-                return true;
-              } catch {
-                return false;
-              }
+          multiselect,
+          default:
+            typeof (parentSchema as JsonObject).default == 'object' &&
+            (parentSchema as JsonObject).default !== null &&
+            !Array.isArray((parentSchema as JsonObject).default)
+              ? undefined
+              : (parentSchema as JsonObject).default as string[],
+          async validator(data: JsonValue) {
+            try {
+              return await it.self.validate(parentSchema, data);
+            } catch {
+              return false;
             }
           },
         };
@@ -624,8 +639,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     if (!provider) {
       return of(data);
     }
-
-    prompts.sort((a, b) => b.priority - a.priority);
 
     return from(provider(prompts)).pipe(
       map(answers => {
@@ -720,7 +733,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
     return (of(data) as any).pipe(
       ...[...smartDefaults.entries()].map(([pointer, schema]) => {
-        return concatMap<T, T>(data => {
+        return concatMap(data => {
           const fragments = JSON.parse(pointer);
           const source = this._sourceMap.get((schema as JsonObject).$source as string);
 
@@ -739,5 +752,18 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         });
       }),
     );
+  }
+
+  useXDeprecatedProvider(onUsage: (message: string) => void): void {
+    this._ajv.addKeyword('x-deprecated', {
+      validate: (schema, _data, _parentSchema, _dataPath, _parentDataObject, propertyName) => {
+        if (schema) {
+          onUsage(`Option "${propertyName}" is deprecated${typeof schema == 'string' ? ': ' + schema : '.'}`);
+        }
+
+        return true;
+      },
+      errors: false,
+    });
   }
 }

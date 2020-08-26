@@ -1,30 +1,19 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noUnusedParameters": false,  // The linter is used for these.
-    "noUnusedLocals": false,  // The linter is used for these.
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
     "outDir": "./dist",
     "rootDir": ".",
-    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "inlineSourceMap": true,
-    "sourceRoot": ".",
-    // Inline sources are necessary for our tests to show the proper sources, since we are using
-    // Istanbul (not Constantinople) as well, and applying both source maps to get the original
-    // source in devtools.
-    "inlineSources": true,
-    "strictNullChecks": true,
-    "target": "es2017",
+    "strict": true,
+    "target": "es2018",
     "lib": [
-      "es2017"
+      "es2018"
     ],
     "baseUrl": "",
     "rootDirs": [
@@ -51,9 +40,9 @@
       "@angular-devkit/build-optimizer": [ "./packages/angular_devkit/build_optimizer/src/index" ],
       "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ],
       "@angular-devkit/architect/testing": [ "./packages/angular_devkit/architect/testing/index" ],
+      "@angular-devkit/build-angular": [ "./packages/angular_devkit/build_angular/src/index" ],
       "@angular-devkit/build-webpack": [ "./packages/angular_devkit/build_webpack/src/index" ],
       "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
-      "@ngtools/webpack/*": [ "./packages/ngtools/webpack/*" ],
       "@schematics/angular": [ "./packages/schematics/angular/index" ]
     }
   },
@@ -61,17 +50,19 @@
     "suppressTsconfigOverrideWarnings": true
   },
   "exclude": [
-    "bazel-*/**/*",
+    "bazel-out/**/*",
     "dist/**/*",
-    "etc/cli.angular.io",
-    "node_modules/**/*",
+    "dist-schema/**",
+    "etc/api/**/*",
+    "etc/cli.angular.io/**/*",
+    "**/node_modules/**/*",
+    "**/third_party/**/*",
     "packages/_/devkit/**/*files/**/*",
     "packages/schematics/*/*/*files/**/*",
-    "tmp/**/*",
-    "scripts/patches/**/*",
+    "packages/angular_devkit/*/test/**/*",
     "tests/**/*",
     "tools/**/*",
     "benchmark/**/*",
-    "etc/api/**/*"
+    "integration/**/*"
   ]
 }

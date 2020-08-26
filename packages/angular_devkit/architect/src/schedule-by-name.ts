@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, json, logging } from '@angular-devkit/core';
-import { Subscription } from 'rxjs';
-import { first, ignoreElements, map, shareReplay } from 'rxjs/operators';
+import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { EMPTY, Subscription } from 'rxjs';
+import { catchError, first, ignoreElements, map, shareReplay } from 'rxjs/operators';
 import {
   BuilderInfo,
   BuilderInput,
@@ -31,6 +31,7 @@ export async function scheduleByName(
     logger: logging.LoggerApi,
     workspaceRoot: string | Promise<string>,
     currentDirectory: string | Promise<string>,
+    analytics?: analytics.Analytics,
   },
 ): Promise<BuilderRun> {
   const childLoggerName = options.target ? `{${targetStringFromTarget(options.target)}}` : name;
@@ -47,8 +48,8 @@ export async function scheduleByName(
 
   const message = {
     id,
-    currentDirectory: workspaceRoot,
-    workspaceRoot: currentDirectory,
+    currentDirectory,
+    workspaceRoot,
     info: info,
     options: buildOptions,
     ...(options.target ? { target: options.target } : {}),
@@ -60,38 +61,50 @@ export async function scheduleByName(
       if (event.kind === experimental.jobs.JobOutboundMessageKind.Start) {
         job.input.next(message);
       }
-    });
+    }, () => {});
   } else {
     job.input.next(message);
   }
 
   const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe(entry => {
     logger.next(entry);
-  });
+  }, () => {});
 
-  const s = job.outboundBus.subscribe(
-    undefined,
-    undefined,
-    () => {
+  const s = job.outboundBus.subscribe({
+    error() {},
+    complete() {
       s.unsubscribe();
       logChannelSub.unsubscribe();
       if (stateSubscription) {
         stateSubscription.unsubscribe();
       }
     },
-  );
+  });
   const output = job.output.pipe(
     map(output => ({
       ...output,
       ...options.target ? { target: options.target } : 0,
       info,
     } as BuilderOutput)),
+    shareReplay(),
   );
+
+  // If there's an analytics object, take the job channel and report it to the analytics.
+  if (options.analytics) {
+    const reporter = new analytics.AnalyticsReporter(options.analytics);
+    job.getChannel<analytics.AnalyticsReport>('analytics')
+      .subscribe(report => reporter.report(report));
+  }
+  // Start the builder.
+  output.pipe(first()).subscribe({
+    error() {},
+  });
 
   return {
     id,
     info,
-    result: output.pipe(first()).toPromise(),
+    // This is a getter so that it always returns the next output, and not the same one.
+    get result() { return output.pipe(first()).toPromise(); },
     output,
     progress: job.getChannel<BuilderProgressReport>('progress', progressSchema).pipe(
       shareReplay(1),
@@ -99,7 +112,10 @@ export async function scheduleByName(
     stop() {
       job.stop();
 
-      return output.pipe(ignoreElements()).toPromise();
+      return job.outboundBus.pipe(
+        ignoreElements(),
+        catchError(() => EMPTY),
+      ).toPromise();
     },
   };
 }
@@ -112,6 +128,7 @@ export async function scheduleByTarget(
     logger: logging.LoggerApi,
     workspaceRoot: string | Promise<string>,
     currentDirectory: string | Promise<string>,
+    analytics?: analytics.Analytics,
   },
 ): Promise<BuilderRun> {
   return scheduleByName(`{${targetStringFromTarget(target)}}`, overrides, {

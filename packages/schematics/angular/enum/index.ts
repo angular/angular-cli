@@ -8,8 +8,6 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
-  SchematicsException,
   Tree,
   apply,
   applyTemplates,
@@ -21,19 +19,14 @@ import {
 } from '@angular-devkit/schematics';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
+import { createDefaultPath } from '../utility/workspace';
 import { Schema as EnumOptions } from './schema';
 
 
 export default function (options: EnumOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    if (!options.project) {
-      throw new SchematicsException('Option (project) is required.');
-    }
-    const project = getProject(host, options.project);
-
+  return async (host: Tree) => {
     if (options.path === undefined) {
-      options.path = buildDefaultPath(project);
+      options.path = await createDefaultPath(host, options.project as string);
     }
 
     const parsedPath = parseName(options.path, options.name);

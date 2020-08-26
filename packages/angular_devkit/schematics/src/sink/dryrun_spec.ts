@@ -9,7 +9,6 @@
 import { Path, normalize, virtualFs } from '@angular-devkit/core';
 import { toArray } from 'rxjs/operators';
 import { HostCreateTree, HostTree } from '../tree/host-tree';
-import { optimize } from '../tree/static';
 import { DryRunSink } from './dryrun';
 
 
@@ -47,7 +46,7 @@ describe('DryRunSink', () => {
       })
       .then(done, done.fail);
 
-    sink.commit(optimize(tree))
+    sink.commit(tree)
       .toPromise().then(done, done.fail);
   });
 
@@ -78,7 +77,7 @@ describe('DryRunSink', () => {
       })
       .then(done, done.fail);
 
-    sink.commit(optimize(tree))
+    sink.commit(tree)
       .toPromise().then(done, done.fail);
   });
 });

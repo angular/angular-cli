@@ -7,7 +7,7 @@ export interface ActionBase {
 }
 
 export declare class ActionList implements Iterable<Action> {
-    readonly length: number;
+    get length(): number;
     [Symbol.iterator](): IterableIterator<Action>;
     protected _action(action: Partial<Action>): void;
     create(path: Path, content: Buffer): void;
@@ -39,17 +39,19 @@ export declare type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntr
 export declare abstract class BaseWorkflow implements Workflow {
     protected _context: WorkflowExecutionContext[];
     protected _dryRun: boolean;
-    protected _engine: SchematicEngine<{}, {}>;
+    protected _engine: Engine<{}, {}>;
     protected _engineHost: EngineHost<{}, {}>;
     protected _force: boolean;
     protected _host: virtualFs.Host;
     protected _lifeCycle: Subject<LifeCycleEvent>;
     protected _registry: schema.CoreSchemaRegistry;
     protected _reporter: Subject<DryRunEvent>;
-    readonly context: Readonly<WorkflowExecutionContext>;
-    readonly lifeCycle: Observable<LifeCycleEvent>;
-    readonly registry: schema.SchemaRegistry;
-    readonly reporter: Observable<DryRunEvent>;
+    get context(): Readonly<WorkflowExecutionContext>;
+    get engine(): Engine<{}, {}>;
+    get engineHost(): EngineHost<{}, {}>;
+    get lifeCycle(): Observable<LifeCycleEvent>;
+    get registry(): schema.SchemaRegistry;
+    get reporter(): Observable<DryRunEvent>;
     constructor(options: BaseWorkflowOptions);
     protected _createSinks(): Sink[];
     execute(options: Partial<WorkflowExecutionContext> & RequiredWorkflowExecutionContext): Observable<void>;
@@ -65,7 +67,7 @@ export interface BaseWorkflowOptions {
 
 export declare function branchAndMerge(rule: Rule, strategy?: MergeStrategy): Rule;
 
-export declare function callRule(rule: Rule, input: Observable<Tree>, context: SchematicContext): Observable<Tree>;
+export declare function callRule(rule: Rule, input: Tree | Observable<Tree>, context: SchematicContext): Observable<Tree>;
 
 export declare function callSource(source: Source, context: SchematicContext): Observable<Tree>;
 
@@ -89,8 +91,8 @@ export declare type CollectionDescription<CollectionMetadataT extends object> = 
 
 export declare class CollectionImpl<CollectionT extends object, SchematicT extends object> implements Collection<CollectionT, SchematicT> {
     readonly baseDescriptions?: CollectionDescription<CollectionT>[] | undefined;
-    readonly description: CollectionDescription<CollectionT>;
-    readonly name: string;
+    get description(): CollectionDescription<CollectionT>;
+    get name(): string;
     constructor(_description: CollectionDescription<CollectionT>, _engine: SchematicEngine<CollectionT, SchematicT>, baseDescriptions?: CollectionDescription<CollectionT>[] | undefined);
     createSchematic(name: string, allowPrivate?: boolean): Schematic<CollectionT, SchematicT>;
     listSchematicNames(): string[];
@@ -111,8 +113,8 @@ export interface CreateFileAction extends ActionBase {
 
 export declare class DelegateTree implements Tree {
     protected _other: Tree;
-    readonly actions: Action[];
-    readonly root: DirEntry;
+    get actions(): Action[];
+    get root(): DirEntry;
     constructor(_other: Tree);
     apply(action: Action, strategy?: MergeStrategy): void;
     beginUpdate(path: string): UpdateRecorder;
@@ -174,7 +176,6 @@ export declare class DryRunSink extends HostSink {
     protected _fileDoesNotExistExceptionSet: Set<string>;
     protected _subject: Subject<DryRunEvent>;
     readonly reporter: Observable<DryRunEvent>;
-    constructor(dir: string, force?: boolean);
     constructor(host: virtualFs.Host, force?: boolean);
     _done(): Observable<void>;
     protected _fileAlreadyExistException(path: string): void;
@@ -213,7 +214,6 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     getSchematicRuleFactory<OptionT extends object>(schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>, collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;
     hasTaskExecutor(name: string): boolean;
     listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
-    listSchematics(collection: Collection<CollectionMetadataT, SchematicMetadataT>): string[];
     transformContext(context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT> | void;
     transformOptions<OptionT extends object, ResultT extends object>(schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>, options: OptionT, context?: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): Observable<ResultT>;
 }
@@ -244,10 +244,6 @@ export interface FilePredicate<T> {
     (path: Path, entry?: Readonly<FileEntry> | null): T;
 }
 
-export declare class FileSystemSink extends HostSink {
-    constructor(dir: string, force?: boolean);
-}
-
 export declare type FileVisitor = FilePredicate<void>;
 
 export declare const FileVisitorCancelToken: symbol;
@@ -269,8 +265,8 @@ export declare class HostDirEntry implements DirEntry {
     protected _tree: Tree;
     readonly parent: DirEntry | null;
     readonly path: Path;
-    readonly subdirs: PathFragment[];
-    readonly subfiles: PathFragment[];
+    get subdirs(): PathFragment[];
+    get subfiles(): PathFragment[];
     constructor(parent: DirEntry | null, path: Path, _host: virtualFs.SyncDelegateHost, _tree: Tree);
     dir(name: PathFragment): DirEntry;
     file(name: PathFragment): FileEntry | null;
@@ -296,8 +292,8 @@ export declare class HostSink extends SimpleSinkBase {
 
 export declare class HostTree implements Tree {
     protected _backend: virtualFs.ReadonlyHost<{}>;
-    readonly actions: Action[];
-    readonly root: DirEntry;
+    get actions(): Action[];
+    get root(): DirEntry;
     constructor(_backend?: virtualFs.ReadonlyHost<{}>);
     protected _normalizePath(path: string): Path;
     protected _willCreate(path: Path): boolean;
@@ -314,7 +310,6 @@ export declare class HostTree implements Tree {
     get(path: string): FileEntry | null;
     getDir(path: string): DirEntry;
     merge(other: Tree, strategy?: MergeStrategy): void;
-    optimize(): this;
     overwrite(path: string, content: Buffer | string): void;
     read(path: string): Buffer | null;
     rename(from: string, to: string): void;
@@ -424,7 +419,7 @@ export interface RequiredWorkflowExecutionContext {
     schematic: string;
 }
 
-export declare type Rule = (tree: Tree, context: SchematicContext) => Tree | Observable<Tree> | Rule | void;
+export declare type Rule = (tree: Tree, context: SchematicContext) => Tree | Observable<Tree> | Rule | Promise<void> | Promise<Rule> | void;
 
 export declare type RuleFactory<T extends object> = (options: T) => Rule;
 
@@ -447,8 +442,8 @@ export declare type SchematicDescription<CollectionMetadataT extends object, Sch
 
 export declare class SchematicEngine<CollectionT extends object, SchematicT extends object> implements Engine<CollectionT, SchematicT> {
     protected _workflow?: Workflow | undefined;
-    readonly defaultMergeStrategy: MergeStrategy;
-    readonly workflow: Workflow | null;
+    get defaultMergeStrategy(): MergeStrategy;
+    get workflow(): Workflow | null;
     constructor(_host: EngineHost<CollectionT, SchematicT>, _workflow?: Workflow | undefined);
     createCollection(name: string): Collection<CollectionT, SchematicT>;
     createContext(schematic: Schematic<CollectionT, SchematicT>, parent?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): TypedSchematicContext<CollectionT, SchematicT>;
@@ -464,8 +459,8 @@ export declare class SchematicEngineConflictingException extends BaseException {
 }
 
 export declare class SchematicImpl<CollectionT extends object, SchematicT extends object> implements Schematic<CollectionT, SchematicT> {
-    readonly collection: Collection<CollectionT, SchematicT>;
-    readonly description: SchematicDescription<CollectionT, SchematicT>;
+    get collection(): Collection<CollectionT, SchematicT>;
+    get description(): SchematicDescription<CollectionT, SchematicT>;
     constructor(_description: SchematicDescription<CollectionT, SchematicT>, _factory: RuleFactory<{}>, _collection: Collection<CollectionT, SchematicT>, _engine: Engine<CollectionT, SchematicT>);
     call<OptionT extends object>(options: OptionT, host: Observable<Tree>, parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): Observable<Tree>;
 }
@@ -556,6 +551,7 @@ export interface TreeConstructor {
 export declare const TreeSymbol: symbol;
 
 export interface TypedSchematicContext<CollectionMetadataT extends object, SchematicMetadataT extends object> {
+    readonly analytics?: analytics.Analytics;
     readonly debug: boolean;
     readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
     readonly interactive: boolean;

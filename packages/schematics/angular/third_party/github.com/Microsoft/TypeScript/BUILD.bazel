@@ -1,0 +1,12 @@
+load("//tools:defaults.bzl", "ts_library")
+
+# files fetched on 2020-08-24 from
+# https://github.com/microsoft/TypeScript/releases/tag/v4.0.2
+licenses(["notice"])  # Apache 2.0
+
+ts_library(
+    name = "TypeScript",
+    srcs = ["lib/typescript.d.ts"],
+    data = ["lib/typescript.js"],
+    visibility = ["//packages/schematics/angular:__subpackages__"],
+)

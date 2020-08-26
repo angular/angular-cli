@@ -5,6 +5,7 @@ import {
   killAllProcesses,
   waitForAnyProcessOutputToMatch,
 } from '../../utils/process';
+import { wait } from '../../utils/utils';
 
 const webpackGoodRegEx = /: Compiled successfully./;
 
@@ -17,7 +18,9 @@ export default async function() {
   try {
     await execAndWaitForOutputToMatch('ng', ['serve', '--prod'], webpackGoodRegEx);
 
-      // Should trigger a rebuild.
+    await wait(4000);
+ 
+    // Should trigger a rebuild.
     await appendToFile('src/environments/environment.prod.ts', `console.log('PROD');`);
     await waitForAnyProcessOutputToMatch(webpackGoodRegEx, 45000);
   } catch (e) {

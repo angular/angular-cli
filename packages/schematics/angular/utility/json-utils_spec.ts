@@ -12,8 +12,10 @@ import {
   appendPropertyInAstObject,
   appendValueInAstArray,
   insertPropertyInAstObjectInOrder,
+  removePropertyInAstObject,
 } from './json-utils';
 
+// tslint:disable-next-line: no-big-function
 describe('json-utils', () => {
   const a = 'a';
   const b = 'b';
@@ -129,6 +131,48 @@ describe('json-utils', () => {
     });
   });
 
+  describe('removePropertyInAstObject', () => {
+    it('should remove a first prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, a);
+      }, {a, m, z}, indent);
+      expect(result).toBe(JSON.stringify({m, z}, null, indent));
+      expect(JSON.parse(result)).toEqual({m, z});
+    });
+
+    it('should remove a middle prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, m);
+      }, {a, m, z}, indent);
+      expect(result).toBe(JSON.stringify({a, z}, null, indent));
+      expect(JSON.parse(result)).toEqual({a, z});
+    });
+
+    it('should remove a last prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, z);
+      }, {a, m, z}, indent);
+      expect(result).toBe(JSON.stringify({a, m}, null, indent));
+      expect(JSON.parse(result)).toEqual({a, m});
+    });
+
+    it('should remove only prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, a);
+      }, {a}, indent);
+      expect(result).toBe(JSON.stringify({}, null, indent));
+      expect(JSON.parse(result)).toEqual({});
+    });
+  });
+
   describe('appendValueInAstArray', () => {
     it('should insert multiple props with different indentations', () => {
       const cases: Array<[string[], string, {}, number]> = [
@@ -156,6 +200,35 @@ describe('json-utils', () => {
         expect(JSON.parse(got)).toEqual(want);
       }
     });
-  });
 
+    it('should insert multiple props with different indentations in Object literal', () => {
+      const cases: Array<[string[], string, {}, number]> = [
+        // initial | value | want | indent
+        [[], z, [z], 0],
+        [[z], m, [z, m], 0],
+        [[m, z], a, [m, z, a], 0],
+        [[a, m, z], b, [a, m, z, b], 0],
+        // todo: investigate how to do this this of addition with the correct formatting
+        // [[], z, [z], 2],
+        [[z], m, [z, m], 2],
+        [[m, z], a, [m, z, a], 2],
+        [[a, m, z], b, [a, m, z, b], 2],
+        // todo: investigate how to do this this of addition with the correct formatting
+        // [[], z, [z], 4],
+        [[z], m, [z, m], 4],
+        [[m, z], a, [m, z, a], 4],
+        [[a, m, z], b, [a, m, z, b], 4],
+      ];
+      for (const c of cases) {
+        const [initial, value, want, indent] = c;
+        const got = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+          expect(ast.properties[0].value.kind).toBe('array');
+          appendValueInAstArray(rec, ast.properties[0].value as unknown as JsonAstArray, value, indent * 2);
+        }, { data: initial }, indent);
+        const wantData = { data: want };
+        expect(got).toBe(JSON.stringify(wantData, null, indent));
+        expect(JSON.parse(got)).toEqual(wantData);
+      }
+    });
+  });
 });

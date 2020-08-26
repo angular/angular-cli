@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, getSystemPath, virtualFs } from '@angular-devkit/core';
+import { Path, getSystemPath, schema, virtualFs } from '@angular-devkit/core';
 import {
   workflow,
 } from '@angular-devkit/schematics';  // tslint:disable-line:no-implicit-dependencies
 import { BuiltinTaskExecutor } from '../../tasks/node';
+import { FileSystemEngine } from '../description';
 import { NodeModulesEngineHost } from '../node-module-engine-host';
-import { validateOptionsWithSchema } from '../schema-option-transform';
 
 /**
  * A workflow specifically for Node tools.
@@ -22,20 +22,22 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     options: {
       force?: boolean;
       dryRun?: boolean;
-      root?: Path,
+      root?: Path;
       packageManager?: string;
+      packageRegistry?: string;
+      registry?: schema.CoreSchemaRegistry;
+      resolvePaths?: string[],
     },
   ) {
-    const engineHost = new NodeModulesEngineHost();
+    const engineHost = new NodeModulesEngineHost(options.resolvePaths);
     super({
-      host: host,
-      engineHost: engineHost,
+      host,
+      engineHost,
 
       force: options.force,
       dryRun: options.dryRun,
+      registry: options.registry,
     });
-
-    engineHost.registerOptionsTransform(validateOptionsWithSchema(this._registry));
 
     engineHost.registerTaskExecutor(
       BuiltinTaskExecutor.NodePackage,
@@ -43,6 +45,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
         allowPackageManagerOverride: true,
         packageManager: options.packageManager,
         rootDirectory: options.root && getSystemPath(options.root),
+        registry: options.packageRegistry,
       },
     );
     engineHost.registerTaskExecutor(
@@ -55,5 +58,12 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
 
     this._context = [];
+  }
+
+  get engine(): FileSystemEngine {
+    return this._engine as {} as FileSystemEngine;
+  }
+  get engineHost(): NodeModulesEngineHost {
+    return this._engineHost as NodeModulesEngineHost;
   }
 }

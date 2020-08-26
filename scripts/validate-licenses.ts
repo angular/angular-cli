@@ -25,7 +25,7 @@ const spdxSatisfies = require('spdx-satisfies');
  * - Public Domain
  *    Same as CC0, it is not a valid license.
  */
-const licensesWhitelist = [
+const allowedLicenses = [
   // Regular valid open source licenses supported by Google.
   'MIT',
   'ISC',
@@ -41,6 +41,8 @@ const licensesWhitelist = [
 
   // Have a full copyright grant. Validated by opensource team.
   'Unlicense',
+  'CC0-1.0',
+  '0BSD',
 
   // Combinations.
   '(AFL-2.1 OR BSD-2-Clause)',
@@ -64,18 +66,14 @@ const ignoredPackages = [
   // Us.
   '@angular/devkit-repo@0.0.0',  // Hey, that's us!
   // * Development only
-  'spdx-license-ids@3.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
-  'tslint-sonarts@1.8.0', // LGPL-3.0 but only used as a tool, not linked in the build.
+  'spdx-license-ids@3.0.5',  // CC0 but it's content only (index.json, no code) and not distributed.
+  'tslint-sonarts@1.9.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 
   // * Broken license fields
-  'bitsyntax@0.0.4', // MIT but no license field in package.json
-  'pako@1.0.6', // MIT but broken license in package.json
-  'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
-  'uws@9.14.0', // zlib license
+  'pako@1.0.11', // MIT but broken license in package.json
 
   // * Other
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
-  'stream-json@0.5.2', // 'New BSD'
 ];
 
 // Ignore own packages (all MIT)
@@ -99,7 +97,7 @@ function _passesSpdx(licenses: string[], accepted: string[]) {
 
 export default function (_options: {}, logger: logging.Logger): Promise<number> {
   return new Promise(resolve => {
-    checker.init({ start: path.join(__dirname, '..') }, (err: Error, json: JsonObject) => {
+    checker.init({ start: path.join(__dirname, '..'), excludePrivatePackages: true }, (err: Error, json: JsonObject) => {
       if (err) {
         logger.fatal(`Something happened:\n${err.message}`);
         resolve(1);
@@ -116,7 +114,7 @@ export default function (_options: {}, logger: logging.Logger): Promise<number> 
               .map(x => x.replace(/\*$/, ''))
               .map(x => x in licenseReplacements ? licenseReplacements[x] : x),
           }))
-          .filter(pkg => !_passesSpdx(pkg.licenses, licensesWhitelist))
+          .filter(pkg => !_passesSpdx(pkg.licenses, allowedLicenses))
           .filter(pkg => !ignoredPackages.find(ignored => ignored === pkg.id));
 
         // Report packages with bad licenses

@@ -9,7 +9,7 @@ export declare function addUndefinedDefaults(value: JsonValue, _pointer: JsonPoi
 
 export declare class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
     protected _aliases: Map<Path, Path>;
-    readonly aliases: Map<Path, Path>;
+    get aliases(): Map<Path, Path>;
     protected _resolve(path: Path): Path;
 }
 
@@ -17,6 +17,63 @@ export declare class AmbiguousProjectPathException extends BaseException {
     readonly path: Path;
     readonly projects: ReadonlyArray<string>;
     constructor(path: Path, projects: ReadonlyArray<string>);
+}
+
+export interface Analytics {
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
+}
+
+export declare type AnalyticsForwarderFn = (report: JsonObject & AnalyticsReport) => void;
+
+export declare type AnalyticsReport = AnalyticsReportEvent | AnalyticsReportScreenview | AnalyticsReportPageview | AnalyticsReportTiming;
+
+export interface AnalyticsReportBase extends JsonObject {
+    kind: AnalyticsReportKind;
+}
+
+export declare class AnalyticsReporter {
+    protected _analytics: Analytics;
+    constructor(_analytics: Analytics);
+    report(report: AnalyticsReport): void;
+}
+
+export interface AnalyticsReportEvent extends AnalyticsReportBase {
+    action: string;
+    category: string;
+    kind: AnalyticsReportKind.Event;
+    options: JsonObject & EventOptions;
+}
+
+export declare enum AnalyticsReportKind {
+    Event = "event",
+    Screenview = "screenview",
+    Pageview = "pageview",
+    Timing = "timing"
+}
+
+export interface AnalyticsReportPageview extends AnalyticsReportBase {
+    kind: AnalyticsReportKind.Pageview;
+    options: JsonObject & PageviewOptions;
+    path: string;
+}
+
+export interface AnalyticsReportScreenview extends AnalyticsReportBase {
+    appName: string;
+    kind: AnalyticsReportKind.Screenview;
+    options: JsonObject & ScreenviewOptions;
+    screenName: string;
+}
+
+export interface AnalyticsReportTiming extends AnalyticsReportBase {
+    category: string;
+    kind: AnalyticsReportKind.Timing;
+    options: JsonObject & TimingOptions;
+    time: string | number;
+    variable: string;
 }
 
 export declare function asPosixPath(path: Path): PosixPath;
@@ -105,8 +162,8 @@ export declare class CordHost extends SimpleMemoryHost {
     protected _filesToOverwrite: Set<Path>;
     protected _filesToRename: Map<Path, Path>;
     protected _filesToRenameRevert: Map<Path, Path>;
-    readonly backend: ReadonlyHost;
-    readonly capabilities: HostCapabilities;
+    get backend(): ReadonlyHost;
+    get capabilities(): HostCapabilities;
     constructor(_back: ReadonlyHost);
     clone(): CordHost;
     commit(host: Host, force?: boolean): Observable<void>;
@@ -157,7 +214,7 @@ export interface CordHostRename {
 
 export declare class CoreSchemaRegistry implements SchemaRegistry {
     constructor(formats?: SchemaFormat[]);
-    protected _resolver(ref: string, validate: ajv.ValidateFunction): {
+    protected _resolver(ref: string, validate?: ajv.ValidateFunction): {
         context?: ajv.ValidateFunction;
         schema?: JsonObject;
     };
@@ -169,6 +226,16 @@ export declare class CoreSchemaRegistry implements SchemaRegistry {
     flatten(schema: JsonObject): Observable<JsonObject>;
     registerUriHandler(handler: UriHandler): void;
     usePromptProvider(provider: PromptProvider): void;
+    useXDeprecatedProvider(onUsage: (message: string) => void): void;
+}
+
+export declare function createSyncHost<StatsT extends object = {}>(handler: SyncHostHandler<StatsT>): Host<StatsT>;
+
+export declare function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost;
+
+export interface CustomDimensionsAndMetricsOptions {
+    dimensions?: (boolean | number | string)[];
+    metrics?: (boolean | number | string)[];
 }
 
 export declare const cyan: (x: string) => string;
@@ -178,6 +245,8 @@ export declare function dasherize(str: string): string;
 export declare function decamelize(str: string): string;
 
 export declare function deepCopy<T extends any>(value: T): T;
+
+export declare type DefinitionCollectionListener<V extends object> = (name: string, action: 'add' | 'remove' | 'replace', newValue: V | undefined, oldValue: V | undefined, collection: DefinitionCollection<V>) => void;
 
 export declare class DependencyNotFoundException extends BaseException {
     constructor();
@@ -195,6 +264,11 @@ export declare class Empty implements ReadonlyHost {
     list(path: Path): Observable<PathFragment[]>;
     read(path: Path): Observable<FileBuffer>;
     stat(path: Path): Observable<Stats<{}> | null>;
+}
+
+export interface EventOptions extends CustomDimensionsAndMetricsOptions {
+    label?: string;
+    value?: string;
 }
 
 export declare function extname(path: Path): string;
@@ -220,6 +294,16 @@ export interface FormatValidatorError extends SchemaValidatorErrorBase {
     params: {
         format: string;
     };
+}
+
+export declare class ForwardingAnalytics implements Analytics {
+    protected _fn: AnalyticsForwarderFn;
+    constructor(_fn: AnalyticsForwarderFn);
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
 }
 
 export declare function fragment(path: string): PathFragment;
@@ -457,7 +541,8 @@ export interface LogEntry extends LoggerMetadata {
 
 export declare class Logger extends Observable<LogEntry> implements LoggerApi {
     protected _metadata: LoggerMetadata;
-    protected _observable: Observable<LogEntry>;
+    protected get _observable(): Observable<LogEntry>;
+    protected set _observable(v: Observable<LogEntry>);
     protected readonly _subject: Subject<LogEntry>;
     readonly name: string;
     readonly parent: Logger | null;
@@ -495,6 +580,16 @@ export interface LoggerMetadata extends JsonObject {
     path: string[];
 }
 
+export declare class LoggingAnalytics implements Analytics {
+    protected _logger: Logger;
+    constructor(_logger: Logger);
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
+}
+
 export declare type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 export declare const magenta: (x: string) => string;
@@ -509,7 +604,63 @@ export declare class MergeConflictException extends BaseException {
     constructor(path: string);
 }
 
+export declare class MultiAnalytics implements Analytics {
+    protected _backends: Analytics[];
+    constructor(_backends?: Analytics[]);
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    push(...backend: Analytics[]): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
+}
+
+export declare enum NgCliAnalyticsDimensions {
+    CpuCount = 1,
+    CpuSpeed = 2,
+    RamInGigabytes = 3,
+    NodeVersion = 4,
+    NgAddCollection = 6,
+    NgBuildBuildEventLog = 7,
+    NgIvyEnabled = 8,
+    BuildErrors = 20
+}
+
+export declare const NgCliAnalyticsDimensionsFlagInfo: {
+    [name: string]: [string, string];
+};
+
+export declare enum NgCliAnalyticsMetrics {
+    NgComponentCount = 1,
+    UNUSED_2 = 2,
+    UNUSED_3 = 3,
+    UNUSED_4 = 4,
+    BuildTime = 5,
+    NgOnInitCount = 6,
+    InitialChunkSize = 7,
+    TotalChunkCount = 8,
+    TotalChunkSize = 9,
+    LazyChunkCount = 10,
+    LazyChunkSize = 11,
+    AssetCount = 12,
+    AssetSize = 13,
+    PolyfillSize = 14,
+    CssSize = 15
+}
+
+export declare const NgCliAnalyticsMetricsFlagInfo: {
+    [name: string]: [string, string];
+};
+
 export declare function noCacheNormalize(path: string): Path;
+
+export declare class NoopAnalytics implements Analytics {
+    event(): void;
+    flush(): Promise<void>;
+    pageview(): void;
+    screenview(): void;
+    timing(): void;
+}
 
 export declare function normalize(path: string): Path;
 
@@ -524,6 +675,11 @@ export declare class NullLogger extends Logger {
 
 export declare function oneLine(strings: TemplateStringsArray, ...values: any[]): string;
 
+export interface PageviewOptions extends CustomDimensionsAndMetricsOptions {
+    hostname?: string;
+    title?: string;
+}
+
 export declare function parseJson(input: string, mode?: JsonParseMode, options?: ParseJsonOptions): JsonValue;
 
 export declare function parseJsonAst(input: string, mode?: JsonParseMode): JsonAstNode;
@@ -535,9 +691,9 @@ export interface ParseJsonOptions {
 export declare function parseJsonPointer(pointer: JsonPointer): string[];
 
 export declare class PartiallyOrderedSet<T> implements Set<T> {
-    readonly [Symbol.toStringTag]: 'Set';
-    readonly size: number;
-    [Symbol.iterator](): IterableIterator<T>;
+    get [Symbol.toStringTag](): 'Set';
+    get size(): number;
+    [Symbol.iterator](): Generator<T, void, unknown>;
     protected _checkCircularDependencies(item: T, deps: Set<T>): void;
     add(item: T, deps?: (Set<T> | T[])): this;
     clear(): void;
@@ -598,13 +754,34 @@ export declare type PosixPath = string & {
 };
 
 export declare class PriorityQueue<T> {
-    readonly size: number;
+    get size(): number;
     constructor(_comparator: (x: T, y: T) => number);
     clear(): void;
     peek(): T | undefined;
     pop(): T | undefined;
     push(item: T): void;
     toArray(): Array<T>;
+}
+
+export interface ProjectDefinition {
+    readonly extensions: Record<string, JsonValue | undefined>;
+    prefix?: string;
+    root: string;
+    sourceRoot?: string;
+    readonly targets: TargetDefinitionCollection;
+}
+
+export declare class ProjectDefinitionCollection extends DefinitionCollection<ProjectDefinition> {
+    constructor(initial?: Record<string, ProjectDefinition>, listener?: DefinitionCollectionListener<ProjectDefinition>);
+    add(definition: {
+        name: string;
+        root: string;
+        sourceRoot?: string;
+        prefix?: string;
+        targets?: Record<string, TargetDefinition | undefined>;
+        [key: string]: unknown;
+    }): ProjectDefinition;
+    set(name: string, value: ProjectDefinition): this;
 }
 
 export declare class ProjectNotFoundException extends BaseException {
@@ -624,10 +801,9 @@ export interface PromptDefinition {
     }>;
     message: string;
     multiselect?: boolean;
-    priority: number;
     raw?: string | JsonObject;
     type: string;
-    validator?: (value: string) => boolean | string | Promise<boolean | string>;
+    validator?: (value: JsonValue) => boolean | string | Promise<boolean | string>;
 }
 
 export declare type PromptProvider = (definitions: Array<PromptDefinition>) => SubscribableOrPromise<{
@@ -643,6 +819,10 @@ export interface ReadonlyHost<StatsT extends object = {}> {
     read(path: Path): Observable<FileBuffer>;
     stat(path: Path): Observable<Stats<StatsT> | null> | null;
 }
+
+export declare function readWorkspace(path: string, host: WorkspaceHost, format?: WorkspaceFormat): Promise<{
+    workspace: WorkspaceDefinition;
+}>;
 
 export declare const red: (x: string) => string;
 
@@ -679,7 +859,7 @@ export declare function resolve(p1: Path, p2: Path): Path;
 
 export declare abstract class ResolverHost<T extends object> implements Host<T> {
     protected _delegate: Host<T>;
-    readonly capabilities: HostCapabilities;
+    get capabilities(): HostCapabilities;
     constructor(_delegate: Host<T>);
     protected abstract _resolve(path: Path): Path;
     delete(path: Path): Observable<void>;
@@ -695,7 +875,7 @@ export declare abstract class ResolverHost<T extends object> implements Host<T> 
 }
 
 export declare class SafeReadonlyHost<StatsT extends object = {}> implements ReadonlyHost<StatsT> {
-    readonly capabilities: HostCapabilities;
+    get capabilities(): HostCapabilities;
     constructor(_delegate: ReadonlyHost<StatsT>);
     exists(path: Path): Observable<boolean>;
     isDirectory(path: Path): Observable<boolean>;
@@ -727,6 +907,7 @@ export interface SchemaRegistry {
     compile(schema: Object): Observable<SchemaValidator>;
     flatten(schema: JsonObject | string): Observable<JsonObject>;
     usePromptProvider(provider: PromptProvider): void;
+    useXDeprecatedProvider(onUsage: (message: string) => void): void;
 }
 
 export declare class SchemaValidationException extends BaseException {
@@ -766,9 +947,15 @@ export declare class ScopedHost<T extends object> extends ResolverHost<T> {
     protected _resolve(path: Path): Path;
 }
 
+export interface ScreenviewOptions extends CustomDimensionsAndMetricsOptions {
+    appId?: string;
+    appInstallerId?: string;
+    appVersion?: string;
+}
+
 export declare class SimpleMemoryHost implements Host<{}> {
     protected _cache: Map<Path, Stats<SimpleMemoryHostStats>>;
-    readonly capabilities: HostCapabilities;
+    get capabilities(): HostCapabilities;
     constructor();
     protected _delete(path: Path): void;
     protected _exists(path: Path): boolean;
@@ -811,6 +998,7 @@ export declare class SimpleMemoryHost implements Host<{}> {
     list(path: Path): Observable<PathFragment[]>;
     read(path: Path): Observable<FileBuffer>;
     rename(from: Path, to: Path): Observable<void>;
+    reset(): void;
     stat(path: Path): Observable<Stats<{}> | null> | null;
     watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null;
     write(path: Path, content: FileBuffer): Observable<void>;
@@ -846,8 +1034,8 @@ export declare function stripIndents(strings: TemplateStringsArray, ...values: a
 
 export declare class SyncDelegateHost<T extends object = {}> {
     protected _delegate: Host<T>;
-    readonly capabilities: HostCapabilities;
-    readonly delegate: Host<T>;
+    get capabilities(): HostCapabilities;
+    get delegate(): Host<T>;
     constructor(_delegate: Host<T>);
     protected _doSyncCall<ResultT>(observable: Observable<ResultT>): ResultT;
     delete(path: Path): void;
@@ -862,8 +1050,34 @@ export declare class SyncDelegateHost<T extends object = {}> {
     write(path: Path, content: FileBufferLike): void;
 }
 
+export interface SyncHostHandler<StatsT extends object = {}> {
+    delete(path: Path): void;
+    exists(path: Path): boolean;
+    isDirectory(path: Path): boolean;
+    isFile(path: Path): boolean;
+    list(path: Path): PathFragment[];
+    read(path: Path): FileBuffer;
+    rename(from: Path, to: Path): void;
+    stat(path: Path): Stats<StatsT> | null;
+    write(path: Path, content: FileBufferLike): void;
+}
+
 export declare class SynchronousDelegateExpectedException extends BaseException {
     constructor();
+}
+
+export interface TargetDefinition {
+    builder: string;
+    configurations?: Record<string, Record<string, JsonValue | undefined> | undefined>;
+    options?: Record<string, JsonValue | undefined>;
+}
+
+export declare class TargetDefinitionCollection extends DefinitionCollection<TargetDefinition> {
+    constructor(initial?: Record<string, TargetDefinition>, listener?: DefinitionCollectionListener<TargetDefinition>);
+    add(definition: {
+        name: string;
+    } & TargetDefinition): TargetDefinition;
+    set(name: string, value: TargetDefinition): this;
 }
 
 export declare function template<T>(content: string, options?: TemplateOptions): (input: T) => string;
@@ -933,10 +1147,10 @@ export declare namespace test {
     };
     class TestHost extends SimpleMemoryHost {
         protected _records: TestLogRecord[];
-        protected _sync: SyncDelegateHost<{}>;
-        readonly files: Path[];
-        readonly records: TestLogRecord[];
-        readonly sync: SyncDelegateHost<{}>;
+        protected _sync: SyncDelegateHost<{}> | null;
+        get files(): Path[];
+        get records(): TestLogRecord[];
+        get sync(): SyncDelegateHost<{}>;
         constructor(map?: {
             [path: string]: string;
         });
@@ -959,6 +1173,10 @@ export declare namespace test {
         clearRecords(): void;
         clone(): TestHost;
     }
+}
+
+export interface TimingOptions extends CustomDimensionsAndMetricsOptions {
+    label?: string;
 }
 
 export declare class TransformLogger extends Logger {
@@ -1000,11 +1218,11 @@ export declare type WindowsPath = string & {
 };
 
 export declare class Workspace {
-    readonly host: virtualFs.Host<{}>;
-    readonly newProjectRoot: string | undefined;
-    readonly root: Path;
-    readonly version: number;
-    constructor(_root: Path, _host: virtualFs.Host<{}>);
+    get host(): virtualFs.Host<{}>;
+    get newProjectRoot(): string | undefined;
+    get root(): Path;
+    get version(): number;
+    constructor(_root: Path, _host: virtualFs.Host<{}>, registry?: schema.CoreSchemaRegistry);
     getCli(): WorkspaceTool;
     getDefaultProjectName(): string | null;
     getProject(projectName: string): WorkspaceProject;
@@ -1018,6 +1236,29 @@ export declare class Workspace {
     loadWorkspaceFromHost(workspacePath: Path): Observable<this>;
     loadWorkspaceFromJson(json: {}): Observable<this>;
     validateAgainstSchema<T = {}>(contentJson: {}, schemaJson: JsonObject): Observable<T>;
+    protected static _workspaceFileNames: string[];
+    static findWorkspaceFile(host: virtualFs.Host<{}>, path: Path): Promise<Path | null>;
+    static fromPath(host: virtualFs.Host<{}>, path: Path, registry: schema.CoreSchemaRegistry): Promise<Workspace>;
+}
+
+export interface WorkspaceDefinition {
+    readonly extensions: Record<string, JsonValue | undefined>;
+    readonly projects: ProjectDefinitionCollection;
+}
+
+export declare class WorkspaceFileNotFoundException extends BaseException {
+    constructor(path: Path);
+}
+
+export declare enum WorkspaceFormat {
+    JSON = 0
+}
+
+export interface WorkspaceHost {
+    isDirectory(path: string): Promise<boolean>;
+    isFile(path: string): Promise<boolean>;
+    readFile(path: string): Promise<string>;
+    writeFile(path: string, data: string): Promise<void>;
 }
 
 export declare class WorkspaceNotYetLoadedException extends BaseException {
@@ -1027,12 +1268,18 @@ export declare class WorkspaceNotYetLoadedException extends BaseException {
 export interface WorkspaceProject {
     architect?: WorkspaceTool;
     cli?: WorkspaceTool;
+    i18n?: WorkspaceProjectI18n;
     prefix: string;
     projectType: "application" | "library";
     root: string;
     schematics?: WorkspaceTool;
     sourceRoot?: string;
     targets?: WorkspaceTool;
+}
+
+export interface WorkspaceProjectI18n {
+    locales: Record<string, string>;
+    sourceLocale?: string;
 }
 
 export interface WorkspaceSchema {
@@ -1057,5 +1304,7 @@ export interface WorkspaceTool {
 export declare class WorkspaceToolNotFoundException extends BaseException {
     constructor(name: string);
 }
+
+export declare function writeWorkspace(workspace: WorkspaceDefinition, host: WorkspaceHost, path?: string, format?: WorkspaceFormat): Promise<void>;
 
 export declare const yellow: (x: string) => string;

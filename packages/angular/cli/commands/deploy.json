@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/deploy.json",
+  "description": "Invokes the deploy builder for a specified project or for the default project in the workspace.",
+  "$longDescription": "./deploy-long.md",
+
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./deploy-impl#DeployCommand",
+
+  "allOf": [
+    {
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "The name of the project to deploy.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "A named build target, as specified in the \"configurations\" section of angular.json.\nEach named target is accompanied by a configuration of option defaults for that target.",
+          "type": "string",
+          "aliases": [
+            "c"
+          ]
+        }
+      },
+      "required": []
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

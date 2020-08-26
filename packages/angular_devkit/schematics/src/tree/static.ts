@@ -34,8 +34,3 @@ export function partition(tree: Tree, predicate: FilePredicate<boolean>): [Tree,
     throw new SchematicsException('Tree type is not supported.');
   }
 }
-
-/** @deprecated Tree's are automically optimized */
-export function optimize(tree: Tree) {
-  return tree;
-}

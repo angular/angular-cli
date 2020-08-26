@@ -8,6 +8,7 @@
 import {
   InvalidPathException,
   Path,
+  PathFragment,
   asWindowsPath,
   basename,
   dirname,
@@ -83,7 +84,7 @@ describe('path', () => {
   });
 
   describe('split', () => {
-    const tests = [
+    const tests: [string, string[]][] = [
       ['a', ['a']],
       ['/a/b', ['', 'a', 'b']],
       ['a/b', ['a', 'b']],
@@ -92,31 +93,29 @@ describe('path', () => {
       ['/', ['']],
     ];
 
-    for (const goldens of tests) {
-      const result = goldens.pop();
-      const args = goldens.map((x: string) => normalize(x)) as Path[];
+    for (const [input, result] of tests) {
+      const normalizedInput = normalize(input);
 
-      it(`(${JSON.stringify(args)}) == "${result}"`, () => {
-        expect(split.apply(null, args)).toEqual(result);
+      it(`(${JSON.stringify(normalizedInput)}) == "${result}"`, () => {
+        expect(split(normalizedInput)).toEqual(result as PathFragment[]);
       });
     }
   });
 
   describe('join', () => {
-    const tests = [
-      ['a', 'a'],
-      ['/a', '/b', '/a/b'],
-      ['/a', '/b', '/c', '/a/b/c'],
-      ['/a', 'b', 'c', '/a/b/c'],
-      ['a', 'b', 'c', 'a/b/c'],
+    const tests: [string[], string][] = [
+      [['a'], 'a'],
+      [['/a', '/b'], '/a/b'],
+      [['/a', '/b', '/c'], '/a/b/c'],
+      [['/a', 'b', 'c'], '/a/b/c'],
+      [['a', 'b', 'c'], 'a/b/c'],
     ];
 
-    for (const goldens of tests) {
-      const result = goldens.pop();
-      const args = goldens.map(x => normalize(x)) as Path[];
+    for (const [input, result] of tests) {
+      const args = input.map(x => normalize(x)) as [Path, ...Path[]];
 
       it(`(${JSON.stringify(args)}) == "${result}"`, () => {
-        expect(join.apply(null, args)).toBe(result);
+        expect(join(...args)).toBe(result);
       });
     }
   });
@@ -133,6 +132,8 @@ describe('path', () => {
         '/src/app/sub1/test1', '/src/app/sub2/test2',
         '../../sub2/test2',
       ],
+      ['/', '/a/b/c', 'a/b/c'],
+      ['/a/b/c', '/d', '../../../d'],
     ];
 
     for (const [from, to, result] of tests) {
@@ -141,6 +142,7 @@ describe('path', () => {
         const t = normalize(to);
 
         expect(relative(f, t)).toBe(result);
+        expect(join(f, relative(f, t))).toBe(t);
       });
     }
   });

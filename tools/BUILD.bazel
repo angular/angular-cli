@@ -1,0 +1,39 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+# @external_begin
+load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+nodejs_binary(
+    name = "quicktype_runner",
+    data = [
+        "quicktype_runner.js",
+        "@npm//quicktype-core",
+    ],
+    entry_point = "quicktype_runner.js",
+)
+
+platform(
+    name = "rbe_ubuntu1604-angular",
+    parents = ["@rbe_ubuntu1604_angular//config:platform"],
+    remote_execution_properties = """
+        {PARENT_REMOTE_EXECUTION_PROPERTIES}
+        properties: {
+            name: "dockerAddCapabilities"
+            value: "SYS_ADMIN"
+        }
+        properties: {
+            name: "dockerNetwork"
+            value: "standard"
+        }
+        properties: {
+            name: "Pool"
+            value: "default"
+        }
+        """,
+)
+
+# @external_end

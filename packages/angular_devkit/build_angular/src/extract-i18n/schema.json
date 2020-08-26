@@ -1,13 +1,15 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Extract i18n Target",
   "description": "Extract i18n target options for Build Facade.",
   "type": "object",
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to extract from."
+      "description": "Target to extract from.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
-    "i18nFormat": {
+    "format": {
       "type": "string",
       "description": "Output format for the generated file.",
       "default": "xlf",
@@ -20,9 +22,28 @@
         "xliff2"
       ]
     },
+    "i18nFormat": {
+      "type": "string",
+      "description": "Output format for the generated file.",
+      "default": "xlf",
+      "x-deprecated": "Use 'format' option instead.",
+      "enum": [
+        "xmb",
+        "xlf",
+        "xlif",
+        "xliff",
+        "xlf2",
+        "xliff2"
+      ]
+    },
     "i18nLocale": {
       "type": "string",
-      "description": "Specifies the source language of the application."
+      "description": "Specifies the source language of the application.",
+      "x-deprecated": "Use 'i18n' project level sub-option 'sourceLocale' instead."
+    },
+    "ivy": {
+      "type": "boolean",
+      "description": "Use Ivy compiler to extract translations."
     },
     "progress": {
       "type": "boolean",

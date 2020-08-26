@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as jobs from './experimental/jobs/index';
-import * as workspace from './workspace/index';
+import * as workspace from './experimental/workspace/index';
 
 export {
   jobs,

@@ -60,6 +60,11 @@
       "description": "Create a guard.",
       "schema": "./guard/schema.json"
     },
+    "interceptor": {
+      "factory": "./interceptor",
+      "description": "Create an interceptor.",
+      "schema": "./interceptor/schema.json"
+    },
     "interface": {
       "aliases": [ "i" ],
       "factory": "./interface",
@@ -87,7 +92,8 @@
     "universal": {
       "factory": "./universal",
       "description": "Create an Angular universal app.",
-      "schema": "./universal/schema.json"
+      "schema": "./universal/schema.json",
+      "hidden": true
     },
     "appShell": {
       "aliases": [ "app-shell" ],
@@ -100,6 +106,12 @@
       "factory": "./library",
       "schema": "./library/schema.json",
       "description": "Generate a library project for Angular."
+    },
+    "webWorker": {
+      "aliases": ["web-worker"],
+      "factory": "./web-worker",
+      "schema": "./web-worker/schema.json",
+      "description": "Create a Web Worker."
     }
   }
 }

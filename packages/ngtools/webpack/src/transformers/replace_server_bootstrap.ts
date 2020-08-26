@@ -7,6 +7,7 @@
  */
 import { dirname, relative } from 'path';
 import * as ts from 'typescript';
+import { forwardSlashPath } from '../utils';
 import { collectDeepNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
 import { ReplaceNodeOperation, StandardTransform, TransformOperation } from './interfaces';
@@ -37,7 +38,7 @@ export function replaceServerBootstrap(
     }
 
     const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
-    const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
+    const normalizedEntryModulePath = forwardSlashPath(`./${relativeEntryModulePath}`);
     const factoryClassName = entryModule.className + 'NgFactory';
     const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
 

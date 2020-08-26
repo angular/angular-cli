@@ -16,7 +16,7 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
-import { Observable, of } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { concatMap, map, mergeMap } from 'rxjs/operators';
 import {
   ContentHasMutatedException,
@@ -146,12 +146,6 @@ export class HostTree implements Tree {
 
   protected _willRename(path: Path) {
     return this._record.willRename(path);
-  }
-
-  // This can be used by old Schematics library with new Trees in some corner cases.
-  // TODO: remove this for 7.0
-  optimize() {
-    return this;
   }
 
   branch(): Tree {
@@ -347,7 +341,9 @@ export class HostTree implements Tree {
         throw new ContentHasMutatedException(path);
       } else {
         const newContent = record.apply(entry.content);
-        this.overwrite(path, newContent);
+        if (!newContent.equals(entry.content)) {
+          this.overwrite(path, newContent);
+        }
       }
     } else {
       throw new InvalidUpdateRecordException();
@@ -457,13 +453,13 @@ export class FilterHostTree extends HostTree {
             let isFile = false;
             originalBackend.isFile(path).subscribe(val => isFile = val);
             if (!isFile || !filter(path)) {
-              return of();
+              return EMPTY;
             }
 
             let content: ArrayBuffer | null = null;
             originalBackend.read(path).subscribe(val => content = val);
             if (!content) {
-              return of();
+              return EMPTY;
             }
 
             return newBackend.write(path, content as {} as virtualFs.FileBuffer);

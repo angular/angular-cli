@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonParseMode, parseJson } from '@angular-devkit/core';
-import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { ProjectType, WorkspaceProject, WorkspaceSchema } from './workspace-models';
 
 // The interfaces below are generated from the Angular CLI configuration schema
@@ -130,7 +130,7 @@ export interface AppConfig {
     /**
      * The type of budget
      */
-    type?: ('bundle' | 'initial' | 'allScript' | 'all' | 'anyScript' | 'any');
+    type?: ('bundle' | 'initial' | 'allScript' | 'all' | 'anyScript' | 'any' | 'anyComponentStyle');
     /**
      * The name of the bundle
      */
@@ -455,26 +455,7 @@ export interface CliConfig {
    * Allow people to disable console warnings.
    */
   warnings?: {
-      /**
-       * Show a warning when the user enabled the --hmr option.
-       */
-      hmrWarning?: boolean;
-      /**
-       * Show a warning when the node version is incompatible.
-       */
-      nodeDeprecation?: boolean;
-      /**
-       * Show a warning when the user installed angular-cli.
-       */
-      packageDeprecation?: boolean;
-      /**
-       * Show a warning when the global version is newer than the local one.
-       */
       versionMismatch?: boolean;
-      /**
-       * Show a warning when the TypeScript version is incompatible
-       */
-      typescriptMismatch?: boolean;
   };
 }
 
@@ -501,8 +482,7 @@ export function addProjectToWorkspace<TProjectType extends ProjectType = Project
   name: string,
   project: WorkspaceProject<TProjectType>,
 ): Rule {
-  return (host: Tree, context: SchematicContext) => {
-
+  return () => {
     if (workspace.projects[name]) {
       throw new Error(`Project '${name}' already exists in workspace.`);
     }
@@ -520,7 +500,7 @@ export function addProjectToWorkspace<TProjectType extends ProjectType = Project
 }
 
 export function updateWorkspace(workspace: WorkspaceSchema): Rule {
-    return (host: Tree, context: SchematicContext) => {
+    return (host: Tree) => {
         host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
     };
 }

@@ -5,15 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable-next-line:no-implicit-dependencies
+// tslint:disable-next-line: no-global-tslint-disable
+// tslint:disable: no-implicit-dependencies
 import { JsonObject } from '@angular-devkit/core';
 import { execSync } from 'child_process';
-import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-const glob = require('glob');
 const distRoot = path.join(__dirname, '../dist');
 const { packages: monorepoPackages } = require('../.monorepo.json');
 
@@ -28,51 +27,18 @@ export interface PackageInfo {
   build: string;
   tar: string;
   private: boolean;
+  experimental: boolean;
   packageJson: JsonObject;
   dependencies: string[];
+  reverseDependencies: string[];
 
   snapshot: boolean;
   snapshotRepo: string;
   snapshotHash: string;
 
-  dirty: boolean;
-  hash: string;
   version: string;
 }
 export type PackageMap = { [name: string]: PackageInfo };
-
-
-const hashCache: {[name: string]: string | null} = {};
-function _getHashOf(pkg: PackageInfo): string {
-  if (!(pkg.name in hashCache)) {
-    hashCache[pkg.name] = null;
-    const md5Stream = crypto.createHash('md5');
-
-    // Update the stream with all files content.
-    const files: string[] = glob.sync(path.join(pkg.root, '**'), { nodir: true });
-    files.forEach(filePath => {
-      md5Stream.write(`\0${filePath}\0`);
-      md5Stream.write(fs.readFileSync(filePath));
-    });
-    // Update the stream with all versions of upstream dependencies.
-    pkg.dependencies.forEach(depName => {
-      md5Stream.write(`\0${depName}\0${_getHashOf(packages[depName])}\0`);
-    });
-
-    md5Stream.end();
-
-    hashCache[pkg.name] = (md5Stream.read() as Buffer).toString('hex');
-  }
-
-  const value = hashCache[pkg.name];
-  if (!value) {
-    // Protect against circular dependency.
-    throw new Error('Circular dependency detected between the following packages: '
-      + Object.keys(hashCache).filter(key => hashCache[key] == null).join(', '));
-  }
-
-  return value;
-}
 
 
 function loadPackageJson(p: string) {
@@ -94,11 +60,11 @@ function loadPackageJson(p: string) {
       case 'private':
       case 'workspaces':
       case 'resolutions':
+      case 'scripts':
         continue;
 
       // Remove the following keys from the package.json.
       case 'devDependencies':
-      case 'scripts':
         delete pkg[key];
         continue;
 
@@ -117,8 +83,9 @@ function loadPackageJson(p: string) {
       // Overwrite engines to a common default.
       case 'engines':
         pkg['engines'] = {
-          'node': '>= 8.9.0',
-          'npm': '>= 5.5.1',
+          'node': '>= 10.13.0',
+          'npm': '>= 6.11.0',
+          'yarn': '>= 1.13.0',
         };
         break;
 
@@ -174,15 +141,51 @@ const packageJsonPaths = _findAllPackageJson(path.join(__dirname, '..'), exclude
   .filter(p => p != path.join(__dirname, '../package.json'));
 
 
+function _exec(cmd: string) {
+  return execSync(cmd).toString().trim();
+}
+
+
 let gitShaCache: string;
 function _getSnapshotHash(_pkg: PackageInfo): string {
   if (!gitShaCache) {
-    gitShaCache = execSync('git log --format=%h -n1').toString().trim();
+    gitShaCache = _exec('git log --format=%h -n1');
   }
 
   return gitShaCache;
 }
 
+
+let stableVersion = '';
+let experimentalVersion = '';
+function _getVersionFromGit(experimental: boolean): string {
+  if (stableVersion && experimentalVersion) {
+    return experimental ? experimentalVersion : stableVersion;
+  }
+
+  const hasLocalChanges = _exec(`git status --porcelain`) != '';
+  const scmVersionTagRaw = _exec(`git describe --match v[0-9]*.[0-9]*.[0-9]* --abbrev=7 --tags`)
+    .slice(1);
+  stableVersion = scmVersionTagRaw.replace(/-([0-9]+)-g/, '+$1.');
+  if (hasLocalChanges) {
+    stableVersion += stableVersion.includes('+') ? '.with-local-changes' : '+with-local-changes';
+  }
+
+  experimentalVersion = stableToExperimentalVersion(stableVersion);
+
+  return experimental ? experimentalVersion : stableVersion;
+}
+
+/**
+ * Convert a stable version to its experimental equivalent. For example,
+ *   stable = 10.2.3, experimental = 0.1002.3
+ * @param stable Must begin with d+.d+ where d is a 0-9 digit.
+ */
+export function stableToExperimentalVersion(stable: string): string {
+  return `0.${stable.replace(/^(\d+)\.(\d+)/, (_, major, minor) => {
+    return '' + (parseInt(major, 10) * 100 + parseInt(minor, 10));
+  })}`;
+}
 
 // All the supported packages. Go through the packages directory and create a map of
 // name => PackageInfo. This map is partial as it lacks some information that requires the
@@ -213,13 +216,16 @@ export const packages: PackageMap =
         bin[binName] = p;
       });
 
+      const experimental = !!packageJson.private || !!packageJson.experimental;
+
       packages[name] = {
         build: path.join(distRoot, pkgRoot.substr(path.dirname(__dirname).length)),
         dist: path.join(distRoot, name),
         root: pkgRoot,
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),
-        private: packageJson.private,
+        private: !!packageJson.private,
+        experimental,
         // yarn doesn't take kindly to @ in tgz filenames
         // https://github.com/yarnpkg/yarn/issues/6339
         tar: path.join(distRoot, name.replace(/\/|@/g, '_') + '.tgz'),
@@ -234,9 +240,10 @@ export const packages: PackageMap =
         },
 
         dependencies: [],
-        hash: '',
-        dirty: false,
-        version: monorepoPackages[name] && monorepoPackages[name].version || '0.0.0',
+        reverseDependencies: [],
+        get version() {
+          return _getVersionFromGit(experimental);
+        },
       };
 
       return packages;
@@ -251,13 +258,5 @@ for (const pkgName of Object.keys(packages)) {
     return name in (pkgJson.dependencies || {})
         || name in (pkgJson.devDependencies || {});
   });
-}
-
-
-// Update the hash values of each.
-for (const pkgName of Object.keys(packages)) {
-  packages[pkgName].hash = _getHashOf(packages[pkgName]);
-  if (!monorepoPackages[pkgName] || packages[pkgName].hash != monorepoPackages[pkgName].hash) {
-    packages[pkgName].dirty = true;
-  }
+  pkg.dependencies.forEach(depName => packages[depName].reverseDependencies.push(pkgName));
 }

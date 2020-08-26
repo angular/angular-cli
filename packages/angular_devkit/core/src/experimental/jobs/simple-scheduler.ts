@@ -162,7 +162,7 @@ export class SimpleScheduler<
           argumentV: this._schemaRegistry.compile(description.argument).pipe(shareReplay(1)),
           inputV: this._schemaRegistry.compile(description.input).pipe(shareReplay(1)),
           outputV: this._schemaRegistry.compile(description.output).pipe(shareReplay(1)),
-        });
+        }) as JobHandlerWithExtra;
         this._internalJobDescriptionMap.set(name, handlerWithExtra);
 
         return of(handlerWithExtra);
@@ -294,7 +294,6 @@ export class SimpleScheduler<
     handler: Observable<JobHandlerWithExtra | null>,
     inboundBus: Observer<JobInboundMessage<I>>,
     outboundBus: Observable<JobOutboundMessage<O>>,
-    options: ScheduleJobOptions,
   ): Job<A, I, O> {
     const schemaRegistry = this._schemaRegistry;
 
@@ -420,7 +419,7 @@ export class SimpleScheduler<
 
     const output = outboundBus.pipe(
       filter(x => x.kind == JobOutboundMessageKind.Output),
-      map((x: JobOutboundMessageOutput<O>) => x.value),
+      map((x) => (x as JobOutboundMessageOutput<O>).value),
       shareReplay(1),
     );
 
@@ -445,7 +444,7 @@ export class SimpleScheduler<
         let maybeObservable = channels.get(name);
         if (!maybeObservable) {
           const s = new Subject<T>();
-          channelsSubject.set(name, s);
+          channelsSubject.set(name, s as unknown as Subject<JsonValue>);
           channels.set(name, s.asObservable());
 
           maybeObservable = s.asObservable();
@@ -509,7 +508,8 @@ export class SimpleScheduler<
       waitable,
 
       from(handler).pipe(
-        switchMap(handler => new Observable((subscriber: Observer<JobOutboundMessage<O>>) => {
+        switchMap(handler => new Observable<JobOutboundMessage<O>>(
+                      (subscriber: Observer<JobOutboundMessage<O>>) => {
           if (!handler) {
             throw new JobDoesNotExistException(name);
           }
@@ -535,11 +535,11 @@ export class SimpleScheduler<
 
               return handler(argument, context);
             }),
-          ).subscribe(subscriber);
+          ).subscribe(subscriber as Observer<JobOutboundMessage<JsonValue>>);
         })),
       ),
     );
 
-    return this._createJob(name, argument, handler, inboundBus, outboundBus, options);
+    return this._createJob(name, argument, handler, inboundBus, outboundBus);
   }
 }

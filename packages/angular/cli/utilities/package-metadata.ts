@@ -18,12 +18,16 @@ export interface PackageDependencies {
   [dependency: string]: string;
 }
 
+export type NgAddSaveDepedency = 'dependencies' | 'devDependencies' | boolean;
+
 export interface PackageIdentifier {
   type: 'git' | 'tag' | 'version' | 'range' | 'file' | 'directory' | 'remote';
   name: string;
   scope: string | null;
   registry: boolean;
   raw: string;
+  fetchSpec: string;
+  rawSpec: string;
 }
 
 export interface PackageManifest {
@@ -37,20 +41,20 @@ export interface PackageManifest {
   devDependencies: PackageDependencies;
   peerDependencies: PackageDependencies;
   optionalDependencies: PackageDependencies;
-
   'ng-add'?: {
-
+    save?: NgAddSaveDepedency;
   };
   'ng-update'?: {
-    migrations: string,
-    packageGroup: { [name: string]: string },
+    migrations: string;
+    packageGroup: { [name: string]: string };
   };
 }
 
 export interface PackageMetadata {
   name: string;
   tags: { [tag: string]: PackageManifest | undefined };
-  versions: Map<string, PackageManifest>;
+  versions: Record<string, PackageManifest>;
+  'dist-tags'?: unknown;
 }
 
 let npmrc: { [key: string]: string };
@@ -59,12 +63,12 @@ function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boo
   if (!npmrc) {
     try {
       npmrc = readOptions(logger, false, verbose);
-    } catch { }
+    } catch {}
 
     if (usingYarn) {
       try {
         npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
-      } catch { }
+      } catch {}
     }
   }
 }
@@ -89,13 +93,11 @@ function readOptions(
   }
 
   const defaultConfigLocations = [
-    path.join(globalPrefix, 'etc', baseFilename),
-    path.join(homedir(), dotFilename),
+    (!yarn && process.env.NPM_CONFIG_GLOBALCONFIG) || path.join(globalPrefix, 'etc', baseFilename),
+    (!yarn && process.env.NPM_CONFIG_USERCONFIG) || path.join(homedir(), dotFilename),
   ];
 
-  const projectConfigLocations: string[] = [
-    path.join(cwd, dotFilename),
-  ];
+  const projectConfigLocations: string[] = [path.join(cwd, dotFilename)];
   const root = path.parse(cwd).root;
   for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
     projectConfigLocations.unshift(path.join(curDir, dotFilename));
@@ -123,7 +125,7 @@ function readOptions(
         delete options.cafile;
         try {
           options.ca = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
-        } catch { }
+        } catch {}
       }
     } else if (showPotentials) {
       logger.info(`Trying '${location}'...not found.`);
@@ -140,7 +142,7 @@ function readOptions(
   return options;
 }
 
-function normalizeManifest(rawManifest: {}): PackageManifest {
+function normalizeManifest(rawManifest: { name: string; version: string }): PackageManifest {
   // TODO: Fully normalize and sanitize
 
   return {
@@ -148,8 +150,7 @@ function normalizeManifest(rawManifest: {}): PackageManifest {
     devDependencies: {},
     peerDependencies: {},
     optionalDependencies: {},
-    // tslint:disable-next-line:no-any
-    ...rawManifest as any,
+    ...rawManifest,
   };
 }
 
@@ -171,31 +172,31 @@ export async function fetchPackageMetadata(
 
   ensureNpmrc(logger, usingYarn, verbose);
 
-  const response = await pacote.packument(
-    name,
-    {
-      'full-metadata': true,
-      ...npmrc,
-      ...(registry ? { registry } : {}),
-    },
-  );
+  const response = await pacote.packument(name, {
+    fullMetadata: true,
+    ...npmrc,
+    ...(registry ? { registry } : {}),
+  });
 
   // Normalize the response
   const metadata: PackageMetadata = {
     name: response.name,
     tags: {},
-    versions: new Map(),
+    versions: {},
   };
 
   if (response.versions) {
     for (const [version, manifest] of Object.entries(response.versions)) {
-      metadata.versions.set(version, normalizeManifest(manifest));
+      metadata.versions[version] = normalizeManifest(manifest as { name: string; version: string });
     }
   }
 
   if (response['dist-tags']) {
+    // Store this for use with other npm utility packages
+    metadata['dist-tags'] = response['dist-tags'];
+
     for (const [tag, version] of Object.entries(response['dist-tags'])) {
-      const manifest = metadata.versions.get(version as string);
+      const manifest = metadata.versions[version as string];
       if (manifest) {
         metadata.tags[tag] = manifest;
       } else if (verbose) {
@@ -225,14 +226,11 @@ export async function fetchPackageManifest(
 
   ensureNpmrc(logger, usingYarn, verbose);
 
-  const response = await pacote.manifest(
-    name,
-    {
-      'full-metadata': true,
-      ...npmrc,
-      ...(registry ? { registry } : {}),
-    },
-  );
+  const response = await pacote.manifest(name, {
+    fullMetadata: true,
+    ...npmrc,
+    ...(registry ? { registry } : {}),
+  });
 
   return normalizeManifest(response);
 }

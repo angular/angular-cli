@@ -8,10 +8,8 @@
 import {
   Path,
   basename,
-  experimental,
   join,
   normalize,
-  parseJson,
   strings,
 } from '@angular-devkit/core';
 import {
@@ -29,55 +27,73 @@ import {
 import {
   NodePackageInstallTask,
 } from '@angular-devkit/schematics/tasks';
-import * as ts from 'typescript';
+import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { getWorkspace, updateWorkspace } from '../utility/config';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
-import { getProject } from '../utility/project';
-import { getProjectTargets, targetBuildNotFoundError } from '../utility/project-targets';
-import { Builders, WorkspaceTargets } from '../utility/workspace-models';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { targetBuildNotFoundError } from '../utility/project-targets';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { BrowserBuilderOptions, Builders, OutputHashing } from '../utility/workspace-models';
 import { Schema as UniversalOptions } from './schema';
 
-
-function getFileReplacements(target: WorkspaceTargets) {
-  const fileReplacements =
-    target.build &&
-    target.build.configurations &&
-    target.build.configurations.production &&
-    target.build.configurations.production.fileReplacements;
-
-  return fileReplacements || [];
-}
-
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
-  return (host: Tree) => {
-    const workspace = getWorkspace(host);
-    const clientProject = getProject(workspace, options.clientProject);
-    const projectTargets = getProjectTargets(clientProject);
+  return updateWorkspace(workspace => {
+    const clientProject = workspace.projects.get(options.clientProject);
+    if (clientProject) {
+      const buildTarget = clientProject.targets.get('build');
+      let fileReplacements;
+      if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
+        fileReplacements = buildTarget.configurations.production.fileReplacements;
+      }
 
-    projectTargets.server = {
-      builder: Builders.Server,
-      options: {
-        outputPath: `dist/${options.clientProject}-server`,
-        main: `${clientProject.root}src/main.server.ts`,
-        tsConfig: join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
-      },
-      configurations: {
-        production: {
-          fileReplacements: getFileReplacements(projectTargets),
-          sourceMap: false,
-          optimization: {
-            scripts: false,
-            styles: true,
+      if (buildTarget && buildTarget.options) {
+        buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+      }
+
+      // In case the browser builder hashes the assets
+      // we need to add this setting to the server builder
+      // as otherwise when assets it will be requested twice.
+      // One for the server which will be unhashed, and other on the client which will be hashed.
+      let outputHashing: OutputHashing | undefined;
+      if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
+        switch (buildTarget.configurations.production.outputHashing as OutputHashing) {
+          case 'all':
+          case 'media':
+            outputHashing = 'media';
+            break;
+        }
+      }
+
+      const mainPath = options.main as string;
+      const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
+
+      clientProject.targets.add({
+        name: 'server',
+        builder: Builders.Server,
+        options: {
+          outputPath: `dist/${options.clientProject}/server`,
+          main: join(normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
+          tsConfig: serverTsConfig,
+        },
+        configurations: {
+          production: {
+            outputHashing,
+            fileReplacements,
+            sourceMap: false,
+            optimization: true,
           },
         },
-      },
-    };
+      });
 
-    return updateWorkspace(workspace);
-  };
+      const lintTarget = clientProject.targets.get('lint');
+      if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
+        lintTarget.options.tsConfig =
+          lintTarget.options.tsConfig.concat(serverTsConfig);
+      }
+    }
+  });
 }
 
 function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
@@ -99,13 +115,9 @@ function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
   return browserModuleNode;
 }
 
-function wrapBootstrapCall(options: UniversalOptions): Rule {
+function wrapBootstrapCall(mainFile: string): Rule {
   return (host: Tree) => {
-    const clientTargets = getProjectTargets(host, options.clientProject);
-    if (!clientTargets.build) {
-      throw targetBuildNotFoundError();
-    }
-    const mainPath = normalize('/' + clientTargets.build.options.main);
+    const mainPath = normalize('/' + mainFile);
     let bootstrapCall: ts.Node | null = findBootstrapModuleCall(host, mainPath);
     if (bootstrapCall === null) {
       throw new SchematicsException('Bootstrap module not found.');
@@ -172,18 +184,17 @@ function findCallExpressionNode(node: ts.Node, text: string): ts.Node | null {
   return foundNode;
 }
 
-function addServerTransition(options: UniversalOptions): Rule {
+function addServerTransition(
+  options: UniversalOptions,
+  mainFile: string,
+  clientProjectRoot: string,
+): Rule {
   return (host: Tree) => {
-    const clientProject = getProject(host, options.clientProject);
-    const clientTargets = getProjectTargets(clientProject);
-    if (!clientTargets.build) {
-      throw targetBuildNotFoundError();
-    }
-    const mainPath = normalize('/' + clientTargets.build.options.main);
+    const mainPath = normalize('/' + mainFile);
 
     const bootstrapModuleRelativePath = findBootstrapModulePath(host, mainPath);
     const bootstrapModulePath = normalize(
-      `/${clientProject.root}/src/${bootstrapModuleRelativePath}.ts`);
+      `/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`);
 
     const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
     const appId = options.appId;
@@ -208,48 +219,34 @@ function addDependencies(): Rule {
       ...coreDep,
       name: '@angular/platform-server',
     };
-    const httpDep = {
-      ...coreDep,
-      name: '@angular/http',
-    };
     addPackageJsonDependency(host, platformServerDep);
-    addPackageJsonDependency(host, httpDep);
 
     return host;
   };
 }
 
-function getTsConfigOutDir(host: Tree, targets: experimental.workspace.WorkspaceTool): string {
-  const tsConfigPath = targets.build.options.tsConfig;
-  const tsConfigBuffer = host.read(tsConfigPath);
-  if (!tsConfigBuffer) {
-    throw new SchematicsException(`Could not read ${tsConfigPath}`);
-  }
-  const tsConfigContent = tsConfigBuffer.toString();
-  const tsConfig = parseJson(tsConfigContent);
-  if (tsConfig === null || typeof tsConfig !== 'object' || Array.isArray(tsConfig) ||
-    tsConfig.compilerOptions === null || typeof tsConfig.compilerOptions !== 'object' ||
-    Array.isArray(tsConfig.compilerOptions)) {
-    throw new SchematicsException(`Invalid tsconfig - ${tsConfigPath}`);
-  }
-  const outDir = tsConfig.compilerOptions.outDir;
-
-  return outDir as string;
-}
-
 export default function (options: UniversalOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    const clientProject = getProject(host, options.clientProject);
-    if (clientProject.projectType !== 'application') {
+  return async (host: Tree, context: SchematicContext) => {
+    const workspace = await getWorkspace(host);
+
+    const clientProject = workspace.projects.get(options.clientProject);
+    if (!clientProject || clientProject.extensions.projectType !== 'application') {
       throw new SchematicsException(`Universal requires a project type of "application".`);
     }
-    const clientTargets = getProjectTargets(clientProject);
-    const outDir = getTsConfigOutDir(host, clientTargets);
-    if (!clientTargets.build) {
+
+    const clientBuildTarget = clientProject.targets.get('build');
+    if (!clientBuildTarget) {
       throw targetBuildNotFoundError();
     }
-    const tsConfigExtends = basename(normalize(clientTargets.build.options.tsConfig));
-    const rootInSrc = clientProject.root === '';
+
+    const clientBuildOptions =
+      (clientBuildTarget.options || {}) as unknown as BrowserBuilderOptions;
+
+    const clientTsConfig = normalize(clientBuildOptions.tsConfig);
+    const tsConfigExtends = basename(clientTsConfig);
+    // this is needed because prior to version 8, tsconfig might have been in 'src'
+    // and we don't want to break the 'ng add @nguniversal/express-engine schematics'
+    const rootInSrc = clientProject.root === '' && clientTsConfig.includes('src/');
     const tsConfigDirectory = join(normalize(clientProject.root), rootInSrc ? 'src' : '');
 
     if (!options.skipInstall) {
@@ -261,6 +258,7 @@ export default function (options: UniversalOptions): Rule {
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
+        hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
       }),
       move(join(normalize(clientProject.root), 'src')),
     ]);
@@ -270,8 +268,8 @@ export default function (options: UniversalOptions): Rule {
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-        outDir,
         tsConfigExtends,
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
         rootInSrc,
       }),
       move(tsConfigDirectory),
@@ -282,8 +280,8 @@ export default function (options: UniversalOptions): Rule {
       mergeWith(rootSource),
       addDependencies(),
       updateConfigFile(options, tsConfigDirectory),
-      wrapBootstrapCall(options),
-      addServerTransition(options),
+      wrapBootstrapCall(clientBuildOptions.main),
+      addServerTransition(options, clientBuildOptions.main, clientProject.root),
     ]);
   };
 }

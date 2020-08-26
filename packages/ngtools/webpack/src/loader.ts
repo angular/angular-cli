@@ -27,7 +27,8 @@ export function ngcLoader(this: loader.LoaderContext) {
 
   time(timeLabel);
 
-  const plugin = this._compilation._ngToolsWebpackPluginInstance;
+  const plugin = (this._compilation as { _ngToolsWebpackPluginInstance?: AngularCompilerPlugin })
+    ._ngToolsWebpackPluginInstance;
   if (!plugin) {
     throw new Error('The AngularCompilerPlugin was not found. '
                   + 'The @ngtools/webpack loader requires the plugin.');
@@ -68,7 +69,11 @@ export function ngcLoader(this: loader.LoaderContext) {
       if (sourceFileName.endsWith('.ts')) {
         result.errorDependencies.forEach(dep => this.addDependency(dep));
         const dependencies = plugin.getDependencies(sourceFileName);
-        dependencies.forEach(dep => {
+        dependencies
+          .filter(d => d.endsWith('index.ts'))
+          .forEach(d => dependencies.push(...plugin.getDependencies(d)));
+
+        [...new Set(dependencies)].forEach(dep => {
           plugin.updateChangedFileExtensions(path.extname(dep));
           this.addDependency(dep);
         });
@@ -92,9 +97,14 @@ export function ngcLoader(this: loader.LoaderContext) {
       const ngStyleRe = /(?:\.shim)?\.ngstyle\.js$/;
       if (ngStyleRe.test(sourceFileName)) {
         const styleFile = sourceFileName.replace(ngStyleRe, '');
-        const styleDependencies = plugin.getResourceDependencies(styleFile);
-        styleDependencies.forEach(dep => this.addDependency(dep));
+        for (const dep of plugin.getResourceDependencies(styleFile)) {
+          this.addDependency(dep);
+        }
       }
+
+      // Add type-only dependencies that should trigger a rebuild when they change.
+      const typeDependencies = plugin.getTypeDependencies(sourceFileName);
+      typeDependencies.forEach(dep => this.addDependency(dep));
 
       timeEnd(timeLabel);
       cb(null, result.outputText, result.sourceMap as any);

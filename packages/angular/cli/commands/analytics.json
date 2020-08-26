@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/analytics.json",
+  "description": "Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering.",
+  "$longDescription": "./analytics-long.md",
+
+  "$aliases": [],
+  "$scope": "all",
+  "$type": "native",
+  "$impl": "./analytics-impl#AnalyticsCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "settingOrProject": {
+          "enum": [
+            "on",
+            "off",
+            "ci",
+            "project",
+            "prompt"
+          ],
+          "description": "Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, or sets the default status for the project.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "projectSetting": {
+          "enum": [
+            "on",
+            "off",
+            "prompt"
+          ],
+          "description": "Sets the default analytics enablement status for the project.",
+          "$default": {
+            "$source": "argv",
+            "index": 1
+          }
+        }
+      },
+      "required": [
+        "settingOrProject"
+      ]
+    },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

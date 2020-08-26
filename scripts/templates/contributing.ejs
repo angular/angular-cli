@@ -26,8 +26,8 @@ should be tagged with tag `angular-cli` or `angular-devkit`.
 
 StackOverflow is a much better place to ask questions since:
 
-- there are thousands of people willing to help on StackOverflow
-- questions and answers stay available for public viewing so your question / answer might help someone else
+- There are thousands of people willing to help on StackOverflow.
+- Questions and answers stay available for public viewing so your question / answer might help someone else.
 - StackOverflow's voting system assures that the best answers are prominently visible.
 
 To save your and our time we will be systematically closing all the issues that are requests for
@@ -71,7 +71,7 @@ We will be insisting on a minimal reproduce scenario in order to save maintainer
 
 Unfortunately we are not able to investigate / fix bugs without a minimal reproduction, so if we don't hear back from you we are going to close an issue that don't have enough info to be reproduced.
 
-You can file new issues by filling out our [new issue form](https://github.com/angular/angular-cli/issues/new).
+You can file new issues by selecting from our [new issue templates](https://github.com/angular/angular-cli/issues/new/choose) and filling out the issue template.
 
 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
@@ -106,18 +106,25 @@ Before you submit your Pull Request (PR) consider the following guidelines:
     git push origin my-fix-branch
     ```
 
-* In GitHub, send a pull request to `devkit:master`.
+* In GitHub, send a pull request to `angular/angular-cli:master`.
 * If we suggest changes then:
   * Make the required updates.
   * Re-run the Angular DevKit test suites to ensure tests are still passing.
-  * Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
+* Once your PR is approved and you are done with any follow up changes:
+  * Rebase to the current master to pre-emptively address any merge conflicts.
 
     ```shell
     git rebase master -i
     git push -f
     ```
+  * Add the `PR action: merge` label and the correct
+[target label](https://github.com/angular/angular/blob/master/docs/TRIAGE_AND_LABELS.md#pr-target)
+    (if PR author has the project collaborator status, or else the last reviewer
+    should do this).
+  * The current caretaker will merge the PR to the target branch(es) within 1-2
+    business days.
 
-That's it! Thank you for your contribution!
+That's it! 🎉 Thank you for your contribution!
 
 #### After your pull request is merged
 
@@ -273,29 +280,29 @@ To test if your change effect the public API you need to run the API guardian on
 For example in case `@angular-devkit/core` package was modified you need to run:
 
 ```bash
-bazel test //etc/api:angular_devkit_core_api
+yarn bazel test //etc/api:angular_devkit_core_api
 ```
 
 You can also test all packages by running:
 ```bash
-bazel test //etc/api ...
+yarn bazel test //etc/api ...
 ```
 
 If you modified the public API, the test will fail. To update the golden files you need to run:
 
 ```bash
-bazel run //etc/api:angular_devkit_core_api.accept
+yarn bazel run //etc/api:angular_devkit_core_api.accept
 ```
 
 **Note**: In some cases we use aliased symbols to create namespaces.
 
 Example:
-```javascript 
+```javascript
 import * as foo from './foo';
 
 export { foo };
 ```
-There are currently not supported by the API guardian. 
+There are currently not supported by the API guardian.
 To overcome this limitation we created `_golden-api.ts` in certain packages.
 
 When adding a new API, it might be the case that you need to add it to `_golden-api.ts`.

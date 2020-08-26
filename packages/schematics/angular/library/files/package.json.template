@@ -4,5 +4,8 @@
   "peerDependencies": {
     "@angular/common": "^<%= angularLatestVersion %>",
     "@angular/core": "^<%= angularLatestVersion %>"
+  },
+  "dependencies": {
+    "tslib": "^<%= tsLibLatestVersion %>"
   }
 }

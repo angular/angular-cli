@@ -7,21 +7,21 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "The name of the project to build. Can be an app or a library.",
+          "description": "The name of the project to build. Can be an application or a library.",
           "$default": {
             "$source": "argv",
             "index": 0
           }
         },
         "configuration": {
-          "description": "A named build target, as specified in the \"configurations\" section of angular.json.\nEach named target is accompanied by a configuration of option defaults for that target.",
+          "description": "A named build target, as specified in the \"configurations\" section of angular.json.\nEach named target is accompanied by a configuration of option defaults for that target.\nSetting this explicitly overrides the \"--prod\" flag",
           "type": "string",
           "aliases": [
             "c"
           ]
         },
         "prod": {
-          "description": "When true, sets the build configuration to the production target.\nAll builds make use of bundling and limited tree-shaking. A production build also runs limited dead code elimination.",
+          "description": "Shorthand for \"--configuration=production\".\nWhen true, sets the build configuration to the production target.\nBy default, the production target is set up in the workspace configuration such that all builds make use of bundling, limited tree-shaking, and also limited dead code elimination.",
           "type": "boolean"
         }
       }

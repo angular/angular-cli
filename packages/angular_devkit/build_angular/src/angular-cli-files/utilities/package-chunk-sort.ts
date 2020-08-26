@@ -8,17 +8,17 @@
 import { ExtraEntryPoint } from '../../browser/schema';
 import { normalizeExtraEntryPoints } from '../models/webpack-configs/utils';
 
-export function generateEntryPoints(
-  appConfig: { styles: ExtraEntryPoint[], scripts: ExtraEntryPoint[] },
-) {
-
+export function generateEntryPoints(appConfig: {
+  styles: ExtraEntryPoint[];
+  scripts: ExtraEntryPoint[];
+}) {
   // Add all styles/scripts, except lazy-loaded ones.
   const extraEntryPoints = (
     extraEntryPoints: ExtraEntryPoint[],
     defaultBundleName: string,
   ): string[] => {
     const entryPoints = normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
-      .filter(entry => !entry.lazy)
+      .filter(entry => entry.inject)
       .map(entry => entry.bundleName);
 
     // remove duplicates
@@ -26,17 +26,19 @@ export function generateEntryPoints(
   };
 
   const entryPoints = [
-    'es2015-polyfills',
+    'runtime',
+    'polyfills-es5',
     'polyfills',
     'sw-register',
     ...extraEntryPoints(appConfig.styles, 'styles'),
     ...extraEntryPoints(appConfig.scripts, 'scripts'),
+    'vendor',
     'main',
   ];
 
-  const duplicates = [...new Set(
-    entryPoints.filter(x => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x)),
-  )];
+  const duplicates = [
+    ...new Set(entryPoints.filter(x => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x))),
+  ];
 
   if (duplicates.length > 0) {
     throw new Error(`Multiple bundles have been named the same: '${duplicates.join(`', '`)}'.`);

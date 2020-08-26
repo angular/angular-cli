@@ -14,16 +14,11 @@
       },
       "x-prompt": "What name would you like to use for the guard?"
     },
-    "spec": {
-      "type": "boolean",
-      "description": "When true (the default), generates a  \"spec.ts\" test file for the new guard.",
-      "default": true,
-      "x-deprecated": "Use \"skipTests\" instead."
-    },
     "skipTests": {
       "type": "boolean",
       "description": "When true, does not create \"spec.ts\" test files for the new guard.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 12
     },
     "flat": {
       "type": "boolean",
@@ -46,29 +41,30 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the guard."
+      "description": "When true, applies lint fixes after generating the guard.",
+      "x-user-analytics": 15
     },
     "implements": {
       "type": "array",
       "description": "Specifies which interfaces to implement.",
       "uniqueItems": true,
+      "minItems": 1,
       "items": {
-        "type": "string"
-      },
-      "x-prompt": {
-        "message": "Which interfaces would you like to implement?",
-        "type": "list",
-        "multiselect": true,
-        "items": [
+        "enum": [
           "CanActivate",
           "CanActivateChild",
+          "CanDeactivate",
           "CanLoad"
-        ]
-      }
+        ],
+        "type": "string"
+      },
+      "default": [
+        "CanActivate"
+      ],
+      "x-prompt": "Which interfaces would you like to implement?"
     }
   },
   "required": [
-    "name",
-    "project"
+    "name"
   ]
 }

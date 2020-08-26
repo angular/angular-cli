@@ -6,7 +6,8 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to serve."
+      "description": "Target to serve.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
     "port": {
       "type": "number",
@@ -43,8 +44,7 @@
     },
     "verbose": {
       "type": "boolean",
-      "description": "Adds more details to output logging.",
-      "default": false
+      "description": "Adds more details to output logging."
     },
     "liveReload": {
       "type": "boolean",
@@ -53,7 +53,15 @@
     },
     "publicHost": {
       "type": "string",
-      "description": "Specify the URL that the browser client will use."
+      "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."
+    },
+    "allowedHosts": {
+      "type": "array",
+      "description": "Whitelist of hosts that are allowed to access the dev server.",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     },
     "servePath": {
       "type": "string",
@@ -86,6 +94,7 @@
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
+      "x-user-analytics": 16,
       "oneOf": [
         {
           "type": "object",
@@ -110,11 +119,11 @@
     },
     "aot": {
       "type": "boolean",
-      "description": "Build using Ahead of Time compilation."
+      "description": "Build using Ahead of Time compilation.",
+      "x-user-analytics": 13
     },
     "sourceMap": {
       "description": "Output sourcemaps.",
-      "default": true,
       "oneOf": [
         {
           "type": "object",
@@ -146,17 +155,6 @@
           "type": "boolean"
         }
       ]
-    },
-    "vendorSourceMap": {
-      "type": "boolean",
-      "description": "Resolve vendor packages sourcemaps.",
-      "x-deprecated": true,
-      "default": false
-    },
-    "evalSourceMap": {
-      "type": "boolean",
-      "description": "Output in-file eval sourcemaps.",
-      "x-deprecated": true
     },
     "vendorChunk": {
       "type": "boolean",

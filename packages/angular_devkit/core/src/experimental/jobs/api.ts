@@ -453,10 +453,10 @@ export function isJobHandler<
   A extends JsonValue,
   I extends JsonValue,
   O extends JsonValue,
-// TODO: this should be unknown
-// tslint:disable-next-line:no-any
->(value: any): value is JobHandler<A, I, O> {
-  return typeof value == 'function'
-      && typeof value.jobDescription == 'object'
-      && value.jobDescription !== null;
+>(value: unknown): value is JobHandler<A, I, O> {
+  const job = value as JobHandler<A, I, O>;
+
+  return typeof job == 'function'
+      && typeof job.jobDescription == 'object'
+      && job.jobDescription !== null;
 }

@@ -5,10 +5,10 @@ import { updateJsonFile } from '../../utils/project';
 export default function () {
   return updateJsonFile('package.json', packageJson => {
     // Install ngrx
-    packageJson['dependencies']['@ngrx/effects'] = '^6.1.0';
-    packageJson['dependencies']['@ngrx/schematics'] = '^6.1.0';
-    packageJson['dependencies']['@ngrx/store'] = '^6.1.0';
-    packageJson['dependencies']['@ngrx/store-devtools'] = '^6.1.0';
+    packageJson['dependencies']['@ngrx/effects'] = '^9.1.0';
+    packageJson['dependencies']['@ngrx/schematics'] = '^9.1.0';
+    packageJson['dependencies']['@ngrx/store'] = '^9.1.0';
+    packageJson['dependencies']['@ngrx/store-devtools'] = '^9.1.0';
   })
     .then(() => npm('install'))
     // Create an app that uses ngrx decorators and has e2e tests.

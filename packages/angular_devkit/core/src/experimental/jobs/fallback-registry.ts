@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable, from, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { concatMap, first } from 'rxjs/operators';
-import { JsonValue, schema } from '../../json';
-import { JobDescription, JobHandler, JobName, Registry, isJobHandler } from './api';
-import { JobNameAlreadyRegisteredException } from './exception';
+import { JsonValue } from '../../json';
+import {  JobHandler, JobName, Registry } from './api';
 
 
 /**

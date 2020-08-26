@@ -33,14 +33,15 @@ describe('strategy.serialize()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
     });
 
-    const job1 = await scheduler.schedule('add', [1, 2, 3, 4]);
-    const job2 = await scheduler.schedule('add', [1, 2, 3, 4, 5]);
+    const job1 = scheduler.schedule('add', [1, 2, 3, 4]);
+    const job2 = scheduler.schedule('add', [1, 2, 3, 4, 5]);
     expect(started).toBe(0);
     expect(finished).toBe(0);
 
@@ -82,7 +83,8 @@ describe('strategy.serialize()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
@@ -96,14 +98,15 @@ describe('strategy.serialize()', () => {
           resolve(input.reduce((a, c) => a + c, 100));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add100',
     });
 
-    const job1 = await scheduler.schedule('add', [1, 2, 3, 4]);
-    const job2 = await scheduler.schedule('add100', [1, 2, 3, 4, 5]);
+    const job1 = scheduler.schedule('add', [1, 2, 3, 4]);
+    const job2 = scheduler.schedule('add100', [1, 2, 3, 4, 5]);
     expect(started).toBe(0);
     expect(finished).toBe(0);
 
@@ -153,14 +156,15 @@ describe('strategy.reuse()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
     });
 
-    const job1 = await scheduler.schedule('add', [1, 2, 3, 4]);
-    const job2 = await scheduler.schedule('add', []);
+    const job1 = scheduler.schedule('add', [1, 2, 3, 4]);
+    const job2 = scheduler.schedule('add', []);
     expect(started).toBe(0);
     expect(finished).toBe(0);
 
@@ -179,8 +183,8 @@ describe('strategy.reuse()', () => {
     expect(job1.state).toBe(JobState.Ended);
     expect(job2.state).toBe(JobState.Ended);
 
-    const job3 = await scheduler.schedule('add', [1, 2, 3, 4, 5]);
-    const job4 = await scheduler.schedule('add', []);
+    const job3 = scheduler.schedule('add', [1, 2, 3, 4, 5]);
+    const job4 = scheduler.schedule('add', []);
     job3.output.subscribe();
     expect(started).toBe(2);
     expect(finished).toBe(1);
@@ -220,16 +224,17 @@ describe('strategy.memoize()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
     });
 
-    const job1 = await scheduler.schedule('add', [1, 2, 3, 4]);
-    const job2 = await scheduler.schedule('add', [1, 2, 3, 4]);
-    const job3 = await scheduler.schedule('add', [1, 2, 3, 4, 5]);
-    const job4 = await scheduler.schedule('add', [1, 2, 3, 4, 5]);
+    const job1 = scheduler.schedule('add', [1, 2, 3, 4]);
+    const job2 = scheduler.schedule('add', [1, 2, 3, 4]);
+    const job3 = scheduler.schedule('add', [1, 2, 3, 4, 5]);
+    const job4 = scheduler.schedule('add', [1, 2, 3, 4, 5]);
     expect(started).toBe(0);
     expect(finished).toBe(0);
 

@@ -21,41 +21,32 @@ import {
 } from '@angular-devkit/schematics';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
-import { Schema as GuardOptions } from './schema';
+import { createDefaultPath } from '../utility/workspace';
+import { Implement as GuardInterface, Schema as GuardOptions } from './schema';
 
 
 export default function (options: GuardOptions): Rule {
-  return (host: Tree) => {
-    if (!options.project) {
-      throw new SchematicsException('Option (project) is required.');
-    }
-    const project = getProject(host, options.project);
-
+  return async (host: Tree) => {
     if (options.path === undefined) {
-      options.path = buildDefaultPath(project);
-    }
-    if (options.implements === undefined) {
-      options.implements = [];
+      options.path = await createDefaultPath(host, options.project as string);
     }
 
-    let implementations = '';
-    let implementationImports = '';
-    if (options.implements.length > 0) {
-      implementations = options.implements.join(', ');
-      implementationImports = `${implementations}, `;
-      // As long as we aren't in IE... ;)
-      if (options.implements.includes('CanLoad')) {
-        implementationImports = `${implementationImports}Route, UrlSegment, `;
-      }
+    if (!options.implements) {
+      throw new SchematicsException('Option "implements" is required.');
+    }
+
+    const implementations = options.implements
+      .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
+      .join(', ');
+    let implementationImports = `${options.implements.join(', ')}, `;
+    // As long as we aren't in IE... ;)
+    if (options.implements.includes(GuardInterface.CanLoad)) {
+      implementationImports = `${implementationImports}Route, UrlSegment, `;
     }
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-
-    // todo remove these when we remove the deprecations
-    options.skipTests = options.skipTests || !options.spec;
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),

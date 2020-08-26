@@ -7,6 +7,7 @@
  */
 import { dirname, relative } from 'path';
 import * as ts from 'typescript';
+import { forwardSlashPath } from '../utils';
 import { collectDeepNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
 import { ReplaceNodeOperation, StandardTransform, TransformOperation } from './interfaces';
@@ -17,7 +18,7 @@ export function replaceBootstrap(
   shouldTransform: (fileName: string) => boolean,
   getEntryModule: () => { path: string, className: string } | null,
   getTypeChecker: () => ts.TypeChecker,
-  enableIvy?: boolean,
+  useFactories = true,
 ): ts.TransformerFactory<ts.SourceFile> {
 
   const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
@@ -79,10 +80,10 @@ export function replaceBootstrap(
       // Add the transform operations.
       const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
       let className = entryModule.className;
-      let modulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
+      let modulePath = forwardSlashPath(`./${relativeEntryModulePath}`);
       let bootstrapIdentifier = 'bootstrapModule';
 
-      if (!enableIvy) {
+      if (useFactories) {
         className += 'NgFactory';
         modulePath += '.ngfactory';
         bootstrapIdentifier = 'bootstrapModuleFactory';

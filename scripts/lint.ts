@@ -6,18 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
+// tslint:disable:no-console
 import { logging } from '@angular-devkit/core';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 import { Configuration, ILinterOptions, Linter, findFormatter } from 'tslint';
 import * as ts from 'typescript';
-
-// Blacklist (regexes) of the files to not lint. Generated files should not be linted.
-// TODO: when moved to using bazel for the build system, this won't be needed.
-const blacklist = [
-  /^dist-schema[\\\/].*/,
-];
-
 
 function _buildRules(logger: logging.Logger) {
   const tsConfigPath = path.join(__dirname, '../etc/rules/tsconfig.json');
@@ -42,8 +36,7 @@ function _buildRules(logger: logging.Logger) {
   }
 }
 
-
-export default async function (options: ParsedArgs, logger: logging.Logger) {
+export default async function(options: ParsedArgs, logger: logging.Logger) {
   _buildRules(logger);
 
   const lintOptions: ILinterOptions = {
@@ -54,11 +47,6 @@ export default async function (options: ParsedArgs, logger: logging.Logger) {
   const linter = new Linter(lintOptions, program);
   const tsLintPath = path.join(__dirname, '../tslint.json');
   const tsLintConfig = Configuration.loadConfigurationFromPath(tsLintPath);
-
-  // Remove comments from the configuration, ie. keys that starts with "//".
-  [...tsLintConfig.rules.keys()]
-    .filter(x => x.startsWith('//'))
-    .forEach(key => tsLintConfig.rules.delete(key));
 
   // Console is used directly by tslint, and when finding a rule that doesn't exist it's considered
   // a warning by TSLint but _only_ shown on the console and impossible to see through the API.
@@ -72,10 +60,6 @@ export default async function (options: ParsedArgs, logger: logging.Logger) {
   };
 
   program.getRootFileNames().forEach(fileName => {
-    if (blacklist.some(x => x.test(path.relative(process.cwd(), fileName)))) {
-      return;
-    }
-
     linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig);
   });
 

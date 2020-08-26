@@ -41,15 +41,15 @@ export function runBenchmark({
   let aggregatedMetricGroups: MetricGroup[] = [];
 
   // Run the process and captures, wait for both to finish, and average out the metrics.
-  return new Observable(obs => {
+  return new Observable<[LocalMonitoredProcess, ...Observable<MetricGroup>[]]>(obs => {
     const monitoredProcess = new LocalMonitoredProcess(command);
-    const metric$ = captures.map(capture => capture(monitoredProcess));
+    const metric$ = captures.map(capture => capture(monitoredProcess.stats$));
     obs.next([monitoredProcess, ...metric$]);
   }).pipe(
     tap(() => logger.debug(`${debugPrefix()} starting`)),
     concatMap(([monitoredProcess, ...metric$]) => forkJoin(monitoredProcess.run(), ...metric$)),
     throwIfEmpty(() => new Error('Nothing was captured')),
-    concatMap((results) => {
+    concatMap(results => {
       const [processExitCode, ...metrics] = results;
 
       if ((processExitCode as number) != command.expectedExitCode) {

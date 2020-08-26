@@ -11,11 +11,7 @@ import { map, take, toArray } from 'rxjs/operators';
 import { JobHandlerContext, JobOutboundMessage, JobOutboundMessageKind, JobState } from './api';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
-import {
-  JobInboundMessageSchemaValidationError,
-  JobOutputSchemaValidationError,
-  SimpleScheduler,
-} from './simple-scheduler';
+import { SimpleScheduler } from './simple-scheduler';
 
 describe('SimpleScheduler', () => {
   let registry: SimpleJobRegistry;
@@ -621,5 +617,17 @@ describe('SimpleScheduler', () => {
       expect(await job.output.toPromise()).toBe(103);
       expect(outputs).toEqual(jasmine.arrayWithExactContents([101, 102, 103]));
     });
+  });
+
+  it('propagates errors', async () => {
+    registry.register('job', createJobHandler(() => { throw 1; }));
+    const job = scheduler.schedule('job', 0);
+
+    try {
+      await job.output.toPromise();
+      expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
+    } catch (error) {
+      expect(error).toBe(1);
+    }
   });
 });

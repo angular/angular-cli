@@ -9,11 +9,14 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import { logging } from '@angular-devkit/core';
-import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
+import { ParsedConfiguration } from '@angular/compiler-cli';
 import {
   AssetPatternClass,
   Budget,
+  CrossOrigin,
   ExtraEntryPoint,
+  I18NMissingTranslation,
+  Localize,
   OptimizationClass,
   SourceMapClass,
 } from '../../browser/schema';
@@ -26,53 +29,58 @@ export interface BuildOptions {
   resourcesOutputPath?: string;
   aot?: boolean;
   sourceMap: SourceMapClass;
-  /** @deprecated use sourceMap instead */
-  vendorSourceMap?: boolean;
-  /** @deprecated  */
-  evalSourceMap?: boolean;
   vendorChunk?: boolean;
   commonChunk?: boolean;
   baseHref?: string;
   deployUrl?: string;
   verbose?: boolean;
   progress?: boolean;
+  /** @deprecated since version 9. Use 'locales' object in the project metadata instead.*/
   i18nFile?: string;
+  /** @deprecated since version 9. No longer needed as the format will be determined automatically.*/
   i18nFormat?: string;
+  /** @deprecated since version 9. Use 'localize' instead.*/
   i18nLocale?: string;
-  i18nMissingTranslation?: string;
+  localize?: Localize;
+  i18nMissingTranslation?: I18NMissingTranslation;
   extractCss?: boolean;
-  bundleDependencies?: 'none' | 'all';
+  bundleDependencies?: boolean;
+  externalDependencies?: string[];
   watch?: boolean;
+  hmr?: boolean;
   outputHashing?: string;
   poll?: number;
-  app?: string;
   deleteOutputPath?: boolean;
   preserveSymlinks?: boolean;
   extractLicenses?: boolean;
   showCircularDependencies?: boolean;
   buildOptimizer?: boolean;
   namedChunks?: boolean;
+  crossOrigin?: CrossOrigin;
   subresourceIntegrity?: boolean;
   serviceWorker?: boolean;
-  skipAppShell?: boolean;
+  webWorkerTsConfig?: string;
   statsJson: boolean;
   forkTypeChecker: boolean;
-  profile?: boolean;
-  es5BrowserSupport?: boolean;
 
   main: string;
-  index: string;
   polyfills?: string;
   budgets: Budget[];
   assets: AssetPatternClass[];
   scripts: ExtraEntryPoint[];
   styles: ExtraEntryPoint[];
   stylePreprocessorOptions?: { includePaths: string[] };
+  /** @deprecated SystemJsNgModuleLoader is deprecated, and this is part of its usage. */
   lazyModules: string[];
   platform?: 'browser' | 'server';
   fileReplacements: NormalizedFileReplacement[];
-    /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
+  /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
   rebaseRootRelativeCssUrls?: boolean;
+
+  /* Append script target version to filename. */
+  esVersionInFileName?: boolean;
+  experimentalRollupPass?: boolean;
+  allowedCommonJsDependencies?: string[];
 }
 
 export interface WebpackTestOptions extends BuildOptions {
@@ -86,7 +94,8 @@ export interface WebpackConfigOptions<T = BuildOptions> {
   projectRoot: string;
   sourceRoot?: string;
   buildOptions: T;
-  tsConfig: ts.ParsedCommandLine;
+  tsConfig: ParsedConfiguration;
   tsConfigPath: string;
   supportES2015: boolean;
+  differentialLoadingMode?: boolean;
 }

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable, Operator, PartialObserver, Subject, Subscription } from 'rxjs';
+import { Observable, Operator, PartialObserver, Subject, Subscription, empty } from 'rxjs';
 import { JsonObject } from '../json/interface';
 
 
@@ -35,8 +35,8 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
   protected readonly _subject: Subject<LogEntry> = new Subject<LogEntry>();
   protected _metadata: LoggerMetadata;
 
-  private _obs: Observable<LogEntry>;
-  private _subscription: Subscription | null;
+  private _obs: Observable<LogEntry> = empty();
+  private _subscription: Subscription | null = null;
 
   protected get _observable() { return this._obs; }
   protected set _observable(v: Observable<LogEntry>) {
@@ -142,7 +142,10 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
   subscribe(_observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
             _error?: (error: Error) => void,
             _complete?: () => void): Subscription {
-    return this._observable.subscribe.apply(this._observable, arguments);
+    return this._observable.subscribe.apply(
+      this._observable,
+      (arguments as unknown) as Parameters<Observable<LogEntry>['subscribe']>,
+    );
   }
   forEach(next: (value: LogEntry) => void, PromiseCtor?: typeof Promise): Promise<void> {
     return this._observable.forEach(next, PromiseCtor);

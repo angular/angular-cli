@@ -144,8 +144,8 @@ export function relative(from: Path, to: Path): Path {
   if (from == to) {
     p = '';
   } else {
-    const splitFrom = from.split(NormalizedSep);
-    const splitTo = to.split(NormalizedSep);
+    const splitFrom = split(from);
+    const splitTo = split(to);
 
     while (splitFrom.length > 0 && splitTo.length > 0 && splitFrom[0] == splitTo[0]) {
       splitFrom.shift();

@@ -24,14 +24,17 @@ import {
   RepositoryInitializerTask,
 } from '@angular-devkit/schematics/tasks';
 import { Schema as ApplicationOptions } from '../application/schema';
+import { validateProjectName } from '../utility/validation';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as NgNewOptions } from './schema';
 
 
-export default function (options: NgNewOptions): Rule {
+export default function(options: NgNewOptions): Rule {
   if (!options.name) {
     throw new SchematicsException(`Invalid options, "name" is required.`);
   }
+
+  validateProjectName(options.name);
 
   if (!options.directory) {
     options.directory = options.name;
@@ -40,13 +43,14 @@ export default function (options: NgNewOptions): Rule {
   const workspaceOptions: WorkspaceOptions = {
     name: options.name,
     version: options.version,
-    newProjectRoot: options.newProjectRoot || 'projects',
+    newProjectRoot: options.newProjectRoot,
     minimal: options.minimal,
+    strict: options.strict,
+    packageManager: options.packageManager,
   };
   const applicationOptions: ApplicationOptions = {
     projectRoot: '',
     name: options.name,
-    experimentalIvy: options.experimentalIvy,
     inlineStyle: options.inlineStyle,
     inlineTemplate: options.inlineTemplate,
     prefix: options.prefix,
@@ -57,7 +61,9 @@ export default function (options: NgNewOptions): Rule {
     skipPackageJson: false,
     // always 'skipInstall' here, so that we do it after the move
     skipInstall: true,
+    strict: options.strict,
     minimal: options.minimal,
+    legacyBrowsers: options.legacyBrowsers,
   };
 
   return chain([
@@ -65,13 +71,18 @@ export default function (options: NgNewOptions): Rule {
       apply(empty(), [
         schematic('workspace', workspaceOptions),
         options.createApplication ? schematic('application', applicationOptions) : noop,
-        move(options.directory || options.name),
+        move(options.directory),
       ]),
     ),
     (_host: Tree, context: SchematicContext) => {
       let packageTask;
       if (!options.skipInstall) {
-        packageTask = context.addTask(new NodePackageInstallTask(options.directory));
+        packageTask = context.addTask(
+          new NodePackageInstallTask({
+            workingDirectory: options.directory,
+            packageManager: options.packageManager,
+          }),
+        );
         if (options.linkCli) {
           packageTask = context.addTask(
             new NodePackageLinkTask('@angular/cli', options.directory),

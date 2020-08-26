@@ -1,0 +1,106 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_json_schema(
+    name = "builder_input_schema",
+    src = "src/input-schema.json",
+)
+
+ts_json_schema(
+    name = "builder_output_schema",
+    src = "src/output-schema.json",
+)
+
+ts_json_schema(
+    name = "builder_builders_schema",
+    src = "src/builders-schema.json",
+)
+
+ts_json_schema(
+    name = "progress_schema",
+    src = "src/progress-schema.json",
+)
+
+ts_library(
+    name = "architect",
+    srcs = glob(
+        include = ["src/**/*.ts"],
+        exclude = ["**/*_spec.ts"],
+    ) + [
+        # @external_begin
+        # These files are generated from the JSON schema
+        "//packages/angular_devkit/architect:src/input-schema.ts",
+        "//packages/angular_devkit/architect:src/output-schema.ts",
+        "//packages/angular_devkit/architect:src/builders-schema.ts",
+        "//packages/angular_devkit/architect:src/progress-schema.ts",
+        # @external_end
+    ],
+    # strict_checks = False,
+    data = glob(
+        include = ["**/*.json"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+    module_name = "@angular-devkit/architect",
+    module_root = "src/index.d.ts",
+    deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "@npm//@types/node",
+        "@npm//rxjs",
+    ],
+)
+
+ts_library(
+    name = "architect_test_lib",
+    testonly = True,
+    srcs = glob(["src/**/*_spec.ts"]),
+    # strict_checks = False,
+    deps = [
+        ":architect",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
+        "@npm//rxjs",
+    ],
+)
+
+jasmine_node_test(
+    name = "architect_test",
+    srcs = [":architect_test_lib"],
+)
+
+# @external_begin
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":architect",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
+)
+# @external_end

@@ -6,144 +6,34 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  BuildEvent,
-  Builder,
-  BuilderConfiguration,
   BuilderContext,
+  createBuilder,
+  targetFromTargetString,
 } from '@angular-devkit/architect';
-import { LoggingCallback, WebpackBuilder } from '@angular-devkit/build-webpack';
-import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
+import { JsonObject } from '@angular-devkit/core';
+import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { gte as semverGte } from 'semver';
 import * as webpack from 'webpack';
-import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getAotConfig,
   getCommonConfig,
   getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
-import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
-import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { NormalizedBrowserBuilderSchema, normalizeBrowserSchema } from '../utils';
-const webpackMerge = require('webpack-merge');
+import { statsErrorsToString, statsHasErrors, statsHasWarnings, statsWarningsToString } from '../angular-cli-files/utilities/stats';
+import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
+import { createI18nOptions } from '../utils/i18n-options';
+import { assertCompatibleAngularVersion } from '../utils/version';
+import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
+import { Format, Schema } from './schema';
 
+export type ExtractI18nBuilderOptions = Schema & JsonObject;
 
-export interface ExtractI18nBuilderOptions {
-  browserTarget: string;
-  i18nFormat: string;
-  i18nLocale: string;
-  outputPath?: string;
-  outFile?: string;
-  progress?: boolean;
-}
-
-export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
-
-  constructor(public context: BuilderContext) { }
-
-  run(builderConfig: BuilderConfiguration<ExtractI18nBuilderOptions>): Observable<BuildEvent> {
-    const architect = this.context.architect;
-    const options = builderConfig.options;
-    const root = this.context.workspace.root;
-    const projectRoot = resolve(root, builderConfig.root);
-    const [project, targetName, configuration] = options.browserTarget.split(':');
-    // Override browser build watch setting.
-    const overrides = { watch: false };
-
-    const browserTargetSpec = { project, target: targetName, configuration, overrides };
-    const browserBuilderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
-      browserTargetSpec);
-    const webpackBuilder = new WebpackBuilder(this.context);
-
-    const loggingCb: LoggingCallback = (stats, config, logger) => {
-      const json = stats.toJson();
-      if (stats.hasWarnings()) {
-        this.context.logger.warn(statsWarningsToString(json, config.stats));
-      }
-
-      if (stats.hasErrors()) {
-        this.context.logger.error(statsErrorsToString(json, config.stats));
-      }
-    };
-
-    return architect.getBuilderDescription(browserBuilderConfig).pipe(
-      concatMap(browserDescription =>
-        architect.validateBuilderOptions(browserBuilderConfig, browserDescription)),
-      map(browserBuilderConfig => browserBuilderConfig.options),
-      concatMap((validatedBrowserOptions) => {
-        const browserOptions = validatedBrowserOptions;
-
-        // We need to determine the outFile name so that AngularCompiler can retrieve it.
-        let outFile = options.outFile || getI18nOutfile(options.i18nFormat);
-        if (options.outputPath) {
-          // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
-          outFile = path.join(options.outputPath, outFile);
-        }
-
-        // Extracting i18n uses the browser target webpack config with some specific options.
-        const webpackConfig = this.buildWebpackConfig(root, projectRoot, {
-          // todo: remove this casting when 'CurrentFileReplacement' is changed to 'FileReplacement'
-          ...(browserOptions as NormalizedBrowserBuilderSchema),
-          optimization: {
-            scripts: false,
-            styles: false,
-          },
-          i18nLocale: options.i18nLocale,
-          i18nFormat: options.i18nFormat,
-          i18nFile: outFile,
-          aot: true,
-          progress: options.progress,
-          assets: [],
-          scripts: [],
-          styles: [],
-        });
-
-        return webpackBuilder.runWebpack(webpackConfig, loggingCb);
-      }),
-    );
-  }
-
-  buildWebpackConfig(
-    root: Path,
-    projectRoot: Path,
-    options: NormalizedBrowserBuilderSchema,
-  ) {
-    let wco: WebpackConfigOptions;
-
-    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
-
-    const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
-    const tsConfig = readTsconfig(tsConfigPath);
-
-    wco = {
-      root: getSystemPath(root),
-      logger: this.context.logger,
-      projectRoot: getSystemPath(projectRoot),
-      // TODO: use only this.options, it contains all flags and configs items already.
-      buildOptions: options,
-      tsConfig,
-      tsConfigPath,
-      supportES2015: false,
-    };
-
-    const webpackConfigs: {}[] = [
-      // We don't need to write to disk.
-      { plugins: [new InMemoryOutputPlugin()] },
-      getCommonConfig(wco),
-      getAotConfig(wco, host, true),
-      getStylesConfig(wco),
-      getStatsConfig(wco),
-    ];
-
-    return webpackMerge(webpackConfigs);
-  }
-}
-
-function getI18nOutfile(format: string) {
+function getI18nOutfile(format: string | undefined) {
   switch (format) {
     case 'xmb':
       return 'messages.xmb';
@@ -158,14 +48,225 @@ function getI18nOutfile(format: string) {
   }
 }
 
-class InMemoryOutputPlugin {
-  constructor() { }
+async function getSerializer(format: Format, sourceLocale: string, basePath: string, useLegacyIds = true) {
+  switch (format) {
+    case Format.Xmb:
+      const { XmbTranslationSerializer } =
+      await import('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer');
 
+      // tslint:disable-next-line: no-any
+      return new XmbTranslationSerializer(basePath as any, useLegacyIds);
+    case Format.Xlf:
+    case Format.Xlif:
+    case Format.Xliff:
+      const { Xliff1TranslationSerializer } =
+        await import('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer');
+
+      // tslint:disable-next-line: no-any
+      return new Xliff1TranslationSerializer(sourceLocale, basePath as any, useLegacyIds);
+    case Format.Xlf2:
+    case Format.Xliff2:
+      const { Xliff2TranslationSerializer } =
+        await import('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer');
+
+      // tslint:disable-next-line: no-any
+      return new Xliff2TranslationSerializer(sourceLocale, basePath as any, useLegacyIds);
+  }
+}
+
+class InMemoryOutputPlugin {
   apply(compiler: webpack.Compiler): void {
     // tslint:disable-next-line:no-any
     compiler.outputFileSystem = new (webpack as any).MemoryOutputFileSystem();
   }
-
 }
 
-export default ExtractI18nBuilder;
+export async function execute(
+  options: ExtractI18nBuilderOptions,
+  context: BuilderContext,
+  transforms?: {
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+  },
+): Promise<BuildResult> {
+  // Check Angular version.
+  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+
+  const browserTarget = targetFromTargetString(options.browserTarget);
+  const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderOptions>(
+    await context.getTargetOptions(browserTarget),
+    await context.getBuilderNameForTarget(browserTarget),
+  );
+
+  if (options.i18nFormat !== Format.Xlf) {
+    options.format = options.i18nFormat;
+  }
+
+  switch (options.format) {
+    case Format.Xlf:
+    case Format.Xlif:
+    case Format.Xliff:
+      options.format = Format.Xlf;
+      break;
+    case Format.Xlf2:
+    case Format.Xliff2:
+      options.format = Format.Xlf2;
+      break;
+    case undefined:
+      options.format = Format.Xlf;
+      break;
+  }
+
+  // We need to determine the outFile name so that AngularCompiler can retrieve it.
+  let outFile = options.outFile || getI18nOutfile(options.format);
+  if (options.outputPath) {
+    // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
+    outFile = path.join(options.outputPath, outFile);
+  }
+
+  if (!context.target || !context.target.project) {
+    throw new Error('The builder requires a target.');
+  }
+
+  const metadata = await context.getProjectMetadata(context.target);
+  const i18n = createI18nOptions(metadata);
+
+  let usingIvy = false;
+  const ivyMessages: LocalizeMessage[] = [];
+  const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
+    {
+      ...browserOptions,
+      optimization: {
+        scripts: false,
+        styles: false,
+      },
+      sourceMap: {
+        scripts: true,
+      },
+      buildOptimizer: false,
+      i18nLocale: options.i18nLocale || i18n.sourceLocale,
+      i18nFormat: options.format,
+      i18nFile: outFile,
+      aot: true,
+      progress: options.progress,
+      assets: [],
+      scripts: [],
+      styles: [],
+      deleteOutputPath: false,
+    },
+    context,
+    (wco) => {
+      const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
+
+      // Ivy-based extraction is currently opt-in
+      if (options.ivy) {
+        if (!isIvyApplication) {
+          context.logger.warn(
+            'Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.',
+          );
+        }
+        usingIvy = true;
+      } else if (isIvyApplication) {
+        context.logger.warn(
+          'Ivy extraction not enabled but application is Ivy enabled. ' +
+          'If the extraction fails, the `--ivy` flag will enable Ivy extraction.',
+        );
+      }
+
+      const partials = [
+        { plugins: [new InMemoryOutputPlugin()] },
+        getCommonConfig(wco),
+        // Only use VE extraction if not using Ivy
+        getAotConfig(wco, !usingIvy),
+        getStylesConfig(wco),
+        getStatsConfig(wco),
+      ];
+
+      // Add Ivy application file extractor support
+      if (usingIvy) {
+        partials.unshift({
+          module: {
+            rules: [
+              {
+                test: /\.ts$/,
+                loader: require.resolve('./ivy-extract-loader'),
+                options: {
+                  messageHandler: (messages: LocalizeMessage[]) => ivyMessages.push(...messages),
+                },
+              },
+            ],
+          },
+        });
+      }
+
+      return partials;
+    },
+  );
+
+  if (usingIvy) {
+    let validLocalizePackage = false;
+    try {
+      const { version: localizeVersion } = require('@angular/localize/package.json');
+      validLocalizePackage = semverGte(localizeVersion, '10.1.0-next.0', { includePrerelease: true });
+    } catch {}
+
+    if (!validLocalizePackage) {
+      context.logger.error(
+        "Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.",
+      );
+
+      return { success: false };
+    }
+  }
+
+  const logging: WebpackLoggingCallback = (stats, config) => {
+    const json = stats.toJson({ errors: true, warnings: true });
+
+    if (statsHasWarnings(json)) {
+      context.logger.warn(statsWarningsToString(json, config.stats));
+    }
+
+    if (statsHasErrors(json)) {
+      context.logger.error(statsErrorsToString(json, config.stats));
+    }
+  };
+
+  const webpackResult = await runWebpack(
+    (await transforms?.webpackConfiguration?.(config)) || config,
+    context,
+    {
+      logging,
+      webpackFactory: await import('webpack'),
+    },
+  ).toPromise();
+
+  // Complete if using VE
+  if (!usingIvy) {
+    return webpackResult;
+  }
+
+  // Nothing to process if the Webpack build failed
+  if (!webpackResult.success) {
+    return webpackResult;
+  }
+
+  // Serialize all extracted messages
+  const serializer = await getSerializer(
+    options.format,
+    i18n.sourceLocale,
+    config.context || projectRoot,
+  );
+  const content = serializer.serialize(ivyMessages);
+
+  // Ensure directory exists
+  const outputPath = path.dirname(outFile);
+  if (!fs.existsSync(outputPath)) {
+    fs.mkdirSync(outputPath, { recursive: true });
+  }
+
+  // Write translation file
+  fs.writeFileSync(outFile, content);
+
+  return webpackResult;
+}
+
+export default createBuilder<JsonObject & ExtractI18nBuilderOptions>(execute);

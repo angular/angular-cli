@@ -128,15 +128,12 @@ export class Chunk {
   }
 
   assert(left: boolean, _content: boolean, right: boolean) {
-    if (left) {
-      if (this._assertLeft) {
-        throw new ContentCannotBeRemovedException();
-      }
+    if (left && this._assertLeft) {
+      throw new ContentCannotBeRemovedException();
     }
-    if (right) {
-      if (this._assertRight) {
-        throw new ContentCannotBeRemovedException();
-      }
+
+    if (right && this._assertRight) {
+      throw new ContentCannotBeRemovedException();
     }
   }
 

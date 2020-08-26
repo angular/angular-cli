@@ -1,26 +1,28 @@
-import {silentNpm, ng} from '../../utils/process';
-import {updateJsonFile} from '../../utils/project';
-import {expectFileToMatch} from '../../utils/fs';
+import { expectFileToMatch } from '../../utils/fs';
+import { ng, silentNpm } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 
+export default async function() {
+  // Install material design icons
+  await silentNpm('install', 'material-design-icons@3.0.1');
 
-export default function() {
-  // TODO(architect): Delete this test. It is now in devkit/build-angular.
+  // Add icon stylesheet to application
+  await updateJsonFile('angular.json', workspaceJson => {
+    const appArchitect = workspaceJson.projects['test-project'].architect;
+    appArchitect.build.options.styles = [
+      { input: 'node_modules/material-design-icons/iconfont/material-icons.css' },
+    ];
+  });
 
-  return Promise.resolve()
-    .then(() => silentNpm('install', 'material-design-icons@3.0.1'))
-    .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
-      appArchitect.build.options.styles = [
-        { input: 'node_modules/material-design-icons/iconfont/material-icons.css' },
-      ];
-    }))
-    .then(() => ng('build', '--extract-css'))
-    .then(() => expectFileToMatch('dist/test-project/styles.css', 'Material Icons'))
-    .then(() => ng(
-      'build',
-      '--prod',
-      '--extract-css',
-      '--output-hashing=none'
-    ))
-    .then(() => expectFileToMatch('dist/test-project/styles.css', 'Material Icons'));
+  // Build dev application
+  await ng('build', '--extract-css');
+
+  // Ensure icons are included
+  await expectFileToMatch('dist/test-project/styles.css', 'Material Icons')
+
+  // Build prod application
+  await ng('build', '--prod', '--extract-css', '--output-hashing=none');
+
+  // Ensure icons are included
+  await expectFileToMatch('dist/test-project/styles.css', 'Material Icons')
 }

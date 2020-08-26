@@ -8,7 +8,7 @@
 import { Observable } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 import { defaultStatsCapture } from './default-stats-capture';
-import { AggregatedProcessStats, MonitoredProcess } from './interfaces';
+import { AggregatedProcessStats } from './interfaces';
 
 
 describe('defaultStatsCapture', () => {
@@ -29,9 +29,8 @@ describe('defaultStatsCapture', () => {
       });
       obs.complete();
     });
-    const process = { stats$ } as {} as MonitoredProcess;
 
-    const res = await defaultStatsCapture(process).pipe(toArray()).toPromise();
+    const res = await defaultStatsCapture(stats$).pipe(toArray()).toPromise();
     expect(res).toEqual([{
       name: 'Process Stats',
       metrics: [

@@ -17,7 +17,9 @@ describe('resolve', () => {
 
     expect(() => resolve('npm', { basedir: '/' })).toThrow();
 
-    expect(() => resolve('npm', { basedir: '/', checkGlobal: true })).not.toThrow();
+    if (!process.env['BAZEL_TARGET']) {
+      expect(() => resolve('npm', { basedir: '/', checkGlobal: true })).not.toThrow();
+    }
   });
 
 });

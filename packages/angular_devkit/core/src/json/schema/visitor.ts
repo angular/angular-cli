@@ -5,31 +5,28 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable, concat, from, of as observableOf } from 'rxjs';
+import { Observable, concat, from, isObservable, of as observableOf } from 'rxjs';
 import { concatMap, ignoreElements, mergeMap, tap } from 'rxjs/operators';
-import { isObservable } from '../../utils';
 import { JsonArray, JsonObject, JsonValue } from '../interface';
 import { JsonPointer, JsonSchemaVisitor, JsonVisitor } from './interface';
 import { buildJsonPointer, joinJsonPointer } from './pointer';
 import { JsonSchema } from './schema';
 
-
 export interface ReferenceResolver<ContextT> {
-  (ref: string, context?: ContextT): { context?: ContextT, schema?: JsonObject };
+  (ref: string, context?: ContextT): { context?: ContextT; schema?: JsonObject };
 }
 
-function _getObjectSubSchema(
-  schema: JsonSchema | undefined,
-  key: string,
-): JsonObject | undefined {
+function _getObjectSubSchema(schema: JsonSchema | undefined, key: string): JsonObject | undefined {
   if (typeof schema !== 'object' || schema === null) {
     return undefined;
   }
 
   // Is it an object schema?
   if (typeof schema.properties == 'object' || schema.type == 'object') {
-    if (typeof schema.properties == 'object'
-        && typeof (schema.properties as JsonObject)[key] == 'object') {
+    if (
+      typeof schema.properties == 'object' &&
+      typeof (schema.properties as JsonObject)[key] == 'object'
+    ) {
       return (schema.properties as JsonObject)[key] as JsonObject;
     }
     if (typeof schema.additionalProperties == 'object') {
@@ -53,7 +50,7 @@ function _visitJsonRecursive<ContextT>(
   ptr: JsonPointer,
   schema?: JsonSchema,
   refResolver?: ReferenceResolver<ContextT>,
-  context?: ContextT,  // tslint:disable-line:no-any
+  context?: ContextT,
   root?: JsonObject | JsonArray,
 ): Observable<JsonValue> {
   if (schema === true || schema === false) {
@@ -68,13 +65,10 @@ function _visitJsonRecursive<ContextT>(
     }
   }
 
-  const value = visitor(json, ptr, schema, root);
+  const value = visitor(json, ptr, schema as JsonObject, root);
 
-  return (isObservable(value)
-      ? value as Observable<JsonValue>
-      : observableOf(value as JsonValue)
-  ).pipe(
-    concatMap((value: JsonValue) => {
+  return (isObservable<JsonValue>(value) ? value : observableOf(value)).pipe(
+    concatMap(value => {
       if (Array.isArray(value)) {
         return concat(
           from(value).pipe(
@@ -87,7 +81,7 @@ function _visitJsonRecursive<ContextT>(
                 refResolver,
                 context,
                 root || value,
-              ).pipe(tap<JsonValue>(x => value[i] = x));
+              ).pipe(tap<JsonValue>(x => (value[i] = x)));
             }),
             ignoreElements(),
           ),
@@ -105,11 +99,18 @@ function _visitJsonRecursive<ContextT>(
                 refResolver,
                 context,
                 root || value,
-              ).pipe(tap<JsonValue>(x => value[key] = x));
+              ).pipe(
+                tap<JsonValue>(x => {
+                  const descriptor = Object.getOwnPropertyDescriptor(value, key);
+                  if (descriptor && descriptor.writable && value[key] !== x) {
+                    value[key] = x;
+                  }
+                }),
+              );
             }),
             ignoreElements(),
-           ),
-           observableOf(value),
+          ),
+          observableOf(value),
         );
       } else {
         return observableOf(value);
@@ -138,11 +139,10 @@ export function visitJson<ContextT>(
   visitor: JsonVisitor,
   schema?: JsonSchema,
   refResolver?: ReferenceResolver<ContextT>,
-  context?: ContextT,  // tslint:disable-line:no-any
+  context?: ContextT,
 ): Observable<JsonValue> {
   return _visitJsonRecursive(json, visitor, buildJsonPointer([]), schema, refResolver, context);
 }
-
 
 export function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor) {
   if (schema === false || schema === true) {

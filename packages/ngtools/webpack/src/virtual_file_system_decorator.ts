@@ -21,6 +21,10 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     private _webpackCompilerHost: WebpackCompilerHost,
   ) { }
 
+  getWebpackCompilerHost() {
+    return this._webpackCompilerHost;
+  }
+
   getVirtualFilesPaths() {
     return this._webpackCompilerHost.getNgFactoryPaths();
   }
@@ -56,7 +60,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     (this._inputFileSystem as any).readJson(path, callback);
   }
 
-  readlink(path: string, callback: (err: Error, linkString: string) => void): void {
+  readlink(path: string, callback: (err: Error | null | undefined, linkString: string) => void): void {
     this._inputFileSystem.readlink(path, callback);
   }
 

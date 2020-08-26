@@ -5,40 +5,65 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
-import * as webpack from 'webpack';  // tslint:disable-line:no-implicit-dependencies
-
+import { RawSourceMap } from 'source-map';
+import * as webpack from 'webpack'; // tslint:disable-line:no-implicit-dependencies
+import { SourceMapSource } from 'webpack-sources';
 const loaderUtils = require('loader-utils');
 
 import { buildOptimizer } from './build-optimizer';
-
 
 interface BuildOptimizerLoaderOptions {
   sourceMap: boolean;
 }
 
-export default function buildOptimizerLoader
-  (this: webpack.loader.LoaderContext, content: string, previousSourceMap: RawSourceMap) {
-  this.cacheable();
-  const options: BuildOptimizerLoaderOptions = loaderUtils.getOptions(this) || {};
+export const buildOptimizerLoaderPath = __filename;
 
-  // Make up names of the intermediate files so we can chain the sourcemaps.
-  const inputFilePath = this.resourcePath + '.pre-build-optimizer.js';
-  const outputFilePath = this.resourcePath + '.post-build-optimizer.js';
+const alwaysProcess = (path: string) =>
+  // Always process TS files.
+  path.endsWith('.ts') ||
+  path.endsWith('.tsx') ||
+  // Always process factory files.
+  path.endsWith('.ngfactory.js') ||
+  path.endsWith('.ngstyle.js');
+
+export default function buildOptimizerLoader(
+  this: webpack.loader.LoaderContext,
+  content: string,
+  previousSourceMap: RawSourceMap,
+) {
+  this.cacheable();
+  const callback = this.async();
+  if (!callback) {
+    throw new Error('Async loader support is required.');
+  }
+
+  const skipBuildOptimizer =
+    this._module && this._module.factoryMeta && this._module.factoryMeta.skipBuildOptimizer;
+
+  if (!alwaysProcess(this.resourcePath) && skipBuildOptimizer) {
+    // Skip loading processing this file with Build Optimizer if we determined in
+    // BuildOptimizerWebpackPlugin that we shouldn't.
+
+    // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
+    // tslint:disable-next-line:no-any
+    this.callback(null, content, previousSourceMap as any);
+
+    return;
+  }
+
+  const options: BuildOptimizerLoaderOptions = loaderUtils.getOptions(this) || {};
 
   const boOutput = buildOptimizer({
     content,
     originalFilePath: this.resourcePath,
-    inputFilePath,
-    outputFilePath,
+    inputFilePath: this.resourcePath,
+    outputFilePath: this.resourcePath,
     emitSourceMap: options.sourceMap,
-    isSideEffectFree: this._module
-                      && this._module.factoryMeta
-                      && this._module.factoryMeta.sideEffectFree,
+    isSideEffectFree:
+      this._module && this._module.factoryMeta && this._module.factoryMeta.sideEffectFree,
   });
 
   if (boOutput.emitSkipped || boOutput.content === null) {
-    // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
     // tslint:disable-next-line:no-any
     this.callback(null, content, previousSourceMap as any);
 
@@ -55,21 +80,18 @@ export default function buildOptimizerLoader
     newContent = newContent.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
 
     if (previousSourceMap) {
-      // If there's a previous sourcemap, we have to chain them.
-      // See https://github.com/mozilla/source-map/issues/216#issuecomment-150839869 for a simple
-      // source map chaining example.
       // Use http://sokra.github.io/source-map-visualization/ to validate sourcemaps make sense.
 
-      // Force the previous sourcemap to use the filename we made up for it.
-      // In order for source maps to be chained, the consumed source map `file` needs to be in the
-      // consumers source map `sources` array.
-      previousSourceMap.file = inputFilePath;
-
-      // Chain the sourcemaps.
-      const consumer = new SourceMapConsumer(intermediateSourceMap);
-      const generator = SourceMapGenerator.fromSourceMap(consumer);
-      generator.applySourceMap(new SourceMapConsumer(previousSourceMap));
-      newSourceMap = generator.toJSON();
+      // The last argument is not yet in the typings
+      // tslint:disable-next-line: no-any
+      newSourceMap = new (SourceMapSource as any)(
+        newContent,
+        this.resourcePath,
+        intermediateSourceMap,
+        content,
+        previousSourceMap,
+        true,
+      ).map();
     } else {
       // Otherwise just return our generated sourcemap.
       newSourceMap = intermediateSourceMap;
@@ -78,5 +100,5 @@ export default function buildOptimizerLoader
 
   // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
   // tslint:disable-next-line:no-any
-  this.callback(null, newContent, newSourceMap as any);
+  callback(null, newContent, newSourceMap as any);
 }

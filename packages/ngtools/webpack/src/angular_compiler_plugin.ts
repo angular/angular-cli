@@ -24,28 +24,35 @@ import {
   Program,
   SOURCE,
   UNKNOWN_ERROR_CODE,
-  VERSION,
   createCompilerHost,
   createProgram,
   formatDiagnostics,
   readConfiguration,
 } from '@angular/compiler-cli';
+import { constructorParametersDownlevelTransform } from '@angular/compiler-cli/src/tooling';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { Compiler, compilation } from 'webpack';
 import { time, timeEnd } from './benchmark';
-import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
+import { WebpackCompilerHost } from './compiler_host';
+import { DiagnosticMode, gatherDiagnostics, hasErrors, reportDiagnostics } from './diagnostics';
 import { resolveEntryModuleFromMain } from './entry_resolver';
-import { DiagnosticMode, gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import {
+  AngularCompilerPluginOptions,
+  ContextElementDependencyConstructor,
+  PLATFORM,
+} from './interfaces';
 import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
+import { NgccProcessor } from './ngcc_processor';
 import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
   exportLazyModuleMap,
   exportNgFactory,
   findResources,
+  importFactory,
   registerLocaleData,
   removeDecorators,
   replaceBootstrap,
@@ -53,6 +60,7 @@ import {
   replaceServerBootstrap,
 } from './transformers';
 import { collectDeepNodes } from './transformers/ast_helpers';
+import { removeIvyJitSupportCalls } from './transformers/remove-ivy-jit-support-calls';
 import {
   AUTO_START_ARG,
 } from './type_checker';
@@ -62,6 +70,7 @@ import {
   MESSAGE_KIND,
   UpdateMessage,
 } from './type_checker_messages';
+import { flattenArray, forwardSlashPath, workaroundResolve } from './utils';
 import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
@@ -71,100 +80,61 @@ import {
   NodeWatchFileSystemInterface,
   NormalModuleFactoryRequest,
 } from './webpack';
-import { WebpackInputHost } from './webpack-input-host';
-
-const treeKill = require('tree-kill');
-
-export interface ContextElementDependency { }
-
-export interface ContextElementDependencyConstructor {
-  new(modulePath: string, name: string): ContextElementDependency;
-}
-
-/**
- * Option Constants
- */
-export interface AngularCompilerPluginOptions {
-  sourceMap?: boolean;
-  tsConfigPath: string;
-  basePath?: string;
-  entryModule?: string;
-  mainPath?: string;
-  skipCodeGeneration?: boolean;
-  hostReplacementPaths?: { [path: string]: string } | ((path: string) => string);
-  forkTypeChecker?: boolean;
-  i18nInFile?: string;
-  i18nInFormat?: string;
-  i18nOutFile?: string;
-  i18nOutFormat?: string;
-  locale?: string;
-  missingTranslation?: string;
-  platform?: PLATFORM;
-  nameLazyFiles?: boolean;
-  logger?: logging.Logger;
-  directTemplateLoading?: boolean;
-
-  // added to the list of lazy routes
-  additionalLazyModules?: { [module: string]: string };
-  additionalLazyModuleResources?: string[];
-
-  // The ContextElementDependency of correct Webpack compilation.
-  // This is needed when there are multiple Webpack installs.
-  contextElementDependencyConstructor?: ContextElementDependencyConstructor;
-
-  // Use tsconfig to include path globs.
-  compilerOptions?: ts.CompilerOptions;
-
-  host?: virtualFs.Host<fs.Stats>;
-  platformTransformers?: ts.TransformerFactory<ts.SourceFile>[];
-}
-
-export enum PLATFORM {
-  Browser,
-  Server,
-}
+import { createWebpackInputHost } from './webpack-input-host';
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
 
   // TS compilation.
-  private _compilerOptions: CompilerOptions;
-  private _rootNames: string[];
-  private _program: (ts.Program | Program) | null;
-  private _compilerHost: WebpackCompilerHost & CompilerHost;
-  private _moduleResolutionCache: ts.ModuleResolutionCache;
+  // The majority of these are initialized in _setupOptions which is called from the constructor.
+  private _compilerOptions!: CompilerOptions;
+  private _rootNames!: string[];
+  private _program: (ts.Program | Program) | undefined;
+  private _compilerHost!: WebpackCompilerHost & CompilerHost;
+  private _moduleResolutionCache!: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
+  private _discoverLazyRoutes = true;
+  private _useFactories = false;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = {};
-  private _tsConfigPath: string;
-  private _entryModule: string | null;
+  private _tsConfigPath!: string;
+  private _entryModule: string | null = null;
   private _mainPath: string | undefined;
-  private _basePath: string;
+  private _basePath!: string;
   private _transformers: ts.TransformerFactory<ts.SourceFile>[] = [];
   private _platformTransformers: ts.TransformerFactory<ts.SourceFile>[] | null = null;
-  private _platform: PLATFORM;
+  private _platform!: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
+  // This is needed because if the first build fails we need to do a full emit
+  // even whe only a single file gets updated.
+  private _hadFullJitEmit: boolean | undefined;
+  private _unusedFiles = new Set<string>();
+  private _typeDeps = new Set<string>();
   private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
+  private _nodeModulesRegExp = /[\\\/]node_modules[\\\/]/;
 
   // Webpack plugin.
   private _firstRun = true;
-  private _donePromise: Promise<void> | null;
-  private _normalizedLocale: string | null;
+  private _donePromise: Promise<void> | null = null;
+  private _normalizedLocale: string | null = null;
   private _warnings: (string | Error)[] = [];
   private _errors: (string | Error)[] = [];
-  private _contextElementDependencyConstructor: ContextElementDependencyConstructor;
+  private _contextElementDependencyConstructor!: ContextElementDependencyConstructor;
 
   // TypeChecker process.
   private _forkTypeChecker = true;
-  private _typeCheckerProcess: ChildProcess | null;
+  private _typeCheckerProcess: ChildProcess | null = null;
   private _forkedTypeCheckerInitialized = false;
 
   // Logging.
   private _logger: logging.Logger;
 
+  private _mainFields: string[] = [];
+
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
+    this._logger = options.logger || createConsoleLogger();
     this._setupOptions(this._options);
   }
 
@@ -187,20 +157,15 @@ export class AngularCompilerPlugin {
     return tsProgram ? tsProgram.getTypeChecker() : null;
   }
 
-  static isSupported() {
-    return VERSION && parseInt(VERSION.major) >= 5;
-  }
-
   private _setupOptions(options: AngularCompilerPluginOptions) {
     time('AngularCompilerPlugin._setupOptions');
-    this._logger = options.logger || createConsoleLogger();
 
     // Fill in the missing options.
     if (!options.hasOwnProperty('tsConfigPath')) {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
     }
     // TS represents paths internally with '/' and expects the tsconfig path to be in this format
-    this._tsConfigPath = options.tsConfigPath.replace(/\\/g, '/');
+    this._tsConfigPath = forwardSlashPath(options.tsConfigPath);
 
     // Check the base path.
     const maybeBasePath = path.resolve(process.cwd(), this._tsConfigPath);
@@ -281,6 +246,11 @@ export class AngularCompilerPlugin {
         options.missingTranslation as 'error' | 'warning' | 'ignore';
     }
 
+    // For performance, disable AOT decorator downleveling transformer for applications in the CLI.
+    // The transformer is not needed for VE or Ivy in this plugin since Angular decorators are removed.
+    // While the transformer would make no changes, it would still need to walk each source file AST.
+    this._compilerOptions.annotationsAs = 'decorators' as 'decorators';
+
     // Process forked type checker options.
     if (options.forkTypeChecker !== undefined) {
       this._forkTypeChecker = options.forkTypeChecker;
@@ -290,6 +260,41 @@ export class AngularCompilerPlugin {
     // Add custom platform transformers.
     if (options.platformTransformers !== undefined) {
       this._platformTransformers = options.platformTransformers;
+    }
+
+    // Determine if lazy route discovery via Compiler CLI private API should be attempted.
+    // The default is to discover routes, but it can be overriden.
+    if (options.discoverLazyRoutes !== undefined) {
+      this._discoverLazyRoutes = options.discoverLazyRoutes;
+    }
+
+    if (this._discoverLazyRoutes === false && this.options.additionalLazyModuleResources
+      && this.options.additionalLazyModuleResources.length > 0) {
+      this._warnings.push(
+        new Error(`Lazy route discovery is disabled but additional Lazy Module Resources were`
+          + ` provided. These will be ignored.`),
+      );
+    }
+
+    if (this._compilerOptions.strictMetadataEmit) {
+      this._warnings.push(
+        new Error(
+          `Using Angular compiler option 'strictMetadataEmit' for applications might cause undefined behavior.`,
+        ),
+      );
+    }
+
+    if (this._discoverLazyRoutes === false && this.options.additionalLazyModules
+      && Object.keys(this.options.additionalLazyModules).length > 0) {
+      this._warnings.push(
+        new Error(`Lazy route discovery is disabled but additional lazy modules were provided.`
+          + `These will be ignored.`),
+      );
+    }
+
+    if (!this._JitMode && !this._compilerOptions.enableIvy) {
+      // Only attempt to use factories when AOT and not Ivy.
+      this._useFactories = true;
     }
 
     // Default ContextElementDependency to the one we can import from here.
@@ -359,14 +364,7 @@ export class AngularCompilerPlugin {
       this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
     }
 
-    // Use an identity function as all our paths are absolute already.
-    this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
-
-    const tsProgram = this._getTsProgram();
-    const oldFiles = new Set(tsProgram ?
-      tsProgram.getSourceFiles().map(sf => sf.fileName)
-      : [],
-    );
+    const oldTsProgram = this._getTsProgram();
 
     if (this._JitMode) {
       // Create the TypeScript program.
@@ -375,14 +373,9 @@ export class AngularCompilerPlugin {
         this._rootNames,
         this._compilerOptions,
         this._compilerHost,
-        tsProgram,
+        oldTsProgram,
       );
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
-
-      const newFiles = this._program.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-      for (const newFile of newFiles) {
-        this._compilerHost.invalidate(newFile.fileName);
-      }
     } else {
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
       // Create the Angular program.
@@ -397,11 +390,47 @@ export class AngularCompilerPlugin {
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
       await this._program.loadNgStructureAsync();
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+    }
 
-      const newFiles = this._program.getTsProgram()
-        .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-      for (const newFile of newFiles) {
-        this._compilerHost.invalidate(newFile.fileName);
+    const newTsProgram = this._getTsProgram();
+    const newProgramSourceFiles = newTsProgram?.getSourceFiles();
+    const localDtsFiles = new Set(
+      newProgramSourceFiles?.filter(
+        f => f.isDeclarationFile && !this._nodeModulesRegExp.test(f.fileName),
+      )
+      .map(f => this._compilerHost.denormalizePath(f.fileName)),
+    );
+
+    if (!oldTsProgram) {
+      // Add all non node package dts files as depedencies when not having an old program
+      for (const dts of localDtsFiles) {
+        this._typeDeps.add(dts);
+      }
+    } else if (oldTsProgram && newProgramSourceFiles) {
+      // The invalidation should only happen if we have an old program
+      // as otherwise we will invalidate all the sourcefiles.
+      const oldFiles = new Set(oldTsProgram.getSourceFiles().map(sf => sf.fileName));
+      const newProgramFiles = new Set(newProgramSourceFiles.map(sf => sf.fileName));
+
+      for (const dependency of this._typeDeps) {
+        // Remove type dependencies of no longer existing files
+        if (!newProgramFiles.has(forwardSlashPath(dependency))) {
+          this._typeDeps.delete(dependency);
+        }
+      }
+
+      for (const fileName of newProgramFiles) {
+        if (oldFiles.has(fileName)) {
+          continue;
+        }
+
+        this._compilerHost.invalidate(fileName);
+
+        const denormalizedFileName = this._compilerHost.denormalizePath(fileName);
+        if (localDtsFiles.has(denormalizedFileName)) {
+          // Add new dts file as a type depedency
+          this._typeDeps.add(denormalizedFileName);
+        }
       }
     }
 
@@ -411,7 +440,7 @@ export class AngularCompilerPlugin {
       this._entryModule = resolveEntryModuleFromMain(
         this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
 
-      if (!this.entryModule && !this._compilerOptions.enableIvy) {
+      if (this._discoverLazyRoutes && !this.entryModule && !this._compilerOptions.enableIvy) {
         this._warnings.push('Lazy routes discovery is not enabled. '
           + 'Because there is neither an entryModule nor a '
           + 'statically analyzable bootstrap code in the main file.',
@@ -449,7 +478,7 @@ export class AngularCompilerPlugin {
       time('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
       ngProgram = createProgram({
         rootNames: this._rootNames,
-        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true },
+        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true, enableIvy: false },
         host: this._compilerHost,
       });
       timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
@@ -497,21 +526,17 @@ export class AngularCompilerPlugin {
           return;
         }
 
-        const lazyRouteTSFile = discoveredLazyRoutes[lazyRouteKey].replace(/\\/g, '/');
+        const lazyRouteTSFile = forwardSlashPath(discoveredLazyRoutes[lazyRouteKey]);
         let modulePath: string, moduleKey: string;
 
-        if (this._JitMode ||
-          // When using Ivy and not using allowEmptyCodegenFiles, factories are not generated.
-          (this._compilerOptions.enableIvy && !this._compilerOptions.allowEmptyCodegenFiles)
-        ) {
-          modulePath = lazyRouteTSFile;
-          moduleKey = `${lazyRouteModule}${moduleName ? '#' + moduleName : ''}`;
-        } else {
-          // NgFactories are only used with AOT on ngc (legacy) mode.
+        if (this._useFactories) {
           modulePath = lazyRouteTSFile.replace(/(\.d)?\.tsx?$/, '');
           modulePath += '.ngfactory.js';
           const factoryModuleName = moduleName ? `#${moduleName}NgFactory` : '';
           moduleKey = `${lazyRouteModule}.ngfactory${factoryModuleName}`;
+        } else {
+          modulePath = lazyRouteTSFile;
+          moduleKey = `${lazyRouteModule}${moduleName ? '#' + moduleName : ''}`;
         }
 
         modulePath = workaroundResolve(modulePath);
@@ -533,11 +558,7 @@ export class AngularCompilerPlugin {
   }
 
   private _createForkedTypeChecker() {
-    // Bootstrap type checker is using local CLI.
-    const g: any = typeof global !== 'undefined' ? global : {};  // tslint:disable-line:no-any
-    const typeCheckerFile: string = g['_DevKitIsLocal']
-      ? './type_checker_bootstrap.js'
-      : './type_checker_worker.js';
+    const typeCheckerFile = './type_checker_worker.js';
 
     const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
 
@@ -584,8 +605,10 @@ export class AngularCompilerPlugin {
   }
 
   private _killForkedTypeChecker() {
-    if (this._typeCheckerProcess && this._typeCheckerProcess.pid) {
-      treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+    if (this._typeCheckerProcess && !this._typeCheckerProcess.killed) {
+      try {
+        this._typeCheckerProcess.kill();
+      } catch {}
       this._typeCheckerProcess = null;
     }
   }
@@ -606,18 +629,106 @@ export class AngularCompilerPlugin {
     }
   }
 
+  private _checkUnusedFiles(compilation: compilation.Compilation) {
+    // Only do the unused TS files checks when under Ivy
+    // since previously we did include unused files in the compilation
+    // See: https://github.com/angular/angular-cli/pull/15030
+    // Don't do checks for compilations with errors, since that can result in a partial compilation.
+    if (!this._compilerOptions.enableIvy || compilation.errors.length > 0) {
+      return;
+    }
+
+    // Bail if there's no TS program. Nothing to do in that case.
+    const program = this._getTsProgram();
+    if (!program) {
+      return;
+    }
+
+    // Exclude the following files from unused checks
+    // - ngfactories & ngstyle might not have a correspondent
+    //   JS file example `@angular/core/core.ngfactory.ts`.
+    // - ngtypecheck.ts and __ng_typecheck__.ts are used for type-checking in Ivy.
+    const fileExcludeRegExp = /(\.(ngfactory|ngstyle|ngsummary|ngtypecheck)\.ts|ng_typecheck__\.ts)$/;
+
+    // Start all the source file names we care about.
+    // Ignore matches to the regexp above, files we've already reported once before, and
+    // node_modules.
+    const sourceFiles = program.getSourceFiles()
+      .map(x => this._compilerHost.denormalizePath(x.fileName))
+      .filter(f => !(fileExcludeRegExp.test(f) || this._unusedFiles.has(f)
+        || this._nodeModulesRegExp.test(f)));
+
+    // Make a set with the sources, but exclude .d.ts files since those are type-only.
+    const unusedSourceFileNames = new Set(sourceFiles.filter(f => !f.endsWith('.d.ts')));
+    // Separately keep track of type-only deps.
+    const typeDepFileNames = new Set(sourceFiles);
+
+    // This function removes a source file name and all its dependencies from the set.
+    const removeSourceFile = (fileName: string, originalModule = false) => {
+      if (unusedSourceFileNames.has(fileName) || (originalModule && typeDepFileNames.has(fileName))) {
+        unusedSourceFileNames.delete(fileName);
+        if (originalModule) {
+          typeDepFileNames.delete(fileName);
+        }
+        this.getDependencies(fileName, false).forEach(f => removeSourceFile(f));
+      }
+    };
+
+    // Go over all the modules in the webpack compilation and remove them from the sets.
+    compilation.modules.forEach(m => m.resource ? removeSourceFile(m.resource, true) : null);
+
+    // Anything that remains is unused, because it wasn't referenced directly or transitively
+    // on the files in the compilation.
+    for (const fileName of unusedSourceFileNames) {
+      compilation.warnings.push(
+        `${fileName} is part of the TypeScript compilation but it's unused.\n` +
+        `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
+      );
+      this._unusedFiles.add(fileName);
+      // Remove the truly unused from the type dep list.
+      typeDepFileNames.delete(fileName);
+    }
+
+    // At this point we know what the type deps are.
+    // These are the TS files that weren't part of the compilation modules, aren't unused, but were
+    // part of the TS original source list.
+    // Next build we add them to the TS entry points so that they trigger rebuilds.
+    for (const fileName of typeDepFileNames) {
+      this._typeDeps.add(fileName);
+    }
+  }
+
   // Registration hook for webpack plugin.
   // tslint:disable-next-line:no-big-function
-  apply(compiler: Compiler & { watchMode?: boolean }) {
+  apply(compiler: Compiler & { watchMode?: boolean, parentCompilation?: compilation.Compilation }) {
+    // The below is require by NGCC processor
+    // since we need to know which fields we need to process
+    compiler.hooks.environment.tap('angular-compiler', () => {
+      const { options } = compiler;
+      const mainFields = options.resolve && options.resolve.mainFields;
+      if (mainFields) {
+        this._mainFields = flattenArray(mainFields);
+      }
+    });
+
     // cleanup if not watching
     compiler.hooks.thisCompilation.tap('angular-compiler', compilation => {
       compilation.hooks.finishModules.tap('angular-compiler', () => {
+        this._checkUnusedFiles(compilation);
+
+        let rootCompiler = compiler;
+        while (rootCompiler.parentCompilation) {
+          // tslint:disable-next-line:no-any
+          rootCompiler = compiler.parentCompilation as any;
+        }
+
         // only present for webpack 4.23.0+, assume true otherwise
-        const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
+        const watchMode = rootCompiler.watchMode === undefined ? true : rootCompiler.watchMode;
         if (!watchMode) {
-          this._program = null;
+          this._program = undefined;
           this._transformers = [];
           this._resourceLoader = undefined;
+          this._compilerHost.reset();
         }
       });
     });
@@ -630,7 +741,7 @@ export class AngularCompilerPlugin {
         watchFileSystem: NodeWatchFileSystemInterface,
       };
 
-      let host: virtualFs.Host<fs.Stats> = this._options.host || new WebpackInputHost(
+      let host: virtualFs.Host<fs.Stats> = this._options.host || createWebpackInputHost(
         compilerWithFileSystems.inputFileSystem,
       );
 
@@ -660,6 +771,31 @@ export class AngularCompilerPlugin {
         }
       }
 
+      let ngccProcessor: NgccProcessor | undefined;
+      if (this._compilerOptions.enableIvy) {
+        const fileWatchPurger = (path: string) => {
+          // tslint:disable-next-line: no-any
+          if ((compilerWithFileSystems.inputFileSystem as any).purge) {
+            // tslint:disable-next-line: no-any
+            (compilerWithFileSystems.inputFileSystem as any).purge(path);
+          }
+        };
+
+        ngccProcessor = new NgccProcessor(
+          this._mainFields,
+          fileWatchPurger,
+          this._warnings,
+          this._errors,
+          this._basePath,
+          this._tsConfigPath,
+        );
+
+        ngccProcessor.process();
+      }
+
+      // Use an identity function as all our paths are absolute already.
+      this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
+
       // Create the webpack compiler host.
       const webpackCompilerHost = new WebpackCompilerHost(
         this._compilerOptions,
@@ -667,6 +803,8 @@ export class AngularCompilerPlugin {
         host,
         true,
         this._options.directTemplateLoading,
+        ngccProcessor,
+        this._moduleResolutionCache,
       );
 
       // Create and set a new WebpackResourceLoader in AOT
@@ -697,64 +835,65 @@ export class AngularCompilerPlugin {
       );
     });
 
-    // Add lazy modules to the context module for @angular/core
-    compiler.hooks.contextModuleFactory.tap('angular-compiler', cmf => {
-      const angularCorePackagePath = require.resolve('@angular/core/package.json');
+    if (this._discoverLazyRoutes) {
+      // Add lazy modules to the context module for @angular/core
+      compiler.hooks.contextModuleFactory.tap('angular-compiler', cmf => {
+        const angularCorePackagePath = require.resolve('@angular/core/package.json', {
+          paths: [this._basePath],
+        });
 
-      // APFv6 does not have single FESM anymore. Instead of verifying if we're pointing to
-      // FESMs, we resolve the `@angular/core` path and verify that the path for the
-      // module starts with it.
-      // This may be slower but it will be compatible with both APF5, 6 and potential future
-      // versions (until the dynamic import appears outside of core I suppose).
-      // We resolve any symbolic links in order to get the real path that would be used in webpack.
-      const angularCoreResourceRoot = fs.realpathSync(path.dirname(angularCorePackagePath));
+        // APFv6 does not have single FESM anymore. Instead of verifying if we're pointing to
+        // FESMs, we resolve the `@angular/core` path and verify that the path for the
+        // module starts with it.
+        // This may be slower but it will be compatible with both APF5, 6 and potential future
+        // versions (until the dynamic import appears outside of core I suppose).
+        // We resolve symbolic links in order to get the real path that would be used in webpack.
+        const angularCoreResourceRoot = fs.realpathSync(path.dirname(angularCorePackagePath));
 
-      cmf.hooks.afterResolve.tapPromise('angular-compiler', async result => {
-        // Alter only existing request from Angular or one of the additional lazy module resources.
-        const isLazyModuleResource = (resource: string) =>
-          resource.startsWith(angularCoreResourceRoot) ||
-          ( this.options.additionalLazyModuleResources &&
-            this.options.additionalLazyModuleResources.includes(resource));
+        cmf.hooks.afterResolve.tapPromise('angular-compiler', async result => {
+          // Alter only existing request from Angular or the additional lazy module resources.
+          const isLazyModuleResource = (resource: string) =>
+            resource.startsWith(angularCoreResourceRoot) ||
+            (this.options.additionalLazyModuleResources &&
+              this.options.additionalLazyModuleResources.includes(resource));
 
-        if (!result || !this.done || !isLazyModuleResource(result.resource)) {
-          return result;
-        }
-
-        return this.done.then(
-          () => {
-            // This folder does not exist, but we need to give webpack a resource.
-            // TODO: check if we can't just leave it as is (angularCoreModuleDir).
-            result.resource = path.join(this._basePath, '$$_lazy_route_resource');
-            // tslint:disable-next-line:no-any
-            result.dependencies.forEach((d: any) => d.critical = false);
-            // tslint:disable-next-line:no-any
-            result.resolveDependencies = (_fs: any, options: any, callback: Callback) => {
-              const dependencies = Object.keys(this._lazyRoutes)
-                .map((key) => {
-                  const modulePath = this._lazyRoutes[key];
-                  if (modulePath !== null) {
-                    const name = key.split('#')[0];
-
-                    return new this._contextElementDependencyConstructor(modulePath, name);
-                  } else {
-                    return null;
-                  }
-                })
-                .filter(x => !!x);
-
-              if (this._options.nameLazyFiles) {
-                options.chunkName = '[request]';
-              }
-
-              callback(null, dependencies);
-            };
-
+          if (!result || !this.done || !isLazyModuleResource(result.resource)) {
             return result;
-          },
-          () => undefined,
-        );
+          }
+
+          await this.done;
+
+          // This folder does not exist, but we need to give webpack a resource.
+          // TODO: check if we can't just leave it as is (angularCoreModuleDir).
+          result.resource = path.join(this._basePath, '$$_lazy_route_resource');
+          // tslint:disable-next-line:no-any
+          result.dependencies.forEach((d: any) => d.critical = false);
+          // tslint:disable-next-line:no-any
+          result.resolveDependencies = (_fs: any, options: any, callback: Callback) => {
+            const dependencies = Object.keys(this._lazyRoutes)
+              .map((key) => {
+                const modulePath = this._lazyRoutes[key];
+                if (modulePath !== null) {
+                  const name = key.split('#')[0];
+
+                  return new this._contextElementDependencyConstructor(modulePath, name);
+                } else {
+                  return null;
+                }
+              })
+              .filter(x => !!x);
+
+            if (this._options.nameLazyFiles) {
+              options.chunkName = '[request]';
+            }
+
+            callback(null, dependencies);
+          };
+
+          return result;
+        });
       });
-    });
+    }
 
     // Create and destroy forked type checker on watch mode.
     compiler.hooks.watchRun.tap('angular-compiler', () => {
@@ -779,6 +918,26 @@ export class AngularCompilerPlugin {
     });
 
     compiler.hooks.afterResolvers.tap('angular-compiler', compiler => {
+      if (this._compilerOptions.enableIvy) {
+        // When Ivy is enabled we need to add the fields added by NGCC
+        // to take precedence over the provided mainFields.
+        // NGCC adds fields in package.json suffixed with '_ivy_ngcc'
+        // Example: module -> module_ivy_ngcc
+        // tslint:disable-next-line:no-any
+        (compiler as any).resolverFactory.hooks.resolveOptions
+          .for('normal')
+          // tslint:disable-next-line:no-any
+          .tap('WebpackOptionsApply', (resolveOptions: any) => {
+            const originalMainFields: string[] = resolveOptions.mainFields;
+            const ivyMainFields = originalMainFields.map(f => `${f}_ivy_ngcc`);
+
+            return {
+              ...resolveOptions,
+              mainFields: [...ivyMainFields, ...originalMainFields],
+            };
+          });
+      }
+
       // tslint:disable-next-line:no-any
       (compiler as any).resolverFactory.hooks.resolver
         .for('normal')
@@ -816,10 +975,27 @@ export class AngularCompilerPlugin {
 
   private async _make(compilation: compilation.Compilation) {
     time('AngularCompilerPlugin._make');
-    this._emitSkipped = true;
     // tslint:disable-next-line:no-any
     if ((compilation as any)._ngToolsWebpackPluginInstance) {
       throw new Error('An @ngtools/webpack plugin already exist for this compilation.');
+    }
+
+    // If there is no compiler host at this point, it means that the environment hook did not run.
+    // This happens in child compilations that inherit the parent compilation file system.
+    // Node: child compilations also do not run most webpack compiler hooks, including almost all
+    // we use here. The child compiler will always run as if it was the first build.
+    if (this._compilerHost === undefined) {
+      const inputFs = compilation.compiler.inputFileSystem as VirtualFileSystemDecorator;
+      if (!inputFs.getWebpackCompilerHost) {
+        throw new Error('AngularCompilerPlugin is running in a child compilation, but could' +
+          'not find a WebpackCompilerHost in the parent compilation.');
+      }
+
+      // Use the existing WebpackCompilerHost to ensure builds and rebuilds work.
+      this._compilerHost = createCompilerHost({
+        options: this._compilerOptions,
+        tsHost: inputFs.getWebpackCompilerHost(),
+      }) as CompilerHost & WebpackCompilerHost;
     }
 
     // Set a private variable for this plugin instance.
@@ -863,10 +1039,37 @@ export class AngularCompilerPlugin {
 
     if (this._JitMode) {
       // Replace resources in JIT.
-      this._transformers.push(replaceResources(isAppPath, getTypeChecker));
+      this._transformers.push(
+        replaceResources(isAppPath, getTypeChecker, this._options.directTemplateLoading));
+      // Downlevel constructor parameters for DI support
+      // This is required to support forwardRef in ES2015 due to TDZ issues
+      // This wrapper is needed here due to the program not being available until after the transformers are created.
+      const downlevelFactory: ts.TransformerFactory<ts.SourceFile> = (context) => {
+        const factory = constructorParametersDownlevelTransform(this._getTsProgram() as ts.Program);
+
+        return factory(context);
+      };
+      this._transformers.push(downlevelFactory);
     } else {
-      // Remove unneeded angular decorators.
-      this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      if (!this._compilerOptions.enableIvy) {
+        // Remove unneeded angular decorators in VE.
+        // In Ivy they are removed in ngc directly.
+        this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      } else {
+        // Default for both options is to emit (undefined means true)
+        const removeClassMetadata = this._options.emitClassMetadata === false;
+        const removeNgModuleScope = this._options.emitNgModuleScope === false;
+        if (removeClassMetadata || removeNgModuleScope) {
+          this._transformers.push(
+            removeIvyJitSupportCalls(removeClassMetadata, removeNgModuleScope, getTypeChecker),
+          );
+        }
+      }
+      // Import ngfactory in loadChildren import syntax
+      if (this._useFactories) {
+        // Only transform imports to use factories with View Engine.
+        this._transformers.push(importFactory(msg => this._warnings.push(msg), getTypeChecker));
+      }
     }
 
     if (this._platformTransformers !== null) {
@@ -882,17 +1085,22 @@ export class AngularCompilerPlugin {
         }
 
         if (!this._JitMode) {
-          // Replace bootstrap in browser AOT.
+          // Replace bootstrap in browser non JIT Mode.
           this._transformers.push(replaceBootstrap(
             isAppPath,
             getEntryModule,
             getTypeChecker,
-            !!this._compilerOptions.enableIvy,
+            this._useFactories,
           ));
         }
       } else if (this._platform === PLATFORM.Server) {
-        this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
-        if (!this._JitMode) {
+        // The export lazy module map is required only for string based lazy loading
+        // which is not supported in Ivy
+        if (!this._compilerOptions.enableIvy) {
+          this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
+        }
+
+        if (this._useFactories) {
           this._transformers.push(
             exportNgFactory(isMainPath, getEntryModule),
             replaceServerBootstrap(isMainPath, getEntryModule, getTypeChecker));
@@ -921,48 +1129,41 @@ export class AngularCompilerPlugin {
     // Make a new program and load the Angular structure.
     await this._createOrUpdateProgram();
 
-    // Try to find lazy routes if we have an entry module.
-    // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-    // and other things that we might miss using the (faster) findLazyRoutesInAst.
-    // Lazy routes modules will be read with compilerHost and added to the changed files.
-    let lazyRouteMap: LazyRouteMap = {};
-    if (!this._JitMode || this._firstRun) {
-      lazyRouteMap = this._listLazyRoutesFromProgram();
-    } else {
-      const changedTsFiles = this._getChangedTsFiles();
-      if (changedTsFiles.length > 0) {
-        lazyRouteMap = this._findLazyRoutesInAst(changedTsFiles);
+    if (this._discoverLazyRoutes) {
+      // Try to find lazy routes if we have an entry module.
+      // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+      // and other things that we might miss using the (faster) findLazyRoutesInAst.
+      // Lazy routes modules will be read with compilerHost and added to the changed files.
+      let lazyRouteMap: LazyRouteMap = {};
+      if (!this._JitMode || this._firstRun) {
+        lazyRouteMap = this._listLazyRoutesFromProgram();
+      } else {
+        const changedTsFiles = this._getChangedTsFiles();
+        if (changedTsFiles.length > 0) {
+          lazyRouteMap = this._findLazyRoutesInAst(changedTsFiles);
+        }
       }
+
+      // Find lazy routes
+      lazyRouteMap = {
+        ...lazyRouteMap,
+        ...this._options.additionalLazyModules,
+      };
+
+      this._processLazyRoutes(lazyRouteMap);
     }
-
-    // Find lazy routes
-    lazyRouteMap = {
-      ...lazyRouteMap,
-      ...this._options.additionalLazyModules,
-    };
-
-    this._processLazyRoutes(lazyRouteMap);
 
     // Emit files.
     time('AngularCompilerPlugin._update._emit');
     const { emitResult, diagnostics } = this._emit();
     timeEnd('AngularCompilerPlugin._update._emit');
 
-    // Report diagnostics.
-    const errors = diagnostics
-      .filter((diag) => diag.category === ts.DiagnosticCategory.Error);
-    const warnings = diagnostics
-      .filter((diag) => diag.category === ts.DiagnosticCategory.Warning);
-
-    if (errors.length > 0) {
-      const message = formatDiagnostics(errors);
-      this._errors.push(new Error(message));
-    }
-
-    if (warnings.length > 0) {
-      const message = formatDiagnostics(warnings);
-      this._warnings.push(message);
-    }
+    // Report any diagnostics.
+    reportDiagnostics(
+      diagnostics,
+      msg => this._errors.push(new Error(msg)),
+      msg => this._warnings.push(msg),
+    );
 
     this._emitSkipped = !emitResult || emitResult.emitSkipped;
 
@@ -1011,7 +1212,8 @@ export class AngularCompilerPlugin {
         // We also need to all changed files as dependencies of this file, so that all of them
         // will be watched and trigger a rebuild next time.
         outputText = '';
-        errorDependencies = this._getChangedCompilationFiles()
+        const program = this._getTsProgram();
+        errorDependencies = (program ? program.getSourceFiles().map(x => x.fileName) : [])
           // These paths are used by the loader so we must denormalize them.
           .map((p) => this._compilerHost.denormalizePath(p));
       }
@@ -1023,7 +1225,7 @@ export class AngularCompilerPlugin {
         let msg = `${fileName} is missing from the TypeScript compilation. `
           + `Please make sure it is in your tsconfig via the 'files' or 'include' property.`;
 
-        if (/(\\|\/)node_modules(\\|\/)/.test(fileName)) {
+        if (this._nodeModulesRegExp.test(fileName)) {
           msg += '\nThe missing file seems to be part of a third party library. '
             + 'TS files in published libraries are often a sign of a badly packaged library. '
             + 'Please open an issue in the library repository to alert its author and ask them '
@@ -1040,7 +1242,7 @@ export class AngularCompilerPlugin {
     return { outputText, sourceMap, errorDependencies };
   }
 
-  getDependencies(fileName: string): string[] {
+  getDependencies(fileName: string, includeResources = true): string[] {
     const resolvedFileName = this._compilerHost.resolve(fileName);
     const sourceFile = this._compilerHost.getSourceFile(resolvedFileName, ts.ScriptTarget.Latest);
     if (!sourceFile) {
@@ -1051,9 +1253,18 @@ export class AngularCompilerPlugin {
     const host = this._compilerHost;
     const cache = this._moduleResolutionCache;
 
-    const esImports = collectDeepNodes<ts.ImportDeclaration>(sourceFile,
-      ts.SyntaxKind.ImportDeclaration)
+    const esImports = collectDeepNodes<ts.ImportDeclaration | ts.ExportDeclaration>(
+      sourceFile,
+      [
+        ts.SyntaxKind.ImportDeclaration,
+        ts.SyntaxKind.ExportDeclaration,
+      ],
+    )
       .map(decl => {
+        if (!decl.moduleSpecifier) {
+          return null;
+        }
+
         const moduleName = (decl.moduleSpecifier as ts.StringLiteral).text;
         const resolved = ts.resolveModuleName(moduleName, resolvedFileName, options, host, cache);
 
@@ -1063,28 +1274,52 @@ export class AngularCompilerPlugin {
           return null;
         }
       })
-      .filter(x => x);
+      .filter(x => x) as string[];
 
-    const resourceImports = findResources(sourceFile)
-      .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+    let resourceImports: string[] = [];
+    const resourceDependencies: string[] = [];
+    if (includeResources) {
+      resourceImports = findResources(sourceFile)
+        .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+
+      for (const resource of resourceImports) {
+        for (const dep of this.getResourceDependencies(
+          this._compilerHost.denormalizePath(resource))) {
+          resourceDependencies.push(dep);
+        }
+      }
+    }
 
     // These paths are meant to be used by the loader so we must denormalize them.
     const uniqueDependencies = new Set([
       ...esImports,
       ...resourceImports,
-      ...this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName)),
+      ...resourceDependencies,
     ].map((p) => p && this._compilerHost.denormalizePath(p)));
 
-    return [...uniqueDependencies]
-      .filter(x => !!x) as string[];
+    return [...uniqueDependencies];
   }
 
-  getResourceDependencies(fileName: string): string[] {
+  getResourceDependencies(fileName: string) {
     if (!this._resourceLoader) {
       return [];
     }
+    // The source loader uses TS-style forward slash paths for all platforms.
+    const resolvedFileName = forwardSlashPath(fileName);
 
-    return this._resourceLoader.getResourceDependencies(fileName);
+    return this._resourceLoader.getResourceDependencies(resolvedFileName);
+  }
+
+  getTypeDependencies(fileName: string): string[] {
+    // We currently add all type deps directly to the main path.
+    // If there's no main path or the lookup isn't the main path, bail.
+    if (!this._mainPath || this._compilerHost.resolve(fileName) != this._mainPath) {
+      return [];
+    }
+
+    // Note: this set is always for the previous build, not the current build.
+    // It should be better than not having rebuilds on type deps but isn't 100% correct.
+    return Array.from(this._typeDeps);
   }
 
   // This code mostly comes from `performCompilation` in `@angular/compiler-cli`.
@@ -1127,7 +1362,7 @@ export class AngularCompilerPlugin {
           'AngularCompilerPlugin._emit.ts', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
-          if (this._firstRun || changedTsFiles.size > 20) {
+          if (this._firstRun || changedTsFiles.size > 20 || !this._hadFullJitEmit) {
             emitResult = tsProgram.emit(
               undefined,
               undefined,
@@ -1135,6 +1370,7 @@ export class AngularCompilerPlugin {
               undefined,
               { before: this._transformers },
             );
+            this._hadFullJitEmit = !emitResult.emitSkipped;
             allDiagnostics.push(...emitResult.diagnostics);
           } else {
             for (const changedFile of changedTsFiles) {
@@ -1209,7 +1445,7 @@ export class AngularCompilerPlugin {
       } else {
         errMsg = e.stack;
         // It is not a syntax error we might have a program with unknown state, discard it.
-        this._program = null;
+        this._program = undefined;
         code = UNKNOWN_ERROR_CODE;
       }
       allDiagnostics.push(

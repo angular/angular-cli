@@ -8,6 +8,8 @@
 import { Path, strings } from '@angular-devkit/core';
 import {
   Rule,
+  SchematicContext,
+  Tree,
   apply,
   mergeWith,
   move,
@@ -15,6 +17,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema } from './schema';
 
 
@@ -22,17 +25,21 @@ export default function (options: Schema): Rule {
   const schematicsVersion = require('@angular-devkit/schematics/package.json').version;
   const coreVersion = require('@angular-devkit/core/package.json').version;
 
-  return mergeWith(apply(url('./files'), [
-    partitionApplyMerge(
-      (p: Path) => !/\/src\/.*?\/files\//.test(p),
-      template({
-        ...options as object,
-        coreVersion,
-        schematicsVersion,
-        dot: '.',
-        dasherize: strings.dasherize,
-      }),
-    ),
-    move(options.name),
-  ]));
+  return (_tree: Tree, context: SchematicContext) => {
+    context.addTask(new NodePackageInstallTask(options.name));
+
+    return mergeWith(apply(url('./files'), [
+      partitionApplyMerge(
+        (p: Path) => !/\/src\/.*?\/files\//.test(p),
+        template({
+          ...options as object,
+          coreVersion,
+          schematicsVersion,
+          dot: '.',
+          dasherize: strings.dasherize,
+        }),
+      ),
+      move(options.name),
+    ]));
+  };
 }

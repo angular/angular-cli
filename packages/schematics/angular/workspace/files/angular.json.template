@@ -1,6 +1,9 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1,
+  "version": 1,<% if (packageManager) { %>
+  "cli": {
+    "packageManager": "<%= packageManager %>"
+  },<% } %>
   "newProjectRoot": "<%= newProjectRoot %>",
   "projects": {}
 }

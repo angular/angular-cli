@@ -10,8 +10,7 @@ import {
   InvalidJsonCharacterException,
   UnexpectedEndOfInputException,
 } from '@angular-devkit/core';
-import * as core from '@angular-devkit/core/node';
-import { dirname, join, resolve as resolvePath } from 'path';
+import { dirname, join, resolve } from 'path';
 import { RuleFactory } from '../src';
 import {
   FileSystemCollectionDesc,
@@ -27,7 +26,6 @@ import {
 } from './file-system-engine-host-base';
 import { readJsonFile } from './file-system-utility';
 
-
 export class NodePackageDoesNotSupportSchematics extends BaseException {
   constructor(name: string) {
     super(`Package ${JSON.stringify(name)} was found but does not support schematics.`);
@@ -39,82 +37,82 @@ export class NodePackageDoesNotSupportSchematics extends BaseException {
  * A simple EngineHost that uses NodeModules to resolve collections.
  */
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
-  constructor() { super(); }
+  constructor(private readonly paths?: string[]) { super(); }
 
-  protected _resolvePackageJson(name: string, basedir = process.cwd()) {
-    return core.resolve(name, {
-      basedir,
-      checkLocal: true,
-      checkGlobal: true,
-      resolvePackageJson: true,
-    });
-  }
+  private resolve(name: string, requester?: string, references = new Set<string>()): string {
+    if (requester) {
+      if (references.has(requester)) {
+        references.add(requester);
+        throw new Error(
+          'Circular schematic reference detected: ' + JSON.stringify(Array.from(references)),
+        );
+      } else {
+        references.add(requester);
+      }
+    }
 
-  protected _resolvePath(name: string, basedir = process.cwd()) {
-    // Allow relative / absolute paths.
-    if (name.startsWith('.') || name.startsWith('/')) {
-      return resolvePath(basedir, name);
-    } else {
-      // If it's a file inside a package, resolve the package then return the file...
-      if (name.split('/').length > (name[0] == '@' ? 2 : 1)) {
-        const rest = name.split('/');
-        const packageName = rest.shift() + (name[0] == '@' ? '/' + rest.shift() : '');
+    const relativeBase = requester ? dirname(requester) : process.cwd();
+    let collectionPath: string | undefined = undefined;
 
-        return resolvePath(core.resolve(packageName, {
-          basedir,
-          checkLocal: true,
-          checkGlobal: true,
-          resolvePackageJson: true,
-        }), '..', ...rest);
+    if (name.startsWith('.')) {
+      name = resolve(relativeBase, name);
+    }
+
+    const resolveOptions = {
+      paths: requester ? [dirname(requester), ...(this.paths || [])] : this.paths,
+    };
+
+    // Try to resolve as a package
+    try {
+      const packageJsonPath = require.resolve(join(name, 'package.json'), resolveOptions);
+      const { schematics } = require(packageJsonPath);
+
+      if (!schematics || typeof schematics !== 'string') {
+        throw new NodePackageDoesNotSupportSchematics(name);
       }
 
-      return core.resolve(name, {
-        basedir,
-        checkLocal: true,
-        checkGlobal: true,
-      });
+      collectionPath = this.resolve(schematics, packageJsonPath, references);
+    } catch (e) {
+      if (e.code !== 'MODULE_NOT_FOUND') {
+        throw e;
+      }
     }
+
+    // If not a package, try to resolve as a file
+    if (!collectionPath) {
+      try {
+        collectionPath = require.resolve(name, resolveOptions);
+      } catch (e) {
+        if (e.code !== 'MODULE_NOT_FOUND') {
+          throw e;
+        }
+      }
+    }
+
+    // If not a package or a file, error
+    if (!collectionPath) {
+      throw new CollectionCannotBeResolvedException(name);
+    }
+
+    return collectionPath;
   }
 
   protected _resolveCollectionPath(name: string): string {
-    let collectionPath: string | undefined = undefined;
-
-    if (name.replace(/\\/, '/').split('/').length > (name[0] == '@' ? 2 : 1)) {
-      try {
-        collectionPath = this._resolvePath(name, process.cwd());
-      } catch {
-      }
-    }
-
-    if (!collectionPath) {
-      let packageJsonPath = this._resolvePackageJson(name, process.cwd());
-      // If it's a file, use it as is. Otherwise append package.json to it.
-      if (!core.fs.isFile(packageJsonPath)) {
-        packageJsonPath = join(packageJsonPath, 'package.json');
-      }
-
-      const pkgJsonSchematics = require(packageJsonPath)['schematics'];
-      if (!pkgJsonSchematics || typeof pkgJsonSchematics != 'string') {
-        throw new NodePackageDoesNotSupportSchematics(name);
-      }
-      collectionPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
-    }
+    const collectionPath = this.resolve(name);
 
     try {
-      if (collectionPath) {
-        readJsonFile(collectionPath);
+      readJsonFile(collectionPath);
 
-        return collectionPath;
-      }
+      return collectionPath;
     } catch (e) {
       if (
         e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException
       ) {
         throw new InvalidCollectionJsonException(name, collectionPath, e);
+      } else {
+        throw e;
       }
     }
-
-    throw new CollectionCannotBeResolvedException(name);
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {

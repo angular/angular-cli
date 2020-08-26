@@ -90,7 +90,7 @@ This seems like a lot of boilerplate in comparison, but there are a few advantag
 
 ## Diagram
 A simpler way to think about jobs in contrast to observables is that job are closer to a Unix
-process. It has an argument (command line flags), receive inputs (STDIN and interupt signals),
+process. It has an argument (command line flags), receive inputs (STDIN and interrupt signals),
 and output values (STDOUT) as well as diagnostic (STDERR). They can be plugged one into another
 (piping), and can be transformed, synchronized and scheduled (fork, exec, cron).
 

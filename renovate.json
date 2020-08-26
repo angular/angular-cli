@@ -2,13 +2,17 @@
   "pinVersions": false,
   "semanticCommits": true,
   "semanticPrefix": "build",
-  "commitMessage": "{{semanticPrefix}} update {{depName}} to version {{newVersion}}",
+  "commitMessage": "{{semanticPrefix}} update {{#if groupName}}{{{groupName}}} packages{{else}}{{{depName}}} to version {{{newVersion}}}{{/if}}",
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
   "labels": [
-    "PR target: master-only"
+    "PR target: master-only",
+    "PR action: merge"
   ],
   "timezone": "America/Tijuana",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "schedule": [
     "after 10pm every weekday",
     "before 4am every weekday",
@@ -18,19 +22,14 @@
     "master"
   ],
   "ignoreDeps": [
-    "source-map",
-    "@types/node",
-    "webpack-subresource-integrity"
+    "@types/node"
   ],
   "packageFiles": [
+    "WORKSPACE",
     "package.json",
-    "packages/**/package.json"
+    "packages/**/package.json",
+    "tests/legacy-cli/e2e/ng-snapshot/package.json"
   ],
-  "major": {
-    "devDependencies": {
-      "enabled": false
-    }
-  },
   "packageRules": [
     {
       "packagePatterns": [
@@ -39,9 +38,18 @@
       "groupName": "angular",
       "pinVersions": false
     },
+   {
+      "packagePatterns": [
+        "^@babel\/.*"
+      ],
+      "groupName": "Babel",
+      "pinVersions": false
+    },
     {
       "packagePatterns": [
-        "^@bazel\/.*"
+        "^@bazel\/.*",
+        "^build_bazel.*",
+        "bazel_toolchains"
       ],
       "groupName": "bazel",
       "pinVersions": false
@@ -50,7 +58,17 @@
       "packageNames": [
         "typescript"
       ],
-      "updateTypes": "patch"
+      "separateMinorPatch": true
+    },
+    {
+      "packageNames": [
+        "typescript"
+      ],
+      "updateTypes": [
+        "minor",
+        "major"
+      ],
+      "enabled": false
     }
   ]
 }

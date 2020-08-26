@@ -141,4 +141,73 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
   });
+
+  it('doesn\'t add comment to downlevel arrow function', () => {
+    const input = tags.stripIndent`
+      var populate = (function (props, rawData, entity) {
+          props.forEach(function (prop) { });
+      });
+    `;
+    const output = tags.stripIndent`
+      ${input}
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('doesn\'t add comment inside arrow function', () => {
+    const input = tags.stripIndent`
+      const populate = ((props, rawData, entity) => {
+          props.forEach(x => x);
+      });
+    `;
+    const output = tags.stripIndent`
+      ${input}
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('doesn\'t add comment when inside class expression', () => {
+    const input = tags.stripIndent`
+      let Foo = class Foo {
+        constructor() {
+          this.isExpandedChange = new EventEmitter();
+        }
+
+        set isExpanded(value) {
+          this.isExpandedChange.emit(value);
+        }
+      };
+    `;
+    const output = tags.stripIndent`
+      ${input}
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it(`doesn't add pure comments to tslib helpers`, () => {
+    const input = tags.stripIndent`
+    class LanguageState {
+
+    }
+
+    LanguageState.ctorParameters = () => [
+        { type: TranslateService },
+        { type: undefined, decorators: [{ type: Inject, args: [LANGUAGE_CONFIG,] }] }
+    ];
+
+    __decorate([
+        Action(CheckLanguage),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object]),
+        __metadata("design:returntype", void 0)
+    ], LanguageState.prototype, "checkLanguage", null);
+    `;
+
+    const output = input;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
 });

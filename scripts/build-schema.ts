@@ -23,6 +23,15 @@ function _mkdirp(p: string) {
 }
 
 
+function _rimraf(p: string) {
+  glob.sync(path.join(p, '**/*'), { dot: true, nodir: true })
+    .forEach(p => fs.unlinkSync(p));
+  glob.sync(path.join(p, '**/*'), { dot: true })
+    .sort((a, b) => b.length - a.length)
+    .forEach(p => fs.rmdirSync(p));
+}
+
+
 export default async function(
   argv: { },
   logger: logging.Logger,
@@ -35,8 +44,12 @@ export default async function(
       '**/package.json',
     ],
   });
+  const dist = path.join(__dirname, '../dist-schema');
 
   const quicktypeRunner = require('../tools/quicktype_runner');
+  logger.info('Removing dist-schema/...');
+  _rimraf(dist);
+
   logger.info('Generating JSON Schema....');
 
   for (const fileName of allJsonFiles) {
@@ -47,13 +60,19 @@ export default async function(
     }
     const content = fs.readFileSync(fileName, 'utf-8');
 
-    const json = JSON.parse(content);
-    if (!json.$schema) {
-      // Skip non-schema files.
+    let json;
+    try {
+      json = JSON.parse(content);
+      if (typeof json.$schema !== 'string' || !json.$schema.startsWith('http://json-schema.org/')) {
+        // Skip non-schema files.
+        continue;
+      }
+    } catch {
+      // malformed or JSON5
       continue;
     }
     const tsContent = await quicktypeRunner.generate(fileName);
-    const tsPath = path.join(__dirname, '../dist-schema', fileName.replace(/\.json$/, '.ts'));
+    const tsPath = path.join(dist, fileName.replace(/\.json$/, '.ts'));
 
     _mkdirp(path.dirname(tsPath));
     fs.writeFileSync(tsPath, tsContent, 'utf-8');

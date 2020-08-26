@@ -9,7 +9,7 @@ import { existsSync } from 'fs';
 import * as path from 'path';
 import { isDirectory } from './is-directory';
 
-export function findUp(names: string | string[], from: string, stopOnNodeModules = false) {
+export function findUp(names: string | string[], from: string, stopOnNodeModules = false): string | null {
   if (!Array.isArray(names)) {
     names = [names];
   }
@@ -37,7 +37,7 @@ export function findUp(names: string | string[], from: string, stopOnNodeModules
   return null;
 }
 
-export function findAllNodeModules(from: string, root?: string) {
+export function findAllNodeModules(from: string, root?: string): string[] {
   const nodeModules: string[] = [];
 
   let current = from;

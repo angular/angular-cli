@@ -1,4 +1,5 @@
 export declare class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
+    hideOutput: boolean;
     packageManager?: string;
     packageName?: string;
     quiet: boolean;

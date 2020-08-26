@@ -1,0 +1,68 @@
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+# @angular-devkit/schematics-cli
+
+ts_library(
+    name = "schematics_cli",
+    srcs = glob(
+        include = ["bin/**/*.ts"],
+        exclude = [
+            "bin/**/*_spec.ts",
+            "bin/**/*_benchmark.ts",
+        ],
+    ),
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
+    data = glob(
+        include = ["**/*.json"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+    module_name = "@angular-devkit/schematics-cli",
+    module_root = "bin/schematics.d.ts",
+    deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tools",
+        "//packages/schematics/schematics",
+        "@npm//@types/inquirer",
+        "@npm//@types/minimist",
+        "@npm//@types/node",
+        "@npm//inquirer",  # @external
+        "@npm//minimist",  # @external
+        "@npm//rxjs",
+        "@npm//symbol-observable",  # @external
+    ],
+)
+
+ts_library(
+    name = "schematics_cli_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "bin/**/*_spec.ts",
+        ],
+    ),
+    # strict_checks = False,
+    deps = [
+        ":schematics_cli",
+    ],
+)
+
+jasmine_node_test(
+    name = "schematics_cli_test",
+    srcs = [":schematics_cli_test_lib"],
+)

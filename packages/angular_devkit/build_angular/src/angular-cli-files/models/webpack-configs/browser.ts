@@ -5,99 +5,83 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { LicenseWebpackPlugin } from 'license-webpack-plugin';
-import * as path from 'path';
-import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
-import { generateEntryPoints } from '../../utilities/package-chunk-sort';
+import * as webpack from 'webpack';
+import { CommonJsUsageWarnPlugin } from '../../plugins/webpack';
 import { WebpackConfigOptions } from '../build-options';
-import { getSourceMapDevTool, normalizeExtraEntryPoints } from './utils';
+import { getSourceMapDevTool } from './utils';
 
-const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
+export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
+  const { buildOptions } = wco;
+  const {
+    crossOrigin = 'none',
+    subresourceIntegrity,
+    extractLicenses,
+    vendorChunk,
+    commonChunk,
+    allowedCommonJsDependencies,
+  } = buildOptions;
 
-
-export function getBrowserConfig(wco: WebpackConfigOptions) {
-  const { root, buildOptions } = wco;
   const extraPlugins = [];
 
-  let isEval = false;
-  const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   const {
     styles: stylesSourceMap,
     scripts: scriptsSourceMap,
     hidden: hiddenSourceMap,
   } = buildOptions.sourceMap;
 
-  // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-  if ((stylesSourceMap || scriptsSourceMap) &&
-    buildOptions.evalSourceMap &&
-    !stylesOptimization &&
-    !scriptsOptimization) {
-    // Produce eval sourcemaps for development with serve, which are faster.
-    isEval = true;
-  }
-
-  if (buildOptions.index) {
-    extraPlugins.push(new IndexHtmlWebpackPlugin({
-      input: path.resolve(root, buildOptions.index),
-      output: path.basename(buildOptions.index),
-      baseHref: buildOptions.baseHref,
-      entrypoints: generateEntryPoints(buildOptions),
-      deployUrl: buildOptions.deployUrl,
-      sri: buildOptions.subresourceIntegrity,
-      noModuleEntrypoints: ['es2015-polyfills'],
-    }));
-  }
-
-  if (buildOptions.subresourceIntegrity) {
+  if (subresourceIntegrity) {
+    const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
     extraPlugins.push(new SubresourceIntegrityPlugin({
       hashFuncNames: ['sha384'],
     }));
   }
 
-  if (buildOptions.extractLicenses) {
+  if (extractLicenses) {
+    const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
     extraPlugins.push(new LicenseWebpackPlugin({
       stats: {
         warnings: false,
         errors: false,
       },
       perChunkOutput: false,
-      outputFilename: `3rdpartylicenses.txt`,
+      outputFilename: '3rdpartylicenses.txt',
     }));
   }
 
-  if (!isEval && (scriptsSourceMap || stylesSourceMap)) {
+  if (scriptsSourceMap || stylesSourceMap) {
     extraPlugins.push(getSourceMapDevTool(
-      !!scriptsSourceMap,
-      !!stylesSourceMap,
-      hiddenSourceMap,
+      scriptsSourceMap,
+      stylesSourceMap,
+      wco.differentialLoadingMode ? true : hiddenSourceMap,
     ));
   }
 
-  const globalStylesBundleNames = normalizeExtraEntryPoints(buildOptions.styles, 'styles')
-    .map(style => style.bundleName);
+  let crossOriginLoading: 'anonymous' | 'use-credentials' | false = false;
+  if (subresourceIntegrity && crossOrigin === 'none') {
+    crossOriginLoading = 'anonymous';
+  } else if (crossOrigin !== 'none') {
+    crossOriginLoading = crossOrigin;
+  }
 
   return {
-    devtool: isEval ? 'eval' : false,
+    devtool: false,
     resolve: {
-      mainFields: [
-        ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main',
-      ],
+      mainFields: ['es2015', 'browser', 'module', 'main'],
     },
     output: {
-      crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false,
+      crossOriginLoading,
     },
     optimization: {
       runtimeChunk: 'single',
       splitChunks: {
         maxAsyncRequests: Infinity,
         cacheGroups: {
-          default: buildOptions.commonChunk && {
+          default: !!commonChunk && {
             chunks: 'async',
             minChunks: 2,
             priority: 10,
           },
-          common: buildOptions.commonChunk && {
+          common: !!commonChunk && {
             name: 'common',
             chunks: 'async',
             minChunks: 2,
@@ -105,22 +89,21 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
             priority: 5,
           },
           vendors: false,
-          vendor: buildOptions.vendorChunk && {
+          defaultVendors: !!vendorChunk && {
             name: 'vendor',
-            chunks: 'initial',
+            chunks: (chunk) => chunk.name === 'main',
             enforce: true,
-            test: (module: { nameForCondition?: Function }, chunks: Array<{ name: string }>) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills' || name === 'es2015-polyfills'
-                  || globalStylesBundleNames.includes(name));
-            },
+            test: /[\\/]node_modules[\\/]/,
           },
         },
       },
     },
-    plugins: extraPlugins,
+    plugins: [
+      new CommonJsUsageWarnPlugin({
+        allowedDepedencies: allowedCommonJsDependencies,
+      }),
+      ...extraPlugins,
+    ],
     node: false,
   };
 }

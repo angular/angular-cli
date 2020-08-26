@@ -19,7 +19,7 @@
       "type": "string",
       "format": "path",
       "description": "The path at which to create the library's public API file, relative to the workspace root.",
-      "default": "public_api"
+      "default": "public-api"
     },
     "prefix": {
       "type": "string",
@@ -46,7 +46,8 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the library."
+      "description": "When true, applies lint fixes after generating the library.",
+      "x-user-analytics": 15
     }
   },
   "required": []

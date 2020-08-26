@@ -121,17 +121,13 @@ Flags:
 
 Compile and outputs the templates. For now, only README is being built and outputted.
 
-## test
+## bazel:test
 
-Run unit or large tests. Tests will exclude all files that excluded from `tsconfig.json`.
+Run API and unit tests using Bazel.
 
-Flags:
+## bazel:integration
 
-* `--large`. Run the large tests (`**/*_spec_large.ts`).
-* `--full`. Run all the tests. By default only runs tests in packages that have changed since the last release.
-* `--spec-reporter`. Use the spec reporter (instead of the default one).
-* `--glob=<glob string>`. Only run the tests that match the glob pattern.
-* `--code-coverage`. Outputs code coverage for the tests run.
+Run integration tests using Bazel.
 
 ## validate
 

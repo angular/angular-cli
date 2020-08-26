@@ -12,7 +12,7 @@ export declare class ModuleNotFoundException extends BaseException {
 }
 
 export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
-    readonly capabilities: virtualFs.HostCapabilities;
+    get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
     exists(path: Path): Observable<boolean>;
     isDirectory(path: Path): Observable<boolean>;
@@ -26,7 +26,7 @@ export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
 }
 
 export declare class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
-    readonly capabilities: virtualFs.HostCapabilities;
+    get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
     exists(path: Path): Observable<boolean>;
     isDirectory(path: Path): Observable<boolean>;
@@ -40,7 +40,6 @@ export declare class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 }
 
 export declare class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> implements core_experimental.jobs.Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
-    constructor(_resolveLocal?: boolean, _resolveGlobal?: boolean);
     protected _resolve(name: string): string | null;
     get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: core_experimental.jobs.JobName): Observable<core_experimental.jobs.JobHandler<A, I, O> | null>;
 }
@@ -49,7 +48,7 @@ export interface ProcessOutput {
     write(buffer: string | Buffer): boolean;
 }
 
-export declare function resolve(x: string, options: ResolveOptions): string;
+export declare function resolve(packageName: string, options: ResolveOptions): string;
 
 export interface ResolveOptions {
     basedir: string;

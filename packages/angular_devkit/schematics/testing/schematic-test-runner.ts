@@ -72,6 +72,10 @@ export class SchematicTestRunner {
   get logger(): logging.Logger { return this._logger; }
   get tasks(): TaskConfiguration[] { return [...this._engineHost.tasks]; }
 
+  registerCollection(collectionName: string, collectionPath: string) {
+    this._engineHost.registerCollection(collectionName, collectionPath);
+  }
+
   runSchematicAsync<SchematicSchemaT>(
     schematicName: string,
     opts?: SchematicSchemaT,
@@ -83,32 +87,6 @@ export class SchematicTestRunner {
 
     return schematic.call(opts || {}, host, { logger: this._logger })
       .pipe(map(tree => new UnitTestTree(tree)));
-  }
-
-  runSchematic<SchematicSchemaT>(
-    schematicName: string,
-    opts?: SchematicSchemaT,
-    tree?: Tree,
-  ): UnitTestTree {
-    const schematic = this._collection.createSchematic(schematicName, true);
-
-    let result: UnitTestTree | null = null;
-    let error;
-    const host = observableOf(tree || new HostTree);
-    this._engineHost.clearTasks();
-
-    schematic.call(opts || {}, host, { logger: this._logger })
-      .subscribe(t => result = new UnitTestTree(t), e => error = e);
-
-    if (error) {
-      throw error;
-    }
-
-    if (result === null) {
-      throw new Error('Schematic is async, please use runSchematicAsync');
-    }
-
-    return result;
   }
 
   runExternalSchematicAsync<SchematicSchemaT>(
@@ -124,29 +102,6 @@ export class SchematicTestRunner {
 
     return schematic.call(opts || {}, host, { logger: this._logger })
       .pipe(map(tree => new UnitTestTree(tree)));
-  }
-
-  runExternalSchematic<SchematicSchemaT>(
-    collectionName: string,
-    schematicName: string,
-    opts?: SchematicSchemaT,
-    tree?: Tree,
-  ): UnitTestTree {
-    const externalCollection = this._engine.createCollection(collectionName);
-    const schematic = externalCollection.createSchematic(schematicName, true);
-
-    let result: UnitTestTree | null = null;
-    const host = observableOf(tree || new HostTree);
-    this._engineHost.clearTasks();
-
-    schematic.call(opts || {}, host, { logger: this._logger })
-      .subscribe(t => result = new UnitTestTree(t));
-
-    if (result === null) {
-      throw new Error('Schematic is async, please use runSchematicAsync');
-    }
-
-    return result;
   }
 
   callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {

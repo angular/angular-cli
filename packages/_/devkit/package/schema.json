@@ -24,5 +24,9 @@
       },
       "description": "The human readable name."
     }
-  }
+  },
+  "required": [
+    "name",
+    "displayName"
+  ]
 }

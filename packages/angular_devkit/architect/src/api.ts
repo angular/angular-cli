@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, json, logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
+import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { Observable, SubscribableOrPromise, Subscriber, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
 import { Schema as RealBuilderOutput } from './output-schema';
 import { Schema as RealBuilderProgress, State as BuilderProgressState } from './progress-schema';
@@ -100,6 +101,22 @@ export interface BuilderRun {
 }
 
 /**
+ * Additional optional scheduling options.
+ */
+export interface ScheduleOptions {
+  /**
+   * Logger to pass to the builder. Note that messages will stop being forwarded, and if you want
+   * to log a builder scheduled from your builder you should forward log events yourself.
+   */
+  logger?: logging.Logger;
+
+  /**
+   * Target to pass to the builder.
+   */
+  target?: Target;
+}
+
+/**
  * The context received as a second argument in your builder.
  */
 export interface BuilderContext {
@@ -148,11 +165,13 @@ export interface BuilderContext {
    * Targets are considered the same if the project, the target AND the configuration are the same.
    * @param target The target to schedule.
    * @param overrides A set of options to override the workspace set of options.
+   * @param scheduleOptions Additional optional scheduling options.
    * @return A promise of a run. It will resolve when all the members of the run are available.
    */
   scheduleTarget(
     target: Target,
     overrides?: json.JsonObject,
+    scheduleOptions?: ScheduleOptions,
   ): Promise<BuilderRun>;
 
   /**
@@ -160,12 +179,47 @@ export interface BuilderContext {
    * @param builderName The name of the builder, ie. its `packageName:builderName` tuple.
    * @param options All options to use for the builder (by default empty object). There is no
    *     additional options added, e.g. from the workspace.
+   * @param scheduleOptions Additional optional scheduling options.
    * @return A promise of a run. It will resolve when all the members of the run are available.
    */
   scheduleBuilder(
     builderName: string,
     options?: json.JsonObject,
+    scheduleOptions?: ScheduleOptions,
   ): Promise<BuilderRun>;
+
+  /**
+   * Resolve and return options for a specified target. If the target isn't defined in the
+   * workspace this will reject the promise. This object will be read directly from the workspace
+   * but not validated against the builder of the target.
+   * @param target The target to resolve the options of.
+   * @return A non-validated object resolved from the workspace.
+   */
+  getTargetOptions(target: Target): Promise<json.JsonObject>;
+
+  getProjectMetadata(projectName: string): Promise<json.JsonObject>;
+  getProjectMetadata(target: Target): Promise<json.JsonObject>;
+
+  /**
+   * Resolves and return a builder name. The exact format of the name is up to the host,
+   * so it should not be parsed to gather information (it's free form). This string can be
+   * used to validate options or schedule a builder directly.
+   * @param target The target to resolve the builder name.
+   */
+  getBuilderNameForTarget(target: Target): Promise<string>;
+
+  /**
+   * Validates the options against a builder schema. This uses the same methods as the
+   * scheduleTarget and scheduleBrowser methods to validate and apply defaults to the options.
+   * It can be generically typed, if you know which interface it is supposed to validate against.
+   * @param options A generic option object to validate.
+   * @param builderName The name of a builder to use. This can be gotten for a target by using the
+   *                    getBuilderForTarget() method on the context.
+   */
+  validateOptions<T extends json.JsonObject = json.JsonObject>(
+    options: json.JsonObject,
+    builderName: string,
+  ): Promise<T>;
 
   /**
    * Set the builder to running. This should be used if an external event triggered a re-run,
@@ -187,14 +241,66 @@ export interface BuilderContext {
    * @param status Update the status string. If omitted the status string is not modified.
    */
   reportProgress(current: number, total?: number, status?: string): void;
+
+  /**
+   * API to report analytics. This might be undefined if the feature is unsupported. This might
+   * not be undefined, but the backend could also not report anything.
+   */
+  readonly analytics: analytics.Analytics;
+
+  /**
+   * Add teardown logic to this Context, so that when it's being stopped it will execute teardown.
+   */
+  addTeardown(teardown: () => (Promise<void> | void)): void;
 }
 
 
 /**
  * An accepted return value from a builder. Can be either an Observable, a Promise or a vector.
  */
-export type BuilderOutputLike = Observable<BuilderOutput> | Promise<BuilderOutput> | BuilderOutput;
+export type BuilderOutputLike = AsyncIterable<BuilderOutput> | SubscribableOrPromise<BuilderOutput> | BuilderOutput;
 
+// tslint:disable-next-line:no-any
+export function isBuilderOutput(obj: any): obj is BuilderOutput {
+  if (!obj || typeof obj.then === 'function' || typeof obj.subscribe === 'function') {
+    return false;
+  }
+
+  if (typeof obj[Symbol.asyncIterator] === 'function') {
+    return false;
+  }
+
+  return typeof obj.success === 'boolean';
+}
+
+export function fromAsyncIterable<T>(iterable: AsyncIterable<T>): Observable<T> {
+  return new Observable((subscriber) => {
+    handleAsyncIterator(subscriber, iterable[Symbol.asyncIterator]()).then(
+      () => subscriber.complete(),
+      (error) => subscriber.error(error),
+    );
+  });
+}
+
+async function handleAsyncIterator<T>(
+  subscriber: Subscriber<T>,
+  iterator: AsyncIterator<T>,
+): Promise<void> {
+  const teardown = new Promise<void>((resolve) => subscriber.add(() => resolve()));
+
+  try {
+    while (!subscriber.closed) {
+      const result = await Promise.race([teardown, iterator.next()]);
+      if (!result || result.done) {
+        break;
+      }
+
+      subscriber.next(result.value);
+    }
+  } finally {
+    await iterator.return?.();
+  }
+}
 
 /**
  * A builder handler function. The function signature passed to `createBuilder()`.
@@ -227,4 +333,58 @@ export type BuilderInfo = json.JsonObject & {
  */
 export function targetStringFromTarget({project, target, configuration}: Target) {
   return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
+}
+
+/**
+ * Return a Target tuple from a string.
+ */
+export function targetFromTargetString(str: string): Target {
+  const tuple = str.split(/:/, 3);
+  if (tuple.length < 2) {
+    throw new Error('Invalid target string: ' + JSON.stringify(str));
+  }
+
+  return {
+    project: tuple[0],
+    target: tuple[1],
+    ...(tuple[2] !== undefined) && { configuration: tuple[2] },
+  };
+}
+
+/**
+ * Schedule a target, and forget about its run. This will return an observable of outputs, that
+ * as a a teardown will stop the target from running. This means that the Run object this returns
+ * should not be shared.
+ *
+ * The reason this is not part of the Context interface is to keep the Context as normal form as
+ * possible. This is really an utility that people would implement in their project.
+ *
+ * @param context The context of your current execution.
+ * @param target The target to schedule.
+ * @param overrides Overrides that are used in the target.
+ * @param scheduleOptions Additional scheduling options.
+ */
+export function scheduleTargetAndForget(
+  context: BuilderContext,
+  target: Target,
+  overrides?: json.JsonObject,
+  scheduleOptions?: ScheduleOptions,
+): Observable<BuilderOutput> {
+  let resolve: (() => void) | null = null;
+  const promise = new Promise<void>(r => resolve = r);
+  context.addTeardown(() => promise);
+
+  return from(context.scheduleTarget(target, overrides, scheduleOptions)).pipe(
+    switchMap(run => new Observable<BuilderOutput>(observer => {
+      const subscription = run.output.subscribe(observer);
+
+      return () => {
+        subscription.unsubscribe();
+        // We can properly ignore the floating promise as it's a "reverse" promise; the teardown
+        // is waiting for the resolve.
+        // tslint:disable-next-line:no-floating-promises
+        run.stop().then(resolve);
+      };
+    })),
+  );
 }

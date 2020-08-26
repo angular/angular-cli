@@ -1,4 +1,3 @@
-import {getGlobalVariable} from '../../utils/env';
 import {expectFileToExist} from '../../utils/fs';
 import {expectGitToBeClean} from '../../utils/git';
 import {ng} from '../../utils/process';

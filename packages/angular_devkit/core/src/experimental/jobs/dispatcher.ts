@@ -53,26 +53,29 @@ export function createDispatcher<
   options: Partial<Readwrite<JobDescription>> = {},
 ): JobDispatcher<A, I, O> {
   let defaultDelegate: JobName | null = null;
-  const conditionalDelegateList: [(args: A) => boolean, JobName][] = [];
+  const conditionalDelegateList: [(args: JsonValue) => boolean, JobName][] = [];
 
-  const job: JobHandler<A, I, O> = Object.assign((argument: A, context: JobHandlerContext) => {
-    const maybeDelegate = conditionalDelegateList.find(([predicate]) => predicate(argument));
-    let delegate: Job<A, I, O> | null = null;
+  const job: JobHandler<JsonValue, JsonValue, JsonValue> = Object.assign(
+      (argument: JsonValue, context: JobHandlerContext) => {
+        const maybeDelegate = conditionalDelegateList.find(([predicate]) => predicate(argument));
+        let delegate: Job<JsonValue, JsonValue, JsonValue> | null = null;
 
-    if (maybeDelegate) {
-      delegate = context.scheduler.schedule(maybeDelegate[1], argument);
-    } else if (defaultDelegate) {
-      delegate = context.scheduler.schedule(defaultDelegate, argument);
-    } else {
-      throw new JobDoesNotExistException('<null>');
-    }
+        if (maybeDelegate) {
+          delegate = context.scheduler.schedule(maybeDelegate[1], argument);
+        } else if (defaultDelegate) {
+          delegate = context.scheduler.schedule(defaultDelegate, argument);
+        } else {
+          throw new JobDoesNotExistException('<null>');
+        }
 
-    context.inboundBus.subscribe(delegate.inboundBus);
+        context.inboundBus.subscribe(delegate.inboundBus);
 
-    return delegate.outboundBus;
-  }, {
-    jobDescription: options,
-  });
+        return delegate.outboundBus;
+      },
+      {
+        jobDescription: options,
+      },
+  );
 
   return Object.assign(job, {
     setDefaultJob(name: JobName | null | JobHandler<JsonValue, JsonValue, JsonValue>) {
@@ -82,8 +85,9 @@ export function createDispatcher<
 
       defaultDelegate = name;
     },
-    addConditionalJob(predicate: (args: A) => boolean, name: JobName) {
+    addConditionalJob(predicate: (args: JsonValue) => boolean, name: JobName) {
       conditionalDelegateList.push([predicate, name]);
     },
-  });
+  // TODO: Remove return-only generic from createDispatcher() API.
+  }) as unknown as JobDispatcher<A, I, O>;
 }
