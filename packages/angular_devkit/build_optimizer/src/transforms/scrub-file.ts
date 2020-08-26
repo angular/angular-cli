@@ -17,7 +17,7 @@ export function testScrubFile(content: string) {
     'ɵsetClassMetadata',
   ];
 
-  return markers.some((marker) => content.indexOf(marker) !== -1);
+  return markers.some((marker) => content.includes(marker));
 }
 
 export function getScrubFileTransformer(program?: ts.Program): ts.TransformerFactory<ts.SourceFile> {
@@ -156,7 +156,7 @@ function isDecoratorAssignmentExpression(exprStmt: ts.ExpressionStatement): bool
     return false;
   }
   const expr = exprStmt.expression as ts.BinaryExpression;
-  if (expr.right.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+  if (!ts.isArrayLiteralExpression(expr.right)) {
     return false;
   }
 
@@ -169,28 +169,26 @@ function isDecorateAssignmentExpression(
   tslibImports: ts.NamespaceImport[],
   checker: ts.TypeChecker,
 ): boolean {
-
-  if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
+  if (!ts.isBinaryExpression(exprStmt.expression)) {
     return false;
   }
-  const expr = exprStmt.expression as ts.BinaryExpression;
-  if (expr.left.kind !== ts.SyntaxKind.Identifier) {
+  const expr = exprStmt.expression;
+  if (!ts.isIdentifier(expr.left)) {
     return false;
   }
-  const classIdent = expr.left as ts.Identifier;
+  const classIdent = expr.left;
   let callExpr: ts.CallExpression;
 
-  if (expr.right.kind === ts.SyntaxKind.CallExpression) {
-    callExpr = expr.right as ts.CallExpression;
-  } else if (expr.right.kind === ts.SyntaxKind.BinaryExpression) {
+  if (ts.isCallExpression(expr.right)) {
+    callExpr = expr.right;
+  } else if (ts.isBinaryExpression(expr.right)) {
     // `Clazz = Clazz_1 = __decorate([...], Clazz)` can be found when there are static property
     // accesses.
-    const innerExpr = expr.right as ts.BinaryExpression;
-    if (innerExpr.left.kind !== ts.SyntaxKind.Identifier
-      || innerExpr.right.kind !== ts.SyntaxKind.CallExpression) {
+    const innerExpr = expr.right;
+    if (!ts.isIdentifier(innerExpr.left) || !ts.isCallExpression(innerExpr.right)) {
       return false;
     }
-    callExpr = innerExpr.right as ts.CallExpression;
+    callExpr = innerExpr.right;
   } else {
     return false;
   }
@@ -202,14 +200,16 @@ function isDecorateAssignmentExpression(
   if (callExpr.arguments.length !== 2) {
     return false;
   }
-  if (callExpr.arguments[1].kind !== ts.SyntaxKind.Identifier) {
+
+  const classArg = callExpr.arguments[1];
+  if (!ts.isIdentifier(classArg)) {
     return false;
   }
-  const classArg = callExpr.arguments[1] as ts.Identifier;
+
   if (classIdent.text !== classArg.text) {
     return false;
   }
-  if (callExpr.arguments[0].kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+  if (!ts.isArrayLiteralExpression(callExpr.arguments[0])) {
     return false;
   }
 
@@ -224,20 +224,20 @@ function isAngularDecoratorExpression(
   checker: ts.TypeChecker,
 ): boolean {
 
-  if (exprStmt.expression.kind !== ts.SyntaxKind.CallExpression) {
+  if (!ts.isCallExpression(exprStmt.expression)) {
     return false;
   }
-  const callExpr = exprStmt.expression as ts.CallExpression;
+  const callExpr = exprStmt.expression;
   if (!isTslibHelper(callExpr, '__decorate', tslibImports, checker)) {
     return false;
   }
   if (callExpr.arguments.length !== 4) {
     return false;
   }
-  if (callExpr.arguments[0].kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+  const decorateArray = callExpr.arguments[0];
+  if (!ts.isArrayLiteralExpression(decorateArray)) {
     return false;
   }
-  const decorateArray = callExpr.arguments[0] as ts.ArrayLiteralExpression;
   // Check first array entry for Angular decorators.
   if (decorateArray.elements.length === 0 || !ts.isCallExpression(decorateArray.elements[0])) {
     return false;
@@ -283,18 +283,18 @@ function isCtorParamsAssignmentExpression(exprStmt: ts.ExpressionStatement): boo
 }
 
 function isAssignmentExpressionTo(exprStmt: ts.ExpressionStatement, name: string) {
-  if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
+  if (!ts.isBinaryExpression(exprStmt.expression)) {
     return false;
   }
-  const expr = exprStmt.expression as ts.BinaryExpression;
-  if (expr.left.kind !== ts.SyntaxKind.PropertyAccessExpression) {
+  const expr = exprStmt.expression;
+  if (!ts.isPropertyAccessExpression(expr.left)) {
     return false;
   }
-  const propAccess = expr.left as ts.PropertyAccessExpression;
+  const propAccess = expr.left;
   if (propAccess.name.text !== name) {
     return false;
   }
-  if (propAccess.expression.kind !== ts.SyntaxKind.Identifier) {
+  if (!ts.isIdentifier(propAccess.expression)) {
     return false;
   }
   if (expr.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
@@ -342,7 +342,7 @@ function isIvyPrivateCallExpression(exprStmt: ts.ExpressionStatement) {
     return false;
   }
 
-  if (propAccExpr.name.text != 'ɵsetClassMetadata') {
+  if (propAccExpr.name.text !== 'ɵsetClassMetadata') {
     return false;
   }
 
@@ -396,29 +396,25 @@ function pickDecorateNodesToRemove(
   const arrLiteral = expect<ts.ArrayLiteralExpression>(callExpr.arguments[0],
     ts.SyntaxKind.ArrayLiteralExpression);
 
-  if (!arrLiteral.elements.every((elem) => elem.kind === ts.SyntaxKind.CallExpression)) {
+  if (!arrLiteral.elements.every((elem) => ts.isCallExpression(elem))) {
     return [];
   }
   const elements = arrLiteral.elements as ts.NodeArray<ts.CallExpression>;
   const ngDecoratorCalls = elements.filter((el) => {
-    if (el.expression.kind !== ts.SyntaxKind.Identifier) {
+    if (!ts.isIdentifier(el.expression)) {
       return false;
     }
-    const id = el.expression as ts.Identifier;
 
-    return identifierIsMetadata(id, ngMetadata, checker);
+    return identifierIsMetadata(el.expression, ngMetadata, checker);
   });
-
 
   // Remove __metadata calls of type 'design:paramtypes'.
   const metadataCalls = elements.filter((el) => {
     if (!isTslibHelper(el, '__metadata', tslibImports, checker)) {
       return false;
     }
-    if (el.arguments.length < 2) {
-      return false;
-    }
-    if (el.arguments[0].kind !== ts.SyntaxKind.StringLiteral) {
+
+    if (el.arguments.length < 2 || !ts.isStringLiteral(el.arguments[0])) {
       return false;
     }
 
@@ -429,10 +425,8 @@ function pickDecorateNodesToRemove(
     if (!isTslibHelper(el, '__param', tslibImports, checker)) {
       return false;
     }
-    if (el.arguments.length != 2) {
-      return false;
-    }
-    if (el.arguments[0].kind !== ts.SyntaxKind.NumericLiteral) {
+
+    if (el.arguments.length !== 2 || !ts.isNumericLiteral(el.arguments[0])) {
       return false;
     }
 
@@ -469,7 +463,7 @@ function pickPropDecorationNodesToRemove(
       const decorators =
         expect<ts.ArrayLiteralExpression>(assign.initializer,
           ts.SyntaxKind.ArrayLiteralExpression).elements;
-      if (!decorators.every((el) => el.kind === ts.SyntaxKind.ObjectLiteralExpression)) {
+      if (!decorators.every((el) => ts.isObjectLiteralExpression(el))) {
         return [];
       }
       const decsToRemove = decorators.filter((expression) => {
@@ -507,26 +501,25 @@ function isAngularDecorator(
     return false;
   }
   const assign = expect<ts.PropertyAssignment>(types[0], ts.SyntaxKind.PropertyAssignment);
-  if (assign.initializer.kind !== ts.SyntaxKind.Identifier) {
+  if (!ts.isIdentifier(assign.initializer)) {
     return false;
   }
-  const id = assign.initializer as ts.Identifier;
+  const id = assign.initializer;
   const res = identifierIsMetadata(id, ngMetadata, checker);
 
   return res;
 }
 
 function isTypeProperty(prop: ts.ObjectLiteralElement): boolean {
-  if (prop.kind !== ts.SyntaxKind.PropertyAssignment) {
+  if (!ts.isPropertyAssignment(prop)) {
     return false;
   }
-  const assignment = prop as ts.PropertyAssignment;
-  if (assignment.name.kind !== ts.SyntaxKind.Identifier) {
-    return false;
-  }
-  const name = assignment.name as ts.Identifier;
 
-  return name.text === 'type';
+  if (!ts.isIdentifier(prop.name)) {
+    return false;
+  }
+
+  return prop.name.text === 'type';
 }
 
 // Check if an identifier is part of the known Angular Metadata.
@@ -542,30 +535,23 @@ function identifierIsMetadata(
 
   return symbol
     .declarations
-    .some((spec) => metadata.indexOf(spec) !== -1);
-}
-
-// Check if an import is a tslib helper import (`import * as tslib from "tslib";`)
-function isTslibImport(node: ts.ImportDeclaration): boolean {
-  return !!(node.moduleSpecifier &&
-    node.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
-    (node.moduleSpecifier as ts.StringLiteral).text === 'tslib' &&
-    node.importClause &&
-    node.importClause.namedBindings &&
-    node.importClause.namedBindings.kind === ts.SyntaxKind.NamespaceImport);
+    .some((spec) => metadata.includes(spec));
 }
 
 // Find all namespace imports for `tslib`.
 function findTslibImports(node: ts.Node): ts.NamespaceImport[] {
   const imports: ts.NamespaceImport[] = [];
-  ts.forEachChild(node, (child) => {
-    if (child.kind === ts.SyntaxKind.ImportDeclaration) {
-      const importDecl = child as ts.ImportDeclaration;
-      if (isTslibImport(importDecl)) {
-        const importClause = importDecl.importClause as ts.ImportClause;
-        const namespaceImport = importClause.namedBindings as ts.NamespaceImport;
-        imports.push(namespaceImport);
-      }
+
+  ts.forEachChild(node, child => {
+    if (
+      ts.isImportDeclaration(child) &&
+      child.moduleSpecifier &&
+      ts.isStringLiteral(child.moduleSpecifier) &&
+      child.moduleSpecifier.text === 'tslib' &&
+      child.importClause?.namedBindings &&
+      ts.isNamespaceImport(child.importClause.namedBindings)
+    ) {
+      imports.push(child.importClause.namedBindings);
     }
   });
 
@@ -585,7 +571,7 @@ function identifierIsTslib(
 
   return symbol
     .declarations
-    .some((spec) => tslibImports.indexOf(spec as ts.NamespaceImport) !== -1);
+    .some((spec) => tslibImports.includes(spec as ts.NamespaceImport));
 }
 
 // Check if a function call is a tslib helper.
@@ -595,7 +581,7 @@ function isTslibHelper(
   tslibImports: ts.NamespaceImport[],
   checker: ts.TypeChecker,
 ) {
-  let name;
+  let name: string | undefined;
 
   if (ts.isIdentifier(callExpr.expression)) {
     name = callExpr.expression.text;
