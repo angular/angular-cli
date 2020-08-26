@@ -3335,11 +3335,6 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha1-2jCcwmPfFZlMaIypAheco8fNfH4=
 
-clone@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
-  integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
-
 coa@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/coa/-/coa-2.0.2.tgz#43f6c21151b4ef2bf57187db0d73de229e3e7ec3"
@@ -7225,6 +7220,11 @@ klona@^1.1.2:
   resolved "https://registry.yarnpkg.com/klona/-/klona-1.1.2.tgz#a79e292518a5a5412ec8d097964bff1571a64db0"
   integrity sha512-xf88rTeHiXk+XE2Vhi6yj8Wm3gMZrygGdKjJqN8HkV+PwF/t50/LdAKHoHpPcxFAlmQszTZ1CugrK25S7qDRLA==
 
+klona@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.3.tgz#98274552c513583ad7a01456a789a2a0b4a2a538"
+  integrity sha512-CgPOT3ZadDpXxKcfV56lEQ9OQSZ42Mk26gnozI+uN/k39vzD8toUhRQoqsX0m9Q3eMPEfsLWmtyUpK/yqST4yg==
+
 latest-version@^5.0.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-5.1.0.tgz#119dfe908fe38d15dfa43ecd13fa12ec8832face"
@@ -7239,27 +7239,16 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-less-loader@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-6.0.0.tgz#f7833177c2fc3de5014de072d5c26eca0954c1cb"
-  integrity sha512-k9KrSkjkdGCQwbKPHfbJT9AfRCmOCHCCjiQCc0v2fdVCRTlJvr1Si68Zk6Z4d4UyVkp0U/nEEdQeH4wV/jW8/g==
+less-loader@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-7.0.0.tgz#d2a66f4fbbb4911e587f691579ee0ae79e21cfe5"
+  integrity sha512-fAgAaZHQJdX/woSMyNhvJt6bQUhpOtKODfuhk5AqgVPo6FVD3PezwHIZEtNPr4aumYoNQ1KBLnhynGX2XE/Lrg==
   dependencies:
-    clone "^2.1.2"
-    less "^3.11.1"
-    loader-utils "^2.0.0"
-    schema-utils "^2.6.6"
-
-less-loader@6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-6.2.0.tgz#8b26f621c155b342eefc24f5bd6e9dc40c42a719"
-  integrity sha512-Cl5h95/Pz/PWub/tCBgT1oNMFeH1WTD33piG80jn5jr12T4XbxZcjThwNXDQ7AG649WEynuIzO4b0+2Tn9Qolg==
-  dependencies:
-    clone "^2.1.2"
-    less "^3.11.3"
+    klona "^2.0.3"
     loader-utils "^2.0.0"
     schema-utils "^2.7.0"
 
-less@^3.10.3, less@^3.11.1, less@^3.11.3:
+less@^3.10.3:
   version "3.12.2"
   resolved "https://registry.yarnpkg.com/less/-/less-3.12.2.tgz#157e6dd32a68869df8859314ad38e70211af3ab4"
   integrity sha512-+1V2PCMFkL+OIj2/HrtrvZw0BC0sYLMICJfbQjuj/K8CEnlrFX6R5cKKgzzttsZDHyxQNL1jqMREjKN3ja/E3Q==
