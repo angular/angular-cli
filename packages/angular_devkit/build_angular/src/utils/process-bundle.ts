@@ -19,6 +19,7 @@ import templateBuilder from '@babel/template';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
+import { lt as semverLt } from 'semver';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import * as v8 from 'v8';
@@ -31,6 +32,8 @@ import {
 } from 'webpack-sources';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
+
+type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
 const cacache = require('cacache');
 const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
@@ -547,7 +550,6 @@ export async function createI18nPlugins(
   localeDataContent?: string,
 ) {
   const plugins = [];
-  // tslint:disable-next-line: no-implicit-dependencies
   const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
 
   const diagnostics = new localizeDiag.Diagnostics();
@@ -723,9 +725,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
 
   const { default: generate } = await import('@babel/generator');
 
-  // tslint:disable-next-line: no-implicit-dependencies
   const utils = await import('@angular/localize/src/tools/src/source_file_utils');
-  // tslint:disable-next-line: no-implicit-dependencies
   const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
 
   const diagnostics = new localizeDiag.Diagnostics();
@@ -829,21 +829,24 @@ function inlineCopyOnly(options: InlineOptions) {
 function findLocalizePositions(
   ast: ParseResult,
   options: InlineOptions,
-  // tslint:disable-next-line: no-implicit-dependencies
-  utils: typeof import('@angular/localize/src/tools/src/source_file_utils'),
+  utils: LocalizeUtilities,
 ): LocalizePosition[] {
   const positions: LocalizePosition[] = [];
+
+  // Workaround to ensure a path hub is present for traversal
+  const { File } = require('@babel/core');
+  const file = new File({}, { code: options.code, ast });
+
   if (options.es5) {
-    traverse(ast, {
-      CallExpression(path: NodePath<types.CallExpression>) {
+    traverse(file.ast, {
+      CallExpression(path) {
         const callee = path.get('callee');
         if (
           callee.isIdentifier() &&
           callee.node.name === localizeName &&
           utils.isGlobalIdentifier(callee)
         ) {
-          const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
-          const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
+          const [messageParts, expressions] = unwrapLocalizeCall(path, utils);
           positions.push({
             // tslint:disable-next-line: no-non-null-assertion
             start: path.node.start!,
@@ -856,30 +859,78 @@ function findLocalizePositions(
       },
     });
   } else {
-    const traverseFast = ((types as unknown) as {
-      traverseFast: (node: types.Node, enter: (node: types.Node) => void) => void;
-    }).traverseFast;
-
-    traverseFast(ast, node => {
-      if (
-        node.type === 'TaggedTemplateExpression' &&
-        types.isIdentifier(node.tag) &&
-        node.tag.name === localizeName
-      ) {
-        const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(node.quasi.quasis);
-        positions.push({
-          // tslint:disable-next-line: no-non-null-assertion
-          start: node.start!,
-          // tslint:disable-next-line: no-non-null-assertion
-          end: node.end!,
-          messageParts,
-          expressions: node.quasi.expressions,
-        });
-      }
+    traverse(file.ast, {
+      TaggedTemplateExpression(path) {
+        if (types.isIdentifier(path.node.tag) && path.node.tag.name === localizeName) {
+          const [messageParts, expressions] = unwrapTemplateLiteral(path, utils);
+          positions.push({
+            // tslint:disable-next-line: no-non-null-assertion
+            start: path.node.start!,
+            // tslint:disable-next-line: no-non-null-assertion
+            end: path.node.end!,
+            messageParts,
+            expressions,
+          });
+        }
+      },
     });
   }
 
   return positions;
+}
+
+// TODO: Remove this for v11.
+// This check allows the CLI to support both FW 10.0 and 10.1
+let localizeOld: boolean | undefined;
+
+function unwrapTemplateLiteral(
+  path: NodePath<types.TemplateLiteral>,
+  utils: LocalizeUtilities,
+): [TemplateStringsArray, types.Expression[]] {
+  if (localizeOld === undefined) {
+    const { version: localizeVersion } = require('@angular/localize/package.json');
+    localizeOld = semverLt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
+  }
+
+  if (localizeOld) {
+    // tslint:disable-next-line: no-any
+    const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(path.node.quasi.quasis as any);
+
+    return [(messageParts as unknown) as TemplateStringsArray, path.node.quasi.expressions];
+  }
+
+  const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(
+    path.get('quasi').get('quasis'),
+  );
+  const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
+
+  return [messageParts, expressions];
+}
+
+function unwrapLocalizeCall(
+  path: NodePath<types.CallExpression>,
+  utils: LocalizeUtilities,
+): [TemplateStringsArray, types.Expression[]] {
+  if (localizeOld === undefined) {
+    const { version: localizeVersion } = require('@angular/localize/package.json');
+    localizeOld = semverLt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
+  }
+
+  if (localizeOld) {
+    const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
+    // tslint:disable-next-line: no-any
+    const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node as any);
+
+    return [
+      (messageParts as unknown) as TemplateStringsArray,
+      (expressions as unknown) as types.Expression[],
+    ];
+  }
+
+  const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
+  const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
+
+  return [messageParts, expressions];
 }
 
 async function loadLocaleData(path: string, optimize: boolean, es5: boolean): Promise<string> {
