@@ -14,7 +14,10 @@ import { buildOptimizer } from './build-optimizer';
 
 
 describe('build-optimizer', () => {
-  const imports = 'import { Injectable, Input, Component } from \'@angular/core\';';
+  const imports = `
+    import { __decorate, __metadata } from "tslib";
+    import { Injectable, Input, Component } from '@angular/core';
+  `;
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
   const decorators = 'Clazz.decorators = [ { type: Injectable } ];';
 
