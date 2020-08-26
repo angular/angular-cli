@@ -90,13 +90,15 @@ describe('scrub-file', () => {
   describe('__decorate', () => {
     it('removes Angular decorators calls in __decorate', () => {
       const output = tags.stripIndent`
-        import { Component, Injectable } from '@angular/core';
+      import { __decorate } from "tslib";
+      import { Component, Injectable } from '@angular/core';
         var Clazz = (function () {
           function Clazz() { }
           return Clazz;
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate } from "tslib";
         import { Component, Injectable } from '@angular/core';
         var Clazz = (function () {
           function Clazz() { }
@@ -118,6 +120,7 @@ describe('scrub-file', () => {
 
     it('removes constructor parameter metadata in __decorate', () => {
       const output = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Component, ElementRef } from '@angular/core';
         import { LibService } from 'another-lib';
         var Clazz = (function () {
@@ -126,6 +129,7 @@ describe('scrub-file', () => {
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Component, ElementRef } from '@angular/core';
         import { LibService } from 'another-lib';
         var Clazz = (function () {
@@ -148,6 +152,7 @@ describe('scrub-file', () => {
 
     it('removes constructor parameter metadata when static properties are present', () => {
       const output = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Injectable } from '@angular/core';
         import { Logger } from 'another-lib';
         var GaService = (function () {
@@ -164,6 +169,7 @@ describe('scrub-file', () => {
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Injectable } from '@angular/core';
         import { Logger } from 'another-lib';
         var GaService = (function () {
@@ -190,6 +196,7 @@ describe('scrub-file', () => {
 
     it('removes only Angular decorators calls in __decorate', () => {
       const output = tags.stripIndent`
+        import { __decorate } from "tslib";
         import { Component } from '@angular/core';
         import { NotComponent } from 'another-lib';
         var Clazz = (function () {
@@ -201,6 +208,7 @@ describe('scrub-file', () => {
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate } from "tslib";
         import { Component } from '@angular/core';
         import { NotComponent } from 'another-lib';
         var Clazz = (function () {
@@ -223,13 +231,12 @@ describe('scrub-file', () => {
 
     it('recognizes tslib as well', () => {
       const input = tags.stripIndent`
-        import * as tslib from "tslib";
-        import * as tslib_2 from "tslib";
+        import { __decorate } from "tslib";
         import { Component } from '@angular/core';
         import { NotComponent } from 'another-lib';
         var Clazz = (function () {
           function Clazz() { }
-          Clazz = tslib.__decorate([
+          Clazz = __decorate([
             NotComponent(),
             Component({
               selector: 'app-root',
@@ -242,7 +249,7 @@ describe('scrub-file', () => {
 
         var Clazz2 = (function () {
           function Clazz2() { }
-          Clazz2 = tslib_2.__decorate([
+          Clazz2 = __decorate([
             NotComponent(),
             Component({
               selector: 'app-root',
@@ -254,13 +261,12 @@ describe('scrub-file', () => {
         }());
       `;
       const output = tags.stripIndent`
-        import * as tslib from "tslib";
-        import * as tslib_2 from "tslib";
+        import { __decorate } from "tslib";
         import { Component } from '@angular/core';
         import { NotComponent } from 'another-lib';
         var Clazz = (function () {
           function Clazz() { }
-          Clazz = tslib.__decorate([
+          Clazz = __decorate([
             NotComponent()
           ], Clazz);
           return Clazz;
@@ -268,7 +274,7 @@ describe('scrub-file', () => {
 
         var Clazz2 = (function () {
           function Clazz2() { }
-          Clazz2 = tslib_2.__decorate([
+          Clazz2 = __decorate([
             NotComponent()
           ], Clazz2);
           return Clazz2;
@@ -281,7 +287,7 @@ describe('scrub-file', () => {
 
     it('recognizes decorator imports in Angular core', () => {
       const input = tags.stripIndent`
-        import * as tslib_1 from "tslib";
+        import { __decorate } from "tslib";
         import { Injectable } from './di';
         var Console = /** @class */ (function () {
             function Console() {
@@ -292,7 +298,7 @@ describe('scrub-file', () => {
             Console.prototype.warn = function (message) {
                 console.warn(message);
             };
-            Console = tslib_1.__decorate([
+            Console = __decorate([
                 Injectable()
             ], Console);
             return Console;
@@ -300,7 +306,7 @@ describe('scrub-file', () => {
         export { Console };
       `;
       const output = tags.stripIndent`
-        import * as tslib_1 from "tslib";
+        import { __decorate } from "tslib";
         import { Injectable } from './di';
         var Console = /** @class */ (function () {
             function Console() {
@@ -425,6 +431,7 @@ describe('scrub-file', () => {
   describe('__metadata', () => {
     it('removes Angular decorators metadata', () => {
       const output = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Input, Output, EventEmitter, HostListener } from '@angular/core';
         var Clazz = (function () {
           function Clazz() {
@@ -434,6 +441,7 @@ describe('scrub-file', () => {
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Input, Output, EventEmitter, HostListener } from '@angular/core';
         import { NotInput } from 'another-lib';
         var Clazz = (function () {
@@ -464,6 +472,7 @@ describe('scrub-file', () => {
 
     it('removes only Angular decorator metadata', () => {
       const output = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Input } from '@angular/core';
         import { NotInput } from 'another-lib';
         var Clazz = (function () {
@@ -483,6 +492,7 @@ describe('scrub-file', () => {
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate, __metadata } from "tslib";
         import { Input } from '@angular/core';
         import { NotInput } from 'another-lib';
         var Clazz = (function () {
@@ -512,30 +522,28 @@ describe('scrub-file', () => {
 
     it('recognizes tslib as well', () => {
       const input = tags.stripIndent`
-        import * as tslib from "tslib";
-        import * as tslib_2 from "tslib";
+        import { __decorate, __metadata } from "tslib";
         import { Input } from '@angular/core';
         var Clazz = (function () {
           function Clazz() { }
-          tslib.__decorate([
+          __decorate([
             Input(),
-            tslib.__metadata("design:type", Object)
+            __metadata("design:type", Object)
           ], Clazz.prototype, "selected", void 0);
           return Clazz;
         }());
 
         var Clazz2 = (function () {
           function Clazz2() { }
-          tslib_2.__decorate([
+          __decorate([
             Input(),
-            tslib_2.__metadata("design:type", Object)
+            __metadata("design:type", Object)
           ], Clazz.prototype, "selected", void 0);
           return Clazz2;
         }());
       `;
       const output = tags.stripIndent`
-        import * as tslib from "tslib";
-        import * as tslib_2 from "tslib";
+        import { __decorate, __metadata } from "tslib";
         import { Input } from '@angular/core';
         var Clazz = (function () {
           function Clazz() { }
@@ -556,6 +564,7 @@ describe('scrub-file', () => {
   describe('__param', () => {
     it('removes all constructor parameters and their type metadata', () => {
       const output = tags.stripIndent`
+      import { __decorate, __param, __metadata } from "tslib";
         var MyClass = /** @class */ (function () {
             function MyClass(myParam) {
                 this.myProp = 'foo';
@@ -567,6 +576,7 @@ describe('scrub-file', () => {
         }());
       `;
       const input = tags.stripIndent`
+        import { __decorate, __param, __metadata } from "tslib";
         var MyClass = /** @class */ (function () {
             function MyClass(myParam) {
                 this.myProp = 'foo';
