@@ -34,9 +34,9 @@ describe('Browser Builder index HTML processing', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><base href="/"></head>`
+      `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head>`
       + `<body><app-root></app-root><script src="runtime.js" defer></script>`
-      + `<script src="polyfills.js" defer></script><script src="styles.js" defer></script>`
+      + `<script src="polyfills.js" defer></script>`
       + `<script src="vendor.js" defer></script><script src="main.js" defer></script></body></html>`,
     );
     await run.stop();
@@ -56,9 +56,10 @@ describe('Browser Builder index HTML processing', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><base href="/"></head><body><app-root></app-root>`
+      `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head>`
+      + `<body><app-root></app-root>`
       + `<script src="runtime.js" defer></script><script src="polyfills.js" defer></script>`
-      + `<script src="styles.js" defer></script><script src="vendor.js" defer></script>`
+      + `<script src="vendor.js" defer></script>`
       + `<script src="main.js" defer></script></body></html>`,
     );
     await run.stop();
@@ -78,9 +79,9 @@ describe('Browser Builder index HTML processing', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><title>&iacute;</title><base href="/"></head> `
+      `<html><head><title>&iacute;</title><base href="/"><link rel="stylesheet" href="styles.css"></head> `
       + `<body><app-root></app-root><script src="runtime.js" defer></script>`
-      + `<script src="polyfills.js" defer></script><script src="styles.js" defer></script>`
+      + `<script src="polyfills.js" defer></script>`
       + `<script src="vendor.js" defer></script><script src="main.js" defer></script></body></html>`,
     );
     await run.stop();
@@ -100,9 +101,9 @@ describe('Browser Builder index HTML processing', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><base href="/"><%= csrf_meta_tags %></head> `
+      `<html><head><base href="/"><%= csrf_meta_tags %><link rel="stylesheet" href="styles.css"></head> `
       + `<body><app-root></app-root><script src="runtime.js" defer></script>`
-      + `<script src="polyfills.js" defer></script><script src="styles.js" defer></script>`
+      + `<script src="polyfills.js" defer></script>`
       + `<script src="vendor.js" defer></script><script src="main.js" defer></script></body></html>`,
     );
     await run.stop();
@@ -145,9 +146,9 @@ describe('Browser Builder index HTML processing', () => {
     const outputIndexPath = join(host.root(), 'dist', 'index.html');
     const content = await host.read(normalize(outputIndexPath)).toPromise();
     expect(virtualFs.fileBufferToString(content)).toBe(
-      `<html><head><base href="/"><%= csrf_meta_tags %></head> `
+      `<html><head><base href="/"><%= csrf_meta_tags %><link rel="stylesheet" href="styles.css"></head> `
       + `<body><app-root></app-root><script src="runtime.js" defer></script>`
-      + `<script src="polyfills.js" defer></script><script src="styles.js" defer></script>`
+      + `<script src="polyfills.js" defer></script>`
       + `<script src="vendor.js" defer></script><script src="main.js" defer></script></body></html>`,
     );
   });
@@ -188,9 +189,9 @@ describe('Browser Builder index HTML processing', () => {
     const outputIndexPath = join(host.root(), 'dist', 'main.html');
     const content = await host.read(normalize(outputIndexPath)).toPromise();
     expect(virtualFs.fileBufferToString(content)).toBe(
-      `<html><head><base href="/"></head> `
+      `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head> `
       + `<body><app-root></app-root><script src="runtime.js" defer></script>`
-      + `<script src="polyfills.js" defer></script><script src="styles.js" defer></script>`
+      + `<script src="polyfills.js" defer></script>`
       + `<script src="vendor.js" defer></script><script src="main.js" defer></script></body></html>`,
     );
   });
@@ -231,9 +232,9 @@ describe('Browser Builder index HTML processing', () => {
     const outputIndexPath = join(host.root(), 'dist', 'extra', 'main.html');
     const content = await host.read(normalize(outputIndexPath)).toPromise();
     expect(virtualFs.fileBufferToString(content)).toBe(
-      `<html><head><base href="/"></head> `
+      `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head> `
       + `<body><app-root></app-root><script src="runtime.js" defer></script>`
-      + `<script src="polyfills.js" defer></script><script src="styles.js" defer></script>`
+      + `<script src="polyfills.js" defer></script>`
       + `<script src="vendor.js" defer></script><script src="main.js" defer></script></body></html>`,
     );
   });

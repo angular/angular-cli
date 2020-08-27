@@ -54,7 +54,7 @@ describe('Browser Builder base href', () => {
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
-    expect(content).toContain('<head><base href="/myUrl"><meta charset="UTF-8"></head>');
+    expect(content).toContain('<head><base href="/myUrl"><meta charset="UTF-8">');
     await run.stop();
   });
 });

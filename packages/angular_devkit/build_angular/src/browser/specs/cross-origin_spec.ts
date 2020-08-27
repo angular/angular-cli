@@ -37,11 +37,10 @@ describe('Browser Builder crossOrigin', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><base href="/"></head>` +
+      `<html><head><base href="/"><link rel="stylesheet" href="styles.css" crossorigin="use-credentials"></head>` +
         `<body><app-root></app-root>` +
         `<script src="runtime.js" crossorigin="use-credentials" defer></script>` +
         `<script src="polyfills.js" crossorigin="use-credentials" defer></script>` +
-        `<script src="styles.js" crossorigin="use-credentials" defer></script>` +
         `<script src="vendor.js" crossorigin="use-credentials" defer></script>` +
         `<script src="main.js" crossorigin="use-credentials" defer></script></body></html>`,
     );
@@ -56,11 +55,11 @@ describe('Browser Builder crossOrigin', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><base href="/"></head>` +
+        `<html><head><base href="/">` +
+        `<link rel="stylesheet" href="styles.css" crossorigin="anonymous"></head>` +
         `<body><app-root></app-root>` +
         `<script src="runtime.js" crossorigin="anonymous" defer></script>` +
         `<script src="polyfills.js" crossorigin="anonymous" defer></script>` +
-        `<script src="styles.js" crossorigin="anonymous" defer></script>` +
         `<script src="vendor.js" crossorigin="anonymous" defer></script>` +
         `<script src="main.js" crossorigin="anonymous" defer></script></body></html>`,
     );
@@ -75,11 +74,11 @@ describe('Browser Builder crossOrigin', () => {
     const fileName = join(normalize(output.outputPath), 'index.html');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toBe(
-      `<html><head><base href="/"></head>` +
+        `<html><head><base href="/">` +
+        `<link rel="stylesheet" href="styles.css"></head>` +
         `<body><app-root></app-root>` +
         `<script src="runtime.js" defer></script>` +
         `<script src="polyfills.js" defer></script>` +
-        `<script src="styles.js" defer></script>` +
         `<script src="vendor.js" defer></script>` +
         `<script src="main.js" defer></script></body></html>`,
     );
