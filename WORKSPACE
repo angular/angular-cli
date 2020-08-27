@@ -93,9 +93,9 @@ npm_bazel_labs_dependencies()
 # Bring in bazel_toolchains for RBE setup configuration.
 http_archive(
     name = "bazel_toolchains",
-    sha256 = "7ebb200ed3ca3d1f7505659c7dfed01c4b5cb04c3a6f34140726fe22f5d35e86",
-    strip_prefix = "bazel-toolchains-3.4.1",
-    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.4.1.tar.gz",
+    sha256 = "caf516464966470c075c33fae53c33ada5f32f1d43dbeaaea7388fe6e006d001",
+    strip_prefix = "bazel-toolchains-3.4.2",
+    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.4.2.tar.gz",
 )
 
 load("@bazel_toolchains//rules:environments.bzl", "clang_env")
