@@ -10,6 +10,7 @@ import {
   concat,
   defer as deferObservable,
   from as observableFrom,
+  isObservable,
   of as observableOf,
 } from 'rxjs';
 import {
@@ -122,13 +123,12 @@ export abstract class SimpleSinkBase implements Sink {
       deferObservable(() => actions).pipe(
         concatMap(action => {
           const maybeAction = this.preCommitAction(action);
-          if (!maybeAction) {
-            return observableOf(action);
-          } else if (isAction(maybeAction)) {
-            return observableOf(maybeAction);
-          } else {
+
+          if (isObservable(maybeAction) || isPromiseLike(maybeAction)) {
             return maybeAction;
           }
+
+          return observableOf(maybeAction || action);
         }),
         concatMap(action => {
           return concat(
@@ -142,4 +142,8 @@ export abstract class SimpleSinkBase implements Sink {
       deferObservable(() => this.postCommit() || observableOf(null)),
     ).pipe(ignoreElements());
   }
+}
+
+function isPromiseLike<T, U = unknown>(value: U | PromiseLike<T>): value is PromiseLike<T> {
+  return !!value && typeof (value as PromiseLike<T>).then === 'function';
 }
