@@ -21,12 +21,6 @@
       "description": "The name of the main entry-point file.",
       "default": "main.server.ts"
     },
-    "tsconfigFileName": {
-      "type": "string",
-      "default": "tsconfig.server",
-      "description": "The name of the TypeScript configuration file.",
-      "x-deprecated": "This option has no effect."
-    },
     "appDir": {
       "type": "string",
       "format": "path",
