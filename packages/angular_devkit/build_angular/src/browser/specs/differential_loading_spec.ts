@@ -49,15 +49,13 @@ describe('Browser Builder with differential loading', () => {
       'runtime-es5.js',
       'runtime-es5.js.map',
 
-      'styles-es2015.js',
-      'styles-es2015.js.map',
-      'styles-es5.js',
-      'styles-es5.js.map',
-
       'vendor-es2015.js',
       'vendor-es2015.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
+
+      'styles.css',
+      'styles.css.map',
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
@@ -91,15 +89,13 @@ describe('Browser Builder with differential loading', () => {
       'runtime-es5.js',
       'runtime-es5.js.map',
 
-      'styles-es2016.js',
-      'styles-es2016.js.map',
-      'styles-es5.js',
-      'styles-es5.js.map',
-
       'vendor-es2016.js',
       'vendor-es2016.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
+
+      'styles.css',
+      'styles.css.map',
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
@@ -133,15 +129,13 @@ describe('Browser Builder with differential loading', () => {
       'runtime-es5.js',
       'runtime-es5.js.map',
 
-      'styles-esnext.js',
-      'styles-esnext.js.map',
-      'styles-es5.js',
-      'styles-es5.js.map',
-
       'vendor-esnext.js',
       'vendor-esnext.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
+
+      'styles.css',
+      'styles.css.map',
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
@@ -163,11 +157,11 @@ describe('Browser Builder with differential loading', () => {
       'runtime.js',
       'runtime.js.map',
 
-      'styles.js',
-      'styles.js.map',
-
       'vendor.js',
       'vendor.js.map',
+
+      'styles.css',
+      'styles.css.map',
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
@@ -209,10 +203,9 @@ describe('Browser Builder with differential loading', () => {
     const { files } = await browserBuild(architect, host, target, { watch: true });
     expect(await files['index.html']).toContain(
       '<script src="runtime.js" type="module"></script>' +
-        '<script src="polyfills.js" type="module"></script>' +
-        '<script src="styles.js" type="module"></script>' +
-        '<script src="vendor.js" type="module"></script>' +
-        '<script src="main.js" type="module"></script>',
+      '<script src="polyfills.js" type="module"></script>' +
+      '<script src="vendor.js" type="module"></script>' +
+      '<script src="main.js" type="module"></script>',
     );
   });
 });

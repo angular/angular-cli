@@ -15,7 +15,6 @@ export default async function () {
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="runtime.js" defer></script>
     <script src="polyfills.js" defer></script>
-    <script src="styles.js" defer></script>
     <script src="vendor.js" defer></script>
     <script src="main.js" defer></script>
   `);
@@ -27,7 +26,6 @@ export default async function () {
     <script src="runtime.js" defer></script>
     <script src="polyfills-es5.js" nomodule defer></script>
     <script src="polyfills.js" defer></script>
-    <script src="styles.js" defer></script>
     <script src="vendor.js" defer></script>
     <script src="main.js" defer></script>
   `);

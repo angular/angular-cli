@@ -831,8 +831,8 @@
             },
             "extractCss": {
               "type": "boolean",
-              "description": "Extract css from global styles onto css files instead of js ones.",
-              "default": false
+              "description": "Extract CSS from global styles into '.css' files instead of '.js'.",
+              "default": true
             },
             "watch": {
               "type": "boolean",

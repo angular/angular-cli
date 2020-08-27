@@ -29,9 +29,9 @@ describe('Browser Builder basic test', () => {
     expect(await host.scopedSync().exists(normalize('dist/runtime.js'))).toBe(true);
     expect(await host.scopedSync().exists(normalize('dist/main.js'))).toBe(true);
     expect(await host.scopedSync().exists(normalize('dist/polyfills.js'))).toBe(true);
-    expect(await host.scopedSync().exists(normalize('dist/styles.js'))).toBe(true);
     expect(await host.scopedSync().exists(normalize('dist/vendor.js'))).toBe(true);
     expect(await host.scopedSync().exists(normalize('dist/favicon.ico'))).toBe(true);
+    expect(await host.scopedSync().exists(normalize('dist/styles.css'))).toBe(true);
     expect(await host.scopedSync().exists(normalize('dist/index.html'))).toBe(true);
   });
 });

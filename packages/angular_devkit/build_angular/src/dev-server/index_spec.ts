@@ -32,7 +32,6 @@ describe('Dev Server Builder index', () => {
     expect(await response.text()).toContain(
       '<script src="runtime.js" type="module"></script>' +
         '<script src="polyfills.js" type="module"></script>' +
-        '<script src="styles.js" type="module"></script>' +
         '<script src="vendor.js" type="module"></script>' +
         '<script src="main.js" type="module"></script>',
     );
@@ -75,7 +74,6 @@ describe('Dev Server Builder index', () => {
     expect(await response.text()).toContain(
       '<script src="runtime.js" type="module"></script>' +
         '<script src="polyfills.js" type="module"></script>' +
-        '<script src="styles.js" type="module"></script>' +
         '<script src="scripts.js" defer></script>' +
         '<script src="vendor.js" type="module"></script>' +
         '<script src="main.js" type="module"></script>',
@@ -98,7 +96,6 @@ describe('Dev Server Builder index', () => {
     expect(await response.text()).toContain(
       '<script src="runtime.js" defer></script>' +
         '<script src="polyfills.js" defer></script>' +
-        '<script src="styles.js" defer></script>' +
         '<script src="vendor.js" defer></script>' +
         '<script src="main.js" defer></script>',
     );
