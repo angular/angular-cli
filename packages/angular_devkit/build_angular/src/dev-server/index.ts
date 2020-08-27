@@ -93,7 +93,6 @@ export function serveWebpackBrowser(
     browserOptions: json.JsonObject & BrowserBuilderSchema;
     webpackConfig: webpack.Configuration;
     webpackDevServerConfig: WebpackDevServer.Configuration;
-    port: number;
     projectRoot: string;
   }> {
     // Get the browser configuration from the target name.
@@ -138,7 +137,7 @@ export function serveWebpackBrowser(
       await setupLocalize(i18n, browserOptions, webpackConfig);
     }
 
-    const port = await checkPort(options.port || 0, options.host || 'localhost', 4200);
+    options.port = await checkPort(options.port ?? 4200, options.host || 'localhost');
     const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(
       root,
       options,
@@ -154,15 +153,12 @@ export function serveWebpackBrowser(
       browserOptions,
       webpackConfig,
       webpackDevServerConfig,
-      port,
       projectRoot,
     };
   }
 
   return from(setup()).pipe(
-    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot }) => {
-      options.port = port;
-
+    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, projectRoot }) => {
       // Resolve public host and client address.
       let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
       if (options.publicHost) {

@@ -5,36 +5,50 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { prompt } from 'inquirer';
 import * as net from 'net';
+import { isTTY } from './tty';
 
-export function checkPort(port: number, host: string, basePort = 49152): Promise<number> {
+function createInUseError(port: number): Error {
+  return new Error(`Port ${port} is already in use. Use '--port' to specify a different port.`);
+}
+
+export async function checkPort(port: number, host: string): Promise<number> {
+  if (port === 0) {
+    return 0;
+  }
+
   return new Promise<number>((resolve, reject) => {
-    function _getPort(portNumber: number) {
-      if (portNumber > 65535) {
-        reject(new Error(`There is no port available.`));
-      }
+    const server = net.createServer();
 
-      const server = net.createServer();
-
-      server.once('error', (err: Error & {code: string}) => {
+    server
+      .once('error', (err: NodeJS.ErrnoException) => {
         if (err.code !== 'EADDRINUSE') {
           reject(err);
-        } else if (port === 0) {
-          _getPort(portNumber + 1);
-        } else {
-          // If the port isn't available and we weren't looking for any port, throw error.
-          reject(
-            new Error(`Port ${port} is already in use. Use '--port' to specify a different port.`),
-          );
+
+          return;
         }
+
+        if (!isTTY) {
+          reject(createInUseError(port));
+
+          return;
+        }
+
+        prompt({
+          type: 'confirm',
+          name: 'useDifferent',
+          message: `Port ${port} is already in use.\nWould you like to use a different port?`,
+          default: true,
+        }).then(
+          (answers) => answers.useDifferent ? resolve(0) : reject(createInUseError(port)),
+          () => reject(createInUseError(port)),
+        );
       })
       .once('listening', () => {
         server.close();
-        resolve(portNumber);
+        resolve(port);
       })
-      .listen(portNumber, host);
-    }
-
-    _getPort(port || basePort);
+      .listen(port, host);
   });
 }
