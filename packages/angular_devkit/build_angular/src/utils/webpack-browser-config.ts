@@ -17,6 +17,7 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
+import { merge as webpackMerge } from 'webpack-merge';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import { getEsVersionForFileName } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
@@ -31,7 +32,6 @@ import { profilingEnabled } from './environment-options';
 import { I18nOptions, configureI18nBuild } from './i18n-options';
 
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
-const webpackMerge = require('webpack-merge');
 
 export type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 
@@ -101,8 +101,7 @@ export async function generateWebpackConfig(
 
   wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
 
-  const partials = webpackPartialGenerator(wco);
-  const webpackConfig = webpackMerge(partials) as webpack.Configuration;
+  const webpackConfig = webpackMerge(webpackPartialGenerator(wco));
 
   if (supportES2015) {
     if (!webpackConfig.resolve) {
