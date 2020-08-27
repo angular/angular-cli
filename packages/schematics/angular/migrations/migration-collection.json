@@ -104,6 +104,11 @@
       "version": "10.1.0-next.5",
       "factory": "./update-10/remove-solution-style-tsconfig",
       "description": "Removing \"Solution Style\" TypeScript configuration file support."
+    },
+    "replace-ng-packagr-builder": {
+      "version": "11.0.0-next.0",
+      "factory": "./update-11/replace-ng-packagr-builder",
+      "description": "Replace deprecated library builder '@angular-devkit/build-ng-packagr'."
     }
   }
 }
