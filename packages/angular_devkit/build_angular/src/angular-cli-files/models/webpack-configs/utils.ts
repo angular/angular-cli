@@ -40,38 +40,31 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   return hashFormats[option] || hashFormats['none'];
 }
 
-// todo: replace with Omit when we update to TS 3.5
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export type NormalizedEntryPoint = Required<Omit<ExtraEntryPointClass, 'lazy'>>;
+export type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
 
 export function normalizeExtraEntryPoints(
   extraEntryPoints: ExtraEntryPoint[],
   defaultBundleName: string,
 ): NormalizedEntryPoint[] {
   return extraEntryPoints.map(entry => {
-    let normalizedEntry;
     if (typeof entry === 'string') {
-      normalizedEntry = { input: entry, inject: true, bundleName: defaultBundleName };
-    } else {
-      const { lazy, inject = true, ...newEntry } = entry;
-      const injectNormalized = entry.lazy !== undefined ? !entry.lazy : inject;
-      let bundleName;
-
-      if (entry.bundleName) {
-        bundleName = entry.bundleName;
-      } else if (!injectNormalized) {
-        // Lazy entry points use the file name as bundle name.
-        bundleName = basename(
-          normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-        );
-      } else {
-        bundleName = defaultBundleName;
-      }
-
-      normalizedEntry = { ...newEntry, inject: injectNormalized, bundleName };
+      return { input: entry, inject: true, bundleName: defaultBundleName };
     }
 
-    return normalizedEntry;
+    const { inject = true, ...newEntry } = entry;
+    let bundleName;
+    if (entry.bundleName) {
+      bundleName = entry.bundleName;
+    } else if (!inject) {
+      // Lazy entry points use the file name as bundle name.
+      bundleName = basename(
+        normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+      );
+    } else {
+      bundleName = defaultBundleName;
+    }
+
+    return { ...newEntry, inject, bundleName };
   });
 }
 
