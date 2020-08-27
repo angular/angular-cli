@@ -47,12 +47,6 @@
       "format": "html-selector",
       "description": "The name of the root module class.",
       "default": "AppServerModule"
-    },
-    "tsconfigFileName": {
-      "type": "string",
-      "default": "tsconfig.server",
-      "description": "The name of the TypeScript configuration file.",
-      "x-deprecated": "This option has no effect."
     }
   },
   "required": [

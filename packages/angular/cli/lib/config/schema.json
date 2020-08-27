@@ -1072,11 +1072,6 @@
                       "type": "string",
                       "description": "The bundle name for this extra entry point."
                     },
-                    "lazy": {
-                      "type": "boolean",
-                      "description": "If the bundle will be lazy loaded.",
-                      "default": false
-                    },
                     "inject": {
                       "type": "boolean",
                       "description": "If the bundle will be referenced in the HTML file.",
@@ -1615,11 +1610,6 @@
                     "bundleName": {
                       "type": "string",
                       "description": "The bundle name for this extra entry point."
-                    },
-                    "lazy": {
-                      "type": "boolean",
-                      "description": "If the bundle will be lazy loaded.",
-                      "default": false
                     },
                     "inject": {
                       "type": "boolean",
