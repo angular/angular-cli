@@ -45,6 +45,12 @@ export default async function() {
     throw new Error('Expected ivy enabled application warning');
   }
 
+  // Should not show any warnings when extracting
+  const { stderr: message5 } = await ng('xi18n', '--ivy');
+  if (message5.includes('WARNING')) {
+    throw new Error('Expected no warnings to be shown');
+  }
+
   // Disable Ivy
   await updateJsonFile('tsconfig.json', config => {
     const { angularCompilerOptions = {} } = config;

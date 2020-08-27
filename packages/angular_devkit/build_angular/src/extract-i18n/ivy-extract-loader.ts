@@ -44,27 +44,33 @@ export default function localizeExtractLoader(
     },
   };
 
+  let filename = loaderContext.resourcePath;
+  if (map?.file) {
+    // The extractor's internal sourcemap handling expects the filenames to match
+    filename = nodePath.posix.join(loaderContext.context, map.file);
+  }
+
   // Setup a virtual file system instance for the extractor
   // * MessageExtractor itself uses readFile and resolve
   // * Internal SourceFileLoader (sourcemap support) uses dirname, exists, readFile, and resolve
   const filesystem = {
     readFile(path: string): string {
-      if (path === loaderContext.resourcePath) {
+      if (path === filename) {
         return content;
-      } else if (path === loaderContext.resourcePath + '.map') {
+      } else if (path === filename + '.map') {
         return typeof map === 'string' ? map : JSON.stringify(map);
       } else {
-        throw new Error('Unknown file requested.');
+        throw new Error('Unknown file requested: ' + path);
       }
     },
     resolve(...paths: string[]): string {
-      return nodePath.resolve(...paths);
+      return nodePath.posix.resolve(...paths);
     },
     exists(path: string): boolean {
-      return path === loaderContext.resourcePath || path === loaderContext.resourcePath + '.map';
+      return path === filename || path === filename + '.map';
     },
     dirname(path: string): string {
-      return nodePath.dirname(path);
+      return nodePath.posix.dirname(path);
     },
   };
 
@@ -75,7 +81,7 @@ export default function localizeExtractLoader(
     useSourceMaps: !!map,
   });
 
-  const messages = extractor.extractMessages(loaderContext.resourcePath);
+  const messages = extractor.extractMessages(filename);
   if (messages.length > 0) {
     options?.messageHandler(messages);
   }
