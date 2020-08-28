@@ -313,7 +313,7 @@ jobs:
       - custom_attach_workspace
       - setup_windows
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
-      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }
+      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy.ts}" }
              
   e2e-cli-win:
     executor: windows-executor
