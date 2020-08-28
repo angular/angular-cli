@@ -47,7 +47,7 @@ export default function localizeExtractLoader(
   let filename = loaderContext.resourcePath;
   if (map?.file) {
     // The extractor's internal sourcemap handling expects the filenames to match
-    filename = nodePath.posix.join(loaderContext.context, map.file);
+    filename = nodePath.join(loaderContext.context, map.file);
   }
 
   // Setup a virtual file system instance for the extractor
@@ -64,13 +64,13 @@ export default function localizeExtractLoader(
       }
     },
     resolve(...paths: string[]): string {
-      return nodePath.posix.resolve(...paths);
+      return nodePath.resolve(...paths);
     },
     exists(path: string): boolean {
       return path === filename || path === filename + '.map';
     },
     dirname(path: string): string {
-      return nodePath.posix.dirname(path);
+      return nodePath.dirname(path);
     },
   };
 
