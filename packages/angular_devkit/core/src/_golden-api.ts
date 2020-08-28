@@ -8,10 +8,6 @@
 
 export * from './exception/exception';
 
- // Start experimental namespace
-export * from './experimental/workspace/index';
-// End experimental namespace
-
 // Start json namespace
 export * from './json/interface';
 export * from './json/parser';
