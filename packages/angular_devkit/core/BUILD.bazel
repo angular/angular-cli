@@ -54,10 +54,7 @@ ts_library(
     name = "core_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
-    data = glob(["src/workspace/json/test/**/*.json"]) + [
-        "src/experimental/workspace/test/test-workspace.json",
-        "src/experimental/workspace/workspace-schema.json",
-    ],
+    data = glob(["src/workspace/json/test/**/*.json"]),
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [

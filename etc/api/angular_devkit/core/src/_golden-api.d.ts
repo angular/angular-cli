@@ -13,12 +13,6 @@ export declare class AliasHost<StatsT extends object = {}> extends ResolverHost<
     protected _resolve(path: Path): Path;
 }
 
-export declare class AmbiguousProjectPathException extends BaseException {
-    readonly path: Path;
-    readonly projects: ReadonlyArray<string>;
-    constructor(path: Path, projects: ReadonlyArray<string>);
-}
-
 export interface Analytics {
     event(category: string, action: string, options?: EventOptions): void;
     flush(): Promise<void>;
@@ -784,14 +778,6 @@ export declare class ProjectDefinitionCollection extends DefinitionCollection<Pr
     set(name: string, value: ProjectDefinition): this;
 }
 
-export declare class ProjectNotFoundException extends BaseException {
-    constructor(name: string);
-}
-
-export declare class ProjectToolNotFoundException extends BaseException {
-    constructor(name: string);
-}
-
 export interface PromptDefinition {
     default?: string | string[] | number | boolean | null;
     id: string;
@@ -1217,37 +1203,9 @@ export declare type WindowsPath = string & {
     __PRIVATE_DEVKIT_WINDOWS_PATH: void;
 };
 
-export declare class Workspace {
-    get host(): virtualFs.Host<{}>;
-    get newProjectRoot(): string | undefined;
-    get root(): Path;
-    get version(): number;
-    constructor(_root: Path, _host: virtualFs.Host<{}>, registry?: schema.CoreSchemaRegistry);
-    getCli(): WorkspaceTool;
-    getDefaultProjectName(): string | null;
-    getProject(projectName: string): WorkspaceProject;
-    getProjectByPath(path: Path): string | null;
-    getProjectCli(projectName: string): WorkspaceTool;
-    getProjectSchematics(projectName: string): WorkspaceTool;
-    getProjectTargets(projectName: string): WorkspaceTool;
-    getSchematics(): WorkspaceTool;
-    getTargets(): WorkspaceTool;
-    listProjectNames(): string[];
-    loadWorkspaceFromHost(workspacePath: Path): Observable<this>;
-    loadWorkspaceFromJson(json: {}): Observable<this>;
-    validateAgainstSchema<T = {}>(contentJson: {}, schemaJson: JsonObject): Observable<T>;
-    protected static _workspaceFileNames: string[];
-    static findWorkspaceFile(host: virtualFs.Host<{}>, path: Path): Promise<Path | null>;
-    static fromPath(host: virtualFs.Host<{}>, path: Path, registry: schema.CoreSchemaRegistry): Promise<Workspace>;
-}
-
 export interface WorkspaceDefinition {
     readonly extensions: Record<string, JsonValue | undefined>;
     readonly projects: ProjectDefinitionCollection;
-}
-
-export declare class WorkspaceFileNotFoundException extends BaseException {
-    constructor(path: Path);
 }
 
 export declare enum WorkspaceFormat {
@@ -1259,50 +1217,6 @@ export interface WorkspaceHost {
     isFile(path: string): Promise<boolean>;
     readFile(path: string): Promise<string>;
     writeFile(path: string, data: string): Promise<void>;
-}
-
-export declare class WorkspaceNotYetLoadedException extends BaseException {
-    constructor();
-}
-
-export interface WorkspaceProject {
-    architect?: WorkspaceTool;
-    cli?: WorkspaceTool;
-    i18n?: WorkspaceProjectI18n;
-    prefix: string;
-    projectType: "application" | "library";
-    root: string;
-    schematics?: WorkspaceTool;
-    sourceRoot?: string;
-    targets?: WorkspaceTool;
-}
-
-export interface WorkspaceProjectI18n {
-    locales: Record<string, string>;
-    sourceLocale?: string;
-}
-
-export interface WorkspaceSchema {
-    $schema?: string;
-    architect?: WorkspaceTool;
-    cli?: WorkspaceTool;
-    defaultProject?: string;
-    newProjectRoot?: string;
-    projects: {
-        [k: string]: WorkspaceProject;
-    };
-    schematics?: WorkspaceTool;
-    targets?: WorkspaceTool;
-    version: number;
-}
-
-export interface WorkspaceTool {
-    $schema?: string;
-    [k: string]: any;
-}
-
-export declare class WorkspaceToolNotFoundException extends BaseException {
-    constructor(name: string);
 }
 
 export declare function writeWorkspace(workspace: WorkspaceDefinition, host: WorkspaceHost, path?: string, format?: WorkspaceFormat): Promise<void>;
