@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonParseMode, parseJson } from '@angular-devkit/core';
-import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { ProjectType, WorkspaceProject, WorkspaceSchema } from './workspace-models';
+import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { WorkspaceSchema } from './workspace-models';
 
 // The interfaces below are generated from the Angular CLI configuration schema
 // https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/lib/config/schema.json
@@ -475,57 +475,4 @@ export function getWorkspace(host: Tree): WorkspaceSchema {
   const content = configBuffer.toString();
 
   return parseJson(content, JsonParseMode.Loose) as {} as WorkspaceSchema;
-}
-
-export function addProjectToWorkspace<TProjectType extends ProjectType = ProjectType.Application>(
-  workspace: WorkspaceSchema,
-  name: string,
-  project: WorkspaceProject<TProjectType>,
-): Rule {
-  return () => {
-    if (workspace.projects[name]) {
-      throw new Error(`Project '${name}' already exists in workspace.`);
-    }
-
-    // Add project to workspace.
-    workspace.projects[name] = project;
-
-    if (!workspace.defaultProject && Object.keys(workspace.projects).length === 1) {
-      // Make the new project the default one.
-      workspace.defaultProject = name;
-    }
-
-    return updateWorkspace(workspace);
-  };
-}
-
-export function updateWorkspace(workspace: WorkspaceSchema): Rule {
-    return (host: Tree) => {
-        host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
-    };
-}
-
-export const configPath = '/.angular-cli.json';
-
-export function getConfig(host: Tree): CliConfig {
-  const configBuffer = host.read(configPath);
-  if (configBuffer === null) {
-    throw new SchematicsException('Could not find .angular-cli.json');
-  }
-
-  const config = parseJson(configBuffer.toString(), JsonParseMode.Loose) as {} as CliConfig;
-
-  return config;
-}
-
-export function getAppFromConfig(config: CliConfig, appIndexOrName: string): AppConfig | null {
-  if (!config.apps) {
-    return null;
-  }
-
-  if (parseInt(appIndexOrName) >= 0) {
-    return config.apps[parseInt(appIndexOrName)];
-  }
-
-  return config.apps.filter((app) => app.name === appIndexOrName)[0];
 }
