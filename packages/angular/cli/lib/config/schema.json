@@ -725,7 +725,7 @@
               ]
             },
             "fileReplacements": {
-              "description": "Replace files with other files in the build.",
+              "description": "Replace compilation source files with other compilation source files in the build.",
               "type": "array",
               "items": {
                 "$ref": "#/definitions/targetOptions/definitions/browser/definitions/fileReplacement"
@@ -1511,7 +1511,7 @@
               "default": []
             },
             "fileReplacements": {
-              "description": "Replace files with other files in the build.",
+              "description": "Replace compilation source files with other compilation source files in the build.",
               "type": "array",
               "items": {
                 "oneOf": [
@@ -1752,7 +1752,7 @@
               ]
             },
             "fileReplacements": {
-              "description": "Replace files with other files in the build.",
+              "description": "Replace compilation source files with other compilation source files in the build.",
               "type": "array",
               "items": {
                 "$ref": "#/definitions/targetOptions/definitions/server/definitions/fileReplacement"
