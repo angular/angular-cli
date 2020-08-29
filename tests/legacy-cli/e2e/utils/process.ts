@@ -209,6 +209,10 @@ export function silentNpm(...args: string[]) {
   return _exec({silent: true}, 'npm', args);
 }
 
+export function silentYarn(...args: string[]) {
+  return _exec({silent: true}, 'yarn', args);
+}
+
 export function npm(...args: string[]) {
   return _exec({}, 'npm', args);
 }

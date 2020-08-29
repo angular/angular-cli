@@ -39,7 +39,7 @@
     "npm-pick-manifest": "6.1.0",
     "open": "7.2.1",
     "pacote": "9.5.12",
-    "read-package-tree": "5.3.1",
+    "resolve": "1.17.0",
     "rimraf": "3.0.2",
     "semver": "7.3.2",
     "symbol-observable": "2.0.0",
@@ -50,7 +50,7 @@
     "migrations": "@schematics/angular/migrations/migration-collection.json",
     "packageGroup": {
       "@angular/cli": "0.0.0",
-      "@angular-devkit/build-angular":  "0.0.0",
+      "@angular-devkit/build-angular": "0.0.0",
       "@angular-devkit/build-ng-packagr": "0.0.0",
       "@angular-devkit/build-webpack": "0.0.0",
       "@angular-devkit/core": "0.0.0",

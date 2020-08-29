@@ -1,11 +1,10 @@
-import {join} from 'path';
+import { join } from 'path';
 import * as glob from 'glob';
-import {getGlobalVariable} from './env';
-import {relative} from 'path';
-import {copyFile, writeFile} from './fs';
-import {useBuiltPackages} from './project';
-import { git, silentNpm } from './process';
-
+import { getGlobalVariable } from './env';
+import { relative } from 'path';
+import { copyFile, writeFile } from './fs';
+import { useBuiltPackages } from './project';
+import { silentNpm } from './process';
 
 export function assetDir(assetName: string) {
   return join(__dirname, '../assets', assetName);
@@ -38,13 +37,21 @@ export function copyAssets(assetName: string) {
     .then(() => tempRoot);
 }
 
-
-export async function createProjectFromAsset(assetName: string, useNpmPackages = false) {
+export async function createProjectFromAsset(
+  assetName: string,
+  useNpmPackages = false,
+  skipInstall = false,
+) {
   const dir = await copyAssets(assetName);
   process.chdir(dir);
   if (!useNpmPackages) {
     await useBuiltPackages();
     await writeFile('.npmrc', 'registry = http://localhost:4873', 'utf8');
   }
-  await silentNpm('install');
+
+  if (!skipInstall) {
+    await silentNpm('install');
+  }
+
+  return dir;
 }

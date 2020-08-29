@@ -27,7 +27,12 @@ import {
   fetchPackageManifest,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
-import { PackageTreeNode, findNodeDependencies, readPackageTree } from '../utilities/package-tree';
+import {
+  PackageTreeNode,
+  findPackageJson,
+  getProjectDependencies,
+  readPackageJson,
+} from '../utilities/package-tree';
 import { Schema as UpdateCommandSchema } from './update';
 
 const npa = require('npm-package-arg') as (selector: string) => PackageIdentifier;
@@ -377,15 +382,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
     this.logger.info('Collecting installed dependencies...');
 
-    const packageTree = await readPackageTree(this.workspace.root);
-    const rootDependencies = findNodeDependencies(packageTree);
+    const rootDependencies = await getProjectDependencies(this.workspace.root);
 
-    this.logger.info(`Found ${Object.keys(rootDependencies).length} dependencies.`);
+    this.logger.info(`Found ${rootDependencies.size} dependencies.`);
 
     if (options.all) {
       // 'all' option and a zero length packages have already been checked.
       // Add all direct dependencies to be updated
-      for (const dep of Object.keys(rootDependencies)) {
+      for (const dep of rootDependencies.keys()) {
         const packageIdentifier = npa(dep);
         if (options.next) {
           packageIdentifier.fetchSpec = 'next';
@@ -400,7 +404,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         next: options.next || false,
         verbose: options.verbose || false,
         packageManager: this.packageManager,
-        packages: options.all ? Object.keys(rootDependencies) : [],
+        packages: options.all ? rootDependencies.keys() : [],
       });
 
       return success ? 0 : 1;
@@ -424,8 +428,9 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
 
       const packageName = packages[0].name;
-      const packageDependency = rootDependencies[packageName];
-      let packageNode = packageDependency && packageDependency.node;
+      const packageDependency = rootDependencies.get(packageName);
+      let packagePath = packageDependency?.path;
+      let packageNode = packageDependency?.package;
       if (packageDependency && !packageNode) {
         this.logger.error('Package found in package.json but is not installed.');
 
@@ -434,20 +439,21 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         // Allow running migrations on transitively installed dependencies
         // There can technically be nested multiple versions
         // TODO: If multiple, this should find all versions and ask which one to use
-        const child = packageTree.children.find(c => c.name === packageName);
-        if (child) {
-          packageNode = child;
+        const packageJson = findPackageJson(this.workspace.root, packageName);
+        if (packageJson) {
+          packagePath = path.dirname(packageJson);
+          packageNode = await readPackageJson(packagePath);
         }
       }
 
-      if (!packageNode) {
+      if (!packageNode || !packagePath) {
         this.logger.error('Package is not installed.');
 
         return 1;
       }
 
-      const updateMetadata = packageNode.package['ng-update'];
-      let migrations = updateMetadata && updateMetadata.migrations;
+      const updateMetadata = packageNode['ng-update'];
+      let migrations = updateMetadata?.migrations;
       if (migrations === undefined) {
         this.logger.error('Package does not provide migrations.');
 
@@ -477,14 +483,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
 
       // Check if it is a package-local location
-      const localMigrations = path.join(packageNode.path, migrations);
+      const localMigrations = path.join(packagePath, migrations);
       if (fs.existsSync(localMigrations)) {
         migrations = localMigrations;
       } else {
         // Try to resolve from package location.
         // This avoids issues with package hoisting.
         try {
-          migrations = require.resolve(migrations, { paths: [packageNode.path] });
+          migrations = require.resolve(migrations, { paths: [packagePath] });
         } catch (e) {
           if (e.code === 'MODULE_NOT_FOUND') {
             this.logger.error('Migrations for package were not found.');
@@ -513,7 +519,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         }
 
         const migrationRange = new semver.Range(
-          '>' + from + ' <=' + (options.to || packageNode.package.version),
+          '>' + from + ' <=' + (options.to || packageNode.version),
         );
 
         success = await this.executeMigrations(
@@ -529,7 +535,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           packageName === '@angular/core'
           && options.from
           && +options.from.split('.')[0] < 9
-          && (options.to || packageNode.package.version).split('.')[0] === '9'
+          && (options.to || packageNode.version).split('.')[0] === '9'
         ) {
           this.logger.info(NG_VERSION_9_POST_MSG);
         }
@@ -547,8 +553,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
     // Validate packages actually are part of the workspace
     for (const pkg of packages) {
-      const node = rootDependencies[pkg.name] && rootDependencies[pkg.name].node;
-      if (!node) {
+      const node = rootDependencies.get(pkg.name);
+      if (!node?.package) {
         this.logger.error(`Package '${pkg.name}' is not a dependency.`);
 
         return 1;
@@ -627,7 +633,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         return 1;
       }
 
-      if (manifest.version === node.package.version) {
+      if (manifest.version === node.package?.version) {
         this.logger.info(`Package '${packageName}' is already up to date.`);
         continue;
       }
