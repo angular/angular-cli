@@ -5,18 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
-import { Rule, Tree, chain } from '@angular-devkit/schematics';
+import { Rule, chain } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {
   NodeDependencyType,
   addPackageJsonDependency,
   getPackageJsonDependency,
 } from '../../utility/dependencies';
-import {
-  findPropertyInAstObject,
-  insertPropertyInAstObjectInOrder,
-} from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
 import { latestVersions } from '../../utility/latest-versions';
 
 export function typeScriptHelpersRule(): Rule {
@@ -42,38 +38,27 @@ export function typeScriptHelpersRule(): Rule {
 }
 
 function _updateTsConfig(): Rule {
-  return (host: Tree) => {
+  return (host) => {
     const tsConfigPath = '/tsconfig.json';
-    const buffer = host.read(tsConfigPath);
-    if (!buffer) {
-      return host;
+
+    let tsConfigJson;
+    try {
+      tsConfigJson = new JSONFile(host, tsConfigPath);
+    } catch {
+      return;
     }
 
-    const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-    if (tsCfgAst.kind !== 'object') {
-      return host;
+    const compilerOptions = tsConfigJson.get(['compilerOptions']);
+    if (!compilerOptions || typeof compilerOptions !== 'object') {
+      return;
     }
 
-    const compilerOptions = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-    if (!compilerOptions || compilerOptions.kind !== 'object') {
-      return host;
+    const importHelpersPath = ['compilerOptions', 'importHelpers'];
+    const importHelpers = tsConfigJson.get(importHelpersPath);
+    if (importHelpers === true) {
+      return;
     }
 
-    const importHelpers = findPropertyInAstObject(compilerOptions, 'importHelpers');
-    if (importHelpers && importHelpers.value === true) {
-      return host;
-    }
-
-    const recorder = host.beginUpdate(tsConfigPath);
-    if (importHelpers) {
-      const { start, end } = importHelpers;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, 'true');
-    } else {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'importHelpers', true, 4);
-    }
-    host.commitUpdate(recorder);
-
-    return host;
+    tsConfigJson.modify(importHelpersPath, true);
   };
 }
