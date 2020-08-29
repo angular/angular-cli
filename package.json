@@ -175,7 +175,7 @@
     "ng-packagr": "~10.1.0",
     "node-fetch": "^2.2.0",
     "npm-registry-client": "8.6.0",
-    "open": "7.2.0",
+    "open": "7.2.1",
     "ora": "^5.0.0",
     "pacote": "11.1.4",
     "parse5": "6.0.1",
