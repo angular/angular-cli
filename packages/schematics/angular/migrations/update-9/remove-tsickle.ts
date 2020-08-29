@@ -7,9 +7,10 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { removePackageJsonDependency } from '../../utility/dependencies';
-import { findPropertyInAstObject, removePropertyInAstObject } from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
+import { findPropertyInAstObject } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
+import { getAllOptions, getTargets, getWorkspace } from './utils';
 
 /**
  * Remove tsickle from libraries
@@ -28,23 +29,17 @@ export function removeTsickle(): Rule {
         }
 
         const tsConfigPath = tsConfigOption.value;
-        const tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
-        if (!tsConfigAst) {
+        let tsConfigJson;
+        try {
+          tsConfigJson = new JSONFile(tree, tsConfigPath);
+        } catch {
           logger.warn(`Cannot find file: ${tsConfigPath}`);
 
           continue;
         }
 
-        const ngCompilerOptions = findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
-        if (ngCompilerOptions && ngCompilerOptions.kind === 'object') {
-          // remove annotateForClosureCompiler option
-          const recorder = tree.beginUpdate(tsConfigPath);
-          removePropertyInAstObject(recorder, ngCompilerOptions, 'annotateForClosureCompiler');
-          tree.commitUpdate(recorder);
-        }
+        tsConfigJson.remove(['angularCompilerOptions', 'annotateForClosureCompiler']);
       }
     }
-
-    return tree;
   };
 }
