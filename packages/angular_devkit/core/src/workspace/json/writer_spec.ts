@@ -592,4 +592,35 @@ describe('writeJsonWorkpaceFile', () => {
 
     await writeJsonWorkspace(workspace, host, 'ObjectReplace3');
   });
+
+  it('removes a property when property value is set to undefined', async () => {
+    const host = createTestCaseHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    workspace.extensions['x-baz'] = undefined;
+
+    await writeJsonWorkspace(workspace, host, 'ObjectRemove');
+  });
+
+  it('removes a property when using delete operator', async () => {
+    const host = createTestCaseHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    delete workspace.extensions['x-baz'];
+
+    await writeJsonWorkspace(workspace, host, 'ObjectRemove');
+  });
+
+  it('removes multiple properties when using delete operator', async () => {
+    const host = createTestCaseHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    delete workspace.extensions['x-baz'];
+    delete workspace.extensions.schematics;
+
+    await writeJsonWorkspace(workspace, host, 'ObjectRemoveMultiple');
+  });
 });
