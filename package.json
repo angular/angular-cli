@@ -115,6 +115,7 @@
     "@types/pidusage": "^2.0.1",
     "@types/progress": "^2.0.3",
     "@types/request": "^2.47.1",
+    "@types/resolve": "^1.17.1",
     "@types/rimraf": "^3.0.0",
     "@types/semver": "^7.0.0",
     "@types/universal-analytics": "^0.4.2",

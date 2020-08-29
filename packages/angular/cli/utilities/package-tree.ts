@@ -6,88 +6,94 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-
+import * as fs from 'fs';
+import { dirname, join } from 'path';
+import * as resolve from 'resolve';
+import { promisify } from 'util';
 import { NgAddSaveDepedency } from './package-metadata';
 
-export interface PackageTreeNodeBase {
+const readFile = promisify(fs.readFile);
+
+interface PackageJson {
   name: string;
-  path: string;
-  realpath: string;
-  error?: Error;
-  id: number;
-  isLink: boolean;
-  package: {
-    name: string;
-    version: string;
-    dependencies?: Record<string, string>;
-    devDependencies?: Record<string, string>;
-    peerDependencies?: Record<string, string>;
-    optionalDependencies?: Record<string, string>;
-    'ng-update'?: {
-      migrations?: string;
-    };
-    'ng-add'?: {
-      save?: NgAddSaveDepedency;
-    };
-  };
-  parent?: PackageTreeNode;
-  children: PackageTreeNode[];
-}
-
-export interface PackageTreeActual extends PackageTreeNodeBase {
-  isLink: false;
-}
-
-export interface PackageTreeLink extends PackageTreeNodeBase {
-  isLink: true;
-  target: PackageTreeActual;
-}
-
-export type PackageTreeNode = PackageTreeActual | PackageTreeLink;
-
-export function readPackageTree(path: string): Promise<PackageTreeNode> {
-  const rpt = require('read-package-tree');
-
-  return new Promise((resolve, reject) => {
-    rpt(path, (e: Error | undefined, data: PackageTreeNode) => {
-      if (e) {
-        reject(e);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
-
-export interface NodeDependency {
   version: string;
-  node?: PackageTreeNode;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+  'ng-update'?: {
+    migrations?: string;
+  };
+  'ng-add'?: {
+    save?: NgAddSaveDepedency;
+  };
 }
 
-export function findNodeDependencies(node: PackageTreeNode) {
-  const rawDeps: Record<string, string> = {
-    ...node.package.dependencies,
-    ...node.package.devDependencies,
-    ...node.package.peerDependencies,
-    ...node.package.optionalDependencies,
-  };
+async function readJSON(file: string) {
+  const buffer = await readFile(file);
 
-  return Object.entries(rawDeps).reduce(
-    (deps, [name, version]) => {
-      let dependencyNode;
-      let parent: PackageTreeNode | undefined | null = node;
-      while (!dependencyNode && parent) {
-        dependencyNode = parent.children.find(child => child.name === name);
-        parent = parent.parent;
+  return JSON.parse(buffer.toString());
+}
+
+function getAllDependencies(pkg: PackageJson) {
+  return new Set([
+    ...Object.entries(pkg.dependencies || []),
+    ...Object.entries(pkg.devDependencies || []),
+    ...Object.entries(pkg.peerDependencies || []),
+    ...Object.entries(pkg.optionalDependencies || []),
+  ]);
+}
+
+export interface PackageTreeNode {
+  name: string;
+  version: string;
+  path: string;
+  package: PackageJson | undefined;
+}
+
+export async function readPackageJson(packageJsonPath: string): Promise<PackageJson | undefined> {
+  try {
+    return await readJSON(packageJsonPath);
+  } catch (err) {
+    return undefined;
+  }
+}
+
+export function findPackageJson(workspaceDir: string, packageName: string) {
+  try {
+    // avoid require.resolve here, see: https://github.com/angular/angular-cli/pull/18610#issuecomment-681980185
+    const packageJsonPath = resolve.sync(`${packageName}/package.json`, { paths: [workspaceDir] });
+
+    return packageJsonPath;
+  } catch (err) {
+    return undefined;
+  }
+}
+
+export async function getProjectDependencies(dir: string) {
+  const pkgJsonPath = resolve.sync(join(dir, `package.json`));
+  if (!pkgJsonPath) {
+    throw new Error('Could not find package.json');
+  }
+
+  const pkg: PackageJson = await readJSON(pkgJsonPath);
+
+  const results = new Map<string, PackageTreeNode>();
+  await Promise.all(
+    Array.from(getAllDependencies(pkg)).map(async ([name, version]) => {
+      const packageJsonPath = findPackageJson(dir, name);
+      if (packageJsonPath) {
+        const currentDependency = {
+          name,
+          version,
+          path: dirname(packageJsonPath),
+          package: await readPackageJson(packageJsonPath),
+        };
+
+        results.set(currentDependency.name, currentDependency);
       }
-
-      deps[name] = {
-        node: dependencyNode,
-        version,
-      };
-
-      return deps;
-    },
-    Object.create(null) as Record<string, NodeDependency>,
+    }),
   );
+
+  return results;
 }

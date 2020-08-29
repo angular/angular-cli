@@ -72,6 +72,7 @@ ts_library(
         "@npm//@types/debug",
         "@npm//@types/inquirer",
         "@npm//@types/node",
+        "@npm//@types/resolve",
         "@npm//@types/rimraf",
         "@npm//@types/semver",
         "@npm//@types/universal-analytics",
