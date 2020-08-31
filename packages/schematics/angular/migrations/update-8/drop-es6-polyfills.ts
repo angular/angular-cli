@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, isJsonObject, parseJson } from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
@@ -19,6 +18,7 @@ import {
 } from '@angular-devkit/schematics';
 import { createHash } from 'crypto';
 import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { getWorkspace } from '../../utility/workspace';
 
 const toDrop: {[importName: string]: true} = {
   'core-js/es6/symbol': true,
@@ -146,42 +146,26 @@ function dropES2015PolyfillsFromFile(polyfillPath: string): Rule {
  * Drop ES2015 polyfills from all application projects
  */
 export function dropES2015Polyfills(): Rule {
-  return (tree) => {
-    // Simple. Take the ast of polyfills (if it exists) and find the import metadata. Remove it.
-    const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
-    const rules: Rule[] = [];
-
-    if (!angularConfigContent) {
-      // Is this even an angular project?
+  return async (tree) => {
+    let workspace;
+    try {
+      workspace = await getWorkspace(tree);
+    } catch {
       return;
     }
 
-    const angularJson = parseJson(angularConfigContent.toString(), JsonParseMode.Loose);
-
-    if (!isJsonObject(angularJson) || !isJsonObject(angularJson.projects)) {
-      // If that field isn't there, no use...
-      return;
-    }
-
-    // For all projects
-    for (const projectName of Object.keys(angularJson.projects)) {
-      const project = angularJson.projects[projectName];
-      if (!isJsonObject(project)) {
-        continue;
-      }
-      if (project.projectType !== 'application') {
+    const rules = [];
+    for (const [, project] of workspace.projects) {
+      if (project.extensions.projectType !== 'application') {
         continue;
       }
 
-      const architect = project.architect;
-      if (!isJsonObject(architect)
-        || !isJsonObject(architect.build)
-        || !isJsonObject(architect.build.options)
-        || typeof architect.build.options.polyfills !== 'string') {
-        continue;
-      }
+      const buildTarget = project.targets.get('build');
+      const polyfills = buildTarget?.options?.polyfills;
 
-      rules.push(dropES2015PolyfillsFromFile(architect.build.options.polyfills));
+      if (polyfills && typeof polyfills === 'string') {
+        rules.push(dropES2015PolyfillsFromFile(polyfills));
+      }
     }
 
     return chain(rules);
