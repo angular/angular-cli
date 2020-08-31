@@ -5,15 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  JsonParseMode,
-  isJsonObject,
-  join,
-  normalize,
-  parseJson,
-} from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { JSONFile } from '../../utility/json-file';
+import { getWorkspace } from '../../utility/workspace';
+import { Builders } from '../../utility/workspace-models';
 
 const browserslistContent = `# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
 # For additional information regarding the format and rule options, please see:
@@ -29,62 +25,51 @@ not dead
 not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 
 export function updateES5Projects(): Rule {
-  return (tree: Tree) => {
+  return async (tree) => {
     // update workspace tsconfig
     updateTsConfig(tree, '/tsconfig.json');
 
-    const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
-
-    if (!angularConfigContent) {
+    let workspace;
+    try {
+      workspace = await getWorkspace(tree);
+    } catch {
       return;
     }
 
-    const angularJson = parseJson(angularConfigContent.toString(), JsonParseMode.Loose);
-
-    if (!isJsonObject(angularJson) || !isJsonObject(angularJson.projects)) {
-      // If that field isn't there, no use...
-      return;
-    }
-
-    // For all projects
-    for (const [name, project] of Object.entries(angularJson.projects)) {
-      if (!isJsonObject(project)) {
+    for (const [projectName, project] of workspace.projects) {
+      if (typeof project.root !== 'string') {
         continue;
       }
-      if (typeof project.root != 'string' || project.projectType !== 'application') {
-        continue;
-      }
-      if (name.endsWith('-e2e')) {
+
+      if (projectName.endsWith('-e2e')) {
         // Skip existing separate E2E projects
         continue;
       }
 
-      // Older projects app and spec ts configs had script and module set in them.
-      const architect = project.architect;
-      if (!(isJsonObject(architect)
-        && isJsonObject(architect.build)
-        && architect.build.builder === '@angular-devkit/build-angular:browser')
-      ) {
-        // Skip projects who's build builder is not build-angular:browser
+      const buildTarget = project.targets.get('build');
+      if (!buildTarget || buildTarget.builder !== Builders.Browser) {
         continue;
       }
 
-      const buildOptionsConfig = architect.build.options;
-      if (isJsonObject(buildOptionsConfig) && typeof buildOptionsConfig.tsConfig === 'string') {
-        updateTsConfig(tree, buildOptionsConfig.tsConfig);
+      const buildTsConfig = buildTarget?.options?.tsConfig;
+      if (buildTsConfig && typeof buildTsConfig === 'string') {
+        updateTsConfig(tree, buildTsConfig);
       }
 
-      const testConfig = architect.test;
-      if (isJsonObject(testConfig)
-        && isJsonObject(testConfig.options)
-        && typeof testConfig.options.tsConfig === 'string') {
-        updateTsConfig(tree, testConfig.options.tsConfig);
+      const testTarget = project.targets.get('test');
+      if (!testTarget) {
+        continue;
+      }
+
+      const testTsConfig = testTarget?.options?.tsConfig;
+      if (testTsConfig && typeof testTsConfig === 'string') {
+        updateTsConfig(tree, testTsConfig);
       }
 
       const browserslistPath = join(normalize(project.root), 'browserslist');
 
       // Move the CLI 7 style browserlist to root if it's there.
-      const sourceRoot = project.sourceRoot === 'string'
+      const sourceRoot = typeof project.sourceRoot === 'string'
         ? project.sourceRoot
         : join(normalize(project.root), 'src');
       const srcBrowsersList = join(normalize(sourceRoot), 'browserslist');
@@ -95,8 +80,6 @@ export function updateES5Projects(): Rule {
         tree.create(browserslistPath, browserslistContent);
       }
     }
-
-    return tree;
   };
 }
 
