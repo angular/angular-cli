@@ -11,14 +11,9 @@ import {
   join,
   normalize,
   parseJson,
-  parseJsonAst,
 } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-import {
-  findPropertyInAstObject,
-  insertPropertyInAstObjectInOrder,
-  removePropertyInAstObject,
-} from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
 
 const browserslistContent = `# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
 # For additional information regarding the format and rule options, please see:
@@ -106,57 +101,28 @@ export function updateES5Projects(): Rule {
 }
 
 function updateTsConfig(tree: Tree, tsConfigPath: string): void {
-  const buffer = tree.read(tsConfigPath);
-  if (!buffer) {
+  let tsConfigJson;
+  try {
+    tsConfigJson = new JSONFile(tree, tsConfigPath);
+  } catch {
     return;
   }
 
-  const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-
-  if (tsCfgAst.kind !== 'object') {
+  const compilerOptions = tsConfigJson.get(['compilerOptions']);
+  if (!compilerOptions || typeof compilerOptions !== 'object') {
     return;
   }
 
-  const configExtends = findPropertyInAstObject(tsCfgAst, 'extends');
-  const isExtendedConfig = configExtends && configExtends.kind === 'string';
+  const configExtends = tsConfigJson.get(['extends']);
+  const isExtended = configExtends && typeof configExtends === 'string';
 
-  const compilerOptions = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-  if (!compilerOptions || compilerOptions.kind !== 'object') {
-    return;
-  }
-
-  const recorder = tree.beginUpdate(tsConfigPath);
-
-  if (isExtendedConfig) {
-    removePropertyInAstObject(recorder, compilerOptions, 'target');
-    removePropertyInAstObject(recorder, compilerOptions, 'module');
-    removePropertyInAstObject(recorder, compilerOptions, 'downlevelIteration');
+  if (isExtended) {
+    tsConfigJson.remove(['compilerOptions', 'target']);
+    tsConfigJson.remove(['compilerOptions', 'module']);
+    tsConfigJson.remove(['compilerOptions', 'downlevelIteration']);
   } else {
-    const downlevelIteration = findPropertyInAstObject(compilerOptions, 'downlevelIteration');
-    if (!downlevelIteration) {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'downlevelIteration', true, 4);
-    } else if (!downlevelIteration.value) {
-      const { start, end } = downlevelIteration;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, 'true');
-    }
-    const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
-    if (!scriptTarget) {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
-    } else if (scriptTarget.value !== 'es2015') {
-      const { start, end } = scriptTarget;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, '"es2015"');
-    }
-    const scriptModule = findPropertyInAstObject(compilerOptions, 'module');
-    if (!scriptModule) {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
-    } else if (scriptModule.value !== 'esnext') {
-      const { start, end } = scriptModule;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, '"esnext"');
-    }
+    tsConfigJson.modify(['compilerOptions', 'target'], 'es2015');
+    tsConfigJson.modify(['compilerOptions', 'module'], 'esnext');
+    tsConfigJson.modify(['compilerOptions', 'downlevelIteration'], true);
   }
-
-  tree.commitUpdate(recorder);
 }
