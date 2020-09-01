@@ -503,37 +503,43 @@ function _addLiveReload(
 
   // Workaround node shim hoisting issues with live reload client
   // Only needed in dev server mode to support live reload capabilities in all package managers
-  const webpackPath = path.dirname(require.resolve('webpack/package.json'));
-  const nodeLibsBrowserPath = require.resolve('node-libs-browser', { paths: [webpackPath] });
-  const nodeLibsBrowser = require(nodeLibsBrowserPath);
-  webpackConfig.plugins.push(
-    new webpack.NormalModuleReplacementPlugin(
-      /^events|url|querystring$/,
-      (resource: { issuer?: string; request: string }) => {
-        if (!resource.issuer) {
-          return;
-        }
-        if (/[\/\\]hot[\/\\]emitter\.js$/.test(resource.issuer)) {
-          if (resource.request === 'events') {
-            resource.request = nodeLibsBrowser.events;
+  // Not needed in Webpack 5 - node-libs-browser will not be present in webpack 5
+  let nodeLibsBrowserPath;
+  try {
+    const webpackPath = path.dirname(require.resolve('webpack/package.json'));
+    nodeLibsBrowserPath = require.resolve('node-libs-browser', { paths: [webpackPath] });
+  } catch {}
+  if (nodeLibsBrowserPath) {
+    const nodeLibsBrowser = require(nodeLibsBrowserPath);
+    webpackConfig.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^events|url|querystring$/,
+        (resource: { issuer?: string; request: string }) => {
+          if (!resource.issuer) {
+            return;
           }
-        } else if (
-          /[\/\\]webpack-dev-server[\/\\]client[\/\\]utils[\/\\]createSocketUrl\.js$/.test(
-            resource.issuer,
-          )
-        ) {
-          switch (resource.request) {
-            case 'url':
-              resource.request = nodeLibsBrowser.url;
-              break;
-            case 'querystring':
-              resource.request = nodeLibsBrowser.querystring;
-              break;
+          if (/[\/\\]hot[\/\\]emitter\.js$/.test(resource.issuer)) {
+            if (resource.request === 'events') {
+              resource.request = nodeLibsBrowser.events;
+            }
+          } else if (
+            /[\/\\]webpack-dev-server[\/\\]client[\/\\]utils[\/\\]createSocketUrl\.js$/.test(
+              resource.issuer,
+            )
+          ) {
+            switch (resource.request) {
+              case 'url':
+                resource.request = nodeLibsBrowser.url;
+                break;
+              case 'querystring':
+                resource.request = nodeLibsBrowser.querystring;
+                break;
+            }
           }
+        },
+      ),
+    );
   }
-      },
-    ),
-  );
 
   // This allows for live reload of page when changes are made to repo.
   // https://webpack.js.org/configuration/dev-server/#devserver-inline
