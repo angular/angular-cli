@@ -50,9 +50,7 @@ describe('Browser Builder with differential loading', () => {
       'runtime-es5.js.map',
 
       'vendor-es2015.js',
-      'vendor-es2015.js.map',
       'vendor-es5.js',
-      'vendor-es5.js.map',
 
       'styles.css',
       'styles.css.map',
@@ -90,9 +88,7 @@ describe('Browser Builder with differential loading', () => {
       'runtime-es5.js.map',
 
       'vendor-es2016.js',
-      'vendor-es2016.js.map',
       'vendor-es5.js',
-      'vendor-es5.js.map',
 
       'styles.css',
       'styles.css.map',
@@ -130,9 +126,7 @@ describe('Browser Builder with differential loading', () => {
       'runtime-es5.js.map',
 
       'vendor-esnext.js',
-      'vendor-esnext.js.map',
       'vendor-es5.js',
-      'vendor-es5.js.map',
 
       'styles.css',
       'styles.css.map',
@@ -158,7 +152,6 @@ describe('Browser Builder with differential loading', () => {
       'runtime.js.map',
 
       'vendor.js',
-      'vendor.js.map',
 
       'styles.css',
       'styles.css.map',

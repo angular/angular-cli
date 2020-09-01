@@ -48,13 +48,18 @@ export function getTestConfig(
     });
   }
 
-  if (sourceMap.scripts || sourceMap.styles) {
-    extraPlugins.push(getSourceMapDevTool(
-      sourceMap.scripts,
-      sourceMap.styles,
-      false,
-      true,
-    ));
+  if (sourceMap) {
+    const { styles, scripts, vendor } = sourceMap;
+
+    if (styles || scripts) {
+      extraPlugins.push(getSourceMapDevTool(
+        scripts,
+        styles,
+        false,
+        true,
+        vendor,
+      ));
+    }
   }
 
   return {
