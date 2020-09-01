@@ -9,7 +9,7 @@ import { FileDoesNotExistException, Path, getSystemPath, normalize } from '@angu
 import { Stats } from 'fs';
 import { InputFileSystem } from 'webpack';
 import { WebpackCompilerHost } from './compiler_host';
-import { Callback, NodeWatchFileSystemInterface } from './webpack';
+import { NodeWatchFileSystemInterface } from './webpack';
 
 export const NodeWatchFileSystem: NodeWatchFileSystemInterface = require(
   'webpack/lib/node/NodeWatchFileSystem');
@@ -29,7 +29,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     return this._webpackCompilerHost.getNgFactoryPaths();
   }
 
-  stat(path: string, callback: (err: Error, stats: Stats) => void): void {
+  stat(path: string, callback: (err: Error, result: Stats) => void): void {
     const result = this._webpackCompilerHost.stat(path);
     if (result) {
       // tslint:disable-next-line:no-any
@@ -40,8 +40,8 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     }
   }
 
-  readdir(path: string, callback: Callback<string[]>): void {
-    // tslint:disable-next-line:no-any
+  readdir(path: string, callback: (err: Error, result: string[]) => void): void {
+    // tslint:disable-next-line: no-any
     (this._inputFileSystem as any).readdir(path, callback);
   }
 
@@ -55,7 +55,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     }
   }
 
-  readJson(path: string, callback: Callback<{}>): void {
+  readJson(path: string, callback: (err: Error, result: unknown) => void): void {
     // tslint:disable-next-line:no-any
     (this._inputFileSystem as any).readJson(path, callback);
   }
@@ -112,17 +112,17 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
     super(_virtualInputFileSystem);
   }
 
-  watch(
-    files: string[],
-    dirs: string[],
-    missing: string[],
-    startTime: number | undefined,
+  watch = (
+    files: Iterable<string>,
+    dirs: Iterable<string>,
+    missing: Iterable<string>,
+    startTime: number,
     options: {},
-    callback: any,  // tslint:disable-line:no-any
+    callback: Parameters<NodeWatchFileSystemInterface['watch']>[5],
     callbackUndelayed: (filename: string, timestamp: number) => void,
-  ) {
+  ): ReturnType<NodeWatchFileSystemInterface['watch']> => {
     const reverseReplacements = new Map<string, string>();
-    const reverseTimestamps = (map: Map<string, number>) => {
+    const reverseTimestamps = <T>(map: Map<string, T>) => {
       for (const entry of Array.from(map.entries())) {
         const original = reverseReplacements.get(entry[0]);
         if (original) {
@@ -144,7 +144,7 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
       }
     };
 
-    const newCallback = (
+    const newCallback: Parameters<NodeWatchFileSystemInterface['watch']>[5] = (
       err: Error | null,
       filesModified: string[],
       contextModified: string[],
@@ -169,13 +169,13 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
       );
     };
 
-    const mapReplacements = (original: string[]): string[] => {
+    const mapReplacements = (original: Iterable<string>): Iterable<string> => {
       if (!this._replacements) {
         return original;
       }
       const replacements = this._replacements;
 
-      return original.map(file => {
+      return [...original].map(file => {
         if (typeof replacements === 'function') {
           const replacement = getSystemPath(replacements(normalize(file)));
           if (replacement !== file) {

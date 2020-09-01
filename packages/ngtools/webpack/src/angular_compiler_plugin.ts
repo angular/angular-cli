@@ -76,7 +76,6 @@ import {
   VirtualWatchFileSystemDecorator,
 } from './virtual_file_system_decorator';
 import {
-  Callback,
   NodeWatchFileSystemInterface,
   NormalModuleFactoryRequest,
 } from './webpack';
@@ -869,7 +868,7 @@ export class AngularCompilerPlugin {
           // tslint:disable-next-line:no-any
           result.dependencies.forEach((d: any) => d.critical = false);
           // tslint:disable-next-line:no-any
-          result.resolveDependencies = (_fs: any, options: any, callback: Callback) => {
+          result.resolveDependencies = (_fs: any, options: any, callback: any) => {
             const dependencies = Object.keys(this._lazyRoutes)
               .map((key) => {
                 const modulePath = this._lazyRoutes[key];
