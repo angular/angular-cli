@@ -158,7 +158,7 @@
     "jest-worker": "26.3.0",
     "jquery": "^3.3.1",
     "jsonc-parser": "2.3.0",
-    "karma": "~5.1.0",
+    "karma": "~5.2.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.0",
     "karma-jasmine": "~4.0.0",
