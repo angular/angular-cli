@@ -9,11 +9,6 @@ import { InputFileSystem } from 'webpack';
 
 // Declarations for (some) Webpack types. Only what's needed.
 
-// tslint:disable-next-line:no-any
-export interface Callback<T = any> {
-  (err?: Error | null, result?: T): void;
-}
-
 export interface NormalModuleFactoryRequest {
   request: string;
   context: { issuer: string };
