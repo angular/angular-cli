@@ -884,7 +884,7 @@ function findLocalizePositions(
 let localizeOld: boolean | undefined;
 
 function unwrapTemplateLiteral(
-  path: NodePath<types.TemplateLiteral>,
+  path: NodePath<types.TaggedTemplateExpression>,
   utils: LocalizeUtilities,
 ): [TemplateStringsArray, types.Expression[]] {
   if (localizeOld === undefined) {
