@@ -25,7 +25,7 @@
     "cacache": "15.0.5",
     "caniuse-lite": "^1.0.30001032",
     "circular-dependency-plugin": "5.2.0",
-    "copy-webpack-plugin": "6.0.4",
+    "copy-webpack-plugin": "6.1.0",
     "core-js": "3.6.4",
     "css-loader": "4.2.2",
     "cssnano": "4.1.10",

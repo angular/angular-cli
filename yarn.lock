@@ -3735,10 +3735,10 @@ copy-descriptor@^0.1.0:
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
 
-copy-webpack-plugin@6.0.4:
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/copy-webpack-plugin/-/copy-webpack-plugin-6.0.4.tgz#7b7d7f7f290aa21b3411d02525859b89988a200b"
-  integrity sha512-zCazfdYAh3q/O4VzZFiadWGpDA2zTs6FC6D7YTHD6H1J40pzo0H4z22h1NYMCl4ArQP4CK8y/KWqPrJ4rVkZ5A==
+copy-webpack-plugin@6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/copy-webpack-plugin/-/copy-webpack-plugin-6.1.0.tgz#5bde7f826d87e716d8d5e761ddd34bb675448458"
+  integrity sha512-aWjIuLt1OVQxaDVffnt3bnGmLA8zGgAJaFwPA+a+QYVPh1vhIKjVfh3SbOFLV0kRPvGBITbw17n5CsmiBS4LQQ==
   dependencies:
     cacache "^15.0.5"
     fast-glob "^3.2.4"
@@ -3748,7 +3748,7 @@ copy-webpack-plugin@6.0.4:
     loader-utils "^2.0.0"
     normalize-path "^3.0.0"
     p-limit "^3.0.2"
-    schema-utils "^2.7.0"
+    schema-utils "^2.7.1"
     serialize-javascript "^4.0.0"
     webpack-sources "^1.4.3"
 
@@ -10489,7 +10489,7 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
-schema-utils@^2.5.0, schema-utils@^2.6.4, schema-utils@^2.6.5, schema-utils@^2.6.6, schema-utils@^2.7.0:
+schema-utils@^2.5.0, schema-utils@^2.6.4, schema-utils@^2.6.5, schema-utils@^2.6.6, schema-utils@^2.7.0, schema-utils@^2.7.1:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-2.7.1.tgz#1ca4f32d1b24c590c203b8e7a50bf0ea4cd394d7"
   integrity sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==
