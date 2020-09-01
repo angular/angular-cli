@@ -22,9 +22,9 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
   } = wco.buildOptions;
 
   const extraPlugins = [];
-  const { scripts, styles, hidden } = sourceMap;
+  const { scripts, styles, hidden, vendor } = sourceMap;
   if (scripts || styles) {
-    extraPlugins.push(getSourceMapDevTool(scripts, styles, hidden));
+    extraPlugins.push(getSourceMapDevTool(scripts, styles, hidden, false, vendor));
   }
 
   const externals: Configuration['externals'] = [...externalDependencies];

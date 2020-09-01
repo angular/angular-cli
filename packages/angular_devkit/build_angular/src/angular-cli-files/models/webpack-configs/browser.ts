@@ -27,6 +27,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     styles: stylesSourceMap,
     scripts: scriptsSourceMap,
     hidden: hiddenSourceMap,
+    vendor: vendorSourceMap,
   } = buildOptions.sourceMap;
 
   if (subresourceIntegrity) {
@@ -53,6 +54,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
       scriptsSourceMap,
       stylesSourceMap,
       wco.differentialLoadingMode ? true : hiddenSourceMap,
+      false,
+      vendorSourceMap,
     ));
   }
 
