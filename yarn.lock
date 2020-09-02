@@ -11506,10 +11506,10 @@ svgo@^1.0.0:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
-symbol-observable@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
-  integrity sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==
+symbol-observable@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-2.0.0.tgz#08d9e7d0f4298bf25c917907aeea39fa131065ec"
+  integrity sha512-E56rCtH6Of77kyoXEv+lwHqRNGLoEsxoEuvyAZflOUkg9BJ2y/qXfdhEBqAtUngCSZZyDkuGaF4FsmO5paGaqA==
 
 symbol-tree@^3.2.2:
   version "3.2.4"
