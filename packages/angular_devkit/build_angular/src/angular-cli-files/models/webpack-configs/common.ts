@@ -24,6 +24,7 @@ import {
   compilation,
   debug,
 } from 'webpack';
+import webpack = require('webpack');
 import { RawSource } from 'webpack-sources';
 import { AssetPatternClass } from '../../../browser/schema';
 import { BuildBrowserFeatures, maxWorkers } from '../../../utils';
@@ -471,13 +472,16 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     devtool: false,
     profile: buildOptions.statsJson,
     resolve: {
+      roots: [projectRoot],
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
       plugins: [
         PnpWebpackPlugin,
       ],
-    },
+      // Cast since roots is currently not in typings
+      // See: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/47233
+    } as webpack.Resolve,
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
       modules: [
