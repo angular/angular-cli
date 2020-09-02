@@ -4,13 +4,6 @@ export declare function isDirectory(filePath: string): boolean;
 
 export declare function isFile(filePath: string): boolean;
 
-export declare class ModuleNotFoundException extends BaseException {
-    readonly basePath: string;
-    readonly code: string;
-    readonly moduleName: string;
-    constructor(moduleName: string, basePath: string);
-}
-
 export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
@@ -46,16 +39,4 @@ export declare class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonVal
 
 export interface ProcessOutput {
     write(buffer: string | Buffer): boolean;
-}
-
-export declare function resolve(packageName: string, options: ResolveOptions): string;
-
-export interface ResolveOptions {
-    basedir: string;
-    checkGlobal?: boolean;
-    checkLocal?: boolean;
-    extensions?: string[];
-    paths?: string[];
-    preserveSymlinks?: boolean;
-    resolvePackageJson?: boolean;
 }
