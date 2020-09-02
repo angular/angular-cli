@@ -92,7 +92,7 @@ function visitBlockStatements(
         const name = variableDeclaration.name.text;
 
         if (!initializer) {
-          const iife = findTs2_3EnumIife(name, statements[oIndex + 1]);
+          const iife = findEnumIife(name, statements[oIndex + 1]);
           if (iife) {
             // update IIFE and replace variable statement and old IIFE
             oldStatementsLength = 2;
@@ -104,30 +104,6 @@ function visitBlockStatements(
             // skip IIFE statement
             oIndex++;
           }
-        } else if (ts.isObjectLiteralExpression(initializer)) {
-          // tsickle es2015 enums first statement is an export declaration
-          const isPotentialEnumExport = ts.isExportDeclaration(statements[oIndex + 1]);
-          if (isPotentialEnumExport) {
-            // skip the export
-            oIndex++;
-          }
-
-          const enumStatements = findStatements(name, statements, oIndex, 1);
-          if (!enumStatements) {
-            continue;
-          }
-
-          // create wrapper and replace variable statement and enum member statements
-          oldStatementsLength = enumStatements.length + (isPotentialEnumExport ? 2 : 1);
-          newStatement = createWrappedEnum(
-            name,
-            currentStatement,
-            enumStatements,
-            initializer,
-            isPotentialEnumExport,
-          );
-          // skip enum member declarations
-          oIndex += enumStatements.length;
         } else if (
           ts.isClassExpression(initializer)
           || (
@@ -191,7 +167,7 @@ function visitBlockStatements(
 }
 
 // TS 2.3 enums have statements that are inside a IIFE.
-function findTs2_3EnumIife(
+function findEnumIife(
   name: string,
   statement: ts.Statement,
 ): [ts.CallExpression, ts.Expression | undefined] | null {

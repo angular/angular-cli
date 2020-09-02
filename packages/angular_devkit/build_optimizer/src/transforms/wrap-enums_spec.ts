@@ -448,28 +448,6 @@ describe('wrap enums and classes transformer', () => {
   });
 
   describe('wrap enums', () => {
-    it('wraps ts 2.2 enums in IIFE', () => {
-      const input = tags.stripIndent`
-        export var ChangeDetectionStrategy = {};
-        ChangeDetectionStrategy.OnPush = 0;
-        ChangeDetectionStrategy.Default = 1;
-        ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = "OnPush";
-        ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";
-      `;
-      const output = tags.stripIndent`
-        export var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
-          var ChangeDetectionStrategy = {};
-          ChangeDetectionStrategy.OnPush = 0;
-          ChangeDetectionStrategy.Default = 1;
-          ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = "OnPush";
-          ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";
-          return ChangeDetectionStrategy;
-        }());
-      `;
-
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
-
     it('should not wrap enum like object literal declarations', () => {
       const input = tags.stripIndent`
         const RendererStyleFlags3 = {
@@ -486,63 +464,6 @@ describe('wrap enums and classes transformer', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('wraps ES2015 tsickle enums in IIFE', () => {
-      const input = tags.stripIndent`
-        const ChangeDetectionStrategy = {
-            OnPush: 0,
-            Default: 1,
-        };
-        export { ChangeDetectionStrategy };
-        ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = 'OnPush';
-        ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = 'Default';
-      `;
-
-      const output = tags.stripIndent`
-        export const ChangeDetectionStrategy = /*@__PURE__*/ (function () {
-            var ChangeDetectionStrategy = { OnPush: 0, Default: 1, };
-
-            ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = 'OnPush';
-            ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = 'Default';
-            return ChangeDetectionStrategy;
-        }());
-      `;
-
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
-
-    it('wraps only ES2015 tsickle enums in IIFE', () => {
-      const input = tags.stripIndent`
-        const RendererStyleFlags3 = {
-            Important: 1,
-            DashCase: 2,
-        };
-        export { RendererStyleFlags3 };
-        RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
-        RendererStyleFlags3[RendererStyleFlags3.DashCase] = 'DashCase';
-
-        export const domRendererFactory3 = {
-            createRenderer: (hostElement, rendererType) => { return document; }
-        };
-
-        export const unusedValueExportToPlacateAjd = 1;
-      `;
-      const output = tags.stripIndent`
-        export const RendererStyleFlags3 = /*@__PURE__*/ (function () {
-          var RendererStyleFlags3 = { Important: 1, DashCase: 2, };
-          RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
-          RendererStyleFlags3[RendererStyleFlags3.DashCase] = 'DashCase';
-          return RendererStyleFlags3;
-        }());
-
-        export const domRendererFactory3 = {
-          createRenderer: (hostElement, rendererType) => { return document; }
-        };
-
-        export const unusedValueExportToPlacateAjd = 1;
-      `;
-
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
 
     it('wraps ts >2.3 enums in IIFE', () => {
       const input = tags.stripIndent`
@@ -657,39 +578,6 @@ describe('wrap enums and classes transformer', () => {
             NotificationKind["COMPLETE"] = "C";
             return NotificationKind;
         })({});
-      `;
-
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
-
-    it('wraps tsickle enums in IIFE', () => {
-      const input = tags.stripIndent`
-        /** @enum {number} */
-        var FormatWidth = {
-          Short: 0,
-          Medium: 1,
-          Long: 2,
-          Full: 3,
-        };
-        FormatWidth[FormatWidth.Short] = "Short";
-        FormatWidth[FormatWidth.Medium] = "Medium";
-        FormatWidth[FormatWidth.Long] = "Long";
-        FormatWidth[FormatWidth.Full] = "Full";
-      `;
-      const output = tags.stripIndent`
-        /** @enum {number} */ var FormatWidth = /*@__PURE__*/ (function () {
-          var FormatWidth = {
-            Short: 0,
-            Medium: 1,
-            Long: 2,
-            Full: 3,
-          };
-          FormatWidth[FormatWidth.Short] = "Short";
-          FormatWidth[FormatWidth.Medium] = "Medium";
-          FormatWidth[FormatWidth.Long] = "Long";
-          FormatWidth[FormatWidth.Full] = "Full";
-          return FormatWidth;
-        }());
       `;
 
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
