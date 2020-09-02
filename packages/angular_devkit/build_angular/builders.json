@@ -45,6 +45,11 @@
       "implementation": "./src/ng-packagr",
       "schema": "./src/ng-packagr/schema.json",
       "description": "Build a library with ng-packagr."
+    },
+    "eslint": {
+      "implementation": "./src/eslint",
+      "schema": "./src/eslint/schema.json",
+      "description": "Run ESLint over a project."
     }
   }
 }

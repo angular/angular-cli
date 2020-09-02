@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "ESLint Target",
+  "description": "ESLint target options for Build Facade.",
+  "type": "object",
+  "properties": {
+    "eslintConfig": {
+      "type": "string",
+      "description": "The name of the ESLint configuration file."
+    },
+    "fix": {
+      "type": "boolean",
+      "description": "Fixes linting errors (May overwrite linted files).",
+      "default": false
+    },
+    "force": {
+      "type": "boolean",
+      "description": "Succeeds even if there was linting errors.",
+      "default": false
+    },
+    "format": {
+      "type": "string",
+      "description": "ESLint Output formatter See https://eslint.org/docs/user-guide/formatters.",
+      "default": "stylish",
+      "enum": [
+        "checkstyle",
+        "codeframe",
+        "compact",
+        "html",
+        "jslint-xml",
+        "json",
+        "junit",
+        "stylish",
+        "table",
+        "tap",
+        "unix",
+        "visualstudio"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "description": "Files to include for linting. Can be a combination of file paths, directory paths, and glob patterns.",
+      "items": {
+        "type": "string",
+        "minItems": 1
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "files"
+  ]
+}

@@ -124,6 +124,16 @@
             ]
           }
         },
+        "eslint": {
+          "builder": "@angular-devkit/build-angular:eslint",
+          "options": {
+            "eslintConfig": ".eslintrc.json",
+            "files": [
+              "src/**/*.ts",
+              "e2e/**/*.ts"
+            ]
+          }
+        },
         "lint-test": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {

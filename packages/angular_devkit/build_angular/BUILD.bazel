@@ -57,6 +57,11 @@ ts_json_schema(
 )
 
 ts_json_schema(
+    name = "eslint_schema",
+    src = "src/eslint/schema.json",
+)
+
+ts_json_schema(
     name = "ng_packagr_schema",
     src = "src/ng-packagr/schema.json",
 )
@@ -82,6 +87,7 @@ ts_library(
         "//packages/angular_devkit/build_angular:src/protractor/schema.ts",
         "//packages/angular_devkit/build_angular:src/server/schema.ts",
         "//packages/angular_devkit/build_angular:src/tslint/schema.ts",
+        "//packages/angular_devkit/build_angular:src/eslint/schema.ts",
         "//packages/angular_devkit/build_angular:src/ng-packagr/schema.ts",
     ],
     data = glob(
@@ -117,6 +123,7 @@ ts_library(
         "@npm//@types/caniuse-lite",
         "@npm//@types/copy-webpack-plugin",
         "@npm//@types/cssnano",
+        "@npm//@types/eslint",
         "@npm//@types/find-cache-dir",
         "@npm//@types/glob",
         "@npm//@types/inquirer",
@@ -304,6 +311,13 @@ LARGE_SPECS = {
         "extra_deps": [
             "@npm//codelyzer",
             "@npm//tslint",
+        ],
+    },
+    "eslint": {
+        "extra_deps": [
+            "@npm//@typescript-eslint/eslint-plugin",
+            "@npm//@typescript-eslint/parser",
+            "@npm//eslint",
         ],
     },
     "server": {
