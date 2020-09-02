@@ -19,6 +19,21 @@ const isDebug =
   debugEnv !== '0' &&
   debugEnv.toLowerCase() !== 'false';
 
+// Same structure as used in framework packages
+export class Version {
+  public readonly major: string;
+  public readonly minor: string;
+  public readonly patch: string;
+
+  constructor(public readonly full: string) {
+    this.major = full.split('.')[0];
+    this.minor = full.split('.')[1];
+    this.patch = full.split('.').slice(2).join('.');
+  }
+}
+
+export const VERSION = new Version(require('../../package.json').version);
+
 // tslint:disable: no-console
 export default async function(options: { testing?: boolean; cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
