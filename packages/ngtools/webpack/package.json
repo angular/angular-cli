@@ -26,7 +26,7 @@
     "webpack-sources": "1.4.3"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": ">=10.1.0-next.0 < 11",
+    "@angular/compiler-cli": "^11.0.0 || ^11.0.0-next",
     "typescript": ">=3.9 < 4.1",
     "webpack": "^4.0.0"
   },
