@@ -31,13 +31,13 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
         **kwargs
     )
 
-NG_VERSION = "^10.1.0"
+NG_VERSION = "^11.0.0-next.0"
 RXJS_VERSION = "^6.5.5"
 HAPI_VERSION = "^18.4.0"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
-DEVKIT_CORE_VERSION = "^10.1.0"
-DEVKIT_ARCHITECT_VERSION = "^0.1001.0"
+DEVKIT_CORE_VERSION = "^11.0.0-next.0"
+DEVKIT_ARCHITECT_VERSION = "^0.1100.0-next.0"
 TSLIB_VERSION = "^2.0.0"
 
 NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
