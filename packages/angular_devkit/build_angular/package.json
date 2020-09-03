@@ -74,8 +74,8 @@
     "worker-plugin": "5.0.0"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": ">=10.1.0-next.0 < 11",
-    "@angular/localize": ">=10.1.0-next.0 < 11",
+    "@angular/compiler-cli": "^10.0.0",
+    "@angular/localize": "^10.0.0",
     "ng-packagr": "^10.0.0",
     "typescript": ">=3.9 < 4.1"
   },
