@@ -2,7 +2,7 @@ import { normalize } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, expectFileToMatch, writeFile } from '../../utils/fs';
 import { exec, ng, silentNpm } from '../../utils/process';
-import { updateJsonFile } from '../../utils/project';
+import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
 
@@ -12,15 +12,16 @@ export default async function () {
 
   // @nguniversal/express-engine currently relies on ^0.1000.0 of @angular-devkit/architect
   // which is not present in the local package registry and not semver compatible with 0.1001.0+
-  const { stdout: stdout1 } = await silentNpm('pack', '@angular-devkit/architect@0.1000', '--registry=https://registry.npmjs.org');
+  const { stdout: stdout1 } = await silentNpm('pack', '@angular-devkit/architect@0.1001', '--registry=https://registry.npmjs.org');
   await silentNpm('publish', stdout1.trim(), '--registry=http://localhost:4873', '--tag=minor');
 
   // @nguniversal/express-engine currently relies on ^10.0.0 of @angular-devkit/core
   // which is not present in the local package registry and not semver compatible prerelease version of 10.1.0
-  const { stdout: stdout2 } = await silentNpm('pack', '@angular-devkit/core@10.0', '--registry=https://registry.npmjs.org');
+  const { stdout: stdout2 } = await silentNpm('pack', '@angular-devkit/core@10.1', '--registry=https://registry.npmjs.org');
   await silentNpm('publish', stdout2.trim(), '--registry=http://localhost:4873', '--tag=minor');
 
-  await ng('add', '@nguniversal/express-engine');
+  const tag = (await isPrereleaseCli()) ? 'next' : 'latest';
+  await ng('add', `@nguniversal/express-engine@${tag}`);
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
