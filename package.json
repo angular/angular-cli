@@ -119,7 +119,7 @@
     "@types/semver": "^7.0.0",
     "@types/universal-analytics": "^0.4.2",
     "@types/uuid": "^8.0.0",
-    "@types/webpack": "^4.32.1",
+    "@types/webpack": "^4.41.22",
     "@types/webpack-dev-server": "^3.1.7",
     "@types/webpack-sources": "^1.4.2",
     "@yarnpkg/lockfile": "1.1.0",
