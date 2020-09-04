@@ -131,7 +131,7 @@ export enum JobOutboundMessageKind {
   OnReady = 'c',
   Start = 's',
   End = 'e',
-  Pong = 'p',
+  Ping = 'p',
 
   // Feedback messages.
   Output = 'o',
@@ -250,7 +250,7 @@ export interface JobOutboundMessageEnd extends JobOutboundMessageBase {
  * A pong response from a ping input. The id is the same as the one passed in.
  */
 export interface JobOutboundMessagePong extends JobOutboundMessageBase {
-  readonly kind: JobOutboundMessageKind.Pong;
+  readonly kind: JobOutboundMessageKind.Ping;
 
   /**
    * The ID that was passed in the `Ping` messages.

@@ -84,7 +84,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
       const inboundSub = inboundBus.subscribe(message => {
         switch (message.kind) {
           case JobInboundMessageKind.Ping:
-            subject.next({ kind: JobOutboundMessageKind.Pong, description, id: message.id });
+            subject.next({ kind: JobOutboundMessageKind.Ping, description, id: message.id });
             break;
 
           case JobInboundMessageKind.Stop:

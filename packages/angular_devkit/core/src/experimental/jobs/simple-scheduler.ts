@@ -468,7 +468,7 @@ export class SimpleScheduler<
         inboundBus.next({ kind: JobInboundMessageKind.Ping, id });
 
         return outboundBus.pipe(
-          filter(x => x.kind === JobOutboundMessageKind.Pong && x.id == id),
+          filter(x => x.kind === JobOutboundMessageKind.Ping && x.id == id),
           first(),
           ignoreElements(),
         );
