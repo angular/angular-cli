@@ -7,14 +7,6 @@ descriptions here.
 
 Design documents on GitHub, in Markdown format. The number of design documents available is limited.
 
-## `/docs/documentation`
-
-THIS FOLDER IS DEPRECATED AND SHOULD NOT BE UPDATED ANYMORE. Documentation is now available on
-angular.io and can be updated on the main [angular/angular](https://github.com/angular/angular)
-repo.
-
-Markdown files used to publish to the [GitHub Wiki](https://github.com/angular/angular-cli/wiki).
-
 ## `/docs/process`
 
 Description of various caretaker and workflow processes.
