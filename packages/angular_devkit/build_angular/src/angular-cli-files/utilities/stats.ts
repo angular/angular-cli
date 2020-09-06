@@ -86,9 +86,12 @@ export function statsToString(json: any, statsConfig: any) {
   }
 }
 
-// TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
 const ERRONEOUS_WARNINGS_FILTER = (warning: string) => ![
+  // TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
   /multiple assets emit different content.*3rdpartylicenses\.txt/i,
+  // Webpack 5+ has no facility to disable this warning.
+  // System.import is used in @angular/core for deprecated string-form lazy routes
+  /System.import\(\) is deprecated and will be removed soon/i,
 ].some(msg => msg.test(warning));
 
 export function statsWarningsToString(json: any, statsConfig: any): string {
