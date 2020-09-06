@@ -16,14 +16,14 @@ export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'pat
 }
 
 export class TypeScriptPathsPlugin {
-  constructor(private _options: TypeScriptPathsPluginOptions) { }
+  constructor(private options?: TypeScriptPathsPluginOptions) {}
+
+  update(options: TypeScriptPathsPluginOptions): void {
+    this.options = options;
+  }
 
   // tslint:disable-next-line:no-any
   apply(resolver: any) {
-    if (!this._options.paths || Object.keys(this._options.paths).length === 0) {
-      return;
-    }
-
     const target = resolver.ensureHook('resolve');
     const resolveAsync = (request: NormalModuleFactoryRequest, requestContext: {}) => {
       return new Promise<NormalModuleFactoryRequest | undefined>((resolve, reject) => {
@@ -46,6 +46,10 @@ export class TypeScriptPathsPlugin {
     resolver.getHook('described-resolve').tapPromise(
       'TypeScriptPathsPlugin',
       async (request: NormalModuleFactoryRequest, resolveContext: {}) => {
+        if (!this.options) {
+          throw new Error('TypeScriptPathsPlugin options were not provided.');
+        }
+
         if (!request || request.typescriptPathMapped) {
           return;
         }
@@ -70,11 +74,11 @@ export class TypeScriptPathsPlugin {
           return;
         }
 
-        const replacements = findReplacements(originalRequest, this._options.paths || {});
+        const replacements = findReplacements(originalRequest, this.options.paths || {});
         for (const potential of replacements) {
           const potentialRequest = {
             ...request,
-            request: path.resolve(this._options.baseUrl || '', potential),
+            request: path.resolve(this.options.baseUrl || '', potential),
             typescriptPathMapped: true,
           };
           const result = await resolveAsync(potentialRequest, resolveContext);
