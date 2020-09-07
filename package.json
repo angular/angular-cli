@@ -198,7 +198,7 @@
     "resolve-url-loader": "3.1.1",
     "rimraf": "3.0.2",
     "rollup": "2.26.10",
-    "rxjs": "6.6.2",
+    "rxjs": "6.6.3",
     "sass": "1.26.3",
     "sass-loader": "10.0.2",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.5.4-linux.tar.gz",

@@ -20,7 +20,7 @@
     "@schematics/schematics": "0.0.0",
     "inquirer": "7.3.3",
     "minimist": "1.2.5",
-    "rxjs": "6.6.2",
+    "rxjs": "6.6.3",
     "symbol-observable": "2.0.1"
   }
 }
