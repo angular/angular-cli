@@ -15,12 +15,12 @@ export function replaceResources(
   return (context: ts.TransformationContext) => {
     const typeChecker = getTypeChecker();
     const resourceImportDeclarations: ts.ImportDeclaration[] = [];
-
+    const moduleKind = context.getCompilerOptions().module;
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
         const decorators = ts.visitNodes(node.decorators, node =>
           ts.isDecorator(node)
-            ? visitDecorator(node, typeChecker, directTemplateLoading, resourceImportDeclarations)
+            ? visitDecorator(node, typeChecker, directTemplateLoading, resourceImportDeclarations, moduleKind)
             : node,
         );
 
@@ -68,6 +68,7 @@ function visitDecorator(
   typeChecker: ts.TypeChecker,
   directTemplateLoading: boolean,
   resourceImportDeclarations: ts.ImportDeclaration[],
+  moduleKind?: ts.ModuleKind,
 ): ts.Decorator {
   if (!isComponentDecorator(node, typeChecker)) {
     return node;
@@ -90,7 +91,7 @@ function visitDecorator(
   // visit all properties
   let properties = ts.visitNodes(objectExpression.properties, node =>
     ts.isObjectLiteralElementLike(node)
-      ? visitComponentMetadata(node, styleReplacements, directTemplateLoading, resourceImportDeclarations)
+      ? visitComponentMetadata(node, styleReplacements, directTemplateLoading, resourceImportDeclarations, moduleKind)
       : node,
   );
 
@@ -117,6 +118,7 @@ function visitComponentMetadata(
   styleReplacements: ts.Expression[],
   directTemplateLoading: boolean,
   resourceImportDeclarations: ts.ImportDeclaration[],
+  moduleKind?: ts.ModuleKind,
 ): ts.ObjectLiteralElementLike | undefined {
   if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
     return node;
@@ -128,7 +130,12 @@ function visitComponentMetadata(
       return undefined;
 
     case 'templateUrl':
-      const importName = createResourceImport(node.initializer, directTemplateLoading ? '!raw-loader!' : '', resourceImportDeclarations);
+      const importName = createResourceImport(
+        node.initializer,
+        directTemplateLoading ? '!raw-loader!' : '',
+        resourceImportDeclarations,
+        moduleKind,
+      );
       if (!importName) {
         return node;
       }
@@ -154,7 +161,7 @@ function visitComponentMetadata(
           return ts.createLiteral(node.text);
         }
 
-        return createResourceImport(node, undefined, resourceImportDeclarations) || node;
+        return createResourceImport(node, undefined, resourceImportDeclarations, moduleKind) || node;
       });
 
       // Styles should be placed first
@@ -168,28 +175,6 @@ function visitComponentMetadata(
     default:
       return node;
   }
-}
-
-export function createResourceImport(
-  node: ts.Node,
-  loader: string |  undefined,
-  resourceImportDeclarations: ts.ImportDeclaration[],
-): ts.Identifier | null {
-  const url = getResourceUrl(node, loader);
-  if (!url) {
-    return null;
-  }
-
-  const importName = ts.createIdentifier(`__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`);
-
-  resourceImportDeclarations.push(ts.createImportDeclaration(
-    undefined,
-    undefined,
-    ts.createImportClause(importName, undefined),
-    ts.createLiteral(url),
-  ));
-
-  return importName;
 }
 
 export function getResourceUrl(node: ts.Node, loader = ''): string | null {
@@ -212,6 +197,41 @@ function isComponentDecorator(node: ts.Node, typeChecker: ts.TypeChecker): node 
   }
 
   return false;
+}
+
+function createResourceImport(
+  node: ts.Node,
+  loader: string | undefined,
+  resourceImportDeclarations: ts.ImportDeclaration[],
+  moduleKind = ts.ModuleKind.ES2015,
+): ts.Identifier | ts.Expression | null {
+  const url = getResourceUrl(node, loader);
+  if (!url) {
+    return null;
+  }
+
+  const urlLiteral = ts.createLiteral(url);
+
+  if (moduleKind < ts.ModuleKind.ES2015) {
+    return ts.createPropertyAccess(
+      ts.createCall(
+        ts.createIdentifier('require'),
+        [],
+        [urlLiteral],
+      ),
+      'default',
+    );
+  } else {
+    const importName = ts.createIdentifier(`__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`);
+    resourceImportDeclarations.push(ts.createImportDeclaration(
+      undefined,
+      undefined,
+      ts.createImportClause(importName, undefined),
+      urlLiteral,
+    ));
+
+    return importName;
+  }
 }
 
 interface DecoratorOrigin {
