@@ -53,7 +53,7 @@
     "resolve-url-loader": "3.1.1",
     "rimraf": "3.0.2",
     "rollup": "2.26.10",
-    "rxjs": "6.6.2",
+    "rxjs": "6.6.3",
     "sass": "1.26.10",
     "sass-loader": "10.0.2",
     "semver": "7.3.2",
