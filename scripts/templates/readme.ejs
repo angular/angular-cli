@@ -123,18 +123,20 @@ as expected.
 
 There are three different test suites which can be run locally:
 
-* Unit tests
-  * Run: `yarn test --full`
-  * Debug: `yarn debug:test --full`
-* Large tests
-  * Run: `yarn test-large --full`
-  * Debug: `yarn debug:test-large --full`
-* End to end tests
-  * Run: `node tests/legacy-cli/run_e2e.js`
-  * Run subset of tests: `node tests/legacy-cli/run_e2e.js tests/legacy-cli/e2e/tests/i18n/ivy-localize-*`
+### Unit tests
+  * Run all tests: `yarn bazel test //packages/...`
+  * Run a subset of the tests, use the full Bazel target example: `yarn bazel test //packages/schematics/angular:angular_test`
+  * For a complete list of test targets use the following Bazel query: `yarn bazel query "tests(//packages/...)"`
 
-When running the debug commands, Node will stop and wait for a debugger to
-attach. You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also see [IDE Specific Usage](#ide-specific-usage) for a
+You can find more info about debugging [tests with Bazel in the docs.]
+(https://github.com/angular/angular-cli/blob/master/docs/process/bazel.md#debugging-jasmine_node_test)  
+
+### End to end tests
+  * Run: `node tests/legacy-cli/run_e2e.js`
+  * Run a subset of the tests: `node tests/legacy-cli/run_e2e.js tests/legacy-cli/e2e/tests/i18n/ivy-localize-*`
+
+When running the debug commands, Node will stop and wait for a debugger to attach.
+You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also, see [IDE Specific Usage](#ide-specific-usage) for a
 simpler debug story.
 
 When debugging a specific test, change `describe()` or `it()` to `fdescribe()`
