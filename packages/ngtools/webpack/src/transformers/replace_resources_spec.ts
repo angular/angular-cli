@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
+import * as ts from 'typescript';
 import { replaceResources } from './replace_resources';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
@@ -14,8 +15,9 @@ function transform(
   shouldTransform = true,
   directTemplateLoading = true,
   importHelpers = true,
+  module: ts.ModuleKind = ts.ModuleKind.ESNext,
 ) {
-  const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, { importHelpers });
+  const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, { importHelpers, module });
   const getTypeChecker = () => program.getTypeChecker();
   const transformer = replaceResources(
     () => shouldTransform, getTypeChecker, directTemplateLoading);
@@ -64,6 +66,41 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(input);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should replace resources with `require()` when module is CommonJs', () => {
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css', './app.component.2.css']
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+      const output = tags.stripIndent`
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+
+        exports.AppComponent = void 0;
+        const tslib_1 = require("tslib");
+        const core_1 = require("@angular/core");
+        let AppComponent = class AppComponent {
+          constructor() { this.title = 'app'; }
+        };
+        AppComponent = tslib_1.__decorate([
+          core_1.Component({
+            selector: 'app-root',
+            template: require("!raw-loader!./app.component.html").default,
+            styles: [require("./app.component.css").default, require("./app.component.2.css").default] }) ], AppComponent);
+        exports.AppComponent = AppComponent;
+      `;
+
+      const result = transform(input, true, true, true, ts.ModuleKind.CommonJS);
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
