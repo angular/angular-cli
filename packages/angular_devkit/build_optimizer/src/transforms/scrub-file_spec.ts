@@ -118,6 +118,49 @@ describe('scrub-file', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('removes Angular decorators calls when __decorate is inlined', () => {
+      const output = tags.stripIndent`
+        var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+          var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+          if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+          else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+          return c > 3 && r && Object.defineProperty(target, key, r), r;
+        };
+
+        import { Component, Injectable } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+      `;
+
+      const input = tags.stripIndent`
+        var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+          var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+          if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+          else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+          return c > 3 && r && Object.defineProperty(target, key, r), r;
+        };
+
+        import { Component, Injectable } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = __decorate([
+            Injectable(),
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            })
+          ], Clazz);
+          return Clazz;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('removes constructor parameter metadata in __decorate', () => {
       const output = tags.stripIndent`
         import { __decorate, __metadata } from "tslib";
