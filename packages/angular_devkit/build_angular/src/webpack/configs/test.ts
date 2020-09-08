@@ -9,8 +9,8 @@
 import * as glob from 'glob';
 import * as path from 'path';
 import * as webpack from 'webpack';
-import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
-import { getSourceMapDevTool, isPolyfillsEntry } from './utils';
+import { WebpackConfigOptions, WebpackTestOptions } from '../../utils/build-options';
+import { getSourceMapDevTool, isPolyfillsEntry } from '../utils/helpers';
 
 export function getTestConfig(
   wco: WebpackConfigOptions<WebpackTestOptions>,

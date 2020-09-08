@@ -17,18 +17,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { gte as semverGte } from 'semver';
 import * as webpack from 'webpack';
-import {
-  getAotConfig,
-  getCommonConfig,
-  getStatsConfig,
-  getStylesConfig,
-} from '../angular-cli-files/models/webpack-configs';
-import { createWebpackLoggingCallback } from '../angular-cli-files/utilities/stats';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
+import {
+  getAotConfig,
+  getCommonConfig,
+  getStatsConfig,
+  getStylesConfig,
+} from '../webpack/configs';
+import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Format, Schema } from './schema';
 
 export type ExtractI18nBuilderOptions = Schema & JsonObject;

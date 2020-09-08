@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as webpack from 'webpack';
-import { ProcessBundleFile, ProcessBundleResult } from '../../../src/utils/process-bundle';
-import { Budget, Type } from '../../browser/schema';
-import { formatSize } from '../utilities/stats';
+import { Budget, Type } from '../browser/schema';
+import { ProcessBundleFile, ProcessBundleResult } from '../utils/process-bundle';
+import { formatSize } from '../webpack/utils/stats';
 
 interface Size {
   size: number;

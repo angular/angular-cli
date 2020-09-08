@@ -8,14 +8,14 @@
 
 import * as path from 'path';
 import * as webpack from 'webpack';
+import { WebpackConfigOptions } from '../../utils/build-options';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
   RemoveHashPlugin,
   SuppressExtractedTextChunksWebpackPlugin,
-} from '../../plugins/webpack';
-import { WebpackConfigOptions } from '../build-options';
-import { getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
+} from '../plugins';
+import { getOutputHashFormat, normalizeExtraEntryPoints } from '../utils/helpers';
 
 // tslint:disable-next-line:no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions) {

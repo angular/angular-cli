@@ -12,9 +12,9 @@ import {
   CrossOriginValue,
   FileInfo,
   augmentIndexHtml,
-} from '../utilities/index-file/augment-index-html';
-import { IndexHtmlTransform } from '../utilities/index-file/write-index-html';
-import { stripBom } from '../utilities/strip-bom';
+} from '../../utils/index-file/augment-index-html';
+import { IndexHtmlTransform } from '../../utils/index-file/write-index-html';
+import { stripBom } from '../../utils/strip-bom';
 
 export interface IndexHtmlWebpackPluginOptions {
   input: string;

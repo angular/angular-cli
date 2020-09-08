@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
 import { logging } from '@angular-devkit/core';
 import { ParsedConfiguration } from '@angular/compiler-cli';
 import {
@@ -19,8 +17,8 @@ import {
   Localize,
   OptimizationClass,
   SourceMapClass,
-} from '../../browser/schema';
-import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
+} from '../browser/schema';
+import { NormalizedFileReplacement } from './normalize-file-replacements';
 
 export interface BuildOptions {
   optimization: OptimizationClass;

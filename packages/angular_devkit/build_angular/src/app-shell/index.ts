@@ -15,10 +15,10 @@ import { JsonObject, normalize, resolve } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
+import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { Schema as BuildWebpackAppShellSchema } from './schema';
 
 async function _renderUniversal(

@@ -18,15 +18,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
-import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
-import { getEsVersionForFileName } from '../angular-cli-files/models/webpack-configs';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import {
   NormalizedBrowserBuilderSchema,
   defaultProgress,
   normalizeBrowserSchema,
 } from '../utils';
+import { WebpackConfigOptions } from '../utils/build-options';
+import { readTsconfig } from '../utils/read-tsconfig';
+import { getEsVersionForFileName } from '../webpack/utils/helpers';
 import { BuildBrowserFeatures } from './build-browser-features';
 import { profilingEnabled } from './environment-options';
 import { I18nOptions, configureI18nBuild } from './i18n-options';

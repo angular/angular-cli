@@ -7,7 +7,7 @@
  */
 import { resolve } from 'path';
 import { Configuration } from 'webpack';
-import { WebpackConfigOptions } from '../build-options';
+import { WebpackConfigOptions } from '../../utils/build-options';
 import { getTypescriptWorkerPlugin } from './typescript';
 
 export function getWorkerConfig(wco: WebpackConfigOptions): Configuration {

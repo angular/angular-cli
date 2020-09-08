@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as webpack from 'webpack';
-import { Budget, Type } from '../../browser/schema';
-import { ProcessBundleResult } from '../../utils/process-bundle';
+import { Budget, Type } from '../browser/schema';
 import { ThresholdSeverity, checkBudgets } from './bundle-calculator';
+import { ProcessBundleResult } from './process-bundle';
 
 const KB = 1024;
 

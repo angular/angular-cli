@@ -7,9 +7,9 @@
  */
 import { Compiler } from 'webpack';
 import { Budget } from '../../browser/schema';
+import { ThresholdSeverity, checkBudgets } from '../../utils/bundle-calculator';
 import { ProcessBundleResult } from '../../utils/process-bundle';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
-import { ThresholdSeverity, checkBudgets } from '../utilities/bundle-calculator';
 
 export interface BundleBudgetPluginOptions {
   budgets: Budget[];

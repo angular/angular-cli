@@ -22,23 +22,23 @@ import * as ts from 'typescript';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
-import { normalizeExtraEntryPoints } from '../angular-cli-files/models/webpack-configs/utils';
-import { IndexHtmlWebpackPlugin } from '../angular-cli-files/plugins/index-html-webpack-plugin';
-import { checkPort } from '../angular-cli-files/utilities/check-port';
-import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
-import { generateEntryPoints } from '../angular-cli-files/utilities/package-chunk-sort';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
-import { createWebpackLoggingCallback } from '../angular-cli-files/utilities/stats';
 import { buildBrowserWebpackConfigFromContext } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
+import { checkPort } from '../utils/check-port';
 import { I18nOptions } from '../utils/i18n-options';
+import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
+import { generateEntryPoints } from '../utils/package-chunk-sort';
 import { createI18nPlugins } from '../utils/process-bundle';
+import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
 import { addError, addWarning } from '../utils/webpack-diagnostics';
+import { normalizeExtraEntryPoints } from '../webpack/configs';
+import { IndexHtmlWebpackPlugin } from '../webpack/plugins/index-html-webpack-plugin';
+import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Schema } from './schema';
 const open = require('open');
 
@@ -86,9 +86,6 @@ export function serveWebpackBrowser(
   const root = context.workspaceRoot;
   let first = true;
   const host = new NodeJsSyncHost();
-
-  const loggingFn =
-    transforms.logging || createWebpackLoggingCallback(!!options.verbose, context.logger);
 
   async function setup(): Promise<{
     browserOptions: json.JsonObject & BrowserBuilderSchema;
@@ -237,7 +234,7 @@ export function serveWebpackBrowser(
         webpackConfig,
         context,
         {
-          logging: loggingFn,
+          logging: transforms.logging || createWebpackLoggingCallback(!!options.verbose, context.logger),
           webpackFactory: require('webpack') as typeof webpack,
           webpackDevServerFactory: require('webpack-dev-server') as typeof WebpackDevServer,
         },
