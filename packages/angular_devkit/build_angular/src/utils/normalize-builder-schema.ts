@@ -9,13 +9,13 @@
 
 
 import { Path, virtualFs } from '@angular-devkit/core';
-import { BuildOptions } from '../angular-cli-files/models/build-options';
 import {
   AssetPatternClass,
   OptimizationClass,
   Schema as BrowserBuilderSchema,
   SourceMapClass,
 } from '../browser/schema';
+import { BuildOptions } from './build-options';
 import { normalizeAssetPatterns } from './normalize-asset-patterns';
 import {
   NormalizedFileReplacement,

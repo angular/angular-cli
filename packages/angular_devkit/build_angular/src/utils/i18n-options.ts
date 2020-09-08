@@ -11,9 +11,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { Schema as ServerBuilderSchema } from '../server/schema';
+import { readTsconfig } from '../utils/read-tsconfig';
 import { createTranslationLoader } from './load-translations';
 
 export interface I18nOptions {

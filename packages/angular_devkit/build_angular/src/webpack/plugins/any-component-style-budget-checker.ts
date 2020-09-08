@@ -8,9 +8,9 @@
 
 import * as path from 'path';
 import { Compiler } from 'webpack';
-import { Budget, Type } from '../../../src/browser/schema';
+import { Budget, Type } from '../../browser/schema';
+import { ThresholdSeverity, calculateThresholds, checkThresholds } from '../../utils/bundle-calculator';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
-import { ThresholdSeverity, calculateThresholds, checkThresholds } from '../utilities/bundle-calculator';
 
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 

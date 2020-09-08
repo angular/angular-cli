@@ -11,19 +11,19 @@ import { dirname, resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
+import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
+import { assertCompatibleAngularVersion } from '../utils/version';
+import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import {
   getCommonConfig,
   getNonAotConfig,
   getStylesConfig,
   getTestConfig,
   getWorkerConfig,
-} from '../angular-cli-files/models/webpack-configs';
-import { SingleTestTransformLoader } from '../angular-cli-files/plugins/single-test-transform';
-import { findTests } from '../angular-cli-files/utilities/find-tests';
-import { Schema as BrowserBuilderOptions } from '../browser/schema';
-import { ExecutionTransformer } from '../transforms';
-import { assertCompatibleAngularVersion } from '../utils/version';
-import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
+} from '../webpack/configs';
+import { SingleTestTransformLoader } from '../webpack/plugins/single-test-transform';
+import { findTests } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
 
 // tslint:disable-next-line:no-implicit-dependencies

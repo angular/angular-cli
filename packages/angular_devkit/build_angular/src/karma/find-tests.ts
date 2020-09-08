@@ -8,7 +8,7 @@
 import { existsSync } from 'fs';
 import * as glob from 'glob';
 import { basename, dirname, extname, join } from 'path';
-import { isDirectory } from './is-directory';
+import { isDirectory } from '../utils/is-directory';
 
 // go through all patterns and find unique list of files
 export function findTests(patterns: string[], cwd: string, workspaceRoot: string): string[] {

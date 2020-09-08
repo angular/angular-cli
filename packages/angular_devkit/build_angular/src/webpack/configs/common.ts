@@ -25,16 +25,18 @@ import {
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
-import { AssetPatternClass } from '../../../browser/schema';
-import { BuildBrowserFeatures, maxWorkers } from '../../../utils';
-import { findCachePath } from '../../../utils/cache-path';
+import { AssetPatternClass } from '../../browser/schema';
+import { BuildBrowserFeatures, maxWorkers } from '../../utils';
+import { WebpackConfigOptions } from '../../utils/build-options';
+import { findCachePath } from '../../utils/cache-path';
 import {
   allowMangle,
   allowMinify,
   cachingDisabled,
   profilingEnabled,
   shouldBeautify,
-} from '../../../utils/environment-options';
+} from '../../utils/environment-options';
+import { findAllNodeModules } from '../../utils/find-up';
 import {
   BundleBudgetPlugin,
   DedupeModuleResolvePlugin,
@@ -42,10 +44,8 @@ import {
   OptimizeCssWebpackPlugin,
   ScriptsWebpackPlugin,
   WebpackRollupLoader,
-} from '../../plugins/webpack';
-import { findAllNodeModules } from '../../utilities/find-up';
-import { WebpackConfigOptions } from '../build-options';
-import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
+} from '../plugins';
+import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from '../utils/helpers';
 
 const TerserPlugin = require('terser-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
@@ -548,7 +548,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                       cacheCompression: false,
                       cacheDirectory: findCachePath('babel-webpack'),
                       cacheIdentifier: JSON.stringify({
-                        buildAngular: require('../../../../package.json').version,
+                        buildAngular: require('../../../package.json').version,
                       }),
                       sourceType: 'unambiguous',
                       presets: [

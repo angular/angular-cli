@@ -7,8 +7,8 @@
  */
 import { isAbsolute } from 'path';
 import { Configuration, ContextReplacementPlugin } from 'webpack';
-import { WebpackConfigOptions } from '../build-options';
-import { getSourceMapDevTool } from './utils';
+import { WebpackConfigOptions } from '../../utils/build-options';
+import { getSourceMapDevTool } from '../utils/helpers';
 
 /**
  * Returns a partial Webpack configuration specific to creating a bundle for node

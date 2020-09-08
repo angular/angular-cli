@@ -5,13 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import { basename, normalize } from '@angular-devkit/core';
-import { ExtraEntryPoint, ExtraEntryPointClass } from '../../../browser/schema';
-import { SourceMapDevToolPlugin } from 'webpack';
 import { ScriptTarget } from 'typescript';
+import { SourceMapDevToolPlugin } from 'webpack';
+import { ExtraEntryPoint, ExtraEntryPointClass } from '../../browser/schema';
 
 export interface HashFormat {
   chunk: string;
@@ -37,6 +35,7 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
       script: `.[hash:${length}]`,
     },
   };
+
   return hashFormats[option] || hashFormats['none'];
 }
 

@@ -13,22 +13,22 @@ import { Observable, from } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
+import { ExecutionTransformer } from '../transforms';
+import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../utils';
+import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
+import { I18nOptions } from '../utils/i18n-options';
+import { ensureOutputPaths } from '../utils/output-paths';
+import { readTsconfig } from '../utils/read-tsconfig';
+import { assertCompatibleAngularVersion } from '../utils/version';
+import { generateI18nBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import {
   getAotConfig,
   getCommonConfig,
   getServerConfig,
   getStatsConfig,
   getStylesConfig,
-} from '../angular-cli-files/models/webpack-configs';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
-import { createWebpackLoggingCallback } from '../angular-cli-files/utilities/stats';
-import { ExecutionTransformer } from '../transforms';
-import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../utils';
-import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
-import { I18nOptions } from '../utils/i18n-options';
-import { ensureOutputPaths } from '../utils/output-paths';
-import { assertCompatibleAngularVersion } from '../utils/version';
-import { generateI18nBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
+} from '../webpack/configs';
+import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
 // If success is true, outputPath should be set.

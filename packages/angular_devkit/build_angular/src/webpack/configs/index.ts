@@ -11,6 +11,6 @@ export * from './server';
 export * from './styles';
 export * from './test';
 export * from './typescript';
-export * from './utils';
+export * from '../utils/helpers';
 export * from './stats';
 export * from './worker';

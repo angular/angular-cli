@@ -15,35 +15,6 @@ import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
-import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
-import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
-import {
-  getAotConfig,
-  getBrowserConfig,
-  getCommonConfig,
-  getNonAotConfig,
-  getStatsConfig,
-  getStylesConfig,
-  getWorkerConfig,
-  normalizeExtraEntryPoints,
-} from '../angular-cli-files/models/webpack-configs';
-import { markAsyncChunksNonInitial } from '../angular-cli-files/utilities/async-chunks';
-import { ThresholdSeverity, checkBudgets } from '../angular-cli-files/utilities/bundle-calculator';
-import {
-  IndexHtmlTransform,
-  writeIndexHtml,
-} from '../angular-cli-files/utilities/index-file/write-index-html';
-import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
-import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
-import {
-  createWebpackLoggingCallback,
-  generateBuildStats,
-  generateBundleStats,
-  statsErrorsToString,
-  statsHasErrors,
-  statsHasWarnings,
-  statsWarningsToString,
-} from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
 import {
   BuildBrowserFeatures,
@@ -54,11 +25,17 @@ import {
   urlJoin,
 } from '../utils';
 import { BundleActionExecutor } from '../utils/action-executor';
+import { WebpackConfigOptions } from '../utils/build-options';
+import { ThresholdSeverity, checkBudgets } from '../utils/bundle-calculator';
 import { findCachePath } from '../utils/cache-path';
 import { copyAssets } from '../utils/copy-assets';
 import { cachingDisabled } from '../utils/environment-options';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
 import { I18nOptions } from '../utils/i18n-options';
+import {
+  IndexHtmlTransform,
+  writeIndexHtml,
+} from '../utils/index-file/write-index-html';
 import { ensureOutputPaths } from '../utils/output-paths';
 import {
   InlineOptions,
@@ -66,6 +43,8 @@ import {
   ProcessBundleOptions,
   ProcessBundleResult,
 } from '../utils/process-bundle';
+import { readTsconfig } from '../utils/read-tsconfig';
+import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
   BrowserWebpackConfigOptions,
@@ -74,6 +53,27 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
+import {
+  getAotConfig,
+  getBrowserConfig,
+  getCommonConfig,
+  getNonAotConfig,
+  getStatsConfig,
+  getStylesConfig,
+  getWorkerConfig,
+  normalizeExtraEntryPoints,
+} from '../webpack/configs';
+import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
+import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
+import {
+  createWebpackLoggingCallback,
+  generateBuildStats,
+  generateBundleStats,
+  statsErrorsToString,
+  statsHasErrors,
+  statsHasWarnings,
+  statsWarningsToString,
+} from '../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 const cacheDownlevelPath = cachingDisabled ? undefined : findCachePath('angular-build-dl');

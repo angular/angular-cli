@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as webpack from 'webpack';
-import { NormalizedEntryPoint } from '../models/webpack-configs';
+import { NormalizedEntryPoint } from '../configs';
 
 /**
  * Webpack stats may incorrectly mark extra entry points `initial` chunks, when

@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as webpack from 'webpack';
-import { CommonJsUsageWarnPlugin } from '../../plugins/webpack';
-import { WebpackConfigOptions } from '../build-options';
-import { getSourceMapDevTool } from './utils';
+import { WebpackConfigOptions } from '../../utils/build-options';
+import { CommonJsUsageWarnPlugin } from '../plugins';
+import { getSourceMapDevTool } from '../utils/helpers';
 
 export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const { buildOptions } = wco;

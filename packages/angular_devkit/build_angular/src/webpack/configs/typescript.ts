@@ -15,7 +15,7 @@ import {
   NgToolsLoader,
   PLATFORM
 } from '@ngtools/webpack';
-import { WebpackConfigOptions, BuildOptions } from '../build-options';
+import { WebpackConfigOptions, BuildOptions } from '../../utils/build-options';
 
 function _pluginOptionsOverrides(
   buildOptions: BuildOptions,

@@ -13,7 +13,7 @@ import { Minimatch } from 'minimatch';
 import * as path from 'path';
 import * as tslint from 'tslint'; // tslint:disable-line:no-implicit-dependencies
 import { Program } from 'typescript';
-import { stripBom } from '../angular-cli-files/utilities/strip-bom';
+import { stripBom } from '../utils/strip-bom';
 import { Schema as RealTslintBuilderOptions } from './schema';
 
 

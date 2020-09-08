@@ -14,11 +14,11 @@ import * as webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
 import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
-import { statsErrorsToString } from '../utilities/stats';
-import { getWebpackStatsConfig } from '../models/webpack-configs/stats';
+import { statsErrorsToString } from '../utils/stats';
+import { getWebpackStatsConfig } from '../configs/stats';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
-import { WebpackTestOptions } from '../models/build-options';
+import { WebpackTestOptions } from '../../utils/build-options';
 import { normalizeSourceMaps } from '../../utils/index';
 
 /**

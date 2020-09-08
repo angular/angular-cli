@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Compiler } from 'webpack';
-import { HashFormat } from '../models/webpack-configs/utils';
+import { HashFormat } from '../utils/helpers';
 
 
 export interface RemoveHashPluginOptions {

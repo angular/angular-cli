@@ -10,7 +10,7 @@ import { EmittedFiles } from '@angular-devkit/build-webpack';
 import { Path, dirname, getSystemPath, join, virtualFs } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { ExtraEntryPoint } from '../../../browser/schema';
+import { ExtraEntryPoint } from '../../browser/schema';
 import { generateEntryPoints } from '../package-chunk-sort';
 import { stripBom } from '../strip-bom';
 import { CrossOriginValue, FileInfo, augmentIndexHtml } from './augment-index-html';
