@@ -27,7 +27,6 @@ import {
   OverwriteFileAction,
   RenameFileAction,
   UnknownActionException,
-  isAction,
 } from '../tree/action';
 import { Tree } from '../tree/interface';
 

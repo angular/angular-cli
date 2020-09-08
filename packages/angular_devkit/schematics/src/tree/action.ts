@@ -156,7 +156,9 @@ export function isContentAction(action: Action): action is CreateFileAction | Ov
   return action.kind == 'c' || action.kind == 'o';
 }
 
-
+/**
+ * @deprecated since version 11.0. not used anymore can be removed in future version.
+ */
 export function isAction(action: any): action is Action {  // tslint:disable-line:no-any
   const kind = action && action.kind;
 
