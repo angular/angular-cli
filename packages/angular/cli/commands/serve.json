@@ -12,15 +12,6 @@
   "type": "object",
   "allOf": [
     { "$ref": "./definitions.json#/definitions/architect" },
-    { "$ref": "./definitions.json#/definitions/base" },
-    {
-      "type": "object",
-      "properties": {
-        "buildEventLog": {
-          "type": "string",
-          "description": "**EXPERIMENTAL** Output file path for Build Event Protocol events"
-        }
-      }
-    }
+    { "$ref": "./definitions.json#/definitions/base" }
   ]
 }
