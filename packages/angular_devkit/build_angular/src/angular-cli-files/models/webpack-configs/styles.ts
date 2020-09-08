@@ -17,12 +17,12 @@ import {
 import { WebpackConfigOptions } from '../build-options';
 import { getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
-const autoprefixer = require('autoprefixer');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const postcssImports = require('postcss-import');
-
 // tslint:disable-next-line:no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions) {
+  const autoprefixer = require('autoprefixer');
+  const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+  const postcssImports = require('postcss-import');
+
   const { root, buildOptions } = wco;
   const entryPoints: { [key: string]: [string, ...string[]] } = {};
   const globalStylePaths: string[] = [];
