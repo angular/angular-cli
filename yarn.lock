@@ -1003,11 +1003,6 @@
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/labs@2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@bazel/labs/-/labs-2.0.3.tgz#98c2a4c2055372ecf0020c55eb6a33f065e65252"
-  integrity sha512-8E2gqSpi+RgJPdqeKgt3Jc/UGl8R22xROukdYddUGygLHbQxaYLVJ/LboLX00316S+pNIpA/t5S3+Y4CguWtOg==
-
 "@bazel/typescript@2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.0.3.tgz#0be019014ef973f3a415c4671c65d943afc62023"

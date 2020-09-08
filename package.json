@@ -89,7 +89,6 @@
     "@bazel/bazelisk": "1.6.1",
     "@bazel/buildifier": "3.4.0",
     "@bazel/jasmine": "2.0.3",
-    "@bazel/labs": "2.0.3",
     "@bazel/typescript": "2.0.3",
     "@jsdevtools/coverage-istanbul-loader": "3.0.3",
     "@types/babel__core": "7.1.9",

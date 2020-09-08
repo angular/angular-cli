@@ -4,25 +4,12 @@ workspace(
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "build_bazel_rules_nodejs",
     sha256 = "10fffa29f687aa4d8eb6dfe8731ab5beb63811ab00981fc84a93899641fd4af1",
     urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/2.0.3/rules_nodejs-2.0.3.tar.gz"],
 )
-
-# We use protocol buffers for the Build Event Protocol
-git_repository(
-    name = "com_google_protobuf",
-    commit = "6263268b8c1b78a8a9b65acd6f5dd5c04dd9b0e1",
-    remote = "https://github.com/protocolbuffers/protobuf",
-    shallow_since = "1576607245 -0800",
-)
-
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
-protobuf_deps()
 
 # Check the bazel version and download npm dependencies
 load("@build_bazel_rules_nodejs//:index.bzl", "check_bazel_version", "check_rules_nodejs_version", "node_repositories", "yarn_install")
@@ -81,11 +68,6 @@ yarn_install(
 load("@npm//:install_bazel_dependencies.bzl", "install_bazel_dependencies")
 
 install_bazel_dependencies(suppress_warning = True)
-
-# Load labs dependencies
-load("@npm//@bazel/labs:package.bzl", "npm_bazel_labs_dependencies")
-
-npm_bazel_labs_dependencies()
 
 ##########################
 # Remote Execution Setup #
