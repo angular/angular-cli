@@ -27,11 +27,6 @@ export * from './logger/null-logger';
 export * from './logger/transform-logger';
 // End logging namespace
 
-// Start terminal namespace
-export * from './terminal/text';
-export * from './terminal/colors';
-// End terminal namespace
-
 // Start utils namespace
 export * from './utils/literals';
 export * from './utils/strings';

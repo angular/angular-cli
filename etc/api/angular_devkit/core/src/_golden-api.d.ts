@@ -80,28 +80,6 @@ export declare class BaseException extends Error {
 
 export declare function basename(path: Path): PathFragment;
 
-export declare const bgBlack: (x: string) => string;
-
-export declare const bgBlue: (x: string) => string;
-
-export declare const bgCyan: (x: string) => string;
-
-export declare const bgGreen: (x: string) => string;
-
-export declare const bgMagenta: (x: string) => string;
-
-export declare const bgRed: (x: string) => string;
-
-export declare const bgWhite: (x: string) => string;
-
-export declare const bgYellow: (x: string) => string;
-
-export declare const black: (x: string) => string;
-
-export declare const blue: (x: string) => string;
-
-export declare const bold: (x: string) => string;
-
 export declare function buildJsonPointer(fragments: string[]): JsonPointer;
 
 export declare function camelize(str: string): string;
@@ -115,35 +93,6 @@ export declare class CircularDependencyFoundException extends BaseException {
 export declare function classify(str: string): string;
 
 export declare function clean<T>(array: Array<T | undefined>): Array<T>;
-
-export declare namespace colors {
-    const reset: (x: string) => string;
-    const bold: (x: string) => string;
-    const dim: (x: string) => string;
-    const italic: (x: string) => string;
-    const underline: (x: string) => string;
-    const inverse: (x: string) => string;
-    const hidden: (x: string) => string;
-    const strikethrough: (x: string) => string;
-    const black: (x: string) => string;
-    const red: (x: string) => string;
-    const green: (x: string) => string;
-    const yellow: (x: string) => string;
-    const blue: (x: string) => string;
-    const magenta: (x: string) => string;
-    const cyan: (x: string) => string;
-    const white: (x: string) => string;
-    const grey: (x: string) => string;
-    const gray: (x: string) => string;
-    const bgBlack: (x: string) => string;
-    const bgRed: (x: string) => string;
-    const bgGreen: (x: string) => string;
-    const bgYellow: (x: string) => string;
-    const bgBlue: (x: string) => string;
-    const bgMagenta: (x: string) => string;
-    const bgCyan: (x: string) => string;
-    const bgWhite: (x: string) => string;
-}
 
 export declare class ContentHasMutatedException extends BaseException {
     constructor(path: string);
@@ -232,8 +181,6 @@ export interface CustomDimensionsAndMetricsOptions {
     metrics?: (boolean | number | string)[];
 }
 
-export declare const cyan: (x: string) => string;
-
 export declare function dasherize(str: string): string;
 
 export declare function decamelize(str: string): string;
@@ -245,8 +192,6 @@ export declare type DefinitionCollectionListener<V extends object> = (name: stri
 export declare class DependencyNotFoundException extends BaseException {
     constructor();
 }
-
-export declare const dim: (x: string) => string;
 
 export declare function dirname(path: Path): Path;
 
@@ -306,14 +251,6 @@ export declare function getSystemPath(path: Path): string;
 
 export declare function getTypesOfSchema(schema: JsonSchema): Set<string>;
 
-export declare const gray: (x: string) => string;
-
-export declare const green: (x: string) => string;
-
-export declare const grey: (x: string) => string;
-
-export declare const hidden: (x: string) => string;
-
 export interface Host<StatsT extends object = {}> extends ReadonlyHost<StatsT> {
     delete(path: Path): Observable<void>;
     rename(from: Path, to: Path): Observable<void>;
@@ -365,8 +302,6 @@ export declare class InvalidUpdateRecordException extends BaseException {
     constructor();
 }
 
-export declare const inverse: (x: string) => string;
-
 export declare function isAbsolute(p: Path): boolean;
 
 export declare function isJsonArray(value: JsonValue): value is JsonArray;
@@ -376,8 +311,6 @@ export declare function isJsonObject(value: JsonValue): value is JsonObject;
 export declare function isObservable(obj: any | Observable<any>): obj is Observable<any>;
 
 export declare function isPromise(obj: any): obj is Promise<any>;
-
-export declare const italic: (x: string) => string;
 
 export declare function join(p1: Path, ...others: string[]): Path;
 
@@ -585,8 +518,6 @@ export declare class LoggingAnalytics implements Analytics {
 }
 
 export declare type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
-
-export declare const magenta: (x: string) => string;
 
 export declare function mapObject<T, V>(obj: {
     [k: string]: T;
@@ -810,8 +741,6 @@ export declare function readWorkspace(path: string, host: WorkspaceHost, format?
     workspace: WorkspaceDefinition;
 }>;
 
-export declare const red: (x: string) => string;
-
 export interface ReferenceResolver<ContextT> {
     (ref: string, context?: ContextT): {
         context?: ContextT;
@@ -836,8 +765,6 @@ export interface RequiredValidatorError extends SchemaValidatorErrorBase {
         missingProperty: string;
     };
 }
-
-export declare const reset: (x: string) => string;
 
 export declare function resetNormalizeCache(): void;
 
@@ -1010,8 +937,6 @@ export declare type Stats<T extends object = {}> = T & {
     readonly birthtime: Date;
 };
 
-export declare const strikethrough: (x: string) => string;
-
 export declare function stringToFileBuffer(str: string): FileBuffer;
 
 export declare function stripIndent(strings: TemplateStringsArray, ...values: any[]): string;
@@ -1171,8 +1096,6 @@ export declare class TransformLogger extends Logger {
 
 export declare function trimNewlines(strings: TemplateStringsArray, ...values: any[]): string;
 
-export declare const underline: (x: string) => string;
-
 export declare function underscore(str: string): string;
 
 export declare class UnexpectedEndOfInputException extends JsonException {
@@ -1197,8 +1120,6 @@ export declare function visitJson<ContextT>(json: JsonValue, visitor: JsonVisito
 
 export declare function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor): void;
 
-export declare const white: (x: string) => string;
-
 export declare type WindowsPath = string & {
     __PRIVATE_DEVKIT_WINDOWS_PATH: void;
 };
@@ -1220,5 +1141,3 @@ export interface WorkspaceHost {
 }
 
 export declare function writeWorkspace(workspace: WorkspaceDefinition, host: WorkspaceHost, path?: string, format?: WorkspaceFormat): Promise<void>;
-
-export declare const yellow: (x: string) => string;
