@@ -1,12 +1,14 @@
 import { ng } from '../../utils/process';
 import { copyProjectAsset } from '../../utils/assets';
-import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
+import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 
 export default function () {
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/styles.css': 'div { background: url("./assets/more.png"); }',
+      'src/lazy.ts': 'export const lazy = "lazy";',
     }))
+    .then(() => appendToFile('src/main.ts', 'import("./lazy");'))
     // use image with file size >10KB to prevent inlining
     .then(() => copyProjectAsset('images/spectrum.png', './src/assets/more.png'))
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
