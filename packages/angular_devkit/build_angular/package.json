@@ -47,7 +47,7 @@
     "pnp-webpack-plugin": "1.6.4",
     "postcss": "7.0.32",
     "postcss-import": "12.0.1",
-    "postcss-loader": "3.0.0",
+    "postcss-loader": "4.0.1",
     "raw-loader": "4.0.1",
     "regenerator-runtime": "0.13.7",
     "resolve-url-loader": "3.1.1",
