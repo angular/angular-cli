@@ -35,38 +35,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Determine hashing format.
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
 
-  const postcssPluginCreator = function(loader: webpack.loader.LoaderContext) {
-    return [
-      postcssImports({
-        resolve: (url: string) => (url.startsWith('~') ? url.substr(1) : url),
-        load: (filename: string) => {
-          return new Promise<string>((resolve, reject) => {
-            loader.fs.readFile(filename, (err: Error, data: Buffer) => {
-              if (err) {
-                reject(err);
-
-                return;
-              }
-
-              const content = data.toString();
-              resolve(content);
-            });
-          });
-        },
-      }),
-      PostcssCliResources({
-        baseHref: buildOptions.baseHref,
-        deployUrl: buildOptions.deployUrl,
-        resourcesOutputPath: buildOptions.resourcesOutputPath,
-        loader,
-        rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
-        filename: `[name]${hashFormat.file}.[ext]`,
-        emitFile: buildOptions.platform !== 'server',
-      }),
-      autoprefixer(),
-    ];
-  };
-
   // use includePaths from appConfig
   const includePaths: string[] = [];
   let lessPathOptions: { paths?: string[] } = {};
@@ -186,7 +154,56 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     },
   ];
 
+  const postcssOptionsCreator = (sourceMap: boolean, extracted: boolean | undefined) => {
+    return (loader: webpack.loader.LoaderContext) => ({
+      map: sourceMap && {
+        inline: true,
+        annotation: false,
+      },
+      plugins: [
+        postcssImports({
+          resolve: (url: string) => url.startsWith('~') ? url.substr(1) : url,
+          load: (filename: string) => {
+            return new Promise<string>((resolve, reject) => {
+              loader.fs.readFile(filename, (err: Error, data: Buffer) => {
+                if (err) {
+                  reject(err);
+
+                  return;
+                }
+
+                const content = data.toString();
+                resolve(content);
+              });
+            });
+          },
+        }),
+        PostcssCliResources({
+          baseHref: buildOptions.baseHref,
+          deployUrl: buildOptions.deployUrl,
+          resourcesOutputPath: buildOptions.resourcesOutputPath,
+          loader,
+          rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
+          filename: `[name]${hashFormat.file}.[ext]`,
+          emitFile: buildOptions.platform !== 'server',
+          extracted,
+        }),
+        autoprefixer(),
+      ],
+    });
+  };
+
   // load component css as raw strings
+  const componentsSourceMap = !!(
+    cssSourceMap
+    // Never use component css sourcemap when style optimizations are on.
+    // It will just increase bundle size without offering good debug experience.
+    && !buildOptions.optimization.styles
+    // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
+    // for component css.
+    && !buildOptions.sourceMap.hidden
+  );
+
   const rules: webpack.RuleSetRule[] = baseRules.map(({ test, use }) => ({
     exclude: globalStylePaths,
     test,
@@ -195,15 +212,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       {
         loader: require.resolve('postcss-loader'),
         options: {
-          ident: 'embedded',
-          plugins: postcssPluginCreator,
-          sourceMap: cssSourceMap
-            // Never use component css sourcemap when style optimizations are on.
-            // It will just increase bundle size without offering good debug experience.
-            && !buildOptions.optimization.styles
-            // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
-            // for component css.
-            && !buildOptions.sourceMap.hidden ? 'inline' : false,
+          postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
         },
       },
       ...use,
@@ -212,6 +221,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
+    const globalSourceMap = !!(
+      cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden
+    );
+
     rules.push(
       ...baseRules.map(({ test, use }) => {
         return {
@@ -230,18 +243,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
               loader: require.resolve('css-loader'),
               options: {
                 url: false,
-                sourceMap: cssSourceMap,
+                sourceMap: globalSourceMap,
               },
             },
             {
               loader: require.resolve('postcss-loader'),
               options: {
-                ident: buildOptions.extractCss ? 'extracted' : 'embedded',
-                plugins: postcssPluginCreator,
-                sourceMap:
-                  cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden
-                    ? 'inline'
-                    : cssSourceMap,
+                postcssOptions: postcssOptionsCreator(globalSourceMap, buildOptions.extractCss),
               },
             },
             ...use,

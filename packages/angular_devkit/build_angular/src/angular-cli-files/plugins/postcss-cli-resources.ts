@@ -29,6 +29,8 @@ export interface PostcssCliResourcesOptions {
   deployUrl?: string;
   resourcesOutputPath?: string;
   rebaseRootRelative?: boolean;
+  /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
+  extracted?: boolean;
   filename: string;
   loader: webpack.loader.LoaderContext;
   emitFile: boolean;
@@ -59,6 +61,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     filename,
     loader,
     emitFile,
+    extracted,
   } = options;
 
   const dedupeSlashes = (url: string) => url.replace(/\/\/+/g, '/');
@@ -149,7 +152,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
           outputUrl = url.format({ pathname: outputUrl, hash, search });
         }
 
-        if (deployUrl && loader.loaders[loader.loaderIndex].options.ident !== 'extracted') {
+        if (deployUrl && !extracted) {
           outputUrl = url.resolve(deployUrl, outputUrl);
         }
 
