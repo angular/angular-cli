@@ -34,14 +34,14 @@ exports.config = {
     },
     {
       browserName: 'safari',
-      platform: 'macOS 10.13',
-      version: '12.1',
+      platform: 'macOS 10.15',
+      version: '13.1',
       tunnelIdentifier,
     },
     {
       browserName: 'safari',
       platform: 'macOS 10.15',
-      version: '13.1',
+      version: '14.0',
       tunnelIdentifier,
     },
     {
