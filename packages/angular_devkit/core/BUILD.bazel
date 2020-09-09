@@ -29,9 +29,7 @@ ts_library(
         include = ["**/*.json"],
         # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
         exclude = ["node_modules/**"],
-    ) + [
-        "//packages/angular_devkit/core/third_party/github.com/chalk/supports-color",
-    ],
+    ),
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
