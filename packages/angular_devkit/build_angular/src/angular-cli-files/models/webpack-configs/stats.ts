@@ -38,11 +38,12 @@ const verboseWebpackOutputOptions = {
   chunkModules: true,
   errorDetails: true,
   moduleTrace: true,
+  logging: 'verbose',
 };
 
 export function getWebpackStatsConfig(verbose = false) {
   return verbose
-    ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
+    ? { ...webpackOutputOptions, ...verboseWebpackOutputOptions }
     : webpackOutputOptions;
 }
 
