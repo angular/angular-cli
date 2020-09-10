@@ -41,6 +41,7 @@ ts_library(
         "@npm//@types/inquirer",
         "@npm//@types/minimist",
         "@npm//@types/node",
+        "@npm//ansi-colors",
         "@npm//inquirer",  # @external
         "@npm//minimist",  # @external
         "@npm//rxjs",

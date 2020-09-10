@@ -16,7 +16,6 @@ import {
   normalize,
   schema,
   tags,
-  terminal,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost, ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
@@ -26,6 +25,7 @@ import {
   formats,
 } from '@angular-devkit/schematics';
 import { NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
+import * as ansiColors from 'ansi-colors';
 import * as inquirer from 'inquirer';
 import * as minimist from 'minimist';
 
@@ -117,6 +117,7 @@ function _createPromptProvider(): schema.PromptProvider {
   };
 }
 
+// tslint:disable-next-line: no-big-function
 export async function main({
   args,
   stdout = process.stdout,
@@ -124,8 +125,19 @@ export async function main({
 }: MainOptions): Promise<0 | 1> {
   const argv = parseArgs(args);
 
+  // Create a separate instance to prevent unintended global changes to the color configuration
+  // Create function is not defined in the typings. See: https://github.com/doowb/ansi-colors/pull/44
+  const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
+
   /** Create the DevKit Logger used through the CLI. */
-  const logger = createConsoleLogger(argv['verbose'], stdout, stderr);
+  const logger = createConsoleLogger(argv['verbose'], stdout, stderr, {
+    info: s => s,
+    debug: s => s,
+    warn: s => colors.bold.yellow(s),
+    error: s => colors.bold.red(s),
+    fatal: s => colors.bold.red(s),
+  });
+
   if (argv.help) {
     logger.info(getUsage());
 
@@ -205,20 +217,20 @@ export async function main({
         break;
       case 'update':
         loggingQueue.push(tags.oneLine`
-        ${terminal.white('UPDATE')} ${eventPath} (${event.content.length} bytes)
+        ${colors.white('UPDATE')} ${eventPath} (${event.content.length} bytes)
       `);
         break;
       case 'create':
         loggingQueue.push(tags.oneLine`
-        ${terminal.green('CREATE')} ${eventPath} (${event.content.length} bytes)
+        ${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)
       `);
         break;
       case 'delete':
-        loggingQueue.push(`${terminal.yellow('DELETE')} ${eventPath}`);
+        loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
         break;
       case 'rename':
         const eventToPath = event.to.startsWith('/') ? event.to.substr(1) : event.to;
-        loggingQueue.push(`${terminal.blue('RENAME')} ${eventPath} => ${eventToPath}`);
+        loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
         break;
     }
   });

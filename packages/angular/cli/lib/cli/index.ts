@@ -8,7 +8,7 @@
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
 import { runCommand } from '../../models/command-runner';
-import { colors, removeColor, supportsColor } from '../../utilities/color';
+import { colors, removeColor } from '../../utilities/color';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import { getWorkspaceDetails } from '../../utilities/project';
@@ -49,11 +49,11 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
   }
 
   const logger = createConsoleLogger(isDebug, process.stdout, process.stderr, {
-    info: s => (supportsColor ? s : removeColor(s)),
-    debug: s => (supportsColor ? s : removeColor(s)),
-    warn: s => (supportsColor ? colors.bold.yellow(s) : removeColor(s)),
-    error: s => (supportsColor ? colors.bold.red(s) : removeColor(s)),
-    fatal: s => (supportsColor ? colors.bold.red(s) : removeColor(s)),
+    info: s => (colors.enabled ? s : removeColor(s)),
+    debug: s => (colors.enabled ? s : removeColor(s)),
+    warn: s => (colors.enabled ? colors.bold.yellow(s) : removeColor(s)),
+    error: s => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
+    fatal: s => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
   });
 
   // Redirect console to logger

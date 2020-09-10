@@ -131,6 +131,7 @@ ts_library(
         "@npm//@types/webpack-dev-server",
         "@npm//@types/webpack-sources",
         "@npm//ajv",
+        "@npm//ansi-colors",
         "@npm//autoprefixer",
         "@npm//babel-loader",
         "@npm//browserslist",

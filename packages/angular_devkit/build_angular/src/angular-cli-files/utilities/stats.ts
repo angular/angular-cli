@@ -7,12 +7,10 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import { logging, tags, terminal } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import * as path from 'path';
-
-
-const { bold, green, red, reset, white, yellow } = terminal;
+import { colors as ansiColors } from '../../utils/color';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -37,8 +35,8 @@ export function generateBundleStats(
   },
   colors: boolean,
 ): string {
-  const g = (x: string) => (colors ? bold(green(x)) : x);
-  const y = (x: string) => (colors ? bold(yellow(x)) : x);
+  const g = (x: string) => (colors ? ansiColors.bold.green(x) : x);
+  const y = (x: string) => (colors ? ansiColors.bold.yellow(x) : x);
 
   const id = info.id ? y(info.id.toString()) : '';
   const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
@@ -53,14 +51,14 @@ export function generateBundleStats(
 }
 
 export function generateBuildStats(hash: string, time: number, colors: boolean): string {
-  const w = (x: string) => colors ? bold(white(x)) : x;
+  const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
   return `Date: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`
 }
 
 export function statsToString(json: any, statsConfig: any) {
   const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? reset(x) : x;
-  const w = (x: string) => colors ? bold(white(x)) : x;
+  const rs = (x: string) => colors ? ansiColors.reset(x) : x;
+  const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
 
   const changedChunksStats = json.chunks
     .filter((chunk: any) => chunk.rendered)
@@ -97,8 +95,8 @@ const ERRONEOUS_WARNINGS_FILTER = (warning: string) => ![
 
 export function statsWarningsToString(json: any, statsConfig: any): string {
   const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? reset(x) : x;
-  const y = (x: string) => colors ? bold(yellow(x)) : x;
+  const rs = (x: string) => colors ? ansiColors.reset(x) : x;
+  const y = (x: string) => colors ? ansiColors.bold.yellow(x) : x;
   const warnings = [...json.warnings];
   if (json.children) {
     warnings.push(...json.children
@@ -116,8 +114,8 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
 
 export function statsErrorsToString(json: any, statsConfig: any): string {
   const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? reset(x) : x;
-  const r = (x: string) => colors ? bold(red(x)) : x;
+  const rs = (x: string) => colors ? ansiColors.reset(x) : x;
+  const r = (x: string) => colors ? ansiColors.bold.red(x) : x;
   const errors = [...json.errors];
   if (json.children) {
     errors.push(...json.children

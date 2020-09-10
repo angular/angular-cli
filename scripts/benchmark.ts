@@ -7,7 +7,8 @@
  */
 // tslint:disable:no-implicit-dependencies
 // tslint:disable:no-console
-import { tags, terminal } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
+import * as colors from 'ansi-colors';
 import * as glob from 'glob';
 import 'jasmine';
 import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
@@ -89,7 +90,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         const baseAverageMult = pad(precision(stat.average / stat.base.average), multPad);
 
         console.log(
-          terminal.colors.yellow(tags.indentBy(6)`
+          colors.yellow(tags.indentBy(6)`
           count:   ${count}
           fastest: ${fastest}
             (base) ${baseFastest}
@@ -101,7 +102,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         );
       } else {
         console.log(
-          terminal.colors.yellow(tags.indentBy(6)`
+          colors.yellow(tags.indentBy(6)`
           count:   ${count}
           fastest: ${fastest}
           slowest: ${slowest}

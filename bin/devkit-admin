@@ -33,19 +33,19 @@ process.chdir(path.join(__dirname, '..'));
 let logger = null;
 try {
   logger = new (require('@angular-devkit/core').logging.IndentLogger)('root');
-  const { bold, gray, red, yellow, white } = require('@angular-devkit/core').terminal;
+  const colors = require('ansi-colors').create();
   const filter = require('rxjs/operators').filter;
 
   logger
     .pipe(filter(entry => (entry.level !== 'debug' || args.verbose)))
     .subscribe(entry => {
-      let color = gray;
+      let color = colors.gray;
       let output = process.stdout;
       switch (entry.level) {
-        case 'info': color = white; break;
-        case 'warn': color = yellow; break;
-        case 'error': color = red; output = process.stderr; break;
-        case 'fatal': color = x => bold(red(x)); output = process.stderr; break;
+        case 'info': color = colors.white; break;
+        case 'warn': color = colors.yellow; break;
+        case 'error': color = colors.red; output = process.stderr; break;
+        case 'fatal': color = x => colors.bold.red(x); output = process.stderr; break;
       }
 
       output.write(color(entry.message) + '\n');
