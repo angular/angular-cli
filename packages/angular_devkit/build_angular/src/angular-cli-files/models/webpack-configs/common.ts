@@ -594,7 +594,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       // https://github.com/angular/angular/issues/11580
       // With VE the correct context is added in @ngtools/webpack, but Ivy doesn't need it at all.
       new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/),
-      new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
+      new DedupeModuleResolvePlugin(),
       ...extraPlugins,
     ],
   };

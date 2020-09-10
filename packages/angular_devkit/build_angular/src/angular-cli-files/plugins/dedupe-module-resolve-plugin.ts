@@ -15,10 +15,6 @@ interface ResourceData {
   packageVersion?: string;
 }
 
-export interface DedupeModuleResolvePluginOptions {
-  verbose?: boolean;
-}
-
 // tslint:disable-next-line: no-any
 function getResourceData(resolveData: any): ResourceData {
   if (resolveData.createData) {
@@ -60,9 +56,9 @@ function getResourceData(resolveData: any): ResourceData {
 export class DedupeModuleResolvePlugin {
   modules = new Map<string, { request: string, resource: string }>();
 
-  constructor(private options?: DedupeModuleResolvePluginOptions) { }
-
   apply(compiler: Compiler) {
+    const logger = compiler.getInfrastructureLogger('DedupeModuleResolvePlugin');
+
     compiler.hooks.compilation.tap('DedupeModuleResolvePlugin', (compilation, { normalModuleFactory }) => {
       normalModuleFactory.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result) => {
         if (!result) {
@@ -96,9 +92,7 @@ export class DedupeModuleResolvePlugin {
           return;
         }
 
-        if (this.options?.verbose) {
-          addWarning(compilation, `[DedupeModuleResolvePlugin]: ${resource} -> ${prevResource}`);
-        }
+        logger.debug(`deduped: ${result.resource} -> ${prevResource}`);
 
         // Alter current request with previously resolved module.
         result.request = prevRequest;
