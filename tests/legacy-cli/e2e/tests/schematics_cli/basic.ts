@@ -10,6 +10,8 @@ export default async function () {
     return;
   }
 
+  process.env['NPM_CONFIG_REGISTRY'] = 'http://localhost:4873';
+
   await silentNpm(
     'install',
     '-g',
