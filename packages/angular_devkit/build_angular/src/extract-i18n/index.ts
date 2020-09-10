@@ -10,7 +10,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
+import { BuildResult, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import * as fs from 'fs';
@@ -23,7 +23,7 @@ import {
   getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { statsErrorsToString, statsHasErrors, statsHasWarnings, statsWarningsToString } from '../angular-cli-files/utilities/stats';
+import { createWebpackLoggingCallback } from '../angular-cli-files/utilities/stats';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
@@ -218,23 +218,11 @@ export async function execute(
     }
   }
 
-  const logging: WebpackLoggingCallback = (stats, config) => {
-    const json = stats.toJson({ errors: true, warnings: true });
-
-    if (statsHasWarnings(json)) {
-      context.logger.warn(statsWarningsToString(json, config.stats));
-    }
-
-    if (statsHasErrors(json)) {
-      context.logger.error(statsErrorsToString(json, config.stats));
-    }
-  };
-
   const webpackResult = await runWebpack(
     (await transforms?.webpackConfiguration?.(config)) || config,
     context,
     {
-      logging,
+      logging: createWebpackLoggingCallback(false, context.logger),
       webpackFactory: await import('webpack'),
     },
   ).toPromise();

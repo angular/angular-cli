@@ -21,6 +21,7 @@ import {
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
+import { createWebpackLoggingCallback } from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
 import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../utils';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
@@ -84,6 +85,7 @@ export function execute(
     concatMap(({ config, i18n }) => {
       return runWebpack(config, context, {
         webpackFactory: require('webpack') as typeof webpack,
+        logging: createWebpackLoggingCallback(!!options.verbose, context.logger),
       }).pipe(
         concatMap(async output => {
           const { emittedFiles = [], webpackStats } = output;

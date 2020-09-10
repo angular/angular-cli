@@ -7,7 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { join, json, logging, normalize, tags, virtualFs } from '@angular-devkit/core';
+import { join, json, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -36,12 +36,12 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import {
+  createWebpackLoggingCallback,
   generateBuildStats,
   generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
   statsHasWarnings,
-  statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
@@ -87,28 +87,6 @@ export type BrowserBuilderOutput = json.JsonObject &
      */
     outputPath: string;
   };
-
-export function createBrowserLoggingCallback(
-  verbose: boolean,
-  logger: logging.LoggerApi,
-): WebpackLoggingCallback {
-  return (stats, config) => {
-    // config.stats contains our own stats settings, added during buildWebpackConfig().
-    const json = stats.toJson(config.stats);
-    if (verbose) {
-      logger.info(stats.toString(config.stats));
-    } else {
-      logger.info(statsToString(json, config.stats));
-    }
-
-    if (statsHasWarnings(json)) {
-      logger.warn(statsWarningsToString(json, config.stats));
-    }
-    if (statsHasErrors(json)) {
-      logger.error(statsErrorsToString(json, config.stats));
-    }
-  };
-}
 
 // todo: the below should be cleaned once dev-server support the new i18n
 interface ConfigFromContextReturn {
@@ -284,7 +262,7 @@ export function buildWebpackBrowser(
           transforms.logging ||
           (useBundleDownleveling
             ? () => {}
-            : createBrowserLoggingCallback(!!options.verbose, context.logger)),
+            : createWebpackLoggingCallback(!!options.verbose, context.logger)),
       }).pipe(
         // tslint:disable-next-line: no-big-function
         concatMap(async buildEvent => {
