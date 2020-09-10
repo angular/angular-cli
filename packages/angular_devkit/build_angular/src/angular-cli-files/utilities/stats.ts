@@ -7,7 +7,8 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import { tags, terminal } from '@angular-devkit/core';
+import { logging, tags, terminal } from '@angular-devkit/core';
+import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import * as path from 'path';
 
 
@@ -138,4 +139,26 @@ export function statsHasErrors(json: any): boolean {
 export function statsHasWarnings(json: any): boolean {
   return json.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length ||
     !!json.children?.some((c: any) => c.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length);
+}
+
+export function createWebpackLoggingCallback(
+  verbose: boolean,
+  logger: logging.LoggerApi,
+): WebpackLoggingCallback {
+  return (stats, config) => {
+    // config.stats contains our own stats settings, added during buildWebpackConfig().
+    const json = stats.toJson(config.stats);
+    if (verbose) {
+      logger.info(stats.toString(config.stats));
+    } else {
+      logger.info(statsToString(json, config.stats));
+    }
+
+    if (statsHasWarnings(json)) {
+      logger.warn(statsWarningsToString(json, config.stats));
+    }
+    if (statsHasErrors(json)) {
+      logger.error(statsErrorsToString(json, config.stats));
+    }
+  };
 }

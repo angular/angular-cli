@@ -28,7 +28,8 @@ import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
 import { generateEntryPoints } from '../angular-cli-files/utilities/package-chunk-sort';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
-import { buildBrowserWebpackConfigFromContext, createBrowserLoggingCallback } from '../browser';
+import { createWebpackLoggingCallback } from '../angular-cli-files/utilities/stats';
+import { buildBrowserWebpackConfigFromContext } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
@@ -87,7 +88,7 @@ export function serveWebpackBrowser(
   const host = new NodeJsSyncHost();
 
   const loggingFn =
-    transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
+    transforms.logging || createWebpackLoggingCallback(!!options.verbose, context.logger);
 
   async function setup(): Promise<{
     browserOptions: json.JsonObject & BrowserBuilderSchema;
