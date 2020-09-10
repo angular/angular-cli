@@ -1,10 +1,9 @@
+import * as ansiColors from 'ansi-colors';
 import { SpawnOptions } from "child_process";
 import * as child_process from 'child_process';
-import { terminal } from '@angular-devkit/core';
-import { Observable, concat, defer, EMPTY, from} from 'rxjs';
+import { concat, defer, EMPTY, from} from 'rxjs';
 import {repeat, takeLast} from 'rxjs/operators';
 import {getGlobalVariable} from './env';
-import {rimraf} from './fs';
 import {catchError} from 'rxjs/operators';
 const treeKill = require('tree-kill');
 
@@ -25,6 +24,10 @@ export type ProcessOutput = {
 
 
 function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
+  // Create a separate instance to prevent unintended global changes to the color configuration
+  // Create function is not defined in the typings. See: https://github.com/doowb/ansi-colors/pull/44
+  const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
+
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
@@ -42,9 +45,9 @@ function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proc
     .join(', ')
     .replace(/^(.+)$/, ' [$1]');  // Proper formatting.
 
-  console.log(terminal.blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
-  console.log(terminal.blue(`CWD: ${cwd}`));
-  console.log(terminal.blue(`ENV: ${JSON.stringify(env)}`));
+  console.log(colors.blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
+  console.log(colors.blue(`CWD: ${cwd}`));
+  console.log(colors.blue(`ENV: ${JSON.stringify(env)}`));
   const spawnOptions: SpawnOptions = {
     cwd,
     ...env ? { env } : {},
@@ -75,7 +78,7 @@ function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proc
     data.toString('utf-8')
       .split(/[\n\r]+/)
       .filter(line => line !== '')
-      .forEach(line => console.error(terminal.yellow('  ' + line)));
+      .forEach(line => console.error(colors.yellow('  ' + line)));
   });
 
   _processes.push(childProcess);

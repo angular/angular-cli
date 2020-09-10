@@ -19,6 +19,7 @@
     "@babel/template": "7.10.4",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@ngtools/webpack": "0.0.0",
+    "ansi-colors": "4.1.1",
     "autoprefixer": "9.8.6",
     "babel-loader": "8.1.0",
     "browserslist": "^4.9.1",

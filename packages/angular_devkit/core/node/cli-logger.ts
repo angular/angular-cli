@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { filter } from 'rxjs/operators';
-import { logging, terminal } from '../src';
+import { logging } from '../src';
 
 export interface ProcessOutput {
   write(buffer: string | Buffer): boolean;
@@ -24,20 +24,15 @@ export function createConsoleLogger(
   const logger = new logging.IndentLogger('cling');
 
   logger
-    .pipe(filter(entry => (entry.level != 'debug' || verbose)))
+    .pipe(filter(entry => entry.level !== 'debug' || verbose))
     .subscribe(entry => {
-      let color = colors && colors[entry.level];
+      const color = colors && colors[entry.level];
       let output = stdout;
+
       switch (entry.level) {
-        case 'info':
-          break;
         case 'warn':
-          color = color || (s => terminal.bold(terminal.yellow(s)));
-          output = stderr;
-          break;
         case 'fatal':
         case 'error':
-          color = color || (s => terminal.bold(terminal.red(s)));
           output = stderr;
           break;
       }

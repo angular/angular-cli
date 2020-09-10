@@ -8,8 +8,9 @@
  */
 import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { logging, schema, tags, terminal, workspaces } from '@angular-devkit/core';
+import { logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
@@ -67,6 +68,10 @@ interface BarInfo {
   builder: BuilderInfo;
   target?: Target;
 }
+
+// Create a separate instance to prevent unintended global changes to the color configuration
+// Create function is not defined in the typings. See: https://github.com/doowb/ansi-colors/pull/44
+const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
 
 async function _executeTarget(
   parentLogger: logging.Logger,
@@ -139,9 +144,9 @@ async function _executeTarget(
       .pipe(
         tap(result => {
           if (result.success) {
-            parentLogger.info(terminal.green('SUCCESS'));
+            parentLogger.info(colors.green('SUCCESS'));
           } else {
-            parentLogger.info(terminal.yellow('FAILURE'));
+            parentLogger.info(colors.red('FAILURE'));
           }
           parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
 
@@ -157,7 +162,7 @@ async function _executeTarget(
 
     return success ? 0 : 1;
   } catch (err) {
-    parentLogger.info(terminal.red('ERROR'));
+    parentLogger.info(colors.red('ERROR'));
     parentLogger.info('\nLogs:');
     logs.forEach(l => parentLogger.next(l));
 
@@ -173,7 +178,13 @@ async function main(args: string[]): Promise<number> {
   const argv = minimist(args, { boolean: ['help'] });
 
   /** Create the DevKit Logger used through the CLI. */
-  const logger = createConsoleLogger(argv['verbose']);
+  const logger = createConsoleLogger(argv['verbose'], process.stdout, process.stderr, {
+    info: s => s,
+    debug: s => s,
+    warn: s => colors.bold.yellow(s),
+    error: s => colors.bold.red(s),
+    fatal: s => colors.bold.red(s),
+  });
 
   // Check the target.
   const targetStr = argv._[0] || '';

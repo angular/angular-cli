@@ -1,7 +1,8 @@
 // This may seem awkward but we're using Logger in our e2e. At this point the unit tests
 // have run already so it should be "safe", teehee.
-import { logging, terminal } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
+import * as colors from 'ansi-colors';
 import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
@@ -10,8 +11,6 @@ import * as os from 'os';
 import * as path from 'path';
 import { setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
-
-const { blue, bold, green, red, yellow, white } = terminal;
 
 Error.stackTraceLimit = Infinity;
 
@@ -57,7 +56,14 @@ const argv = minimist(process.argv.slice(2), {
  */
 process.exitCode = 255;
 
-const logger = createConsoleLogger(argv.verbose);
+const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr, {
+  info: s => s,
+  debug: s => s,
+  warn: s => colors.bold.yellow(s),
+  error: s => colors.bold.red(s),
+  fatal: s => colors.bold.red(s),
+});
+
 const logStack = [logger];
 function lastLogger() {
   return logStack[logStack.length - 1];
@@ -227,14 +233,14 @@ testsToRun
         registryProcess.kill();
       }
 
-      console.log(green('Done.'));
+      console.log(colors.green('Done.'));
       process.exit(0);
     },
     err => {
       console.log('\n');
-      console.error(red(`Test "${currentFileName}" failed...`));
-      console.error(red(err.message));
-      console.error(red(err.stack));
+      console.error(colors.red(`Test "${currentFileName}" failed...`));
+      console.error(colors.red(err.message));
+      console.error(colors.red(err.stack));
 
       if (registryProcess) {
         registryProcess.kill();
@@ -262,13 +268,13 @@ function printHeader(testName: string, testIndex: number) {
       : (testIndex - allSetups.length) * nbShards + shardId + allSetups.length) + 1;
   const length = tests.length + allSetups.length;
   const shard =
-    shardId === null ? '' : yellow(` [${shardId}:${nbShards}]` + bold(` (${fullIndex}/${length})`));
-  console.log(green(`Running "${bold(blue(testName))}" (${bold(white(text))}${shard})...`));
+    shardId === null ? '' : colors.yellow(` [${shardId}:${nbShards}]` + colors.bold(` (${fullIndex}/${length})`));
+  console.log(colors.green(`Running "${colors.bold.blue(testName)}" (${colors.bold.white(text)}${shard})...`));
 }
 
 function printFooter(testName: string, startTime: number) {
   // Round to hundredth of a second.
   const t = Math.round((Date.now() - startTime) / 10) / 100;
-  console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
+  console.log(colors.green('Last step took ') + colors.bold.blue('' + t) + colors.green('s...'));
   console.log('');
 }

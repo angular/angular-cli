@@ -7,8 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, tags, terminal } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import { ProcessOutput } from '@angular-devkit/core/node';
+import * as ansiColors from 'ansi-colors';
 import { appendFileSync, writeFileSync } from 'fs';
 import * as minimist from 'minimist';
 import { filter, map, toArray } from 'rxjs/operators';
@@ -102,26 +103,30 @@ export async function main({
     })),
   );
 
+  // Create a separate instance to prevent unintended global changes to the color configuration
+  // Create function is not defined in the typings. See: https://github.com/doowb/ansi-colors/pull/44
+  const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
+
   // Log to console.
   logger
     .pipe(filter(entry => (entry.level != 'debug' || argv['verbose'])))
     .subscribe(entry => {
-      let color: (s: string) => string = x => terminal.dim(terminal.white(x));
+      let color: (s: string) => string = x => colors.dim.white(x);
       let output = stdout;
       switch (entry.level) {
         case 'info':
           color = s => s;
           break;
         case 'warn':
-          color = terminal.yellow;
+          color = colors.yellow;
           output = stderr;
           break;
         case 'error':
-          color = terminal.red;
+          color = colors.red;
           output = stderr;
           break;
         case 'fatal':
-          color = (x: string) => terminal.bold(terminal.red(x));
+          color = (x: string) => colors.bold.red(x);
           output = stderr;
           break;
       }
