@@ -10351,9 +10351,9 @@ sass@1.26.10, sass@^1.23.0:
   dependencies:
     chokidar ">=2.0.0 <4.0.0"
 
-"sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.5.4-linux.tar.gz":
+"sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.2-linux.tar.gz":
   version "0.0.0"
-  resolved "https://saucelabs.com/downloads/sc-4.5.4-linux.tar.gz#dc5efcd2be24ddb099a85b923d6e754754651fa8"
+  resolved "https://saucelabs.com/downloads/sc-4.6.2-linux.tar.gz#7b7f35433af9c3380758e048894d7b9aecf3754e"
 
 saucelabs@^1.5.0:
   version "1.5.0"
