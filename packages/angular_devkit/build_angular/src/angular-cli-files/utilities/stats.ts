@@ -52,7 +52,7 @@ export function generateBundleStats(
 
 export function generateBuildStats(hash: string, time: number, colors: boolean): string {
   const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
-  return `Date: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`
+  return `Built at: ${w(new Date().toLocaleString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`
 }
 
 export function statsToString(json: any, statsConfig: any) {
@@ -72,7 +72,7 @@ export function statsToString(json: any, statsConfig: any) {
 
   if (unchangedChunkNumber > 0) {
     return '\n' + rs(tags.stripIndents`
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)}
+      Built at: ${w(new Date().toLocaleString())} - Hash: ${w(json.hash)}
       ${unchangedChunkNumber} unchanged chunks
       ${changedChunksStats.join('\n')}
       Time: ${w('' + json.time)}ms
@@ -80,7 +80,7 @@ export function statsToString(json: any, statsConfig: any) {
   } else {
     return '\n' + rs(tags.stripIndents`
       ${changedChunksStats.join('\n')}
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
+      Built at: ${w(new Date().toLocaleString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
       `);
   }
 }
