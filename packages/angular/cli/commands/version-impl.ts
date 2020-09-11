@@ -6,25 +6,28 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonParseMode, isJsonObject, parseJson } from '@angular-devkit/core';
-import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from '../models/command';
 import { colors } from '../utilities/color';
-import { findUp } from '../utilities/find-up';
 import { Schema as VersionCommandSchema } from './version';
+
+interface PartialPackageInfo {
+  name: string;
+  version: string;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+}
 
 export class VersionCommand extends Command<VersionCommandSchema> {
   public static aliases = ['v'];
 
   async run() {
-    const pkg = require(path.resolve(__dirname, '..', 'package.json'));
-    let projPkg;
+    const cliPackage: PartialPackageInfo = require('../package.json');
+    let workspacePackage: PartialPackageInfo | undefined;
     try {
-      projPkg = require(path.resolve(this.workspace.root, 'package.json'));
-    } catch {
-      projPkg = undefined;
-    }
+      workspacePackage = require(path.resolve(this.workspace.root, 'package.json'));
+    } catch {}
 
     const patterns = [
       /^@angular\/.*/,
@@ -39,32 +42,12 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       /^webpack$/,
     ];
 
-    const maybeNodeModules = findUp('node_modules', __dirname);
-    const packageRoot = projPkg
-      ? path.resolve(this.workspace.root, 'node_modules')
-      : maybeNodeModules;
-
     const packageNames = [
-      ...Object.keys((pkg && pkg['dependencies']) || {}),
-      ...Object.keys((pkg && pkg['devDependencies']) || {}),
-      ...Object.keys((projPkg && projPkg['dependencies']) || {}),
-      ...Object.keys((projPkg && projPkg['devDependencies']) || {}),
+      ...Object.keys(cliPackage.dependencies || {}),
+      ...Object.keys(cliPackage.devDependencies || {}),
+      ...Object.keys(workspacePackage?.dependencies || {}),
+      ...Object.keys(workspacePackage?.devDependencies || {}),
     ];
-
-    if (packageRoot != null) {
-      // Add all node_modules and node_modules/@*/*
-      const nodePackageNames = fs.readdirSync(packageRoot).reduce<string[]>((acc, name) => {
-        if (name.startsWith('@')) {
-          return acc.concat(
-            fs.readdirSync(path.resolve(packageRoot, name)).map(subName => name + '/' + subName),
-          );
-        } else {
-          return acc.concat(name);
-        }
-      }, []);
-
-      packageNames.push(...nodePackageNames);
-    }
 
     const versions = packageNames
       .filter(x => patterns.some(p => p.test(x)))
@@ -74,31 +57,18 @@ export class VersionCommand extends Command<VersionCommandSchema> {
             return acc;
           }
 
-          acc[name] = this.getVersion(name, packageRoot, maybeNodeModules);
+          acc[name] = this.getVersion(name);
 
           return acc;
         },
         {} as { [module: string]: string },
       );
 
-    let ngCliVersion = pkg.version;
-    if (!__dirname.match(/node_modules/)) {
-      let gitBranch = '??';
-      try {
-        const gitRefName = child_process.execSync('git rev-parse --abbrev-ref HEAD', {
-          cwd: __dirname,
-          encoding: 'utf8',
-          stdio: 'pipe',
-        });
-        gitBranch = gitRefName.replace('\n', '');
-      } catch {}
-
-      ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
-    }
+    const ngCliVersion = cliPackage.version;
     let angularCoreVersion = '';
     const angularSameAsCore: string[] = [];
 
-    if (projPkg) {
+    if (workspacePackage) {
       // Filter all angular versions that are the same as core.
       angularCoreVersion = versions['@angular/core'];
       if (angularCoreVersion) {
@@ -156,7 +126,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
           return acc;
         }, [])
         .join('\n... ')}
-      Ivy Workspace: ${projPkg ? this.getIvyWorkspace() : ''}
+      Ivy Workspace: ${workspacePackage ? this.getIvyWorkspace() : ''}
 
       Package${namePad.slice(7)}Version
       -------${namePad.replace(/ /g, '-')}------------------
@@ -168,28 +138,33 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     );
   }
 
-  private getVersion(
-    moduleName: string,
-    projectNodeModules: string | null,
-    cliNodeModules: string | null,
-  ): string {
-    try {
-      if (projectNodeModules) {
-        const modulePkg = require(path.resolve(projectNodeModules, moduleName, 'package.json'));
+  private getVersion(moduleName: string): string {
+    let packagePath;
+    let cliOnly = false;
 
-        return modulePkg.version;
-      }
+    // Try to find the package in the workspace
+    try {
+      packagePath = require.resolve(`${moduleName}/package.json`, { paths: [ this.workspace.root ]});
     } catch {}
 
-    try {
-      if (cliNodeModules) {
-        const modulePkg = require(path.resolve(cliNodeModules, moduleName, 'package.json'));
+    // If not found, try to find within the CLI
+    if (!packagePath) {
+      try {
+        packagePath = require.resolve(`${moduleName}/package.json`);
+        cliOnly = true;
+      } catch {}
+    }
 
-        return modulePkg.version + ' (cli-only)';
-      }
-    } catch {}
+    let version: string | undefined;
 
-    return '<error>';
+    // If found, attempt to get the version
+    if (packagePath) {
+      try {
+        version = require(packagePath).version + (cliOnly ? ' (cli-only)' : '');
+      } catch {}
+    }
+
+    return version || '<error>';
   }
 
   private getIvyWorkspace(): string {
