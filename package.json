@@ -80,7 +80,7 @@
     "http-proxy-middleware": "^1.0.0",
     "jasmine-core": "^3.0.0",
     "minimatch": "^3.0.4",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.1",
     "protractor": "7.0.0",
     "puppeteer": "5.2.1",
     "rollup": "~2.26.0",
