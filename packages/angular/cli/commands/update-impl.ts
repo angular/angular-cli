@@ -123,7 +123,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       if (event.kind == 'end' || event.kind == 'post-tasks-start') {
         if (!error) {
           // Output the logging queue, no error happened.
-          logs.forEach(log => this.logger.info(log));
+          logs.forEach(log => this.logger.info(`  ${log}`));
           logs = [];
         }
       }
@@ -231,7 +231,16 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     commit = false,
   ): Promise<boolean> {
     for (const migration of migrations) {
-      this.logger.info(`${colors.symbols.pointer} ${migration.description.replace(/\. /g, '.\n  ')}`);
+      const [title, ...description] = migration.description.split('. ');
+
+      this.logger.info(
+        colors.cyan(colors.symbols.pointer) + ' ' +
+        colors.bold(title.endsWith('.') ? title : title + '.'),
+      );
+
+      if (description.length) {
+        this.logger.info('  ' + description.join('.\n  '));
+      }
 
       const result = await this.executeSchematic(migration.collection.name, migration.name);
       if (!result.success) {
