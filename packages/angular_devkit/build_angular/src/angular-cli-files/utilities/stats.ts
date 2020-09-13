@@ -93,10 +93,19 @@ const ERRONEOUS_WARNINGS_FILTER = (warning: string) => ![
   /System.import\(\) is deprecated and will be removed soon/i,
 ].some(msg => msg.test(warning));
 
+interface WebpackDiagnostic {
+  message: string;
+  file?: string;
+  moduleName?: string;
+  loc?: string;
+}
+
 export function statsWarningsToString(json: any, statsConfig: any): string {
   const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? ansiColors.reset(x) : x;
-  const y = (x: string) => colors ? ansiColors.bold.yellow(x) : x;
+  const c = (x: string) => colors ? ansiColors.reset.cyan(x) : x;
+  const y = (x: string) => colors ? ansiColors.reset.yellow(x) : x;
+  const yb = (x: string) => colors ? ansiColors.reset.yellowBright(x) : x;
+
   const warnings = [...json.warnings];
   if (json.children) {
     warnings.push(...json.children
@@ -105,17 +114,45 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
     );
   }
 
-  return rs('\n' + warnings
-    .map((warning: any) => `${warning}`)
-    .filter(ERRONEOUS_WARNINGS_FILTER)
-    .map((warning: string) => y(`WARNING in ${warning}`))
-    .join('\n\n'));
+  let output = '';
+  for (const warning of warnings as (string | WebpackDiagnostic)[]) {
+    if (typeof warning === 'string') {
+      if (!ERRONEOUS_WARNINGS_FILTER(warning)) {
+        continue;
+      }
+      output += yb(`WARNING in ${warning}\n\n`);
+    } else {
+      if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
+          continue;
+      }
+      const file = warning.file || warning.moduleName;
+      if (file) {
+        output += c(file);
+        if (warning.loc) {
+          output += ':' + yb(warning.loc);
+        }
+        output += ' - ';
+      }
+      if (!/^warning/i.test(warning.message)) {
+        output += y('Warning: ');
+      }
+      output += `${warning.message}\n\n`;
+    }
+  }
+
+  if (output) {
+      return '\n' + output;
+  }
+
+  return '';
 }
 
 export function statsErrorsToString(json: any, statsConfig: any): string {
   const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? ansiColors.reset(x) : x;
-  const r = (x: string) => colors ? ansiColors.bold.red(x) : x;
+  const c = (x: string) => colors ? ansiColors.reset.cyan(x) : x;
+  const yb = (x: string) => colors ? ansiColors.reset.yellowBright(x) : x;
+  const r = (x: string) => colors ? ansiColors.reset.redBright(x) : x;
+
   const errors = [...json.errors];
   if (json.children) {
     errors.push(...json.children
@@ -124,10 +161,31 @@ export function statsErrorsToString(json: any, statsConfig: any): string {
     );
   }
 
-  return rs('\n' + errors
-    .map((error: any) => r(`ERROR in ${error}`))
-    .join('\n\n')
-  );
+  let output = '';
+  for (const error of errors as (string | WebpackDiagnostic)[]) {
+    if (typeof error === 'string') {
+      output += r(`ERROR in ${error}\n\n`);
+    } else {
+      const file = error.file || error.moduleName;
+      if (file) {
+        output += c(file);
+        if (error.loc) {
+          output += ':' + yb(error.loc);
+        }
+        output += ' - ';
+      }
+      if (!/^error/i.test(error.message)) {
+        output += r('Error: ');
+      }
+      output += `${error.message}\n\n`;
+    }
+  }
+
+  if (output) {
+      return '\n' + output;
+  }
+
+  return '';
 }
 
 export function statsHasErrors(json: any): boolean {
