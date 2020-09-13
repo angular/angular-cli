@@ -123,7 +123,7 @@
     "@types/webpack-dev-server": "^3.1.7",
     "@types/webpack-sources": "^1.4.2",
     "@yarnpkg/lockfile": "1.1.0",
-    "ajv": "6.12.4",
+    "ajv": "6.12.5",
     "ansi-colors": "4.1.1",
     "autoprefixer": "9.8.6",
     "babel-loader": "8.1.0",
