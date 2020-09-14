@@ -100,7 +100,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           this.logger.error(`ERROR! ${eventPath} ${desc}.`);
           break;
         case 'update':
-          logs.push(`${colors.whiteBright('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
+          logs.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
           files.add(eventPath);
           break;
         case 'create':

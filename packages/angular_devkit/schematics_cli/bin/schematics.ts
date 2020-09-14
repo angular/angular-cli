@@ -217,7 +217,7 @@ export async function main({
         break;
       case 'update':
         loggingQueue.push(tags.oneLine`
-        ${colors.white('UPDATE')} ${eventPath} (${event.content.length} bytes)
+        ${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)
       `);
         break;
       case 'create':
