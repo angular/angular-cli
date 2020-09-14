@@ -6,7 +6,6 @@
     "tslint-no-circular-imports"
   ],
   "rulesDirectory": [
-    "dist/etc/rules",
     "node_modules/tslint-sonarts/lib/rules"
   ],
   "linterOptions": {
@@ -17,12 +16,6 @@
     ]
   },
   "rules": {
-    // ==================================================================================================
-    // custom rules defined in etc/rules/**
-    "defocus": true,
-    "import-groups": true,
-    "no-global-tslint-disable": true,
-    "single-eof-line": true,
     // ==================================================================================================
     // tslint-sonarts rules. See https://github.com/SonarSource/SonarTS
     // These rules are part of the bug detection section of tslint-sonarts
