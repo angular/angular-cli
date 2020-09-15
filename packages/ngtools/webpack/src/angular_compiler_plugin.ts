@@ -79,7 +79,9 @@ import {
   NodeWatchFileSystemInterface,
   NormalModuleFactoryRequest,
 } from './webpack';
+import { addError, addWarning } from './webpack-diagnostics';
 import { createWebpackInputHost } from './webpack-input-host';
+import { isWebpackFiveOrHigher } from './webpack-version';
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
@@ -117,8 +119,8 @@ export class AngularCompilerPlugin {
   private _firstRun = true;
   private _donePromise: Promise<void> | null = null;
   private _normalizedLocale: string | null = null;
-  private _warnings: (string | Error)[] = [];
-  private _errors: (string | Error)[] = [];
+  private _warnings: string[] = [];
+  private _errors: string[] = [];
   private _contextElementDependencyConstructor!: ContextElementDependencyConstructor;
 
   // TypeChecker process.
@@ -270,24 +272,22 @@ export class AngularCompilerPlugin {
     if (this._discoverLazyRoutes === false && this.options.additionalLazyModuleResources
       && this.options.additionalLazyModuleResources.length > 0) {
       this._warnings.push(
-        new Error(`Lazy route discovery is disabled but additional Lazy Module Resources were`
-          + ` provided. These will be ignored.`),
+        `Lazy route discovery is disabled but additional Lazy Module Resources were` +
+          ` provided. These will be ignored.`,
       );
     }
 
     if (this._compilerOptions.strictMetadataEmit) {
       this._warnings.push(
-        new Error(
-          `Using Angular compiler option 'strictMetadataEmit' for applications might cause undefined behavior.`,
-        ),
+        `Using Angular compiler option 'strictMetadataEmit' for applications might cause undefined behavior.`,
       );
     }
 
     if (this._discoverLazyRoutes === false && this.options.additionalLazyModules
       && Object.keys(this.options.additionalLazyModules).length > 0) {
       this._warnings.push(
-        new Error(`Lazy route discovery is disabled but additional lazy modules were provided.`
-          + `These will be ignored.`),
+        `Lazy route discovery is disabled but additional lazy modules were provided.` +
+          `These will be ignored.`,
       );
     }
 
@@ -544,9 +544,9 @@ export class AngularCompilerPlugin {
           if (this._lazyRoutes[moduleKey] !== modulePath) {
             // Found a duplicate, this is an error.
             this._warnings.push(
-              new Error(`Duplicated path in loadChildren detected during a rebuild. `
-                + `We will take the latest version detected and override it to save rebuild time. `
-                + `You should perform a full build to validate that your routes don't overlap.`),
+              `Duplicated path in loadChildren detected during a rebuild. ` +
+                `We will take the latest version detected and override it to save rebuild time. ` +
+                `You should perform a full build to validate that your routes don't overlap.`,
             );
           }
         } else {
@@ -679,9 +679,10 @@ export class AngularCompilerPlugin {
     // Anything that remains is unused, because it wasn't referenced directly or transitively
     // on the files in the compilation.
     for (const fileName of unusedSourceFileNames) {
-      compilation.warnings.push(
+      addWarning(
+        compilation,
         `${fileName} is part of the TypeScript compilation but it's unused.\n` +
-        `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
+          `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
       );
       this._unusedFiles.add(fileName);
       // Remove the truly unused from the type dep list.
@@ -965,7 +966,9 @@ export class AngularCompilerPlugin {
               }
             }
 
-            return request;
+            if (!isWebpackFiveOrHigher()) {
+              return request;
+            }
           },
         );
       });
@@ -1010,7 +1013,7 @@ export class AngularCompilerPlugin {
       await this._update();
       this.pushCompilationErrors(compilation);
     } catch (err) {
-      compilation.errors.push(err);
+      addError(compilation, err.message || err);
       this.pushCompilationErrors(compilation);
     }
 
@@ -1018,8 +1021,8 @@ export class AngularCompilerPlugin {
   }
 
   private pushCompilationErrors(compilation: compilation.Compilation) {
-    compilation.errors.push(...this._errors);
-    compilation.warnings.push(...this._warnings);
+    this._errors.forEach((error) => addError(compilation, error));
+    this._warnings.forEach((warning) => addWarning(compilation, warning));
     this._errors = [];
     this._warnings = [];
   }
@@ -1160,7 +1163,7 @@ export class AngularCompilerPlugin {
     // Report any diagnostics.
     reportDiagnostics(
       diagnostics,
-      msg => this._errors.push(new Error(msg)),
+      msg => this._errors.push(msg),
       msg => this._warnings.push(msg),
     );
 
