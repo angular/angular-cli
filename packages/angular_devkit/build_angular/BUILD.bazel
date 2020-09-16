@@ -157,6 +157,7 @@ ts_library(
         "@npm//minimatch",
         "@npm//ng-packagr",
         "@npm//open",
+        "@npm//ora",
         "@npm//parse5",
         "@npm//parse5-htmlparser2-tree-adapter",
         "@npm//pnp-webpack-plugin",

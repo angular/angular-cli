@@ -43,6 +43,7 @@
     "mini-css-extract-plugin": "0.11.2",
     "minimatch": "3.0.4",
     "open": "7.2.1",
+    "ora": "5.1.0",
     "parse5": "6.0.1",
     "parse5-htmlparser2-tree-adapter": "6.0.1",
     "pnp-webpack-plugin": "1.6.4",
