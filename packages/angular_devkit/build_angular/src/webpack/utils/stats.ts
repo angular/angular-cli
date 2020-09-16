@@ -10,7 +10,8 @@
 import { logging, tags } from '@angular-devkit/core';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import * as path from 'path';
-import { colors as ansiColors } from '../../utils/color';
+import * as textTable from 'text-table';
+import { colors as ansiColors, removeColor } from '../../utils/color';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -23,9 +24,15 @@ export function formatSize(size: number): string {
   return `${+(size / Math.pow(1024, index)).toPrecision(3)} ${abbreviations[index]}`;
 }
 
+export type BundleStatsData = [files: string, names: string, size: string];
+
+export interface BundleStats {
+  initial: boolean;
+  stats: BundleStatsData;
+};
+
 export function generateBundleStats(
   info: {
-    id: string | number;
     size?: number;
     files: string[];
     names?: string[];
@@ -34,53 +41,100 @@ export function generateBundleStats(
     rendered?: boolean;
   },
   colors: boolean,
-): string {
-  const g = (x: string) => (colors ? ansiColors.bold.green(x) : x);
-  const y = (x: string) => (colors ? ansiColors.bold.yellow(x) : x);
+): BundleStats {
+  const g = (x: string) => (colors ? ansiColors.greenBright(x) : x);
+  const c = (x: string) => (colors ? ansiColors.cyanBright(x) : x);
 
-  const id = info.id ? y(info.id.toString()) : '';
-  const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
-  const files = info.files.map(f => path.basename(f)).join(', ');
-  const names = info.names ? ` (${info.names.join(', ')})` : '';
-  const initial = y(info.entry ? '[entry]' : info.initial ? '[initial]' : '');
-  const flags = ['rendered', 'recorded']
-    .map(f => (f && (info as any)[f] ? g(` [${f}]`) : ''))
-    .join('');
+  const size = typeof info.size === 'number' ? formatSize(info.size) : '-';
+  const files = info.files.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ');
+  const names = info.names?.length ? info.names.join(', ') : '-';
+  const initial = !!(info.entry || info.initial);
 
-  return `chunk {${id}} ${g(files)}${names}${size} ${initial}${flags}`;
+  return {
+    initial,
+    stats: [g(files), names, c(size)],
+  }
+}
+
+export function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
+  const changedEntryChunksStats: BundleStatsData[] = [];
+  const changedLazyChunksStats: BundleStatsData[] = [];
+  for (const {initial, stats} of data) {
+    if (initial) {
+      changedEntryChunksStats.push(stats);
+    } else {
+      changedLazyChunksStats.push(stats);
+    }
+  }
+
+  const bundleInfo: string[][] = [];
+
+  const bold = (x: string) => colors ? ansiColors.bold(x) : x;
+  const dim = (x: string) => colors ? ansiColors.dim(x) : x;
+
+  // Entry chunks
+  if (changedEntryChunksStats.length) {
+    bundleInfo.push(
+      ['Initial Chunk Files', 'Names', 'Size'].map(bold),
+      ...changedEntryChunksStats,
+    );
+  }
+
+  // Seperator
+  if (changedEntryChunksStats.length && changedLazyChunksStats.length) {
+    bundleInfo.push([]);
+  }
+
+  // Lazy chunks
+  if (changedLazyChunksStats.length) {
+    bundleInfo.push(
+      ['Lazy Chunk Files', 'Names', 'Size'].map(bold),
+    ...changedLazyChunksStats,
+    );
+  }
+
+  return textTable(bundleInfo, {
+    hsep: dim(' | '),
+    stringLength: s => removeColor(s).length,
+  });
 }
 
 export function generateBuildStats(hash: string, time: number, colors: boolean): string {
   const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
-  return `Date: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`
+  return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 
 export function statsToString(json: any, statsConfig: any) {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? ansiColors.reset(x) : x;
-  const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
 
-  const changedChunksStats = json.chunks
-    .filter((chunk: any) => chunk.rendered)
-    .map((chunk: any) => {
-      const assets = json.assets.filter((asset: any) => chunk.files.indexOf(asset.name) != -1);
-      const summedSize = assets.filter((asset: any) => !asset.name.endsWith(".map")).reduce((total: number, asset: any) => { return total + asset.size }, 0);
-      return generateBundleStats({ ...chunk, size: summedSize }, colors);
-    });
+  const changedChunksStats: BundleStats[] = [];
+  for (const chunk of json.chunks) {
+    if (!chunk.rendered) {
+      continue;
+    }
+
+    const assets = json.assets.filter((asset: any) => chunk.files.includes(asset.name));
+    const summedSize = assets.filter((asset: any) => !asset.name.endsWith(".map")).reduce((total: number, asset: any) => { return total + asset.size }, 0);
+    changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
+  }
 
   const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+  const statsTable = generateBuildStatsTable(changedChunksStats, colors);
 
   if (unchangedChunkNumber > 0) {
     return '\n' + rs(tags.stripIndents`
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)}
+      ${statsTable}
+
       ${unchangedChunkNumber} unchanged chunks
-      ${changedChunksStats.join('\n')}
-      Time: ${w('' + json.time)}ms
+
+      ${generateBuildStats(json.hash, json.time, colors)}
       `);
   } else {
     return '\n' + rs(tags.stripIndents`
-      ${changedChunksStats.join('\n')}
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
+      ${statsTable}
+
+      ${generateBuildStats(json.hash, json.time, colors)}
       `);
   }
 }
