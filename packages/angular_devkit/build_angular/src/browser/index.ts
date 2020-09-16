@@ -10,6 +10,7 @@ import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devki
 import { join, json, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
+import * as ora from 'ora';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
@@ -28,6 +29,7 @@ import { BundleActionExecutor } from '../utils/action-executor';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { ThresholdSeverity, checkBudgets } from '../utils/bundle-calculator';
 import { findCachePath } from '../utils/cache-path';
+import { colors } from '../utils/color';
 import { copyAssets } from '../utils/copy-assets';
 import { cachingDisabled } from '../utils/environment-options';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
@@ -457,8 +459,7 @@ export function buildWebpackBrowser(
 
               // Execute the bundle processing actions
               try {
-                context.logger.info('Generating ES5 bundles for differential loading...');
-
+                const dlSpinner = ora('Generating ES5 bundles for differential loading...').start();
                 for await (const result of executor.processAll(processActions)) {
                   processResults.push(result);
                 }
@@ -475,10 +476,10 @@ export function buildWebpackBrowser(
                   );
                 }
 
-                context.logger.info('ES5 bundle generation complete.');
+                dlSpinner.succeed('ES5 bundle generation complete.');
 
                 if (i18n.shouldInline) {
-                  context.logger.info('Generating localized bundles...');
+                  const spinner = ora('Generating localized bundles...').start();
 
                   const inlineActions: InlineOptions[] = [];
                   const processedFiles = new Set<string>();
@@ -528,12 +529,14 @@ export function buildWebpackBrowser(
                         );
                       }
                       for (const diagnostic of result.diagnostics) {
+                        spinner.stop();
                         if (diagnostic.type === 'error') {
                           hasErrors = true;
                           context.logger.error(diagnostic.message);
                         } else {
                           context.logger.warn(diagnostic.message);
                         }
+                        spinner.start();
                       }
                     }
 
@@ -555,14 +558,16 @@ export function buildWebpackBrowser(
                       '',
                     );
                   } catch (err) {
-                    context.logger.error('Localized bundle generation failed: ' + err.message);
+                    spinner.fail(colors.redBright('Localized bundle generation failed: ' + err.message));
 
                     return { success: false };
                   }
 
-                  context.logger.info(
-                    `Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`,
-                  );
+                  if (hasErrors) {
+                    spinner.fail(colors.redBright('Localized bundle generation failed.'));
+                  } else {
+                    spinner.succeed('Localized bundle generation complete.');
+                  }
 
                   if (hasErrors) {
                     return { success: false };
