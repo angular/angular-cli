@@ -187,7 +187,7 @@
     "popper.js": "^1.14.1",
     "postcss": "7.0.32",
     "postcss-import": "12.0.1",
-    "postcss-loader": "4.0.1",
+    "postcss-loader": "4.0.2",
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "5.3.0",
