@@ -170,9 +170,11 @@ describe('Browser Builder scripts array', () => {
       { logger },
     );
 
-    expect(logs.join('\n')).toMatch(/\(lazy-script\) 69 bytes.*\[entry].*\[rendered]/);
-    expect(logs.join('\n')).toMatch(/\(renamed-script\) 78 bytes.*\[entry].*\[rendered]/);
-    expect(logs.join('\n')).toMatch(/\(renamed-lazy-script\) 88 bytes.*\[entry].*\[rendered]/);
+    const joinedLogs = logs.join('\n');
+    expect(joinedLogs).toMatch(/lazy-script.+69 bytes/);
+    expect(joinedLogs).toMatch(/renamed-script.+78 bytes/);
+    expect(joinedLogs).toMatch(/renamed-lazy-script.+88 bytes/);
+    expect(joinedLogs).not.toContain('Lazy Chunks');
   });
 
   it(`should error when a script doesn't exist`, async () => {
