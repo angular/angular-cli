@@ -1,0 +1,8 @@
+{
+  "schematics": {
+    "nested": {
+      "factory": "./index.js",
+      "description": "Add empty file to your application."
+    }
+  }
+}
