@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { tags } from '@angular-devkit/core';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
@@ -84,6 +85,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   try {
     // tslint:disable-next-line:no-implicit-dependencies
     sassImplementation = require('node-sass');
+    wco.logger.warn(tags.oneLine`'node-sass' usage is deprecated and will be removed in a future major version.
+      To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`,
+    );
   } catch {
     sassImplementation = require('sass');
   }
