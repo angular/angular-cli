@@ -1,7 +1,7 @@
 import { join } from 'path';
 import * as glob from 'glob';
 import { getGlobalVariable } from './env';
-import { relative } from 'path';
+import { relative, resolve } from 'path';
 import { copyFile, writeFile } from './fs';
 import { useBuiltPackages } from './project';
 import { silentNpm } from './process';
@@ -18,7 +18,7 @@ export function copyProjectAsset(assetName: string, to?: string) {
   return copyFile(sourcePath, targetPath);
 }
 
-export function copyAssets(assetName: string) {
+export function copyAssets(assetName: string, to?: string) {
   const seed = +Date.now();
   const tempRoot = join(getGlobalVariable('tmp-root'), 'assets', assetName + '-' + seed);
   const root = assetDir(assetName);
@@ -29,7 +29,10 @@ export function copyAssets(assetName: string) {
 
       return allFiles.reduce((promise, filePath) => {
         const relPath = relative(root, filePath);
-        const toPath = join(tempRoot, relPath);
+        const toPath =
+          to !== undefined
+            ? resolve(getGlobalVariable('tmp-root'), 'test-project', to, relPath)
+            : join(tempRoot, relPath);
 
         return promise.then(() => copyFile(filePath, toPath));
       }, Promise.resolve());
