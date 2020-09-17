@@ -37,12 +37,12 @@ export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
     return context;
   }
 
-  protected _resolveCollectionPath(name: string): string {
+  protected _resolveCollectionPath(name: string, requester?: string): string {
     const maybePath = this._collections.get(name);
     if (maybePath) {
       return maybePath;
     }
 
-    return super._resolveCollectionPath(name);
+    return super._resolveCollectionPath(name, requester);
   }
 }

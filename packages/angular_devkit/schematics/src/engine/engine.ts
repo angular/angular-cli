@@ -164,7 +164,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
 
   private _collectionCache = new Map<string, CollectionImpl<CollectionT, SchematicT>>();
   private _schematicCache
-    = new Map<string, Map<string, SchematicImpl<CollectionT, SchematicT>>>();
+    = new WeakMap<Collection<CollectionT, SchematicT>, Map<string, SchematicImpl<CollectionT, SchematicT>>>();
   private _taskSchedulers = new Array<TaskScheduler>();
 
   constructor(private _host: EngineHost<CollectionT, SchematicT>, protected _workflow?: Workflow) {
@@ -173,26 +173,30 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
   get workflow() { return this._workflow || null; }
   get defaultMergeStrategy() { return this._host.defaultMergeStrategy || MergeStrategy.Default; }
 
-  createCollection(name: string): Collection<CollectionT, SchematicT> {
+  createCollection(
+    name: string,
+    requester?: Collection<CollectionT, SchematicT>,
+  ): Collection<CollectionT, SchematicT> {
     let collection = this._collectionCache.get(name);
     if (collection) {
       return collection;
     }
 
-    const [description, bases] = this._createCollectionDescription(name);
+    const [description, bases] = this._createCollectionDescription(name, requester?.description);
 
     collection = new CollectionImpl<CollectionT, SchematicT>(description, this, bases);
     this._collectionCache.set(name, collection);
-    this._schematicCache.set(name, new Map());
+    this._schematicCache.set(collection, new Map());
 
     return collection;
   }
 
   private _createCollectionDescription(
     name: string,
+    requester?: CollectionDescription<CollectionT>,
     parentNames?: Set<string>,
   ): [CollectionDescription<CollectionT>, Array<CollectionDescription<CollectionT>>] {
-    const description = this._host.createCollectionDescription(name);
+    const description = this._host.createCollectionDescription(name, requester);
     if (!description) {
       throw new UnknownCollectionException(name);
     }
@@ -204,7 +208,11 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     if (description.extends) {
       parentNames = (parentNames || new Set<string>()).add(description.name);
       for (const baseName of description.extends) {
-        const [base, baseBases] = this._createCollectionDescription(baseName, new Set(parentNames));
+        const [base, baseBases] = this._createCollectionDescription(
+          baseName,
+          description,
+          new Set(parentNames),
+        );
 
         bases.unshift(base, ...baseBases);
       }
@@ -277,14 +285,9 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     collection: Collection<CollectionT, SchematicT>,
     allowPrivate = false,
   ): Schematic<CollectionT, SchematicT> {
-    const collectionImpl = this._collectionCache.get(collection.description.name);
-    const schematicMap = this._schematicCache.get(collection.description.name);
-    if (!collectionImpl || !schematicMap || collectionImpl !== collection) {
-      // This is weird, maybe the collection was created by another engine?
-      throw new UnknownCollectionException(collection.description.name);
-    }
+    const schematicMap = this._schematicCache.get(collection);
 
-    let schematic = schematicMap.get(name);
+    let schematic = schematicMap?.get(name);
     if (schematic) {
       return schematic;
     }
@@ -314,7 +317,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     const factory = this._host.getSchematicRuleFactory(description, collectionDescription);
     schematic = new SchematicImpl<CollectionT, SchematicT>(description, factory, collection, this);
 
-    schematicMap.set(name, schematic);
+    schematicMap?.set(name, schematic);
 
     return schematic;
   }

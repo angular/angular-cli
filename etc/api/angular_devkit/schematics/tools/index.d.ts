@@ -53,14 +53,14 @@ export declare class FileSystemEngineHost extends FileSystemEngineHostBase {
 }
 
 export declare abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
-    protected abstract _resolveCollectionPath(name: string): string;
+    protected abstract _resolveCollectionPath(name: string, requester?: string): string;
     protected abstract _resolveReferenceString(name: string, parentPath: string): {
         ref: RuleFactory<{}>;
         path: string;
     } | null;
     protected abstract _transformCollectionDescription(name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc;
     protected abstract _transformSchematicDescription(name: string, collection: FileSystemCollectionDesc, desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
-    createCollectionDescription(name: string): FileSystemCollectionDesc;
+    createCollectionDescription(name: string, requester?: FileSystemCollectionDesc): FileSystemCollectionDesc;
     createSchematicDescription(name: string, collection: FileSystemCollectionDesc): FileSystemSchematicDesc | null;
     createSourceFromUrl(url: Url): Source | null;
     createTaskExecutor(name: string): Observable<TaskExecutor>;
@@ -102,7 +102,7 @@ export declare class InvalidCollectionJsonException extends BaseException {
 
 export declare class NodeModulesEngineHost extends FileSystemEngineHostBase {
     constructor(paths?: string[] | undefined);
-    protected _resolveCollectionPath(name: string): string;
+    protected _resolveCollectionPath(name: string, requester?: string): string;
     protected _resolveReferenceString(refString: string, parentPath: string): {
         ref: RuleFactory<{}>;
         path: string;
@@ -113,7 +113,7 @@ export declare class NodeModulesEngineHost extends FileSystemEngineHostBase {
 
 export declare class NodeModulesTestEngineHost extends NodeModulesEngineHost {
     get tasks(): TaskConfiguration<{}>[];
-    protected _resolveCollectionPath(name: string): string;
+    protected _resolveCollectionPath(name: string, requester?: string): string;
     clearTasks(): void;
     registerCollection(name: string, path: string): void;
     transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext;

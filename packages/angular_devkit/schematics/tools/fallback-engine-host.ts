@@ -47,10 +47,10 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     this._hosts.push(host);
   }
 
-  createCollectionDescription(name: string): CollectionDescription<FallbackCollectionDescription> {
+  createCollectionDescription(name: string, requester?: CollectionDescription<{}>): CollectionDescription<FallbackCollectionDescription> {
     for (const host of this._hosts) {
       try {
-        const description = host.createCollectionDescription(name);
+        const description = host.createCollectionDescription(name, requester);
 
         return { name, host, description };
       } catch (_) {

@@ -97,8 +97,8 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     return collectionPath;
   }
 
-  protected _resolveCollectionPath(name: string): string {
-    const collectionPath = this.resolve(name);
+  protected _resolveCollectionPath(name: string, requester?: string): string {
+    const collectionPath = this.resolve(name, requester);
 
     try {
       readJsonFile(collectionPath);
