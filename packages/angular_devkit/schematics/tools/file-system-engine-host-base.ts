@@ -109,7 +109,7 @@ export class SchematicNameCollisionException extends BaseException {
  * all other EngineHost provided by the tooling part of the Schematics library.
  */
 export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
-  protected abstract _resolveCollectionPath(name: string): string;
+  protected abstract _resolveCollectionPath(name: string, requester?: string): string;
   protected abstract _resolveReferenceString(
       name: string, parentPath: string): { ref: RuleFactory<{}>, path: string } | null;
   protected abstract _transformCollectionDescription(
@@ -158,8 +158,11 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
    * @param name
    * @return {{path: string}}
    */
-  createCollectionDescription(name: string): FileSystemCollectionDesc {
-    const path = this._resolveCollectionPath(name);
+  createCollectionDescription(
+    name: string,
+    requester?: FileSystemCollectionDesc,
+  ): FileSystemCollectionDesc {
+    const path = this._resolveCollectionPath(name, requester?.path);
     const jsonValue = readJsonFile(path);
     if (!jsonValue || typeof jsonValue != 'object' || Array.isArray(jsonValue)) {
       throw new InvalidCollectionJsonException(name, path);

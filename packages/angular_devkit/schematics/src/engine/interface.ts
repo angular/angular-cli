@@ -76,7 +76,10 @@ export type SchematicDescription<CollectionMetadataT extends object,
  * parameters contain additional metadata that you want to store while remaining type-safe.
  */
 export interface EngineHost<CollectionMetadataT extends object, SchematicMetadataT extends object> {
-  createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT>;
+  createCollectionDescription(
+    name: string,
+    requester?: CollectionDescription<CollectionMetadataT>,
+  ): CollectionDescription<CollectionMetadataT>;
   listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
 
   createSchematicDescription(
@@ -116,24 +119,27 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
  * SchematicMetadataT is a type that contains additional typing for the Schematic Description.
  */
 export interface Engine<CollectionMetadataT extends object, SchematicMetadataT extends object> {
-  createCollection(name: string): Collection<CollectionMetadataT, SchematicMetadataT>;
+  createCollection(
+    name: string,
+    requester?: Collection<CollectionMetadataT, SchematicMetadataT>,
+  ): Collection<CollectionMetadataT, SchematicMetadataT>;
   createContext(
     schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
     parent?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>,
     executionOptions?: Partial<ExecutionOptions>,
   ): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>;
   createSchematic(
-      name: string,
-      collection: Collection<CollectionMetadataT, SchematicMetadataT>,
+    name: string,
+    collection: Collection<CollectionMetadataT, SchematicMetadataT>,
   ): Schematic<CollectionMetadataT, SchematicMetadataT>;
   createSourceFromUrl(
     url: Url,
     context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
   ): Source;
   transformOptions<OptionT extends object, ResultT extends object>(
-      schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
-      options: OptionT,
-      context?: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
+    schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
+    options: OptionT,
+    context?: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
   ): Observable<ResultT>;
   executePostTasks(): Observable<void>;
 

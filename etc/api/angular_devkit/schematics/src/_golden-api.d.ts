@@ -197,7 +197,7 @@ export declare class EmptyTree extends HostTree {
 export interface Engine<CollectionMetadataT extends object, SchematicMetadataT extends object> {
     readonly defaultMergeStrategy: MergeStrategy;
     readonly workflow: Workflow | null;
-    createCollection(name: string): Collection<CollectionMetadataT, SchematicMetadataT>;
+    createCollection(name: string, requester?: Collection<CollectionMetadataT, SchematicMetadataT>): Collection<CollectionMetadataT, SchematicMetadataT>;
     createContext(schematic: Schematic<CollectionMetadataT, SchematicMetadataT>, parent?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>, executionOptions?: Partial<ExecutionOptions>): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>;
     createSchematic(name: string, collection: Collection<CollectionMetadataT, SchematicMetadataT>): Schematic<CollectionMetadataT, SchematicMetadataT>;
     createSourceFromUrl(url: Url, context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): Source;
@@ -207,7 +207,7 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
 
 export interface EngineHost<CollectionMetadataT extends object, SchematicMetadataT extends object> {
     readonly defaultMergeStrategy?: MergeStrategy;
-    createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT>;
+    createCollectionDescription(name: string, requester?: CollectionDescription<CollectionMetadataT>): CollectionDescription<CollectionMetadataT>;
     createSchematicDescription(name: string, collection: CollectionDescription<CollectionMetadataT>): SchematicDescription<CollectionMetadataT, SchematicMetadataT> | null;
     createSourceFromUrl(url: Url, context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): Source | null;
     createTaskExecutor(name: string): Observable<TaskExecutor>;
@@ -445,7 +445,7 @@ export declare class SchematicEngine<CollectionT extends object, SchematicT exte
     get defaultMergeStrategy(): MergeStrategy;
     get workflow(): Workflow | null;
     constructor(_host: EngineHost<CollectionT, SchematicT>, _workflow?: Workflow | undefined);
-    createCollection(name: string): Collection<CollectionT, SchematicT>;
+    createCollection(name: string, requester?: Collection<CollectionT, SchematicT>): Collection<CollectionT, SchematicT>;
     createContext(schematic: Schematic<CollectionT, SchematicT>, parent?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): TypedSchematicContext<CollectionT, SchematicT>;
     createSchematic(name: string, collection: Collection<CollectionT, SchematicT>, allowPrivate?: boolean): Schematic<CollectionT, SchematicT>;
     createSourceFromUrl(url: Url, context: TypedSchematicContext<CollectionT, SchematicT>): Source;

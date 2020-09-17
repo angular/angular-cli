@@ -26,7 +26,7 @@ export function externalSchematic<OptionT extends object>(
   executionOptions?: Partial<ExecutionOptions>,
 ): Rule {
   return (input: Tree, context: SchematicContext) => {
-    const collection = context.engine.createCollection(collectionName);
+    const collection = context.engine.createCollection(collectionName, context.schematic.collection);
     const schematic = collection.createSchematic(schematicName);
 
     return schematic.call(options, observableOf(branch(input)), context, executionOptions);
