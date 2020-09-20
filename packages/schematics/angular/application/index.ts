@@ -300,7 +300,7 @@ export default function (options: ApplicationOptions): Rule {
     const isRootApp = options.projectRoot !== undefined;
     const appDir = isRootApp
       ? normalize(options.projectRoot || '')
-      : join(normalize(newProjectRoot), options.name);
+      : join(normalize(newProjectRoot), strings.dasherize(options.name));
     const sourceDir = `${appDir}/src/app`;
 
     const e2eOptions: E2eOptions = {

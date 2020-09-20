@@ -451,4 +451,20 @@ describe('Application Schematic', () => {
     expect(content).toContain('not IE 11');
     expect(content).toContain('not IE 9-10');
   });
+
+  it(`should create kebab-case project folder names with camelCase project name`, async () => {
+    const options: ApplicationOptions = { ...defaultOptions, name: 'myCool' };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const exists = tree.exists('/projects/my-cool/.browserslistrc');
+    expect(exists).toBeTrue();
+  });
+
+  it(`should create kebab-case project folder names with PascalCase project name`, async () => {
+    const options: ApplicationOptions = { ...defaultOptions, name: 'MyCool' };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const exists = tree.exists('/projects/my-cool/.browserslistrc');
+    expect(exists).toBeTrue();
+  });
 });
