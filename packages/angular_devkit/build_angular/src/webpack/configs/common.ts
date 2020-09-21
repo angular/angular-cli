@@ -46,6 +46,7 @@ import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
 import { addError } from '../../utils/webpack-diagnostics';
 import { DedupeModuleResolvePlugin, ScriptsWebpackPlugin } from '../plugins';
+import { JavaScriptOptimizerPlugin } from '../plugins/javascript-optimizer-plugin';
 import {
   getEsVersionForFileName,
   getOutputHashFormat,
@@ -316,78 +317,40 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const extraMinimizers = [];
 
   if (scriptsOptimization) {
-    const TerserPlugin = require('terser-webpack-plugin');
-    const angularGlobalDefinitions = buildOptions.aot
-      ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
-      : GLOBAL_DEFS_FOR_TERSER;
-
-    // TODO: Investigate why this fails for some packages: wco.supportES2015 ? 6 : 5;
-    const terserEcma = 5;
-
-    const terserOptions = {
-      warnings: !!buildOptions.verbose,
-      safari10: true,
-      output: {
-        ecma: terserEcma,
-        // For differential loading, this is handled in the bundle processing.
-        ascii_only: !differentialLoadingMode,
-        // Default behavior (undefined value) is to keep only important comments (licenses, etc.)
-        comments: !buildOptions.extractLicenses && undefined,
-        webkit: true,
-        beautify: shouldBeautify,
-        wrap_func_args: false,
-      },
-      // On server, we don't want to compress anything. We still set the ngDevMode = false for it
-      // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
-      compress:
-        allowMinify &&
-        (platform === 'server'
-          ? {
-              ecma: terserEcma,
-              global_defs: angularGlobalDefinitions,
-              keep_fnames: true,
-            }
-          : {
-              ecma: terserEcma,
-              pure_getters: buildOptions.buildOptimizer,
-              // PURE comments work best with 3 passes.
-              // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-              passes: buildOptions.buildOptimizer ? 3 : 1,
-              global_defs: angularGlobalDefinitions,
-              pure_funcs: ['forwardRef'],
-            }),
-      // We also want to avoid mangling on server.
-      // Name mangling is handled within the browser builder
-      mangle: allowMangle && platform !== 'server' && !differentialLoadingMode,
-    };
-
     const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
 
-    extraMinimizers.push(
-      new TerserPlugin({
-        parallel: maxWorkers,
-        extractComments: false,
-        exclude: globalScriptsNames,
-        terserOptions,
-      }),
+    if (globalScriptsNames.length > 0) {
       // Script bundles are fully optimized here in one step since they are never downleveled.
       // They are shared between ES2015 & ES5 outputs so must support ES5.
-      new TerserPlugin({
-        parallel: maxWorkers,
-        extractComments: false,
-        include: globalScriptsNames,
-        terserOptions: {
-          ...terserOptions,
-          compress: allowMinify && {
-            ...terserOptions.compress,
+      // The `terser-webpack-plugin` will add the minified flag to the asset which will prevent
+      // additional optimizations by the next plugin.
+      const TerserPlugin = require('terser-webpack-plugin');
+      extraMinimizers.push(
+        new TerserPlugin({
+          parallel: maxWorkers,
+          extractComments: false,
+          include: globalScriptsNames,
+          terserOptions: {
             ecma: 5,
+            compress: allowMinify,
+            output: {
+              ascii_only: true,
+              wrap_func_args: false,
+            },
+            mangle: allowMangle && platform !== 'server',
           },
-          output: {
-            ...terserOptions.output,
-            ecma: 5,
-          },
-          mangle: allowMangle && platform !== 'server',
-        },
+        }),
+      );
+    }
+
+    extraMinimizers.push(
+      new JavaScriptOptimizerPlugin({
+        define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
+        sourcemap: scriptsSourceMap,
+        target: wco.scriptTarget,
+        keepNames: !allowMangle || platform === 'server',
+        removeLicenses: buildOptions.extractLicenses,
+        advanced: buildOptions.buildOptimizer,
       }),
     );
   }
