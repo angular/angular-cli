@@ -66,6 +66,7 @@
     "ajv-formats/ajv": "8.6.0"
   },
   "devDependencies": {
+    "@ampproject/remapping": "1.0.1",
     "@angular/animations": "12.1.0-next.6",
     "@angular/cdk": "12.1.0-rc.0",
     "@angular/common": "12.1.0-next.6",
@@ -146,6 +147,7 @@
     "css-minimizer-webpack-plugin": "3.0.1",
     "debug": "^4.1.1",
     "enhanced-resolve": "5.8.2",
+    "esbuild": "0.12.8",
     "eslint": "7.29.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-header": "3.1.1",
@@ -191,6 +193,7 @@
     "parse5-html-rewriting-stream": "6.0.1",
     "pidtree": "^0.5.0",
     "pidusage": "^2.0.17",
+    "piscina": "3.1.0",
     "popper.js": "^1.14.1",
     "postcss": "8.3.5",
     "postcss-import": "14.0.2",

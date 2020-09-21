@@ -31,7 +31,7 @@ describe('Browser Builder optimization level', () => {
 
     const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);
-    expect(await files['vendor.js']).toMatch(/class \w{constructor\(\){/);
+    expect(await files['vendor.js']).toMatch(/class \w{1,3}{constructor\(\){/);
   });
 
   it('supports styles only optimizations', async () => {
