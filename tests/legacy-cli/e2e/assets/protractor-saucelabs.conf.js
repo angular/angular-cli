@@ -46,12 +46,6 @@ exports.config = {
     },
     {
       browserName: 'internet explorer',
-      platform: 'Windows 8',
-      version: '10',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'internet explorer',
       platform: 'Windows 8.1',
       version: '11',
       tunnelIdentifier,
