@@ -8,27 +8,28 @@
 import { Rule } from '@angular-devkit/schematics';
 import { removePackageJsonDependency } from '../../utility/dependencies';
 import { JSONFile } from '../../utility/json-file';
-import { findPropertyInAstObject } from '../../utility/json-utils';
+import { allTargetOptions, allWorkspaceTargets, getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace } from './utils';
 
 /**
  * Remove tsickle from libraries
  */
 export function removeTsickle(): Rule {
-  return (tree, context) => {
+  return async (tree, { logger }) => {
     removePackageJsonDependency(tree, 'tsickle');
-    const logger = context.logger;
-    const workspace = getWorkspace(tree);
 
-    for (const { target } of getTargets(workspace, 'build', Builders.DeprecatedNgPackagr)) {
-      for (const options of getAllOptions(target)) {
-        const tsConfigOption = findPropertyInAstObject(options, 'tsConfig');
-        if (!tsConfigOption || tsConfigOption.kind !== 'string') {
+    const workspace = await getWorkspace(tree);
+    for (const [targetName, target] of allWorkspaceTargets(workspace)) {
+      if (targetName !== 'build' || target.builder !== Builders.DeprecatedNgPackagr) {
+        continue;
+      }
+
+      for (const [, options] of allTargetOptions(target)) {
+        const tsConfigPath = options.tsConfig;
+        if (!tsConfigPath || typeof tsConfigPath !== 'string') {
           continue;
         }
 
-        const tsConfigPath = tsConfigOption.value;
         let tsConfigJson;
         try {
           tsConfigJson = new JSONFile(tree, tsConfigPath);
