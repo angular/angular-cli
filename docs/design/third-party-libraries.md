@@ -143,14 +143,14 @@ that those hooks might not prompt users (no STDIN) and throw an error.
 
 # <a name="providers">Providers</a>
 Adding Angular providers to the app should be seamless. The install process will create a
-`providers.js` from all the providers contained in all the dependencies. The User can blacklist
+`providers.js` from all the providers contained in all the dependencies. The User can disclude
 providers it doesn't want.
 
 The `providers.js` file will always be overwritten by the `install` / `uninstall` process. It
 needs to exist for toolings to be able to understand dependencies. These providers are global
 to the application.
 
-In order to blacklist providers from being global, the user can use the `--no-global-providers`
+In order to prevent providers from being global, the user can use the `--no-global-providers`
 flag during installation, or can change the dependencies by using `ng providers`. As an example:
 
 ```bash
