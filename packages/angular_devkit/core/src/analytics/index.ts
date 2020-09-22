@@ -17,7 +17,8 @@ export * from './noop';
  *
  * These cannot be in their respective schema.json file because we either change the type
  * (e.g. --buildEventLog is string, but we want to know the usage of it, not its value), or
- * some validation needs to be done (we cannot record ng add --collection if it's not whitelisted).
+ * some validation needs to be done (we cannot record ng add --collection if it's not marked as
+ * allowed).
  */
 export enum NgCliAnalyticsDimensions {
   CpuCount = 1,

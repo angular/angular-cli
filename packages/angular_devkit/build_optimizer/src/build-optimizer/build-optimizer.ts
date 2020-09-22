@@ -23,7 +23,7 @@ import { getWrapEnumsTransformer } from '../transforms/wrap-enums';
 
 
 // Angular packages are known to have no side effects.
-const whitelistedAngularModules = [
+const knownSideEffectFreeAngularModules = [
   /[\\/]node_modules[\\/]@angular[\\/]animations[\\/]/,
   /[\\/]node_modules[\\/]@angular[\\/]common[\\/]/,
   /[\\/]node_modules[\\/]@angular[\\/]compiler[\\/]/,
@@ -61,7 +61,7 @@ function isKnownCoreFile(filePath: string) {
 
 function isKnownSideEffectFree(filePath: string) {
   return ngFactories.some((re) => re.test(filePath)) ||
-    whitelistedAngularModules.some((re) => re.test(filePath));
+    knownSideEffectFreeAngularModules.some((re) => re.test(filePath));
 }
 
 export interface BuildOptimizerOptions {
@@ -117,7 +117,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.push(
       // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
       // It will mark both `require()` calls and `console.log(stuff)` as pure.
-      // We only apply it to whitelisted modules, since we know they are safe.
+      // We only apply it to modules known to be side effect free, since we know they are safe.
       // getPrefixFunctionsTransformer needs to be before getFoldFileTransformer.
       getPrefixFunctionsTransformer,
       selectedGetScrubFileTransformer,
