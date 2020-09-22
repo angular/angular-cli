@@ -254,25 +254,28 @@ describe('build-optimizer', () => {
     });
   });
 
-  describe('whitelisted modules', () => {
-    // This statement is considered pure by getPrefixFunctionsTransformer on whitelisted modules.
+  describe('known side effect free modules', () => {
+    // This statement is considered pure by getPrefixFunctionsTransformer on known side effect free
+    // modules.
     const input = 'console.log(42);';
     const output = '/*@__PURE__*/ console.log(42);';
 
-    it('should process whitelisted modules', () => {
+    it('should process known side effect free modules', () => {
       const inputFilePath = '/node_modules/@angular/core/@angular/core.es5.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
       expect(boOutput.content).toContain(output);
       expect(boOutput.emitSkipped).toEqual(false);
     });
 
-    it('should not process non-whitelisted modules', () => {
+    it('should not process modules which are not in the list of known side effect free modules',
+     () => {
       const inputFilePath = '/node_modules/other-package/core.es5.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
       expect(boOutput.emitSkipped).toEqual(true);
     });
 
-    it('should not process non-whitelisted umd modules', () => {
+    it('should not process umd modules which are not in the list of known side effect free modules',
+    () => {
       const inputFilePath = '/node_modules/other_lib/index.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
       expect(boOutput.emitSkipped).toEqual(true);
