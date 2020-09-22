@@ -6,18 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Rule } from '@angular-devkit/schematics';
-import { appendValueInAstArray, findPropertyInAstObject } from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
+import { findPropertyInAstObject } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
+import { getAllOptions, getTargets, getWorkspace } from './utils';
 
 
 /**
  * Update ngsw-config.json to fix issue https://github.com/angular/angular-cli/pull/15277
  */
 export function updateNGSWConfig(): Rule {
-  return (tree, context) => {
+  return (tree, { logger }) => {
     const workspace = getWorkspace(tree);
-    const logger = context.logger;
 
     for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
       for (const options of getAllOptions(target)) {
@@ -27,46 +27,41 @@ export function updateNGSWConfig(): Rule {
         }
 
         const path = ngswConfigPath.value;
-        const ngswConfigAst = readJsonFileAsAstObject(tree, path);
-        if (!ngswConfigAst || ngswConfigAst.kind !== 'object') {
+        let ngswConfigJson;
+        try {
+          ngswConfigJson = new JSONFile(tree, path);
+        } catch {
           logger.warn(`Cannot find file: ${ngswConfigPath}`);
           continue;
         }
 
-        const assetGroups = findPropertyInAstObject(ngswConfigAst, 'assetGroups');
-        if (!assetGroups || assetGroups.kind !== 'array') {
+        const assetGroups = ngswConfigJson.get(['assetGroups']);
+        if (!assetGroups || !Array.isArray(assetGroups)) {
           continue;
         }
 
-        const prefetchElement = assetGroups.elements.find(element => {
-          const installMode = element.kind === 'object' && findPropertyInAstObject(element, 'installMode');
+        const prefetchElementIndex = assetGroups.findIndex(
+          (element) => element?.installMode === 'prefetch',
+        );
 
-          return installMode && installMode.value === 'prefetch';
-        });
-
-        if (!prefetchElement || prefetchElement.kind !== 'object') {
+        if (prefetchElementIndex === -1) {
           continue;
         }
 
-        const resources = findPropertyInAstObject(prefetchElement, 'resources');
-        if (!resources || resources.kind !== 'object') {
+        const filesPath = ['assetGroups', prefetchElementIndex, 'resources', 'files'];
+        const files = ngswConfigJson.get(filesPath);
+        if (!files || !Array.isArray(files)) {
           continue;
         }
 
-        const files = findPropertyInAstObject(resources, 'files');
-        if (!files || files.kind !== 'array') {
-          continue;
-        }
-
-        const hasManifest = files.elements
-          .some(({ value }) => typeof value === 'string' && value.endsWith('manifest.webmanifest'));
+        const hasManifest = files
+          .some((value) => typeof value === 'string' && value.endsWith('manifest.webmanifest'));
         if (hasManifest) {
           continue;
         }
 
-        const recorder = tree.beginUpdate(path);
-        appendValueInAstArray(recorder, files, '/manifest.webmanifest', 10);
-        tree.commitUpdate(recorder);
+        // Append to files array
+        ngswConfigJson.modify([...filesPath, -1], '/manifest.webmanifest');
       }
     }
 
