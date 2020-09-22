@@ -5,17 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstObject } from '@angular-devkit/core';
-import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
-import { getWorkspacePath } from '../../utility/config';
-import {
-  appendValueInAstArray,
-  findPropertyInAstObject,
-  insertPropertyInAstObjectInOrder,
-  removePropertyInAstObject,
-} from '../../utility/json-utils';
+import { workspaces } from '@angular-devkit/core';
+import { Rule, Tree } from '@angular-devkit/schematics';
+import { allTargetOptions, allWorkspaceTargets, updateWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace, isIvyEnabled } from './utils';
+import { isIvyEnabled } from './utils';
 
 export const ANY_COMPONENT_STYLE_BUDGET = {
   type: 'anyComponentStyle',
@@ -23,141 +17,123 @@ export const ANY_COMPONENT_STYLE_BUDGET = {
 };
 
 export function updateWorkspaceConfig(): Rule {
-  return (tree, context) => {
-    const workspacePath = getWorkspacePath(tree);
-    const workspace = getWorkspace(tree);
-    const recorder = tree.beginUpdate(workspacePath);
-
-    for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
-      updateStyleOrScriptOption('styles', recorder, target);
-      updateStyleOrScriptOption('scripts', recorder, target);
-      addAnyComponentStyleBudget(recorder, target);
-      updateAotOption(tree, recorder, target);
-    }
-
-    for (const { target } of getTargets(workspace, 'test', Builders.Karma)) {
-      updateStyleOrScriptOption('styles', recorder, target);
-      updateStyleOrScriptOption('scripts', recorder, target);
-    }
-
-    for (const { target } of getTargets(workspace, 'server', Builders.Server)) {
-      updateOptimizationOption(recorder, target);
-    }
-
-    tree.commitUpdate(recorder);
-
-    return tree;
-  };
+  return (tree) =>
+    updateWorkspace((workspace) => {
+      for (const [targetName, target] of allWorkspaceTargets(workspace)) {
+        switch (targetName) {
+          case 'build':
+            if (target.builder !== Builders.Browser) {
+              break;
+            }
+            updateStyleOrScriptOption('styles', target);
+            updateStyleOrScriptOption('scripts', target);
+            addAnyComponentStyleBudget(target);
+            updateAotOption(tree, target);
+            break;
+          case 'test':
+            if (target.builder !== Builders.Karma) {
+              break;
+            }
+            updateStyleOrScriptOption('styles', target);
+            updateStyleOrScriptOption('scripts', target);
+            break;
+          case 'server':
+            if (target.builder !== Builders.Server) {
+              break;
+            }
+            updateOptimizationOption(target);
+            break;
+        }
+      }
+    });
 }
 
-function updateAotOption(tree: Tree, recorder: UpdateRecorder, builderConfig: JsonAstObject) {
-  const options = findPropertyInAstObject(builderConfig, 'options');
-  if (!options || options.kind !== 'object') {
+function updateAotOption(tree: Tree, builderConfig: workspaces.TargetDefinition) {
+  if (!builderConfig.options) {
     return;
   }
 
-  const tsConfig = findPropertyInAstObject(options, 'tsConfig');
-  // Do not add aot option if the users already opted out from Ivy.
-  if (tsConfig && tsConfig.kind === 'string' && !isIvyEnabled(tree, tsConfig.value)) {
+  const tsConfig = builderConfig.options.tsConfig;
+  // Do not add aot option if the users already opted out from Ivy
+  if (tsConfig && typeof tsConfig === 'string' && !isIvyEnabled(tree, tsConfig)) {
     return;
   }
 
-  // Add aot to options.
-  const aotOption = findPropertyInAstObject(options, 'aot');
+  // Add aot to options
+  const aotOption = builderConfig.options.aot;
+  if (aotOption === undefined || aotOption === false) {
+    builderConfig.options.aot = true;
+  }
 
-  if (!aotOption) {
-    insertPropertyInAstObjectInOrder(recorder, options, 'aot', true, 12);
-
+  if (!builderConfig.configurations) {
     return;
   }
 
-  if (aotOption.kind !== 'true') {
-    const { start, end } = aotOption;
-    recorder.remove(start.offset, end.offset - start.offset);
-    recorder.insertLeft(start.offset, 'true');
-  }
-
-  // Remove aot properties from other configurations as they are no redundant
-  const configOptions = getAllOptions(builderConfig, true);
-  for (const options of configOptions) {
-    removePropertyInAstObject(recorder, options, 'aot');
+  for (const configurationOptions of Object.values(builderConfig.configurations)) {
+    delete configurationOptions?.aot;
   }
 }
 
-function updateStyleOrScriptOption(property: 'scripts' | 'styles', recorder: UpdateRecorder, builderConfig: JsonAstObject) {
-  const options = getAllOptions(builderConfig);
-
-  for (const option of options) {
-    const propertyOption = findPropertyInAstObject(option, property);
-    if (!propertyOption || propertyOption.kind !== 'array') {
+function updateStyleOrScriptOption(
+  property: 'scripts' | 'styles',
+  builderConfig: workspaces.TargetDefinition,
+) {
+  for (const [, options] of allTargetOptions(builderConfig)) {
+    const propertyOption = options[property];
+    if (!propertyOption || !Array.isArray(propertyOption)) {
       continue;
     }
 
-    for (const node of propertyOption.elements) {
-      if (!node || node.kind !== 'object') {
+    for (const node of propertyOption) {
+      if (!node || typeof node !== 'object' || Array.isArray(node)) {
         // skip non complex objects
         continue;
       }
 
-      const lazy = findPropertyInAstObject(node, 'lazy');
-      removePropertyInAstObject(recorder, node, 'lazy');
+      const lazy = node.lazy;
+      if (lazy !== undefined) {
+        delete node.lazy;
 
-      // if lazy was not true, it is redundant hence, don't add it
-      if (lazy && lazy.kind === 'true') {
-        insertPropertyInAstObjectInOrder(recorder, node, 'inject', false, 0);
+        // if lazy was not true, it is redundant hence, don't add it
+        if (lazy) {
+          node.inject = false;
+        }
       }
     }
   }
 }
 
-function addAnyComponentStyleBudget(recorder: UpdateRecorder, builderConfig: JsonAstObject) {
-  const options = getAllOptions(builderConfig, true);
-
-  for (const option of options) {
-    const budgetOption = findPropertyInAstObject(option, 'budgets');
-    if (!budgetOption) {
-      // add
-      insertPropertyInAstObjectInOrder(recorder, option, 'budgets', [ANY_COMPONENT_STYLE_BUDGET], 14);
+function addAnyComponentStyleBudget(builderConfig: workspaces.TargetDefinition) {
+  for (const [, options] of allTargetOptions(builderConfig, /* skipBaseOptions */ true)) {
+    if (options.budgets === undefined) {
+      options.budgets = [ANY_COMPONENT_STYLE_BUDGET];
       continue;
     }
 
-    if (budgetOption.kind !== 'array') {
+    if (!Array.isArray(options.budgets)) {
       continue;
     }
 
-    // if 'anyComponentStyle' budget already exists don't add.
-    const hasAnyComponentStyle = budgetOption.elements.some(node => {
-      if (!node || node.kind !== 'object') {
+    // If 'anyComponentStyle' budget already exists, don't add
+    const hasAnyComponentStyle = options.budgets.some((node) => {
+      if (!node || typeof node !== 'object' || Array.isArray(node)) {
         // skip non complex objects
         return false;
       }
 
-      const budget = findPropertyInAstObject(node, 'type');
-
-      return !!budget && budget.kind === 'string' && budget.value === 'anyComponentStyle';
+      return node.type === 'anyComponentStyle';
     });
 
     if (!hasAnyComponentStyle) {
-      appendValueInAstArray(recorder, budgetOption, ANY_COMPONENT_STYLE_BUDGET, 16);
+      options.budgets.push(ANY_COMPONENT_STYLE_BUDGET);
     }
   }
 }
 
-function updateOptimizationOption(recorder: UpdateRecorder, builderConfig: JsonAstObject) {
-  const options = getAllOptions(builderConfig, true);
-
-  for (const option of options) {
-    const optimizationOption = findPropertyInAstObject(option, 'optimization');
-    if (!optimizationOption) {
-      // add
-      insertPropertyInAstObjectInOrder(recorder, option, 'optimization', true, 14);
-      continue;
-    }
-
-    if (optimizationOption.kind !== 'true') {
-      const { start, end } = optimizationOption;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, 'true');
+function updateOptimizationOption(builderConfig: workspaces.TargetDefinition) {
+  for (const [, options] of allTargetOptions(builderConfig, /* skipBaseOptions */ true)) {
+    if (options.optimization !== true) {
+      options.optimization = true;
     }
   }
 }

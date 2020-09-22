@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { virtualFs, workspaces } from '@angular-devkit/core';
+import { json, virtualFs, workspaces } from '@angular-devkit/core';
 import { Rule, Tree, noop } from '@angular-devkit/schematics';
 import { ProjectType } from './workspace-models';
 
@@ -89,4 +89,33 @@ export async function createDefaultPath(tree: Tree, projectName: string): Promis
   }
 
   return buildDefaultPath(project);
+}
+
+export function* allWorkspaceTargets(
+  workspace: workspaces.WorkspaceDefinition,
+): Iterable<[string, workspaces.TargetDefinition]> {
+  for (const [, project] of workspace.projects) {
+    for (const targetEntry of project.targets) {
+      yield targetEntry;
+    }
+  }
+}
+
+export function* allTargetOptions(
+  target: workspaces.TargetDefinition,
+  skipBaseOptions = false,
+): Iterable<[string | undefined, Record<string, json.JsonValue | undefined>]> {
+  if (!skipBaseOptions && target.options) {
+    yield [undefined, target.options];
+  }
+
+  if (!target.configurations) {
+    return;
+  }
+
+  for (const [name, options] of Object.entries(target.configurations)) {
+    if (options !== undefined) {
+      yield [name, options];
+    }
+  }
 }
