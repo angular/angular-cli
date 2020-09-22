@@ -8,31 +8,27 @@
 import { Rule } from '@angular-devkit/schematics';
 import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNodes } from '../../utility/ast-utils';
-import { findPropertyInAstObject } from '../../utility/json-utils';
+import { allWorkspaceTargets, getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
-import { getTargets, getWorkspace } from './utils';
 
 /**
  * Update the `main.server.ts` file by adding exports to `renderModule` and `renderModuleFactory` which are
  * now required for Universal and App-Shell for Ivy and `bundleDependencies`.
  */
 export function updateServerMainFile(): Rule {
-  return tree => {
-    const workspace = getWorkspace(tree);
+  return async tree => {
+    const workspace = await getWorkspace(tree);
 
-    for (const { target } of getTargets(workspace, 'server', Builders.Server)) {
-      const options = findPropertyInAstObject(target, 'options');
-      if (!options || options.kind !== 'object') {
+    for (const [targetName, target] of allWorkspaceTargets(workspace)) {
+      if (targetName !== 'server' || target.builder !== Builders.Server) {
         continue;
       }
 
       // find the main server file
-      const mainFile = findPropertyInAstObject(options, 'main');
-      if (!mainFile || typeof mainFile.value !== 'string') {
+      const mainFilePath = target.options?.main;
+      if (!mainFilePath || typeof mainFilePath !== 'string') {
         continue;
       }
-
-      const mainFilePath = mainFile.value;
 
       const content = tree.read(mainFilePath);
       if (!content) {
@@ -137,7 +133,5 @@ export function updateServerMainFile(): Rule {
 
       tree.commitUpdate(recorder);
     }
-
-    return tree;
   };
 }
