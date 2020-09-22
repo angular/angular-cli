@@ -292,7 +292,7 @@ describe('Component Schematic', () => {
     const content = tree.readContent('/projects/bar/src/app/foo/foo.route.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.route.spec.ts');
     expect(content).toContain('export class FooRoute implements OnInit');
-    expect(testContent).toContain("describe('FooRoute'");
+    expect(testContent).toContain('describe(FooRoute.name');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.css');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.html');
   });
@@ -303,7 +303,7 @@ describe('Component Schematic', () => {
     const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.spec.ts');
     expect(content).toContain('export class Foo implements OnInit');
-    expect(testContent).toContain("describe('Foo'");
+    expect(testContent).toContain('describe(Foo.name');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.css');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.html');
   });

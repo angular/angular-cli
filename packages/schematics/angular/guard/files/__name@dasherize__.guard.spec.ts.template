@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { <%= classify(name) %>Guard } from './<%= dasherize(name) %>.guard';
 
-describe('<%= classify(name) %>Guard', () => {
+describe(<%= classify(name) %>Guard.name, () => {
   let guard: <%= classify(name) %>Guard;
 
   beforeEach(() => {

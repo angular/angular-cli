@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { <%= classify(name) %>Interceptor } from './<%= dasherize(name) %>.interceptor';
 
-describe('<%= classify(name) %>Interceptor', () => {
+describe(<%= classify(name) %>Interceptor.name, () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
       <%= classify(name) %>Interceptor
