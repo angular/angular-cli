@@ -7,8 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { logging, normalize, virtualFs } from '@angular-devkit/core';
 import { of, race } from 'rxjs';
 import { delay, filter, map, take, takeUntil, takeWhile, tap, timeout } from 'rxjs/operators';
 import { browserBuild, createArchitect, host } from '../../test-utils';
@@ -179,7 +178,8 @@ describe('Browser Builder file replacements', () => {
 
     const unexpectedError = `Property 'two' does not exist on type '{ one: number; }'`;
     const expectedError = `Property 'prop' does not exist on type '{}'`;
-    const logger = new TestLogger('rebuild-type-errors');
+
+    const logger = new logging.Logger('');
 
     // Race between a timeout and the expected log entry.
     const stop$ = race<null | string>(

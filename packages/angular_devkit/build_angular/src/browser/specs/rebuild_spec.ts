@@ -7,8 +7,7 @@
  */
 // tslint:disable:no-big-function
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';
 import {
   createArchitect,
@@ -154,7 +153,10 @@ describe('Browser Builder rebuilds', () => {
     );
 
     const overrides = { watch: true, forkTypeChecker: false };
-    const logger = new TestLogger('rebuild-type-errors');
+    const logger = new logging.Logger('');
+    let logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const typeError = `is not assignable to parameter of type 'number'`;
     let buildNumber = 0;
 
@@ -177,8 +179,8 @@ describe('Browser Builder rebuilds', () => {
             case 2:
               // The second build should error out with a type error on the type of an argument.
               expect(buildEvent.success).toBe(false);
-              expect(logger.includes(typeError)).toBe(true);
-              logger.clear();
+              expect(logs.join().includes(typeError)).toBe(true);
+              logs = [];
               // Change an UNRELATED file and the error should still happen.
               // Should trigger a rebuild, this time an error is also expected.
               host.appendToFile('src/app/app.module.ts', `console.log(1);`);
@@ -187,8 +189,8 @@ describe('Browser Builder rebuilds', () => {
             case 3:
               // The third build should have the same error as the first.
               expect(buildEvent.success).toBe(false);
-              expect(logger.includes(typeError)).toBe(true);
-              logger.clear();
+              expect(logs.join().includes(typeError)).toBe(true);
+              logs = [];
               // Fix the error.
               host.writeMultipleFiles({
                 'src/funky2.ts': `export const funky2 = (value: string) => value + 'hello';`,
@@ -350,7 +352,9 @@ describe('Browser Builder rebuilds', () => {
     // show up in getNgSemanticDiagnostics. Since getNgSemanticDiagnostics is only called on the
     // type checker, we must disable it to get a failing fourth build with Ivy.
     const overrides = { watch: true, aot: true, forkTypeChecker: veEnabled };
-    const logger = new TestLogger('rebuild-aot-errors');
+    const logger = new logging.Logger('');
+    let logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
     const staticAnalysisError = !veEnabled
       ? 'selector must be a string'
       : 'Function expressions are not supported in decorators';
@@ -367,18 +371,18 @@ describe('Browser Builder rebuilds', () => {
             case 1:
               // The first build should error out with a static analysis error.
               expect(buildEvent.success).toBe(false, 'First build should not succeed.');
-              expect(logger.includes(staticAnalysisError)).toBe(true,
+              expect(logs.join().includes(staticAnalysisError)).toBe(true,
                 'First build should have static analysis error.');
-              logger.clear();
+              logs = [];
               // Fix the static analysis error.
               host.writeMultipleFiles({ 'src/app/app.component.ts': origContent });
               break;
 
             case 2:
               expect(buildEvent.success).toBe(true, 'Second build should succeed.');
-              expect(logger.includes(staticAnalysisError)).toBe(false,
+              expect(logs.join().includes(staticAnalysisError)).toBe(false,
                 'Second build should not have static analysis error.');
-              logger.clear();
+              logs = [];
               // Add an syntax error to a non-main file.
               host.appendToFile('src/app/app.component.ts', `]]]`);
               break;
@@ -386,11 +390,11 @@ describe('Browser Builder rebuilds', () => {
             case 3:
               // The third build should have TS syntax error.
               expect(buildEvent.success).toBe(false, 'Third build should not succeed.');
-              expect(logger.includes(syntaxError)).toBe(true,
+              expect(logs.join().includes(syntaxError)).toBe(true,
                 'Third build should have syntax analysis error.');
-              expect(logger.includes(staticAnalysisError)).toBe(false,
+              expect(logs.join().includes(staticAnalysisError)).toBe(false,
                 'Third build should not have static analysis error.');
-              logger.clear();
+              logs = [];
               // Fix the syntax error, but add the static analysis error again.
               host.writeMultipleFiles({
                 'src/app/app.component.ts': origContent.replace(
@@ -402,11 +406,11 @@ describe('Browser Builder rebuilds', () => {
 
             case 4:
               expect(buildEvent.success).toBe(false, 'Fourth build should not succeed.');
-              expect(logger.includes(syntaxError)).toBe(false,
+              expect(logs.join().includes(syntaxError)).toBe(false,
                 'Fourth build should not have syntax analysis error.');
-              expect(logger.includes(staticAnalysisError)).toBe(true,
+              expect(logs.join().includes(staticAnalysisError)).toBe(true,
                 'Fourth build should have static analysis error.');
-              logger.clear();
+              logs = [];
               // Restore the file to a error-less state.
               host.writeMultipleFiles({ 'src/app/app.component.ts': origContent });
               break;
@@ -414,9 +418,9 @@ describe('Browser Builder rebuilds', () => {
             case 5:
               // The fifth build should have everything fixed..
               expect(buildEvent.success).toBe(true, 'Fifth build should succeed.');
-              expect(logger.includes(syntaxError)).toBe(false,
+              expect(logs.join().includes(syntaxError)).toBe(false,
                 'Fifth build should not have syntax analysis error.');
-              expect(logger.includes(staticAnalysisError)).toBe(false,
+              expect(logs.join().includes(staticAnalysisError)).toBe(false,
                 'Fifth build should not have static analysis error.');
               break;
           }

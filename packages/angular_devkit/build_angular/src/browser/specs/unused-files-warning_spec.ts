@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
+import { logging } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
 import { createArchitect, host, veEnabled } from '../../test-utils';
 
@@ -32,12 +32,14 @@ describe('Browser Builder unused files warnings', () => {
       return;
     }
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    expect(logger.includes(warningMessageSuffix)).toBe(false);
-    logger.clear();
+    expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
     await run.stop();
   });
@@ -56,12 +58,14 @@ describe('Browser Builder unused files warnings', () => {
       '"main.ts", "environments/environment.prod.ts"',
     );
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    expect(logger.includes(`environment.prod.ts ${warningMessageSuffix}`)).toBe(true);
-    logger.clear();
+    expect(logs.join().includes(`environment.prod.ts ${warningMessageSuffix}`)).toBe(true);
 
     await run.stop();
   });
@@ -90,12 +94,14 @@ describe('Browser Builder unused files warnings', () => {
       `"main.ts", ${Object.keys(ignoredFiles).map(f => `"${f.replace('src/', '')}"`).join(',')}`,
     );
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    expect(logger.includes(warningMessageSuffix)).toBe(false);
-    logger.clear();
+    expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
     await run.stop();
   });
@@ -118,12 +124,14 @@ describe('Browser Builder unused files warnings', () => {
       `'@angular/core';\nimport { MyType } from './type';\n`,
     );
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    expect(logger.includes(warningMessageSuffix)).toBe(false);
-    logger.clear();
+    expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
     await run.stop();
   });
@@ -148,12 +156,14 @@ describe('Browser Builder unused files warnings', () => {
       `'@angular/core';\nimport { MyType } from './type';\n`,
     );
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    expect(logger.includes(warningMessageSuffix)).toBe(false);
-    logger.clear();
+    expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
     await run.stop();
   });
@@ -172,7 +182,10 @@ describe('Browser Builder unused files warnings', () => {
       '"**/*.d.ts", "testing/**/*.ts"',
     );
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    let logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     let buildNumber = 0;
     const run = await architect.scheduleTarget(targetSpec, { watch: true }, { logger });
 
@@ -186,7 +199,7 @@ describe('Browser Builder unused files warnings', () => {
           switch (buildNumber) {
             case 1:
               // The first should not have unused files
-              expect(logger.includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
+              expect(logs.join().includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
 
               // Write a used file
               host.writeMultipleFiles({
@@ -203,7 +216,7 @@ describe('Browser Builder unused files warnings', () => {
 
             case 2:
               // The second should have type.ts as unused
-              expect(logger.includes(`type.ts ${warningMessageSuffix}`)).toBe(true, `Case ${buildNumber} failed.`);
+              expect(logs.join().includes(`type.ts ${warningMessageSuffix}`)).toBe(true, `Case ${buildNumber} failed.`);
 
               host.replaceInFile(
                 'src/app/app.component.ts',
@@ -214,11 +227,11 @@ describe('Browser Builder unused files warnings', () => {
 
             case 3:
               // The third should not have any unused files
-              expect(logger.includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
+              expect(logs.join().includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
               break;
           }
 
-          logger.clear();
+          logs = [];
         }),
         take(3),
       )
@@ -245,7 +258,9 @@ describe('Browser Builder unused files warnings', () => {
       'src/testing/type.ts': 'export type MyType = number;',
     });
 
-    const logger = new TestLogger('unused-files-warnings');
+    const logger = new logging.Logger('');
+    let logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
     let buildNumber = 0;
     const run = await architect.scheduleTarget(targetSpec, { watch: true }, { logger });
 
@@ -259,18 +274,18 @@ describe('Browser Builder unused files warnings', () => {
           switch (buildNumber) {
             case 1:
               // The first should have type.ts as unused.
-              expect(logger.includes(`type.ts ${warningMessageSuffix}`)).toBe(true, `Case ${buildNumber} failed.`);
+              expect(logs.join().includes(`type.ts ${warningMessageSuffix}`)).toBe(true, `Case ${buildNumber} failed.`);
 
               // touch a file to trigger a rebuild
               host.appendToFile('src/main.ts', '');
               break;
             case 2:
               // The second should should have type.ts as unused but shouldn't warn.
-              expect(logger.includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
+              expect(logs.join().includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
               break;
           }
 
-          logger.clear();
+          logs = [];
         }),
         take(2),
       )

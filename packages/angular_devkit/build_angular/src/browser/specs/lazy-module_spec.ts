@@ -7,7 +7,8 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger, TestProjectHost } from '@angular-devkit/architect/testing';
+import { TestProjectHost } from '@angular-devkit/architect/testing';
+import { logging } from '@angular-devkit/core';
 import { take, tap, timeout } from 'rxjs/operators';
 import {
   browserBuild,
@@ -45,12 +46,12 @@ describe('Browser Builder lazy modules', () => {
     );
   }
 
-  function hasMissingModuleError(logger: TestLogger) {
+  function hasMissingModuleError(logs: string): boolean {
     // TS type error when using import().
-    return logger.includes('Cannot find module') ||
+    return logs.includes('Cannot find module') ||
       // Webpack error when using import() on a rebuild.
       // There is no TS error because the type checker is forked on rebuilds.
-      logger.includes('Module not found');
+      logs.includes('Module not found');
   }
 
   const cases: [string, Record<string, string>][] = [
@@ -96,11 +97,14 @@ describe('Browser Builder lazy modules', () => {
       host.writeMultipleFiles(lazyModuleFnImport);
       host.replaceInFile('src/app/app.module.ts', 'lazy.module', 'invalid.module');
 
-      const logger = new TestLogger('build-lazy-errors');
+      const logger = new logging.Logger('');
+      const logs: string[] = [];
+      logger.subscribe(e => logs.push(e.message));
+
       const run = await architect.scheduleTarget(target, {}, { logger });
       const output = await run.result;
       expect(output.success).toBe(false);
-      expect(hasMissingModuleError(logger)).toBe(true, 'Should show missing module error');
+      expect(hasMissingModuleError(logs.join())).toBe(true, 'Should show missing module error');
     });
 
     it('should show error when lazy route is invalid on watch mode AOT', async () => {
@@ -108,9 +112,9 @@ describe('Browser Builder lazy modules', () => {
       host.writeMultipleFiles(lazyModuleFnImport);
 
       let buildNumber = 0;
-      const logger = new TestLogger('rebuild-lazy-errors');
+
       const overrides = { watch: true, aot: true };
-      const run = await architect.scheduleTarget(target, overrides, { logger });
+      const run = await architect.scheduleTarget(target, overrides);
       await run.output
         .pipe(
           timeout(15000),
@@ -120,7 +124,6 @@ describe('Browser Builder lazy modules', () => {
               case 1:
                 expect(buildEvent.success).toBe(true);
                 host.replaceInFile('src/app/app.module.ts', 'lazy.module', 'invalid.module');
-                logger.clear();
                 break;
               case 2:
                 expect(buildEvent.success).toBe(false);

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, extractI18nTargetSpec, host } from '../test-utils';
 
 
@@ -41,21 +40,27 @@ describe('Extract i18n Target', () => {
   }, 30000);
 
   it('does not show full build logs', async () => {
-    const logger = new TestLogger('i18n');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
 
-    const run = await architect.scheduleTarget(extractI18nTargetSpec);
+    const run = await architect.scheduleTarget(extractI18nTargetSpec, undefined, { logger });
 
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
 
-    expect(logger.includes('Chunk Names')).toBe(false);
-    expect(logger.includes('[emitted]')).toBe(false);
+    expect(logs.join().includes('Chunk Names')).toBe(false);
+    expect(logs.join().includes('[emitted]')).toBe(false);
   }, 30000);
 
   it('shows errors', async () => {
-    const logger = new TestLogger('i18n-errors');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     host.appendToFile('src/app/app.component.html',
       '<p i18n>Hello world <span i18n>inner</span></p>');
 
@@ -66,7 +71,7 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     const msg = 'Could not mark an element as translatable inside a translatable section';
-    expect(logger.includes(msg)).toBe(true);
+    expect(logs.join().includes(msg)).toBe(true);
   }, 30000);
 
   it('supports locale', async () => {
