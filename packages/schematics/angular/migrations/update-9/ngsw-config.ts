@@ -7,29 +7,30 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { JSONFile } from '../../utility/json-file';
-import { findPropertyInAstObject } from '../../utility/json-utils';
+import { allTargetOptions, allWorkspaceTargets, getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace } from './utils';
-
 
 /**
  * Update ngsw-config.json to fix issue https://github.com/angular/angular-cli/pull/15277
  */
 export function updateNGSWConfig(): Rule {
-  return (tree, { logger }) => {
-    const workspace = getWorkspace(tree);
+  return async (tree, { logger }) => {
+    const workspace = await getWorkspace(tree);
 
-    for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
-      for (const options of getAllOptions(target)) {
-        const ngswConfigPath = findPropertyInAstObject(options, 'ngswConfigPath');
-        if (!ngswConfigPath || ngswConfigPath.kind !== 'string') {
+    for (const [targetName, target] of allWorkspaceTargets(workspace)) {
+      if (targetName !== 'build' || target.builder !== Builders.Browser) {
+        continue;
+      }
+
+      for (const [, options] of allTargetOptions(target)) {
+        const ngswConfigPath = options.ngswConfigPath;
+        if (!ngswConfigPath || typeof ngswConfigPath !== 'string') {
           continue;
         }
 
-        const path = ngswConfigPath.value;
         let ngswConfigJson;
         try {
-          ngswConfigJson = new JSONFile(tree, path);
+          ngswConfigJson = new JSONFile(tree, ngswConfigPath);
         } catch {
           logger.warn(`Cannot find file: ${ngswConfigPath}`);
           continue;
@@ -54,8 +55,9 @@ export function updateNGSWConfig(): Rule {
           continue;
         }
 
-        const hasManifest = files
-          .some((value) => typeof value === 'string' && value.endsWith('manifest.webmanifest'));
+        const hasManifest = files.some(
+          (value) => typeof value === 'string' && value.endsWith('manifest.webmanifest'),
+        );
         if (hasManifest) {
           continue;
         }
@@ -64,7 +66,5 @@ export function updateNGSWConfig(): Rule {
         ngswConfigJson.modify([...filesPath, -1], '/manifest.webmanifest');
       }
     }
-
-    return tree;
   };
 }
