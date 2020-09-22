@@ -7,7 +7,7 @@ const ERROR_MESSAGE = 'Uses of RxJS patch imports are forbidden.';
 
 /**
  * Rule that prevents uses of RxJS patch imports (e.g. `import 'rxjs/add/operator/map').
- * Supports allowing usage in specific filesvia `"no-patch-imports": [true, "\.spec\.ts$"]`.
+ * Supports allowing usage in specific files via `"no-patch-imports": [true, "\.spec\.ts$"]`.
  */
 export class Rule extends Lint.Rules.AbstractRule {
   apply(sourceFile: ts.SourceFile) {
