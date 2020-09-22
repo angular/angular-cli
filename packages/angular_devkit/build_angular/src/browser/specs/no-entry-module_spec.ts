@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
+import { logging } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host, veEnabled } from '../../test-utils';
 
 describe('Browser Builder no entry module', () => {
@@ -38,8 +38,11 @@ describe('Browser Builder no entry module', () => {
     host.replaceInFile('src/main.ts', /./g, '');
     host.appendToFile('src/main.ts', `import './app/app.module';`);
 
-    const logger = new TestLogger('no-bootstrap');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     await browserBuild(architect, host, target, { baseHref: '/myUrl' }, { logger });
-    expect(logger.includes('Lazy routes discovery is not enabled')).toBe(true);
+    expect(logs.join().includes('Lazy routes discovery is not enabled')).toBe(true);
   });
 });

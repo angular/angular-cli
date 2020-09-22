@@ -14,13 +14,6 @@ export declare class TestingArchitectHost implements ArchitectHost {
     resolveBuilder(builderName: string): Promise<BuilderInfo | null>;
 }
 
-export declare class TestLogger extends logging.Logger {
-    constructor(name: string, parent?: logging.Logger | null);
-    clear(): void;
-    includes(message: string): boolean;
-    test(re: RegExp): boolean;
-}
-
 export declare class TestProjectHost extends NodeJsSyncHost {
     protected _templateRoot: Path;
     constructor(_templateRoot: Path);

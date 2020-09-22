@@ -7,8 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
-import { join, virtualFs } from '@angular-devkit/core';
+import { join, logging, virtualFs } from '@angular-devkit/core';
 import { timer } from 'rxjs';
 import { debounceTime, map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { browserBuild, createArchitect, host, outputPath } from '../../test-utils';
@@ -87,7 +86,11 @@ describe('Browser Builder Web Worker support', () => {
 
   it('bundles TS worker', async () => {
     host.writeMultipleFiles(workerFiles);
-    const logger = new TestLogger('worker-warnings');
+
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
     const overrides = { webWorkerTsConfig: 'src/tsconfig.worker.json' };
     await browserBuild(architect, host, target, overrides, { logger });
 
@@ -101,7 +104,7 @@ describe('Browser Builder Web Worker support', () => {
     const mainContent = virtualFs.fileBufferToString(
       host.scopedSync().read(join(outputPath, 'main.js')));
     expect(mainContent).toContain('0.worker.js');
-    expect(logger.includes('WARNING')).toBe(false, 'Should show no warnings.');
+    expect(logs.join().includes('WARNING')).toBe(false, 'Should show no warnings.');
   });
 
   it('minimizes and hashes worker', async () => {

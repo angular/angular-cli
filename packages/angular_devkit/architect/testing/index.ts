@@ -7,4 +7,3 @@
  */
 export * from './testing-architect-host';
 export * from './test-project-host';
-export * from './test-logger';
