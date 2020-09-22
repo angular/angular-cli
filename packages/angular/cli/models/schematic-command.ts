@@ -256,7 +256,10 @@ export abstract class SchematicCommand<
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
       resolvePaths: !!this.workspace.configFile
         // Workspace
-        ? [process.cwd(), this.workspace.root, __dirname]
+        ? this.collectionName === this.defaultCollectionName
+          // Favor __dirname for @schematics/angular to use the build-in version
+          ? [__dirname, process.cwd(), this.workspace.root]
+          : [process.cwd(), this.workspace.root, __dirname]
         // Global
         : [__dirname, process.cwd()],
     });
