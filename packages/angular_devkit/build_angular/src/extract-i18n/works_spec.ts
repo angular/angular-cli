@@ -39,23 +39,6 @@ describe('Extract i18n Target', () => {
     }
   }, 30000);
 
-  it('does not show full build logs', async () => {
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
-
-    host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
-
-    const run = await architect.scheduleTarget(extractI18nTargetSpec, undefined, { logger });
-
-    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
-
-    await run.stop();
-
-    expect(logs.join().includes('Chunk Names')).toBe(false);
-    expect(logs.join().includes('[emitted]')).toBe(false);
-  }, 30000);
-
   it('shows errors', async () => {
     const logger = new logging.Logger('');
     const logs: string[] = [];
