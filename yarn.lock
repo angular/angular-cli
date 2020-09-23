@@ -9,10 +9,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/cdk@10.2.1":
-  version "10.2.1"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-10.2.1.tgz#7ca0fe7220ca97bdf8e73a40105212749427a88f"
-  integrity sha512-67nPfteerlGPlwBeKt+EEOgEo2zm3+U6FzwhXVqwEeBxCZ7PWelMDiartHC7zZnzIKkcNEO0Uptq7Bzl2gdU0w==
+"@angular/cdk@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-10.2.2.tgz#429816d2f8d15d1da99b85ee6810d54bf46e3d05"
+  integrity sha512-DVMnj7QY1prZblRjYfDeyEH79p1TDI0JGgg2D2BAWwzMoPKCgVCqy1uRuvi+WNhYoDR3QJJJ8tXLKucUoShuIw==
   dependencies:
     tslib "^2.0.0"
   optionalDependencies:
@@ -84,10 +84,10 @@
     glob "7.1.2"
     yargs "15.3.0"
 
-"@angular/material@10.2.1":
-  version "10.2.1"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-10.2.1.tgz#d402d157edfe39963c917095a51ab26c6071dfa2"
-  integrity sha512-TSfjW4w3orzDtTstNcNR2zsfNcO/R7NNmDMQ11LO6+EfnbNF2yktsMS3FZl811GX6dXEE+R/GCdDgCnlvqv9Mw==
+"@angular/material@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-10.2.2.tgz#224864e3c280ee2e8f0ccf28574c65d788799782"
+  integrity sha512-xRt8FsjY/MdC/dMBhitCXmOfXo4uhzLZ+kBqkKwY8gBsJ7FjhJIPbe/kRPBuzvVkVphrEfi/pMeDOge8v5ETbA==
   dependencies:
     tslib "^2.0.0"
 
@@ -10307,14 +10307,7 @@ rollup-plugin-sourcemaps@^0.6.0:
     "@rollup/pluginutils" "^3.0.9"
     source-map-resolve "^0.6.0"
 
-rollup@2.28.1:
-  version "2.28.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.28.1.tgz#ceedca3cdb013c2fa8f22f958a29c203368159ea"
-  integrity sha512-DOtVoqOZt3+FjPJWLU8hDIvBjUylc9s6IZvy76XklxzcLvAQLtVAG/bbhsMhcWnYxC0TKKcf1QQ/tg29zeID0Q==
-  optionalDependencies:
-    fsevents "~2.1.2"
-
-rollup@^2.8.0:
+rollup@2.28.1, rollup@^2.8.0:
   version "2.28.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.28.1.tgz#ceedca3cdb013c2fa8f22f958a29c203368159ea"
   integrity sha512-DOtVoqOZt3+FjPJWLU8hDIvBjUylc9s6IZvy76XklxzcLvAQLtVAG/bbhsMhcWnYxC0TKKcf1QQ/tg29zeID0Q==
