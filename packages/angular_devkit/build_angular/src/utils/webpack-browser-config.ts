@@ -30,8 +30,6 @@ import { getEsVersionForFileName } from '../webpack/utils/helpers';
 import { profilingEnabled } from './environment-options';
 import { I18nOptions, configureI18nBuild } from './i18n-options';
 
-const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
-
 export type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 
 export async function generateWebpackConfig(
@@ -109,6 +107,7 @@ export async function generateWebpackConfig(
       wco.differentialLoadingMode,
     );
 
+    const SpeedMeasurePlugin = await import('speed-measure-webpack-plugin');
     const smp = new SpeedMeasurePlugin({
       outputFormat: 'json',
       outputTarget: path.resolve(
