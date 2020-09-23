@@ -568,9 +568,9 @@ export function buildWebpackBrowser(
                         '',
                       );
                     } catch (err) {
-                      spinner.fail(colors.redBright('Localized bundle generation failed: ' + err.message));
+                      spinner.fail(colors.redBright('Localized bundle generation failed.'));
 
-                      return { success: false };
+                      return { success: false, error: mapErrorToMessage(err) };
                     }
 
                     if (hasErrors) {
@@ -688,7 +688,7 @@ export function buildWebpackBrowser(
               }
 
               // Copy assets
-              if (!options.watch && options.assets) {
+              if (!options.watch && options.assets?.length) {
                 try {
                   await copyAssets(
                     normalizeAssetPatterns(
@@ -702,9 +702,7 @@ export function buildWebpackBrowser(
                     context.workspaceRoot,
                   );
                 } catch (err) {
-                  context.logger.error('Unable to copy assets: ' + err.message);
-
-                  return { success: false };
+                  return { success: false, error: 'Unable to copy assets: ' + err.message };
                 }
               }
 
