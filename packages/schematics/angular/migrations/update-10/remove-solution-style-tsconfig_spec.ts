@@ -114,4 +114,12 @@ describe('Migration to remove "Solution Style" tsconfig', () => {
     expect(readJsonFile(newTree, 'src/tsconfig.spec.json').extends).toEqual('./../tsconfig.json');
     expect(logs.join('\n')).toContain('Failed to parse "/src/invalid/error.json" as JSON AST Object. InvalidSymbol at location: 43.');
   });
+
+  it(`should not error when 'tsconfig.json' doesn't exist`, async () => {
+    tree.delete('tsconfig.json');
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+
+    expect(readJsonFile(newTree, 'tsconfig.json')['compilerOptions']).toBeTruthy();
+    expect(newTree.exists('tsconfig.base.json')).toBeFalse();
+  });
 });

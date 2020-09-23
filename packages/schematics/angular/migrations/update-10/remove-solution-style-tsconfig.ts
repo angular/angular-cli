@@ -35,16 +35,23 @@ export default function (): Rule {
   return (host, context) => {
     const logger = context.logger;
 
-    const files = new JSONFile(host, 'tsconfig.json').get(['files']);
-    if (!(Array.isArray(files) && files.length === 0)) {
-      logger.info('Migration has already been executed.');
+    const tsConfigExists = host.exists('tsconfig.json');
+    if (tsConfigExists) {
+      const files = new JSONFile(host, 'tsconfig.json').get(['files']);
+      if (!(Array.isArray(files) && files.length === 0)) {
+        logger.info('Migration has already been executed.');
 
-      return;
+        return;
+      }
     }
 
     if (host.exists('tsconfig.base.json')) {
-      host.overwrite('tsconfig.json', host.read('tsconfig.base.json') || '');
-      host.delete('tsconfig.base.json');
+      if (tsConfigExists) {
+        host.overwrite('tsconfig.json', host.read('tsconfig.base.json') || '');
+        host.delete('tsconfig.base.json');
+      } else {
+        host.rename('tsconfig.base.json', 'tsconfig.json');
+      }
     }
 
     // Iterate over all tsconfig files and change the extends from 'tsconfig.base.json' to 'tsconfig.json'.
