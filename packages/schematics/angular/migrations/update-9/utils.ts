@@ -5,40 +5,32 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { JsonParseMode, dirname, normalize, parseJsonAst, resolve } from '@angular-devkit/core';
+import { dirname, normalize, resolve } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
-import { findPropertyInAstObject } from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
 
 export function isIvyEnabled(tree: Tree, tsConfigPath: string): boolean {
   // In version 9, Ivy is turned on by default
   // Ivy is opted out only when 'enableIvy' is set to false.
 
-  const buffer = tree.read(tsConfigPath);
-  if (!buffer) {
+  let tsconfigJson;
+  try {
+    tsconfigJson = new JSONFile(tree, tsConfigPath);
+  } catch {
     return true;
   }
 
-  const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
+  const enableIvy = tsconfigJson.get(['angularCompilerOptions', 'enableIvy']);
 
-  if (tsCfgAst.kind !== 'object') {
-    return true;
+  if (enableIvy !== undefined) {
+    return !!enableIvy;
   }
 
-  const ngCompilerOptions = findPropertyInAstObject(tsCfgAst, 'angularCompilerOptions');
-  if (ngCompilerOptions && ngCompilerOptions.kind === 'object') {
-    const enableIvy = findPropertyInAstObject(ngCompilerOptions, 'enableIvy');
-
-    if (enableIvy) {
-      return !!enableIvy.value;
-    }
-  }
-
-  const configExtends = findPropertyInAstObject(tsCfgAst, 'extends');
-  if (configExtends && configExtends.kind === 'string') {
+  const configExtends = tsconfigJson.get(['extends']);
+  if (configExtends && typeof configExtends === 'string') {
     const extendedTsConfigPath = resolve(
       dirname(normalize(tsConfigPath)),
-      normalize(configExtends.value),
+      normalize(configExtends),
     );
 
     return isIvyEnabled(tree, extendedTsConfigPath);
