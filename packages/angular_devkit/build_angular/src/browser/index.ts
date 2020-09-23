@@ -7,7 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { join, json, normalize, tags, virtualFs } from '@angular-devkit/core';
+import { getSystemPath, join, json, normalize, resolve, tags, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as ora from 'ora';
@@ -50,7 +50,6 @@ import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
   BrowserWebpackConfigOptions,
-  generateBrowserWebpackConfigFromContext,
   generateI18nBrowserWebpackConfigFromContext,
   getIndexInputFile,
   getIndexOutputFile,
@@ -97,25 +96,15 @@ interface ConfigFromContextReturn {
   config: webpack.Configuration;
   projectRoot: string;
   projectSourceRoot?: string;
+  i18n: I18nOptions;
 }
 
 export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  host: virtualFs.Host<fs.Stats>,
-  i18n: boolean,
-): Promise<ConfigFromContextReturn & { i18n: I18nOptions }>;
-export async function buildBrowserWebpackConfigFromContext(
-  options: BrowserBuilderSchema,
-  context: BuilderContext,
-  host?: virtualFs.Host<fs.Stats>,
-): Promise<ConfigFromContextReturn>;
-export async function buildBrowserWebpackConfigFromContext(
-  options: BrowserBuilderSchema,
-  context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-  i18n = false,
-): Promise<ConfigFromContextReturn & { i18n?: I18nOptions }> {
+  differentialLoadingMode = false,
+): Promise<ConfigFromContextReturn> {
   const webpackPartialGenerator = (wco: BrowserWebpackConfigOptions) => [
     getCommonConfig(wco),
     getBrowserConfig(wco),
@@ -126,16 +115,13 @@ export async function buildBrowserWebpackConfigFromContext(
     wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
   ];
 
-  if (i18n) {
-    return generateI18nBrowserWebpackConfigFromContext(
-      options,
-      context,
-      webpackPartialGenerator,
-      host,
-    );
-  }
-
-  return generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
+  return generateI18nBrowserWebpackConfigFromContext(
+    options,
+    context,
+    webpackPartialGenerator,
+    host,
+    differentialLoadingMode,
+  );
 }
 
 function getAnalyticsConfig(
@@ -177,6 +163,7 @@ async function initialize(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats>,
+  differentialLoadingMode: boolean,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
 ): Promise<{
   config: webpack.Configuration;
@@ -194,7 +181,7 @@ async function initialize(
     projectRoot,
     projectSourceRoot,
     i18n,
-  } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, true);
+  } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, differentialLoadingMode);
 
   // Validate asset option values if processed directly
   if (options.assets?.length && !adjustedOptions.assets?.length) {
@@ -235,39 +222,60 @@ export function buildWebpackBrowser(
 ): Observable<BrowserBuilderOutput> {
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
+
+  const projectName = context.target && context.target.project;
+  if (!projectName) {
+    throw new Error('The builder requires a target.');
+  }
+
   const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
   let outputPaths: undefined | Map<string, string>;
 
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
-  return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
-    // tslint:disable-next-line: no-big-function
-    switchMap(({ config, projectRoot, projectSourceRoot, i18n }) => {
-      const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
-      const target = tsConfig.options.target || ScriptTarget.ES5;
-      const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
-      const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
+  return from(context.getProjectMetadata(projectName))
+    .pipe(
+      switchMap(async projectMetadata => {
+        const sysProjectRoot = getSystemPath(
+          resolve(normalize(context.workspaceRoot),
+          normalize((projectMetadata.root as string) ?? '')),
+        );
 
-      if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
-        context.logger.warn(tags.stripIndent`
+        const { options: compilerOptions } = readTsconfig(options.tsConfig, context.workspaceRoot);
+        const target = compilerOptions.target || ScriptTarget.ES5;
+        const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
+        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
+        const differentialLoadingMode = !options.watch && isDifferentialLoadingNeeded;
+
+        if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
+          context.logger.warn(tags.stripIndent`
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
           referenced with script[type="module"] but they may not support ES2016+ syntax.
         `);
-      }
+        }
 
-      const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
-      const startTime = Date.now();
+        return {
+          ...(await initialize(options, context, host, differentialLoadingMode, transforms.webpackConfiguration)),
+          buildBrowserFeatures,
+          isDifferentialLoadingNeeded,
+          target,
+        };
+      }),
+      // tslint:disable-next-line: no-big-function
+      switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
+        const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
+        const startTime = Date.now();
 
-      return runWebpack(config, context, {
-        webpackFactory: require('webpack') as typeof webpack,
-        logging:
-          transforms.logging ||
-          (useBundleDownleveling
-            ? () => {}
-            : createWebpackLoggingCallback(!!options.verbose, context.logger)),
-      }).pipe(
+        return runWebpack(config, context, {
+          webpackFactory: require('webpack') as typeof webpack,
+          logging:
+            transforms.logging ||
+            (useBundleDownleveling
+              ? () => { }
+              : createWebpackLoggingCallback(!!options.verbose, context.logger)),
+        }).pipe(
         // tslint:disable-next-line: no-big-function
         concatMap(async buildEvent => {
           const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
