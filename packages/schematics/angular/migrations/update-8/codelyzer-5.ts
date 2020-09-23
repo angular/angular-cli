@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
 import {
   Rule,
   Tree,
@@ -16,7 +14,7 @@ import {
   NodeDependencyType,
   addPackageJsonDependency,
 } from '../../utility/dependencies';
-import { findPropertyInAstObject } from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
 
 const ruleMapping: {[key: string]: string} = {
   'contextual-life-cycle': 'contextual-lifecycle',
@@ -44,34 +42,20 @@ const ruleMapping: {[key: string]: string} = {
 export const updateTsLintConfig = (): Rule => {
   return (host: Tree) => {
     const tsLintPath = '/tslint.json';
-    const buffer = host.read(tsLintPath);
-    if (!buffer) {
-      return host;
-    }
-    const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-
-    if (tsCfgAst.kind != 'object') {
-      return host;
+    let tsLintJson;
+    try {
+      tsLintJson = new JSONFile(host, tsLintPath);
+    } catch {
+      return;
     }
 
-    const rulesNode = findPropertyInAstObject(tsCfgAst, 'rules');
-    if (!rulesNode || rulesNode.kind != 'object') {
-      return host;
-    }
-
-    const recorder = host.beginUpdate(tsLintPath);
-
-    rulesNode.properties.forEach(prop => {
-      const mapping = ruleMapping[prop.key.value];
-      if (mapping) {
-        recorder.remove(prop.key.start.offset + 1, prop.key.value.length);
-        recorder.insertLeft(prop.key.start.offset + 1, mapping);
+    for (const [existingRule, newRule] of Object.entries(ruleMapping)) {
+      const ruleValue = tsLintJson.get(['rules', existingRule]);
+      if (ruleValue !== undefined) {
+        tsLintJson.remove(['rules', existingRule]);
+        tsLintJson.modify(['rules', newRule], ruleValue as boolean);
       }
-    });
-
-    host.commitUpdate(recorder);
-
-    return host;
+    }
   };
 };
 
