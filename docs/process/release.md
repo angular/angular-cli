@@ -193,7 +193,7 @@ for the tag just released.
 If you have an API token for GitHub you can create a draft automatically by
 using the `--githubToken` flag. You just then have to confirm the draft.
 
-> **Tags containing `beta` or `rc` should be marked as pre-release.**
+> **Tags containing `next` or `rc` should be marked as pre-release.**
 
 ### Microsite Publishing
 
