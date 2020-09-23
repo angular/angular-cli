@@ -93,10 +93,10 @@ export async function createDefaultPath(tree: Tree, projectName: string): Promis
 
 export function* allWorkspaceTargets(
   workspace: workspaces.WorkspaceDefinition,
-): Iterable<[string, workspaces.TargetDefinition]> {
-  for (const [, project] of workspace.projects) {
-    for (const targetEntry of project.targets) {
-      yield targetEntry;
+): Iterable<[string, workspaces.TargetDefinition, string, workspaces.ProjectDefinition]> {
+  for (const [projectName, project] of workspace.projects) {
+    for (const [targetName, target] of project.targets) {
+      yield [targetName, target, projectName, project] ;
     }
   }
 }
