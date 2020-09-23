@@ -127,6 +127,7 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/rimraf",
         "@npm//@types/semver",
+        "@npm//@types/speed-measure-webpack-plugin",
         "@npm//@types/text-table",
         "@npm//@types/webpack",
         "@npm//@types/webpack-dev-server",

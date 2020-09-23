@@ -1657,6 +1657,13 @@
   resolved "https://registry.yarnpkg.com/@types/source-list-map/-/source-list-map-0.1.2.tgz#0078836063ffaf17412349bba364087e0ac02ec9"
   integrity sha512-K5K+yml8LTo9bWJI/rECfIPrGgxdpeNbj+d53lwN4QjW1MCwlkhUms+gtdzigTeUyBr09+u8BwOIY3MXvHdcsA==
 
+"@types/speed-measure-webpack-plugin@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@types/speed-measure-webpack-plugin/-/speed-measure-webpack-plugin-1.3.0.tgz#406a4ba9c087ecbad01266a3c9b206c7bb99bc24"
+  integrity sha512-p3gUQy1dqcdg67tjrKPjvBBsaSM3y28Za7DcT3sAyztzshGuZd6uKO+TT40JsfJAkyDrdRF2szk/CNjQhOQ0Bg==
+  dependencies:
+    "@types/webpack" "*"
+
 "@types/tapable@*":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.6.tgz#a9ca4b70a18b270ccb2bc0aaafefd1d486b7ea74"
@@ -10307,14 +10314,7 @@ rollup-plugin-sourcemaps@^0.6.0:
     "@rollup/pluginutils" "^3.0.9"
     source-map-resolve "^0.6.0"
 
-rollup@2.28.1:
-  version "2.28.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.28.1.tgz#ceedca3cdb013c2fa8f22f958a29c203368159ea"
-  integrity sha512-DOtVoqOZt3+FjPJWLU8hDIvBjUylc9s6IZvy76XklxzcLvAQLtVAG/bbhsMhcWnYxC0TKKcf1QQ/tg29zeID0Q==
-  optionalDependencies:
-    fsevents "~2.1.2"
-
-rollup@^2.8.0:
+rollup@2.28.1, rollup@^2.8.0:
   version "2.28.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.28.1.tgz#ceedca3cdb013c2fa8f22f958a29c203368159ea"
   integrity sha512-DOtVoqOZt3+FjPJWLU8hDIvBjUylc9s6IZvy76XklxzcLvAQLtVAG/bbhsMhcWnYxC0TKKcf1QQ/tg29zeID0Q==
