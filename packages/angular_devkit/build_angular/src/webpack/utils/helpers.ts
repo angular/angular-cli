@@ -101,20 +101,20 @@ export function getSourceMapDevTool(
  * Returns an ES version file suffix to differentiate between various builds.
  */
 export function getEsVersionForFileName(
-  scriptTargetOverride: ScriptTarget | undefined,
+  scriptTarget: ScriptTarget | undefined,
   esVersionInFileName = false,
 ): string {
-  if (!esVersionInFileName || scriptTargetOverride === undefined) {
+  if (!esVersionInFileName || scriptTarget === undefined) {
     return '';
   }
 
-  if (scriptTargetOverride === ScriptTarget.ESNext) {
+  if (scriptTarget === ScriptTarget.ESNext) {
     return '-esnext';
   }
 
-  return '-' + ScriptTarget[scriptTargetOverride].toLowerCase();
+  return '-' + ScriptTarget[scriptTarget].toLowerCase();
 }
 
-export function isPolyfillsEntry(name: string) {
+export function isPolyfillsEntry(name: string): boolean {
   return name === 'polyfills' || name === 'polyfills-es5';
 }

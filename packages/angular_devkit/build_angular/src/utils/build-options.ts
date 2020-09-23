@@ -76,8 +76,6 @@ export interface BuildOptions {
   /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
   rebaseRootRelativeCssUrls?: boolean;
 
-  /* Append script target version to filename. */
-  esVersionInFileName?: boolean;
   experimentalRollupPass?: boolean;
   allowedCommonJsDependencies?: string[];
 }
