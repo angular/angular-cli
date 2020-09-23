@@ -11,23 +11,22 @@ import { feature, features } from 'caniuse-lite';
 import * as ts from 'typescript';
 
 export class BuildBrowserFeatures {
-  private readonly _es6TargetOrLater: boolean;
   readonly supportedBrowsers: string[];
 
   constructor(
     private projectRoot: string,
-    private scriptTarget: ts.ScriptTarget,
   ) {
     this.supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
-    this._es6TargetOrLater = this.scriptTarget > ts.ScriptTarget.ES5;
   }
 
   /**
    * True, when one or more browsers requires ES5
    * support and the scirpt target is ES2015 or greater.
    */
-  isDifferentialLoadingNeeded(): boolean {
-    return this._es6TargetOrLater && this.isEs5SupportNeeded();
+  isDifferentialLoadingNeeded(scriptTarget: ts.ScriptTarget): boolean {
+    const es6TargetOrLater = scriptTarget > ts.ScriptTarget.ES5;
+
+    return es6TargetOrLater && this.isEs5SupportNeeded();
   }
 
   /**
