@@ -223,7 +223,7 @@ export function buildWebpackBrowser(
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
 
-  const projectName = context.target && context.target.project;
+  const projectName = context.target?.project;
   if (!projectName) {
     throw new Error('The builder requires a target.');
   }
@@ -596,9 +596,9 @@ export function buildWebpackBrowser(
                     {
                       size: bundle.size,
                       files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
-                      names: chunk && chunk.names,
-                      entry: !!chunk && chunk.names.includes('runtime'),
-                      initial: !!chunk && chunk.initial,
+                      names: chunk?.names,
+                      entry: !!chunk?.names.includes('runtime'),
+                      initial: !!chunk?.initial,
                       rendered: true,
                     },
                     true,
@@ -607,8 +607,7 @@ export function buildWebpackBrowser(
 
                 const bundleInfoStats: BundleStats[] = [];
                 for (const result of processResults) {
-                  const chunk = webpackStats.chunks
-                    && webpackStats.chunks.find((chunk) => chunk.id.toString() === result.name);
+                  const chunk = webpackStats.chunks?.find((chunk) => chunk.id.toString() === result.name);
 
                   if (result.original) {
                     bundleInfoStats.push(generateBundleInfoStats(result.original, chunk));
@@ -619,14 +618,12 @@ export function buildWebpackBrowser(
                   }
                 }
 
-                const unprocessedChunks = webpackStats.chunks && webpackStats.chunks
-                  .filter((chunk) => !processResults
-                    .find((result) => chunk.id.toString() === result.name),
-                  ) || [];
+                const unprocessedChunks = webpackStats.chunks?.filter((chunk) => !processResults
+                  .find((result) => chunk.id.toString() === result.name),
+                ) || [];
                 for (const chunk of unprocessedChunks) {
-                  const asset =
-                    webpackStats.assets && webpackStats.assets.find(a => a.name === chunk.files[0]);
-                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset && asset.size }, true));
+                  const asset = webpackStats.assets?.find(a => a.name === chunk.files[0]);
+                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }, true));
                 }
 
                 context.logger.info(
@@ -634,7 +631,7 @@ export function buildWebpackBrowser(
                   generateBuildStatsTable(bundleInfoStats, colors.enabled) +
                   '\n\n' +
                   generateBuildStats(
-                    (webpackStats && webpackStats.hash) || '<unknown>',
+                    webpackStats?.hash || '<unknown>',
                     Date.now() - startTime,
                     true,
                   ),
@@ -706,17 +703,17 @@ export function buildWebpackBrowser(
                 }
               }
 
-              if (options.index) {
-                for (const [locale, outputPath] of outputPaths.entries()) {
-                  let localeBaseHref;
-                  if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                    localeBaseHref = urlJoin(
-                      options.baseHref || '',
-                      i18n.locales[locale].baseHref ?? `/${locale}/`,
-                    );
-                  }
+              for (const [locale, outputPath] of outputPaths.entries()) {
+                let localeBaseHref;
+                if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
+                  localeBaseHref = urlJoin(
+                    options.baseHref || '',
+                    i18n.locales[locale].baseHref ?? `/${locale}/`,
+                  );
+                }
 
-                  try {
+                try {
+                  if (options.index) {
                     await generateIndex(
                       outputPath,
                       options,
@@ -729,23 +726,9 @@ export function buildWebpackBrowser(
                       locale || options.i18nLocale,
                       localeBaseHref || options.baseHref,
                     );
-                  } catch (err) {
-                    return { success: false, error: mapErrorToMessage(err) };
-                  }
-                }
-              }
-
-              if (options.serviceWorker) {
-                for (const [locale, outputPath] of outputPaths.entries()) {
-                  let localeBaseHref;
-                  if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                    localeBaseHref = urlJoin(
-                      options.baseHref || '',
-                      i18n.locales[locale].baseHref ?? `/${locale}/`,
-                    );
                   }
 
-                  try {
+                  if (options.serviceWorker) {
                     await augmentAppWithServiceWorker(
                       host,
                       root,
@@ -754,9 +737,9 @@ export function buildWebpackBrowser(
                       localeBaseHref || options.baseHref || '/',
                       options.ngswConfigPath,
                     );
-                  } catch (err) {
-                    return { success: false, error: mapErrorToMessage(err) };
                   }
+                } catch (err) {
+                  return { success: false, error: mapErrorToMessage(err) };
                 }
               }
             }
