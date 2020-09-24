@@ -36,6 +36,16 @@
       "type": "string",
       "description": "SSL certificate to use for serving HTTPS."
     },
+    "headers": {
+      "type": "object",
+      "description": "Custom HTTP headers to serve.",
+      "propertyNames": {
+        "pattern": "^[-_A-Za-z0-9]+$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "open": {
       "type": "boolean",
       "description": "Opens the url in default browser.",

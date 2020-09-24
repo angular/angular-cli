@@ -397,10 +397,13 @@ export function buildServerConfig(
   const servePath = buildServePath(serverOptions, browserOptions, logger);
   const { styles, scripts } = normalizeOptimization(browserOptions.optimization);
 
-  const config: WebpackDevServer.Configuration & { logLevel: string } = {
+  const config: WebpackDevServer.Configuration&{logLevel: string} = {
     host: serverOptions.host,
     port: serverOptions.port,
-    headers: { 'Access-Control-Allow-Origin': '*' },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      ...serverOptions.headers,
+    },
     historyApiFallback: !!browserOptions.index && {
       index: `${servePath}/${getIndexOutputFile(browserOptions)}`,
       disableDotRule: true,
