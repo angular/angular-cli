@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, dirname, join, normalize, parseJsonAst } from '@angular-devkit/core';
+import { dirname, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -15,10 +15,7 @@ import {
 } from '@angular-devkit/schematics';
 import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
 import { NodeDependencyType, addPackageJsonDependency } from '@schematics/angular/utility/dependencies';
-import {
-  appendValueInAstArray,
-  findPropertyInAstObject,
-} from '@schematics/angular/utility/json-utils';
+import { JSONFile } from '@schematics/angular/utility/json-file';
 import { updateWorkspace } from '@schematics/angular/utility/workspace';
 import * as ts from 'typescript';
 
@@ -152,33 +149,14 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
       return;
     }
 
-    const configBuffer = host.read(tsConfigPath);
-    if (!configBuffer) {
-      throw new SchematicsException(`Could not find (${tsConfigPath})`);
-    }
-
-    const content = configBuffer.toString();
-    const tsConfigAst = parseJsonAst(content, JsonParseMode.Loose);
-    if (!tsConfigAst || tsConfigAst.kind !== 'object') {
-      throw new SchematicsException(`Invalid JSON AST Object (${tsConfigPath})`);
-    }
-
-    const filesAstNode = findPropertyInAstObject(tsConfigAst, 'files');
-
+    const tsConfig = new JSONFile(host, tsConfigPath);
+    const filesAstNode = tsConfig.get(['files']);
     const serverFilePath = stripTsExtension(options.serverFileName) + '.ts';
-    if (
-      filesAstNode &&
-      filesAstNode.kind === 'array' &&
-      !filesAstNode.elements.some(({ text }) => text === serverFilePath)) {
-      const recorder = host.beginUpdate(tsConfigPath);
-
-      appendValueInAstArray(
-        recorder,
-        filesAstNode,
-        stripTsExtension(options.serverFileName) + '.ts',
-      );
-
-      host.commitUpdate(recorder);
+    if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
+      tsConfig.modify(['files'], [
+        ...filesAstNode,
+        serverFilePath
+      ]);
     }
   };
 }
