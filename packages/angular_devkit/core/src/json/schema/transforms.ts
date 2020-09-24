@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, JsonValue, isJsonObject } from '../interface';
+import { JsonObject, JsonValue, isJsonArray, isJsonObject } from '../interface';
 import { JsonPointer } from './interface';
 import { JsonSchema } from './schema';
 import { getTypesOfSchema } from './utility';
@@ -15,10 +15,7 @@ export function addUndefinedDefaults(
   _pointer: JsonPointer,
   schema?: JsonSchema,
 ): JsonValue {
-  if (schema === true || schema === false) {
-    return value;
-  }
-  if (schema === undefined) {
+  if (typeof schema === 'boolean' || schema === undefined) {
     return value;
   }
 
@@ -64,14 +61,37 @@ export function addUndefinedDefaults(
     }
 
     for (const [propName, schemaObject] of Object.entries(schema.properties)) {
-      if (newValue[propName] !== undefined || propName === '$schema') {
+      if (propName === '$schema' || !isJsonObject(schemaObject)) {
         continue;
       }
 
-      // TODO: Does not currently handle more complex schemas (oneOf/anyOf/etc.)
-      const defaultValue = (schemaObject as JsonObject).default;
+      const value = newValue[propName];
+      if (value === undefined) {
+        newValue[propName] = schemaObject.default;
+      } else if (isJsonObject(value)) {
+        // Basic support for oneOf and anyOf.
+        const propertySchemas = schemaObject.oneOf || schemaObject.anyOf;
+        const allProperties = Object.keys(value);
+        // Locate a schema which declares all the properties that the object contains.
+        const adjustedSchema = isJsonArray(propertySchemas) && propertySchemas.find(s => {
+          if (!isJsonObject(s)) {
+            return false;
+          }
 
-      newValue[propName] = defaultValue;
+          const schemaType = getTypesOfSchema(s);
+          if (schemaType.size === 1 && schemaType.has('object') && isJsonObject(s.properties)) {
+            const properties = Object.keys(s.properties);
+
+            return allProperties.every(key => properties.includes(key));
+          }
+
+          return false;
+        });
+
+        if (adjustedSchema && isJsonObject(adjustedSchema)) {
+          newValue[propName] = addUndefinedDefaults(value, _pointer, adjustedSchema);
+        }
+      }
     }
 
     return newValue;
