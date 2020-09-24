@@ -102,4 +102,14 @@ describe('Dev Server Builder', () => {
     expect(hasSourceMaps).toBe(false, `Expected emitted files not to contain '.map' files.`);
   });
 
+  it('serves custom headers', async () => {
+    const run = await architect.scheduleTarget(
+        target, {headers: {'X-Header': 'Hello World'}});
+    runs.push(run);
+    const output = await run.result as DevServerBuilderOutput;
+    expect(output.success).toBe(true);
+    const response = await fetch('http://localhost:4200/index.html');
+    expect(response.headers.get('X-Header')).toBe('Hello World');
+  }, 30000);
+
 });
