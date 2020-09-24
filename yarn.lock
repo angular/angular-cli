@@ -990,23 +990,23 @@
   resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.6.1.tgz#f9e279d2fecaf6cec6ed676bc8714846f3704e40"
   integrity sha512-2JpfZb6eYCGrdLdUJamncIpI4pgEAhPURYGg+rCgqoZDJxzADuOnpf/00dEBXPM2XByXNXTqsKEFN2gTaZz2mA==
 
-"@bazel/buildifier@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-3.4.0.tgz#44ce98b33bf8057f5398a78f7d1c564760b43f6c"
-  integrity sha512-TdugkgxAIxSyXSBZcLlntQKJ/rGV3LSMjlYuvRr3YtQBn/2sIfpHX0dcNZ7zdCPkev9cK0kpEs42MkmKHY9peQ==
+"@bazel/buildifier@3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-3.5.0.tgz#afbee61d61543d0a0a28e2b29a5cbdb64c852953"
+  integrity sha512-cbUS0/GMg57g6NIg6JekgmqVtuobYzW4aGHk7KzMS/bFZvxg6WY19JJ5UZSzGyAGDu2152oUTFbh4WN74Fz1+Q==
 
-"@bazel/jasmine@2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.0.3.tgz#91416eab2eb3da265a21cbc829294d51e93f0c52"
-  integrity sha512-szLfDDw+nuUoX51drpq0C32CJ3FuOIl7X06ljX7YpX15GyCjLzCRnX2antZCUq2gau/AcBJ3RY+3yruzD6RZiQ==
+"@bazel/jasmine@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.2.0.tgz#78fc4171362113d993e2473b0168ee8c255e05c9"
+  integrity sha512-NmrgbHBSWUaBXT9rFqeC+bYYWfHtPphnfgchusy7LOQMs/aWVePEo9tsbggNBt1pf6NYv+Y/cHLgtlL/EdQ6Dg==
   dependencies:
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.0.3.tgz#0be019014ef973f3a415c4671c65d943afc62023"
-  integrity sha512-yESlesTHX7gOuBzuc61HtHB8h/gRCaEB3C6guJnBVPuz4tGMLJ069fJz/SW/pfgrACP7ixqWqHXIAEnPsRU+tw==
+"@bazel/typescript@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.2.0.tgz#f2d3dce8715d574fe3146f19fdb8479abcc4d608"
+  integrity sha512-Thf8pXntBzE3EvJtyiTBNsfIf1QnYmGPQmUSGLcKUuuFoplUVYShMRHaxBoPZmYsnD/x+BFLgUKIzlXiEQpGqQ==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
