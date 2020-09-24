@@ -1,6 +1,6 @@
 ## TransferHttpCacheModule
 
-`TransferHttpCacheModule` installs a Http interceptor that avoids duplicate `HttpClient` GET requests
+`TransferHttpCacheModule` installs an Http interceptor that avoids duplicate `HttpClient` GET requests
 on the client, for requests that were already made when the application was rendered on the server
 side.
 
