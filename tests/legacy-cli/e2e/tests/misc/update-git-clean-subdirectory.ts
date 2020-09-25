@@ -18,7 +18,7 @@ export default async function() {
   await writeFile('../added.ts', 'console.log(\'created\');\n');
   await silentGit('add', '../added.ts');
 
-  const { stderr } = await ng('update', '--all', '--force');
+  const { stderr } = await ng('update', '@angular/cli');
   if (stderr && stderr.includes('Repository is not clean.')) {
     throw new Error('Expected clean repository');
   }
