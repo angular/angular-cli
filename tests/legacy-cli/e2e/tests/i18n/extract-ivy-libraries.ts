@@ -65,6 +65,8 @@ export default async function() {
   await expectFileToMatch('messages.xlf', 'Hello world');
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
 
+  await npm('uninstall', '@angular/localize');
+
   // TODO: Investigate failures on Windows and remove this check
   if (process.platform === 'win32') {
     return;

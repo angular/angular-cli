@@ -63,4 +63,6 @@ export default async function() {
   if (!message4.includes(`Ivy extraction enabled but application is not Ivy enabled.`)) {
     throw new Error('Expected ivy disabled application warning');
   }
+
+  await npm('uninstall', '@angular/localize');
 }
