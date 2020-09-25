@@ -26,7 +26,6 @@ import { SingleTestTransformLoader } from '../webpack/plugins/single-test-transf
 import { findTests } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
 
-// tslint:disable-next-line:no-implicit-dependencies
 export type KarmaConfigOptions = import('karma').ConfigOptions & {
   buildWebpack?: unknown;
   configFile?: string;
@@ -36,7 +35,6 @@ async function initialize(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   webpackConfigurationTransformer?: ExecutionTransformer<webpack.Configuration>,
-  // tslint:disable-next-line:no-implicit-dependencies
 ): Promise<[typeof import('karma'), webpack.Configuration]> {
   const { config } = await generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
@@ -53,7 +51,6 @@ async function initialize(
     ],
   );
 
-  // tslint:disable-next-line:no-implicit-dependencies
   const karma = await import('karma');
 
   return [
