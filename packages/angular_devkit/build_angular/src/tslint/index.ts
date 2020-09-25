@@ -11,7 +11,7 @@ import { readFileSync } from 'fs';
 import * as glob from 'glob';
 import { Minimatch } from 'minimatch';
 import * as path from 'path';
-import * as tslint from 'tslint'; // tslint:disable-line:no-implicit-dependencies
+import * as tslint from 'tslint';
 import { Program } from 'typescript';
 import { stripBom } from '../utils/strip-bom';
 import { Schema as RealTslintBuilderOptions } from './schema';
@@ -25,7 +25,7 @@ interface LintResult extends tslint.LintResult {
 async function _loadTslint() {
   let tslint;
   try {
-    tslint = await import('tslint'); // tslint:disable-line:no-implicit-dependencies
+    tslint = await import('tslint');
   } catch {
     throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
   }

@@ -84,6 +84,7 @@
     "karma": "^5.2.0",
     "ng-packagr": "^10.0.0",
     "protractor": "^7.0.0",
+    "tslint": "^6.1.0",
     "typescript": ">=3.9 < 4.1"
   },
   "peerDependenciesMeta": {
@@ -97,6 +98,9 @@
       "optional": true
     },
     "protractor": {
+      "optional": true
+    },
+    "tslint": {
       "optional": true
     }
   }
