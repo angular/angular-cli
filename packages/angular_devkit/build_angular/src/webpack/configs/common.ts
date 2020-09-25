@@ -208,10 +208,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     'scripts',
   ).reduce((prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {
     const { bundleName, inject, input } = curr;
-    const resolvedPath = path.resolve(root, input);
+    let resolvedPath = path.resolve(root, input);
 
     if (!existsSync(resolvedPath)) {
-      throw new Error(`Script file ${input} does not exist.`);
+      try {
+        resolvedPath = require.resolve(input, { paths: [root] });
+      } catch {
+        throw new Error(`Script file ${input} does not exist.`);
+      }
     }
 
     const existingEntry = prev.find(el => el.bundleName === bundleName);

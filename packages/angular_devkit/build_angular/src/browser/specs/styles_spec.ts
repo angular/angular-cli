@@ -570,13 +570,23 @@ describe('Browser Builder styles', () => {
     expect(main).toContain(`url('/base/assets/component-img-absolute.svg')`);
   }, 90000);
 
-  it(`supports bootstrap@4`, async () => {
+  it(`supports bootstrap@4 with full path`, async () => {
     const bootstrapPath = dirname(require.resolve('bootstrap/package.json'));
 
     const overrides = {
       extractCss: true,
       styles: [bootstrapPath + '/dist/css/bootstrap.css'],
       scripts: [bootstrapPath + '/dist/js/bootstrap.js'],
+    };
+
+    await browserBuild(architect, host, target, overrides);
+  });
+
+  it(`supports bootstrap@4 with package reference`, async () => {
+    const overrides = {
+      extractCss: true,
+      styles: ['bootstrap/dist/css/bootstrap.css'],
+      scripts: ['bootstrap/dist/js/bootstrap.js'],
     };
 
     await browserBuild(architect, host, target, overrides);

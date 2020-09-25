@@ -7,6 +7,7 @@
  */
 
 import { tags } from '@angular-devkit/core';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
@@ -58,7 +59,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     const chunkNames: string[] = [];
 
     normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
-      const resolvedPath = path.resolve(root, style.input);
+      let resolvedPath = path.resolve(root, style.input);
+      if (!fs.existsSync(resolvedPath)) {
+        try {
+          resolvedPath = require.resolve(style.input, { paths: [root] });
+        } catch {}
+      }
       // Add style entry points.
       if (entryPoints[style.bundleName]) {
         entryPoints[style.bundleName].push(resolvedPath);
