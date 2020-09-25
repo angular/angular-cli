@@ -89,13 +89,12 @@ async function _executeTarget(
   const targetSpec = { project, target, configuration };
 
   delete argv['help'];
-  argv['_'] = [];
-
   const logger = new logging.Logger('jobs');
   const logs: logging.LogEntry[] = [];
   logger.subscribe(entry => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
 
-  const run = await architect.scheduleTarget(targetSpec, argv, { logger });
+  const { _, ...options } = argv;
+  const run = await architect.scheduleTarget(targetSpec, options, { logger });
   const bars = new MultiProgressBar<number, BarInfo>(':name :bar (:current/:total) :status');
 
   run.progress.subscribe(update => {
