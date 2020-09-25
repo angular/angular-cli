@@ -577,7 +577,16 @@ function _addLiveReload(
       // When HMR is enabled we need to add the css paths as part of the entrypoints
       // because otherwise no JS bundle will contain the HMR accept code.
       const normalizedStyles = normalizeExtraEntryPoints(browserOptions.styles, 'styles')
-        .map(style => path.resolve(root, style.input));
+        .map(style => {
+          let resolvedPath = path.resolve(root, style.input);
+          if (!existsSync(resolvedPath)) {
+            try {
+              resolvedPath = require.resolve(style.input, { paths: [root] });
+            } catch {}
+          }
+
+          return resolvedPath;
+        });
       entryPoints.push(...normalizedStyles);
     }
 
