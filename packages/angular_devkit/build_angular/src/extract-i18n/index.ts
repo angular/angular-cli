@@ -141,6 +141,8 @@ export async function execute(
       },
       sourceMap: {
         scripts: true,
+        styles: false,
+        vendor: true,
       },
       buildOptimizer: false,
       i18nLocale: options.i18nLocale || i18n.sourceLocale,
@@ -187,7 +189,7 @@ export async function execute(
           module: {
             rules: [
               {
-                test: /\.ts$/,
+                test: /\.[t|j]s$/,
                 loader: require.resolve('./ivy-extract-loader'),
                 options: {
                   messageHandler: (messages: LocalizeMessage[]) => ivyMessages.push(...messages),

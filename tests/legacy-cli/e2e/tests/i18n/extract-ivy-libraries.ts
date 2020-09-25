@@ -1,0 +1,72 @@
+import { getGlobalVariable } from '../../utils/env';
+import { expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
+import { ng, npm } from '../../utils/process';
+import { expectToFail } from '../../utils/utils';
+import { readNgVersion } from '../../utils/version';
+
+export default async function() {
+  // Ivy only test
+  if (getGlobalVariable('argv')['ve']) {
+    return;
+  }
+
+  // Setup a library
+  await ng('generate', 'library', 'i18n-lib-test');
+  await replaceInFile(
+    'projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts',
+    '<p>',
+    '<p i18n>',
+  );
+
+  // Build library
+  await ng('build', 'i18n-lib-test');
+
+  // Consume library in application
+  await writeFile(
+    'src/app/app.module.ts',
+    `
+    import { BrowserModule } from '@angular/platform-browser';
+    import { NgModule } from '@angular/core';
+    import { AppComponent } from './app.component';
+    import { I18nLibTestModule } from 'i18n-lib-test';
+
+    @NgModule({
+      declarations: [
+        AppComponent
+      ],
+      imports: [
+        BrowserModule,
+        I18nLibTestModule,
+      ],
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule { }
+    `,
+  );
+
+  await writeFile(
+    'src/app/app.component.html',
+    `
+      <p i18n>Hello world</p>
+      <lib-i18n-lib-test></lib-i18n-lib-test>
+    `,
+  );
+
+  // Install correct version
+  let localizeVersion = '@angular/localize@' + readNgVersion();
+  if (getGlobalVariable('argv')['ng-snapshots']) {
+    localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
+  }
+  await npm('install', `${localizeVersion}`);
+
+  // Extract messages
+  await ng('xi18n', '--ivy');
+  await expectFileToMatch('messages.xlf', 'src/app/app.component.html');
+  await expectFileToMatch('messages.xlf', 'Hello world');
+  await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
+  await expectFileToMatch(
+    'messages.xlf',
+    `projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts`,
+  );
+}
