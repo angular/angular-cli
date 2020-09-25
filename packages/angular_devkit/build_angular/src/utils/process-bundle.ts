@@ -560,7 +560,7 @@ export async function createI18nPlugins(
   const diagnostics = new localizeDiag.Diagnostics();
 
   const es2015 = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    // tslint:disable-next-line: trailing-comma
     '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
   );
   plugins.push(
@@ -571,7 +571,7 @@ export async function createI18nPlugins(
   );
 
   const es5 = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    // tslint:disable-next-line: trailing-comma
     '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
   );
   plugins.push(
@@ -582,7 +582,7 @@ export async function createI18nPlugins(
   );
 
   const inlineLocale = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    // tslint:disable-next-line: trailing-comma
     '@angular/localize/src/tools/src/translate/source_files/locale_plugin'
   );
   plugins.push(inlineLocale.makeLocalePlugin(locale));
