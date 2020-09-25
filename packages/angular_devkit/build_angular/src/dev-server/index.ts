@@ -558,22 +558,14 @@ function _addLiveReload(
 
   const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
   if (options.hmr) {
-    const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
-    logger.warn(tags.oneLine`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
+    logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
+      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
 
-    const showWarning = options.hmrWarning;
-    if (showWarning) {
-      logger.info(tags.stripIndents`
-          The project will still live reload when HMR is enabled, but to take full advantage of HMR
-          additional application code which is not included by default in an Angular CLI project is required.
+    entryPoints.push(
+      'webpack/hot/dev-server',
+      path.join(__dirname, '../webpack/hmr.js'),
+    );
 
-          See ${webpackHmrLink} for information on working with HMR for Webpack.`);
-      logger.warn(
-        tags.oneLine`To disable this warning use "hmrWarning: false" under "serve"
-           options in "angular.json".`,
-      );
-    }
-    entryPoints.push('webpack/hot/dev-server');
     if (browserOptions.styles?.length) {
       // When HMR is enabled we need to add the css paths as part of the entrypoints
       // because otherwise no JS bundle will contain the HMR accept code.
