@@ -91,7 +91,7 @@
     "@bazel/jasmine": "2.2.0",
     "@bazel/typescript": "2.2.0",
     "@jsdevtools/coverage-istanbul-loader": "3.0.3",
-    "@types/babel__core": "7.1.9",
+    "@types/babel__core": "7.1.10",
     "@types/babel__template": "7.0.2",
     "@types/browserslist": "^4.4.0",
     "@types/caniuse-lite": "^1.0.0",
