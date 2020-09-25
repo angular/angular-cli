@@ -111,7 +111,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     },
     plugins: [
       new CommonJsUsageWarnPlugin({
-        allowedDepedencies: allowedCommonJsDependencies,
+        allowedDependencies: allowedCommonJsDependencies,
       }),
       ...extraPlugins,
     ],
