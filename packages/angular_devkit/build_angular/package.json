@@ -83,6 +83,7 @@
     "@angular/localize": "^11.0.0 || ^11.0.0-next",
     "karma": "^5.2.0",
     "ng-packagr": "^10.0.0",
+    "protractor": "^7.0.0",
     "typescript": ">=3.9 < 4.1"
   },
   "peerDependenciesMeta": {
@@ -93,6 +94,9 @@
       "optional": true
     },
     "ng-packagr": {
+      "optional": true
+    },
+    "protractor": {
       "optional": true
     }
   }
