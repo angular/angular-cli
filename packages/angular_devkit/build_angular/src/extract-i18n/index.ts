@@ -122,6 +122,7 @@ export async function execute(
     // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
     outFile = path.join(options.outputPath, outFile);
   }
+  outFile = path.resolve(context.workspaceRoot, outFile);
 
   if (!context.target || !context.target.project) {
     throw new Error('The builder requires a target.');
@@ -163,7 +164,7 @@ export async function execute(
       // Ivy extraction is the default for Ivy applications.
       usingIvy = (isIvyApplication && options.ivy === undefined) || !!options.ivy;
 
-      if (options.ivy) {
+      if (usingIvy) {
         if (!isIvyApplication) {
           context.logger.warn(
             'Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.',
