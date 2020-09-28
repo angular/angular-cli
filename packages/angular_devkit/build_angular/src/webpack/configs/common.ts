@@ -141,23 +141,26 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           extraPlugins.push({
             apply(compiler) {
               compiler.hooks.compilation.tap('build-angular', compilation => {
-                // Webpack typings do not contain MainTemplate assetPath hook
-                // The webpack.Compilation assetPath hook is a noop in 4.x so the template must be used
-                // tslint:disable-next-line: no-any
-                (compilation.mainTemplate.hooks as any).assetPath.tap(
-                  'build-angular',
-                  (
-                    filename: string | ((data: { chunk: compilation.Chunk }) => string),
-                    data: { chunk: compilation.Chunk },
-                  ) => {
-                    const assetName = typeof filename === 'function' ? filename(data) : filename;
-                    const isMap = assetName && assetName.endsWith('.map');
+                const assetPath = (
+                  filename: string | ((data: { chunk: compilation.Chunk }) => string),
+                  data: { chunk: compilation.Chunk },
+                ) => {
+                  const assetName = typeof filename === 'function' ? filename(data) : filename;
+                  const isMap = assetName?.endsWith('.map');
 
-                    return data.chunk && data.chunk.name === 'polyfills-es5'
-                      ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
-                      : assetName;
-                  },
-                );
+                  return data.chunk?.name === 'polyfills-es5'
+                    ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
+                    : assetName;
+                };
+
+                if (isWebpackFiveOrHigher()) {
+                  compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
+                } else {
+                  const mainTemplate = compilation.mainTemplate as typeof compilation.mainTemplate & {
+                    hooks: typeof compilation['hooks'];
+                  };
+                  mainTemplate.hooks.assetPath.tap('build-angular', assetPath);
+                }
               });
             },
           });
