@@ -22,18 +22,6 @@ interface LintResult extends tslint.LintResult {
   fileNames: string[];
 }
 
-async function _loadTslint() {
-  let tslint;
-  try {
-    tslint = await import('tslint');
-  } catch {
-    throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
-  }
-
-  return tslint;
-}
-
-
 async function _run(
   options: TslintBuilderOptions,
   context: BuilderContext,
@@ -55,11 +43,17 @@ async function _run(
     throw new Error('A "project" must be specified to enable type checking.');
   }
 
-  const projectTslint = await _loadTslint();
+  let tslint;
+  try {
+    tslint = await import('tslint');
+  } catch {
+    throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
+  }
+
   const tslintConfigPath = options.tslintConfig
     ? path.resolve(systemRoot, options.tslintConfig)
     : null;
-  const Linter = projectTslint.Linter;
+  const Linter = tslint.Linter;
 
   let result: undefined | LintResult = undefined;
   if (options.tsConfig) {
@@ -72,7 +66,7 @@ async function _run(
     let i = 0;
     for (const program of allPrograms) {
       const partial = await _lint(
-        projectTslint,
+        tslint,
         systemRoot,
         tslintConfigPath,
         options,
@@ -102,7 +96,7 @@ async function _run(
       context.reportProgress(++i, allPrograms.length);
     }
   } else {
-    result = await _lint(projectTslint, systemRoot, tslintConfigPath, options);
+    result = await _lint(tslint, systemRoot, tslintConfigPath, options);
   }
 
   if (result == undefined) {
@@ -110,7 +104,7 @@ async function _run(
   }
 
   if (!options.silent) {
-    const Formatter = projectTslint.findFormatter(options.format || '');
+    const Formatter = tslint.findFormatter(options.format || '');
     if (!Formatter) {
       throw new Error(`Invalid lint format "${options.format}".`);
     }
