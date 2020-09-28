@@ -88,7 +88,8 @@
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "browserTarget": "app:build",
-            "progress": false
+            "progress": false,
+            "outputPath": "src"
           }
         },
         "test": {
