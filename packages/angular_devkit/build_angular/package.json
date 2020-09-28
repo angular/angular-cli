@@ -74,7 +74,7 @@
     "webpack-dev-middleware": "3.7.2",
     "webpack-dev-server": "3.11.0",
     "webpack-merge": "5.1.4",
-    "webpack-sources": "1.4.3",
+    "webpack-sources": "2.0.1",
     "webpack-subresource-integrity": "1.4.1",
     "worker-plugin": "5.0.0"
   },

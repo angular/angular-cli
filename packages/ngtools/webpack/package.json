@@ -23,7 +23,7 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "enhanced-resolve": "5.0.0",
-    "webpack-sources": "1.4.3"
+    "webpack-sources": "2.0.1"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^11.0.0 || ^11.0.0-next",
