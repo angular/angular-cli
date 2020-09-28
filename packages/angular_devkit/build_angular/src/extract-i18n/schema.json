@@ -43,7 +43,7 @@
     },
     "ivy": {
       "type": "boolean",
-      "description": "Use Ivy compiler to extract translations."
+      "description": "Use Ivy compiler to extract translations. The default for Ivy applications."
     },
     "progress": {
       "type": "boolean",

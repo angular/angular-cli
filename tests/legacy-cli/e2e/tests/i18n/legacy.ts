@@ -221,7 +221,6 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
     'xi18n',
     '--output-path=src/locale',
     `--format=${format}`,
-    getGlobalVariable('argv')['ve'] ? '' : '--ivy',
   );
   const translationFile = `src/locale/messages.${formats[format].ext}`;
   await expectFileToExist(translationFile);
