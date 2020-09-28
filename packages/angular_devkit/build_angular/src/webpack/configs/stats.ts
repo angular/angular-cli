@@ -7,6 +7,7 @@
  */
 
 import { WebpackConfigOptions } from '../../utils/build-options';
+import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 const webpackOutputOptions = {
   colors: true,
@@ -25,11 +26,10 @@ const webpackOutputOptions = {
   moduleTrace: false,
 };
 
-const verboseWebpackOutputOptions = {
+const verboseWebpackOutputOptions:  Record<string, boolean | string | number> = {
   // The verbose output will most likely be piped to a file, so colors just mess it up.
   colors: false,
   usedExports: true,
-  maxModules: Infinity,
   optimizationBailout: true,
   reasons: true,
   children: true,
@@ -40,6 +40,12 @@ const verboseWebpackOutputOptions = {
   moduleTrace: true,
   logging: 'verbose',
 };
+
+if (isWebpackFiveOrHigher()) {
+  verboseWebpackOutputOptions['modulesSpace'] = Infinity;
+} else {
+  verboseWebpackOutputOptions['maxModules'] = Infinity;
+}
 
 export function getWebpackStatsConfig(verbose = false) {
   return verbose
