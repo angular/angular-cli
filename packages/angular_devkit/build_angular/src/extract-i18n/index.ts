@@ -131,6 +131,7 @@ export async function execute(
   const i18n = createI18nOptions(metadata);
 
   let usingIvy = false;
+
   const ivyMessages: LocalizeMessage[] = [];
   const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
     {
@@ -159,14 +160,15 @@ export async function execute(
     (wco) => {
       const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
 
-      // Ivy-based extraction is currently opt-in
+      // Ivy extraction is the default for Ivy applications.
+      usingIvy = (isIvyApplication && options.ivy === undefined) || !!options.ivy;
+
       if (options.ivy) {
         if (!isIvyApplication) {
           context.logger.warn(
             'Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.',
           );
         }
-        usingIvy = true;
       } else if (isIvyApplication) {
         context.logger.warn(
           'Ivy extraction not enabled but application is Ivy enabled. ' +

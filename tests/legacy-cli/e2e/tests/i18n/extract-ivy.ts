@@ -20,7 +20,7 @@ export default async function() {
   );
 
   // Should fail with --ivy flag if `@angular/localize` is missing
-  const { message: message1 } = await expectToFail(() => ng('xi18n', '--ivy'));
+  const { message: message1 } = await expectToFail(() => ng('xi18n'));
   if (!message1.includes(`Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`)) {
     throw new Error('Expected localize package error message when missing');
   }
@@ -40,7 +40,7 @@ export default async function() {
   await npm('install', `${localizeVersion}`);
 
   // Should show ivy enabled application warning without --ivy flag
-  const { stderr: message3 } = await ng('xi18n');
+  const { stderr: message3 } = await ng('xi18n', '--no-ivy');
   if (!message3.includes(`Ivy extraction not enabled but application is Ivy enabled.`)) {
     throw new Error('Expected ivy enabled application warning');
   }
