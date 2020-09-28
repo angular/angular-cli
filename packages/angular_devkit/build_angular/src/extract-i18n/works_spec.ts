@@ -7,7 +7,7 @@
  */
 import { Architect } from '@angular-devkit/architect';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, extractI18nTargetSpec, host } from '../test-utils';
+import { createArchitect, extractI18nTargetSpec, host, veEnabled } from '../test-utils';
 
 
 describe('Extract i18n Target', () => {
@@ -53,11 +53,15 @@ describe('Extract i18n Target', () => {
 
     await run.stop();
 
-    const msg = 'Could not mark an element as translatable inside a translatable section';
-    expect(logs.join().includes(msg)).toBe(true);
+    const msg = veEnabled
+      ? 'Could not mark an element as translatable inside a translatable section'
+      : 'Cannot mark an element as translatable inside of a translatable section';
+
+    expect(logs.join()).toMatch(msg);
   }, 30000);
 
-  it('supports locale', async () => {
+  // DISABLED_FOR_IVY
+  (veEnabled ? it : xit)('supports locale', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     const overrides = { i18nLocale: 'fr' };
 
@@ -92,8 +96,8 @@ describe('Extract i18n Target', () => {
   it('supports output path', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     // Note: this folder will not be created automatically. It must exist beforehand.
-    const outputPath = 'app';
-    const extractionFile = join(normalize('src'), outputPath, 'messages.xlf');
+    const outputPath = 'src/i18n';
+    const extractionFile = join(normalize('src'), 'i18n', 'messages.xlf');
     const overrides = { outputPath };
 
     const run = await architect.scheduleTarget(extractI18nTargetSpec, overrides);
