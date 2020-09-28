@@ -51,7 +51,7 @@ export default function localizeExtractLoader(
   }
 
   // Setup a virtual file system instance for the extractor
-  // * MessageExtractor itself uses readFile and resolve
+  // * MessageExtractor itself uses readFile, relative and resolve
   // * Internal SourceFileLoader (sourcemap support) uses dirname, exists, readFile, and resolve
   const filesystem = {
     readFile(path: string): string {
@@ -62,6 +62,9 @@ export default function localizeExtractLoader(
       } else {
         throw new Error('Unknown file requested: ' + path);
       }
+    },
+    relative(from: string, to: string): string {
+      return nodePath.relative(from, to);
     },
     resolve(...paths: string[]): string {
       return nodePath.resolve(...paths);
