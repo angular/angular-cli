@@ -11,6 +11,7 @@ import { Compiler } from 'webpack';
 import { Budget, Type } from '../../browser/schema';
 import { ThresholdSeverity, calculateThresholds, checkThresholds } from '../../utils/bundle-calculator';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
+import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 
@@ -20,13 +21,14 @@ const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
  */
 export class AnyComponentStyleBudgetChecker {
   private readonly budgets: Budget[];
+
   constructor(budgets: Budget[]) {
     this.budgets = budgets.filter((budget) => budget.type === Type.AnyComponentStyle);
   }
 
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-      compilation.hooks.afterOptimizeChunkAssets.tap(PLUGIN_NAME, () => {
+      const afterOptimizeChunkAssets = () => {
         // In AOT compilations component styles get processed in child compilations.
         // tslint:disable-next-line: no-any
         const parentCompilation = (compilation.compiler as any).parentCompilation;
@@ -43,15 +45,15 @@ export class AnyComponentStyleBudgetChecker {
         ];
 
         const componentStyles = Object.keys(compilation.assets)
-            .filter((name) => cssExtensions.includes(path.extname(name)))
-            .map((name) => ({
-              size: compilation.assets[name].size(),
-              label: name,
-            }));
+          .filter((name) => cssExtensions.includes(path.extname(name)))
+          .map((name) => ({
+            size: compilation.assets[name].size(),
+            label: name,
+          }));
         const thresholds = flatMap(this.budgets, (budget) => calculateThresholds(budget));
 
-        for (const { size, label } of componentStyles) {
-          for (const { severity, message } of checkThresholds(thresholds[Symbol.iterator](), size, label)) {
+        for (const {size, label} of componentStyles) {
+          for (const {severity, message} of checkThresholds(thresholds[Symbol.iterator](), size, label)) {
             switch (severity) {
               case ThresholdSeverity.Warning:
                 addWarning(compilation, message);
@@ -65,7 +67,18 @@ export class AnyComponentStyleBudgetChecker {
             }
           }
         }
-      });
+      };
+
+      if (isWebpackFiveOrHigher()) {
+        // webpack 5 migration "guide"
+        // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L535-L539
+        // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1;
+        const stage = 101;
+        // tslint:disable-next-line: no-any
+        (compilation.hooks as any).processAssets.tap({name: PLUGIN_NAME, stage}, afterOptimizeChunkAssets);
+      } else {
+        compilation.hooks.afterOptimizeChunkAssets.tap(PLUGIN_NAME, afterOptimizeChunkAssets);
+      }
     });
   }
 }
