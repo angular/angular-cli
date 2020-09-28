@@ -63,6 +63,9 @@ export default function localizeExtractLoader(
         throw new Error('Unknown file requested: ' + path);
       }
     },
+    relative(from: string, to: string): string {
+      return nodePath.relative(from, to);
+    },
     resolve(...paths: string[]): string {
       return nodePath.resolve(...paths);
     },

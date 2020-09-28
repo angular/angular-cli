@@ -54,11 +54,7 @@ export default async function() {
   );
 
   // Install correct version
-  let localizeVersion = '@angular/localize@' + readNgVersion();
-  if (getGlobalVariable('argv')['ng-snapshots']) {
-    localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
-  }
-  await npm('install', `${localizeVersion}`);
+  await npm('install', 'https://817492-24195339-gh.circle-artifacts.com/0/angular/compiler-cli-pr39006-ca89d35106.tgz', 'https://817492-24195339-gh.circle-artifacts.com/0/angular/localize-pr39006-ca89d35106.tgz');
 
   // Extract messages
   await ng('xi18n', '--ivy');
@@ -66,11 +62,6 @@ export default async function() {
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
 
   await npm('uninstall', '@angular/localize');
-
-  // TODO: Investigate failures on Windows and remove this check
-  if (process.platform === 'win32') {
-    return;
-  }
 
   await expectFileToMatch('messages.xlf', 'src/app/app.component.html');
   await expectFileToMatch(
