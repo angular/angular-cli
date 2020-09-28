@@ -212,11 +212,10 @@ export async function execute(
     } catch {}
 
     if (!validLocalizePackage) {
-      context.logger.error(
-        "Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.",
-      );
-
-      return { success: false };
+      return {
+        success: false,
+        error: `Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`,
+       };
     }
   }
 
