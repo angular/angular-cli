@@ -1,10 +1,14 @@
 import { join } from 'path';
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, expectFileToMatch, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 
 export default async function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
+  if (!getGlobalVariable('argv')['ve']) {
+    return;
+  }
 
   await ng('generate', 'component', 'i18n-test');
   await writeFile(
