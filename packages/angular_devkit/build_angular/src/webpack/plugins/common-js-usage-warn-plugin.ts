@@ -46,7 +46,8 @@ export class CommonJsUsageWarnPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
       compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
-        for (const {dependencies, rawRequest, issuer} of modules as unknown as WebpackModule[]) {
+        for (const module of modules as unknown as WebpackModule[]) {
+          const {dependencies, rawRequest} = module;
           if (
             !rawRequest ||
             rawRequest.startsWith('.') ||
@@ -66,18 +67,20 @@ export class CommonJsUsageWarnPlugin {
 
           if (this.hasCommonJsDependencies(compilation, dependencies)) {
             // Dependency is CommonsJS or AMD.
-
+            const issuer = getIssuer(compilation, module);
             // Check if it's parent issuer is also a CommonJS dependency.
             // In case it is skip as an warning will be show for the parent CommonJS dependency.
-            const parentDependencies = issuer?.issuer?.dependencies;
+            const parentDependencies = getIssuer(compilation, issuer)?.dependencies;
             if (parentDependencies && this.hasCommonJsDependencies(compilation, parentDependencies, true)) {
               continue;
             }
 
             // Find the main issuer (entry-point).
             let mainIssuer = issuer;
-            while (mainIssuer?.issuer) {
-              mainIssuer = mainIssuer.issuer;
+            let nextIssuer = getIssuer(compilation, mainIssuer);
+            while (nextIssuer) {
+              mainIssuer = nextIssuer;
+              nextIssuer = getIssuer(compilation, mainIssuer);
             }
 
             // Only show warnings for modules from main entrypoint.
@@ -127,6 +130,19 @@ export class CommonJsUsageWarnPlugin {
       // Non-scoped request ex: lodash/isEmpty -> lodash
       : rawRequest.split('/', 1)[0];
   }
+}
+
+function getIssuer(compilation: compilation.Compilation, module: WebpackModule | null): WebpackModule | null {
+  if (!module) {
+    return null;
+  }
+
+  if (!isWebpackFiveOrHigher()) {
+    return module?.issuer;
+  }
+
+  return (compilation as unknown as { moduleGraph: { getIssuer(dependency: WebpackModule): WebpackModule; } })
+    .moduleGraph.getIssuer(module);
 }
 
 function getWebpackModule(compilation: compilation.Compilation, dependency: WebpackModule): WebpackModule | null {
