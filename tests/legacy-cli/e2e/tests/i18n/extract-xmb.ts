@@ -4,10 +4,14 @@ import {
   expectFileToExist, writeFile,
   expectFileToMatch
 } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
 
 
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
+  if (!getGlobalVariable('argv')['ve']) {
+    return;
+  }
 
   return ng('generate', 'component', 'i18n-test')
     .then(() =>

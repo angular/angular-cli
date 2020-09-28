@@ -5,6 +5,11 @@ import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
+  if (!getGlobalVariable('argv')['ve']) {
+    return;
+  }
+
   await ng('generate', 'component', 'i18n-test');
   await writeFile(
     join('src/app/i18n-test', 'i18n-test.component.html'),
