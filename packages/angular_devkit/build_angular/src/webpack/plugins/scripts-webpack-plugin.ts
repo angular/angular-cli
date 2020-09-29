@@ -12,6 +12,7 @@ import { Compiler, loader } from 'webpack';
 import { CachedSource, ConcatSource, OriginalSource, RawSource, Source } from 'webpack-sources';
 import { interpolateName } from 'loader-utils';
 import * as path from 'path';
+import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 const Chunk = require('webpack/lib/Chunk');
 const EntryPoint = require('webpack/lib/Entrypoint');
@@ -72,7 +73,11 @@ export class ScriptsWebpackPlugin {
     chunk.rendered = !cached;
     chunk.id = this.options.name;
     chunk.ids = [chunk.id];
-    chunk.files.push(filename);
+    if (isWebpackFiveOrHigher()) {
+      chunk.files.add(filename);
+    } else {
+      chunk.files.push(filename);
+    }
 
     const entrypoint = new EntryPoint(this.options.name);
     entrypoint.pushChunk(chunk);
