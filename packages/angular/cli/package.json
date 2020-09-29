@@ -37,7 +37,7 @@
     "inquirer": "7.3.3",
     "npm-package-arg": "8.0.1",
     "npm-pick-manifest": "6.1.0",
-    "open": "7.2.1",
+    "open": "7.3.0",
     "pacote": "9.5.12",
     "resolve": "1.17.0",
     "rimraf": "3.0.2",

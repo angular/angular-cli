@@ -42,7 +42,7 @@
     "loader-utils": "2.0.0",
     "mini-css-extract-plugin": "0.11.2",
     "minimatch": "3.0.4",
-    "open": "7.2.1",
+    "open": "7.3.0",
     "ora": "5.1.0",
     "parse5": "6.0.1",
     "parse5-htmlparser2-tree-adapter": "6.0.1",
