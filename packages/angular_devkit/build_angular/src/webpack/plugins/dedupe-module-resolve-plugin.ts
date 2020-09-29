@@ -30,8 +30,8 @@ function getResourceData(resolveData: any): ResourceData {
     } = resolveData.createData.resourceResolveData;
 
     return {
-      packageName: descriptionFileData.name,
-      packageVersion: descriptionFileData.version,
+      packageName: descriptionFileData?.name,
+      packageVersion: descriptionFileData?.version,
       relativePath,
       resource,
     };
@@ -40,8 +40,8 @@ function getResourceData(resolveData: any): ResourceData {
     const { resource, resourceResolveData } = resolveData;
 
     return {
-      packageName: resourceResolveData.descriptionFileData.name,
-      packageVersion: resourceResolveData.descriptionFileData.version,
+      packageName: resourceResolveData.descriptionFileData?.name,
+      packageVersion: resourceResolveData.descriptionFileData?.version,
       relativePath: resourceResolveData.relativePath,
       resource: resource,
     };

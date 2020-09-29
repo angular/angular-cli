@@ -1,41 +1,42 @@
-import {updateTsConfig} from '../../utils/project';
-import {writeMultipleFiles, appendToFile, createDir, replaceInFile} from '../../utils/fs';
-import {ng} from '../../utils/process';
-import {stripIndents} from 'common-tags';
+import { stripIndents } from 'common-tags';
+import { appendToFile, createDir, replaceInFile, rimraf, writeMultipleFiles } from '../../utils/fs';
+import { ng } from '../../utils/process';
+import { updateTsConfig } from '../../utils/project';
 
-
-export default function() {
-  // TODO(architect): Delete this test. It is now in devkit/build-angular.
-
-  return updateTsConfig(json => {
+export default async function () {
+  await updateTsConfig(json => {
     json['compilerOptions']['baseUrl'] = './src';
     json['compilerOptions']['paths'] = {
       '@shared': [
-        'app/shared'
+        'app/shared',
       ],
       '@shared/*': [
-        'app/shared/*'
+        'app/shared/*',
       ],
       '@root/*': [
-        './*'
-      ]
+        './*',
+      ],
     };
-  })
-  .then(() => createDir('src/app/shared'))
-  .then(() => writeMultipleFiles({
+  });
+
+  await createDir('src/app/shared');
+  await writeMultipleFiles({
     'src/meaning-too.ts': 'export var meaning = 42;',
     'src/app/shared/meaning.ts': 'export var meaning = 42;',
     'src/app/shared/index.ts': `export * from './meaning'`,
-  }))
-  .then(() => replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component'))
-  .then(() => ng('build'))
-  .then(() => updateTsConfig(json => {
+  });
+
+  await replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
+  await ng('build');
+
+  await updateTsConfig(json => {
     json['compilerOptions']['paths']['*'] = [
       '*',
-      'app/shared/*'
+      'app/shared/*',
     ];
-  }))
-  .then(() => appendToFile('src/app/app.component.ts', stripIndents`
+  });
+
+  await appendToFile('src/app/app.component.ts', stripIndents`
     import { meaning } from 'app/shared/meaning';
     import { meaning as meaning2 } from '@shared';
     import { meaning as meaning3 } from '@shared/meaning';
@@ -49,6 +50,11 @@ export default function() {
     console.log(meaning3)
     console.log(meaning4)
     console.log(meaning5)
-  `))
-  .then(() => ng('build'));
+  `);
+
+  await ng('build');
+
+  // Simulate no package.json file which causes Webpack to have an undefined 'descriptionFileData'.
+  await rimraf('package.json');
+  await ng('build');
 }
