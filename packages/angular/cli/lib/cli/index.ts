@@ -9,9 +9,9 @@ import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
 import { runCommand } from '../../models/command-runner';
 import { colors, removeColor } from '../../utilities/color';
-import { getWorkspaceRaw } from '../../utilities/config';
+import { AngularWorkspace, getWorkspaceRaw } from '../../utilities/config';
 import { writeErrorToLogFile } from '../../utilities/log-file';
-import { getWorkspaceDetails } from '../../utilities/project';
+import { findWorkspaceFile } from '../../utilities/project';
 
 const debugEnv = process.env['NG_DEBUG'];
 const isDebug =
@@ -67,8 +67,9 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
     logger.error(format(...args));
   };
 
-  let projectDetails = getWorkspaceDetails();
-  if (projectDetails === null) {
+  let workspace;
+  const workspaceFile = findWorkspaceFile();
+  if (workspaceFile === null) {
     const [, localPath] = getWorkspaceRaw('local');
     if (localPath !== null) {
       logger.fatal(
@@ -78,12 +79,18 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
 
       return 1;
     }
+  } else {
+    try {
+      workspace = await AngularWorkspace.load(workspaceFile);
+    } catch (e) {
+      logger.fatal(`Unable to read workspace file '${workspaceFile}': ${e.message}`);
 
-    projectDetails = { root: process.cwd() };
+      return 1;
+    }
   }
 
   try {
-    const maybeExitCode = await runCommand(options.cliArgs, logger, projectDetails);
+    const maybeExitCode = await runCommand(options.cliArgs, logger, workspace);
     if (typeof maybeExitCode === 'number') {
       console.assert(Number.isInteger(maybeExitCode));
 

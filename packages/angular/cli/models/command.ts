@@ -6,16 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, logging, strings, tags } from '@angular-devkit/core';
-import * as path from 'path';
 import { colors } from '../utilities/color';
-import { getWorkspace } from '../utilities/config';
+import { AngularWorkspace } from '../utilities/config';
 import {
   Arguments,
   CommandContext,
   CommandDescription,
   CommandDescriptionMap,
   CommandScope,
-  CommandWorkspace,
   Option,
   SubCommandDescription,
 } from './interface';
@@ -26,8 +24,8 @@ export interface BaseCommandOptions {
 
 export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions> {
   public allowMissingWorkspace = false;
-  public workspace: CommandWorkspace;
-  public analytics: analytics.Analytics;
+  readonly workspace?: AngularWorkspace;
+  readonly analytics: analytics.Analytics;
 
   protected static commandMap: () => Promise<CommandDescriptionMap>;
   static setCommandMap(map: () => Promise<CommandDescriptionMap>) {
@@ -35,7 +33,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   }
 
   constructor(
-    context: CommandContext,
+    protected readonly context: CommandContext,
     public readonly description: CommandDescription,
     protected readonly logger: logging.Logger,
   ) {
@@ -120,19 +118,16 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   async validateScope(scope?: CommandScope): Promise<void> {
     switch (scope === undefined ? this.description.scope : scope) {
       case CommandScope.OutProject:
-        if (this.workspace.configFile) {
+        if (this.workspace) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run outside of a project, but a
-            project definition was found at "${path.join(
-              this.workspace.root,
-              this.workspace.configFile,
-            )}".
+            project definition was found at "${this.workspace.filePath}".
           `);
           throw 1;
         }
         break;
       case CommandScope.InProject:
-        if (!this.workspace.configFile || (await getWorkspace('local')) === null) {
+        if (!this.workspace) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run in an Angular project, but a
             project definition could not be found.

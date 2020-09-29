@@ -17,6 +17,7 @@ import {
 } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
+import { AngularWorkspace } from '../utilities/config';
 import { parseJsonSchemaToCommandDescription } from '../utilities/json-schema';
 import {
   getGlobalAnalytics,
@@ -26,7 +27,7 @@ import {
   promptProjectAnalytics,
 } from './analytics';
 import { Command } from './command';
-import { CommandDescription, CommandWorkspace } from './interface';
+import { CommandDescription } from './interface';
 import * as parser from './parser';
 
 // NOTE: Update commands.json if changing this.  It's still deep imported in one CI validation
@@ -116,9 +117,9 @@ async function loadCommandDescription(
 export async function runCommand(
   args: string[],
   logger: logging.Logger,
-  workspace: CommandWorkspace,
+  workspace: AngularWorkspace | undefined,
   commands: CommandMapOptions = standardCommands,
-  options: { analytics?: analytics.Analytics } = {},
+  options: { analytics?: analytics.Analytics; currentDirectory: string } = { currentDirectory: process.cwd() },
 ): Promise<number | void> {
   // This registry is exclusively used for flattening schemas, and not for validating.
   const registry = new schema.CoreSchemaRegistry([]);
@@ -233,8 +234,13 @@ export async function runCommand(
 
     const analytics =
       options.analytics ||
-      (await _createAnalytics(!!workspace.configFile, description.name === 'update'));
-    const context = { workspace, analytics };
+      (await _createAnalytics(!!workspace, description.name === 'update'));
+    const context = {
+      workspace,
+      analytics,
+      currentDirectory: options.currentDirectory,
+      root: workspace?.basePath ?? options.currentDirectory,
+    };
     const command = new description.impl(context, description, logger);
 
     // Flush on an interval (if the event loop is waiting).
