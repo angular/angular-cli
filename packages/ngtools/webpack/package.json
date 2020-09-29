@@ -22,7 +22,7 @@
   "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/webpack",
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "enhanced-resolve": "5.0.0",
+    "enhanced-resolve": "5.1.0",
     "webpack-sources": "2.0.1"
   },
   "peerDependencies": {
