@@ -55,7 +55,7 @@ export class DedupeModuleResolvePlugin {
         const { descriptionFileData, relativePath } = resourceResolveData;
 
         // Empty name or versions are no valid primary  entrypoints of a library
-        if (!descriptionFileData.name || !descriptionFileData.version) {
+        if (!descriptionFileData?.name || !descriptionFileData?.version) {
           return;
         }
 
