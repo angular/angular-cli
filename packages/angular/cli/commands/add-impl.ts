@@ -79,7 +79,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
-    const packageManager = await getPackageManager(this.workspace.root);
+    const packageManager = await getPackageManager(this.context.root);
     const usingYarn = packageManager === PackageManager.Yarn;
 
     if (packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
@@ -210,7 +210,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
 
   private isPackageInstalled(name: string): boolean {
     try {
-      require.resolve(join(name, 'package.json'), { paths: [this.workspace.root] });
+      require.resolve(join(name, 'package.json'), { paths: [this.context.root] });
 
       return true;
     } catch (e) {
@@ -254,7 +254,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     let installedPackage;
     try {
       installedPackage = require.resolve(join(name, 'package.json'), {
-        paths: [this.workspace.root],
+        paths: [this.context.root],
       });
     } catch {}
 
@@ -268,7 +268,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
 
     let projectManifest;
     try {
-      projectManifest = await fetchPackageManifest(this.workspace.root, this.logger);
+      projectManifest = await fetchPackageManifest(this.context.root, this.logger);
     } catch {}
 
     if (projectManifest) {

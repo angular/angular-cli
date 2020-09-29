@@ -26,7 +26,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     const cliPackage: PartialPackageInfo = require('../package.json');
     let workspacePackage: PartialPackageInfo | undefined;
     try {
-      workspacePackage = require(path.resolve(this.workspace.root, 'package.json'));
+      workspacePackage = require(path.resolve(this.context.root, 'package.json'));
     } catch {}
 
     const patterns = [
@@ -144,7 +144,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
     // Try to find the package in the workspace
     try {
-      packagePath = require.resolve(`${moduleName}/package.json`, { paths: [ this.workspace.root ]});
+      packagePath = require.resolve(`${moduleName}/package.json`, { paths: [ this.context.root ]});
     } catch {}
 
     // If not found, try to find within the CLI
@@ -169,7 +169,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
   private getIvyWorkspace(): string {
     try {
-      const content = fs.readFileSync(path.resolve(this.workspace.root, 'tsconfig.json'), 'utf-8');
+      const content = fs.readFileSync(path.resolve(this.context.root, 'tsconfig.json'), 'utf-8');
       const tsConfig = parseJson(content, JsonParseMode.Loose);
       if (!isJsonObject(tsConfig)) {
         return '<error>';

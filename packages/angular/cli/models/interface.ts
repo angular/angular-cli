@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, json, logging } from '@angular-devkit/core';
+import { AngularWorkspace } from '../utilities/config';
 
 /**
  * Value type of arguments.
@@ -45,20 +46,15 @@ export interface CommandConstructor {
 }
 
 /**
- * A CLI workspace information.
- */
-export interface CommandWorkspace {
-  root: string;
-  configFile?: string;
-}
-
-/**
  * A command runner context.
  */
 export interface CommandContext {
-  workspace: CommandWorkspace;
+  currentDirectory: string;
+  root: string;
 
-  // This feel is optional for backward compatibility.
+  workspace?: AngularWorkspace;
+
+  // This property is optional for backward compatibility.
   analytics?: analytics.Analytics;
 }
 

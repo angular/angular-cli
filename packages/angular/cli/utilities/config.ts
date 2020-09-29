@@ -102,6 +102,26 @@ export class AngularWorkspace {
 
     return (project?.extensions['cli'] as Record<string, unknown>) || {};
   }
+
+  static async load(workspaceFilePath: string): Promise<AngularWorkspace> {
+    const oldConfigFileNames = ['.angular-cli.json', 'angular-cli.json'];
+    if (oldConfigFileNames.includes(path.basename(workspaceFilePath))) {
+      // 1.x file format
+      // Create an empty workspace to allow update to be used
+      return new AngularWorkspace(
+        { extensions: {}, projects: new workspaces.ProjectDefinitionCollection() },
+        workspaceFilePath,
+      );
+    }
+
+    const result = await workspaces.readWorkspace(
+      workspaceFilePath,
+      workspaces.createWorkspaceHost(new NodeJsSyncHost()),
+      workspaces.WorkspaceFormat.JSON,
+    );
+
+    return new AngularWorkspace(result.workspace, workspaceFilePath);
+  }
 }
 
 const cachedWorkspaces = new Map<string, AngularWorkspace | null>();
@@ -198,7 +218,7 @@ export async function validateWorkspace(data: JsonObject): Promise<void> {
   }
 }
 
-function getProjectByPath(workspace: AngularWorkspace, location: string): string | null {
+function findProjectByPath(workspace: AngularWorkspace, location: string): string | null {
   const isInside = (base: string, potential: string): boolean => {
     const absoluteBase = path.resolve(workspace.basePath, base);
     const absolutePotential = path.resolve(workspace.basePath, potential);
@@ -246,7 +266,7 @@ export function getProjectByCwd(workspace: AngularWorkspace): string | null {
     return Array.from(workspace.projects.keys())[0];
   }
 
-  const project = getProjectByPath(workspace, process.cwd());
+  const project = findProjectByPath(workspace, process.cwd());
   if (project) {
     return project;
   }

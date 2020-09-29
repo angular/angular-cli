@@ -7,8 +7,7 @@
  */
 import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json, schema, tags, workspaces } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { json, schema, tags } from '@angular-devkit/core';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
@@ -27,7 +26,6 @@ export abstract class ArchitectCommand<
 > extends Command<T> {
   protected _architect!: Architect;
   protected _architectHost!: WorkspaceNodeModulesArchitectHost;
-  protected _workspace!: workspaces.WorkspaceDefinition;
   protected _registry!: json.schema.SchemaRegistry;
 
   // If this command supports running multiple targets.
@@ -43,13 +41,11 @@ export abstract class ArchitectCommand<
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
     this._registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
 
-    const { workspace } = await workspaces.readWorkspace(
-      this.workspace.root,
-      workspaces.createWorkspaceHost(new NodeJsSyncHost()),
-    );
-    this._workspace = workspace;
+    if (!this.workspace) {
+      throw new Error('A workspace is required for an architect command.');
+    }
 
-    this._architectHost = new WorkspaceNodeModulesArchitectHost(workspace, this.workspace.root);
+    this._architectHost = new WorkspaceNodeModulesArchitectHost(this.workspace, this.workspace.basePath);
     this._architect = new Architect(this._architectHost, this._registry);
 
     if (!this.target) {
@@ -67,13 +63,13 @@ export abstract class ArchitectCommand<
     }
 
     let projectName = options.project;
-    if (projectName && !this._workspace.projects.has(projectName)) {
+    if (projectName && !this.workspace.projects.has(projectName)) {
       throw new Error(`Project '${projectName}' does not exist.`);
     }
 
     const commandLeftovers = options['--'];
     const targetProjectNames: string[] = [];
-    for (const [name, project] of this._workspace.projects) {
+    for (const [name, project] of this.workspace.projects) {
       if (project.targets.has(this.target)) {
         targetProjectNames.push(name);
       }
@@ -153,7 +149,7 @@ export abstract class ArchitectCommand<
     }
 
     if (!projectName && !this.multiTarget) {
-      const defaultProjectName = this._workspace.extensions['defaultProject'] as string;
+      const defaultProjectName = this.workspace.extensions['defaultProject'] as string;
       if (targetProjectNames.length === 1) {
         projectName = targetProjectNames[0];
       } else if (defaultProjectName && targetProjectNames.includes(defaultProjectName)) {
@@ -286,7 +282,8 @@ export abstract class ArchitectCommand<
 
   private getProjectNamesByTarget(targetName: string): string[] {
     const allProjectsForTargetName: string[] = [];
-    for (const [name, project] of this._workspace.projects) {
+    // tslint:disable-next-line: no-non-null-assertion
+    for (const [name, project] of this.workspace!.projects) {
       if (project.targets.has(targetName)) {
         allProjectsForTargetName.push(name);
       }
@@ -298,7 +295,8 @@ export abstract class ArchitectCommand<
     } else {
       // For single target commands, we try the default project first,
       // then the full list if it has a single project, then error out.
-      const maybeDefaultProject = this._workspace.extensions['defaultProject'] as string;
+      // tslint:disable-next-line: no-non-null-assertion
+      const maybeDefaultProject = this.workspace!.extensions['defaultProject'] as string;
       if (maybeDefaultProject && allProjectsForTargetName.includes(maybeDefaultProject)) {
         return [maybeDefaultProject];
       }
