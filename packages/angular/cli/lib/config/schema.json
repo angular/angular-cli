@@ -1437,10 +1437,6 @@
               },
               "additionalProperties": false
             },
-            "environment": {
-              "type": "string",
-              "description": "Defines the build environment."
-            },
             "sourceMap": {
               "description": "Output sourcemaps.",
               "default": true,
