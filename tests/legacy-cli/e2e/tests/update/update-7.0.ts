@@ -36,8 +36,7 @@ export default async function() {
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
-  // TODO: Re-enable after v11.0.0-next.4 release.
-  // await ng('lint');
+  await ng('lint');
   await ng('e2e');
   await ng('e2e', '--prod');
 
