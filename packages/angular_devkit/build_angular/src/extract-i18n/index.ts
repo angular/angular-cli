@@ -22,12 +22,7 @@ import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
-import {
-  getAotConfig,
-  getCommonConfig,
-  getStatsConfig,
-  getStylesConfig,
-} from '../webpack/configs';
+import { getAotConfig, getCommonConfig, getStatsConfig } from '../webpack/configs';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Format, Schema } from './schema';
 
@@ -182,7 +177,6 @@ export async function execute(
         getCommonConfig(wco),
         // Only use VE extraction if not using Ivy
         getAotConfig(wco, !usingIvy),
-        getStylesConfig(wco),
         getStatsConfig(wco),
       ];
 
@@ -202,6 +196,16 @@ export async function execute(
           },
         });
       }
+
+      // Replace all stylesheets with an empty default export
+      partials.push({
+        plugins: [
+          new webpack.NormalModuleReplacementPlugin(
+            /\.(css|scss|sass|styl|less)$/,
+            path.join(__dirname, 'empty-export-default.js'),
+          ),
+        ],
+      });
 
       return partials;
     },
@@ -227,7 +231,7 @@ export async function execute(
     context,
     {
       logging: createWebpackLoggingCallback(false, context.logger),
-      webpackFactory: await import('webpack'),
+      webpackFactory: webpack,
     },
   ).toPromise();
 
