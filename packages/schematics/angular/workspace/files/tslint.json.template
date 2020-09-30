@@ -42,8 +42,7 @@
           "instance-method"
         ]
       }
-    ],<% if (strict) { %>
-    "no-any": true,<% } %>
+    ],
     "no-console": [
       true,
       "debug",

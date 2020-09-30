@@ -289,23 +289,6 @@ describe('Application Schematic', () => {
     });
   });
 
-  it('sideEffects property should be true when strict mode', async () => {
-    const options = { ...defaultOptions, projectRoot: '', strict: true };
-
-    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    const content = JSON.parse(tree.readContent('/src/app/package.json'));
-    expect(content.sideEffects).toBe(false);
-  });
-
-  it('sideEffects package.json should not exist when not in strict mode', async () => {
-    const options = { ...defaultOptions, projectRoot: '', strict: false };
-
-    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    expect(tree.exists('/src/app/package.json')).toBeFalse();
-  });
-
   describe('custom projectRoot', () => {
     it('should put app files in the right spot', async () => {
       const options = { ...defaultOptions, projectRoot: '' };

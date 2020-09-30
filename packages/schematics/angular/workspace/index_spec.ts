@@ -90,16 +90,4 @@ describe('Workspace Schematic', () => {
     expect(compilerOptions.strict).toBe(true);
     expect(angularCompilerOptions.strictTemplates).toBe(true);
   });
-
-  it('should not add strict lint options when false', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
-    const { rules } = JSON.parse(tree.readContent('/tslint.json'));
-    expect(rules['no-any']).toBeUndefined();
-  });
-
-  it('should add strict lint options when true', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
-    const { rules } = JSON.parse(tree.readContent('/tslint.json'));
-    expect(rules['no-any']).toBe(true);
-  });
 });
