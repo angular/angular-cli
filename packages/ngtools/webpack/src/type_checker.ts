@@ -114,8 +114,8 @@ export class TypeChecker {
     if (!cancellationToken.isCancellationRequested()) {
       reportDiagnostics(
         allDiagnostics,
-        msg => this.sendMessage(new LogMessage('error', 'ERROR in ' + msg)),
-        msg => this.sendMessage(new LogMessage('warn', 'WARNING in ' + msg)),
+        msg => this.sendMessage(new LogMessage('error', 'Error: ' + msg)),
+        msg => this.sendMessage(new LogMessage('warn', 'Warning: ' + msg)),
       );
     }
   }

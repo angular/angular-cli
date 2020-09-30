@@ -4,12 +4,11 @@ import {
   execAndWaitForOutputToMatch,
 } from '../../utils/process';
 import {writeFile, prependToFile, appendToFile} from '../../utils/fs';
-import {getGlobalVariable} from '../../utils/env';
 
 
 const doneRe =
   /: Compiled successfully.|: Failed to compile./;
-const errorRe = /ERROR in/;
+const errorRe = /Error/;
 
 
 export default function() {
@@ -49,7 +48,7 @@ export default function() {
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (!/ERROR in (.*src\/)?main\.ts/.test(stderr)) {
+      if (!/Error: (.*src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected an error but none happened.');
       }
     })
@@ -63,7 +62,7 @@ export default function() {
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (!/ERROR in (.*src\/)?main\.ts/.test(stderr)) {
+      if (!/Error: (.*src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected an error to still be there but none was.');
       }
     })
@@ -78,7 +77,7 @@ export default function() {
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (/ERROR in (.*src\/)?main\.ts/.test(stderr)) {
+      if (/Error: (.*src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected no error but an error was shown.');
       }
     })

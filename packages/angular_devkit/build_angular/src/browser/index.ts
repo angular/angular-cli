@@ -250,7 +250,7 @@ export function buildWebpackBrowser(
 
         if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
           context.logger.warn(tags.stripIndent`
-          WARNING: Using differential loading with targets ES5 and ES2016 or higher may
+          Warning: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
           referenced with script[type="module"] but they may not support ES2016+ syntax.
         `);
@@ -262,7 +262,7 @@ export function buildWebpackBrowser(
           const browsers =
             (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
           context.logger.warn(
-            `WARNING: Support was requested for ${browsers} in the project's browserslist configuration. ` +
+            `Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
               (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
               ' no longer officially supported with Angular v11 and higher.' +
               '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
@@ -654,13 +654,12 @@ export function buildWebpackBrowser(
                 const budgets = options.budgets || [];
                 const budgetFailures = checkBudgets(budgets, webpackStats, processResults);
                 for (const { severity, message } of budgetFailures) {
-                  const msg = `budgets: ${message}`;
                   switch (severity) {
                     case ThresholdSeverity.Warning:
-                      webpackStats.warnings.push(msg);
+                      webpackStats.warnings.push(message);
                       break;
                     case ThresholdSeverity.Error:
-                      webpackStats.errors.push(msg);
+                      webpackStats.errors.push(message);
                       break;
                     default:
                       assertNever(severity);
