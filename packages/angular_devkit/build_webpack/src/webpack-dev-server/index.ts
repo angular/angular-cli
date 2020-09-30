@@ -68,7 +68,7 @@ export function runWebpackDevServer(
   // Disable stats reporting by the devserver, we have our own logger.
   devServerConfig.stats = false;
 
-  return createWebpack(config).pipe(
+  return createWebpack({ ...config, watch: false }).pipe(
     switchMap(webpackCompiler => new Observable<DevServerBuildOutput>(obs => {
       const server = createWebpackDevServer(webpackCompiler, devServerConfig);
       let result: DevServerBuildOutput;

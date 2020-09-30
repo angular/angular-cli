@@ -50,7 +50,7 @@ export function runWebpack(
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
-  return createWebpack(config).pipe(
+  return createWebpack({ ...config, watch: false }).pipe(
     switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
       const callback = (err?: Error, stats?: webpack.Stats) => {
         if (err) {
