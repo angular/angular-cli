@@ -14,6 +14,7 @@ export default function (): Rule {
   return updateWorkspace(workspace => {
 
     const optionsToRemove: Record<string, undefined> = {
+      environment: undefined,
       extractCss: undefined,
       tsconfigFileName: undefined,
     };
