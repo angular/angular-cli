@@ -96,15 +96,20 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     sourceCodeLocationInfo: true,
    });
 
-  // tslint:disable: no-any
-  const htmlElement = document.children.find((c: any) => c.name === 'html');
-  const headElement = htmlElement.children.find((c: any) => c.name === 'head');
-  const bodyElement = htmlElement.children.find((c: any) => c.name === 'body');
-  // tslint:enable: no-any
+  // tslint:disable-next-line: no-any
+  const findTag = (parentNode: any, tagName: string) => {
+    // tslint:disable-next-line: no-any
+    const tag = parentNode.children.find((c: any) => c.name === tagName);
+    if (!tag?.sourceCodeLocation) {
+      throw new Error(`Cannot find ${tagName} element in ${params.input}.`);
+    }
 
-  if (!headElement || !bodyElement) {
-    throw new Error('Missing head and/or body elements');
-  }
+    return tag;
+  };
+
+  const htmlElement = findTag(document, 'html');
+  const headElement = findTag(htmlElement, 'head');
+  const bodyElement = findTag(htmlElement, 'body');
 
   // Inject into the html
   const indexSource = new ReplaceSource(new RawSource(params.inputContent), params.input);
