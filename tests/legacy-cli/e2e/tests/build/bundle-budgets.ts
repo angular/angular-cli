@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
@@ -39,7 +38,7 @@ export default function () {
           })
           .then(() => expectToFail(() => ng('build', '--optimization')))
           .then(errorMessage => {
-            if (!/ERROR in budgets/.test(errorMessage)) {
+            if (!/Error.+budgets/.test(errorMessage)) {
               throw new Error(cfg.message);
             }
           });
@@ -51,7 +50,7 @@ export default function () {
           })
           .then(() => ng('build', '--optimization'))
           .then(({ stderr }) => {
-            if (!/WARNING in budgets/.test(stderr)) {
+            if (!/Warning.+budgets/.test(stderr)) {
               throw new Error(cfg.message);
             }
           });
@@ -63,7 +62,7 @@ export default function () {
           })
           .then(() => ng('build', '--optimization'))
           .then(({ stderr }) => {
-            if (/(WARNING|ERROR)/.test(stderr)) {
+            if (/(Warning|Error)/.test(stderr)) {
               throw new Error(cfg.message);
             }
           });

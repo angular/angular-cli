@@ -46,7 +46,7 @@ describe('Browser Builder commonjs warning', () => {
       const run = await architect.scheduleTarget(targetSpec, { aot }, { logger });
       const output = await run.result;
       expect(output.success).toBe(true);
-      expect(logs.join()).not.toContain('WARNING');
+      expect(logs.join()).not.toContain('Warning');
       await run.stop();
     });
 
@@ -60,7 +60,7 @@ describe('Browser Builder commonjs warning', () => {
       const output = await run.result;
       expect(output.success).toBe(true);
       const logMsg = logs.join();
-      expect(logMsg).toMatch(/WARNING in.+app\.component\.ts depends on 'bootstrap'\. CommonJS or AMD dependencies/);
+      expect(logMsg).toMatch(/Warning: .+app\.component\.ts depends on 'bootstrap'\. CommonJS or AMD dependencies/);
       expect(logMsg).not.toContain('jquery', 'Should not warn on transitive CommonJS packages which parent is also CommonJS.');
       await run.stop();
     });
@@ -83,7 +83,7 @@ describe('Browser Builder commonjs warning', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;
     expect(output.success).toBe(true);
-    expect(logs.join()).not.toContain('WARNING');
+    expect(logs.join()).not.toContain('Warning');
     await run.stop();
   });
 
@@ -97,7 +97,7 @@ describe('Browser Builder commonjs warning', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
 
-    expect(logs.join()).not.toContain('WARNING');
+    expect(logs.join()).not.toContain('Warning');
     await run.stop();
   });
 

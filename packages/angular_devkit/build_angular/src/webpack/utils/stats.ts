@@ -174,7 +174,7 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
       if (!ERRONEOUS_WARNINGS_FILTER(warning)) {
         continue;
       }
-      output += yb(`WARNING in ${warning}\n\n`);
+      output += yb(`Warning: ${warning}\n\n`);
     } else {
       if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
           continue;
@@ -218,7 +218,7 @@ export function statsErrorsToString(json: any, statsConfig: any): string {
   let output = '';
   for (const error of errors as (string | WebpackDiagnostic)[]) {
     if (typeof error === 'string') {
-      output += r(`ERROR in ${error}\n\n`);
+      output += r(`Error: ${error}\n\n`);
     } else {
       const file = error.file || error.moduleName;
       if (file) {

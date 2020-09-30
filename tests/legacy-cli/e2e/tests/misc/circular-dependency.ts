@@ -8,7 +8,7 @@ export default async function () {
   await prependToFile('src/app/app.component.ts',
     `import { AppModule } from './app.module'; console.log(AppModule);`);
   const { stderr } = await ng('build', '--show-circular-dependencies');
-  if (!stderr.match(/WARNING in Circular dependency detected/)) {
+  if (!stderr.match(/Warning: Circular dependency detected/)) {
     throw new Error('Expected to have circular dependency warning in output.');
   }
 }

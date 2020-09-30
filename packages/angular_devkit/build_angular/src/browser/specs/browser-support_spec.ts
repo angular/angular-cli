@@ -35,7 +35,7 @@ describe('Browser Builder browser support', () => {
 
     const fullLog = logs.join();
     expect(fullLog).toContain(
-      "WARNING: Support was requested for IE 9 in the project's browserslist configuration.",
+      "Warning: Support was requested for IE 9 in the project's browserslist configuration.",
     );
     expect(fullLog).toContain('This browser is ');
 
@@ -55,7 +55,7 @@ describe('Browser Builder browser support', () => {
 
     const fullLog = logs.join();
     expect(fullLog).toContain(
-      "WARNING: Support was requested for IE 10 in the project's browserslist configuration.",
+      "Warning: Support was requested for IE 10 in the project's browserslist configuration.",
     );
     expect(fullLog).toContain('This browser is ');
 
@@ -75,7 +75,7 @@ describe('Browser Builder browser support', () => {
 
     const fullLog = logs.join();
     expect(fullLog).toContain(
-      "WARNING: Support was requested for IE 9 & IE 10 in the project's browserslist configuration.",
+      "Warning: Support was requested for IE 9 & IE 10 in the project's browserslist configuration.",
     );
     expect(fullLog).toContain('These browsers are ');
 

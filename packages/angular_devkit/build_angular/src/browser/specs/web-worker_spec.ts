@@ -104,7 +104,7 @@ describe('Browser Builder Web Worker support', () => {
     const mainContent = virtualFs.fileBufferToString(
       host.scopedSync().read(join(outputPath, 'main.js')));
     expect(mainContent).toContain('0.worker.js');
-    expect(logs.join().includes('WARNING')).toBe(false, 'Should show no warnings.');
+    expect(logs.join().includes('Warning')).toBe(false, 'Should show no warnings.');
   });
 
   it('minimizes and hashes worker', async () => {

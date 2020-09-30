@@ -442,7 +442,7 @@ export abstract class SchematicCommand<
 
         if (positions.length > 0) {
           const warning = tags.oneLine`
-            WARNING: This command may not execute successfully.
+            Warning: This command may not execute successfully.
             The package/collection may not support the 'targets' field within '${configPath}'.
             This can be corrected by renaming the following 'targets' fields to 'architect':
           `;
