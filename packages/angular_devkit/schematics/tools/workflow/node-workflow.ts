@@ -13,6 +13,7 @@ import {
 import { BuiltinTaskExecutor } from '../../tasks/node';
 import { FileSystemEngine } from '../description';
 import { NodeModulesEngineHost } from '../node-module-engine-host';
+import { validateOptionsWithSchema } from '../schema-option-transform';
 
 /**
  * A workflow specifically for Node tools.
@@ -25,6 +26,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     packageRegistry?: string;
     registry?: schema.CoreSchemaRegistry;
     resolvePaths?: string[],
+    schemaValidation?: boolean;
   });
 
   constructor(
@@ -37,6 +39,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       packageRegistry?: string;
       registry?: schema.CoreSchemaRegistry;
       resolvePaths?: string[],
+      schemaValidation?: boolean;
     },
   );
 
@@ -50,6 +53,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       packageRegistry?: string;
       registry?: schema.CoreSchemaRegistry;
       resolvePaths?: string[],
+      schemaValidation?: boolean;
     },
   ) {
     let host;
@@ -89,6 +93,10 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     );
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
+
+    if (options.schemaValidation) {
+      engineHost.registerOptionsTransform(validateOptionsWithSchema(this.registry));
+    }
 
     this._context = [];
   }
