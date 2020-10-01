@@ -10,19 +10,10 @@
 // symbol polyfill must go first
 import 'symbol-observable';
 // tslint:disable-next-line:ordered-imports import-groups
-import {
-  logging,
-  normalize,
-  schema,
-  tags,
-  virtualFs,
-} from '@angular-devkit/core';
-import { NodeJsSyncHost, ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
-import {
-  UnsuccessfulWorkflowExecution,
-  formats,
-} from '@angular-devkit/schematics';
-import { NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
+import { logging, schema, tags } from '@angular-devkit/core';
+import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
+import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
+import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
 import * as inquirer from 'inquirer';
 import * as minimist from 'minimist';
@@ -156,16 +147,12 @@ export async function main({
   const force = argv['force'];
   const allowPrivate = argv['allow-private'];
 
-  /** Create a Virtual FS Host scoped to where the process is being run. **/
-  const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
-  const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
-
-  /** Create the workflow that will be executed with this run. */
-  const workflow = new NodeWorkflow(fsHost, {
+  /** Create the workflow scoped to the working directory that will be executed with this run. */
+  const workflow = new NodeWorkflow(process.cwd(), {
     force,
     dryRun,
-    registry,
     resolvePaths: [process.cwd(), __dirname],
+    schemaValidation: true,
   });
 
   /** If the user wants to list schematics, we simply show all the schematic names. */
@@ -178,9 +165,6 @@ export async function main({
 
     return 1;
   }
-
-  registry.addPostTransform(schema.transforms.addUndefinedDefaults);
-  workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 
   // Indicate to the user when nothing has been done. This is automatically set to off when there's
   // a new DryRunEvent.
