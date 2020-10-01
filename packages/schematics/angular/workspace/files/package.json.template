@@ -25,8 +25,7 @@
   "devDependencies": {
     "@angular/cli": "<%= '~' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
-    "@types/jasmine": "~3.5.0",
-    "@types/jasminewd2": "~2.0.3",<% } %>
+    "@types/jasmine": "~3.5.0",<% } %>
     "@types/node": "^12.11.1",<% if (!minimal) { %>
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
