@@ -11,7 +11,6 @@
 import 'symbol-observable';
 // tslint:disable-next-line:ordered-imports import-groups
 import {
-  JsonObject,
   logging,
   normalize,
   schema,
@@ -20,7 +19,6 @@ import {
 } from '@angular-devkit/core';
 import { NodeJsSyncHost, ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import {
-  DryRunEvent,
   UnsuccessfulWorkflowExecution,
   formats,
 } from '@angular-devkit/schematics';
@@ -77,7 +75,7 @@ function _listSchematics(workflow: NodeWorkflow, collectionName: string, logger:
 }
 
 function _createPromptProvider(): schema.PromptProvider {
-  return (definitions: Array<schema.PromptDefinition>) => {
+  return (definitions) => {
     const questions: inquirer.QuestionCollection = definitions.map(definition => {
       const question: inquirer.Question = {
         name: definition.id,
@@ -203,7 +201,7 @@ export async function main({
    *
    * This is a simple way to only show errors when an error occur.
    */
-  workflow.reporter.subscribe((event: DryRunEvent) => {
+  workflow.reporter.subscribe((event) => {
     nothingDone = false;
     // Strip leading slash to prevent confusion.
     const eventPath = event.path.startsWith('/') ? event.path.substr(1) : event.path;
@@ -216,14 +214,10 @@ export async function main({
         logger.error(`ERROR! ${eventPath} ${desc}.`);
         break;
       case 'update':
-        loggingQueue.push(tags.oneLine`
-        ${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)
-      `);
+        loggingQueue.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
         break;
       case 'create':
-        loggingQueue.push(tags.oneLine`
-        ${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)
-      `);
+        loggingQueue.push(`${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)`);
         break;
       case 'delete':
         loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
@@ -273,7 +267,7 @@ export async function main({
   workflow.registry.useXDeprecatedProvider(msg => logger.warn(msg));
 
   // Pass the rest of the arguments as the smart default "argv". Then delete it.
-  workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObject) => {
+  workflow.registry.addSmartDefaultProvider('argv', (schema) => {
     if ('index' in schema) {
       return argv._[Number(schema['index'])];
     } else {
