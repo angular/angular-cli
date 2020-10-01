@@ -15,47 +15,25 @@ import { FileSystemEngine } from '../description';
 import { NodeModulesEngineHost } from '../node-module-engine-host';
 import { validateOptionsWithSchema } from '../schema-option-transform';
 
+export interface NodeWorkflowOptions {
+  force?: boolean;
+  dryRun?: boolean;
+  packageManager?: string;
+  packageRegistry?: string;
+  registry?: schema.CoreSchemaRegistry;
+  resolvePaths?: string[];
+  schemaValidation?: boolean;
+}
+
 /**
  * A workflow specifically for Node tools.
  */
 export class NodeWorkflow extends workflow.BaseWorkflow {
-  constructor(root: string, options: {
-    force?: boolean;
-    dryRun?: boolean;
-    packageManager?: string;
-    packageRegistry?: string;
-    registry?: schema.CoreSchemaRegistry;
-    resolvePaths?: string[],
-    schemaValidation?: boolean;
-  });
+  constructor(root: string, options: NodeWorkflowOptions);
 
-  constructor(
-    host: virtualFs.Host,
-    options: {
-      force?: boolean;
-      dryRun?: boolean;
-      root?: Path;
-      packageManager?: string;
-      packageRegistry?: string;
-      registry?: schema.CoreSchemaRegistry;
-      resolvePaths?: string[],
-      schemaValidation?: boolean;
-    },
-  );
+  constructor(host: virtualFs.Host, options: NodeWorkflowOptions & { root?: Path });
 
-  constructor(
-    hostOrRoot: virtualFs.Host | string,
-    options: {
-      force?: boolean;
-      dryRun?: boolean;
-      root?: Path;
-      packageManager?: string;
-      packageRegistry?: string;
-      registry?: schema.CoreSchemaRegistry;
-      resolvePaths?: string[],
-      schemaValidation?: boolean;
-    },
-  ) {
+  constructor(hostOrRoot: virtualFs.Host | string, options: NodeWorkflowOptions & { root?: Path }) {
     let host;
     let root;
     if (typeof hostOrRoot === 'string') {
@@ -76,21 +54,15 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       registry: options.registry,
     });
 
-    engineHost.registerTaskExecutor(
-      BuiltinTaskExecutor.NodePackage,
-      {
-        allowPackageManagerOverride: true,
-        packageManager: options.packageManager,
-        rootDirectory: root && getSystemPath(root),
-        registry: options.packageRegistry,
-      },
-    );
-    engineHost.registerTaskExecutor(
-      BuiltinTaskExecutor.RepositoryInitializer,
-      {
-        rootDirectory: root && getSystemPath(root),
-      },
-    );
+    engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage, {
+      allowPackageManagerOverride: true,
+      packageManager: options.packageManager,
+      rootDirectory: root && getSystemPath(root),
+      registry: options.packageRegistry,
+    });
+    engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer, {
+      rootDirectory: root && getSystemPath(root),
+    });
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
 
