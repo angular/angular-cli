@@ -126,15 +126,20 @@ export declare class NodePackageDoesNotSupportSchematics extends BaseException {
 export declare class NodeWorkflow extends workflow.BaseWorkflow {
     get engine(): FileSystemEngine;
     get engineHost(): NodeModulesEngineHost;
-    constructor(host: virtualFs.Host, options: {
-        force?: boolean;
-        dryRun?: boolean;
+    constructor(host: virtualFs.Host, options: NodeWorkflowOptions & {
         root?: Path;
-        packageManager?: string;
-        packageRegistry?: string;
-        registry?: schema.CoreSchemaRegistry;
-        resolvePaths?: string[];
     });
+    constructor(root: string, options: NodeWorkflowOptions);
+}
+
+export interface NodeWorkflowOptions {
+    dryRun?: boolean;
+    force?: boolean;
+    packageManager?: string;
+    packageRegistry?: string;
+    registry?: schema.CoreSchemaRegistry;
+    resolvePaths?: string[];
+    schemaValidation?: boolean;
 }
 
 export declare type OptionTransform<T extends object, R extends object> = (schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext) => Observable<R> | PromiseLike<R> | R;
