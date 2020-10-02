@@ -12,10 +12,8 @@ import {
   schema,
   strings,
   tags,
-  virtualFs,
   workspaces,
 } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import {
   DryRunEvent,
   UnsuccessfulWorkflowExecution,
@@ -28,7 +26,6 @@ import {
   FileSystemSchematic,
   FileSystemSchematicDescription,
   NodeWorkflow,
-  validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
@@ -243,14 +240,12 @@ export abstract class SchematicCommand<
 
     const { force, dryRun } = options;
     const root = this.context.root;
-    const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(root));
-
-    const workflow = new NodeWorkflow(fsHost, {
+    const workflow = new NodeWorkflow(root, {
       force,
       dryRun,
       packageManager: await getPackageManager(root),
       packageRegistry: options.packageRegistry,
-      root: normalize(root),
+      // A schema registry is required to allow customizing addUndefinedDefaults
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
       resolvePaths: !!this.workspace
         // Workspace
@@ -260,6 +255,7 @@ export abstract class SchematicCommand<
           : [process.cwd(), root, __dirname]
         // Global
         : [__dirname, process.cwd()],
+      schemaValidation: true,
     });
     workflow.engineHost.registerContextTransform(context => {
       // This is run by ALL schematics, so if someone uses `externalSchematics(...)` which
@@ -314,8 +310,6 @@ export abstract class SchematicCommand<
     } else {
       workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
     }
-
-    workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(workflow.registry));
 
     workflow.registry.addSmartDefaultProvider('projectName', getProjectName);
     workflow.registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
