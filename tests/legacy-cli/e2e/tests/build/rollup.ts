@@ -35,9 +35,9 @@ export default async function () {
     import { browser, logging, element, by } from 'protractor';
 
     describe('workspace-project App', () => {
-      it('should display lazy route', () => {
-        browser.get(browser.baseUrl + '/lazy');
-        expect(element(by.css('app-lazy p')).getText()).toEqual('lazy works!');
+      it('should display lazy route', async () => {
+        await browser.get(browser.baseUrl + '/lazy');
+        expect(await element(by.css('app-lazy p')).getText()).toEqual('lazy works!');
       });
 
       afterEach(async () => {
