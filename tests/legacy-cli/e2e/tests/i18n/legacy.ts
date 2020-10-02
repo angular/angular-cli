@@ -125,7 +125,7 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
       import { browser, logging, element, by } from 'protractor';
 
       describe('workspace-project App', () => {
-        const getParagraph = (name: string) => element(by.css('app-root p#' + name)).getText();
+        const getParagraph = async (name: string) => element(by.css('app-root p#' + name)).getText();
         beforeEach(() => browser.get(browser.baseUrl));
         afterEach(async () => {
           // Assert that there are no errors emitted from the browser
@@ -135,17 +135,17 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
           } as logging.Entry));
         });
 
-        it('should display welcome message', () =>
-          expect(getParagraph('hello')).toEqual('${translation.hello}'));
+        it('should display welcome message', async () =>
+          expect(await getParagraph('hello')).toEqual('${translation.hello}'));
 
-        it('should display locale', () =>
-          expect(getParagraph('locale')).toEqual('${lang}'));
+        it('should display locale', async () =>
+          expect(await getParagraph('locale')).toEqual('${lang}'));
 
-        it('should display localized date', () =>
-          expect(getParagraph('date')).toEqual('${translation.date}'));
+        it('should display localized date', async () =>
+          expect(await getParagraph('date')).toEqual('${translation.date}'));
 
-        it('should display pluralized message', () =>
-          expect(getParagraph('plural')).toEqual('${translation.plural}'));
+        it('should display pluralized message', async () =>
+          expect(await getParagraph('plural')).toEqual('${translation.plural}'));
       });
     `);
   }
