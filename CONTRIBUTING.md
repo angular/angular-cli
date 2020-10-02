@@ -192,16 +192,15 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 ### Type
 Must be one of the following:
 
-* **build**: Changes that affect the build system or external dependencies. [2]
-* **ci**: Changes to our CI configuration files and scripts. [2]
-* **docs**: Documentation only changes. 
-* **feat**: A new feature. [1]
-* **fix**: A bug fix. [1]
-* **refactor**: A code change that neither fixes a bug nor adds a feature 
-* **release**: A release commit. Must only include version changes. [2]
-* **revert**: A git commit revert. The description must include the original commit message. [2]
-* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc). 
-* **test**: Adding missing tests or correcting existing tests. 
+* **build**: Changes to local repository build system and tooling 
+* **ci**: Changes to CI configuration and CI specific tooling [2]
+* **docs**: Changes which exclusively affects documentation. 
+* **feat**: Creates a new feature [1]
+* **fix**: Fixes a previously discovered failure/bug [1]
+* **perf**: Improves performance without any change in functionality or API [1]
+* **refactor**: Refactor without any change in functionality or API (includes style changes) [1]
+* **release**: A release point in the repository [2]
+* **test**: Improvements or corrections made to the project's test suite [1]
 
 
 <sup>[1] This type MUST have a scope. See the next section for more information.</sup><br/>
