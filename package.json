@@ -71,6 +71,7 @@
     "@angular/compiler": "11.0.0-next.4",
     "@angular/compiler-cli": "11.0.0-next.4",
     "@angular/core": "11.0.0-next.4",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#0364a68f33191747a0bb7580e44a9ad6d50add10",
     "@angular/forms": "11.0.0-next.4",
     "@angular/localize": "11.0.0-next.4",
     "@angular/material": "10.2.3",
@@ -238,6 +239,8 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "yarn -s ng-dev commit-message pre-commit-validate --file-env-variable HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "yarn -s ng-dev commit-message restore-commit-message-draft --file-env-variable HUSKY_GIT_PARAMS",
       "pre-push": "node ./bin/devkit-admin hooks/pre-push"
     }
   }
