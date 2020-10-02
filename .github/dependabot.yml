@@ -1,0 +1,11 @@
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    commit-message:
+      prefix: "build"
+    labels:
+      - "comp: build & ci"
+      - "PR target: master & patch"
+      - "PR action: merge"
