@@ -16,11 +16,11 @@ export default function () {
       './e2e/src/app.po.ts': `
         import { browser, by, element } from 'protractor';
         export class AppPage {
-          navigateTo() {    return browser.get('/');  }
+          async navigateTo() {    return browser.get('/');  }
           getIncrementButton() { return element(by.buttonText('Increment')); }
           getDecrementButton() { return element(by.buttonText('Decrement')); }
           getResetButton() { return element(by.buttonText('Reset Counter')); }
-          getCounter() { return element(by.xpath('/html/body/app-root/div/span')).getText(); }
+          async getCounter() { return element(by.xpath('/html/body/app-root/div/span')).getText(); }
         }
       `,
       './e2e/src/app.e2e-spec.ts': `
@@ -33,15 +33,15 @@ export default function () {
             page = new AppPage();
           });
 
-          it('should operate counter', () => {
-            page.navigateTo();
-            page.getIncrementButton().click();
-            page.getIncrementButton().click();
-            expect(page.getCounter()).toEqual('2');
-            page.getDecrementButton().click();
-            expect(page.getCounter()).toEqual('1');
-            page.getResetButton().click();
-            expect(page.getCounter()).toEqual('0');
+          it('should operate counter', async () => {
+            await page.navigateTo();
+            await page.getIncrementButton().click();
+            await page.getIncrementButton().click();
+            expect(await page.getCounter()).toEqual('2');
+            await page.getDecrementButton().click();
+            expect(await page.getCounter()).toEqual('1');
+            await page.getResetButton().click();
+            expect(await page.getCounter()).toEqual('0');
           });
         });
       `,
