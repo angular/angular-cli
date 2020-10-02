@@ -22,18 +22,16 @@ import { getWorkspace, updateWorkspace } from '@schematics/angular/utility/works
 import { Readable, Writable } from 'stream';
 import { Schema as PwaOptions } from './schema';
 
-const RewritingStream = require('parse5-html-rewriting-stream');
-
 function updateIndexFile(path: string): Rule {
-  return (host: Tree) => {
+  return async (host: Tree) => {
     const buffer = host.read(path);
     if (buffer === null) {
       throw new SchematicsException(`Could not read index file: ${path}`);
     }
 
-    const rewriter = new RewritingStream();
+    const rewriter = new (await import('parse5-html-rewriting-stream'))();
     let needsNoScript = true;
-    rewriter.on('startTag', (startTag: { tagName: string }) => {
+    rewriter.on('startTag', startTag => {
       if (startTag.tagName === 'noscript') {
         needsNoScript = false;
       }
@@ -41,7 +39,7 @@ function updateIndexFile(path: string): Rule {
       rewriter.emitStartTag(startTag);
     });
 
-    rewriter.on('endTag', (endTag: { tagName: string }) => {
+    rewriter.on('endTag', endTag => {
       if (endTag.tagName === 'head') {
         rewriter.emitRaw('  <link rel="manifest" href="manifest.webmanifest">\n');
         rewriter.emitRaw('  <meta name="theme-color" content="#1976d2">\n');
