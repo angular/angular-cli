@@ -5,10 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize, virtualFs } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
-import { NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
+import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -66,17 +64,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   async initialize() {
     this.packageManager = await getPackageManager(this.context.root);
     this.workflow = new NodeWorkflow(
-      new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.context.root)),
+      this.context.root,
       {
         packageManager: this.packageManager,
-        root: normalize(this.context.root),
         // __dirname -> favor @schematics/update from this package
         // Otherwise, use packages from the active workspace (migrations)
         resolvePaths: [__dirname, this.context.root],
+        schemaValidation: true,
       },
-    );
-    this.workflow.engineHost.registerOptionsTransform(
-      validateOptionsWithSchema(this.workflow.registry),
     );
   }
 
