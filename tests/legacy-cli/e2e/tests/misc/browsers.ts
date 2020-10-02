@@ -46,17 +46,7 @@ export default async function () {
   // Leading and trailing space is not removed
   await replaceInFile(
     'e2e/src/app.e2e-spec.ts',
-    '\'should display welcome message\',',
-    '\'should display welcome message\', async',
-  );
-  await replaceInFile(
-    'e2e/src/app.e2e-spec.ts',
-    'page.navigateTo();',
-    'await page.navigateTo();',
-  );
-  await replaceInFile(
-    'e2e/src/app.e2e-spec.ts',
-    'page.getTitleText()',
+    'await page.getTitleText()',
     '(await page.getTitleText()).trim()',
   );
 
