@@ -123,7 +123,7 @@ Run integration tests using Bazel.
 
 ## validate
 
-Performs BUILD files, commit messages and license validation.
+Performs BUILD files and license validation.
 
 Flags:
 
