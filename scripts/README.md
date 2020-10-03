@@ -42,14 +42,6 @@ Flags:
 * `--githubTokenFile=<path>`. Reads the githubToken from a file instead of the command line (for CI).
 * `--stdout`. Skip the whole release note process and output the markdown to stdout instead.
 
-## lint
-
-Runs tslint on the whole repo.
-
-Flags:
-
-* `--fix`. Also applies fixes.
-
 ## packages
 
 Outputs a JSON containing all informations from the package script (main files, repo names, versions, deps, etc).
