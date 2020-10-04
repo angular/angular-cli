@@ -248,7 +248,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       if (commit) {
         const commitPrefix = `${packageName} migration - ${migration.name}`;
         const commitMessage = migration.description
-          ? `${commitPrefix}\n${migration.description}`
+          ? `${commitPrefix}\n\n${migration.description}`
           : commitPrefix;
         const committed = this.commit(commitMessage);
         if (!committed) {
