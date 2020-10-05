@@ -16,6 +16,7 @@ import {
   types,
 } from '@babel/core';
 import templateBuilder from '@babel/template';
+import * as cacache from 'cacache';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -35,7 +36,6 @@ import { isWebpackFiveOrHigher } from './webpack-version';
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
-const cacache = require('cacache');
 const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
 
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
@@ -97,7 +97,7 @@ export function setup(data: number[] | { cachePath: string; i18n: I18nOptions })
 
 async function cachePut(content: string, key: string | undefined, integrity?: string): Promise<void> {
   if (cachePath && key) {
-    await cacache.put(cachePath, key || null, content, {
+    await cacache.put(cachePath, key, content, {
       metadata: { integrity },
     });
   }
