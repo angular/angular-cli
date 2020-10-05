@@ -7,7 +7,7 @@
  */
 import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { WorkspaceSchema } from './workspace-models';
+import { WorkspaceSchema } from '../../utility/workspace-models';
 
 // The interfaces below are generated from the Angular CLI configuration schema
 // https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/lib/config/schema.json
