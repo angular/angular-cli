@@ -156,8 +156,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         {
           loader: require.resolve('stylus-loader'),
           options: {
-            sourceMap: { comment: false },
-            paths: includePaths,
+            sourceMap: cssSourceMap,
+            webpackImporter: false,
+            stylusOptions: {
+              compress: false,
+              sourceMap: { comment: false },
+              paths: includePaths,
+            },
           },
         },
       ],
