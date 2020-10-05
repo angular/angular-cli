@@ -24,7 +24,6 @@ import {
   chain,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { AppConfig, CliConfig } from '../../utility/config';
 import {
   NodeDependency,
   NodeDependencyType,
@@ -32,6 +31,7 @@ import {
 } from '../../utility/dependencies';
 import { JSONFile } from '../../utility/json-file';
 import { latestVersions } from '../../utility/latest-versions';
+import { AppConfig, CliConfig } from './config';
 
 const defaults = {
   appRoot: 'src',
