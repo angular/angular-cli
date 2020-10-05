@@ -6,8 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as cacache from 'cacache';
+import { readFile } from 'fs';
 import * as https from 'https';
+import { promisify } from 'util';
+import { findCachePath } from '../cache-path';
+import { cachingDisabled } from '../environment-options';
 import { htmlRewritingStream } from './html-rewriting-stream';
+
+const cacheFontsPath = cachingDisabled ? undefined : findCachePath('angular-build-fonts');
+const packageVersion = require('../../../package.json').version;
 
 const enum UserAgent {
   Chrome = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko)',
@@ -25,8 +33,6 @@ export interface InlineFontsOptions {
 }
 
 export class InlineFontsProcessor {
-  private readonly ResponseCache = new Map<string, string>();
-
   async process(options: InlineFontsOptions): Promise<string> {
     const {
       content,
@@ -89,16 +95,17 @@ export class InlineFontsProcessor {
   }
 
   private async getResponse(url: string, userAgent: UserAgent): Promise<string> {
-    const key = url + userAgent;
+    const key = `${packageVersion}|${url}|${userAgent}`;
 
-    if (this.ResponseCache.has(key)) {
-      // tslint:disable-next-line: no-non-null-assertion
-      return this.ResponseCache.get(key)!;
+    if (cacheFontsPath) {
+      const entry = await cacache.get.info(cacheFontsPath, key);
+      if (entry) {
+        return promisify(readFile)(entry.path, 'utf8');
+      }
     }
 
-    return new Promise((resolve, reject) => {
+    const data = await new Promise<string>((resolve, reject) => {
       let rawResponse = '';
-
       https.get(
         url,
         {
@@ -109,15 +116,17 @@ export class InlineFontsProcessor {
         res => {
           res
             .on('data', chunk => rawResponse += chunk)
-            .on('end', () => {
-              const response = rawResponse.toString();
-              this.ResponseCache.set(key, response);
-              resolve(response);
-            });
+            .on('end', () => resolve(rawResponse.toString()));
         },
       )
         .on('error', e => reject(e));
     });
+
+    if (cacheFontsPath) {
+      await cacache.put(cacheFontsPath, key, data);
+    }
+
+    return data;
   }
 
   private async processHrefs(hrefList: string[], minifyInlinedCSS: boolean, WOFF1SupportNeeded: boolean): Promise<Map<string, string>> {
