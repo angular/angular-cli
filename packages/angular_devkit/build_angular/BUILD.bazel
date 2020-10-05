@@ -114,6 +114,7 @@ ts_library(
         "@npm//@types/babel__core",
         "@npm//@types/babel__template",
         "@npm//@types/browserslist",
+        "@npm//@types/cacache",
         "@npm//@types/caniuse-lite",
         "@npm//@types/copy-webpack-plugin",
         "@npm//@types/cssnano",

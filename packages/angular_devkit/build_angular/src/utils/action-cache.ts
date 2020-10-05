@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as cacache from 'cacache';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import { copyFile } from './copy-file';
 import { allowMangle } from './environment-options';
 import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 
-const cacache = require('cacache');
 const packageVersion = require('../../package.json').version;
 
 export interface CacheEntry {
@@ -98,7 +98,8 @@ export class BundleActionCache {
         }
         cacheEntries.push({
           path: entry.path,
-          size: entry.size,
+          // tslint:disable-next-line: no-any
+          size: (entry as any).size,
           integrity: entry.metadata && entry.metadata.integrity,
         });
       } else {
