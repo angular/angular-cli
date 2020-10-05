@@ -622,7 +622,7 @@ describe('ast utils', () => {
       };
     `;
 
-    let recursive:boolean;
+    let recursive: boolean;
 
     describe('when `recursive` is not set', () => {
       beforeEach(() => {
