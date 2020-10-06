@@ -609,4 +609,45 @@ describe('ast utils', () => {
       );
     });
   });
+
+  describe('findNodes', () => {
+    const filePath = './src/foo.ts';
+    const fileContent = `
+      const a = {
+        nodeAtDepth0: {
+          nodeAtDepth1: {
+            nodeAtDepth2: { nodeAtDepth3: 'foo' },
+          },
+        },
+      };
+    `;
+
+    let recursive: boolean;
+
+    describe('when `recursive` is not set', () => {
+      beforeEach(() => {
+        recursive = false;
+      });
+
+      it('should return node excluding nested nodes', () => {
+        const source = getTsSource(filePath, fileContent);
+        const paNodes = findNodes(source, ts.SyntaxKind.PropertyAssignment, Infinity, recursive);
+
+        expect(paNodes.length).toEqual(1);
+      });
+    });
+
+    describe('when `recursive` is set', () => {
+      beforeEach(() => {
+        recursive = true;
+      });
+
+      it('should return node including all nested nodes', () => {
+        const source = getTsSource(filePath, fileContent);
+        const paNodes = findNodes(source, ts.SyntaxKind.PropertyAssignment, Infinity, recursive);
+
+        expect(paNodes.length).toEqual(4);
+      });
+    });
+  });
 });
