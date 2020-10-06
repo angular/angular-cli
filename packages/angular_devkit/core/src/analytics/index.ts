@@ -26,8 +26,6 @@ export enum NgCliAnalyticsDimensions {
   RamInGigabytes = 3,
   NodeVersion = 4,
   NgAddCollection = 6,
-  /** @deprecated */
-  NgBuildBuildEventLog = 7,
   NgIvyEnabled = 8,
   BuildErrors = 20,
 }
@@ -58,7 +56,6 @@ export const NgCliAnalyticsDimensionsFlagInfo: { [name: string]: [string, string
   RamInGigabytes: ['RAM (In GB)', 'number'],
   NodeVersion: ['Node Version', 'number'],
   NgAddCollection: ['--collection', 'string'],
-  NgBuildBuildEventLog: ['--buildEventLog', 'boolean'], // deprecated
   NgIvyEnabled: ['Ivy Enabled', 'boolean'],
   BuildErrors: ['Build Errors (comma separated)', 'string'],
 };

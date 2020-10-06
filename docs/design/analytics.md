@@ -46,7 +46,7 @@ Note: There's a limit of 20 custom dimensions.
 | 4 | `Node Version` | `number` |
 | 5 | `Flag: --style` | `string` |
 | 6 | `--collection` | `string` |
-| 7 | `--buildEventLog` | `boolean` |
+| 7 | `Flag: --strict` | `boolean` |
 | 8 | `Ivy Enabled` | `boolean` |
 | 9 | `Flag: --inlineStyle` | `boolean` |
 | 10 | `Flag: --inlineTemplate` | `boolean` |
