@@ -131,7 +131,8 @@
     "strict": {
       "description": "Creates a workspace with stricter type checking and stricter bundle budgets settings.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 7
     },
     "legacyBrowsers": {
       "type": "boolean",
