@@ -109,7 +109,8 @@
     "strict": {
       "description": "Creates an application with stricter bundle budgets settings.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 7
     },
     "legacyBrowsers": {
       "type": "boolean",

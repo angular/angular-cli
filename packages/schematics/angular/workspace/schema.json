@@ -35,7 +35,8 @@
     "strict": {
       "description": "Creates a workspace with stricter type checking options.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 7
     },
     "packageManager": {
       "description": "The package manager used to install dependencies.",
