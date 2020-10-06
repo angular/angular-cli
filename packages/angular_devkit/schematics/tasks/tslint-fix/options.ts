@@ -7,8 +7,10 @@
  */
 import { JsonObject } from '@angular-devkit/core';
 
+/** @deprecated since version 11. Use `ng lint --fix` directly instead. */
 export const TslintFixName = 'tslint-fix';
 
+/** @deprecated since version 11. Use `ng lint --fix` directly instead. */
 export interface TslintFixTaskOptionsBase {
   silent?: boolean;
   format?: string;
@@ -23,4 +25,5 @@ export interface TslintFixTaskOptionsBase {
   tslintConfig?: JsonObject;
 }
 
+/** @deprecated since version 11. Use `ng lint --fix` directly instead. */
 export type TslintFixTaskOptions = TslintFixTaskOptionsBase;
