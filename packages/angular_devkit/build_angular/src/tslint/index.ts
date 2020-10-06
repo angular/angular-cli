@@ -26,6 +26,11 @@ async function _run(
   options: TslintBuilderOptions,
   context: BuilderContext,
 ): Promise<BuilderOutput> {
+  context.logger.warn(
+    `TSLint's support is discontinued and we're deprecating its support in Angular CLI.\n` +
+    'To opt-in using the community driven ESLint builder, see: https://github.com/angular-eslint/angular-eslint#migrating-from-codelyzer-and-tslint.',
+  );
+
   const systemRoot = context.workspaceRoot;
   process.chdir(context.currentDirectory);
   const projectName = (context.target && context.target.project) || '<???>';
@@ -134,6 +139,7 @@ async function _run(
 }
 
 
+/** @deprecated since version 11 as part of the TSLint deprecation. */
 export default createBuilder<TslintBuilderOptions>(_run);
 
 
