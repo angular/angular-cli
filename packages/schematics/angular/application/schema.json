@@ -104,7 +104,8 @@
       "type": "boolean",
       "default": false,
       "description": "When true, applies lint fixes after generating the application.",
-      "x-user-analytics": 15
+      "x-user-analytics": 15,
+      "x-deprecated": "Use \"ng lint --fix\" directly instead."
     },
     "strict": {
       "description": "Creates an application with stricter bundle budgets settings.",
