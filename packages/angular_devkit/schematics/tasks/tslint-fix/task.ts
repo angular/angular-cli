@@ -10,6 +10,7 @@ import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { TslintFixName, TslintFixTaskOptions, TslintFixTaskOptionsBase } from './options';
 
 
+/** @deprecated since version 11. Use `ng lint --fix` directly instead. */
 export class TslintFixTask implements TaskConfigurationGenerator<TslintFixTaskOptions> {
   protected _configOrPath: null | string | JsonObject;
   protected _options: TslintFixTaskOptionsBase;

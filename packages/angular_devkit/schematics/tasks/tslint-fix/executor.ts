@@ -79,7 +79,7 @@ function _listAllFiles(root: string): string[] {
   return result;
 }
 
-
+/** @deprecated since version 11. Use `ng lint --fix` directly instead. */
 export default function (): TaskExecutor<TslintFixTaskOptions> {
   return async (options: TslintFixTaskOptions = {}, context: SchematicContext) => {
     const root = process.cwd();
