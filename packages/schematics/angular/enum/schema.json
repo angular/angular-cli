@@ -31,7 +31,8 @@
       "type": "boolean",
       "default": false,
       "description": "When true, applies lint fixes after generating the enum.",
-      "x-user-analytics": 15
+      "x-user-analytics": 15,
+      "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
   },
   "required": [
