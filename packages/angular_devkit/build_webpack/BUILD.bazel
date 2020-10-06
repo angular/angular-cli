@@ -29,7 +29,10 @@ ts_json_schema(
 ts_library(
     name = "build_webpack",
     srcs = glob(
-        include = ["src/**/*.ts"],
+        include = [
+            "_types/webpack5-compat.d.ts",
+            "src/**/*.ts",
+        ],
         exclude = [
             "src/test-utils.ts",
             "src/**/*_spec.ts",

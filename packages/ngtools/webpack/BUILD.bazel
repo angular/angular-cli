@@ -19,6 +19,7 @@ ts_library(
     name = "webpack",
     srcs = glob(
         include = [
+            "_types/webpack5-compat.d.ts",
             "src/**/*.ts",
         ],
         exclude = [

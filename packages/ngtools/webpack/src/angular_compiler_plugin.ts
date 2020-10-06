@@ -674,7 +674,11 @@ export class AngularCompilerPlugin {
     };
 
     // Go over all the modules in the webpack compilation and remove them from the sets.
-    compilation.modules.forEach(m => m.resource ? removeSourceFile(m.resource, true) : null);
+    //TODO_WEBPACK_5
+    // Module type is missing resource: string property, most likely here will be runtime issues
+    compilation.modules
+      //@ts-ignore
+      .forEach(m => m.resource ? removeSourceFile(m.resource, true) : null);
 
     // Anything that remains is unused, because it wasn't referenced directly or transitively
     // on the files in the compilation.
@@ -828,7 +832,13 @@ export class AngularCompilerPlugin {
         compilerWithFileSystems.inputFileSystem,
         this._compilerHost,
       );
+      //TODO_WEBPACK_5
+      // errors in callback should be optional -> something to fix in webpack typings
+      //@ts-ignore
       compilerWithFileSystems.inputFileSystem = inputDecorator;
+      //TODO_WEBPACK_5
+      // is missing the following properties from type 'Watcher': close, pause, getFileTimeInfoEntries, getContextTimeInfoEntries
+      //@ts-ignore
       compilerWithFileSystems.watchFileSystem = new VirtualWatchFileSystemDecorator(
         inputDecorator,
         replacements,
@@ -949,8 +959,11 @@ export class AngularCompilerPlugin {
         // VirtualFileSystemDecorator.
         // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
         // when the issuer is a `.ts` or `.ngfactory.js` file.
+        //TODO_WEBPACK_5
+        // in webpack 5 request has type  { issuer: string }
         nmf.hooks.beforeResolve.tapPromise(
           'angular-compiler',
+          // @ts-ignore
           async (request?: NormalModuleFactoryRequest) => {
             if (this.done && request) {
               const name = request.request;

@@ -13,7 +13,7 @@ import { getSourceMapDevTool } from '../utils/helpers';
 
 type ExternalHookWebpack5 = (
   data: { context: string; request: string },
-  callback: (err?: Error, result?: string) => void,
+  callback: (err: Error, result?: string) => void,
 ) => void;
 
 /**
@@ -37,9 +37,15 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
   if (!bundleDependencies) {
     if (isWebpackFiveOrHigher()) {
       const hook: ExternalHookWebpack5 = ({ context, request }, callback) =>
+        //TODO_WEBPACK_5
+        //@ts-ignore
         externalizePackages(request, context, callback);
-      externals.push(hook);
+        //TODO_WEBPACK_5
+        //@ts-ignore
+        externals.push(hook);
     } else {
+      //TODO_WEBPACK_5
+      //@ts-ignore
       externals.push(externalizePackages as unknown as ExternalHookWebpack5);
     }
   }

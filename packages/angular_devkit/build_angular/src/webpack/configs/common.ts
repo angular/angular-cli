@@ -318,6 +318,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         apply(compiler: Compiler) {
           compiler.hooks.emit.tap('angular-cli-stats', compilation => {
             const data = JSON.stringify(compilation.getStats().toJson('verbose'), undefined, 2);
+            //TODO_WEBPACK_5 webpack-sources@2 has buffers() property, but @types\webpack-sources has to be updated
+            //@ts-ignore
             compilation.assets['stats.json'] = new RawSource(data);
           });
         }

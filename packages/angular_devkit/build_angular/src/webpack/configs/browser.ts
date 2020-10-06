@@ -31,6 +31,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     vendor: vendorSourceMap,
   } = buildOptions.sourceMap;
 
+  //TODO_WEBPACK_5: webpack-subresource-integrity v1.4.1 has dependency on outdated webpack-sources@1.4.1
   if (subresourceIntegrity) {
     const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
     extraPlugins.push(new SubresourceIntegrityPlugin({

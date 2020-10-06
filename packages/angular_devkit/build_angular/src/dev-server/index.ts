@@ -347,7 +347,7 @@ async function setupLocalize(
     if (Array.isArray(webpackConfig.entry['main'])) {
       webpackConfig.entry['main'].unshift(localeDescription.dataPath);
     } else {
-      webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
+      webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main'] as string];
     }
   }
 
