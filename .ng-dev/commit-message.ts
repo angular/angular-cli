@@ -17,6 +17,6 @@ export const commitMessage: CommitMessageConfig = {
   minBodyLength: 0,
   minBodyLengthTypeExcludes: ['docs'],
   scopes: [
-    ...Object.keys(packages).filter(name => !packages[name].private),
+    ...Object.keys(packages),
   ],
 };

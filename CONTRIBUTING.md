@@ -215,6 +215,7 @@ The following is the list of supported scopes:
 * **@angular/pwa**
 * **@angular-devkit/architect**
 * **@angular-devkit/architect-cli**
+* **@angular-devkit/benchmark**
 * **@angular-devkit/build-angular**
 * **@angular-devkit/build-ng-packagr**
 * **@angular-devkit/build-optimizer**
