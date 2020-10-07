@@ -7,7 +7,6 @@
  */
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 import { Arguments } from '../models/interface';
-import { Schema as BuildCommandSchema } from './build';
 import { Schema as ServeCommandSchema } from './serve';
 
 export class ServeCommand extends ArchitectCommand<ServeCommandSchema> {
@@ -19,14 +18,5 @@ export class ServeCommand extends ArchitectCommand<ServeCommandSchema> {
 
   public async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
-  }
-
-  async reportAnalytics(
-    paths: string[],
-    options: BuildCommandSchema & Arguments,
-    dimensions: (boolean | number | string)[] = [],
-    metrics: (boolean | number | string)[] = [],
-  ): Promise<void> {
-    return super.reportAnalytics(paths, options, dimensions, metrics);
   }
 }

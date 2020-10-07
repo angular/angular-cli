@@ -15,13 +15,4 @@ export class BuildCommand extends ArchitectCommand<BuildCommandSchema> {
   public async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
   }
-
-  async reportAnalytics(
-    paths: string[],
-    options: BuildCommandSchema & Arguments,
-    dimensions: (boolean | number | string)[] = [],
-    metrics: (boolean | number | string)[] = [],
-  ): Promise<void> {
-    return super.reportAnalytics(paths, options, dimensions, metrics);
-  }
 }
