@@ -11,13 +11,6 @@ $ npm link
 This will link the binaries included in this repository, which includes the `devkit-admin` binary. This document
 describes each scripts available.
 
-## benchmark
-
-Runs all benchmarks of the repo. Benchmarks are run like Jasmine tests, but when the test are passing also record
-performance metrics. An example is the file `packages/angular_devkit/core/src/json/parser_benchmark.ts`.
-
-There's no flags associated with this script.
-
 ## build
 
 Builds the repo and the pack files. The output of `build` is in `dist/` and contains 1 tgz per package which can be
