@@ -463,8 +463,7 @@ export function buildServePath(
   let servePath = serverOptions.servePath;
   if (!servePath && servePath !== '') {
     const defaultPath = _findDefaultServePath(browserOptions.baseHref, browserOptions.deployUrl);
-    const showWarning = serverOptions.servePathDefaultWarning;
-    if (defaultPath == null && showWarning) {
+    if (defaultPath == null) {
       logger.warn(tags.oneLine`
         Warning: --deploy-url and/or --base-href contain unsupported values for ng serve. Default
         serve path of '/' used. Use --serve-path to override.
