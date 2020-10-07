@@ -27,6 +27,7 @@ export abstract class ArchitectCommand<
   protected _architect!: Architect;
   protected _architectHost!: WorkspaceNodeModulesArchitectHost;
   protected _registry!: json.schema.SchemaRegistry;
+  protected readonly useReportAnalytics = false;
 
   // If this command supports running multiple targets.
   protected multiTarget = false;
@@ -192,7 +193,6 @@ export abstract class ArchitectCommand<
   protected async runSingleTarget(
     target: Target,
     targetOptions: string[],
-    commandOptions: ArchitectCommandOptions & Arguments,
   ) {
     // We need to build the builderSpec twice because architect does not understand
     // overrides separately (getting the configuration builds the whole project, including
@@ -215,6 +215,11 @@ export abstract class ArchitectCommand<
 
       return 1;
     }
+
+    await this.reportAnalytics([this.description.name], {
+      ...await this._architectHost.getOptionsForTarget(target) as unknown as T,
+      ...overrides,
+    });
 
     const run = await this._architect.scheduleTarget(target, overrides as json.JsonObject, {
       logger: this.logger,
@@ -246,13 +251,12 @@ export abstract class ArchitectCommand<
           result |= await this.runSingleTarget(
             { ...targetSpec, project } as Target,
             extra,
-            options,
           );
         }
 
         return result;
       } else {
-        return await this.runSingleTarget(targetSpec, extra, options);
+        return await this.runSingleTarget(targetSpec, extra);
       }
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {

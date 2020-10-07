@@ -78,22 +78,18 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     paths: string[],
     options: GenerateCommandSchema & Arguments,
   ): Promise<void> {
-    const [collectionName, schematicName] = await this.parseSchematicInfo(options);
-
-    if (!schematicName || !collectionName) {
+    if (!this.collectionName || !this.schematicName) {
       return;
     }
-    const escapedSchematicName = (this.longSchematicName || schematicName).replace(/\//g, '_');
+    const escapedSchematicName = (this.longSchematicName || this.schematicName).replace(/\//g, '_');
 
     return super.reportAnalytics(
-      ['generate', collectionName.replace(/\//g, '_'), escapedSchematicName],
+      ['generate', this.collectionName.replace(/\//g, '_'), escapedSchematicName],
       options,
     );
   }
 
-  private async parseSchematicInfo(options: {
-    schematic?: string;
-  }): Promise<[string, string | undefined]> {
+  private async parseSchematicInfo(options: GenerateCommandSchema): Promise<[string, string | undefined]> {
     let collectionName = await this.getDefaultSchematicCollection();
 
     let schematicName = options.schematic;

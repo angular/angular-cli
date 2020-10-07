@@ -37,13 +37,4 @@ export class DeployCommand extends ArchitectCommand<DeployCommandSchema> {
       return super.initialize(options);
     }
   }
-
-  async reportAnalytics(
-    paths: string[],
-    options: DeployCommandSchema & Arguments,
-    dimensions: (boolean | number | string)[] = [],
-    metrics: (boolean | number | string)[] = [],
-  ): Promise<void> {
-    return super.reportAnalytics(paths, options, dimensions, metrics);
-  }
 }

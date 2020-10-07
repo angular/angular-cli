@@ -23,7 +23,8 @@ export interface BaseCommandOptions {
 }
 
 export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions> {
-  public allowMissingWorkspace = false;
+  protected allowMissingWorkspace = false;
+  protected useReportAnalytics = true;
   readonly workspace?: AngularWorkspace;
   readonly analytics: analytics.Analytics;
 
@@ -143,7 +144,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
 
   async reportAnalytics(
     paths: string[],
-    options: T & Arguments,
+    options: Arguments,
     dimensions: (boolean | number | string)[] = [],
     metrics: (boolean | number | string)[] = [],
   ): Promise<void> {
@@ -173,7 +174,9 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
       return this.printJsonHelp(options);
     } else {
       const startTime = +new Date();
-      await this.reportAnalytics([this.description.name], options);
+      if (this.useReportAnalytics) {
+        await this.reportAnalytics([this.description.name], options);
+      }
       const result = await this.run(options);
       const endTime = +new Date();
 

@@ -70,7 +70,8 @@ export class UnknownCollectionError extends Error {
 export abstract class SchematicCommand<
   T extends BaseSchematicSchema & BaseCommandOptions
 > extends Command<T> {
-  readonly allowPrivateSchematics: boolean = false;
+  protected readonly allowPrivateSchematics: boolean = false;
+  protected readonly useReportAnalytics = false;
   protected _workflow!: NodeWorkflow;
 
   protected defaultCollectionName = '@schematics/angular';
@@ -481,6 +482,9 @@ export abstract class SchematicCommand<
       ...input,
       ...options.additionalOptions,
     };
+
+    const transformOptions = await workflow.engine.transformOptions(schematic, input).toPromise();
+    await this.reportAnalytics([this.description.name], transformOptions as Arguments);
 
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;
