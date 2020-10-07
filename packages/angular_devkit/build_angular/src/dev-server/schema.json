@@ -85,12 +85,14 @@
     "hmrWarning": {
       "type": "boolean",
       "description": "Show a warning when the --hmr option is enabled.",
-      "default": true
+      "default": true,
+      "x-deprecated": "No longer has an effect."
     },
     "servePathDefaultWarning": {
       "type": "boolean",
       "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
-      "default": true
+      "default": true,
+      "x-deprecated": "No longer has an effect."
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
@@ -115,12 +117,14 @@
         {
           "type": "boolean"
         }
-      ]
+      ],
+      "x-deprecated": "Use the \"optimization\" option in the browser builder instead."
     },
     "aot": {
       "type": "boolean",
       "description": "Build using Ahead of Time compilation.",
-      "x-user-analytics": 13
+      "x-user-analytics": 13,
+      "x-deprecated": "Use the \"aot\" option in the browser builder instead."
     },
     "sourceMap": {
       "description": "Output sourcemaps.",
@@ -154,27 +158,33 @@
         {
           "type": "boolean"
         }
-      ]
+      ],
+      "x-deprecated": "Use the \"sourceMap\" option in the browser builder instead."
     },
     "vendorChunk": {
       "type": "boolean",
-      "description": "Use a separate bundle containing only vendor libraries."
+      "description": "Use a separate bundle containing only vendor libraries.",
+      "x-deprecated": "Use the \"vendorChunk\" option in the browser builder instead."
     },
     "commonChunk": {
       "type": "boolean",
-      "description": "Use a separate bundle containing code used across multiple bundles."
+      "description": "Use a separate bundle containing code used across multiple bundles.",
+      "x-deprecated": "Use the \"commonChunk\" option in the browser builder instead."
     },
     "baseHref": {
       "type": "string",
-      "description": "Base url for the application being built."
+      "description": "Base url for the application being built.",
+      "x-deprecated": "Use the \"baseHref\" option in the browser builder instead."
     },
     "deployUrl": {
       "type": "string",
-      "description": "URL where files will be deployed."
+      "description": "URL where files will be deployed.",
+      "x-deprecated": "Use the \"deployUrl\" option in the browser builder instead."
     },
     "progress": {
       "type": "boolean",
-      "description": "Log progress to the console while building."
+      "description": "Log progress to the console while building.",
+      "x-deprecated": "Use the \"progress\" option in the browser builder instead."
     },
     "poll": {
       "type": "number",
