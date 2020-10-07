@@ -11,7 +11,7 @@
   "dependencies": {
     "loader-utils": "2.0.0",
     "source-map": "0.7.3",
-    "tslib": "2.0.1",
+    "tslib": "2.0.2",
     "typescript": "4.0.3",
     "webpack-sources": "2.0.1"
   }
