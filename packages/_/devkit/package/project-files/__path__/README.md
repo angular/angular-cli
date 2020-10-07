@@ -1,3 +1,0 @@
-# <%= displayName %>
-
-Work in progress

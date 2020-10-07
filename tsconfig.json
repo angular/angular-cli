@@ -28,7 +28,6 @@
       "node"
     ],
     "paths": {
-      "@_/benchmark": [ "./packages/_/benchmark/src/index" ],
       "@angular-devkit/core": [ "./packages/angular_devkit/core/src/index" ],
       "@angular-devkit/core/node": [ "./packages/angular_devkit/core/node/index" ],
       "@angular-devkit/core/node/testing": [ "./packages/angular_devkit/core/node/testing/index" ],
@@ -57,12 +56,10 @@
     "etc/cli.angular.io/**/*",
     "**/node_modules/**/*",
     "**/third_party/**/*",
-    "packages/_/devkit/**/*files/**/*",
     "packages/schematics/*/*/*files/**/*",
     "packages/angular_devkit/*/test/**/*",
     "tests/**/*",
     "tools/**/*",
-    "benchmark/**/*",
     "integration/**/*",
     ".ng-dev/**/*"
   ]
