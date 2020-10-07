@@ -21,15 +21,8 @@ export default async function() {
 
   // Should fail with --ivy flag if `@angular/localize` is missing
   const { message: message1 } = await expectToFail(() => ng('xi18n'));
-  if (!message1.includes(`Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`)) {
+  if (!message1.includes(`Ivy extraction requires the '@angular/localize' package.`)) {
     throw new Error('Expected localize package error message when missing');
-  }
-
-  // Should fail with --ivy flag if `@angular/localize` is wrong version
-  await npm('install', '@angular/localize@9');
-  const { message: message2 } = await expectToFail(() => ng('xi18n', '--ivy'));
-  if (!message2.includes(`Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`)) {
-    throw new Error('Expected localize package error message when wrong version');
   }
 
   // Install correct version

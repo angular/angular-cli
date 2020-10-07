@@ -19,7 +19,6 @@ import templateBuilder from '@babel/template';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import { lt as semverLt } from 'semver';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import * as v8 from 'v8';
@@ -884,26 +883,10 @@ function findLocalizePositions(
   return positions;
 }
 
-// TODO: Remove this for v11.
-// This check allows the CLI to support both FW 10.0 and 10.1
-let localizeOld: boolean | undefined;
-
 function unwrapTemplateLiteral(
   path: NodePath<types.TaggedTemplateExpression>,
   utils: LocalizeUtilities,
 ): [TemplateStringsArray, types.Expression[]] {
-  if (localizeOld === undefined) {
-    const { version: localizeVersion } = require('@angular/localize/package.json');
-    localizeOld = semverLt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
-  }
-
-  if (localizeOld) {
-    // tslint:disable-next-line: no-any
-    const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(path.node.quasi.quasis as any);
-
-    return [(messageParts as unknown) as TemplateStringsArray, path.node.quasi.expressions];
-  }
-
   const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(
     path.get('quasi').get('quasis'),
   );
@@ -916,22 +899,6 @@ function unwrapLocalizeCall(
   path: NodePath<types.CallExpression>,
   utils: LocalizeUtilities,
 ): [TemplateStringsArray, types.Expression[]] {
-  if (localizeOld === undefined) {
-    const { version: localizeVersion } = require('@angular/localize/package.json');
-    localizeOld = semverLt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
-  }
-
-  if (localizeOld) {
-    const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
-    // tslint:disable-next-line: no-any
-    const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node as any);
-
-    return [
-      (messageParts as unknown) as TemplateStringsArray,
-      (expressions as unknown) as types.Expression[],
-    ];
-  }
-
   const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
   const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
 

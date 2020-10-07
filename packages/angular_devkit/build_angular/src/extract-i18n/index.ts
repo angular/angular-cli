@@ -15,7 +15,6 @@ import { JsonObject } from '@angular-devkit/core';
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import * as fs from 'fs';
 import * as path from 'path';
-import { gte as semverGte } from 'semver';
 import * as webpack from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
@@ -212,16 +211,12 @@ export async function execute(
   );
 
   if (usingIvy) {
-    let validLocalizePackage = false;
     try {
-      const { version: localizeVersion } = require('@angular/localize/package.json');
-      validLocalizePackage = semverGte(localizeVersion, '10.1.0-next.0', { includePrerelease: true });
-    } catch {}
-
-    if (!validLocalizePackage) {
+      require.resolve('@angular/localize');
+    } catch {
       return {
         success: false,
-        error: `Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`,
+        error: `Ivy extraction requires the '@angular/localize' package.`,
        };
     }
   }
