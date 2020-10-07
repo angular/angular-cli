@@ -36,7 +36,7 @@ function hook(
       });
     } else {
       compilation.hooks.optimizeChunkAssets
-        .tapPromise(PLUGIN_NAME, (chunks: compilation.Chunk[]) => {
+        .tapPromise(PLUGIN_NAME, (chunks: Iterable<compilation.Chunk>) => {
           const files: string[] = [];
           for (const chunk of chunks) {
             if (!chunk.files) {

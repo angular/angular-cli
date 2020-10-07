@@ -15,8 +15,8 @@ import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
 
-// The below is extended because there are not in the typings
-interface WebpackModule extends compilation.Module {
+// The below is used to remain compatible with both Webpack 4 and 5
+interface WebpackModule {
   name?: string;
   rawRequest?: string;
   dependencies: WebpackModule[];
