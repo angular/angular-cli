@@ -7,8 +7,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "4952ef879704ab4ad6729a29007e7094aef213ea79e9f2e94cbe1c9a753e63ef",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/2.2.0/rules_nodejs-2.2.0.tar.gz"],
+    sha256 = "64a71a64ac58b8969bb19b1c9258a973b6433913e958964da698943fb5521d98",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/2.2.1/rules_nodejs-2.2.1.tar.gz"],
 )
 
 # Check the bazel version and download npm dependencies
@@ -75,9 +75,9 @@ install_bazel_dependencies(suppress_warning = True)
 # Bring in bazel_toolchains for RBE setup configuration.
 http_archive(
     name = "bazel_toolchains",
-    sha256 = "698d52e561cc8b5f502dc1ce83b6db72d5dabed4ae756393fb326b0243e4e20c",
-    strip_prefix = "bazel-toolchains-3.5.1",
-    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.5.1.tar.gz",
+    sha256 = "4fb3ceea08101ec41208e3df9e56ec72b69f3d11c56629d6477c0ff88d711cf7",
+    strip_prefix = "bazel-toolchains-3.6.0",
+    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.6.0.tar.gz",
 )
 
 load("@bazel_toolchains//rules:environments.bzl", "clang_env")
