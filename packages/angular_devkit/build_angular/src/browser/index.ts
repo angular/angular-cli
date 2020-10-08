@@ -7,7 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { getSystemPath, join, json, normalize, resolve, tags, virtualFs } from '@angular-devkit/core';
+import { getSystemPath, json, normalize, resolve, tags, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as ora from 'ora';
@@ -726,18 +726,23 @@ export function buildWebpackBrowser(
 
                 try {
                   if (options.index) {
-                    await generateIndex(
-                      outputPath,
-                      options,
-                      root,
+                    await writeIndexHtml({
+                      host,
+                      outputPath: path.join(outputPath, getIndexOutputFile(options)),
+                      indexPath: path.join(context.workspaceRoot, getIndexInputFile(options)),
                       files,
                       noModuleFiles,
                       moduleFiles,
-                      transforms.indexHtml,
+                      baseHref: localeBaseHref || options.baseHref,
+                      deployUrl: options.deployUrl,
+                      sri: options.subresourceIntegrity,
+                      scripts: options.scripts,
+                      styles: options.styles,
+                      postTransform: transforms.indexHtml,
+                      crossOrigin: options.crossOrigin,
                       // i18nLocale is used when Ivy is disabled
-                      locale || options.i18nLocale,
-                      localeBaseHref || options.baseHref,
-                    );
+                      lang: locale || options.i18nLocale,
+                    });
                   }
 
                   if (options.serviceWorker) {
@@ -770,37 +775,6 @@ export function buildWebpackBrowser(
         );
     }),
   );
-}
-
-function generateIndex(
-  baseOutputPath: string,
-  options: BrowserBuilderSchema,
-  root: string,
-  files: EmittedFiles[] | undefined,
-  noModuleFiles: EmittedFiles[] | undefined,
-  moduleFiles: EmittedFiles[] | undefined,
-  transformer?: IndexHtmlTransform,
-  locale?: string,
-  baseHref?: string,
-): Promise<void> {
-  const host = new NodeJsSyncHost();
-
-  return writeIndexHtml({
-    host,
-    outputPath: join(normalize(baseOutputPath), getIndexOutputFile(options)),
-    indexPath: join(normalize(root), getIndexInputFile(options)),
-    files,
-    noModuleFiles,
-    moduleFiles,
-    baseHref,
-    deployUrl: options.deployUrl,
-    sri: options.subresourceIntegrity,
-    scripts: options.scripts,
-    styles: options.styles,
-    postTransform: transformer,
-    crossOrigin: options.crossOrigin,
-    lang: locale,
-  }).toPromise();
 }
 
 function mapErrorToMessage(error: unknown): string | undefined {
