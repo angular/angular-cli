@@ -64,12 +64,15 @@ describe('Browser Builder errors', () => {
     const run = await architect.scheduleTarget(targetSpec, { aot: true }, { logger });
     const output = await run.result;
     expect(output.success).toBe(false);
+
+    // Wait for the builder to complete
+    await run.stop();
+
     if (!veEnabled) {
       expect(logs.join()).toContain('selector must be a string');
     } else {
       expect(logs.join()).toContain('Function expressions are not supported in');
     }
-    await run.stop();
   });
 
   it('shows missing export errors', async () => {
@@ -87,7 +90,10 @@ describe('Browser Builder errors', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;
     expect(output.success).toBe(false);
-    expect(logs.join()).toContain(`export 'missingExport' was not found in 'rxjs'`);
+
+    // Wait for the builder to complete
     await run.stop();
+
+    expect(logs.join()).toContain(`export 'missingExport' was not found in 'rxjs'`);
   });
 });
