@@ -1,7 +1,6 @@
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng, npm } from '../../utils/process';
-import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
 export default async function() {
@@ -64,17 +63,11 @@ export default async function() {
   await ng('xi18n', '--ivy');
   await expectFileToMatch('messages.xlf', 'Hello world');
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
-
-  await npm('uninstall', '@angular/localize');
-
-  // TODO: Investigate failures on Windows and remove this check
-  if (process.platform === 'win32') {
-    return;
-  }
-
   await expectFileToMatch('messages.xlf', 'src/app/app.component.html');
   await expectFileToMatch(
     'messages.xlf',
-    `projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts`,
+    'projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts',
   );
+
+  await npm('uninstall', '@angular/localize');
 }
