@@ -349,7 +349,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     buildOptimizerUseRule = [
       {
         loader: buildOptimizerLoaderPath,
-        options: { sourceMap: scriptsSourceMap },
+        options: {
+          sourceMap: scriptsSourceMap,
+          ivyMode: wco.tsConfig.options.enableIvy !== false,
+        },
       },
     ];
   }

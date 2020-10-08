@@ -67,6 +67,7 @@ export interface BuildOptimizerOptions {
   strict?: boolean;
   isSideEffectFree?: boolean;
   isAngularCoreFile?: boolean;
+  ivyMode?: boolean;
 }
 
 export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput {
@@ -108,14 +109,16 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
 
   let typeCheck = false;
   if (options.isSideEffectFree || originalFilePath && isKnownSideEffectFree(originalFilePath)) {
-    getTransforms.push(
-      // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
-      // It will mark both `require()` calls and `console.log(stuff)` as pure.
-      // We only apply it to modules known to be side effect free, since we know they are safe.
-      // getPrefixFunctionsTransformer needs to be before getFoldFileTransformer.
-      getPrefixFunctionsTransformer,
-      selectedGetScrubFileTransformer,
-    );
+    if (!options.ivyMode) {
+      // This transformer is not needed when using Ivy
+      getTransforms.push(
+        // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
+        // It will mark both `require()` calls and `console.log(stuff)` as pure.
+        // We only apply it to modules known to be side effect free, since we know they are safe.
+        getPrefixFunctionsTransformer,
+      );
+    }
+    getTransforms.push(selectedGetScrubFileTransformer);
     typeCheck = true;
   } else if (testScrubFile(content)) {
     // Always test as these require the type checker

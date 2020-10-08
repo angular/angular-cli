@@ -117,7 +117,10 @@ export function getAotConfig(wco: WebpackConfigOptions, i18nExtract = false) {
   if (buildOptions.buildOptimizer) {
     loaders.unshift({
       loader: buildOptimizerLoaderPath,
-      options: { sourceMap: buildOptions.sourceMap.scripts }
+      options: {
+        sourceMap: buildOptions.sourceMap.scripts,
+        ivyMode: wco.tsConfig.options.enableIvy !== false,
+      },
     });
   }
 

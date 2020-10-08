@@ -14,6 +14,7 @@ import { buildOptimizer } from './build-optimizer';
 
 interface BuildOptimizerLoaderOptions {
   sourceMap: boolean;
+  ivyMode: boolean;
 }
 
 export const buildOptimizerLoaderPath = __filename;
@@ -59,6 +60,7 @@ export default function buildOptimizerLoader(
     inputFilePath: this.resourcePath,
     outputFilePath: this.resourcePath,
     emitSourceMap: options.sourceMap,
+    ivyMode: options.ivyMode,
     isSideEffectFree:
       this._module && this._module.factoryMeta && this._module.factoryMeta.sideEffectFree,
   });
