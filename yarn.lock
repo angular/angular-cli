@@ -1032,10 +1032,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@bazel/bazelisk@1.6.1":
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.6.1.tgz#f9e279d2fecaf6cec6ed676bc8714846f3704e40"
-  integrity sha512-2JpfZb6eYCGrdLdUJamncIpI4pgEAhPURYGg+rCgqoZDJxzADuOnpf/00dEBXPM2XByXNXTqsKEFN2gTaZz2mA==
+"@bazel/bazelisk@1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.7.1.tgz#e277a50821125edfed12fbddeaf0a297e10846c3"
+  integrity sha512-mYriXNuwGb/2bP5mjTUH6ls7/pBDKCg0dBVwmJaLISBVculCjayxtNVFdcX8y2tmNegP8UFqnF6/dTY/uSD8NA==
 
 "@bazel/buildifier-darwin_x64@0.29.0":
   version "0.29.0"
@@ -1066,18 +1066,18 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/jasmine@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.2.0.tgz#78fc4171362113d993e2473b0168ee8c255e05c9"
-  integrity sha512-NmrgbHBSWUaBXT9rFqeC+bYYWfHtPphnfgchusy7LOQMs/aWVePEo9tsbggNBt1pf6NYv+Y/cHLgtlL/EdQ6Dg==
+"@bazel/jasmine@2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.2.1.tgz#4a1cc54b0092569104cf88fc1cbb27e34578cd90"
+  integrity sha512-l028iUpIbQ8WIWI+3OQpnBRa+NBKKrvtbrQNCrRv4+R305c4KAS2cGixIKI62CizD4nmhNAXRN/jE849I1g1zg==
   dependencies:
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.2.0.tgz#f2d3dce8715d574fe3146f19fdb8479abcc4d608"
-  integrity sha512-Thf8pXntBzE3EvJtyiTBNsfIf1QnYmGPQmUSGLcKUuuFoplUVYShMRHaxBoPZmYsnD/x+BFLgUKIzlXiEQpGqQ==
+"@bazel/typescript@2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.2.1.tgz#46d6dcedd91a7fd0421e9286790aff94ec45bece"
+  integrity sha512-nFdwkJYzKsmu9IzbQ8Wtt6YI7AlTEv5JHWTbMmZB4HBOi7xjhgFKiq3HQRhZ963EVoJ481Kb6M0wtkzARCb3YA==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
