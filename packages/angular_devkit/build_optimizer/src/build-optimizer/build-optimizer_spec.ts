@@ -69,10 +69,10 @@ describe('build-optimizer', () => {
 
       // Check Angular 4/5 and unix/windows paths.
       const inputPaths = [
-        '/node_modules/@angular/core/@angular/core.es5.js',
-        '/node_modules/@angular/core/esm5/core.js',
-        '\\node_modules\\@angular\\core\\@angular\\core.es5.js',
-        '\\node_modules\\@angular\\core\\esm5\\core.js',
+        '/node_modules/@angular/core/fesm2015/core.js',
+        '/node_modules/@angular/core/esm2015/core.js',
+        '\\node_modules\\@angular\\core\\fesm2015\\core.js',
+        '\\node_modules\\@angular\\core\\esm2015\\core.js',
         '/project/file.ngfactory.js',
         '/project/file.ngstyle.js',
       ];
