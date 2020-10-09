@@ -41,26 +41,20 @@ const knownSideEffectFreeAngularModules = [
 ];
 
 // Factories created by AOT are known to have no side effects.
-// In Angular 2/4 the file path for factories can be `.ts`, but in Angular 5 it is `.js`.
 const ngFactories = [
-  /\.ngfactory\.[jt]s/,
-  /\.ngstyle\.[jt]s/,
+  '.ngfactory.js',
+  '.ngstyle.js',
 ];
 
 // Known locations for the source files of @angular/core.
-const coreFilesRegex = [
-  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]esm5[\\/]/,
-  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]fesm5[\\/]/,
-  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]esm2015[\\/]/,
-  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]fesm2015[\\/]/,
-];
+const coreFilesRegex = /[\\/]node_modules[\\/]@angular[\\/]core[\\/][f]?esm2015[\\/]/;
 
 function isKnownCoreFile(filePath: string) {
-  return coreFilesRegex.some(re => re.test(filePath));
+  return coreFilesRegex.test(filePath);
 }
 
 function isKnownSideEffectFree(filePath: string) {
-  return ngFactories.some((re) => re.test(filePath)) ||
+  return ngFactories.some((s) => filePath.endsWith(s)) ||
     knownSideEffectFreeAngularModules.some((re) => re.test(filePath));
 }
 
