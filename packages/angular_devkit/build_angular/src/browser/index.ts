@@ -34,6 +34,7 @@ import { copyAssets } from '../utils/copy-assets';
 import { cachingDisabled } from '../utils/environment-options';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
 import { I18nOptions } from '../utils/i18n-options';
+import { getHtmlTransforms } from '../utils/index-file/transforms';
 import {
   IndexHtmlTransform,
   writeIndexHtml,
@@ -290,6 +291,12 @@ export function buildWebpackBrowser(
       switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
         const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
+        const normalizedOptimization = normalizeOptimization(options.optimization);
+        const indexTransforms = getHtmlTransforms(
+          normalizedOptimization,
+          buildBrowserFeatures,
+          transforms.indexHtml,
+        );
 
         return runWebpack(config, context, {
           webpackFactory: require('webpack') as typeof webpack,
@@ -366,7 +373,7 @@ export function buildWebpackBrowser(
                 // Common options for all bundle process actions
                 const sourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
                 const actionOptions: Partial<ProcessBundleOptions> = {
-                  optimize: normalizeOptimization(options.optimization).scripts,
+                  optimize: normalizedOptimization.scripts,
                   sourceMaps: sourceMapOptions.scripts,
                   hiddenSourceMaps: sourceMapOptions.hidden,
                   vendorSourceMaps: sourceMapOptions.vendor,
@@ -748,7 +755,7 @@ export function buildWebpackBrowser(
                       sri: options.subresourceIntegrity,
                       scripts: options.scripts,
                       styles: options.styles,
-                      postTransform: transforms.indexHtml,
+                      postTransforms: indexTransforms,
                       crossOrigin: options.crossOrigin,
                       // i18nLocale is used when Ivy is disabled
                       lang: locale || options.i18nLocale,

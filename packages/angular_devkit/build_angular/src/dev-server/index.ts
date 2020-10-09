@@ -29,6 +29,7 @@ import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
 import { checkPort } from '../utils/check-port';
 import { I18nOptions } from '../utils/i18n-options';
+import { getHtmlTransforms } from '../utils/index-file/transforms';
 import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
 import { generateEntryPoints } from '../utils/package-chunk-sort';
 import { createI18nPlugins } from '../utils/process-bundle';
@@ -40,7 +41,6 @@ import { normalizeExtraEntryPoints } from '../webpack/configs';
 import { IndexHtmlWebpackPlugin } from '../webpack/plugins/index-html-webpack-plugin';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Schema } from './schema';
-const open = require('open');
 
 export type DevServerBuilderOptions = Schema & json.JsonObject;
 
@@ -189,6 +189,8 @@ export function serveWebpackBrowser(
         });
       }
 
+      const normalizedOptimization = normalizeOptimization(browserOptions.optimization);
+
       if (browserOptions.index) {
         const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
         const { options: compilerOptions } = readTsconfig(tsConfig, context.workspaceRoot);
@@ -210,14 +212,17 @@ export function serveWebpackBrowser(
             deployUrl: browserOptions.deployUrl,
             sri: browserOptions.subresourceIntegrity,
             noModuleEntrypoints: ['polyfills-es5'],
-            postTransform: transforms.indexHtml,
+            postTransforms: getHtmlTransforms(
+              normalizedOptimization,
+              buildBrowserFeatures,
+              transforms.indexHtml,
+            ),
             crossOrigin: browserOptions.crossOrigin,
             lang: browserOptions.i18nLocale,
           }),
         );
       }
 
-      const normalizedOptimization = normalizeOptimization(browserOptions.optimization);
       if (normalizedOptimization.scripts || normalizedOptimization.styles) {
         context.logger.error(tags.stripIndents`
           ****************************************************************************************
@@ -257,6 +262,7 @@ export function serveWebpackBrowser(
             `);
 
             if (options.open) {
+              const open = require('open');
               open(serverAddress);
             }
           }

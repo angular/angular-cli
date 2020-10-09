@@ -28,7 +28,7 @@ export interface WriteIndexHtmlOptions {
   sri?: boolean;
   scripts?: ExtraEntryPoint[];
   styles?: ExtraEntryPoint[];
-  postTransform?: IndexHtmlTransform;
+  postTransforms: IndexHtmlTransform[];
   crossOrigin?: CrossOriginValue;
   lang?: string;
 }
@@ -47,7 +47,7 @@ export async function writeIndexHtml({
   sri = false,
   scripts = [],
   styles = [],
-  postTransform,
+  postTransforms,
   crossOrigin,
   lang,
 }: WriteIndexHtmlOptions): Promise<void> {
@@ -69,8 +69,8 @@ export async function writeIndexHtml({
     loadOutputFile: filePath => readFile(join(dirname(outputPath), filePath)),
   });
 
-  if (postTransform) {
-    content = await postTransform(content);
+  for (const transform of postTransforms) {
+    content = await transform(content);
   }
 
   await host.write(normalize(outputPath), virtualFs.stringToFileBuffer(content)).toPromise();
