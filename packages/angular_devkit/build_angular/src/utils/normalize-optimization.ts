@@ -6,13 +6,28 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { OptimizationClass, OptimizationUnion } from '../browser/schema';
+import { FontsClass, OptimizationClass, OptimizationUnion } from '../browser/schema';
 
-export function normalizeOptimization(
-  optimization: OptimizationUnion = false,
-): Required<OptimizationClass> {
+export type NormalizeOptimizationOptions = Required<Omit<OptimizationClass, 'fonts'>> & {
+  fonts: FontsClass,
+};
+
+export function normalizeOptimization(optimization: OptimizationUnion = false): NormalizeOptimizationOptions {
+  if (typeof optimization === 'object') {
+    return {
+      scripts: !!optimization.scripts,
+      styles: !!optimization.styles,
+      fonts: typeof optimization.fonts === 'object' ? optimization.fonts : {
+        inline: !!optimization.fonts,
+      },
+    };
+  }
+
   return {
-    scripts: typeof optimization === 'object' ? !!optimization.scripts : optimization,
-    styles: typeof optimization === 'object' ? !!optimization.styles : optimization,
+    scripts: optimization,
+    styles: optimization,
+    fonts: {
+      inline: optimization,
+    },
   };
 }

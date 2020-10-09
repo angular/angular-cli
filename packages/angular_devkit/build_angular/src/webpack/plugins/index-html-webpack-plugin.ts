@@ -25,7 +25,7 @@ export interface IndexHtmlWebpackPluginOptions {
   sri: boolean;
   noModuleEntrypoints: string[];
   moduleEntrypoints: string[];
-  postTransform?: IndexHtmlTransform;
+  postTransforms: IndexHtmlTransform[];
   crossOrigin?: CrossOriginValue;
   lang?: string;
 }
@@ -55,6 +55,7 @@ export class IndexHtmlWebpackPlugin {
       noModuleEntrypoints: [],
       moduleEntrypoints: [],
       sri: false,
+      postTransforms: [],
       ...options,
     };
   }
@@ -93,6 +94,7 @@ export class IndexHtmlWebpackPlugin {
 
         return typeof data === 'string' ? data : data.toString();
       };
+
       let indexSource = await augmentIndexHtml({
         input: this._options.input,
         inputContent,
@@ -108,8 +110,8 @@ export class IndexHtmlWebpackPlugin {
         lang: this._options.lang,
       });
 
-      if (this._options.postTransform) {
-        indexSource = await this._options.postTransform(indexSource);
+      for (const transform of this._options.postTransforms) {
+        indexSource = await transform(indexSource);
       }
 
       // Add to compilation assets

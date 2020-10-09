@@ -7,39 +7,37 @@
  */
 
 import * as cacache from 'cacache';
-import { readFile } from 'fs';
+import { readFile as readFileAsync } from 'fs';
 import * as https from 'https';
+import { URL } from 'url';
 import { promisify } from 'util';
 import { findCachePath } from '../cache-path';
 import { cachingDisabled } from '../environment-options';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
-const cacheFontsPath = cachingDisabled ? undefined : findCachePath('angular-build-fonts');
+const cacheFontsPath: string | undefined = cachingDisabled ? undefined : findCachePath('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
+const readFile = promisify(readFileAsync);
 
 const enum UserAgent {
-  Chrome = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko)',
-  IE = 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko',
+  Chrome = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
+  IE = 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11. 0) like Gecko',
 }
 
 const SUPPORTED_PROVIDERS = [
-  'https://fonts.googleapis.com/',
+  'fonts.googleapis.com',
 ];
 
 export interface InlineFontsOptions {
-  content: string;
   minifyInlinedCSS: boolean;
-  WOFF1SupportNeeded: boolean;
+  WOFFSupportNeeded: boolean;
 }
 
 export class InlineFontsProcessor {
-  async process(options: InlineFontsOptions): Promise<string> {
-    const {
-      content,
-      minifyInlinedCSS,
-      WOFF1SupportNeeded,
-    } = options;
 
+  constructor(private options: InlineFontsOptions) { }
+
+  async process(content: string): Promise<string> {
     const hrefList: string[] = [];
 
     // Collector link tags with href
@@ -64,7 +62,7 @@ export class InlineFontsProcessor {
     await new Promise(resolve => collectorStream.on('finish', resolve));
 
     // Download stylesheets
-    const hrefsContent = await this.processHrefs(hrefList, minifyInlinedCSS, WOFF1SupportNeeded);
+    const hrefsContent = await this.processHrefs(hrefList);
     if (hrefsContent.size === 0) {
       return content;
     }
@@ -94,13 +92,13 @@ export class InlineFontsProcessor {
     return transformedContent;
   }
 
-  private async getResponse(url: string, userAgent: UserAgent): Promise<string> {
+  private async getResponse(url: URL, userAgent: UserAgent): Promise<string> {
     const key = `${packageVersion}|${url}|${userAgent}`;
 
     if (cacheFontsPath) {
       const entry = await cacache.get.info(cacheFontsPath, key);
       if (entry) {
-        return promisify(readFile)(entry.path, 'utf8');
+        return readFile(entry.path, 'utf8');
       }
     }
 
@@ -116,7 +114,7 @@ export class InlineFontsProcessor {
         res => {
           res
             .on('data', chunk => rawResponse += chunk)
-            .on('end', () => resolve(rawResponse.toString()));
+            .on('end', () => resolve(rawResponse));
         },
       )
         .on('error', e => reject(e));
@@ -129,44 +127,45 @@ export class InlineFontsProcessor {
     return data;
   }
 
-  private async processHrefs(hrefList: string[], minifyInlinedCSS: boolean, WOFF1SupportNeeded: boolean): Promise<Map<string, string>> {
+  private async processHrefs(hrefList: string[]): Promise<Map<string, string>> {
     const hrefsContent = new Map<string, string>();
 
-    for (const href of hrefList) {
-      // Normalize protocols to https://
-      let normalizedHref = href;
-      if (!href.startsWith('https://')) {
-        if (href.startsWith('//')) {
-          normalizedHref = 'https:' + href;
-        } else if (href.startsWith('http://')) {
-          normalizedHref = href.replace('http:', 'https:');
-        } else {
-          // Unsupported CSS href.
-          continue;
-        }
+    for (const hrefPath of hrefList) {
+      // Need to convert '//' to 'https://' because the URL parser will fail with '//'.
+      const normalizedHref = hrefPath.startsWith('//') ? `https:${hrefPath}` : hrefPath;
+      if (!normalizedHref.startsWith('http')) {
+        // Non valid URL.
+        // Example: relative path styles.css.
+        continue;
       }
 
-      if (!SUPPORTED_PROVIDERS.some(url => normalizedHref.startsWith(url))) {
+      const url = new URL(normalizedHref);
+      // Force HTTPS protocol
+      url.protocol = 'https:';
+
+      if (!SUPPORTED_PROVIDERS.includes(url.hostname)) {
         // Provider not supported.
         continue;
       }
 
       // The order IE -> Chrome is important as otherwise Chrome will load woff1.
       let cssContent = '';
-      if (WOFF1SupportNeeded) {
-        cssContent += await this.getResponse(normalizedHref, UserAgent.IE);
+      if (this.options.WOFFSupportNeeded) {
+        cssContent += await this.getResponse(url, UserAgent.IE);
       }
-      cssContent += await this.getResponse(normalizedHref, UserAgent.Chrome);
+      cssContent += await this.getResponse(url, UserAgent.Chrome);
 
-      if (minifyInlinedCSS) {
+      if (this.options.minifyInlinedCSS) {
         cssContent = cssContent
+          // New lines.
+          .replace(/\n/g, '')
           // Comments and new lines.
-          .replace(/(\n|\/\*\s.+\s\*\/)/g, '')
+          .replace(/\/\*\s.+\s\*\//g, '')
           // Safe spaces.
           .replace(/\s?[\{\:\;]\s+/g, s => s.trim());
       }
 
-      hrefsContent.set(href, cssContent);
+      hrefsContent.set(hrefPath, cssContent);
     }
 
     return hrefsContent;
