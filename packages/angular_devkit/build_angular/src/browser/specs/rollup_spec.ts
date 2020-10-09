@@ -82,7 +82,7 @@ describe('Browser Builder Rollup Concatenation test', () => {
     await browserBuild(architect, host, target, overrides);
   });
 
-  it('creates smaller or same size bundles for app without lazy bundles', async () => {
+  xit('creates smaller or same size bundles for app without lazy bundles', async () => {
     const prodOutput = await browserBuild(architect, host, target, prodOverrides);
     const prodSize = await getOutputSize(prodOutput);
     const rollupProdOutput = await browserBuild(architect, host, target, rollupProdOverrides);
@@ -90,7 +90,7 @@ describe('Browser Builder Rollup Concatenation test', () => {
     expect(prodSize).toBeGreaterThan(rollupProd);
   });
 
-  it('creates smaller bundles for apps with lazy bundles', async () => {
+  xit('creates smaller bundles for apps with lazy bundles', async () => {
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles(lazyModuleFnImport);
     const prodOutput = await browserBuild(architect, host, target, prodOverrides);
