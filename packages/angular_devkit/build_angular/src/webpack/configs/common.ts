@@ -414,18 +414,39 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         allowMinify &&
         (buildOptions.platform == 'server'
           ? {
-            ecma: terserEcma,
-            global_defs: angularGlobalDefinitions,
-            keep_fnames: true,
-          }
+              ecma: terserEcma,
+              global_defs: angularGlobalDefinitions,
+              keep_fnames: true,
+            }
           : {
-            ecma: terserEcma,
-            pure_getters: buildOptions.buildOptimizer,
-            // PURE comments work best with 3 passes.
-            // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-            passes: buildOptions.buildOptimizer ? 3 : 1,
-            global_defs: angularGlobalDefinitions,
-          }),
+              ecma: terserEcma,
+              pure_getters: buildOptions.buildOptimizer,
+              // PURE comments work best with 3 passes.
+              // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+              passes: buildOptions.buildOptimizer ? 3 : 1,
+              global_defs: angularGlobalDefinitions,
+              pure_funcs: buildOptions.buildOptimizer
+              // These should eventually be evaluated for pure annotation suitability at callsites.
+                ? [
+                    'ComponentFactoryResolver$1',
+                    'InjectionToken',
+                    'KeyRegistry',
+                    'Optional',
+                    'ObservableStrategy',
+                    'PromiseStrategy',
+                    'ReflectionCapabilities',
+                    'Reflector',
+                    'Version',
+                    'core_merge',
+                    'getClosureSafeProperty',
+                    'makeDecorator',
+                    'makeParamDecorator',
+                    'makePropDecorator',
+                    'tagSet',
+                    'tokenKey',
+                  ]
+                : undefined,
+            }),
       // We also want to avoid mangling on server.
       // Name mangling is handled within the browser builder
       mangle: allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
