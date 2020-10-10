@@ -84,19 +84,6 @@ describe('build-optimizer', () => {
       });
     });
 
-    it('supports flagging module as side-effect free', () => {
-      const output = tags.oneLine`
-        var RenderType_MdOption = /*@__PURE__*/ ɵcrt({ encapsulation: 2, styles: styles_MdOption });
-      `;
-      const input = tags.stripIndent`
-        var RenderType_MdOption = ɵcrt({ encapsulation: 2, styles: styles_MdOption});
-      `;
-
-      const boOutput = buildOptimizer({ content: input, isSideEffectFree: true });
-      expect(tags.oneLine`${boOutput.content}`).toEqual(output);
-      expect(boOutput.emitSkipped).toEqual(false);
-    });
-
     it('should not add pure comments to tslib helpers', () => {
       const input = tags.stripIndent`
         class LanguageState {
