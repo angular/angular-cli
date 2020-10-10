@@ -227,7 +227,7 @@
     "typescript": "4.0.3",
     "verdaccio": "4.8.1",
     "verdaccio-auth-memory": "^9.7.2",
-    "webpack": "4.44.2",
+    "webpack": "5.0.0",
     "webpack-dev-middleware": "3.7.2",
     "webpack-dev-server": "3.10.3",
     "webpack-merge": "5.2.0",
