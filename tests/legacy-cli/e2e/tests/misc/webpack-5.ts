@@ -3,10 +3,6 @@ import { killAllProcesses, ng, silentYarn } from '../../utils/process';
 import { ngServe, updateJsonFile } from '../../utils/project';
 
 export default async function() {
-  // Currently disabled as it breaks tslib 2.0.2
-  // Cannot destructure property '__extends' of '_tslib_js__WEBPACK_IMPORTED_MODULE_0___default(...)' as it is undefined.
-  return;
-
   // Setup project for yarn usage
   await rimraf('node_modules');
   await updateJsonFile('package.json', (json) => {
