@@ -15,8 +15,7 @@ import {
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
 import {
-  getScrubFileTransformer,
-  getScrubFileTransformerForCore,
+  createScrubFileTransformerFactory,
   testScrubFile,
 } from '../transforms/scrub-file';
 import { getWrapEnumsTransformer } from '../transforms/wrap-enums';
@@ -70,9 +69,8 @@ export interface BuildOptimizerOptions {
 }
 
 export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput {
-
-  const { inputFilePath, isAngularCoreFile } = options;
-  let { originalFilePath, content } = options;
+  const { inputFilePath } = options;
+  let { originalFilePath, content, isAngularCoreFile } = options;
 
   if (!originalFilePath && inputFilePath) {
     originalFilePath = inputFilePath;
@@ -94,39 +92,34 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     };
   }
 
-  let selectedGetScrubFileTransformer = getScrubFileTransformer;
-
-  if (
-    isAngularCoreFile === true ||
-    (isAngularCoreFile === undefined && originalFilePath && isKnownCoreFile(originalFilePath))
-  ) {
-    selectedGetScrubFileTransformer = getScrubFileTransformerForCore;
+  if (isAngularCoreFile === undefined) {
+    isAngularCoreFile = !!originalFilePath && isKnownCoreFile(originalFilePath);
   }
+
+  const hasSafeSideEffects = originalFilePath && isKnownSideEffectFree(originalFilePath);
 
   // Determine which transforms to apply.
   const getTransforms: TransformerFactoryCreator[] = [];
 
   let typeCheck = false;
-  if (options.isSideEffectFree || originalFilePath && isKnownSideEffectFree(originalFilePath)) {
+  if (hasSafeSideEffects) {
+    // Angular modules have known safe side effects
     getTransforms.push(
       // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
       // It will mark both `require()` calls and `console.log(stuff)` as pure.
       // We only apply it to modules known to be side effect free, since we know they are safe.
-      // getPrefixFunctionsTransformer needs to be before getFoldFileTransformer.
       getPrefixFunctionsTransformer,
-      selectedGetScrubFileTransformer,
     );
     typeCheck = true;
-  } else if (testScrubFile(content)) {
-    // Always test as these require the type checker
-    getTransforms.push(
-      selectedGetScrubFileTransformer,
-    );
-    typeCheck = true;
+  } else if (testPrefixClasses(content)) {
+    // This is only relevant if prefix functions is not used since prefix functions will prefix IIFE wrapped classes.
+    getTransforms.unshift(getPrefixClassesTransformer);
   }
 
-  if (testPrefixClasses(content)) {
-    getTransforms.unshift(getPrefixClassesTransformer);
+  if (testScrubFile(content)) {
+    // Always test as these require the type checker
+    getTransforms.push(createScrubFileTransformerFactory(isAngularCoreFile));
+    typeCheck = true;
   }
 
   getTransforms.push(getWrapEnumsTransformer);

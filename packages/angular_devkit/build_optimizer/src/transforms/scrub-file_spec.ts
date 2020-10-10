@@ -10,16 +10,15 @@
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import {
-  getScrubFileTransformer,
-  getScrubFileTransformerForCore,
+  createScrubFileTransformerFactory,
   testScrubFile,
 } from './scrub-file';
 
 
 const transform = (content: string) => transformJavascript(
-  { content, getTransforms: [getScrubFileTransformer], typeCheck: true }).content;
+  { content, getTransforms: [createScrubFileTransformerFactory(false)], typeCheck: true }).content;
 const transformCore = (content: string) => transformJavascript(
-  { content, getTransforms: [getScrubFileTransformerForCore], typeCheck: true }).content;
+  { content, getTransforms: [createScrubFileTransformerFactory(true)], typeCheck: true }).content;
 
 describe('scrub-file', () => {
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
@@ -605,17 +604,59 @@ describe('scrub-file', () => {
   });
 
   describe('__param', () => {
-    it('removes all constructor parameters and their type metadata', () => {
+    it('removes all constructor parameters and their type metadata with only Angular decorators', () => {
       const output = tags.stripIndent`
-      import { __decorate, __param, __metadata } from "tslib";
+        import { Component } from '@angular/core';
+        import { __decorate, __param, __metadata } from "tslib";
+        var MyClass = /** @class */ (function () {
+            function MyClass(myParam) {
+                this.myProp = 'foo';
+            }
+            return MyClass;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { __decorate, __param, __metadata } from "tslib";
         var MyClass = /** @class */ (function () {
             function MyClass(myParam) {
                 this.myProp = 'foo';
             }
             MyClass = __decorate([
-                myDecorator()
+              Component(),
+                __param(0, Component()),
+                __metadata("design:paramtypes", [Number])
             ], MyClass);
             return MyClass;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('keeps all constructor parameters and their type metadata with only custom decorators', () => {
+      const output = tags.stripIndent`
+        import { __decorate, __param, __metadata } from "tslib";
+        var MyClass = /** @class */ (function () {
+            function MyClass(myParam) {
+                this.myProp = 'foo';
+            }
+            MyClass = __decorate([
+              myDecorator(),
+              __param(0, myDecorator()),
+              __metadata("design:paramtypes", [Number])
+          ], MyClass);
+            return MyClass;
+        }());
+        var MyOtherClass = /** @class */ (function () {
+          function MyOtherClass(myParam) {
+              this.myProp = 'bar';
+          }
+          MyOtherClass = __decorate([
+            __metadata("design:paramtypes", [Number])
+          ], MyOtherClass);
+            return MyOtherClass;
         }());
       `;
       const input = tags.stripIndent`
@@ -625,6 +666,52 @@ describe('scrub-file', () => {
                 this.myProp = 'foo';
             }
             MyClass = __decorate([
+                myDecorator(),
+                __param(0, myDecorator()),
+                __metadata("design:paramtypes", [Number])
+            ], MyClass);
+            return MyClass;
+        }());
+        var MyOtherClass = /** @class */ (function () {
+          function MyOtherClass(myParam) {
+              this.myProp = 'bar';
+          }
+          MyOtherClass = __decorate([
+            __metadata("design:paramtypes", [Number])
+          ], MyOtherClass);
+            return MyOtherClass;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('keeps all constructor parameters and their type metadata with custom & Angular decorators', () => {
+      const output = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { __decorate, __param, __metadata } from "tslib";
+        var MyClass = /** @class */ (function () {
+            function MyClass(myParam) {
+                this.myProp = 'foo';
+            }
+            MyClass = __decorate([
+              myDecorator(),
+              __param(0, myDecorator()),
+              __metadata("design:paramtypes", [Number])
+          ], MyClass);
+            return MyClass;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { __decorate, __param, __metadata } from "tslib";
+        var MyClass = /** @class */ (function () {
+            function MyClass(myParam) {
+                this.myProp = 'foo';
+            }
+            MyClass = __decorate([
+                Component(),
                 myDecorator(),
                 __param(0, myDecorator()),
                 __metadata("design:paramtypes", [Number])
