@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularResolver",
+  "title": "Angular resolver Options Schema",
+  "type": "object",
+  "description": "Generates a new, generic resolver definition in the given or default project.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the new resolver.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the resolver?"
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "When true, does not create \"spec.ts\" test files for the new resolver.",
+      "default": false,
+      "x-user-analytics": 12
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "When true (the default), creates the new files at the top level of the current project.",
+      "default": true
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the interface that defines the resolver, relative to the current workspace.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
