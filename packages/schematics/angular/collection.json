@@ -60,6 +60,12 @@
       "description": "Create a guard.",
       "schema": "./guard/schema.json"
     },
+    "resolver": {
+      "aliases": [ "r" ],
+      "factory": "./resolver",
+      "description": "Create a resolver.",
+      "schema": "./resolver/schema.json"
+    },
     "interceptor": {
       "factory": "./interceptor",
       "description": "Create an interceptor.",
