@@ -26,21 +26,29 @@ function canUseIvyPlugin(wco: WebpackConfigOptions): boolean {
     return false;
   }
 
-  // Allow fallback to legacy build system via environment variable ('NG_BUILD_IVY_LEGACY=1')
-  const flag = process.env['NG_BUILD_IVY_LEGACY'];
-  if (flag !== undefined && flag !== '0' && flag.toLowerCase() !== 'false') {
-    wco.logger.warn(
-      '"NG_BUILD_IVY_LEGACY" environment variable detected. Using legacy Ivy build system.',
-    );
-
+  // Allow new ivy build system via environment variable ('NG_BUILD_IVY_EXPERIMENTAL=1')
+  // TODO: Remove this section and adjust warnings below once the Ivy plugin is the default
+  const flag = process.env['NG_BUILD_IVY_EXPERIMENTAL'];
+  if (flag === undefined || flag === '0' || flag.toLowerCase() === 'false') {
     return false;
   }
+
+  // Allow fallback to legacy build system via environment variable ('NG_BUILD_IVY_LEGACY=1')
+  // TODO: Enable this section once the Ivy plugin is the default
+  // const flag = process.env['NG_BUILD_IVY_LEGACY'];
+  // if (flag !== undefined && flag !== '0' && flag.toLowerCase() !== 'false') {
+  //   wco.logger.warn(
+  //     '"NG_BUILD_IVY_LEGACY" environment variable detected. Using legacy Ivy build system.',
+  //   );
+
+  //   return false;
+  // }
 
   // Lazy modules option uses the deprecated string format for lazy routes which is not supported
   if (wco.buildOptions.lazyModules && wco.buildOptions.lazyModules.length > 0) {
     wco.logger.warn(
-      '"lazyModules" option is deprecated and not supported by the new Ivy build system. ' +
-        'Using legacy Ivy build system.'
+      '"lazyModules" option is deprecated and not supported by the experimental Ivy build system. ' +
+        'Using original Ivy build system.'
     );
 
     return false;
@@ -48,8 +56,17 @@ function canUseIvyPlugin(wco: WebpackConfigOptions): boolean {
 
   // This pass relies on internals of the original plugin
   if (wco.buildOptions.experimentalRollupPass) {
+    wco.logger.warn(
+      'The experimental rollup pass is not supported by the experimental Ivy build system. ' +
+        'Using original Ivy build system.'
+    );
+
     return false;
   }
+
+  wco.logger.warn(
+    '"NG_BUILD_IVY_EXPERIMENTAL" environment variable detected. Using experimental Ivy build system.',
+  );
 
   return true;
 }
