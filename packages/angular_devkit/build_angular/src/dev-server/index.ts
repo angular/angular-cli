@@ -169,8 +169,12 @@ export function serveWebpackBrowser(
             continue;
           }
 
+          // TODO_WEBPACK_5
+          // @ts-ignore
           for (let index = 0; index < value.length; index++) {
+            // @ts-ignore
             if (value[index].includes('webpack-dev-server/client/index.js')) {
+              // @ts-ignore
               config.entry[key] = value.splice(index + 1, 1);
             }
           }

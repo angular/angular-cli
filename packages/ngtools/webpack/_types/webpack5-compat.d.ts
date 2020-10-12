@@ -1,7 +1,8 @@
 import 'webpack';
 import {
   Compilation as CompilationWp5, Compiler,
-  Module as ModuleWp5, Chunk as ChunkWp5
+  Module as ModuleWp5, Chunk as ChunkWp5,
+  WatchOptions
 } from 'webpack';
 
 type loaderCallback = (err: Error | undefined | null, content?: string | Buffer, sourceMap?: RawSourceMap) => void;
@@ -304,6 +305,9 @@ declare module 'webpack' {
       version?: string;
       warnings: string[];
     }
+  }
+  namespace Options {
+    type WatchOptions = WatchOptions;
   }
 }
 
