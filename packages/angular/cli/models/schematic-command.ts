@@ -304,53 +304,51 @@ export abstract class SchematicCommand<
       ...(await getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName())),
       ...current,
     });
+
     workflow.engineHost.registerOptionsTransform(defaultOptionTransform);
 
-    if (options.defaults) {
-      workflow.registry.addPreTransform(schema.transforms.addUndefinedDefaults);
-    } else {
-      workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
-    }
-
+    workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
     workflow.registry.addSmartDefaultProvider('projectName', getProjectName);
     workflow.registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
 
     if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
-        const questions: inquirer.QuestionCollection = definitions.map(definition => {
-          const question: inquirer.Question = {
-            name: definition.id,
-            message: definition.message,
-            default: definition.default,
-          };
+        const questions: inquirer.QuestionCollection = definitions
+          .filter(definition => !options.defaults || definition.default === undefined)
+          .map(definition => {
+            const question: inquirer.Question = {
+              name: definition.id,
+              message: definition.message,
+              default: definition.default,
+            };
 
-          const validator = definition.validator;
-          if (validator) {
-            question.validate = input => validator(input);
-          }
+            const validator = definition.validator;
+            if (validator) {
+              question.validate = input => validator(input);
+            }
 
-          switch (definition.type) {
-            case 'confirmation':
-              question.type = 'confirm';
-              break;
-            case 'list':
-              question.type = definition.multiselect ? 'checkbox' : 'list';
-              (question as inquirer.CheckboxQuestion).choices = definition.items?.map(item => {
-                return typeof item == 'string'
-                  ? item
-                  : {
-                    name: item.label,
-                    value: item.value,
-                  };
-              });
-              break;
-            default:
-              question.type = definition.type;
-              break;
-          }
+            switch (definition.type) {
+              case 'confirmation':
+                question.type = 'confirm';
+                break;
+              case 'list':
+                question.type = definition.multiselect ? 'checkbox' : 'list';
+                (question as inquirer.CheckboxQuestion).choices = definition.items?.map(item => {
+                  return typeof item == 'string'
+                    ? item
+                    : {
+                      name: item.label,
+                      value: item.value,
+                    };
+                });
+                break;
+              default:
+                question.type = definition.type;
+                break;
+            }
 
-          return question;
-        });
+            return question;
+          });
 
         return inquirer.prompt(questions);
       });
