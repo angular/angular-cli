@@ -235,9 +235,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             buildOptions.extractCss
               ? {
                 loader: MiniCssExtractPlugin.loader,
-                options: {
-                  hmr: buildOptions.hmr,
-                },
               }
               : require.resolve('style-loader'),
             {
