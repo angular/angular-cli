@@ -36,7 +36,6 @@ import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
 import { addError, addWarning } from '../utils/webpack-diagnostics';
-import { normalizeExtraEntryPoints } from '../webpack/configs';
 import { HmrLoader } from '../webpack/plugins/hmr/hmr-loader';
 import { IndexHtmlWebpackPlugin } from '../webpack/plugins/index-html-webpack-plugin';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
@@ -562,25 +561,7 @@ function _addLiveReload(
 
     entryPoints.push(
       'webpack/hot/dev-server',
-      path.join(__dirname, '../webpack/hmr.js'),
     );
-
-    if (browserOptions.styles?.length) {
-      // When HMR is enabled we need to add the css paths as part of the entrypoints
-      // because otherwise no JS bundle will contain the HMR accept code.
-      const normalizedStyles = normalizeExtraEntryPoints(browserOptions.styles, 'styles')
-        .map(style => {
-          let resolvedPath = path.resolve(root, style.input);
-          if (!existsSync(resolvedPath)) {
-            try {
-              resolvedPath = require.resolve(style.input, { paths: [root] });
-            } catch {}
-          }
-
-          return resolvedPath;
-        });
-      entryPoints.push(...normalizedStyles);
-    }
 
     webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
 

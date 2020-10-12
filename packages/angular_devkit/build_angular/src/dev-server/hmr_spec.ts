@@ -10,7 +10,6 @@ import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
 import { createArchitect, host } from '../test-utils';
 
-
 describe('Dev Server Builder hmr', () => {
   const target = { project: 'app', target: 'serve' };
   let architect: Architect;
@@ -27,17 +26,25 @@ describe('Dev Server Builder hmr', () => {
     await Promise.all(runs.map(r => r.stop()));
   });
 
-  it('adds HMR accept code in all JS bundles', async () => {
+  it('adds HMR accept code in main JS bundle', async () => {
     const run = await architect.scheduleTarget(target, { hmr: true });
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('https://localhost:4200/');
+    expect(output.baseUrl).toBe('http://localhost:4200/');
 
-    const polyfills = await fetch('https://localhost:4200/polyfills.js');
-    expect(await polyfills.text()).toContain('ngHmrAccept(module);');
+    const response = await fetch('http://localhost:4200/main.js');
+    expect(await response.text()).toContain('// HMR Accept Code');
+  }, 30000);
 
-    const main = await fetch('https://localhost:4200/main.js');
-    expect(await main.text()).toContain('ngHmrAccept(module);');
+  it('adds HMR accept code for CSS in JS bundles', async () => {
+    const run = await architect.scheduleTarget(target, { hmr: true });
+    runs.push(run);
+    const output = await run.result as DevServerBuilderOutput;
+    expect(output.success).toBe(true);
+    expect(output.baseUrl).toBe('http://localhost:4200/');
+
+    const response = await fetch('http://localhost:4200/styles.js');
+    expect(await response.text()).toContain('module.hot.accept(undefined, cssReload);');
   }, 30000);
 });
