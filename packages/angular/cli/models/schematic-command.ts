@@ -315,6 +315,16 @@ export abstract class SchematicCommand<
     workflow.registry.addSmartDefaultProvider('projectName', getProjectName);
     workflow.registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
 
+    let shouldReportAnalytics = true;
+    workflow.engineHost.registerOptionsTransform(async (_, options) => {
+      if (shouldReportAnalytics) {
+        shouldReportAnalytics = false;
+        await this.reportAnalytics([this.description.name], options as Arguments);
+      }
+
+      return options;
+    });
+
     if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
         const questions: inquirer.QuestionCollection = definitions.map(definition => {
@@ -482,9 +492,6 @@ export abstract class SchematicCommand<
       ...input,
       ...options.additionalOptions,
     };
-
-    const transformOptions = await workflow.engine.transformOptions(schematic, input).toPromise();
-    await this.reportAnalytics([this.description.name], transformOptions as Arguments);
 
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;
