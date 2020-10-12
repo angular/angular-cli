@@ -193,7 +193,7 @@ export default function (mod) {
 
         dispatchEvents(newElement);
       }
-    } else {
+    } else if (oldInputs.length) {
       console.warn('[NG HMR] Cannot restore input/textarea values.');
     }
 
@@ -207,7 +207,7 @@ export default function (mod) {
 
         dispatchEvents(newElement);
       }
-    } else {
+    } else if (oldOptions.length) {
       console.warn('[NG HMR] Cannot restore selected options.');
     }
   }
