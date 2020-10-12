@@ -7,7 +7,7 @@
  */
 import { logging, tags } from '@angular-devkit/core';
 import { getOptions } from 'loader-utils';
-import { extname, join } from 'path';
+import { extname } from 'path';
 import { loader } from 'webpack';
 
 export interface SingleTestTransformLoaderOptions {
@@ -16,7 +16,7 @@ export interface SingleTestTransformLoaderOptions {
   logger?: logging.Logger;
 }
 
-export const SingleTestTransformLoader = require.resolve(join(__dirname, 'single-test-transform'));
+export const SingleTestTransformLoader = __filename;
 
 /**
  * This loader transforms the default test file to only run tests
