@@ -196,6 +196,7 @@ export interface TypedSchematicContext<CollectionMetadataT extends object,
   addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
 
   // This might be undefined if the feature is unsupported.
+  /** @deprecated since version 11 - as it's unused. */
   readonly analytics?: analytics.Analytics;
 }
 
