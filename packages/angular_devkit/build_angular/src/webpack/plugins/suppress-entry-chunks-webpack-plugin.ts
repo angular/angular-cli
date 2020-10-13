@@ -14,6 +14,11 @@ export class SuppressExtractedTextChunksWebpackPlugin {
   apply(compiler: import('webpack').Compiler): void {
     compiler.hooks.compilation.tap('SuppressExtractedTextChunks', (compilation) => {
       compilation.hooks.chunkAsset.tap('SuppressExtractedTextChunks', (chunk, filename) => {
+        if (compiler.options?.devServer?.hot) {
+          // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
+          return;
+        }
+
         // Remove only JavaScript assets
         if (!filename.endsWith('.js')) {
           return;
@@ -58,7 +63,10 @@ export class SuppressExtractedTextChunksWebpackPlugin {
               return (
                 name === 'CssDependency' ||
                 name === 'SingleEntryDependency' ||
-                name === 'MultiEntryDependency'
+                name === 'MultiEntryDependency' ||
+                name === 'HarmonyCompatibilityDependency' ||
+                name === 'HarmonyExportHeaderDependency' ||
+                name === 'HarmonyInitDependency'
               );
             });
 
