@@ -295,5 +295,6 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
     };
   }
 
-  watch = isWebpackFiveOrHigher() ? this.createWebpack5Watch : this.createWebpack4Watch();
+  // tslint:disable-next-line: no-any
+  watch = isWebpackFiveOrHigher() ? this.createWebpack5Watch() : this.createWebpack4Watch() as any;
 }

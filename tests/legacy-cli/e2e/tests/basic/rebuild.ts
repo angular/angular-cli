@@ -49,7 +49,8 @@ export default function() {
     // Count the bundles.
     .then((results) => {
       const stdout = results[0].stdout;
-      if (!/(lazy-module|0)\.js/g.test(stdout)) {
+      // First regexp is for Webpack 4; Second is for Webpack 5
+      if (!/(lazy-module|0)\.js/g.test(stdout) && !/lazy_module_ts\.js/g.test(stdout)) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })
