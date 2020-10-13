@@ -7,7 +7,7 @@
  */
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { isWebpackFiveOrHigher, withWebpackFourOrFive } from '../../utils/webpack-version';
+import { withWebpackFourOrFive } from '../../utils/webpack-version';
 import { CommonJsUsageWarnPlugin } from '../plugins';
 import { getSourceMapDevTool } from '../utils/helpers';
 
@@ -38,13 +38,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     }));
   }
 
-  // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
-  if (extractLicenses && isWebpackFiveOrHigher()) {
-    wco.logger.warn(
-      'Warning: License extraction is currently disabled when using Webpack 5. ' +
-        'This is temporary and will be corrected in a future update.',
-    );
-  } else if (extractLicenses) {
+  if (extractLicenses) {
     const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
     extraPlugins.push(new LicenseWebpackPlugin({
       stats: {
