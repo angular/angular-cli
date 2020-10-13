@@ -6027,6 +6027,13 @@ hosted-git-info@^3.0.2:
   dependencies:
     lru-cache "^6.0.0"
 
+hosted-git-info@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-3.0.6.tgz#761da6d68c559238164f3f3078842ef9e8ae1607"
+  integrity sha512-VRvqVD5T6t9HdmNDWTwbi8H/EC722MemAhOSP5QvYAXpDAY0Nhu2I/i+bXsktu4sU5LVHSh/wmXtVU8bDtjedQ==
+  dependencies:
+    lru-cache "^6.0.0"
+
 hpack.js@^2.1.6:
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/hpack.js/-/hpack.js-2.1.6.tgz#87774c0949e513f42e84575b3c45681fade2a0b2"
@@ -7272,7 +7279,7 @@ kleur@4.0.2:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-4.0.2.tgz#57b36cc5235601f824c33e6e45db10cd5493dbf5"
   integrity sha512-FGCCxczbrZuF5CtMeO0xfnjhzkVZSXfcWK90IPLucDWZwskrpYN7pmRIgvd8muU0mrPrzy4A2RBGuwCjLHI+nw==
 
-klona@^2.0.3, klona@^2.0.4:
+klona@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.4.tgz#7bb1e3affb0cb8624547ef7e8f6708ea2e39dfc0"
   integrity sha512-ZRbnvdg/NxqzC7L9Uyqzf4psi1OM4Cuc+sJAkQPjO6XkQIJTNbfK2Rsmbw8fx1p2mkZdp2FZYo2+LwXYY/uwIA==
@@ -8541,12 +8548,12 @@ npm-normalize-package-bin@^1.0.0, npm-normalize-package-bin@^1.0.1:
   resolved "https://registry.yarnpkg.com/npm-normalize-package-bin/-/npm-normalize-package-bin-1.0.1.tgz#6e79a41f23fd235c0623218228da7d9c23b8f6e2"
   integrity sha512-EPfafl6JL5/rU+ot6P3gRSCpPDW5VmIzX959Ob1+ySFUuuYHWHekXpwdUZcKP5C+DS4GEtdJluwBjnsNDl+fSA==
 
-npm-package-arg@8.0.1, npm-package-arg@^8.0.0, npm-package-arg@^8.0.1:
-  version "8.0.1"
-  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.0.1.tgz#9d76f8d7667b2373ffda60bb801a27ef71e3e270"
-  integrity sha512-/h5Fm6a/exByzFSTm7jAyHbgOqErl9qSNJDQF32Si/ZzgwT2TERVxRxn3Jurw1wflgyVVAxnFR4fRHPM7y1ClQ==
+npm-package-arg@8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.1.0.tgz#b5f6319418c3246a1c38e1a8fbaa06231bc5308f"
+  integrity sha512-/ep6QDxBkm9HvOhOg0heitSd7JHA1U7y1qhhlRlteYYAi9Pdb/ZV7FW5aHpkrpM8+P+4p/jjR8zCyKPBMBjSig==
   dependencies:
-    hosted-git-info "^3.0.2"
+    hosted-git-info "^3.0.6"
     semver "^7.0.0"
     validate-npm-package-name "^3.0.0"
 
@@ -8558,6 +8565,15 @@ npm-package-arg@8.0.1, npm-package-arg@^8.0.0, npm-package-arg@^8.0.1:
     hosted-git-info "^2.7.1"
     osenv "^0.1.5"
     semver "^5.6.0"
+    validate-npm-package-name "^3.0.0"
+
+npm-package-arg@^8.0.0, npm-package-arg@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.0.1.tgz#9d76f8d7667b2373ffda60bb801a27ef71e3e270"
+  integrity sha512-/h5Fm6a/exByzFSTm7jAyHbgOqErl9qSNJDQF32Si/ZzgwT2TERVxRxn3Jurw1wflgyVVAxnFR4fRHPM7y1ClQ==
+  dependencies:
+    hosted-git-info "^3.0.2"
+    semver "^7.0.0"
     validate-npm-package-name "^3.0.0"
 
 npm-packlist@^1.1.12:
