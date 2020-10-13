@@ -81,7 +81,7 @@ import {
 } from './webpack';
 import { addError, addWarning } from './webpack-diagnostics';
 import { createWebpackInputHost } from './webpack-input-host';
-import { isWebpackFiveOrHigher } from './webpack-version';
+import { isWebpackFiveOrHigher, mergeResolverMainFields } from './webpack-version';
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
@@ -931,10 +931,7 @@ export class AngularCompilerPlugin {
             const originalMainFields: string[] = resolveOptions.mainFields;
             const ivyMainFields = originalMainFields.map(f => `${f}_ivy_ngcc`);
 
-            return {
-              ...resolveOptions,
-              mainFields: [...ivyMainFields, ...originalMainFields],
-            };
+            return mergeResolverMainFields(resolveOptions, originalMainFields, ivyMainFields);
           });
       }
 

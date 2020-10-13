@@ -21,3 +21,24 @@ export function isWebpackFiveOrHigher(): boolean {
 
   return cachedIsWebpackFiveOrHigher;
 }
+
+export function mergeResolverMainFields(
+  options: object,
+  originalMainFields: string[],
+  extraMainFields: string[],
+): object {
+  const cleverMerge = (webpack as {
+    util?: { cleverMerge?: (first: object, second: object) => object };
+  }).util?.cleverMerge;
+  if (cleverMerge) {
+    // Webpack 5
+    // https://github.com/webpack/webpack/issues/11635#issuecomment-707016779
+    return cleverMerge(options, { mainFields: [...extraMainFields, '...'] });
+  } else {
+    // Webpack 4
+    return {
+      ...options,
+      mainFields: [...extraMainFields, ...originalMainFields],
+    };
+  }
+}
