@@ -6,45 +6,190 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
-import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
+// tslint:disable: no-implicit-dependencies
+import puppeteer from 'puppeteer/lib/cjs/puppeteer';
+import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser';
+import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page';
+// tslint:enable: no-implicit-dependencies
+import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../test-utils';
 
-describe('Dev Server Builder hmr', () => {
+// tslint:disable: no-any
+declare const document: any;
+declare const getComputedStyle: any;
+// tslint:enable: no-any
+
+describe('Dev Server Builder HMR', () => {
   const target = { project: 'app', target: 'serve' };
+  const overrides = { hmr: true, watch: true, port: 0 };
   let architect: Architect;
-  // We use runs like this to ensure it WILL stop the servers at the end of each tests.
+  let browser: Browser;
+  let page: Page;
+  let logs: string[] = [];
   let runs: BuilderRun[];
+
+  beforeAll(async () => {
+    browser = await puppeteer.launch({
+      // MacOSX users need to set the local binary manually because Chrome has lib files with
+      // spaces in them which Bazel does not support in runfiles
+      // See: https://github.com/angular/angular-cli/pull/17624
+      // tslint:disable-next-line: max-line-length
+      // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-800071/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+      args: ['--no-sandbox', '--disable-gpu'],
+    });
+  });
+
+  afterAll(async () => {
+    await browser.close();
+  });
 
   beforeEach(async () => {
     await host.initialize().toPromise();
     architect = (await createArchitect(host.root())).architect;
+
+    logs = [];
     runs = [];
+    page = await browser.newPage();
+    page.on('console', msg => logs.push(msg.text()));
+
+    host.writeMultipleFiles({
+      'src/app/app.component.html': `
+        <p>{{title}}</p>
+
+        <input type="text">
+
+        <select>
+          <option>one</option>
+          <option>two</option>
+        </select>
+      `,
+    });
   });
+
   afterEach(async () => {
     await host.restore().toPromise();
+    await page.close();
     await Promise.all(runs.map(r => r.stop()));
   });
 
-  it('adds HMR accept code in main JS bundle', async () => {
-    const run = await architect.scheduleTarget(target, { hmr: true });
+  it('works for CSS changes', async () => {
+    const run = await architect.scheduleTarget(target, overrides);
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
-    expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('http://localhost:4200/');
 
-    const response = await fetch('http://localhost:4200/main.js');
-    expect(await response.text()).toContain('// HMR Accept Code');
+    let buildCount = 0;
+    await run.output
+      .pipe(
+        debounceTime(1000),
+        switchMap(async buildEvent => {
+          expect(buildEvent.success).toBe(true);
+          const url = buildEvent.baseUrl as string;
+          switch (buildCount) {
+            case 0:
+              await page.goto(url);
+              expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
+              host.writeMultipleFiles({
+                'src/styles.css': 'p { color: rgb(255, 255, 0) }',
+              });
+              break;
+            case 1:
+              expect(logs).toContain('[HMR] Updated modules:');
+              expect(logs).toContain(`[HMR] css reload %s ${url}styles.css`);
+              expect(logs).toContain('[HMR] App is up to date.');
+
+              const pTag = await page.evaluate(() => {
+                const el = document.querySelector('p');
+
+                return JSON.parse(JSON.stringify(getComputedStyle(el)));
+              });
+
+              expect(pTag.color).toBe('rgb(255, 255, 0)');
+              break;
+          }
+
+          logs = [];
+          buildCount++;
+        }),
+        take(2),
+      )
+      .toPromise();
   }, 30000);
 
-  it('adds HMR accept code for CSS in JS bundles', async () => {
-    const run = await architect.scheduleTarget(target, { hmr: true });
+  it('works for TS changes', async () => {
+    const run = await architect.scheduleTarget(target, overrides);
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
-    expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('http://localhost:4200/');
 
-    const response = await fetch('http://localhost:4200/styles.js');
-    expect(await response.text()).toContain('module.hot.accept(undefined, cssReload);');
+    let buildCount = 0;
+    await run.output
+      .pipe(
+        debounceTime(1000),
+        switchMap(async buildEvent => {
+          expect(buildEvent.success).toBe(true);
+          const url = buildEvent.baseUrl as string;
+
+          switch (buildCount) {
+            case 0:
+              await page.goto(url);
+              expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
+              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-hmr'`);
+              break;
+            case 1:
+              expect(logs).toContain('[HMR] Updated modules:');
+              expect(logs).toContain('[HMR] App is up to date.');
+
+              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+              expect(innerText).toBe('app-hmr');
+              break;
+          }
+
+          logs = [];
+          buildCount++;
+        }),
+        take(2),
+      )
+      .toPromise();
+  }, 30000);
+
+  it('restores input and select values', async () => {
+    const run = await architect.scheduleTarget(target, overrides);
+    runs.push(run);
+
+    let buildCount = 0;
+    await run.output
+      .pipe(
+        debounceTime(1000),
+        switchMap(async buildEvent => {
+          expect(buildEvent.success).toBe(true);
+          const url = buildEvent.baseUrl as string;
+          switch (buildCount) {
+            case 0:
+              await page.goto(url);
+              expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
+              await page.evaluate(() => {
+                document.querySelector('input').value = 'input value';
+                document.querySelector('select').value = 'two';
+              });
+
+              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-hmr'`);
+              break;
+            case 1:
+              expect(logs).toContain('[HMR] Updated modules:');
+              expect(logs).toContain('[HMR] App is up to date.');
+              expect(logs).toContain('[NG HMR] Restoring input/textarea values.');
+              expect(logs).toContain('[NG HMR] Restoring selected options.');
+
+              const inputValue = await page.evaluate(() => document.querySelector('input').value);
+              expect(inputValue).toBe('input value');
+
+              const selectValue = await page.evaluate(() => document.querySelector('select').value);
+              expect(selectValue).toBe('two');
+              break;
+          }
+
+          logs = [];
+          buildCount++;
+        }),
+        take(2),
+      )
+      .toPromise();
   }, 30000);
 });

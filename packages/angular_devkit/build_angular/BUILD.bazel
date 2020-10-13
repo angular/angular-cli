@@ -281,6 +281,7 @@ LARGE_SPECS = {
             "@npm//@types/node-fetch",
             "@npm//express",
             "@npm//node-fetch",
+            "@npm//puppeteer",
         ],
     },
     "extract-i18n": {},
