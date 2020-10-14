@@ -54,7 +54,7 @@ export interface PackageTreeNode {
 export async function readPackageJson(packageJsonPath: string): Promise<PackageJson | undefined> {
   try {
     return await readJSON(packageJsonPath);
-  } catch (err) {
+  } catch {
     return undefined;
   }
 }
@@ -62,16 +62,16 @@ export async function readPackageJson(packageJsonPath: string): Promise<PackageJ
 export function findPackageJson(workspaceDir: string, packageName: string) {
   try {
     // avoid require.resolve here, see: https://github.com/angular/angular-cli/pull/18610#issuecomment-681980185
-    const packageJsonPath = resolve.sync(`${packageName}/package.json`, { paths: [workspaceDir] });
+    const packageJsonPath = resolve.sync(`${packageName}/package.json`, { basedir: workspaceDir });
 
     return packageJsonPath;
-  } catch (err) {
+  } catch {
     return undefined;
   }
 }
 
 export async function getProjectDependencies(dir: string) {
-  const pkgJsonPath = resolve.sync(join(dir, `package.json`));
+  const pkgJsonPath = join(dir, 'package.json');
   if (!pkgJsonPath) {
     throw new Error('Could not find package.json');
   }
