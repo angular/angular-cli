@@ -4,7 +4,8 @@ import {
   replaceInFile,
   writeMultipleFiles,
 } from '../../../utils/fs';
-import { ng, silentNpm } from '../../../utils/process';
+import { installWorkspacePackages } from '../../../utils/packages';
+import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
 const snapshots = require('../../../ng-snapshot/package.json');
@@ -19,7 +20,7 @@ export default async function () {
     dependencies['@angular/cdk'] = isSnapshotBuild ? snapshots.dependencies['@angular/cdk'] : 'latest';
   });
 
-  await silentNpm('install');
+  await installWorkspacePackages();
 
   for (const ext of ['css', 'scss', 'less', 'styl']) {
     await writeMultipleFiles({

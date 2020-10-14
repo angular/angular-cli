@@ -1,6 +1,6 @@
 import {readdirSync} from 'fs';
-
-import {ng, silentNpm} from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import {ng} from '../../utils/process';
 import {appendToFile, writeFile, prependToFile, replaceInFile} from '../../utils/fs';
 
 
@@ -53,7 +53,7 @@ export default function() {
       oldNumberOfFiles = currentNumberOfDistFiles;
     })
     // verify 'import *' syntax doesn't break lazy modules
-    .then(() => silentNpm('install', 'moment'))
+    .then(() => installPackage('moment'))
     .then(() => appendToFile('src/app/app.component.ts', `
       import * as moment from 'moment';
       console.log(moment);

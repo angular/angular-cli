@@ -2,7 +2,8 @@ import * as express from 'express';
 import { resolve } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, copyFile, expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
@@ -213,7 +214,7 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
     if (getGlobalVariable('argv')['ng-snapshots']) {
       localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
     }
-    await npm('install', `${localizeVersion}`);
+    await installPackage(localizeVersion);
   }
 
   // Extract the translation messages.

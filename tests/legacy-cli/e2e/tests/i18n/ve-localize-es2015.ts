@@ -1,10 +1,11 @@
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, writeFile } from '../../utils/fs';
-import { execAndWaitForOutputToMatch, ng, npm } from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
-import { baseDir, externalServer, langTranslations, setupI18nConfig } from './legacy';
+import { externalServer, langTranslations, setupI18nConfig } from './legacy';
 
 export default async function() {
   if (!getGlobalVariable('argv')['ve']) {
@@ -19,7 +20,7 @@ export default async function() {
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
-  await npm('install', `${localizeVersion}`);
+  await installPackage(localizeVersion);
 
   // Ensure a ES2015 build is used.
   await writeFile('.browserslistrc', 'Chrome 65');

@@ -1,5 +1,6 @@
 import { createProjectFromAsset } from '../../utils/assets';
-import { ng, silentNpm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { isPrereleaseCli, useBuiltPackages } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
@@ -11,7 +12,7 @@ export default async function() {
   await expectToFail(() => ng('build'));
   await ng('update', '@angular/cli', '--migrate-only', '--from=1.7.1');
   await useBuiltPackages();
-  await silentNpm('install');
+  await installWorkspacePackages(false);
   await ng('update', '@angular/core', ...extraUpdateArgs);
   await ng('build');
 }

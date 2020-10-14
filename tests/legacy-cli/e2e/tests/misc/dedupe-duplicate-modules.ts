@@ -1,5 +1,6 @@
 import { expectFileToMatch, writeFile } from '../../utils/fs';
-import { ng, silentNpm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
@@ -14,7 +15,7 @@ export default async function () {
     };
   });
 
-  await silentNpm('install');
+  await installWorkspacePackages();
 
   await writeFile('./src/main.ts',
     `

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { createProjectFromAsset } from '../../utils/assets';
-import { ng, silentNpm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
@@ -14,7 +15,7 @@ export default async function() {
   await expectToFail(() => ng('build'));
   await ng('update', '@angular/cli');
   await useBuiltPackages();
-  await silentNpm('install');
+  await installWorkspacePackages(false);
   await ng('update', '@angular/core', ...extraUpdateArgs);
   await useCIDefaults('latest-project');
   await ng('generate', 'component', 'my-comp');

@@ -4,7 +4,8 @@ import { packages } from '../../../../lib/packages';
 import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
-import { execAndWaitForOutputToMatch, git, ng, npm, silentNpm } from './process';
+import { installWorkspacePackages } from './packages';
+import { execAndWaitForOutputToMatch, git, ng, npm } from './process';
 
 const tsConfigPath = 'tsconfig.json';
 
@@ -94,9 +95,7 @@ export async function prepareProjectForE2e(name) {
   console.log(
     `Project ${name} created... Installing npm.`,
   );
-  await silentNpm(
-    'install',
-  );
+  await installWorkspacePackages(false);
   await useCIDefaults(
     name,
   );

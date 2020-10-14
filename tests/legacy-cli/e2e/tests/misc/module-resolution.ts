@@ -1,5 +1,6 @@
 import { appendToFile, createDir, moveFile, prependToFile } from '../../utils/fs';
-import { ng, silentNpm } from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
@@ -50,11 +51,11 @@ export default async function () {
   await prependToFile('src/app/app.module.ts', 'import * as firebase from \'firebase\';');
   await appendToFile('src/app/app.module.ts', 'firebase.initializeApp({});');
 
-  await silentNpm('install', 'firebase@3.7.8');
+  await installPackage('firebase@3.7.8');
   await ng('build', '--aot');
   await ng('test', '--watch=false');
 
-  await silentNpm('install', 'firebase@4.9.0');
+  await installPackage('firebase@4.9.0');
   await ng('build', '--aot');
   await ng('test', '--watch=false');
 

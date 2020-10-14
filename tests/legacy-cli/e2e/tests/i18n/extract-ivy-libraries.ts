@@ -1,6 +1,7 @@
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { installPackage, uninstallPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { readNgVersion } from '../../utils/version';
 
 export default async function() {
@@ -57,7 +58,7 @@ export default async function() {
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
-  await npm('install', `${localizeVersion}`);
+  await installPackage(localizeVersion);
 
   // Extract messages
   await ng('xi18n', '--ivy');
@@ -69,5 +70,5 @@ export default async function() {
     'projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts',
   );
 
-  await npm('uninstall', '@angular/localize');
+  await uninstallPackage('@angular/localize');
 }

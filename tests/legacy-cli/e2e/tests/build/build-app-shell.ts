@@ -1,7 +1,8 @@
 import { stripIndent } from 'common-tags';
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, writeFile } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 
@@ -159,7 +160,7 @@ export default function() {
       updateJsonFile('package.json', packageJson => {
         const dependencies = packageJson['dependencies'];
         dependencies['@angular/platform-server'] = platformServerVersion;
-      }).then(() => npm('install')),
+      }).then(() => installWorkspacePackages()),
     )
     .then(() => ng('run', 'test-project:app-shell'))
     .then(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/));

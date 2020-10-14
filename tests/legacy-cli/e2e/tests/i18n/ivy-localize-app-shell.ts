@@ -7,7 +7,8 @@ import {
   replaceInFile,
   writeFile,
 } from '../../utils/fs';
-import { ng, silentNpm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 
@@ -38,7 +39,7 @@ export default async function () {
     });
   }
 
-  await silentNpm('install');
+  await installWorkspacePackages();
 
   const browserBaseDir = 'dist/test-project/browser';
 
