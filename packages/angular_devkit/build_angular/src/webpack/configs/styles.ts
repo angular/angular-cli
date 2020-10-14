@@ -258,12 +258,16 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.extractCss) {
+    // extract global css from js files into own css file.
     extraPlugins.push(
-      // extract global css from js files into own css file
       new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }),
-      // suppress empty .js files in css only entry points
-      new SuppressExtractedTextChunksWebpackPlugin(),
     );
+
+    if (!buildOptions.hmr) {
+      // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
+      // suppress empty .js files in css only entry points.
+      extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
+    }
   }
 
   return {

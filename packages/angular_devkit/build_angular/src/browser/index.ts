@@ -19,6 +19,7 @@ import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import {
   BuildBrowserFeatures,
+  NormalizedBrowserBuilderSchema,
   deleteOutputDir,
   normalizeAssetPatterns,
   normalizeOptimization,
@@ -103,7 +104,7 @@ export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-  differentialLoadingMode = false,
+  extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
 ): Promise<ConfigFromContextReturn> {
   const webpackPartialGenerator = (wco: BrowserWebpackConfigOptions) => [
     getCommonConfig(wco),
@@ -120,7 +121,7 @@ export async function buildBrowserWebpackConfigFromContext(
     context,
     webpackPartialGenerator,
     host,
-    differentialLoadingMode,
+    extraBuildOptions,
   );
 }
 
@@ -181,7 +182,7 @@ async function initialize(
     projectRoot,
     projectSourceRoot,
     i18n,
-  } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, differentialLoadingMode);
+  } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, { differentialLoadingMode });
 
   // Validate asset option values if processed directly
   if (options.assets?.length && !adjustedOptions.assets?.length) {
