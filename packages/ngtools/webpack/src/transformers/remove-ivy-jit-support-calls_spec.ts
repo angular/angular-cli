@@ -51,9 +51,39 @@ const input = tags.stripIndent`
       }], null, null); })();
 `;
 
+const inputNoPure = tags.stripIndent`
+  export class AppModule {
+  }
+  AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+  AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+              BrowserModule,
+              AppRoutingModule
+          ]] });
+  (function () { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵɵsetNgModuleScope(AppModule, { declarations: [AppComponent,
+          ExampleComponent], imports: [BrowserModule,
+          AppRoutingModule] }); })();
+  (function () { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵsetClassMetadata(AppModule, [{
+          type: NgModule,
+          args: [{
+                  declarations: [
+                      AppComponent,
+                      ExampleComponent
+                  ],
+                  imports: [
+                      BrowserModule,
+                      AppRoutingModule
+                  ],
+                  providers: [],
+                  bootstrap: [AppComponent]
+              }]
+      }], null, null); })();
+`;
+
+// tslint:disable-next-line: no-big-function
 describe('@ngtools/webpack transformers', () => {
+  // tslint:disable-next-line: no-big-function
   describe('remove-ivy-dev-calls', () => {
-    it('should allow removing only set class metadata', () => {
+    it('should allow removing only set class metadata with pure annotation', () => {
       const output = tags.stripIndent`
         export class AppModule {
         }
@@ -74,7 +104,28 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should allow removing only ng module scope', () => {
+    it('should allow removing only set class metadata', () => {
+      const output = tags.stripIndent`
+        export class AppModule {
+        }
+        AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+        AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+                    BrowserModule,
+                    AppRoutingModule
+                ]] });
+        (function () { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵɵsetNgModuleScope(AppModule, { declarations: [AppComponent,
+                ExampleComponent], imports: [BrowserModule,
+                AppRoutingModule] }); })();
+      `;
+
+      const result = transform(inputNoPure, getTypeChecker =>
+        removeIvyJitSupportCalls(true, false, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should allow removing only ng module scope with pure annotation', () => {
       const output = tags.stripIndent`
         export class AppModule {
         }
@@ -107,7 +158,40 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should allow removing both set class metadata and ng module scope', () => {
+    it('should allow removing only ng module scope', () => {
+      const output = tags.stripIndent`
+        export class AppModule {
+        }
+        AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+        AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+                    BrowserModule,
+                    AppRoutingModule
+                ]] });
+        (function () { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵsetClassMetadata(AppModule, [{
+                type: NgModule,
+                args: [{
+                        declarations: [
+                            AppComponent,
+                            ExampleComponent
+                        ],
+                        imports: [
+                            BrowserModule,
+                            AppRoutingModule
+                        ],
+                        providers: [],
+                        bootstrap: [AppComponent]
+                    }]
+            }], null, null); })();
+      `;
+
+      const result = transform(inputNoPure, getTypeChecker =>
+        removeIvyJitSupportCalls(false, true, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should allow removing both set class metadata and ng module scope with pure annotation', () => {
       const output = tags.stripIndent`
         export class AppModule {
         }
@@ -125,7 +209,25 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should allow removing neither set class metadata nor ng module scope', () => {
+    it('should allow removing both set class metadata and ng module scope', () => {
+      const output = tags.stripIndent`
+        export class AppModule {
+        }
+        AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+        AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+                    BrowserModule,
+                    AppRoutingModule
+                ]] });
+      `;
+
+      const result = transform(inputNoPure, getTypeChecker =>
+        removeIvyJitSupportCalls(true, true, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should allow removing neither set class metadata nor ng module scope with pure annotation', () => {
       const result = transform(input, getTypeChecker =>
         removeIvyJitSupportCalls(false, false, getTypeChecker),
       );
@@ -133,7 +235,15 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
     });
 
-    it('should strip unused imports when removing set class metadata and ng module scope', () => {
+    it('should allow removing neither set class metadata nor ng module scope', () => {
+      const result = transform(inputNoPure, getTypeChecker =>
+        removeIvyJitSupportCalls(false, false, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${inputNoPure}`);
+    });
+
+    it('should strip unused imports when removing set class metadata and ng module scope with pure annotation', () => {
       const imports = tags.stripIndent`
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
@@ -164,5 +274,35 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('should strip unused imports when removing set class metadata and ng module scope', () => {
+      const imports = tags.stripIndent`
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppRoutingModule } from './app-routing.module';
+        import { AppComponent } from './app.component';
+        import { ExampleComponent } from './example/example.component';
+        import * as i0 from "@angular/core";
+      `;
+
+      const output = tags.stripIndent`
+        import { BrowserModule } from '@angular/platform-browser';
+        import { AppRoutingModule } from './app-routing.module';
+        import { AppComponent } from './app.component';
+        import * as i0 from "@angular/core";
+        export class AppModule {
+        }
+        AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+        AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+                    BrowserModule,
+                    AppRoutingModule
+                ]] });
+      `;
+
+      const result = transform(imports + inputNoPure, getTypeChecker =>
+        removeIvyJitSupportCalls(true, true, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 });
