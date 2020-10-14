@@ -49,13 +49,24 @@ function scrubFileTransformer(
         }
 
         const exprStmt = node as ts.ExpressionStatement;
+        const iife = getIifeStatement(exprStmt)?.expression;
         // Do checks that don't need the typechecker first and bail early.
-        if (isIvyPrivateCallExpression(exprStmt) || isCtorParamsAssignmentExpression(exprStmt)) {
+        if (isCtorParamsAssignmentExpression(exprStmt)) {
+          nodes.push(node);
+        } else if (iife && isIvyPrivateCallExpression(iife, 'ɵsetClassMetadata')) {
+          nodes.push(node);
+        } else if (
+          iife &&
+          ts.isBinaryExpression(iife) &&
+          isIvyPrivateCallExpression(iife.right, 'ɵsetClassMetadata')
+        ) {
           nodes.push(node);
         } else if (isDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
-        } else if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)
-          || isAngularDecoratorExpression(exprStmt, ngMetadata, tslibImports, checker)) {
+        } else if (
+          isDecorateAssignmentExpression(exprStmt, tslibImports, checker) ||
+          isAngularDecoratorExpression(exprStmt, ngMetadata, tslibImports, checker)
+        ) {
           nodes.push(...pickDecorateNodesToRemove(exprStmt, tslibImports, ngMetadata, checker));
         } else if (isPropDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickPropDecorationNodesToRemove(exprStmt, ngMetadata, checker));
@@ -299,8 +310,8 @@ function isAssignmentExpressionTo(exprStmt: ts.ExpressionStatement, name: string
   return true;
 }
 
-function isIvyPrivateCallExpression(exprStmt: ts.ExpressionStatement) {
-  // Each Ivy private call expression is inside an IIFE as single statements, so we must go down it.
+// Each Ivy private call expression is inside an IIFE
+function getIifeStatement(exprStmt: ts.ExpressionStatement): null | ts.ExpressionStatement {
   const expression = exprStmt.expression;
   if (!expression || !ts.isCallExpression(expression) || expression.arguments.length !== 0) {
     return null;
@@ -326,18 +337,22 @@ function isIvyPrivateCallExpression(exprStmt: ts.ExpressionStatement) {
     return null;
   }
 
+  return innerExprStmt;
+}
+
+function isIvyPrivateCallExpression(expression: ts.Expression, name: string) {
   // Now we're in the IIFE and have the inner expression statement. We can check if it matches
   // a private Ivy call.
-  const callExpr = innerExprStmt.expression;
-  if (!ts.isCallExpression(callExpr)) {
+  if (!ts.isCallExpression(expression)) {
     return false;
   }
-  const propAccExpr = callExpr.expression;
+
+  const propAccExpr = expression.expression;
   if (!ts.isPropertyAccessExpression(propAccExpr)) {
     return false;
   }
 
-  if (propAccExpr.name.text !== 'ɵsetClassMetadata') {
+  if (propAccExpr.name.text != name) {
     return false;
   }
 
