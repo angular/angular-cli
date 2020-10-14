@@ -1,6 +1,7 @@
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, expectFileToMatch } from '../../utils/fs';
-import { ng, silentNpm } from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
@@ -23,7 +24,7 @@ export default async function () {
     });
 
     for (const pkg of packagesToInstall) {
-      await silentNpm('install', pkg);
+      await installPackage(pkg);
     }
   }
 

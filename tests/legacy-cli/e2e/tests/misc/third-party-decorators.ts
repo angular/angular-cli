@@ -1,5 +1,6 @@
 import { writeMultipleFiles } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default function () {
@@ -10,7 +11,7 @@ export default function () {
     packageJson['dependencies']['@ngrx/store'] = '^9.1.0';
     packageJson['dependencies']['@ngrx/store-devtools'] = '^9.1.0';
   })
-    .then(() => npm('install'))
+    .then(() => installWorkspacePackages())
     // Create an app that uses ngrx decorators and has e2e tests.
     .then(_ => writeMultipleFiles({
       './e2e/src/app.po.ts': `

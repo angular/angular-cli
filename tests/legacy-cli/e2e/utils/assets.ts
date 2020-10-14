@@ -3,8 +3,8 @@ import * as glob from 'glob';
 import { getGlobalVariable } from './env';
 import { relative, resolve } from 'path';
 import { copyFile, writeFile } from './fs';
+import { installWorkspacePackages } from './packages';
 import { useBuiltPackages } from './project';
-import { silentNpm } from './process';
 
 export function assetDir(assetName: string) {
   return join(__dirname, '../assets', assetName);
@@ -53,7 +53,7 @@ export async function createProjectFromAsset(
   }
 
   if (!skipInstall) {
-    await silentNpm('install');
+    await installWorkspacePackages(false);
   }
 
   return dir;

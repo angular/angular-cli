@@ -1,7 +1,8 @@
 import {join} from 'path';
 import {getGlobalVariable} from '../../utils/env';
 import {expectFileNotToExist, expectFileToExist, expectFileToMatch, writeFile} from '../../utils/fs';
-import {ng, npm, silentNpm} from '../../utils/process';
+import { installPackage, uninstallPackage } from '../../utils/packages';
+import {ng} from '../../utils/process';
 
 const MANIFEST = {
   index: '/index.html',
@@ -25,8 +26,8 @@ const MANIFEST = {
 export default function() {
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  return silentNpm('remove', '@angular/service-worker')
-    .then(() => silentNpm('install', '@angular/service-worker'))
+  return uninstallPackage('@angular/service-worker')
+    .then(() => installPackage('@angular/service-worker'))
     .then(() => ng('config', 'projects.test-project.architect.build.options.serviceWorker', 'true'))
     .then(() => writeFile('src/ngsw-config.json', JSON.stringify(MANIFEST, null, 2)))
     .then(() => ng('build', '--optimization'))

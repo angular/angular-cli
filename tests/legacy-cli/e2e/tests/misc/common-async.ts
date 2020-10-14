@@ -1,7 +1,7 @@
 import {readdirSync} from 'fs';
 import {oneLine} from 'common-tags';
-
-import {ng, silentNpm} from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import {appendToFile, expectFileToExist, prependToFile, replaceInFile} from '../../utils/fs';
 import {expectToFail} from '../../utils/utils';
 
@@ -32,7 +32,7 @@ export default function() {
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
     })
-    .then(() => silentNpm('install', 'moment'))
+    .then(() => installPackage('moment'))
     .then(() => appendToFile('src/app/lazy-a/lazy-a.module.ts', `
       import * as moment from 'moment';
       console.log(moment);

@@ -8,7 +8,8 @@ import {
   replaceInFile,
   writeFile,
 } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { installPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
@@ -22,7 +23,7 @@ export default async function() {
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
-  await npm('install', `${localizeVersion}`);
+  await installPackage(localizeVersion);
 
   let serviceWorkerVersion = '@angular/service-worker@' + readNgVersion();
   if (getGlobalVariable('argv')['ng-snapshots']) {
@@ -30,7 +31,7 @@ export default async function() {
       '@angular/service-worker'
     ];
   }
-  await npm('install', `${serviceWorkerVersion}`);
+  await installPackage(serviceWorkerVersion);
 
   await updateJsonFile('tsconfig.json', config => {
     config.compilerOptions.target = 'es2015';

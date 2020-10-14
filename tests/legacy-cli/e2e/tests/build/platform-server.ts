@@ -1,6 +1,7 @@
 import { normalize } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, expectFileToMatch, writeFile } from '../../utils/fs';
+import { installPackage } from '../../utils/packages';
 import { exec, ng, silentNpm } from '../../utils/process';
 import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 
@@ -37,7 +38,7 @@ export default async function () {
     });
 
     for (const pkg of packagesToInstall) {
-      await silentNpm('install', pkg);
+      await installPackage(pkg);
     }
   }
 

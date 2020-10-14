@@ -1,4 +1,5 @@
-import { ng, silentNpm } from '../../utils/process';
+import { installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { readFile, writeFile } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
 
@@ -45,5 +46,5 @@ export default function () {
       }
     })
     .then(() => writeFile('package.json', origPackageJson))
-    .then(() => silentNpm('install'));
+    .then(() => installWorkspacePackages());
 }

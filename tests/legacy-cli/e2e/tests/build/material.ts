@@ -1,6 +1,7 @@
 import { getGlobalVariable } from '../../utils/env';
 import { replaceInFile } from '../../utils/fs';
-import { ng, silentNpm } from '../../utils/process';
+import { installPackage, installWorkspacePackages } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
@@ -25,12 +26,12 @@ export default async function () {
         snapshots.dependencies['@angular/material-moment-adapter'];
     });
 
-    await silentNpm('install');
+    await installWorkspacePackages();
   } else {
-    await silentNpm('install', '@angular/material-moment-adapter');
+    await installPackage('@angular/material-moment-adapter');
   }
 
-  await silentNpm('install', 'moment');
+  await installPackage('moment');
 
   await ng('build', '--prod');
 

@@ -143,6 +143,7 @@ if (testsToRun.length == allTests.length) {
 }
 
 setGlobalVariable('argv', argv);
+setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
 // Setup local package registry
 const registryPath =

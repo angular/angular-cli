@@ -1,8 +1,13 @@
 import { join } from 'path';
+import { getGlobalVariable } from '../../../utils/env';
 import { expectFileToExist, readFile, rimraf } from '../../../utils/fs';
 import { ng, npm } from '../../../utils/process';
 
 export default async function () {
+    if (getGlobalVariable('package-manager') === 'yarn') {
+      return;
+    }
+
     // forcibly remove in case another test doesn't clean itself up
     await rimraf('node_modules/@angular/pwa');
 

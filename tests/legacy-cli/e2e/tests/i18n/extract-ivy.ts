@@ -1,7 +1,8 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { writeFile } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { installPackage, uninstallPackage } from '../../utils/packages';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
@@ -30,7 +31,7 @@ export default async function() {
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
-  await npm('install', `${localizeVersion}`);
+  await installPackage(localizeVersion);
 
   // Should show ivy enabled application warning without --ivy flag
   const { stderr: message3 } = await ng('xi18n', '--no-ivy');
@@ -57,5 +58,5 @@ export default async function() {
     throw new Error('Expected ivy disabled application warning');
   }
 
-  await npm('uninstall', '@angular/localize');
+  await uninstallPackage('@angular/localize');
 }
