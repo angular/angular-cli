@@ -49,6 +49,7 @@
     "suppressTsconfigOverrideWarnings": true
   },
   "exclude": [
+    "packages/angular_devkit/build_angular/src/typings.d.ts",
     "bazel-out/**/*",
     "dist/**/*",
     "dist-schema/**",
