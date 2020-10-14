@@ -855,7 +855,7 @@ describe('scrub-file', () => {
   });
 
   describe('Ivy', () => {
-    it('removes ɵsetClassMetadata call', () => {
+    it('removes ɵsetClassMetadata call with pure annotation', () => {
       const output = tags.stripIndent`
         import { Component } from '@angular/core';
         ${clazz}
@@ -863,6 +863,27 @@ describe('scrub-file', () => {
       const input = tags.stripIndent`
         ${output}
         /*@__PURE__*/ (function () { i0.ɵsetClassMetadata(Clazz, [{
+                type: Component,
+                args: [{
+                        selector: 'app-lazy',
+                        template: 'very lazy',
+                        styles: []
+                    }]
+            }], null, null); })();
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('removes ɵsetClassMetadata call', () => {
+      const output = tags.stripIndent`
+        import { Component } from '@angular/core';
+        ${clazz}
+      `;
+      const input = tags.stripIndent`
+        ${output}
+        (function () { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵsetClassMetadata(Clazz, [{
                 type: Component,
                 args: [{
                         selector: 'app-lazy',
