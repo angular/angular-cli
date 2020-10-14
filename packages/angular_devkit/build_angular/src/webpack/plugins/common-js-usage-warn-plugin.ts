@@ -37,7 +37,10 @@ export class CommonJsUsageWarnPlugin {
   // Allow the below dependency for HMR
   // tslint:disable-next-line: max-line-length
   // https://github.com/angular/angular-cli/blob/1e258317b1f6ec1e957ee3559cc3b28ba602f3ba/packages/angular_devkit/build_angular/src/dev-server/index.ts#L605-L638
-  private allowedDependencies = new Set<string>(['webpack/hot/dev-server']);
+  private allowedDependencies = new Set<string>([
+    'webpack/hot/dev-server',
+    '@angular-devkit/build-angular',
+  ]);
 
   constructor(private options: CommonJsUsageWarnPluginOptions = {}) {
     this.options.allowedDependencies?.forEach(d => this.allowedDependencies.add(d));
