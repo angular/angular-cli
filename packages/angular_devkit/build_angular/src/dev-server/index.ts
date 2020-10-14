@@ -37,7 +37,6 @@ import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
 import { addError, addWarning } from '../utils/webpack-diagnostics';
-import { HmrLoader } from '../webpack/plugins/hmr/hmr-loader';
 import { IndexHtmlWebpackPlugin } from '../webpack/plugins/index-html-webpack-plugin';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Schema } from './schema';
@@ -120,6 +119,7 @@ export function serveWebpackBrowser(
       browserOptions,
       context,
       host,
+      { hmr: options.hmr },
     );
     let webpackConfig = config;
 
@@ -571,23 +571,8 @@ function _addLiveReload(
     entryPoints.push(
       'webpack/hot/dev-server',
     );
-
-    webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
-
-    const hmrLoader: webpack.RuleSetRule = {
-      loader: HmrLoader,
-      include: [browserOptions.main].map(p => path.resolve(root, p)),
-    };
-
-    if (typeof webpackConfig.module !== 'object') {
-      webpackConfig.module = {
-        rules: [hmrLoader],
-      };
-    } else {
-      webpackConfig.module.rules.unshift(hmrLoader);
-    }
-
   }
+
   if (typeof webpackConfig.entry !== 'object' || Array.isArray(webpackConfig.entry)) {
     webpackConfig.entry = {};
   }

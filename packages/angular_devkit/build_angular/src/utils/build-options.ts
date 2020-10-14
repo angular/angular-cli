@@ -60,6 +60,7 @@ export interface BuildOptions {
   webWorkerTsConfig?: string;
   statsJson: boolean;
   forkTypeChecker: boolean;
+  hmr?: boolean;
 
   main: string;
   polyfills?: string;
@@ -77,6 +78,8 @@ export interface BuildOptions {
 
   experimentalRollupPass?: boolean;
   allowedCommonJsDependencies?: string[];
+
+  differentialLoadingMode?: boolean;
 }
 
 export interface WebpackTestOptions extends BuildOptions {
@@ -93,5 +96,4 @@ export interface WebpackConfigOptions<T = BuildOptions> {
   tsConfig: ParsedConfiguration;
   tsConfigPath: string;
   supportES2015: boolean;
-  differentialLoadingMode?: boolean;
 }
