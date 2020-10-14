@@ -103,6 +103,7 @@ ts_library(
         "//packages/angular_devkit/core/node",
         "//packages/ngtools/webpack",
         "@npm//@angular/compiler-cli",
+        "@npm//@angular/core",
         "@npm//@angular/localize",
         "@npm//@angular/service-worker",
         "@npm//@babel/core",
