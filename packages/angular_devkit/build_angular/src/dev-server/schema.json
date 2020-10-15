@@ -38,7 +38,7 @@
     },
     "headers": {
       "type": "object",
-      "description": "Custom HTTP headers to serve.",
+      "description": "Custom HTTP headers to be added to all responses.",
       "propertyNames": {
         "pattern": "^[-_A-Za-z0-9]+$"
       },
