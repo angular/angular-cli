@@ -95,6 +95,7 @@ export function serveWebpackBrowser(
     webpackDevServerConfig: WebpackDevServer.Configuration;
     port: number;
     projectRoot: string;
+    locale: string | undefined;
   }> {
     // Get the browser configuration from the target name.
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
@@ -156,11 +157,13 @@ export function serveWebpackBrowser(
       webpackDevServerConfig,
       port,
       projectRoot,
+      locale:
+        browserOptions.i18nLocale || (i18n.shouldInline ? [...i18n.inlineLocales][0] : undefined),
     };
   }
 
   return from(setup()).pipe(
-    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot }) => {
+    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot, locale }) => {
       options.port = port;
 
       // Resolve public host and client address.
@@ -219,7 +222,7 @@ export function serveWebpackBrowser(
             noModuleEntrypoints: ['polyfills-es5'],
             postTransform: transforms.indexHtml,
             crossOrigin: browserOptions.crossOrigin,
-            lang: browserOptions.i18nLocale,
+            lang: locale,
           }),
         );
       }
