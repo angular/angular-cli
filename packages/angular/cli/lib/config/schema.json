@@ -1183,6 +1183,16 @@
               "description": "Host to listen on.",
               "default": "localhost"
             },
+            "headers": {
+              "type": "object",
+              "description": "Custom HTTP headers to be added to all responses.",
+              "propertyNames": {
+                "pattern": "^[-_A-Za-z0-9]+$"
+              },
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
             "proxyConfig": {
               "type": "string",
               "description": "Proxy configuration file."
