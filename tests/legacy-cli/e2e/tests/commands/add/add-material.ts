@@ -1,4 +1,5 @@
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
+import { uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
 
@@ -24,6 +25,10 @@ export default async function () {
   if (!output1.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation was not skipped');
   }
+
+  // Clean up existing cdk package
+  // Not doing so can cause adding material to fail if an incompatible cdk is present
+  await uninstallPackage('@angular/cdk');
 
   const output2 = await ng('add', '@angular/material@latest');
   if (output2.stdout.includes('Skipping installation: Package already installed')) {
