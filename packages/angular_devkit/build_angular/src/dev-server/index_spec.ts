@@ -101,4 +101,42 @@ describe('Dev Server Builder index', () => {
     );
     await run.stop();
   });
+
+  it('sets HTML lang attribute with the active locale', async () => {
+    const locale = 'fr';
+    const { workspace } = await workspaces.readWorkspace(host.root(), workspaces.createWorkspaceHost(host));
+    const app = workspace.projects.get('app');
+    if (!app) {
+      fail('Test application "app" not found.');
+
+      return;
+    }
+
+    app.extensions['i18n'] = {
+      locales: {
+        [locale]: [],
+      },
+    };
+
+    const target = app.targets.get('build');
+    if (!target) {
+      fail('Test application "app" target "build" not found.');
+
+      return;
+    }
+    if (!target.options) {
+      target.options = {};
+    }
+    target.options.localize = [locale];
+
+    await workspaces.writeWorkspace(workspace, workspaces.createWorkspaceHost(host));
+
+    const architect = (await createArchitect(host.root())).architect;
+    const run = await architect.scheduleTarget(targetSpec);
+    const output = (await run.result) as DevServerBuilderOutput;
+    expect(output.success).toBe(true);
+    const response = await fetch('http://localhost:4200/index.html');
+    expect(await response.text()).toContain(`lang="${locale}"`);
+    await run.stop();
+  });
 });
