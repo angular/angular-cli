@@ -366,28 +366,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (scriptsOptimization) {
-    let angularGlobalDefinitions = {
-      ngDevMode: false,
-      ngI18nClosureMode: false,
-    };
-
-    // Try to load known global definitions from @angular/compiler-cli.
-    const GLOBAL_DEFS_FOR_TERSER = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER;
-    if (GLOBAL_DEFS_FOR_TERSER) {
-      angularGlobalDefinitions = GLOBAL_DEFS_FOR_TERSER;
-    }
-
-    if (buildOptions.aot) {
-      // Also try to load AOT-only global definitions.
-      const GLOBAL_DEFS_FOR_TERSER_WITH_AOT = require('@angular/compiler-cli')
-        .GLOBAL_DEFS_FOR_TERSER_WITH_AOT;
-      if (GLOBAL_DEFS_FOR_TERSER_WITH_AOT) {
-        angularGlobalDefinitions = {
-          ...angularGlobalDefinitions,
-          ...GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-        };
-      }
-    }
+    const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = require('@angular/compiler-cli');
+    const angularGlobalDefinitions = buildOptions.aot
+      ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
+      : GLOBAL_DEFS_FOR_TERSER;
 
     // TODO: Investigate why this fails for some packages: wco.supportES2015 ? 6 : 5;
     const terserEcma = 5;
