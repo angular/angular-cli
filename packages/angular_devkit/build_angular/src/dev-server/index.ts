@@ -91,6 +91,7 @@ export function serveWebpackBrowser(
     webpackConfig: webpack.Configuration;
     webpackDevServerConfig: WebpackDevServer.Configuration;
     projectRoot: string;
+    locale: string | undefined;
   }> {
     // Get the browser configuration from the target name.
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
@@ -151,11 +152,13 @@ export function serveWebpackBrowser(
       webpackConfig,
       webpackDevServerConfig,
       projectRoot,
+      locale:
+        browserOptions.i18nLocale || (i18n.shouldInline ? [...i18n.inlineLocales][0] : undefined),
     };
   }
 
   return from(setup()).pipe(
-    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, projectRoot }) => {
+    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, projectRoot, locale }) => {
       // Resolve public host and client address.
       let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
       if (options.publicHost) {
@@ -218,7 +221,7 @@ export function serveWebpackBrowser(
               transforms.indexHtml,
             ),
             crossOrigin: browserOptions.crossOrigin,
-            lang: browserOptions.i18nLocale,
+            lang: locale,
           }),
         );
       }
