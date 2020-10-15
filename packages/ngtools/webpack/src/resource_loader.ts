@@ -56,7 +56,7 @@ export class WebpackResourceLoader {
     // Simple sanity check.
     if (filePath.match(/\.[jt]s$/)) {
       return Promise.reject(
-        'Cannot use a JavaScript or TypeScript file for styleUrl or templateUrl.',
+        `Cannot use a JavaScript or TypeScript file (${filePath}) in a component's styleUrls or templateUrl.`,
       );
     }
 
