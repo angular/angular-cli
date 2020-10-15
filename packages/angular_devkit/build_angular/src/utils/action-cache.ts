@@ -33,15 +33,21 @@ export class BundleActionCache {
     }
   }
 
-  generateBaseCacheKey(content: string): string {
-    // Create base cache key with elements:
-    // * package version - different build-angular versions cause different final outputs
-    // * code length/hash - ensure cached version matches the same input code
+  generateIntegrityValue(content: string): string {
     const algorithm = this.integrityAlgorithm || 'sha1';
     const codeHash = createHash(algorithm)
       .update(content)
       .digest('base64');
-    let baseCacheKey = `${packageVersion}|${content.length}|${algorithm}-${codeHash}`;
+
+    return `${algorithm}-${codeHash}`;
+  }
+
+  generateBaseCacheKey(content: string): string {
+    // Create base cache key with elements:
+    // * package version - different build-angular versions cause different final outputs
+    // * code length/hash - ensure cached version matches the same input code
+    const integrity = this.generateIntegrityValue(content);
+    let baseCacheKey = `${packageVersion}|${content.length}|${integrity}`;
     if (!allowMangle) {
       baseCacheKey += '|MD';
     }
@@ -115,7 +121,10 @@ export class BundleActionCache {
       return null;
     }
 
-    const result: ProcessBundleResult = { name: action.name };
+    const result: ProcessBundleResult = {
+      name: action.name,
+      integrity: this.generateIntegrityValue(action.code),
+    };
 
     let cacheEntry = entries[CacheKey.OriginalCode];
     if (cacheEntry) {
