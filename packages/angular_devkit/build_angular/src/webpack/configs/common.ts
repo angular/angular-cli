@@ -277,6 +277,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         to: output.replace(/^\//, ''),
         from: glob,
         noErrorOnMissing: true,
+        force: true,
         globOptions: {
           dot: true,
           ignore: [
