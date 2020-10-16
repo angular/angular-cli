@@ -389,6 +389,11 @@
         {
           "type": "object",
           "properties": {
+            "followSymlinks": {
+              "type": "boolean",
+              "default": false,
+              "description": "Allow glob patterns to follow symlink directories. This allows subdirectories of the symlink to be searched."
+            },
             "glob": {
               "type": "string",
               "description": "The pattern to match."

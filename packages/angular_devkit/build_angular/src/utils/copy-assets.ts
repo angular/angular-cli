@@ -17,7 +17,14 @@ function globAsync(pattern: string, options: glob.IOptions) {
 }
 
 export async function copyAssets(
-  entries: { glob: string; ignore?: string[]; input: string; output: string; flatten?: boolean }[],
+  entries: {
+    glob: string;
+    ignore?: string[];
+    input: string;
+    output: string;
+    flatten?: boolean;
+    followSymlinks?: boolean;
+  }[],
   basePaths: Iterable<string>,
   root: string,
   changed?: Set<string>,
@@ -31,6 +38,7 @@ export async function copyAssets(
       dot: true,
       nodir: true,
       ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
+      follow: entry.followSymlinks,
     });
 
     const directoryExists = new Set<string>();
