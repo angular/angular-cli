@@ -280,6 +280,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         force: true,
         globOptions: {
           dot: true,
+          followSymbolicLinks: !!asset.followSymlinks,
           ignore: [
             '.gitkeep',
             '**/.DS_Store',
