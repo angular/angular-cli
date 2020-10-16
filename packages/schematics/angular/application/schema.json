@@ -22,14 +22,12 @@
     "inlineStyle": {
       "description": "When true, includes styles inline in the root component.ts file. Only CSS styles can be included inline. Default is false, meaning that an external styles file is created and referenced in the root component.ts file.",
       "type": "boolean",
-      "default": false,
       "alias": "s",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
       "description": "When true, includes template inline in the root component.ts file. Default is false, meaning that an external template file is created and referenced in the root component.ts file. ",
       "type": "boolean",
-      "default": false,
       "alias": "t",
       "x-user-analytics": 10
     },

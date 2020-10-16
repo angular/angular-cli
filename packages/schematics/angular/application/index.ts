@@ -103,10 +103,10 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     || options.minimal
     || options.style !== Style.Css) {
     const componentSchematicsOptions: JsonObject = {};
-    if (options.inlineTemplate || options.minimal) {
+    if (options.inlineTemplate ?? options.minimal) {
       componentSchematicsOptions.inlineTemplate = true;
     }
-    if (options.inlineStyle || options.minimal) {
+    if (options.inlineStyle ?? options.minimal) {
       componentSchematicsOptions.inlineStyle = true;
     }
     if (options.style && options.style !== Style.Css) {
@@ -289,10 +289,11 @@ export default function (options: ApplicationOptions): Rule {
         viewEncapsulation: options.viewEncapsulation,
       } :
       {
-        inlineStyle: true,
-        inlineTemplate: true,
+        inlineStyle: options.inlineStyle ?? true,
+        inlineTemplate: options.inlineTemplate ?? true,
         skipTests: true,
         style: options.style,
+        viewEncapsulation: options.viewEncapsulation,
       };
 
     const workspace = await getWorkspace(host);
