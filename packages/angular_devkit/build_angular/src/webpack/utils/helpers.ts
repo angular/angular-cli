@@ -8,8 +8,9 @@
 
 import { basename, normalize } from '@angular-devkit/core';
 import { ScriptTarget } from 'typescript';
-import { SourceMapDevToolPlugin } from 'webpack';
+import { Options, SourceMapDevToolPlugin } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../browser/schema';
+import { withWebpackFourOrFive } from '../../utils/webpack-version';
 
 export interface HashFormat {
   chunk: string;
@@ -117,4 +118,11 @@ export function getEsVersionForFileName(
 
 export function isPolyfillsEntry(name: string): boolean {
   return name === 'polyfills' || name === 'polyfills-es5';
+}
+
+export function getWatchOptions(poll: number | undefined): Options.WatchOptions {
+  return {
+    poll,
+    ignored: poll === undefined ? undefined : withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
+  };
 }
