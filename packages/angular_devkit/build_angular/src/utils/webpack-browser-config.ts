@@ -236,18 +236,18 @@ export async function generateBrowserWebpackConfigFromContext(
   };
 }
 
-export function getIndexOutputFile(options: BrowserBuilderSchema): string {
-  if (typeof options.index === 'string') {
-    return path.basename(options.index);
+export function getIndexOutputFile(index: BrowserBuilderSchema['index']): string {
+  if (typeof index === 'string') {
+    return path.basename(index);
   } else {
-    return options.index.output || 'index.html';
+    return index.output || 'index.html';
   }
 }
 
-export function getIndexInputFile(options: BrowserBuilderSchema): string {
-  if (typeof options.index === 'string') {
-    return options.index;
+export function getIndexInputFile(index: BrowserBuilderSchema['index']): string {
+  if (typeof index === 'string') {
+    return index;
   } else {
-    return options.index.input;
+    return index.input;
   }
 }

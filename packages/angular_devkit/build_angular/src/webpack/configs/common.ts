@@ -46,7 +46,7 @@ import {
   ScriptsWebpackPlugin,
   WebpackRollupLoader,
 } from '../plugins';
-import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from '../utils/helpers';
+import { getEsVersionForFileName, getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
 
 const TerserPlugin = require('terser-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
@@ -487,13 +487,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
     },
     watch: buildOptions.watch,
-    watchOptions: {
-      poll: buildOptions.poll,
-      ignored:
-        buildOptions.poll === undefined
-          ? undefined
-          : withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
-    },
+    watchOptions: getWatchOptions(buildOptions.poll),
     performance: {
       hints: false,
     },

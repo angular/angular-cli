@@ -102,8 +102,8 @@ describe('Dev Server Builder ssl', () => {
 
     const overrides = {
       ssl: true,
-      sslKey: '../ssl/server.key',
-      sslCert: '../ssl/server.crt',
+      sslKey: 'ssl/server.key',
+      sslCert: 'ssl/server.crt',
     };
 
     const run = await architect.scheduleTarget(target, overrides);

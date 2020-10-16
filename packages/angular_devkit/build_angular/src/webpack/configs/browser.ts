@@ -5,12 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { resolve } from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { withWebpackFourOrFive } from '../../utils/webpack-version';
 import { CommonJsUsageWarnPlugin } from '../plugins';
-import { HmrLoader } from '../plugins/hmr/hmr-loader';
 import { getSourceMapDevTool } from '../utils/helpers';
 
 export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
@@ -22,7 +20,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     vendorChunk,
     commonChunk,
     allowedCommonJsDependencies,
-    hmr,
   } = buildOptions;
 
   const extraPlugins = [];
@@ -70,23 +67,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     crossOriginLoading = crossOrigin;
   }
 
-  const extraRules: webpack.RuleSetRule[] = [];
-  if (hmr) {
-    extraRules.push({
-      loader: HmrLoader,
-      include: [buildOptions.main].map(p => resolve(wco.root, p)),
-    });
-
-    extraPlugins.push(new webpack.HotModuleReplacementPlugin());
-  }
-
   return {
     devtool: false,
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
-    },
-    module: {
-      rules: extraRules,
     },
     ...withWebpackFourOrFive({}, { target: ['web', 'es5'] }),
     output: {
