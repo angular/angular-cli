@@ -120,7 +120,6 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     // Hide webpack output because its noisy.
     logLevel: 'error',
     stats: false,
-    watchOptions: { poll: options.poll },
     publicPath: '/_karma_webpack_/',
   };
 
