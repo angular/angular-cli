@@ -14,8 +14,10 @@ import {
 import { JsonObject, tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import * as url from 'url';
+import { DevServerBuilderOptions } from '../dev-server/index';
 import { runModuleAsObservableFork } from '../utils';
 import { Schema as ProtractorBuilderOptions } from './schema';
+
 
 interface JasmineNodeOpts {
   jasmineNodeOpts: {
@@ -105,7 +107,11 @@ export async function execute(
     const target = targetFromTargetString(options.devServerTarget);
     const serverOptions = await context.getTargetOptions(target);
 
-    const overrides: Record<string, string | number | boolean> = { watch: false };
+    const overrides = {
+      watch: false,
+      liveReload: false,
+    } as DevServerBuilderOptions;
+
     if (options.host !== undefined) {
       overrides.host = options.host;
     } else if (typeof serverOptions.host === 'string') {
