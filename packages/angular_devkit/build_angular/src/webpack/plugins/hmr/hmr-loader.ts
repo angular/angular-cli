@@ -9,7 +9,7 @@
 import { join } from 'path';
 
 export const HmrLoader = __filename;
-const hmrAcceptPath = join(__dirname, './hmr-accept.js');
+const hmrAcceptPath = join(__dirname, './hmr-accept.js').replace(/\\/g, '/');
 
 export default function (
   this: import('webpack').loader.LoaderContext,
