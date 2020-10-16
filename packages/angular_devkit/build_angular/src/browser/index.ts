@@ -19,7 +19,6 @@ import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import {
   BuildBrowserFeatures,
-  NormalizedBrowserBuilderSchema,
   deleteOutputDir,
   normalizeAssetPatterns,
   normalizeOptimization,
@@ -51,7 +50,6 @@ import { readTsconfig } from '../utils/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
-  BrowserWebpackConfigOptions,
   generateI18nBrowserWebpackConfigFromContext,
   getIndexInputFile,
   getIndexOutputFile,
@@ -102,32 +100,7 @@ interface ConfigFromContextReturn {
   i18n: I18nOptions;
 }
 
-export async function buildBrowserWebpackConfigFromContext(
-  options: BrowserBuilderSchema,
-  context: BuilderContext,
-  host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-  extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
-): Promise<ConfigFromContextReturn> {
-  const webpackPartialGenerator = (wco: BrowserWebpackConfigOptions) => [
-    getCommonConfig(wco),
-    getBrowserConfig(wco),
-    getStylesConfig(wco),
-    getStatsConfig(wco),
-    getAnalyticsConfig(wco, context),
-    getCompilerConfig(wco),
-    wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
-  ];
-
-  return generateI18nBrowserWebpackConfigFromContext(
-    options,
-    context,
-    webpackPartialGenerator,
-    host,
-    extraBuildOptions,
-  );
-}
-
-function getAnalyticsConfig(
+export function getAnalyticsConfig(
   wco: WebpackConfigOptions,
   context: BuilderContext,
 ): webpack.Configuration {
@@ -154,7 +127,7 @@ function getAnalyticsConfig(
   return {};
 }
 
-function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration {
+export function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration {
   if (wco.buildOptions.main || wco.buildOptions.polyfills) {
     return wco.buildOptions.aot ? getAotConfig(wco) : getNonAotConfig(wco);
   }
@@ -193,7 +166,21 @@ async function initialize(
     projectRoot,
     projectSourceRoot,
     i18n,
-  } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, { differentialLoadingMode });
+  } = await generateI18nBrowserWebpackConfigFromContext(
+    adjustedOptions,
+    context,
+    wco => [
+      getCommonConfig(wco),
+      getBrowserConfig(wco),
+      getStylesConfig(wco),
+      getStatsConfig(wco),
+      getAnalyticsConfig(wco, context),
+      getCompilerConfig(wco),
+      wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
+    ],
+    host,
+    { differentialLoadingMode },
+  );
 
   // Validate asset option values if processed directly
   if (options.assets?.length && !adjustedOptions.assets?.length) {
@@ -746,8 +733,8 @@ export function buildWebpackBrowser(
                   if (options.index) {
                     await writeIndexHtml({
                       host,
-                      outputPath: path.join(outputPath, getIndexOutputFile(options)),
-                      indexPath: path.join(context.workspaceRoot, getIndexInputFile(options)),
+                      outputPath: path.join(outputPath, getIndexOutputFile(options.index)),
+                      indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
                       files,
                       noModuleFiles,
                       moduleFiles,
