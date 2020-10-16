@@ -32,8 +32,6 @@ describe('Application Schematic', () => {
 
   const defaultOptions: ApplicationOptions = {
     name: 'foo',
-    inlineStyle: false,
-    inlineTemplate: false,
     routing: false,
     skipPackageJson: false,
   };
@@ -206,6 +204,30 @@ describe('Application Schematic', () => {
     });
   });
 
+  it('minimal=true allows inlineStyle=false when configuring the schematics options for components', async () => {
+    const options = { ...defaultOptions, minimal: true, inlineStyle: false };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const config = JSON.parse(tree.readContent('/angular.json'));
+    const schematics = config.projects.foo.schematics;
+    expect(schematics['@schematics/angular:component']).toEqual({
+      inlineTemplate: true,
+      skipTests: true,
+    });
+  });
+
+  it('minimal=true allows inlineTemplate=false when configuring the schematics options for components', async () => {
+    const options = { ...defaultOptions, minimal: true, inlineTemplate: false };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const config = JSON.parse(tree.readContent('/angular.json'));
+    const schematics = config.projects.foo.schematics;
+    expect(schematics['@schematics/angular:component']).toEqual({
+      inlineStyle: true,
+      skipTests: true,
+    });
+  });
+
   it('should create correct files when using minimal', async () => {
     const options = { ...defaultOptions, minimal: true };
     const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
@@ -231,6 +253,64 @@ describe('Application Schematic', () => {
       '/projects/foo/src/polyfills.ts',
       '/projects/foo/src/styles.css',
       '/projects/foo/src/app/app.module.ts',
+      '/projects/foo/src/app/app.component.ts',
+    ]));
+  });
+
+  it('should create correct files when using minimal and inlineStyle=false', async () => {
+    const options = { ...defaultOptions, minimal: true, inlineStyle: false };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const files = tree.files;
+    [
+      '/projects/foo/tsconfig.spec.json',
+      '/projects/foo/tslint.json',
+      '/projects/foo/karma.conf.js',
+      '/projects/foo/src/test.ts',
+      '/projects/foo/src/app/app.component.html',
+      '/projects/foo/src/app/app.component.spec.ts',
+    ].forEach(x => expect(files).not.toContain(x));
+
+    expect(files).toEqual(jasmine.arrayContaining([
+      '/projects/foo/tsconfig.app.json',
+      '/projects/foo/src/environments/environment.ts',
+      '/projects/foo/src/environments/environment.prod.ts',
+      '/projects/foo/src/favicon.ico',
+      '/projects/foo/src/index.html',
+      '/projects/foo/src/main.ts',
+      '/projects/foo/src/polyfills.ts',
+      '/projects/foo/src/styles.css',
+      '/projects/foo/src/app/app.module.ts',
+      '/projects/foo/src/app/app.component.css',
+      '/projects/foo/src/app/app.component.ts',
+    ]));
+  });
+
+  it('should create correct files when using minimal and inlineTemplate=false', async () => {
+    const options = { ...defaultOptions, minimal: true, inlineTemplate: false };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const files = tree.files;
+    [
+      '/projects/foo/tsconfig.spec.json',
+      '/projects/foo/tslint.json',
+      '/projects/foo/karma.conf.js',
+      '/projects/foo/src/test.ts',
+      '/projects/foo/src/app/app.component.css',
+      '/projects/foo/src/app/app.component.spec.ts',
+    ].forEach(x => expect(files).not.toContain(x));
+
+    expect(files).toEqual(jasmine.arrayContaining([
+      '/projects/foo/tsconfig.app.json',
+      '/projects/foo/src/environments/environment.ts',
+      '/projects/foo/src/environments/environment.prod.ts',
+      '/projects/foo/src/favicon.ico',
+      '/projects/foo/src/index.html',
+      '/projects/foo/src/main.ts',
+      '/projects/foo/src/polyfills.ts',
+      '/projects/foo/src/styles.css',
+      '/projects/foo/src/app/app.module.ts',
+      '/projects/foo/src/app/app.component.html',
       '/projects/foo/src/app/app.component.ts',
     ]));
   });
