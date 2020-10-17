@@ -1210,18 +1210,18 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/jasmine@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.2.1.tgz#4a1cc54b0092569104cf88fc1cbb27e34578cd90"
-  integrity sha512-l028iUpIbQ8WIWI+3OQpnBRa+NBKKrvtbrQNCrRv4+R305c4KAS2cGixIKI62CizD4nmhNAXRN/jE849I1g1zg==
+"@bazel/jasmine@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.2.2.tgz#32e7ec7af3549dd739c9ea74a9f2103589a91c62"
+  integrity sha512-etcJVYSf0ix3QstY7A5K1eUwKeIB1gOQpCZw2kCDsaKeiYcyRTusgqG3EHQdHBEytEV/FIP8LJ6CwahpJ0vg/Q==
   dependencies:
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.2.1.tgz#46d6dcedd91a7fd0421e9286790aff94ec45bece"
-  integrity sha512-nFdwkJYzKsmu9IzbQ8Wtt6YI7AlTEv5JHWTbMmZB4HBOi7xjhgFKiq3HQRhZ963EVoJ481Kb6M0wtkzARCb3YA==
+"@bazel/typescript@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.2.2.tgz#c7cd49cb630ca3720c04c94046ba8ca4c0d5b0aa"
+  integrity sha512-hkx/7L3s8q5gIgaSFmkUZWPqdKmdJmQ04GaLnsI/YEp9EhPObqATSKnOHeDdT7bzqLO7giDAwAiXhEmsO1Smcw==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
