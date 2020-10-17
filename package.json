@@ -235,7 +235,7 @@
     "webpack-sources": "2.0.1",
     "webpack-subresource-integrity": "1.5.0",
     "worker-plugin": "5.0.0",
-    "zone.js": "^0.10.2"
+    "zone.js": "^0.11.2"
   },
   "husky": {
     "hooks": {
