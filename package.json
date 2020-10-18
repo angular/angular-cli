@@ -233,7 +233,7 @@
     "webpack-dev-server": "3.10.3",
     "webpack-merge": "5.2.0",
     "webpack-sources": "2.0.1",
-    "webpack-subresource-integrity": "1.5.0",
+    "webpack-subresource-integrity": "1.5.1",
     "worker-plugin": "5.0.0",
     "zone.js": "^0.10.2"
   },
