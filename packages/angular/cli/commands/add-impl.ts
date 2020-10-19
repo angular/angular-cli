@@ -13,8 +13,8 @@ import { PackageManager } from '../lib/config/schema';
 import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
-import { installPackage, installTempPackage } from '../tasks/install-package';
 import { colors } from '../utilities/color';
+import { installPackage, installTempPackage } from '../utilities/install-package';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   NgAddSaveDepedency,
