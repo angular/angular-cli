@@ -15,8 +15,8 @@ import {
 import { json, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as path from 'path';
-import { Observable, from } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { concatMap, switchMap } from 'rxjs/operators';
 import * as ts from 'typescript';
 import * as url from 'url';
 import * as webpack from 'webpack';
@@ -80,11 +80,10 @@ export function serveWebpackBrowser(
   } = {},
 ): Observable<DevServerBuilderOutput> {
   // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+  const { logger, workspaceRoot } = context;
+  assertCompatibleAngularVersion(workspaceRoot, logger);
 
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const root = context.workspaceRoot;
-  let first = true;
   const host = new NodeJsSyncHost();
 
   async function setup(): Promise<{
@@ -151,7 +150,7 @@ export function serveWebpackBrowser(
       );
     }
 
-    if (options.liveReload || options.hmr) {
+    if (options.liveReload && !options.hmr) {
       // This is needed because we cannot use the inline option directly in the config
       // because of the SuppressExtractedTextChunksWebpackPlugin
       // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
@@ -163,7 +162,7 @@ export function serveWebpackBrowser(
       // Remove live-reload code from all entrypoints but not main.
       // Otherwise this will break SuppressExtractedTextChunksWebpackPlugin because
       // 'addDevServerEntrypoints' adds addional entry-points to all entries.
-      if (!options.hmr && config.entry && typeof config.entry === 'object' && !Array.isArray(config.entry) && config.entry.main) {
+      if (config.entry && typeof config.entry === 'object' && !Array.isArray(config.entry) && config.entry.main) {
         for (const [key, value] of Object.entries(config.entry)) {
           if (key === 'main' || typeof value === 'string') {
             continue;
@@ -176,11 +175,11 @@ export function serveWebpackBrowser(
           }
         }
       }
+    }
 
-      if (options.hmr) {
-        context.logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
-        See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
-      }
+    if (options.hmr) {
+      logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
+      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
     }
 
     if (
@@ -188,7 +187,7 @@ export function serveWebpackBrowser(
       && !/^127\.\d+\.\d+\.\d+/g.test(options.host)
       && options.host !== 'localhost'
     ) {
-      context.logger.warn(tags.stripIndent`
+      logger.warn(tags.stripIndent`
         Warning: This is a simple server for use in testing or debugging Angular applications
         locally. It hasn't been reviewed for security issues.
 
@@ -200,7 +199,7 @@ export function serveWebpackBrowser(
     }
 
     if (options.disableHostCheck) {
-      context.logger.warn(tags.oneLine`
+      logger.warn(tags.oneLine`
         Warning: Running a server with --disable-host-check is a security risk.
         See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
         for more information.
@@ -208,7 +207,7 @@ export function serveWebpackBrowser(
     }
 
     let webpackConfig = config;
-    const tsConfig = readTsconfig(browserOptions.tsConfig, context.workspaceRoot);
+    const tsConfig = readTsconfig(browserOptions.tsConfig, workspaceRoot);
     if (i18n.shouldInline && tsConfig.options.enableIvy !== false) {
       if (i18n.inlineLocales.size > 1) {
         throw new Error(
@@ -238,7 +237,7 @@ export function serveWebpackBrowser(
 
       if (browserOptions.index) {
         const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
-        const { options: compilerOptions } = readTsconfig(tsConfig, context.workspaceRoot);
+        const { options: compilerOptions } = readTsconfig(tsConfig, workspaceRoot);
         const target = compilerOptions.target || ts.ScriptTarget.ES5;
         const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
 
@@ -250,7 +249,7 @@ export function serveWebpackBrowser(
         webpackConfig.plugins = [...(webpackConfig.plugins || [])];
         webpackConfig.plugins.push(
           new IndexHtmlWebpackPlugin({
-            input: path.resolve(root, getIndexInputFile(browserOptions.index)),
+            input: path.resolve(workspaceRoot, getIndexInputFile(browserOptions.index)),
             output: getIndexOutputFile(browserOptions.index),
             baseHref,
             moduleEntrypoints,
@@ -270,7 +269,7 @@ export function serveWebpackBrowser(
       }
 
       if (normalizedOptimization.scripts || normalizedOptimization.styles) {
-        context.logger.error(tags.stripIndents`
+        logger.error(tags.stripIndents`
           ****************************************************************************************
           This is a simple server for use in testing or debugging Angular applications locally.
           It hasn't been reviewed for security issues.
@@ -284,12 +283,12 @@ export function serveWebpackBrowser(
         webpackConfig,
         context,
         {
-          logging: transforms.logging || createWebpackLoggingCallback(!!options.verbose, context.logger),
+          logging: transforms.logging || createWebpackLoggingCallback(!!options.verbose, logger),
           webpackFactory: require('webpack') as typeof webpack,
           webpackDevServerFactory: require('webpack-dev-server') as typeof webpackDevServer,
         },
       ).pipe(
-        map(buildEvent => {
+        concatMap((buildEvent, index) => {
           // Resolve serve address.
           const serverAddress = url.format({
             protocol: options.ssl ? 'https' : 'http',
@@ -298,9 +297,8 @@ export function serveWebpackBrowser(
             port: buildEvent.port,
           });
 
-          if (first) {
-            first = false;
-            context.logger.info(tags.oneLine`
+          if (index === 0) {
+            logger.info(tags.oneLine`
               **
               Angular Live Development Server is listening on ${options.host}:${buildEvent.port},
               open your browser on ${serverAddress}
@@ -314,10 +312,10 @@ export function serveWebpackBrowser(
           }
 
           if (buildEvent.success) {
-            context.logger.info(': Compiled successfully.');
+            logger.info(': Compiled successfully.');
           }
 
-          return { ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput;
+          return of({ ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput);
         }),
       );
     }),

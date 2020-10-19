@@ -119,7 +119,9 @@ export function getDevServerConfig(
       public: publicHost,
       allowedHosts,
       disableHostCheck,
-      inline: false,
+      // This should always be true, but at the moment this breaks 'SuppressExtractedTextChunksWebpackPlugin'
+      // because it will include addition JS in the styles.js.
+      inline: hmr,
       publicPath: servePath,
       liveReload,
       hotOnly: hmr && !liveReload,
