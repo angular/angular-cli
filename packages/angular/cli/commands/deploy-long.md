@@ -8,15 +8,15 @@ For example:
 
 ```json
 "projects": {
-     "my-project": {
-         ...
-        "architect": {
-            ...
-            "deploy": {
-                "builder": "@angular/fire:deploy",
-                "options": {}
-                }
-            }
-        }
+  "my-project": {
+    ...
+    "architect": {
+      ...
+      "deploy": {
+        "builder": "@angular/fire:deploy",
+        "options": {}
+      }
     }
+  }
+}
  ```
