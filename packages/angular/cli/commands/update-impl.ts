@@ -14,8 +14,8 @@ import * as semver from 'semver';
 import { PackageManager } from '../lib/config/schema';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
-import { runTempPackageBin } from '../tasks/install-package';
 import { colors } from '../utilities/color';
+import { runTempPackageBin } from '../utilities/install-package';
 import { writeErrorToLogFile } from '../utilities/log-file';
 import { getPackageManager } from '../utilities/package-manager';
 import {
