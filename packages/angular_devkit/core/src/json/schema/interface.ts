@@ -105,6 +105,7 @@ export interface PromptDefinition {
 
   raw?: string | JsonObject;
   multiselect?: boolean;
+  propertyTypes: Set<string>;
 }
 
 export type PromptProvider = (definitions: Array<PromptDefinition>)
