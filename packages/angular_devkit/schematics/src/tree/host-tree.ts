@@ -10,7 +10,6 @@ import {
   PathFragment,
   PathIsDirectoryException,
   PathIsFileException,
-  clean,
   dirname,
   join,
   normalize,
@@ -369,52 +368,53 @@ export class HostTree implements Tree {
   apply(action: Action, strategy?: MergeStrategy): void {
     throw new SchematicsException('Apply not implemented on host trees.');
   }
+
+  private *generateActions(): Iterable<Action> {
+    for (const record of this._record.records()) {
+      switch (record.kind) {
+        case 'create':
+          yield {
+            id: this._id,
+            parent: 0,
+            kind: 'c',
+            path: record.path,
+            content: Buffer.from(record.content),
+          } as CreateFileAction;
+          break;
+        case 'overwrite':
+          yield {
+            id: this._id,
+            parent: 0,
+            kind: 'o',
+            path: record.path,
+            content: Buffer.from(record.content),
+          } as OverwriteFileAction;
+          break;
+        case 'rename':
+          yield {
+            id: this._id,
+            parent: 0,
+            kind: 'r',
+            path: record.from,
+            to: record.to,
+          } as RenameFileAction;
+          break;
+        case 'delete':
+          yield {
+            id: this._id,
+            parent: 0,
+            kind: 'd',
+            path: record.path,
+          } as DeleteFileAction;
+          break;
+      }
+    }
+  }
+
   get actions(): Action[] {
     // Create a list of all records until we hit our original backend. This is to support branches
     // that diverge from each others.
-    const allRecords = [...this._record.records()];
-
-    return clean(
-      allRecords
-        .map(record => {
-          switch (record.kind) {
-            case 'create':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'c',
-                path: record.path,
-                content: Buffer.from(record.content),
-              } as CreateFileAction;
-            case 'overwrite':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'o',
-                path: record.path,
-                content: Buffer.from(record.content),
-              } as OverwriteFileAction;
-            case 'rename':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'r',
-                path: record.from,
-                to: record.to,
-              } as RenameFileAction;
-            case 'delete':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'd',
-                path: record.path,
-              } as DeleteFileAction;
-
-            default:
-              return;
-          }
-        }),
-    );
+    return Array.from(this.generateActions());
   }
 }
 

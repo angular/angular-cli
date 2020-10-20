@@ -10,7 +10,6 @@ import {
   InvalidJsonCharacterException,
   JsonObject,
   UnexpectedEndOfInputException,
-  isPromise,
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
@@ -21,10 +20,8 @@ import {
   Observable,
   from as observableFrom,
   isObservable,
-  of as observableOf,
   throwError,
 } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
 import { Url } from 'url';
 import {
   HostCreateTree,
@@ -301,20 +298,17 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     options: OptionT,
     context?: FileSystemSchematicContext,
   ): Observable<ResultT> {
-    // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
-    return ((observableOf(options) as any)
-      .pipe(
-        ...this._transforms.map(tFn => mergeMap((opt: {}) => {
-          const newOptions = tFn(schematic, opt, context);
-          if (isObservable(newOptions)) {
-            return newOptions;
-          } else if (isPromise(newOptions)) {
-            return observableFrom(newOptions);
-          } else {
-            return observableOf(newOptions);
-          }
-        })),
-      )) as {} as Observable<ResultT>;
+    const transform = async () => {
+      let transformedOptions = options;
+      for (const transformer of this._transforms) {
+        const transformerResult = transformer(schematic, transformedOptions, context);
+        transformedOptions = await (isObservable(transformerResult) ? transformerResult.toPromise() : transformerResult);
+      }
+
+      return transformedOptions;
+    };
+
+    return observableFrom(transform()) as unknown as Observable<ResultT>;
   }
 
   transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
