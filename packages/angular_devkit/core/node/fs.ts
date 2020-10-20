@@ -7,6 +7,7 @@
  */
 import { statSync } from 'fs';
 
+/** @deprecated Since v11.0, unused by the Angular tooling */
 export function isFile(filePath: string): boolean {
   let stat;
   try {
@@ -21,7 +22,7 @@ export function isFile(filePath: string): boolean {
   return stat.isFile() || stat.isFIFO();
 }
 
-
+/** @deprecated Since v11.0, unused by the Angular tooling */
 export function isDirectory(filePath: string): boolean {
   let stat;
   try {
