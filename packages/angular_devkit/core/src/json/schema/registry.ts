@@ -590,6 +590,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           raw: schema,
           items,
           multiselect,
+          propertyTypes,
           default:
             typeof (parentSchema as JsonObject).default == 'object' &&
             (parentSchema as JsonObject).default !== null &&
