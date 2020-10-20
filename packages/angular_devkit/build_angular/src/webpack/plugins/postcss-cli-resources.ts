@@ -57,14 +57,11 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     deployUrl = '',
     baseHref = '',
     resourcesOutputPath = '',
-    rebaseRootRelative = false,
     filename,
     loader,
     emitFile,
     extracted,
   } = options;
-
-  const dedupeSlashes = (url: string) => url.replace(/\/\/+/g, '/');
 
   const process = async (inputUrl: string, context: string, resourceCache: Map<string, string>) => {
     // If root-relative, absolute or protocol relative url, leave as is
@@ -72,7 +69,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       return inputUrl;
     }
 
-    if (!rebaseRootRelative && /^\//.test(inputUrl)) {
+    if (/^\//.test(inputUrl)) {
       return inputUrl;
     }
 
@@ -86,24 +83,6 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     const cachedUrl = resourceCache.get(cacheKey);
     if (cachedUrl) {
       return cachedUrl;
-    }
-
-    if (rebaseRootRelative && inputUrl.startsWith('/')) {
-      let outputUrl = '';
-      if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
-        // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
-        outputUrl = `${deployUrl.replace(/\/$/, '')}${inputUrl}`;
-      } else if (baseHref.match(/:\/\//)) {
-        // If baseHref contains a scheme, include it as is.
-        outputUrl = baseHref.replace(/\/$/, '') + dedupeSlashes(`/${deployUrl}/${inputUrl}`);
-      } else {
-        // Join together base-href, deploy-url and the original URL.
-        outputUrl = dedupeSlashes(`/${baseHref}/${deployUrl}/${inputUrl}`);
-      }
-
-      resourceCache.set(cacheKey, outputUrl);
-
-      return outputUrl;
     }
 
     if (inputUrl.startsWith('~')) {

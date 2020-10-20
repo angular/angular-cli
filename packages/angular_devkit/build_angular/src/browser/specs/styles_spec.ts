@@ -354,7 +354,7 @@ describe('Browser Builder styles', () => {
   });
 
   // TODO: consider making this a unit test in the url processing plugins.
-  it(`supports baseHref/deployUrl in resource urls without rebaseRootRelativeCssUrls`, async () => {
+  it(`supports baseHref/deployUrl in resource urls`, async () => {
     // Use a large image for the relative ref so it cannot be inlined.
     host.copyFile('src/spectrum.png', './src/assets/global-img-relative.png');
     host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
@@ -456,118 +456,6 @@ describe('Browser Builder styles', () => {
     main = await files['main.js'];
     expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-  }, 90000);
-
-  it(`supports baseHref/deployUrl in resource urls with rebaseRootRelativeCssUrls`, async () => {
-    // Use a large image for the relative ref so it cannot be inlined.
-    host.copyFile('src/spectrum.png', './src/assets/global-img-relative.png');
-    host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
-    host.writeMultipleFiles({
-      'src/styles.css': `
-        h1 { background: url('/assets/global-img-absolute.svg'); }
-        h2 { background: url('./assets/global-img-relative.png'); }
-      `,
-      'src/app/app.component.css': `
-        h3 { background: url('/assets/component-img-absolute.svg'); }
-        h4 { background: url('../assets/component-img-relative.png'); }
-      `,
-      'src/assets/global-img-absolute.svg': imgSvg,
-      'src/assets/component-img-absolute.svg': imgSvg,
-    });
-
-    // Check base paths are correctly generated.
-    const overrides = {
-      extractCss: true,
-      rebaseRootRelativeCssUrls: true,
-    };
-    let { files } = await browserBuild(architect, host, target, {
-      ...overrides,
-      aot: true,
-    });
-
-    let styles = await files['styles.css'];
-    let main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(styles).toContain(`url('global-img-relative.png')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-    expect(main).toContain(`url('component-img-relative.png')`);
-    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
-      true,
-    );
-    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png'))).toBe(true);
-
-    // Check urls with deploy-url scheme are used as is.
-    files = (await browserBuild(architect, host, target, {
-      ...overrides,
-      baseHref: '/base/',
-      deployUrl: 'http://deploy.url/',
-    })).files;
-
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('http://deploy.url/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('http://deploy.url/assets/component-img-absolute.svg')`);
-
-    // Check urls with base-href scheme are used as is (with deploy-url).
-    files = (await browserBuild(architect, host, target, {
-      ...overrides,
-      baseHref: 'http://base.url/',
-      deployUrl: 'deploy/',
-    })).files;
-
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('http://base.url/deploy/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('http://base.url/deploy/assets/component-img-absolute.svg')`);
-
-    // Check urls with deploy-url and base-href scheme only use deploy-url.
-    files = (await browserBuild(architect, host, target, {
-      ...overrides,
-      baseHref: 'http://base.url/',
-      deployUrl: 'http://deploy.url/',
-    })).files;
-
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('http://deploy.url/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('http://deploy.url/assets/component-img-absolute.svg')`);
-
-    // Check with schemeless base-href and deploy-url flags.
-    files = (await browserBuild(architect, host, target, {
-      ...overrides,
-      baseHref: '/base/',
-      deployUrl: 'deploy/',
-    })).files;
-
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/base/deploy/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/base/deploy/assets/component-img-absolute.svg')`);
-
-    // Check with identical base-href and deploy-url flags.
-    files = (await browserBuild(architect, host, target, {
-      ...overrides,
-      baseHref: '/base/',
-      deployUrl: '/base/',
-    })).files;
-
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/base/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/base/assets/component-img-absolute.svg')`);
-
-    // Check with only base-href flag.
-    files = (await browserBuild(architect, host, target, {
-      ...overrides,
-      baseHref: '/base/',
-    })).files;
-
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/base/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/base/assets/component-img-absolute.svg')`);
   }, 90000);
 
   it(`supports bootstrap@4 with full path`, async () => {
