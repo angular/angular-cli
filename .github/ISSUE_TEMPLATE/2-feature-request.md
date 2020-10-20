@@ -28,7 +28,7 @@ Existing issues often contain information about workarounds, resolution, or prog
 - [ ] add
 - [ ] update
 - [ ] lint
-- [ ] xi18n
+- [ ] extract-i18n
 - [ ] run
 - [ ] config
 - [ ] help
