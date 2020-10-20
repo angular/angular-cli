@@ -15,15 +15,6 @@ export default function () {
   let origCliVersion: string;
   let origTypeScriptVersion: string;
 
-  function updateVersions(obj: any) {
-    const keys = Object.keys(obj);
-    keys.forEach(key => {
-      if (key.startsWith('@angular/')) {
-        obj[key] = '2.1.0';
-      }
-    });
-  }
-
   return readFile('package.json')
     .then((content) => origPackageJson = content)
     .then(() => updateJsonFile('package.json', obj => {
