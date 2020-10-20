@@ -75,8 +75,6 @@ export interface BuildOptions {
   lazyModules: string[];
   platform?: 'browser' | 'server';
   fileReplacements: NormalizedFileReplacement[];
-  /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
-  rebaseRootRelativeCssUrls?: boolean;
 
   experimentalRollupPass?: boolean;
   allowedCommonJsDependencies?: string[];
