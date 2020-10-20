@@ -153,6 +153,12 @@ export interface Option {
    * If this is falsey, do not report this option.
    */
   userAnalytics?: number;
+
+  /**
+   * Deprecation. If this flag is not false a warning will be shown on the console. Either `true`
+   * or a string to show the user as a notice.
+  */
+  deprecated?: boolean | string;
 }
 
 /**
