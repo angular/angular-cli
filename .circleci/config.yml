@@ -350,10 +350,6 @@ workflows:
       - build:
           requires:
             - setup
-          filters:
-            branches:
-              ignore:
-              - /docs-preview/
       - e2e-cli:
           post-steps:
             - store_artifacts:
