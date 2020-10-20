@@ -118,7 +118,6 @@ commands:
             sudo apt-get update > /dev/null 2>&1
             sudo apt-get install -y python
             python --version
-
 # Job definitions
 jobs:
   setup:
@@ -325,7 +324,7 @@ jobs:
 
 workflows:
   version: 2
-  default_workflow:
+  commits:
     jobs:
       # Linux jobs
       - setup
@@ -338,10 +337,6 @@ workflows:
       - build:
           requires:
             - setup
-          filters:
-            branches:
-              ignore:
-              - /docs-preview/
       - e2e-cli:
           post-steps:
             - store_artifacts:
@@ -420,3 +415,29 @@ workflows:
             - build
             - test
             - e2e-cli
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - 10.1.x
+    jobs:
+      # Linux jobs
+      - setup
+      - build:
+          requires:
+            - setup
+      - e2e-cli:
+          requires:
+            - build
+      - e2e-cli:
+          name: e2e-cli-ve
+          ve: true
+          requires:
+            - build
+      - test-browsers:
+          requires:
+            - build
