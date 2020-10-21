@@ -39,6 +39,7 @@ const standardCommands = {
   'config': '../commands/config.json',
   'doc': '../commands/doc.json',
   'e2e': '../commands/e2e.json',
+  'extract-i18n': '../commands/extract-i18n.json',
   'make-this-awesome': '../commands/easter-egg.json',
   'generate': '../commands/generate.json',
   'help': '../commands/help.json',
@@ -49,7 +50,6 @@ const standardCommands = {
   'test': '../commands/test.json',
   'update': '../commands/update.json',
   'version': '../commands/version.json',
-  'xi18n': '../commands/xi18n.json',
 };
 
 export interface CommandMapOptions {

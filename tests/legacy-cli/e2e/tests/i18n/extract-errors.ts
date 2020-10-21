@@ -16,7 +16,7 @@ export default async function () {
     '<p i18n>Hello world <span i18n>inner</span></p>',
   );
 
-  const { message } = await expectToFail(() => ng('xi18n'));
+  const { message } = await expectToFail(() => ng('extract-i18n'));
 
   const veProject = getGlobalVariable('argv')['ve'];
   const msg = veProject

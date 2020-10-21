@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "ng-cli://commands/xi18n.json",
+  "$id": "ng-cli://commands/extract-i18n.json",
   "description": "Extracts i18n messages from source code.",
   "$longDescription": "",
 
-  "$aliases": ["i18n-extract"],
+  "$aliases": ["i18n-extract", "xi18n"],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./xi18n-impl#Xi18nCommand",
+  "$impl": "./extract-i18n-impl#ExtractI18nCommand",
 
   "type": "object",
   "allOf": [
