@@ -81,33 +81,37 @@ if (process.env['NG_CLI_PROFILING']) {
     const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
     cli = await import(projectLocalCli);
 
-    // This was run from a global, check local version.
-    if (await isWarningEnabled('versionMismatch')) {
-      const globalVersion = new SemVer(require('../package.json').version);
+    const globalVersion = new SemVer(require('../package.json').version);
 
-      // Older versions might not have the VERSION export
-      let localVersion = cli.VERSION?.full;
-      if (!localVersion) {
-        try {
-          localVersion = require(path.join(path.dirname(projectLocalCli), '../../package.json'))
-            .version;
-        } catch (error) {
-          // tslint:disable-next-line no-console
-          console.error(
-            'Version mismatch check skipped. Unable to retrieve local version: ' + error,
-          );
-        }
-      }
-
-      let shouldWarn = false;
+    // Older versions might not have the VERSION export
+    let localVersion = cli.VERSION?.full;
+    if (!localVersion) {
       try {
-        shouldWarn = !!localVersion && globalVersion.compare(localVersion) > 0;
+        localVersion = require(path.join(path.dirname(projectLocalCli), '../../package.json'))
+          .version;
       } catch (error) {
         // tslint:disable-next-line no-console
-        console.error('Version mismatch check skipped. Unable to compare local version: ' + error);
+        console.error(
+          'Version mismatch check skipped. Unable to retrieve local version: ' + error,
+        );
       }
+    }
 
-      if (shouldWarn) {
+    let isGlobalGreater = false;
+    try {
+      isGlobalGreater = !!localVersion && globalVersion.compare(localVersion) > 0;
+    } catch (error) {
+      // tslint:disable-next-line no-console
+      console.error('Version mismatch check skipped. Unable to compare local version: ' + error);
+    }
+
+    if (isGlobalGreater) {
+      // If using the update command and the global version is greater, use the newer update command
+      // This allows improvements in update to be used in older versions that do not have bootstrapping
+      if (process.argv[2] === 'update') {
+        cli = await import('./cli');
+      } else if (await isWarningEnabled('versionMismatch')) {
+        // Otherwise, use local version and warn if global is newer than local
         const warning =
           `Your global Angular CLI version (${globalVersion}) is greater than your local ` +
           `version (${localVersion}). The local Angular CLI version is used.\n\n` +
