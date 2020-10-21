@@ -4,6 +4,8 @@ import { isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults } from '.
 import { expectToFail } from '../../utils/utils';
 
 export default async function() {
+  process.env['NPM_CONFIG_REGISTRY'] = 'http://localhost:4873';
+
   const extraUpdateArgs = (await isPrereleaseCli()) ? ['--next', '--force'] : [];
 
   const dir = await createProjectFromAsset('1.0-yarn-workspace-project', false, true);
