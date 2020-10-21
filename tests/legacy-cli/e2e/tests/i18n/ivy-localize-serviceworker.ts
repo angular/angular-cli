@@ -119,7 +119,7 @@ export default async function() {
   );
 
   // Extract the translation messages and copy them for each language.
-  await ng('xi18n', '--output-path=src/locale');
+  await ng('extract-i18n', '--output-path=src/locale');
   await expectFileToExist('src/locale/messages.xlf');
   await expectFileToMatch('src/locale/messages.xlf', `source-language="en-US"`);
   await expectFileToMatch('src/locale/messages.xlf', `An introduction header for this sample`);

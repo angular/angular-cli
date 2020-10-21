@@ -46,7 +46,7 @@ ts_library(
         "//packages/angular/cli:commands/update.ts",
         "//packages/angular/cli:commands/version.ts",
         "//packages/angular/cli:commands/run.ts",
-        "//packages/angular/cli:commands/xi18n.ts",
+        "//packages/angular/cli:commands/extract-i18n.ts",
         # @external_end
     ],
     data = glob(
@@ -223,8 +223,8 @@ ts_json_schema(
 )
 
 ts_json_schema(
-    name = "xi18n_schema",
-    src = "commands/xi18n.json",
+    name = "extract-i18n_schema",
+    src = "commands/extract-i18n.json",
     data = [
         "commands/definitions.json",
     ],

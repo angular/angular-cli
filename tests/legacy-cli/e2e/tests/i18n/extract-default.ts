@@ -15,7 +15,7 @@ export default async function() {
     join('src/app/i18n-test', 'i18n-test.component.html'),
     '<p i18n>Hello world</p>',
   );
-  await ng('xi18n');
+  await ng('extract-i18n');
   await expectFileToExist('messages.xlf');
   await expectFileToMatch('messages.xlf', /Hello world/);
 }
