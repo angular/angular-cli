@@ -187,7 +187,7 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
 export function ng(...args: string[]) {
   const argv = getGlobalVariable('argv');
   const maybeSilentNg = argv['nosilent'] ? noSilentNg : silentNg;
-  if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
+  if (['build', 'serve', 'test', 'e2e', 'extract-i18n'].indexOf(args[0]) != -1) {
     if (args[0] == 'e2e') {
       // Wait 1 second before running any end-to-end test.
       return new Promise(resolve => setTimeout(resolve, 1000))

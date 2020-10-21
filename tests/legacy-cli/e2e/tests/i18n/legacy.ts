@@ -219,7 +219,7 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
 
   // Extract the translation messages.
   await ng(
-    'xi18n',
+    'extract-i18n',
     '--output-path=src/locale',
     `--format=${format}`,
   );
