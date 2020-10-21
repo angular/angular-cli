@@ -423,7 +423,7 @@ workflows:
           filters:
             branches:
               only:
-                - 10.1.x
+                - 10.2.x
     jobs:
       # Linux jobs
       - setup
