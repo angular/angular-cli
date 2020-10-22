@@ -154,13 +154,13 @@ For the first release of a major version, follow the instructions in
 
 For non-major release, check out the patch branch (e.g. `9.1.x`), then run:
 ```bash
-yarn # Reload dependencies
+rm -rf node_modules/ && yarn # Reload dependencies
 yarn admin publish --tag latest
 ```
 
 If also publishing a prerelease, check out `master`, then run:
 ```bash
-yarn # Reload dependencies
+rm -rf node_modules/ && yarn # Reload dependencies
 yarn admin publish --tag next
 ```
 
@@ -170,7 +170,7 @@ run:
 **Make sure to update the NPM tag for the version you are releasing!**
 
 ```bash
-yarn # Reload dependencies
+rm -rf node_modules/ && yarn # Reload dependencies
 yarn admin publish --tag v8-lts
 ```
 
