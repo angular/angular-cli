@@ -76,7 +76,6 @@
     },
     "lintFix": {
       "type": "boolean",
-      "default": false,
       "description": "When true, applies lint fixes after generating the directive.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
