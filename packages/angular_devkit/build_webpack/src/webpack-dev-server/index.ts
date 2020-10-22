@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, createBuilder } from '@angular-devkit/architect';
-import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import * as net from 'net';
+import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
@@ -112,9 +113,9 @@ export function runWebpackDevServer(
 export default createBuilder<
   json.JsonObject & WebpackDevServerBuilderSchema, DevServerBuildOutput
 >((options, context) => {
-  const configPath = resolve(normalize(context.workspaceRoot), normalize(options.webpackConfig));
+  const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
-  return from(import(getSystemPath(configPath))).pipe(
+  return from(import(configPath)).pipe(
     switchMap((config: webpack.Configuration) => runWebpackDevServer(config, context)),
   );
 });
