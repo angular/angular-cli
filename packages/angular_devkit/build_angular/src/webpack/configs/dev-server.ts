@@ -48,7 +48,6 @@ export function getDevServerConfig(
   const extraPlugins = [];
 
   // Resolve public host and client address.
-  let sockPath: string | undefined;
   let publicHost = wco.buildOptions.publicHost;
   if (publicHost) {
     if (!/^\w+:\/\//.test(publicHost)) {
@@ -57,10 +56,6 @@ export function getDevServerConfig(
 
     const parsedHost = url.parse(publicHost);
     publicHost = parsedHost.host;
-
-    if (parsedHost.pathname) {
-      sockPath = posix.join(parsedHost.pathname, 'sockjs-node');
-    }
   }
 
   if (!watch) {
@@ -107,7 +102,7 @@ export function getDevServerConfig(
           },
         ],
       },
-      sockPath,
+      sockPath: posix.join(servePath, 'sockjs-node'),
       stats: false,
       compress: stylesOptimization || scriptsOptimization,
       watchOptions: getWatchOptions(poll),
