@@ -116,24 +116,23 @@ async function _getServerModuleBundlePath(
 ) {
   if (options.appModuleBundle) {
     return path.join(context.workspaceRoot, options.appModuleBundle);
-  } else {
-    const { baseOutputPath = '' } = serverResult;
-    const outputPath = path.join(baseOutputPath, browserLocaleDirectory);
-
-    if (!fs.existsSync(outputPath)) {
-      throw new Error(`Could not find server output directory: ${outputPath}.`);
-    }
-
-    const files = fs.readdirSync(outputPath, 'utf8');
-    const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?(?:bundle\.)?js$/;
-    const maybeMain = files.filter(x => re.test(x))[0];
-
-    if (!maybeMain) {
-      throw new Error('Could not find the main bundle.');
-    } else {
-      return path.join(outputPath, maybeMain);
-    }
   }
+
+  const { baseOutputPath = '' } = serverResult;
+  const outputPath = path.join(baseOutputPath, browserLocaleDirectory);
+
+  if (!fs.existsSync(outputPath)) {
+    throw new Error(`Could not find server output directory: ${outputPath}.`);
+  }
+
+  const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?js$/;
+  const maybeMain = fs.readdirSync(outputPath).find(x => re.test(x));
+
+  if (!maybeMain) {
+    throw new Error('Could not find the main bundle.');
+  }
+
+  return path.join(outputPath, maybeMain);
 }
 
 async function _appShellBuilder(
