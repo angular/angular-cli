@@ -6,7 +6,7 @@ export default async function() {
   // Setup project for yarn usage
   await rimraf('node_modules');
   await updateJsonFile('package.json', (json) => {
-    json.resolutions = { webpack: '5.1.0' };
+    json.resolutions = { webpack: '5.1.3' };
   });
   await silentYarn();
   await silentYarn('webdriver-update');
