@@ -9,7 +9,7 @@ import { wait, expectToFail } from '../../utils/utils';
 
 
 const failedRe = /: Failed to compile/;
-const successRe = /: Compiled successfully/;
+const successRe = / Compiled successfully/;
 const errorRe = /ERROR in/;
 const extraErrors = [
   `Final loader didn't return a Buffer or String`,

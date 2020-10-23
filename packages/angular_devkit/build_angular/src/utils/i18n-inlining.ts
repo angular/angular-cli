@@ -8,13 +8,12 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { EmittedFiles } from '@angular-devkit/build-webpack';
 import * as fs from 'fs';
-import * as ora from 'ora';
 import * as path from 'path';
 import { BundleActionExecutor } from './action-executor';
-import { colors } from './color';
 import { copyAssets } from './copy-assets';
 import { I18nOptions } from './i18n-options';
 import { InlineOptions } from './process-bundle';
+import { Spinner } from './spinner';
 
 function emittedFilesToInlineOptions(
   emittedFiles: EmittedFiles[],
@@ -75,7 +74,8 @@ export async function i18nInlineEmittedFiles(
 ): Promise<boolean> {
   const executor = new BundleActionExecutor({ i18n });
   let hasErrors = false;
-  const spinner = ora('Generating localized bundles...').start();
+  const spinner = new Spinner();
+  spinner.start('Generating localized bundles...');
 
   try {
     const { options, originalFiles: processedFiles } = emittedFilesToInlineOptions(
@@ -114,7 +114,7 @@ export async function i18nInlineEmittedFiles(
       '',
     );
   } catch (err) {
-    spinner.fail(colors.redBright('Localized bundle generation failed: ' + err.message));
+    spinner.fail('Localized bundle generation failed: ' + err.message);
 
     return false;
   } finally {
@@ -122,7 +122,7 @@ export async function i18nInlineEmittedFiles(
   }
 
   if (hasErrors) {
-    spinner.fail(colors.redBright('Localized bundle generation failed.'));
+    spinner.fail('Localized bundle generation failed.');
   } else {
     spinner.succeed('Localized bundle generation complete.');
   }

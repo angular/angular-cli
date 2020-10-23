@@ -1,4 +1,3 @@
-import { getGlobalVariable } from '../../utils/env';
 import { appendToFile } from '../../utils/fs';
 import {
   execAndWaitForOutputToMatch,
@@ -7,7 +6,7 @@ import {
 } from '../../utils/process';
 import { wait } from '../../utils/utils';
 
-const webpackGoodRegEx = /: Compiled successfully./;
+const webpackGoodRegEx = / Compiled successfully./;
 
 export default async function() {
   if (process.platform.startsWith('win')) {
