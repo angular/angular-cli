@@ -487,6 +487,18 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
+      chunkFilename: function (pathData, assetInfo) {
+        const def = `default`;
+        const delimeter = `~`;
+        const prefixes: string[] = [];
+        const postfix = pathData.contentHashType === 'javascript' ? '.js' : '.css'; // don't judge
+        (pathData.chunk as any)._groups.forEach((group: any) => prefixes.push(group.origins[0].request.split('/').pop()))
+        if (prefixes.length > 1) {
+          prefixes.unshift(def);
+          return prefixes.join(delimeter) + postfix;
+        }
+        return prefixes[0] + postfix;
+      },
     },
     watch: buildOptions.watch,
     watchOptions: getWatchOptions(buildOptions.poll),
