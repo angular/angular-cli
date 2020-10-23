@@ -19,6 +19,7 @@ import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
 import { augmentAppWithServiceWorker } from '../utils/service-worker';
+import { Spinner } from '../utils/spinner';
 import { Schema as BuildWebpackAppShellSchema } from './schema';
 
 async function _renderUniversal(
@@ -152,6 +153,8 @@ async function _appShellBuilder(
     watch: false,
   });
 
+  let spinner: Spinner | undefined;
+
   try {
     const [browserResult, serverResult] = await Promise.all([
       browserTargetRun.result as unknown as BrowserBuilderOutput,
@@ -164,8 +167,14 @@ async function _appShellBuilder(
       return serverResult;
     }
 
-    return await _renderUniversal(options, context, browserResult, serverResult);
+    spinner = new Spinner().start('Generating application shell...');
+    const result =  await _renderUniversal(options, context, browserResult, serverResult);
+    spinner.succeed('Application shell generation complete.');
+
+    return result;
   } catch (err) {
+    spinner?.fail('Application shell generation failed.');
+
     return { success: false, error: err.message };
   } finally {
     // Just be good citizens and stop those jobs.

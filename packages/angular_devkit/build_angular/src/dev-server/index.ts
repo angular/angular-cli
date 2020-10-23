@@ -27,6 +27,7 @@ import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
 import { checkPort } from '../utils/check-port';
+import { colors } from '../utils/color';
 import { I18nOptions } from '../utils/i18n-options';
 import { getHtmlTransforms } from '../utils/index-file/transforms';
 import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
@@ -328,7 +329,7 @@ export function serveWebpackBrowser(
           }
 
           if (buildEvent.success) {
-            logger.info(': Compiled successfully.');
+            logger.info(`${colors.greenBright(colors.symbols.check)} Compiled successfully.`);
           }
 
           return of({ ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput);

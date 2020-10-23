@@ -122,19 +122,24 @@ export function statsToString(json: any, statsConfig: any) {
   const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
   const statsTable = generateBuildStatsTable(changedChunksStats, colors);
 
+  // In some cases we do things outside of webpack context 
+  // Such us index generation, service worker augmentation etc...
+  // This will correct the time and include these.
+  const time = (Date.now() - json.builtAt) + json.time;
+
   if (unchangedChunkNumber > 0) {
     return '\n' + rs(tags.stripIndents`
       ${statsTable}
 
       ${unchangedChunkNumber} unchanged chunks
 
-      ${generateBuildStats(json.hash, json.time, colors)}
+      ${generateBuildStats(json.hash, time, colors)}
       `);
   } else {
     return '\n' + rs(tags.stripIndents`
       ${statsTable}
 
-      ${generateBuildStats(json.hash, json.time, colors)}
+      ${generateBuildStats(json.hash, time, colors)}
       `);
   }
 }
