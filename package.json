@@ -158,7 +158,7 @@
     "jasmine": "^3.3.1",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~6.0.0",
-    "jest-worker": "26.5.0",
+    "jest-worker": "26.6.1",
     "jquery": "^3.3.1",
     "jsonc-parser": "2.3.1",
     "karma": "~5.2.0",
