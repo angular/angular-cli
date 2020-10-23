@@ -134,7 +134,8 @@ jobs:
               git config user.name "angular-ci"
               git config user.email "angular-ci"
               # Rebase PR on top of target branch.
-              node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
+              # node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
+              echo "all fine need to skip this as for next.6"
             else
               echo "This build is not over a PR, nothing to do."
             fi
