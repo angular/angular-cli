@@ -68,10 +68,9 @@ async function getSerializer(format: Format, sourceLocale: string, basePath: str
   }
 }
 
-class InMemoryOutputPlugin {
+class NoEmitPlugin {
   apply(compiler: webpack.Compiler): void {
-    // tslint:disable-next-line:no-any
-    compiler.outputFileSystem = new (webpack as any).MemoryOutputFileSystem();
+    compiler.hooks.shouldEmit.tap('angular-no-emit', () => false);
   }
 }
 
@@ -172,7 +171,7 @@ export async function execute(
       }
 
       const partials = [
-        { plugins: [new InMemoryOutputPlugin()] },
+        { plugins: [new NoEmitPlugin()] },
         getCommonConfig(wco),
         // Only use VE extraction if not using Ivy
         getAotConfig(wco, !usingIvy),
