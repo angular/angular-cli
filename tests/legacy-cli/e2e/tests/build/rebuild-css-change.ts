@@ -6,7 +6,7 @@ import {
 import {appendToFile} from '../../utils/fs';
 import {getGlobalVariable} from '../../utils/env';
 
-const webpackGoodRegEx = /: Compiled successfully./;
+const webpackGoodRegEx = / Compiled successfully./;
 
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.

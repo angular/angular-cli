@@ -6,7 +6,7 @@ import {
 import { ngServe } from '../../utils/project';
 import { expectToFail, wait } from '../../utils/utils';
 
-const webpackGoodRegEx = /: Compiled successfully./;
+const webpackGoodRegEx = / Compiled successfully./;
 
 export default async function() {
   try {

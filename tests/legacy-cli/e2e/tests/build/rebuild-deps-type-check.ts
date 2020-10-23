@@ -7,7 +7,7 @@ import {writeFile, prependToFile, appendToFile} from '../../utils/fs';
 
 
 const doneRe =
-  /: Compiled successfully.|: Failed to compile./;
+  / Compiled successfully.|: Failed to compile./;
 const errorRe = /Error/;
 
 

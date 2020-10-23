@@ -8,7 +8,7 @@ import {writeFile, writeMultipleFiles} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
 
-const validBundleRegEx = /: Compiled successfully./;
+const validBundleRegEx = / Compiled successfully./;
 
 export default function() {
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
