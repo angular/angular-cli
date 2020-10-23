@@ -6,7 +6,7 @@ import {
 import { appendToFile, writeMultipleFiles, replaceInFile, expectFileToMatch } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 
-const validBundleRegEx = /: Compiled successfully./;
+const validBundleRegEx = / Compiled successfully./;
 
 export default function () {
   // TODO(architect): This test is behaving oddly both here and in devkit/build-angular.

@@ -59,7 +59,7 @@ export default function () {
     ))
     // Should run side-by-side with `ng serve`
     .then(() => execAndWaitForOutputToMatch('ng', ['serve'],
-      /: Compiled successfully./))
+      / Compiled successfully./))
     .then(() => ng('e2e', 'test-project', '--devServerTarget='))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
