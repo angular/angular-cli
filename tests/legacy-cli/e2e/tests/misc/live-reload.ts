@@ -15,7 +15,7 @@ export default function temporarilyDisabledTest() { return Promise.resolve(); }
 
 // export default function () {
 //   const protractorGoodRegEx = /Jasmine started/;
-//   const webpackGoodRegEx = /: Compiled successfully./;
+//   const webpackGoodRegEx = / Compiled successfully./;
 
 //   // Create an express api for the Angular app to call.
 //   const app = express();
