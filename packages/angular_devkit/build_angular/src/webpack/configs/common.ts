@@ -497,7 +497,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       strictExportPresence: true,
       rules: [
         {
-          test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
+          test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani|avif)$/,
           loader: require.resolve('file-loader'),
           options: {
             name: `[name]${hashFormat.file}.[ext]`,
