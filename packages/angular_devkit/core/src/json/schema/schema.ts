@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { clean } from '../../utils';
 import { JsonObject, JsonValue, isJsonObject } from '../interface';
 
 /**
@@ -27,7 +26,11 @@ export function isJsonSchema(value: unknown): value is JsonSchema {
  * @param schemas All schemas to be merged.
  */
 export function mergeSchemas(...schemas: (JsonSchema | undefined)[]): JsonSchema {
-  return clean(schemas).reduce((prev, curr) => {
+  return schemas.reduce<JsonSchema>((prev, curr) => {
+    if (curr === undefined) {
+      return prev;
+    }
+
     if (prev === false || curr === false) {
       return false;
     } else if (prev === true) {
@@ -45,5 +48,5 @@ export function mergeSchemas(...schemas: (JsonSchema | undefined)[]): JsonSchema
     } else {
       return { ...prev, allOf: [prev, curr] };
     }
-  }, true as JsonSchema);
+  }, true);
 }
