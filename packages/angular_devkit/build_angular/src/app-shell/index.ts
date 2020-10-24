@@ -167,7 +167,8 @@ async function _appShellBuilder(
       return serverResult;
     }
 
-    spinner = new Spinner().start('Generating application shell...');
+    spinner = new Spinner();
+    spinner.start('Generating application shell...');
     const result =  await _renderUniversal(options, context, browserResult, serverResult);
     spinner.succeed('Application shell generation complete.');
 

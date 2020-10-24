@@ -28,7 +28,7 @@ import {
   getStatsConfig,
   getStylesConfig,
 } from '../webpack/configs';
-import { createWebpackLoggingCallback } from '../webpack/utils/stats';
+import { webpackStatsLogger } from '../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
 // If success is true, outputPath should be set.
@@ -85,34 +85,39 @@ export function execute(
     concatMap(({ config, i18n }) => {
       return runWebpack(config, context, {
         webpackFactory: require('webpack') as typeof webpack,
-        logging: createWebpackLoggingCallback(!!options.verbose, context.logger),
+        logging: (stats, config) => {
+          if (options.verbose) {
+            context.logger.info(stats.toString(config.stats));
+          }
+        },
       }).pipe(
         concatMap(async output => {
           const { emittedFiles = [], webpackStats } = output;
-          if (!output.success || !i18n.shouldInline) {
-            return output;
-          }
-
           if (!webpackStats) {
             throw new Error('Webpack stats build result is required.');
           }
 
-          outputPaths = ensureOutputPaths(baseOutputPath, i18n);
+          let success = output.success;
+          if (success && i18n.shouldInline) {
+            outputPaths = ensureOutputPaths(baseOutputPath, i18n);
 
-          const success = await i18nInlineEmittedFiles(
-            context,
-            emittedFiles,
-            i18n,
-            baseOutputPath,
-            Array.from(outputPaths.values()),
-            [],
-            // tslint:disable-next-line: no-non-null-assertion
-            webpackStats.outputPath!,
-            target <= ScriptTarget.ES5,
-            options.i18nMissingTranslation,
-          );
+            success = await i18nInlineEmittedFiles(
+              context,
+              emittedFiles,
+              i18n,
+              baseOutputPath,
+              Array.from(outputPaths.values()),
+              [],
+              // tslint:disable-next-line: no-non-null-assertion
+              webpackStats.outputPath!,
+              target <= ScriptTarget.ES5,
+              options.i18nMissingTranslation,
+            );
+          }
 
-          return { output, success };
+          webpackStatsLogger(context.logger, webpackStats, config);
+
+          return { ...output, success };
         }),
       );
     }),
