@@ -14,7 +14,7 @@ import {
   schema,
   workspaces,
 } from '@angular-devkit/core';
-import { NodeJsAsyncHost } from '@angular-devkit/core/node';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { workspaceRoot } from '../test-utils';
 
 
@@ -32,7 +32,7 @@ describe('Tslint Target', () => {
 
     const { workspace } = await workspaces.readWorkspace(
       normalize(workspaceRoot),
-      workspaces.createWorkspaceHost(new NodeJsAsyncHost()),
+      workspaces.createWorkspaceHost(new NodeJsSyncHost()),
     );
 
     testArchitectHost = new TestingArchitectHost(
