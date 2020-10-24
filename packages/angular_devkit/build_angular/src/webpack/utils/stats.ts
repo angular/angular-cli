@@ -12,6 +12,7 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import * as path from 'path';
 import * as textTable from 'text-table';
 import { colors as ansiColors, removeColor } from '../../utils/color';
+import { Configuration, Stats } from 'webpack';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -56,10 +57,10 @@ export function generateBundleStats(
   }
 }
 
-export function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
+function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
   const changedEntryChunksStats: BundleStatsData[] = [];
   const changedLazyChunksStats: BundleStatsData[] = [];
-  for (const {initial, stats} of data) {
+  for (const { initial, stats } of data) {
     if (initial) {
       changedEntryChunksStats.push(stats);
     } else {
@@ -89,7 +90,7 @@ export function generateBuildStatsTable(data: BundleStats[], colors: boolean): s
   if (changedLazyChunksStats.length) {
     bundleInfo.push(
       ['Lazy Chunk Files', 'Names', 'Size'].map(bold),
-    ...changedLazyChunksStats,
+      ...changedLazyChunksStats,
     );
   }
 
@@ -99,27 +100,30 @@ export function generateBuildStatsTable(data: BundleStats[], colors: boolean): s
   });
 }
 
-export function generateBuildStats(hash: string, time: number, colors: boolean): string {
+function generateBuildStats(hash: string, time: number, colors: boolean): string {
   const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
   return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 
-export function statsToString(json: any, statsConfig: any) {
+function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[]): string {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? ansiColors.reset(x) : x;
 
-  const changedChunksStats: BundleStats[] = [];
-  for (const chunk of json.chunks) {
-    if (!chunk.rendered) {
-      continue;
-    }
+  const changedChunksStats: BundleStats[] = bundleState ?? [];
+  let unchangedChunkNumber = 0;
+  if (!bundleState?.length) {
+    for (const chunk of json.chunks) {
+      if (!chunk.rendered) {
+        continue;
+      }
 
-    const assets = json.assets.filter((asset: any) => chunk.files.includes(asset.name));
-    const summedSize = assets.filter((asset: any) => !asset.name.endsWith(".map")).reduce((total: number, asset: any) => { return total + asset.size }, 0);
-    changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
+      const assets = json.assets.filter((asset: any) => chunk.files.includes(asset.name));
+      const summedSize = assets.filter((asset: any) => !asset.name.endsWith(".map")).reduce((total: number, asset: any) => { return total + asset.size }, 0);
+      changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
+    }
+    unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
   }
 
-  const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
   const statsTable = generateBuildStatsTable(changedChunksStats, colors);
 
   // In some cases we do things outside of webpack context 
@@ -180,7 +184,7 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
       output += yb(`Warning: ${warning}\n\n`);
     } else {
       if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
-          continue;
+        continue;
       }
       const file = warning.file || warning.moduleName;
       if (file) {
@@ -198,7 +202,7 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
   }
 
   if (output) {
-      return '\n' + output;
+    return '\n' + output;
   }
 
   return '';
@@ -239,7 +243,7 @@ export function statsErrorsToString(json: any, statsConfig: any): string {
   }
 
   if (output) {
-      return '\n' + output;
+    return '\n' + output;
   }
 
   return '';
@@ -259,19 +263,26 @@ export function createWebpackLoggingCallback(
   logger: logging.LoggerApi,
 ): WebpackLoggingCallback {
   return (stats, config) => {
-    // config.stats contains our own stats settings, added during buildWebpackConfig().
-    const json = stats.toJson(config.stats);
     if (verbose) {
       logger.info(stats.toString(config.stats));
-    } else {
-      logger.info(statsToString(json, config.stats));
     }
 
-    if (statsHasWarnings(json)) {
-      logger.warn(statsWarningsToString(json, config.stats));
-    }
-    if (statsHasErrors(json)) {
-      logger.error(statsErrorsToString(json, config.stats));
-    }
-  };
+    webpackStatsLogger(logger, stats.toJson(config.stats), config);
+  }
 }
+
+export function webpackStatsLogger(
+  logger: logging.LoggerApi,
+  json: Stats.ToJsonOutput,
+  config: Configuration,
+  bundleStats?: BundleStats[],
+): void {
+  logger.info(statsToString(json, config.stats, bundleStats));
+
+  if (statsHasWarnings(json)) {
+    logger.warn(statsWarningsToString(json, config.stats));
+  }
+  if (statsHasErrors(json)) {
+    logger.error(statsErrorsToString(json, config.stats));
+  }
+};
