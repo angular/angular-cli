@@ -69,14 +69,12 @@ import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
 import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
 import {
   BundleStats,
-  generateBuildStats,
-  generateBuildStatsTable,
   generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
   statsHasWarnings,
-  statsToString,
   statsWarningsToString,
+  webpackStatsLogger,
 } from '../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema } from './schema';
 
@@ -269,7 +267,6 @@ export function buildWebpackBrowser(
       }),
       // tslint:disable-next-line: no-big-function
       switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
-        const startTime = Date.now();
         const normalizedOptimization = normalizeOptimization(options.optimization);
         const indexTransforms = getHtmlTransforms(
           normalizedOptimization,
@@ -279,8 +276,13 @@ export function buildWebpackBrowser(
 
         return runWebpack(config, context, {
           webpackFactory: require('webpack') as typeof webpack,
-          logging:
-            transforms.logging || (() => { }),
+          logging: transforms.logging || (
+            (stats, config) => {
+              if (options.verbose) {
+                context.logger.info(stats.toString(config.stats));
+              }
+            }
+          ),
         }).pipe(
           // tslint:disable-next-line: no-big-function
           concatMap(async buildEvent => {
@@ -730,33 +732,10 @@ export function buildWebpackBrowser(
                 }
               }
 
-              if (bundleInfoStats.length) {
-                context.logger.info(
-                  '\n' +
-                  generateBuildStatsTable(bundleInfoStats, colors.enabled) +
-                  '\n\n' +
-                  generateBuildStats(
-                    webpackStats?.hash || '<unknown>',
-                    Date.now() - startTime,
-                    true,
-                  ),
-                );
-              } else {
-                context.logger.info(statsToString(webpackStats, config.stats));
-              }
+              webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
 
-              if (statsHasWarnings(webpackStats)) {
-                context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
-              }
-
-              if (statsHasErrors(webpackStats)) {
-                context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
-
-                return { success: false };
-              }
+              return { success: !statsHasErrors(webpackStats) };
             }
-
-            return { success };
           }),
           map(
             event =>
