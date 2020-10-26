@@ -191,7 +191,7 @@
     "postcss-loader": "4.0.4",
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "5.3.1",
+    "puppeteer": "5.4.0",
     "quicktype-core": "^6.0.15",
     "raw-loader": "4.0.2",
     "regenerator-runtime": "0.13.7",
