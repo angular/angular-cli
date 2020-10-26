@@ -19,6 +19,7 @@ import {
   lazyModuleStringImport,
   veEnabled,
 } from '../../test-utils';
+import { withWebpackFourOrFive } from '../../utils/webpack-version';
 
 // tslint:disable-next-line:no-big-function
 describe('Browser Builder lazy modules', () => {
@@ -158,7 +159,9 @@ describe('Browser Builder lazy modules', () => {
       `,
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
+    host.replaceInFile('src/tsconfig.app.json', `"polyfills.ts"`, `"polyfills.ts", "lazy-module.ts"`);
 
+    // works
     const { files } = await browserBuild(architect, host, target);
     expect(files['lazy-module.js']).not.toBeUndefined();
   });
@@ -183,7 +186,9 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    const { files } = await browserBuild(architect, host, target, { namedChunks: false });
+    const { files } = await browserBuild(architect, host, target,
+      withWebpackFourOrFive({ namedChunks: false }, { chunkId: 'natural' })
+      );
     expect(files['0.js']).not.toBeUndefined();
   });
 
@@ -237,6 +242,7 @@ describe('Browser Builder lazy modules', () => {
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
     addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
 
+    // works
     const { files } = await browserBuild(architect, host, target, {
       lazyModules: ['src/app/lazy/lazy.module'],
     });

@@ -490,9 +490,22 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       chunkFilename: function (pathData, assetInfo) {
         const def = `default`;
         const delimeter = `~`;
-        const prefixes: string[] = [];
+        // const prefixes: string[] = [];
+        const prefixesSet = new Set<string>();
         const postfix = pathData.contentHashType === 'javascript' ? '.js' : '.css'; // don't judge
-        (pathData.chunk as any)._groups.forEach((group: any) => prefixes.push(group.origins[0].request.split('/').pop()))
+        (pathData.chunk as any)._groups
+          .forEach((group: any) =>
+          {
+            const basename = group.options.name.split('-ts').shift();
+            // const basename = group.origins[0].request
+            //   // take last name
+            //   .split('/').pop()
+            // // remove ext
+            //   .split('.').shift();
+            prefixesSet.add(basename);
+            // prefixes.push(group.origins[0].request.split('/').pop())
+          });
+        const prefixes = Array.from(prefixesSet);
         if (prefixes.length > 1) {
           prefixes.unshift(def);
           return prefixes.join(delimeter) + postfix;

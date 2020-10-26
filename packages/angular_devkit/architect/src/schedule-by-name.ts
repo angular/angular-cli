@@ -61,17 +61,27 @@ export async function scheduleByName(
       if (event.kind === experimental.jobs.JobOutboundMessageKind.Start) {
         job.input.next(message);
       }
-    }, () => {});
+    }, (err) => {
+
+      console.error(err);
+    });
   } else {
     job.input.next(message);
   }
 
   const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe(entry => {
+    // valorkin errors are visible here
     logger.next(entry);
-  }, () => {});
+  }, (err) => {
+
+    console.error(err);
+  });
 
   const s = job.outboundBus.subscribe({
-    error() {},
+    error(err) {
+
+      console.error(err)
+    },
     complete() {
       s.unsubscribe();
       logChannelSub.unsubscribe();
@@ -93,11 +103,16 @@ export async function scheduleByName(
   if (options.analytics) {
     const reporter = new analytics.AnalyticsReporter(options.analytics);
     job.getChannel<analytics.AnalyticsReport>('analytics')
-      .subscribe(report => reporter.report(report));
+      .subscribe(report => reporter.report(report),
+        err => {
+          console.error(err);
+        });
   }
   // Start the builder.
   output.pipe(first()).subscribe({
-    error() {},
+    error(err) {
+      console.error(err);
+    },
   });
 
   return {
@@ -114,7 +129,10 @@ export async function scheduleByName(
 
       return job.outboundBus.pipe(
         ignoreElements(),
-        catchError(() => EMPTY),
+        catchError((err) => {
+          console.error(err);
+          return EMPTY;
+        }),
       ).toPromise();
     },
   };
