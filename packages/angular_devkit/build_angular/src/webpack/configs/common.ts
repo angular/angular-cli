@@ -496,14 +496,17 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         (pathData.chunk as any)._groups
           .forEach((group: any) =>
           {
-            const basename = group.options.name.split('-ts').shift();
-            // const basename = group.origins[0].request
-            //   // take last name
-            //   .split('/').pop()
-            // // remove ext
-            //   .split('.').shift();
+            let basename: string;
+            if (group.options.name) {
+              basename = group.options.name.split('-ts').shift();
+            } else {
+              basename = group.origins[0].request
+                // take last name
+                .split('/').pop()
+                // remove ext
+                .split('.').shift();
+            }
             prefixesSet.add(basename);
-            // prefixes.push(group.origins[0].request.split('/').pop())
           });
         const prefixes = Array.from(prefixesSet);
         if (prefixes.length > 1) {

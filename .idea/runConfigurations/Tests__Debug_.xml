@@ -6,7 +6,7 @@
       <script value="debug:test" />
     </scripts>
     <arguments value="--full" />
-    <node-interpreter value="project" />
+    <node-interpreter value="$USER_HOME$/.nvm/versions/node/v12.18.3/bin/node" />
     <envs />
     <method v="2" />
   </configuration>

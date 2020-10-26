@@ -28,6 +28,7 @@ import {
 } from './api';
 import { ArchitectHost, BuilderDescription, BuilderJobHandler } from './internal';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
+import { isWebpackFiveOrHigher } from './utils/webpack-version';
 
 const inputSchema = require('./input-schema.json');
 const outputSchema = require('./output-schema.json');
@@ -46,6 +47,24 @@ function _createJobHandlerFromBuilderInfo(
     output: outputSchema,
     info,
   };
+
+  if (isWebpackFiveOrHigher()) {
+    if ((info.optionSchema as Record<string, string>).description === 'Browser target options') {
+      (info.optionSchema as { properties: Record<string, Record<string, any>> })
+        .properties.chunkIds =
+        {
+          "description": "Define the algorithm to choose chunk ids (named: readable ids for better debugging, deterministic: numeric hash ids for better long term caching, size: numeric ids focused on minimal initial download size, total-size: numeric ids focused on minimal total download size, false: no algorithm used, as custom one can be provided via plugin).",
+          "enum": [
+            "natural",
+            "named",
+            "deterministic",
+            "size",
+            "total-size",
+            false
+          ]
+        }
+    }
+  }
 
   function handler(argument: json.JsonObject, context: experimental.jobs.JobHandlerContext) {
     // Add input validation to the inbound bus.

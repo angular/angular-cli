@@ -72,6 +72,9 @@ export async function scheduleByName(
   const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe(entry => {
     // valorkin errors are visible here
     logger.next(entry);
+    if (entry.level === 'error') {
+      console.error(entry.message);
+    }
   }, (err) => {
 
     console.error(err);

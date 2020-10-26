@@ -174,7 +174,7 @@ describe('Browser Builder lazy modules', () => {
 
     host.writeMultipleFiles(lazyfiles);
     addLazyLoadedModulesInTsConfig(host, lazyfiles);
-
+    // doesn't work
     const { files } = await browserBuild(architect, host, target);
     expect(files['lazy-module.js']).not.toBeUndefined();
   });
@@ -187,7 +187,7 @@ describe('Browser Builder lazy modules', () => {
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const { files } = await browserBuild(architect, host, target,
-      withWebpackFourOrFive({ namedChunks: false }, { chunkId: 'natural' })
+      withWebpackFourOrFive({ namedChunks: false }, { chunkIds: 'natural' })
       );
     expect(files['0.js']).not.toBeUndefined();
   });
@@ -275,7 +275,7 @@ describe('Browser Builder lazy modules', () => {
       lazyModules: ['src/app/lazy/lazy.module'],
       aot: true,
     });
-
+    // works
     if (!veEnabled) {
       const data = await files['src-app-lazy-lazy-module.js'];
       expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
