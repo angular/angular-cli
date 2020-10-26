@@ -7,9 +7,9 @@
  */
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 // tslint:disable: no-implicit-dependencies
-import puppeteer from 'puppeteer/lib/cjs/puppeteer';
 import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser';
 import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page';
+import puppeteer from 'puppeteer/lib/cjs/puppeteer/node';
 // tslint:enable: no-implicit-dependencies
 import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../test-utils';
