@@ -123,7 +123,7 @@ jobs:
           # https://github.com/GoogleChrome/puppeteer/releases
           # http://chromedriver.chromium.org/downloads
           command: |
-            echo 'export CHROMEDRIVER_VERSION_ARG="--versions.chrome 85.0.4183.87"' >> $BASH_ENV # Redirect into $BASH_ENV
+            echo 'export CHROMEDRIVER_VERSION_ARG="--versions.chrome 87.0.4280.20"' >> $BASH_ENV # Redirect into $BASH_ENV
       - run: ./integration/run_tests.sh
 
 workflows:
