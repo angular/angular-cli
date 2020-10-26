@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e --prod",
-    "postinstall": "webdriver-manager update --standalone false --gecko false --versions.chrome 85.0.4183.38"
+    "postinstall": "webdriver-manager update --standalone false --gecko false --versions.chrome 87.0.4280.20"
   },
   "private": true,
   "dependencies": {
