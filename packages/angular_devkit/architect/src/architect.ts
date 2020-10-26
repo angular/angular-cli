@@ -48,8 +48,9 @@ function _createJobHandlerFromBuilderInfo(
     info,
   };
 
-  if (isWebpackFiveOrHigher()) {
-    if ((info.optionSchema as Record<string, string>).description === 'Browser target options') {
+  // TODO_VALORKIN
+  // if (isWebpackFiveOrHigher()) {
+  //   if ((info.optionSchema as Record<string, string>).description === 'Browser target options') {
       (info.optionSchema as { properties: Record<string, Record<string, any>> })
         .properties.chunkIds =
         {
@@ -63,8 +64,8 @@ function _createJobHandlerFromBuilderInfo(
             false
           ]
         }
-    }
-  }
+    // }
+  // }
 
   function handler(argument: json.JsonObject, context: experimental.jobs.JobHandlerContext) {
     // Add input validation to the inbound bus.
