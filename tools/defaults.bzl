@@ -1,10 +1,10 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
-load("@npm_angular_bazel//:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
+load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
 load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
-load("@npm_bazel_jasmine//:index.bzl", _jasmine_node_test = "jasmine_node_test")
+load("@npm//@bazel/jasmine:index.bzl", _jasmine_node_test = "jasmine_node_test")
 load(
-    "@npm_bazel_typescript//:index.bzl",
+    "@npm//@bazel/typescript:index.bzl",
     _ts_library = "ts_library",
 )
 
