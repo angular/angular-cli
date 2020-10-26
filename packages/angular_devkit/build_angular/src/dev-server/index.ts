@@ -168,10 +168,10 @@ export function serveWebpackBrowser(
             continue;
           }
 
-          for (let index = 0; index < value.length; index++) {
-            if (value[index].includes('webpack-dev-server/client/index.js')) {
-              config.entry[key] = value.splice(index + 1, 1);
-            }
+          const webpackClientScriptIndex = value.findIndex(x => x.includes('webpack-dev-server/client/index.js'));
+          if (webpackClientScriptIndex >= 0) {
+            // Remove the webpack-dev-server/client script from array.
+            value.splice(webpackClientScriptIndex, 1);
           }
         }
       }
