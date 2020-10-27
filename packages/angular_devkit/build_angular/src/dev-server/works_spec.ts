@@ -7,7 +7,7 @@
  */
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
-import { logging } from '@angular-devkit/core';
+import { logging, normalize, virtualFs } from '@angular-devkit/core';
 import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
 import { createArchitect, host } from '../test-utils';
 
@@ -111,5 +111,31 @@ describe('Dev Server Builder', () => {
     const response = await fetch('http://localhost:4200/index.html');
     expect(response.headers.get('X-Header')).toBe('Hello World');
   }, 30000);
+
+  it('uses source locale when not localizing', async () => {
+    const config = host.scopedSync().read(normalize('angular.json'));
+    const jsonConfig = JSON.parse(virtualFs.fileBufferToString(config));
+    const applicationProject = jsonConfig.projects.app;
+
+    applicationProject.i18n = { sourceLocale: 'fr' };
+
+    host.writeMultipleFiles({
+      'angular.json': JSON.stringify(jsonConfig),
+    });
+
+    const architect = (await createArchitect(host.root())).architect;
+    const run = await architect.scheduleTarget(target);
+    const output = await run.result;
+    expect(output.success).toBe(true);
+
+    const indexResponse = await fetch('http://localhost:4200/index.html');
+    expect(await indexResponse.text()).toContain('lang="fr"');
+    const vendorResponse = await fetch('http://localhost:4200/vendor.js');
+    const vendorText = await vendorResponse.text();
+    expect(vendorText).toContain('fr');
+    expect(vendorText).toContain('octobre');
+
+    await run.stop();
+  });
 
 });

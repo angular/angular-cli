@@ -552,6 +552,7 @@ export async function createI18nPlugins(
   locale: string,
   translation: unknown | undefined,
   missingTranslation: 'error' | 'warning' | 'ignore',
+  shouldInline: boolean,
   localeDataContent?: string,
 ) {
   const plugins = [];
@@ -559,27 +560,29 @@ export async function createI18nPlugins(
 
   const diagnostics = new localizeDiag.Diagnostics();
 
-  const es2015 = await import(
-    // tslint:disable-next-line: trailing-comma
-    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
-  );
-  plugins.push(
-    // tslint:disable-next-line: no-any
-    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
-      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }),
-  );
+  if (shouldInline) {
+    const es2015 = await import(
+      // tslint:disable-next-line: trailing-comma
+      '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
+    );
+    plugins.push(
+      // tslint:disable-next-line: no-any
+      es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
+        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+      }),
+    );
 
-  const es5 = await import(
-    // tslint:disable-next-line: trailing-comma
-    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
-  );
-  plugins.push(
-    // tslint:disable-next-line: no-any
-    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
-      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }),
-  );
+    const es5 = await import(
+      // tslint:disable-next-line: trailing-comma
+      '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
+    );
+    plugins.push(
+      // tslint:disable-next-line: no-any
+      es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
+        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+      }),
+    );
+  }
 
   const inlineLocale = await import(
     // tslint:disable-next-line: trailing-comma
@@ -678,6 +681,7 @@ export async function inlineLocales(options: InlineOptions) {
       locale,
       translations,
       isSourceLocale ? 'ignore' : options.missingTranslation || 'warning',
+      true,
       localeDataContent,
     );
     const transformResult = await transformFromAstSync(ast, options.code, {

@@ -206,16 +206,33 @@ export function serveWebpackBrowser(
       `);
     }
 
-    let webpackConfig = config;
-    const tsConfig = readTsconfig(browserOptions.tsConfig, workspaceRoot);
-    if (i18n.shouldInline && tsConfig.options.enableIvy !== false) {
-      if (i18n.inlineLocales.size > 1) {
-        throw new Error(
-          'The development server only supports localizing a single locale per build.',
-        );
-      }
+    let locale: string | undefined;
+    if (browserOptions.i18nLocale) {
+      // Deprecated VE option
+      locale = browserOptions.i18nLocale;
+    } else if (i18n.shouldInline) {
+      // Dev-server only supports one locale
+      locale = [...i18n.inlineLocales][0];
+    } else if (i18n.hasDefinedSourceLocale) {
+      // use source locale if not localizing
+      locale = i18n.sourceLocale;
+    }
 
-      await setupLocalize(i18n, browserOptions, webpackConfig);
+    let webpackConfig = config;
+
+    // If a locale is defined, setup localization
+    if (locale) {
+      // Only supported with Ivy
+      const tsConfig = readTsconfig(browserOptions.tsConfig, workspaceRoot);
+      if (tsConfig.options.enableIvy !== false) {
+        if (i18n.inlineLocales.size > 1) {
+          throw new Error(
+            'The development server only supports localizing a single locale per build.',
+          );
+        }
+
+        await setupLocalize(locale, i18n, browserOptions, webpackConfig);
+      }
     }
 
     if (transforms.webpackConfiguration) {
@@ -226,8 +243,7 @@ export function serveWebpackBrowser(
       browserOptions,
       webpackConfig,
       projectRoot,
-      locale:
-        browserOptions.i18nLocale || (i18n.shouldInline ? [...i18n.inlineLocales][0] : undefined),
+      locale,
     };
   }
 
@@ -323,16 +339,17 @@ export function serveWebpackBrowser(
 }
 
 async function setupLocalize(
+  locale: string,
   i18n: I18nOptions,
   browserOptions: BrowserBuilderSchema,
   webpackConfig: webpack.Configuration,
 ) {
-  const locale = [...i18n.inlineLocales][0];
   const localeDescription = i18n.locales[locale];
   const { plugins, diagnostics } = await createI18nPlugins(
     locale,
     localeDescription?.translation,
     browserOptions.i18nMissingTranslation || 'ignore',
+    i18n.shouldInline,
   );
 
   // Modify main entrypoint to include locale data
