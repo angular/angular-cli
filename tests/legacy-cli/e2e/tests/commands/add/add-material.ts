@@ -21,27 +21,7 @@ export default async function () {
   await ng('add',  `@angular/material${tag}`, '--theme', 'custom', '--verbose');
   await expectFileToMatch('package.json', /@angular\/material/);
 
-  const output1 = await ng('add', '@angular/material');
-  if (!output1.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation was not skipped');
-  }
-
   // Clean up existing cdk package
   // Not doing so can cause adding material to fail if an incompatible cdk is present
   await uninstallPackage('@angular/cdk');
-
-  const output2 = await ng('add', '@angular/material@latest');
-  if (output2.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation should not have been skipped');
-  }
-
-  const output3 = await ng('add', '@angular/material@8.0.0');
-  if (output3.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation should not have been skipped');
-  }
-
-  const output4 = await ng('add', '@angular/material@8');
-  if (!output4.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation was not skipped');
-  }
 }
