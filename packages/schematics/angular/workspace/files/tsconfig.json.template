@@ -20,10 +20,11 @@
       "es2018",
       "dom"
     ]
-  }<% if (strict) { %>,
+  },
   "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false<% if (strict) { %>,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
-  }<% } %>
+    "strictTemplates": true<% } %>
+  }
 }
