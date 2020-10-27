@@ -37,6 +37,7 @@ const knownSideEffectFreeAngularModules = [
   /[\\/]node_modules[\\/]@angular[\\/]upgrade[\\/]/,
   /[\\/]node_modules[\\/]@angular[\\/]material[\\/]/,
   /[\\/]node_modules[\\/]@angular[\\/]cdk[\\/]/,
+  /[\\/]node_modules[\\/]rxjs[\\/]/,
 ];
 
 // Factories created by AOT are known to have no side effects.
