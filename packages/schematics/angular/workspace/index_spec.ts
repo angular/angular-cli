@@ -73,13 +73,21 @@ describe('Workspace Schematic', () => {
     expect(files).not.toContain('/.editorconfig');
   });
 
+  it('should set the `enableI18nLegacyMessageIdFormat` Angular compiler option', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
+    const { angularCompilerOptions } =
+      // tslint:disable-next-line: no-any
+      parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    expect(angularCompilerOptions.enableI18nLegacyMessageIdFormat).toBe(false);
+  });
+
   it('should not add strict compiler options when false', async () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
       parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
     expect(compilerOptions.strict).toBeUndefined();
-    expect(angularCompilerOptions).toBeUndefined();
+    expect(Object.keys(angularCompilerOptions).filter(option => option.startsWith('strict'))).toEqual([]);
   });
 
   it('should add strict compiler options when true', async () => {
