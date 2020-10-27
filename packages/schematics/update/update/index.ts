@@ -865,10 +865,9 @@ export default function(options: UpdateSchema): Rule {
       try {
         return isPkgFromRegistry(name, specifier);
       } catch {
-        // Abort on failure because package.json is malformed.
-        throw new SchematicsException(
-          `Failed to parse dependency "${name}" with specifier "${specifier}"`
-              + ` from package.json. Is the specifier malformed?`);
+        logger.warn(`Package ${name} was not found on the registry. Skipping.`);
+
+        return false;
       }
     }));
     const packages = _buildPackageList(options, npmDeps, logger);
