@@ -19,11 +19,6 @@
       "default": false,
       "type": "boolean"
     },
-    "all": {
-      "description": "When true, update all packages in `package.json`.",
-      "default": false,
-      "type": "boolean"
-    },
     "next": {
       "description": "Update to the latest version, including beta and RCs.",
       "default": false,
