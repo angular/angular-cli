@@ -72,6 +72,24 @@ describe('@schematics/update', () => {
     ).toPromise().then(done, done.fail);
   }, 45000);
 
+  it('should not error with yarn 2.0 protocols', async () => {
+    const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
+      '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "src": "src@link:./src",
+          "@angular-devkit-tests/update-base": "1.0.0"
+        }
+      }`,
+    })));
+
+    const newTree = await schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit-tests/update-base'],
+    }, tree).toPromise();
+    const { dependencies } = JSON.parse(newTree.readContent('/package.json'));
+    expect(dependencies['@angular-devkit-tests/update-base']).toBe('1.1.0');
+  });
+
   it('updates Angular as compatible with Angular N-1', done => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
