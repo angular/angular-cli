@@ -635,7 +635,7 @@ function _buildPackageList(
   const commandLinePackages =
     (options.packages && options.packages.length > 0)
     ? options.packages
-    : (options.all ? projectDeps.keys() : []);
+    : [];
 
   for (const pkg of commandLinePackages) {
     // Split the version asked on command line.
@@ -651,26 +651,6 @@ function _buildPackageList(
     if (!version) {
       logger.warn(`Package not installed: ${JSON.stringify(npmName)}. Skipping.`);
       continue;
-    }
-
-    // Verify that people have an actual version in the package.json, otherwise (label or URL or
-    // gist or ...) we don't update it.
-    if (
-      version.startsWith('http:')  // HTTP
-      || version.startsWith('file:')  // Local folder
-      || version.startsWith('git:')  // GIT url
-      || version.match(/^\w{1,100}\/\w{1,100}/)  // GitHub's "user/repo"
-      || version.match(/^(?:\.{0,2}\/)\w{1,100}/)  // Local folder, maybe relative.
-    ) {
-      // We only do that for --all. Otherwise we have the installed version and the user specified
-      // it on the command line.
-      if (options.all) {
-        logger.warn(
-          `Package ${JSON.stringify(npmName)} has a custom version: `
-          + `${JSON.stringify(version)}. Skipping.`,
-        );
-        continue;
-      }
     }
 
     packages.set(npmName, (maybeVersion || (options.next ? 'next' : 'latest')) as VersionRange);
@@ -891,14 +871,9 @@ export default function(options: UpdateSchema): Rule {
         // private one, but it's rare enough.
         if (!npmPackageJson.name) {
           if (npmPackageJson.requestedName && packages.has(npmPackageJson.requestedName)) {
-            if (options.all) {
-              logger.warn(`Package ${JSON.stringify(npmPackageJson.requestedName)} was not `
-                + 'found on the registry. Skipping.');
-            } else {
-              throw new SchematicsException(
-                `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
-                + 'registry. Cannot continue as this may be an error.');
-            }
+            throw new SchematicsException(
+              `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
+              + 'registry. Cannot continue as this may be an error.');
           }
         } else {
           // If a name is present, it is assumed to be fully populated

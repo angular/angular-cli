@@ -8,10 +8,9 @@
 // tslint:disable:no-big-function
 
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { HostTree, SchematicsException } from '@angular-devkit/schematics';
+import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { EMPTY } from 'rxjs'; // tslint:disable-line: no-implicit-dependencies
-import { catchError, map } from 'rxjs/operators'; // tslint:disable-line: no-implicit-dependencies
+import { map } from 'rxjs/operators'; // tslint:disable-line: no-implicit-dependencies
 import * as semver from 'semver';
 import { angularMajorCompatGuarantee } from './index';
 
@@ -54,28 +53,6 @@ describe('@schematics/update', () => {
     appTree = new UnitTestTree(new HostTree(host));
   });
 
-  it('updates package.json', done => {
-    // Since we cannot run tasks in unit tests, we need to validate that the default
-    // update schematic updates the package.json appropriately, AND validate that the
-    // migrate schematic actually do work appropriately, in a separate test.
-    schematicRunner.runSchematicAsync('update', { all: true }, appTree).pipe(
-      map(tree => {
-        const packageJson = JSON.parse(tree.readContent('/package.json'));
-        expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('1.1.0');
-
-        // Check install task.
-        expect(schematicRunner.tasks).toEqual([
-          {
-            name: 'node-package',
-            options: jasmine.objectContaining({
-              command: 'install',
-            }),
-          },
-        ]);
-      }),
-    ).toPromise().then(done, done.fail);
-  }, 45000);
-
   it('ignores dependencies not hosted on the NPM registry', done => {
     const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
       '/package.json': `{
@@ -86,89 +63,11 @@ describe('@schematics/update', () => {
       }`,
     })));
 
-    schematicRunner.runSchematicAsync('update', { all: true }, tree).pipe(
+    schematicRunner.runSchematicAsync('update', undefined, tree).pipe(
       map(t => {
         const packageJson = JSON.parse(t.readContent('/package.json'));
         expect(packageJson['dependencies']['@angular-devkit-tests/update-base'])
             .toBe('file:update-base-1.0.0.tgz');
-      }),
-    ).toPromise().then(done, done.fail);
-  }, 45000);
-
-  it('emits SchematicsException when given an invalid dependency', done => {
-    const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
-      '/package.json': `{
-        "name": "blah",
-        "dependencies": {
-          "//": "'abc://' is not a valid protocol for NPM.",
-          "@angular-devkit-tests/update-base": "abc://foo.tgz"
-        }
-      }`,
-    })));
-
-    schematicRunner.runSchematicAsync('update', { all: true }, tree).pipe(
-      catchError(err => {
-        expect(err instanceof SchematicsException).toBe(true);
-
-        return EMPTY;
-      }),
-    ).toPromise().then(done, done.fail);
-  });
-
-  it('respects existing tilde and caret ranges', done => {
-    // Add ranges.
-    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
-    const packageJson = JSON.parse(content);
-    packageJson['dependencies']['@angular-devkit-tests/update-base'] = '^1.0.0';
-    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '~1.0.0';
-    host.sync.write(
-      normalize('/package.json'),
-      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
-    );
-
-    schematicRunner.runSchematicAsync('update', { all: true }, appTree).pipe(
-      map(tree => {
-        const packageJson = JSON.parse(tree.readContent('/package.json'));
-        // This one should not change because 1.1.0 was already satisfied by ^1.0.0.
-        expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('^1.0.0');
-        expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
-          .toBe('~1.6.0');
-      }),
-    ).toPromise().then(done, done.fail);
-  }, 45000);
-
-  it('calls migration tasks', done => {
-    // Add the basic migration package.
-    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
-    const packageJson = JSON.parse(content);
-    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '1.0.0';
-    host.sync.write(
-      normalize('/package.json'),
-      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
-    );
-
-    schematicRunner.runSchematicAsync('update', { all: true }, appTree).pipe(
-      map(tree => {
-        const packageJson = JSON.parse(tree.readContent('/package.json'));
-        expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('1.1.0');
-        expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
-          .toBe('1.6.0');
-
-        // Check install task.
-        expect(schematicRunner.tasks).toEqual([
-          {
-            name: 'node-package',
-            options: jasmine.objectContaining({
-              command: 'install',
-            }),
-          },
-          {
-            name: 'run-schematic',
-            options: jasmine.objectContaining({
-              name: 'migrate',
-            }),
-          },
-        ]);
       }),
     ).toPromise().then(done, done.fail);
   }, 45000);
