@@ -6,7 +6,7 @@ import {
 } from '../../../utils/fs';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
-import { updateJsonFile } from '../../../utils/project';
+import { isPrereleaseCli, updateJsonFile } from '../../../utils/project';
 
 const snapshots = require('../../../ng-snapshot/package.json');
 
@@ -14,10 +14,12 @@ export default async function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
+  const tag = await isPrereleaseCli() ?  'next' : 'latest';
+
   await updateJsonFile('package.json', packageJson => {
     const dependencies = packageJson['dependencies'];
-    dependencies['@angular/material'] = isSnapshotBuild ? snapshots.dependencies['@angular/material'] : 'latest';
-    dependencies['@angular/cdk'] = isSnapshotBuild ? snapshots.dependencies['@angular/cdk'] : 'latest';
+    dependencies['@angular/material'] = isSnapshotBuild ? snapshots.dependencies['@angular/material'] : tag;
+    dependencies['@angular/cdk'] = isSnapshotBuild ? snapshots.dependencies['@angular/cdk'] : tag;
   });
 
   await installWorkspacePackages();
