@@ -400,6 +400,7 @@ async function terserMangle(
       ascii_only: true,
       webkit: true,
       beautify: shouldBeautify,
+      wrap_func_args: false,
     },
     sourceMap:
       !!options.map &&

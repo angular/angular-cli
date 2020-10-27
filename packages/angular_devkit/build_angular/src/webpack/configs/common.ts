@@ -388,6 +388,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         comments: !buildOptions.extractLicenses && undefined,
         webkit: true,
         beautify: shouldBeautify,
+        wrap_func_args: false,
       },
       // On server, we don't want to compress anything. We still set the ngDevMode = false for it
       // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
