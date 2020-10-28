@@ -82,6 +82,7 @@
     "jasmine-core": "^3.6.0",
     "minimatch": "^3.0.4",
     "node-fetch": "^2.6.1",
+    "ora": "^5.1.0",
     "protractor": "7.0.0",
     "puppeteer": "5.4.1",
     "rollup": "~2.28.0",

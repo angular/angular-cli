@@ -10,6 +10,7 @@ import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } 
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { fork } from 'child_process';
 import * as fs from 'fs';
+import * as ora from 'ora';
 import * as path from 'path';
 
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
@@ -83,10 +84,9 @@ async function _parallelRenderRoutes(
       ])
         .on('message', data => {
           if (data.success) {
-            context.logger.info(`CREATE ${data.outputIndexPath} (${data.bytes} bytes)`);
+            context.logger.debug(`CREATE ${data.outputIndexPath}`);
           } else {
-            context.logger.error(`Error: ${data.error.message}`);
-            context.logger.error(`Unable to render ${data.outputIndexPath}`);
+            reject(new Error(`Unable to render ${data.outputIndexPath}.\nError: ${data.error}`));
           }
         })
         .on('exit', resolve)
@@ -108,7 +108,7 @@ async function _renderUniversal(
   serverResult: BuildBuilderOutput,
   browserOptions: BrowserBuilderOptions,
   numProcesses?: number,
-): Promise<BuildBuilderOutput> {
+): Promise<PrerenderBuilderOutput> {
   // Users can specify a different base html file e.g. "src/home.html"
   const indexFile = getIndexOutputFile(browserOptions);
   // We need to render the routes for each locale from the browser output.
@@ -124,16 +124,24 @@ async function _renderUniversal(
     }
 
     const shardedRoutes = shardArray(routes, numProcesses);
-    context.logger.info(`\nPrerendering ${routes.length} route(s) to ${outputPath}`);
+    const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
 
-    await _parallelRenderRoutes(
-      shardedRoutes,
-      context,
-      indexHtml,
-      outputPath,
-      indexFile,
-      serverBundlePath,
-    );
+    try {
+      await _parallelRenderRoutes(
+        shardedRoutes,
+        context,
+        indexHtml,
+        outputPath,
+        indexFile,
+        serverBundlePath,
+      );
+    } catch (error) {
+      spinner.fail(`Prerendering routes to ${outputPath} failed.`);
+
+      return { success: false, error: error.message };
+    }
+
+    spinner.succeed(`Prerendering routes to ${outputPath} complete.`);
   }
 
   return browserResult;

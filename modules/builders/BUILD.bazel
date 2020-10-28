@@ -30,6 +30,7 @@ ts_library(
         "@npm//browser-sync",
         "@npm//guess-parser",
         "@npm//http-proxy-middleware",
+        "@npm//ora",
         "@npm//rxjs",
         "@npm//tree-kill",
     ],

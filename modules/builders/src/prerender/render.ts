@@ -43,42 +43,46 @@ async function getServerBundle(bundlePath: string) {
       AppServerModuleDef: AppServerModule,
     };
   }
+
   throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
 }
 
 /**
  * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
  */
+// tslint:disable-next-line: no-floating-promises
 (async () => {
-  const { renderModuleFn, AppServerModuleDef } = await getServerBundle(serverBundlePath);
   const browserIndexOutputPath = path.join(browserOutputPath, indexFile);
   for (const route of routes) {
-    const renderOpts = {
-      document: indexHtml + '<!-- This page was prerendered with Angular Universal -->',
-      url: route,
-    };
-    const html = await renderModuleFn(AppServerModuleDef, renderOpts);
-
     const outputFolderPath = path.join(browserOutputPath, route);
     const outputIndexPath = path.join(outputFolderPath, 'index.html');
 
-    // This case happens when we are prerendering "/".
-    if (browserIndexOutputPath === outputIndexPath) {
-      const browserIndexOutputPathOriginal = path.join(browserOutputPath, 'index.original.html');
-      fs.writeFileSync(browserIndexOutputPathOriginal, indexHtml);
-    }
-
     try {
+      const { renderModuleFn, AppServerModuleDef } = await getServerBundle(serverBundlePath);
+
+      const html = await renderModuleFn(AppServerModuleDef, {
+        document: indexHtml + '<!-- This page was prerendered with Angular Universal -->',
+        url: route,
+      });
+
       fs.mkdirSync(outputFolderPath, { recursive: true });
       fs.writeFileSync(outputIndexPath, html);
-      const bytes = Buffer.byteLength(html).toFixed(0);
+
+      // This case happens when we are prerendering "/".
+      if (browserIndexOutputPath === outputIndexPath) {
+        const browserIndexOutputPathOriginal = path.join(browserOutputPath, 'index.original.html');
+        fs.writeFileSync(browserIndexOutputPathOriginal, indexHtml);
+      }
+
       if (process.send) {
-        process.send({ success: true, outputIndexPath, bytes });
+        process.send({ success: true, outputIndexPath });
       }
     } catch (e) {
       if (process.send) {
         process.send({ success: false, error: e.message, outputIndexPath });
       }
+
+      return;
     }
   }
-})().then().catch();
+})();
