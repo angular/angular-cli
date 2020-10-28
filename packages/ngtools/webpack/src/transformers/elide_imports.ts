@@ -48,7 +48,9 @@ export function elideImports(
 
     // Record import and skip
     if (ts.isImportDeclaration(node)) {
-      imports.push(node);
+      if (!node.importClause?.isTypeOnly) {
+        imports.push(node);
+      }
 
       return;
     }

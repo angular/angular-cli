@@ -41,6 +41,15 @@ describe('@ngtools/webpack transformers', () => {
       'service.ts': `
         export class Service { }
       `,
+      'type.ts': `
+        export interface OnChanges {
+          ngOnChanges(changes: SimpleChanges): void;
+        }
+
+        export interface SimpleChanges {
+          [propName: string]: unknown;
+        }
+      `,
     };
 
     it('should remove unused imports', () => {
@@ -522,6 +531,40 @@ describe('@ngtools/webpack transformers', () => {
 
           __decorate([ Decorator(), __metadata("design:type", Function), __metadata("design:paramtypes", [Service]),
           __metadata("design:returntype", void 0) ], Foo.prototype, "name", null);
+        `;
+
+        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
+        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+        expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+      });
+
+      it('should remove type-only imports', () => {
+        const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { Service } from './service';
+          import type { OnChanges, SimpleChanges } from './type';
+
+          @Decorator()
+          class Foo implements OnChanges {
+            constructor(param: Service) { }
+            ngOnChanges(changes: SimpleChanges) { }
+          }
+
+          ${dummyNode}
+        `;
+
+        const output = tags.stripIndent`
+          import { __decorate, __metadata } from "tslib";
+          import { Decorator } from './decorator';
+          import { Service } from './service';
+
+          let Foo = class Foo {
+            constructor(param) { }
+            ngOnChanges(changes) { }
+          };
+
+          Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service]) ], Foo);
         `;
 
         const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
