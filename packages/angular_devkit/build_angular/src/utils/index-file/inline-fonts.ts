@@ -7,17 +7,15 @@
  */
 
 import * as cacache from 'cacache';
-import { readFile as readFileAsync } from 'fs';
 import * as https from 'https';
 import { URL } from 'url';
-import { promisify } from 'util';
 import { findCachePath } from '../cache-path';
 import { cachingDisabled } from '../environment-options';
+import { readFile } from '../fs';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
 const cacheFontsPath: string | undefined = cachingDisabled ? undefined : findCachePath('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
-const readFile = promisify(readFileAsync);
 
 const enum UserAgent {
   Chrome = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
