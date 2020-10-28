@@ -732,7 +732,6 @@ export function buildWebpackBrowser(
                 try {
                   if (options.index) {
                     await writeIndexHtml({
-                      host,
                       outputPath: path.join(outputPath, getIndexOutputFile(options.index)),
                       indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
                       files,

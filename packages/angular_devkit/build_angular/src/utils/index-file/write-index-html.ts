@@ -7,9 +7,9 @@
  */
 
 import { EmittedFiles } from '@angular-devkit/build-webpack';
-import { normalize, virtualFs } from '@angular-devkit/core';
 import { dirname, join } from 'path';
 import { ExtraEntryPoint } from '../../browser/schema';
+import { mkdir, readFile, writeFile } from '../fs';
 import { generateEntryPoints } from '../package-chunk-sort';
 import { stripBom } from '../strip-bom';
 import { CrossOriginValue, FileInfo, augmentIndexHtml } from './augment-index-html';
@@ -17,7 +17,6 @@ import { CrossOriginValue, FileInfo, augmentIndexHtml } from './augment-index-ht
 type ExtensionFilter = '.js' | '.css';
 
 export interface WriteIndexHtmlOptions {
-  host: virtualFs.Host;
   outputPath: string;
   indexPath: string;
   files?: EmittedFiles[];
@@ -36,7 +35,6 @@ export interface WriteIndexHtmlOptions {
 export type IndexHtmlTransform = (content: string) => Promise<string>;
 
 export async function writeIndexHtml({
-  host,
   outputPath,
   indexPath,
   files = [],
@@ -51,12 +49,9 @@ export async function writeIndexHtml({
   crossOrigin,
   lang,
 }: WriteIndexHtmlOptions): Promise<void> {
-  const readFile = async (filePath: string) =>
-    virtualFs.fileBufferToString(await host.read(normalize(filePath)).toPromise());
-
   let content = await augmentIndexHtml({
     input: outputPath,
-    inputContent: stripBom(await readFile(indexPath)),
+    inputContent: stripBom(await readFile(indexPath, 'utf-8')),
     baseHref,
     deployUrl,
     crossOrigin,
@@ -66,14 +61,15 @@ export async function writeIndexHtml({
     files: filterAndMapBuildFiles(files, ['.js', '.css']),
     noModuleFiles: filterAndMapBuildFiles(noModuleFiles, '.js'),
     moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
-    loadOutputFile: filePath => readFile(join(dirname(outputPath), filePath)),
+    loadOutputFile: filePath => readFile(join(dirname(outputPath), filePath), 'utf-8'),
   });
 
   for (const transform of postTransforms) {
     content = await transform(content);
   }
 
-  await host.write(normalize(outputPath), virtualFs.stringToFileBuffer(content)).toPromise();
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, content);
 }
 
 function filterAndMapBuildFiles(
