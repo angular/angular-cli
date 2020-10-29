@@ -78,6 +78,7 @@ ts_library(
         "@npm//@types/universal-analytics",
         "@npm//@types/uuid",
         "@npm//ansi-colors",
+        "@npm//jsonc-parser",
     ],
 )
 
