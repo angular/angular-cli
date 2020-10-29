@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/new.json",
-  "description": "Creates a new workspace and an initial Angular app.",
+  "description": "Creates a new workspace and an initial Angular application.",
   "$longDescription": "./new.md",
 
   "$aliases": [ "n" ],
@@ -16,7 +16,7 @@
         "collection": {
           "type": "string",
           "aliases": [ "c" ],
-          "description": "A collection of schematics to use in generating the initial app."
+          "description": "A collection of schematics to use in generating the initial application."
         },
         "verbose": {
           "type": "boolean",
