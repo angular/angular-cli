@@ -21,8 +21,10 @@ export function formatSize(size: number): string {
 
   const abbreviations = ['bytes', 'kB', 'MB', 'GB'];
   const index = Math.floor(Math.log(size) / Math.log(1024));
-
-  return `${+(size / Math.pow(1024, index)).toPrecision(3)} ${abbreviations[index]}`;
+  const roundedSize = size / Math.pow(1024, index);
+  // bytes don't have a fraction
+  const fractionDigits = index === 0 ? 0 : 2;
+  return `${roundedSize.toFixed(fractionDigits)} ${abbreviations[index]}`;
 }
 
 export type BundleStatsData = [files: string, names: string, size: number | string];
