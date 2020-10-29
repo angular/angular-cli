@@ -56,7 +56,7 @@ export function generateBundleStats(
   }
 }
 
-function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
+function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotalSize: boolean): string {
   const g = (x: string) => colors ? ansiColors.greenBright(x) : x;
   const c = (x: string) => colors ? ansiColors.cyanBright(x) : x;
   const bold = (x: string) => colors ? ansiColors.bold(x) : x;
@@ -65,13 +65,27 @@ function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
   const changedEntryChunksStats: BundleStatsData[] = [];
   const changedLazyChunksStats: BundleStatsData[] = [];
 
+  let initialTotalSize = 0;
+
   for (const { initial, stats } of data) {
     const [files, names, size] = stats;
-    (initial ? changedEntryChunksStats : changedLazyChunksStats).push([
+
+    const data: BundleStatsData = [
       g(files),
       names,
-      c(typeof size === 'string' ? size : formatSize(size)),
-    ]);
+      c(typeof size === 'number' ? formatSize(size) : size),
+    ];
+
+    if (initial) {
+      changedEntryChunksStats.push(data);
+
+      if (typeof size === 'number') {
+        initialTotalSize += size;
+      }
+
+    } else {
+      changedLazyChunksStats.push(data);
+    }
   }
 
   const bundleInfo: (string | number)[][] = [];
@@ -82,6 +96,11 @@ function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
       ['Initial Chunk Files', 'Names', 'Size'].map(bold),
       ...changedEntryChunksStats,
     );
+
+    if (showTotalSize) {
+      bundleInfo.push([]);
+      bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
+    }
   }
 
   // Seperator
@@ -100,6 +119,7 @@ function generateBuildStatsTable(data: BundleStats[], colors: boolean): string {
   return textTable(bundleInfo, {
     hsep: dim(' | '),
     stringLength: s => removeColor(s).length,
+    align: ['l', 'l', 'r'],
   });
 }
 
@@ -132,7 +152,7 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
     if (a.stats[2] > b.stats[2]) {
       return -1;
     }
-    
+
     if (a.stats[2] < b.stats[2]) {
       return 1;
     }
@@ -140,7 +160,7 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
     return 0;
   });
 
-  const statsTable = generateBuildStatsTable(changedChunksStats, colors);
+  const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
 
   // In some cases we do things outside of webpack context 
   // Such us index generation, service worker augmentation etc...
