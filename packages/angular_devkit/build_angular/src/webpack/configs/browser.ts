@@ -47,6 +47,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
       },
       perChunkOutput: false,
       outputFilename: '3rdpartylicenses.txt',
+      skipChildCompilers: true,
     }));
   }
 
