@@ -15,14 +15,38 @@ import {
   parseJsonAst,
   workspaces,
 } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { findUp } from './find-up';
 
 function isJsonObject(value: json.JsonValue | undefined): value is json.JsonObject {
   return value !== undefined && json.isJsonObject(value);
+}
+
+function createWorkspaceHost(): workspaces.WorkspaceHost {
+  return {
+    async readFile(path) {
+      return readFileSync(path, 'utf-8');
+    },
+    async writeFile(path, data) {
+      writeFileSync(path, data);
+    },
+    async isDirectory(path) {
+      try {
+        return statSync(path).isDirectory();
+      } catch {
+        return false;
+      }
+    },
+    async isFile(path) {
+      try {
+        return statSync(path).isFile();
+      } catch {
+        return false;
+      }
+    },
+  };
 }
 
 function getSchemaLocation(): string {
@@ -116,7 +140,7 @@ export class AngularWorkspace {
 
     const result = await workspaces.readWorkspace(
       workspaceFilePath,
-      workspaces.createWorkspaceHost(new NodeJsSyncHost()),
+      createWorkspaceHost(),
       workspaces.WorkspaceFormat.JSON,
     );
 
@@ -143,13 +167,7 @@ export async function getWorkspace(
   }
 
   try {
-    const result = await workspaces.readWorkspace(
-      configPath,
-      workspaces.createWorkspaceHost(new NodeJsSyncHost()),
-      workspaces.WorkspaceFormat.JSON,
-    );
-
-    const workspace = new AngularWorkspace(result.workspace, configPath);
+    const workspace = await AngularWorkspace.load(configPath);
     cachedWorkspaces.set(level, workspace);
 
     return workspace;
