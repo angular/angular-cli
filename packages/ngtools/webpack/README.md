@@ -63,6 +63,8 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 * `i18nOutFile`. Optional and only used for View Engine compilations. The name of the file to write extractions to.
 * `i18nOutFormat`. Optional and only used for View Engine compilations. The format of the localization file where extractions will be written to.
 * `locale`. Optional and only used for View Engine compilations. Locale to use for i18n.
+* `suppressZoneJsIncompatibilityWarning`. Optional, defaults to `false`. A Zone.js incompatibility warning is shown when the compilation target is ES2017+. Zone.js does not support native async/await in ES2017+. These blocks are not intercepted by zone.js and will not triggering change detection. 
+See https://github.com/angular/zone.js/pull/1140 for more information.
 
 ## Features
 The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:

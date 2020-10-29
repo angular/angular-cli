@@ -269,6 +269,18 @@ export class AngularCompilerPlugin {
       this._discoverLazyRoutes = options.discoverLazyRoutes;
     }
 
+    if (
+      !this.options.suppressZoneJsIncompatibilityWarning &&
+      this._compilerOptions.target !== undefined &&
+      this._compilerOptions.target >= ts.ScriptTarget.ES2017
+    ) {
+      this._warnings.push(
+        'Zone.js does not support native async/await in ES2017+.\n' +
+        'These blocks are not intercepted by zone.js and will not triggering change detection.\n' +
+        'See: https://github.com/angular/zone.js/pull/1140 for more information.',
+      );
+    }
+
     if (this._discoverLazyRoutes === false && this.options.additionalLazyModuleResources
       && this.options.additionalLazyModuleResources.length > 0) {
       this._warnings.push(
