@@ -22,12 +22,27 @@ export function getWorkerConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   const workerTsConfigPath = resolve(wco.root, buildOptions.webWorkerTsConfig);
-  const WorkerPlugin = require('worker-plugin');
+  const WebWorkerPlugin = require('worker-plugin');
+
+  const workerPlugins = [getTypescriptWorkerPlugin(wco, workerTsConfigPath)];
+  if (buildOptions.extractLicenses) {
+    // Webpack child compilations will not inherit the license plugin
+    const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
+    workerPlugins.push(new LicenseWebpackPlugin({
+      stats: {
+        warnings: false,
+        errors: false,
+      },
+      perChunkOutput: false,
+      // The name needs to be unique to this child compilation to avoid duplicate asset errors
+      outputFilename: '3rdpartylicenses-worker-[hash].txt',
+    }));
+  }
 
   return {
-    plugins: [new WorkerPlugin({
+    plugins: [new WebWorkerPlugin({
       globalObject: false,
-      plugins: [getTypescriptWorkerPlugin(wco, workerTsConfigPath)],
+      plugins: workerPlugins,
     })],
   };
 }

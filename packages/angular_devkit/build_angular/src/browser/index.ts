@@ -152,15 +152,6 @@ async function initialize(
   // Assets are processed directly by the builder except when watching
   const adjustedOptions = options.watch ? options : { ...options, assets: [] };
 
-  // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
-  if (adjustedOptions.extractLicenses && isWebpackFiveOrHigher()) {
-    adjustedOptions.extractLicenses = false;
-    context.logger.warn(
-      'Warning: License extraction is currently disabled when using Webpack 5. ' +
-        'This is temporary and will be corrected in a future update.',
-    );
-  }
-
   const {
     config,
     projectRoot,
