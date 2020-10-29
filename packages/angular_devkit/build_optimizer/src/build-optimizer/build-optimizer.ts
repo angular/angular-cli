@@ -54,6 +54,11 @@ function isKnownCoreFile(filePath: string) {
 }
 
 function isKnownSideEffectFree(filePath: string) {
+  // rxjs add imports contain intentional side effects
+  if (/[\\/]node_modules[\\/]rxjs[\\/]add[\\/]/.test(filePath)) {
+    return false;
+  }
+
   return ngFactories.some((s) => filePath.endsWith(s)) ||
     knownSideEffectFreeAngularModules.some((re) => re.test(filePath));
 }
