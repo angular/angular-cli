@@ -9,7 +9,6 @@ import {
   BuildOptimizerWebpackPlugin,
   buildOptimizerLoaderPath,
 } from '@angular-devkit/build-optimizer';
-import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { existsSync } from 'fs';
 import * as path from 'path';
@@ -444,17 +443,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         },
       }),
     );
-  }
-
-  if (
-    wco.tsConfig.options.target !== undefined &&
-    wco.tsConfig.options.target >= ScriptTarget.ES2017
-  ) {
-    wco.logger.warn(tags.stripIndent`
-      Warning: Zone.js does not support native async/await in ES2017.
-      These blocks are not intercepted by zone.js and will not triggering change detection.
-      See: https://github.com/angular/zone.js/pull/1140 for more information.
-    `);
   }
 
   return {
