@@ -60,7 +60,7 @@
     "@bazel/bazelisk": "1.7.3",
     "@bazel/buildifier": "3.5.0",
     "@bazel/hide-bazel-files": "1.7.0",
-    "@bazel/ibazel": "0.13.2",
+    "@bazel/ibazel": "0.14.0",
     "@bazel/jasmine": "2.2.2",
     "@bazel/typescript": "2.2.2",
     "@hapi/hapi": "^18.4.0",
