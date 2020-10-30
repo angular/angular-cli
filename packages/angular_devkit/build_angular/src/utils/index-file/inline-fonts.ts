@@ -115,7 +115,11 @@ export class InlineFontsProcessor {
             .on('end', () => resolve(rawResponse));
         },
       )
-        .on('error', e => reject(e));
+        .on('error', e =>
+          reject(new Error(
+            `Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
+            e.message,
+          )));
     });
 
     if (cacheFontsPath) {
