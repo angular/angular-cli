@@ -42,7 +42,7 @@ function getI18nOutfile(format: string | undefined) {
   }
 }
 
-async function getSerializer(format: Format, sourceLocale: string, basePath: string, useLegacyIds = true) {
+async function getSerializer(format: Format, sourceLocale: string, basePath: string, useLegacyIds: boolean) {
   switch (format) {
     case Format.Xmb:
       const { XmbTranslationSerializer } =
@@ -125,6 +125,7 @@ export async function execute(
   const i18n = createI18nOptions(metadata);
 
   let usingIvy = false;
+  let useLegacyIds = true;
 
   const ivyMessages: LocalizeMessage[] = [];
   const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
@@ -153,6 +154,9 @@ export async function execute(
     context,
     (wco) => {
       const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
+
+      // Default value for legacy message ids is currently true
+      useLegacyIds = wco.tsConfig.options.enableI18nLegacyMessageIdFormat ?? true;
 
       // Ivy extraction is the default for Ivy applications.
       usingIvy = (isIvyApplication && options.ivy === undefined) || !!options.ivy;
@@ -244,6 +248,7 @@ export async function execute(
     options.format,
     i18n.sourceLocale,
     config.context || projectRoot,
+    useLegacyIds,
   );
   const content = serializer.serialize(ivyMessages);
 
