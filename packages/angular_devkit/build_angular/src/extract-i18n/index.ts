@@ -68,6 +68,32 @@ async function getSerializer(format: Format, sourceLocale: string, basePath: str
   }
 }
 
+function normalizeFormatOption(options: ExtractI18nBuilderOptions) {
+  let format;
+  if (options.i18nFormat !== Format.Xlf) {
+    format = options.i18nFormat;
+  } else {
+    format = options.format;
+  }
+
+  switch (format) {
+    case Format.Xlf:
+    case Format.Xlif:
+    case Format.Xliff:
+      format = Format.Xlf;
+      break;
+    case Format.Xlf2:
+    case Format.Xliff2:
+      format = Format.Xlf2;
+      break;
+    case undefined:
+      format = Format.Xlf;
+      break;
+  }
+
+  return format;
+}
+
 class NoEmitPlugin {
   apply(compiler: webpack.Compiler): void {
     compiler.hooks.shouldEmit.tap('angular-no-emit', () => false);
@@ -90,24 +116,7 @@ export async function execute(
     await context.getBuilderNameForTarget(browserTarget),
   );
 
-  if (options.i18nFormat !== Format.Xlf) {
-    options.format = options.i18nFormat;
-  }
-
-  switch (options.format) {
-    case Format.Xlf:
-    case Format.Xlif:
-    case Format.Xliff:
-      options.format = Format.Xlf;
-      break;
-    case Format.Xlf2:
-    case Format.Xliff2:
-      options.format = Format.Xlf2;
-      break;
-    case undefined:
-      options.format = Format.Xlf;
-      break;
-  }
+  const format = normalizeFormatOption(options);
 
   // We need to determine the outFile name so that AngularCompiler can retrieve it.
   let outFile = options.outFile || getI18nOutfile(options.format);
@@ -142,7 +151,7 @@ export async function execute(
       },
       buildOptimizer: false,
       i18nLocale: options.i18nLocale || i18n.sourceLocale,
-      i18nFormat: options.format,
+      i18nFormat: format,
       i18nFile: outFile,
       aot: true,
       progress: options.progress,
@@ -245,7 +254,7 @@ export async function execute(
 
   // Serialize all extracted messages
   const serializer = await getSerializer(
-    options.format,
+    format,
     i18n.sourceLocale,
     config.context || projectRoot,
     useLegacyIds,
