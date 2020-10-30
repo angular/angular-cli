@@ -252,11 +252,37 @@ export async function execute(
     return webpackResult;
   }
 
+  const basePath = config.context || projectRoot;
+
+  const { checkDuplicateMessages } = await import(
+    // tslint:disable-next-line: trailing-comma
+    '@angular/localize/src/tools/src/extract/duplicates'
+  );
+
+  // The filesystem is used to create a relative path for each file
+  // from the basePath.  This relative path is then used in the error message.
+  const checkFileSystem = {
+    relative(from: string, to: string): string {
+      return path.relative(from, to);
+    },
+  };
+  const diagnostics = checkDuplicateMessages(
+    // tslint:disable-next-line: no-any
+    checkFileSystem as any,
+    ivyMessages,
+    'warning',
+    // tslint:disable-next-line: no-any
+    basePath as any,
+  );
+  if (diagnostics.messages.length > 0) {
+    context.logger.warn(diagnostics.formatDiagnostics(''));
+  }
+
   // Serialize all extracted messages
   const serializer = await getSerializer(
     format,
     i18n.sourceLocale,
-    config.context || projectRoot,
+    basePath,
     useLegacyIds,
   );
   const content = serializer.serialize(ivyMessages);
