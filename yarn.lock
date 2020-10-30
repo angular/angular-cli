@@ -11594,10 +11594,10 @@ stylehacks@^4.0.0:
     postcss "^7.0.0"
     postcss-selector-parser "^3.0.0"
 
-stylus-loader@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/stylus-loader/-/stylus-loader-4.1.1.tgz#0e94f5d6274932a2dad054d1a736b32146ac7a99"
-  integrity sha512-Vnm7J/nIs/P6swIrdwJW/dflhsCOiFmb1U3PeQ6phRtg1soPLN4uKnnL7AtGIJDe173elbtYIXVzmCyF493CfA==
+stylus-loader@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/stylus-loader/-/stylus-loader-4.2.0.tgz#ec4cf3408a52d07e6d3c15ffe1a0e5c2484bacc7"
+  integrity sha512-n2zrq+rwUcK3DMX396XoxUYoQE+2DatqMId9RId79hOEYI7DVzsMKlQHcH7jkezvAD22SIks3YxgDhPUoRZ8ZQ==
   dependencies:
     fast-glob "^3.2.4"
     klona "^2.0.4"
