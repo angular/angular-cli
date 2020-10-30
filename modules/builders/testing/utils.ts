@@ -71,6 +71,16 @@ export async function createArchitect(root: Path) {
     );
   }
 
+  const ngUniveralCommonmNodePackages = path.join(ngUniversalNodePackages, 'common');
+  if (!existsSync(ngUniveralCommonmNodePackages)) {
+    cp(
+      '-ru',
+      path.join(
+        require.resolve('nguniversal/modules/common/npm_package/package.json'), '../'),
+        ngUniveralCommonmNodePackages,
+    );
+  }
+
   const { workspace } = await workspaces.readWorkspace(
     workspaceSysPath,
     workspaces.createWorkspaceHost(host),

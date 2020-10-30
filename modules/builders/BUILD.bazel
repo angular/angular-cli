@@ -64,6 +64,7 @@ jasmine_node_test(
         "@npm//shelljs",
         "@npm//node-fetch",
         "@npm//zone.js",
+        "//modules/common:npm_package",
         "//modules/express-engine:npm_package",
         ":npm_package",
     ] + glob([
