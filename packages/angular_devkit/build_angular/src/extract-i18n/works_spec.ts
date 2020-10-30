@@ -39,6 +39,18 @@ describe('Extract i18n Target', () => {
     }
   }, 30000);
 
+  it('does not emit the application files', async () => {
+    host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
+
+    const run = await architect.scheduleTarget(extractI18nTargetSpec);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    expect(host.scopedSync().exists(normalize('dist/app/main.js'))).toBeFalse();
+  }, 30000);
+
   it('shows errors', async () => {
     const logger = new logging.Logger('');
     const logs: string[] = [];
@@ -125,5 +137,30 @@ describe('Extract i18n Target', () => {
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
     expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
       .toMatch(/i18n test/);
+  }, 30000);
+
+  // DISABLED_FOR_VE
+  (veEnabled ? xit : it)('issues warnings for duplicate message identifiers', async () => {
+    host.appendToFile(
+      'src/app/app.component.ts',
+      'const c = $localize`:@@message-2:message contents`; const d = $localize`:@@message-2:different message contents`;',
+    );
+
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe((e) => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(extractI18nTargetSpec, undefined, { logger });
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    expect(host.scopedSync().exists(extractionFile)).toBe(true);
+
+    const fullLog = logs.join();
+    expect(fullLog).toContain(
+      'Duplicate messages with id',
+    );
+
   }, 30000);
 });
