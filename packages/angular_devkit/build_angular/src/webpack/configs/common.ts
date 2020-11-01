@@ -551,26 +551,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                       sourceType: 'unambiguous',
                       presets: [
                         [
-                          require.resolve('@babel/preset-env'),
+                          require.resolve('../../babel/presets/application'),
                           {
-                            bugfixes: true,
-                            modules: false,
-                            // Comparable behavior to tsconfig target of ES5
-                            targets: { ie: 9 },
-                            exclude: ['transform-typeof-symbol'],
-                          },
-                        ],
-                      ],
-                      plugins: [
-                        [
-                          require('@babel/plugin-transform-runtime').default,
-                          {
-                            useESModules: true,
-                            version: require('@babel/runtime/package.json').version,
-                            absoluteRuntime: path.dirname(
-                              require.resolve('@babel/runtime/package.json'),
-                            ),
-                          },
+                            forceES5: true,
+                          } as import('../../babel/presets/application').ApplicationPresetOptions,
                         ],
                       ],
                     },

@@ -32,7 +32,6 @@ import { I18nOptions } from '../utils/i18n-options';
 import { getHtmlTransforms } from '../utils/index-file/transforms';
 import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
 import { generateEntryPoints } from '../utils/package-chunk-sort';
-import { createI18nPlugins } from '../utils/process-bundle';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateI18nBrowserWebpackConfigFromContext, getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
@@ -346,12 +345,7 @@ async function setupLocalize(
   webpackConfig: webpack.Configuration,
 ) {
   const localeDescription = i18n.locales[locale];
-  const { plugins, diagnostics } = await createI18nPlugins(
-    locale,
-    localeDescription?.translation,
-    browserOptions.i18nMissingTranslation || 'ignore',
-    i18n.shouldInline,
-  );
+  const i18nDiagnostics: { type: string, message: string }[] = [];
 
   // Modify main entrypoint to include locale data
   if (
@@ -365,6 +359,14 @@ async function setupLocalize(
     } else {
       webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
     }
+  }
+
+  let missingTranslationBehavior = browserOptions.i18nMissingTranslation || 'ignore';
+  let translation = localeDescription?.translation || {};
+
+  if (locale === i18n.sourceLocale) {
+    missingTranslationBehavior = 'ignore';
+    translation = {};
   }
 
   const i18nRule: webpack.RuleSetRule = {
@@ -384,7 +386,20 @@ async function setupLocalize(
             locale,
             translationIntegrity: localeDescription?.files.map((file) => file.integrity),
           }),
-          plugins,
+          sourceType: 'unambiguous',
+          presets: [
+            [
+              require.resolve('../babel/presets/application'),
+              {
+                i18n: {
+                  locale,
+                  translation: i18n.shouldInline ? translation : undefined,
+                  missingTranslationBehavior,
+                },
+                diagnosticReporter: (type, message) => i18nDiagnostics.push({ type, message }),
+              } as import('../babel/presets/application').ApplicationPresetOptions,
+            ],
+          ],
         },
       },
     ],
@@ -406,17 +421,14 @@ async function setupLocalize(
     apply: (compiler: webpack.Compiler) => {
       compiler.hooks.thisCompilation.tap('build-angular', compilation => {
         compilation.hooks.finishModules.tap('build-angular', () => {
-          if (!diagnostics) {
-            return;
-          }
-          for (const diagnostic of diagnostics.messages) {
+          for (const diagnostic of i18nDiagnostics) {
             if (diagnostic.type === 'error') {
               addError(compilation, diagnostic.message);
             } else {
               addWarning(compilation, diagnostic.message);
             }
           }
-          diagnostics.messages.length = 0;
+          i18nDiagnostics.length = 0;
         });
       });
     },
