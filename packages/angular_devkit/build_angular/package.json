@@ -25,7 +25,7 @@
     "browserslist": "^4.9.1",
     "cacache": "15.0.5",
     "caniuse-lite": "^1.0.30001032",
-    "circular-dependency-plugin": "5.2.0",
+    "circular-dependency-plugin": "5.2.2",
     "copy-webpack-plugin": "6.2.1",
     "core-js": "3.6.5",
     "css-loader": "5.0.0",
