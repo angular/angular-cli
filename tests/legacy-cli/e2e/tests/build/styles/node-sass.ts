@@ -32,7 +32,7 @@ export default async function () {
   await silentExec('rm', '-rf', 'node_modules/sass');
   await expectToFail(() => ng('build', '--extract-css', '--source-map'));
 
-  await silentNpm('install', 'node-sass');
+  await silentNpm('install', 'node-sass@4');
   await silentExec('rm', '-rf', 'node_modules/sass');
   await ng('build', '--extract-css', '--source-map');
 
