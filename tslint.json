@@ -5,7 +5,7 @@
   "rules": {
     "max-line-length": [
       true,
-      100
+      140
     ],
     // Disable this flag because of SHA tslint#48b0c597f9257712c7d1f04b55ed0aa60e333f6a
     // TSLint now shows warnings if types for properties are inferred. This rule needs to be
@@ -165,8 +165,7 @@
     "no-rxjs-patch-imports": [
       true,
       "modules/**/*.ts"
-    ],
-    "deletion-target": true
+    ]
   },
   "linterOptions": {
     "format": "codeFrame",
