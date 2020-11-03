@@ -21,6 +21,6 @@
     "ansi-colors": "4.1.1",
     "inquirer": "7.3.3",
     "minimist": "1.2.5",
-    "symbol-observable": "2.0.3"
+    "symbol-observable": "3.0.0"
   }
 }
