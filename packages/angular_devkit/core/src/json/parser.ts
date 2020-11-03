@@ -29,6 +29,7 @@ export class JsonException extends BaseException {}
 
 /**
  * A character was invalid in this context.
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  */
 export class InvalidJsonCharacterException extends JsonException {
   invalidChar: string;
@@ -51,6 +52,7 @@ export class InvalidJsonCharacterException extends JsonException {
 
 /**
  * More input was expected, but we reached the end of the stream.
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  */
 export class UnexpectedEndOfInputException extends JsonException {
   constructor(_context: JsonParserContext) {
@@ -60,6 +62,7 @@ export class UnexpectedEndOfInputException extends JsonException {
 
 /**
  * An error happened within a file.
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  */
 export class PathSpecificJsonException extends JsonException {
   constructor(public path: string, public exception: JsonException) {
@@ -69,6 +72,7 @@ export class PathSpecificJsonException extends JsonException {
 
 /**
  * Context passed around the parser with information about where we currently are in the parse.
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  */
 export interface JsonParserContext {
   position: Position;
@@ -832,6 +836,8 @@ export enum JsonParseMode {
  * Parse the JSON string and return its AST. The AST may be losing data (end comments are
  * discarded for example, and space characters are not represented in the AST), but all values
  * will have a single node in the AST (a 1-to-1 mapping).
+ *
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  * @param input The string to use.
  * @param mode The mode to parse the input with. {@see JsonParseMode}.
  * @returns {JsonAstNode} The root node of the value of the AST.
@@ -863,6 +869,7 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
 
 /**
  * Options for the parseJson() function.
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  */
 export interface ParseJsonOptions {
   /**
@@ -879,6 +886,7 @@ export interface ParseJsonOptions {
  * If a path option is pass, it also absorbs JSON parsing errors and return a new error with the
  * path in it. Useful for showing errors when parsing from a file.
  *
+ * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
  * @param input The string to parse.
  * @param mode The mode to parse the input with. {@see JsonParseMode}.
  * @param options Additional optinos for parsing.
