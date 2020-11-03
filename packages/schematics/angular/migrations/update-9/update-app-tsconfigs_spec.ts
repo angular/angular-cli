@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { parse as parseJson } from 'jsonc-parser';
 import { getWorkspaceTargets, updateWorkspaceTargets } from './update-workspace-config_spec';
 
 // tslint:disable-next-line: no-any
 function readJsonFile(tree: UnitTestTree, path: string): any {
-  return parseJson(tree.readContent(path).toString(), JsonParseMode.Loose);
+  return parseJson(tree.readContent(path).toString());
 }
 
 function overrideJsonFile(tree: UnitTestTree, path: string, newContent: object) {

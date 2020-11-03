@@ -16,50 +16,15 @@ import {
   validateWorkspace,
 } from '../utilities/config';
 import { JSONFile, parseJson } from '../utilities/json-file';
-import { Schema as ConfigCommandSchema, Value as ConfigCommandSchemaValue } from './config';
+import { Schema as ConfigCommandSchema } from './config';
 
-function _validateBoolean(value: string) {
-  if (('' + value).trim() === 'true') {
-    return true;
-  } else if (('' + value).trim() === 'false') {
-    return false;
-  } else {
-    throw new Error(`Invalid value type; expected Boolean, received ${JSON.stringify(value)}.`);
-  }
-}
-function _validateString(value: string) {
-  return value;
-}
-function _validateAnalytics(value: string) {
-  if (value === '') {
-    // Disable analytics.
-    return null;
-  } else {
-    return value;
-  }
-}
-function _validateAnalyticsSharingUuid(value: string) {
-  if (value == '') {
-    return uuidV4();
-  } else {
-    return value;
-  }
-}
-function _validateAnalyticsSharingTracking(value: string) {
-  if (!value.match(/^GA-\d+-\d+$/)) {
-    throw new Error(`Invalid GA property ID: ${JSON.stringify(value)}.`);
-  }
-
-  return value;
-}
-
-const validCliPaths = new Map<string, (arg: string) => JsonValue>([
-  ['cli.warnings.versionMismatch', _validateBoolean],
-  ['cli.defaultCollection', _validateString],
-  ['cli.packageManager', _validateString],
-  ['cli.analytics', _validateAnalytics],
-  ['cli.analyticsSharing.tracking', _validateAnalyticsSharingTracking],
-  ['cli.analyticsSharing.uuid', _validateAnalyticsSharingUuid],
+const validCliPaths = new Map<string, ((arg: string | number | boolean | undefined) => string) | undefined>([
+  ['cli.warnings.versionMismatch', undefined],
+  ['cli.defaultCollection', undefined],
+  ['cli.packageManager', undefined],
+  ['cli.analytics', undefined],
+  ['cli.analyticsSharing.tracking', undefined],
+  ['cli.analyticsSharing.uuid', v => v ? `${v}` : uuidV4()],
 ]);
 
 /**
@@ -98,21 +63,17 @@ function parseJsonPath(path: string): (string | number)[] {
   return result.filter(fragment => fragment != null);
 }
 
-function normalizeValue(value: ConfigCommandSchemaValue, path: string): JsonValue {
-  const cliOptionType = validCliPaths.get(path);
-  if (cliOptionType) {
-    return cliOptionType('' + value);
+function normalizeValue(value: string | undefined | boolean | number): JsonValue | undefined {
+  const valueString = `${value}`.trim();
+  if (valueString === 'true') {
+    return true;
+  } else if (valueString === 'false') {
+    return false;
+  } else if (isFinite(+valueString)) {
+    return +valueString;
   }
 
-  if (typeof value === 'string') {
-    try {
-      return parseJson(value);
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  return value;
+  return value || undefined;
 }
 
 export class ConfigCommand extends Command<ConfigCommandSchema> {
@@ -133,7 +94,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
             We found a global configuration that was used in Angular CLI 1.
             It has been automatically migrated.`);
         }
-      } catch {}
+      } catch { }
     }
 
     if (options.value == undefined) {
@@ -171,7 +132,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
   }
 
   private async set(options: ConfigCommandSchema) {
-    if (!options.jsonPath || !options.jsonPath.trim()) {
+    if (!options.jsonPath?.trim()) {
       throw new Error('Invalid Path.');
     }
 
@@ -190,11 +151,9 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
       return 1;
     }
 
-    // TODO: Modify & save without destroying comments
-    const value = normalizeValue(options.value || '', options.jsonPath);
-
     const jsonPath = parseJsonPath(options.jsonPath);
-    const modified = config.modify(jsonPath, value);
+    const value = validCliPaths.get(options.jsonPath)?.(options.value) ?? options.value;
+    const modified = config.modify(jsonPath, normalizeValue(value));
 
     if (!modified) {
       this.logger.error('Value cannot be found.');
@@ -210,7 +169,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
       return 1;
     }
 
-    config.write();
+    config.save();
 
     return 0;
   }

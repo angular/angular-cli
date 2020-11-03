@@ -64,6 +64,20 @@
         "analytics": {
           "type": ["boolean", "string"],
           "description": "Share anonymous usage data with the Angular Team at Google."
+        },
+        "analyticsSharing": {
+          "type": "object",
+          "properties": {
+            "tracking": {
+              "description": "Analytics sharing info tracking ID.",
+              "type": "string",
+              "pattern": "^GA-\\d+-\\d+$"
+            },
+            "uuid": {
+              "description": "Analytics sharing info universally unique identifier.",
+              "type": "string"
+            }
+          }
         }
       },
       "additionalProperties": false

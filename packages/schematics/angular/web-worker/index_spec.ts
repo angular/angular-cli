@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { parse as parseJson } from 'jsonc-parser';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as WebWorkerOptions } from './schema';
@@ -60,7 +60,7 @@ describe('Web Worker Schematic', () => {
     expect(tree.exists(path)).toEqual(true);
 
     // tslint:disable-next-line: no-any
-    const { compilerOptions } = parseJson(tree.readContent(path).toString(), JsonParseMode.Loose) as any;
+    const { compilerOptions } = parseJson(tree.readContent(path).toString()) as any;
     expect(compilerOptions.outDir).toBe('../../out-tsc/worker');
   });
 
@@ -125,7 +125,7 @@ describe('Web Worker Schematic', () => {
     expect(tree.exists(path)).toEqual(true);
 
     // tslint:disable-next-line: no-any
-    const { compilerOptions } = parseJson(tree.readContent(path).toString(), JsonParseMode.Loose) as any;
+    const { compilerOptions } = parseJson(tree.readContent(path).toString()) as any;
     expect(compilerOptions.outDir).toBe('./out-tsc/worker');
   });
 

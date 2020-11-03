@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
+import { parse as parseJson } from 'jsonc-parser';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from './schema';
 
@@ -77,7 +77,7 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
     const { angularCompilerOptions } =
       // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
+      parseJson(tree.readContent('tsconfig.json').toString()) as any;
     expect(angularCompilerOptions.enableI18nLegacyMessageIdFormat).toBe(false);
   });
 
@@ -85,7 +85,7 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
+      parseJson(tree.readContent('tsconfig.json').toString()) as any;
     expect(compilerOptions.strict).toBeUndefined();
     expect(Object.keys(angularCompilerOptions).filter(option => option.startsWith('strict'))).toEqual([]);
   });
@@ -94,7 +94,7 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
+      parseJson(tree.readContent('tsconfig.json').toString()) as any;
     expect(compilerOptions.strict).toBe(true);
     expect(angularCompilerOptions.strictTemplates).toBe(true);
   });
