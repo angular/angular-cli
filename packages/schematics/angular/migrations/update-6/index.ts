@@ -8,12 +8,10 @@
 import {
   JsonArray,
   JsonObject,
-  JsonParseMode,
   Path,
   join,
   logging,
   normalize,
-  parseJson,
   tags,
 } from '@angular-devkit/core';
 import {
@@ -24,6 +22,7 @@ import {
   chain,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { parse as parseJson } from 'jsonc-parser';
 import {
   NodeDependency,
   NodeDependencyType,
@@ -745,7 +744,7 @@ export default function (): Rule {
     if (configBuffer == null) {
       throw new SchematicsException(`Could not find configuration file (${configPath})`);
     }
-    const config = parseJson(configBuffer.toString(), JsonParseMode.Loose);
+    const config = parseJson(configBuffer.toString());
 
     if (typeof config != 'object' || Array.isArray(config) || config === null) {
       throw new SchematicsException('Invalid angular-cli.json configuration; expected an object.');

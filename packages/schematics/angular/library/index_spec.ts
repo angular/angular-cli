@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-big-function
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { parse as parseJson } from 'jsonc-parser';
 import { getFileContent } from '../../angular/utility/test';
 import { Schema as ComponentOptions } from '../component/schema';
 import { latestVersions } from '../utility/latest-versions';
@@ -16,7 +16,7 @@ import { Schema as GenerateLibrarySchema } from './schema';
 
 // tslint:disable-next-line: no-any
 function getJsonFileContent(tree: UnitTestTree, path: string): any {
-  return parseJson(tree.readContent(path).toString(), JsonParseMode.Loose);
+  return parseJson(tree.readContent(path).toString());
 }
 
 describe('Library Schematic', () => {

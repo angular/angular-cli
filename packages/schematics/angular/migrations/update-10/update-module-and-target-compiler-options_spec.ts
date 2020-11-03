@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { parse as parseJson } from 'jsonc-parser';
 import { Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
 
 describe('Migration to update target and module compiler options', () => {
@@ -24,8 +24,7 @@ describe('Migration to update target and module compiler options', () => {
 
   // tslint:disable-next-line: no-any
   function readJsonFile(tree: UnitTestTree, filePath: string): any {
-    // tslint:disable-next-line: no-any
-    return parseJson(tree.readContent(filePath).toString(), JsonParseMode.Loose) as any;
+    return parseJson(tree.readContent(filePath).toString());
   }
 
   function createWorkSpaceConfig(tree: UnitTestTree) {

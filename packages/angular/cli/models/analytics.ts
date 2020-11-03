@@ -367,7 +367,7 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
   }
 
   config.modify(['cli', 'analytics'], value);
-  config.write();
+  config.save();
 
   analyticsDebug('done');
 
