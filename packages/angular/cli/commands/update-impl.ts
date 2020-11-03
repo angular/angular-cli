@@ -439,7 +439,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         const packageJson = findPackageJson(this.context.root, packageName);
         if (packageJson) {
           packagePath = path.dirname(packageJson);
-          packageNode = await readPackageJson(packagePath);
+          packageNode = await readPackageJson(packageJson);
         }
       }
 
