@@ -299,12 +299,12 @@ export function serveWebpackBrowser(
           });
 
           if (index === 0) {
-            logger.info(tags.oneLine`
+            logger.info('\n' + tags.oneLine`
               **
               Angular Live Development Server is listening on ${options.host}:${buildEvent.port},
               open your browser on ${serverAddress}
               **
-            `);
+            ` + '\n');
 
             if (options.open) {
               const open = require('open');
@@ -313,7 +313,7 @@ export function serveWebpackBrowser(
           }
 
           if (buildEvent.success) {
-            logger.info(`${colors.greenBright(colors.symbols.check)} Compiled successfully.`);
+            logger.info(`\n${colors.greenBright(colors.symbols.check)} Compiled successfully.`);
           }
 
           return of({ ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput);
