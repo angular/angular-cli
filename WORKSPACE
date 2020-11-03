@@ -75,9 +75,9 @@ install_bazel_dependencies(suppress_warning = True)
 # Bring in bazel_toolchains for RBE setup configuration.
 http_archive(
     name = "bazel_toolchains",
-    sha256 = "4fb3ceea08101ec41208e3df9e56ec72b69f3d11c56629d6477c0ff88d711cf7",
-    strip_prefix = "bazel-toolchains-3.6.0",
-    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.6.0.tar.gz",
+    sha256 = "8e0633dfb59f704594f19ae996a35650747adc621ada5e8b9fb588f808c89cb0",
+    strip_prefix = "bazel-toolchains-3.7.0",
+    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.7.0.tar.gz",
 )
 
 load("@bazel_toolchains//rules:environments.bzl", "clang_env")
