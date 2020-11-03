@@ -34,7 +34,7 @@ describe('Browser Builder external source map', () => {
     expect(hasTsSourcePaths).toBe(true, `vendor.js.map should have '.ts' extentions`);
   });
 
-  it(`does not generate 'vendor.js.map' when vendor sourcemap is disabled`, async () => {
+  it(`does not generate vendor sourcemaps when vendor sourcemap is disabled`, async () => {
     const overrides = {
       sourceMap: {
         scripts: true,
@@ -44,6 +44,7 @@ describe('Browser Builder external source map', () => {
     };
 
     const { files } = await browserBuild(architect, host, target, overrides);
-    expect(files['vendor.js.map']).toBeUndefined();
+    expect(files['vendor.js.map']).toBeUndefined('Expected vendor.js.map not to exists.');
+    expect(files['vendor.js']).not.toContain('sourceMappingURL', `Expected vendor.js not to contain '//# sourceMappingURL`);
   });
 });

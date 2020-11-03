@@ -46,6 +46,7 @@ import {
   ScriptsWebpackPlugin,
   WebpackRollupLoader,
 } from '../plugins';
+import { SourceMappingUrlRemoverLoaderPath } from '../plugins/source-mapping-url-remover-loader';
 import { getEsVersionForFileName, getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
 
 const TerserPlugin = require('terser-webpack-plugin');
@@ -358,13 +359,20 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     extraPlugins.push(new BundleBudgetPlugin({ budgets: buildOptions.budgets }));
   }
 
-  if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
-    extraRules.push({
-      test: /\.m?js$/,
-      exclude: /(ngfactory|ngstyle)\.js$/,
-      enforce: 'pre',
-      loader: require.resolve('source-map-loader'),
-    });
+  if (scriptsSourceMap || stylesSourceMap) {
+    extraRules.push(
+      vendorSourceMap
+        ? {
+          test: /\.m?js$/,
+          exclude: /(ngfactory|ngstyle)\.js$/,
+          enforce: 'pre',
+          loader: require.resolve('source-map-loader'),
+        }
+        : {
+          test: /\.m?js$/,
+          loader: SourceMappingUrlRemoverLoaderPath,
+        },
+    );
   }
 
   let buildOptimizerUseRule: RuleSetLoader[] = [];
