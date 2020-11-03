@@ -278,7 +278,7 @@ export function buildWebpackBrowser(
           // tslint:disable-next-line: no-big-function
           concatMap(async buildEvent => {
             const spinner = new Spinner();
-            spinner.enabled = !!options.progress;
+            spinner.enabled = options.progress !== false;
 
             const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
             if (!webpackRawStats) {
