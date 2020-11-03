@@ -1,5 +1,4 @@
 import { ng } from '../../../utils/process';
-import { expectToFail } from '../../../utils/utils';
 
 export default async function() {
 

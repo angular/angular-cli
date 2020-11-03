@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  JsonParseMode,
   analytics,
   isJsonObject,
   json,
@@ -18,6 +17,7 @@ import {
 import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { AngularWorkspace } from '../utilities/config';
+import { readAndParseJson } from '../utilities/json-file';
 import { parseJsonSchemaToCommandDescription } from '../utilities/json-schema';
 import {
   getGlobalAnalytics,
@@ -97,8 +97,7 @@ async function loadCommandDescription(
   registry: json.schema.CoreSchemaRegistry,
 ): Promise<CommandDescription> {
   const schemaPath = resolve(__dirname, path);
-  const schemaContent = readFileSync(schemaPath, 'utf-8');
-  const schema = json.parseJson(schemaContent, JsonParseMode.Loose, { path: schemaPath });
+  const schema = readAndParseJson(schemaPath);
   if (!isJsonObject(schema)) {
     throw new Error('Invalid command JSON loaded from ' + JSON.stringify(schemaPath));
   }

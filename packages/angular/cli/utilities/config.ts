@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json, parseJsonAst, workspaces } from '@angular-devkit/core';
+import { json, workspaces } from '@angular-devkit/core';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'fs';
-import { parse as parseJson } from 'jsonc-parser';
 import * as os from 'os';
 import * as path from 'path';
 import { findUp } from './find-up';
+import { JSONFile, readAndParseJson } from './json-file';
 
 function isJsonObject(value: json.JsonValue | undefined): value is json.JsonObject {
   return value !== undefined && json.isJsonObject(value);
@@ -185,7 +185,7 @@ export function createGlobalSettings(): string {
 
 export function getWorkspaceRaw(
   level: 'local' | 'global' = 'local',
-): [json.JsonAstObject | null, string | null] {
+): [JSONFile | null, string | null] {
   let configPath = level === 'local' ? projectFilePath() : globalFilePath();
 
   if (!configPath) {
@@ -196,28 +196,11 @@ export function getWorkspaceRaw(
     }
   }
 
-  const data = readFileSync(configPath);
-  let start = 0;
-  if (data.length > 3 && data[0] === 0xef && data[1] === 0xbb && data[2] === 0xbf) {
-    // Remove BOM
-    start = 3;
-  }
-  const content = data.toString('utf-8', start);
-  const ast = parseJsonAst(content, json.JsonParseMode.Loose);
-
-  if (ast.kind != 'object') {
-    throw new Error(`Invalid JSON file: ${configPath}`);
-  }
-
-  return [ast, configPath];
+  return [new JSONFile(configPath), configPath];
 }
 
 export async function validateWorkspace(data: json.JsonObject): Promise<void> {
-  const schemaContent = readFileSync(
-    path.join(__dirname, '..', 'lib', 'config', 'schema.json'),
-    'utf-8',
-  );
-  const schema = parseJson(schemaContent) as json.schema.JsonSchema;
+  const schema = readAndParseJson(path.join(__dirname, '../lib/config/schema.json')) as json.schema.JsonSchema;
   const { formats } = await import('@angular-devkit/schematics');
   const registry = new json.schema.CoreSchemaRegistry(formats.standardFormats);
   const validator = await registry.compile(schema).toPromise();
@@ -331,8 +314,7 @@ export function migrateLegacyGlobalConfig(): boolean {
   if (homeDir) {
     const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
     if (existsSync(legacyGlobalConfigPath)) {
-      const content = readFileSync(legacyGlobalConfigPath, 'utf-8');
-      const legacy = parseJson(content);
+      const legacy = readAndParseJson(legacyGlobalConfigPath);
       if (!isJsonObject(legacy)) {
         return false;
       }
@@ -384,9 +366,7 @@ function getLegacyPackageManager(): string | null {
   if (homeDir) {
     const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
     if (existsSync(legacyGlobalConfigPath)) {
-      const content = readFileSync(legacyGlobalConfigPath, 'utf-8');
-
-      const legacy = parseJson(content);
+      const legacy = readAndParseJson(legacyGlobalConfigPath);
       if (!isJsonObject(legacy)) {
         return null;
       }

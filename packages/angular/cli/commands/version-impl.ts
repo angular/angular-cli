@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, isJsonObject, parseJson } from '@angular-devkit/core';
-import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from '../models/command';
 import { colors } from '../utilities/color';
+import { JSONFile } from '../utilities/json-file';
 import { Schema as VersionCommandSchema } from './version';
 
 interface PartialPackageInfo {
@@ -169,15 +168,9 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
   private getIvyWorkspace(): string {
     try {
-      const content = fs.readFileSync(path.resolve(this.context.root, 'tsconfig.json'), 'utf-8');
-      const tsConfig = parseJson(content, JsonParseMode.Loose);
-      if (!isJsonObject(tsConfig)) {
-        return '<error>';
-      }
+      const json = new JSONFile(path.resolve(this.context.root, 'tsconfig.json'));
 
-      const { angularCompilerOptions } = tsConfig;
-
-      return isJsonObject(angularCompilerOptions) && angularCompilerOptions.enableIvy === false
+      return json.get(['angularCompilerOptions', 'enableIvy']) === false
         ? 'No'
         : 'Yes';
     } catch {

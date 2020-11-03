@@ -8,7 +8,6 @@
 import { analytics, json, tags } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as debug from 'debug';
-import { writeFileSync } from 'fs';
 import * as inquirer from 'inquirer';
 import * as os from 'os';
 import * as ua from 'universal-analytics';
@@ -357,21 +356,21 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
     throw new Error(`Could not find ${level} workspace.`);
   }
 
-  const configValue = config.value;
-  const cli: json.JsonValue = configValue['cli'] || (configValue['cli'] = {});
+  const cli = config.get(['cli']);
 
-  if (!json.isJsonObject(cli)) {
+  if (!json.isJsonObject(cli as json.JsonValue)) {
     throw new Error(`Invalid config found at ${configPath}. CLI should be an object.`);
   }
 
   if (value === true) {
     value = uuidV4();
   }
-  cli['analytics'] = value;
 
-  const output = JSON.stringify(configValue, null, 2);
-  writeFileSync(configPath, output);
+  config.modify(['cli', 'analytics'], value);
+  config.write();
+
   analyticsDebug('done');
+
 }
 
 /**
