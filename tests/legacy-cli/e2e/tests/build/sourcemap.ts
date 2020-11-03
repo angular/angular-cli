@@ -15,10 +15,10 @@ export default async function () {
   await ng('build', '--output-hashing=bundles', '--source-map');
 
   await ng('build', '--prod', '--output-hashing=none', '--source-map');
-  await testForSourceMaps(5);
+  await testForSourceMaps(6);
 
   await ng('build', '--output-hashing=none', '--source-map');
-  await testForSourceMaps(6);
+  await testForSourceMaps(8);
 }
 
 async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> {
@@ -29,7 +29,7 @@ async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> 
 
   let count = 0;
   for (const file of files) {
-    if (!file.endsWith('.js') || file.startsWith('vendor-')) {
+    if (!file.endsWith('.js')) {
       continue;
     }
 

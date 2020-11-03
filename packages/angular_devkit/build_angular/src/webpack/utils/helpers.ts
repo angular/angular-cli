@@ -73,7 +73,6 @@ export function getSourceMapDevTool(
   stylesSourceMap: boolean | undefined,
   hiddenSourceMap = false,
   inlineSourceMap = false,
-  vendorSourceMap = false,
 ): SourceMapDevToolPlugin {
   const include = [];
   if (scriptsSourceMap) {
@@ -94,7 +93,6 @@ export function getSourceMapDevTool(
     sourceRoot: 'webpack:///',
     moduleFilenameTemplate: '[resource-path]',
     append: hiddenSourceMap ? false : undefined,
-    exclude: vendorSourceMap ? undefined : /vendor.*\.js/,
   });
 }
 
