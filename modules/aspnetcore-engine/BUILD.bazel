@@ -11,6 +11,7 @@ ng_module(
     module_name = "@nguniversal/aspnetcore-engine",
     deps = [
         "//modules/aspnetcore-engine/tokens",
+        "//modules/common/engine",
         "@npm//@angular/common",
         "@npm//@angular/compiler",
         "@npm//@angular/platform-browser",

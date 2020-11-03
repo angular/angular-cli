@@ -8,10 +8,18 @@
 import { ResourceLoader } from '@angular/compiler';
 import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { INITIAL_CONFIG, platformDynamicServer, renderModuleFactory } from '@angular/platform-server';
-import * as fs from 'fs';
 
 import { FileLoader } from './file-loader';
-import { RenderOptions } from './interfaces';
+import { readFile } from './utils';
+
+/** These are the allowed options for the render */
+export interface RenderOptions {
+  bootstrap: Type<{}> | NgModuleFactory<{}>;
+  providers?: StaticProvider[];
+  url?: string;
+  document?: string;
+  documentFilePath?: string;
+}
 
 /**
  * A common rendering engine utility. This abstracts the logic
@@ -30,7 +38,7 @@ export class CommonEngine {
   }
 
   private factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
-  private templateCache: {[key: string]: string} = {};
+  private templateCache = new Map<string, string>();
 
   constructor(private moduleOrFactory?: Type<{}> | NgModuleFactory<{}>,
               private providers: StaticProvider[] = []) {}
@@ -41,7 +49,7 @@ export class CommonEngine {
    */
   async render(opts: RenderOptions): Promise<string> {
     // if opts.document dosen't exist then opts.documentFilePath must
-    const doc = opts.document || await this.getDocument(opts.documentFilePath as string);
+    const doc = opts.document || opts.documentFilePath && await this.getDocument(opts.documentFilePath);
     const extraProviders = [
       ...(opts.providers || []),
       ...(this.providers || []),
@@ -83,11 +91,14 @@ export class CommonEngine {
   }
 
   /** Retrieve the document from the cache or the filesystem */
-  private getDocument(filePath: string): Promise<string> {
-    const doc = this.templateCache[filePath] = this.templateCache[filePath] ||
-    fs.readFileSync(filePath).toString();
+  async getDocument(filePath: string): Promise<string> {
+    let doc = this.templateCache.get(filePath);
 
-    // As  promise so we can change the API later without breaking
-    return Promise.resolve(doc);
+    if (!doc) {
+      doc = await readFile(filePath, 'utf-8');
+      this.templateCache.set(filePath, doc);
+    }
+
+    return doc;
   }
 }

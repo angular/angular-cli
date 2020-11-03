@@ -44,7 +44,8 @@ describe('Prerender Builder Utils', () => {
       loggerErrorSpy = spyOn(CONTEXT.logger, 'error');
     });
 
-    it('Should return the union of the routes from routes, routesFile, and the extracted routes without any parameterized routes', async () => {
+    it('Should return the union of the routes from routes, routesFile, and the extracted routes without any parameterized routes',
+    async () => {
       const options = {
         routes: ROUTES,
         routesFile: ROUTES_FILE,

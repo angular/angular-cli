@@ -6,5 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export { FileLoader as ɵFileLoader, CommonEngine as ɵCommonEngine,
-  RenderOptions as ɵRenderOptions } from './src/index';
+export {
+  FileLoader as ɵFileLoader,
+  CommonEngine as ɵCommonEngine,
+  RenderOptions as ɵRenderOptions,
+} from './src/index';

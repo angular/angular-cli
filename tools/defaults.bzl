@@ -74,7 +74,6 @@ GLOBALS = {
     "@angular/platform-server": "ng.platformServer",
     "@nguniversal/common": "nguniversal.common",
     "@nguniversal/common/engine": "nguniversal.common.engine",
-    "@nguniversal/common/tokens": "nguniversal.common.tokens",
     "@nguniversal/aspnetcore-engine/tokens": "nguniversal.aspnetcoreEngine.tokens",
     "@nguniversal/express-engine/tokens": "nguniversal.expressEngine.tokens",
     "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",

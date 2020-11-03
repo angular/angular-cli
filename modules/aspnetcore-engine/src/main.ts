@@ -11,72 +11,42 @@ import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from
 import { platformDynamicServer } from '@angular/platform-server';
 
 import { ORIGIN_URL, REQUEST } from '@nguniversal/aspnetcore-engine/tokens';
-import { FileLoader } from './file-loader';
+import { ɵFileLoader } from '@nguniversal/common/engine';
 import { IEngineOptions } from './interfaces/engine-options';
 import { IEngineRenderResult } from './interfaces/engine-render-result';
 import { renderModuleFactory } from './platform-server-utils';
 
 /* @internal */
-export class UniversalData {
-  appNode = '';
-  title = '';
-  scripts = '';
-  styles = '';
-  meta = '';
-  links = '';
-}
-
-/* @internal */
 let appSelector = 'app-root'; // default
 
 /* @internal */
-function _getUniversalData(doc: Document): UniversalData {
+function _getUniversalData(doc: Document): Omit<IEngineRenderResult, 'moduleRef'> {
 
-  const STYLES: string[] = [];
-  const SCRIPTS: string[] = [];
-  const META: string[] = [];
-  const LINKS: string[] = [];
+  const styles: string[] = [];
+  const scripts: string[] = [];
+  const meta: string[] = [];
+  const links: string[] = [];
 
-  // tslint:disable-next-line: no-non-null-assertion
-  for (let i = 0; i < doc.head!.children.length; i++) {
-    // tslint:disable-next-line: no-non-null-assertion
-    const element = doc.head!.children[i];
-    const tagName = element.tagName.toUpperCase();
+  // tslint:disable: no-non-null-assertion
+  const elements = [
+    ...Array.from(doc.head!.children),
+    ...Array.from(doc.body!.children),
+  ];
+  // tslint:enable: no-non-null-assertion
 
-    switch (tagName) {
+  for (const element of elements) {
+    switch (element.tagName.toUpperCase()) {
       case 'SCRIPT':
-        SCRIPTS.push(element.outerHTML);
+        scripts.push(element.outerHTML);
         break;
       case 'STYLE':
-        STYLES.push(element.outerHTML);
+        styles.push(element.outerHTML);
         break;
       case 'LINK':
-        LINKS.push(element.outerHTML);
+        links.push(element.outerHTML);
         break;
       case 'META':
-        META.push(element.outerHTML);
-        break;
-      default:
-        break;
-    }
-  }
-
-  for (let i = 0; i < doc.body.children.length; i++) {
-    const element: Element = doc.body.children[i];
-    const tagName = element.tagName.toUpperCase();
-
-    switch (tagName) {
-      case 'SCRIPT':
-        SCRIPTS.push(element.outerHTML);
-        break;
-      case 'STYLE':
-        STYLES.push(element.outerHTML);
-        break;
-      case 'LINK':
-        LINKS.push(element.outerHTML);
-        break;
-      case 'META':
-        META.push(element.outerHTML);
+        meta.push(element.outerHTML);
         break;
       default:
         break;
@@ -84,13 +54,15 @@ function _getUniversalData(doc: Document): UniversalData {
   }
 
   return {
-    title: doc.title,
     // tslint:disable-next-line: no-non-null-assertion
-    appNode: doc.querySelector(appSelector)!.outerHTML,
-    scripts: SCRIPTS.join('\n'),
-    styles: STYLES.join('\n'),
-    meta: META.join('\n'),
-    links: LINKS.join('\n')
+    html: doc.querySelector(appSelector)!.outerHTML,
+    globals: {
+      title: doc.title,
+      scripts: scripts.join('\n'),
+      styles: styles.join('\n'),
+      meta: meta.join('\n'),
+      links: links.join('\n')
+    }
   };
 }
 
@@ -109,7 +81,7 @@ export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
   const compiler: Compiler = compilerFactory.createCompiler([
     {
       providers: [
-        { provide: ResourceLoader, useClass: FileLoader, deps: [] }
+        { provide: ResourceLoader, useClass: ɵFileLoader, deps: [] }
       ]
     }
   ]);
@@ -132,18 +104,10 @@ export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
   });
 
   const doc = result.moduleRef.injector.get(DOCUMENT);
-  const universalData = _getUniversalData(doc);
 
   return {
-    html: universalData.appNode,
     moduleRef: result.moduleRef,
-    globals: {
-      styles: universalData.styles,
-      title: universalData.title,
-      scripts: universalData.scripts,
-      meta: universalData.meta,
-      links: universalData.links
-    }
+    ..._getUniversalData(doc),
   };
 }
 

@@ -6,69 +6,49 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Request, ResponseToolkit } from '@hapi/hapi';
-import * as fs from 'fs';
 
-import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
-import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
+import { StaticProvider } from '@angular/core';
+import { ɵCommonEngine as CommonEngine, ɵRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
-
-/**
- * These are the allowed options for the engine
- */
-export interface NgSetupOptions {
-  bootstrap: Type<{}> | NgModuleFactory<{}>;
-  providers?: StaticProvider[];
-}
 
 /**
  * These are the allowed options for the render
  */
-export interface RenderOptions extends NgSetupOptions {
+export interface RenderOptions extends ɵRenderOptions {
   req: Request;
   res?: ResponseToolkit;
-  url?: string;
-  document?: string;
 }
-
-/**
- * This holds a cached version of each index used.
- */
-const templateCache: { [key: string]: string } = {};
 
 /**
  * The CommonEngine with module to facory map in case of JIT.
  */
-const commonEngine = new CommonEngine(undefined);
+const commonEngine = new CommonEngine();
 
 /**
  * This is an express engine for handling Angular Applications
  */
-export function ngHapiEngine(options: Readonly<RenderOptions>) {
+export async function ngHapiEngine(options: Readonly<RenderOptions>): Promise<string> {
   const req = options.req;
   if (req.raw.req.url === undefined) {
-    return Promise.reject(new Error('url is undefined'));
+    throw new Error('url is undefined');
   }
 
   const protocol = req.server.info.protocol;
   const filePath = req.raw.req.url as string;
 
-  const renderOptions: RenderOptions = Object.assign({}, options);
+  const renderOptions: RenderOptions = {...options};
 
-  return new Promise((resolve, reject) => {
-    const moduleOrFactory = options.bootstrap;
+  const moduleOrFactory = options.bootstrap;
 
-    if (!moduleOrFactory) {
-      return reject(new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped'));
-    }
+  if (!moduleOrFactory) {
+    throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
+  }
 
-    renderOptions.url = options.url || `${protocol}://${req.info.host}${req.path}`;
-    renderOptions.document = options.document || getDocument(filePath);
+  renderOptions.url = options.url || `${protocol}://${req.info.host}${req.path}`;
+  renderOptions.documentFilePath = renderOptions.documentFilePath || filePath;
+  renderOptions.providers = [...(options.providers || []), getReqProviders(options.req)];
 
-    renderOptions.providers = options.providers || [];
-    renderOptions.providers = renderOptions.providers.concat(getReqProviders(options.req));
-
-    commonEngine.render(renderOptions).then(resolve, reject);
-  });
+  return commonEngine.render(renderOptions);
 }
 
 /**
@@ -87,11 +67,4 @@ function getReqProviders(req: Request): StaticProvider[] {
   });
 
   return providers;
-}
-
-/**
- * Get the document at the file path
- */
-function getDocument(filePath: string): string {
-  return templateCache[filePath] = templateCache[filePath] || fs.readFileSync(filePath).toString();
 }

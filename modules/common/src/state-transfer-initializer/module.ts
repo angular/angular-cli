@@ -9,17 +9,21 @@
 import { DOCUMENT } from '@angular/common';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 
-export function domContentLoadedFactory(doc: Document) {
+
+export function domContentLoadedFactory(doc: Document): () => Promise<void>  {
   return () => new Promise ((resolve, _reject) => {
+    if (doc.readyState === 'complete' || doc.readyState === 'interactive') {
+      resolve();
+
+      return;
+    }
+
     const contentLoaded = () => {
       doc.removeEventListener('DOMContentLoaded', contentLoaded);
       resolve();
     };
-    if (doc.readyState === 'complete' || doc.readyState === 'interactive') {
-      resolve();
-    } else {
-      doc.addEventListener('DOMContentLoaded', contentLoaded);
-    }
+
+    doc.addEventListener('DOMContentLoaded', contentLoaded);
   });
 }
 

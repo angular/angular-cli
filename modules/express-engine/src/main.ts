@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Request, Response } from 'express';
-import * as fs from 'fs';
 
 import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
-import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
+import { ɵCommonEngine as CommonEngine, ɵRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
 /**
@@ -23,17 +22,10 @@ export interface NgSetupOptions {
 /**
  * These are the allowed options for the render
  */
-export interface RenderOptions extends NgSetupOptions {
+export interface RenderOptions extends ɵRenderOptions {
   req: Request;
   res?: Response;
-  url?: string;
-  document?: string;
 }
-
-/**
- * This holds a cached version of each index used.
- */
-const templateCache: { [key: string]: string } = {};
 
 /**
  * This is an express engine for handling Angular Applications
@@ -55,10 +47,8 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
 
       renderOptions.url =
       renderOptions.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`;
-      renderOptions.document = renderOptions.document || getDocument(filePath);
-
-      renderOptions.providers = renderOptions.providers || [];
-      renderOptions.providers = renderOptions.providers.concat(getReqResProviders(req, res));
+      renderOptions.documentFilePath = renderOptions.documentFilePath || filePath;
+      renderOptions.providers = [...(renderOptions.providers || []), getReqResProviders(req, res)];
 
       engine.render(renderOptions)
         .then(html => callback(null, html))
@@ -87,11 +77,4 @@ function getReqResProviders(req: Request, res?: Response): StaticProvider[] {
   }
 
   return providers;
-}
-
-/**
- * Get the document at the file path
- */
-function getDocument(filePath: string): string {
-  return templateCache[filePath] = templateCache[filePath] || fs.readFileSync(filePath).toString();
 }
