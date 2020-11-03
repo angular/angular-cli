@@ -6,16 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  InvalidJsonCharacterException,
-  JsonArray,
-  JsonObject,
-  JsonParseMode,
-  JsonValue,
-  parseJson,
-  tags,
-} from '@angular-devkit/core';
-import { writeFileSync } from 'fs';
+import { JsonValue, tags } from '@angular-devkit/core';
 import { v4 as uuidV4 } from 'uuid';
 import { Command } from '../models/command';
 import { Arguments, CommandScope } from '../models/interface';
@@ -24,6 +15,7 @@ import {
   migrateLegacyGlobalConfig,
   validateWorkspace,
 } from '../utilities/config';
+import { JSONFile, parseJson } from '../utilities/json-file';
 import { Schema as ConfigCommandSchema, Value as ConfigCommandSchemaValue } from './config';
 
 function _validateBoolean(value: string) {
@@ -106,73 +98,6 @@ function parseJsonPath(path: string): (string | number)[] {
   return result.filter(fragment => fragment != null);
 }
 
-function getValueFromPath<T extends JsonArray | JsonObject>(
-  root: T,
-  path: string,
-): JsonValue | undefined {
-  const fragments = parseJsonPath(path);
-
-  try {
-    return fragments.reduce((value: JsonValue | undefined, current: string | number) => {
-      if (value == undefined || typeof value != 'object') {
-        return undefined;
-      } else if (typeof current == 'string' && !Array.isArray(value)) {
-        return value[current];
-      } else if (typeof current == 'number' && Array.isArray(value)) {
-        return value[current];
-      } else {
-        return undefined;
-      }
-    }, root);
-  } catch {
-    return undefined;
-  }
-}
-
-function setValueFromPath<T extends JsonArray | JsonObject>(
-  root: T,
-  path: string,
-  newValue: JsonValue,
-): JsonValue | undefined {
-  const fragments = parseJsonPath(path);
-
-  try {
-    return fragments.reduce((value: JsonValue | undefined, current: string | number, index: number) => {
-      if (value == undefined || typeof value != 'object') {
-        return undefined;
-      } else if (typeof current == 'string' && !Array.isArray(value)) {
-        if (index === fragments.length - 1) {
-          value[current] = newValue;
-        } else if (value[current] == undefined) {
-          if (typeof fragments[index + 1] == 'number') {
-            value[current] = [];
-          } else if (typeof fragments[index + 1] == 'string') {
-            value[current] = {};
-          }
-        }
-
-        return value[current];
-      } else if (typeof current == 'number' && Array.isArray(value)) {
-        if (index === fragments.length - 1) {
-          value[current] = newValue;
-        } else if (value[current] == undefined) {
-          if (typeof fragments[index + 1] == 'number') {
-            value[current] = [];
-          } else if (typeof fragments[index + 1] == 'string') {
-            value[current] = {};
-          }
-        }
-
-        return value[current];
-      } else {
-        return undefined;
-      }
-    }, root);
-  } catch {
-    return undefined;
-  }
-}
-
 function normalizeValue(value: ConfigCommandSchemaValue, path: string): JsonValue {
   const cliOptionType = validCliPaths.get(path);
   if (cliOptionType) {
@@ -181,13 +106,9 @@ function normalizeValue(value: ConfigCommandSchemaValue, path: string): JsonValu
 
   if (typeof value === 'string') {
     try {
-      return parseJson(value, JsonParseMode.Loose);
+      return parseJson(value);
     } catch (e) {
-      if (e instanceof InvalidJsonCharacterException && !value.startsWith('{')) {
-        return value;
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
@@ -222,28 +143,28 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
         return 1;
       }
 
-      return this.get(config.value, options);
+      return this.get(config, options);
     } else {
       return this.set(options);
     }
   }
 
-  private get(config: JsonObject, options: ConfigCommandSchema) {
+  private get(jsonFile: JSONFile, options: ConfigCommandSchema) {
     let value;
     if (options.jsonPath) {
-      value = getValueFromPath(config, options.jsonPath);
+      value = jsonFile.get(parseJsonPath(options.jsonPath));
     } else {
-      value = config;
+      value = jsonFile.content;
     }
 
     if (value === undefined) {
       this.logger.error('Value cannot be found.');
 
       return 1;
-    } else if (typeof value == 'object') {
-      this.logger.info(JSON.stringify(value, null, 2));
+    } else if (typeof value === 'string') {
+      this.logger.info(value);
     } else {
-      this.logger.info(value.toString());
+      this.logger.info(JSON.stringify(value, null, 2));
     }
 
     return 0;
@@ -270,27 +191,26 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
     }
 
     // TODO: Modify & save without destroying comments
-    const configValue = config.value;
-
     const value = normalizeValue(options.value || '', options.jsonPath);
-    const result = setValueFromPath(configValue, options.jsonPath, value);
 
-    if (result === undefined) {
+    const jsonPath = parseJsonPath(options.jsonPath);
+    const modified = config.modify(jsonPath, value);
+
+    if (!modified) {
       this.logger.error('Value cannot be found.');
 
       return 1;
     }
 
     try {
-      await validateWorkspace(configValue);
+      await validateWorkspace(parseJson(config.content));
     } catch (error) {
       this.logger.fatal(error.message);
 
       return 1;
     }
 
-    const output = JSON.stringify(configValue, null, 2);
-    writeFileSync(configPath, output);
+    config.write();
 
     return 0;
   }
