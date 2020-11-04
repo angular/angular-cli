@@ -160,7 +160,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     this.analytics.pageview('/command/' + paths.join('/'), { dimensions, metrics });
   }
 
-  abstract async run(options: T & Arguments): Promise<number | void>;
+  abstract run(options: T & Arguments): Promise<number | void>;
 
   async validateAndRun(options: T & Arguments): Promise<number | void> {
     if (!(options.help === true || options.help === 'json' || options.help === 'JSON')) {
