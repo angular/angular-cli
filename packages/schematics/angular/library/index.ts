@@ -56,19 +56,25 @@ function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>):
 }
 
 function updateTsConfig(packageName: string, ...paths: string[]) {
-
   return (host: Tree) => {
-    if (!host.exists('tsconfig.json')) { return host; }
+    const addPathsToTsConfig = (file: string) => 
+      updateJsonFile(host, file, (tsconfig: TsConfigPartialType) => {
+        if (!tsconfig.compilerOptions.paths) {
+          tsconfig.compilerOptions.paths = {};
+        }
+        if (!tsconfig.compilerOptions.paths[packageName]) {
+          tsconfig.compilerOptions.paths[packageName] = [];
+        }
+        tsconfig.compilerOptions.paths[packageName].push(...paths);
+      });
+    ;
 
-    return updateJsonFile(host, 'tsconfig.json', (tsconfig: TsConfigPartialType) => {
-      if (!tsconfig.compilerOptions.paths) {
-        tsconfig.compilerOptions.paths = {};
-      }
-      if (!tsconfig.compilerOptions.paths[packageName]) {
-        tsconfig.compilerOptions.paths[packageName] = [];
-      }
-      tsconfig.compilerOptions.paths[packageName].push(...paths);
-    });
+    if (host.exists('tsconfig.base.json')) {
+      addPathsToTsConfig('tsconfig.base.json');
+    } else if (host.exists('tsconfig.json')) {
+      addPathsToTsConfig('tsconfig.json');
+    }
+    return host;
   };
 }
 
