@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { logging } from '@angular-devkit/core';
-import { take, tap, timeout } from 'rxjs/operators';
+import { debounceTime, take, tap } from 'rxjs/operators';
 import {
   browserBuild,
   createArchitect,
@@ -117,7 +117,7 @@ describe('Browser Builder lazy modules', () => {
       const run = await architect.scheduleTarget(target, overrides);
       await run.output
         .pipe(
-          timeout(15000),
+          debounceTime(3000),
           tap(buildEvent => {
             buildNumber++;
             switch (buildNumber) {
