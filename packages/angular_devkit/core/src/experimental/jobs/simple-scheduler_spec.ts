@@ -316,7 +316,7 @@ describe('SimpleScheduler', () => {
         return new Observable<number>(observer => {
           function fn() {
             if (keepGoing) {
-              const p = new Promise(r => resolves.push(r));
+              const p = new Promise<void>(r => resolves.push(r));
 
               observer.next(argument);
               done.push(argument);
