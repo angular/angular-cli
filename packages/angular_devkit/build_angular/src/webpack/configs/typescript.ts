@@ -9,6 +9,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 import { CompilerOptions } from '@angular/compiler-cli';
 import { buildOptimizerLoaderPath } from '@angular-devkit/build-optimizer';
+import { getSystemPath } from '@angular-devkit/core';
 import {
   AngularCompilerPlugin,
   AngularCompilerPluginOptions,
@@ -69,7 +70,7 @@ function createIvyPlugin(
   const fileReplacements: Record<string, string> = {};
   if (buildOptions.fileReplacements) {
     for (const replacement of buildOptions.fileReplacements) {
-      fileReplacements[replacement.replace] = replacement.with;
+      fileReplacements[getSystemPath(replacement.replace)] = getSystemPath(replacement.with);
     }
   }
 
