@@ -8,6 +8,9 @@
 
 import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
+import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
+import { normalize, resolve as resolvePath } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { fork } from 'child_process';
 import * as fs from 'fs';
 import * as ora from 'ora';
@@ -109,6 +112,19 @@ async function _renderUniversal(
   browserOptions: BrowserBuilderOptions,
   numProcesses?: number,
 ): Promise<PrerenderBuilderOutput> {
+  const host = new NodeJsSyncHost();
+  const projectName = context.target && context.target.project;
+  if (!projectName) {
+    throw new Error('The builder requires a target.');
+  }
+
+  const root = normalize(context.workspaceRoot);
+  const projectMetadata = await context.getProjectMetadata(projectName);
+  const projectRoot = resolvePath(
+    root,
+    normalize((projectMetadata.root as string) || ''),
+  );
+
   // Users can specify a different base html file e.g. "src/home.html"
   const indexFile = getIndexOutputFile(browserOptions);
   // We need to render the routes for each locale from the browser output.
@@ -142,6 +158,26 @@ async function _renderUniversal(
     }
 
     spinner.succeed(`Prerendering routes to ${outputPath} complete.`);
+
+    if (browserOptions.serviceWorker) {
+      spinner.start('Generating service worker...');
+      try {
+        await augmentAppWithServiceWorker(
+          host,
+          root,
+          projectRoot,
+          normalize(outputPath),
+          browserOptions.baseHref || '/',
+          browserOptions.ngswConfigPath,
+        );
+      } catch (error) {
+        spinner.fail('Service worker generation failed.');
+
+        return { success: false, error: error.message };
+      }
+
+      spinner.succeed('Service worker generation complete.');
+    }
   }
 
   return browserResult;

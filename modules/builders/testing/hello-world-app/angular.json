@@ -32,6 +32,9 @@
             "scripts": []
           },
           "configurations": {
+            "sw": {
+              "serviceWorker": true
+            },
             "production": {
               "fileReplacements": [
                 {

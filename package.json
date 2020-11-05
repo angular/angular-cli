@@ -57,6 +57,7 @@
     "@angular/platform-browser-dynamic": "^11.0.0-rc.0",
     "@angular/platform-server": "^11.0.0-rc.0",
     "@angular/router": "^11.0.0-rc.0",
+    "@angular/service-worker": "^11.0.0-rc.0",
     "@bazel/bazelisk": "1.7.3",
     "@bazel/buildifier": "3.5.0",
     "@bazel/hide-bazel-files": "1.7.0",

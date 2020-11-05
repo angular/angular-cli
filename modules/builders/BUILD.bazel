@@ -57,6 +57,7 @@ jasmine_node_test(
         "@npm//@angular/compiler",
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-browser-dynamic",
+        "@npm//@angular/service-worker",
         "@npm//@types/node",
         "@npm//browser-sync",
         "@npm//express",

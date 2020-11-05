@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, virtualFs } from '@angular-devkit/core';
+import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host, outputPathBrowser } from '../../testing/utils';
 
 describe('Prerender Builder', () => {
@@ -157,6 +157,40 @@ describe('Prerender Builder', () => {
     expect(fooBarContent).toContain('foo-bar works!');
     expect(fooBarContent).toContain('This page was prerendered with Angular Universal');
 
+    await run.stop();
+  });
+
+  it('should generate service-worker', async () => {
+    const manifest = {
+      index: '/index.html',
+      assetGroups: [
+        {
+          name: 'app',
+          installMode: 'prefetch',
+          resources: {
+            files: [
+              '/index.html',
+            ],
+          },
+        },
+      ],
+    };
+
+    host.writeMultipleFiles({
+      'ngsw-config.json': JSON.stringify(manifest),
+    });
+
+    const run = await architect.scheduleTarget(target, { routes: ['foo'], browserTarget: 'app:build:sw' });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+
+    const content = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+    );
+
+    expect(content).toContain('foo works!');
+    expect(content).toContain('This page was prerendered with Angular Universal');
+    expect(host.scopedSync().exists(normalize('dist/app/browser/ngsw.json'))).toBeTrue();
     await run.stop();
   });
 });
