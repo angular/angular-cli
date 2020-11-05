@@ -155,8 +155,13 @@ export function augmentHostWithReplacements(
     return;
   }
 
+  const normalizedReplacements: Record<string, string> = {};
+  for (const [key, value] of Object.entries(replacements)) {
+    normalizedReplacements[forwardSlashPath(key)] = forwardSlashPath(value);
+  }
+
   const tryReplace = (resolvedModule: ts.ResolvedModule | undefined) => {
-    const replacement = resolvedModule && replacements[resolvedModule.resolvedFileName];
+    const replacement = resolvedModule && normalizedReplacements[resolvedModule.resolvedFileName];
     if (replacement) {
       return {
         resolvedFileName: replacement,
