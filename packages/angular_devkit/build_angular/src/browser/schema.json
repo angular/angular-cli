@@ -433,10 +433,12 @@
           "type": "object",
           "properties": {
             "src": {
-              "type": "string"
+              "type": "string",
+              "pattern": "\\.([cm]?j|t)sx?$"
             },
             "replaceWith": {
-              "type": "string"
+              "type": "string",
+              "pattern": "\\.([cm]?j|t)sx?$"
             }
           },
           "additionalProperties": false,
@@ -449,10 +451,12 @@
           "type": "object",
           "properties": {
             "replace": {
-              "type": "string"
+              "type": "string",
+              "pattern": "\\.([cm]?j|t)sx?$"
             },
             "with": {
-              "type": "string"
+              "type": "string",
+              "pattern": "\\.([cm]?j|t)sx?$"
             }
           },
           "additionalProperties": false,
