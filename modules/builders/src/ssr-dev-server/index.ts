@@ -64,7 +64,6 @@ export function execute(
   const getBaseUrl = (bs: browserSync.BrowserSyncInstance) => `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
 
   const browserTargetRun = context.scheduleTarget(browserTarget, {
-    extractCss: true,
     serviceWorker: false,
     watch: true,
     progress: options.progress,
