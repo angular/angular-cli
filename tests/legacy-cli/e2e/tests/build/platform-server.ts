@@ -10,18 +10,18 @@ const snapshots = require('../../ng-snapshot/package.json');
 export default async function () {
   const argv = getGlobalVariable('argv');
   const veEnabled = argv['ve'];
+  const tag = (await isPrereleaseCli()) ? 'next' : 'latest';
 
-  // @nguniversal/express-engine currently relies on ^0.1000.0 of @angular-devkit/architect
-  // which is not present in the local package registry and not semver compatible with 0.1001.0+
-  const { stdout: stdout1 } = await silentNpm('pack', '@angular-devkit/architect@0.1001', '--registry=https://registry.npmjs.org');
+  // @nguniversal/express-engine currently relies on ^0.1100.0-rc.2 of @angular-devkit/architect
+  // which is not present in the local package registry and not semver compatible with ^11.0.0-next.7
+  const { stdout: stdout1 } = await silentNpm('pack', '@angular-devkit/architect@0.1100.0-rc.2', '--registry=https://registry.npmjs.org');
   await silentNpm('publish', stdout1.trim(), '--registry=http://localhost:4873', '--tag=minor');
 
-  // @nguniversal/express-engine currently relies on ^10.0.0 of @angular-devkit/core
-  // which is not present in the local package registry and not semver compatible prerelease version of 10.1.0
-  const { stdout: stdout2 } = await silentNpm('pack', '@angular-devkit/core@10.1', '--registry=https://registry.npmjs.org');
+  // @nguniversal/express-engine currently relies on ^11.0.0-rc.2 of @angular-devkit/core
+  // which is not present in the local package registry and not semver compatible prerelease version of ^11.0.0-next.7
+  const { stdout: stdout2 } = await silentNpm('pack', '@angular-devkit/core@11.0.0-rc.2', '--registry=https://registry.npmjs.org');
   await silentNpm('publish', stdout2.trim(), '--registry=http://localhost:4873', '--tag=minor');
 
-  const tag = (await isPrereleaseCli()) ? 'next' : 'latest';
   await ng('add', `@nguniversal/express-engine@${tag}`);
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
