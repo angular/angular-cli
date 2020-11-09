@@ -229,7 +229,7 @@
     "verdaccio": "4.8.1",
     "verdaccio-auth-memory": "^9.7.2",
     "webpack": "4.44.2",
-    "webpack-dev-middleware": "3.7.2",
+    "webpack-dev-middleware": "4.0.1",
     "webpack-dev-server": "3.11.0",
     "webpack-merge": "5.3.0",
     "webpack-sources": "2.0.1",
