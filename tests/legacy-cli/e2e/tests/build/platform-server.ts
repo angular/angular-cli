@@ -1,28 +1,17 @@
 import { normalize } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { appendToFile, expectFileToMatch, writeFile } from '../../utils/fs';
+import { appendToFile, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
-import { exec, ng, silentNpm } from '../../utils/process';
-import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
+import { exec, ng } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
   const argv = getGlobalVariable('argv');
   const veEnabled = argv['ve'];
-  const tag = (await isPrereleaseCli()) ? 'next' : 'latest';
 
-  // @nguniversal/express-engine currently relies on ^0.1100.0-rc.2 of @angular-devkit/architect
-  // which is not present in the local package registry and not semver compatible with ^11.0.0-next.7
-  const { stdout: stdout1 } = await silentNpm('pack', '@angular-devkit/architect@0.1100.0-rc.2', '--registry=https://registry.npmjs.org');
-  await silentNpm('publish', stdout1.trim(), '--registry=http://localhost:4873', '--tag=minor');
-
-  // @nguniversal/express-engine currently relies on ^11.0.0-rc.2 of @angular-devkit/core
-  // which is not present in the local package registry and not semver compatible prerelease version of ^11.0.0-next.7
-  const { stdout: stdout2 } = await silentNpm('pack', '@angular-devkit/core@11.0.0-rc.2', '--registry=https://registry.npmjs.org');
-  await silentNpm('publish', stdout2.trim(), '--registry=http://localhost:4873', '--tag=minor');
-
-  await ng('add', `@nguniversal/express-engine@${tag}`);
+  await ng('generate', 'universal', '--client-project', 'test-project');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
@@ -82,6 +71,8 @@ export default async function () {
     );
   }
 
+  await replaceInFile('tsconfig.server.json', 'src/main.server.ts', 'server.ts');
+  await replaceInFile('angular.json', 'src/main.server.ts', 'server.ts');
 
   await ng('run', 'test-project:server:production', '--optimization', 'false');
 
