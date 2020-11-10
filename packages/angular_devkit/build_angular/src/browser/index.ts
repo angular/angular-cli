@@ -69,6 +69,7 @@ import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
 import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
 import {
   BundleStats,
+  ChunkType,
   generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
@@ -592,11 +593,11 @@ export function buildWebpackBrowser(
                   const chunk = webpackStats.chunks?.find((chunk) => chunk.id.toString() === result.name);
 
                   if (result.original) {
-                    bundleInfoStats.push(generateBundleInfoStats(result.original, chunk));
+                    bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
                   }
 
                   if (result.downlevel) {
-                    bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk));
+                    bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
                   }
                 }
 
@@ -605,7 +606,7 @@ export function buildWebpackBrowser(
                 ) || [];
                 for (const chunk of unprocessedChunks) {
                   const asset = webpackStats.assets?.find(a => a.name === chunk.files[0]);
-                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }, true));
+                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }));
                 }
 
                 // Check for budget errors and display them to the user.
@@ -773,6 +774,7 @@ type ArrayElement<A> = A extends ReadonlyArray<infer T> ? T : never;
 function generateBundleInfoStats(
   bundle: ProcessBundleFile,
   chunk: ArrayElement<webpack.Stats.ToJsonOutput['chunks']> | undefined,
+  chunkType: ChunkType,
 ): BundleStats {
   return generateBundleStats(
     {
@@ -782,8 +784,8 @@ function generateBundleInfoStats(
       entry: !!chunk?.names.includes('runtime'),
       initial: !!chunk?.initial,
       rendered: true,
+      chunkType,
     },
-    true,
   );
 }
 export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);
