@@ -99,6 +99,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     const hasIstanbulReporter = reporters.includes('coverage-istanbul');
     if (hasCoveragePlugin && !hasCoverageReporter) {
       reporters.push('coverage');
+      logger.warn(`There is a known issue with Karma and karma-coverage. Tests that exceed the coverage threshold will not fail. This will be fixed in Karma 5.2.x soon.`)
     }
     else if (hasIstanbulPlugin && !hasIstanbulReporter) {
       // coverage-istanbul is deprecated in favor of karma-coverage
