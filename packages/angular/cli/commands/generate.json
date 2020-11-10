@@ -1,4 +1,4 @@
-{
+{ massto }
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/generate.json",
   "description": "Generates and/or modifies files based on a schematic.",
