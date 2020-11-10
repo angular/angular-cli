@@ -177,6 +177,8 @@ describe('Browser Builder output hashing', () => {
   });
 
   it('does not hash non injected styles when optimization is enabled', async () => {
+    host.writeMultipleFiles({ 'src/styles.css': 'body { background: blue; }' });
+
     const overrides = {
       outputHashing: 'all',
       extractCss: true,
