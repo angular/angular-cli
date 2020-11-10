@@ -13,7 +13,7 @@
     "@angular-devkit/core": "0.0.0",
     "@babel/core": "7.12.3",
     "@babel/generator": "7.12.1",
-    "@babel/plugin-transform-runtime": "7.12.1",  
+    "@babel/plugin-transform-runtime": "7.12.1",
     "@babel/preset-env": "7.12.1",
     "@babel/runtime": "7.12.1",
     "@babel/template": "7.10.4",
@@ -80,7 +80,7 @@
   "peerDependencies": {
     "@angular/compiler-cli": "^11.0.0 || ^11.0.0-next",
     "@angular/localize": "^11.0.0 || ^11.0.0-next",
-    "karma": "^5.2.0",
+    "karma": "~5.1.0",
     "ng-packagr": "^11.0.0 || ^11.0.0-next",
     "protractor": "^7.0.0",
     "tslint": "^6.1.0",
