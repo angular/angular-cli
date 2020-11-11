@@ -1114,18 +1114,18 @@
   resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.14.0.tgz#86fa0002bed2ce1123b7ad98d4dd4623a0d93244"
   integrity sha512-s0gyec6lArcRDwVfIP6xpY8iEaFpzrSpyErSppd3r2O49pOEg7n6HGS/qJ8ncvme56vrDk6crl/kQ6VAdEO+rg==
 
-"@bazel/jasmine@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.2.2.tgz#32e7ec7af3549dd739c9ea74a9f2103589a91c62"
-  integrity sha512-etcJVYSf0ix3QstY7A5K1eUwKeIB1gOQpCZw2kCDsaKeiYcyRTusgqG3EHQdHBEytEV/FIP8LJ6CwahpJ0vg/Q==
+"@bazel/jasmine@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.3.0.tgz#b8d9a1bd9f8f35e49e1bddd5bfc12f9460331af1"
+  integrity sha512-gcaswsXMiGL5IOckgyCjFR1OehqTYuqcGQGg1xTpbOaGDMW21b8OvIZbqR2xLwBg2td6qdFjfXKQlxcQpyBrwA==
   dependencies:
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.2.2.tgz#c7cd49cb630ca3720c04c94046ba8ca4c0d5b0aa"
-  integrity sha512-hkx/7L3s8q5gIgaSFmkUZWPqdKmdJmQ04GaLnsI/YEp9EhPObqATSKnOHeDdT7bzqLO7giDAwAiXhEmsO1Smcw==
+"@bazel/typescript@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.3.0.tgz#642c8049390c34d25de175788862b2a9cc156899"
+  integrity sha512-XsRzCbL3FDsZM1PDlEjTIJrZeXysuDFRLI3SflXhTOqZa5+2bmG/Eur1/y5zOdSz3JFNNxGYAUUm7VXHVrMZRA==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
