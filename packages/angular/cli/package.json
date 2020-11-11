@@ -40,7 +40,7 @@
     "npm-pick-manifest": "6.1.0",
     "open": "7.3.0",
     "pacote": "9.5.12",
-    "resolve": "1.18.1",
+    "resolve": "1.19.0",
     "rimraf": "3.0.2",
     "semver": "7.3.2",
     "symbol-observable": "3.0.0",
