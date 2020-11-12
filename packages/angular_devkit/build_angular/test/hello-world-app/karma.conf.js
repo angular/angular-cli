@@ -25,6 +25,9 @@ module.exports = function(config) {
     client: {
       clearContext: false, // leave Jasmine Spec Runner output visible in browser
     },
+    jasmineHtmlReporter: {
+      suppressAll: true // removes the duplicated traces
+    },
     coverageReporter: {
       dir: path.join(__dirname, './coverage'),
       subdir: '.',
