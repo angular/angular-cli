@@ -7373,12 +7373,13 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-license-checker-webpack-plugin@0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/license-checker-webpack-plugin/-/license-checker-webpack-plugin-0.1.5.tgz#5f09b91098b53f986c74f02d81258aa691b2956e"
-  integrity sha512-UkQiBPva59iJqWJ1eF0CuOpvIHUehOyojjVkI2Q1a9Bv4tR1g0BpBRamqjKoCPDNoE53Y5f1znhQ6k81LGEBwQ==
+license-checker-webpack-plugin@0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/license-checker-webpack-plugin/-/license-checker-webpack-plugin-0.1.6.tgz#deae7457a4804a71eb60b82ec31d2aca150665ff"
+  integrity sha512-pB1lBaQONqMzuNdc9BqB/s3h0K/fF2agPEagwoDxEa7me3kS98RVvCAZiAX9xXasZ6sSeMStz+zfUuzF/huW4w==
   dependencies:
     "@hapi/joi" "^16.1.7"
+    glob "^7.1.6"
     lodash.template "^4.5.0"
     minimatch "^3.0.4"
     semver "^6.3.0"
