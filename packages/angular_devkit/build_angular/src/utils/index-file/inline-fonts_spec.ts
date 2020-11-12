@@ -39,6 +39,27 @@ describe('InlineFontsProcessor', () => {
     expect(html).toContain(`font-family: 'Material Icons'`);
   });
 
+  it('should inline multiple fonts from a single request with minification enabled', async () => {
+    const inlineFontsProcessor = new InlineFontsProcessor({
+      minifyInlinedCSS: true,
+      WOFFSupportNeeded: false,
+    });
+
+    const html = await inlineFontsProcessor.process(`
+      <html>
+      <head>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500%7CGoogle+Sans:400,500%7CRoboto+Mono:400,500%7CMaterial+Icons&display=swap" rel="stylesheet">
+        <link href="theme.css" rel="stylesheet">
+      </head>
+      <body></body>
+    </html>`);
+
+    expect(html).toContain(`'Google Sans'`);
+    expect(html).toContain(`'Roboto'`);
+    expect(html).toContain(`'Roboto Mono'`);
+    expect(html).toContain(`'Material Icons'`);
+  });
+
   it('works with http protocol', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
       WOFFSupportNeeded: false,
