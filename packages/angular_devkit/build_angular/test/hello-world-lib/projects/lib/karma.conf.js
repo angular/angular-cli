@@ -22,6 +22,9 @@ module.exports = function (config) {
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
+    jasmineHtmlReporter: {
+      suppressAll: true // removes the duplicated traces
+    },
     coverageIstanbulReporter: {
       dir: require('path').join(__dirname, 'coverage'),
       reports: ['html', 'lcovonly'],
