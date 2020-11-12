@@ -102,5 +102,10 @@
     "tslint": {
       "optional": true
     }
+  },
+  "ng-update": {
+    "packageGroup": {
+      "codelyzer": "^6.0.0"
+    }
   }
 }
