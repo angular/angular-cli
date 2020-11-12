@@ -21,7 +21,7 @@ module.exports = function (config) {
       reporters: [
         { type: 'html' },
         { type: 'text-summary' }
-      ],
+      ]
     },
     reporters: ['progress', 'kjhtml'],
     port: 9876,
