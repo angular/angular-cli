@@ -61,6 +61,7 @@ import {
 } from './transformers';
 import { collectDeepNodes } from './transformers/ast_helpers';
 import { removeIvyJitSupportCalls } from './transformers/remove-ivy-jit-support-calls';
+import { replaceIsPlatformCalls } from './transformers/replace_is_platform_calls';
 import {
   AUTO_START_ARG,
 } from './type_checker';
@@ -1102,7 +1103,7 @@ export class AngularCompilerPlugin {
             getEntryModule,
             getTypeChecker,
             this._useFactories,
-          ));
+          ), replaceIsPlatformCalls(PLATFORM.Browser));
         }
       } else if (this._platform === PLATFORM.Server) {
         // The export lazy module map is required only for string based lazy loading
@@ -1110,6 +1111,8 @@ export class AngularCompilerPlugin {
         if (!this._compilerOptions.enableIvy) {
           this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
         }
+
+        this._transformers.push(replaceIsPlatformCalls(PLATFORM.Server));
 
         if (this._useFactories) {
           this._transformers.push(
