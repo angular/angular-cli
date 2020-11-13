@@ -56,8 +56,8 @@ describe('Dev Server Builder HMR', () => {
       'src/app/app.component.html': `
         <p>{{title}}</p>
 
-        <input type="text">
-
+        <input class="visible" type="text">
+        <input type="hidden">
         <select>
           <option>one</option>
           <option>two</option>
@@ -165,7 +165,7 @@ describe('Dev Server Builder HMR', () => {
               await page.goto(url);
               expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
               await page.evaluate(() => {
-                document.querySelector('input').value = 'input value';
+                document.querySelector('input.visible').value = 'input value';
                 document.querySelector('select').value = 'two';
               });
 
@@ -177,7 +177,7 @@ describe('Dev Server Builder HMR', () => {
               expect(logs).toContain('[NG HMR] Restoring input/textarea values.');
               expect(logs).toContain('[NG HMR] Restoring selected options.');
 
-              const inputValue = await page.evaluate(() => document.querySelector('input').value);
+              const inputValue = await page.evaluate(() => document.querySelector('input.visible').value);
               expect(inputValue).toBe('input value');
 
               const selectValue = await page.evaluate(() => document.querySelector('select').value);
