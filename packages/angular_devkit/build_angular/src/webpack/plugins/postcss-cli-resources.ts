@@ -7,7 +7,7 @@
  */
 import { interpolateName } from 'loader-utils';
 import * as path from 'path';
-import * as postcss from 'postcss';
+import { Declaration, Plugin } from 'postcss';
 import * as url from 'url';
 import * as webpack from 'webpack';
 
@@ -48,14 +48,15 @@ async function resolve(
   }
 }
 
-export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResourcesOptions | undefined) => {
+export const postcss = true;
+
+export default function(options?: PostcssCliResourcesOptions): Plugin {
   if (!options) {
     throw new Error('No options were specified to "postcss-cli-resources".');
   }
 
   const {
     deployUrl = '',
-    baseHref = '',
     resourcesOutputPath = '',
     filename,
     loader,
@@ -141,21 +142,16 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     });
   };
 
-  return (root) => {
-    const urlDeclarations: Array<postcss.Declaration> = [];
-    root.walkDecls(decl => {
-      if (decl.value && decl.value.includes('url')) {
-        urlDeclarations.push(decl);
+  const resourceCache = new Map<string, string>();
+  const processed = Symbol('postcss-cli-resources');
+
+  return {
+    postcssPlugin: 'postcss-cli-resources',
+    async Declaration(decl) {
+      if (!decl.value.includes('url') || processed in decl) {
+        return;
       }
-    });
 
-    if (urlDeclarations.length === 0) {
-      return;
-    }
-
-    const resourceCache = new Map<string, string>();
-
-    return Promise.all(urlDeclarations.map(async decl => {
       const value = decl.value;
       const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+?))\s*\)/g;
       const segments: string[] = [];
@@ -200,6 +196,8 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       if (modified) {
         decl.value = segments.join('');
       }
-    }));
+
+      (decl as Declaration & { [processed]: boolean })[processed] = true;
+    },
   };
-});
+}
