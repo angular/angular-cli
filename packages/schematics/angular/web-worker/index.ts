@@ -35,9 +35,12 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
 
     try {
       const json = new JSONFile(host, tsConfigPath);
-      const exclude = json.get(['exclude']);
-      if (exclude && Array.isArray(exclude) && !exclude.includes(workerGlob)) {
-        json.modify(['exclude'], [...exclude, workerGlob]);
+      const jsonPath = ['exclude'];
+      const exclude = json.get(jsonPath);
+      if (!exclude) {
+        json.modify(jsonPath, [workerGlob]);
+      } else if (Array.isArray(exclude) && !exclude.includes(workerGlob)) {
+        json.modify(jsonPath, [...exclude, workerGlob]);
       }
     } catch {}
 
