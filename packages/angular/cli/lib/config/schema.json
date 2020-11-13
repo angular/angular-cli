@@ -1063,11 +1063,11 @@
                   "properties": {
                     "src": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     },
                     "replaceWith": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     }
                   },
                   "additionalProperties": false,
@@ -1081,11 +1081,11 @@
                   "properties": {
                     "replace": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     },
                     "with": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     }
                   },
                   "additionalProperties": false,
@@ -1960,11 +1960,11 @@
                   "properties": {
                     "src": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     },
                     "replaceWith": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     }
                   },
                   "additionalProperties": false,
@@ -1978,11 +1978,11 @@
                   "properties": {
                     "replace": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     },
                     "with": {
                       "type": "string",
-                      "pattern": "\\.([cm]?j|t)sx?$"
+                      "pattern": "\\.(([cm]?j|t)sx?|json)$"
                     }
                   },
                   "additionalProperties": false,
