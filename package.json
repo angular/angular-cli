@@ -91,7 +91,7 @@
     "@bazel/typescript": "2.2.2",
     "@jsdevtools/coverage-istanbul-loader": "3.0.3",
     "@types/babel__core": "7.1.12",
-    "@types/babel__template": "7.0.3",
+    "@types/babel__template": "7.4.0",
     "@types/browserslist": "^4.4.0",
     "@types/cacache": "^12.0.1",
     "@types/caniuse-lite": "^1.0.0",
