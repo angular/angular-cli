@@ -12,6 +12,7 @@ import {
 } from '@angular-devkit/schematics';  // tslint:disable-line:no-implicit-dependencies
 import { BuiltinTaskExecutor } from '../../tasks/node';
 import { FileSystemEngine } from '../description';
+import { OptionTransform } from '../file-system-engine-host-base';
 import { NodeModulesEngineHost } from '../node-module-engine-host';
 import { validateOptionsWithSchema } from '../schema-option-transform';
 
@@ -23,6 +24,7 @@ export interface NodeWorkflowOptions {
   registry?: schema.CoreSchemaRegistry;
   resolvePaths?: string[];
   schemaValidation?: boolean;
+  optionTransforms?: OptionTransform<object, object>[];
 }
 
 /**
@@ -65,6 +67,12 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     });
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
+
+    if (options.optionTransforms) {
+      for (const transform of options.optionTransforms) {
+        engineHost.registerOptionsTransform(transform);
+      }
+    }
 
     if (options.schemaValidation) {
       engineHost.registerOptionsTransform(validateOptionsWithSchema(this.registry));
