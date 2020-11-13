@@ -52,7 +52,8 @@ export default function (mod: any): void {
       return;
     }
 
-    const oldInputs = document.querySelectorAll('input, textarea');
+    // Inputs that are hidden should be ignored
+    const oldInputs = document.querySelectorAll('input:not([type="hidden"]), textarea');
     const oldOptions = document.querySelectorAll('option');
 
     // Create new application
@@ -160,8 +161,8 @@ function dispatchEvents(element: any): void {
 }
 
 function restoreFormValues(oldInputs: any[], oldOptions: any[]): void {
-  // Restore input
-  const newInputs = document.querySelectorAll('input, textarea');
+  // Restore input that are not hidden
+  const newInputs = document.querySelectorAll('input:not([type="hidden"]), textarea');
   if (newInputs.length && newInputs.length === oldInputs.length) {
     console.log('[NG HMR] Restoring input/textarea values.');
     for (let index = 0; index < newInputs.length; index++) {
