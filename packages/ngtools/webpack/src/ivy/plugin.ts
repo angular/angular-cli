@@ -20,7 +20,7 @@ import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
 import { forwardSlashPath } from '../utils';
 import { addError, addWarning } from '../webpack-diagnostics';
-import { mergeResolverMainFields } from '../webpack-version';
+import { isWebpackFiveOrHigher, mergeResolverMainFields } from '../webpack-version';
 import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
 import {
   augmentHostWithCaching,
@@ -239,9 +239,15 @@ export class AngularWebpackPlugin {
         .filter((sourceFile) => !internalFiles?.has(sourceFile));
 
       // Ensure all program files are considered part of the compilation and will be watched
-      allProgramFiles.forEach((sourceFile) =>
-        compilation.compilationDependencies.add(sourceFile.fileName),
-      );
+      if (isWebpackFiveOrHigher()) {
+        allProgramFiles.forEach((sourceFile) =>
+          compilation.fileDependencies.add(sourceFile.fileName),
+        );
+      } else {
+        allProgramFiles.forEach((sourceFile) =>
+          compilation.compilationDependencies.add(sourceFile.fileName),
+        );
+      }
 
       compilation.hooks.finishModules.tapPromise(PLUGIN_NAME, async (modules) => {
         // Rebuild any remaining AOT required modules
