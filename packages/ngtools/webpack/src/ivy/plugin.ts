@@ -59,22 +59,16 @@ function initializeNgccProcessor(
   const { inputFileSystem, options: webpackOptions } = compiler;
   const mainFields = ([] as string[]).concat(...(webpackOptions.resolve?.mainFields || []));
 
-  const fileWatchPurger = (path: string) => {
-    if (inputFileSystem.purge) {
-      // Webpack typings do not contain the string parameter overload for purge
-      (inputFileSystem as { purge(path: string): void }).purge(path);
-    }
-  };
-
   const errors: string[] = [];
   const warnings: string[] = [];
   const processor = new NgccProcessor(
     mainFields,
-    fileWatchPurger,
     warnings,
     errors,
     compiler.context,
     tsconfig,
+    inputFileSystem,
+    webpackOptions.resolve?.symlinks,
   );
 
   return { processor, errors, warnings };
