@@ -32,7 +32,7 @@ export class JSONFile {
   }
 
   private _jsonAst: Node | undefined;
-  private get JsonAst(): Node {
+  private get JsonAst(): Node | undefined {
     if (this._jsonAst) {
       return this._jsonAst;
     }
@@ -47,11 +47,16 @@ export class JSONFile {
   }
 
   get(jsonPath: JSONPath): unknown {
-    if (jsonPath.length === 0) {
-      return getNodeValue(this.JsonAst);
+    const jsonAstNode = this.JsonAst;
+    if (!jsonAstNode) {
+      return undefined;
     }
 
-    const node = findNodeAtLocation(this.JsonAst, jsonPath);
+    if (jsonPath.length === 0) {
+      return getNodeValue(jsonAstNode);
+    }
+
+    const node = findNodeAtLocation(jsonAstNode, jsonPath);
 
     return node === undefined ? undefined : getNodeValue(node);
   }
