@@ -10,8 +10,7 @@ import { AugmentIndexHtmlOptions, FileInfo, augmentIndexHtml } from './augment-i
 
 describe('augment-index-html', () => {
   const indexGeneratorOptions: AugmentIndexHtmlOptions = {
-    input: 'index.html',
-    inputContent: '<html><head></head><body></body></html>',
+    html: '<html><head></head><body></body></html>',
     baseHref: '/',
     sri: false,
     files: [],
@@ -52,7 +51,7 @@ describe('augment-index-html', () => {
   it('should replace base href value', async () => {
     const source = augmentIndexHtml({
       ...indexGeneratorOptions,
-      inputContent: '<html><head><base href="/"></head><body></body></html>',
+      html: '<html><head><base href="/"></head><body></body></html>',
       baseHref: '/Apps/',
     });
 

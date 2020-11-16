@@ -14,10 +14,8 @@ export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 export type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
 
 export interface AugmentIndexHtmlOptions {
-  /* Input file name (e. g. index.html) */
-  input: string;
   /* Input contents */
-  inputContent: string;
+  html: string;
   baseHref?: string;
   deployUrl?: string;
   sri: boolean;
@@ -59,7 +57,7 @@ export interface FileInfo {
 export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
   const {
     loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints,
-    sri, deployUrl = '', lang, baseHref, inputContent,
+    sri, deployUrl = '', lang, baseHref, html,
   } = params;
 
   let { crossOrigin = 'none' } = params;
@@ -145,8 +143,8 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     linkTags.push(`<link ${attrs.join(' ')}>`);
   }
 
-  const { rewriter, transformedContent } = await htmlRewritingStream(inputContent);
-  const baseTagExists = inputContent.includes('<base');
+  const { rewriter, transformedContent } = await htmlRewritingStream(html);
+  const baseTagExists = html.includes('<base');
 
   rewriter
     .on('startTag', tag => {

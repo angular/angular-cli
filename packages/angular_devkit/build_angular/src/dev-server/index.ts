@@ -29,8 +29,7 @@ import { findCachePath } from '../utils/cache-path';
 import { checkPort } from '../utils/check-port';
 import { colors } from '../utils/color';
 import { I18nOptions } from '../utils/i18n-options';
-import { getHtmlTransforms } from '../utils/index-file/transforms';
-import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
+import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { generateEntryPoints } from '../utils/package-chunk-sort';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
@@ -265,19 +264,17 @@ export function serveWebpackBrowser(
         webpackConfig.plugins = [...(webpackConfig.plugins || [])];
         webpackConfig.plugins.push(
           new IndexHtmlWebpackPlugin({
-            input: path.resolve(workspaceRoot, getIndexInputFile(browserOptions.index)),
-            output: getIndexOutputFile(browserOptions.index),
+            indexPath: path.resolve(workspaceRoot, getIndexInputFile(browserOptions.index)),
+            outputPath: getIndexOutputFile(browserOptions.index),
             baseHref,
-            moduleEntrypoints,
             entrypoints,
+            moduleEntrypoints,
+            noModuleEntrypoints: ['polyfills-es5'],
             deployUrl: browserOptions.deployUrl,
             sri: browserOptions.subresourceIntegrity,
-            noModuleEntrypoints: ['polyfills-es5'],
-            postTransforms: getHtmlTransforms(
-              normalizedOptimization,
-              buildBrowserFeatures,
-              transforms.indexHtml,
-            ),
+            postTransform: transforms.indexHtml,
+            optimization: normalizedOptimization,
+            WOFFSupportNeeded: !buildBrowserFeatures.isFeatureSupported('woff2'),
             crossOrigin: browserOptions.crossOrigin,
             lang: locale,
           }),
