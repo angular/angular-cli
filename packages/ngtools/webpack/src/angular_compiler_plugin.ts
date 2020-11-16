@@ -785,21 +785,14 @@ export class AngularCompilerPlugin {
 
       let ngccProcessor: NgccProcessor | undefined;
       if (this._compilerOptions.enableIvy) {
-        const fileWatchPurger = (path: string) => {
-          // tslint:disable-next-line: no-any
-          if ((compilerWithFileSystems.inputFileSystem as any).purge) {
-            // tslint:disable-next-line: no-any
-            (compilerWithFileSystems.inputFileSystem as any).purge(path);
-          }
-        };
-
         ngccProcessor = new NgccProcessor(
           this._mainFields,
-          fileWatchPurger,
           this._warnings,
           this._errors,
           this._basePath,
           this._tsConfigPath,
+          compilerWithFileSystems.inputFileSystem,
+          compiler.options.resolve?.symlinks,
         );
 
         ngccProcessor.process();
