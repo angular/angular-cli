@@ -54,10 +54,9 @@ export function runWebpack(
   return createWebpack({ ...config, watch: false }).pipe(
     switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
       // Webpack 5 has a compiler level close function
-      // The close function will crash if caching is disabled
-      const compilerClose = webpackCompiler.options.cache !== false
-        ? (webpackCompiler as { close?(callback: () => void): void }).close
-        : undefined;
+      const compilerClose = (webpackCompiler as { close?(callback: () => void): void }).close?.bind(
+        webpackCompiler,
+      );
 
       const callback = (err?: Error, stats?: webpack.Stats) => {
         if (err) {
