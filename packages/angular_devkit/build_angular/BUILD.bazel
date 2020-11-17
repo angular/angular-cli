@@ -282,6 +282,8 @@ LARGE_SPECS = {
             "@npm//@types/node-fetch",
             "@npm//express",
             "@npm//node-fetch",
+            "@npm//@types/http-proxy",
+            "@npm//http-proxy",
             "@npm//puppeteer",
         ],
     },
