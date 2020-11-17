@@ -65,7 +65,7 @@
     "style-loader": "2.0.0",
     "stylus": "0.54.8",
     "stylus-loader": "4.3.0",
-    "terser": "5.3.8",
+    "terser": "5.4.0",
     "terser-webpack-plugin": "4.2.3",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
