@@ -214,7 +214,7 @@
     "symbol-observable": "3.0.0",
     "tar": "^6.0.0",
     "temp": "^0.9.0",
-    "terser": "5.3.8",
+    "terser": "5.4.0",
     "terser-webpack-plugin": "4.2.3",
     "text-table": "0.2.0",
     "through2": "^4.0.0",
