@@ -25,11 +25,11 @@ interface ProxyInstance {
 }
 
 let proxyPort = 9100;
-function createProxy(target: string, secure: boolean): ProxyInstance {
+function createProxy(target: string, secure: boolean, ws = true): ProxyInstance {
   proxyPort++;
 
   const server = createProxyServer({
-    ws: true,
+    ws,
     target,
     secure,
     ssl: secure && {
@@ -107,7 +107,9 @@ async function goToPageAndWaitForSockJs(page: Page, url: string): Promise<void> 
 
 describe('Dev Server Builder live-reload', () => {
   const target = { project: 'app', target: 'serve' };
-  const overrides = { hmr: false, watch: true, port: 0, liveReload: true };
+  // Avoid using port `0` as these tests will behave differrently and tests will pass when they shouldn't.
+  // Port 0 and host 0.0.0.0 have special meaning in dev-server.
+  const overrides = { hmr: false, watch: true, port: 4202, liveReload: true };
   let architect: Architect;
   let browser: Browser;
   let page: Page;
@@ -120,12 +122,11 @@ describe('Dev Server Builder live-reload', () => {
       // spaces in them which Bazel does not support in runfiles
       // See: https://github.com/angular/angular-cli/pull/17624
       // tslint:disable-next-line: max-line-length
-      // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-809590/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+      // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+      ignoreHTTPSErrors: true,
       args: [
         '--no-sandbox',
         '--disable-gpu',
-        '--ignore-certificate-errors',
-        '--ignore-urlfetcher-cert-requests',
       ],
     });
   });
@@ -232,6 +233,39 @@ describe('Dev Server Builder live-reload', () => {
             case 0:
               proxy = createProxy(url, true);
               await goToPageAndWaitForSockJs(page, proxy.url);
+              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
+              break;
+            case 1:
+              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+              expect(innerText).toBe('app-live-reload');
+              break;
+          }
+
+          buildCount++;
+        }),
+        take(2),
+      )
+      .toPromise();
+  }, 30000);
+
+  it('works without https -> http proxy without websockets (dotnet emulation)', async () => {
+    const run = await architect.scheduleTarget(target, overrides);
+    runs.push(run);
+
+    let proxy: ProxyInstance | undefined;
+    let buildCount = 0;
+
+    await run.output
+      .pipe(
+        debounceTime(1000),
+        switchMap(async buildEvent => {
+          expect(buildEvent.success).toBe(true);
+          const url = buildEvent.baseUrl as string;
+          switch (buildCount) {
+            case 0:
+              proxy = createProxy(url, true, false);
+              await goToPageAndWaitForSockJs(page, proxy.url);
+              await page.waitForResponse((response: HTTPResponse) => response.url().includes('xhr_streaming') && response.status() === 200);
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
               break;
             case 1:
