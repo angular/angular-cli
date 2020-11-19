@@ -166,4 +166,27 @@ describe('augment-index-html', () => {
         </html>
       `);
   });
+
+  it(`should add script and link tags even when body and head element doesn't exist`, async () => {
+    const source = augmentIndexHtml({
+      ...indexGeneratorOptions,
+      html: `<app-root></app-root>`,
+      files: [
+        { file: 'styles.css', extension: '.css', name: 'styles' },
+        { file: 'runtime.js', extension: '.js', name: 'main' },
+        { file: 'main.js', extension: '.js', name: 'main' },
+        { file: 'runtime.js', extension: '.js', name: 'polyfills' },
+        { file: 'polyfills.js', extension: '.js', name: 'polyfills' },
+      ],
+    });
+
+    const html = await source;
+    expect(html).toEqual(oneLineHtml`
+      <link rel="stylesheet" href="styles.css">
+      <script src="runtime.js" defer></script>
+      <script src="polyfills.js" defer></script>
+      <script src="main.js" defer></script>
+      <app-root></app-root>
+    `);
+  });
 });
