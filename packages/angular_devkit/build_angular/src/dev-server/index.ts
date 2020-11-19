@@ -22,7 +22,7 @@ import * as url from 'url';
 import * as webpack from 'webpack';
 import * as webpackDevServer from 'webpack-dev-server';
 import { getAnalyticsConfig, getCompilerConfig } from '../browser';
-import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { OutputHashing, Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
@@ -92,7 +92,7 @@ export function serveWebpackBrowser(
     locale: string | undefined;
   }> {
     // Get the browser configuration from the target name.
-    const rawBrowserOptions = await context.getTargetOptions(browserTarget);
+    const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as json.JsonObject & BrowserBuilderSchema;
     options.port = await checkPort(options.port ?? 4200, options.host || 'localhost');
 
     // Override options we need to override, if defined.
@@ -120,11 +120,18 @@ export function serveWebpackBrowser(
     // In dev server we should not have budgets because of extra libs such as socks-js
     overrides.budgets = undefined;
 
+    if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== OutputHashing.None) {
+      // Disable output hashing for dev build as this can cause memory leaks
+      // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
+      overrides.outputHashing = OutputHashing.None;
+      logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
+    }
+
     const browserName = await context.getBuilderNameForTarget(browserTarget);
-    const browserOptions = await context.validateOptions<json.JsonObject & BrowserBuilderSchema>(
+    const browserOptions = await context.validateOptions(
       { ...rawBrowserOptions, ...overrides },
       browserName,
-    );
+    ) as json.JsonObject & BrowserBuilderSchema;
 
     const { config, projectRoot, i18n } = await generateI18nBrowserWebpackConfigFromContext(
       browserOptions,
