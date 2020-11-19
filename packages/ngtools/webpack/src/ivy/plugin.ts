@@ -565,10 +565,10 @@ export class AngularWebpackPlugin {
 
       onAfterEmit?.(sourceFile);
 
-      const dependencies = [
+      const dependencies = [...new Set([
         ...program.getAllDependencies(sourceFile),
         ...getExtraDependencies(sourceFile),
-      ];
+      ])];
 
       return { content, map, dependencies };
     };
