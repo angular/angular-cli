@@ -9695,7 +9695,17 @@ postcss@7.0.21:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@8.1.7, postcss@^8.1.4:
+postcss@8.1.8:
+  version "8.1.8"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.8.tgz#697439e7276735ecdd2893d2cf8efb2236693ac3"
+  integrity sha512-hO6jFWBy0QnBBRaw+s0F4hVPKGDICec/nLNEG1D4qqw9/LBzWMkTjckqqELXAo0J42jN8GFZXtgQfezEaoG9gQ==
+  dependencies:
+    colorette "^1.2.1"
+    line-column "^1.0.2"
+    nanoid "^3.1.16"
+    source-map "^0.6.1"
+
+postcss@^8.1.4:
   version "8.1.7"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.7.tgz#ff6a82691bd861f3354fd9b17b2332f88171233f"
   integrity sha512-llCQW1Pz4MOPwbZLmOddGM9eIJ8Bh7SZ2Oj5sxZva77uVaotYDsYTch1WBTNu7fUY0fpWp0fdt7uW40D4sRiiQ==
