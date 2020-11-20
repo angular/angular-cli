@@ -47,6 +47,7 @@ import {
   WebpackRollupLoader,
 } from '../plugins';
 import { getEsVersionForFileName, getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
+import { IGNORE_WARNINGS } from '../utils/stats';
 
 const TerserPlugin = require('terser-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
@@ -366,10 +367,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     extraPlugins.push(new BundleBudgetPlugin({ budgets: buildOptions.budgets }));
   }
 
-  if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
+  if ((scriptsSourceMap || stylesSourceMap)) {
     extraRules.push({
       test: /\.m?js$/,
-      exclude: /(ngfactory|ngstyle)\.js$/,
+      exclude: vendorSourceMap
+        ? /(ngfactory|ngstyle)\.js$/
+        : [/[\\\/]node_modules[\\\/]/, /(ngfactory|ngstyle)\.js$/],
       enforce: 'pre',
       loader: require.resolve('source-map-loader'),
     });
@@ -512,6 +515,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     performance: {
       hints: false,
     },
+    ...withWebpackFourOrFive({}, { ignoreWarnings: IGNORE_WARNINGS }),
     module: {
       // Show an error for missing exports instead of a warning.
       strictExportPresence: true,
