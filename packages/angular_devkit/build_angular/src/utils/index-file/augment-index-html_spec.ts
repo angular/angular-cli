@@ -171,7 +171,7 @@ describe('augment-index-html', () => {
   it(`should add script and link tags even when body and head element doesn't exist`, async () => {
     const source = augmentIndexHtml({
       ...indexGeneratorOptions,
-      html: `<app-root></app-root>`,
+      inputContent: `<app-root></app-root>`,
       files: [
         { file: 'styles.css', extension: '.css', name: 'styles' },
         { file: 'runtime.js', extension: '.js', name: 'main' },
