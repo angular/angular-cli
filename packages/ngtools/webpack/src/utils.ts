@@ -21,7 +21,9 @@ export function flattenArray<T>(value: Array<T | T[]>): T[] {
   return ([] as T[]).concat.apply([], value);
 }
 
+const IS_WINDOWS = process.platform === 'win32';
+
 // TS represents paths internally with '/' and expects paths to be in this format.
-export function forwardSlashPath(path: string): string {
-  return path.replace(/\\/g, '/');
-}
+export const forwardSlashPath  = IS_WINDOWS
+? (path: string) => path.replace(/\\/g, '/')
+: (path: string) => path;
