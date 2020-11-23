@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { win32 } from 'path';
 import * as ts from 'typescript';
 import { InputFileSystem } from 'webpack';
 
@@ -12,34 +13,22 @@ function shouldNotWrite(): never {
   throw new Error('Webpack TypeScript System should not write.');
 }
 
+
+const IS_WINDOWS = process.platform === 'win32';
+
 // Webpack's CachedInputFileSystem uses the default directory separator in the paths it uses
 // for keys to its cache. If the keys do not match then the file watcher will not purge outdated
 // files and cause stale data to be used in the next rebuild. TypeScript always uses a `/` (POSIX)
 // directory separator internally which is also supported with Windows system APIs. However,
 // if file operations are performed with the non-default directory separator, the Webpack cache
 // will contain a key that will not be purged.
-function createToSystemPath(): (path: string) => string {
-  if (process.platform === 'win32') {
-    const cache = new Map<string, string>();
+// TS represents paths internally with '/' and expects paths to be in this format.
 
-    return (path) => {
-      let value = cache.get(path);
-      if (value === undefined) {
-        value = path.replace(/\//g, '\\');
-        cache.set(path, value);
-      }
-
-      return value;
-    };
-  }
-
-  // POSIX-like platforms retain the existing directory separator
-  return (path) => path;
-}
+export const toSystemPath = IS_WINDOWS
+  ? (path: string) => win32.normalize(path)
+  : (path: string) => path;
 
 export function createWebpackSystem(input: InputFileSystem, currentDirectory: string): ts.System {
-  const toSystemPath = createToSystemPath();
-
   const system: ts.System = {
     ...ts.sys,
     readFile(path: string) {

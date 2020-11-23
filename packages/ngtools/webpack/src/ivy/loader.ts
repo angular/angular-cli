@@ -7,6 +7,7 @@
  */
 import * as path from 'path';
 import { AngularPluginSymbol, FileEmitter } from './symbol';
+import { toSystemPath } from './system';
 
 export function angularWebpackLoader(
   this: import('webpack').loader.LoaderContext,
@@ -51,7 +52,7 @@ export function angularWebpackLoader(
         return;
       }
 
-      result.dependencies.forEach((dependency) => this.addDependency(dependency));
+      result.dependencies.forEach((dependency) => this.addDependency(toSystemPath(dependency)));
 
       let resultContent = result.content || '';
       let resultMap;
