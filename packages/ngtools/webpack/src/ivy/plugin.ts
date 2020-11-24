@@ -567,7 +567,7 @@ export class AngularWebpackPlugin {
       const dependencies = [
         ...program.getAllDependencies(sourceFile),
         ...getExtraDependencies(sourceFile),
-      ];
+      ].map(externalizePath);
 
       return { content, map, dependencies };
     };
