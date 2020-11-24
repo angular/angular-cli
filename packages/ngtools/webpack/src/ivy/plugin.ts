@@ -18,7 +18,6 @@ import {
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
-import { forwardSlashPath } from '../utils';
 import { addError, addWarning } from '../webpack-diagnostics';
 import { isWebpackFiveOrHigher, mergeResolverMainFields } from '../webpack-version';
 import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
@@ -30,6 +29,7 @@ import {
   augmentHostWithSubstitutions,
   augmentProgramWithVersioning,
 } from './host';
+import { externalizePath, normalizePath } from './paths';
 import { AngularPluginSymbol, FileEmitter } from './symbol';
 import { createWebpackSystem } from './system';
 import { createAotTransformers, createJitTransformers, mergeTransformers } from './transformation';
@@ -180,7 +180,7 @@ export class AngularWebpackPlugin {
       // Create a Webpack-based TypeScript compiler host
       const system = createWebpackSystem(
         compiler.inputFileSystem,
-        forwardSlashPath(compiler.context),
+        normalizePath(compiler.context),
       );
       const host = ts.createIncrementalCompilerHost(compilerOptions, system);
 
@@ -190,7 +190,8 @@ export class AngularWebpackPlugin {
         // Invalidate existing cache based on compilation file timestamps
         for (const [file, time] of compilation.fileTimestamps) {
           if (this.buildTimestamp < time) {
-            cache.delete(forwardSlashPath(file));
+            // Cache stores paths using the POSIX directory separator
+            cache.delete(normalizePath(file));
           }
         }
       } else {
@@ -254,7 +255,7 @@ export class AngularWebpackPlugin {
         const rebuild = (filename: string) => new Promise<void>((resolve) => {
           const module = modules.find(
             ({ resource }: compilation.Module & { resource?: string }) =>
-              resource && forwardSlashPath(resource) === filename,
+              resource && normalizePath(resource) === filename,
           );
           if (!module) {
             resolve();
@@ -279,7 +280,7 @@ export class AngularWebpackPlugin {
             .map((sourceFile) => sourceFile.fileName),
         );
         modules.forEach(({ resource }: compilation.Module & { resource?: string }) => {
-          const sourceFile = resource && builder.getSourceFile(forwardSlashPath(resource));
+          const sourceFile = resource && builder.getSourceFile(resource);
           if (!sourceFile) {
             return;
           }
@@ -408,8 +409,7 @@ export class AngularWebpackPlugin {
 
     const getDependencies = (sourceFile: ts.SourceFile) => {
       const dependencies = [];
-      for (const resourceDependency of angularCompiler.getResourceDependencies(sourceFile)) {
-        const resourcePath = forwardSlashPath(resourceDependency);
+      for (const resourcePath of angularCompiler.getResourceDependencies(sourceFile)) {
         dependencies.push(
           resourcePath,
           // Retrieve all dependencies of the resource (stylesheet imports, etc.)
@@ -444,8 +444,7 @@ export class AngularWebpackPlugin {
       // NOTE: This can be removed once support for the deprecated lazy route string format is removed
       for (const lazyRoute of angularCompiler.listLazyRoutes()) {
         const [routeKey] = lazyRoute.route.split('#');
-        const routePath = forwardSlashPath(lazyRoute.referencedModule.filePath);
-        this.lazyRouteMap[routeKey] = routePath;
+        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
       }
 
       return this.createFileEmitter(
@@ -513,8 +512,7 @@ export class AngularWebpackPlugin {
     const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
       for (const lazyRoute of angularCompiler.listLazyRoutes()) {
         const [routeKey] = lazyRoute.route.split('#');
-        const routePath = forwardSlashPath(lazyRoute.referencedModule.filePath);
-        this.lazyRouteMap[routeKey] = routePath;
+        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
       }
 
       return this.createFileEmitter(builder, transformers, () => []);
