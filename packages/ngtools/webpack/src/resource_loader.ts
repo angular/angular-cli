@@ -44,7 +44,7 @@ export class WebpackResourceLoader {
       this.changedFiles.clear();
       for (const [file, time] of parentCompilation.fileTimestamps) {
         if (this.buildTimestamp < time) {
-          this.changedFiles.add(file);
+          this.changedFiles.add(forwardSlashPath(file));
         }
       }
     }

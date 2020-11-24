@@ -142,19 +142,6 @@ export default function() {
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
       writeMultipleFiles({
-        'src/app/app.component.css': ':host { color: blue; }',
-      }),
-    ]))
-    .then(() => wait(2000))
-    .then(() => request('http://localhost:4200/main.js'))
-    .then((body) => {
-      if (!body.match(/color:\s?blue/)) {
-        throw new Error('Expected component CSS to update.');
-      }
-    })
-    .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
-      writeMultipleFiles({
         'src/app/app.component.html': '<h1>testingTESTING123</h1>',
       }),
     ]))
@@ -163,6 +150,19 @@ export default function() {
     .then((body) => {
       if (!body.match(/testingTESTING123/)) {
         throw new Error('Expected component HTML to update.');
+      }
+    })
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
+      writeMultipleFiles({
+        'src/app/app.component.css': ':host { color: blue; }',
+      }),
+    ]))
+    .then(() => wait(2000))
+    .then(() => request('http://localhost:4200/main.js'))
+    .then((body) => {
+      if (!body.match(/color:\s?blue/)) {
+        throw new Error('Expected component CSS to update.');
       }
     })
     .then(() => killAllProcesses(), (err: unknown) => {
