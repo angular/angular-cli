@@ -31,7 +31,7 @@ export default async function() {
 
   // Update Angular.
   const extraUpdateArgs = (await isPrereleaseCli()) ? ['--next', '--force'] : [];
-  await ng('update', '@angular/core', ...extraUpdateArgs);
+  await ng('update', '@angular/core@10', ...extraUpdateArgs);
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');

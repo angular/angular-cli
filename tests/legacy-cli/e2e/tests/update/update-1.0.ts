@@ -13,7 +13,7 @@ export default async function() {
   await ng('update', '@angular/cli');
   await useBuiltPackages();
   await silentNpm('install');
-  await ng('update', '@angular/core', ...extraUpdateArgs);
+  await ng('update', '@angular/core@10', ...extraUpdateArgs);
   await useCIDefaults('one-oh-project');
   await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
