@@ -633,11 +633,11 @@
           "properties": {
             "browserTarget": {
               "type": "string",
-              "description": "Target to build."
+              "description": "A browser builder target to use for rendering the app shell in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`."
             },
             "serverTarget": {
               "type": "string",
-              "description": "Server target to use for rendering the app shell."
+              "description": "A server builder target to use for rendering the app shell in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`."
             },
             "appModuleBundle": {
               "type": "string",
@@ -715,7 +715,7 @@
               "additionalProperties": false
             },
             "optimization": {
-              "description": "Enables optimization of the build output.",
+              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code eliminiation and fonts inlining. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
               "oneOf": [
                 {
                   "type": "object",
@@ -1188,7 +1188,7 @@
           "properties": {
             "browserTarget": {
               "type": "string",
-              "description": "Target to serve."
+              "description": "A browser builder target to serve in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`."
             },
             "port": {
               "type": "number",
@@ -1280,7 +1280,7 @@
               "default": true
             },
             "optimization": {
-              "description": "Enable optimization of the build output.",
+              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code eliminiation and fonts inlining. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
               "default": false,
               "oneOf": [
                 {
@@ -1371,7 +1371,7 @@
           "properties": {
             "browserTarget": {
               "type": "string",
-              "description": "Target to extract from."
+              "description": "A browser builder target to extract i18n messages in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`."
             },
             "format": {
               "type": "string",
@@ -1689,7 +1689,7 @@
             },
             "devServerTarget": {
               "type": "string",
-              "description": "Dev server target to run tests against."
+              "description": "A dev-server builder target to run tests against in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`."
             },
             "grep": {
               "type": "string",
@@ -1767,7 +1767,7 @@
               "additionalProperties": false
             },
             "optimization": {
-              "description": "Enables optimization of the build output.",
+              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking and dead-code eliminiation. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
               "default": false,
               "oneOf": [
                 {
