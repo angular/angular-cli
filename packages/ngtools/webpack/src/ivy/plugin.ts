@@ -252,8 +252,10 @@ export class AngularWebpackPlugin {
       compilation.hooks.finishModules.tapPromise(PLUGIN_NAME, async (modules) => {
         // Rebuild any remaining AOT required modules
         const rebuild = (filename: string) => new Promise<void>((resolve) => {
-          // tslint:disable-next-line: no-any
-          const module = modules.find((element) => (element as any).resource === filename);
+          const module = modules.find(
+            ({ resource }: compilation.Module & { resource?: string }) =>
+              resource && forwardSlashPath(resource) === filename,
+          );
           if (!module) {
             resolve();
           } else {
@@ -276,8 +278,7 @@ export class AngularWebpackPlugin {
             .filter((sourceFile) => !sourceFile.isDeclarationFile)
             .map((sourceFile) => sourceFile.fileName),
         );
-        modules.forEach((module) => {
-          const { resource } = module as { resource?: string };
+        modules.forEach(({ resource }: compilation.Module & { resource?: string }) => {
           const sourceFile = resource && builder.getSourceFile(forwardSlashPath(resource));
           if (!sourceFile) {
             return;
@@ -542,7 +543,7 @@ export class AngularWebpackPlugin {
     onAfterEmit?: (sourceFile: ts.SourceFile) => void,
   ): FileEmitter {
     return async (file: string) => {
-      const sourceFile = program.getSourceFile(forwardSlashPath(file));
+      const sourceFile = program.getSourceFile(file);
       if (!sourceFile) {
         return undefined;
       }
