@@ -584,8 +584,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ...withWebpackFourOrFive({}, buildOptions.namedChunks ? { chunkIds: 'named' } : {}),
       ...withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
     },
-    // TODO_WEBPACK_5: Investigate non-working cache in development builds
-    ...withWebpackFourOrFive({}, { cache: false }),
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.
       // https://github.com/angular/angular/issues/11580
