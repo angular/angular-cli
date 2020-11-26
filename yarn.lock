@@ -17,10 +17,10 @@
     "@angular/core" "^10.0.0-0 || ^11.0.0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@11.0.0":
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.0.0.tgz#7ec0fc8b5051c54f4a3910e61f1ee7d30796c2d2"
-  integrity sha512-kfgEE/LDYMZB4NICChzWn/nTEeoZ3wxrYsDDcy2Qj+57zUmJcxBLL1h+tawYCy3a1g7ypDLYX7yrbPEBE7/EXQ==
+"@angular/cdk@11.0.1":
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.0.1.tgz#37e1e4fe4450497a5965282dd8cc3702583fd6cf"
+  integrity sha512-PkOaIZWG9RQRmvw/6LxTM4nti5qzmhAKj6G9un5D/izO0gAyCzGgPzdqf3ZSW/rYz2nUVicdBvk+w0rRgcj1iw==
   dependencies:
     tslib "^2.0.0"
   optionalDependencies:
@@ -85,9 +85,9 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a2d6b522506a2b91ac1cbec2cd21cb073b9156c0":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#1a23db7ec1ed476480b832635e116ac96e0b6bfe":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#a2d6b522506a2b91ac1cbec2cd21cb073b9156c0"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#1a23db7ec1ed476480b832635e116ac96e0b6bfe"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^0.29.0"
@@ -113,7 +113,7 @@
     ts-node "^8.6.2"
     tslib "^2.0.0"
     typed-graphqlify "^2.3.0"
-    typescript "~4.0.2"
+    typescript "~4.1.2"
     yaml "^1.10.0"
     yargs "^16.1.1"
 
@@ -133,10 +133,10 @@
     glob "7.1.2"
     yargs "15.3.0"
 
-"@angular/material@11.0.0":
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-11.0.0.tgz#6ef7048763e7415dabda54d32847b2821bf6413d"
-  integrity sha512-pTwYmBrRXbEzF5J/oayZF0ApA0tLN+CUl/2MaYFNLzvE/Kn6hIdDb7TonWAEBgeSHIzqzyTV8IUQuXwGaPds9A==
+"@angular/material@11.0.1":
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-11.0.1.tgz#add0e87d3e01d7d20484ea5a90d15439ec31a1d6"
+  integrity sha512-FcGIKgFouA9QHwfbWCj8140gMTEgXV3n/yiYsc4Y8VkMIpEmQQnjoOnf5FRIm0ajTQT4qs6uVyB4opJWoHn/pg==
   dependencies:
     tslib "^2.0.0"
 
@@ -9678,17 +9678,7 @@ postcss@7.0.21:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@8.1.10:
-  version "8.1.10"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.10.tgz#129834f94c720554d2cfdaeb27d5542ac4a026ea"
-  integrity sha512-iBXEV5VTTYaRRdxiFYzTtuv2lGMQBExqkZKSzkJe+Fl6rvQrA/49UVGKqB+LG54hpW/TtDBMGds8j33GFNW7pg==
-  dependencies:
-    colorette "^1.2.1"
-    nanoid "^3.1.18"
-    source-map "^0.6.1"
-    vfile-location "^3.2.0"
-
-postcss@^8.1.4:
+postcss@8.1.10, postcss@^8.1.4:
   version "8.1.10"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.10.tgz#129834f94c720554d2cfdaeb27d5542ac4a026ea"
   integrity sha512-iBXEV5VTTYaRRdxiFYzTtuv2lGMQBExqkZKSzkJe+Fl6rvQrA/49UVGKqB+LG54hpW/TtDBMGds8j33GFNW7pg==
@@ -12169,10 +12159,15 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.0.5, typescript@~4.0.2:
+typescript@4.0.5:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
   integrity sha512-ywmr/VrTVCmNTJ6iV2LwIrfG1P+lv6luD8sUJs+2eI9NLGigaN+nUQc13iHqisq7bra9lnmUSYqbJvegraBOPQ==
+
+typescript@~4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.2.tgz#6369ef22516fe5e10304aae5a5c4862db55380e9"
+  integrity sha512-thGloWsGH3SOxv1SoY7QojKi0tc+8FnOmiarEGMbd/lar7QOEd3hvlx3Fp5y6FlDUGl9L+pd4n2e+oToGMmhRQ==
 
 ua-parser-js@0.7.22:
   version "0.7.22"
