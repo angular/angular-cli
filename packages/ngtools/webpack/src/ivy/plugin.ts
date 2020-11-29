@@ -20,6 +20,7 @@ import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
 import { addError, addWarning } from '../webpack-diagnostics';
 import { isWebpackFiveOrHigher, mergeResolverMainFields } from '../webpack-version';
+import { SourceFileCache } from './cache';
 import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
 import {
   augmentHostWithCaching,
@@ -81,7 +82,7 @@ export class AngularWebpackPlugin {
   private watchMode?: boolean;
   private ngtscNextProgram?: NgtscProgram;
   private builder?: ts.EmitAndSemanticDiagnosticsBuilderProgram;
-  private sourceFileCache?: Map<string, ts.SourceFile>;
+  private sourceFileCache?: SourceFileCache;
   private buildTimestamp!: number;
   private readonly lazyRouteMap: Record<string, string> = {};
   private readonly requiredFilesToEmit = new Set<string>();
@@ -186,17 +187,13 @@ export class AngularWebpackPlugin {
 
       // Setup source file caching and reuse cache from previous compilation if present
       let cache = this.sourceFileCache;
+      let changedFiles;
       if (cache) {
-        // Invalidate existing cache based on compilation file timestamps
-        for (const [file, time] of compilation.fileTimestamps) {
-          if (this.buildTimestamp < time) {
-            // Cache stores paths using the POSIX directory separator
-            cache.delete(normalizePath(file));
-          }
-        }
+        // Invalidate existing cache based on compiler file timestamps
+        changedFiles = cache.invalidate(compiler.fileTimestamps, this.buildTimestamp);
       } else {
         // Initialize a new cache
-        cache = new Map();
+        cache = new SourceFileCache();
         // Only store cache if in watch mode
         if (this.watchMode) {
           this.sourceFileCache = cache;
@@ -215,7 +212,7 @@ export class AngularWebpackPlugin {
       augmentHostWithNgcc(host, ngccProcessor, moduleResolutionCache);
 
       // Setup resource loading
-      resourceLoader.update(compilation);
+      resourceLoader.update(compilation, changedFiles);
       augmentHostWithResources(host, resourceLoader, {
         directTemplateLoading: this.pluginOptions.directTemplateLoading,
       });
