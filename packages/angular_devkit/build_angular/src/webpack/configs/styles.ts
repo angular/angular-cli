@@ -221,9 +221,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    const globalSourceMap = !!(
-      cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden
-    );
+    const globalSourceMap = !!cssSourceMap && !buildOptions.sourceMap.hidden;
 
     rules.push(
       ...baseRules.map(({ test, use }) => {
