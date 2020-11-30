@@ -72,6 +72,7 @@ ts_library(
             "src/test-utils.ts",
             "src/**/*_spec.ts",
             "plugins/**/*_spec.ts",
+            "src/testing/**/*.ts",
         ],
     ) + [
         "//packages/angular_devkit/build_angular:src/app-shell/schema.ts",
@@ -249,7 +250,12 @@ pkg_tar(
 ts_library(
     name = "build_angular_test_utils",
     testonly = True,
-    srcs = [":src/test-utils.ts"],
+    srcs = glob(
+        include = [
+            "src/test-utils.ts",
+            "src/testing/**/*.ts",
+        ],
+    ),
     data = glob(["test/**/*"]),
     tsconfig = "//:tsconfig-test.json",
     deps = [
@@ -259,6 +265,7 @@ ts_library(
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+        "@npm//rxjs",
     ],
 )
 
