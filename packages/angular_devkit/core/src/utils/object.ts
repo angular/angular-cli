@@ -40,7 +40,7 @@ export function deepCopy<T extends any>(value: T): T {
       return JSON.parse(valueCasted['toJSON']());
     }
 
-    const copy = new (Object.getPrototypeOf(valueCasted).constructor)();
+    const copy = Object.create(Object.getPrototypeOf(valueCasted));
     valueCasted[copySymbol] = copy;
     for (const key of Object.getOwnPropertyNames(valueCasted)) {
       copy[key] = deepCopy(valueCasted[key]);

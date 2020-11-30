@@ -50,5 +50,11 @@ describe('object', () => {
       expect(result.b).not.toBe(data1);
       expect(result.b).toBe(result.b.circular.b);
     });
+
+    it('works with null prototype', () => {
+      const data = Object.create(null);
+      data['a'] = 1;
+      expect(deepCopy(data)).toEqual(data);
+    });
   });
 });
