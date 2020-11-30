@@ -106,6 +106,8 @@ As commits are cherry-picked when PRs are merged, creating the release should be
 
 **Make sure you update the package versions in `packages/schematics/angular/utility/latest-versions.ts`.**
 
+Update the version in the root package.json file to reflect the new release version.
+
 ```bash
 git commit -a -m 'release: vXX'
 git tag -a 'vXX' -m 'release: tag vXX'
@@ -116,7 +118,7 @@ we just created. Double check that the versions are correct by running the
 following command.
 
 ```bash
-yarn admin packages --version
+yarn admin packages --releaseCheck
 ```
 
 Now push the commit and the tag to the upstream repository. **Make sure to use
