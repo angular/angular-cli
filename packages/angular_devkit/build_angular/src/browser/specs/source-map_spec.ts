@@ -158,4 +158,20 @@ describe('Browser Builder source map', () => {
     expect(await files['styles.css']).not.toContain('sourceMappingURL=styles.css.map');
     expect(await files['styles.css']).not.toContain('sourceMappingURL=data:application/json');
   });
+
+  it('should resolve sources to partial SCSS files', async () => {
+    const overrides = {
+      sourceMap: true,
+      extractCss: true,
+      styles: ['src/styles.scss'],
+    };
+
+    host.writeMultipleFiles({
+      'src/styles.scss': `@import './partial';`,
+      'src/_partial.scss': `p { color: red; }`,
+    });
+
+    const { files } = await browserBuild(architect, host, target, overrides);
+    expect(await files['styles.css.map']).toContain('_partial.scss');
+  });
 });
