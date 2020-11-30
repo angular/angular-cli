@@ -41,8 +41,12 @@ export interface PackageInfo {
 export type PackageMap = { [name: string]: PackageInfo };
 
 
+export function loadRootPackageJson() {
+  return require('../package.json');
+}
+
 function loadPackageJson(p: string) {
-  const root = require('../package.json');
+  const root = loadRootPackageJson();
   const pkg = require(p);
 
   for (const key of Object.keys(root)) {
