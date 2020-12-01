@@ -7,7 +7,7 @@
  */
 // tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
-import chalk from 'chalk';
+import * as colors from 'ansi-colors';
 
 const { packages, loadRootPackageJson, stableToExperimentalVersion } = require('../lib/packages');
 
@@ -17,15 +17,15 @@ export default function(args: { json: boolean, version: boolean, releaseCheck: b
   if (args.releaseCheck) {
     const {version: root} = loadRootPackageJson();
     const experimental = stableToExperimentalVersion(root);
-    logger.info(`The expected version for the release is ${chalk.bold(root)} (${experimental})`);
+    logger.info(`The expected version for the release is ${colors.bold(root)} (${experimental})`);
     logger.info(
       Object.keys(packages)
         .filter(name => !packages[name].private)
         .map(name => {
-          let result = chalk.red('✘');
+          let result = colors.red(colors.symbols.cross);
           const version = packages[name].version;
           if ([root, experimental].includes(version)) {
-            result = chalk.green('✓');
+            result = colors.green(colors.symbols.check);
           }
 
           return ` ${result}  ${name}@${packages[name].version}`;
