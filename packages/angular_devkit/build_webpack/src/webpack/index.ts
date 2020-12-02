@@ -34,8 +34,13 @@ export function runWebpack(
   options: {
     logging?: WebpackLoggingCallback,
     webpackFactory?: WebpackFactory,
+    shouldProvideStats?: boolean,
   } = {},
 ): Observable<BuildResult> {
+  const {
+    logging: log = (stats, config) => context.logger.info(stats.toString(config.stats)),
+    shouldProvideStats = true,
+  } = options;
   const createWebpack = (c: webpack.Configuration) => {
     if (options.webpackFactory) {
       const result = options.webpackFactory(c);
@@ -48,8 +53,6 @@ export function runWebpack(
       return of(webpack(c));
     }
   };
-  const log: WebpackLoggingCallback = options.logging
-    || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
   return createWebpack({ ...config, watch: false }).pipe(
     switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
@@ -72,7 +75,7 @@ export function runWebpack(
 
         obs.next({
           success: !stats.hasErrors(),
-          webpackStats: stats.toJson(),
+          webpackStats: shouldProvideStats ? stats.toJson() : undefined,
           emittedFiles: getEmittedFiles(stats.compilation),
         } as unknown as BuildResult);
 
