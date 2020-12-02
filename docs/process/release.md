@@ -65,9 +65,9 @@ Consider if you need to update [`packages/schematics/angular/utility/latest-vers
 
 As commits are cherry-picked when PRs are merged, creating the release should be a matter of creating a tag.
 
-**Make sure you update the package versions in `packages/schematics/angular/utility/latest-versions.ts`.**
-
-Update the version in the root package.json file to reflect the new release version.
+Update the package versions to reflect the new release version in **both**:
+1. [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json#L3)
+1. [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
 
 ```bash
 git commit -a -m 'release: vXX'
