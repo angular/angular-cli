@@ -211,6 +211,13 @@ function _assignOption(
       errors.push(error);
       ignored.push(arg);
     }
+
+    if (/^[a-z]+[A-Z]/.test(key)) {
+      warnings.push(
+        'Support for camel case arguments has been deprecated and will be removed in a future major version.\n' +
+        `Use '--${strings.dasherize(key)}' instead of '--${key}'.`,
+      );
+    }
   }
 
   return consumedNextArg;
