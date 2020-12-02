@@ -54,7 +54,10 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   }
 
   async printJsonHelp(_options: T & Arguments): Promise<number> {
-    this.logger.info(JSON.stringify(this.description));
+    const replacer = (key: string, value: string) => key === 'name'
+      ? strings.dasherize(value)
+      : value;
+    this.logger.info(JSON.stringify(this.description, replacer, 2));
 
     return 0;
   }
