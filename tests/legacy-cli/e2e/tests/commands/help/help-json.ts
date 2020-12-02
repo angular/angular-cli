@@ -7,7 +7,11 @@ export default async function() {
     const { stdout } = await silentNg(commandName, '--help=json');
 
     if (stdout.trim()) {
-      JSON.parse(stdout);
+      JSON.parse(stdout, (key, value) => {
+        if (key === 'name' && /[A-Z]/.test(value)) {
+          throw new Error(`Option named '${value}' is not kebab case.`);
+        }
+      });
     } else {
       console.warn(`No JSON output for command [${commandName}].`);
     }
