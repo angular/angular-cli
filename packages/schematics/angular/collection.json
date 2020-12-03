@@ -101,8 +101,8 @@
       "schema": "./universal/schema.json",
       "hidden": true
     },
-    "appShell": {
-      "aliases": [ "app-shell" ],
+    "app-shell": {
+      "aliases": [ "appShell" ],
       "factory": "./app-shell",
       "description": "Create an app shell.",
       "schema": "./app-shell/schema.json"
