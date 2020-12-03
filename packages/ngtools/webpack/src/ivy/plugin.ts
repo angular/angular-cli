@@ -18,9 +18,8 @@ import {
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
-import { forwardSlashPath } from '../utils';
 import { addError, addWarning } from '../webpack-diagnostics';
-import { mergeResolverMainFields } from '../webpack-version';
+import { isWebpackFiveOrHigher, mergeResolverMainFields } from '../webpack-version';
 import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
 import {
   augmentHostWithCaching,
@@ -30,6 +29,7 @@ import {
   augmentHostWithSubstitutions,
   augmentProgramWithVersioning,
 } from './host';
+import { externalizePath, normalizePath } from './paths';
 import { AngularPluginSymbol, FileEmitter } from './symbol';
 import { createWebpackSystem } from './system';
 import { createAotTransformers, createJitTransformers, mergeTransformers } from './transformation';
@@ -59,22 +59,16 @@ function initializeNgccProcessor(
   const { inputFileSystem, options: webpackOptions } = compiler;
   const mainFields = ([] as string[]).concat(...(webpackOptions.resolve?.mainFields || []));
 
-  const fileWatchPurger = (path: string) => {
-    if (inputFileSystem.purge) {
-      // Webpack typings do not contain the string parameter overload for purge
-      (inputFileSystem as { purge(path: string): void }).purge(path);
-    }
-  };
-
   const errors: string[] = [];
   const warnings: string[] = [];
   const processor = new NgccProcessor(
     mainFields,
-    fileWatchPurger,
     warnings,
     errors,
     compiler.context,
     tsconfig,
+    inputFileSystem,
+    webpackOptions.resolve?.symlinks,
   );
 
   return { processor, errors, warnings };
@@ -186,7 +180,7 @@ export class AngularWebpackPlugin {
       // Create a Webpack-based TypeScript compiler host
       const system = createWebpackSystem(
         compiler.inputFileSystem,
-        forwardSlashPath(compiler.context),
+        normalizePath(compiler.context),
       );
       const host = ts.createIncrementalCompilerHost(compilerOptions, system);
 
@@ -196,7 +190,8 @@ export class AngularWebpackPlugin {
         // Invalidate existing cache based on compilation file timestamps
         for (const [file, time] of compilation.fileTimestamps) {
           if (this.buildTimestamp < time) {
-            cache.delete(forwardSlashPath(file));
+            // Cache stores paths using the POSIX directory separator
+            cache.delete(normalizePath(file));
           }
         }
       } else {
@@ -245,15 +240,23 @@ export class AngularWebpackPlugin {
         .filter((sourceFile) => !internalFiles?.has(sourceFile));
 
       // Ensure all program files are considered part of the compilation and will be watched
-      allProgramFiles.forEach((sourceFile) =>
-        compilation.compilationDependencies.add(sourceFile.fileName),
-      );
+      if (isWebpackFiveOrHigher()) {
+        allProgramFiles.forEach((sourceFile) =>
+          compilation.fileDependencies.add(sourceFile.fileName),
+        );
+      } else {
+        allProgramFiles.forEach((sourceFile) =>
+          compilation.compilationDependencies.add(sourceFile.fileName),
+        );
+      }
 
       compilation.hooks.finishModules.tapPromise(PLUGIN_NAME, async (modules) => {
         // Rebuild any remaining AOT required modules
         const rebuild = (filename: string) => new Promise<void>((resolve) => {
-          // tslint:disable-next-line: no-any
-          const module = modules.find((element) => (element as any).resource === filename);
+          const module = modules.find(
+            ({ resource }: compilation.Module & { resource?: string }) =>
+              resource && normalizePath(resource) === filename,
+          );
           if (!module) {
             resolve();
           } else {
@@ -276,9 +279,8 @@ export class AngularWebpackPlugin {
             .filter((sourceFile) => !sourceFile.isDeclarationFile)
             .map((sourceFile) => sourceFile.fileName),
         );
-        modules.forEach((module) => {
-          const { resource } = module as { resource?: string };
-          const sourceFile = resource && builder.getSourceFile(forwardSlashPath(resource));
+        modules.forEach(({ resource }: compilation.Module & { resource?: string }) => {
+          const sourceFile = resource && builder.getSourceFile(resource);
           if (!sourceFile) {
             return;
           }
@@ -407,8 +409,7 @@ export class AngularWebpackPlugin {
 
     const getDependencies = (sourceFile: ts.SourceFile) => {
       const dependencies = [];
-      for (const resourceDependency of angularCompiler.getResourceDependencies(sourceFile)) {
-        const resourcePath = forwardSlashPath(resourceDependency);
+      for (const resourcePath of angularCompiler.getResourceDependencies(sourceFile)) {
         dependencies.push(
           resourcePath,
           // Retrieve all dependencies of the resource (stylesheet imports, etc.)
@@ -443,8 +444,7 @@ export class AngularWebpackPlugin {
       // NOTE: This can be removed once support for the deprecated lazy route string format is removed
       for (const lazyRoute of angularCompiler.listLazyRoutes()) {
         const [routeKey] = lazyRoute.route.split('#');
-        const routePath = forwardSlashPath(lazyRoute.referencedModule.filePath);
-        this.lazyRouteMap[routeKey] = routePath;
+        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
       }
 
       return this.createFileEmitter(
@@ -512,8 +512,7 @@ export class AngularWebpackPlugin {
     const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
       for (const lazyRoute of angularCompiler.listLazyRoutes()) {
         const [routeKey] = lazyRoute.route.split('#');
-        const routePath = forwardSlashPath(lazyRoute.referencedModule.filePath);
-        this.lazyRouteMap[routeKey] = routePath;
+        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
       }
 
       return this.createFileEmitter(builder, transformers, () => []);
@@ -542,7 +541,7 @@ export class AngularWebpackPlugin {
     onAfterEmit?: (sourceFile: ts.SourceFile) => void,
   ): FileEmitter {
     return async (file: string) => {
-      const sourceFile = program.getSourceFile(forwardSlashPath(file));
+      const sourceFile = program.getSourceFile(file);
       if (!sourceFile) {
         return undefined;
       }
@@ -568,7 +567,7 @@ export class AngularWebpackPlugin {
       const dependencies = [
         ...program.getAllDependencies(sourceFile),
         ...getExtraDependencies(sourceFile),
-      ];
+      ].map(externalizePath);
 
       return { content, map, dependencies };
     };

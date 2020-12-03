@@ -233,7 +233,7 @@ export async function main({
   /**
    * Remove every options from argv that we support in schematics itself.
    */
-  const parsedArgs = Object.assign({}, argv);
+  const parsedArgs = Object.assign({}, argv) as Record<string, unknown>;
   delete parsedArgs['--'];
   for (const key of booleanArgs) {
     delete parsedArgs[key];
@@ -259,7 +259,7 @@ export async function main({
     }
   });
 
-  parsedArgs._  = [];
+  delete parsedArgs._;
 
   // Add prompts.
   if (argv['interactive'] && isTTY()) {

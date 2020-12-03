@@ -159,10 +159,10 @@ export class InlineFontsProcessor {
 
       if (this.options.minifyInlinedCSS) {
         cssContent = cssContent
+          // Comments.
+          .replace(/\/\*([\s\S]*?)\*\//g, '')
           // New lines.
           .replace(/\n/g, '')
-          // Comments and new lines.
-          .replace(/\/\*\s.+\s\*\//g, '')
           // Safe spaces.
           .replace(/\s?[\{\:\;]\s+/g, s => s.trim());
       }

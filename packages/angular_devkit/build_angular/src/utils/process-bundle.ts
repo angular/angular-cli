@@ -32,7 +32,6 @@ import {
 } from 'webpack-sources';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
-import { isWebpackFiveOrHigher } from './webpack-version';
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
@@ -220,8 +219,7 @@ async function mergeSourceMaps(
   fast = false,
 ): Promise<RawSourceMap> {
   // Webpack 5 terser sourcemaps currently fail merging with the high-quality method
-  // TODO_WEBPACK_5: Investigate high-quality sourcemap merge failures
-  if (fast || isWebpackFiveOrHigher()) {
+  if (fast) {
     return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
   }
 

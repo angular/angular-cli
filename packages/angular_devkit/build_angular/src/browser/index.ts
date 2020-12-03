@@ -31,14 +31,13 @@ import { findCachePath } from '../utils/cache-path';
 import { colors } from '../utils/color';
 import { copyAssets } from '../utils/copy-assets';
 import { cachingDisabled } from '../utils/environment-options';
+import { mkdir, writeFile } from '../utils/fs';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
 import { I18nOptions } from '../utils/i18n-options';
-import { getHtmlTransforms } from '../utils/index-file/transforms';
-import {
-  IndexHtmlTransform,
-  writeIndexHtml,
-} from '../utils/index-file/write-index-html';
+import { FileInfo } from '../utils/index-file/augment-index-html';
+import { IndexHtmlGenerator, IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { ensureOutputPaths } from '../utils/output-paths';
+import { generateEntryPoints } from '../utils/package-chunk-sort';
 import {
   InlineOptions,
   ProcessBundleFile,
@@ -54,7 +53,6 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
-import { isWebpackFiveOrHigher } from '../utils/webpack-version';
 import {
   getAotConfig,
   getBrowserConfig,
@@ -69,6 +67,7 @@ import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
 import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
 import {
   BundleStats,
+  ChunkType,
   generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
@@ -219,7 +218,7 @@ export function buildWebpackBrowser(
       switchMap(async projectMetadata => {
         const sysProjectRoot = getSystemPath(
           resolve(normalize(context.workspaceRoot),
-          normalize((projectMetadata.root as string) ?? '')),
+            normalize((projectMetadata.root as string) ?? '')),
         );
 
         const { options: compilerOptions } = readTsconfig(options.tsConfig, context.workspaceRoot);
@@ -243,9 +242,9 @@ export function buildWebpackBrowser(
             (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
           context.logger.warn(
             `Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
-              (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
-              ' no longer officially supported with Angular v11 and higher.' +
-              '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
+            (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
+            ' no longer officially supported with Angular v11 and higher.' +
+            '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
           );
         }
 
@@ -259,11 +258,6 @@ export function buildWebpackBrowser(
       // tslint:disable-next-line: no-big-function
       switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
-        const indexTransforms = getHtmlTransforms(
-          normalizedOptimization,
-          buildBrowserFeatures,
-          transforms.indexHtml,
-        );
 
         return runWebpack(config, context, {
           webpackFactory: require('webpack') as typeof webpack,
@@ -592,11 +586,11 @@ export function buildWebpackBrowser(
                   const chunk = webpackStats.chunks?.find((chunk) => chunk.id.toString() === result.name);
 
                   if (result.original) {
-                    bundleInfoStats.push(generateBundleInfoStats(result.original, chunk));
+                    bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
                   }
 
                   if (result.downlevel) {
-                    bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk));
+                    bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
                   }
                 }
 
@@ -605,7 +599,7 @@ export function buildWebpackBrowser(
                 ) || [];
                 for (const chunk of unprocessedChunks) {
                   const asset = webpackStats.assets?.find(a => a.name === chunk.files[0]);
-                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }, true));
+                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }));
                 }
 
                 // Check for budget errors and display them to the user.
@@ -671,24 +665,39 @@ export function buildWebpackBrowser(
               if (success) {
                 if (options.index) {
                   spinner.start('Generating index html...');
+
+                  const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
+                  const entrypoints = generateEntryPoints({
+                    scripts: options.scripts ?? [],
+                    styles: options.styles ?? [],
+                  });
+
+                  const indexHtmlGenerator = new IndexHtmlGenerator({
+                    indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
+                    entrypoints,
+                    deployUrl: options.deployUrl,
+                    sri: options.subresourceIntegrity,
+                    WOFFSupportNeeded,
+                    optimization: normalizedOptimization,
+                    crossOrigin: options.crossOrigin,
+                    postTransform: transforms.indexHtml,
+                  });
+
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
-                      await writeIndexHtml({
-                        outputPath: path.join(outputPath, getIndexOutputFile(options.index)),
-                        indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
-                        files,
-                        noModuleFiles,
-                        moduleFiles,
+                      const content = await indexHtmlGenerator.process({
                         baseHref: getLocaleBaseHref(i18n, locale) || options.baseHref,
-                        deployUrl: options.deployUrl,
-                        sri: options.subresourceIntegrity,
-                        scripts: options.scripts,
-                        styles: options.styles,
-                        postTransforms: indexTransforms,
-                        crossOrigin: options.crossOrigin,
                         // i18nLocale is used when Ivy is disabled
                         lang: locale || options.i18nLocale,
+                        outputPath,
+                        files: mapEmittedFilesToFileInfo(files),
+                        noModuleFiles: mapEmittedFilesToFileInfo(noModuleFiles),
+                        moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                       });
+
+                      const indexOutput = path.join(outputPath, getIndexOutputFile(options.index));
+                      await mkdir(path.dirname(indexOutput), { recursive: true });
+                      await writeFile(indexOutput, content);
                     } catch (error) {
                       spinner.fail('Index html generation failed.');
 
@@ -737,8 +746,8 @@ export function buildWebpackBrowser(
               } as BrowserBuilderOutput),
           ),
         );
-    }),
-  );
+      }),
+    );
 
   function getLocaleBaseHref(i18n: I18nOptions, locale: string): string | undefined {
     if (i18n.locales[locale] && i18n.locales[locale]?.baseHref !== '') {
@@ -765,14 +774,14 @@ function mapErrorToMessage(error: unknown): string | undefined {
 }
 
 function assertNever(input: never): never {
-  throw new Error(`Unexpected call to assertNever() with input: ${
-      JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
+  throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }
 
 type ArrayElement<A> = A extends ReadonlyArray<infer T> ? T : never;
 function generateBundleInfoStats(
   bundle: ProcessBundleFile,
   chunk: ArrayElement<webpack.Stats.ToJsonOutput['chunks']> | undefined,
+  chunkType: ChunkType,
 ): BundleStats {
   return generateBundleStats(
     {
@@ -782,8 +791,20 @@ function generateBundleInfoStats(
       entry: !!chunk?.names.includes('runtime'),
       initial: !!chunk?.initial,
       rendered: true,
+      chunkType,
     },
-    true,
   );
 }
+
+function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
+  const filteredFiles: FileInfo[] = [];
+  for (const { file, name, extension, initial } of files) {
+    if (name && initial) {
+      filteredFiles.push({ file, extension, name });
+    }
+  }
+
+  return filteredFiles;
+}
+
 export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);

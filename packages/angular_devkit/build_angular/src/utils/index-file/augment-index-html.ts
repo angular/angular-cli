@@ -14,10 +14,8 @@ export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 export type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
 
 export interface AugmentIndexHtmlOptions {
-  /* Input file name (e. g. index.html) */
-  input: string;
   /* Input contents */
-  inputContent: string;
+  html: string;
   baseHref?: string;
   deployUrl?: string;
   sri: boolean;
@@ -59,7 +57,7 @@ export interface FileInfo {
 export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
   const {
     loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints,
-    sri, deployUrl = '', lang, baseHref, inputContent,
+    sri, deployUrl = '', lang, baseHref, html,
   } = params;
 
   let { crossOrigin = 'none' } = params;
@@ -89,7 +87,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     }
   }
 
-  const scriptTags: string[] = [];
+  let scriptTags: string[] = [];
   for (const script of scripts) {
     const attrs = [`src="${deployUrl}${script}"`];
 
@@ -126,7 +124,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     scriptTags.push(`<script ${attrs.join(' ')}></script>`);
   }
 
-  const linkTags: string[] = [];
+  let linkTags: string[] = [];
   for (const stylesheet of stylesheets) {
     const attrs = [
       `rel="stylesheet"`,
@@ -145,8 +143,8 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     linkTags.push(`<link ${attrs.join(' ')}>`);
   }
 
-  const { rewriter, transformedContent } = await htmlRewritingStream(inputContent);
-  const baseTagExists = inputContent.includes('<base');
+  const { rewriter, transformedContent } = await htmlRewritingStream(html);
+  const baseTagExists = html.includes('<base');
 
   rewriter
     .on('startTag', tag => {
@@ -182,19 +180,30 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
           for (const linkTag of linkTags) {
             rewriter.emitRaw(linkTag);
           }
+
+          linkTags = [];
           break;
         case 'body':
           // Add script tags
           for (const scriptTag of scriptTags) {
             rewriter.emitRaw(scriptTag);
           }
+
+          scriptTags = [];
           break;
       }
 
       rewriter.emitEndTag(tag);
     });
 
-  return transformedContent;
+  const content = await transformedContent;
+
+  if (linkTags.length || scriptTags.length) {
+    // In case no body/head tags are not present (dotnet partial templates)
+    return linkTags.join('') + scriptTags.join('') + content;
+  }
+
+  return content;
 }
 
 function generateSriAttributes(content: string): string {

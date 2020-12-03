@@ -251,6 +251,13 @@ export abstract class SchematicCommand<
         // Global
         : [__dirname, process.cwd()],
       schemaValidation: true,
+      optionTransforms: [
+        // Add configuration file defaults
+        async (schematic, current) => ({
+          ...(await getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName())),
+          ...current,
+        }),
+      ],
     });
 
     const getProjectName = () => {
@@ -277,16 +284,6 @@ export abstract class SchematicCommand<
 
       return undefined;
     };
-
-    const defaultOptionTransform = async (
-      schematic: FileSystemSchematicDescription,
-      current: {},
-    ) => ({
-      ...(await getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName())),
-      ...current,
-    });
-
-    workflow.engineHost.registerOptionsTransform(defaultOptionTransform);
 
     workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
     workflow.registry.addSmartDefaultProvider('projectName', getProjectName);

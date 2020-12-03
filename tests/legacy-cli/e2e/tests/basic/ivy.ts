@@ -38,9 +38,7 @@ export default async function() {
     }
 
     // Verify it's Ivy.
-    const mainUrlMatch = body.match(/src="(main\.[a-z0-9]{0,32}\.js)"/);
-    const mainUrl = mainUrlMatch && mainUrlMatch[1];
-    const main = await request('http://localhost:4200/' + mainUrl);
+    const main = await request('http://localhost:4200/main.js');
 
     if (!main.match(/ɵcmp\s*=/) && !main.match(/\\u0275cmp\s*=/)) {
       throw new Error('Ivy could not be found.');

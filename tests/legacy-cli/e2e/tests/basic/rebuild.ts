@@ -44,7 +44,7 @@ export default function() {
           bootstrap: [AppComponent]
         })
         export class AppModule { }
-      `)
+      `),
     ]))
     // Count the bundles.
     .then((results) => {
@@ -79,7 +79,7 @@ export default function() {
           console.log('$$_E2E_GOLDEN_VALUE_1');
           export let X = '$$_E2E_GOLDEN_VALUE_2';
         `,
-          'src/main.ts': `
+        'src/main.ts': `
           import { enableProdMode } from '@angular/core';
           import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
@@ -95,8 +95,8 @@ export default function() {
           import * as m from './app/app.module';
           console.log(m.X);
           console.log('$$_E2E_GOLDEN_VALUE_3');
-        `
-      })
+        `,
+      }),
     ]))
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
@@ -137,6 +137,32 @@ export default function() {
       }
       if (!body.match(/\$\$_E2E_GOLDEN_VALUE_3/)) {
         throw new Error('Expected golden value 3.');
+      }
+    })
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
+      writeMultipleFiles({
+        'src/app/app.component.html': '<h1>testingTESTING123</h1>',
+      }),
+    ]))
+    .then(() => wait(2000))
+    .then(() => request('http://localhost:4200/main.js'))
+    .then((body) => {
+      if (!body.match(/testingTESTING123/)) {
+        throw new Error('Expected component HTML to update.');
+      }
+    })
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
+      writeMultipleFiles({
+        'src/app/app.component.css': ':host { color: blue; }',
+      }),
+    ]))
+    .then(() => wait(2000))
+    .then(() => request('http://localhost:4200/main.js'))
+    .then((body) => {
+      if (!body.match(/color:\s?blue/)) {
+        throw new Error('Expected component CSS to update.');
       }
     })
     .then(() => killAllProcesses(), (err: unknown) => {

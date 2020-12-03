@@ -99,14 +99,13 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     const hasIstanbulReporter = reporters.includes('coverage-istanbul');
     if (hasCoveragePlugin && !hasCoverageReporter) {
       reporters.push('coverage');
-    }
-    else if (hasIstanbulPlugin && !hasIstanbulReporter) {
+    } else if (hasIstanbulPlugin && !hasIstanbulReporter) {
       // coverage-istanbul is deprecated in favor of karma-coverage
       reporters.push('coverage-istanbul');
+    } else if (!hasCoveragePlugin && !hasIstanbulPlugin) {
+      throw new Error('karma-coverage must be installed in order to run code coverage.');
     }
-    else {
-      throw new Error('karma-coverage must be installed in order to run code coverage');
-    }
+
     if (hasIstanbulPlugin) {
       logger.warn(`'karma-coverage-istanbul-reporter' usage has been deprecated since version 11.\n` +
        `Please install 'karma-coverage' and update 'karma.conf.js.' ` +

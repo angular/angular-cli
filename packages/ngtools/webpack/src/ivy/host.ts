@@ -11,7 +11,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { NgccProcessor } from '../ngcc_processor';
 import { WebpackResourceLoader } from '../resource_loader';
-import { forwardSlashPath } from '../utils';
+import { normalizePath } from './paths';
 
 export function augmentHostWithResources(
   host: ts.CompilerHost,
@@ -21,7 +21,7 @@ export function augmentHostWithResources(
   const resourceHost = host as CompilerHost;
 
   resourceHost.readResource = function (fileName: string) {
-    const filePath = forwardSlashPath(fileName);
+    const filePath = normalizePath(fileName);
 
     if (
       options.directTemplateLoading &&
@@ -41,7 +41,7 @@ export function augmentHostWithResources(
   };
 
   resourceHost.resourceNameToFileName = function (resourceName: string, containingFile: string) {
-    return forwardSlashPath(path.join(path.dirname(containingFile), resourceName));
+    return path.join(path.dirname(containingFile), resourceName);
   };
 
   resourceHost.getModifiedResourceFiles = function () {
@@ -157,7 +157,7 @@ export function augmentHostWithReplacements(
 
   const normalizedReplacements: Record<string, string> = {};
   for (const [key, value] of Object.entries(replacements)) {
-    normalizedReplacements[forwardSlashPath(key)] = forwardSlashPath(value);
+    normalizedReplacements[normalizePath(key)] = normalizePath(value);
   }
 
   const tryReplace = (resolvedModule: ts.ResolvedModule | undefined) => {

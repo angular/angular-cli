@@ -19,9 +19,17 @@ export default async function() {
     'IE 11',
   );
   // Production build
-  const { stderr: stderrProgress } = await ng('build', '--prod', '--progress');
+  const { stderr: stderrProgress, stdout } = await ng('build', '--prod', '--progress');
   await expectFileToMatch('dist/test-project/index.html', /main-es5\.[a-zA-Z0-9]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /main-es2015\.[a-zA-Z0-9]{20}\.js/);
+
+  if (!stdout.includes('Initial ES5 Total')) {
+    throw new Error(`Expected stdout not to contain 'Initial ES5 Total' but it did.\n${stdout}`);
+  }
+
+  if (!stdout.includes('Initial ES2015 Total')) {
+    throw new Error(`Expected stdout not to contain 'Initial ES2015 Total' but it did.\n${stdout}`);
+  }
 
   const logs: string[] = [
     'Browser application bundle generation complete',

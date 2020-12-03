@@ -11,7 +11,7 @@
 import * as path from 'path';
 import * as vm from 'vm';
 import { RawSource } from 'webpack-sources';
-import { forwardSlashPath } from './utils';
+import { normalizePath } from './ivy/paths';
 
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
@@ -44,7 +44,7 @@ export class WebpackResourceLoader {
       this.changedFiles.clear();
       for (const [file, time] of parentCompilation.fileTimestamps) {
         if (this.buildTimestamp < time) {
-          this.changedFiles.add(file);
+          this.changedFiles.add(normalizePath(file));
         }
       }
     }
@@ -159,7 +159,7 @@ export class WebpackResourceLoader {
     // Save the dependencies for this resource.
     this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
     for (const file of childCompilation.fileDependencies) {
-      const resolvedFile = forwardSlashPath(file);
+      const resolvedFile = normalizePath(file);
       const entry = this._reverseDependencies.get(resolvedFile);
       if (entry) {
         entry.add(filePath);

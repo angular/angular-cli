@@ -28,17 +28,86 @@ function clone(obj: unknown): unknown {
   }
 }
 
-// TODO: create a base class for all workspace related hosts.
+export interface WorkspaceHost {
+  getBuilderName(project: string, target: string): Promise<string>;
+  getMetadata(project: string): Promise<json.JsonObject>;
+  getOptions(project: string, target: string, configuration?: string): Promise<json.JsonObject>;
+  hasTarget(project: string, target: string): Promise<boolean>;
+}
+
+function findProjectTarget(
+  workspace: workspaces.WorkspaceDefinition,
+  project: string,
+  target: string,
+): workspaces.TargetDefinition {
+  const projectDefinition = workspace.projects.get(project);
+  if (!projectDefinition) {
+    throw new Error(`Project "${project}" does not exist.`);
+  }
+
+  const targetDefinition = projectDefinition.targets.get(target);
+  if (!targetDefinition) {
+    throw new Error('Project target does not exist.');
+  }
+
+  return targetDefinition;
+}
+
 export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModulesBuilderInfo> {
-  constructor(protected _workspace: workspaces.WorkspaceDefinition, protected _root: string) {}
+  private workspaceHost: WorkspaceHost;
+
+  constructor(workspaceHost: WorkspaceHost, _root: string);
+
+  constructor(workspace: workspaces.WorkspaceDefinition, _root: string);
+
+  constructor(
+    workspaceOrHost: workspaces.WorkspaceDefinition | WorkspaceHost,
+    protected _root: string,
+  ) {
+    if ('getBuilderName' in workspaceOrHost) {
+      this.workspaceHost = workspaceOrHost;
+    } else {
+      this.workspaceHost = {
+        async getBuilderName(project, target) {
+          const targetDefinition = findProjectTarget(workspaceOrHost, project, target);
+
+          return targetDefinition.builder;
+        },
+        async getOptions(project, target, configuration) {
+          const targetDefinition = findProjectTarget(workspaceOrHost, project, target);
+
+          if (configuration === undefined) {
+            return (targetDefinition.options ?? {}) as json.JsonObject;
+          }
+
+          if (!targetDefinition.configurations?.[configuration]) {
+            throw new Error(`Configuration '${configuration}' is not set in the workspace.`);
+          }
+
+          return (targetDefinition.configurations?.[configuration] ?? {}) as json.JsonObject;
+        },
+        async getMetadata(project) {
+          const projectDefinition = workspaceOrHost.projects.get(project);
+          if (!projectDefinition) {
+            throw new Error(`Project "${project}" does not exist.`);
+          }
+
+          return ({
+            root: projectDefinition.root,
+            sourceRoot: projectDefinition.sourceRoot,
+            prefix: projectDefinition.prefix,
+            ...(clone(projectDefinition.extensions) as {}),
+          } as unknown) as json.JsonObject;
+        },
+        async hasTarget(project, target) {
+          return !!workspaceOrHost.projects.get(project)?.targets.has(target);
+        },
+      };
+    }
+  }
 
   async getBuilderNameForTarget(target: Target) {
-    const targetDefinition = this.findProjectTarget(target);
-    if (!targetDefinition) {
-      throw new Error('Project target does not exist.');
-    }
-
-    return targetDefinition.builder;
+    return this.workspaceHost.getBuilderName(target.project, target.target);
   }
 
   /**
@@ -95,49 +164,28 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
   }
 
   async getOptionsForTarget(target: Target): Promise<json.JsonObject | null> {
-    const targetSpec = this.findProjectTarget(target);
-    if (targetSpec === undefined) {
+    if (!(await this.workspaceHost.hasTarget(target.project, target.target))) {
       return null;
     }
 
-    let additionalOptions = {};
+    let options = await this.workspaceHost.getOptions(target.project, target.target);
 
     if (target.configuration) {
-      const configurations = target.configuration.split(',').map(c => c.trim());
+      const configurations = target.configuration.split(',').map((c) => c.trim());
       for (const configuration of configurations) {
-        if (!(targetSpec['configurations'] && targetSpec['configurations'][configuration])) {
-          throw new Error(`Configuration '${configuration}' is not set in the workspace.`);
-        } else {
-          additionalOptions = {
-            ...additionalOptions,
-            ...targetSpec['configurations'][configuration],
-          };
-        }
+        options = {
+          ...options,
+          ...await this.workspaceHost.getOptions(target.project, target.target, configuration),
+        };
       }
     }
-
-    const options = {
-      ...targetSpec['options'],
-      ...additionalOptions,
-    };
 
     return clone(options) as json.JsonObject;
   }
 
   async getProjectMetadata(target: Target | string): Promise<json.JsonObject | null> {
     const projectName = typeof target === 'string' ? target : target.project;
-
-    const projectDefinition = this._workspace.projects.get(projectName);
-    if (!projectDefinition) {
-      throw new Error(`Project "${projectName}" does not exist.`);
-    }
-
-    const metadata = ({
-      root: projectDefinition.root,
-      sourceRoot: projectDefinition.sourceRoot,
-      prefix: projectDefinition.prefix,
-      ...clone(projectDefinition.extensions) as {},
-    } as unknown) as json.JsonObject;
+    const metadata = this.workspaceHost.getMetadata(projectName);
 
     return metadata;
   }
@@ -149,14 +197,5 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     }
 
     throw new Error('Builder is not a builder');
-  }
-
-  private findProjectTarget(target: Target) {
-    const projectDefinition = this._workspace.projects.get(target.project);
-    if (!projectDefinition) {
-      throw new Error(`Project "${target.project}" does not exist.`);
-    }
-
-    return projectDefinition.targets.get(target.target);
   }
 }

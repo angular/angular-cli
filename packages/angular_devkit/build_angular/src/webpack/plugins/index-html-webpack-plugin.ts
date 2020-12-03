@@ -8,63 +8,32 @@
 import * as path from 'path';
 import { Compiler, compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
-import {
-  CrossOriginValue,
-  FileInfo,
-  augmentIndexHtml,
-} from '../../utils/index-file/augment-index-html';
-import { IndexHtmlTransform } from '../../utils/index-file/write-index-html';
-import { stripBom } from '../../utils/strip-bom';
+import { FileInfo } from '../../utils/index-file/augment-index-html';
+import { IndexHtmlGenerator, IndexHtmlGeneratorOptions, IndexHtmlGeneratorProcessOptions } from '../../utils/index-file/index-html-generator';
 
-export interface IndexHtmlWebpackPluginOptions {
-  input: string;
-  output: string;
-  baseHref?: string;
-  entrypoints: string[];
-  deployUrl?: string;
-  sri: boolean;
+export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions,
+  Omit<IndexHtmlGeneratorProcessOptions, 'files' | 'noModuleFiles' | 'moduleFiles'> {
   noModuleEntrypoints: string[];
   moduleEntrypoints: string[];
-  postTransforms: IndexHtmlTransform[];
-  crossOrigin?: CrossOriginValue;
-  lang?: string;
 }
 
-function readFile(filename: string, compilation: compilation.Compilation): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    compilation.inputFileSystem.readFile(filename, (err: Error, data: Buffer) => {
-      if (err) {
-        reject(err);
+export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
+  private _compilation: compilation.Compilation | undefined;
+  get compilation(): compilation.Compilation {
+    if (this._compilation) {
+      return this._compilation;
+    }
 
-        return;
-      }
+    throw new Error('compilation is undefined.');
+  }
 
-      resolve(stripBom(data.toString()));
-    });
-  });
-}
-
-export class IndexHtmlWebpackPlugin {
-  private _options: IndexHtmlWebpackPluginOptions;
-
-  constructor(options?: Partial<IndexHtmlWebpackPluginOptions>) {
-    this._options = {
-      input: 'index.html',
-      output: 'index.html',
-      entrypoints: ['polyfills', 'main'],
-      noModuleEntrypoints: [],
-      moduleEntrypoints: [],
-      sri: false,
-      postTransforms: [],
-      ...options,
-    };
+  constructor(readonly options: IndexHtmlWebpackPluginOptions) {
+    super(options);
   }
 
   apply(compiler: Compiler) {
     compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async compilation => {
-      // Get input html file
-      const inputContent = await readFile(this._options.input, compilation);
-      compilation.fileDependencies.add(this._options.input);
+      this._compilation = compilation;
 
       // Get all files for selected entrypoints
       const files: FileInfo[] = [];
@@ -72,7 +41,7 @@ export class IndexHtmlWebpackPlugin {
       const moduleFiles: FileInfo[] = [];
 
       for (const [entryName, entrypoint] of compilation.entrypoints) {
-        const entryFiles: FileInfo[] = ((entrypoint && entrypoint.getFiles()) || []).map(
+        const entryFiles: FileInfo[] = entrypoint?.getFiles()?.map(
           (f: string): FileInfo => ({
             name: entryName,
             file: f,
@@ -80,42 +49,50 @@ export class IndexHtmlWebpackPlugin {
           }),
         );
 
-        if (this._options.noModuleEntrypoints.includes(entryName)) {
+        if (!entryFiles) {
+          continue;
+        }
+
+        if (this.options.noModuleEntrypoints.includes(entryName)) {
           noModuleFiles.push(...entryFiles);
-        } else if (this._options.moduleEntrypoints.includes(entryName)) {
+        } else if (this.options.moduleEntrypoints.includes(entryName)) {
           moduleFiles.push(...entryFiles);
         } else {
           files.push(...entryFiles);
         }
       }
 
-      const loadOutputFile = async (name: string) => {
-        const data = compilation.assets[name].source();
-
-        return typeof data === 'string' ? data : data.toString();
-      };
-
-      let indexSource = await augmentIndexHtml({
-        input: this._options.input,
-        inputContent,
-        baseHref: this._options.baseHref,
-        deployUrl: this._options.deployUrl,
-        sri: this._options.sri,
-        crossOrigin: this._options.crossOrigin,
+      const content = await this.process({
         files,
         noModuleFiles,
-        loadOutputFile,
         moduleFiles,
-        entrypoints: this._options.entrypoints,
-        lang: this._options.lang,
+        outputPath: this.options.outputPath,
+        baseHref: this.options.baseHref,
+        lang: this.options.lang,
       });
 
-      for (const transform of this._options.postTransforms) {
-        indexSource = await transform(indexSource);
-      }
+      compilation.assets[this.options.outputPath] = new RawSource(content);
+    });
+  }
 
-      // Add to compilation assets
-      compilation.assets[this._options.output] = new RawSource(indexSource);
+  async readAsset(path: string): Promise<string> {
+    const data = this.compilation.assets[path].source();
+
+    return typeof data === 'string' ? data : data.toString();
+  }
+
+  protected async readIndex(path: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.compilation.inputFileSystem.readFile(path, (err: Error, data: Buffer) => {
+        if (err) {
+          reject(err);
+
+          return;
+        }
+
+        this.compilation.fileDependencies.add(path);
+        resolve(data.toString());
+      });
     });
   }
 }
