@@ -134,16 +134,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.styl$/,
       use: [
         {
-          loader: require.resolve('resolve-url-loader'),
-          options: {
-            sourceMap: cssSourceMap,
-          },
-        },
-        {
           loader: require.resolve('stylus-loader'),
           options: {
             sourceMap: cssSourceMap,
-            webpackImporter: false,
             stylusOptions: {
               compress: false,
               sourceMap: { comment: false },
