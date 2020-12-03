@@ -16,7 +16,13 @@ export class Spinner {
   enabled = true;
 
   constructor(text?: string) {
-    this.spinner = ora(text);
+    this.spinner = ora({
+      text,
+      // The below 2 options are needed because otherwise CTRL+C will be delayed
+      // when the underlying process is sync.
+      hideCursor: false,
+      discardStdin: false,
+    });
   }
 
   set text(text: string) {
@@ -37,7 +43,7 @@ export class Spinner {
     this.spinner.stop();
   }
 
-  start(text?: string) {
+  start(text?: string): void {
     if (this.enabled) {
       this.spinner.start(text);
     }
