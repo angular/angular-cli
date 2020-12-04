@@ -22,6 +22,9 @@ describe('AppShell Builder', () => {
   afterEach(async () => host.restore().toPromise());
 
   const appShellRouteFiles = {
+    'src/styles.css': `
+      p { color: #000 }
+    `,
     'src/app/app-shell/app-shell.component.html': `
       <p>
         app-shell works!
@@ -261,5 +264,25 @@ describe('AppShell Builder', () => {
 
     // Close the express server.
     server.close();
+  });
+
+  it('critical CSS is inlined', async () => {
+    host.writeMultipleFiles(appShellRouteFiles);
+    const overrides = {
+      route: 'shell',
+      browserTarget: 'app:build:production,inline-critical-css',
+    };
+
+    const run = await architect.scheduleTarget(target, overrides);
+    const output = await run.result;
+    await run.stop();
+
+    expect(output.success).toBe(true);
+    const fileName = 'dist/index.html';
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+
+    expect(content).toContain('app-shell works!');
+    expect(content).toContain('p{color:#000;}');
+    expect(content).toMatch(/<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" onload="this\.media='all'">/);
   });
 });

@@ -11,7 +11,6 @@
 import { Path, virtualFs } from '@angular-devkit/core';
 import {
   AssetPatternClass,
-  OptimizationClass,
   Schema as BrowserBuilderSchema,
   SourceMapClass,
 } from '../browser/schema';
@@ -21,7 +20,7 @@ import {
   NormalizedFileReplacement,
   normalizeFileReplacements,
 } from './normalize-file-replacements';
-import { normalizeOptimization } from './normalize-optimization';
+import { NormalizedOptimizationOptions, normalizeOptimization } from './normalize-optimization';
 import { normalizeSourceMaps } from './normalize-source-maps';
 
 
@@ -32,7 +31,7 @@ export type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & BuildOptions
   sourceMap: SourceMapClass;
   assets: AssetPatternClass[];
   fileReplacements: NormalizedFileReplacement[];
-  optimization: OptimizationClass;
+  optimization: NormalizedOptimizationOptions;
 };
 
 export function normalizeBrowserSchema(

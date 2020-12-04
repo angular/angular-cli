@@ -48,6 +48,16 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true
+            },
+            "inline-critical-css": {
+              "optimization": {
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "scripts": true,
+                "fonts": true
+              }
             }
           }
         },

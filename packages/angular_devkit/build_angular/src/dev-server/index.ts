@@ -107,9 +107,11 @@ export function serveWebpackBrowser(
       );
 
     // Get dev-server only options.
-    const devServerOptions = (Object.keys(options) as (keyof Schema)[])
+    type DevServerOptions = Partial<Omit<Schema,
+      'watch' | 'optimization' | 'aot' | 'sourceMap' | 'vendorChunk' | 'commonChunk' | 'baseHref' | 'progress' | 'poll' | 'verbose' | 'deployUrl'>>;
+    const devServerOptions: DevServerOptions = (Object.keys(options) as (keyof Schema)[])
       .filter(key => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
-      .reduce<Partial<Schema>>(
+      .reduce<DevServerOptions>(
         (previous, key) => ({
           ...previous,
           [key]: options[key],
@@ -288,7 +290,7 @@ export function serveWebpackBrowser(
         );
       }
 
-      if (normalizedOptimization.scripts || normalizedOptimization.styles) {
+      if (normalizedOptimization.scripts || normalizedOptimization.styles.minify) {
         logger.error(tags.stripIndents`
           ****************************************************************************************
           This is a simple server for use in testing or debugging Angular applications locally.

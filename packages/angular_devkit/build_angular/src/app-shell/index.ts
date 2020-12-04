@@ -18,6 +18,9 @@ import * as path from 'path';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
+import { normalizeOptimization } from '../utils';
+import { readFile, writeFile } from '../utils/fs';
+import { InlineCriticalCssProcessor } from '../utils/index-file/inline-critical-css';
 import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { Spinner } from '../utils/spinner';
 import { Schema as BuildWebpackAppShellSchema } from './schema';
@@ -27,15 +30,17 @@ async function _renderUniversal(
   context: BuilderContext,
   browserResult: BrowserBuilderOutput,
   serverResult: ServerBuilderOutput,
+  spinner: Spinner,
 ): Promise<BrowserBuilderOutput> {
   // Get browser target options.
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const rawBrowserOptions = await context.getTargetOptions(browserTarget);
+  const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject & BrowserBuilderSchema;
   const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderSchema>(
     rawBrowserOptions,
     browserBuilderName,
   );
+
 
   // Initialize zone.js
   const root = context.workspaceRoot;
@@ -54,10 +59,18 @@ async function _renderUniversal(
     normalize((projectMetadata.root as string) || ''),
   );
 
+  const { styles } = normalizeOptimization(browserOptions.optimization);
+  const inlineCriticalCssProcessor = styles.inlineCritical
+    ? new InlineCriticalCssProcessor({
+      minify: styles.minify,
+      deployUrl: browserOptions.deployUrl,
+    })
+    : undefined;
+
   for (const outputPath of browserResult.outputPaths) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
     const browserIndexOutputPath = path.join(outputPath, 'index.html');
-    const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
+    const indexHtml = await readFile(browserIndexOutputPath, 'utf8');
     const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
 
     const {
@@ -86,13 +99,25 @@ async function _renderUniversal(
       url: options.route,
     };
 
-    const html = await renderModuleFn(AppServerModuleDef, renderOpts);
+    let html = await renderModuleFn(AppServerModuleDef, renderOpts);
     // Overwrite the client index file.
     const outputIndexPath = options.outputIndexPath
       ? path.join(root, options.outputIndexPath)
       : browserIndexOutputPath;
 
-    fs.writeFileSync(outputIndexPath, html);
+    if (inlineCriticalCssProcessor) {
+      const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, { outputPath });
+      html = content;
+
+      if (warnings.length || errors.length) {
+        spinner.stop();
+        warnings.forEach(m => context.logger.warn(m));
+        errors.forEach(m => context.logger.error(m));
+        spinner.start();
+      }
+    }
+
+    await writeFile(outputIndexPath, html);
 
     if (browserOptions.serviceWorker) {
       await augmentAppWithServiceWorker(
@@ -145,9 +170,15 @@ async function _appShellBuilder(
 
   // Never run the browser target in watch mode.
   // If service worker is needed, it will be added in _renderUniversal();
+  const browserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject & BrowserBuilderSchema;
+
+  const optimization = normalizeOptimization(browserOptions.optimization);
+  optimization.styles.inlineCritical = false;
+
   const browserTargetRun = await context.scheduleTarget(browserTarget, {
     watch: false,
     serviceWorker: false,
+    optimization: (optimization as unknown as JsonObject),
   });
   const serverTargetRun = await context.scheduleTarget(serverTarget, {
     watch: false,
@@ -169,7 +200,7 @@ async function _appShellBuilder(
 
     spinner = new Spinner();
     spinner.start('Generating application shell...');
-    const result =  await _renderUniversal(options, context, browserResult, serverResult);
+    const result = await _renderUniversal(options, context, browserResult, serverResult, spinner);
     spinner.succeed('Application shell generation complete.');
 
     return result;

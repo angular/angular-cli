@@ -191,7 +191,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     cssSourceMap
     // Never use component css sourcemap when style optimizations are on.
     // It will just increase bundle size without offering good debug experience.
-    && !buildOptions.optimization.styles
+    && !buildOptions.optimization.styles.minify
     // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
     // for component css.
     && !buildOptions.sourceMap.hidden
