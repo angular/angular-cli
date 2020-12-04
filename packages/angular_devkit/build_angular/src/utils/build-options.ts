@@ -21,9 +21,10 @@ import {
 } from '../browser/schema';
 import { Schema as DevServerSchema } from '../dev-server/schema';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
+import { NormalizedOptimizationOptions } from './normalize-optimization';
 
 export interface BuildOptions {
-  optimization: OptimizationClass;
+  optimization: NormalizedOptimizationOptions;
   environment?: string;
   outputPath: string;
   resourcesOutputPath?: string;

@@ -18,7 +18,7 @@ describe('InlineFontsProcessor', () => {
 
   it('should inline supported fonts and icons in HTML', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
-      minifyInlinedCSS: false,
+      minify: false,
       WOFFSupportNeeded: false,
     });
 
@@ -41,7 +41,7 @@ describe('InlineFontsProcessor', () => {
 
   it('should inline multiple fonts from a single request with minification enabled', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
-      minifyInlinedCSS: true,
+      minify: true,
       WOFFSupportNeeded: false,
     });
 
@@ -63,7 +63,7 @@ describe('InlineFontsProcessor', () => {
   it('works with http protocol', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
       WOFFSupportNeeded: false,
-      minifyInlinedCSS: false,
+      minify: false,
     });
 
     const html = await inlineFontsProcessor
@@ -74,7 +74,7 @@ describe('InlineFontsProcessor', () => {
   it('works with // protocol', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
       WOFFSupportNeeded: false,
-      minifyInlinedCSS: false,
+      minify: false,
     });
 
     const html = await inlineFontsProcessor
@@ -85,7 +85,7 @@ describe('InlineFontsProcessor', () => {
   it('should include WOFF1 definitions when `WOFF1SupportNeeded` is true', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
       WOFFSupportNeeded: true,
-      minifyInlinedCSS: false,
+      minify: false,
     });
 
     const html = await inlineFontsProcessor.process(content);
@@ -96,7 +96,7 @@ describe('InlineFontsProcessor', () => {
   it('should remove comments and line breaks when `minifyInlinedCSS` is true', async () => {
     const inlineFontsProcessor = new InlineFontsProcessor({
       WOFFSupportNeeded: false,
-      minifyInlinedCSS: true,
+      minify: true,
     });
 
     const html = await inlineFontsProcessor.process(content);

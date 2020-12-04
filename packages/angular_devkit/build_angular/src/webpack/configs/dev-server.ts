@@ -106,11 +106,11 @@ export function getDevServerConfig(
       },
       sockPath: posix.join(servePath, 'sockjs-node'),
       stats: false,
-      compress: stylesOptimization || scriptsOptimization,
+      compress: stylesOptimization.minify || scriptsOptimization,
       watchOptions: getWatchOptions(poll),
       https: getSslConfig(root, wco.buildOptions),
       overlay: {
-        errors: !(stylesOptimization || scriptsOptimization),
+        errors: !(stylesOptimization.minify || scriptsOptimization),
         warnings: false,
       },
       public: publicHost,

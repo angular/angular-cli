@@ -390,7 +390,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   const extraMinimizers = [];
-  if (stylesOptimization) {
+  if (stylesOptimization.minify) {
     extraMinimizers.push(
       new OptimizeCssWebpackPlugin({
         sourceMap: stylesSourceMap,
@@ -481,7 +481,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   return {
-    mode: scriptsOptimization || stylesOptimization ? 'production' : 'development',
+    mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
     devtool: false,
     profile: buildOptions.statsJson,
     resolve: {

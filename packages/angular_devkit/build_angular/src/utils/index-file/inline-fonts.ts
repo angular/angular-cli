@@ -27,7 +27,7 @@ const SUPPORTED_PROVIDERS = [
 ];
 
 export interface InlineFontsOptions {
-  minifyInlinedCSS: boolean;
+  minify?: boolean;
   WOFFSupportNeeded: boolean;
 }
 
@@ -157,7 +157,7 @@ export class InlineFontsProcessor {
       }
       cssContent += await this.getResponse(url, UserAgent.Chrome);
 
-      if (this.options.minifyInlinedCSS) {
+      if (this.options.minify) {
         cssContent = cssContent
           // Comments.
           .replace(/\/\*([\s\S]*?)\*\//g, '')

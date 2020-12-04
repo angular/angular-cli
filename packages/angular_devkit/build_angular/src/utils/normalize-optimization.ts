@@ -6,17 +6,22 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { FontsClass, OptimizationClass, OptimizationUnion } from '../browser/schema';
+import { FontsClass, OptimizationClass, OptimizationUnion, StylesClass } from '../browser/schema';
 
-export type NormalizeOptimizationOptions = Required<Omit<OptimizationClass, 'fonts'>> & {
+export type NormalizedOptimizationOptions = Required<Omit<OptimizationClass, 'fonts' | 'styles'>> & {
   fonts: FontsClass,
+  styles: StylesClass,
 };
 
-export function normalizeOptimization(optimization: OptimizationUnion = false): NormalizeOptimizationOptions {
+export function normalizeOptimization(optimization: OptimizationUnion = false): NormalizedOptimizationOptions {
   if (typeof optimization === 'object') {
     return {
       scripts: !!optimization.scripts,
-      styles: !!optimization.styles,
+      styles: typeof optimization.styles === 'object' ? optimization.styles : {
+        minify: !!optimization.styles,
+        // inlineCritical is always false unless explictly set.
+        inlineCritical: false,
+      },
       fonts: typeof optimization.fonts === 'object' ? optimization.fonts : {
         inline: !!optimization.fonts,
       },
@@ -25,7 +30,11 @@ export function normalizeOptimization(optimization: OptimizationUnion = false): 
 
   return {
     scripts: optimization,
-    styles: optimization,
+    styles: {
+      minify: optimization,
+      // inlineCritical is always false unless explictly set.
+      inlineCritical: false,
+    },
     fonts: {
       inline: optimization,
     },

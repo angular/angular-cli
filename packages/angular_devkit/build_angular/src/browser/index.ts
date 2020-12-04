@@ -685,7 +685,7 @@ export function buildWebpackBrowser(
 
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
-                      const content = await indexHtmlGenerator.process({
+                      const { content, warnings, errors } = await indexHtmlGenerator.process({
                         baseHref: getLocaleBaseHref(i18n, locale) || options.baseHref,
                         // i18nLocale is used when Ivy is disabled
                         lang: locale || options.i18nLocale,
@@ -694,6 +694,13 @@ export function buildWebpackBrowser(
                         noModuleFiles: mapEmittedFilesToFileInfo(noModuleFiles),
                         moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                       });
+
+                      if (warnings.length || errors.length) {
+                        spinner.stop();
+                        warnings.forEach(m => context.logger.warn(m));
+                        errors.forEach(m => context.logger.error(m));
+                        spinner.start();
+                      }
 
                       const indexOutput = path.join(outputPath, getIndexOutputFile(options.index));
                       await mkdir(path.dirname(indexOutput), { recursive: true });

@@ -140,10 +140,7 @@ export async function execute(
   const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
     {
       ...browserOptions,
-      optimization: {
-        scripts: false,
-        styles: false,
-      },
+      optimization: false,
       sourceMap: {
         scripts: true,
         styles: false,

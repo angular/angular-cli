@@ -145,6 +145,7 @@ ts_library(
         "@npm//circular-dependency-plugin",
         "@npm//copy-webpack-plugin",
         "@npm//core-js",
+        "@npm//critters",
         "@npm//css-loader",
         "@npm//cssnano",
         "@npm//file-loader",

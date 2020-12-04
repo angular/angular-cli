@@ -5,11 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as path from 'path';
+import { basename, dirname, extname } from 'path';
 import { Compiler, compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator, IndexHtmlGeneratorOptions, IndexHtmlGeneratorProcessOptions } from '../../utils/index-file/index-html-generator';
+import { addError, addWarning } from '../../utils/webpack-diagnostics';
 import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions,
@@ -63,7 +64,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
           (f: string): FileInfo => ({
             name: entryName,
             file: f,
-            extension: path.extname(f),
+            extension: extname(f),
           }),
         );
 
@@ -80,21 +81,24 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
         }
       }
 
-      const content = await this.process({
+      const { content, warnings, errors } = await this.process({
         files,
         noModuleFiles,
         moduleFiles,
-        outputPath: this.options.outputPath,
+        outputPath: dirname(this.options.outputPath),
         baseHref: this.options.baseHref,
         lang: this.options.lang,
       });
 
       assets[this.options.outputPath] = new RawSource(content);
+
+      warnings.forEach(msg => addWarning(this.compilation, msg));
+      errors.forEach(msg => addError(this.compilation, msg));
     };
   }
 
   async readAsset(path: string): Promise<string> {
-    const data = this.compilation.assets[path].source();
+    const data = this.compilation.assets[basename(path)].source();
 
     return typeof data === 'string' ? data : data.toString();
   }
