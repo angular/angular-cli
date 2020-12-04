@@ -701,7 +701,7 @@
               "additionalProperties": false
             },
             "optimization": {
-              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code eliminiation and fonts inlining. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
+              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code elimination and fonts inlining. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
               "oneOf": [
                 {
                   "type": "object",
@@ -1261,7 +1261,7 @@
               "default": true
             },
             "optimization": {
-              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code eliminiation and fonts inlining. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
+              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code elimination and fonts inlining. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
               "default": false,
               "oneOf": [
                 {
@@ -1743,7 +1743,7 @@
               "additionalProperties": false
             },
             "optimization": {
-              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking and dead-code eliminiation. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
+              "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking and dead-code elimination. For more information, see https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.",
               "default": false,
               "oneOf": [
                 {
