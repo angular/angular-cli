@@ -39,7 +39,7 @@
       "default": "AppServerModule"
     },
     "skipInstall": {
-      "description": "When true, does not install packages for dependencies.",
+      "description": "Do not install packages for dependencies.",
       "type": "boolean",
       "default": false
     }

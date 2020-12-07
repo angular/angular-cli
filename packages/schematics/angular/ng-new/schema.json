@@ -19,18 +19,18 @@
       "x-prompt": "What name would you like to use for the new workspace and initial project?"
     },
     "skipInstall": {
-      "description": "When true, does not install dependency packages.",
+      "description": "Do not install dependency packages.",
       "type": "boolean",
       "default": false
     },
     "linkCli": {
-      "description": "When true, links the CLI to the global version (internal development only).",
+      "description": "Link the CLI to the global version (internal development only).",
       "type": "boolean",
       "default": false,
       "visible": false
     },
     "skipGit": {
-      "description": "When true, does not initialize a git repository.",
+      "description": "Do not initialize a git repository.",
       "type": "boolean",
       "default": false,
       "alias": "g"
@@ -64,13 +64,13 @@
       "default": "projects"
     },
     "inlineStyle": {
-      "description": "When true, includes styles inline in the component TS file. By default, an external styles file is created and referenced in the component TS file.",
+      "description": "Include styles inline in the component TS file. By default, an external styles file is created and referenced in the component TypeScript file.",
       "type": "boolean",
       "alias": "s",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
-      "description": "When true, includes template inline in the component TS file. By default, an external template file is created and referenced in the component TS file.",
+      "description": "Include template inline in the component TS file. By default, an external template file is created and referenced in the component TypeScript file.",
       "type": "boolean",
       "alias": "t",
       "x-user-analytics": 10
@@ -91,7 +91,7 @@
     },
     "routing": {
       "type": "boolean",
-      "description": "When true, generates a routing module for the initial project.",
+      "description": "Generate a routing module for the initial project.",
       "x-user-analytics": 17
     },
     "prefix": {
@@ -109,19 +109,19 @@
       "x-user-analytics": 5
     },
     "skipTests": {
-      "description": "When true, does not generate \"spec.ts\" test files for the new project. ",
+      "description": "Do not generate \"spec.ts\" test files for the new project.",
       "type": "boolean",
       "default": false,
       "alias": "S",
       "x-user-analytics": 12
     },
     "createApplication": {
-      "description": "When true (the default), creates a new initial application project in the src folder of the new workspace. When false, creates an empty workspace with no initial app. You can then use the generate application command so that all apps are created in the projects folder.",
+      "description": "Create a new initial application project in the 'src' folder of the new workspace. When false, creates an empty workspace with no initial application. You can then use the generate application command so that all applications are created in the projects folder.",
       "type": "boolean",
       "default": true
     },
     "minimal": {
-      "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
+      "description": "Create a workspace without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14

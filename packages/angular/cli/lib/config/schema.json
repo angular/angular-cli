@@ -155,7 +155,7 @@
             },
             "skipTests": {
               "type": "boolean",
-              "description": "When true, does not create test files.",
+              "description": "Do not create test files.",
               "default": false
             }
           }
@@ -197,7 +197,7 @@
             },
             "skipTests": {
               "type": "boolean",
-              "description": "When true, does not create test files.",
+              "description": "Do not create test files.",
               "default": false
             }
           }
@@ -244,7 +244,7 @@
             },
             "skipTests": {
               "type": "boolean",
-              "description": "When true, does not create test files.",
+              "description": "Do not create test files.",
               "default": false
             }
           }
@@ -259,7 +259,7 @@
             },
             "skipTests": {
               "type": "boolean",
-              "description": "When true, does not create test files.",
+              "description": "Do not create test files.",
               "default": false
             },
             "skipImport": {
@@ -285,7 +285,7 @@
           "properties": {
             "skipTests": {
               "type": "boolean",
-              "description": "When true, does not create test files.",
+              "description": "Do not create test files.",
               "default": false
             }
           }
@@ -1210,13 +1210,13 @@
             },
             "open": {
               "type": "boolean",
-              "description": "When true, open the live-reload URL in default browser.",
+              "description": "Open the live-reload URL in default browser.",
               "default": false,
               "alias": "o"
             },
             "liveReload": {
               "type": "boolean",
-              "description": "When true, reload the page on change using live-reload.",
+              "description": "Reload the page on change using live-reload.",
               "default": true
             },
             "publicHost": {
@@ -1237,27 +1237,27 @@
             },
             "disableHostCheck": {
               "type": "boolean",
-              "description": "When true, don't verify that connected clients are part of allowed hosts.",
+              "description": "Do not verify that connected clients are part of allowed hosts.",
               "default": false
             },
             "hmr": {
               "type": "boolean",
-              "description": "When true, enable hot module replacement.",
+              "description": "Enable hot module replacement.",
               "default": false
             },
             "watch": {
               "type": "boolean",
-              "description": "When true, rebuild on change.",
+              "description": "Rebuild on change.",
               "default": true
             },
             "hmrWarning": {
               "type": "boolean",
-              "description": "When true, show a warning when the --hmr option is enabled.",
+              "description": "Show a warning when the --hmr option is enabled.",
               "default": true
             },
             "servePathDefaultWarning": {
               "type": "boolean",
-              "description": "When true, show a warning when deploy-url/base-href use unsupported serve path values.",
+              "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
               "default": true
             },
             "optimization": {
@@ -1269,12 +1269,12 @@
                   "properties": {
                     "scripts": {
                       "type": "boolean",
-                      "description": "When true, enable optimization of the scripts output.",
+                      "description": "Enable optimization of the scripts output.",
                       "default": true
                     },
                     "styles": {
                       "type": "boolean",
-                      "description": "When true, enable optimization of the styles output.",
+                      "description": "Enable optimization of the styles output.",
                       "default": true
                     }
                   },
@@ -1290,7 +1290,7 @@
               "description": "Build using ahead-of-time compilation."
             },
             "sourceMap": {
-              "description": "When true, output sourcemaps.",
+              "description": "Output sourcemaps.",
               "default": true,
               "oneOf": [
                 {
@@ -1298,17 +1298,17 @@
                   "properties": {
                     "scripts": {
                       "type": "boolean",
-                      "description": "When true, output sourcemaps for all scripts.",
+                      "description": "Output sourcemaps for all scripts.",
                       "default": true
                     },
                     "styles": {
                       "type": "boolean",
-                      "description": "When true, output sourcemaps for all styles.",
+                      "description": "Output sourcemaps for all styles.",
                       "default": true
                     },
                     "vendor": {
                       "type": "boolean",
-                      "description": "When true, resolve vendor packages sourcemaps.",
+                      "description": "Resolve vendor packages sourcemaps.",
                       "default": false
                     }
                   },
@@ -1321,11 +1321,11 @@
             },
             "vendorChunk": {
               "type": "boolean",
-              "description": "When true, use a separate bundle containing only vendor libraries."
+              "description": "Use a separate bundle containing only vendor libraries."
             },
             "commonChunk": {
               "type": "boolean",
-              "description": "When true, use a separate bundle containing code used across multiple bundles."
+              "description": "Use a separate bundle containing code used across multiple bundles."
             },
             "baseHref": {
               "type": "string",
@@ -1337,11 +1337,11 @@
             },
             "verbose": {
               "type": "boolean",
-              "description": "When true, add more details to output logging."
+              "description": "Add more details to output logging."
             },
             "progress": {
               "type": "boolean",
-              "description": "When true, log progress to the console while building."
+              "description": "Log progress to the console while building."
             }
           },
           "additionalProperties": false

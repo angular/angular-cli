@@ -55,7 +55,7 @@
       ]
     },
     "verbose": {
-      "description": "When true, display additional details during the update process.",
+      "description": "Display additional details during the update process.",
       "type": "boolean"
     },
     "packageManager": {

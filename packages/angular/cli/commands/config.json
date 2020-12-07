@@ -31,7 +31,7 @@
         },
         "global": {
           "type": "boolean",
-          "description": "When true, accesses the global configuration in the caller's home directory.",
+          "description": "Access the global configuration in the caller's home directory.",
           "default": false,
           "aliases": ["g"]
         }

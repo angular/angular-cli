@@ -29,7 +29,7 @@
     },
     "lintFix": {
       "type": "boolean",
-      "description": "When true, applies lint fixes after generating the enum.",
+      "description": "Apply lint fixes after generating the enum.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }

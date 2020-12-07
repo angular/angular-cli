@@ -21,7 +21,7 @@
           ]
         },
         "prod": {
-          "description": "Shorthand for \"--configuration=production\".\nWhen true, sets the build configuration to the production target.\nBy default, the production target is set up in the workspace configuration such that all builds make use of bundling, limited tree-shaking, and also limited dead code elimination.",
+          "description": "Shorthand for \"--configuration=production\".\nSet the build configuration to the production target.\nBy default, the production target is set up in the workspace configuration such that all builds make use of bundling, limited tree-shaking, and also limited dead code elimination.",
           "type": "boolean"
         }
       }
@@ -42,13 +42,13 @@
           "type": "boolean",
           "default": false,
           "aliases": [ "d" ],
-          "description": "When true, runs through and reports activity without writing out results."
+          "description": "Run through and reports activity without writing out results."
         },
         "force": {
           "type": "boolean",
           "default": false,
           "aliases": [ "f" ],
-          "description": "When true, forces overwriting of existing files."
+          "description": "Force overwriting of existing files."
         }
       }
     },
@@ -57,12 +57,12 @@
         "interactive": {
           "type": "boolean",
           "default": "true",
-          "description": "When false, disables interactive input prompts."
+          "description": "Enable interactive input prompts."
         },
         "defaults": {
           "type": "boolean",
           "default": "false",
-          "description": "When true, disables interactive input prompts for options with a default."
+          "description": "Disable interactive input prompts for options with a default."
         }
       }
     }

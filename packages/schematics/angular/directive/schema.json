@@ -43,13 +43,13 @@
     },
     "skipTests": {
       "type": "boolean",
-      "description": "When true, does not create \"spec.ts\" test files for the new class.",
+      "description": "Do not create \"spec.ts\" test files for the new class.",
       "default": false,
       "x-user-analytics": 12
     },
     "skipImport": {
       "type": "boolean",
-      "description": "When true, does not import this directive into the owning NgModule.",
+      "description": "Do not import this directive into the owning NgModule.",
       "default": false,
       "x-user-analytics": 18
     },
@@ -71,12 +71,12 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the declaring NgModule exports this directive.",
+      "description": "The declaring NgModule exports this directive.",
       "x-user-analytics": 19
     },
     "lintFix": {
       "type": "boolean",
-      "description": "When true, applies lint fixes after generating the directive.",
+      "description": "Apply lint fixes after generating the directive.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
