@@ -9,6 +9,7 @@
     ],
     "experimentalDecorators": true,
     "types": [],
+    "skipLibCheck": true,
     "module": "amd",
     "moduleResolution": "node"
   },
