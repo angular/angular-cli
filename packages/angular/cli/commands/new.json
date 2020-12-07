@@ -22,7 +22,7 @@
           "type": "boolean",
           "default": false,
           "aliases": [ "v" ],
-          "description": "When true, adds more details to output logging."
+          "description": "Add more details to output logging."
         }
       },
       "required": []

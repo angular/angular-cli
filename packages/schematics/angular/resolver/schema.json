@@ -16,7 +16,7 @@
     },
     "skipTests": {
       "type": "boolean",
-      "description": "When true, does not create \"spec.ts\" test files for the new resolver.",
+      "description": "Do not create \"spec.ts\" test files for the new resolver.",
       "default": false,
       "x-user-analytics": 12
     },

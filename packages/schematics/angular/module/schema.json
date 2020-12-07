@@ -29,7 +29,7 @@
     },
     "routing": {
       "type": "boolean",
-      "description": "When true, creates a routing module.",
+      "description": "Create a routing module.",
       "default": false,
       "x-user-analytics": 17
     },
@@ -45,12 +45,12 @@
     },
     "flat": {
       "type": "boolean",
-      "description": "When true, creates the new files at the top level of the current project root. ",
+      "description": "Create the new files at the top level of the current project root. ",
       "default": false
     },
     "commonModule": {
       "type": "boolean",
-      "description": "When true, the new NgModule imports \"CommonModule\". ",
+      "description": "The new NgModule imports \"CommonModule\". ",
       "default": true,
       "visible": false
     },
@@ -61,7 +61,7 @@
     },
     "lintFix": {
       "type": "boolean",
-      "description": "When true, applies lint fixes after generating the module.",
+      "description": "Apply lint fixes after generating the module.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }

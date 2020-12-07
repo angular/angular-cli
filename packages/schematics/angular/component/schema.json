@@ -34,14 +34,14 @@
       "alias": "b"
     },
     "inlineStyle": {
-      "description": "When true, includes styles inline in the component.ts file. Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component.ts file.",
+      "description": "Include styles inline in the component.ts file. Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
       "alias": "s",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
-      "description": "When true, includes template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.",
+      "description": "Include template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
       "alias": "t",
@@ -95,18 +95,18 @@
     },
     "skipTests": {
       "type": "boolean",
-      "description": "When true, does not create \"spec.ts\" test files for the new component.",
+      "description": "Do not create \"spec.ts\" test files for the new component.",
       "default": false,
       "x-user-analytics": 12
     },
     "flat": {
       "type": "boolean",
-      "description": "When true, creates the new files at the top level of the current project.",
+      "description": "Create the new files at the top level of the current project.",
       "default": false
     },
     "skipImport": {
       "type": "boolean",
-      "description": "When true, does not import this component into the owning NgModule.",
+      "description": "Do not import this component into the owning NgModule.",
       "default": false,
       "x-user-analytics": 18
     },
@@ -128,18 +128,18 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the declaring NgModule exports this component.",
+      "description": "The declaring NgModule exports this component.",
       "x-user-analytics": 19
     },
     "entryComponent": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the new component is the entry component of the declaring NgModule.",
+      "description": "The new component is the entry component of the declaring NgModule.",
       "x-deprecated": "Since version 9.0.0 with Ivy, entryComponents is no longer necessary."
     },
     "lintFix": {
       "type": "boolean",
-      "description": "When true, applies lint fixes after generating the component.",
+      "description": "Apply lint fixes after generating the component.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }

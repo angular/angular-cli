@@ -20,13 +20,13 @@
       "x-prompt": "What name would you like to use for the application?"
     },
     "inlineStyle": {
-      "description": "When true, includes styles inline in the root component.ts file. Only CSS styles can be included inline. Default is false, meaning that an external styles file is created and referenced in the root component.ts file.",
+      "description": "Include styles inline in the root component.ts file. Only CSS styles can be included inline. Default is false, meaning that an external styles file is created and referenced in the root component.ts file.",
       "type": "boolean",
       "alias": "s",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
-      "description": "When true, includes template inline in the root component.ts file. Default is false, meaning that an external template file is created and referenced in the root component.ts file. ",
+      "description": "Include template inline in the root component.ts file. Default is false, meaning that an external template file is created and referenced in the root component.ts file. ",
       "type": "boolean",
       "alias": "t",
       "x-user-analytics": 10
@@ -39,7 +39,7 @@
     },
     "routing": {
       "type": "boolean",
-      "description": "When true, creates a routing NgModule.",
+      "description": "Create a routing NgModule.",
       "default": false,
       "x-prompt": "Would you like to add Angular routing?",
       "x-user-analytics": 17
@@ -76,7 +76,7 @@
       "x-user-analytics": 5
     },
     "skipTests": {
-      "description": "When true, does not create \"spec.ts\" test files for the application.",
+      "description": "Do not create \"spec.ts\" test files for the application.",
       "type": "boolean",
       "default": false,
       "alias": "S",
@@ -85,10 +85,10 @@
     "skipPackageJson": {
       "type": "boolean",
       "default": false,
-      "description": "When true, does not add dependencies to the \"package.json\" file."
+      "description": "Do not add dependencies to the \"package.json\" file."
     },
     "minimal": {
-      "description": "When true, creates a bare-bones project without any testing frameworks. (Use for learning purposes only.)",
+      "description": "Create a bare-bones project without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14
@@ -100,7 +100,7 @@
     },
     "lintFix": {
       "type": "boolean",
-      "description": "When true, applies lint fixes after generating the application.",
+      "description": "Apply lint fixes after generating the application.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     },
