@@ -42,7 +42,7 @@
     },
     "lintFix": {
       "type": "boolean",
-      "description": "When true, applies lint fixes after generating the interface.",
+      "description": "Apply lint fixes after generating the interface.",
       "x-user-analytics": 15,
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
