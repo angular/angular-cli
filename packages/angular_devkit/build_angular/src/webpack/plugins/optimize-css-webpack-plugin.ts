@@ -115,7 +115,7 @@ export class OptimizeCssWebpackPlugin {
             // tslint:disable-next-line: no-any
             (cssNano.process as any)(content, postCssOptions, cssNanoOptions)
               .then(resolve)
-              .catch(reject);
+              .catch((err: Error) => reject(new Error(`${file} ${err.message}`)));
           });
 
           for (const { text } of output.warnings()) {
