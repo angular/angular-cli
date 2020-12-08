@@ -440,6 +440,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
             // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
             passes: buildOptions.buildOptimizer ? 3 : 1,
             global_defs: angularGlobalDefinitions,
+            pure_funcs: ['forwardRef'],
           }),
       // We also want to avoid mangling on server.
       // Name mangling is handled within the browser builder
