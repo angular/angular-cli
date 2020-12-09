@@ -9,8 +9,8 @@ updates:
       prefix: "build"
     labels:
       - "comp: build & ci"
-      - "PR target: master & patch"
-      - "PR action: merge"
+      - "target: patch"
+      - "action: merge"
     # Disable version updates
     # This does not affect security updates
     open-pull-requests-limit: 0

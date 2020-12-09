@@ -117,7 +117,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
     git rebase master -i
     git push -f
     ```
-  * Add the `PR action: merge` label and the correct
+  * Add the `action: merge` label and the correct
 [target label](https://github.com/angular/angular/blob/master/docs/TRIAGE_AND_LABELS.md#pr-target)
     (if PR author has the project collaborator status, or else the last reviewer
     should do this).
