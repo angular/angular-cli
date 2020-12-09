@@ -457,7 +457,7 @@
           "type": "object",
           "properties": {
             "sourcemaps": {
-              "description": "Output sourcemaps.",
+              "description": "Output source maps.",
               "type": "boolean"
             },
             "baseHref": {
