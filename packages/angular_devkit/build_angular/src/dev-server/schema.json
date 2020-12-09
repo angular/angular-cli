@@ -137,29 +137,29 @@
       "x-deprecated": "Use the \"aot\" option in the browser builder instead."
     },
     "sourceMap": {
-      "description": "Output sourcemaps.",
+      "description": "Output source maps.",
       "oneOf": [
         {
           "type": "object",
           "properties": {
             "scripts": {
               "type": "boolean",
-              "description": "Output sourcemaps for all scripts.",
+              "description": "Output source maps for all scripts.",
               "default": true
             },
             "styles": {
               "type": "boolean",
-              "description": "Output sourcemaps for all styles.",
+              "description": "Output source maps for all styles.",
               "default": true
             },
             "hidden": {
               "type": "boolean",
-              "description": "Output sourcemaps used for error reporting tools.",
+              "description": "Output source maps used for error reporting tools.",
               "default": false
             },
             "vendor": {
               "type": "boolean",
-              "description": "Resolve vendor packages sourcemaps.",
+              "description": "Resolve vendor packages source maps.",
               "default": false
             }
           },
