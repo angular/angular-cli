@@ -71,6 +71,7 @@ ts_library(
         exclude = [
             "src/test-utils.ts",
             "src/**/*_spec.ts",
+            "src/**/tests/**/*.ts",
             "plugins/**/*_spec.ts",
             "src/testing/**/*.ts",
         ],
@@ -254,6 +255,7 @@ ts_library(
         include = [
             "src/test-utils.ts",
             "src/testing/**/*.ts",
+            "src/**/tests/*.ts",
         ],
     ),
     data = glob(["test/**/*"]),
