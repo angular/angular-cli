@@ -38,7 +38,7 @@ export class JSONFile {
     }
 
     const errors: ParseError[] = [];
-    this._jsonAst = parseTree(this.content, errors);
+    this._jsonAst = parseTree(this.content, errors, { allowTrailingComma: true });
     if (errors.length) {
       formatError(this.path, errors);
     }
@@ -106,7 +106,7 @@ export class JSONFile {
 // tslint:disable-next-line: no-any
 export function readAndParseJson(path: string): any {
   const errors: ParseError[] = [];
-  const content = parse(readFileSync(path, 'utf-8'), errors);
+  const content = parse(readFileSync(path, 'utf-8'), errors, { allowTrailingComma: true });
   if (errors.length) {
     formatError(path, errors);
   }
@@ -121,5 +121,5 @@ function formatError(path: string, errors: ParseError[]): never {
 
 // tslint:disable-next-line: no-any
 export function parseJson(content: string): any {
-  return parse(content);
+  return parse(content, undefined, { allowTrailingComma: true });
 }
