@@ -83,7 +83,7 @@
                   "properties": {
                     "inline": {
                       "type": "boolean",
-                      "description": "Reduce render blocking requests by inlining external fonts in the application's HTML index file. This requires internet access.",
+                      "description": "Reduce render blocking requests by inlining external Google fonts and icons CSS definitions in the application's HTML index file. This requires internet access.",
                       "default": true
                     }
                   },
