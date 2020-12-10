@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {browser, by, element} from 'protractor';
+import { browser, by, element } from 'protractor';
 
-import {verifyNoBrowserErrors, waitForAppRootElement} from './util';
+import { verifyNoBrowserErrors, waitForAppRootElement } from './util';
 
 describe('Hello world E2E Tests', () => {
   beforeAll(async () => {
@@ -54,5 +54,17 @@ describe('Hello world E2E Tests', () => {
 
     // Make sure there were no client side errors.
     verifyNoBrowserErrors();
-   });
+  });
+
+  it('stylesheets should be configured to load asynchronously', async () => {
+    // Load the page without waiting for Angular since it is not bootstrapped automatically.
+    await browser.driver.get(browser.baseUrl);
+
+    // Test the contents from the server.
+    const styleTag = browser.driver.findElement(by.css('link[rel="stylesheet"]'));
+    expect(styleTag.getAttribute('media')).toMatch('all');
+
+    // Make sure there were no client side errors.
+    verifyNoBrowserErrors();
+  });
 });

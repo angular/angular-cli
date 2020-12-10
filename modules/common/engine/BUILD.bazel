@@ -1,6 +1,13 @@
 load("//tools:defaults.bzl", "ng_module")
+load("@npm//@bazel/typescript:index.bzl", "ts_config")
 
 package(default_visibility = ["//visibility:public"])
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    deps = ["//modules:bazel-tsconfig-build.json"],
+)
 
 ng_module(
     name = "engine",
@@ -9,9 +16,11 @@ ng_module(
         "*.ts",
     ]),
     module_name = "@nguniversal/common/engine",
+    tsconfig = ":tsconfig",
     deps = [
         "@npm//@angular/compiler",
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
+        "@npm//critters",
     ],
 )

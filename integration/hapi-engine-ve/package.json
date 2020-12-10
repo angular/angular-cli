@@ -19,6 +19,9 @@
     "build": "ng build --prod && ng run hapi-engine-ve:server:production"
   },
   "private": true,
+  "resolutions": {
+    "@nguniversal/common": "file:../../dist/modules-dist/common"
+  },
   "dependencies": {
     "@angular/animations": "file:../../node_modules/@angular/animations",
     "@angular/common": "file:../../node_modules/@angular/common",

@@ -42,7 +42,14 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": {
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": true,
+                "scripts": true
+              },
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
@@ -165,6 +172,12 @@
           "options": {
             "browserTarget": "app:build",
             "serverTarget": "app:server"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "app:build:production",
+              "serverTarget": "app:server:production"
+            }
           }
         }
       }

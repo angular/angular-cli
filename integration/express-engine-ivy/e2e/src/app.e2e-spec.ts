@@ -55,4 +55,16 @@ describe('Hello world E2E Tests', () => {
     // Make sure there were no client side errors.
     verifyNoBrowserErrors();
    });
+
+  it('stylesheets should be configured to load asynchronously', async () => {
+    // Load the page without waiting for Angular since it is not bootstrapped automatically.
+    await browser.driver.get(browser.baseUrl);
+
+    // Test the contents from the server.
+    const styleTag = browser.driver.findElement(by.css('link[rel="stylesheet"]'));
+    expect(styleTag.getAttribute('media')).toMatch('all');
+
+    // Make sure there were no client side errors.
+    verifyNoBrowserErrors();
+   });
 });

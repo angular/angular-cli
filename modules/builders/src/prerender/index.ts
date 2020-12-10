@@ -8,6 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
+import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
 import { normalize, resolve as resolvePath } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -15,9 +16,12 @@ import { fork } from 'child_process';
 import * as fs from 'fs';
 import * as ora from 'ora';
 import * as path from 'path';
-
+import { promisify } from 'util';
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getIndexOutputFile, getRoutes, shardArray } from './utils';
+
+export const readFile = promisify(fs.readFile);
+
 
 type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
@@ -67,39 +71,6 @@ async function _scheduleBuilds(
   }
 }
 
-async function _parallelRenderRoutes(
-  shardedRoutes: string[][],
-  context: BuilderContext,
-  indexHtml: string,
-  outputPath: string,
-  indexFile: string,
-  serverBundlePath: string,
-): Promise<void> {
-  const workerFile = path.join(__dirname, 'render.js');
-  const childProcesses = shardedRoutes.map(routes =>
-    new Promise((resolve, reject) => {
-      fork(workerFile, [
-        indexHtml,
-        indexFile,
-        serverBundlePath,
-        outputPath,
-        ...routes,
-      ])
-        .on('message', data => {
-          if (data.success) {
-            context.logger.debug(`CREATE ${data.outputIndexPath}`);
-          } else {
-            reject(new Error(`Unable to render ${data.outputIndexPath}.\nError: ${data.error}`));
-          }
-        })
-        .on('exit', resolve)
-        .on('error', reject);
-    })
-  );
-
-  await Promise.all(childProcesses);
-}
-
 /**
  * Renders each route and writes them to
  * <route>/index.html for each output path in the browser result.
@@ -127,10 +98,17 @@ async function _renderUniversal(
 
   // Users can specify a different base html file e.g. "src/home.html"
   const indexFile = getIndexOutputFile(browserOptions);
+  const { styles: normalizedStylesOptimization } = normalizeOptimization(browserOptions.optimization);
+
   // We need to render the routes for each locale from the browser output.
   for (const outputPath of browserResult.outputPaths) {
     const browserIndexInputPath = path.join(outputPath, indexFile);
-    const indexHtml = fs.readFileSync(browserIndexInputPath, 'utf8');
+    let indexHtml = await readFile(browserIndexInputPath, 'utf8');
+
+    if (normalizedStylesOptimization.inlineCritical) {
+      // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
+      indexHtml = indexHtml.replace(/ media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g, '>');
+    }
 
     const { baseOutputPath = '' } = serverResult;
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
@@ -139,18 +117,42 @@ async function _renderUniversal(
       throw new Error(`Could not find the main bundle: ${serverBundlePath}`);
     }
 
-    const shardedRoutes = shardArray(routes, numProcesses);
     const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
 
     try {
-      await _parallelRenderRoutes(
-        shardedRoutes,
-        context,
-        indexHtml,
-        outputPath,
-        indexFile,
-        serverBundlePath,
-      );
+      const workerFile = path.join(__dirname, 'render.js');
+      const childProcesses = shardArray(routes, numProcesses)
+        .map(routesShard =>
+          new Promise((resolve, reject) => {
+            fork(workerFile, [
+              indexHtml,
+              indexFile,
+              serverBundlePath,
+              outputPath,
+              browserOptions.deployUrl || '',
+              normalizedStylesOptimization.inlineCritical === true ? 'true' : 'false' ,
+              normalizedStylesOptimization.minify === true ? 'true' : 'false' ,
+              ...routesShard,
+            ])
+              .on('message', data => {
+                if (data.success === false) {
+                  reject(new Error(`Unable to render ${data.outputIndexPath}.\nError: ${data.error}`));
+
+                  return;
+                }
+
+                if (data.logLevel) {
+                  spinner.stop();
+                  context.logger.log(data.logLevel, data.message);
+                  spinner.start();
+                }
+              })
+              .on('exit', resolve)
+              .on('error', reject);
+          })
+        );
+
+      await Promise.all(childProcesses);
     } catch (error) {
       spinner.fail(`Prerendering routes to ${outputPath} failed.`);
 

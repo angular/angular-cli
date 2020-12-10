@@ -40,7 +40,7 @@ describe('Prerender Builder', () => {
   it('fails with error when no routes are provided', async () => {
     const run = await architect.scheduleTarget(target, { routes: [], guessRoutes: false });
     await expectAsync(run.result).toBeRejectedWith(
-      jasmine.objectContaining({ message: jasmine.stringMatching(/Could not find any routes to prerender/)})
+      jasmine.objectContaining({ message: jasmine.stringMatching(/Could not find any routes to prerender/) })
     );
     await run.stop();
   });
@@ -123,7 +123,7 @@ describe('Prerender Builder', () => {
       routesFile: './nonexistent-file.txt',
     });
     await expectAsync(run.result).toBeRejectedWith(
-      jasmine.objectContaining({ message: jasmine.stringMatching(/no such file or directory/)})
+      jasmine.objectContaining({ message: jasmine.stringMatching(/no such file or directory/) })
     );
     await run.stop();
   });
@@ -184,13 +184,22 @@ describe('Prerender Builder', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
 
+    expect(host.scopedSync().exists(normalize('dist/app/browser/ngsw.json'))).toBeTrue();
+
+    await run.stop();
+  });
+
+  it('should inline critical css for route', async () => {
+    host.appendToFile('src/styles.css', 'p{color:red;}');
+    const run = await architect.scheduleTarget({ ...target, configuration: 'production' }, { routes: ['foo'] });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+
     const content = virtualFs.fileBufferToString(
       host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
     );
 
-    expect(content).toContain('foo works!');
-    expect(content).toContain('This page was prerendered with Angular Universal');
-    expect(host.scopedSync().exists(normalize('dist/app/browser/ngsw.json'))).toBeTrue();
+    expect(content).toMatch(/<style>p{color:red;}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this.media='all'">/);
     await run.stop();
   });
 });

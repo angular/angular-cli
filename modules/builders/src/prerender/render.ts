@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { ɵInlineCriticalCssProcessor as InlineCriticalCssProcessor } from '@nguniversal/common/engine';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -14,6 +15,9 @@ const [
   indexFile,
   serverBundlePath,
   browserOutputPath,
+  deployUrl,
+  inlineCritialCss,
+  minifyCss,
   ...routes
 ] = process.argv.slice(2);
 
@@ -52,7 +56,20 @@ async function getServerBundle(bundlePath: string) {
  */
 // tslint:disable-next-line: no-floating-promises
 (async () => {
+  if (!process.send) {
+    throw new Error('Process must be spawned with an IPC channel.');
+  }
+
   const browserIndexOutputPath = path.join(browserOutputPath, indexFile);
+  let inlineCriticalCssProcessor: InlineCriticalCssProcessor | undefined;
+
+  if (inlineCritialCss === 'true') {
+    inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
+      deployUrl,
+      minify: minifyCss === 'true',
+    });
+  }
+
   for (const route of routes) {
     const outputFolderPath = path.join(browserOutputPath, route);
     const outputIndexPath = path.join(outputFolderPath, 'index.html');
@@ -60,10 +77,22 @@ async function getServerBundle(bundlePath: string) {
     try {
       const { renderModuleFn, AppServerModuleDef } = await getServerBundle(serverBundlePath);
 
-      const html = await renderModuleFn(AppServerModuleDef, {
-        document: indexHtml + '<!-- This page was prerendered with Angular Universal -->',
+      let html = await renderModuleFn(AppServerModuleDef, {
+        document: indexHtml + '\n<!-- This page was prerendered with Angular Universal -->',
         url: route,
       });
+
+      if (inlineCriticalCssProcessor) {
+        const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
+          outputPath: browserOutputPath,
+        });
+
+        // tslint:disable-next-line: no-non-null-assertion
+        warnings.forEach(message => process.send!({ logLevel: 'warn', message }));
+        // tslint:disable-next-line: no-non-null-assertion
+        errors.forEach(message => process.send!({ logLevel: 'error', message }));
+        html = content;
+      }
 
       fs.mkdirSync(outputFolderPath, { recursive: true });
       fs.writeFileSync(outputIndexPath, html);
@@ -74,13 +103,9 @@ async function getServerBundle(bundlePath: string) {
         fs.writeFileSync(browserIndexOutputPathOriginal, indexHtml);
       }
 
-      if (process.send) {
-        process.send({ success: true, outputIndexPath });
-      }
+      process.send({ success: true, outputIndexPath });
     } catch (e) {
-      if (process.send) {
-        process.send({ success: false, error: e.message, outputIndexPath });
-      }
+      process.send({ success: false, error: e.message, outputIndexPath });
 
       return;
     }

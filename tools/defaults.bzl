@@ -77,6 +77,7 @@ GLOBALS = {
     "@nguniversal/aspnetcore-engine/tokens": "nguniversal.aspnetcoreEngine.tokens",
     "@nguniversal/express-engine/tokens": "nguniversal.expressEngine.tokens",
     "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",
+    "critters": "critters",
     "express": "express",
     "fs": "fs",
     "@hapi/hapi": "hapi.hapi",

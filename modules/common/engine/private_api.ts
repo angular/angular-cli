@@ -7,7 +7,14 @@
  */
 
 export {
-  FileLoader as ɵFileLoader,
   CommonEngine as ɵCommonEngine,
   RenderOptions as ɵRenderOptions,
-} from './src/index';
+} from './src/engine';
+
+export {
+  FileLoader as ɵFileLoader,
+} from './src/file-loader';
+
+export {
+  InlineCriticalCssProcessor as ɵInlineCriticalCssProcessor,
+} from './src/inline-css-processor';

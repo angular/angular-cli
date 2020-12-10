@@ -23,6 +23,7 @@ ts_library(
     module_name = "@nguniversal/builders",
     tsconfig = ":bazel-tsconfig-build.json",
     deps = [
+        "//modules/common/engine",
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/build-angular",
         "@npm//@angular-devkit/core",

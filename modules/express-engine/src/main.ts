@@ -7,17 +7,14 @@
  */
 import { Request, Response } from 'express';
 
-import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
+import { StaticProvider } from '@angular/core';
 import { ɵCommonEngine as CommonEngine, ɵRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
 /**
  * These are the allowed options for the engine
  */
-export interface NgSetupOptions {
-  bootstrap: Type<{}> | NgModuleFactory<{}>;
-  providers?: StaticProvider[];
-}
+export type NgSetupOptions = Pick<ɵRenderOptions, 'bootstrap' | 'providers' | 'publicPath' | 'inlineCriticalCss'>;
 
 /**
  * These are the allowed options for the render
@@ -49,6 +46,8 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
       renderOptions.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`;
       renderOptions.documentFilePath = renderOptions.documentFilePath || filePath;
       renderOptions.providers = [...(renderOptions.providers || []), getReqResProviders(req, res)];
+      renderOptions.publicPath = renderOptions.publicPath ?? setupOptions.publicPath ?? (options as any).settings?.views,
+      renderOptions.inlineCriticalCss = renderOptions.inlineCriticalCss ?? setupOptions.inlineCriticalCss;
 
       engine.render(renderOptions)
         .then(html => callback(null, html))
