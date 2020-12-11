@@ -7,7 +7,7 @@
  */
 
 // tslint:disable-next-line: no-implicit-dependencies
-import { ApplicationRef, PlatformRef, Type, ɵresetCompiledComponents } from '@angular/core';
+import { ApplicationRef, PlatformRef, Type, isDevMode, ɵresetCompiledComponents } from '@angular/core';
 import { filter, take } from 'rxjs/operators';
 
 // For the time being we cannot use the DOM lib because it conflicts with @types/node,
@@ -24,6 +24,12 @@ declare const Event: any;
 
 export default function (mod: any): void {
   if (!mod['hot']) {
+    return;
+  }
+
+  if (!isDevMode()) {
+    console.error(`[NG HMR] Cannot use HMR when Angular is running in production mode. To prevent production mode, do not call 'enableProdMode()'.`);
+
     return;
   }
 
