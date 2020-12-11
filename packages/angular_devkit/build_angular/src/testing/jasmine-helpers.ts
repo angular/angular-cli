@@ -16,14 +16,14 @@ const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
 export function describeBuilder<T>(
   builderHandler: BuilderHandlerFn<T & json.JsonObject>,
   options: { name?: string; schemaPath: string },
-  specDefinitions: (harness: BuilderHarness<T>) => void,
+  specDefinitions: (harness: JasmineBuilderHarness<T>) => void,
 ): void {
   let optionSchema = optionSchemaCache.get(options.schemaPath);
   if (optionSchema === undefined) {
     optionSchema = JSON.parse(readFileSync(options.schemaPath, 'utf8')) as json.schema.JsonSchema;
     optionSchemaCache.set(options.schemaPath, optionSchema);
   }
-  const harness = new BuilderHarness<T>(builderHandler, host, {
+  const harness = new JasmineBuilderHarness<T>(builderHandler, host, {
     builderName: options.name,
     optionSchema,
   });
@@ -35,4 +35,33 @@ export function describeBuilder<T>(
 
     specDefinitions(harness);
   });
+}
+
+class JasmineBuilderHarness<T> extends BuilderHarness<T> {
+  expectFile(path: string): HarnessFileMatchers {
+    return expectFile(path, this);
+  }
+}
+
+export interface HarnessFileMatchers {
+  toExist(): boolean;
+  toNotExist(): boolean;
+  readonly content: jasmine.ArrayLikeMatchers<string>;
+  readonly size: jasmine.Matchers<number>;
+}
+
+export function expectFile<T>(path: string, harness: BuilderHarness<T>): HarnessFileMatchers {
+  return {
+    toExist: () => expect(harness.hasFile(path)).toBe(true, 'Expected file to exist: ' + path),
+    toNotExist: () =>
+      expect(harness.hasFile(path)).toBe(false, 'Expected file to not exist: ' + path),
+    get content() {
+      return expect(harness.readFile(path)).withContext(`With file content for '${path}'`);
+    },
+    get size() {
+      return expect(Buffer.byteLength(harness.readFile(path))).withContext(
+        `With file size for '${path}'`,
+      );
+    },
+  };
 }
