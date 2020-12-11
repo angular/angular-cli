@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { BuilderHarnessExecutionOptions, BuilderHarnessExecutionResult } from './builder-harness';
-export { describeBuilder } from './jasmine-helpers';
+export { HarnessFileMatchers, describeBuilder } from './jasmine-helpers';
