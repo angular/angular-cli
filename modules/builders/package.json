@@ -21,6 +21,9 @@
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
+  "peerDependencies": {
+    "@angular-devkit/build-angular": "DEVKIT_BUILD_ANGULAR_VERSION"
+  },
   "dependencies": {
     "@angular-devkit/architect": "DEVKIT_ARCHITECT_VERSION",
     "@angular-devkit/core": "DEVKIT_CORE_VERSION",
