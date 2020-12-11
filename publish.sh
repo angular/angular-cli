@@ -17,6 +17,6 @@ for target in $(getAllPackages); do
   echo "=============================================="
   echo "Publishing ${target}"
   echo "=============================================="
-  ${bazel_bin} run --config=release "${target}.publish" -- \
+  ${bazel_bin} run --config=release "${target}.publish.sh" -- \
     --access public --tag "${tag}"
 done
