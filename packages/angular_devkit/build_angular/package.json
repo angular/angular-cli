@@ -58,7 +58,7 @@
     "rxjs": "6.6.3",
     "sass": "1.29.0",
     "sass-loader": "10.1.0",
-    "semver": "7.3.2",
+    "semver": "7.3.4",
     "source-map": "0.7.3",
     "source-map-loader": "1.1.2",
     "source-map-support": "0.5.19",
