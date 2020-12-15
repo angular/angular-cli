@@ -15,15 +15,16 @@ const ini = require('ini');
 const lockfile = require('@yarnpkg/lockfile');
 const pacote = require('pacote');
 
-const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
-let npmrc: { [key: string]: string };
+type PackageManagerOptions = Record<string, unknown>;
 
+const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
+let npmrc: PackageManagerOptions;
 
 function readOptions(
   logger: logging.LoggerApi,
   yarn = false,
   showPotentials = false,
-): Record<string, string> {
+): PackageManagerOptions {
   const cwd = process.cwd();
   const baseFilename = yarn ? 'yarnrc' : 'npmrc';
   const dotFilename = '.' + baseFilename;
@@ -55,7 +56,7 @@ function readOptions(
     logger.info(`Locating potential ${baseFilename} files:`);
   }
 
-  let options: { [key: string]: string } = {};
+  const options: PackageManagerOptions = {};
   for (const location of [...defaultConfigLocations, ...projectConfigLocations]) {
     if (existsSync(location)) {
       if (showPotentials) {
@@ -63,17 +64,40 @@ function readOptions(
       }
 
       const data = readFileSync(location, 'utf8');
-      options = {
-        ...options,
-        ...(yarn ? lockfile.parse(data) : ini.parse(data)),
-      };
-
-      if (options.cafile) {
-        const cafile = path.resolve(path.dirname(location), options.cafile);
-        delete options.cafile;
-        try {
-          options.ca = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
-        } catch { }
+      // Normalize RC options that are needed by 'npm-registry-fetch'.
+      // See: https://github.com/npm/npm-registry-fetch/blob/ebddbe78a5f67118c1f7af2e02c8a22bcaf9e850/index.js#L99-L126
+      const rcConfig: PackageManagerOptions = yarn ? lockfile.parse(data) : ini.parse(data);
+      for (const [key, value] of Object.entries(rcConfig)) {
+        switch (key) {
+          case 'noproxy':
+          case 'no-proxy':
+            options['noProxy'] = value;
+            break;
+          case 'maxsockets':
+            options['maxSockets'] = value;
+            break;
+          case 'https-proxy':
+          case 'proxy':
+            options['proxy'] = value;
+            break;
+          case 'strict-ssl':
+            options['strictSSL'] = value;
+            break;
+          case 'local-address':
+            options['localAddress'] = value;
+            break;
+          case 'cafile':
+            if (typeof value === 'string') {
+              const cafile = path.resolve(path.dirname(location), value);
+              try {
+                options['ca'] = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
+              } catch { }
+            }
+            break;
+          default:
+            options[key] = value;
+            break;
+        }
       }
     } else if (showPotentials) {
       logger.info(`Trying '${location}'...not found.`);
@@ -82,8 +106,9 @@ function readOptions(
 
   // Substitute any environment variable references
   for (const key in options) {
-    if (typeof options[key] === 'string') {
-      options[key] = options[key].replace(/\$\{([^\}]+)\}/, (_, name) => process.env[name] || '');
+    const value = options[key];
+    if (typeof value === 'string') {
+      options[key] = value.replace(/\$\{([^\}]+)\}/, (_, name) => process.env[name] || '');
     }
   }
 
