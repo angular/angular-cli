@@ -8,11 +8,11 @@
 import { ResourceLoader } from '@angular/compiler';
 import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { INITIAL_CONFIG, platformDynamicServer, renderModuleFactory } from '@angular/platform-server';
-import { dirname } from 'path';
+import { dirname, resolve } from 'path';
 
 import { FileLoader } from './file-loader';
 import { InlineCriticalCssProcessor } from './inline-css-processor';
-import { readFile } from './utils';
+import { exists, readFile } from './utils';
 
 /** These are the allowed options for the render */
 export interface RenderOptions {
@@ -52,6 +52,8 @@ export class CommonEngine {
   private factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
   private templateCache = new Map<string, string>();
   private inlineCriticalCssProcessor: InlineCriticalCssProcessor;
+  private pageExists = new Map<string, boolean>();
+
 
   constructor(private moduleOrFactory?: Type<{}> | NgModuleFactory<{}>,
               private providers: StaticProvider[] = []) {
@@ -65,6 +67,27 @@ export class CommonEngine {
    * render options
    */
   async render(opts: RenderOptions): Promise<string> {
+    if (opts.publicPath && opts.documentFilePath && opts.url !== undefined) {
+      const url = new URL(opts.url);
+      // Remove leading forward slash.
+      const pathname  = url.pathname.substring(1);
+      const pagePath = resolve(opts.publicPath, pathname, 'index.html');
+
+      if (pagePath !== resolve(opts.documentFilePath)) {
+        // View path doesn't match with prerender path.
+        let pageExists = this.pageExists.get(pagePath);
+        if (pageExists === undefined) {
+          pageExists = await exists(pagePath);
+          this.pageExists.set(pagePath, pageExists);
+        }
+
+        if (pageExists) {
+          // Serve pre-rendered page.
+          return readFile(pagePath, 'utf-8');
+        }
+      }
+    }
+
     // if opts.document dosen't exist then opts.documentFilePath must
     const extraProviders = [
       ...(opts.providers || []),

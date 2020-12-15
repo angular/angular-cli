@@ -10,3 +10,14 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 
 export const readFile = promisify(fs.readFile);
+export const access = promisify(fs.access);
+
+export async function exists(path: fs.PathLike): Promise<boolean> {
+  try {
+    await access(path, fs.constants.F_OK);
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
