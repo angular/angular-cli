@@ -78,7 +78,7 @@ async function getServerBundle(bundlePath: string) {
       const { renderModuleFn, AppServerModuleDef } = await getServerBundle(serverBundlePath);
 
       let html = await renderModuleFn(AppServerModuleDef, {
-        document: indexHtml + '\n<!-- This page was prerendered with Angular Universal -->',
+        document: indexHtml,
         url: route,
       });
 
@@ -94,14 +94,14 @@ async function getServerBundle(bundlePath: string) {
         html = content;
       }
 
-      fs.mkdirSync(outputFolderPath, { recursive: true });
-      fs.writeFileSync(outputIndexPath, html);
-
       // This case happens when we are prerendering "/".
       if (browserIndexOutputPath === outputIndexPath) {
         const browserIndexOutputPathOriginal = path.join(browserOutputPath, 'index.original.html');
-        fs.writeFileSync(browserIndexOutputPathOriginal, indexHtml);
+        fs.renameSync(browserIndexOutputPath, browserIndexOutputPathOriginal);
       }
+
+      fs.mkdirSync(outputFolderPath, { recursive: true });
+      fs.writeFileSync(outputIndexPath, html);
 
       process.send({ success: true, outputIndexPath });
     } catch (e) {

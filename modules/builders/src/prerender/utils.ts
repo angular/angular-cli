@@ -46,6 +46,8 @@ export async function getRoutes(
     }
   }
 
+  routes = routes.map(r => r === '' ? '/' : r);
+
   return [...new Set(routes)];
 }
 

@@ -125,7 +125,7 @@ async function _renderUniversal(
         .map(routesShard =>
           new Promise((resolve, reject) => {
             fork(workerFile, [
-              indexHtml,
+              indexHtml.replace('</html>', '<!-- This page was prerendered with Angular Universal -->\n</html>'),
               indexFile,
               serverBundlePath,
               outputPath,
