@@ -4,7 +4,7 @@ export declare class NodePackageInstallTask implements TaskConfigurationGenerato
     packageName?: string;
     quiet: boolean;
     workingDirectory?: string;
-    constructor(options: Partial<NodePackageInstallTaskOptions>);
+    constructor(options: NodePackageInstallTaskOptions);
     constructor(workingDirectory?: string);
     toConfiguration(): TaskConfiguration<NodePackageTaskOptions>;
 }
