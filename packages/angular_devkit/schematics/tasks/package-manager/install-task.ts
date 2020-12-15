@@ -8,13 +8,12 @@
 import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { NodePackageName, NodePackageTaskOptions } from './options';
 
-// TODO: This should be an interface but that would change the public API
-export class NodePackageInstallTaskOptions {
-  packageManager!: string;
-  packageName!: string;
-  workingDirectory!: string;
-  quiet!: boolean;
-  hideOutput!: boolean;
+interface NodePackageInstallTaskOptions {
+  packageManager?: string;
+  packageName?: string;
+  workingDirectory?: string;
+  quiet?: boolean;
+  hideOutput?: boolean;
 }
 
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
@@ -25,8 +24,8 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
   packageName?: string;
 
   constructor(workingDirectory?: string);
-  constructor(options: Partial<NodePackageInstallTaskOptions>);
-  constructor(options?: string | Partial<NodePackageInstallTaskOptions>) {
+  constructor(options: NodePackageInstallTaskOptions);
+  constructor(options?: string | NodePackageInstallTaskOptions) {
     if (typeof options === 'string') {
       this.workingDirectory = options;
     } else if (typeof options === 'object') {
