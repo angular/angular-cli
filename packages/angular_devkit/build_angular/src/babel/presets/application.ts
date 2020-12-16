@@ -5,15 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as fs from 'fs';
 import * as path from 'path';
 
-export type DiagnosticReporter = (type: 'error' | 'warning', message: string) => void;
+export type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
 export interface ApplicationPresetOptions {
   i18n?: {
     locale: string;
     missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
     translation?: unknown;
   };
+
+  angularLinker?: boolean;
 
   forceES5?: boolean;
   forceAsyncTransformation?: boolean;
@@ -98,10 +101,46 @@ function createI18nPlugins(
   return plugins;
 }
 
+function createNgtscLogger(
+  reporter: DiagnosticReporter | undefined,
+): import('@angular/compiler-cli/src/ngtsc/logging').Logger {
+  return {
+    level: 1, // Info level
+    debug(...args: string[]) {},
+    info(...args: string[]) {
+      reporter?.('info', args.join());
+    },
+    warn(...args: string[]) {
+      reporter?.('warning', args.join());
+    },
+    error(...args: string[]) {
+      reporter?.('error', args.join());
+    },
+  };
+}
+
 export default function (api: unknown, options: ApplicationPresetOptions) {
   const presets = [];
   const plugins = [];
   let needRuntimeTransform = false;
+
+  if (options.angularLinker) {
+    // Babel currently is synchronous so import cannot be used
+    const {
+      createEs2015LinkerPlugin,
+    } = require('@angular/compiler-cli/linker/babel');
+
+    plugins.push(createEs2015LinkerPlugin({
+      logger: createNgtscLogger(options.diagnosticReporter),
+      fileSystem: {
+        resolve: path.resolve,
+        exists: fs.existsSync,
+        dirname: path.dirname,
+        relative: path.relative,
+        readFile: fs.readFileSync,
+      },
+    }));
+  }
 
   if (options.forceES5) {
     presets.push([

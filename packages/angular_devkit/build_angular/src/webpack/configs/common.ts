@@ -544,35 +544,19 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           sideEffects: true,
         },
         {
-          test: /\.m?js$/,
+          test: /\.[cm]?js$/,
           exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
           use: [
-            ...(wco.supportES2015
-              ? []
-              : [
-                  {
-                    loader: require.resolve('babel-loader'),
-                    options: {
-                      babelrc: false,
-                      configFile: false,
-                      compact: false,
-                      cacheCompression: false,
-                      cacheDirectory: findCachePath('babel-webpack'),
-                      cacheIdentifier: JSON.stringify({
-                        buildAngular: require('../../../package.json').version,
-                      }),
-                      sourceType: 'unambiguous',
-                      presets: [
-                        [
-                          require.resolve('../../babel/presets/application'),
-                          {
-                            forceES5: true,
-                          } as import('../../babel/presets/application').ApplicationPresetOptions,
-                        ],
-                      ],
-                    },
-                  },
-                ]),
+            {
+              loader: require.resolve('../../babel/webpack-loader'),
+              options: {
+                cacheDirectory: findCachePath('babel-webpack'),
+                cacheIdentifier: JSON.stringify({
+                  buildAngular: require('../../../package.json').version,
+                }),
+                forceES5: !wco.supportES2015,
+              },
+            },
             ...buildOptimizerUseRule,
           ],
         },
