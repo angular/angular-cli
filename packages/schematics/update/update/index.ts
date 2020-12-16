@@ -538,7 +538,7 @@ function _usageMessage(
 
   logger.info(
     `\nThere might be additional packages which don't provide 'ng update' capabilities that are outdated.\n`
-    + `You can update the addition packages by running the update command of your package manager.`,
+    + `You can update the additional packages by running the update command of your package manager.`,
   );
 
   return;
