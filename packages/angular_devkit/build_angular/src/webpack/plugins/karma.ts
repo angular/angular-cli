@@ -7,7 +7,7 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-
+import * as http from 'http';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as webpack from 'webpack';
@@ -28,6 +28,8 @@ import { normalizeSourceMaps } from '../../utils/index';
  * require('source-map-support')
  * require('karma-source-map-support')
  */
+
+ const KARMA_APPLICATION_PATH = '_karma_webpack_';
 
 
 let blocked: any[] = [];
@@ -119,7 +121,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     // Hide webpack output because its noisy.
     logLevel: 'error',
     stats: false,
-    publicPath: '/_karma_webpack_/',
+    publicPath: `/${KARMA_APPLICATION_PATH}/`,
   };
 
   const compilationErrorCb = (error: string | undefined, errors: string[]) => {
@@ -163,8 +165,8 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     });
   }
   // Files need to be served from a custom path for Karma.
-  webpackConfig.output.path = '/_karma_webpack_/';
-  webpackConfig.output.publicPath = '/_karma_webpack_/';
+  webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
+  webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
 
   let compiler: any;
   try {
@@ -219,18 +221,18 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
 
   // Forward requests to webpack server.
   customFileHandlers.push({
-    urlRegex: /^\/_karma_webpack_\/.*/,
+    urlRegex: new RegExp(`\\/${KARMA_APPLICATION_PATH}\\/.*`),
     handler: function handler(req: any, res: any) {
       webpackMiddleware(req, res, function () {
         // Ensure script and style bundles are served.
         // They are mentioned in the custom karma context page and we don't want them to 404.
         const alwaysServe = [
-          '/_karma_webpack_/runtime.js',
-          '/_karma_webpack_/polyfills.js',
-          '/_karma_webpack_/polyfills-es5.js',
-          '/_karma_webpack_/scripts.js',
-          '/_karma_webpack_/styles.js',
-          '/_karma_webpack_/vendor.js',
+          `/${KARMA_APPLICATION_PATH}/runtime.js`,
+          `/${KARMA_APPLICATION_PATH}/polyfills.js`,
+          `/${KARMA_APPLICATION_PATH}/polyfills-es5.js`,
+          `/${KARMA_APPLICATION_PATH}/scripts.js`,
+          `/${KARMA_APPLICATION_PATH}/styles.js`,
+          `/${KARMA_APPLICATION_PATH}/vendor.js`,
         ];
         if (alwaysServe.indexOf(req.url) != -1) {
           res.statusCode = 200;
@@ -323,11 +325,10 @@ sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
 
 // When a request is not found in the karma server, try looking for it from the webpack server root.
 function fallbackMiddleware() {
-  return function (req: any, res: any, next: () => void) {
+  return function (request: http.IncomingMessage, response: http.ServerResponse, next: () => void) {
     if (webpackMiddleware) {
-      const webpackUrl = '/_karma_webpack_' + req.url;
-      const webpackReq = { ...req, url: webpackUrl }
-      webpackMiddleware(webpackReq, res, next);
+      request.url = '/' + KARMA_APPLICATION_PATH + request.url;
+      webpackMiddleware(request, response, next);
     } else {
       next();
     }
