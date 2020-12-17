@@ -7352,10 +7352,10 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-license-checker-webpack-plugin@0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/license-checker-webpack-plugin/-/license-checker-webpack-plugin-0.2.0.tgz#b65c2066b62ed07279271290db6cb19dcbebbd62"
-  integrity sha512-unuoDo8INdybT723eCD65lr827klOgyzcEarNIyTBWjxsI9U9ujCmUlJvQdqDebv/TsLPw3txeWm+11IUhV9TQ==
+license-checker-webpack-plugin@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/license-checker-webpack-plugin/-/license-checker-webpack-plugin-0.2.1.tgz#985892b40be2a85198194038b63f3f000a30afd0"
+  integrity sha512-rX8B+mH6fk1vxbnIu/UztqTEonQw95xwOkoRjX3TSrRZA/pbG9CWa3wnSo89KY/ej379JQoq050fsuthy6AU+A==
   dependencies:
     glob "^7.1.6"
     lodash.template "^4.5.0"
