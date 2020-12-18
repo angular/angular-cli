@@ -955,7 +955,7 @@
               "default": true
             },
             "lazyModules": {
-              "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules with be discovered automatically.",
+              "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.",
               "type": "array",
               "items": {
                 "type": "string"
