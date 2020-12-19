@@ -187,7 +187,7 @@ export default function (options: LibraryOptions): Rule {
     }
 
     const workspace = await getWorkspace(host);
-    const newProjectRoot = workspace.extensions.newProjectRoot as (string | undefined) || '';
+    const newProjectRoot = options.newProjectRoot || workspace.extensions.newProjectRoot as (string | undefined) || '';
 
     const scopeFolder = scopeName ? strings.dasherize(scopeName) + '/' : '';
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;
