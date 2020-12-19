@@ -1,6 +1,9 @@
 {
   "name": "<%= dasherize(packageName) %>",
   "version": "0.0.1",
+  "scripts": {
+    "test" : "ng test <%= name %>"
+  },
   "peerDependencies": {
     "@angular/common": "^<%= angularLatestVersion %>",
     "@angular/core": "^<%= angularLatestVersion %>"
