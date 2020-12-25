@@ -50,18 +50,77 @@ export interface HarnessFileMatchers {
   readonly size: jasmine.Matchers<number>;
 }
 
+/**
+ * Add a Jasmine expectation filter to an expectation that always fails with a message.
+ * @param base The base expectation (`expect(...)`) to use.
+ * @param message The message to provide in the expectation failure.
+ */
+function createFailureExpectation<T>(base: T, message: string): T {
+  // Needed typings are not included in the Jasmine types
+  const expectation = base as T & {
+    expector: {
+      addFilter(filter: {
+        selectComparisonFunc(): () => { pass: boolean; message: string };
+      }): typeof expectation.expector;
+    };
+  };
+  expectation.expector = expectation.expector.addFilter({
+    selectComparisonFunc() {
+      return () => ({
+        pass: false,
+        message,
+      });
+    },
+  });
+
+  return expectation;
+}
+
 export function expectFile<T>(path: string, harness: BuilderHarness<T>): HarnessFileMatchers {
   return {
-    toExist: () => expect(harness.hasFile(path)).toBe(true, 'Expected file to exist: ' + path),
-    toNotExist: () =>
-      expect(harness.hasFile(path)).toBe(false, 'Expected file to not exist: ' + path),
+    toExist() {
+      const exists = harness.hasFile(path);
+      expect(exists).toBe(true, 'Expected file to exist: ' + path);
+
+      return exists;
+    },
+    toNotExist() {
+      const exists = harness.hasFile(path);
+      expect(exists).toBe(false, 'Expected file to not exist: ' + path);
+
+      return !exists;
+    },
     get content() {
-      return expect(harness.readFile(path)).withContext(`With file content for '${path}'`);
+      try {
+        return expect(harness.readFile(path)).withContext(`With file content for '${path}'`);
+      } catch (e) {
+        if (e.code !== 'ENOENT') {
+          throw e;
+        }
+
+        // File does not exist so always fail the expectation
+        return createFailureExpectation(
+          expect(''),
+          `Expected file content but file does not exist: '${path}'`,
+        );
+      }
     },
     get size() {
-      return expect(Buffer.byteLength(harness.readFile(path))).withContext(
-        `With file size for '${path}'`,
-      );
+      try {
+        return expect(Buffer.byteLength(harness.readFile(path))).withContext(
+          `With file size for '${path}'`,
+        );
+      } catch (e) {
+        if (e.code !== 'ENOENT') {
+          throw e;
+        }
+
+        // File does not exist so always fail the expectation
+        return createFailureExpectation(
+          expect(0),
+          `Expected file size but file does not exist: '${path}'`,
+        );
+      }
     },
   };
 }
