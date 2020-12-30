@@ -1,8 +1,12 @@
 ---
 name: "\U0001F680Feature request"
 about: Suggest a feature for Angular CLI
+title: ''
+labels: ''
+assignees: ''
 
 ---
+
 <!--🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅
 
 Oh hi there! 😄

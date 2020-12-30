@@ -1,6 +1,9 @@
 ---
 name: "\U0001F48EAngular Material"
 about: Issues and feature requests for Angular Material
+title: ''
+labels: ''
+assignees: ''
 
 ---
 

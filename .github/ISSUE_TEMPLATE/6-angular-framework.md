@@ -1,6 +1,9 @@
 ---
 name: "⚡Angular Framework"
 about: Issues and feature requests for Angular Framework
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
