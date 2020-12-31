@@ -89,6 +89,12 @@ export const formats = {
       [/<source>.*?<\/source>/g, ''],
     ],
   },
+  'json': {
+    ext: 'json',
+    sourceCheck: '"locale": "en-US"',
+    replacements: [
+    ],
+  }
 };
 
 export async function setupI18nConfig(useLocalize = true, format: keyof typeof formats = 'xlf') {
@@ -226,7 +232,10 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
   const translationFile = `src/locale/messages.${formats[format].ext}`;
   await expectFileToExist(translationFile);
   await expectFileToMatch(translationFile, formats[format].sourceCheck);
-  await expectFileToMatch(translationFile, `An introduction header for this sample`);
+
+  if (format !== 'json') {
+    await expectFileToMatch(translationFile, `An introduction header for this sample`);
+  }
 
   // Make translations for each language.
   for (const { lang, translationReplacements } of langTranslations) {
