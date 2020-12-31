@@ -1403,7 +1403,8 @@
                 "xlif",
                 "xliff",
                 "xlf2",
-                "xliff2"
+                "xliff2",
+                "json"
               ]
             },
             "i18nFormat": {
@@ -1417,7 +1418,8 @@
                 "xlif",
                 "xliff",
                 "xlf2",
-                "xliff2"
+                "xliff2",
+                "json"
               ]
             },
             "i18nLocale": {

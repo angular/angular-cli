@@ -37,6 +37,8 @@ function getI18nOutfile(format: string | undefined) {
     case 'xlf2':
     case 'xliff2':
       return 'messages.xlf';
+    case 'json':
+      return 'messages.json';
     default:
       throw new Error(`Unsupported format "${format}"`);
   }
@@ -65,6 +67,12 @@ async function getSerializer(format: Format, sourceLocale: string, basePath: str
 
       // tslint:disable-next-line: no-any
       return new Xliff2TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
+    case Format.Json:
+      const { SimpleJsonTranslationSerializer } =
+        await import('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer');
+
+      // tslint:disable-next-line: no-any
+      return new SimpleJsonTranslationSerializer(sourceLocale);
   }
 }
 
@@ -85,6 +93,9 @@ function normalizeFormatOption(options: ExtractI18nBuilderOptions) {
     case Format.Xlf2:
     case Format.Xliff2:
       format = Format.Xlf2;
+      break;
+    case Format.Json:
+      format = Format.Json;
       break;
     case undefined:
       format = Format.Xlf;
