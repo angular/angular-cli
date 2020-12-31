@@ -26,6 +26,7 @@ import {
 } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { readTsconfig } from '../utils/read-tsconfig';
+import { BuilderWatchPlugin, BuilderWatcherFactory } from '../webpack/plugins/builder-watch-plugin';
 import { getEsVersionForFileName } from '../webpack/utils/helpers';
 import { profilingEnabled } from './environment-options';
 import { I18nOptions, configureI18nBuild } from './i18n-options';
@@ -228,6 +229,18 @@ export async function generateBrowserWebpackConfigFromContext(
     context.logger,
     extraBuildOptions,
   );
+
+  // If builder watch support is present in the context, add watch plugin
+  // This is internal only and currently only used for testing
+  const watcherFactory = (context as {
+    watcherFactory?: BuilderWatcherFactory;
+  }).watcherFactory;
+  if (watcherFactory) {
+    if (!config.plugins) {
+      config.plugins = [];
+    }
+    config.plugins.push(new BuilderWatchPlugin(watcherFactory));
+  }
 
   return {
     config,
