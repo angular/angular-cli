@@ -25,7 +25,7 @@ import {
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { AssetPatternClass } from '../../browser/schema';
-import { BuildBrowserFeatures, maxWorkers } from '../../utils';
+import { BuildBrowserFeatures, maxWorkers, normalizeOptimization } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { findCachePath } from '../../utils/cache-path';
 import {
@@ -62,11 +62,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       scripts: scriptsSourceMap,
       vendor: vendorSourceMap,
     },
-    optimization: {
-      styles: stylesOptimization,
-      scripts: scriptsOptimization,
-    },
   } = buildOptions;
+
+  const {
+    styles: stylesOptimization,
+    scripts: scriptsOptimization,
+  } = normalizeOptimization(buildOptions.optimization);
 
   const extraPlugins: { apply(compiler: Compiler): void }[] = [];
   const extraRules: RuleSetRule[] = [];
