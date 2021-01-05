@@ -51,6 +51,11 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           resolvedPath = require.resolve(style.input, { paths: [root] });
         } catch {}
       }
+
+      if (!buildOptions.preserveSymlinks) {
+        resolvedPath = fs.realpathSync(resolvedPath);
+      }
+
       // Add style entry points.
       if (entryPoints[style.bundleName]) {
         entryPoints[style.bundleName].push(resolvedPath);
