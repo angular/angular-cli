@@ -377,8 +377,7 @@ export function getMetadataField(
     // Filter out every fields that's not "metadataField". Also handles string literals
     // (but not expressions).
     .filter(({ name }) => {
-      return (ts.isIdentifier(name) || ts.isStringLiteral(name))
-        && name.getText() === metadataField;
+      return (ts.isIdentifier(name) || ts.isStringLiteral(name)) && name.text === metadataField;
     });
 }
 
