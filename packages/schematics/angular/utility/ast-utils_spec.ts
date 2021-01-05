@@ -91,6 +91,29 @@ describe('ast utils', () => {
     expect(output).toMatch(/declarations: \[\nAppComponent,\nFooComponent\n\]/);
   });
 
+  it('should add declarations to module when PropertyAssignment is StringLiteral', () => {
+    moduleContent = tags.stripIndents`
+    import { BrowserModule } from '@angular/platform-browser';
+    import { NgModule } from '@angular/core';
+    import { AppComponent } from './app.component';
+
+    @NgModule({
+      "declarations": [
+        AppComponent
+      ],
+      "imports": [
+        BrowserModule
+      ],
+      "providers": [],
+      "bootstrap": [AppComponent]
+    })`;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addDeclarationToModule(source, modulePath, 'FooComponent', './foo.component');
+    const output = applyChanges(modulePath, moduleContent, changes);
+    expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
+    expect(output).toMatch(/"declarations": \[\nAppComponent,\nFooComponent\n\]/);
+  });
+
   it('should add metadata', () => {
     const source = getTsSource(modulePath, moduleContent);
     const changes = addSymbolToNgModuleMetadata(source, modulePath, 'imports', 'HelloWorld');
