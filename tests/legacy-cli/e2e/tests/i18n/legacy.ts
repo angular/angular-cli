@@ -235,14 +235,14 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
       for (const replacements of translationReplacements) {
         await replaceInFile(
           `src/locale/messages.${lang}.${formats[format].ext}`,
-          replacements[0],
+          new RegExp(replacements[0], 'g'),
           replacements[1] as string,
         );
       }
       for (const replacement of formats[format].replacements) {
         await replaceInFile(
           `src/locale/messages.${lang}.${formats[format].ext}`,
-          replacement[0],
+          new RegExp(replacement[0], 'g'),
           replacement[1] as string,
         );
       }
