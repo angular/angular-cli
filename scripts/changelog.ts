@@ -103,7 +103,7 @@ export default async function(args: ChangelogOptions, logger: logging.Logger) {
           headerPattern: /^(\w*)(?:\(([^)]*)\))?: (.*)$/,
           headerCorrespondence: ['type', 'scope', 'subject'],
           noteKeywords: ['BREAKING CHANGE'],
-          revertPattern: /^revert:\s([\s\S]*?)\s*This reverts commit (\w*)\./,
+          revertPattern: /^revert:?\s([\s\S]*?)\s*This reverts commit (\w*)\./i,
           revertCorrespondence: [`header`, `hash`],
         }),
       )
