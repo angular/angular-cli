@@ -20,7 +20,8 @@
         "xliff",
         "xlf2",
         "xliff2",
-        "json"
+        "json",
+        "arb"
       ]
     },
     "i18nFormat": {
@@ -35,7 +36,8 @@
         "xliff",
         "xlf2",
         "xliff2",
-        "json"
+        "json",
+        "arb"
       ]
     },
     "i18nLocale": {

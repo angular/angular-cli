@@ -66,6 +66,10 @@ async function importParsers() {
     const diagnostics = new localizeDiag.Diagnostics();
 
     const parsers = {
+      arb: new (await import(
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/arb_translation_parser'
+        )).ArbTranslationParser(),
       json: new (await import(
         // tslint:disable-next-line:trailing-comma
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'

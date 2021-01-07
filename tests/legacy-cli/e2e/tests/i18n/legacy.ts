@@ -94,6 +94,12 @@ export const formats = {
     sourceCheck: '"locale": "en-US"',
     replacements: [
     ],
+  },
+  'arb': {
+    ext: 'arb',
+    sourceCheck: '"@@locale": "en-US"',
+    replacements: [
+    ],
   }
 };
 
