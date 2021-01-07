@@ -93,6 +93,16 @@ describe('readJsonWorkpace Parsing', () => {
     expect({ ...prodConfig }).toEqual(prodConfig);
   });
 
+  it('does work with duplicate keys and use last value', async () => {
+    const host = createTestHost(stripIndent`{
+      "version": 1,
+      "x-foo": 1,
+      "x-foo": 2
+    }`);
+    const workspace = await readJsonWorkspace('', host);
+    expect(workspace.extensions['x-foo']).toBe(2);
+  });
+
   it('parses extensions only into extensions object', async () => {
     const host = createTestHost(representativeFile);
 

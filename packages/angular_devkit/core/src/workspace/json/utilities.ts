@@ -42,7 +42,7 @@ function findNode(
   p: PropertyKey,
 ): { node?: JsonAstNode; parent: JsonAstArray | JsonAstKeyValue | JsonAstObject } {
   if (parent.kind === 'object') {
-    const entry = parent.properties.find(entry => entry.key.value === p);
+    const entry = [...parent.properties].reverse().find(entry => entry.key.value === p);
     if (entry) {
       return { node: entry.value, parent: entry };
     }
