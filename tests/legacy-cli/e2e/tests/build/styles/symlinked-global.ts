@@ -13,7 +13,6 @@ export default async function () {
   symlinkSync(
     resolve('src/styles-for-link.scss'),
     resolve('src/styles-linked.scss'),
-    'junction',
   );
 
   await updateJsonFile('angular.json', workspaceJson => {
