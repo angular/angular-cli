@@ -39,6 +39,8 @@ function getI18nOutfile(format: string | undefined) {
       return 'messages.xlf';
     case 'json':
       return 'messages.json';
+    case 'arb':
+      return 'messages.arb';
     default:
       throw new Error(`Unsupported format "${format}"`);
   }
@@ -73,6 +75,18 @@ async function getSerializer(format: Format, sourceLocale: string, basePath: str
 
       // tslint:disable-next-line: no-any
       return new SimpleJsonTranslationSerializer(sourceLocale);
+    case Format.Arb:
+      const { ArbTranslationSerializer } =
+        await import('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer');
+
+      const fileSystem = {
+        relative(from: string, to: string): string {
+          return path.relative(from, to);
+        },
+      };
+
+      // tslint:disable-next-line: no-any
+      return new ArbTranslationSerializer(sourceLocale, basePath as any, fileSystem as any);
   }
 }
 
@@ -96,6 +110,9 @@ function normalizeFormatOption(options: ExtractI18nBuilderOptions) {
       break;
     case Format.Json:
       format = Format.Json;
+      break;
+    case Format.Arb:
+      format = Format.Arb;
       break;
     case undefined:
       format = Format.Xlf;
