@@ -38,7 +38,7 @@
     "jsonc-parser": "3.0.0",
     "npm-package-arg": "8.1.0",
     "npm-pick-manifest": "6.1.0",
-    "open": "7.3.0",
+    "open": "7.3.1",
     "pacote": "11.1.13",
     "resolve": "1.19.0",
     "rimraf": "3.0.2",
