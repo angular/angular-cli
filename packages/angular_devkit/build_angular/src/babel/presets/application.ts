@@ -170,7 +170,6 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
 
   if (options.forceAsyncTransformation) {
     // Always transform async/await to support Zone.js
-    // tslint:disable-next-line: no-implicit-dependencies
     plugins.push(require('@babel/plugin-transform-async-to-generator').default);
     needRuntimeTransform = true;
   }

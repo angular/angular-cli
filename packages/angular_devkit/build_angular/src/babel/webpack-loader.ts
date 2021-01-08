@@ -9,6 +9,7 @@ import { custom } from 'babel-loader';
 import { ScriptTarget } from 'typescript';
 
 interface AngularCustomOptions {
+  forceAsyncTransformation: boolean;
   forceES5: boolean;
   shouldLink: boolean;
 }
@@ -27,7 +28,8 @@ async function checkLinking(
   source: string,
 ): Promise<{ hasLinkerSupport?: boolean; requiresLinking: boolean }> {
   // @angular/core and @angular/compiler will cause false positives
-  if (/[\\\/]@angular[\\\/](?:compiler|core)/.test(path)) {
+  // Also, TypeScript files do not require linking
+  if (/[\\\/]@angular[\\\/](?:compiler|core)|\.tsx?$/.test(path)) {
     return { requiresLinking: false };
   }
 
@@ -82,11 +84,15 @@ export default custom<AngularCustomOptions>(() => {
 
       // Analyze for ES target processing
       let forceES5 = false;
+      let forceAsyncTransformation = false;
       const esTarget = scriptTarget as ScriptTarget;
       if (esTarget < ScriptTarget.ES2015) {
-        forceES5 = true;
+        // TypeScript files will have already been downlevelled
+        forceES5 = !/\.tsx?$/.test(this.resourcePath);
+      } else if (esTarget >= ScriptTarget.ES2017) {
+        forceAsyncTransformation = source.includes('async');
       }
-      shouldProcess ||= forceES5;
+      shouldProcess ||= forceAsyncTransformation || forceES5;
 
       // Add provided loader options to default base options
       const options: Record<string, unknown> = {
@@ -100,7 +106,7 @@ export default custom<AngularCustomOptions>(() => {
         options.ignore = [() => true];
       }
 
-      return { custom: { forceES5, shouldLink }, loader: options };
+      return { custom: { forceAsyncTransformation, forceES5, shouldLink }, loader: options };
     },
     config(configuration, { customOptions }) {
       return {
@@ -112,6 +118,7 @@ export default custom<AngularCustomOptions>(() => {
             {
               angularLinker: customOptions.shouldLink,
               forceES5: customOptions.forceES5,
+              forceAsyncTransformation: customOptions.forceAsyncTransformation,
               diagnosticReporter: (type, message) => {
                 switch (type) {
                   case 'error':

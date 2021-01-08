@@ -544,7 +544,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           sideEffects: true,
         },
         {
-          test: /\.[cm]?js$/,
+          test: /\.[cm]?js$|\.tsx?$/,
           exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
           use: [
             {
