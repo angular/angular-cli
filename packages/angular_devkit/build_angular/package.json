@@ -47,7 +47,7 @@
     "ora": "5.2.0",
     "parse5-html-rewriting-stream": "6.0.1",
     "pnp-webpack-plugin": "1.6.4",
-    "postcss": "8.2.2",
+    "postcss": "8.2.3",
     "postcss-import": "14.0.0",
     "postcss-loader": "4.1.0",
     "raw-loader": "4.0.2",

@@ -189,7 +189,7 @@
     "pidusage": "^2.0.17",
     "pnp-webpack-plugin": "1.6.4",
     "popper.js": "^1.14.1",
-    "postcss": "8.2.2",
+    "postcss": "8.2.3",
     "postcss-import": "14.0.0",
     "postcss-loader": "4.1.0",
     "prettier": "^2.0.0",
