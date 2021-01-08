@@ -79,6 +79,7 @@ function createIvyPlugin(
     compilerOptions,
     fileReplacements,
     emitNgModuleScope: !optimize,
+    suppressZoneJsIncompatibilityWarning: true,
   });
 }
 
@@ -159,6 +160,7 @@ function _createAotPlugin(
     directTemplateLoading: true,
     ...options,
     compilerOptions,
+    suppressZoneJsIncompatibilityWarning: true,
   };
 
   pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
