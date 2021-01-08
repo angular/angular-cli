@@ -20,7 +20,7 @@
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@ngtools/webpack": "0.0.0",
     "ansi-colors": "4.1.1",
-    "autoprefixer": "10.2.0",
+    "autoprefixer": "10.2.1",
     "babel-loader": "8.2.2",
     "browserslist": "^4.9.1",
     "cacache": "15.0.5",
