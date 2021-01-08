@@ -554,7 +554,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                 cacheIdentifier: JSON.stringify({
                   buildAngular: require('../../../package.json').version,
                 }),
-                forceES5: !wco.supportES2015,
+                scriptTarget: wco.scriptTarget,
               },
             },
             ...buildOptimizerUseRule,
