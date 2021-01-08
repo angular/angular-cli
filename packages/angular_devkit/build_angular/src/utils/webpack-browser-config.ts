@@ -77,7 +77,7 @@ export async function generateWebpackConfig(
     buildOptions,
     tsConfig,
     tsConfigPath,
-    supportES2015,
+    scriptTarget,
   };
 
   wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);

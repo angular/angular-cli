@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { custom } from 'babel-loader';
+import { ScriptTarget } from 'typescript';
 
 interface AngularCustomOptions {
   forceES5: boolean;
@@ -62,9 +63,11 @@ export default custom<AngularCustomOptions>(() => {
   });
 
   return {
-    async customOptions({ forceES5, ...loaderOptions }, { source }) {
-      let shouldProcess = forceES5;
+    async customOptions({ scriptTarget, ...loaderOptions }, { source }) {
+      // Must process file if plugins are added
+      let shouldProcess = Array.isArray(loaderOptions.plugins) && loaderOptions.plugins.length > 0;
 
+      // Analyze file for linking
       let shouldLink = false;
       const { hasLinkerSupport, requiresLinking } = await checkLinking(this.resourcePath, source);
       if (requiresLinking && !hasLinkerSupport) {
@@ -77,17 +80,27 @@ export default custom<AngularCustomOptions>(() => {
       }
       shouldProcess ||= shouldLink;
 
+      // Analyze for ES target processing
+      let forceES5 = false;
+      const esTarget = scriptTarget as ScriptTarget;
+      if (esTarget < ScriptTarget.ES2015) {
+        forceES5 = true;
+      }
+      shouldProcess ||= forceES5;
+
+      // Add provided loader options to default base options
       const options: Record<string, unknown> = {
         ...baseOptions,
         ...loaderOptions,
       };
 
+      // Skip babel processing if no actions are needed
       if (!shouldProcess) {
         // Force the current file to be ignored
         options.ignore = [() => true];
       }
 
-      return { custom: { forceES5: !!forceES5, shouldLink }, loader: options };
+      return { custom: { forceES5, shouldLink }, loader: options };
     },
     config(configuration, { customOptions }) {
       return {
