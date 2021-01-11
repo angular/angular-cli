@@ -32,6 +32,10 @@ import 'core-js/modules/es.object.assign';
 import 'core-js/modules/es.object.is';
 import 'core-js/modules/es.object.set-prototype-of';
 import 'core-js/modules/es.object.to-string';
+import 'core-js/modules/es.object.entries';
+import 'core-js/modules/es.object.values';
+import 'core-js/modules/es.object.get-own-property-descriptors';
+import 'core-js/modules/es.object.from-entries';
 
 // ES2015 array capabilities
 import 'core-js/modules/es.array.concat';
@@ -56,6 +60,9 @@ import 'core-js/modules/es.array.fill';
 import 'core-js/modules/es.array.find';
 import 'core-js/modules/es.array.find-index';
 import 'core-js/modules/es.array.iterator';
+import 'core-js/modules/es.array.includes';
+import 'core-js/modules/es.array.flat';
+import 'core-js/modules/es.array.flat-map';
 
 // ES2015 string capabilities
 import 'core-js/modules/es.string.from-code-point';
