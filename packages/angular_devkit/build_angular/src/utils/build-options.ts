@@ -79,7 +79,7 @@ export interface BuildOptions {
   experimentalRollupPass?: boolean;
   allowedCommonJsDependencies?: string[];
 
-  differentialLoadingMode?: boolean;
+  differentialLoadingNeeded?: boolean;
 }
 
 export interface WebpackTestOptions extends BuildOptions {

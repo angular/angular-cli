@@ -128,7 +128,7 @@ async function initialize(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats>,
-  differentialLoadingMode: boolean,
+  differentialLoadingNeeded: boolean,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
 ): Promise<{
   config: webpack.Configuration;
@@ -159,7 +159,7 @@ async function initialize(
       wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
     ],
     host,
-    { differentialLoadingMode },
+    { differentialLoadingNeeded },
   );
 
   // Validate asset option values if processed directly
@@ -225,7 +225,6 @@ export function buildWebpackBrowser(
         const target = compilerOptions.target || ScriptTarget.ES5;
         const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
         const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
-        const differentialLoadingMode = !options.watch && isDifferentialLoadingNeeded;
 
         if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
           context.logger.warn(tags.stripIndent`
@@ -249,7 +248,7 @@ export function buildWebpackBrowser(
         }
 
         return {
-          ...(await initialize(options, context, host, differentialLoadingMode, transforms.webpackConfiguration)),
+          ...(await initialize(options, context, host, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
           buildBrowserFeatures,
           isDifferentialLoadingNeeded,
           target,
