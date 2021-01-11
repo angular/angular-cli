@@ -76,7 +76,7 @@ export function execute(
       context.logger.warn(tags.stripIndent`
       Warning: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
       unless 'node_modules' are transformed using the standalone Angular compatibility compiler (NGCC).
-      See: http://v9.angular.io/guide/ivy#ivy-and-universal-app-shell
+      See: https://angular.io/guide/ivy#ivy-and-universal-app-shell
     `);
     }
   }
