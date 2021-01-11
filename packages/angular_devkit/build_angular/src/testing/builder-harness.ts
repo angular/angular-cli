@@ -256,6 +256,10 @@ export class BuilderHarness<T> {
     return this.execute(options).pipe(first()).toPromise();
   }
 
+  async appendToFile(path: string, content: string): Promise<void> {
+    await this.writeFile(path, this.readFile(path).concat(content));
+  }
+
   async writeFile(path: string, content: string | Buffer): Promise<void> {
     this.host
       .scopedSync()
