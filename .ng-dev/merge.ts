@@ -10,9 +10,9 @@ import { release } from './release';
 export const merge: DevInfraMergeConfig['merge'] = async api => {
   return {
     githubApiMerge: {
-      default: 'squash',
+      default: 'rebase',
       labels: [
-        {pattern: 'preserve commits', method: 'rebase'},
+        {pattern: 'squash commits', method: 'squash'},
       ],
     },
     claSignedLabel: 'cla: yes',
