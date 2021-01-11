@@ -104,7 +104,7 @@ export async function generateWebpackConfig(
   if (profilingEnabled) {
     const esVersionInFileName = getEsVersionForFileName(
       tsConfig.options.target,
-      buildOptions.differentialLoadingMode,
+      buildOptions.differentialLoadingNeeded,
     );
 
     const SpeedMeasurePlugin = await import('speed-measure-webpack-plugin');

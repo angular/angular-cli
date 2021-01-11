@@ -148,17 +148,17 @@ describe('Browser Builder with differential loading', () => {
       'favicon.ico',
       'index.html',
 
-      'main.js',
-      'main.js.map',
+      'main-es2015.js',
+      'main-es2015.js.map',
 
-      'polyfills.js',
-      'polyfills.js.map',
+      'polyfills-es2015.js',
+      'polyfills-es2015.js.map',
 
-      'runtime.js',
-      'runtime.js.map',
+      'runtime-es2015.js',
+      'runtime-es2015.js.map',
 
-      'vendor.js',
-      'vendor.js.map',
+      'vendor-es2015.js',
+      'vendor-es2015.js.map',
 
       'styles.css',
       'styles.css.map',
@@ -202,10 +202,10 @@ describe('Browser Builder with differential loading', () => {
 
     const { files } = await browserBuild(architect, host, target, { watch: true });
     expect(await files['index.html']).toContain(
-      '<script src="runtime.js" type="module"></script>' +
-      '<script src="polyfills.js" type="module"></script>' +
-      '<script src="vendor.js" type="module"></script>' +
-      '<script src="main.js" type="module"></script>',
+      '<script src="runtime-es2015.js" type="module"></script>' +
+      '<script src="polyfills-es2015.js" type="module"></script>' +
+      '<script src="vendor-es2015.js" type="module"></script>' +
+      '<script src="main-es2015.js" type="module"></script>',
     );
   });
 });

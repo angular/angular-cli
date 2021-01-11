@@ -77,7 +77,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   const targetInFileName = getEsVersionForFileName(
     tsConfig.options.target,
-    buildOptions.differentialLoadingMode,
+    buildOptions.differentialLoadingNeeded,
   );
 
   if (buildOptions.main) {
@@ -128,7 +128,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
   }
 
-  const differentialLoadingMode = buildOptions.differentialLoadingMode;
+  const differentialLoadingMode = buildOptions.differentialLoadingNeeded && !buildOptions.watch;
   if (platform !== 'server') {
     if (differentialLoadingMode || tsConfig.options.target === ScriptTarget.ES5) {
       const buildBrowserFeatures = new BuildBrowserFeatures(

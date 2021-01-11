@@ -81,20 +81,20 @@ describe('Browser Builder scripts array', () => {
       'lazy-script.js': 'lazy-script',
       'renamed-script.js': 'pre-rename-script',
       'renamed-lazy-script.js': 'pre-rename-lazy-script',
-      'main.js': 'input-script',
-      'index.html': '<script src="runtime.js" type="module"></script>'
-        + '<script src="polyfills.js" type="module"></script>'
+      'main-es2015.js': 'input-script',
+      'index.html': '<script src="runtime-es2015.js" type="module"></script>'
+        + '<script src="polyfills-es2015.js" type="module"></script>'
         + '<script src="scripts.js" defer></script>'
         + '<script src="renamed-script.js" defer></script>'
-        + '<script src="vendor.js" type="module"></script>'
-        + '<script src="main.js" type="module"></script>',
+        + '<script src="vendor-es2015.js" type="module"></script>'
+        + '<script src="main-es2015.js" type="module"></script>',
     };
 
     host.writeMultipleFiles(scripts);
     host.appendToFile('src/main.ts', '\nimport \'./input-script.js\';');
 
     // Enable differential loading
-    host.appendToFile('.browserslistrc', '\nIE 10');
+    host.appendToFile('.browserslistrc', '\nIE 11');
 
     // Remove styles so we don't have to account for them in the index.html order check.
     const { files } = await browserBuild(architect, host, target, {

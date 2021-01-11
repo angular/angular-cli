@@ -54,7 +54,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     extraPlugins.push(getSourceMapDevTool(
       scriptsSourceMap,
       stylesSourceMap,
-      buildOptions.differentialLoadingMode ? true : hiddenSourceMap,
+      buildOptions.differentialLoadingNeeded && !buildOptions.watch ? true : hiddenSourceMap,
       false,
     ));
   }
