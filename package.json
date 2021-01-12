@@ -105,7 +105,7 @@
     "@types/inquirer": "^7.3.0",
     "@types/jasmine": "~3.6.0",
     "@types/karma": "^5.0.0",
-    "@types/license-checker-webpack-plugin": "^0.0.2",
+    "@types/license-checker-webpack-plugin": "^0.0.3",
     "@types/loader-utils": "^2.0.0",
     "@types/minimatch": "3.0.3",
     "@types/minimist": "^1.2.0",
