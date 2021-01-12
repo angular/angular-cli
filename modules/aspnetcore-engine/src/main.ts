@@ -17,10 +17,7 @@ import { IEngineRenderResult } from './interfaces/engine-render-result';
 import { renderModuleFactory } from './platform-server-utils';
 
 /* @internal */
-let appSelector = 'app-root'; // default
-
-/* @internal */
-function _getUniversalData(doc: Document): Omit<IEngineRenderResult, 'moduleRef'> {
+function _getUniversalData(doc: Document, appSelector: string): Omit<IEngineRenderResult, 'moduleRef'> {
 
   const styles: string[] = [];
   const scripts: string[] = [];
@@ -69,13 +66,13 @@ function _getUniversalData(doc: Document): Omit<IEngineRenderResult, 'moduleRef'
 export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
   : Promise<IEngineRenderResult> {
   if (!options.appSelector) {
-    const selector = `" appSelector: '<${appSelector}></${appSelector}>' "`;
+    const selector = `" appSelector: '<app-root></app-root>' "`;
     throw new Error(`appSelector is required! Pass in ${selector},
      for your root App component.`);
   }
 
   // Grab the DOM "selector" from the passed in Template <app-root> for example = "app-root"
-  appSelector = options.appSelector.substring(1, options.appSelector.indexOf('>'));
+  const appSelector = options.appSelector.substring(1, options.appSelector.indexOf('>'));
 
   const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
   const compiler: Compiler = compilerFactory.createCompiler([
@@ -107,7 +104,7 @@ export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
 
   return {
     moduleRef: result.moduleRef,
-    ..._getUniversalData(doc),
+    ..._getUniversalData(doc, appSelector),
   };
 }
 
