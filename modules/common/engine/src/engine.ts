@@ -40,20 +40,10 @@ export interface RenderOptions {
  */
 export class CommonEngine {
 
-  /** Return an instance of the platformServer compiler */
-  getCompiler(): Compiler {
-    const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
-
-    return compilerFactory.createCompiler([
-      { providers: [{ provide: ResourceLoader, useClass: FileLoader, deps: [] }] }
-    ]);
-  }
-
-  private factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
-  private templateCache = new Map<string, string>();
-  private inlineCriticalCssProcessor: InlineCriticalCssProcessor;
-  private pageExists = new Map<string, boolean>();
-
+  private readonly factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
+  private readonly templateCache = new Map<string, string>();
+  private readonly inlineCriticalCssProcessor: InlineCriticalCssProcessor;
+  private readonly pageExists = new Map<string, boolean>();
 
   constructor(private moduleOrFactory?: Type<{}> | NgModuleFactory<{}>,
               private providers: StaticProvider[] = []) {
@@ -133,7 +123,7 @@ export class CommonEngine {
   }
 
   /** Return the factory for a given engine instance */
-  async getFactory(moduleOrFactory: Type<{}> | NgModuleFactory<{}>): Promise<NgModuleFactory<{}>> {
+  private async getFactory(moduleOrFactory: Type<{}> | NgModuleFactory<{}>): Promise<NgModuleFactory<{}>> {
     // If module has been compiled AoT
     if (moduleOrFactory instanceof NgModuleFactory) {
       return moduleOrFactory;
@@ -155,7 +145,7 @@ export class CommonEngine {
   }
 
   /** Retrieve the document from the cache or the filesystem */
-  async getDocument(filePath: string): Promise<string> {
+  private async getDocument(filePath: string): Promise<string> {
     let doc = this.templateCache.get(filePath);
 
     if (!doc) {
@@ -164,5 +154,14 @@ export class CommonEngine {
     }
 
     return doc;
+  }
+
+  /** Return an instance of the platformServer compiler */
+  private getCompiler(): Compiler {
+    const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
+
+    return compilerFactory.createCompiler([
+      { providers: [{ provide: ResourceLoader, useClass: FileLoader, deps: [] }] }
+    ]);
   }
 }
