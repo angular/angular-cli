@@ -57,7 +57,7 @@
     "rollup": "2.36.1",
     "rxjs": "6.6.3",
     "sass": "1.32.4",
-    "sass-loader": "10.1.0",
+    "sass-loader": "10.1.1",
     "semver": "7.3.4",
     "source-map": "0.7.3",
     "source-map-loader": "1.1.3",
