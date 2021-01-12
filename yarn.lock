@@ -1618,10 +1618,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/license-checker-webpack-plugin@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@types/license-checker-webpack-plugin/-/license-checker-webpack-plugin-0.0.2.tgz#ee35e2b36a0eccea48254dc1bcc47429f8290384"
-  integrity sha512-ad6Z7r3PdexKQI1MQD3o7VVHPdfduZbTRiob7bKBKihZC6Z3BzKvoZjHWIpkkxXjk6SaEhPjWdDGYQbFtsCQBg==
+"@types/license-checker-webpack-plugin@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@types/license-checker-webpack-plugin/-/license-checker-webpack-plugin-0.0.3.tgz#20016a5ed6aec0a43a55e790713dbfc26f902c26"
+  integrity sha512-rbtXJfZPFdr7z6vOYAE/jhBmOiB7NQkS/dDtxv5Xor5mkB6Kml4l14quNSDolRUdDFM5xKx1AcpqtuUN+Nwc+Q==
   dependencies:
     "@types/webpack" "*"
 
