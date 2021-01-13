@@ -12,6 +12,6 @@
     "src/<%= stripTsExtension(main) %>.ts"
   ],
   "angularCompilerOptions": {
-    "entryModule": "./<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
+    "entryModule": "./<%= sourceRoot ? sourceRoot + '/' : ''%><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
   }
 }

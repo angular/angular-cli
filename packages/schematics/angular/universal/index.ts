@@ -8,6 +8,7 @@
 import {
   Path,
   basename,
+  dirname,
   join,
   normalize,
   strings,
@@ -68,13 +69,14 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
 
       const mainPath = options.main as string;
       const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
+      const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
 
       clientProject.targets.add({
         name: 'server',
         builder: Builders.Server,
         options: {
           outputPath: `dist/${options.clientProject}/server`,
-          main: join(normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
+          main: join(normalize(sourceRoot), mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
           tsConfig: serverTsConfig,
         },
         configurations: {
@@ -194,7 +196,7 @@ function addServerTransition(
 
     const bootstrapModuleRelativePath = findBootstrapModulePath(host, mainPath);
     const bootstrapModulePath = normalize(
-      `/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`);
+      `/${clientProjectRoot}/${bootstrapModuleRelativePath}.ts`);
 
     const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
     const appId = options.appId;
@@ -234,6 +236,10 @@ export default function (options: UniversalOptions): Rule {
       throw new SchematicsException(`Universal requires a project type of "application".`);
     }
 
+    if (typeof clientProject.sourceRoot !== 'string') {
+      throw new SchematicsException(`"sourceRoot" option is not defined in "${options.clientProject}" project.`);
+    }
+
     const clientBuildTarget = clientProject.targets.get('build');
     if (!clientBuildTarget) {
       throw targetBuildNotFoundError();
@@ -244,10 +250,7 @@ export default function (options: UniversalOptions): Rule {
 
     const clientTsConfig = normalize(clientBuildOptions.tsConfig);
     const tsConfigExtends = basename(clientTsConfig);
-    // this is needed because prior to version 8, tsconfig might have been in 'src'
-    // and we don't want to break the 'ng add @nguniversal/express-engine schematics'
-    const rootInSrc = clientProject.root === '' && clientTsConfig.includes('src/');
-    const tsConfigDirectory = join(normalize(clientProject.root), rootInSrc ? 'src' : '');
+    const tsConfigDirectory = dirname(clientTsConfig);
 
     if (!options.skipInstall) {
       context.addTask(new NodePackageInstallTask());
@@ -260,7 +263,7 @@ export default function (options: UniversalOptions): Rule {
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
       }),
-      move(join(normalize(clientProject.root), 'src')),
+      move(clientProject.sourceRoot),
     ]);
 
     const rootSource = apply(url('./files/root'), [
@@ -270,7 +273,7 @@ export default function (options: UniversalOptions): Rule {
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         tsConfigExtends,
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
-        rootInSrc,
+        sourceRoot: clientProject.sourceRoot ?? '',
       }),
       move(tsConfigDirectory),
     ]);
@@ -279,9 +282,9 @@ export default function (options: UniversalOptions): Rule {
       mergeWith(templateSource),
       mergeWith(rootSource),
       addDependencies(),
-      updateConfigFile(options, tsConfigDirectory),
+      updateConfigFile(options, normalize(tsConfigDirectory)),
       wrapBootstrapCall(clientBuildOptions.main),
-      addServerTransition(options, clientBuildOptions.main, clientProject.root),
+      addServerTransition(options, clientBuildOptions.main, clientProject.sourceRoot),
     ]);
   };
 }
