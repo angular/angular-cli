@@ -7,6 +7,7 @@
  */
 
 export interface IEngineRenderResult {
+  completeHTML: string;
   html: string;
   globals: {
     styles: string;

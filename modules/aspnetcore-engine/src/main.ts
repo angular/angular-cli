@@ -49,6 +49,7 @@ function _getUniversalData(content: string, appSelector: string): IEngineRenderR
   }
 
   return {
+    completeHTML: content,
     // tslint:disable-next-line: no-non-null-assertion
     html: doc.querySelector(appSelector)!.outerHTML,
     globals: {
@@ -76,6 +77,7 @@ export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
     document: options.document || options.appSelector,
     providers: [...(options.providers || []), getReqResProviders(options.request.origin, options.request.data.request)],
     bootstrap: options.ngModule,
+    inlineCriticalCss: options.inlineCriticalCss,
   };
 
 
