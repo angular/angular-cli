@@ -7,7 +7,7 @@ This is an ASP.NET Core Engine for running Angular Apps on the server for server
 ## Installation
 
 ```bash
-npm i --S @nguniversal/aspnetcore-engine @nguniversal/common-engine
+npm i --S @nguniversal/aspnetcore-engine @nguniversal/common
 # or yarn install
 ```
 
