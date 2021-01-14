@@ -158,14 +158,12 @@ export default function (options: ComponentOptions): Rule {
         ...options,
       }),
       !options.type ? forEach((file => {
-        if (!!file.path.match(new RegExp('..'))) {
-          return {
+        return file.path.includes('..')
+          ? {
             content: file.content,
             path: file.path.replace('..', '.'),
-          };
-        } else {
-          return file;
-        }
+          }
+          : file;
       }) as FileOperator) : noop(),
       move(parsedPath.path),
     ]);
