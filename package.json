@@ -146,7 +146,7 @@
     "css-loader": "5.0.1",
     "cssnano": "4.1.10",
     "debug": "^4.1.1",
-    "enhanced-resolve": "5.6.0",
+    "enhanced-resolve": "5.7.0",
     "express": "4.17.1",
     "fast-json-stable-stringify": "2.1.0",
     "file-loader": "6.2.0",
