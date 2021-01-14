@@ -599,10 +599,22 @@ export class CoreSchemaRegistry implements SchemaRegistry {
               : (parentSchema as JsonObject).default as string[],
           async validator(data: JsonValue) {
             try {
-              return await it.self.validate(parentSchema, data);
-            } catch {
-              return false;
+              const result = await it.self.validate(parentSchema, data);
+              // If the schema is sync then false will be returned on validation failure
+              if (result) {
+                return result;
+              } else if (it.self.errors?.length) {
+                // Validation errors will be present on the Ajv instance when sync
+                return it.self.errors[0].message;
+              }
+            } catch (e) {
+              // If the schema is async then an error will be thrown on validation failure
+              if (Array.isArray(e.errors) && e.errors.length) {
+                return e.errors[0].message;
+              }
             }
+
+            return false;
           },
         };
 
