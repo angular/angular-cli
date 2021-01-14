@@ -356,17 +356,6 @@ export abstract class SchematicCommand<
                     };
                 });
                 break;
-              case 'input':
-                if (
-                  definition.propertyTypes.size === 1 &&
-                  (definition.propertyTypes.has('number') ||
-                    definition.propertyTypes.has('integer'))
-                ) {
-                  question.type = 'number';
-                } else {
-                  question.type = 'input';
-                }
-                break;
               default:
                 question.type = definition.type;
                 break;
