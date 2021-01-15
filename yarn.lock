@@ -1081,17 +1081,6 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@jsdevtools/coverage-istanbul-loader@3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@jsdevtools/coverage-istanbul-loader/-/coverage-istanbul-loader-3.0.3.tgz#102e414b02ae2f0b3c7fd45a705601e1fd4867c5"
-  integrity sha512-TAdNkeGB5Fe4Og+ZkAr1Kvn9by2sfL44IAHFtxlh1BA1XJ5cLpO9iSNki5opWESv3l3vSHsZ9BNKuqFKbEbFaA==
-  dependencies:
-    convert-source-map "^1.7.0"
-    istanbul-lib-instrument "^4.0.1"
-    loader-utils "^1.4.0"
-    merge-source-map "^1.1.0"
-    schema-utils "^2.6.4"
-
 "@jsdevtools/coverage-istanbul-loader@3.0.5":
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/@jsdevtools/coverage-istanbul-loader/-/coverage-istanbul-loader-3.0.5.tgz#2a4bc65d0271df8d4435982db4af35d81754ee26"
@@ -10424,7 +10413,7 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
-schema-utils@^2.6.4, schema-utils@^2.6.5, schema-utils@^2.7.0:
+schema-utils@^2.6.5, schema-utils@^2.7.0:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-2.7.1.tgz#1ca4f32d1b24c590c203b8e7a50bf0ea4cd394d7"
   integrity sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==
