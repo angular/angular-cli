@@ -8767,10 +8767,10 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-pacote@11.2.0:
-  version "11.2.0"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.2.0.tgz#c95be8ef4db76a5436738f9ad493d0669dfaf9df"
-  integrity sha512-O5jAQu7bP8AxMiJXMQuePaN8ue8Ngj4UVtwU29HlnRF6EYa5+HPZtGaLGvEk/Y5uNcqbT0AjwnPoaZS33FvY6A==
+pacote@11.2.1:
+  version "11.2.1"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.2.1.tgz#1b80e1ef24ca2a5000cb1a469a308072623f33dd"
+  integrity sha512-r5GzxJdmyLdWxP98xYcXinyyj1MIO3wwgJeJpaIIql7rnMBkcLx5k3WKCPpknZU11ybOiXCrIjWuZt3le0Es9A==
   dependencies:
     "@npmcli/git" "^2.0.1"
     "@npmcli/installed-package-contents" "^1.0.5"
