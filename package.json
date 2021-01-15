@@ -89,7 +89,7 @@
     "@bazel/buildifier": "3.5.0",
     "@bazel/jasmine": "2.3.1",
     "@bazel/typescript": "2.3.1",
-    "@jsdevtools/coverage-istanbul-loader": "3.0.3",
+    "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@types/babel__core": "7.1.12",
     "@types/babel__template": "7.4.0",
     "@types/browserslist": "^4.4.0",
