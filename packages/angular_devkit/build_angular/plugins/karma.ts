@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-module.exports = require('../src/webpack/plugins/karma');
+module.exports = require('../src/webpack/plugins/karma/karma');

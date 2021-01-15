@@ -14,12 +14,12 @@ import * as webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
 import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
-import { statsErrorsToString } from '../utils/stats';
-import { getWebpackStatsConfig } from '../configs/stats';
+import { statsErrorsToString } from '../../utils/stats';
+import { getWebpackStatsConfig } from '../../configs/stats';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
-import { WebpackTestOptions } from '../../utils/build-options';
-import { normalizeSourceMaps } from '../../utils/index';
+import { WebpackTestOptions } from '../../../utils/build-options';
+import { normalizeSourceMaps } from '../../../utils/index';
 
 /**
  * Enumerate needed (but not require/imported) dependencies from this file
