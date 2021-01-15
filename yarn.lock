@@ -17,10 +17,10 @@
     "@angular/core" "^10.0.0-0 || ^11.0.0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.0.3.tgz#f5a119e28b4ba21a6f013dfd4de41b16083bd25a"
-  integrity sha512-hgbJXvZURKBnZawwxUrsZE/3a+HCJh2UhoLIng3cn5Q+WIW/4a37knDl8B9DYKBWrCqeINXNcUHVSKkWc/gjCA==
+"@angular/cdk@11.0.4":
+  version "11.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.0.4.tgz#ecdf9206b10cc0f1dc7217948b43b01604cb1406"
+  integrity sha512-suhAhsZEv+lLwm8dc524cMvO7gHPi+z2+4tueNS+zDiIObdZc4fs+KoOlnRMdYwba++X/V8mHXuDEQetl3GFcw==
   dependencies:
     tslib "^2.0.0"
   optionalDependencies:
@@ -85,9 +85,9 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#d46e59817dc0ecebc10e2c716baa461afcd710cf":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#445b600ebaba4b61d18e9f40056b3b13ad808182":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#d46e59817dc0ecebc10e2c716baa461afcd710cf"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#445b600ebaba4b61d18e9f40056b3b13ad808182"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^0.29.0"
@@ -133,10 +133,10 @@
     glob "7.1.2"
     yargs "^16.1.1"
 
-"@angular/material@11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-11.0.3.tgz#dd848f1804b07c9654b095d5b1accb13083e91e5"
-  integrity sha512-YTHmtKGwjAEFAOOmuivcwnINMPHxvM7iZQpTgZqDKNiqiv53cwry2Ctb54suRNT+D794z59D0/r+YocGkzFv3w==
+"@angular/material@11.0.4":
+  version "11.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-11.0.4.tgz#af7a8208800332dfba1dc5c8f1dbc0745f72da1f"
+  integrity sha512-yjJEl3UbJxyKZFAbhvyZGphDfhtR1vo0AnDEE3KBxAOp9oD4r7paL6ER9rSXFoNRjST56tIDbNtG/wZNtH0XDQ==
   dependencies:
     tslib "^2.0.0"
 
