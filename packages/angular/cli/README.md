@@ -250,7 +250,7 @@ In addition to this one, another, more elaborated way to capture a CPU profile u
 
 ## Documentation
 
-The documentation for the Angular CLI is located in this repo's [wiki](https://angular.io/cli).
+The documentation for the Angular CLI is located on our [documentation website](https://angular.io/cli).
 
 ## License
 
