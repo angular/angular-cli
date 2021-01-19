@@ -11,10 +11,7 @@ import {
   logging,
   normalize,
   resolve,
-  virtualFs,
 } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
@@ -125,7 +122,6 @@ export async function generateI18nBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
-  host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
 ): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string, i18n: I18nOptions }> {
   const { buildOptions, i18n } = await configureI18nBuild(context, options);
@@ -133,7 +129,6 @@ export async function generateI18nBrowserWebpackConfigFromContext(
     buildOptions,
     context,
     webpackPartialGenerator,
-    host,
     extraBuildOptions,
   );
   const config = result.config;
@@ -195,7 +190,6 @@ export async function generateBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
-  host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
 ): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string }> {
   const projectName = context.target && context.target.project;
@@ -212,7 +206,6 @@ export async function generateBrowserWebpackConfigFromContext(
     : undefined;
 
   const normalizedOptions = normalizeBrowserSchema(
-    host,
     workspaceRoot,
     projectRoot,
     sourceRoot,

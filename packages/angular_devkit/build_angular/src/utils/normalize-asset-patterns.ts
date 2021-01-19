@@ -10,12 +10,13 @@ import {
   Path,
   basename,
   dirname,
+  getSystemPath,
   join,
   normalize,
   relative,
   resolve,
-  virtualFs,
 } from '@angular-devkit/core';
+import { statSync } from 'fs';
 import { AssetPattern, AssetPatternClass } from '../browser/schema';
 
 
@@ -27,7 +28,6 @@ export class MissingAssetSourceRootException extends BaseException {
 
 export function normalizeAssetPatterns(
   assetPatterns: AssetPattern[],
-  host: virtualFs.SyncDelegateHost,
   root: Path,
   projectRoot: Path,
   maybeSourceRoot: Path | undefined,
@@ -56,7 +56,7 @@ export function normalizeAssetPatterns(
         let isDirectory = false;
 
         try {
-          isDirectory = host.isDirectory(resolvedAssetPath);
+          isDirectory = statSync(getSystemPath(resolvedAssetPath)).isDirectory();
         } catch {
           isDirectory = true;
         }

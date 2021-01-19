@@ -7,8 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { getSystemPath, json, normalize, resolve, tags, virtualFs } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { getSystemPath, json, normalize, resolve, tags } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
@@ -127,7 +126,6 @@ export function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configurat
 async function initialize(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  host: virtualFs.Host<fs.Stats>,
   differentialLoadingNeeded: boolean,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
 ): Promise<{
@@ -158,7 +156,6 @@ async function initialize(
       getCompilerConfig(wco),
       wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
     ],
-    host,
     { differentialLoadingNeeded },
   );
 
@@ -166,7 +163,6 @@ async function initialize(
   if (options.assets?.length && !adjustedOptions.assets?.length) {
     normalizeAssetPatterns(
       options.assets,
-      new virtualFs.SyncDelegateHost(host),
       normalize(context.workspaceRoot),
       normalize(projectRoot),
       projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
@@ -199,7 +195,6 @@ export function buildWebpackBrowser(
     indexHtml?: IndexHtmlTransform;
   } = {},
 ): Observable<BrowserBuilderOutput> {
-  const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
 
   const projectName = context.target?.project;
@@ -248,7 +243,7 @@ export function buildWebpackBrowser(
         }
 
         return {
-          ...(await initialize(options, context, host, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
+          ...(await initialize(options, context, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
           buildBrowserFeatures,
           isDifferentialLoadingNeeded,
           target,
@@ -645,7 +640,6 @@ export function buildWebpackBrowser(
                   await copyAssets(
                     normalizeAssetPatterns(
                       options.assets,
-                      new virtualFs.SyncDelegateHost(host),
                       root,
                       normalize(projectRoot),
                       projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
@@ -719,7 +713,6 @@ export function buildWebpackBrowser(
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
                       await augmentAppWithServiceWorker(
-                        host,
                         root,
                         normalize(projectRoot),
                         normalize(outputPath),

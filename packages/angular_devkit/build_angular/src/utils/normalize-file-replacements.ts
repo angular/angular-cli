@@ -12,8 +12,8 @@ import {
   getSystemPath,
   join,
   normalize,
-  virtualFs,
 } from '@angular-devkit/core';
+import { existsSync } from 'fs';
 import { FileReplacement } from '../browser/schema';
 
 
@@ -30,7 +30,6 @@ export interface NormalizedFileReplacement {
 
 export function normalizeFileReplacements(
   fileReplacements: FileReplacement[],
-  host: virtualFs.SyncDelegateHost,
   root: Path,
 ): NormalizedFileReplacement[] {
   if (fileReplacements.length === 0) {
@@ -41,11 +40,11 @@ export function normalizeFileReplacements(
     .map(replacement => normalizeFileReplacement(replacement, root));
 
   for (const { replace, with: replacementWith } of normalizedReplacement) {
-    if (!host.exists(replacementWith)) {
+    if (!existsSync(getSystemPath(replacementWith))) {
       throw new MissingFileReplacementException(getSystemPath(replacementWith));
     }
 
-    if (!host.exists(replace)) {
+    if (!existsSync(getSystemPath(replace))) {
       throw new MissingFileReplacementException(getSystemPath(replace));
     }
   }

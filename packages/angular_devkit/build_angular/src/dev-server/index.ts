@@ -13,7 +13,6 @@ import {
   runWebpackDevServer,
 } from '@angular-devkit/build-webpack';
 import { json, tags } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { Observable, from, of } from 'rxjs';
 import { concatMap, switchMap } from 'rxjs/operators';
@@ -83,7 +82,6 @@ export function serveWebpackBrowser(
   assertCompatibleAngularVersion(workspaceRoot, logger);
 
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const host = new NodeJsSyncHost();
 
   async function setup(): Promise<{
     browserOptions: json.JsonObject & BrowserBuilderSchema;
@@ -148,7 +146,6 @@ export function serveWebpackBrowser(
         getCompilerConfig(wco),
         browserOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
       ],
-      host,
       devServerOptions,
     );
 
