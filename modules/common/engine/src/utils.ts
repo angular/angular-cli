@@ -17,7 +17,7 @@ export async function exists(path: fs.PathLike): Promise<boolean> {
     await access(path, fs.constants.F_OK);
 
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
