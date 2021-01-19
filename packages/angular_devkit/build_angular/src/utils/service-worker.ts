@@ -18,7 +18,7 @@ import {
 import {
   Filesystem,
   Generator,
-} from '@angular/service-worker/config'; // tslint:disable-line:no-implicit-dependencies
+} from '@angular/service-worker/config';
 import * as crypto from 'crypto';
 
 class CliFilesystem implements Filesystem {
