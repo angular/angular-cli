@@ -12,7 +12,6 @@ import {
   targetFromTargetString,
 } from '@angular-devkit/architect';
 import { JsonObject, normalize, resolve } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import { BrowserBuilderOutput } from '../browser';
@@ -47,7 +46,6 @@ async function _renderUniversal(
   const zonePackage = require.resolve('zone.js', { paths: [root] });
   await import(zonePackage);
 
-  const host = new NodeJsSyncHost();
   const projectName = context.target && context.target.project;
   if (!projectName) {
     throw new Error('The builder requires a target.');
@@ -121,7 +119,6 @@ async function _renderUniversal(
 
     if (browserOptions.serviceWorker) {
       await augmentAppWithServiceWorker(
-        host,
         normalize(root),
         projectRoot,
         normalize(outputPath),

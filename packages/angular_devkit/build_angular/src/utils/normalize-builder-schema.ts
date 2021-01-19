@@ -8,7 +8,7 @@
  */
 
 
-import { Path, virtualFs } from '@angular-devkit/core';
+import { Path } from '@angular-devkit/core';
 import {
   AssetPatternClass,
   Schema as BrowserBuilderSchema,
@@ -35,19 +35,17 @@ export type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & BuildOptions
 };
 
 export function normalizeBrowserSchema(
-  host: virtualFs.Host<{}>,
   root: Path,
   projectRoot: Path,
   sourceRoot: Path | undefined,
   options: BrowserBuilderSchema,
 ): NormalizedBrowserBuilderSchema {
-  const syncHost = new virtualFs.SyncDelegateHost(host);
   const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
 
   return {
     ...options,
-    assets: normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot),
-    fileReplacements: normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
+    assets: normalizeAssetPatterns(options.assets || [], root, projectRoot, sourceRoot),
+    fileReplacements: normalizeFileReplacements(options.fileReplacements || [], root),
     optimization: normalizeOptimization(options.optimization),
     sourceMap: normalizedSourceMapOptions,
     preserveSymlinks: options.preserveSymlinks === undefined ? process.execArgv.includes('--preserve-symlinks') : options.preserveSymlinks,

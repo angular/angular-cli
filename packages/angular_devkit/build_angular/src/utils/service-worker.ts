@@ -15,6 +15,7 @@ import {
   tags,
   virtualFs,
 } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import {
   Filesystem,
   Generator,
@@ -70,13 +71,13 @@ class CliFilesystem implements Filesystem {
 }
 
 export async function augmentAppWithServiceWorker(
-  host: virtualFs.Host,
   projectRoot: Path,
   appRoot: Path,
   outputPath: Path,
   baseHref: string,
   ngswConfigPath?: string,
 ): Promise<void> {
+  const host = new NodeJsSyncHost();
   const distPath = normalize(outputPath);
   const systemProjectRoot = getSystemPath(projectRoot);
 
