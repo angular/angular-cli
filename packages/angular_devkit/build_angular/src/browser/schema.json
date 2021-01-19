@@ -182,12 +182,12 @@
     },
     "vendorChunk": {
       "type": "boolean",
-      "description": "Use a separate bundle containing only vendor libraries.",
+      "description": "Generate a seperate bundle containing only vendor libraries. This option should only used for development.",
       "default": true
     },
     "commonChunk": {
       "type": "boolean",
-      "description": "Use a separate bundle containing code used across multiple bundles.",
+      "description": "Generate a seperate bundle containing code used across multiple bundles.",
       "default": true
     },
     "baseHref": {
