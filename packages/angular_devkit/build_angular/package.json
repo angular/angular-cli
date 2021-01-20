@@ -44,7 +44,7 @@
     "mini-css-extract-plugin": "1.3.4",
     "minimatch": "3.0.4",
     "open": "7.3.1",
-    "ora": "5.2.0",
+    "ora": "5.3.0",
     "parse5-html-rewriting-stream": "6.0.1",
     "pnp-webpack-plugin": "1.6.4",
     "postcss": "8.2.4",
