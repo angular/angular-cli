@@ -16,15 +16,17 @@ export function replaceResources(
     const typeChecker = getTypeChecker();
     const resourceImportDeclarations: ts.ImportDeclaration[] = [];
     const moduleKind = context.getCompilerOptions().module;
+    const nodeFactory = context.factory;
+
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
         const decorators = ts.visitNodes(node.decorators, node =>
           ts.isDecorator(node)
-            ? visitDecorator(node, typeChecker, directTemplateLoading, resourceImportDeclarations, moduleKind)
+            ? visitDecorator(nodeFactory, node, typeChecker, directTemplateLoading, resourceImportDeclarations, moduleKind)
             : node,
         );
 
-        return ts.updateClassDeclaration(
+        return nodeFactory.updateClassDeclaration(
           node,
           decorators,
           node.modifiers,
@@ -46,10 +48,10 @@ export function replaceResources(
       const updatedSourceFile = ts.visitNode(sourceFile, visitNode);
       if (resourceImportDeclarations.length) {
         // Add resource imports
-        return ts.updateSourceFileNode(
+        return context.factory.updateSourceFile(
           updatedSourceFile,
           ts.setTextRange(
-            ts.createNodeArray([
+            context.factory.createNodeArray([
               ...resourceImportDeclarations,
               ...updatedSourceFile.statements,
             ]),
@@ -64,6 +66,7 @@ export function replaceResources(
 }
 
 function visitDecorator(
+  nodeFactory: ts.NodeFactory,
   node: ts.Decorator,
   typeChecker: ts.TypeChecker,
   directTemplateLoading: boolean,
@@ -91,29 +94,30 @@ function visitDecorator(
   // visit all properties
   let properties = ts.visitNodes(objectExpression.properties, node =>
     ts.isObjectLiteralElementLike(node)
-      ? visitComponentMetadata(node, styleReplacements, directTemplateLoading, resourceImportDeclarations, moduleKind)
+      ? visitComponentMetadata(nodeFactory, node, styleReplacements, directTemplateLoading, resourceImportDeclarations, moduleKind)
       : node,
   );
 
   // replace properties with updated properties
   if (styleReplacements.length > 0) {
-    const styleProperty = ts.createPropertyAssignment(
-      ts.createIdentifier('styles'),
-      ts.createArrayLiteral(styleReplacements),
+    const styleProperty = nodeFactory.createPropertyAssignment(
+      nodeFactory.createIdentifier('styles'),
+      nodeFactory.createArrayLiteralExpression(styleReplacements),
     );
 
-    properties = ts.createNodeArray([...properties, styleProperty]);
+    properties = nodeFactory.createNodeArray([...properties, styleProperty]);
   }
 
-  return ts.updateDecorator(
+  return nodeFactory.updateDecorator(
     node,
-    ts.updateCall(decoratorFactory, decoratorFactory.expression, decoratorFactory.typeArguments, [
-      ts.updateObjectLiteral(objectExpression, properties),
+    nodeFactory.updateCallExpression(decoratorFactory, decoratorFactory.expression, decoratorFactory.typeArguments, [
+      nodeFactory.updateObjectLiteralExpression(objectExpression, properties),
     ]),
   );
 }
 
 function visitComponentMetadata(
+  nodeFactory: ts.NodeFactory,
   node: ts.ObjectLiteralElementLike,
   styleReplacements: ts.Expression[],
   directTemplateLoading: boolean,
@@ -131,6 +135,7 @@ function visitComponentMetadata(
 
     case 'templateUrl':
       const importName = createResourceImport(
+        nodeFactory,
         node.initializer,
         directTemplateLoading ? '!raw-loader!' : '',
         resourceImportDeclarations,
@@ -140,9 +145,9 @@ function visitComponentMetadata(
         return node;
       }
 
-      return ts.updatePropertyAssignment(
+      return nodeFactory.updatePropertyAssignment(
         node,
-        ts.createIdentifier('template'),
+        nodeFactory.createIdentifier('template'),
         importName,
       );
     case 'styles':
@@ -158,10 +163,10 @@ function visitComponentMetadata(
         }
 
         if (isInlineStyles) {
-          return ts.createLiteral(node.text);
+          return nodeFactory.createStringLiteral(node.text);
         }
 
-        return createResourceImport(node, undefined, resourceImportDeclarations, moduleKind) || node;
+        return createResourceImport(nodeFactory, node, undefined, resourceImportDeclarations, moduleKind) || node;
       });
 
       // Styles should be placed first
@@ -200,6 +205,7 @@ function isComponentDecorator(node: ts.Node, typeChecker: ts.TypeChecker): node 
 }
 
 function createResourceImport(
+  nodeFactory: ts.NodeFactory,
   node: ts.Node,
   loader: string | undefined,
   resourceImportDeclarations: ts.ImportDeclaration[],
@@ -210,23 +216,23 @@ function createResourceImport(
     return null;
   }
 
-  const urlLiteral = ts.createLiteral(url);
+  const urlLiteral = nodeFactory.createStringLiteral(url);
 
   if (moduleKind < ts.ModuleKind.ES2015) {
-    return ts.createPropertyAccess(
-      ts.createCall(
-        ts.createIdentifier('require'),
+    return nodeFactory.createPropertyAccessExpression(
+      nodeFactory.createCallExpression(
+        nodeFactory.createIdentifier('require'),
         [],
         [urlLiteral],
       ),
       'default',
     );
   } else {
-    const importName = ts.createIdentifier(`__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`);
-    resourceImportDeclarations.push(ts.createImportDeclaration(
+    const importName = nodeFactory.createIdentifier(`__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`);
+    resourceImportDeclarations.push(nodeFactory.createImportDeclaration(
       undefined,
       undefined,
-      ts.createImportClause(importName, undefined),
+      nodeFactory.createImportClause(false, importName, undefined),
       urlLiteral,
     ));
 

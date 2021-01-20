@@ -23,10 +23,10 @@ export function insertStarImport(
   // We don't need to verify if the symbol is already imported, star imports should be unique.
 
   // Create the new import node.
-  const namespaceImport = ts.createNamespaceImport(identifier);
-  const importClause = ts.createImportClause(undefined, namespaceImport);
-  const newImport = ts.createImportDeclaration(undefined, undefined, importClause,
-    ts.createLiteral(modulePath));
+  const namespaceImport = ts.factory.createNamespaceImport(identifier);
+  const importClause = ts.factory.createImportClause(false, undefined, namespaceImport);
+  const newImport = ts.factory.createImportDeclaration(undefined, undefined, importClause,
+    ts.factory.createStringLiteral(modulePath));
 
   if (target) {
     ops.push(new AddNodeOperation(
@@ -106,15 +106,15 @@ export function insertImport(
       sourceFile,
       maybeImports[0].elements[maybeImports[0].elements.length - 1],
       undefined,
-      ts.createImportSpecifier(undefined, ts.createIdentifier(symbolName)),
+      ts.factory.createImportSpecifier(undefined, ts.factory.createIdentifier(symbolName)),
     ));
   } else {
     // Create the new import node.
-    const namedImports = ts.createNamedImports([ts.createImportSpecifier(undefined,
-      ts.createIdentifier(symbolName))]);
-    const importClause = ts.createImportClause(undefined, namedImports);
-    const newImport = ts.createImportDeclaration(undefined, undefined, importClause,
-      ts.createLiteral(modulePath));
+    const namedImports = ts.factory.createNamedImports([ts.factory.createImportSpecifier(undefined,
+      ts.factory.createIdentifier(symbolName))]);
+    const importClause = ts.factory.createImportClause(false, undefined, namedImports);
+    const newImport = ts.factory.createImportDeclaration(undefined, undefined, importClause,
+      ts.factory.createStringLiteral(modulePath));
 
     if (allImports.length > 0) {
       // Find the last import and insert after.

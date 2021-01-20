@@ -74,8 +74,8 @@ export function replaceBootstrap(
 
       const platformBrowserDynamicIdentifier = innerCallExpr.expression as ts.Identifier;
 
-      const idPlatformBrowser = ts.createUniqueName('__NgCli_bootstrap_');
-      const idNgFactory = ts.createUniqueName('__NgCli_bootstrap_');
+      const idPlatformBrowser = ts.factory.createUniqueName('__NgCli_bootstrap_');
+      const idNgFactory = ts.factory.createUniqueName('__NgCli_bootstrap_');
 
       // Add the transform operations.
       const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
@@ -93,13 +93,13 @@ export function replaceBootstrap(
         // Replace the entry module import.
         ...insertStarImport(sourceFile, idNgFactory, modulePath),
         new ReplaceNodeOperation(sourceFile, entryModuleIdentifier,
-          ts.createPropertyAccess(idNgFactory, ts.createIdentifier(className))),
+          ts.factory.createPropertyAccessExpression(idNgFactory, ts.factory.createIdentifier(className))),
         // Replace the platformBrowserDynamic import.
         ...insertStarImport(sourceFile, idPlatformBrowser, '@angular/platform-browser'),
         new ReplaceNodeOperation(sourceFile, platformBrowserDynamicIdentifier,
-          ts.createPropertyAccess(idPlatformBrowser, 'platformBrowser')),
+          ts.factory.createPropertyAccessExpression(idPlatformBrowser, 'platformBrowser')),
         new ReplaceNodeOperation(sourceFile, bootstrapModuleIdentifier,
-          ts.createIdentifier(bootstrapIdentifier)),
+          ts.factory.createIdentifier(bootstrapIdentifier)),
       );
     });
 
