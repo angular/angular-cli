@@ -79,21 +79,21 @@ export function replaceServerBootstrap(
 
           const platformDynamicServerIdentifier = innerCallExpr.expression as ts.Identifier;
 
-          const idPlatformServer = ts.createUniqueName('__NgCli_bootstrap_');
-          const idNgFactory = ts.createUniqueName('__NgCli_bootstrap_');
+          const idPlatformServer = ts.factory.createUniqueName('__NgCli_bootstrap_');
+          const idNgFactory = ts.factory.createUniqueName('__NgCli_bootstrap_');
 
           // Add the transform operations.
           ops.push(
             // Replace the entry module import.
             ...insertStarImport(sourceFile, idNgFactory, factoryModulePath),
             new ReplaceNodeOperation(sourceFile, entryModuleIdentifier,
-              ts.createPropertyAccess(idNgFactory, ts.createIdentifier(factoryClassName))),
+              ts.factory.createPropertyAccessExpression(idNgFactory, ts.factory.createIdentifier(factoryClassName))),
             // Replace the platformBrowserDynamic import.
             ...insertStarImport(sourceFile, idPlatformServer, '@angular/platform-server'),
             new ReplaceNodeOperation(sourceFile, platformDynamicServerIdentifier,
-              ts.createPropertyAccess(idPlatformServer, 'platformServer')),
+              ts.factory.createPropertyAccessExpression(idPlatformServer, 'platformServer')),
             new ReplaceNodeOperation(sourceFile, bootstrapModuleIdentifier,
-              ts.createIdentifier('bootstrapModuleFactory')),
+              ts.factory.createIdentifier('bootstrapModuleFactory')),
           );
         } else if (callExpr.expression.kind === ts.SyntaxKind.Identifier) {
           // Figure out if it is renderModule
@@ -106,30 +106,30 @@ export function replaceServerBootstrap(
 
           const renderModuleIdentifier = identifierExpr as ts.Identifier;
 
-          const idPlatformServer = ts.createUniqueName('__NgCli_bootstrap_');
-          const idNgFactory = ts.createUniqueName('__NgCli_bootstrap_');
+          const idPlatformServer = ts.factory.createUniqueName('__NgCli_bootstrap_');
+          const idNgFactory = ts.factory.createUniqueName('__NgCli_bootstrap_');
 
           ops.push(
             // Replace the entry module import.
             ...insertStarImport(sourceFile, idNgFactory, factoryModulePath),
             new ReplaceNodeOperation(sourceFile, entryModuleIdentifier,
-              ts.createPropertyAccess(idNgFactory, ts.createIdentifier(factoryClassName))),
+              ts.factory.createPropertyAccessExpression(idNgFactory, ts.factory.createIdentifier(factoryClassName))),
             // Replace the renderModule import.
             ...insertStarImport(sourceFile, idPlatformServer, '@angular/platform-server'),
             new ReplaceNodeOperation(sourceFile, renderModuleIdentifier,
-              ts.createPropertyAccess(idPlatformServer, 'renderModuleFactory')),
+              ts.factory.createPropertyAccessExpression(idPlatformServer, 'renderModuleFactory')),
           );
         }
       } else if (entryModuleIdentifier.parent.kind === ts.SyntaxKind.PropertyAssignment) {
         // This is for things that accept a module as a property in a config object
         // .ie the express engine
 
-        const idNgFactory = ts.createUniqueName('__NgCli_bootstrap_');
+        const idNgFactory = ts.factory.createUniqueName('__NgCli_bootstrap_');
 
         ops.push(
           ...insertStarImport(sourceFile, idNgFactory, factoryModulePath),
           new ReplaceNodeOperation(sourceFile, entryModuleIdentifier,
-            ts.createPropertyAccess(idNgFactory, ts.createIdentifier(factoryClassName))),
+            ts.factory.createPropertyAccessExpression(idNgFactory, ts.factory.createIdentifier(factoryClassName))),
         );
       }
     });

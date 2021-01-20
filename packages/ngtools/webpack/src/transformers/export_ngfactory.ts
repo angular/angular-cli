@@ -58,10 +58,10 @@ export function exportNgFactory(
       const factoryClassName = entryModule.className + 'NgFactory';
       const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
 
-      const namedExports = ts.createNamedExports([ts.createExportSpecifier(undefined,
-        ts.createIdentifier(factoryClassName))]);
-      const newImport = ts.createExportDeclaration(undefined, undefined, namedExports,
-        ts.createLiteral(factoryModulePath));
+      const namedExports = ts.factory.createNamedExports([ts.factory.createExportSpecifier(undefined,
+        ts.factory.createIdentifier(factoryClassName))]);
+      const newImport = ts.factory.createExportDeclaration(undefined, undefined, false, namedExports,
+        ts.factory.createStringLiteral(factoryModulePath));
 
       const firstNode = getFirstNode(sourceFile);
       if (firstNode) {
