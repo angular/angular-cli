@@ -358,7 +358,7 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
 
   const cli = config.get(['cli']);
 
-  if (!json.isJsonObject(cli as json.JsonValue)) {
+  if (cli !== undefined && !json.isJsonObject(cli as json.JsonValue)) {
     throw new Error(`Invalid config found at ${configPath}. CLI should be an object.`);
   }
 
