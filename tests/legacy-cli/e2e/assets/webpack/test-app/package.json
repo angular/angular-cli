@@ -2,26 +2,25 @@
   "name": "test",
   "license": "MIT",
   "dependencies": {
-    "@angular/common": "9.0.0",
-    "@angular/compiler": "9.0.0",
-    "@angular/compiler-cli": "9.0.0",
-    "@angular/core": "9.0.0",
-    "@angular/platform-browser": "9.0.0",
-    "@angular/platform-browser-dynamic": "9.0.0",
-    "@angular/platform-server": "9.0.0",
-    "@angular/router": "9.0.0",
+    "@angular/common": "11.0.0",
+    "@angular/compiler": "11.0.0",
+    "@angular/compiler-cli": "11.0.0",
+    "@angular/core": "11.0.0",
+    "@angular/platform-browser": "11.0.0",
+    "@angular/platform-browser-dynamic": "11.0.0",
+    "@angular/platform-server": "11.0.0",
+    "@angular/router": "11.0.0",
     "@ngtools/webpack": "0.0.0",
     "core-js": "^3.0.0",
     "rxjs": "^6.4.0",
     "zone.js": "^0.9.1"
   },
   "devDependencies": {
-    "node-sass": "^4.7.0",
-    "performance-now": "^0.2.0",
-    "raw-loader": "^0.5.1",
-    "sass-loader": "^6.0.0",
-    "typescript": "~3.6.4",
-    "webpack": "~4.0.1",
-    "webpack-cli": "~2.0.9"
+    "raw-loader": "^4.0.2",
+    "sass": "^1.32.5",
+    "sass-loader": "^10.1.1",
+    "typescript": "~4.0.1",
+    "webpack": "^4.0.1",
+    "webpack-cli": "^4.4.0"
   }
 }

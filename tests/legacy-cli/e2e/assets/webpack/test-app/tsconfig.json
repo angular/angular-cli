@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "",
-    "module": "es2015",
+    "module": "es2020",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es2015",
     "noImplicitAny": false,
     "sourceMap": true,
     "mapRoot": "",
