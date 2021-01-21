@@ -24,7 +24,7 @@ export default async function (skipCleaning: () => void) {
   // Note: these sizes are without Build Optimizer or any advanced optimizations in the CLI.
   await expectFileSizeToBeUnder('dist/app.main.js', (isVe ? 483 : 565) * 1024);
   await expectFileSizeToBeUnder('dist/0.app.main.js', 1 * 1024);
-  await expectFileSizeToBeUnder('dist/1.app.main.js', 2 * 1024);
+  await expectFileSizeToBeUnder('dist/2.app.main.js', 2 * 1024);
 
   // test resource urls without ./
   await replaceInFile('app/app.component.ts', './app.component.html', 'app.component.html');
