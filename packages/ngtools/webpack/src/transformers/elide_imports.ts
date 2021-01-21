@@ -118,6 +118,11 @@ export function elideImports(
   }
 
   const isUnused = (node: ts.Identifier) => {
+    // Do not remove JSX factory imports
+    if (node.text === compilerOptions.jsxFactory) {
+      return false;
+    }
+
     const symbol = typeChecker.getSymbolAtLocation(node);
 
     return symbol && !usedSymbols.has(symbol);

@@ -14,7 +14,7 @@ import { WebpackCompilerHost } from '../compiler_host';
 
 // Test transform helpers.
 const basePath = '/project/src/';
-const fileName = basePath + 'test-file.ts';
+const basefileName = basePath + 'test-file.ts';
 const typeScriptLibFiles = loadTypeScriptLibFiles();
 const tsLibFiles = loadTsLibFiles();
 
@@ -23,7 +23,9 @@ export function createTypescriptContext(
   additionalFiles?: Record<string, string>,
   useLibs = false,
   extraCompilerOptions: ts.CompilerOptions = {},
+  jsxFile = false,
 ) {
+  const fileName = basefileName + (jsxFile ? 'x' : '');
   // Set compiler options.
   const compilerOptions: ts.CompilerOptions = {
     noEmitOnError: useLibs,
@@ -107,7 +109,7 @@ export function transformTypescript(
   }
 
   // Return the transpiled js.
-  return compilerHost.readFile(fileName.replace(/\.tsx?$/, '.js'));
+  return compilerHost.readFile(basefileName.replace(/\.tsx?$/, '.js'));
 }
 
 function loadTypeScriptLibFiles(): Record<string, string> {
