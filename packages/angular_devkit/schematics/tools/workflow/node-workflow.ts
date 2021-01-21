@@ -25,6 +25,7 @@ export interface NodeWorkflowOptions {
   resolvePaths?: string[];
   schemaValidation?: boolean;
   optionTransforms?: OptionTransform<object, object>[];
+  engineHostCreator?: (options: NodeWorkflowOptions) => NodeModulesEngineHost;
 }
 
 /**
@@ -46,7 +47,8 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       root = options.root;
     }
 
-    const engineHost = new NodeModulesEngineHost(options.resolvePaths);
+    const engineHost =
+      options.engineHostCreator?.(options) || new NodeModulesEngineHost(options.resolvePaths);
     super({
       host,
       engineHost,
