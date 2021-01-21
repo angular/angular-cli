@@ -50,6 +50,9 @@ describe('@ngtools/webpack transformers', () => {
           [propName: string]: unknown;
         }
       `,
+      'jsx.ts': `
+        export function createElement() {}
+      `,
     };
 
     it('should remove unused imports', () => {
@@ -346,6 +349,47 @@ describe('@ngtools/webpack transformers', () => {
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
+    });
+
+    it('keeps jsxFactory imports when configured', () => {
+      const extraCompilerOptions: ts.CompilerOptions = {
+        jsxFactory: 'createElement',
+        experimentalDecorators: true,
+        jsx: ts.JsxEmit.React,
+      };
+
+      const input = tags.stripIndent`
+        import { Decorator } from './decorator';
+        import { Service } from './service';
+        import { createElement } from './jsx';
+
+        const test = <p>123</p>;
+
+        @Decorator()
+        export class Foo {
+          constructor(param: Service) {
+          }
+        }
+
+        ${dummyNode}
+      `;
+
+      const output = tags.stripIndent`
+        import { __decorate } from "tslib";
+        import { Decorator } from './decorator';
+        import { createElement } from './jsx';
+
+        const test = createElement("p", null, "123");
+
+        let Foo = class Foo { constructor(param) { } };
+        Foo = __decorate([ Decorator() ], Foo);
+        export { Foo };
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions, true);
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
     describe('should not elide imports decorator type references when emitDecoratorMetadata is true', () => {
