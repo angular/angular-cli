@@ -134,6 +134,7 @@ export declare class NodeWorkflow extends workflow.BaseWorkflow {
 
 export interface NodeWorkflowOptions {
     dryRun?: boolean;
+    engineHostCreator?: (options: NodeWorkflowOptions) => NodeModulesEngineHost;
     force?: boolean;
     optionTransforms?: OptionTransform<object, object>[];
     packageManager?: string;
