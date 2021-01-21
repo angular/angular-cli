@@ -93,6 +93,7 @@ export class ScriptsWebpackPlugin {
     }
 
     compilation.assets[filename] = source;
+    compilation.hooks.chunkAsset.call(chunk, filename);
   }
 
   apply(compiler: Compiler): void {
