@@ -143,7 +143,7 @@ function readOptions(
             if (typeof value === 'string') {
               const cafile = path.resolve(path.dirname(location), value);
               try {
-                options['ca'] = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
+                options['ca'] = readFileSync(cafile, 'utf8').replace(/\r?\n/g, '\n');
               } catch { }
             }
             break;
