@@ -78,6 +78,7 @@ export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
     providers: [...(options.providers || []), getReqResProviders(options.request.origin, options.request.data.request)],
     bootstrap: options.ngModule,
     inlineCriticalCss: options.inlineCriticalCss,
+    publicPath: options.publicPath,
   };
 
 
