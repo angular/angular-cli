@@ -210,6 +210,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       {
         loader: require.resolve('postcss-loader'),
         options: {
+          implementation: require('postcss'),
           postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
         },
       },
@@ -242,6 +243,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             {
               loader: require.resolve('postcss-loader'),
               options: {
+                implementation: require('postcss'),
                 postcssOptions: postcssOptionsCreator(globalSourceMap, buildOptions.extractCss),
               },
             },
