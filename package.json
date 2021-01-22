@@ -156,6 +156,7 @@
     "git-raw-commits": "^2.0.0",
     "glob": "7.1.6",
     "http-proxy": "^1.18.1",
+    "https-proxy-agent": "5.0.0",
     "husky": "5.0.6",
     "inquirer": "7.3.3",
     "jasmine": "^3.3.1",
