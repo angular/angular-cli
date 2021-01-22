@@ -95,7 +95,7 @@
               ]
             },
             "fonts": {
-              "description": "Enables optimization for fonts. This requires internet access.",
+              "description": "Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY` environment variable can be used to specify a proxy server.",
               "default": true,
               "oneOf": [
                 {
@@ -103,7 +103,7 @@
                   "properties": {
                     "inline": {
                       "type": "boolean",
-                      "description": "Reduce render blocking requests by inlining external Google fonts and icons CSS definitions in the application's HTML index file. This requires internet access.",
+                      "description": "Reduce render blocking requests by inlining external Google fonts and icons CSS definitions in the application's HTML index file. This option requires internet access. `HTTPS_PROXY` environment variable can be used to specify a proxy server.",
                       "default": true
                     }
                   },

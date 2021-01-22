@@ -153,6 +153,7 @@ ts_library(
         "@npm//file-loader",
         "@npm//find-cache-dir",
         "@npm//glob",
+        "@npm//https-proxy-agent",
         "@npm//inquirer",
         "@npm//jest-worker",
         "@npm//karma",
