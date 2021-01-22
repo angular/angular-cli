@@ -8,6 +8,7 @@
 
 import * as cacache from 'cacache';
 import * as https from 'https';
+import * as proxyAgent from 'https-proxy-agent';
 import { URL } from 'url';
 import { findCachePath } from '../cache-path';
 import { cachingDisabled } from '../environment-options';
@@ -100,11 +101,20 @@ export class InlineFontsProcessor {
       }
     }
 
+    let agent: proxyAgent.HttpsProxyAgent | undefined;
+    const httpsProxy = process.env.HTTPS_PROXY ?? process.env.https_proxy;
+
+    if (httpsProxy) {
+      agent = proxyAgent(httpsProxy);
+    }
+
     const data = await new Promise<string>((resolve, reject) => {
       let rawResponse = '';
       https.get(
         url,
         {
+          agent,
+          rejectUnauthorized: false,
           headers: {
             'user-agent': userAgent,
           },
