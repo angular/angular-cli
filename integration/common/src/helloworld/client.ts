@@ -8,7 +8,6 @@
 
 import 'zone.js/dist/zone.js';
 
-import {enableProdMode} from '@angular/core';
 import {platformBrowser} from '@angular/platform-browser';
 import {HelloWorldModuleNgFactory} from './app.ngfactory';
 

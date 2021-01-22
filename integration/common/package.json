@@ -17,7 +17,6 @@
     "@angular/platform-browser-dynamic": "file:../../node_modules/@angular/platform-browser-dynamic",
     "@angular/platform-server": "file:../../node_modules/@angular/platform-server",
     "@nguniversal/common": "file:../../dist/modules-dist/common",
-    "@nguniversal/express-engine": "file:../../dist/modules-dist/express-engine",
     "express": "file:../../node_modules/express",
     "rxjs": "file:../../node_modules/rxjs",
     "typescript": "file:../../node_modules/typescript",
