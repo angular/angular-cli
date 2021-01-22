@@ -126,6 +126,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         {
           loader: require.resolve('less-loader'),
           options: {
+            implementation: require('less'),
             sourceMap: cssSourceMap,
             lessOptions: {
               javascriptEnabled: true,
