@@ -1,7 +1,7 @@
 {
   "name": "nguniversal",
   "main": "index.js",
-  "version": "11.1.0",
+  "version": "11.2.0-next.0",
   "private": true,
   "description": "Universal (isomorphic) JavaScript support for Angular",
   "homepage": "https://github.com/angular/universal",
@@ -53,6 +53,7 @@
     "@angular/compiler": "^11.1.0",
     "@angular/compiler-cli": "^11.1.0",
     "@angular/core": "^11.1.0",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#6fe5d83c0e7c7ce92c3541d0100759ee3e649ffa",
     "@angular/platform-browser": "^11.1.0",
     "@angular/platform-browser-dynamic": "^11.1.0",
     "@angular/platform-server": "^11.1.0",
