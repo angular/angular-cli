@@ -171,7 +171,7 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.0",
-    "less-loader": "7.2.1",
+    "less-loader": "7.3.0",
     "license-checker": "^25.0.0",
     "license-checker-webpack-plugin": "0.2.1",
     "loader-utils": "2.0.0",
