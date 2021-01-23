@@ -27,12 +27,13 @@ export async function installWorkspacePackages(updateWebdriver = true): Promise<
   }
 }
 
-export async function installPackage(specifier: string): Promise<ProcessOutput> {
+export async function installPackage(specifier: string, registry?: string): Promise<ProcessOutput> {
+  const registryOption = registry ? [`--registry=${registry}`] : [];
   switch (getActivePackageManager()) {
     case 'npm':
-      return silentNpm('install', specifier);
+      return silentNpm('install', specifier, ...registryOption);
     case 'yarn':
-      return silentYarn('add', specifier);
+      return silentYarn('add', specifier, ...registryOption);
   }
 }
 
