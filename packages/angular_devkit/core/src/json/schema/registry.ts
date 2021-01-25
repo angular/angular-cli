@@ -239,6 +239,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    *
    * @param schema The schema or URI to flatten.
    * @returns An Observable of the flattened schema object.
+   * @deprecated since 11.2 without replacement.
+   * Producing a flatten schema document does not in all cases produce a schema with identical behavior to the original.
+   * See: https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.appendix.B.2
    */
   flatten(schema: JsonObject): Observable<JsonObject> {
     this._ajv.removeSchema(schema);

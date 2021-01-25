@@ -113,6 +113,11 @@ export type PromptProvider = (definitions: Array<PromptDefinition>)
 
 export interface SchemaRegistry {
   compile(schema: Object): Observable<SchemaValidator>;
+  /**
+   * @deprecated since 11.2 without replacement.
+   * Producing a flatten schema document does not in all cases produce a schema with identical behavior to the original.
+   * See: https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.appendix.B.2
+   */
   flatten(schema: JsonObject | string): Observable<JsonObject>;
   addFormat(format: SchemaFormat): void;
   addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
