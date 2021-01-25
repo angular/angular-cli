@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { basename } from 'path';
 import * as webpack from 'webpack';
 import { Budget, Type } from '../browser/schema';
 import { ProcessBundleFile, ProcessBundleResult } from '../utils/process-bundle';
@@ -181,6 +182,18 @@ abstract class Calculator {
           .reduce((l, r) => l + r, 0);
     }
   }
+
+  protected getAssetSize(asset: Asset): number {
+    if (asset.name.endsWith('.js')) {
+      const processResult = this.processResults
+        .find((processResult) => processResult.original && basename(processResult.original.filename) === asset.name);
+      if (processResult?.original) {
+        return processResult.original.size;
+      }
+    }
+
+    return asset.size;
+  }
 }
 
 /**
@@ -246,7 +259,7 @@ class AllScriptCalculator extends Calculator {
   calculate() {
     const size = this.assets
       .filter(asset => asset.name.endsWith('.js'))
-      .map(asset => asset.size)
+      .map(asset => this.getAssetSize(asset))
       .reduce((total: number, size: number) => total + size, 0);
 
     return [{size, label: 'total scripts'}];
@@ -260,7 +273,7 @@ class AllCalculator extends Calculator {
   calculate() {
     const size = this.assets
       .filter(asset => !asset.name.endsWith('.map'))
-      .map(asset => asset.size)
+      .map(asset => this.getAssetSize(asset))
       .reduce((total: number, size: number) => total + size, 0);
 
     return [{size, label: 'total'}];
@@ -275,7 +288,7 @@ class AnyScriptCalculator extends Calculator {
     return this.assets
       .filter(asset => asset.name.endsWith('.js'))
       .map(asset => ({
-        size: asset.size,
+        size: this.getAssetSize(asset),
         label: asset.name,
       }));
   }
@@ -289,7 +302,7 @@ class AnyCalculator extends Calculator {
     return this.assets
       .filter(asset => !asset.name.endsWith('.map'))
       .map(asset => ({
-        size: asset.size,
+        size: this.getAssetSize(asset),
         label: asset.name,
       }));
   }

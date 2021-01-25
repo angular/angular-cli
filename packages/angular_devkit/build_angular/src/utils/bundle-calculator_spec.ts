@@ -464,5 +464,169 @@ describe('bundle-calculator', () => {
         message: jasmine.stringMatching('foo.ext exceeded maximum budget.'),
       });
     });
+
+    it('does *not* yield a combined differential bundle budget for any script', () => {
+      const budgets: Budget[] = [{
+        type: Type.AnyScript,
+        maximumError: '1kb',
+      }];
+      const stats = {
+        chunks: [
+          {
+            initial: true,
+            files: [ 'foo.js' ],
+          },
+        ],
+        assets: [
+          {
+            name: 'main-es2015.js',
+            size: 1.25 * KB,
+          },
+        ],
+      } as unknown as webpack.Stats.ToJsonOutput;
+      const processResults: ProcessBundleResult[] = [
+        {
+          name: '0',
+          // Individual builds are under budget, but combined they are over.
+          original: {
+            filename: '/home/main-es2015.js',
+            size: 0.5 * KB,
+          },
+          downlevel: {
+            filename: '/home/main-es5.js',
+            size: 0.75 * KB,
+          },
+        },
+      ];
+
+      const failures = Array.from(checkBudgets(budgets, stats, processResults));
+
+      // Because individual builds are under budget, they are acceptable. Should
+      // **not** yield a combined build which is over budget.
+      expect(failures.length).toBe(0);
+    });
+
+    it('does *not* yield a combined differential bundle budget for all script', () => {
+      const budgets: Budget[] = [{
+        type: Type.AllScript,
+        maximumError: '1kb',
+      }];
+      const stats = {
+        chunks: [
+          {
+            initial: true,
+            files: [ 'foo.js' ],
+          },
+        ],
+        assets: [
+          {
+            name: 'main-es2015.js',
+            size: 1.25 * KB,
+          },
+        ],
+      } as unknown as webpack.Stats.ToJsonOutput;
+      const processResults: ProcessBundleResult[] = [
+        {
+          name: '0',
+          // Individual builds are under budget, but combined they are over.
+          original: {
+            filename: '/home/main-es2015.js',
+            size: 0.5 * KB,
+          },
+          downlevel: {
+            filename: '/home/main-es5.js',
+            size: 0.75 * KB,
+          },
+        },
+      ];
+
+      const failures = Array.from(checkBudgets(budgets, stats, processResults));
+
+      // Because individual builds are under budget, they are acceptable. Should
+      // **not** yield a combined build which is over budget.
+      expect(failures.length).toBe(0);
+    });
+
+    it('does *not* yield a combined differential bundle budget for total budget', () => {
+      const budgets: Budget[] = [{
+        type: Type.All,
+        maximumError: '1kb',
+      }];
+      const stats = {
+        chunks: [
+          {
+            initial: true,
+            files: [ 'foo.js' ],
+          },
+        ],
+        assets: [
+          {
+            name: 'main-es2015.js',
+            size: 1.25 * KB,
+          },
+        ],
+      } as unknown as webpack.Stats.ToJsonOutput;
+      const processResults: ProcessBundleResult[] = [
+        {
+          name: '0',
+          // Individual builds are under budget, but combined they are over.
+          original: {
+            filename: '/home/main-es2015.js',
+            size: 0.5 * KB,
+          },
+          downlevel: {
+            filename: '/home/main-es5.js',
+            size: 0.75 * KB,
+          },
+        },
+      ];
+
+      const failures = Array.from(checkBudgets(budgets, stats, processResults));
+
+      // Because individual builds are under budget, they are acceptable. Should
+      // **not** yield a combined build which is over budget.
+      expect(failures.length).toBe(0);
+    });
+
+    it('does *not* yield a combined differential bundle budget for individual file budget', () => {
+      const budgets: Budget[] = [{
+        type: Type.Any,
+        maximumError: '1kb',
+      }];
+      const stats = {
+        chunks: [
+          {
+            initial: true,
+            files: [ 'foo.js' ],
+          },
+        ],
+        assets: [
+          {
+            name: 'main-es2015.js',
+            size: 1.25 * KB,
+          },
+        ],
+      } as unknown as webpack.Stats.ToJsonOutput;
+      const processResults: ProcessBundleResult[] = [
+        {
+          name: '0',
+          // Individual builds are under budget, but combined they are over.
+          original: {
+            filename: '/home/main-es2015.js',
+            size: 0.5 * KB,
+          },
+          downlevel: {
+            filename: '/home/main-es5.js',
+            size: 0.75 * KB,
+          },
+        },
+      ];
+
+      const failures = Array.from(checkBudgets(budgets, stats, processResults));
+
+      // Because individual builds are under budget, they are acceptable. Should
+      // **not** yield a combined build which is over budget.
+      expect(failures.length).toBe(0);
+    });
   });
 });
