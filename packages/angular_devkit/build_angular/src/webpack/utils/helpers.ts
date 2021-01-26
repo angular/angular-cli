@@ -7,6 +7,7 @@
  */
 
 import { basename, normalize } from '@angular-devkit/core';
+import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import { Options, SourceMapDevToolPlugin } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../browser/schema';
@@ -122,5 +123,32 @@ export function getWatchOptions(poll: number | undefined): Options.WatchOptions 
   return {
     poll,
     ignored: poll === undefined ? undefined : withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
+  };
+}
+
+export function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string {
+  const visitedFiles = new Map<string, string>();
+
+  return (resourcePath: string) => {
+    if (hashFormat.file) {
+      // File names are hashed therefore we don't need to handle files with the same file name.
+      return `[name]${hashFormat.file}.[ext]`;
+    }
+
+    const filename = path.basename(resourcePath);
+    // Check if the file with the same name has already been processed.
+    const visited = visitedFiles.get(filename);
+    if (!visited) {
+      // Not visited.
+      visitedFiles.set(filename, resourcePath);
+
+      return filename;
+    } else if (visited === resourcePath) {
+      // Same file.
+      return filename;
+    }
+
+    // File has the same name but it's in a different location.
+    return '[path][name].[ext]';
   };
 }

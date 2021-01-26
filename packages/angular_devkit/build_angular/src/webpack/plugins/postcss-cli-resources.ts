@@ -31,7 +31,7 @@ export interface PostcssCliResourcesOptions {
   rebaseRootRelative?: boolean;
   /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
   extracted?: boolean;
-  filename: string;
+  filename: (resourcePath: string) => string;
   loader: webpack.loader.LoaderContext;
   emitFile: boolean;
 }
@@ -113,10 +113,11 @@ export default function(options?: PostcssCliResourcesOptions): Plugin {
         }
 
         let outputPath = interpolateName(
-          { resourcePath: result } as webpack.loader.LoaderContext,
-          filename,
-          { content },
-        );
+          {  resourcePath: result } as webpack.loader.LoaderContext,
+          filename(result),
+          { content, context: loader.context || loader.rootContext },
+        )
+        .replace(/\\|\//g, '-');
 
         if (resourcesOutputPath) {
           outputPath = path.posix.join(resourcesOutputPath, outputPath);
