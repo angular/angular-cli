@@ -79,6 +79,7 @@ ts_library(
         "@npm//@types/uuid",
         "@npm//ansi-colors",
         "@npm//jsonc-parser",
+        "@npm//ora",
     ],
 )
 

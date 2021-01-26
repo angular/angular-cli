@@ -22,6 +22,7 @@ import {
   fetchPackageManifest,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
+import { Spinner } from '../utilities/spinner';
 import { Schema as AddCommandSchema } from './add';
 
 const npa = require('npm-package-arg');
@@ -79,12 +80,18 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
+    const spinner = new Spinner();
+
+    spinner.start('Determining package manager...');
     const packageManager = await getPackageManager(this.context.root);
     const usingYarn = packageManager === PackageManager.Yarn;
+    spinner.info(`Using package manager: ${colors.grey(packageManager)}`);
 
     if (packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
       // only package name provided; search for viable version
       // plus special cases for packages that did not have peer deps setup
+      spinner.start('Searching for compatible package version...');
+
       let packageMetadata;
       try {
         packageMetadata = await fetchPackageMetadata(packageIdentifier.name, this.logger, {
@@ -93,7 +100,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           verbose: options.verbose,
         });
       } catch (e) {
-        this.logger.error('Unable to fetch package metadata: ' + e.message);
+        spinner.fail('Unable to load package information from registry: ' + e.message);
 
         return 1;
       }
@@ -111,7 +118,10 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           ) {
             packageIdentifier = npa.resolve('@angular/pwa', '0.12');
           }
+        } else {
+          packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
         }
+        spinner.succeed(`Found compatible package version: ${colors.grey(packageIdentifier)}.`);
       } else if (!latestManifest || (await this.hasMismatchedPeer(latestManifest))) {
         // 'latest' is invalid so search for most recent matching package
         const versionManifests = Object.values(packageMetadata.versions).filter(
@@ -129,10 +139,14 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         }
 
         if (!newIdentifier) {
-          this.logger.warn("Unable to find compatible package.  Using 'latest'.");
+          spinner.warn("Unable to find compatible package.  Using 'latest'.");
         } else {
           packageIdentifier = newIdentifier;
+          spinner.succeed(`Found compatible package version: ${colors.grey(packageIdentifier)}.`);
         }
+      } else {
+        packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
+        spinner.succeed(`Found compatible package version: ${colors.grey(packageIdentifier)}.`);
       }
     }
 
@@ -140,6 +154,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     let savePackage: NgAddSaveDepedency | undefined;
 
     try {
+      spinner.start('Loading package information from registry...');
       const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
         registry: options.registry,
         verbose: options.verbose,
@@ -150,41 +165,51 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       collectionName = manifest.name;
 
       if (await this.hasMismatchedPeer(manifest)) {
-        this.logger.warn(
+        spinner.warn(
           'Package has unmet peer dependencies. Adding the package may not succeed.',
         );
+      } else {
+        spinner.succeed(`Package information loaded.`);
       }
     } catch (e) {
-      this.logger.error('Unable to fetch package manifest: ' + e.message);
+      spinner.fail(`Unable to fetch package information for '${packageIdentifier}': ${e.message}`);
 
       return 1;
     }
 
-    if (savePackage === false) {
-      // Temporary packages are located in a different directory
-      // Hence we need to resolve them using the temp path
-      const tempPath = installTempPackage(
-        packageIdentifier.raw,
-        this.logger,
-        packageManager,
-        options.registry ? [`--registry="${options.registry}"`] : undefined,
-      );
-      const resolvedCollectionPath = require.resolve(
-        join(collectionName, 'package.json'),
-        {
-          paths: [tempPath],
-        },
-      );
+    try {
+      spinner.start('Installing package...');
+      if (savePackage === false) {
+        // Temporary packages are located in a different directory
+        // Hence we need to resolve them using the temp path
+        const tempPath = installTempPackage(
+          packageIdentifier.raw,
+          undefined,
+          packageManager,
+          options.registry ? [`--registry="${options.registry}"`] : undefined,
+        );
+        const resolvedCollectionPath = require.resolve(
+          join(collectionName, 'package.json'),
+          {
+            paths: [tempPath],
+          },
+        );
 
-      collectionName = dirname(resolvedCollectionPath);
-    } else {
-      installPackage(
-        packageIdentifier.raw,
-        this.logger,
-        packageManager,
-        savePackage,
-        options.registry ? [`--registry="${options.registry}"`] : undefined,
-      );
+        collectionName = dirname(resolvedCollectionPath);
+      } else {
+        installPackage(
+          packageIdentifier.raw,
+          undefined,
+          packageManager,
+          savePackage,
+          options.registry ? [`--registry="${options.registry}"`] : undefined,
+        );
+      }
+      spinner.succeed('Package successfully installed.');
+    } catch (error) {
+      spinner.fail(`Package installation failed: ${error.message}`);
+
+      return 1;
     }
 
     return this.executeSchematic(collectionName, options['--']);
