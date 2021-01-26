@@ -17,7 +17,7 @@ import {
   RemoveHashPlugin,
   SuppressExtractedTextChunksWebpackPlugin,
 } from '../plugins';
-import { getOutputHashFormat, normalizeExtraEntryPoints } from '../utils/helpers';
+import { assetNameTemplateFactory, getOutputHashFormat, normalizeExtraEntryPoints } from '../utils/helpers';
 
 // tslint:disable-next-line:no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions) {
@@ -154,6 +154,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     },
   ];
 
+  const assetNameTemplate = assetNameTemplateFactory(hashFormat);
+
   const postcssOptionsCreator = (sourceMap: boolean, extracted: boolean | undefined) => {
     return (loader: webpack.loader.LoaderContext) => ({
       map: sourceMap && {
@@ -183,7 +185,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           deployUrl: buildOptions.deployUrl,
           resourcesOutputPath: buildOptions.resourcesOutputPath,
           loader,
-          filename: `[name]${hashFormat.file}.[ext]`,
+          filename: assetNameTemplate,
           emitFile: buildOptions.platform !== 'server',
           extracted,
         }),
