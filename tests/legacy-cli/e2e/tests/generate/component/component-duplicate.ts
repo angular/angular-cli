@@ -1,6 +1,7 @@
+import { oneLine } from 'common-tags';
+import { appendToFile } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
-import { oneLine } from 'common-tags';
 
 export default function () {
   return ng('generate', 'component', 'test-component')
@@ -12,5 +13,6 @@ export default function () {
           in ${output.stdout}.`);
       }
     })
+    .then(() => appendToFile('src/app/test-component/test-component.component.ts', '\n// new content'))
     .then(() => expectToFail(() => ng('generate', 'component', 'test-component')));
 }
