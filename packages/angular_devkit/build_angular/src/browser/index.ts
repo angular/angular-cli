@@ -279,8 +279,11 @@ export function buildWebpackBrowser(
             }
 
             // Fix incorrectly set `initial` value on chunks.
-            const extraEntryPoints = normalizeExtraEntryPoints(options.styles || [], 'styles')
-              .concat(normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
+            const extraEntryPoints = [
+              ...normalizeExtraEntryPoints(options.styles || [], 'styles'),
+              ...normalizeExtraEntryPoints(options.scripts || [], 'scripts'),
+            ];
+
             const webpackStats = {
               ...webpackRawStats,
               chunks: markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),

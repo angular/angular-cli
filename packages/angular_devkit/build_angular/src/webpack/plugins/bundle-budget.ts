@@ -10,9 +10,12 @@ import { Budget } from '../../browser/schema';
 import { ThresholdSeverity, checkBudgets } from '../../utils/bundle-calculator';
 import { ProcessBundleResult } from '../../utils/process-bundle';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
+import { markAsyncChunksNonInitial } from '../utils/async-chunks';
+import { NormalizedEntryPoint } from '../utils/helpers';
 
 export interface BundleBudgetPluginOptions {
   budgets: Budget[];
+  extraEntryPoints: NormalizedEntryPoint[];
 }
 
 export class BundleBudgetPlugin {
@@ -30,7 +33,10 @@ export class BundleBudgetPlugin {
       // builds are disabled.
       const processResults: ProcessBundleResult[] = [];
 
+      // Fix incorrectly set `initial` value on chunks.
       const stats = compilation.getStats().toJson();
+      stats.chunks = markAsyncChunksNonInitial(stats, this.options.extraEntryPoints);
+
       for (const { severity, message } of checkBudgets(budgets, stats, processResults)) {
         switch (severity) {
           case ThresholdSeverity.Warning:
