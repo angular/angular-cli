@@ -26,7 +26,7 @@ interface PackageManagerOptions {
 
 export function installPackage(
   packageName: string,
-  logger: logging.Logger,
+  logger: logging.Logger | undefined,
   packageManager: PackageManager = PackageManager.Npm,
   save: Exclude<NgAddSaveDepedency, false> = true,
   extraArgs: string[] = [],
@@ -40,7 +40,7 @@ export function installPackage(
     packageManagerArgs.silent,
   ];
 
-  logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
+  logger?.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
 
   if (save === 'devDependencies') {
     installArgs.push(packageManagerArgs.saveDev);
@@ -61,12 +61,12 @@ export function installPackage(
     throw new Error(errorMessage + `Package install failed${errorMessage ? ', see above' : ''}.`);
   }
 
-  logger.info(colors.green(`Installed packages for tooling via ${packageManager}.`));
+  logger?.info(colors.green(`Installed packages for tooling via ${packageManager}.`));
 }
 
 export function installTempPackage(
   packageName: string,
-  logger: logging.Logger,
+  logger: logging.Logger | undefined,
   packageManager: PackageManager = PackageManager.Npm,
   extraArgs?: string[],
 ): string {
