@@ -249,7 +249,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     return prev;
   }, []);
 
-    // Add a new asset for each entry.
+  // Add a new asset for each entry.
   for (const script of globalScriptsByBundleName) {
     // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
     const hash = script.inject ? hashFormat.script : '';
