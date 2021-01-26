@@ -56,7 +56,7 @@ export class HostDirEntry implements DirEntry {
     readonly path: Path,
     protected _host: virtualFs.SyncDelegateHost,
     protected _tree: Tree,
-  ) {}
+  ) { }
 
   get subdirs(): PathFragment[] {
     return this._host.list(this.path)
@@ -180,7 +180,7 @@ export class HostTree implements Tree {
         case 'c': {
           const { path, content } = action;
 
-          if ((this._willCreate(path) || this._willOverwrite(path))) {
+          if (this._willCreate(path) || this._willOverwrite(path) || this.exists(path)) {
             const existingContent = this.read(path);
             if (existingContent && content.equals(existingContent)) {
               // Identical outcome; no action required

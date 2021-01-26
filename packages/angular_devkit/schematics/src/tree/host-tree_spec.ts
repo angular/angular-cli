@@ -7,9 +7,47 @@
  */
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { FilterHostTree, HostTree } from './host-tree';
+import { MergeStrategy } from './interface';
 
 describe('HostTree', () => {
+  describe('merge', () => {
+    it('should create files from each tree', () => {
+      const tree = new HostTree();
+      tree.create('/file1', 'a');
+      const tree2 = new HostTree();
+      tree2.create('/file2', 'a');
+      tree.merge(tree2);
+      expect(tree.actions[0].kind).toEqual('c');
+      expect(tree.actions[1].kind).toEqual('c');
+    });
 
+    it('should overwrite if the file exists in one tree', () => {
+      const tree = new HostTree();
+      tree.create('/file1', 'a');
+      const tree2 = new HostTree();
+      tree2.create('/file1', 'b');
+      tree.merge(tree2, MergeStrategy.Overwrite);
+      expect(tree.actions[0].kind).toEqual('c');
+    });
+
+    it('should throw if the file exists in one tree with the correct MergeStrategy', () => {
+      const tree = new HostTree();
+      tree.create('/file1', 'a');
+      const tree2 = new HostTree();
+      tree2.create('/file1', 'b');
+      expect(() => tree.merge(tree2)).toThrow();
+    });
+
+    it('should not have a second action if the file content is the same', () => {
+      const tree = new HostTree();
+      tree.create('/file1', 'a');
+      const tree2 = new HostTree();
+      tree2.create('/file1', 'a');
+      tree.merge(tree2, MergeStrategy.Overwrite);
+      expect(tree.actions[0].kind).toEqual('c');
+      expect(tree.actions.length).toEqual(1);
+    });
+  });
 });
 
 describe('FilterHostTree', () => {
