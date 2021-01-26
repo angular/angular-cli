@@ -120,8 +120,7 @@ There are two different test suites which can be run locally:
   * Run a subset of the tests, use the full Bazel target example: `yarn bazel test //packages/schematics/angular:angular_test`
   * For a complete list of test targets use the following Bazel query: `yarn bazel query "tests(//packages/...)"`
 
-You can find more info about debugging [tests with Bazel in the docs.]
-(https://github.com/angular/angular-cli/blob/master/docs/process/bazel.md#debugging-jasmine_node_test)  
+You can find more info about debugging [tests with Bazel in the docs.](https://github.com/angular/angular-cli/blob/master/docs/process/bazel.md#debugging-jasmine_node_test)  
 
 ### End to end tests
   * Run: `node tests/legacy-cli/run_e2e.js`
