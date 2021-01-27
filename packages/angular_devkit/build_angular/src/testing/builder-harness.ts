@@ -312,6 +312,12 @@ export class BuilderHarness<T> {
     return this.host.scopedSync().exists(normalize(path));
   }
 
+  hasFileMatch(directory: string, pattern: RegExp): boolean {
+    return this.host.scopedSync()
+      .list(normalize(directory))
+      .some(name => pattern.test(name));
+  }
+
   readFile(path: string): string {
     const content = this.host.scopedSync().read(normalize(path));
 
