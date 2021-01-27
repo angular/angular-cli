@@ -23,8 +23,9 @@ import { ExecutionTransformer } from '../../transforms';
 import { normalizeOptimization } from '../../utils';
 import { checkPort } from '../../utils/check-port';
 import { colors } from '../../utils/color';
-import { I18nOptions } from '../../utils/i18n-options';
+import { I18nOptions, loadTranslations } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
+import { createTranslationLoader } from '../../utils/load-translations';
 import { NormalizedCachedOptions, normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { assertCompatibleAngularVersion } from '../../utils/version';
@@ -33,6 +34,7 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../../utils/webpack-browser-config';
+import { addError, addWarning } from '../../utils/webpack-diagnostics';
 import {
   getAnalyticsConfig,
   getCommonConfig,
@@ -192,7 +194,7 @@ export function serveWebpackBrowser(
         );
       }
 
-      await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions);
+      await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions, context);
     }
 
     if (transforms.webpackConfiguration) {
@@ -288,6 +290,7 @@ async function setupLocalize(
   browserOptions: BrowserBuilderSchema,
   webpackConfig: webpack.Configuration,
   cacheOptions: NormalizedCachedOptions,
+  context: BuilderContext,
 ) {
   const localeDescription = i18n.locales[locale];
 
@@ -320,6 +323,9 @@ async function setupLocalize(
     locale,
     missingTranslationBehavior,
     translation: i18n.shouldInline ? translation : undefined,
+    translationFiles: localeDescription?.files.map((file) =>
+      path.resolve(context.workspaceRoot, file.path),
+    ),
   };
 
   const i18nRule: webpack.RuleSetRule = {
@@ -351,6 +357,33 @@ async function setupLocalize(
   }
 
   rules.push(i18nRule);
+
+  // Add a plugin to reload translation files on rebuilds
+  const loader = await createTranslationLoader();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  webpackConfig.plugins!.push({
+    apply: (compiler: webpack.Compiler) => {
+      compiler.hooks.thisCompilation.tap('build-angular', (compilation) => {
+        if (i18n.shouldInline && i18nLoaderOptions.translation === undefined) {
+          // Reload translations
+          loadTranslations(locale, localeDescription, context.workspaceRoot, loader, {
+            warn(message) {
+              addWarning(compilation, message);
+            },
+            error(message) {
+              addError(compilation, message);
+            },
+          });
+          i18nLoaderOptions.translation = localeDescription.translation;
+        }
+
+        compilation.hooks.finishModules.tap('build-angular', () => {
+          // After loaders are finished, clear out the now unneeded translations
+          i18nLoaderOptions.translation = undefined;
+        });
+      });
+    },
+  });
 }
 
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);

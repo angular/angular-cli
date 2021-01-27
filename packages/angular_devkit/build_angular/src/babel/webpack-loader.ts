@@ -62,6 +62,7 @@ async function requiresLinking(path: string, source: string): Promise<boolean> {
   return needsLinking(path, source);
 }
 
+// eslint-disable-next-line max-lines-per-function
 export default custom<ApplicationPresetOptions>(() => {
   const baseOptions = Object.freeze({
     babelrc: false,
@@ -149,6 +150,18 @@ export default custom<ApplicationPresetOptions>(() => {
           ...(i18n as NonNullable<ApplicationPresetOptions['i18n']>),
           pluginCreators: i18nPluginCreators,
         };
+
+        // Add translation files as dependencies of the file to support rebuilds
+        // Except for `@angular/core` which needs locale injection but has no translations
+        if (
+          customOptions.i18n.translationFiles &&
+          !/[\\/]@angular[\\/]core/.test(this.resourcePath)
+        ) {
+          for (const file of customOptions.i18n.translationFiles) {
+            this.addDependency(file);
+          }
+        }
+
         shouldProcess = true;
       }
 
