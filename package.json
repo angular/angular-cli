@@ -149,7 +149,6 @@
     "enhanced-resolve": "5.7.0",
     "express": "4.17.1",
     "fast-json-stable-stringify": "2.1.0",
-    "file-loader": "6.2.0",
     "find-cache-dir": "3.3.1",
     "font-awesome": "^4.7.0",
     "gh-got": "^9.0.0",
