@@ -39,7 +39,6 @@ import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
 import { isWebpackFiveOrHigher, withWebpackFourOrFive } from '../../utils/webpack-version';
 import {
-  BundleBudgetPlugin,
   DedupeModuleResolvePlugin,
   NamedLazyChunksPlugin,
   OptimizeCssWebpackPlugin,
@@ -359,17 +358,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         (data: { chunkName?: string }) => (data.chunkName = '[request]'),
       ),
     );
-  }
-
-  if (buildOptions.budgets.length && !differentialLoadingMode) {
-    // Budgets are computed after differential builds, not via a plugin.
-    // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
-    const extraEntryPoints = [
-      ...normalizeExtraEntryPoints(buildOptions.styles || [], 'styles'),
-      ...normalizeExtraEntryPoints(buildOptions.scripts || [], 'scripts'),
-    ];
-
-    extraPlugins.push(new BundleBudgetPlugin({ budgets: buildOptions.budgets, extraEntryPoints }));
   }
 
   if ((scriptsSourceMap || stylesSourceMap)) {
