@@ -24,7 +24,7 @@ Angular has a dependency on the @bazel/bazelisk package which supplies it.
 Try running `yarn bazel` instead.
     (If you did run that, check that you've got a fresh `yarn install`)
 """,
-    minimum_bazel_version = "3.0.0",
+    minimum_bazel_version = "4.0.0",
 )
 
 # The NodeJS rules version must be at least the following version because:
@@ -75,9 +75,9 @@ install_bazel_dependencies(suppress_warning = True)
 # Bring in bazel_toolchains for RBE setup configuration.
 http_archive(
     name = "bazel_toolchains",
-    sha256 = "8c9728dc1bb3e8356b344088dfd10038984be74e1c8d6e92dbb05f21cabbb8e4",
-    strip_prefix = "bazel-toolchains-3.7.1",
-    url = "https://github.com/bazelbuild/bazel-toolchains/archive/3.7.1.tar.gz",
+    sha256 = "1adf5db506a7e3c465a26988514cfc3971af6d5b3c2218925cd6e71ee443fc3f",
+    strip_prefix = "bazel-toolchains-4.0.0",
+    url = "https://github.com/bazelbuild/bazel-toolchains/archive/4.0.0.tar.gz",
 )
 
 load("@bazel_toolchains//rules:environments.bzl", "clang_env")
