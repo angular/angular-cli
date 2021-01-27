@@ -78,25 +78,26 @@ export function replaceBootstrap(
     let bootstrapImport: ts.ImportDeclaration | undefined;
     let bootstrapNamespace: ts.Identifier | undefined;
     const replacedNodes: ts.Node[] = [];
+    const nodeFactory = context.factory;
 
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
         const target = node.expression;
         if (target.text === 'platformBrowserDynamic') {
           if (!bootstrapNamespace) {
-            bootstrapNamespace = ts.createUniqueName('__NgCli_bootstrap_');
-            bootstrapImport = ts.createImportDeclaration(
+            bootstrapNamespace = nodeFactory.createUniqueName('__NgCli_bootstrap_');
+            bootstrapImport = nodeFactory.createImportDeclaration(
               undefined,
               undefined,
-              ts.createImportClause(undefined, ts.createNamespaceImport(bootstrapNamespace)),
-              ts.createLiteral('@angular/platform-browser'),
+              nodeFactory.createImportClause(false, undefined, nodeFactory.createNamespaceImport(bootstrapNamespace)),
+              nodeFactory.createStringLiteral('@angular/platform-browser'),
             );
           }
           replacedNodes.push(target);
 
-          return ts.updateCall(
+          return nodeFactory.updateCallExpression(
             node,
-            ts.createPropertyAccess(bootstrapNamespace, 'platformBrowser'),
+            nodeFactory.createPropertyAccessExpression(bootstrapNamespace, 'platformBrowser'),
             node.typeArguments,
             node.arguments,
           );
@@ -126,10 +127,10 @@ export function replaceBootstrap(
         }
 
         // Add new platform browser import
-        return ts.updateSourceFileNode(
+        return nodeFactory.updateSourceFile(
           updatedSourceFile,
           ts.setTextRange(
-            ts.createNodeArray([bootstrapImport, ...updatedSourceFile.statements]),
+            nodeFactory.createNodeArray([bootstrapImport, ...updatedSourceFile.statements]),
             sourceFile.statements,
           ),
         );
