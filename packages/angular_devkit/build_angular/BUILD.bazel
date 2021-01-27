@@ -150,7 +150,6 @@ ts_library(
         "@npm//critters",
         "@npm//css-loader",
         "@npm//cssnano",
-        "@npm//file-loader",
         "@npm//find-cache-dir",
         "@npm//glob",
         "@npm//https-proxy-agent",

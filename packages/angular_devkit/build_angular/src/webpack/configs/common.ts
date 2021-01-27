@@ -522,15 +522,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       strictExportPresence: true,
       rules: [
         {
-          test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani|avif)$/,
-          loader: require.resolve('file-loader'),
-          options: {
-            name: `[name]${hashFormat.file}.[ext]`,
-            // Re-use emitted files from browser builder on the server.
-            emitFile: platform !== 'server',
-          },
-        },
-        {
           // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
           // Removing this will cause deprecation warnings to appear.
           test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
