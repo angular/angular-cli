@@ -15,25 +15,28 @@ import path from 'path';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
-import { createTranslationLoader } from './load-translations';
+import { TranslationLoader, createTranslationLoader } from './load-translations';
 
 /**
  * The base module location used to search for locale specific data.
  */
 const LOCALE_DATA_BASE_MODULE = '@angular/common/locales/global';
 
+export interface LocaleDescription {
+  files: {
+    path: string;
+    integrity?: string;
+    format?: string;
+  }[];
+  translation?: Record<string, unknown>;
+  dataPath?: string;
+  baseHref?: string;
+}
+
 export interface I18nOptions {
   inlineLocales: Set<string>;
   sourceLocale: string;
-  locales: Record<
-    string,
-    {
-      files: { path: string; integrity?: string; format?: string }[];
-      translation?: Record<string, unknown>;
-      dataPath?: string;
-      baseHref?: string;
-    }
-  >;
+  locales: Record<string, LocaleDescription>;
   flatOutput?: boolean;
   readonly shouldInline: boolean;
   hasDefinedSourceLocale?: boolean;
@@ -218,48 +221,27 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
       loader = await createTranslationLoader();
     }
 
-    for (const file of desc.files) {
-      const loadResult = loader(path.join(context.workspaceRoot, file.path));
+    loadTranslations(
+      locale,
+      desc,
+      context.workspaceRoot,
+      loader,
+      {
+        warn(message) {
+          context.logger.warn(message);
+        },
+        error(message) {
+          throw new Error(message);
+        },
+      },
+      usedFormats,
+    );
 
-      for (const diagnostics of loadResult.diagnostics.messages) {
-        if (diagnostics.type === 'error') {
-          throw new Error(`Error parsing translation file '${file.path}': ${diagnostics.message}`);
-        } else {
-          context.logger.warn(`WARNING [${file.path}]: ${diagnostics.message}`);
-        }
-      }
-
-      if (loadResult.locale !== undefined && loadResult.locale !== locale) {
-        context.logger.warn(
-          `WARNING [${file.path}]: File target locale ('${loadResult.locale}') does not match configured locale ('${locale}')`,
-        );
-      }
-
-      usedFormats.add(loadResult.format);
-      if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
-        // This limitation is only for legacy message id support (defaults to true as of 9.0)
-        throw new Error(
-          'Localization currently only supports using one type of translation file format for the entire application.',
-        );
-      }
-
-      file.format = loadResult.format;
-      file.integrity = loadResult.integrity;
-
-      if (desc.translation) {
-        // Merge translations
-        for (const [id, message] of Object.entries(loadResult.translations)) {
-          if (desc.translation[id] !== undefined) {
-            context.logger.warn(
-              `WARNING [${file.path}]: Duplicate translations for message '${id}' when merging`,
-            );
-          }
-          desc.translation[id] = message;
-        }
-      } else {
-        // First or only translation file
-        desc.translation = loadResult.translations;
-      }
+    if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+      // This limitation is only for legacy message id support (defaults to true as of 9.0)
+      throw new Error(
+        'Localization currently only supports using one type of translation file format for the entire application.',
+      );
     }
   }
 
@@ -292,5 +274,51 @@ function findLocaleDataPath(locale: string, resolver: (locale: string) => string
     }
 
     return null;
+  }
+}
+
+export function loadTranslations(
+  locale: string,
+  desc: LocaleDescription,
+  workspaceRoot: string,
+  loader: TranslationLoader,
+  logger: { warn: (message: string) => void; error: (message: string) => void },
+  usedFormats?: Set<string>,
+) {
+  for (const file of desc.files) {
+    const loadResult = loader(path.join(workspaceRoot, file.path));
+
+    for (const diagnostics of loadResult.diagnostics.messages) {
+      if (diagnostics.type === 'error') {
+        logger.error(`Error parsing translation file '${file.path}': ${diagnostics.message}`);
+      } else {
+        logger.warn(`WARNING [${file.path}]: ${diagnostics.message}`);
+      }
+    }
+
+    if (loadResult.locale !== undefined && loadResult.locale !== locale) {
+      logger.warn(
+        `WARNING [${file.path}]: File target locale ('${loadResult.locale}') does not match configured locale ('${locale}')`,
+      );
+    }
+
+    usedFormats?.add(loadResult.format);
+    file.format = loadResult.format;
+    file.integrity = loadResult.integrity;
+
+    if (desc.translation) {
+      // Merge translations
+      for (const [id, message] of Object.entries(loadResult.translations)) {
+        if (desc.translation[id] !== undefined) {
+          logger.warn(
+            `WARNING [${file.path}]: Duplicate translations for message '${id}' when merging`,
+          );
+        }
+        desc.translation[id] = message;
+      }
+    } else {
+      // First or only translation file
+      desc.translation = loadResult.translations;
+    }
   }
 }
