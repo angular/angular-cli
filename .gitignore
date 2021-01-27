@@ -43,6 +43,7 @@ yarn-error.log*
 .ng-dev.log
 .ng-dev.user*
 .husky/_
+.bazelrc.user
 
 # Mac OSX Finder files.
 **/.DS_Store

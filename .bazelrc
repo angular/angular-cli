@@ -99,10 +99,8 @@ build:remote --define=EXECUTOR=remote
 # Setup the remote build execution servers.
 build:remote --remote_cache=remotebuildexecution.googleapis.com
 build:remote --remote_executor=remotebuildexecution.googleapis.com
-build:remote --tls_enabled=true
-build:remote --auth_enabled=true
-build:remote --remote_timeout=3600
-build:remote --jobs=50
+build:remote --remote_timeout=600
+build:remote --jobs=150
 
  # Setup the toolchain and platform for the remote build execution. The platform
 # is automatically configured by the "rbe_autoconfig" rule in the project workpsace.
@@ -117,11 +115,6 @@ build:remote --extra_execution_platforms=//tools:rbe_ubuntu1604-angular
 build:remote --host_platform=//tools:rbe_ubuntu1604-angular
 build:remote --platforms=//tools:rbe_ubuntu1604-angular
 
-  # Setup Build Event Service
-build:remote --bes_backend=buildeventservice.googleapis.com
-build:remote --bes_timeout=30s
-build:remote --bes_results_url="https://source.cloud.google.com/results/invocations/"
-
  # Set remote caching settings
 build:remote --remote_accept_cached=true
 
@@ -130,14 +123,13 @@ build:remote --remote_accept_cached=true
 build:remote --cpu=k8
 build:remote --host_cpu=k8
 
+# Set up authentication mechanism for RBE
+build:remote --google_default_credentials
+
 ###############################
 # NodeJS rules settings
 # These settings are required for rules_nodejs
 ###############################
-
-# Turn on managed directories feature in Bazel
-# This allows us to avoid installing a second copy of node_modules
-common --experimental_allow_incremental_repository_updates
 
 ####################################################
 # User bazel configuration
