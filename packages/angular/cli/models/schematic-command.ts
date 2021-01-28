@@ -530,7 +530,7 @@ export abstract class SchematicCommand<
               // "See above" because we already printed the error.
               this.logger.fatal('The Schematic workflow failed. See above.');
             } else if (debug) {
-              this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
+              this.logger.fatal(`An error occurred:\n${err.message}\n${err.stack}`);
             } else {
               this.logger.fatal(err.message);
             }
