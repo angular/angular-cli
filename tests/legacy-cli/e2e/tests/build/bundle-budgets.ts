@@ -10,70 +10,40 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
-// tslint:disable:max-line-length
-export default function () {
-  const budgetConfigs = [
-    {
-      expectation: 'pass',
-      message: 'BIG max for all, should not error',
-      budget: { type: 'allScript', maximumError: '100mb' },
-    },
-    {
-      expectation: 'error',
-      message: 'Budget error: all, max error',
-      budget: { type: 'all', maximumError: '100b' },
-    },
-    {
-      expectation: 'warning',
-      message: 'Budget warning: all, min warning',
-      budget: { type: 'all', minimumWarning: '100mb' },
-    },
-  ];
-
-  const promiseFactories = budgetConfigs.map(cfg => {
-    if (cfg.expectation === 'error') {
-      return () => {
-        return updateJsonFile('angular.json', (json) => {
-            json.projects['test-project'].architect.build.options.budgets = [cfg.budget];
-          })
-          .then(() => expectToFail(() => ng('build', '--optimization')))
-          .then(errorMessage => {
-            if (!/Error.+budgets/.test(errorMessage)) {
-              throw new Error(cfg.message);
-            }
-          });
-      };
-    } else if (cfg.expectation === 'warning') {
-      return () => {
-        return updateJsonFile('angular.json', (json) => {
-            json.projects['test-project'].architect.build.options.budgets = [cfg.budget];
-          })
-          .then(() => ng('build', '--optimization'))
-          .then(({ stderr }) => {
-            if (!/Warning.+budgets/.test(stderr)) {
-              throw new Error(cfg.message);
-            }
-          });
-      };
-    } else { // pass
-      return () => {
-        return updateJsonFile('angular.json', (json) => {
-            json.projects['test-project'].architect.build.options.budgets = [cfg.budget];
-          })
-          .then(() => ng('build', '--optimization'))
-          .then(({ stderr }) => {
-            if (/(Warning|Error)/.test(stderr)) {
-              throw new Error(cfg.message);
-            }
-          });
-      };
-    }
+export default async function () {
+  // Error
+  await updateJsonFile('angular.json', json => {
+    json.projects['test-project'].architect.build.options.budgets = [
+      { type: 'all', maximumError: '100b' },
+    ];
   });
 
-  let promiseChain = Promise.resolve();
-  for (let i = 0; i < promiseFactories.length; i++) {
-    promiseChain = promiseChain.then(promiseFactories[i]);
+  const errorMessage = await expectToFail(() => ng('build'));
+  if (!/Error.+budget/.test(errorMessage)) {
+    throw new Error('Budget error: all, max error.');
   }
 
-  return promiseChain;
+  // Warning
+  await updateJsonFile('angular.json', json => {
+    json.projects['test-project'].architect.build.options.budgets = [
+      { type: 'all', minimumWarning: '100mb' },
+    ];
+  });
+
+  const { stderr } = await ng('build');
+  if (!/Warning.+budget/.test(stderr)) {
+    throw new Error('Budget warning: all, min warning');
+  }
+
+  // Pass
+  await updateJsonFile('angular.json', json => {
+    json.projects['test-project'].architect.build.options.budgets = [
+      { type: 'allScript', maximumError: '100mb' },
+    ];
+  });
+
+  const { stderr: stderr2 } = await ng('build');
+  if (/(Warning|Error)/.test(stderr2)) {
+    throw new Error('BIG max for all, should not error');
+  }
 }

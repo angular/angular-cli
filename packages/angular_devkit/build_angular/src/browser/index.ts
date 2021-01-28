@@ -638,29 +638,30 @@ export function buildWebpackBrowser(
                 }
               }
 
-              // Copy assets
-              if (!options.watch && options.assets?.length) {
-                spinner.start('Copying assets...');
-                try {
-                  await copyAssets(
-                    normalizeAssetPatterns(
-                      options.assets,
-                      root,
-                      normalize(projectRoot),
-                      projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
-                    ),
-                    Array.from(outputPaths.values()),
-                    context.workspaceRoot,
-                  );
-                  spinner.succeed('Copying assets complete.');
-                } catch (err) {
-                  spinner.fail(colors.redBright('Copying of assets failed.'));
+              const buildSuccess = success && !statsHasErrors(webpackStats);
+              if (buildSuccess) {
+                // Copy assets
+                if (!options.watch && options.assets?.length) {
+                  spinner.start('Copying assets...');
+                  try {
+                    await copyAssets(
+                      normalizeAssetPatterns(
+                        options.assets,
+                        root,
+                        normalize(projectRoot),
+                        projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
+                      ),
+                      Array.from(outputPaths.values()),
+                      context.workspaceRoot,
+                    );
+                    spinner.succeed('Copying assets complete.');
+                  } catch (err) {
+                    spinner.fail(colors.redBright('Copying of assets failed.'));
 
-                  return { success: false, error: 'Unable to copy assets: ' + err.message };
+                    return { success: false, error: 'Unable to copy assets: ' + err.message };
+                  }
                 }
-              }
 
-              if (success) {
                 if (options.index) {
                   spinner.start('Generating index html...');
 
@@ -737,7 +738,7 @@ export function buildWebpackBrowser(
 
               webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
 
-              return { success: !statsHasErrors(webpackStats) };
+              return { success: buildSuccess };
             }
           }),
           map(
