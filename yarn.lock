@@ -1046,18 +1046,18 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/jasmine@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-2.3.1.tgz#e4df8dd2b8d906e41e4073b5c49c700a962fe853"
-  integrity sha512-6QYTfJfbwPxCvKu4rOhG1YZUm94MbG4K2Dq1q2A2OUiM0eqAZG8T1HJAswDh7L286r5x9nRX8h7Pb7CyJvSmbg==
+"@bazel/jasmine@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.0.0.tgz#18541696b9d8b4e1f4383dbad00e380096957827"
+  integrity sha512-m0VDs+05Svv6RAYdLF/hM9mTeVKhEmZh4qkT1ZEiHOAwdanfcCWjhF5UaMYPmSih6NYkpmNyParx+weBVaIpsA==
   dependencies:
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-2.3.1.tgz#f103c4a5230cabaffd8d574b7278265b5478f056"
-  integrity sha512-blgLpx+9Vh8DZWTVOYTWSk1HEU28FF+GwU1stFaemfY7/pUQfK/URb9FARRkw/v2UrPKCd9EBywFYQyPGSAb1A==
+"@bazel/typescript@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.0.0.tgz#7cb3bcf405c590228888be78b9e49d1dc298dfea"
+  integrity sha512-qYsfyi/+7QOFP9uVAv3gKaqkxo+fIamFrdQ71K85FlJSowxAkwj51pxOPnIWBcMzFVNv1p2ZyfM3ZctKqGye2g==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
@@ -9668,7 +9668,7 @@ quick-lru@^4.0.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
   integrity sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==
 
-quicktype-core@^6.0.15:
+quicktype-core@^6.0.69:
   version "6.0.69"
   resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-6.0.69.tgz#955347b64e8a7b6a37af49fe12f5772abc153b8e"
   integrity sha512-wKQ+/fwgdtFOcbeRiZkIBLA2ajvrFvmtTmexdv7PlO1dyp3C7Irbn2/HjwzalD1dYFrtMEYWohB/4rr3Mg75Xw==
@@ -11614,10 +11614,10 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
 
-ts-api-guardian@0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/ts-api-guardian/-/ts-api-guardian-0.5.0.tgz#1b63546dfd61581054802bdc8d5915ceebcc2c35"
-  integrity sha512-BjVlb23FUqWU+wmdHkLdaHcllU+v/Cca26sY40bCkM15BCF2yc17daOm+UXyvxQ9NndPM/40m+X+GLyDkrE9tA==
+ts-api-guardian@0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/ts-api-guardian/-/ts-api-guardian-0.6.0.tgz#9f44cf9bad1db5de358ccca7b4e6fb1d2c7fe462"
+  integrity sha512-DVA+UgPI1TVRI7GNDG1XBxwGs+cKqJq1os00txr52TUxBPwsUWWT7f83VHWvPQvh7G2wj93U/dTUBeDq3FIDTg==
   dependencies:
     chalk "^2.3.1"
     diff "^3.5.0"

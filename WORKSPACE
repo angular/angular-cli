@@ -7,8 +7,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "121f17d8b421ce72f3376431c3461cd66bfe14de49059edc7bb008d5aebd16be",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/2.3.1/rules_nodejs-2.3.1.tar.gz"],
+    sha256 = "6142e9586162b179fdd570a55e50d1332e7d9c030efd853453438d607569721d",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/3.0.0/rules_nodejs-3.0.0.tar.gz"],
 )
 
 # Check the bazel version and download npm dependencies
@@ -62,12 +62,9 @@ yarn_install(
         "//:tools/yarn/check-yarn.js",
     ],
     package_json = "//:package.json",
+    strict_visibility = False,  # Needed for ts-api-guardian. More info about this can be found https://github.com/bazelbuild/rules_nodejs/wiki#strict_visibility-on-yarn_install-and-npm_install-now-defaults-true-2199
     yarn_lock = "//:yarn.lock",
 )
-
-load("@npm//:install_bazel_dependencies.bzl", "install_bazel_dependencies")
-
-install_bazel_dependencies(suppress_warning = True)
 
 ##########################
 # Remote Execution Setup #
@@ -88,7 +85,7 @@ rbe_autoconfig(
     # Need to specify a base container digest in order to ensure that we can use the checked-in
     # platform configurations for the "ubuntu16_04" image. Otherwise the autoconfig rule would
     # need to pull the image and run it in order determine the toolchain configuration. See:
-    # https://github.com/bazelbuild/bazel-toolchains/blob/3.5.0/configs/ubuntu16_04_clang/versions.bzl
+    # https://github.com/bazelbuild/bazel-toolchains/blob/4.0.0/configs/ubuntu16_04_clang/versions.bzl
     base_container_digest = "sha256:f6568d8168b14aafd1b707019927a63c2d37113a03bcee188218f99bd0327ea1",
     # Note that if you change the `digest`, you might also need to update the
     # `base_container_digest` to make sure marketplace.gcr.io/google/rbe-ubuntu16-04-webtest:<digest>

@@ -43,7 +43,15 @@
       "@angular-devkit/build-webpack": [ "./packages/angular_devkit/build_webpack/src/index" ],
       "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
       "@schematics/angular": [ "./packages/schematics/angular/index" ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "@bazel/tsetse",
+        "disabledRules": [
+          "must-type-assert-json-parse"
+        ]
+      }
+    ]
   },
   "bazelOptions": {
     "suppressTsconfigOverrideWarnings": true

@@ -1,4 +1,4 @@
-load("@npm_ts_api_guardian//:index.bzl", "ts_api_guardian_test")
+load("@npm//ts-api-guardian:index.bzl", "ts_api_guardian_test")
 
 [ts_api_guardian_test(
     name = "%s_%s_%sapi" % (
