@@ -59,41 +59,45 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
       const noModuleFiles: FileInfo[] = [];
       const moduleFiles: FileInfo[] = [];
 
-      for (const [entryName, entrypoint] of this.compilation.entrypoints) {
-        const entryFiles: FileInfo[] = entrypoint?.getFiles()?.map(
-          (f: string): FileInfo => ({
-            name: entryName,
-            file: f,
-            extension: extname(f),
-          }),
-        );
+      try {
+        for (const [entryName, entrypoint] of this.compilation.entrypoints) {
+          const entryFiles: FileInfo[] = entrypoint?.getFiles()?.map(
+            (f: string): FileInfo => ({
+              name: entryName,
+              file: f,
+              extension: extname(f),
+            }),
+          );
 
-        if (!entryFiles) {
-          continue;
+          if (!entryFiles) {
+            continue;
+          }
+
+          if (this.options.noModuleEntrypoints.includes(entryName)) {
+            noModuleFiles.push(...entryFiles);
+          } else if (this.options.moduleEntrypoints.includes(entryName)) {
+            moduleFiles.push(...entryFiles);
+          } else {
+            files.push(...entryFiles);
+          }
         }
 
-        if (this.options.noModuleEntrypoints.includes(entryName)) {
-          noModuleFiles.push(...entryFiles);
-        } else if (this.options.moduleEntrypoints.includes(entryName)) {
-          moduleFiles.push(...entryFiles);
-        } else {
-          files.push(...entryFiles);
-        }
+        const { content, warnings, errors } = await this.process({
+          files,
+          noModuleFiles,
+          moduleFiles,
+          outputPath: dirname(this.options.outputPath),
+          baseHref: this.options.baseHref,
+          lang: this.options.lang,
+        });
+
+        assets[this.options.outputPath] = new RawSource(content);
+
+        warnings.forEach(msg => addWarning(this.compilation, msg));
+        errors.forEach(msg => addError(this.compilation, msg));
+      } catch (error) {
+        addError(this.compilation, error.message);
       }
-
-      const { content, warnings, errors } = await this.process({
-        files,
-        noModuleFiles,
-        moduleFiles,
-        outputPath: dirname(this.options.outputPath),
-        baseHref: this.options.baseHref,
-        lang: this.options.lang,
-      });
-
-      assets[this.options.outputPath] = new RawSource(content);
-
-      warnings.forEach(msg => addWarning(this.compilation, msg));
-      errors.forEach(msg => addError(this.compilation, msg));
     };
   }
 
