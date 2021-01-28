@@ -10,10 +10,12 @@ import { WebpackConfigOptions } from '../../utils/build-options';
 import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 const webpackOutputOptions = {
+  all: false, // Fallback value for stats options when an option is not defined. It has precedence over local webpack defaults.
   colors: true,
   hash: true, // required by custom stat output
   timings: true, // required by custom stat output
   chunks: true, // required by custom stat output
+  builtAt: true, // required by custom stat output
   chunkModules: false,
   children: false, // listing all children is very noisy in AOT and hides warnings/errors
   modules: false,
