@@ -14,6 +14,7 @@ nodejs_binary(
         "@npm//quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
+    templated_args = ["--bazel_patch_module_resolver"],
 )
 
 platform(
