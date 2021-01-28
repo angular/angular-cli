@@ -71,6 +71,8 @@ const ignoredPackages = [
 
   // * Broken license fields
   'pako@1.0.11', // MIT but broken license in package.json
+  'fs-monkey@1.0.1', // Unlicense but missing license field (PR: https://github.com/streamich/fs-monkey/pull/209)
+  'memfs@3.2.0', // Unlicense but missing license field (PR: https://github.com/streamich/memfs/pull/594)
 
   // * Other
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
