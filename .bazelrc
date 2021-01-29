@@ -100,7 +100,7 @@ build:remote --define=EXECUTOR=remote
 build:remote --remote_cache=remotebuildexecution.googleapis.com
 build:remote --remote_executor=remotebuildexecution.googleapis.com
 build:remote --remote_timeout=600
-build:remote --jobs=150
+build:remote --jobs=50
 
  # Setup the toolchain and platform for the remote build execution. The platform
 # is automatically configured by the "rbe_autoconfig" rule in the project workpsace.
