@@ -32,6 +32,7 @@ import {
   OverwriteFileAction,
   RenameFileAction,
 } from './action';
+import { DelegateTree } from './delegate';
 import { LazyFileEntry } from './entry';
 import {
   DirEntry,
@@ -45,6 +46,7 @@ import {
   UpdateRecorder,
 } from './interface';
 import { UpdateRecorderBase } from './recorder';
+import { ScopedTree } from './scoped';
 
 
 let _uniqueId = 0;
@@ -156,13 +158,27 @@ export class HostTree implements Tree {
     return branchedTree;
   }
 
+  private isAncestorOf(tree: Tree): boolean {
+    if (tree instanceof HostTree) {
+      return tree._ancestry.has(this._id);
+    }
+    if (tree instanceof DelegateTree) {
+      return this.isAncestorOf((tree as unknown as { _other: Tree})._other);
+    }
+    if (tree instanceof ScopedTree) {
+      return this.isAncestorOf((tree as unknown as { _base: Tree})._base);
+    }
+
+    return false;
+  }
+
   merge(other: Tree, strategy: MergeStrategy = MergeStrategy.Default): void {
     if (other === this) {
       // Merging with yourself? Tsk tsk. Nothing to do at least.
       return;
     }
 
-    if (other instanceof HostTree && other._ancestry.has(this._id)) {
+    if (this.isAncestorOf(other)) {
       // Workaround for merging a branch back into one of its ancestors
       // More complete branch point tracking is required to avoid
       strategy |= MergeStrategy.Overwrite;
@@ -173,7 +189,7 @@ export class HostTree implements Tree {
     const overwriteConflictAllowed =
       (strategy & MergeStrategy.AllowOverwriteConflict) == MergeStrategy.AllowOverwriteConflict;
     const deleteConflictAllowed =
-      (strategy & MergeStrategy.AllowOverwriteConflict) == MergeStrategy.AllowDeleteConflict;
+      (strategy & MergeStrategy.AllowDeleteConflict) == MergeStrategy.AllowDeleteConflict;
 
     other.actions.forEach(action => {
       switch (action.kind) {
