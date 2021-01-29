@@ -29,7 +29,14 @@ export function externalSchematic<OptionT extends object>(
     const collection = context.engine.createCollection(collectionName, context.schematic.collection);
     const schematic = collection.createSchematic(schematicName);
 
-    return schematic.call(options, observableOf(branch(input)), context, executionOptions);
+    return schematic.call(options, observableOf(branch(input)), context, executionOptions).pipe(
+      last(),
+      map(x => {
+        input.merge(x, MergeStrategy.AllowOverwriteConflict);
+
+        return input;
+      }),
+    );
   };
 }
 
