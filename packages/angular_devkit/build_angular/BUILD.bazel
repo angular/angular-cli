@@ -288,6 +288,7 @@ LARGE_SPECS = {
         "tags": ["no-remote-exec"],
     },
     "dev-server": {
+        "flaky": True,
         "extra_deps": [
             "@npm//@types/express",
             "@npm//@types/node-fetch",
