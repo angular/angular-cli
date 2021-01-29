@@ -157,7 +157,7 @@
     "glob": "7.1.6",
     "http-proxy": "^1.18.1",
     "https-proxy-agent": "5.0.0",
-    "husky": "5.0.6",
+    "husky": "5.0.8",
     "inquirer": "7.3.3",
     "jasmine": "^3.3.1",
     "jasmine-core": "~3.6.0",
