@@ -7,8 +7,8 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
+import { mergeMap, take, timeout } from 'rxjs/operators';
 import { createArchitect, host } from '../test-utils';
 
 describe('Dev Server Builder inline critical CSS optimization', () => {
@@ -34,11 +34,18 @@ describe('Dev Server Builder inline critical CSS optimization', () => {
   });
 
   it('works', async () => {
-    const run = await architect.scheduleTarget(target, { browserTarget: 'app:build:production,inline-critical-css' });
+    const run = await architect.scheduleTarget(target, { browserTarget: 'app:build:production,inline-critical-css', port: 0 });
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
-    expect(output.success).toBe(true);
-    const response = await fetch(`${output.baseUrl}/index.html`);
-    expect(await response.text()).toContain(`body{color:#000;}`);
-  }, 30000);
+
+    await run.output.pipe(
+      take(1),
+      timeout(39000),
+      mergeMap(async output => {
+        expect(output.success).toBe(true);
+        const response = await fetch(`${output.baseUrl}/index.html`);
+        expect(await response.text()).toContain(`body{color:#000;}`);
+      }),
+    ).toPromise();
+
+  }, 40000);
 });
