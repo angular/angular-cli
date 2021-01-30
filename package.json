@@ -129,7 +129,7 @@
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "6.12.6",
     "ansi-colors": "4.1.1",
-    "autoprefixer": "10.2.3",
+    "autoprefixer": "10.2.4",
     "babel-loader": "8.2.2",
     "bootstrap": "^4.0.0",
     "browserslist": "^4.9.1",
