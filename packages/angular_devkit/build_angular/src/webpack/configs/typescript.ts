@@ -239,7 +239,9 @@ export function getAotConfig(wco: WebpackConfigOptions, i18nExtract = false) {
 
 export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {
   if (canUseIvyPlugin(wco)) {
-    return createIvyPlugin(wco, false, workerTsConfigPath);
+    return wco.buildOptions.aot 
+      ? createIvyPlugin(wco, true, workerTsConfigPath) 
+      : createIvyPlugin(wco, false, workerTsConfigPath);
   }
 
   const { buildOptions } = wco;
