@@ -39,7 +39,7 @@
     "inquirer": "7.3.3",
     "jest-worker": "26.6.2",
     "karma-source-map-support": "1.4.0",
-    "less": "4.1.0",
+    "less": "4.1.1",
     "less-loader": "7.3.0",
     "license-webpack-plugin": "2.3.11",
     "loader-utils": "2.0.0",
