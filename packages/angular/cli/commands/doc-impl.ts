@@ -50,11 +50,8 @@ export class DocCommand extends Command<DocCommandSchema> {
       searchUrl = `https://${domain}/docs?search=${options.keyword}`;
     }
 
-    // We should wrap `open` in a new Promise because `open` is already resolved
-    await new Promise(() => {
-      open(searchUrl, {
-        wait: false,
-      });
+    await open(searchUrl, {
+      wait: false,
     });
   }
 }
