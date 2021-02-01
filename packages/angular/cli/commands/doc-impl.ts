@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as open from 'open';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { Schema as DocCommandSchema } from './doc';
-
-const open = require('open');
 
 export class DocCommand extends Command<DocCommandSchema> {
   public async run(options: DocCommandSchema & Arguments) {
@@ -39,7 +38,7 @@ export class DocCommand extends Command<DocCommandSchema> {
       // and use it if we can find it
       try {
         /* tslint:disable-next-line:no-implicit-dependencies */
-        const currentNgVersion = require('@angular/core').VERSION.major;
+        const currentNgVersion = (await import('@angular/core')).VERSION.major;
         domain = `v${currentNgVersion}.angular.io`;
       } catch (e) { }
     }

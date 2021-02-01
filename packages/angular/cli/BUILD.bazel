@@ -69,6 +69,7 @@ ts_library(
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tools",
+        "@npm//@angular/core",
         "@npm//@types/debug",
         "@npm//@types/inquirer",
         "@npm//@types/node",
@@ -79,6 +80,7 @@ ts_library(
         "@npm//@types/uuid",
         "@npm//ansi-colors",
         "@npm//jsonc-parser",
+        "@npm//open",
         "@npm//ora",
     ],
 )
