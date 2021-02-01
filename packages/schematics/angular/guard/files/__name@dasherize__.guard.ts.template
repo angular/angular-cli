@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { <%= implementationImports %>ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { <%= implementationImports %> } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable({
