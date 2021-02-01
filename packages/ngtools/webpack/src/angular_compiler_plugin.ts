@@ -179,14 +179,14 @@ export class AngularCompilerPlugin {
     }
 
     // Parse the tsconfig contents.
-    const config = readConfiguration(this._tsConfigPath);
-    if (config.errors && config.errors.length) {
-      throw new Error(formatDiagnostics(config.errors));
+    const { errors, rootNames, options: compilerOptions } = readConfiguration(this._tsConfigPath, options.compilerOptions);
+    if (errors && errors.length) {
+      throw new Error(formatDiagnostics(errors));
     }
 
-    this._rootNames = config.rootNames;
-    this._compilerOptions = { ...config.options, ...options.compilerOptions };
-    this._basePath = config.options.basePath || basePath || '';
+    this._rootNames = rootNames;
+    this._compilerOptions = compilerOptions;
+    this._basePath = compilerOptions.basePath || basePath || '';
 
     // Overwrite outDir so we can find generated files next to their .ts origin in compilerHost.
     this._compilerOptions.outDir = '';
