@@ -250,7 +250,7 @@ export function useCIDefaults(projectName = 'test-project') {
       // https://github.com/GoogleChrome/puppeteer/releases
       // http://chromedriver.chromium.org/downloads
       json['scripts']['webdriver-update'] = 'webdriver-manager update' +
-        ` --standalone false --gecko false --versions.chrome 81.0.4044.0`; // Supports Chrome 81
+        ` --standalone false --gecko false --versions.chrome 89.0.4389.0`; // Supports Chrome 89
 
     }))
     .then(() => npm('run', 'webdriver-update'));
@@ -266,7 +266,7 @@ export function useCIChrome(projectDir: string) {
       // Use matching versions of Chromium (via puppeteer) and ChromeDriver.
       // https://github.com/GoogleChrome/puppeteer/releases
       // http://chromedriver.chromium.org/downloads
-      json['devDependencies']['puppeteer'] = '3.0.2'; // Chromium 81.0.4044.0 (r737027)
+      json['devDependencies']['puppeteer'] = '6.0.0'; // Chromium 89.0.4389.0 (r843427)
       json['devDependencies']['karma-chrome-launcher'] = '~3.1.0';
     }))
     // Use Pupeteer in protractor if a config is found on the project.
