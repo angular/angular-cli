@@ -60,10 +60,10 @@ import {
   getStatsConfig,
   getStylesConfig,
   getWorkerConfig,
-  normalizeExtraEntryPoints,
 } from '../webpack/configs';
 import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
 import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
+import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 import {
   BundleStats,
   ChunkType,

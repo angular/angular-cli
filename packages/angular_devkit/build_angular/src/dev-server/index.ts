@@ -34,8 +34,14 @@ import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateI18nBrowserWebpackConfigFromContext, getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
 import { addError, addWarning } from '../utils/webpack-diagnostics';
-import { getBrowserConfig, getCommonConfig, getStatsConfig, getStylesConfig, getWorkerConfig } from '../webpack/configs';
-import { getDevServerConfig } from '../webpack/configs/dev-server';
+import {
+  getBrowserConfig,
+  getCommonConfig,
+  getDevServerConfig,
+  getStatsConfig,
+  getStylesConfig,
+  getWorkerConfig,
+} from '../webpack/configs';
 import { IndexHtmlWebpackPlugin } from '../webpack/plugins/index-html-webpack-plugin';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Schema } from './schema';
