@@ -22,39 +22,39 @@ const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 interface CompilationOutput {
   outputName: string;
   source: string;
+  success: boolean;
 }
 
 export class WebpackResourceLoader {
   private _parentCompilation: any;
-  private _context = '';
   private _fileDependencies = new Map<string, Set<string>>();
   private _reverseDependencies = new Map<string, Set<string>>();
-  private _cachedSources = new Map<string, string>();
-  private _cachedEvaluatedSources = new Map<string, RawSource>();
 
-  public changedFiles?: Iterable<string>;
+  private cache = new Map<string, string>();
+  private modifiedResources = new Set<string>();
 
-  update(parentCompilation: import('webpack').compilation.Compilation, changedFiles?: Iterable<string>) {
+  update(
+    parentCompilation: import('webpack').compilation.Compilation,
+    changedFiles?: Iterable<string>,
+  ) {
     this._parentCompilation = parentCompilation;
-    this._context = parentCompilation.context;
 
-    // Update changed file list
-    this.changedFiles = changedFiles;
+    // Update resource cache and modified resources
+    this.modifiedResources.clear();
+    if (changedFiles) {
+      for (const changedFile of changedFiles) {
+        for (const affectedResource of this.getAffectedResources(changedFile)) {
+          this.cache.delete(normalizePath(affectedResource));
+          this.modifiedResources.add(affectedResource);
+        }
+      }
+    } else {
+      this.cache.clear();
+    }
   }
 
   getModifiedResourceFiles() {
-    const modifiedResources = new Set<string>();
-    if (!this.changedFiles) {
-      return modifiedResources;
-    }
-
-    for (const changedFile of this.changedFiles) {
-      this.getAffectedResources(
-        changedFile,
-      ).forEach((affected: string) => modifiedResources.add(affected));
-    }
-
-    return modifiedResources;
+    return this.modifiedResources;
   }
 
   getResourceDependencies(filePath: string) {
@@ -70,7 +70,6 @@ export class WebpackResourceLoader {
   }
 
   private async _compile(filePath: string): Promise<CompilationOutput> {
-
     if (!this._parentCompilation) {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
     }
@@ -83,39 +82,25 @@ export class WebpackResourceLoader {
     }
 
     const outputOptions = { filename: filePath };
-    const relativePath = path.relative(this._context || '', filePath);
+    const context = this._parentCompilation.context;
+    const relativePath = path.relative(context || '', filePath);
     const childCompiler = this._parentCompilation.createChildCompiler(relativePath, outputOptions);
-    childCompiler.context = this._context;
+    childCompiler.context = context;
 
     new NodeTemplatePlugin(outputOptions).apply(childCompiler);
     new NodeTargetPlugin().apply(childCompiler);
-    new SingleEntryPlugin(this._context, filePath).apply(childCompiler);
+    new SingleEntryPlugin(context, filePath).apply(childCompiler);
     new LibraryTemplatePlugin('resource', 'var').apply(childCompiler);
 
     childCompiler.hooks.thisCompilation.tap('ngtools-webpack', (compilation: any) => {
-      compilation.hooks.additionalAssets.tapAsync('ngtools-webpack',
-      (callback: (err?: Error) => void) => {
-        if (this._cachedEvaluatedSources.has(compilation.fullHash)) {
-          const cachedEvaluatedSource = this._cachedEvaluatedSources.get(compilation.fullHash);
-          compilation.assets[filePath] = cachedEvaluatedSource;
-          callback();
-
+      compilation.hooks.additionalAssets.tapPromise('ngtools-webpack', async () => {
+        const asset = compilation.assets[filePath];
+        if (!asset) {
           return;
         }
 
-        const asset = compilation.assets[filePath];
-        if (asset) {
-          this._evaluate({ outputName: filePath, source: asset.source() })
-            .then(output => {
-              const evaluatedSource = new RawSource(output);
-              this._cachedEvaluatedSources.set(compilation.fullHash, evaluatedSource);
-              compilation.assets[filePath] = evaluatedSource;
-              callback();
-            })
-            .catch(err => callback(err));
-        } else {
-          callback();
-        }
+        const output = await this._evaluate(filePath, asset.source());
+        compilation.assets[filePath] = new RawSource(output);
       });
     });
 
@@ -139,13 +124,13 @@ export class WebpackResourceLoader {
       this._parentCompilation.errors.push(...errors);
     }
 
-    Object.keys(childCompilation.assets).forEach(assetName => {
+    Object.keys(childCompilation.assets).forEach((assetName) => {
       // Add all new assets to the parent compilation, with the exception of
       // the file we're loading and its sourcemap.
       if (
-        assetName !== filePath
-        && assetName !== `${filePath}.map`
-        && this._parentCompilation.assets[assetName] == undefined
+        assetName !== filePath &&
+        assetName !== `${filePath}.map` &&
+        this._parentCompilation.assets[assetName] == undefined
       ) {
         this._parentCompilation.assets[assetName] = childCompilation.assets[assetName];
       }
@@ -163,34 +148,40 @@ export class WebpackResourceLoader {
       }
     }
 
-    const compilationHash = childCompilation.fullHash;
-    const maybeSource = this._cachedSources.get(compilationHash);
-    if (maybeSource) {
-      return { outputName: filePath, source: maybeSource };
-    } else {
-      const source = childCompilation.assets[filePath].source();
-      this._cachedSources.set(compilationHash, source);
+    const finalOutput = childCompilation.assets[filePath]?.source();
 
-      return { outputName: filePath, source };
+    return { outputName: filePath, source: finalOutput ?? '', success: !errors?.length };
+  }
+
+  private async _evaluate(filename: string, source: string): Promise<string> {
+    // Evaluate code
+    const context: { resource?: string | { default?: string } } = {};
+    vm.runInNewContext(source, context, { filename });
+
+    if (typeof context.resource === 'string') {
+      return context.resource;
+    } else if (typeof context.resource?.default === 'string') {
+      return context.resource.default;
     }
+
+    throw new Error(`The loader "${filename}" didn't return a string.`);
   }
 
-  private async _evaluate({ outputName, source }: CompilationOutput): Promise<string> {
-      // Evaluate code
-      const context: { resource?: string | { default?: string } } = {};
-      vm.runInNewContext(source, context, { filename: outputName });
+  async get(filePath: string): Promise<string> {
+    const normalizedFile = normalizePath(filePath);
+    let data = this.cache.get(normalizedFile);
 
-      if (typeof context.resource === 'string') {
-        return context.resource;
-      } else if (typeof context.resource?.default === 'string') {
-        return context.resource.default;
+    if (data === undefined) {
+      // cache miss so compile resource
+      const compilationResult = await this._compile(filePath);
+      data = compilationResult.source;
+
+      // Only cache if compilation was successful
+      if (compilationResult.success) {
+        this.cache.set(normalizedFile, data);
       }
+    }
 
-      throw new Error(`The loader "${outputName}" didn't return a string.`);
-  }
-
-  get(filePath: string): Promise<string> {
-    return this._compile(filePath)
-      .then((result: CompilationOutput) => result.source);
+    return data;
   }
 }
