@@ -9,7 +9,6 @@ export const release: ReleaseConfig = {
     '@nguniversal/express-engine',
     '@nguniversal/hapi-engine',
     '@nguniversal/socket-engine',
-    '@nguniversal/module-map-ngfactory-loader',
   ],
   // TODO: Set up package building.
   buildPackages: async () => [],

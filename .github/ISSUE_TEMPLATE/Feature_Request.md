@@ -14,7 +14,6 @@ about: You have an idea that you'd like to be implemented in Angular Universal
 - [ ] common
 - [ ] express-engine
 - [ ] hapi-engine
-- [ ] module-map-ngfactory-loader
 
 ### Description
 <!-- ✍️--> A clear and concise description of the problem or missing capability...

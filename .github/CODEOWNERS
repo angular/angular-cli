@@ -3,7 +3,6 @@
 /modules/common/*                                      @kyliau @CaerusKaru
 /modules/express-engine/*                              @kyliau @FrozenPandaz
 /modules/hapi-engine/*                                 @kyliau @CaerusKaru
-/modules/module-map-ngfactory-loader                   @kyliau @Toxicable @FrozenPandaz
 
 # Tooling
 /scripts/**                                        @CaerusKaru @kyliau
