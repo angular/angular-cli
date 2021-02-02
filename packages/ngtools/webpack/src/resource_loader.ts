@@ -93,14 +93,22 @@ export class WebpackResourceLoader {
     new LibraryTemplatePlugin('resource', 'var').apply(childCompiler);
 
     childCompiler.hooks.thisCompilation.tap('ngtools-webpack', (compilation: any) => {
-      compilation.hooks.additionalAssets.tapPromise('ngtools-webpack', async () => {
+      compilation.hooks.additionalAssets.tap('ngtools-webpack', () => {
         const asset = compilation.assets[filePath];
         if (!asset) {
           return;
         }
 
-        const output = await this._evaluate(filePath, asset.source());
-        compilation.assets[filePath] = new RawSource(output);
+        try {
+          const output = this._evaluate(filePath, asset.source());
+
+          if (typeof output === 'string') {
+            compilation.assets[filePath] = new RawSource(output);
+          }
+        } catch (error) {
+          // Use compilation errors, as otherwise webpack will choke
+          compilation.errors.push(error);
+        }
       });
     });
 
@@ -153,10 +161,16 @@ export class WebpackResourceLoader {
     return { outputName: filePath, source: finalOutput ?? '', success: !errors?.length };
   }
 
-  private async _evaluate(filename: string, source: string): Promise<string> {
+  private _evaluate(filename: string, source: string): string | null {
     // Evaluate code
     const context: { resource?: string | { default?: string } } = {};
-    vm.runInNewContext(source, context, { filename });
+
+    try {
+      vm.runInNewContext(source, context, { filename });
+    } catch {
+      // Error are propagated through the child compilation.
+      return null;
+    }
 
     if (typeof context.resource === 'string') {
       return context.resource;
