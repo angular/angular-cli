@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e --prod",
-    "postinstall": "webdriver-manager update --standalone false --gecko false --versions.chrome 87.0.4280.20"
+    "postinstall": "webdriver-manager update --standalone false --gecko false --versions.chrome 89.0.4389.0"
   },
   "private": true,
   "dependencies": {
@@ -39,7 +39,7 @@
     "karma-jasmine": "~3.3.0",
     "karma-jasmine-html-reporter": "^1.5.0",
     "protractor": "~5.4.3",
-    "puppeteer": "5.2.1",
+    "puppeteer": "6.0.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~4.0.0"

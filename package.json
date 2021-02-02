@@ -35,7 +35,7 @@
     "preinstall": "node ./tools/yarn/check-yarn.js",
     "postinstall": "yarn webdriver-update && yarn ngcc && yarn husky install",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
-    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 87.0.4280.20",
+    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 89.0.4389.0",
     "ngcc": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
   },
   "repository": {
@@ -196,7 +196,7 @@
     "postcss-loader": "4.2.0",
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "5.5.0",
+    "puppeteer": "6.0.0",
     "quicktype-core": "^6.0.69",
     "raw-loader": "4.0.2",
     "regenerator-runtime": "0.13.7",
