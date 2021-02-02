@@ -204,7 +204,7 @@
     "rimraf": "3.0.2",
     "rollup": "2.38.3",
     "rxjs": "6.6.3",
-    "sass": "1.32.5",
+    "sass": "1.32.6",
     "sass-loader": "10.1.1",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.6.2-linux.tar.gz",
     "semver": "7.3.4",
