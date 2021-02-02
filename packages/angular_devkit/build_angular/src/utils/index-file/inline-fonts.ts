@@ -120,6 +120,12 @@ export class InlineFontsProcessor {
           },
         },
         res => {
+          if (res.statusCode !== 200) {
+            reject(new Error(`Inlining of fonts failed. ${url} returned status code: ${res.statusCode}.`));
+
+            return;
+          }
+
           res
             .on('data', chunk => rawResponse += chunk)
             .on('end', () => resolve(rawResponse));
