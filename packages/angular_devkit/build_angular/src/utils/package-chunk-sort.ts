@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ExtraEntryPoint } from '../browser/schema';
-import { normalizeExtraEntryPoints } from '../webpack/configs';
+import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 
 export function generateEntryPoints(appConfig: {
   styles: ExtraEntryPoint[];
