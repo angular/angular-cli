@@ -156,6 +156,38 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   const assetNameTemplate = assetNameTemplateFactory(hashFormat);
 
+  const extraPostcssPlugins: import('postcss').Plugin[] = [];
+
+  // Attempt to setup Tailwind CSS
+  // A configuration file can exist in the project or workspace root
+  const tailwindConfigFile = 'tailwind.config.js';
+  let tailwindConfigPath;
+  for (const basePath of [wco.projectRoot, wco.root]) {
+    const fullPath = path.join(basePath, tailwindConfigFile);
+    if (fs.existsSync(fullPath)) {
+      tailwindConfigPath = fullPath;
+    }
+  }
+  // Only load Tailwind CSS plugin if configuration file was found.
+  // This acts as a guard to ensure the project actually wants to use Tailwind CSS.
+  // The package may be unknowningly present due to a third-party transitive package dependency.
+  if (tailwindConfigPath) {
+    let tailwindPackagePath;
+    try {
+      tailwindPackagePath = require.resolve('tailwindcss', { paths: [wco.root] });
+    } catch {
+      const relativeTailwindConfigPath = path.relative(wco.root, tailwindConfigPath);
+      wco.logger.warn(
+        `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
+          ` but the 'tailwindcss' package is not installed.` +
+          ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
+      );
+    }
+    if (tailwindPackagePath) {
+      extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
+    }
+  }
+
   const postcssOptionsCreator = (sourceMap: boolean, extracted: boolean | undefined) => {
     return (loader: webpack.loader.LoaderContext) => ({
       map: sourceMap && {
@@ -189,6 +221,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           emitFile: buildOptions.platform !== 'server',
           extracted,
         }),
+        ...extraPostcssPlugins,
         autoprefixer(),
       ],
     });
