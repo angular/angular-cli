@@ -67,7 +67,7 @@
     "speed-measure-webpack-plugin": "1.4.2",
     "style-loader": "2.0.0",
     "stylus": "0.54.8",
-    "stylus-loader": "4.3.3",
+    "stylus-loader": "5.0.0",
     "terser": "5.5.1",
     "terser-webpack-plugin": "4.2.3",
     "text-table": "0.2.0",
