@@ -276,17 +276,6 @@ jobs:
           command: yarn bazel:test
           no_output_timeout: 20m
 
-  integration:
-    executor: test-executor
-    resource_class: xlarge
-    steps:
-      - custom_attach_workspace
-      - install_python
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: 
-          command: yarn bazel:integration
-          no_output_timeout: 20m
-
   snapshot_publish:
     executor: action-executor
     resource_class: medium
@@ -410,9 +399,6 @@ workflows:
       # will catch any build errors before proceeding to the more lengthy and resource intensive 
       # Bazel jobs.
       - test:
-          requires:
-            - build
-      - integration:
           requires:
             - build
       
