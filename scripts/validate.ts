@@ -10,7 +10,6 @@ import { logging, tags } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import templates from './templates';
 import validateBuildFiles from './validate-build-files';
-import validateDoNotSubmit from './validate-do-not-submit';
 import validateLicenses from './validate-licenses';
 import validateUserAnalytics from './validate-user-analytics';
 
@@ -37,13 +36,6 @@ export default async function (options: { verbose: boolean; ci: boolean }, logge
       process.exit(2);
     }
     error = true;
-  }
-
-  if (!options.ci) {
-    logger.info('');
-    logger.info(`Running DO_NOT${''}_SUBMIT validation...`);
-    error = await validateDoNotSubmit({}, logger.createChild('validate-do-not-submit')) != 0
-        || error;
   }
 
   logger.info('');
