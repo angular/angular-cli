@@ -175,9 +175,6 @@ jobs:
               echo "This build is not over a PR, nothing to do."
             fi
       - run:
-          name: Validate "do not submit" Commits
-          command: yarn -s admin validate-do-not-submit
-      - run:
           command: yarn -s admin validate --ci
 
   e2e-cli:
