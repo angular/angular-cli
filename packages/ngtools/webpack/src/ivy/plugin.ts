@@ -44,6 +44,7 @@ export interface AngularPluginOptions {
   emitClassMetadata: boolean;
   emitNgModuleScope: boolean;
   suppressZoneJsIncompatibilityWarning: boolean;
+  jitMode: boolean;
 }
 
 // Add support for missing properties in Webpack types as well as the loader's file emitter
@@ -91,6 +92,7 @@ export class AngularWebpackPlugin {
     this.pluginOptions = {
       emitClassMetadata: false,
       emitNgModuleScope: false,
+      jitMode: false,
       fileReplacements: {},
       substitutions: {},
       directTemplateLoading: true,
@@ -222,7 +224,7 @@ export class AngularWebpackPlugin {
       augmentHostWithSubstitutions(host, this.pluginOptions.substitutions);
 
       // Create the file emitter used by the webpack loader
-      const { fileEmitter, builder, internalFiles } = compilerOptions.skipTemplateCodegen
+      const { fileEmitter, builder, internalFiles } = this.pluginOptions.jitMode
         ? this.updateJitProgram(compilerOptions, rootNames, host, diagnosticsReporter)
         : this.updateAotProgram(
             compilerOptions,
