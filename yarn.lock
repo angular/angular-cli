@@ -54,10 +54,38 @@
     tslib "^2.0.0"
     yargs "^16.1.1"
 
+"@angular/compiler-cli@11.2.0-next.0":
+  version "11.2.0-next.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-11.2.0-next.0.tgz#75dbc4dfa2c363f82fd06a3eb99bf966b143c44a"
+  integrity sha512-GyawTOXOXA50NwJzqh1+xzEaNNyvJv4qFcqAM52J2j1MSJwNwdO85CPC/2F2RyhUCRczoRosFgQrqF7E4xNCog==
+  dependencies:
+    "@babel/core" "^7.8.6"
+    "@babel/types" "^7.8.6"
+    canonical-path "1.0.0"
+    chokidar "^3.0.0"
+    convert-source-map "^1.5.1"
+    dependency-graph "^0.7.2"
+    fs-extra "4.0.2"
+    magic-string "^0.25.0"
+    minimist "^1.2.0"
+    reflect-metadata "^0.1.2"
+    semver "^6.3.0"
+    source-map "^0.6.1"
+    sourcemap-codec "^1.4.8"
+    tslib "^2.0.0"
+    yargs "^16.1.1"
+
 "@angular/compiler@11.1.1":
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-11.1.1.tgz#cafe43b52fb69f0b9493e597baec14fcffd13d7d"
   integrity sha512-kybGddMBL6E2BFBOHIX39VsKVxH3yD7NA1g2mQUE9KIqLAavH0KLBr8B03R9MKb6+BElGpk/5yCyCkzkwQES7w==
+  dependencies:
+    tslib "^2.0.0"
+
+"@angular/compiler@11.2.0-next.0":
+  version "11.2.0-next.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-11.2.0-next.0.tgz#01b2912ebd52baaccb9c819299cd75db22dccb9f"
+  integrity sha512-4KMjtTEut2I5yGtMBilU9FUsmlxVkFVHiixl20n66F1XSVT02sUmVejzB3gHITJOP/7jvJ6408HNwGZr1rS1dQ==
   dependencies:
     tslib "^2.0.0"
 
