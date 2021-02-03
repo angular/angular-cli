@@ -165,7 +165,7 @@
     "jest-worker": "26.6.2",
     "jquery": "^3.3.1",
     "jsonc-parser": "3.0.0",
-    "karma": "~6.0.0",
+    "karma": "~6.1.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
