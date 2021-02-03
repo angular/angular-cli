@@ -81,11 +81,11 @@
     "worker-plugin": "5.0.0"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^11.0.0 || ^11.1.0-next",
-    "@angular/localize": "^11.0.0 || ^11.1.0-next",
-    "@angular/service-worker": "^11.0.0 || ^11.1.0-next",
+    "@angular/compiler-cli": "^11.0.0 || ^11.2.0-next",
+    "@angular/localize": "^11.0.0 || ^11.2.0-next",
+    "@angular/service-worker": "^11.0.0 || ^11.2.0-next",
     "karma": "^5.2.0 || ^6.0.0",
-    "ng-packagr": "^11.0.0 || ^11.1.0-next",
+    "ng-packagr": "^11.0.0 || ^11.2.0-next",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0",
     "tslint": "^6.1.0",
