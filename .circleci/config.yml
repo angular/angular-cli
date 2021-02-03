@@ -216,8 +216,8 @@ jobs:
           name: Initialize Environment
           command: |
             ./.circleci/env.sh
-            # Ensure latest npm version to support local package repository
-            PATH=~/.npm-global/bin:$PATH npm install --global npm
+            # Ensure latest v6 npm version to support local package repository
+            PATH=~/.npm-global/bin:$PATH npm install --global npm@6
       - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli-node-14:
