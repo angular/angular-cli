@@ -59,7 +59,6 @@ function createIvyPlugin(
   const optimize = buildOptions.optimization.scripts;
 
   const compilerOptions: CompilerOptions = {
-    skipTemplateCodegen: !aot,
     sourceMap: buildOptions.sourceMap.scripts,
   };
 
@@ -78,6 +77,7 @@ function createIvyPlugin(
     tsconfig,
     compilerOptions,
     fileReplacements,
+    jitMode: !aot,
     emitNgModuleScope: !optimize,
   });
 }
