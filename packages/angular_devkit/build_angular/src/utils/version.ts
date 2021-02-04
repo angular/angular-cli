@@ -41,7 +41,7 @@ export function assertCompatibleAngularVersion(projectRoot: string, logger: logg
     const angularCliPkgPath = require.resolve('@angular/cli/package.json', resolveOptions);
     angularCliPkgJson = require(angularCliPkgPath);
     if (!(angularCliPkgJson && angularCliPkgJson['version'])) {
-      throw new Error();
+      return;
     }
   } catch {
     // Not using @angular-devkit/build-angular with @angular/cli is ok too.
@@ -49,20 +49,17 @@ export function assertCompatibleAngularVersion(projectRoot: string, logger: logg
     return;
   }
 
-  if (angularCliPkgJson['version'] === '0.0.0') {
-    // Internal testing version
+  if (angularCliPkgJson['version'] === '0.0.0' || angularPkgJson['version'] === '0.0.0-PLACEHOLDER') {
+    // Internal CLI testing version or integration testing in the angular/angular
+    // repository with the generated development @angular/core npm package which is versioned "0.0.0-PLACEHOLDER".
     return;
   }
 
-  const cliMajor = new SemVer(angularCliPkgJson['version']).major;
-  // e.g. CLI 8.0 supports '>=8.0.0 <9.0.0', including pre-releases (betas, rcs, snapshots)
-  // of both 8 and 9. Also allow version "0.0.0" for integration testing in the angular/angular
-  // repository with the generated development @angular/core npm package which is versioned "0.0.0".
-  const supportedAngularSemver =
-    `0.0.0 || ^${cliMajor}.0.0-beta || ` + `>=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
-
   const angularVersion = new SemVer(angularPkgJson['version']);
-  const rxjsVersion = new SemVer(rxjsPkgJson['version']);
+  const cliMajor = new SemVer(angularCliPkgJson['version']).major;
+  // e.g. CLI 8.0 supports '>=8.0.0 <9.0.0', including pre-releases (next, rcs, snapshots)
+  // of both 8 and 9.
+  const supportedAngularSemver = `^${cliMajor}.0.0-next || >=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
 
   if (!satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
     logger.error(
@@ -76,30 +73,5 @@ export function assertCompatibleAngularVersion(projectRoot: string, logger: logg
     );
 
     process.exit(3);
-  } else if (
-    gte(angularVersion, '6.0.0-rc.0') &&
-    !gte(rxjsVersion, '5.6.0-forward-compat.0') &&
-    !gte(rxjsVersion, '6.0.0-beta.0')
-  ) {
-    logger.error(
-      tags.stripIndents`
-        This project uses version ${rxjsVersion} of RxJs, which is not supported by Angular v6+.
-        The official RxJs version that is supported is 5.6.0-forward-compat.0 and greater.
-
-        Please visit the link below to find instructions on how to update RxJs.
-        https://docs.google.com/document/d/12nlLt71VLKb-z3YaSGzUfx6mJbc34nsMXtByPUN35cg/edit#
-      ` + '\n',
-    );
-
-    process.exit(3);
-  } else if (gte(angularVersion, '6.0.0-rc.0') && !gte(rxjsVersion, '6.0.0-beta.0')) {
-    logger.warn(
-      tags.stripIndents`
-        This project uses a temporary compatibility version of RxJs (${rxjsVersion}).
-
-        Please visit the link below to find instructions on how to update RxJs.
-        https://docs.google.com/document/d/12nlLt71VLKb-z3YaSGzUfx6mJbc34nsMXtByPUN35cg/edit#
-      ` + '\n',
-    );
   }
 }
