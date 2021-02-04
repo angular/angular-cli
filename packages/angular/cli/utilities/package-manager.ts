@@ -54,3 +54,26 @@ export async function getPackageManager(root: string): Promise<PackageManager> {
   //       Potentially with a prompt to choose and optionally set as the default.
   return packageManager || PackageManager.Npm;
 }
+
+/**
+ * Checks if the npm version is version 6.x.  If not, display a message and exit.
+ */
+export function ensureCompatibleNpm() {
+  try {
+    const version = execSync('npm --version', {encoding: 'utf8', stdio: 'pipe'}).trim();
+    const major = Number(version.match(/^(\d+)\./)?.[1]);
+    if (major === 6) {
+      return;
+    }
+
+    // tslint:disable-next-line: no-console
+    console.error(
+      `npm version ${version} detected.\n` +
+      'The Angular CLI currently requires npm version 6.\n\n' +
+      'Please install a compatible version to proceed (`npm install --global npm@6`).\n',
+    );
+    process.exit(3);
+  } catch {
+    // npm is not installed
+  }
+}

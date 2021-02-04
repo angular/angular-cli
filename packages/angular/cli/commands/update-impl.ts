@@ -18,7 +18,7 @@ import { SchematicEngineHost } from '../models/schematic-engine-host';
 import { colors } from '../utilities/color';
 import { runTempPackageBin } from '../utilities/install-package';
 import { writeErrorToLogFile } from '../utilities/log-file';
-import { getPackageManager } from '../utilities/package-manager';
+import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
 import {
   PackageIdentifier,
   PackageManifest,
@@ -267,6 +267,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
+    ensureCompatibleNpm();
+
     // Check if the current installed CLI version is older than the latest version.
     if (!disableVersionCheck && await this.checkCLILatestVersion(options.verbose, options.next)) {
       this.logger.warn(
