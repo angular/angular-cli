@@ -15,7 +15,7 @@ import { Arguments } from '../models/interface';
 import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
 import { installPackage, installTempPackage } from '../tasks/install-package';
 import { colors } from '../utilities/color';
-import { getPackageManager } from '../utilities/package-manager';
+import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
 import {
   NgAddSaveDepedency,
   PackageManifest,
@@ -38,6 +38,8 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
   }
 
   async run(options: AddCommandSchema & Arguments) {
+    ensureCompatibleNpm();
+
     if (!options.collection) {
       this.logger.fatal(
         `The "ng add" command requires a name argument to be specified eg. ` +

@@ -9,6 +9,7 @@
 // tslint:disable:no-global-tslint-disable no-any
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
+import { ensureCompatibleNpm } from '../utilities/package-manager';
 import { Schema as NewCommandSchema } from './new';
 
 
@@ -23,6 +24,8 @@ export class NewCommand extends SchematicCommand<NewCommandSchema> {
   }
 
   public async run(options: NewCommandSchema & Arguments) {
+    ensureCompatibleNpm();
+
     // Register the version of the CLI in the registry.
     const packageJson = require('../package.json');
     const version = packageJson.version;
