@@ -17,7 +17,7 @@ import { Arguments } from '../models/interface';
 import { colors } from '../utilities/color';
 import { runTempPackageBin } from '../utilities/install-package';
 import { writeErrorToLogFile } from '../utilities/log-file';
-import { getPackageManager } from '../utilities/package-manager';
+import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
 import {
   PackageIdentifier,
   PackageManifest,
@@ -265,6 +265,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
+    ensureCompatibleNpm();
+
     // Check if the @angular-devkit/schematics package can be resolved from the workspace root
     // This works around issues with packages containing migrations that cannot directly depend on the package
     // This check can be removed once the schematic runtime handles this situation
