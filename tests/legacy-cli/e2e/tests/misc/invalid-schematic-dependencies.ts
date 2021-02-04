@@ -1,17 +1,34 @@
-import { join } from 'path';
 import { expectFileToMatch } from '../../utils/fs';
-import { ng } from '../../utils/process';
+import { ng, silentNpm } from '../../utils/process';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 
 export default async function () {
-  const componentDir = join('src', 'app', 'test-component');
+  // Must publish old version to local registry to allow install. This is especially important
+  // for release commits as npm will try to request tooling packages that are not on the npm registry yet
+  const { stdout: stdoutPack1 } = await silentNpm(
+    'pack',
+    '@schematics/angular@7',
+    '--registry=https://registry.npmjs.org',
+  );
+  await silentNpm('publish', stdoutPack1.trim(), '--registry=http://localhost:4873', '--tag=outdated');
+  const { stdout: stdoutPack2 } = await silentNpm(
+    'pack',
+    '@angular-devkit/core@7',
+    '--registry=https://registry.npmjs.org',
+  );
+  await silentNpm('publish', stdoutPack2.trim(), '--registry=http://localhost:4873', '--tag=outdated');
+  const { stdout: stdoutPack3 } = await silentNpm(
+    'pack',
+    '@angular-devkit/schematics@7',
+    '--registry=https://registry.npmjs.org',
+  );
+  await silentNpm('publish', stdoutPack3.trim(), '--registry=http://localhost:4873', '--tag=outdated');
 
-  // Install old and incompatible version
-  // Must directly use npm registry since old versions are not hosted locally
-  await installPackage('@schematics/angular@7', 'https://registry.npmjs.org')
+  // Install outdated and incompatible version
+  await installPackage('@schematics/angular@7');
 
-  const tag = await isPrereleaseCli() ?  '@next' : '';
+  const tag = (await isPrereleaseCli()) ? '@next' : '';
   await ng('add', `@angular/material${tag}`);
   await expectFileToMatch('package.json', /@angular\/material/);
 
