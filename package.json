@@ -93,7 +93,7 @@
     "@types/babel__core": "7.1.12",
     "@types/babel__template": "7.4.0",
     "@types/browserslist": "^4.4.0",
-    "@types/cacache": "^12.0.1",
+    "@types/cacache": "^15.0.0",
     "@types/caniuse-lite": "^1.0.0",
     "@types/copy-webpack-plugin": "^6.0.0",
     "@types/cssnano": "^4.0.0",
