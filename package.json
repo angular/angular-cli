@@ -87,7 +87,7 @@
     "node-fetch": "^2.6.1",
     "ora": "^5.1.0",
     "protractor": "7.0.0",
-    "puppeteer": "6.0.0",
+    "puppeteer": "7.0.0",
     "rollup": "~2.28.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
