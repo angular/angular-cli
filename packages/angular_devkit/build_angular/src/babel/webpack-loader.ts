@@ -98,6 +98,14 @@ export default custom<AngularCustomOptions>(() => {
       const options: Record<string, unknown> = {
         ...baseOptions,
         ...loaderOptions,
+        cacheIdentifier: JSON.stringify({
+          buildAngular: require('../../package.json').version,
+          forceAsyncTransformation,
+          forceES5,
+          shouldLink,
+          baseOptions,
+          loaderOptions,
+        }),
       };
 
       // Skip babel processing if no actions are needed
