@@ -1,15 +1,9 @@
-import { getActivePackageManager } from '../../utils/packages';
 import { ng, npm } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
 const errorText = 'The Angular CLI currently requires npm version 6.';
 
 export default async function() {
-  // Only relevant with npm as a package manager
-  if (getActivePackageManager() !== 'npm') {
-    return;
-  }
-
   // Windows CI fails with permission errors when trying to replace npm
   if (process.platform.startsWith('win')) {
     return;
