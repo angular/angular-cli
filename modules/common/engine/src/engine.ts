@@ -9,6 +9,7 @@ import { ResourceLoader } from '@angular/compiler';
 import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { INITIAL_CONFIG, platformDynamicServer, renderModuleFactory } from '@angular/platform-server';
 import { dirname, resolve } from 'path';
+import { URL } from 'url';
 
 import { FileLoader } from './file-loader';
 import { InlineCriticalCssProcessor } from './inline-css-processor';
