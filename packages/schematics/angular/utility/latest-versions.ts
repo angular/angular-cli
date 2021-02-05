@@ -18,9 +18,9 @@ export const latestVersions = {
   // For our e2e tests, these versions must match the latest tag present on the branch.
   // During RC periods they will not match the latest RC until there's a new git tag, and
   // should not be updated.
-  DevkitBuildAngular: '~0.1102.0-rc.0',
-  DevkitBuildNgPackagr: '~0.1102.0-rc.0',
-  DevkitBuildWebpack: '~0.1102.0-rc.0',
+  DevkitBuildAngular: '~0.1102.0-rc.1',
+  DevkitBuildNgPackagr: '~0.1102.0-rc.1',
+  DevkitBuildWebpack: '~0.1102.0-rc.1',
 
   ngPackagr: '^11.0.0',
 };
