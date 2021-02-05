@@ -1,7 +1,7 @@
 {
   "name": "nguniversal",
   "main": "index.js",
-  "version": "11.2.0-next.0",
+  "version": "12.0.0-next.0",
   "private": true,
   "description": "Universal (isomorphic) JavaScript support for Angular",
   "homepage": "https://github.com/angular/universal",
