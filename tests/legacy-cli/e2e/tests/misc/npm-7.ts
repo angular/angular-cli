@@ -10,6 +10,11 @@ export default async function() {
     return;
   }
 
+  // Windows CI fails with permission errors when trying to replace npm
+  if (process.platform.startsWith('win')) {
+    return;
+  }
+
   const currentDirectory = process.cwd();
   try {
     // Install version 7.x
