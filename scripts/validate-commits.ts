@@ -113,7 +113,7 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
     sha = argv.head || 'HEAD';
   } else {
     const parentRemote = process.env['GIT_REMOTE'] ? process.env['GIT_REMOTE'] + '/' : '';
-    const parentBranch = process.env['GIT_BRANCH'] || 'master';
+    const parentBranch = process.env['GIT_BRANCH'] || process.env['CIRCLE_BRANCH'] || 'master';
     baseSha = execSync(`git merge-base --fork-point "${parentRemote}${parentBranch}"`)
       .toString().trim();
     sha = 'HEAD';
