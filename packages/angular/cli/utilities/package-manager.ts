@@ -58,7 +58,11 @@ export async function getPackageManager(root: string): Promise<PackageManager> {
 /**
  * Checks if the npm version is version 6.x.  If not, display a message and exit.
  */
-export function ensureCompatibleNpm() {
+export async function ensureCompatibleNpm(root: string): Promise<void> {
+  if ((await getPackageManager(root)) !== PackageManager.Npm) {
+    return;
+  }
+
   try {
     const version = execSync('npm --version', {encoding: 'utf8', stdio: 'pipe'}).trim();
     const major = Number(version.match(/^(\d+)\./)?.[1]);

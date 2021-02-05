@@ -267,7 +267,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
-    ensureCompatibleNpm();
+    await ensureCompatibleNpm(this.context.root);
 
     // Check if the current installed CLI version is older than the latest version.
     if (!disableVersionCheck && await this.checkCLILatestVersion(options.verbose, options.next)) {
