@@ -204,22 +204,6 @@ jobs:
             mkdir /mnt/ramdisk/e2e-yarn
             PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**}"
 
-  e2e-cli-node-10:
-    executor:
-      name: test-executor
-      nodeversion: "10.20"
-    parallelism: 4
-    steps:
-      - custom_attach_workspace
-      - browser-tools/install-chrome
-      - run:
-          name: Initialize Environment
-          command: |
-            ./.circleci/env.sh
-            # Ensure latest v6 npm version to support local package repository
-            PATH=~/.npm-global/bin:$PATH npm install --global npm@6
-      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
-
   e2e-cli-node-14:
     executor:
       name: test-executor
@@ -382,10 +366,6 @@ workflows:
               only:
                 - renovate/angular
                 - master
-      - e2e-cli-node-10:
-          <<: *only_release_branches
-          requires:
-            - e2e-cli
       - e2e-cli-node-14:
           <<: *only_release_branches
           requires:
