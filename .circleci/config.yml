@@ -77,9 +77,9 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
-      - run: nvm install 12.1.0
-      - run: nvm use 12.1.0
-      - run: npm install -g yarn@1.17.3
+      - run: nvm install 12.13
+      - run: nvm use 12.13
+      - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
 

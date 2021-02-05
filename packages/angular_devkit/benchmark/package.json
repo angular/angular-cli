@@ -9,10 +9,6 @@
   "keywords": [
     "benchmark"
   ],
-  "engines": {
-    "node": ">= 10.13.0",
-    "npm": ">= 6.2.0"
-  },
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "ansi-colors": "4.1.1",

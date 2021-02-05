@@ -14,12 +14,28 @@ try {
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
 // tslint:disable-next-line: no-var-keyword
-var version = process.versions.node.split('.').map(part => Number(part));
-if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 13)) {
+var version = process.versions.node.split('.').map((part) => Number(part));
+if (version[0] % 2 === 1 && version[0] > 14) {
+  // Allow new odd numbered releases with a warning (currently v15+)
+  console.warn(
+    'Node.js version ' +
+      process.version +
+      ' detected.\n' +
+      'Odd numbered Node.js versions will not enter LTS status and should not be used for production.' +
+      ' For more information, please see https://nodejs.org/en/about/releases/.',
+  );
+} else if (
+  version[0] < 12 ||
+  version[0] === 13 ||
+  (version[0] === 12 && version[1] < 13) ||
+  (version[0] === 14 && version[1] < 15)
+) {
   console.error(
-    'Node.js version ' + process.version + ' detected.\n' +
-    'The Angular CLI requires a minimum Node.js version of either v10.13 or v12.0.\n\n' +
-    'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n'
+    'Node.js version ' +
+      process.version +
+      ' detected.\n' +
+      'The Angular CLI requires a minimum Node.js version of either v12.13 or v14.15.\n\n' +
+      'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
   process.exitCode = 3;
