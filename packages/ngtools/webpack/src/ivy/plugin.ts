@@ -294,23 +294,18 @@ export class AngularWebpackPlugin {
   }
 
   private async rebuildRequiredFiles(
-    modules: compilation.Module[],
+    modules: Iterable<compilation.Module>,
     compilation: WebpackCompilation,
     fileEmitter: FileEmitter,
-  ) {
-    const rebuild = (filename: string) =>
-      new Promise<void>((resolve) => {
-        const module = modules.find(
-          ({ resource }: compilation.Module & { resource?: string }) =>
-            resource && normalizePath(resource) === filename,
-        );
-        if (!module) {
-          resolve();
-        } else {
-          compilation.rebuildModule(module, resolve);
-        }
-      });
+  ): Promise<void> {
+    if (this.requiredFilesToEmit.size === 0) {
+      return;
+    }
 
+    const rebuild = (webpackModule: compilation.Module) =>
+      new Promise<void>((resolve) => compilation.rebuildModule(webpackModule, resolve));
+
+    const filesToRebuild = new Set<string>();
     for (const requiredFile of this.requiredFilesToEmit) {
       const history = this.fileEmitHistory.get(requiredFile);
       if (history) {
@@ -323,13 +318,23 @@ export class AngularWebpackPlugin {
         ) {
           // New emit result is different so rebuild using new emit result
           this.requiredFilesToEmitCache.set(requiredFile, emitResult);
-          await rebuild(requiredFile);
+          filesToRebuild.add(requiredFile);
         }
       } else {
         // No emit history so rebuild
-        await rebuild(requiredFile);
+        filesToRebuild.add(requiredFile);
       }
     }
+
+    if (filesToRebuild.size > 0) {
+      for (const webpackModule of [...modules]) {
+        const resource = (webpackModule as compilation.Module & { resource?: string }).resource;
+        if (resource && filesToRebuild.has(normalizePath(resource))) {
+          await rebuild(webpackModule);
+        }
+      }
+    }
+
     this.requiredFilesToEmit.clear();
     this.requiredFilesToEmitCache.clear();
   }
