@@ -55,7 +55,7 @@
     "regenerator-runtime": "0.13.7",
     "resolve-url-loader": "3.1.2",
     "rimraf": "3.0.2",
-    "rollup": "2.38.4",
+    "rollup": "2.38.5",
     "rxjs": "6.6.3",
     "sass": "1.32.6",
     "sass-loader": "10.1.1",
