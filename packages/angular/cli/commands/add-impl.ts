@@ -38,7 +38,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
   }
 
   async run(options: AddCommandSchema & Arguments) {
-    await ensureCompatibleNpm(this.context.root);
+    await ensureCompatibleNpm(this.workspace.root);
 
     if (!options.collection) {
       this.logger.fatal(

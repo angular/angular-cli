@@ -256,7 +256,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
-    await ensureCompatibleNpm(this.context.root);
+    await ensureCompatibleNpm(this.workspace.root);
 
     // Check if the @angular-devkit/schematics package can be resolved from the workspace root
     // This works around issues with packages containing migrations that cannot directly depend on the package

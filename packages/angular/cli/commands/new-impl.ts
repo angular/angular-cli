@@ -22,7 +22,7 @@ export class NewCommand extends SchematicCommand<NewCommandSchema> {
   }
 
   public async run(options: NewCommandSchema & Arguments) {
-    await ensureCompatibleNpm(this.context.root);
+    await ensureCompatibleNpm(this.workspace.root);
 
     // Register the version of the CLI in the registry.
     const packageJson = require('../package.json');
