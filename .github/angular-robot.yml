@@ -47,7 +47,6 @@ merge:
       - "ci/circleci: validate"
       - "ci/circleci: test"
       - "ci/circleci: test-win"
-      - "ci/circleci: integration"
       - "ci/circleci: e2e-cli"
       - "ci/circleci: e2e-cli-ve"
       - "ci/circleci: test-browsers"
