@@ -1241,10 +1241,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier-win32_x64/-/buildifier-win32_x64-0.29.0.tgz#a63438c7a7d2dc593e626ed6e163e9d8ea93917a"
   integrity sha512-hnOQfPhQNAIqbrhsHT3MWAyAZSUhKwxzEuZJZoOsGrW8fPonhKysdvfZJqfqJ6vDVYaMJKvLnSO1c9QZRhU7kQ==
 
-"@bazel/buildifier@3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-3.5.0.tgz#afbee61d61543d0a0a28e2b29a5cbdb64c852953"
-  integrity sha512-cbUS0/GMg57g6NIg6JekgmqVtuobYzW4aGHk7KzMS/bFZvxg6WY19JJ5UZSzGyAGDu2152oUTFbh4WN74Fz1+Q==
+"@bazel/buildifier@4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.0.0.tgz#c99fb21295c7e2858fa176c2b950c589217ae8ac"
+  integrity sha512-e242AK+shp+5bpAc9l93pmG5YRYRfM0INV3gfbdxNeBxccx1MJUagaiwxqAV+Mw55zk92gsb99f2TAc9tt6C7w==
 
 "@bazel/buildifier@^0.29.0":
   version "0.29.0"
@@ -1255,18 +1255,18 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/jasmine@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.0.0.tgz#18541696b9d8b4e1f4383dbad00e380096957827"
-  integrity sha512-m0VDs+05Svv6RAYdLF/hM9mTeVKhEmZh4qkT1ZEiHOAwdanfcCWjhF5UaMYPmSih6NYkpmNyParx+weBVaIpsA==
+"@bazel/jasmine@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.1.0.tgz#f71b60194f083cd171bf18089e90df1c16cb0ade"
+  integrity sha512-EPKbBtkqpolVhF9l9QCm8+wbdsRqtFvHgOruk/mkLXpvTmSV+cO//okunEMyeA03BIj1+Ek8Hqk4b4l4lAT4bw==
   dependencies:
     c8 "~7.1.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.0.0.tgz#7cb3bcf405c590228888be78b9e49d1dc298dfea"
-  integrity sha512-qYsfyi/+7QOFP9uVAv3gKaqkxo+fIamFrdQ71K85FlJSowxAkwj51pxOPnIWBcMzFVNv1p2ZyfM3ZctKqGye2g==
+"@bazel/typescript@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.1.0.tgz#a07999ad7956b8c624604a521e653570bba32025"
+  integrity sha512-sEWuvkUGIDeRhjLENHtJyop7wu4UqKN8h/nSgUwc5gkpWXQiT2wGH5jKVxBqODOBHB+IInEMtAjyRmCT+HbSHA==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
