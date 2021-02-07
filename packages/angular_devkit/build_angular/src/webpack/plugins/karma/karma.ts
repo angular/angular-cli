@@ -336,7 +336,17 @@ function fallbackMiddleware() {
 function isPlugin(moduleId: string, pluginName: string) {
   return (plugin: string|{}): boolean => {
     if (typeof plugin === 'string') {
-      return plugin === moduleId;
+      if (!plugin.includes('*')) {
+        return plugin === moduleId;
+      }
+      const regexp = new RegExp(`^${plugin.replace('*', '.*')}`);
+      if (regexp.test(moduleId)) {
+        try {
+          require.resolve(moduleId);
+          return true;
+        } catch {}
+      }
+      return false;
     }
     return pluginName in plugin;
   }
