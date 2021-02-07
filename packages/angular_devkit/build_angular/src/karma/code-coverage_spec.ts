@@ -184,4 +184,16 @@ describe('Karma Builder code coverage', () => {
     expect(success).toBe(true);
     await run.stop();
   }, 120000);
+
+  it('is able to process coverage plugins provided as string karma-*', async () => {
+    host.replaceInFile('karma.conf.js', /plugins: \[.+?\]/s, `plugins: [
+      'karma-*',
+      require('@angular-devkit/build-angular/plugins/karma'),
+    ]`);
+    const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
+
+    const {success} = await run.result;
+    expect(success).toBe(true);
+    await run.stop();
+  }, 120000);
 });
