@@ -4,6 +4,9 @@
   "description": "Angular Universal builders package",
   "homepage": "https://github.com/angular/universal#readme",
   "license": "MIT",
+  "engines": {
+    "node": ">=12.13.0"
+  },
   "keywords": [
     "ssr",
     "universal",

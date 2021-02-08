@@ -17,7 +17,7 @@
     "engine-strict": true
   },
   "engines": {
-    "node": ">=10.13.0 <13.0.0",
+    "node": ">=12.13.0 <15.0.0",
     "yarn": ">=1.0.0"
   },
   "scripts": {
