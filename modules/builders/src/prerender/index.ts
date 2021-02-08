@@ -165,7 +165,6 @@ async function _renderUniversal(
       spinner.start('Generating service worker...');
       try {
         await augmentAppWithServiceWorker(
-          host,
           root,
           projectRoot,
           normalize(outputPath),
