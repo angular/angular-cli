@@ -1,8 +1,9 @@
+import { rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, npm } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
-const errorText = 'The Angular CLI currently requires npm version 6.';
+const errorText = 'The Angular CLI temporarily requires npm version 6';
 
 export default async function() {
   // Only relevant with npm as a package manager
@@ -32,6 +33,12 @@ export default async function() {
       throw new Error('ng update expected to show npm version error.');
     }
 
+    // Ensure `ng build` executes successfully
+    const { stderr: stderrBuild } = await ng('build');
+    if (stderrBuild.includes(errorText)) {
+      throw new Error('ng build expected to not show npm version error.');
+    }
+
     // Ensure `ng new` exits and shows npm error
     // Must be outside the project for `ng new`
     process.chdir('..');
@@ -39,7 +46,29 @@ export default async function() {
     if (!stderrNew.includes(errorText)) {
       throw new Error('ng new expected to show npm version error.');
     }
+
+    // Ensure `ng new --package-manager=npm` exits and shows npm error
+    const { message: stderrNewNpm } = await expectToFail(() => ng('new', '--package-manager=npm'));
+    if (!stderrNewNpm.includes(errorText)) {
+      throw new Error('ng new expected to show npm version error.');
+    }
+
+    // Ensure `ng new --skip-install` executes successfully
+    const { stderr: stderrNewSkipInstall } = await ng('new', 'npm-seven-skip', '--skip-install');
+    if (stderrNewSkipInstall.includes(errorText)) {
+      throw new Error('ng new --skip-install expected to not show npm version error.');
+    }
+
+    // Ensure `ng new --package-manager=yarn` executes successfully
+    const { stderr: stderrNewYarn } = await ng('new', 'npm-seven-yarn', '--package-manager=yarn');
+    if (stderrNewYarn.includes(errorText)) {
+      throw new Error('ng new --package-manager=yarn expected to not show npm version error.');
+    }
   } finally {
+    // Cleanup extra test projects
+    await rimraf('npm-seven-skip');
+    await rimraf('npm-seven-yarn');
+
     // Change directory back
     process.chdir(currentDirectory);
 

@@ -66,16 +66,18 @@ export async function ensureCompatibleNpm(root: string): Promise<void> {
   try {
     const version = execSync('npm --version', {encoding: 'utf8', stdio: 'pipe'}).trim();
     const major = Number(version.match(/^(\d+)\./)?.[1]);
-    if (major === 6) {
+    if (major <= 6) {
       return;
     }
 
     // tslint:disable-next-line: no-console
     console.error(
-      `npm version ${version} detected.\n` +
-      'The Angular CLI currently requires npm version 6.\n\n' +
-      'Please install a compatible version to proceed (`npm install --global npm@6`).\n',
+      `npm version ${version} detected. The Angular CLI temporarily requires npm version 6 while upstream issues are addressed.\n\n` +
+      'Please install a compatible version to proceed (`npm install --global npm@6`).\n' +
+      'For additional information and alternative workarounds, please see ' +
+      'https://github.com/angular/angular-cli/issues/19957#issuecomment-775407654',
     );
+
     process.exit(3);
   } catch {
     // npm is not installed

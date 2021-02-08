@@ -30,7 +30,7 @@ import * as systemPath from 'path';
 import { colors } from '../utilities/color';
 import { getProjectByCwd, getSchematicDefaults, getWorkspace } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
-import { getPackageManager } from '../utilities/package-manager';
+import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
 import { isTTY } from '../utilities/tty';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
@@ -502,6 +502,16 @@ export abstract class SchematicCommand<
         error = false;
       }
     });
+
+    // Temporary compatibility check for NPM 7
+    if (collectionName === '@schematics/angular' && schematicName === 'ng-new') {
+      if (
+        !input.skipInstall &&
+        (input.packageManager === undefined || input.packageManager === 'npm')
+      ) {
+        await ensureCompatibleNpm(this.context.root);
+      }
+    }
 
     return new Promise<number | void>(resolve => {
       workflow
