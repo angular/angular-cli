@@ -28,6 +28,7 @@ ng_package(
     deps = [
         ":common",
         "//modules/common/engine",
+        "@npm//critters",
     ],
 )
 
