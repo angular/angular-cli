@@ -21,6 +21,9 @@
   "baseBranches": [
     "master"
   ],
+  "ignoreDeps": [
+    "@types/node"
+  ],
   "packageFiles": [
     "WORKSPACE",
     "package.json",
