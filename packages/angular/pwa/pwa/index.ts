@@ -63,7 +63,7 @@ function updateIndexFile(path: string): Rule {
 
       const chunks: Array<Buffer> = [];
       const output = new Writable({
-        write(chunk: string | Buffer, encoding: string, callback: Function): void {
+        write(chunk: string | Buffer, encoding: BufferEncoding, callback: Function): void {
           chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding) : chunk);
           callback();
         },

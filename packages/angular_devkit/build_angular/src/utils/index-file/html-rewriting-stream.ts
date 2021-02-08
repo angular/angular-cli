@@ -28,7 +28,7 @@ export async function htmlRewritingStream(content: string): Promise<{
       .pipe(rewriter)
       .pipe(new Writable({
         write(chunk: string | Buffer, encoding: string | undefined, callback: Function): void {
-          chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding) : chunk);
+          chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding as BufferEncoding) : chunk);
           callback();
         },
         final(callback: (error?: Error) => void): void {
