@@ -46,7 +46,7 @@ import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from 
 /** Log messages to ignore and not rely to the logger */
 const IGNORED_STDOUT_MESSAGES = [
   'server listening on',
-  'Angular is running in the development mode. Call enableProdMode() to enable the production mode.'
+  'Angular is running in development mode. Call enableProdMode() to enable production mode.'
 ];
 
 
