@@ -1,12 +1,4 @@
-# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
-# For additional information regarding the format and rule options, please see:
-# https://github.com/browserslist/browserslist#queries
+# We want to run tests large with ever green browser so that 
+# we never trigger differential loading as this will slow down the tests.
 
-# You can see what browsers were selected by your queries by running:
-#   npx browserslist
-
-> 0.5%
-last 2 versions
-Firefox ESR
-not dead
-not IE 9-11 # For IE 9-11 support, remove 'not'.
+last 2 Chrome versions
