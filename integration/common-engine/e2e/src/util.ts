@@ -7,6 +7,7 @@
  */
 /* tslint:disable:no-console  */
 import * as webdriver from 'selenium-webdriver';
+import { by } from 'protractor';
 declare var browser: any;
 declare var expect: any;
 
@@ -22,4 +23,15 @@ export function verifyNoBrowserErrors() {
     });
     expect(errors).toEqual([]);
   });
+}
+
+export async function waitForAppRootElement(): Promise<boolean> {
+  try {
+    await browser.driver.get(browser.baseUrl);
+    await browser.driver.findElement(by.tagName('app-root'));
+    return true;
+  } catch {
+    await browser.driver.sleep(1000);
+    return waitForAppRootElement();
+  }
 }
