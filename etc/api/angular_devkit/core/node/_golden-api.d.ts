@@ -13,7 +13,7 @@ export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     list(path: Path): Observable<PathFragment[]>;
     read(path: Path): Observable<virtualFs.FileBuffer>;
     rename(from: Path, to: Path): Observable<void>;
-    stat(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null;
+    stat(path: Path): Observable<virtualFs.Stats<fs.Stats>>;
     watch(path: Path, _options?: virtualFs.HostWatchOptions): Observable<virtualFs.HostWatchEvent> | null;
     write(path: Path, content: virtualFs.FileBuffer): Observable<void>;
 }
