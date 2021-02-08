@@ -5,12 +5,25 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as fs from 'fs';
-import * as path from 'path';
+import {
+  PathLike,
+  Stats,
+  constants,
+  existsSync,
+  mkdirSync,
+  promises as fsPromises,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmdirSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from 'fs';
+import { dirname as pathDirname, join as pathJoin } from 'path';
 import { Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
 import {
   concatMap,
-  ignoreElements,
   map,
   mergeMap,
   publish,
@@ -39,6 +52,16 @@ interface ChokidarWatcher {
   close(): void;
 }
 
+async function exists(path: PathLike): Promise<boolean> {
+  try {
+    await fsPromises.access(path, constants.F_OK);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // This will only be initialized if the watch() method is called.
 // Otherwise chokidar appears only in type positions, and shouldn't be referenced
 // in the JavaScript output.
@@ -58,128 +81,83 @@ function loadFSWatcher() {
   }
 }
 
-type FsFunction0<R> = (cb: (err?: Error|null, result?: R) => void) => void;
-type FsFunction1<R, T1> = (p1: T1, cb: (err?: Error|null, result?: R) => void) => void;
-type FsFunction2<R, T1, T2>
-  = (p1: T1, p2: T2, cb: (err?: Error|null, result?: R) => void) => void;
-
-
-function _callFs<R>(fn: FsFunction0<R>): Observable<R>;
-function _callFs<R, T1>(fn: FsFunction1<R, T1>, p1: T1): Observable<R>;
-function _callFs<R, T1, T2>(fn: FsFunction2<R, T1, T2>, p1: T1, p2: T2): Observable<R>;
-
-function _callFs<ResultT>(fn: Function, ...args: {}[]): Observable<ResultT> {
-  return new Observable(obs => {
-    fn(...args, (err?: Error|null, result?: ResultT) => {
-      if (err) {
-        obs.error(err);
-      } else {
-        obs.next(result);
-        obs.complete();
-      }
-    });
-  });
-}
-
-
 /**
  * An implementation of the Virtual FS using Node as the background. There are two versions; one
  * synchronous and one asynchronous.
  */
-export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
+export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
   get capabilities(): virtualFs.HostCapabilities {
     return { synchronous: false };
   }
 
   write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
-    return _callFs<void, string, fs.MakeDirectoryOptions>(
-      fs.mkdir,
-      getSystemPath(dirname(path)),
-      { recursive: true },
-    ).pipe(
-      mergeMap(() => _callFs<void, string, Uint8Array>(
-        fs.writeFile,
-        getSystemPath(path),
-        new Uint8Array(content),
-      )),
-    );
+    return observableFrom(fsPromises.mkdir(getSystemPath(dirname(path)), { recursive: true }))
+      .pipe(
+        mergeMap(() => fsPromises.writeFile(getSystemPath(path), content)),
+      );
   }
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
-    return _callFs(fs.readFile, getSystemPath(path)).pipe(
-      map(buffer => new Uint8Array(buffer).buffer as virtualFs.FileBuffer),
-    );
+    return observableFrom(fsPromises.readFile(getSystemPath(path)))
+      .pipe(
+        map(buffer => new Uint8Array(buffer).buffer as virtualFs.FileBuffer),
+      );
   }
 
   delete(path: Path): Observable<void> {
     return this.isDirectory(path).pipe(
-      mergeMap(isDirectory => {
+      mergeMap(async isDirectory => {
         if (isDirectory) {
-          const allFiles: Path[] = [];
-          const allDirs: Path[] = [];
-          const _recurseList = (path: Path) => {
-            for (const fragment of fs.readdirSync(getSystemPath(path))) {
-              if (fs.statSync(getSystemPath(join(path, fragment))).isDirectory()) {
-                _recurseList(join(path, fragment));
-                allDirs.push(join(path, fragment));
+          const recursiveDelete = async (dirPath: string) => {
+            for (const fragment of (await fsPromises.readdir(dirPath))) {
+              const sysPath = pathJoin(dirPath, fragment);
+              const stats = await fsPromises.stat(sysPath);
+
+              if (stats.isDirectory()) {
+                await recursiveDelete(sysPath);
+                await fsPromises.rmdir(sysPath);
               } else {
-                allFiles.push(join(path, fragment));
+                await fsPromises.unlink(sysPath);
               }
             }
           };
-          _recurseList(path);
 
-          return concat(
-            observableFrom(allFiles).pipe(
-              mergeMap(p => _callFs(fs.unlink, getSystemPath(p))),
-              ignoreElements(),
-            ),
-            observableFrom(allDirs).pipe(
-              concatMap(p => _callFs(fs.rmdir, getSystemPath(p))),
-            ),
-          );
+          await recursiveDelete(getSystemPath(path));
         } else {
-          return _callFs(fs.unlink, getSystemPath(path));
+          await fsPromises.unlink(getSystemPath(path));
         }
       }),
-      map(() => undefined),
     );
   }
 
   rename(from: Path, to: Path): Observable<void> {
-    return _callFs(fs.rename, getSystemPath(from), getSystemPath(to));
+    return observableFrom(fsPromises.rename(getSystemPath(from), getSystemPath(to)));
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return _callFs<string[], string>(fs.readdir, getSystemPath(path)).pipe(
+    return observableFrom(fsPromises.readdir(getSystemPath(path))).pipe(
       map((names) => names.map(name => fragment(name))),
     );
   }
 
   exists(path: Path): Observable<boolean> {
-    // Exists is a special case because it cannot error.
-    return new Observable(obs => {
-      fs.exists(path, exists => {
-        obs.next(exists);
-        obs.complete();
-      });
-    });
+    return observableFrom(exists(path));
   }
 
   isDirectory(path: Path): Observable<boolean> {
-    return _callFs(fs.stat, getSystemPath(path)).pipe(
+    return this.stat(path).pipe(
       map(stat => stat.isDirectory()),
     );
   }
   isFile(path: Path): Observable<boolean> {
-    return _callFs(fs.stat, getSystemPath(path)).pipe(
+    return this.stat(path).pipe(
       map(stat => stat.isFile()),
     );
   }
 
   // Some hosts may not support stat.
-  stat(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
-    return _callFs(fs.stat, getSystemPath(path));
+  stat(path: Path): Observable<virtualFs.Stats<Stats>> {
+    return observableFrom(fsPromises.stat(getSystemPath(path)));
   }
 
   // Some hosts may not support watching.
@@ -226,15 +204,15 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
 /**
  * An implementation of the Virtual FS using Node as the backend, synchronously.
  */
-export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
+export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   get capabilities(): virtualFs.HostCapabilities {
     return { synchronous: true };
   }
 
   write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
     return new Observable(obs => {
-      fs.mkdirSync(getSystemPath(dirname(path)), { recursive: true });
-      fs.writeFileSync(getSystemPath(path), new Uint8Array(content));
+      mkdirSync(getSystemPath(dirname(path)), { recursive: true });
+      writeFileSync(getSystemPath(path), new Uint8Array(content));
       obs.next();
       obs.complete();
     });
@@ -242,7 +220,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
     return new Observable(obs => {
-      const buffer = fs.readFileSync(getSystemPath(path));
+      const buffer = readFileSync(getSystemPath(path));
 
       obs.next(new Uint8Array(buffer).buffer as virtualFs.FileBuffer);
       obs.complete();
@@ -253,9 +231,9 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
     return this.isDirectory(path).pipe(
       concatMap(isDir => {
         if (isDir) {
-          const dirPaths = fs.readdirSync(getSystemPath(path));
+          const dirPaths = readdirSync(getSystemPath(path));
           const rmDirComplete = new Observable<void>((obs) => {
-            fs.rmdirSync(getSystemPath(path));
+            rmdirSync(getSystemPath(path));
             obs.complete();
           });
 
@@ -265,7 +243,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
           );
         } else {
           try {
-            fs.unlinkSync(getSystemPath(path));
+            unlinkSync(getSystemPath(path));
           } catch (err) {
             return throwError(err);
           }
@@ -279,8 +257,8 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   rename(from: Path, to: Path): Observable<void> {
     return new Observable(obs => {
       const toSystemPath = getSystemPath(to);
-      fs.mkdirSync(path.dirname(toSystemPath), { recursive: true });
-      fs.renameSync(getSystemPath(from), toSystemPath);
+      mkdirSync(pathDirname(toSystemPath), { recursive: true });
+      renameSync(getSystemPath(from), toSystemPath);
       obs.next();
       obs.complete();
     });
@@ -288,7 +266,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 
   list(path: Path): Observable<PathFragment[]> {
     return new Observable(obs => {
-      const names = fs.readdirSync(getSystemPath(path));
+      const names = readdirSync(getSystemPath(path));
       obs.next(names.map(name => fragment(name)));
       obs.complete();
     });
@@ -296,7 +274,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 
   exists(path: Path): Observable<boolean> {
     return new Observable(obs => {
-      obs.next(fs.existsSync(getSystemPath(path)));
+      obs.next(existsSync(getSystemPath(path)));
       obs.complete();
     });
   }
@@ -311,9 +289,9 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   }
 
   // Some hosts may not support stat.
-  stat(path: Path): Observable<virtualFs.Stats<fs.Stats>> {
+  stat(path: Path): Observable<virtualFs.Stats<Stats>> {
     return new Observable(obs => {
-      obs.next(fs.statSync(getSystemPath(path)));
+      obs.next(statSync(getSystemPath(path)));
       obs.complete();
     });
   }

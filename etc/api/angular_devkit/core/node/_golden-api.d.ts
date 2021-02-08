@@ -4,7 +4,7 @@ export declare function isDirectory(filePath: string): boolean;
 
 export declare function isFile(filePath: string): boolean;
 
-export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
+export declare class NodeJsAsyncHost implements virtualFs.Host<Stats> {
     get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
     exists(path: Path): Observable<boolean>;
@@ -13,12 +13,12 @@ export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     list(path: Path): Observable<PathFragment[]>;
     read(path: Path): Observable<virtualFs.FileBuffer>;
     rename(from: Path, to: Path): Observable<void>;
-    stat(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null;
+    stat(path: Path): Observable<virtualFs.Stats<Stats>>;
     watch(path: Path, _options?: virtualFs.HostWatchOptions): Observable<virtualFs.HostWatchEvent> | null;
     write(path: Path, content: virtualFs.FileBuffer): Observable<void>;
 }
 
-export declare class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
+export declare class NodeJsSyncHost implements virtualFs.Host<Stats> {
     get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
     exists(path: Path): Observable<boolean>;
@@ -27,7 +27,7 @@ export declare class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
     list(path: Path): Observable<PathFragment[]>;
     read(path: Path): Observable<virtualFs.FileBuffer>;
     rename(from: Path, to: Path): Observable<void>;
-    stat(path: Path): Observable<virtualFs.Stats<fs.Stats>>;
+    stat(path: Path): Observable<virtualFs.Stats<Stats>>;
     watch(path: Path, _options?: virtualFs.HostWatchOptions): Observable<virtualFs.HostWatchEvent> | null;
     write(path: Path, content: virtualFs.FileBuffer): Observable<void>;
 }
