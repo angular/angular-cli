@@ -40,10 +40,13 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
     error = true;
   }
 
-  logger.info('');
-  logger.info('Running commit validation...');
-  error = validateCommits({}, logger.createChild('validate-commits')) != 0
-       || error;
+  // Only validate commits from PRs
+  if (process.env['CIRCLE_PR_NUMBER']) {
+    logger.info('');
+    logger.info('Running commit validation...');
+    error = validateCommits({}, logger.createChild('validate-commits')) != 0
+        || error;
+  }
 
   logger.info('');
   logger.info(`Running DO_NOT${''}_SUBMIT validation...`);
