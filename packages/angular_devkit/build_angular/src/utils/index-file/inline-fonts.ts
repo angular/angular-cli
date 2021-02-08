@@ -7,12 +7,12 @@
  */
 
 import * as cacache from 'cacache';
+import * as fs from 'fs';
 import * as https from 'https';
 import * as proxyAgent from 'https-proxy-agent';
 import { URL } from 'url';
 import { findCachePath } from '../cache-path';
 import { cachingDisabled } from '../environment-options';
-import { readFile } from '../fs';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
 const cacheFontsPath: string | undefined = cachingDisabled ? undefined : findCachePath('angular-build-fonts');
@@ -97,7 +97,7 @@ export class InlineFontsProcessor {
     if (cacheFontsPath) {
       const entry = await cacache.get.info(cacheFontsPath, key);
       if (entry) {
-        return readFile(entry.path, 'utf8');
+        return fs.promises.readFile(entry.path, 'utf8');
       }
     }
 

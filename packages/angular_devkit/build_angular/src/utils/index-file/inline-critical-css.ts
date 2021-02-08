@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { readFile } from '../fs';
+import * as fs from 'fs';
 
 const Critters: typeof import('critters').default = require('critters');
 
@@ -46,7 +46,7 @@ class CrittersExtended extends Critters {
   protected readFile(path: string): Promise<string> {
     const readAsset = this.optionsExtended.readAsset;
 
-    return readAsset ? readAsset(path) : readFile(path, 'utf-8');
+    return readAsset ? readAsset(path) : fs.promises.readFile(path, 'utf-8');
   }
 }
 

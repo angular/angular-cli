@@ -18,7 +18,6 @@ import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
 import { normalizeOptimization } from '../utils';
-import { readFile, writeFile } from '../utils/fs';
 import { InlineCriticalCssProcessor } from '../utils/index-file/inline-critical-css';
 import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { Spinner } from '../utils/spinner';
@@ -68,7 +67,7 @@ async function _renderUniversal(
   for (const outputPath of browserResult.outputPaths) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
     const browserIndexOutputPath = path.join(outputPath, 'index.html');
-    const indexHtml = await readFile(browserIndexOutputPath, 'utf8');
+    const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
     const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
 
     const {
@@ -115,7 +114,7 @@ async function _renderUniversal(
       }
     }
 
-    await writeFile(outputIndexPath, html);
+    await fs.promises.writeFile(outputIndexPath, html);
 
     if (browserOptions.serviceWorker) {
       await augmentAppWithServiceWorker(

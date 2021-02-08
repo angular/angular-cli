@@ -30,7 +30,6 @@ import { findCachePath } from '../utils/cache-path';
 import { colors } from '../utils/color';
 import { copyAssets } from '../utils/copy-assets';
 import { cachingDisabled } from '../utils/environment-options';
-import { mkdir, writeFile } from '../utils/fs';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
 import { I18nOptions } from '../utils/i18n-options';
 import { FileInfo } from '../utils/index-file/augment-index-html';
@@ -702,8 +701,8 @@ export function buildWebpackBrowser(
                       }
 
                       const indexOutput = path.join(outputPath, getIndexOutputFile(options.index));
-                      await mkdir(path.dirname(indexOutput), { recursive: true });
-                      await writeFile(indexOutput, content);
+                      await fs.promises.mkdir(path.dirname(indexOutput), { recursive: true });
+                      await fs.promises.writeFile(indexOutput, content);
                     } catch (error) {
                       spinner.fail('Index html generation failed.');
 

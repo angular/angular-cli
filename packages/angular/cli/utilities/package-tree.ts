@@ -9,10 +9,7 @@
 import * as fs from 'fs';
 import { dirname, join } from 'path';
 import * as resolve from 'resolve';
-import { promisify } from 'util';
 import { NgAddSaveDepedency } from './package-metadata';
-
-const readFile = promisify(fs.readFile);
 
 interface PackageJson {
   name: string;
@@ -47,7 +44,7 @@ export interface PackageTreeNode {
 
 export async function readPackageJson(packageJsonPath: string): Promise<PackageJson | undefined> {
   try {
-    return JSON.parse((await readFile(packageJsonPath)).toString());
+    return JSON.parse((await fs.promises.readFile(packageJsonPath)).toString());
   } catch {
     return undefined;
   }
