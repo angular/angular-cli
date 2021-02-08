@@ -135,18 +135,9 @@ if (process.env['NG_CLI_PROFILING']) {
 
   return cli;
 })().then(cli => {
-  // This is required to support 1.x local versions with a 6+ global
-  let standardInput;
-  try {
-    standardInput = process.stdin;
-  } catch (e) {
-    process.stdin = new Duplex();
-    standardInput = process.stdin;
-  }
-
   return cli({
     cliArgs: process.argv.slice(2),
-    inputStream: standardInput,
+    inputStream: process.stdin,
     outputStream: process.stdout,
   });
 }).then((exitCode: number) => {

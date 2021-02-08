@@ -125,9 +125,9 @@ export default function(
           }
       });
       if (options.hideOutput) {
-        childProcess.stdout.on('data', (data: Buffer) =>
+        childProcess.stdout?.on('data', (data: Buffer) =>
           bufferedOutput.push({ stream: process.stdout, data: data }));
-        childProcess.stderr.on('data', (data: Buffer) =>
+        childProcess.stderr?.on('data', (data: Buffer) =>
           bufferedOutput.push({ stream: process.stderr, data: data }));
       }
     });

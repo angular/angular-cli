@@ -58,10 +58,10 @@ function loadFSWatcher() {
   }
 }
 
-type FsFunction0<R> = (cb: (err?: Error, result?: R) => void) => void;
-type FsFunction1<R, T1> = (p1: T1, cb: (err?: Error, result?: R) => void) => void;
+type FsFunction0<R> = (cb: (err?: Error|null, result?: R) => void) => void;
+type FsFunction1<R, T1> = (p1: T1, cb: (err?: Error|null, result?: R) => void) => void;
 type FsFunction2<R, T1, T2>
-  = (p1: T1, p2: T2, cb: (err?: Error, result?: R) => void) => void;
+  = (p1: T1, p2: T2, cb: (err?: Error|null, result?: R) => void) => void;
 
 
 function _callFs<R>(fn: FsFunction0<R>): Observable<R>;
@@ -70,7 +70,7 @@ function _callFs<R, T1, T2>(fn: FsFunction2<R, T1, T2>, p1: T1, p2: T2): Observa
 
 function _callFs<ResultT>(fn: Function, ...args: {}[]): Observable<ResultT> {
   return new Observable(obs => {
-    fn(...args, (err?: Error, result?: ResultT) => {
+    fn(...args, (err?: Error|null, result?: ResultT) => {
       if (err) {
         obs.error(err);
       } else {

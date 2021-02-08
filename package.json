@@ -109,7 +109,7 @@
     "@types/loader-utils": "^2.0.0",
     "@types/minimatch": "3.0.3",
     "@types/minimist": "^1.2.0",
-    "@types/node": "10.12.30",
+    "@types/node": "~12.12.6",
     "@types/node-fetch": "^2.1.6",
     "@types/npm-package-arg": "^6.1.0",
     "@types/parse5-html-rewriting-stream": "^5.1.2",

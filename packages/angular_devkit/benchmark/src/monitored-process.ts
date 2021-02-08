@@ -51,8 +51,8 @@ export class LocalMonitoredProcess implements MonitoredProcess {
       const childProcess = spawn(cmd, args, spawnOptions);
 
       // Emit output and stats.
-      childProcess.stdout.on('data', (data: Buffer) => this.stdout.next(data));
-      childProcess.stderr.on('data', (data: Buffer) => this.stderr.next(data));
+      childProcess.stdout?.on('data', (data: Buffer) => this.stdout.next(data));
+      childProcess.stderr?.on('data', (data: Buffer) => this.stderr.next(data));
 
       const statsSubs = timer(0, this.pollingRate).pipe(
         concatMap(() => from(pidtree(childProcess.pid, { root: true }) as Promise<number[]>)),

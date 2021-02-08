@@ -7,7 +7,7 @@
  */
 import { json, workspaces } from '@angular-devkit/core';
 import * as path from 'path';
-import * as v8 from 'v8';
+import { deserialize, serialize } from 'v8';
 import { BuilderInfo } from '../src';
 import { Schema as BuilderSchema } from '../src/builders-schema';
 import { Target } from '../src/input-schema';
@@ -18,9 +18,6 @@ export type NodeModulesBuilderInfo = BuilderInfo & {
 };
 
 function clone(obj: unknown): unknown {
-  const serialize = ((v8 as unknown) as { serialize(value: unknown): Buffer }).serialize;
-  const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
-
   try {
     return deserialize(serialize(obj));
   } catch {

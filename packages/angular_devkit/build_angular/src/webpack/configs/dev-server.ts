@@ -55,7 +55,7 @@ export function getDevServerConfig(
     }
 
     const parsedHost = url.parse(publicHost);
-    publicHost = parsedHost.host;
+    publicHost = parsedHost.host ?? undefined;
   } else {
     publicHost = '0.0.0.0:0';
   }

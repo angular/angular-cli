@@ -93,6 +93,12 @@ export function runWebpackDevServer(
             obs.error(err);
           } else {
             const address = this.address();
+            if (!address) {
+              obs.error(new Error(`Dev-server address info is not defined.`));
+
+              return;
+            }
+
             result = {
               success: true,
               port: typeof address === 'string' ? 0 : address.port,
