@@ -33,4 +33,13 @@ export interface Schema {
    * Use for a complex dev server setup, such as one with reverse proxies.
    */
   publicHost?: string;
+
+  /** Serve using HTTPS. */
+  ssl?: boolean;
+
+  /** SSL key to use for serving HTTPS. */
+  sslKey?: string;
+
+  /** SSL certificate to use for serving HTTPS. */
+  sslCert?: string;
 }

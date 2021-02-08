@@ -42,6 +42,19 @@
       "type": "boolean",
       "description": "Launch the development server in inspector mode and listen on address and port '127.0.0.1:9229'.",
       "default": false
+    },
+    "ssl": {
+      "type": "boolean",
+      "description": "Serve using HTTPS.",
+      "default": false
+    },
+    "sslKey": {
+      "type": "string",
+      "description": "SSL key to use for serving HTTPS."
+    },
+    "sslCert": {
+      "type": "string",
+      "description": "SSL certificate to use for serving HTTPS."
     }
   },
   "additionalProperties": false,

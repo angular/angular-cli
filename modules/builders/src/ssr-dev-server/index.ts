@@ -15,7 +15,7 @@ import {
 import { json, logging, tags } from '@angular-devkit/core';
 import * as browserSync from 'browser-sync';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { join } from 'path';
+import { join, resolve as pathResolve } from 'path';
 import {
   EMPTY,
   Observable,
@@ -62,7 +62,6 @@ export function execute(
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
   const getBaseUrl = (bs: browserSync.BrowserSyncInstance) => `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
-
   const browserTargetRun = context.scheduleTarget(browserTarget, {
     serviceWorker: false,
     watch: true,
@@ -136,7 +135,7 @@ export function execute(
 
         return of(builderOutput);
       } else {
-        return from(initBrowserSync(bsInstance, nodeServerPort, options))
+        return from(initBrowserSync(bsInstance, nodeServerPort, options, context))
           .pipe(
             tap(bs => {
               const baseUrl = getBaseUrl(bs);
@@ -207,6 +206,7 @@ async function initBrowserSync(
   browserSyncInstance: browserSync.BrowserSyncInstance,
   nodeServerPort: number,
   options: SSRDevServerBuilderOptions,
+  context: BuilderContext,
 ): Promise<browserSync.BrowserSyncInstance> {
   if (browserSyncInstance.active) {
     return browserSyncInstance;
@@ -237,6 +237,7 @@ async function initBrowserSync(
     ghostMode: false,
     logLevel: 'silent',
     open,
+    https: getSslConfig(context.workspaceRoot, options),
   };
 
   const publicHostNormalized = publicHost && publicHost.endsWith('/')
@@ -304,6 +305,21 @@ function mapErrorToMessage(error: unknown): string {
   }
 
   return '';
+}
+
+function getSslConfig(
+  root: string,
+  options: SSRDevServerBuilderOptions,
+): browserSync.HttpsOptions | undefined | boolean {
+  const { ssl, sslCert, sslKey } = options;
+  if (ssl && sslCert && sslKey) {
+    return {
+      key: pathResolve(root, sslKey),
+      cert: pathResolve(root, sslCert),
+    };
+  }
+
+  return ssl;
 }
 
 export default createBuilder<SSRDevServerBuilderOptions, BuilderOutput>(execute);

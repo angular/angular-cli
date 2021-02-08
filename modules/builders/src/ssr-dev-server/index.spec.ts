@@ -8,9 +8,9 @@
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import * as browserSync from 'browser-sync';
-import { concatMap, debounceTime, mergeMap, retryWhen, take } from 'rxjs/operators';
-
+import * as https from 'https';
 import { from, throwError, timer } from 'rxjs';
+import { concatMap, debounceTime, mergeMap, retryWhen, take } from 'rxjs/operators';
 import { createArchitect, host } from '../../testing/utils';
 import { SSRDevServerBuilderOutput } from './index';
 
@@ -88,6 +88,20 @@ describe('Serve SSR Builder', () => {
     const output = await run.result as SSRDevServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(output.baseUrl).not.toContain('4200');
+  });
+
+  it('works with SSL', async () => {
+    const run = await architect.scheduleTarget(target, { ssl: true });
+    runs.push(run);
+    const output = await run.result as SSRDevServerBuilderOutput;
+    expect(output.success).toBe(true);
+    expect(output.baseUrl).toBe('https://localhost:4200');
+
+    const response = await fetch('https://localhost:4200/index.html', {
+      agent: new https.Agent({ rejectUnauthorized: false }),
+    });
+
+    expect(await response.text()).toContain('<title>App</title>');
   });
 
   // todo: alan-agius4: Investigate why this tests passed locally but fails in CI.
