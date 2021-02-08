@@ -21,7 +21,7 @@ import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
-import { getAotConfig, getCommonConfig, getStatsConfig } from '../webpack/configs';
+import { getAotConfig, getBrowserConfig, getCommonConfig, getStatsConfig } from '../webpack/configs';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Format, Schema } from './schema';
 
@@ -184,6 +184,8 @@ export async function execute(
       scripts: [],
       styles: [],
       deleteOutputPath: false,
+      extractLicenses: false,
+      subresourceIntegrity: false,
     },
     context,
     (wco) => {
@@ -211,6 +213,7 @@ export async function execute(
       const partials = [
         { plugins: [new NoEmitPlugin()] },
         getCommonConfig(wco),
+        getBrowserConfig(wco),
         // Only use VE extraction if not using Ivy
         getAotConfig(wco, !usingIvy),
         getStatsConfig(wco),
