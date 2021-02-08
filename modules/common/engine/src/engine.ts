@@ -8,12 +8,12 @@
 import { ResourceLoader } from '@angular/compiler';
 import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { INITIAL_CONFIG, platformDynamicServer, renderModuleFactory } from '@angular/platform-server';
+import * as fs from 'fs';
 import { dirname, resolve } from 'path';
 import { URL } from 'url';
 
 import { FileLoader } from './file-loader';
 import { InlineCriticalCssProcessor } from './inline-css-processor';
-import { exists, readFile } from './utils';
 
 /** These are the allowed options for the render */
 export interface RenderOptions {
@@ -74,7 +74,7 @@ export class CommonEngine {
 
         if (pageExists) {
           // Serve pre-rendered page.
-          return readFile(pagePath, 'utf-8');
+          return fs.promises.readFile(pagePath, 'utf-8');
         }
       }
     }
@@ -150,7 +150,7 @@ export class CommonEngine {
     let doc = this.templateCache.get(filePath);
 
     if (!doc) {
-      doc = await readFile(filePath, 'utf-8');
+      doc = await fs.promises.readFile(filePath, 'utf-8');
       this.templateCache.set(filePath, doc);
     }
 
@@ -164,5 +164,15 @@ export class CommonEngine {
     return compilerFactory.createCompiler([
       { providers: [{ provide: ResourceLoader, useClass: FileLoader, deps: [] }] }
     ]);
+  }
+}
+
+async function exists(path: fs.PathLike): Promise<boolean> {
+  try {
+    await fs.promises.access(path, fs.constants.F_OK);
+
+    return true;
+  } catch {
+    return false;
   }
 }

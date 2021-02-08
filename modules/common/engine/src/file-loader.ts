@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ResourceLoader } from '@angular/compiler';
-import { readFile } from './utils';
+import * as fs from 'fs';
 
 /** ResourceLoader implementation for loading files */
 export class FileLoader implements ResourceLoader {
   get(url: string): Promise<string> {
-    return readFile(url, 'utf-8');
+    return fs.promises.readFile(url, 'utf-8');
   }
 }

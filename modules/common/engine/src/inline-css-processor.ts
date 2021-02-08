@@ -7,8 +7,7 @@
  */
 
 import Critters from 'critters';
-import { readFile } from './utils';
-
+import * as fs from 'fs';
 export interface InlineCriticalCssProcessOptions {
   outputPath?: string;
 }
@@ -50,7 +49,7 @@ class CrittersExtended extends Critters {
   protected async readFile(path: string): Promise<string> {
     let resourceContent = this.resourceCache.get(path);
     if (resourceContent === undefined) {
-      resourceContent = await readFile(path, 'utf-8');
+      resourceContent = await fs.promises.readFile(path, 'utf-8');
       this.resourceCache.set(path, resourceContent);
     }
 
