@@ -175,7 +175,6 @@ ts_library(
         "@npm//regenerator-runtime",
         "@npm//resolve-url-loader",
         "@npm//rimraf",
-        "@npm//rollup",
         "@npm//rxjs",
         "@npm//sass",
         "@npm//sass-loader",
