@@ -124,6 +124,11 @@
       "version": "11.0.0",
       "factory": "./update-11/update-dependencies",
       "description": "Update workspace dependencies to match a new v11 project."
+    },
+    "update-angular-config-v12": {
+      "version": "12.0.0-next.0",
+      "factory": "./update-12/update-angular-config",
+      "description": "Remove deprecated options from 'angular.json' that are no longer present in v12."
     }
   }
 }
