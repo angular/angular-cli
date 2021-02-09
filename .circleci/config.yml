@@ -167,10 +167,12 @@ jobs:
       - custom_attach_workspace
       - run:
           name: Validate Commit Messages
-          command: yarn -s admin validate-commits
-      - run:
-          name: Validate "do not submit" Commits
-          command: yarn -s admin validate-do-not-submit
+          command: >
+            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+              yarn -s admin validate-commits
+            else
+              echo "This build is not over a PR, nothing to do."
+            fi
       - run:
           command: yarn -s admin validate --ci
 
