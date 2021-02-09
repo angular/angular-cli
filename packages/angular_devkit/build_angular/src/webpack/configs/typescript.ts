@@ -42,11 +42,6 @@ function canUseIvyPlugin(wco: WebpackConfigOptions): boolean {
     return false;
   }
 
-  // This pass relies on internals of the original plugin
-  if (wco.buildOptions.experimentalRollupPass) {
-    return false;
-  }
-
   return true;
 }
 

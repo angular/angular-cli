@@ -19,6 +19,3 @@ export {
   default as PostcssCliResources,
   PostcssCliResourcesOptions,
 } from './postcss-cli-resources';
-
-import { join } from 'path';
-export const WebpackRollupLoader = require.resolve(join(__dirname, 'webpack-rollup-loader'));
