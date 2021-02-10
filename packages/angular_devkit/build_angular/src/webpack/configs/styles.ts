@@ -91,7 +91,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   // set base rules to derive final rules from
-  const baseRules: { test: RegExp, use: webpack.RuleSetLoader[] }[] = [
+  const baseRules: { test: RegExp, use: webpack.RuleSetUseItem[] }[] = [
     { test: /\.css$/, use: [] },
     {
       test: /\.scss$|\.sass$/,
