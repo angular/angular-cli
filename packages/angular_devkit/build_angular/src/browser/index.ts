@@ -66,6 +66,7 @@ import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 import {
   BundleStats,
   ChunkType,
+  JsonChunkStats,
   generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
@@ -781,10 +782,9 @@ function assertNever(input: never): never {
   throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }
 
-type ArrayElement<A> = A extends ReadonlyArray<infer T> ? T : never;
 function generateBundleInfoStats(
   bundle: ProcessBundleFile,
-  chunk: ArrayElement<webpack.Stats.ToJsonOutput['chunks']> | undefined,
+  chunk: JsonChunkStats | undefined,
   chunkType: ChunkType,
 ): BundleStats {
   return generateBundleStats(

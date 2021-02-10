@@ -16,16 +16,19 @@ describe('async-chunks', () => {
           id: 0,
           names: ['first'],
           initial: true,
+          files: [],
         },
         {
           id: 1,
           names: ['second'],
           initial: true,
+          files: [],
         },
         {
           id: 'third', // IDs can be strings too.
           names: ['third'],
           initial: true,
+          files: [],
         },
       ];
       const entrypoints = {
@@ -39,7 +42,7 @@ describe('async-chunks', () => {
           chunks: ['third'],
         },
       };
-      const webpackStats = { chunks, entrypoints } as unknown as webpack.Stats.ToJsonOutput;
+      const webpackStats = { chunks, entrypoints };
 
       const extraEntryPoints = [
         {
@@ -66,18 +69,21 @@ describe('async-chunks', () => {
           id: 0,
           names: ['first'],
           initial: false, // No longer initial because it was marked async.
+          files: [],
         },
         {
           id: 1,
           names: ['second'],
           initial: true,
+          files: [],
         },
         {
           id: 'third',
           names: ['third'],
           initial: false, // No longer initial because it was marked async.
+          files: [],
         },
-      ] as Exclude<webpack.Stats.ToJsonOutput['chunks'], undefined>);
+      ]);
     });
 
     it('ignores runtime dependency of async chunks', () => {
@@ -86,11 +92,13 @@ describe('async-chunks', () => {
           id: 0,
           names: ['asyncStuff'],
           initial: true,
+          files: [],
         },
         {
           id: 1,
           names: ['runtime'],
           initial: true,
+          files: [],
         },
       ];
       const entrypoints = {
@@ -98,7 +106,7 @@ describe('async-chunks', () => {
           chunks: [0, 1], // Includes runtime as a dependency.
         },
       };
-      const webpackStats = { chunks, entrypoints } as unknown as webpack.Stats.ToJsonOutput;
+      const webpackStats = { chunks, entrypoints };
 
       const extraEntryPoints = [
         {
@@ -115,13 +123,15 @@ describe('async-chunks', () => {
           id: 0,
           names: ['asyncStuff'],
           initial: false, // No longer initial because it was marked async.
+          files: [],
         },
         {
           id: 1,
           names: ['runtime'],
           initial: true, // Still initial, even though its a dependency.
+          files: [],
         },
-      ] as Exclude<webpack.Stats.ToJsonOutput['chunks'], undefined>);
+      ]);
     });
   });
 });
