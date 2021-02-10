@@ -6,10 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { basename } from 'path';
-import * as webpack from 'webpack';
 import { Budget, Type } from '../browser/schema';
 import { ProcessBundleFile, ProcessBundleResult } from '../utils/process-bundle';
-import { formatSize } from '../webpack/utils/stats';
+import {
+  JsonAssetStats,
+  JsonChunkStats,
+  JsonCompilationStats,
+  formatSize,
+} from '../webpack/utils/stats';
 
 interface Size {
   size: number;
@@ -105,7 +109,7 @@ export function* calculateThresholds(budget: Budget): IterableIterator<Threshold
  */
 function calculateSizes(
   budget: Budget,
-  stats: webpack.Stats.ToJsonOutput,
+  stats: JsonCompilationStats,
   processResults: ProcessBundleResult[],
 ): Size[] {
   if (budget.type === Type.AnyComponentStyle) {
@@ -115,7 +119,14 @@ function calculateSizes(
   }
 
   type NonComponentStyleBudgetTypes = Exclude<Budget['type'], Type.AnyComponentStyle>;
-  type CalculatorTypes = { new(budget: Budget, chunks: Chunk[], assets: Asset[], processResults: ProcessBundleResult[]): Calculator };
+  type CalculatorTypes = {
+    new (
+      budget: Budget,
+      chunks: JsonChunkStats[],
+      assets: JsonAssetStats[],
+      processResults: ProcessBundleResult[],
+    ): Calculator;
+  };
   const calculatorMap: Record<NonComponentStyleBudgetTypes, CalculatorTypes> = {
     all: AllCalculator,
     allScript: AllScriptCalculator,
@@ -139,14 +150,11 @@ function calculateSizes(
   return calculator.calculate();
 }
 
-type ArrayElement<T> = T extends Array<infer U> ? U : never;
-type Chunk = ArrayElement<Exclude<webpack.Stats.ToJsonOutput['chunks'], undefined>>;
-type Asset = ArrayElement<Exclude<webpack.Stats.ToJsonOutput['assets'], undefined>>;
 abstract class Calculator {
   constructor (
     protected budget: Budget,
-    protected chunks: Chunk[],
-    protected assets: Asset[],
+    protected chunks: JsonChunkStats[],
+    protected assets: JsonAssetStats[],
     protected processResults: ProcessBundleResult[],
   ) {}
 
@@ -154,7 +162,7 @@ abstract class Calculator {
 
   /** Calculates the size of the given chunk for the provided build type. */
   protected calculateChunkSize(
-    chunk: Chunk,
+    chunk: JsonChunkStats,
     buildType: DifferentialBuildType,
   ): number {
     // Look for a process result containing different builds for this chunk.
@@ -183,7 +191,7 @@ abstract class Calculator {
     }
   }
 
-  protected getAssetSize(asset: Asset): number {
+  protected getAssetSize(asset: JsonAssetStats): number {
     if (asset.name.endsWith('.js')) {
       const processResult = this.processResults
         .find((processResult) => processResult.original && basename(processResult.original.filename) === asset.name);
@@ -348,7 +356,7 @@ function calculateBytes(
 
 export function* checkBudgets(
   budgets: Budget[],
-  webpackStats: webpack.Stats.ToJsonOutput,
+  webpackStats: JsonCompilationStats,
   processResults: ProcessBundleResult[],
 ): IterableIterator<{ severity: ThresholdSeverity, message: string }> {
   // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker`.

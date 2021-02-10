@@ -15,6 +15,28 @@ import { colors as ansiColors, removeColor } from '../../utils/color';
 import { Configuration, Stats } from 'webpack';
 import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
+export interface JsonAssetStats {
+  name: string;
+  size: number;
+}
+
+export interface JsonChunkStats {
+  id: number | string;
+  initial?: boolean;
+  files: string[];
+  names: string[];
+}
+
+export interface JsonEntrypointStats {
+  chunks: (number | string)[];
+}
+
+export interface JsonCompilationStats {
+  assets?: JsonAssetStats[];
+  chunks?: JsonChunkStats[];
+  entrypoints?: Record<string, JsonEntrypointStats>;
+}
+
 export function formatSize(size: number): string {
   if (size <= 0) {
     return '0 bytes';
@@ -43,8 +65,8 @@ export function generateBundleStats(
     size?: number;
     files: string[];
     names?: string[];
-    entry: boolean;
-    initial: boolean;
+    entry?: boolean;
+    initial?: boolean;
     rendered?: boolean;
     chunkType?: ChunkType,
   },
@@ -191,7 +213,7 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
 
   const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
 
-  // In some cases we do things outside of webpack context 
+  // In some cases we do things outside of webpack context
   // Such us index generation, service worker augmentation etc...
   // This will correct the time and include these.
   const time = (Date.now() - json.builtAt) + json.time;
@@ -346,7 +368,7 @@ export function createWebpackLoggingCallback(
 
 export function webpackStatsLogger(
   logger: logging.LoggerApi,
-  json: Stats.ToJsonOutput,
+  json: JsonCompilationStats,
   config: Configuration,
   bundleStats?: BundleStats[],
 ): void {
