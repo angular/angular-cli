@@ -433,10 +433,11 @@ workflows:
           requires:
             - setup
       - e2e-cli:
+          name: e2e-cli-nightly
           requires:
             - build
       - e2e-cli:
-          name: e2e-cli-ve
+          name: e2e-cli-ve-nightly
           ve: true
           requires:
             - build
