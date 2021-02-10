@@ -17,7 +17,6 @@ import {
   Compiler,
   Configuration,
   ContextReplacementPlugin,
-  RuleSetLoader,
   RuleSetRule,
   compilation,
   debug,
@@ -326,7 +325,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     });
   }
 
-  let buildOptimizerUseRule: RuleSetLoader[] = [];
+  let buildOptimizerUseRule: RuleSetRule[] = [];
   if (buildOptions.buildOptimizer) {
     extraPlugins.push(new BuildOptimizerWebpackPlugin());
     buildOptimizerUseRule = [
