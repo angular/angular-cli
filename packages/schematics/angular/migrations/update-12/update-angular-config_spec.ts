@@ -85,6 +85,7 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
     const { options, configurations } = getBuildTarget(newTree);
 
     expect(options.experimentalRollupPass).toBeUndefined();
+    expect(options.sourceMaps).toBeTrue();
     expect(configurations).toBeDefined();
     expect(configurations?.one.experimentalRollupPass).toBeUndefined();
     expect(configurations?.two.experimentalRollupPass).toBeUndefined();
