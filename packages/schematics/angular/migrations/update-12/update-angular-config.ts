@@ -7,38 +7,17 @@
  */
 
 import { Rule } from '@angular-devkit/schematics';
-import { updateWorkspace } from '../../utility/workspace';
+import { allTargetOptions, allWorkspaceTargets, updateWorkspace } from '../../utility/workspace';
 
 export default function (): Rule {
   return updateWorkspace(workspace => {
-    const optionsToRemove: Record<string, undefined> = {
-      experimentalRollupPass: undefined,
-    };
+    for (const [, target] of allWorkspaceTargets(workspace)) {
+      if (!target.builder.startsWith('@angular-devkit/build-angular')) {
+        continue;
+      }
 
-    for (const [, project] of workspace.projects) {
-      for (const [, target] of project.targets) {
-        // Only interested in Angular Devkit builders
-        if (!target?.builder.startsWith('@angular-devkit/build-angular')) {
-          continue;
-        }
-
-        // Check options
-        if (target.options) {
-          target.options = {
-            ...optionsToRemove,
-          };
-        }
-
-        // Go through each configuration entry
-        if (!target.configurations) {
-          continue;
-        }
-
-        for (const configurationName of Object.keys(target.configurations)) {
-          target.configurations[configurationName] = {
-            ...optionsToRemove,
-          };
-        }
+      for (const [, options] of allTargetOptions(target)) {
+        delete options.experimentalRollupPass;
       }
     }
   });
