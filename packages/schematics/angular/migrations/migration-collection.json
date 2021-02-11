@@ -134,6 +134,11 @@
       "version": "12.0.0-next.1",
       "factory": "./update-12/update-zonejs",
       "description": "Update 'zone.js' to version 0.11.x. Read more about this here: https://github.com/angular/angular/blob/master/packages/zone.js/CHANGELOG.md#breaking-changes-since-zonejs-v0111"
+    },
+    "remove-emit-decorator-metadata": {
+      "version": "12.0.0-next.2",
+      "factory": "./update-12/remove-emit-decorator-metadata",
+      "description": "Remove 'emitDecoratorMetadata' TypeScript compiler option. Decorator metadata is no longer needed by Angular. Read more about this here: https://www.typescriptlang.org/docs/handbook/decorators.html#metadata"
     }
   }
 }
