@@ -186,7 +186,27 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       );
     }
     if (tailwindPackagePath) {
-      extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
+      const tailwindConfig = require(tailwindConfigPath);
+      if (typeof tailwindConfig !== 'function') {
+        if (!tailwindConfig.purge) {
+          tailwindConfig.purge = {};
+        }
+        if (Array.isArray(tailwindConfig.purge)) {
+          tailwindConfig.purge = {
+            content: [...tailwindConfig.purge],
+          };
+        }
+        if (typeof tailwindConfig.purge.enabled === 'undefined') {
+          tailwindConfig.purge.enabled = !!buildOptions.optimization?.styles.minify;
+        }
+
+      } else {
+        wco.logger.warn(
+          `Tailwind CSS configuration file export function instead of object.` +
+            ` To enable Purge in Tailwind CSS, please make sure to export an object.`,
+        );
+      }
+      extraPostcssPlugins.push(require(tailwindPackagePath)(tailwindConfig));
     }
   }
 
