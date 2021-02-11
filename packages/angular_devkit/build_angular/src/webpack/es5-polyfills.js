@@ -112,3 +112,6 @@ import 'core-js/modules/es.promise';
 import 'core-js/modules/es.json.to-string-tag';
 
 import 'regenerator-runtime/runtime';
+
+// Zone.js
+import 'zone.js/plugins/zone-legacy';

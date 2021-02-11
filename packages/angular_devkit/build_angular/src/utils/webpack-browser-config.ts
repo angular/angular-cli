@@ -68,23 +68,6 @@ export async function generateWebpackConfig(
 
   const webpackConfig = webpackMerge(webpackPartialGenerator(wco));
 
-  if (supportES2015) {
-    if (!webpackConfig.resolve) {
-      webpackConfig.resolve = {};
-    }
-    if (Array.isArray(webpackConfig.resolve.alias)) {
-      webpackConfig.resolve.alias.push({
-        alias: 'zone.js/dist/zone',
-        name: 'zone.js/dist/zone-evergreen',
-      });
-    } else {
-      if (!webpackConfig.resolve.alias) {
-        webpackConfig.resolve.alias = {};
-      }
-      webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
-    }
-  }
-
   if (profilingEnabled) {
     const esVersionInFileName = getEsVersionForFileName(
       tsConfig.options.target,

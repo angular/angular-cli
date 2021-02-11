@@ -91,11 +91,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       if (buildBrowserFeatures.isEs5SupportNeeded()) {
         const polyfillsChunkName = 'polyfills-es5';
         entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
-        if (differentialLoadingMode) {
-          // Add zone.js legacy support to the es5 polyfills
-          // This is a noop execution-wise if zone-evergreen is not used.
-          entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
 
+        if (differentialLoadingMode) {
           // Since the chunkFileName option schema does not allow the function overload, add a plugin
           // that changes the name of the ES5 polyfills chunk to not include ES2015.
           extraPlugins.push({

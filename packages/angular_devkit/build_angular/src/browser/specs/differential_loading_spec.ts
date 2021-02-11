@@ -184,11 +184,9 @@ describe('Browser Builder with differential loading', () => {
 
   it('uses the right zone.js variant', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: false });
-    expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone-legacy');
+    expect(await files['polyfills-es5.js']).toContain('zone.js/plugins/zone-legacy');
     expect(await files['polyfills-es5.js']).toContain('registerElementPatch');
-    expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone-evergreen');
-    expect(await files['polyfills-es2015.js']).toContain('zone.js/dist/zone-evergreen');
-    expect(await files['polyfills-es2015.js']).not.toContain('zone.js/dist/zone-legacy');
+    expect(await files['polyfills-es2015.js']).not.toContain('zone.js/plugins/zone-legacy');
     expect(await files['polyfills-es2015.js']).not.toContain('registerElementPatch');
   });
 
