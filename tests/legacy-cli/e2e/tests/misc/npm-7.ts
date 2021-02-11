@@ -1,4 +1,4 @@
-import { rimraf } from '../../utils/fs';
+import { rimraf, writeFile } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, npm } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
@@ -60,6 +60,8 @@ export default async function() {
     }
 
     // Ensure `ng new --package-manager=yarn` executes successfully
+    // Need an additional npmrc file since yarn does not use the NPM registry environment variable
+    await writeFile('.npmrc', 'registry=http://localhost:4873')
     const { stderr: stderrNewYarn } = await ng('new', 'npm-seven-yarn', '--package-manager=yarn');
     if (stderrNewYarn.includes(errorText)) {
       throw new Error('ng new --package-manager=yarn expected to not show npm version error.');
@@ -68,6 +70,7 @@ export default async function() {
     // Cleanup extra test projects
     await rimraf('npm-seven-skip');
     await rimraf('npm-seven-yarn');
+    await rimraf('.npmrc');
 
     // Change directory back
     process.chdir(currentDirectory);
