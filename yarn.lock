@@ -17,10 +17,10 @@
     "@angular/core" "^10.0.0-0 || ^11.0.0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@11.1.1":
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.1.1.tgz#87cf1ff8eef898296129742b503bff1f979b7bc1"
-  integrity sha512-rIog+eqv6RtpSWKM+iHQ5oHyOALMxRXkeTiJyvPfBCYQ2hzPN16+eNxP/JOR+C4y7pMaJyPur0pC572IZEnCsw==
+"@angular/cdk@11.2.0":
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.2.0.tgz#4f0d8e9865d29ee1b2ab3ce7be9a7af0a87b0ef4"
+  integrity sha512-25k1giKAJ7DPzJBZfAVZmw/VfR4pZUaZnhgVAMwIdGPl5SaXJEW3e2znGlhzwkuQsiBgrSKfMgJmwKSyUbe2tg==
   dependencies:
     tslib "^2.0.0"
   optionalDependencies:
@@ -85,9 +85,9 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7e54bffe3e14ac167acf6bfd056a3ded77d08e72":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#b08575b1fe0c8dceddb685195ac6e4bce76cc041":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#7e54bffe3e14ac167acf6bfd056a3ded77d08e72"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#b08575b1fe0c8dceddb685195ac6e4bce76cc041"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^0.29.0"
@@ -103,13 +103,13 @@
     inquirer-autocomplete-prompt "^1.0.2"
     minimatch "^3.0.4"
     multimatch "^4.0.0"
-    node-fetch "^2.6.0"
+    node-fetch "^2.6.1"
     node-uuid "1.4.8"
     ora "^5.0.0"
     protractor "^5.4.2"
     selenium-webdriver "3.5.0"
     semver "^6.3.0"
-    shelljs "^0.8.3"
+    shelljs "^0.8.4"
     ts-node "^8.6.2"
     tslib "^2.0.0"
     typed-graphqlify "^2.3.0"
@@ -133,10 +133,10 @@
     glob "7.1.2"
     yargs "^16.1.1"
 
-"@angular/material@11.1.1":
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-11.1.1.tgz#06104a6e456c3e56a1375fbb2890bed5d25d634b"
-  integrity sha512-atQyGG1/Xz1Q4udmQ7HWOYCAl14evL29EWhsrk4q/5OAumqKMEcJI4Ro/Pgn0N31HpsT2zHyDsPYe0bnjy+/Ww==
+"@angular/material@11.2.0":
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-11.2.0.tgz#a5843f2964366daebab9edf2b0a3d6dcad451f5d"
+  integrity sha512-duTQdHtzdZ3KWn90JcN+eI0oNwr7E7JGEOp7tZ9XOtqty0h158SJUCYSuDxhFOqyAgaY41enNPHdB2c4Xz0iBQ==
   dependencies:
     tslib "^2.0.0"
 
@@ -8150,7 +8150,7 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-node-fetch@^2.2.0, node-fetch@^2.6.0, node-fetch@^2.6.1:
+node-fetch@^2.2.0, node-fetch@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
@@ -10936,7 +10936,7 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shelljs@^0.8.3:
+shelljs@^0.8.3, shelljs@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.4.tgz#de7684feeb767f8716b326078a8a00875890e3c2"
   integrity sha512-7gk3UZ9kOfPLIAbslLzyWeGiEqx9e3rxwZM0KE6EL8GlGwjym9Mrlx5/p33bWTu9YG6vcS4MBxYZDHYr5lr8BQ==
