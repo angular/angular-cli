@@ -11,7 +11,7 @@
     "node": ">=12.13.0"
   },
   "dependencies": {
-    "critters": "0.0.6",
+    "critters": "0.0.7",
     "tslib": "TSLIB_VERSION"
   },
   "peerDependencies": {
