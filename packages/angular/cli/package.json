@@ -41,7 +41,7 @@
     "open": "7.4.0",
     "ora": "5.3.0",
     "pacote": "11.2.6",
-    "resolve": "1.19.0",
+    "resolve": "1.20.0",
     "rimraf": "3.0.2",
     "semver": "7.3.4",
     "symbol-observable": "3.0.0",
