@@ -76,7 +76,7 @@
     "@types/node": "12.12.37",
     "@types/shelljs": "^0.8.6",
     "browser-sync": "^2.26.7",
-    "critters": "0.0.6",
+    "critters": "0.0.7",
     "domino": "^2.1.2",
     "express": "^4.15.2",
     "guess-parser": "^0.4.12",
