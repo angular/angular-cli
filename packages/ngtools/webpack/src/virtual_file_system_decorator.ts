@@ -9,8 +9,16 @@ import { FileDoesNotExistException, Path, getSystemPath, normalize } from '@angu
 import { Stats } from 'fs';
 import { InputFileSystem } from 'webpack';
 import { WebpackCompilerHost } from './compiler_host';
-import { NodeWatchFileSystemInterface } from './webpack';
 import { isWebpackFiveOrHigher } from './webpack-version';
+
+interface NodeWatchFileSystemInterface {
+  inputFileSystem: InputFileSystem;
+  new(inputFileSystem: InputFileSystem): NodeWatchFileSystemInterface;
+  // tslint:disable-next-line:no-any
+  watch(files: any, dirs: any, missing: any, startTime: any, options: any, callback: any,
+        // tslint:disable-next-line:no-any
+        callbackUndelayed: any): any;
+}
 
 export const NodeWatchFileSystem: NodeWatchFileSystemInterface = require(
   'webpack/lib/node/NodeWatchFileSystem');
@@ -61,7 +69,12 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     (this._inputFileSystem as any).readJson(path, callback);
   }
 
-  readlink(path: string, callback: (err: Error | null | undefined, linkString: string) => void): void {
+  readlink(
+    path: string,
+    // Callback types differ between Webpack 4 and 5
+    // tslint:disable-next-line: no-any
+    callback: (err: any, linkString: any) => void,
+  ): void {
     this._inputFileSystem.readlink(path, callback);
   }
 
@@ -89,7 +102,9 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   readlinkSync(path: string): string {
-    return this._inputFileSystem.readlinkSync(path);
+    // Synchronous functions are missing from the Webpack typings
+    // tslint:disable-next-line: no-any
+    return (this._inputFileSystem as any).readlinkSync(path);
   }
 
   purge(changes?: string[] | string): void {

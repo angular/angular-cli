@@ -25,7 +25,9 @@ export function createWebpackInputHost(inputFileSystem: InputFileSystem) {
     },
 
     read(path): virtualFs.FileBuffer {
-      const data = inputFileSystem.readFileSync(getSystemPath(path));
+      // Synchronous functions are missing from the Webpack typings
+      // tslint:disable-next-line: no-any
+      const data = (inputFileSystem as any).readFileSync(getSystemPath(path));
 
       return new Uint8Array(data).buffer as ArrayBuffer;
     },
@@ -53,7 +55,9 @@ export function createWebpackInputHost(inputFileSystem: InputFileSystem) {
 
     stat(path): Stats | null {
       try {
-        return inputFileSystem.statSync(getSystemPath(path));
+        // Synchronous functions are missing from the Webpack typings
+        // tslint:disable-next-line: no-any
+        return (inputFileSystem as any).statSync(getSystemPath(path));
       } catch (e) {
         if (e.code === 'ENOENT') {
           return null;
