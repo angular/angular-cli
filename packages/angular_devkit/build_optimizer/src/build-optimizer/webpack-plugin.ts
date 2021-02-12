@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,13 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Compiler } from 'webpack';  // tslint:disable-line:no-implicit-dependencies
+import { Compiler } from 'webpack';
+
+interface ModuleData {
+  resourceResolveData: { descriptionFileData?: { typings?: string } };
+}
 
 export class BuildOptimizerWebpackPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.normalModuleFactory.tap('BuildOptimizerWebpackPlugin', nmf => {
+      // tslint:disable-next-line: no-any
       nmf.hooks.module.tap('BuildOptimizerWebpackPlugin', (module, data) => {
-        const { descriptionFileData } = data.resourceResolveData;
+        const { descriptionFileData } = (data as ModuleData).resourceResolveData;
         if (descriptionFileData) {
           // Only TS packages should use Build Optimizer.
           // Notes:
