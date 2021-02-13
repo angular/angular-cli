@@ -7265,10 +7265,10 @@ license-checker@^25.0.0:
     spdx-satisfies "^4.0.0"
     treeify "^1.1.0"
 
-license-webpack-plugin@2.3.12:
-  version "2.3.12"
-  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.3.12.tgz#e6d1add7539118962abdae8c8d1e7068b2d4bfa6"
-  integrity sha512-KD4Zpth8NKsCheX7FJc6zgggwqngkluUfk1lbKmopalqs/rxxO9MscQuUl6q6WuAsD25gUjW5Sm5iuVoTZYz8Q==
+license-webpack-plugin@2.3.13:
+  version "2.3.13"
+  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.3.13.tgz#ce02c193f0a36e28f0310b8849060a7ba11bbc20"
+  integrity sha512-SOjHXLDOOlSlUmzQ6cF7V4JkHIFbM9r9izw5IhnkIiRdVN7UewSu3cqcXv33qZunB3GyZQZ6nv+9cQXAyo31HA==
   dependencies:
     "@types/webpack-sources" "^0.1.5"
     webpack-sources "^1.2.0"
