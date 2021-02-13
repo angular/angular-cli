@@ -52,16 +52,21 @@ export function runWebpackDevServer(
     config: WebpackDevServer.Configuration,
   ) => {
     if (options.webpackDevServerFactory) {
-      return new options.webpackDevServerFactory(webpack, config);
+      // webpack-dev-server types currently do not support Webpack 5
+      // tslint:disable-next-line: no-any
+      return new options.webpackDevServerFactory(webpack as any, config);
     }
 
-    return new WebpackDevServer(webpack, config);
+    // webpack-dev-server types currently do not support Webpack 5
+    // tslint:disable-next-line: no-any
+    return new WebpackDevServer(webpack as any, config);
   };
 
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
-  const devServerConfig = options.devServerConfig || config.devServer || {};
+  // tslint:disable-next-line: no-any
+  const devServerConfig = options.devServerConfig || (config as any).devServer || {};
   if (devServerConfig.stats) {
     config.stats = devServerConfig.stats;
   }
@@ -110,7 +115,10 @@ export function runWebpackDevServer(
       );
 
       // Teardown logic. Close the server when unsubscribed from.
-      return () => server.close();
+      return (() => {
+        server.close();
+        webpackCompiler.close?.(() => {});
+      });
     })),
   );
 }
