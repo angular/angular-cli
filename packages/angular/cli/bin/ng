@@ -24,12 +24,15 @@ if (version[0] % 2 === 1 && version[0] > 14) {
       'Odd numbered Node.js versions will not enter LTS status and should not be used for production.' +
       ' For more information, please see https://nodejs.org/en/about/releases/.',
   );
+
+  require('../lib/init');
 } else if (
   version[0] < 12 ||
   version[0] === 13 ||
   (version[0] === 12 && version[1] < 13) ||
   (version[0] === 14 && version[1] < 15)
 ) {
+  // Error and exit if less than 12.13 or 13.x or less than 14.15
   console.error(
     'Node.js version ' +
       process.version +
