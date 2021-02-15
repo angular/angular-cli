@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { RawSourceMap } from 'source-map';
-import * as webpack from 'webpack'; // tslint:disable-line:no-implicit-dependencies
 import { SourceMapSource } from 'webpack-sources';
 const loaderUtils = require('loader-utils');
 
@@ -27,15 +26,17 @@ const alwaysProcess = (path: string) =>
   path.endsWith('.ngstyle.js');
 
 export default function buildOptimizerLoader(
-  this: webpack.loader.LoaderContext,
+  // Webpack 5 does not provide a LoaderContext type
+  this: {
+    resourcePath: string;
+    _module: { factoryMeta: { skipBuildOptimizer?: boolean; sideEffectFree?: boolean } };
+    cacheable(): void;
+    callback(error?: Error | null, content?: string, sourceMap?: unknown): void;
+  },
   content: string,
   previousSourceMap: RawSourceMap,
 ) {
   this.cacheable();
-  const callback = this.async();
-  if (!callback) {
-    throw new Error('Async loader support is required.');
-  }
 
   const skipBuildOptimizer =
     this._module && this._module.factoryMeta && this._module.factoryMeta.skipBuildOptimizer;
@@ -43,10 +44,7 @@ export default function buildOptimizerLoader(
   if (!alwaysProcess(this.resourcePath) && skipBuildOptimizer) {
     // Skip loading processing this file with Build Optimizer if we determined in
     // BuildOptimizerWebpackPlugin that we shouldn't.
-
-    // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
-    // tslint:disable-next-line:no-any
-    this.callback(null, content, previousSourceMap as any);
+    this.callback(null, content, previousSourceMap);
 
     return;
   }
@@ -64,8 +62,7 @@ export default function buildOptimizerLoader(
   });
 
   if (boOutput.emitSkipped || boOutput.content === null) {
-    // tslint:disable-next-line:no-any
-    this.callback(null, content, previousSourceMap as any);
+    this.callback(null, content, previousSourceMap);
 
     return;
   }
@@ -81,10 +78,7 @@ export default function buildOptimizerLoader(
 
     if (previousSourceMap) {
       // Use http://sokra.github.io/source-map-visualization/ to validate sourcemaps make sense.
-
-      // The last argument is not yet in the typings
-      // tslint:disable-next-line: no-any
-      newSourceMap = new (SourceMapSource as any)(
+      newSourceMap = new SourceMapSource(
         newContent,
         this.resourcePath,
         intermediateSourceMap,
@@ -98,7 +92,5 @@ export default function buildOptimizerLoader(
     }
   }
 
-  // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
-  // tslint:disable-next-line:no-any
-  callback(null, newContent, newSourceMap as any);
+  this.callback(null, newContent, newSourceMap);
 }

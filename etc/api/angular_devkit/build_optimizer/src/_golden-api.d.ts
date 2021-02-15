@@ -6,7 +6,17 @@ export declare class BuildOptimizerWebpackPlugin {
     apply(compiler: Compiler): void;
 }
 
-export default function buildOptimizerLoader(this: webpack.loader.LoaderContext, content: string, previousSourceMap: RawSourceMap): void;
+export default function buildOptimizerLoader(this: {
+    resourcePath: string;
+    _module: {
+        factoryMeta: {
+            skipBuildOptimizer?: boolean;
+            sideEffectFree?: boolean;
+        };
+    };
+    cacheable(): void;
+    callback(error?: Error | null, content?: string, sourceMap?: unknown): void;
+}, content: string, previousSourceMap: RawSourceMap): void;
 
 export declare function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFile>;
 
