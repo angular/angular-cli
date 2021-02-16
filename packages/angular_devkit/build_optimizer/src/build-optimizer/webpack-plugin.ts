@@ -5,15 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Compiler } from 'webpack';
+import { Compiler, WebpackFourCompiler } from 'webpack';
 
 interface ModuleData {
   resourceResolveData: { descriptionFileData?: { typings?: string } };
 }
 
 export class BuildOptimizerWebpackPlugin {
-  apply(compiler: Compiler) {
-    compiler.hooks.normalModuleFactory.tap('BuildOptimizerWebpackPlugin', nmf => {
+  apply(compiler: Compiler | WebpackFourCompiler) {
+    (compiler as Compiler).hooks.normalModuleFactory.tap('BuildOptimizerWebpackPlugin', nmf => {
       // tslint:disable-next-line: no-any
       nmf.hooks.module.tap('BuildOptimizerWebpackPlugin', (module, data) => {
         const { descriptionFileData } = (data as ModuleData).resourceResolveData;
