@@ -3,7 +3,7 @@ export declare function buildOptimizer(options: BuildOptimizerOptions): Transfor
 export declare const buildOptimizerLoaderPath: string;
 
 export declare class BuildOptimizerWebpackPlugin {
-    apply(compiler: Compiler): void;
+    apply(compiler: Compiler | WebpackFourCompiler): void;
 }
 
 export default function buildOptimizerLoader(this: {
