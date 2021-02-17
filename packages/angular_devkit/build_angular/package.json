@@ -4,6 +4,12 @@
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json",
+    "./builders.json": "./builders.json",
+    "./plugins/karma": "./src/webpack/plugins/karma/karma.js"
+  },
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
