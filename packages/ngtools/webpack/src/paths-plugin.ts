@@ -7,9 +7,15 @@
  */
 import * as path from 'path';
 import { CompilerOptions, MapLike } from 'typescript';
-import { NormalModuleFactoryRequest } from './webpack';
 
 const getInnerRequest = require('enhanced-resolve/lib/getInnerRequest');
+
+interface NormalModuleFactoryRequest {
+  request: string;
+  context: { issuer: string };
+  contextInfo: { issuer: string };
+  typescriptPathMapped?: boolean;
+}
 
 export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {
 

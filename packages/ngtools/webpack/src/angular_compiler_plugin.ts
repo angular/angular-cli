@@ -34,7 +34,7 @@ import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { Compiler, compilation } from 'webpack';
+import { Compiler, WebpackFourCompiler, compilation } from 'webpack';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost } from './compiler_host';
 import { DiagnosticMode, gatherDiagnostics, hasErrors, reportDiagnostics } from './diagnostics';
@@ -75,10 +75,6 @@ import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
 } from './virtual_file_system_decorator';
-import {
-  NodeWatchFileSystemInterface,
-  NormalModuleFactoryRequest,
-} from './webpack';
 import { addError, addWarning } from './webpack-diagnostics';
 import { createWebpackInputHost } from './webpack-input-host';
 import { isWebpackFiveOrHigher, mergeResolverMainFields } from './webpack-version';
@@ -686,7 +682,10 @@ export class AngularCompilerPlugin {
     };
 
     // Go over all the modules in the webpack compilation and remove them from the sets.
-    compilation.modules.forEach(m => m.resource ? removeSourceFile(m.resource, true) : null);
+    // tslint:disable-next-line: no-any
+    compilation.modules.forEach((m: compilation.Module & { resource?: string }) =>
+      m.resource ? removeSourceFile(m.resource, true) : null,
+    );
 
     // Anything that remains is unused, because it wasn't referenced directly or transitively
     // on the files in the compilation.
@@ -712,7 +711,12 @@ export class AngularCompilerPlugin {
 
   // Registration hook for webpack plugin.
   // tslint:disable-next-line:no-big-function
-  apply(compiler: Compiler & { watchMode?: boolean, parentCompilation?: compilation.Compilation }) {
+  apply(webpackCompiler: Compiler | WebpackFourCompiler) {
+    const compiler = webpackCompiler as Compiler & {
+      watchMode?: boolean;
+      parentCompilation?: compilation.Compilation;
+      watchFileSystem?: unknown;
+    };
     // The below is require by NGCC processor
     // since we need to know which fields we need to process
     compiler.hooks.environment.tap('angular-compiler', () => {
@@ -748,13 +752,8 @@ export class AngularCompilerPlugin {
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
     compiler.hooks.environment.tap('angular-compiler', () => {
-      // The webpack types currently do not include these
-      const compilerWithFileSystems = compiler as Compiler & {
-        watchFileSystem: NodeWatchFileSystemInterface,
-      };
-
       let host: virtualFs.Host<fs.Stats> = this._options.host || createWebpackInputHost(
-        compilerWithFileSystems.inputFileSystem,
+        compiler.inputFileSystem,
       );
 
       let replacements: Map<Path, Path> | ((path: Path) => Path) | undefined;
@@ -791,7 +790,7 @@ export class AngularCompilerPlugin {
           this._errors,
           this._basePath,
           this._tsConfigPath,
-          compilerWithFileSystems.inputFileSystem,
+          compiler.inputFileSystem,
           compiler.options.resolve?.symlinks,
         );
 
@@ -830,11 +829,11 @@ export class AngularCompilerPlugin {
       }
 
       const inputDecorator = new VirtualFileSystemDecorator(
-        compilerWithFileSystems.inputFileSystem,
+        compiler.inputFileSystem,
         this._compilerHost,
       );
-      compilerWithFileSystems.inputFileSystem = inputDecorator;
-      compilerWithFileSystems.watchFileSystem = new VirtualWatchFileSystemDecorator(
+      compiler.inputFileSystem = inputDecorator;
+      compiler.watchFileSystem = new VirtualWatchFileSystemDecorator(
         inputDecorator,
         replacements,
       );
@@ -956,7 +955,7 @@ export class AngularCompilerPlugin {
         // when the issuer is a `.ts` or `.ngfactory.js` file.
         nmf.hooks.beforeResolve.tapPromise(
           'angular-compiler',
-          async (request?: NormalModuleFactoryRequest) => {
+          async (request) => {
             if (this.done && request) {
               const name = request.request;
               const issuer = request.contextInfo.issuer;

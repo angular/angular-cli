@@ -10,14 +10,23 @@ import { normalizePath } from './paths';
 
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   invalidate(
-    fileTimestamps: Map<string, number | { timestamp: number } | null>,
+    fileTimestamps: Map<string, 'ignore' | number | { safeTime: number } | null>,
     buildTimestamp: number,
   ): Set<string> {
     const changedFiles = new Set<string>();
     for (const [file, timeOrEntry] of fileTimestamps) {
-      const time =
-        timeOrEntry && (typeof timeOrEntry === 'number' ? timeOrEntry : timeOrEntry.timestamp);
-      if (time === null || buildTimestamp < time) {
+      if (timeOrEntry === 'ignore') {
+        continue;
+      }
+
+      let time;
+      if (typeof timeOrEntry === 'number') {
+        time = timeOrEntry;
+      } else if (timeOrEntry) {
+        time = timeOrEntry.safeTime;
+      }
+
+      if (!time || time >= buildTimestamp) {
         // Cache stores paths using the POSIX directory separator
         const normalizedFile = normalizePath(file);
         this.delete(normalizedFile);

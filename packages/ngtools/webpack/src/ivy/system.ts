@@ -9,11 +9,19 @@ import * as ts from 'typescript';
 import { InputFileSystem } from 'webpack';
 import { externalizePath } from './paths';
 
+export interface InputFileSystemSync extends InputFileSystem {
+  readFileSync(path: string): Buffer;
+  statSync(path: string): { size: number; mtime: Date; isDirectory(): boolean; isFile(): boolean };
+}
+
 function shouldNotWrite(): never {
   throw new Error('Webpack TypeScript System should not write.');
 }
 
-export function createWebpackSystem(input: InputFileSystem, currentDirectory: string): ts.System {
+export function createWebpackSystem(
+  input: InputFileSystemSync,
+  currentDirectory: string,
+): ts.System {
   // Webpack's CachedInputFileSystem uses the default directory separator in the paths it uses
   // for keys to its cache. If the keys do not match then the file watcher will not purge outdated
   // files and cause stale data to be used in the next rebuild. TypeScript always uses a `/` (POSIX)

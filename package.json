@@ -1,6 +1,6 @@
 {
   "name": "@angular/devkit-repo",
-  "version": "12.0.0-next.0",
+  "version": "12.0.0-next.1",
   "private": true,
   "description": "Software Development Kit for Angular",
   "bin": {
@@ -70,7 +70,7 @@
     "@angular/compiler": "12.0.0-next.0",
     "@angular/compiler-cli": "12.0.0-next.0",
     "@angular/core": "12.0.0-next.0",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#aa4005f90600ef2e404815b03cc77edd562c29f0",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#8dda2f402d9a89587ab8d12a378cf0e02954c3e6",
     "@angular/forms": "12.0.0-next.0",
     "@angular/localize": "12.0.0-next.0",
     "@angular/material": "11.2.0",
@@ -181,7 +181,7 @@
     "ng-packagr": "~12.0.0-next.0",
     "node-fetch": "^2.6.1",
     "npm-registry-client": "8.6.0",
-    "open": "7.4.1",
+    "open": "7.4.2",
     "ora": "5.3.0",
     "pacote": "11.2.6",
     "parse5-html-rewriting-stream": "6.0.1",
