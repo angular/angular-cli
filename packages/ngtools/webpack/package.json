@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "description": "Webpack plugin that AoT compiles your Angular components and modules.",
   "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json",
+    "./ivy": "./src/ivy/index.js"
+  },
   "typings": "src/index.d.ts",
   "license": "MIT",
   "keywords": [
