@@ -485,7 +485,7 @@ export class AngularWebpackPlugin {
           !ignoreForEmit.has(sourceFile) &&
           !angularCompiler.incrementalDriver.safeToSkipEmit(sourceFile)
         ) {
-          this.requiredFilesToEmit.add(sourceFile.fileName);
+          this.requiredFilesToEmit.add(normalizePath(sourceFile.fileName));
         }
       }
 
@@ -500,7 +500,7 @@ export class AngularWebpackPlugin {
         mergeTransformers(angularCompiler.prepareEmit().transformers, transformers),
         getDependencies,
         (sourceFile) => {
-          this.requiredFilesToEmit.delete(sourceFile.fileName);
+          this.requiredFilesToEmit.delete(normalizePath(sourceFile.fileName));
           angularCompiler.incrementalDriver.recordSuccessfulEmit(sourceFile);
         },
       );
@@ -589,11 +589,12 @@ export class AngularWebpackPlugin {
     onAfterEmit?: (sourceFile: ts.SourceFile) => void,
   ): FileEmitter {
     return async (file: string) => {
-      if (this.requiredFilesToEmitCache.has(file)) {
-        return this.requiredFilesToEmitCache.get(file);
+      const filePath = normalizePath(file);
+      if (this.requiredFilesToEmitCache.has(filePath)) {
+        return this.requiredFilesToEmitCache.get(filePath);
       }
 
-      const sourceFile = program.getSourceFile(file);
+      const sourceFile = program.getSourceFile(filePath);
       if (!sourceFile) {
         return undefined;
       }
@@ -620,7 +621,7 @@ export class AngularWebpackPlugin {
       if (content !== undefined && this.watchMode) {
         // Capture emit history info for Angular rebuild analysis
         hash = hashContent(content);
-        this.fileEmitHistory.set(file, { length: content.length, hash });
+        this.fileEmitHistory.set(filePath, { length: content.length, hash });
       }
 
       const dependencies = [
