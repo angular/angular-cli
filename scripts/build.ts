@@ -259,6 +259,9 @@ export default async function(
         if (fileName.startsWith('test/') || fileName.startsWith('test\\')) {
           return false;
         }
+        if (pkg.name === '@angular-devkit/core' && fileName.startsWith('src/workspace/json/test')) {
+          return false;
+        }
 
         // Remove Bazel files from NPM.
         if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
