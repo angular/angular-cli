@@ -242,6 +242,14 @@ describe('Universal Schematic', () => {
     expect(tree.exists(filePath)).toEqual(true);
   });
 
+  it(`should add import to '@angular/platform-server/init' in main file`, async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
+    const filePath = '/projects/bar/src/main.server.ts';
+    const contents = tree.readContent(filePath);
+    expect(contents).toContain('import \'@angular/platform-server/init\'');
+  });
+
   it(`should not add import to '@angular/localize' in main file when it's not a depedency`, async () => {
     const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
