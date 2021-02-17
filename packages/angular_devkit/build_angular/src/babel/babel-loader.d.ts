@@ -7,9 +7,7 @@
  */
 
 declare module 'babel-loader' {
-  type BabelLoaderCustomizer<T> = (
-    babel: typeof import('@babel/core'),
-  ) => {
+  type BabelLoaderCustomizer<T> = (babel: typeof import('@babel/core')) => {
     customOptions?(
       this: import('webpack').loader.LoaderContext,
       loaderOptions: Record<string, unknown>,
@@ -20,6 +18,17 @@ declare module 'babel-loader' {
       configuration: import('@babel/core').PartialConfig,
       loaderArguments: { source: string; map?: unknown; customOptions: T },
     ): import('@babel/core').TransformOptions;
+    result?(
+      this: import('webpack').loader.LoaderContext,
+      result: import('@babel/core').BabelFileResult,
+      context: {
+        source: string;
+        map?: unknown;
+        customOptions: T;
+        configuration: import('@babel/core').PartialConfig;
+        options: import('@babel/core').TransformOptions;
+      },
+    ): import('@babel/core').BabelFileResult;
   };
   function custom<T>(customizer: BabelLoaderCustomizer<T>): import('webpack').loader.Loader;
 }
