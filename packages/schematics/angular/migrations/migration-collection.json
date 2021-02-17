@@ -129,6 +129,11 @@
       "version": "12.0.0-next.0",
       "factory": "./update-12/update-angular-config",
       "description": "Remove deprecated options from 'angular.json' that are no longer present in v12."
+    },
+    "update-zonejs": {
+      "version": "12.0.0-next.1",
+      "factory": "./update-12/update-zonejs",
+      "description": "Update 'zone.js' to version 0.11.x. Read more about this here: https://github.com/angular/angular/blob/master/packages/zone.js/CHANGELOG.md#breaking-changes-since-zonejs-v0111"
     }
   }
 }
