@@ -7,6 +7,7 @@
  */
 import { custom } from 'babel-loader';
 import { ScriptTarget } from 'typescript';
+import { SourceMapSource } from 'webpack-sources';
 
 interface AngularCustomOptions {
   forceAsyncTransformation: boolean;
@@ -119,6 +120,9 @@ export default custom<AngularCustomOptions>(() => {
     config(configuration, { customOptions }) {
       return {
         ...configuration.options,
+        // The babel types do not include the false option even though it is valid
+        // tslint:disable-next-line: no-any
+        inputSourceMap: false as any,
         presets: [
           ...(configuration.options.presets || []),
           [
@@ -143,6 +147,20 @@ export default custom<AngularCustomOptions>(() => {
           ],
         ],
       };
+    },
+    result(result, { source, map: inputSourceMap }) {
+      if (result.map && inputSourceMap) {
+        result.map = new SourceMapSource(
+          result.code || '',
+          this.resourcePath,
+          result.map,
+          source,
+          inputSourceMap as string,
+          true,
+        ).map();
+      }
+
+      return result;
     },
   };
 });
