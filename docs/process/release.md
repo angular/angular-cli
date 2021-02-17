@@ -20,7 +20,7 @@ Primary | Secondary
 --------|----------
 Alan    | Doug
 Charles | Keen
-Filipe  | Minko
+Filipe  | Joey
 
 ## Triaging Issues
 TBD
