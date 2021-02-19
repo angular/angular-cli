@@ -34,6 +34,6 @@
     "@angular/compiler": "12.0.0-next.0",
     "@angular/compiler-cli": "12.0.0-next.0",
     "typescript": "4.1.5",
-    "webpack": "5.21.2"
+    "webpack": "5.23.0"
   }
 }
