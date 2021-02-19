@@ -19,8 +19,7 @@ export function normalizeOptimization(optimization: OptimizationUnion = false): 
       scripts: !!optimization.scripts,
       styles: typeof optimization.styles === 'object' ? optimization.styles : {
         minify: !!optimization.styles,
-        // inlineCritical is always false unless explictly set.
-        inlineCritical: false,
+        inlineCritical: !!optimization.styles,
       },
       fonts: typeof optimization.fonts === 'object' ? optimization.fonts : {
         inline: !!optimization.fonts,
@@ -32,8 +31,7 @@ export function normalizeOptimization(optimization: OptimizationUnion = false): 
     scripts: optimization,
     styles: {
       minify: optimization,
-      // inlineCritical is always false unless explictly set.
-      inlineCritical: false,
+      inlineCritical: optimization,
     },
     fonts: {
       inline: optimization,
