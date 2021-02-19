@@ -58,6 +58,8 @@ export class CommonEngine {
    * render options
    */
   async render(opts: RenderOptions): Promise<string> {
+    const { inlineCriticalCss = true } = opts;
+
     if (opts.publicPath && opts.documentFilePath && opts.url !== undefined) {
       const url = new URL(opts.url);
       // Remove leading forward slash.
@@ -94,7 +96,7 @@ export class CommonEngine {
       extraProviders.push({
         provide: INITIAL_CONFIG,
         useValue: {
-          document: opts.inlineCriticalCss
+          document: inlineCriticalCss
             // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
             ? doc.replace(/ media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g, '>')
             : doc,
@@ -107,7 +109,7 @@ export class CommonEngine {
     const factory = await this.getFactory(moduleOrFactory);
 
     const html = await renderModuleFactory(factory, { extraProviders });
-    if (!opts.inlineCriticalCss) {
+    if (!inlineCriticalCss) {
       return html;
     }
 
