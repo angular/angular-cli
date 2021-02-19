@@ -181,7 +181,7 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
 export class BuilderWatchPlugin {
   constructor(private readonly watcherFactory: BuilderWatcherFactory) {}
 
-  apply(compiler: Compiler & { watchFileSystem: WebpackWatchFileSystem }): void {
+  apply(compiler: Compiler & { watchFileSystem: unknown }): void {
     compiler.hooks.environment.tap('BuilderWatchPlugin', () => {
       compiler.watchFileSystem = new BuilderWatchFileSystem(
         this.watcherFactory,

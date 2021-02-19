@@ -197,7 +197,6 @@ ts_library(
         "@npm//webpack-merge",
         "@npm//webpack-sources",
         "@npm//webpack-subresource-integrity",
-        "@npm//worker-plugin",
     ],
 )
 

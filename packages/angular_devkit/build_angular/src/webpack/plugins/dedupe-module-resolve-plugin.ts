@@ -26,14 +26,13 @@ function getResourceData(resolveData: any): ResourceData {
     const {
       descriptionFileData,
       relativePath,
-      resource,
     } = resolveData.createData.resourceResolveData;
 
     return {
       packageName: descriptionFileData?.name,
       packageVersion: descriptionFileData?.version,
       relativePath,
-      resource,
+      resource: resolveData.createData.resource,
     };
   } else {
     // Webpack 4
@@ -101,7 +100,14 @@ export class DedupeModuleResolvePlugin {
         }
 
         // Alter current request with previously resolved module.
-        result.request = prevRequest;
+        // tslint:disable-next-line: no-any
+        const createData = (result as any).createData;
+        if (createData) {
+          createData.resource = prevResource;
+          createData.userRequest = prevResource;
+        } else {
+          result.request = prevRequest;
+        }
       });
     });
   }

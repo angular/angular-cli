@@ -42,6 +42,14 @@ export class CommonJsUsageWarnPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
       compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
+        const mainEntry = compilation.entries.get('main');
+        if (!mainEntry) {
+          return;
+        }
+        const mainModules = new Set(
+          mainEntry.dependencies.map((dep) => compilation.moduleGraph.getModule(dep)),
+        );
+
         for (const module of modules as unknown as WebpackModule[]) {
           const {dependencies, rawRequest} = module;
           if (
@@ -82,7 +90,8 @@ export class CommonJsUsageWarnPlugin {
             // Only show warnings for modules from main entrypoint.
             // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
             // will require CommonJS libraries for live reloading such as 'sockjs-node'.
-            if (mainIssuer?.name === 'main') {
+            // tslint:disable-next-line: no-any
+            if (mainIssuer && mainModules.has(mainIssuer as any)) {
               const warning = `${issuer?.userRequest} depends on '${rawRequest}'. ` +
                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';

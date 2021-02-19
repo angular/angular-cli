@@ -133,6 +133,10 @@ export function serveWebpackBrowser(
       logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
     }
 
+    // Webpack's live reload functionality adds the `strip-ansi` package which is commonJS
+    rawBrowserOptions.allowedCommonJsDependencies ??= [];
+    rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
+
     const browserName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions(
       { ...rawBrowserOptions, ...overrides },
@@ -165,7 +169,8 @@ export function serveWebpackBrowser(
       // This is needed because we cannot use the inline option directly in the config
       // because of the SuppressExtractedTextChunksWebpackPlugin
       // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-      webpackDevServer.addDevServerEntrypoints(config, {
+      // tslint:disable-next-line: no-any
+      webpackDevServer.addDevServerEntrypoints(config as any, {
         ...config.devServer,
         inline: true,
       });
@@ -175,7 +180,7 @@ export function serveWebpackBrowser(
       // 'addDevServerEntrypoints' adds addional entry-points to all entries.
       if (config.entry && typeof config.entry === 'object' && !Array.isArray(config.entry) && config.entry.main) {
         for (const [key, value] of Object.entries(config.entry)) {
-          if (key === 'main' || typeof value === 'string') {
+          if (key === 'main' || !Array.isArray(value)) {
             continue;
           }
 
@@ -362,7 +367,7 @@ async function setupLocalize(
     if (Array.isArray(webpackConfig.entry['main'])) {
       webpackConfig.entry['main'].unshift(localeDescription.dataPath);
     } else {
-      webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
+      webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main'] as string];
     }
   }
 

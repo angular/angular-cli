@@ -9,7 +9,7 @@
 import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
-import { Options, SourceMapDevToolPlugin } from 'webpack';
+import { Configuration, SourceMapDevToolPlugin } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../browser/schema';
 import { withWebpackFourOrFive } from '../../utils/webpack-version';
 
@@ -119,7 +119,7 @@ export function isPolyfillsEntry(name: string): boolean {
   return name === 'polyfills' || name === 'polyfills-es5';
 }
 
-export function getWatchOptions(poll: number | undefined): Options.WatchOptions {
+export function getWatchOptions(poll: number | undefined): Configuration['watchOptions'] {
   return {
     poll,
     ignored: poll === undefined ? undefined : withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
