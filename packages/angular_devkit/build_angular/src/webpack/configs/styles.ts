@@ -129,6 +129,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             implementation: require('less'),
             sourceMap: cssSourceMap,
             lessOptions: {
+              math: 'always',
               javascriptEnabled: true,
               paths: includePaths,
             },
