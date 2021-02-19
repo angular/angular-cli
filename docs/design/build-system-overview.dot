@@ -9,7 +9,7 @@ digraph G {
   "*.scss\|sass" -> "sass-loader" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
   "*.less" -> "less-loader" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
   "*.styl" -> "stylus-loader" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
-  "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer" -> "raw-loader" [label="component style?"] -> "./optimize-css-webpack-plugin.ts";
+  "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer" -> "raw-loader, ./optimize-css-webpack-plugin.ts"  [label="component style?"];
   "raw-loader" -> "./optimize-css-webpack-plugin.ts"
   "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer" -> "style-loader, ./raw-css-loader.ts, and mini-css-extract-plugin" [label="global style?"];
   "style-loader, ./raw-css-loader.ts, and mini-css-extract-plugin" -> "./optimize-css-webpack-plugin.ts"
