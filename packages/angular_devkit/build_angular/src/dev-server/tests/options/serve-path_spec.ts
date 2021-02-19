@@ -34,7 +34,7 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
       const baseUrl = new URL(`${result?.baseUrl}`);
       expect(baseUrl.pathname).toBe('/');
-      expect(await response?.text()).toContain('window["webpackJsonp"]');
+      expect(await response?.text()).toContain('self["webpackChunk"]');
     });
 
     it('serves application at specified path when option is used', async () => {
@@ -48,7 +48,7 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
       const baseUrl = new URL(`${result?.baseUrl}/`);
       expect(baseUrl.pathname).toBe('/test/');
-      expect(await response?.text()).toContain('window["webpackJsonp"]');
+      expect(await response?.text()).toContain('self["webpackChunk"]');
     });
 
     it('does not rewrite from root when option is used', async () => {

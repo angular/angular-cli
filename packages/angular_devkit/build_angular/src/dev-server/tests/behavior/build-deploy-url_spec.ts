@@ -27,7 +27,7 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
       expect(result?.baseUrl).toMatch(/\/test$/);
       expect(response?.url).toMatch(/\/test\/runtime.js$/);
-      expect(await response?.text()).toContain('window["webpackJsonp"]');
+      expect(await response?.text()).toContain('self["webpackChunk"]');
     });
   });
 });

@@ -8,13 +8,7 @@
 import { isAbsolute } from 'path';
 import { Configuration, ContextReplacementPlugin } from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 import { getSourceMapDevTool } from '../utils/helpers';
-
-type ExternalHookWebpack5 = (
-  data: { context: string; request: string },
-  callback: (err?: Error, result?: string) => void,
-) => void;
 
 /**
  * Returns a partial Webpack configuration specific to creating a bundle for node
@@ -35,13 +29,9 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
 
   const externals: Configuration['externals'] = [...externalDependencies];
   if (!bundleDependencies) {
-    if (isWebpackFiveOrHigher()) {
-      const hook: ExternalHookWebpack5 = ({ context, request }, callback) =>
-        externalizePackages(request, context, callback);
-      externals.push(hook);
-    } else {
-      externals.push(externalizePackages as unknown as ExternalHookWebpack5);
-    }
+    externals.push(({ context, request }, callback) =>
+      externalizePackages(context ?? wco.projectRoot, request, callback),
+    );
   }
 
   const config: Configuration = {
@@ -67,9 +57,13 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
 
 function externalizePackages(
   context: string,
-  request: string,
+  request: string | undefined,
   callback: (error?: Error, result?: string) => void,
 ): void {
+  if (!request) {
+    return;
+  }
+
   // Absolute & Relative paths are not externals
   if (request.startsWith('.') || isAbsolute(request)) {
     callback();

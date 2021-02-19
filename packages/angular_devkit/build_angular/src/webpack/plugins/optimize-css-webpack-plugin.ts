@@ -7,8 +7,8 @@
  */
 import * as cssNano from 'cssnano';
 import { ProcessOptions, Result } from 'postcss';
-import { Compiler, compilation } from 'webpack';
-import { RawSource, Source, SourceMapSource } from 'webpack-sources';
+import { Compiler, compilation, sources } from 'webpack';
+import { Source } from 'webpack-sources';
 import { addWarning } from '../../utils/webpack-diagnostics';
 import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
@@ -36,7 +36,7 @@ function hook(
       });
     } else {
       compilation.hooks.optimizeChunkAssets
-        .tapPromise(PLUGIN_NAME, (chunks: Iterable<compilation.Chunk>) => {
+        .tapPromise(PLUGIN_NAME, (chunks) => {
           const files: string[] = [];
           for (const chunk of chunks) {
             if (!chunk.files) {
@@ -124,7 +124,7 @@ export class OptimizeCssWebpackPlugin {
 
           let newSource;
           if (output.map) {
-            newSource = new SourceMapSource(
+            newSource = new sources.SourceMapSource(
               output.css,
               file,
               // tslint:disable-next-line: no-any
@@ -133,7 +133,7 @@ export class OptimizeCssWebpackPlugin {
               map,
             );
           } else {
-            newSource = new RawSource(output.css);
+            newSource = new sources.RawSource(output.css);
           }
 
           compilation.assets[file] = newSource;

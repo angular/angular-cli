@@ -9,8 +9,8 @@ import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 const MAIN_OUTPUT = 'dist/main.js';
-const NAMED_LAZY_OUTPUT = 'dist/lazy-module.js';
-const UNNAMED_LAZY_OUTPUT = 'dist/0.js';
+const NAMED_LAZY_OUTPUT = 'dist/src_lazy-module_ts.js';
+const UNNAMED_LAZY_OUTPUT = 'dist/339.js';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "namedChunks"', () => {

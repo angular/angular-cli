@@ -119,13 +119,13 @@ export class ScriptsWebpackPlugin {
 
           const sourceGetters = scripts.map(fullPath => {
             return new Promise<Source>((resolve, reject) => {
-              compilation.inputFileSystem.readFile(fullPath, (err: Error, data: Buffer) => {
+              compilation.inputFileSystem.readFile(fullPath, (err?: Error, data?: string | Buffer) => {
                 if (err) {
                   reject(err);
                   return;
                 }
 
-                const content = data.toString();
+                const content = data?.toString() ?? '';
 
                 let source;
                 if (this.options.sourceMap) {

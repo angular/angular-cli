@@ -12,7 +12,7 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import * as path from 'path';
 import * as textTable from 'text-table';
 import { colors as ansiColors, removeColor } from '../../utils/color';
-import { Configuration, Stats } from 'webpack';
+import { Configuration } from 'webpack';
 import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 export interface JsonAssetStats {
@@ -35,6 +35,9 @@ export interface JsonCompilationStats {
   assets?: JsonAssetStats[];
   chunks?: JsonChunkStats[];
   entrypoints?: Record<string, JsonEntrypointStats>;
+  outputPath?: string;
+  warnings?: ({ message: string } | string)[];
+  errors?: ({ message: string } | string)[];
 }
 
 export function formatSize(size: number): string {
@@ -362,8 +365,18 @@ export function createWebpackLoggingCallback(
       logger.info(stats.toString(config.stats));
     }
 
-    webpackStatsLogger(logger, stats.toJson(config.stats), config);
-  }
+    webpackStatsLogger(
+      logger,
+      stats.toJson({
+        errors: true,
+        warnings: true,
+        builtAt: true,
+        assets: true,
+        chunks: true,
+      }) as JsonCompilationStats,
+      config,
+    );
+  };
 }
 
 export function webpackStatsLogger(

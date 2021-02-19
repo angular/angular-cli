@@ -81,7 +81,7 @@ describe('Browser Builder rebuilds', () => {
         debounceTime(rebuildDebounceTime),
         tap(result => {
           expect(result.success).toBe(true, 'build should succeed');
-          const hasLazyChunk = host.scopedSync().exists(normalize('dist/lazy-lazy-module.js'));
+          const hasLazyChunk = host.scopedSync().exists(normalize('dist/src_app_lazy_lazy_module_ts.js'));
           switch (phase) {
             case 1:
               // No lazy chunk should exist.

@@ -5,9 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
+import { BuildBrowserFeatures } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { withWebpackFourOrFive } from '../../utils/webpack-version';
 import { CommonJsUsageWarnPlugin } from '../plugins';
 import { getSourceMapDevTool } from '../utils/helpers';
 
@@ -66,12 +67,19 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     crossOriginLoading = crossOrigin;
   }
 
+  const buildBrowserFeatures = new BuildBrowserFeatures(
+    wco.projectRoot,
+  );
+
   return {
     devtool: false,
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
     },
-    ...withWebpackFourOrFive({}, { target: ['web', 'es5'] }),
+    target:
+      wco.tsConfig.options.target === ScriptTarget.ES5 || buildBrowserFeatures.isEs5SupportNeeded()
+        ? ['web', 'es5']
+        : 'web',
     output: {
       crossOriginLoading,
     },

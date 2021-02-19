@@ -25,6 +25,13 @@ describe('Browser Builder deploy url', () => {
     const overrides = { deployUrl: 'deployUrl/' };
     const overrides2 = { deployUrl: 'http://example.com/some/path/' };
 
+    // Add lazy loaded chunk to provide a usage of the deploy URL
+    // Webpack 5+ will not include the deploy URL in the code unless needed
+    host.appendToFile('src/main.ts', '\nimport("./lazy");');
+    host.writeMultipleFiles({
+      'src/lazy.ts': 'export const foo = "bar";',
+    });
+
     const run = await architect.scheduleTarget(targetSpec, overrides);
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
