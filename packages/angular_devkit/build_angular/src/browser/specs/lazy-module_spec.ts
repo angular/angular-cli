@@ -176,17 +176,6 @@ describe('Browser Builder lazy modules', () => {
     expect(files['lazy-module.js']).not.toBeUndefined();
   });
 
-  it(`supports hiding lazy bundle module name`, async () => {
-    host.writeMultipleFiles({
-      'src/lazy-module.ts': 'export const value = 42;',
-      'src/main.ts': `const lazyFileName = 'module'; import('./lazy-' + lazyFileName);`,
-    });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
-
-    const { files } = await browserBuild(architect, host, target, { namedChunks: false });
-    expect(files['0.js']).not.toBeUndefined();
-  });
-
   it(`supports making a common bundle for shared lazy modules`, async () => {
     host.writeMultipleFiles({
       'src/one.ts': `import * as http from '@angular/common/http'; console.log(http);`,
