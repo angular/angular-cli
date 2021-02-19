@@ -28,7 +28,7 @@ import {
   getStatsConfig,
   getStylesConfig,
 } from '../webpack/configs';
-import { webpackStatsLogger } from '../webpack/utils/stats';
+import { JsonCompilationStats, webpackStatsLogger } from '../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
 // If success is true, outputPath should be set.
@@ -114,7 +114,7 @@ export function execute(
             );
           }
 
-          webpackStatsLogger(context.logger, webpackStats, config);
+          webpackStatsLogger(context.logger, webpackStats as JsonCompilationStats, config);
 
           return { ...output, success };
         }),

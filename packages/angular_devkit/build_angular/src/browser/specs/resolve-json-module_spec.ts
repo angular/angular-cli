@@ -46,13 +46,13 @@ describe('Browser Builder resolve json module', () => {
 
         switch (buildCount) {
           case 1:
-            expect(content).toContain('\\"foo\\":\\"1\\"');
+            expect(content).toContain('"foo":"1"');
             host.writeMultipleFiles({
               'src/my-json-file.json': `{"foo": "2"}`,
             });
             break;
           case 2:
-            expect(content).toContain('\\"foo\\":\\"2\\"');
+            expect(content).toContain('"foo":"2"');
             break;
         }
 

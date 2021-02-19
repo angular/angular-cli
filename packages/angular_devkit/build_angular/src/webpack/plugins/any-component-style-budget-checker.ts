@@ -72,8 +72,8 @@ export class AnyComponentStyleBudgetChecker {
       if (isWebpackFiveOrHigher()) {
         // webpack 5 migration "guide"
         // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L535-L539
-        // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1;
-        const stage = 101;
+        // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_ANALYSE;
+        const stage = 4000;
         // tslint:disable-next-line: no-any
         (compilation.hooks as any).processAssets.tap({name: PLUGIN_NAME, stage}, afterOptimizeChunkAssets);
       } else {

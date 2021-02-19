@@ -18,8 +18,8 @@ import {
   Configuration,
   ContextReplacementPlugin,
   RuleSetRule,
-  compilation,
   debug,
+  sources,
 } from 'webpack';
 import { AssetPatternClass } from '../../browser/schema';
 import { BuildBrowserFeatures, maxWorkers } from '../../utils';
@@ -92,36 +92,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         const polyfillsChunkName = 'polyfills-es5';
         entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
 
-        if (differentialLoadingMode) {
-          // Since the chunkFileName option schema does not allow the function overload, add a plugin
-          // that changes the name of the ES5 polyfills chunk to not include ES2015.
-          extraPlugins.push({
-            apply(compiler) {
-              compiler.hooks.compilation.tap('build-angular', compilation => {
-                const assetPath = (
-                  filename: string | ((data: { chunk: compilation.Chunk }) => string),
-                  data: { chunk: compilation.Chunk },
-                ) => {
-                  const assetName = typeof filename === 'function' ? filename(data) : filename;
-                  const isMap = assetName?.endsWith('.map');
-
-                  return data.chunk?.name === 'polyfills-es5'
-                    ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
-                    : assetName;
-                };
-
-                if (isWebpackFiveOrHigher()) {
-                  compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-                } else {
-                  const mainTemplate = compilation.mainTemplate as typeof compilation.mainTemplate & {
-                    hooks: typeof compilation['hooks'];
-                  };
-                  mainTemplate.hooks.assetPath.tap('build-angular', assetPath);
-                }
-              });
-            },
-          });
-        }
         if (!buildOptions.aot) {
           if (differentialLoadingMode) {
             entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'jit-polyfills.js'));
@@ -253,7 +223,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
     extraPlugins.push(new CopyWebpackPlugin({
       patterns: copyWebpackPluginPatterns,
-    }));
+    // The typings for copy-webpack-plugin use the old @types/webpack package
+    // tslint:disable-next-line: no-any
+    }) as any);
   }
 
   if (buildOptions.progress) {
@@ -293,7 +265,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
             const { stringifyStream } = await import('@discoveryjs/json-ext');
             const data = stats.toJson('verbose');
-            const statsOutputPath = path.join(stats.compilation.outputOptions.path, 'stats.json');
+            const statsOutputPath = path.join(root, buildOptions.outputPath, 'stats.json');
 
             try {
               await fsPromises.mkdir(path.dirname(statsOutputPath), { recursive: true });
@@ -469,7 +441,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ...withWebpackFourOrFive({ futureEmitAssets: true }, {}),
       path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
-      filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
+      filename: ({ chunk }) => {
+        if (chunk?.name === 'polyfills-es5') {
+          return `polyfills-es5${hashFormat.chunk}.js`;
+        } else {
+          return `[name]${targetInFileName}${hashFormat.chunk}.js`;
+        }
+      },
+      chunkFilename: `[id]${targetInFileName}${hashFormat.chunk}.js`,
     },
     watch: buildOptions.watch,
     watchOptions: getWatchOptions(buildOptions.poll),
@@ -512,10 +491,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         ...extraRules,
       ],
     },
+    cache: !!buildOptions.watch,
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: withWebpackFourOrFive('hashed', 'deterministic'),
-      ...withWebpackFourOrFive({}, buildOptions.namedChunks ? { chunkIds: 'named' } : {}),
+      chunkIds: buildOptions.namedChunks ? 'named' : 'deterministic',
       ...withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
     },
     plugins: [

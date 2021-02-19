@@ -109,7 +109,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
 
   protected async readIndex(path: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.compilation.inputFileSystem.readFile(path, (err: Error, data: Buffer) => {
+      this.compilation.inputFileSystem.readFile(path, (err?: Error, data?: string | Buffer) => {
         if (err) {
           reject(err);
 
@@ -117,7 +117,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
         }
 
         this.compilation.fileDependencies.add(path);
-        resolve(data.toString());
+        resolve(data?.toString() ?? '');
       });
     });
   }

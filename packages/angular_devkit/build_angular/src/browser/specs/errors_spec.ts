@@ -90,6 +90,6 @@ describe('Browser Builder errors', () => {
     // Wait for the builder to complete
     await run.stop();
 
-    expect(logs.join()).toContain(`export 'missingExport' was not found in 'rxjs'`);
+    expect(logs.join()).toContain(`export 'missingExport' (imported as 'missingExport') was not found in 'rxjs'`);
   });
 });

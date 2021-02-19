@@ -28,29 +28,9 @@ export default function() {
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
 
-      if (!distFiles.includes('too-lazy-lazy-module.js')) {
+      if (!distFiles.includes('src_app_too_lazy_lazy_module_ts.js')) {
         throw new Error('The lazy module chunk did not use a unique name.');
       }
-    })
-    // verify System.import still works
-    .then(() => writeFile('src/app/lazy-file.ts', ''))
-    .then(() => appendToFile('src/app/app.component.ts', `
-      // verify other System.import still work
-      declare var System: any;
-      const lazyFile = 'file';
-      System.import(/*webpackChunkName: '[request]'*/'./lazy-' + lazyFile);
-    `))
-    .then(() => ng('build', '--named-chunks', '--configuration=development'))
-    .then(() => readdirSync('dist/test-project'))
-    .then((distFiles) => {
-      const currentNumberOfDistFiles = distFiles.length;
-      if (oldNumberOfFiles >= currentNumberOfDistFiles) {
-        throw new Error('A bundle for the lazy file was not created.');
-      }
-      if (!distFiles.includes('lazy-file.js')) {
-        throw new Error('The lazy file chunk did not have a name.');
-      }
-      oldNumberOfFiles = currentNumberOfDistFiles;
     })
     // verify 'import *' syntax doesn't break lazy modules
     .then(() => installPackage('moment'))
