@@ -14,8 +14,8 @@ describe('hello-world-app App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('should display welcome message', async () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('Welcome to app!');
+    expect(await page.getTitleText()).toEqual('Welcome to app!');
   });
 });
