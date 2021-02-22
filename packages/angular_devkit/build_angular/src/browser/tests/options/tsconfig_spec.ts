@@ -19,6 +19,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         JSON.stringify({
           compilerOptions: {
             target: 'es5',
+            types: [],
           },
           files: ['main.ts'],
         }),
