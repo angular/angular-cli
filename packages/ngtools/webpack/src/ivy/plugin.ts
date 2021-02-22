@@ -145,16 +145,17 @@ export class AngularWebpackPlugin {
       // Example: module -> module__ivy_ngcc
       resolverFactoryHooks.resolveOptions
         .for('normal')
-        .tap(PLUGIN_NAME, (resolveOptions: { mainFields: string[] }) => {
+        .tap(PLUGIN_NAME, (resolveOptions: { mainFields: string[], plugins: unknown[] }) => {
           const originalMainFields = resolveOptions.mainFields;
           const ivyMainFields = originalMainFields.map((f) => `${f}_ivy_ngcc`);
 
+          if (!resolveOptions.plugins) {
+            resolveOptions.plugins = [];
+          }
+          resolveOptions.plugins.push(pathsPlugin);
+
           return mergeResolverMainFields(resolveOptions, originalMainFields, ivyMainFields);
         });
-
-      resolverFactoryHooks.resolver.for('normal').tap(PLUGIN_NAME, (resolver: {}) => {
-        pathsPlugin.apply(resolver);
-      });
     });
 
     let ngccProcessor: NgccProcessor | undefined;
