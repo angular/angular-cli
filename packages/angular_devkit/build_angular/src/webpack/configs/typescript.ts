@@ -60,6 +60,8 @@ function createIvyPlugin(
 
   const compilerOptions: CompilerOptions = {
     sourceMap: buildOptions.sourceMap.scripts,
+    declaration: false,
+    declarationMap: false,
   };
 
   if (buildOptions.preserveSymlinks !== undefined) {
