@@ -939,12 +939,16 @@ export class AngularCompilerPlugin {
           });
       }
 
-      // tslint:disable-next-line:no-any
-      (compiler as any).resolverFactory.hooks.resolver
+      // tslint:disable-next-line: no-any
+      (compiler as any).resolverFactory.hooks.resolveOptions
         .for('normal')
-        // tslint:disable-next-line:no-any
-        .tap('angular-compiler', (resolver: any) => {
-          new TypeScriptPathsPlugin(this._compilerOptions).apply(resolver);
+        .tap('angular-compiler', (resolveOptions: { plugins: unknown[] }) => {
+          if (!resolveOptions.plugins) {
+            resolveOptions.plugins = [];
+          }
+          resolveOptions.plugins.push(new TypeScriptPathsPlugin(this._compilerOptions));
+
+          return resolveOptions;
         });
 
       compiler.hooks.normalModuleFactory.tap('angular-compiler', nmf => {
