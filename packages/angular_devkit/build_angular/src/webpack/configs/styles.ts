@@ -191,12 +191,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   const { supportedBrowsers } = new BuildBrowserFeatures(wco.projectRoot);
-  const postcssOptionsCreator = (sourceMap: boolean, extracted: boolean | undefined) => {
+  const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean | undefined) => {
     return (loader: webpack.loader.LoaderContext) => ({
-      map: sourceMap && {
-        inline: true,
-        annotation: false,
-      },
+      map: inlineSourcemaps
+        ? {
+            inline: true,
+            annotation: false,
+          }
+        : undefined,
       plugins: [
         postcssImports({
           resolve: (url: string) => url.startsWith('~') ? url.substr(1) : url,
@@ -264,8 +266,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    const globalSourceMap = !!cssSourceMap && !buildOptions.sourceMap.hidden;
-
     rules.push(
       ...baseRules.map(({ test, use }) => {
         return {
@@ -281,14 +281,15 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
               loader: require.resolve('css-loader'),
               options: {
                 url: false,
-                sourceMap: globalSourceMap,
+                sourceMap: !!cssSourceMap,
               },
             },
             {
               loader: require.resolve('postcss-loader'),
               options: {
                 implementation: require('postcss'),
-                postcssOptions: postcssOptionsCreator(globalSourceMap, buildOptions.extractCss),
+                postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
+                sourceMap: !!cssSourceMap,
               },
             },
             ...use,
