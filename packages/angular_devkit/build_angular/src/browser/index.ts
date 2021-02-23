@@ -709,9 +709,9 @@ export function buildWebpackBrowser(
 
                       return { success: false, error: mapErrorToMessage(error) };
                     }
-
-                    spinner.succeed('Index html generation complete.');
                   }
+
+                  spinner.succeed('Index html generation complete.');
                 }
 
                 if (options.serviceWorker) {
@@ -730,9 +730,9 @@ export function buildWebpackBrowser(
 
                       return { success: false, error: mapErrorToMessage(error) };
                     }
-
-                    spinner.succeed('Service worker generation complete.');
                   }
+
+                  spinner.succeed('Service worker generation complete.');
                 }
               }
 
