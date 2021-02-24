@@ -70,7 +70,8 @@ Update the package versions to reflect the new release version in **both**:
 1. [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
 
 ```bash
-git commit -a -m 'release: vXX'
+git add package.json packages/schematics/angular/utility/latest-versions.ts
+git commit -m 'release: vXX'
 git tag -a 'vXX' -m 'release: tag vXX'
 ```
 
