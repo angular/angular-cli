@@ -8,6 +8,7 @@
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { satisfies, valid } from 'semver';
 import { PackageManager } from '../lib/config/schema';
 import { getConfiguredPackageManager } from './config';
 
@@ -56,7 +57,7 @@ export async function getPackageManager(root: string): Promise<PackageManager> {
 }
 
 /**
- * Checks if the npm version is version 6.x.  If not, display a message and exit.
+ * Checks if the npm version is a supported 7.x version.  If not, display a warning.
  */
 export async function ensureCompatibleNpm(root: string): Promise<void> {
   if ((await getPackageManager(root)) !== PackageManager.Npm) {
@@ -64,21 +65,19 @@ export async function ensureCompatibleNpm(root: string): Promise<void> {
   }
 
   try {
-    const version = execSync('npm --version', {encoding: 'utf8', stdio: 'pipe'}).trim();
-    const major = Number(version.match(/^(\d+)\./)?.[1]);
-    if (major <= 6) {
+    const versionText = execSync('npm --version', {encoding: 'utf8', stdio: 'pipe'}).trim();
+    const version = valid(versionText);
+    if (!version) {
       return;
     }
 
-    // tslint:disable-next-line: no-console
-    console.error(
-      `npm version ${version} detected. The Angular CLI temporarily requires npm version 6 while upstream issues are addressed.\n\n` +
-      'Please install a compatible version to proceed (`npm install --global npm@6`).\n' +
-      'For additional information and alternative workarounds, please see ' +
-      'https://github.com/angular/angular-cli/issues/19957#issuecomment-775407654',
-    );
-
-    process.exit(3);
+    if (satisfies(version, '>=7 <7.5.6')) {
+      // tslint:disable-next-line: no-console
+      console.warn(
+        `npm version ${version} detected.` +
+          ' When using npm 7 with the Angular CLI, npm version 7.5.6 or higher is recommended.',
+      );
+    }
   } catch {
     // npm is not installed
   }
