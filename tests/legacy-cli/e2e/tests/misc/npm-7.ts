@@ -1,4 +1,4 @@
-import { rimraf } from '../../utils/fs';
+import { rimraf, writeFile } from '../../utils/fs';
 import { ng, npm } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
@@ -63,6 +63,7 @@ export default async function() {
     }
 
     // Ensure `ng new --package-manager=yarn` executes successfully
+    await writeFile('.npmrc', 'registry=http://localhost:4873');
     const { stderr: stderrNewYarn } = await ng('new', 'npm-seven-yarn', '--package-manager=yarn');
     if (stderrNewYarn.includes(warningText)) {
       throw new Error('ng new --package-manager=yarn expected to not show npm version warning.');
