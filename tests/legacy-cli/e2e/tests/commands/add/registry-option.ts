@@ -1,18 +1,25 @@
-import { expectFileToExist, rimraf, writeMultipleFiles } from '../../../utils/fs';
+import { getGlobalVariable } from '../../../utils/env';
+import { expectFileToExist, writeMultipleFiles } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
-  // forcibly remove in case another test doesn't clean itself up
-  await rimraf('node_modules/@angular/material');
+  const testRegistry = getGlobalVariable('package-registry');
 
   // Setup an invalid registry
   await writeMultipleFiles({
     '.npmrc': 'registry=http://127.0.0.1:9999',
   });
+  // The environment variable has priority over the .npmrc
+  const originalRegistryVariable = process.env['NPM_CONFIG_REGISTRY'];
+  process.env['NPM_CONFIG_REGISTRY'] = undefined;
 
-  await expectToFail(() => ng('add', '@angular/pwa'));
+  try {
+    await expectToFail(() => ng('add', '@angular/pwa'));
 
-  await ng('add', '--registry=http://localhost:4873', '@angular/pwa');
-  await expectFileToExist('src/manifest.webmanifest');
+    await ng('add', `--registry=${testRegistry}`, '@angular/pwa');
+    await expectFileToExist('src/manifest.webmanifest');
+  } finally {
+    process.env['NPM_CONFIG_REGISTRY'] = originalRegistryVariable;
+  }
 }
