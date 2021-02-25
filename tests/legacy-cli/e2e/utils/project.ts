@@ -90,8 +90,6 @@ export async function prepareProjectForE2e(name) {
     await useSha();
   }
 
-  await writeFile('.npmrc', 'registry=http://localhost:4873');
-
   console.log(
     `Project ${name} created... Installing npm.`,
   );
