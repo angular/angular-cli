@@ -18,7 +18,7 @@
     "ansi-colors": "4.1.1",
     "minimist": "1.2.5",
     "progress": "2.0.3",
-    "rxjs": "6.6.3",
+    "rxjs": "6.6.6",
     "symbol-observable": "3.0.0"
   },
   "devDependencies": {

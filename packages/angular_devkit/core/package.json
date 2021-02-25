@@ -11,7 +11,7 @@
     "ajv": "6.12.6",
     "fast-json-stable-stringify": "2.1.0",
     "magic-string": "0.25.7",
-    "rxjs": "6.6.3",
+    "rxjs": "6.6.6",
     "source-map": "0.7.3"
   },
   "devDependencies": {
