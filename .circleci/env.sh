@@ -15,6 +15,8 @@ echo "source $envHelpersPath;" >> $BASH_ENV;
 # See https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables for more info.
 ####################################################################################################
 setPublicVar PROJECT_ROOT "$projectDir";
+setPublicVar NPM_CONFIG_PREFIX "${HOME}/.npm-global";
+setPublicVar PATH "${HOME}/.npm-global/bin:${PATH}";
 
 ####################################################################################################
 # Define SauceLabs environment variables for CircleCI.
