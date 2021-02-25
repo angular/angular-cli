@@ -11,13 +11,10 @@ export default async function () {
     return;
   }
 
-  process.env['NPM_CONFIG_REGISTRY'] = 'http://localhost:4873';
-
   await silentNpm(
     'install',
     '-g',
     '@angular-devkit/schematics-cli',
-    '--registry=http://localhost:4873',
   );
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 

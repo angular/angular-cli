@@ -7,12 +7,14 @@ export default async function() {
     return;
   }
 
+  const testRegistry = getGlobalVariable('package-registry');
+
   // Install global Angular CLI.
   await silentNpm(
     'install',
     '--global',
     '@angular/cli',
-    '--registry=http://localhost:4873',
+    `--registry=${testRegistry}`,
   );
 
   try {

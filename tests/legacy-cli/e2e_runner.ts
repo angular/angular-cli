@@ -143,7 +143,9 @@ if (testsToRun.length == allTests.length) {
 }
 
 setGlobalVariable('argv', argv);
+setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
+setGlobalVariable('package-registry', 'http://localhost:4873');
 
 // Setup local package registry
 const registryPath =

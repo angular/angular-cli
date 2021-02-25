@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { rimraf } from '../../utils/fs';
 import { killAllProcesses, ng, silentYarn } from '../../utils/process';
 import { ngServe, updateJsonFile } from '../../utils/project';
@@ -8,7 +9,8 @@ export default async function() {
   await updateJsonFile('package.json', (json) => {
     json.resolutions = { webpack: '5.1.3' };
   });
-  await silentYarn();
+  const testRegistry = getGlobalVariable('package-registry');
+  await silentYarn(`--registry=${testRegistry}`);
 
   // Ensure webpack 5 is used
   const { stdout } = await silentYarn('list', '--pattern', 'webpack');

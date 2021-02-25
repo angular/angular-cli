@@ -15,7 +15,7 @@ export default async function() {
     // Install the CLI with TTY force enabled
     const execution = execWithEnv(
       'npm',
-      ['install', '@angular/cli', '--registry=http://localhost:4873'],
+      ['install', '@angular/cli'],
       { ...process.env, 'NG_FORCE_TTY': '1' },
     );
 
