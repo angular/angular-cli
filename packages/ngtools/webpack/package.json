@@ -31,8 +31,8 @@
     "webpack": "^4.0.0 || ^5.20.0"
   },
   "devDependencies": {
-    "@angular/compiler": "12.0.0-next.1",
-    "@angular/compiler-cli": "12.0.0-next.1",
+    "@angular/compiler": "12.0.0-next.2",
+    "@angular/compiler-cli": "12.0.0-next.2",
     "typescript": "4.1.5",
     "webpack": "5.21.2"
   }
