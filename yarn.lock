@@ -12825,10 +12825,10 @@ verdaccio-htpasswd@9.7.2:
     http-errors "1.8.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@4.11.0:
-  version "4.11.0"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-4.11.0.tgz#7211cdb34d9856e4c44f2956069dd541428c1785"
-  integrity sha512-9mNILk0MLcd1e2EHhHVQHaiAIqYxr828Bu9ZDDXBEEA1jRNDqkwqdqr2zFfaTb0rRAfAqiorq/VvB4pNyJXWHQ==
+verdaccio@4.11.1:
+  version "4.11.1"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-4.11.1.tgz#da644c46bf053839fc423a072acbc26831920292"
+  integrity sha512-xlu61MWAWztdEsGM2vUbv5fUv+E4GWTZ9rTYU/uc1+X3EURMLEHDdFBZR7qe0abfB3Kj59GATNEtQNQ2KvqNDA==
   dependencies:
     "@verdaccio/commons-api" "9.7.1"
     "@verdaccio/local-storage" "9.7.4"
