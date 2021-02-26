@@ -155,7 +155,7 @@ function addUniversalTarget(options: AppShellOptions): Rule {
 }
 
 function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
-  return () => {
+  return (host, context) => {
     if (!options.route) {
       throw new SchematicsException(`Route is not defined`);
     }
@@ -166,20 +166,44 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
         return;
       }
 
+      // Validation of targets is handled already in the main function.
+      // Duplicate keys means that we have configurations in both server and build builders.
+      const serverConfigKeys = project.targets.get('server')?.configurations ?? {};
+      const buildConfigKeys = project.targets.get('build')?.configurations ?? {};
+
+      const configurationNames = Object.keys({
+        ...serverConfigKeys,
+        ...buildConfigKeys,
+      });
+
+      const configurations: Record<string, {}> = {};
+      for (const key of configurationNames) {
+        if (!serverConfigKeys[key]) {
+          context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "server" target.`);
+
+          continue;
+        }
+
+        if (!buildConfigKeys[key]) {
+          context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "build" target.`);
+
+          continue;
+        }
+
+        configurations[key] = {
+          browserTarget: `${options.clientProject}:build:${key}`,
+          serverTarget: `${options.clientProject}:server:${key}`,
+        };
+      }
+
       project.targets.add({
         name: 'app-shell',
         builder: Builders.AppShell,
+        defaultConfiguration: configurations['production'] ? 'production' : undefined,
         options: {
-          browserTarget: `${options.clientProject}:build`,
-          serverTarget: `${options.clientProject}:server`,
           route: options.route,
         },
-        configurations: {
-          production: {
-            browserTarget: `${options.clientProject}:build:production`,
-            serverTarget: `${options.clientProject}:server:production`,
-          },
-        },
+        configurations,
       });
     });
   };
@@ -242,9 +266,9 @@ function addServerRoutes(options: AppShellOptions): Rule {
     if (!isImported(moduleSource, 'Routes', '@angular/router')) {
       const recorder = host.beginUpdate(modulePath);
       const routesChange = insertImport(moduleSource,
-                                        modulePath,
-                                        'Routes',
-                                        '@angular/router');
+        modulePath,
+        'Routes',
+        '@angular/router');
       if (routesChange) {
         applyToUpdateRecorder(recorder, [routesChange]);
       }
@@ -263,16 +287,16 @@ function addServerRoutes(options: AppShellOptions): Rule {
     if (!isImported(moduleSource, 'RouterModule', '@angular/router')) {
       const recorder = host.beginUpdate(modulePath);
       const routerModuleChange = insertImport(moduleSource,
-                                              modulePath,
-                                              'RouterModule',
-                                              '@angular/router');
+        modulePath,
+        'RouterModule',
+        '@angular/router');
 
       if (routerModuleChange) {
         applyToUpdateRecorder(recorder, [routerModuleChange]);
       }
 
       const metadataChange = addSymbolToNgModuleMetadata(
-          moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
+        moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
       if (metadataChange) {
         applyToUpdateRecorder(recorder, metadataChange);
       }

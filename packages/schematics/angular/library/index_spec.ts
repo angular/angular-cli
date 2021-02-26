@@ -309,22 +309,22 @@ describe('Library Schematic', () => {
     const config = getJsonFileContent(tree, '/angular.json');
     const project = config.projects.foo;
     expect(project.root).toEqual('foo');
-    const buildOpt = project.architect.build.options;
-    expect(buildOpt.project).toEqual('foo/ng-package.json');
-    expect(buildOpt.tsConfig).toEqual('foo/tsconfig.lib.json');
+    const { options, configurations } = project.architect.build;
+    expect(options.project).toEqual('foo/ng-package.json');
+    expect(configurations.production.tsConfig).toEqual('foo/tsconfig.lib.prod.json');
 
-    const appTsConfig = getJsonFileContent(tree, '/foo/tsconfig.lib.json');
-    expect(appTsConfig.extends).toEqual('../tsconfig.json');
+    const libTsConfig = getJsonFileContent(tree, '/foo/tsconfig.lib.json');
+    expect(libTsConfig.extends).toEqual('../tsconfig.json');
     const specTsConfig = getJsonFileContent(tree, '/foo/tsconfig.spec.json');
     expect(specTsConfig.extends).toEqual('../tsconfig.json');
   });
 
-  it(`should add 'production' configuration`, async () => {
+  it(`should add 'development' configuration`, async () => {
     const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
       .toPromise();
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.foo.architect.build.configurations.production).toBeDefined();
+    expect(workspace.projects.foo.architect.build.configurations.development).toBeDefined();
   });
 
   it(`should add 'ng-packagr' builder`, async () => {

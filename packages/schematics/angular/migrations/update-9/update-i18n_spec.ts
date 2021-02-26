@@ -49,6 +49,8 @@ describe('Migration to version 9', () => {
           tree,
         )
         .toPromise();
+
+      tree.overwrite('angular.json', tree.readContent('angular.json').replace(/development/g, 'production'));
     });
 
     describe('i18n configuration', () => {

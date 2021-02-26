@@ -94,9 +94,9 @@ describe('Application Schematic', () => {
       const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
         .toPromise();
       const workspace = JSON.parse(tree.readContent('/angular.json'));
-      const e2eOptions = workspace.projects.foo.architect.e2e.options;
-      expect(e2eOptions.protractorConfig).toEqual('projects/foo/e2e/protractor.conf.js');
-      expect(e2eOptions.devServerTarget).toEqual('foo:serve');
+      const { options, configurations } = workspace.projects.foo.architect.e2e;
+      expect(options.protractorConfig).toEqual('projects/foo/e2e/protractor.conf.js');
+      expect(configurations.development.devServerTarget).toEqual('foo:serve:development');
     });
   });
 
