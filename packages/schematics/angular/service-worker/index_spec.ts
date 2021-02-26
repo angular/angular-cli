@@ -19,7 +19,7 @@ describe('Service Worker Schematic', () => {
   const defaultOptions: ServiceWorkerOptions = {
     project: 'bar',
     target: 'build',
-    configuration: 'production',
+    configuration: '',
   };
 
   let appTree: UnitTestTree;
@@ -45,25 +45,13 @@ describe('Service Worker Schematic', () => {
       .toPromise();
   });
 
-  it('should update the production configuration', async () => {
+  it('should add `serviceWorker` option to build target', async () => {
     const tree = await schematicRunner.runSchematicAsync('service-worker', defaultOptions, appTree)
       .toPromise();
     const configText = tree.readContent('/angular.json');
-    const config = JSON.parse(configText);
-    const swFlag = config.projects.bar.architect
-      .build.configurations.production.serviceWorker;
-    expect(swFlag).toEqual(true);
-  });
+    const buildConfig = JSON.parse(configText).projects.bar.architect.build;
 
-  it('should update the target options if no configuration is set', async () => {
-    const options = { ...defaultOptions, configuration: '' };
-    const tree = await schematicRunner.runSchematicAsync('service-worker', options, appTree)
-      .toPromise();
-    const configText = tree.readContent('/angular.json');
-    const config = JSON.parse(configText);
-    const swFlag = config.projects.bar.architect
-      .build.options.serviceWorker;
-    expect(swFlag).toEqual(true);
+    expect(buildConfig.options.serviceWorker).toBeTrue();
   });
 
   it('should add the necessary dependency', async () => {
@@ -162,8 +150,7 @@ describe('Service Worker Schematic', () => {
     expect(tree.exists(path)).toEqual(true);
 
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
-    expect(projects.bar.architect.build.configurations.production.ngswConfigPath)
-      .toBe('projects/bar/ngsw-config.json');
+    expect(projects.bar.architect.build.options.ngswConfigPath).toBe('projects/bar/ngsw-config.json');
   });
 
   it('should add $schema in ngsw-config.json with correct relative path', async () => {
@@ -214,7 +201,7 @@ describe('Service Worker Schematic', () => {
 
   it('should add resourcesOutputPath to root assets when specified', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
-    config.projects.bar.architect.build.configurations.production.resourcesOutputPath = 'outDir';
+    config.projects.bar.architect.build.options.resourcesOutputPath = 'outDir';
     appTree.overwrite('/angular.json', JSON.stringify(config));
     const tree = await schematicRunner.runSchematicAsync('service-worker', defaultOptions, appTree)
       .toPromise();
@@ -243,7 +230,6 @@ describe('Service Worker Schematic', () => {
     expect(tree.exists('/ngsw-config.json')).toBe(true);
 
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
-    expect(projects.foo.architect.build.configurations.production.ngswConfigPath)
-      .toBe('ngsw-config.json');
+    expect(projects.foo.architect.build.options.ngswConfigPath).toBe('ngsw-config.json');
   });
 });

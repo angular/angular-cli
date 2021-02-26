@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build"<% if (!minimal) { %>,
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development"<% if (!minimal) { %>,
     "test": "ng test",
     "lint": "ng lint"<% } %>
   },

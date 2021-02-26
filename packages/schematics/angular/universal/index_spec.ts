@@ -156,13 +156,9 @@ describe('Universal Schematic', () => {
     expect(opts.main).toEqual('projects/bar/src/main.server.ts');
     expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
     const configurations = targets.server.configurations;
-    expect(configurations.production).toBeDefined();
-    expect(configurations.production.fileReplacements).toBeDefined();
-    expect(configurations.production.outputHashing).toBe('media');
-    const fileReplacements = targets.server.configurations.production.fileReplacements;
-    expect(fileReplacements.length).toEqual(1);
-    expect(fileReplacements[0].replace).toEqual('projects/bar/src/environments/environment.ts');
-    expect(fileReplacements[0].with).toEqual('projects/bar/src/environments/environment.prod.ts');
+    expect(configurations.production.fileReplacements.length).toEqual(1);
+    expect(configurations.production.fileReplacements[0].replace).toEqual('projects/bar/src/environments/environment.ts');
+    expect(configurations.production.fileReplacements[0].with).toEqual('projects/bar/src/environments/environment.prod.ts');
   });
 
   it('should update workspace with a build target outputPath', async () => {

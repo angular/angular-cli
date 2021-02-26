@@ -52,7 +52,7 @@ describe('PWA Schematic', () => {
     schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
       const configText = tree.readContent('/angular.json');
       const config = JSON.parse(configText);
-      const swFlag = config.projects.bar.architect.build.configurations.production.serviceWorker;
+      const swFlag = config.projects.bar.architect.build.options.serviceWorker;
       expect(swFlag).toEqual(true);
       done();
     }, done.fail);

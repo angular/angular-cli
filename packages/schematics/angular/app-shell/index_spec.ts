@@ -68,9 +68,9 @@ describe('App Shell Schematic', () => {
     const content = tree.readContent(filePath);
     const workspace = JSON.parse(content);
     const target = workspace.projects.bar.architect['app-shell'];
-    expect(target.options.browserTarget).toEqual('bar:build');
-    expect(target.options.serverTarget).toEqual('bar:server');
     expect(target.options.route).toEqual('shell');
+    expect(target.configurations.development.browserTarget).toEqual('bar:build:development');
+    expect(target.configurations.development.serverTarget).toEqual('bar:server:development');
     expect(target.configurations.production.browserTarget).toEqual('bar:build:production');
     expect(target.configurations.production.serverTarget).toEqual('bar:server:production');
   });

@@ -93,6 +93,8 @@ describe('Migration to version 9', () => {
       );
 
       tree.overwrite('tsconfig.app.json', tsConfig);
+
+      tree.overwrite('angular.json', tree.readContent('angular.json').replace(/development/g, 'production'));
     });
 
     describe('scripts and style options', () => {
@@ -277,6 +279,8 @@ describe('Migration to version 9', () => {
             tree,
           )
           .toPromise();
+
+        tree.overwrite('angular.json', tree.readContent('angular.json').replace(/development/g, 'production'));
       });
 
       it('should add optimization option when not defined', async () => {

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonValue,
   Path,
   basename,
   join,
@@ -35,62 +36,65 @@ import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
-import { BrowserBuilderOptions, Builders, OutputHashing } from '../utility/workspace-models';
+import { BrowserBuilderOptions, Builders } from '../utility/workspace-models';
 import { Schema as UniversalOptions } from './schema';
 
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
   return updateWorkspace(workspace => {
     const clientProject = workspace.projects.get(options.clientProject);
+
     if (clientProject) {
-      const buildTarget = clientProject.targets.get('build');
-      let fileReplacements;
-      if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
-        fileReplacements = buildTarget.configurations.production.fileReplacements;
-      }
-
-      if (buildTarget && buildTarget.options) {
-        buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
-      }
-
       // In case the browser builder hashes the assets
       // we need to add this setting to the server builder
       // as otherwise when assets it will be requested twice.
       // One for the server which will be unhashed, and other on the client which will be hashed.
-      let outputHashing: OutputHashing | undefined;
-      if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
-        switch (buildTarget.configurations.production.outputHashing as OutputHashing) {
-          case 'all':
-          case 'media':
-            outputHashing = 'media';
-            break;
+      const getServerOptions = (options: Record<string, JsonValue | undefined> = {}): {} => {
+        return {
+          outputHashing: options?.outputHashing === 'all' ? 'media' : options?.outputHashing,
+          fileReplacements: options?.fileReplacements,
+          optimization: options?.optimization === undefined ? undefined : !!options?.optimization,
+          sourceMap: options?.sourceMap,
+          localization: options?.localization,
+          stylePreprocessorOptions: options?.stylePreprocessorOptions,
+          resourcesOutputPath: options?.resourcesOutputPath,
+          deployUrl: options?.deployUrl,
+          i18nMissingTranslation: options?.i18nMissingTranslation,
+          preserveSymlinks: options?.preserveSymlinks,
+          extractLicenses: options?.extractLicenses,
+        };
+      };
+
+      const buildTarget = clientProject.targets.get('build');
+      if (buildTarget?.options) {
+        buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+      }
+
+      const buildConfigurations = buildTarget?.configurations;
+      const configurations: Record<string, {}> = {};
+      if (buildConfigurations) {
+        for (const [key, options] of Object.entries(buildConfigurations)) {
+          configurations[key] = getServerOptions(options);
         }
       }
 
       const mainPath = options.main as string;
       const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
-
       clientProject.targets.add({
         name: 'server',
         builder: Builders.Server,
+        defaultConfiguration: 'production',
         options: {
           outputPath: `dist/${options.clientProject}/server`,
           main: join(normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
           tsConfig: serverTsConfig,
+          ...(buildTarget?.options ? getServerOptions(buildTarget?.options) : {}),
         },
-        configurations: {
-          production: {
-            outputHashing,
-            fileReplacements,
-            sourceMap: false,
-            optimization: true,
-          },
-        },
+        configurations,
       });
 
       const lintTarget = clientProject.targets.get('lint');
       if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
-        lintTarget.options.tsConfig =
-          lintTarget.options.tsConfig.concat(serverTsConfig);
+        lintTarget.options.tsConfig = lintTarget.options.tsConfig.concat(serverTsConfig);
       }
     }
   });
