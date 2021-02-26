@@ -20,9 +20,6 @@ export default async function () {
     }
 
     // 'yarn' will nuke the entire node_modules when it is triggered during the above tests.
-    // Let's restore the previous node_modules state by re-installing using 'npm'
-    // and run 'webdriver-update'. Otherwise, we will start seeing errors in CI like:
-    // Error: Could not find update-config.json. Run 'webdriver-manager update' to download binaries.
+    await rimraf('node_modules');
     await npm('install');
-    await npm('run', 'webdriver-update');
 }
