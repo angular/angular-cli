@@ -12,11 +12,6 @@ export default async function () {
 
   await ng('generate', 'library', 'my-lib');
 
-  // Ensure webdriver is present for E2E (yarn will remove any downloaded drivers)
-  if (getActivePackageManager() === 'yarn') {
-    await silentYarn('run', 'webdriver-update');
-  }
-
   // Enable partial compilation mode (linker) for the library
   // Enable ivy for production as well (current schematic disables ivy in production)
   await updateJsonFile('projects/my-lib/tsconfig.lib.prod.json', config => {

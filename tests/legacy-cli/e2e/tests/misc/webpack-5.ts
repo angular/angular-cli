@@ -9,7 +9,6 @@ export default async function() {
     json.resolutions = { webpack: '5.1.3' };
   });
   await silentYarn();
-  await silentYarn('webdriver-update');
 
   // Ensure webpack 5 is used
   const { stdout } = await silentYarn('list', '--pattern', 'webpack');

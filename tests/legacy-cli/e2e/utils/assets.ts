@@ -53,7 +53,7 @@ export async function createProjectFromAsset(
   }
 
   if (!skipInstall) {
-    await installWorkspacePackages(false);
+    await installWorkspacePackages();
   }
 
   return dir;
