@@ -22,7 +22,8 @@
         },
         "prod": {
           "description": "Shorthand for \"--configuration=production\".\nSet the build configuration to the production target.\nBy default, the production target is set up in the workspace configuration such that all builds make use of bundling, limited tree-shaking, and also limited dead code elimination.",
-          "type": "boolean"
+          "type": "boolean",
+          "x-deprecated": "Use `--configuration production` instead."
         }
       }
     },
