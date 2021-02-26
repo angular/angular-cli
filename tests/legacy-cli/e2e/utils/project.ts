@@ -241,16 +241,7 @@ export function useCIDefaults(projectName = 'test-project') {
       const e2eTargets = e2eProject.targets || e2eProject.architect;
       e2eTargets.e2e.options.webdriverUpdate = false;
     }
-  })
-    .then(() => updateJsonFile('package.json', json => {
-      // Use matching versions of Chromium and ChromeDriver.
-      // https://github.com/GoogleChrome/puppeteer/releases
-      // http://chromedriver.chromium.org/downloads
-      json['scripts']['webdriver-update'] = 'webdriver-manager update' +
-        ` --standalone false --gecko false --versions.chrome 79.0.3945.16`; // Supports Chrome 79
-
-    }))
-    .then(() => npm('run', 'webdriver-update'));
+  });
 }
 
 export function useCIChrome(projectDir: string) {
@@ -258,32 +249,40 @@ export function useCIChrome(projectDir: string) {
   const protractorConf = `${dir}protractor.conf.js`;
   const karmaConf = `${dir}karma.conf.js`;
 
+  const chromePath = require('puppeteer').executablePath();
+  const protractorPath = require.resolve('protractor');
+  const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
+    paths: [protractorPath],
+  });
+  const chromeDriverPath = require(webdriverUpdatePath).chrome.last;
+
   return Promise.resolve()
     .then(() => updateJsonFile('package.json', json => {
-      // Use matching versions of Chromium (via puppeteer) and ChromeDriver.
-      // https://github.com/GoogleChrome/puppeteer/releases
-      // http://chromedriver.chromium.org/downloads
-      json['devDependencies']['puppeteer'] = '2.0.0'; // Chromium 79.0.3942.0 (r706915)
-      json['devDependencies']['karma-chrome-launcher'] = '~2.2.0'; // Minimum for ChromeHeadless.
+      json['devDependencies']['karma-chrome-launcher'] = '~3.1.0';
     }))
     // Use Pupeteer in protractor if a config is found on the project.
-    .then(() => {
+    .then(async () => {
       if (fs.existsSync(protractorConf)) {
-        return replaceInFile(protractorConf,
+        await replaceInFile(protractorConf,
           `browserName: 'chrome'`,
           `browserName: 'chrome',
           chromeOptions: {
             args: ['--headless'],
-            binary: require('puppeteer').executablePath()
+            binary: String.raw\`${chromePath}\`,
           }
         `);
+        await replaceInFile(
+          protractorConf,
+          'directConnect: true,',
+          `directConnect: true, chromeDriver: String.raw\`${chromeDriverPath}\`,`,
+        );
       }
     })
     // Use Pupeteer in karma if a config is found on the project.
     .then(() => {
       if (fs.existsSync(karmaConf)) {
         return prependToFile(karmaConf,
-          `process.env.CHROME_BIN = require('puppeteer').executablePath();`)
+          `process.env.CHROME_BIN = String.raw\`${chromePath}\`;`)
           .then(() => replaceInFile(karmaConf,
             `browsers: ['Chrome']`,
             `browsers: ['Chrome'],

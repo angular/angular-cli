@@ -130,6 +130,7 @@ jobs:
           keys:
             - *cache_key
       - run: yarn install --frozen-lockfile
+      - run: yarn webdriver-update
       - persist_to_workspace:
           root: *workspace_location
           paths:
@@ -174,7 +175,6 @@ jobs:
     parallelism: 4
     steps:
       - custom_attach_workspace
-      - run: yarn webdriver-update
       - run: yarn test-large --full <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.glob >>--glob="<< parameters.glob >>"<</ parameters.glob >> --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli:
@@ -249,7 +249,6 @@ jobs:
     resource_class: medium
     steps:
       - custom_attach_workspace
-      - run: yarn webdriver-update
       - run: yarn test-large --full --flakey --ve
       - run: yarn test-large --full --flakey
       - run: yarn test-large --full --glob packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large_disabled.ts --ve
@@ -306,6 +305,7 @@ jobs:
           keys:
             - *cache_key_win
       - run: yarn install --frozen-lockfile
+      - run: yarn webdriver-update
       - run: yarn build
       - save_cache:
           key: *cache_key_win
