@@ -3,7 +3,7 @@ When used to build a library, a different builder is invoked, and only the `ts-c
 All other options apply only to building applications.
 
 The application builder uses the [webpack](https://webpack.js.org/) build tool, with default configuration options specified in the workspace configuration file (`angular.json`) or with a named alternative configuration.
-A "production" configuration is created by default when you use the CLI to create the project, and you can use that configuration by specifying the `--configuration="production"` or the `--prod` option.
+A "development" configuration is created by default when you use the CLI to create the project, and you can use that configuration by specifying the `--configuration development`.
 
 The configuration options generally correspond to the command options.
 You can override individual configuration defaults by specifying the corresponding options on the command line.
