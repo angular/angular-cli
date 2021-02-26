@@ -130,8 +130,8 @@ async function _renderUniversal(
               serverBundlePath,
               outputPath,
               browserOptions.deployUrl || '',
-              normalizedStylesOptimization.inlineCritical === true ? 'true' : 'false' ,
-              normalizedStylesOptimization.minify === true ? 'true' : 'false' ,
+              normalizedStylesOptimization.inlineCritical ? 'true' : 'false' ,
+              normalizedStylesOptimization.minify ? 'true' : 'false' ,
               ...routesShard,
             ])
               .on('message', data => {

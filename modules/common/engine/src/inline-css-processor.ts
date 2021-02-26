@@ -40,6 +40,7 @@ class CrittersExtended extends Critters {
       mergeStylesheets: false,
       preload: 'media',
       noscriptFallback: true,
+      inlineFonts: true,
       // Cast any is needed because of logger API is not exposed as part of the options
       // https://github.com/GoogleChromeLabs/critters/issues/66
       // tslint:disable-next-line: no-any
