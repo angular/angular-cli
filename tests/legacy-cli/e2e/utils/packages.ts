@@ -10,19 +10,13 @@ export function getActivePackageManager(): 'npm' | 'yarn' {
   return value || 'npm';
 }
 
-export async function installWorkspacePackages(updateWebdriver = true): Promise<void> {
+export async function installWorkspacePackages(): Promise<void> {
   switch (getActivePackageManager()) {
     case 'npm':
       await silentNpm('install');
-      if (updateWebdriver) {
-        await silentNpm('run', 'webdriver-update');
-      }
       break;
     case 'yarn':
       await silentYarn();
-      if (updateWebdriver) {
-        await silentYarn('webdriver-update');
-      }
       break;
   }
 }
