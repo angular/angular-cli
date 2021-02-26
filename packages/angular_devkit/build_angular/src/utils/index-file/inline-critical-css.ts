@@ -39,6 +39,7 @@ class CrittersExtended extends Critters {
       mergeStylesheets: false,
       preload: 'media',
       noscriptFallback: true,
+      inlineFonts: true,
       // tslint:disable-next-line: no-any
     } as any);
   }
