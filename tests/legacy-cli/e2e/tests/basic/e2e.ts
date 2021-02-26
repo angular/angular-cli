@@ -1,26 +1,13 @@
-// TODO(architect): edit the architect config instead of the cli config.
-
 import {
   ng,
-  npm,
   execAndWaitForOutputToMatch,
   killAllProcesses
 } from '../../utils/process';
-import {updateJsonFile} from '../../utils/project';
 import {expectToFail} from '../../utils/utils';
 import {moveFile, copyFile, replaceInFile} from '../../utils/fs';
 
 export default function () {
-  // Should fail without updated webdriver
-  return updateJsonFile('package.json', packageJson => {
-    // Add to npm scripts to make running the binary compatible with Windows
-    const scripts = packageJson['scripts'];
-    scripts['wd:clean'] = 'webdriver-manager clean';
-  })
-    .then(() => npm('run', 'wd:clean'))
-    .then(() => expectToFail(() => ng('e2e', 'test-project', '--no-webdriver-update', '--devServerTarget=')))
-    // Add back the pre-defined version of webdriver. This script is defined when making projects.
-    .then(() => npm('run', 'webdriver-update'))
+  return Promise.resolve()
     // Should fail without serving
     .then(() => expectToFail(() => ng('e2e', 'test-project', '--devServerTarget=')))
     // These should work.
@@ -61,7 +48,10 @@ export default function () {
     .then(() => execAndWaitForOutputToMatch('ng', ['serve'],
       / Compiled successfully./))
     .then(() => ng('e2e', 'test-project', '--devServerTarget='))
-    .then(() => killAllProcesses(), (err: any) => {
+    // Should fail without updated webdriver
+    .then(() => replaceInFile('e2e/protractor.conf.js', /chromeDriver: String.raw`[^`]*`,/, ''))
+    .then(() => expectToFail(() => ng('e2e', 'test-project', '--no-webdriver-update', '--devServerTarget=')))
+    .then(() => killAllProcesses(), (err) => {
       killAllProcesses();
       throw err;
     });

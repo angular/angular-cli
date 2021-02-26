@@ -13,12 +13,11 @@ export default async function() {
   await useCIChrome('./');
   await useCIChrome('./e2e/');
   await useCIDefaults('eight-project');
-  await installWorkspacePackages(false);
+  await installWorkspacePackages();
 
   // Update Angular.
   const extraUpdateArgs = await isPrereleaseCli() ? ['--next', '--force'] : [];
   await ng('update', '@angular/core', ...extraUpdateArgs);
-  await silentNpm('run', 'webdriver-update');
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
