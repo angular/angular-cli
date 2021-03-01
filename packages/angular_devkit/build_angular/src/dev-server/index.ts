@@ -354,7 +354,6 @@ async function setupLocalize(
   webpackConfig: webpack.Configuration,
 ) {
   const localeDescription = i18n.locales[locale];
-  const i18nDiagnostics: { type: string, message: string }[] = [];
 
   // Modify main entrypoint to include locale data
   if (
@@ -378,37 +377,25 @@ async function setupLocalize(
     translation = {};
   }
 
+  const i18nLoaderOptions = {
+    locale,
+    missingTranslationBehavior,
+    translation: i18n.shouldInline ? translation : undefined,
+  };
+
   const i18nRule: webpack.RuleSetRule = {
-    test: /\.(?:m?js|ts)$/,
+    test: /\.(?:[cm]?js|ts)$/,
     enforce: 'post',
     use: [
       {
-        loader: require.resolve('babel-loader'),
+        loader: require.resolve('../babel/webpack-loader'),
         options: {
-          babelrc: false,
-          configFile: false,
-          compact: false,
-          cacheCompression: false,
-          cacheDirectory: findCachePath('babel-loader'),
+          cacheDirectory: findCachePath('babel-dev-server-i18n'),
           cacheIdentifier: JSON.stringify({
-            buildAngular: require('../../package.json').version,
             locale,
             translationIntegrity: localeDescription?.files.map((file) => file.integrity),
           }),
-          sourceType: 'unambiguous',
-          presets: [
-            [
-              require.resolve('../babel/presets/application'),
-              {
-                i18n: {
-                  locale,
-                  translation: i18n.shouldInline ? translation : undefined,
-                  missingTranslationBehavior,
-                },
-                diagnosticReporter: (type, message) => i18nDiagnostics.push({ type, message }),
-              } as import('../babel/presets/application').ApplicationPresetOptions,
-            ],
-          ],
+          i18n: i18nLoaderOptions,
         },
       },
     ],
@@ -423,25 +410,6 @@ async function setupLocalize(
   }
 
   rules.push(i18nRule);
-
-  // Add a plugin to inject the i18n diagnostics
-  // tslint:disable-next-line: no-non-null-assertion
-  webpackConfig.plugins!.push({
-    apply: (compiler: webpack.Compiler) => {
-      compiler.hooks.thisCompilation.tap('build-angular', compilation => {
-        compilation.hooks.finishModules.tap('build-angular', () => {
-          for (const diagnostic of i18nDiagnostics) {
-            if (diagnostic.type === 'error') {
-              addError(compilation, diagnostic.message);
-            } else {
-              addWarning(compilation, diagnostic.message);
-            }
-          }
-          i18nDiagnostics.length = 0;
-        });
-      });
-    },
-  });
 }
 
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);
