@@ -5,22 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { analytics, json, tags } from '@angular-devkit/core';
-import * as child_process from 'child_process';
+import { json, tags } from '@angular-devkit/core';
 import * as debug from 'debug';
 import * as inquirer from 'inquirer';
-import * as os from 'os';
-import * as ua from 'universal-analytics';
 import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
+import { AnalyticsCollector } from './analytics-collector';
 
 // tslint:disable: no-console
 const analyticsDebug = debug('ng:analytics'); // Generate analytics, including settings and users.
-const analyticsLogDebug = debug('ng:analytics:log'); // Actual logs of events.
-
-const BYTES_PER_GIGABYTES = 1024 * 1024 * 1024;
 
 let _defaultAngularCliPropertyCache: string;
 export const AnalyticsProperties = {
@@ -56,7 +51,7 @@ export const analyticsPackageSafelist = [
   '@schematics/update',
 ];
 
-export function isPackageNameSafeForAnalytics(name: string) {
+export function isPackageNameSafeForAnalytics(name: string): boolean {
   return analyticsPackageSafelist.some(pattern => {
     if (typeof pattern == 'string') {
       return pattern === name;
@@ -64,284 +59,6 @@ export function isPackageNameSafeForAnalytics(name: string) {
       return pattern.test(name);
     }
   });
-}
-
-/**
- * Attempt to get the Windows Language Code string.
- * @private
- */
-function _getWindowsLanguageCode(): string | undefined {
-  if (!os.platform().startsWith('win')) {
-    return undefined;
-  }
-
-  try {
-    // This is true on Windows XP, 7, 8 and 10 AFAIK. Would return empty string or fail if it
-    // doesn't work.
-    return child_process
-      .execSync('wmic.exe os get locale')
-      .toString()
-      .trim();
-  } catch (_) {}
-
-  return undefined;
-}
-
-/**
- * Get a language code.
- * @private
- */
-function _getLanguage() {
-  // Note: Windows does not expose the configured language by default.
-  return (
-    process.env.LANG || // Default Unix env variable.
-    process.env.LC_CTYPE || // For C libraries. Sometimes the above isn't set.
-    process.env.LANGSPEC || // For Windows, sometimes this will be set (not always).
-    _getWindowsLanguageCode() ||
-    '??'
-  ); // ¯\_(ツ)_/¯
-}
-
-/**
- * Return the number of CPUs.
- * @private
- */
-function _getCpuCount() {
-  const cpus = os.cpus();
-
-  // Return "(count)x(average speed)".
-  return cpus.length;
-}
-
-/**
- * Get the first CPU's speed. It's very rare to have multiple CPUs of different speed (in most
- * non-ARM configurations anyway), so that's all we care about.
- * @private
- */
-function _getCpuSpeed() {
-  const cpus = os.cpus();
-
-  return Math.floor(cpus[0].speed);
-}
-
-/**
- * Get the amount of memory, in megabytes.
- * @private
- */
-function _getRamSize() {
-  // Report in gigabytes (or closest). Otherwise it's too much noise.
-  return Math.round(os.totalmem() / BYTES_PER_GIGABYTES);
-}
-
-/**
- * Get the Node name and version. This returns a string like "Node 10.11", or "io.js 3.5".
- * @private
- */
-function _getNodeVersion() {
-  const name = process.release.name || process.argv0;
-
-  return name + ' ' + process.version;
-}
-
-/**
- * Get a numerical MAJOR.MINOR version of node. We report this as a metric.
- * @private
- */
-function _getNumericNodeVersion() {
-  const p = process.version;
-  const m = p.match(/\d+\.\d+/);
-
-  return (m && m[0] && parseFloat(m[0])) || 0;
-}
-
-// These are just approximations of UA strings. We just try to fool Google Analytics to give us the
-// data we want.
-// See https://developers.whatismybrowser.com/useragents/
-const osVersionMap: { [os: string]: { [release: string]: string } } = {
-  darwin: {
-    '1.3.1': '10_0_4',
-    '1.4.1': '10_1_0',
-    '5.1': '10_1_1',
-    '5.2': '10_1_5',
-    '6.0.1': '10_2',
-    '6.8': '10_2_8',
-    '7.0': '10_3_0',
-    '7.9': '10_3_9',
-    '8.0': '10_4_0',
-    '8.11': '10_4_11',
-    '9.0': '10_5_0',
-    '9.8': '10_5_8',
-    '10.0': '10_6_0',
-    '10.8': '10_6_8',
-    // We stop here because we try to math out the version for anything greater than 10, and it
-    // works. Those versions are standardized using a calculation now.
-  },
-  win32: {
-    '6.3.9600': 'Windows 8.1',
-    '6.2.9200': 'Windows 8',
-    '6.1.7601': 'Windows 7 SP1',
-    '6.1.7600': 'Windows 7',
-    '6.0.6002': 'Windows Vista SP2',
-    '6.0.6000': 'Windows Vista',
-    '5.1.2600': 'Windows XP',
-  },
-};
-
-/**
- * Build a fake User Agent string for OSX. This gets sent to Analytics so it shows the proper OS,
- * versions and others.
- * @private
- */
-function _buildUserAgentStringForOsx() {
-  let v = osVersionMap.darwin[os.release()];
-
-  if (!v) {
-    // Remove 4 to tie Darwin version to OSX version, add other info.
-    const x = parseFloat(os.release());
-    if (x > 10) {
-      v = `10_` + (x - 4).toString().replace('.', '_');
-    }
-  }
-
-  const cpuModel = os.cpus()[0].model.match(/^[a-z]+/i);
-  const cpu = cpuModel ? cpuModel[0] : os.cpus()[0].model;
-
-  return `(Macintosh; ${cpu} Mac OS X ${v || os.release()})`;
-}
-
-/**
- * Build a fake User Agent string for Windows. This gets sent to Analytics so it shows the proper
- * OS, versions and others.
- * @private
- */
-function _buildUserAgentStringForWindows() {
-  return `(Windows NT ${os.release()})`;
-}
-
-/**
- * Build a fake User Agent string for Linux. This gets sent to Analytics so it shows the proper OS,
- * versions and others.
- * @private
- */
-function _buildUserAgentStringForLinux() {
-  return `(X11; Linux i686; ${os.release()}; ${os.cpus()[0].model})`;
-}
-
-/**
- * Build a fake User Agent string. This gets sent to Analytics so it shows the proper OS version.
- * @private
- */
-function _buildUserAgentString() {
-  switch (os.platform()) {
-    case 'darwin':
-      return _buildUserAgentStringForOsx();
-
-    case 'win32':
-      return _buildUserAgentStringForWindows();
-
-    case 'linux':
-      return _buildUserAgentStringForLinux();
-
-    default:
-      return os.platform() + ' ' + os.release();
-  }
-}
-
-/**
- * Implementation of the Analytics interface for using `universal-analytics` package.
- */
-export class UniversalAnalytics implements analytics.Analytics {
-  private _ua: ua.Visitor;
-  private _dirty = false;
-  private _metrics: (string | number)[] = [];
-  private _dimensions: (string | number)[] = [];
-
-  /**
-   * @param trackingId The Google Analytics ID.
-   * @param uid A User ID.
-   */
-  constructor(trackingId: string, uid: string) {
-    this._ua = ua(trackingId, uid, {
-      enableBatching: true,
-      batchSize: 5,
-    });
-
-    // Add persistent params for appVersion.
-    this._ua.set('ds', 'cli');
-    this._ua.set('ua', _buildUserAgentString());
-    this._ua.set('ul', _getLanguage());
-
-    // @angular/cli with version.
-    this._ua.set('an', require('../package.json').name);
-    this._ua.set('av', require('../package.json').version);
-
-    // We use the application ID for the Node version. This should be "node 10.10.0".
-    // We also use a custom metrics, but
-    this._ua.set('aid', _getNodeVersion());
-
-    // We set custom metrics for values we care about.
-    this._dimensions[analytics.NgCliAnalyticsDimensions.CpuCount] = _getCpuCount();
-    this._dimensions[analytics.NgCliAnalyticsDimensions.CpuSpeed] = _getCpuSpeed();
-    this._dimensions[analytics.NgCliAnalyticsDimensions.RamInGigabytes] = _getRamSize();
-    this._dimensions[analytics.NgCliAnalyticsDimensions.NodeVersion] = _getNumericNodeVersion();
-  }
-
-  /**
-   * Creates the dimension and metrics variables to pass to universal-analytics.
-   * @private
-   */
-  private _customVariables(options: analytics.CustomDimensionsAndMetricsOptions) {
-    const additionals: { [key: string]: boolean | number | string } = {};
-    this._dimensions.forEach((v, i) => (additionals['cd' + i] = v));
-    (options.dimensions || []).forEach((v, i) => (additionals['cd' + i] = v));
-    this._metrics.forEach((v, i) => (additionals['cm' + i] = v));
-    (options.metrics || []).forEach((v, i) => (additionals['cm' + i] = v));
-
-    return additionals;
-  }
-
-  event(ec: string, ea: string, options: analytics.EventOptions = {}) {
-    const vars = this._customVariables(options);
-    analyticsLogDebug('event ec=%j, ea=%j, %j', ec, ea, vars);
-
-    const { label: el, value: ev } = options;
-    this._dirty = true;
-    this._ua.event({ ec, ea, el, ev, ...vars });
-  }
-  screenview(cd: string, an: string, options: analytics.ScreenviewOptions = {}) {
-    const vars = this._customVariables(options);
-    analyticsLogDebug('screenview cd=%j, an=%j, %j', cd, an, vars);
-
-    const { appVersion: av, appId: aid, appInstallerId: aiid } = options;
-    this._dirty = true;
-    this._ua.screenview({ cd, an, av, aid, aiid, ...vars });
-  }
-  pageview(dp: string, options: analytics.PageviewOptions = {}) {
-    const vars = this._customVariables(options);
-    analyticsLogDebug('pageview dp=%j, %j', dp, vars);
-
-    const { hostname: dh, title: dt } = options;
-    this._dirty = true;
-    this._ua.pageview({ dp, dh, dt, ...vars });
-  }
-  timing(utc: string, utv: string, utt: string | number, options: analytics.TimingOptions = {}) {
-    const vars = this._customVariables(options);
-    analyticsLogDebug('timing utc=%j, utv=%j, utl=%j, %j', utc, utv, utt, vars);
-
-    const { label: utl } = options;
-    this._dirty = true;
-    this._ua.timing({ utc, utv, utt, utl, ...vars });
-  }
-
-  flush(): Promise<void> {
-    if (!this._dirty) {
-      return Promise.resolve();
-    }
-
-    this._dirty = false;
-
-    return new Promise(resolve => this._ua.send(resolve));
-  }
 }
 
 /**
@@ -407,12 +124,12 @@ export async function promptGlobalAnalytics(force = false) {
       console.log('');
 
       // Send back a ping with the user `optin`.
-      const ua = new UniversalAnalytics(AnalyticsProperties.AngularCliDefault, 'optin');
+      const ua = new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, 'optin');
       ua.pageview('/telemetry/optin');
       await ua.flush();
     } else {
       // Send back a ping with the user `optout`. This is the only thing we send.
-      const ua = new UniversalAnalytics(AnalyticsProperties.AngularCliDefault, 'optout');
+      const ua = new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, 'optout');
       ua.pageview('/telemetry/optout');
       await ua.flush();
     }
@@ -466,12 +183,12 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
       console.log('');
 
       // Send back a ping with the user `optin`.
-      const ua = new UniversalAnalytics(AnalyticsProperties.AngularCliDefault, 'optin');
+      const ua = new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, 'optin');
       ua.pageview('/telemetry/project/optin');
       await ua.flush();
     } else {
       // Send back a ping with the user `optout`. This is the only thing we send.
-      const ua = new UniversalAnalytics(AnalyticsProperties.AngularCliDefault, 'optout');
+      const ua = new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, 'optout');
       ua.pageview('/telemetry/project/optout');
       await ua.flush();
     }
@@ -491,7 +208,7 @@ export async function hasGlobalAnalyticsConfiguration(): Promise<boolean> {
     if (analyticsConfig !== null && analyticsConfig !== undefined) {
       return true;
     }
-  } catch {}
+  } catch { }
 
   return false;
 }
@@ -502,7 +219,7 @@ export async function hasGlobalAnalyticsConfiguration(): Promise<boolean> {
  *
  * If any problem happens, it is considered the user has been opting out of analytics.
  */
-export async function getGlobalAnalytics(): Promise<UniversalAnalytics | undefined> {
+export async function getGlobalAnalytics(): Promise<AnalyticsCollector | undefined> {
   analyticsDebug('getGlobalAnalytics');
   const propertyId = AnalyticsProperties.AngularCliDefault;
 
@@ -515,7 +232,7 @@ export async function getGlobalAnalytics(): Promise<UniversalAnalytics | undefin
     if (process.env['NG_CLI_ANALYTICS'] === 'ci') {
       analyticsDebug('Running in CI mode');
 
-      return new UniversalAnalytics(propertyId, 'ci');
+      return new AnalyticsCollector(propertyId, 'ci');
     }
   }
 
@@ -550,7 +267,7 @@ export async function getGlobalAnalytics(): Promise<UniversalAnalytics | undefin
         return undefined;
       }
 
-      return new UniversalAnalytics(propertyId, uid);
+      return new AnalyticsCollector(propertyId, uid);
     }
   } catch (err) {
     analyticsDebug('Error happened during reading of analytics config: %s', err.message);
@@ -569,18 +286,18 @@ export async function hasWorkspaceAnalyticsConfiguration(): Promise<boolean> {
     if (analyticsConfig !== undefined) {
       return true;
     }
-  } catch {}
+  } catch { }
 
   return false;
 }
 
 /**
- * Get the workspace analytics object for the user. This returns an instance of UniversalAnalytics,
+ * Get the workspace analytics object for the user. This returns an instance of AnalyticsCollector,
  * or undefined if analytics are disabled.
  *
  * If any problem happens, it is considered the user has been opting out of analytics.
  */
-export async function getWorkspaceAnalytics(): Promise<UniversalAnalytics | undefined> {
+export async function getWorkspaceAnalytics(): Promise<AnalyticsCollector | undefined> {
   analyticsDebug('getWorkspaceAnalytics');
   try {
     const globalWorkspace = await getWorkspace('local');
@@ -608,7 +325,7 @@ export async function getWorkspaceAnalytics(): Promise<UniversalAnalytics | unde
         return undefined;
       }
 
-      return new UniversalAnalytics(AnalyticsProperties.AngularCliDefault, uid);
+      return new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, uid);
     }
   } catch (err) {
     analyticsDebug('Error happened during reading of analytics config: %s', err.message);
@@ -622,7 +339,7 @@ export async function getWorkspaceAnalytics(): Promise<UniversalAnalytics | unde
  * Return the usage analytics sharing setting, which is either a property string (GA-XXXXXXX-XX),
  * or undefined if no sharing.
  */
-export async function getSharedAnalytics(): Promise<UniversalAnalytics | undefined> {
+export async function getSharedAnalytics(): Promise<AnalyticsCollector | undefined> {
   analyticsDebug('getSharedAnalytics');
 
   const envVarName = 'NG_CLI_ANALYTICS_SHARE';
@@ -644,7 +361,7 @@ export async function getSharedAnalytics(): Promise<UniversalAnalytics | undefin
     } else {
       analyticsDebug('Analytics sharing info: %j', analyticsConfig);
 
-      return new UniversalAnalytics(analyticsConfig.tracking, analyticsConfig.uuid);
+      return new AnalyticsCollector(analyticsConfig.tracking, analyticsConfig.uuid);
     }
   } catch (err) {
     analyticsDebug('Error happened during reading of analytics sharing config: %s', err.message);

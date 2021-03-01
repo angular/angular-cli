@@ -76,7 +76,6 @@ ts_library(
         "@npm//@types/resolve",
         "@npm//@types/rimraf",
         "@npm//@types/semver",
-        "@npm//@types/universal-analytics",
         "@npm//@types/uuid",
         "@npm//ansi-colors",
         "@npm//jsonc-parser",
