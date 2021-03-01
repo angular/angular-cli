@@ -1,11 +1,12 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { prerelease } from 'semver';
 import { packages } from '../../../../lib/packages';
 import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { installWorkspacePackages } from './packages';
-import { execAndWaitForOutputToMatch, git, ng, npm } from './process';
+import { execAndWaitForOutputToMatch, git, ng } from './process';
 
 const tsConfigPath = 'tsconfig.json';
 
@@ -229,8 +230,6 @@ export function useCIDefaults(projectName = 'test-project') {
     const appTargets = project.targets || project.architect;
     appTargets.build.options.progress = false;
     appTargets.test.options.progress = false;
-    // Use the CI chrome setup in karma.
-    appTargets.test.options.browsers = 'ChromeHeadlessCI';
     // Disable auto-updating webdriver in e2e.
     if (appTargets.e2e) {
       appTargets.e2e.options.webdriverUpdate = false;
@@ -245,52 +244,43 @@ export function useCIDefaults(projectName = 'test-project') {
   });
 }
 
-export function useCIChrome(projectDir: string) {
-  const dir = projectDir ? projectDir + '/' : '';
-  const protractorConf = `${dir}protractor.conf.js`;
-  const karmaConf = `${dir}karma.conf.js`;
+export async function useCIChrome(projectDir: string = ''): Promise<void> {
+  const protractorConf = path.join(projectDir, 'protractor.conf.js');
+  const karmaConf = path.join(projectDir, 'karma.conf.js');
 
   const chromePath = require('puppeteer').executablePath();
-  const chromeDriverPath = require('webdriver-manager/selenium/update-config.json').chrome.last;
+  const protractorPath = require.resolve('protractor');
+  const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
+    paths: [protractorPath],
+  });
+  const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
+    chrome: { last: string };
+  };
+  const chromeDriverPath = webdriverUpdate.chrome.last;
 
-  return Promise.resolve()
-    .then(() => updateJsonFile('package.json', json => {
-      json['devDependencies']['karma-chrome-launcher'] = '~3.1.0';
-    }))
-    // Use Pupeteer in protractor if a config is found on the project.
-    .then(async () => {
-      if (fs.existsSync(protractorConf)) {
-        await replaceInFile(protractorConf,
-          `browserName: 'chrome'`,
-          `browserName: 'chrome',
-          chromeOptions: {
-            args: ['--headless'],
-            binary: String.raw\`${chromePath}\`,
-          }
-        `);
-        await replaceInFile(
-          protractorConf,
-          'directConnect: true,',
-          `directConnect: true, chromeDriver: String.raw\`${chromeDriverPath}\`,`,
-        );
-      }
-    })
-    // Use Pupeteer in karma if a config is found on the project.
-    .then(() => {
-      if (fs.existsSync(karmaConf)) {
-        return prependToFile(karmaConf,
-          `process.env.CHROME_BIN = String.raw\`${chromePath}\`;`)
-          .then(() => replaceInFile(karmaConf,
-            `browsers: ['Chrome']`,
-            `browsers: ['Chrome'],
-            customLaunchers: {
-              ChromeHeadlessCI: {
-                base: 'ChromeHeadless',
-              }
-            }
-        `));
-      }
-    });
+  // Use Puppeteer in protractor if a config is found on the project.
+  if (fs.existsSync(protractorConf)) {
+    await replaceInFile(
+      protractorConf,
+      `browserName: 'chrome'`,
+      `browserName: 'chrome',
+      chromeOptions: {
+        args: ['--headless'],
+        binary: String.raw\`${chromePath}\`,
+      }`,
+    );
+    await replaceInFile(
+      protractorConf,
+      'directConnect: true,',
+      `directConnect: true, chromeDriver: String.raw\`${chromeDriverPath}\`,`,
+    );
+  }
+
+  // Use Puppeteer in karma if a config is found on the project.
+  if (fs.existsSync(karmaConf)) {
+    await prependToFile(karmaConf, `process.env.CHROME_BIN = String.raw\`${chromePath}\`;`);
+    await replaceInFile(karmaConf, `browsers: ['Chrome']`, `browsers: ['ChromeHeadless']`);
+  }
 }
 
 export async function isPrereleaseCli() {
