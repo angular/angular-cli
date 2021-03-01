@@ -34,7 +34,7 @@
     "find-cache-dir": "3.3.1",
     "glob": "7.1.6",
     "https-proxy-agent": "5.0.0",
-    "inquirer": "7.3.3",
+    "inquirer": "8.0.0",
     "jest-worker": "26.6.2",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.1",
