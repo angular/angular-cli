@@ -41,7 +41,7 @@ export function augmentHostWithResources(
   };
 
   resourceHost.resourceNameToFileName = function (resourceName: string, containingFile: string) {
-    return path.join(path.dirname(containingFile), resourceName);
+    return path.resolve(path.dirname(containingFile), resourceName);
   };
 
   resourceHost.getModifiedResourceFiles = function () {
