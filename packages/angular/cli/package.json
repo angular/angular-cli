@@ -34,7 +34,7 @@
     "ansi-colors": "4.1.1",
     "debug": "4.3.1",
     "ini": "2.0.0",
-    "inquirer": "7.3.3",
+    "inquirer": "8.0.0",
     "jsonc-parser": "3.0.0",
     "npm-package-arg": "8.1.1",
     "npm-pick-manifest": "6.1.0",
