@@ -31,7 +31,7 @@
     "optimization": {
       "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking and dead-code elimination. For more information, see https://angular.io/guide/workspace-config#optimization-configuration.",
       "x-user-analytics": 16,
-      "default": false,
+      "default": true,
       "oneOf": [
         {
           "type": "object",
@@ -73,7 +73,7 @@
     },
     "sourceMap": {
       "description": "Output source maps for scripts and styles. For more information, see https://angular.io/guide/workspace-config#source-map-configuration.",
-      "default": true,
+      "default": false,
       "oneOf": [
         {
           "type": "object",
@@ -162,7 +162,7 @@
     "outputHashing": {
       "type": "string",
       "description": "Define the output filename cache-busting hashing mode.",
-      "default": "none",
+      "default": "media",
       "enum": [
         "none",
         "all",
@@ -192,7 +192,7 @@
     "namedChunks": {
       "type": "boolean",
       "description": "Use file name for lazy loaded chunks.",
-      "default": true
+      "default": false
     },
     "bundleDependencies": {
       "description": "Which external dependencies to bundle into the bundle. By default, all of node_modules will be bundled.",
