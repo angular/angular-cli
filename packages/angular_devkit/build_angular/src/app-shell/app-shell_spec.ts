@@ -9,6 +9,8 @@
 import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
+import * as http from 'http';
+import { AddressInfo } from 'net';
 import { createArchitect, host } from '../test-utils';
 
 describe('AppShell Builder', () => {
@@ -251,19 +253,25 @@ describe('AppShell Builder', () => {
     // Serve the app using a simple static server.
     const app = express();
     app.use('/', express.static(getSystemPath(join(host.root(), 'dist')) + '/'));
-    const server = app.listen(4200);
+    const server = await new Promise<http.Server>((resolve) => {
+      const innerServer = app.listen(0, 'localhost', () => resolve(innerServer));
+    });
+    try {
+      const serverPort = (server.address() as AddressInfo).port;
+      // Load app in protractor, then check service worker status.
+      const protractorRun = await architect.scheduleTarget(
+        { project: 'app-e2e', target: 'e2e' },
+        { baseUrl: `http://localhost:${serverPort}/`, devServerTarget: '' },
+      );
 
-    // Load app in protractor, then check service worker status.
-    const protractorRun = await architect.scheduleTarget(
-      { project: 'app-e2e', target: 'e2e' },
-      { devServerTarget: undefined } as {},
-    );
-    const protractorOutput = await protractorRun.result;
-    await protractorRun.stop();
-    expect(protractorOutput.success).toBe(true);
+      const protractorOutput = await protractorRun.result;
+      await protractorRun.stop();
 
-    // Close the express server.
-    server.close();
+      expect(protractorOutput.success).toBe(true);
+    } finally {
+      // Close the express server.
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 
   it('critical CSS is inlined', async () => {
