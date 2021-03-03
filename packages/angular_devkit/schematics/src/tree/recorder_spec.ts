@@ -30,6 +30,18 @@ describe('UpdateRecorderBase', () => {
     expect(result.toString()).toBe('Hello beautiful World');
   });
 
+  it('works with multiple adjacent inserts', () => {
+    const buffer = Buffer.from('Hello beautiful World');
+    const entry = new SimpleFileEntry(normalize('/some/path'), buffer);
+
+    const recorder = new UpdateRecorderBase(entry);
+    recorder.remove(6, 9);
+    recorder.insertRight(6, 'amazing');
+    recorder.insertRight(15, ' and fantastic');
+    const result = recorder.apply(buffer);
+    expect(result.toString()).toBe('Hello amazing and fantastic World');
+  });
+
   it('can create the proper recorder', () => {
     const e = new SimpleFileEntry(normalize('/some/path'),  Buffer.from('hello'));
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBase).toBe(true);
