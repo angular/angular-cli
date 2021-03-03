@@ -125,7 +125,6 @@ ts_library(
         "@npm//@types/glob",
         "@npm//@types/inquirer",
         "@npm//@types/karma",
-        "@npm//@types/license-checker-webpack-plugin",
         "@npm//@types/loader-utils",
         "@npm//@types/minimatch",
         "@npm//@types/node",
