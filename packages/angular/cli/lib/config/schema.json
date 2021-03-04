@@ -496,6 +496,10 @@
                     ]
                   }
                 },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "options": {
                   "type": "object"
                 },
@@ -516,6 +520,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:app-shell" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/appShell" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/appShell" }
@@ -527,6 +535,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:browser" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/browser" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/browser" }
@@ -538,6 +550,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:dev-server" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/devServer" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/devServer" }
@@ -549,6 +565,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:extract-i18n" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/extracti18n" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/extracti18n" }
@@ -560,6 +580,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:karma" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/karma" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/karma" }
@@ -571,6 +595,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:protractor" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/protractor" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/protractor" }
@@ -582,6 +610,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:server" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/server" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/server" }
@@ -593,6 +625,10 @@
               "properties": {
                 "builder": { "const": "@angular-devkit/build-angular:tslint" },
                 "options": { "$ref": "#/definitions/targetOptions/definitions/tslint" },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": { "$ref": "#/definitions/targetOptions/definitions/tslint" }
