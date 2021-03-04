@@ -978,6 +978,7 @@ export declare class SynchronousDelegateExpectedException extends BaseException 
 export interface TargetDefinition {
     builder: string;
     configurations?: Record<string, Record<string, JsonValue | undefined> | undefined>;
+    defaultConfiguration?: string;
     options?: Record<string, JsonValue | undefined>;
 }
 
