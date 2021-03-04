@@ -30,6 +30,7 @@ export interface WorkspaceHost {
   getMetadata(project: string): Promise<json.JsonObject>;
   getOptions(project: string, target: string, configuration?: string): Promise<json.JsonObject>;
   hasTarget(project: string, target: string): Promise<boolean>;
+  getDefaultConfigurationName(project: string, target: string): Promise<string | undefined>;
 }
 
 function findProjectTarget(
@@ -99,6 +100,9 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
         async hasTarget(project, target) {
           return !!workspaceOrHost.projects.get(project)?.targets.has(target);
         },
+        async getDefaultConfigurationName(project, target) {
+          return workspaceOrHost.projects.get(project)?.targets.get(target)?.defaultConfiguration;
+        },
       };
     }
   }
@@ -166,9 +170,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     }
 
     let options = await this.workspaceHost.getOptions(target.project, target.target);
+    const targetConfiguration =
+      target.configuration || await this.workspaceHost.getDefaultConfigurationName(target.project, target.target);
 
-    if (target.configuration) {
-      const configurations = target.configuration.split(',').map((c) => c.trim());
+    if (targetConfiguration) {
+      const configurations = targetConfiguration.split(',').map((c) => c.trim());
       for (const configuration of configurations) {
         options = {
           ...options,
