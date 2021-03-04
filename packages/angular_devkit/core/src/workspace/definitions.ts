@@ -25,7 +25,7 @@ export interface ProjectDefinition {
 export interface TargetDefinition {
   options?: Record<string, JsonValue | undefined>;
   configurations?: Record<string, Record<string, JsonValue | undefined> | undefined>;
-
+  defaultConfiguration?: string;
   builder: string;
 }
 
@@ -234,6 +234,7 @@ export class TargetDefinitionCollection extends DefinitionCollection<TargetDefin
       builder: definition.builder,
       options: definition.options,
       configurations: definition.configurations,
+      defaultConfiguration: definition.defaultConfiguration,
     };
 
     super.set(definition.name, target);

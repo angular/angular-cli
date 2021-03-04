@@ -104,6 +104,9 @@ function convertJsonTarget(target: TargetDefinition): JsonObject {
     ...(isEmpty(target.configurations)
       ? {}
       : { configurations: target.configurations as JsonObject }),
+    ...(target.defaultConfiguration === undefined
+      ? {}
+      : { defaultConfiguration: target.defaultConfiguration }),
   };
 }
 

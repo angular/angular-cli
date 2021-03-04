@@ -294,7 +294,7 @@ function parseTargetsObject(
     const name = key.value;
     if (context.trackChanges) {
       targets[name] = createVirtualAstObject<TargetDefinition>(value, {
-        include: [ 'builder', 'options', 'configurations' ],
+        include: [ 'builder', 'options', 'configurations', 'defaultConfiguration' ],
         listener(op, path, node, value) {
           jsonMetadata.addChange(
             op,
