@@ -23,8 +23,8 @@ export default async function () {
   // Add new configuration and set "defaultConfiguration"
   await updateJsonFile('angular.json', workspace => {
     const build = workspace.projects['test-project'].architect.build;
-    build.defaultConfiguration = 'defaultConfiguration';
-    build.configurations.defaultConfiguration = {
+    build.defaultConfiguration = 'foo';
+    build.configurations.foo = {
       sourceMap: false,
     };
   });
