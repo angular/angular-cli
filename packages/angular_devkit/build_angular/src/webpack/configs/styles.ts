@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { tags } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
+import { ExtraEntryPoint } from '../../browser/schema';
 import { BuildBrowserFeatures } from '../../utils/build-browser-features';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import {
@@ -20,15 +19,57 @@ import {
 } from '../plugins';
 import { assetNameTemplateFactory, getOutputHashFormat, normalizeExtraEntryPoints } from '../utils/helpers';
 
-// tslint:disable-next-line:no-big-function
+function resolveGlobalStyles(
+  styleEntrypoints: ExtraEntryPoint[],
+  root: string,
+  preserveSymlinks: boolean,
+): { entryPoints: Record<string, string[]>; noInjectNames: string[]; paths: string[] } {
+  const entryPoints: Record<string, string[]> = {};
+  const noInjectNames: string[] = [];
+  const paths: string[] = [];
+
+  if (styleEntrypoints.length === 0) {
+    return { entryPoints, noInjectNames, paths };
+  }
+
+  for (const style of normalizeExtraEntryPoints(styleEntrypoints, 'styles')) {
+    let resolvedPath = path.resolve(root, style.input);
+    if (!fs.existsSync(resolvedPath)) {
+      try {
+        resolvedPath = require.resolve(style.input, { paths: [root] });
+      } catch {}
+    }
+
+    if (!preserveSymlinks) {
+      resolvedPath = fs.realpathSync(resolvedPath);
+    }
+
+    // Add style entry points.
+    if (entryPoints[style.bundleName]) {
+      entryPoints[style.bundleName].push(resolvedPath);
+    } else {
+      entryPoints[style.bundleName] = [resolvedPath];
+    }
+
+    // Add non injected styles to the list.
+    if (!style.inject) {
+      noInjectNames.push(style.bundleName);
+    }
+
+    // Add global css paths.
+    paths.push(resolvedPath);
+  }
+
+  return { entryPoints, noInjectNames, paths };
+}
+
+// tslint:disable-next-line: no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const MiniCssExtractPlugin = require('mini-css-extract-plugin');
   const postcssImports = require('postcss-import');
   const postcssPresetEnv: typeof import('postcss-preset-env') = require('postcss-preset-env');
 
   const { root, buildOptions } = wco;
-  const entryPoints: { [key: string]: [string, ...string[]] } = {};
-  const globalStylePaths: string[] = [];
   const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
 
   extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
@@ -42,49 +83,23 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   const includePaths = buildOptions.stylePreprocessorOptions?.includePaths?.map(p => path.resolve(root, p)) ?? [];
 
   // Process global styles.
-  if (buildOptions.styles.length > 0) {
-    const chunkNames: string[] = [];
-
-    normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
-      let resolvedPath = path.resolve(root, style.input);
-      if (!fs.existsSync(resolvedPath)) {
-        try {
-          resolvedPath = require.resolve(style.input, { paths: [root] });
-        } catch {}
-      }
-
-      if (!buildOptions.preserveSymlinks) {
-        resolvedPath = fs.realpathSync(resolvedPath);
-      }
-
-      // Add style entry points.
-      if (entryPoints[style.bundleName]) {
-        entryPoints[style.bundleName].push(resolvedPath);
-      } else {
-        entryPoints[style.bundleName] = [resolvedPath];
-      }
-
-      // Add non injected styles to the list.
-      if (!style.inject) {
-        chunkNames.push(style.bundleName);
-      }
-
-      // Add global css paths.
-      globalStylePaths.push(resolvedPath);
-    });
-
-    if (chunkNames.length > 0) {
-      // Add plugin to remove hashes from lazy styles.
-      extraPlugins.push(new RemoveHashPlugin({ chunkNames, hashFormat }));
-    }
+  const { entryPoints, noInjectNames, paths: globalStylePaths } = resolveGlobalStyles(
+    buildOptions.styles,
+    root,
+    !!buildOptions.preserveSymlinks,
+  );
+  if (noInjectNames.length > 0) {
+    // Add plugin to remove hashes from lazy styles.
+    extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
   }
 
   let sassImplementation: {} | undefined;
   try {
     // tslint:disable-next-line:no-implicit-dependencies
     sassImplementation = require('node-sass');
-    wco.logger.warn(tags.oneLine`'node-sass' usage is deprecated and will be removed in a future major version.
-      To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`,
+    wco.logger.warn(
+      `'node-sass' usage is deprecated and will be removed in a future major version. ` +
+        `To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`,
     );
   } catch {
     sassImplementation = require('sass');
