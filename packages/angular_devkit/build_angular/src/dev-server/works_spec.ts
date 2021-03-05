@@ -38,18 +38,6 @@ describe('Dev Server Builder', () => {
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
   }, 30000);
 
-  it('works with verbose', async () => {
-    const logger = new logging.Logger('verbose-serve');
-    let logs = '';
-    logger.subscribe(event => logs += event.message);
-
-    const run = await architect.scheduleTarget(target, { verbose: true }, { logger });
-    runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
-    expect(output.success).toBe(true);
-    expect(logs).toContain('Built at');
-  }, 30000);
-
   it(`doesn't serve files on the cwd directly`, async () => {
     const run = await architect.scheduleTarget(target);
     runs.push(run);
