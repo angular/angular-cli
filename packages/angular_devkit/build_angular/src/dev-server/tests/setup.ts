@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { buildWebpackBrowser } from '../../browser';
+import { Schema as BrowserSchema } from '../../browser/schema';
 import { BASE_OPTIONS as BROWSER_BASE_OPTIONS } from '../../browser/tests/setup';
 import { BuilderHarness } from '../../testing/builder-harness';
 import { Schema } from '../schema';
@@ -33,8 +34,12 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
  */
 export const BUILD_TIMEOUT = 15000;
 
-export function setupBrowserTarget<T>(harness: BuilderHarness<T>): void {
+export function setupBrowserTarget<T>(
+  harness: BuilderHarness<T>,
+  extraOptions?: Partial<BrowserSchema>,
+): void {
   harness.withBuilderTarget('build', buildWebpackBrowser, {
     ...BROWSER_BASE_OPTIONS,
+    ...extraOptions,
   });
 }
