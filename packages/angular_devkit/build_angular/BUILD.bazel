@@ -266,6 +266,7 @@ ts_library(
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+        "@npm//@types/node-fetch",
         "@npm//rxjs",
     ],
 )

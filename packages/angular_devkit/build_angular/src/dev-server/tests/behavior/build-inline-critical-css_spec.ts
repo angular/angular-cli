@@ -5,9 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
-import { mergeMap, take, timeout } from 'rxjs/operators';
 import { serveWebpackBrowser } from '../../index';
+import { executeOnceAndFetch } from '../execute-fetch';
 import {
   BASE_OPTIONS,
   DEV_SERVER_BUILDER_INFO,
@@ -41,21 +40,10 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
         ...BASE_OPTIONS,
       });
 
-      await harness
-        .execute()
-        .pipe(
-          timeout(39000),
-          mergeMap(async ({ result }) => {
-            expect(result?.success).toBeTrue();
+      const { result, response } = await executeOnceAndFetch(harness, '/');
 
-            if (result?.success) {
-              const response = await fetch(`${result.baseUrl}index.html`);
-              expect(await response.text()).toContain(`body{color:#000;}`);
-            }
-          }),
-          take(1),
-        )
-        .toPromise();
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toContain('body{color:#000;}');
     });
   });
 });
