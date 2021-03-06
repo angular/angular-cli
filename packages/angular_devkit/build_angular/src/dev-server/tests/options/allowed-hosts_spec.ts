@@ -5,12 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
-import { mergeMap, take, timeout } from 'rxjs/operators';
 import { serveWebpackBrowser } from '../../index';
+import { executeOnceAndFetch } from '../execute-fetch';
 import {
   BASE_OPTIONS,
-  BUILD_TIMEOUT,
   DEV_SERVER_BUILDER_INFO,
   describeBuilder,
   setupBrowserTarget,
@@ -32,21 +30,12 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
         ...BASE_OPTIONS,
       });
 
-      await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          mergeMap(async ({ result }) => {
-            expect(result?.success).toBeTrue();
+      const { result, response } = await executeOnceAndFetch(harness, '/', {
+        request: { headers: FETCH_HEADERS },
+      });
 
-            if (result?.success) {
-              const response = await fetch(`${result.baseUrl}`, { headers: FETCH_HEADERS });
-              expect(await response.text()).toBe('Invalid Host header');
-            }
-          }),
-          take(1),
-        )
-        .toPromise();
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toBe('Invalid Host header');
     });
 
     it('does not allow an invalid host when option is an empty array', async () => {
@@ -55,21 +44,12 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
         allowedHosts: [],
       });
 
-      await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          mergeMap(async ({ result }) => {
-            expect(result?.success).toBeTrue();
+      const { result, response } = await executeOnceAndFetch(harness, '/', {
+        request: { headers: FETCH_HEADERS },
+      });
 
-            if (result?.success) {
-              const response = await fetch(`${result.baseUrl}`, { headers: FETCH_HEADERS });
-              expect(await response.text()).toBe('Invalid Host header');
-            }
-          }),
-          take(1),
-        )
-        .toPromise();
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toBe('Invalid Host header');
     });
 
     it('allows a host when specified in the option', async () => {
@@ -78,21 +58,12 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
         allowedHosts: ['example.com'],
       });
 
-      await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          mergeMap(async ({ result }) => {
-            expect(result?.success).toBeTrue();
+      const { result, response } = await executeOnceAndFetch(harness, '/', {
+        request: { headers: FETCH_HEADERS },
+      });
 
-            if (result?.success) {
-              const response = await fetch(`${result.baseUrl}`, { headers: FETCH_HEADERS });
-              expect(await response.text()).toContain('<title>');
-            }
-          }),
-          take(1),
-        )
-        .toPromise();
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toContain('<title>');
     });
   });
 });
