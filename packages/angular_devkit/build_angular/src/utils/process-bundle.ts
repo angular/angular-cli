@@ -157,7 +157,10 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
           exclude: ['transform-typeof-symbol'],
         },
       ]],
-      plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
+      plugins: [
+        createIifeWrapperPlugin(),
+        ...(options.replacements ? [createReplacePlugin(options.replacements)] : []),
+      ],
       minified: allowMinify && !!options.optimize,
       compact: !shouldBeautify && !!options.optimize,
       sourceMaps: !!sourceMap,
@@ -504,6 +507,36 @@ function createReplacePlugin(replacements: [string, string][]): PluginObj {
             path.node.value = replacement[1];
           }
         }
+      },
+    },
+  };
+}
+
+function createIifeWrapperPlugin(): PluginObj {
+  return {
+    visitor: {
+      Program: {
+        exit(path: NodePath<types.Program>) {
+          // Save existing body and directives
+          const { body, directives } = path.node;
+
+          // Clear out body and directives for wrapper
+          path.node.body = [];
+          path.node.directives = [];
+
+          // Create the wrapper - "(function() { ... })();"
+          const wrapper = types.expressionStatement(
+            types.callExpression(
+              types.parenthesizedExpression(
+                types.functionExpression(undefined, [], types.blockStatement(body, directives)),
+              ),
+              [],
+            ),
+          );
+
+          // Insert the wrapper
+          path.pushContainer('body', wrapper);
+        },
       },
     },
   };

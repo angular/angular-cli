@@ -10,6 +10,7 @@ import { Architect } from '@angular-devkit/architect/src/index';
 import { PathFragment } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../utils';
 
+// tslint:disable-next-line: no-big-function
 describe('Browser Builder with differential loading', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;
@@ -207,5 +208,12 @@ describe('Browser Builder with differential loading', () => {
         '<script src="vendor.js" type="module"></script>' +
         '<script src="main.js" type="module"></script>',
     );
+  });
+
+  it('wraps ES5 scripts in an IIFE', async () => {
+    const { files } = await browserBuild(architect, host, target, { optimization: false });
+
+    expect(await files['main-es5.js']).toMatch(/^\(function \(\) \{/);
+    expect(await files['main-es2015.js']).not.toMatch(/^\(function \(\) \{/);
   });
 });
