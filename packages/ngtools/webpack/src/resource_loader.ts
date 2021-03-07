@@ -5,11 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// TODO: fix typings.
-// tslint:disable-next-line:no-global-tslint-disable
-// tslint:disable:no-any
-import * as path from 'path';
 import * as vm from 'vm';
+import { Compiler, compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { normalizePath } from './ivy/paths';
 
@@ -18,26 +15,43 @@ const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
 const LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
+type WebpackCompilation = compilation.Compilation & {
+  createChildCompiler(
+    name: string,
+    outputOptions: {},
+    plugins: ((compiler: Compiler) => void)[],
+  ): WebpackCompiler;
+};
+
+type WebpackCompiler = Compiler & {
+  runAsChild(
+    callback: (
+      error?: Error,
+      entries?: unknown,
+      compilation?: compilation.Compilation,
+    ) => void,
+  ): void;
+};
 
 interface CompilationOutput {
-  outputName: string;
-  source: string;
+  content: string;
+  map?: string;
   success: boolean;
 }
 
 export class WebpackResourceLoader {
-  private _parentCompilation: any;
+  private _parentCompilation?: WebpackCompilation;
   private _fileDependencies = new Map<string, Set<string>>();
   private _reverseDependencies = new Map<string, Set<string>>();
 
-  private cache = new Map<string, string>();
+  private cache = new Map<string, CompilationOutput>();
   private modifiedResources = new Set<string>();
 
   update(
-    parentCompilation: import('webpack').compilation.Compilation,
+    parentCompilation: compilation.Compilation,
     changedFiles?: Iterable<string>,
   ) {
-    this._parentCompilation = parentCompilation;
+    this._parentCompilation = parentCompilation as WebpackCompilation;
 
     // Update resource cache and modified resources
     this.modifiedResources.clear();
@@ -82,28 +96,32 @@ export class WebpackResourceLoader {
     }
 
     const outputOptions = { filename: filePath };
-    const context = this._parentCompilation.context;
-    const relativePath = path.relative(context || '', filePath);
-    const childCompiler = this._parentCompilation.createChildCompiler(relativePath, outputOptions);
-    childCompiler.context = context;
+    const context = this._parentCompilation.compiler.context;
+    const childCompiler = this._parentCompilation.createChildCompiler(
+      'angular-compiler:resource',
+      outputOptions,
+      [
+        new NodeTemplatePlugin(outputOptions),
+        new NodeTargetPlugin(),
+        new SingleEntryPlugin(context, filePath, 'resource'),
+        new LibraryTemplatePlugin('resource', 'var'),
+      ],
+    );
 
-    new NodeTemplatePlugin(outputOptions).apply(childCompiler);
-    new NodeTargetPlugin().apply(childCompiler);
-    new SingleEntryPlugin(context, filePath).apply(childCompiler);
-    new LibraryTemplatePlugin('resource', 'var').apply(childCompiler);
-
-    childCompiler.hooks.thisCompilation.tap('ngtools-webpack', (compilation: any) => {
-      compilation.hooks.additionalAssets.tap('ngtools-webpack', () => {
+    childCompiler.hooks.thisCompilation.tap('angular-compiler', (compilation) => {
+      compilation.hooks.additionalAssets.tap('angular-compiler', () => {
         const asset = compilation.assets[filePath];
         if (!asset) {
           return;
         }
 
         try {
-          const output = this._evaluate(filePath, asset.source());
+          const output = this._evaluate(filePath, asset.source().toString());
 
           if (typeof output === 'string') {
-            compilation.assets[filePath] = new RawSource(output);
+            // `webpack-sources` package has incomplete typings
+            // tslint:disable-next-line: no-any
+            compilation.assets[filePath] = new RawSource(output) as any;
           }
         } catch (error) {
           // Use compilation errors, as otherwise webpack will choke
@@ -112,53 +130,47 @@ export class WebpackResourceLoader {
       });
     });
 
-    // Compile and return a promise
-    const childCompilation = await new Promise<any>((resolve, reject) => {
-      childCompiler.compile((err: Error, childCompilation: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(childCompilation);
+    let finalContent: string | undefined;
+    let finalMap: string | undefined;
+    childCompiler.hooks.afterCompile.tap('angular-compiler', (childCompilation) => {
+      finalContent = childCompilation.assets[filePath]?.source().toString();
+      finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
+
+      delete childCompilation.assets[filePath];
+      delete childCompilation.assets[filePath + '.map'];
+    });
+
+    return new Promise<CompilationOutput>((resolve, reject) => {
+      childCompiler.runAsChild((error, _, childCompilation) => {
+        if (error) {
+          reject(error);
+
+          return;
+        } else if (!childCompilation) {
+          reject(new Error('Unknown child compilation error'));
+
+          return;
         }
+
+        // Save the dependencies for this resource.
+        this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
+        for (const file of childCompilation.fileDependencies) {
+          const resolvedFile = normalizePath(file);
+          const entry = this._reverseDependencies.get(resolvedFile);
+          if (entry) {
+            entry.add(filePath);
+          } else {
+            this._reverseDependencies.set(resolvedFile, new Set([filePath]));
+          }
+        }
+
+        resolve({
+          content: finalContent ?? '',
+          map: finalMap,
+          success: childCompilation.errors?.length === 0,
+        });
       });
     });
-
-    // Propagate warnings to parent compilation.
-    const { warnings, errors } = childCompilation;
-    if (warnings && warnings.length) {
-      this._parentCompilation.warnings.push(...warnings);
-    }
-    if (errors && errors.length) {
-      this._parentCompilation.errors.push(...errors);
-    }
-
-    Object.keys(childCompilation.assets).forEach((assetName) => {
-      // Add all new assets to the parent compilation, with the exception of
-      // the file we're loading and its sourcemap.
-      if (
-        assetName !== filePath &&
-        assetName !== `${filePath}.map` &&
-        this._parentCompilation.assets[assetName] == undefined
-      ) {
-        this._parentCompilation.assets[assetName] = childCompilation.assets[assetName];
-      }
-    });
-
-    // Save the dependencies for this resource.
-    this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
-    for (const file of childCompilation.fileDependencies) {
-      const resolvedFile = normalizePath(file);
-      const entry = this._reverseDependencies.get(resolvedFile);
-      if (entry) {
-        entry.add(filePath);
-      } else {
-        this._reverseDependencies.set(resolvedFile, new Set([filePath]));
-      }
-    }
-
-    const finalOutput = childCompilation.assets[filePath]?.source();
-
-    return { outputName: filePath, source: finalOutput ?? '', success: !errors?.length };
   }
 
   private _evaluate(filename: string, source: string): string | null {
@@ -183,19 +195,18 @@ export class WebpackResourceLoader {
 
   async get(filePath: string): Promise<string> {
     const normalizedFile = normalizePath(filePath);
-    let data = this.cache.get(normalizedFile);
+    let compilationResult = this.cache.get(normalizedFile);
 
-    if (data === undefined) {
+    if (compilationResult === undefined) {
       // cache miss so compile resource
-      const compilationResult = await this._compile(filePath);
-      data = compilationResult.source;
+      compilationResult = await this._compile(filePath);
 
       // Only cache if compilation was successful
       if (compilationResult.success) {
-        this.cache.set(normalizedFile, data);
+        this.cache.set(normalizedFile, compilationResult);
       }
     }
 
-    return data;
+    return compilationResult.content;
   }
 }
