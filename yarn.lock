@@ -87,7 +87,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#992364d568f301171614a4c56d22f3c2d32adb41":
   version "0.0.0"
-  uid "992364d568f301171614a4c56d22f3c2d32adb41"
   resolved "https://github.com/angular/dev-infra-private-builds.git#992364d568f301171614a4c56d22f3c2d32adb41"
   dependencies:
     "@angular/benchpress" "0.2.1"
@@ -1174,10 +1173,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@bazel/bazelisk@1.7.3":
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.7.3.tgz#51d99286326e15434ce10c54c1ee598c4ab1f694"
-  integrity sha512-A+QLZvKifKnbFawH5aaCnooPx0Ia5JS3S8SckKB034GVB3BjtUTCwjaxzxG3ARQ6Jq1vDcQwWgF2bjT9FjrdDg==
+"@bazel/bazelisk@1.7.5":
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.7.5.tgz#dd1a52e3d23464f72de55aa3dc4777847fa85373"
+  integrity sha512-JHwP9JhfZUSoj4sku471Bjw4uE773U2Agujnx0CdPkeRk25khy1l3VyjaPaHB+z1fmMnM6ED3M7tetQUsovUQg==
 
 "@bazel/buildifier-darwin_x64@0.29.0":
   version "0.29.0"
@@ -1194,10 +1193,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier-win32_x64/-/buildifier-win32_x64-0.29.0.tgz#a63438c7a7d2dc593e626ed6e163e9d8ea93917a"
   integrity sha512-hnOQfPhQNAIqbrhsHT3MWAyAZSUhKwxzEuZJZoOsGrW8fPonhKysdvfZJqfqJ6vDVYaMJKvLnSO1c9QZRhU7kQ==
 
-"@bazel/buildifier@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.0.0.tgz#c99fb21295c7e2858fa176c2b950c589217ae8ac"
-  integrity sha512-e242AK+shp+5bpAc9l93pmG5YRYRfM0INV3gfbdxNeBxccx1MJUagaiwxqAV+Mw55zk92gsb99f2TAc9tt6C7w==
+"@bazel/buildifier@4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.0.1.tgz#52cfbad5cbb86e9183a29dde2370cd465730ea0d"
+  integrity sha512-BTmtvJbeeEVrqRApI1gr5hvPgYcHLpdGJ5EXNXEWO692ztMPSj5fB/dH0xUlaW45jn6LimYx8ymqTMhj3538og==
 
 "@bazel/buildifier@^0.29.0":
   version "0.29.0"
@@ -1208,18 +1207,18 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/jasmine@3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.2.1.tgz#3a29b4a04222de2add06a57d771b9c2ecc97af80"
-  integrity sha512-VPz4AuK0DTk8kyiUzWrh36zGyaX1Yvq1vTNvc0TM8cXsQPRNsQbFTmQsy/y4quLvdJfk8P1qP9N95gqqkz9M9Q==
+"@bazel/jasmine@3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.2.2.tgz#e4c088d8267f83c4c718ac46e5923f549d47fef6"
+  integrity sha512-fSz0fRdk9IgyN/9Ietzasdp2QAhMGz/E4LKdiu+WyZrPjwd06zQ4ypb3DzzT1g+M/7NXJqV8X6ahTGQMrm/Rpw==
   dependencies:
     c8 "~7.5.0"
     jasmine-reporters "~2.3.2"
 
-"@bazel/typescript@3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.2.1.tgz#564849e2f05387612d13ef64304b7a7582bd107a"
-  integrity sha512-2KgMqKcbqL89WWWVC2iwTCS0tMWmQ4LpQgFhaF3Lp56Edl0nv/fy0TOu+waw2Qs2rTBbTVKhk5/9DRiqJmOd2g==
+"@bazel/typescript@3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.2.2.tgz#b53ee35dee68952abd711a2d472485748c7521c1"
+  integrity sha512-fTPtX3kZAQ50fWJaBvHtHf4w0fqMCrOhK9A8c5GgbqRrIWF8GG/+Tbt4OPwsG0N3+JDYOsHATacJI0qkjIeG1g==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
