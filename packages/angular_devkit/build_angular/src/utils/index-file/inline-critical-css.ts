@@ -63,7 +63,7 @@ export class InlineCriticalCssProcessor {
       // Clean up value from value less attributes.
       // This is caused because parse5 always requires attributes to have a string value.
       // nomodule="" defer="" -> nomodule defer.
-      content: content.replace(/(\s[a-z]+)=""/g, '$1'),
+      content: content.replace(/(\s(?:defer|nomodule))=""/g, '$1'),
       errors: critters.errors,
       warnings: critters.warnings,
     };
