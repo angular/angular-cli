@@ -391,7 +391,6 @@ LARGE_SPECS = {
         # compete for the resources of other parallel tests slowing everything down.
         # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
         tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
-        templated_args = ["--nobazel_patch_module_resolver"],
         deps = [":build_angular_" + spec + "_test_lib"],
     )
     for spec in LARGE_SPECS
@@ -404,7 +403,6 @@ jasmine_node_test(
     shard_count = 30,
     tags = ["cpu:2"],
     templated_args = [
-        "--nobazel_patch_module_resolver",
         "view_engine",
     ],
     deps = [":build_angular_browser_test_lib"],
