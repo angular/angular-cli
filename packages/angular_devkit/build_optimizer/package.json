@@ -25,6 +25,6 @@
   },
   "devDependencies": {
     "@types/webpack": "^4.41.22",
-    "webpack": "5.21.2"
+    "webpack": "5.24.4"
   }
 }
