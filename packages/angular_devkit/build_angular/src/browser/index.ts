@@ -7,7 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { getSystemPath, json, normalize, resolve, tags } from '@angular-devkit/core';
+import { getSystemPath, json, logging, normalize, resolve, tags } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
@@ -229,18 +229,7 @@ export function buildWebpackBrowser(
         `);
         }
 
-        const hasIE9 = buildBrowserFeatures.supportedBrowsers.includes('ie 9');
-        const hasIE10 = buildBrowserFeatures.supportedBrowsers.includes('ie 10');
-        if (hasIE9 || hasIE10) {
-          const browsers =
-            (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
-          context.logger.warn(
-            `Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
-            (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
-            ' no longer officially supported with Angular v11 and higher.' +
-            '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
-          );
-        }
+        checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
 
         return {
           ...(await initialize(options, context, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
@@ -809,6 +798,30 @@ function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
   }
 
   return filteredFiles;
+}
+
+function checkInternetExplorerSupport(supportedBrowsers: string[], logger: logging.LoggerApi): void {
+  const hasIE9 = supportedBrowsers.includes('ie 9');
+  const hasIE10 = supportedBrowsers.includes('ie 10');
+  const hasIE11 = supportedBrowsers.includes('ie 11');
+
+  if (hasIE9 || hasIE10) {
+    const browsers = (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
+    logger.warn(
+      `Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
+      (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
+      ' no longer officially supported with Angular v11 and higher.' +
+      '\nFor more information, see https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
+    );
+  }
+
+  if (hasIE11) {
+    logger.warn(
+      `Warning: Support was requested for IE 11 in the project's browserslist configuration. ` +
+      'IE 11 support is deprecated since Angular v12.' +
+      '\nFor more information, see https://angular.io/guide/browser-support',
+    );
+  }
 }
 
 export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);
