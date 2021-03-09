@@ -8,6 +8,14 @@ load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 package(default_visibility = ["//visibility:public"])
 
 nodejs_binary(
+    name = "ng_cli_schema",
+    data = [
+        "ng_cli_schema_generator.js",
+    ],
+    entry_point = "ng_cli_schema_generator.js",
+)
+
+nodejs_binary(
     name = "quicktype_runner",
     data = [
         "quicktype_runner.js",

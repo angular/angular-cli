@@ -33,7 +33,7 @@ function _rimraf(p: string) {
 
 
 export default async function(
-  argv: { },
+  argv: {},
   logger: logging.Logger,
 ) {
   const allJsonFiles = glob.sync('packages/**/*.json', {
@@ -77,4 +77,10 @@ export default async function(
     _mkdirp(path.dirname(tsPath));
     fs.writeFileSync(tsPath, tsContent, 'utf-8');
   }
+
+  // Angular CLI config schema
+  const cliJsonSchema = require('../tools/ng_cli_schema_generator');
+  const inputPath = 'packages/angular/cli/lib/config/workspace-schema.json';
+  const outputPath = path.join(dist, inputPath.replace('workspace-schema.json', 'schema.json'));
+  cliJsonSchema.generate(inputPath, outputPath);
 }

@@ -11,7 +11,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
-import { PackageManager } from '../lib/config/schema';
+import { PackageManager } from '../lib/config/workspace-schema';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { SchematicEngineHost } from '../models/schematic-engine-host';

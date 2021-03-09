@@ -12,7 +12,7 @@ import { existsSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } fr
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
 import * as rimraf from 'rimraf';
-import { PackageManager } from '../lib/config/schema';
+import { PackageManager } from '../lib/config/workspace-schema';
 import { colors } from '../utilities/color';
 import { NgAddSaveDepedency } from '../utilities/package-metadata';
 

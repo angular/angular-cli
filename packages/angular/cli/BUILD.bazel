@@ -5,6 +5,7 @@
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
 load("//tools:defaults.bzl", "ts_library")
 
 # @external_begin
@@ -28,7 +29,7 @@ ts_library(
     ) + [
         # @external_begin
         # These files are generated from the JSON schema
-        "//packages/angular/cli:lib/config/schema.ts",
+        "//packages/angular/cli:lib/config/workspace-schema.ts",
         "//packages/angular/cli:commands/analytics.ts",
         "//packages/angular/cli:commands/add.ts",
         "//packages/angular/cli:commands/build.ts",
@@ -58,8 +59,11 @@ ts_library(
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
+            "cli/lib/config/workspace-schema.json",
         ],
-    ),
+    ) + [
+        "//packages/angular/cli:lib/config/schema.json",
+    ],
     module_name = "@angular/cli",
     # strict_checks = False,
     deps = [
@@ -84,9 +88,46 @@ ts_library(
     ],
 )
 
+CLI_SCHEMA_DATA = [
+    "//packages/angular_devkit/build_angular:src/app-shell/schema.json",
+    "//packages/angular_devkit/build_angular:src/browser/schema.json",
+    "//packages/angular_devkit/build_angular:src/dev-server/schema.json",
+    "//packages/angular_devkit/build_angular:src/extract-i18n/schema.json",
+    "//packages/angular_devkit/build_angular:src/karma/schema.json",
+    "//packages/angular_devkit/build_angular:src/ng-packagr/schema.json",
+    "//packages/angular_devkit/build_angular:src/protractor/schema.json",
+    "//packages/angular_devkit/build_angular:src/server/schema.json",
+    "//packages/angular_devkit/build_angular:src/tslint/schema.json",
+    "//packages/schematics/angular:app-shell/schema.json",
+    "//packages/schematics/angular:application/schema.json",
+    "//packages/schematics/angular:class/schema.json",
+    "//packages/schematics/angular:component/schema.json",
+    "//packages/schematics/angular:directive/schema.json",
+    "//packages/schematics/angular:enum/schema.json",
+    "//packages/schematics/angular:guard/schema.json",
+    "//packages/schematics/angular:interceptor/schema.json",
+    "//packages/schematics/angular:interface/schema.json",
+    "//packages/schematics/angular:library/schema.json",
+    "//packages/schematics/angular:module/schema.json",
+    "//packages/schematics/angular:ng-new/schema.json",
+    "//packages/schematics/angular:pipe/schema.json",
+    "//packages/schematics/angular:resolver/schema.json",
+    "//packages/schematics/angular:service/schema.json",
+    "//packages/schematics/angular:service-worker/schema.json",
+    "//packages/schematics/angular:web-worker/schema.json",
+]
+
+cli_json_schema(
+    name = "cli_config_schema",
+    src = "lib/config/workspace-schema.json",
+    out = "lib/config/schema.json",
+    data = CLI_SCHEMA_DATA,
+)
+
 ts_json_schema(
     name = "cli_schema",
-    src = "lib/config/schema.json",
+    src = "lib/config/workspace-schema.json",
+    data = CLI_SCHEMA_DATA,
 )
 
 ts_json_schema(
