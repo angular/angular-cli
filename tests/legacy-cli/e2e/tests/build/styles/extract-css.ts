@@ -34,7 +34,7 @@ export default function() {
           ];
         }),
       )
-      .then(() => ng('build', '--extract-css'))
+      .then(() => ng('build', '--extract-css', '--configuration=development'))
       // files were created successfully
       .then(() => expectFileToMatch('dist/test-project/styles.css', '.string-style'))
       .then(() => expectFileToMatch('dist/test-project/styles.css', '.input-style'))
@@ -68,7 +68,7 @@ export default function() {
         `)),
       )
       // also check when css isn't extracted
-      .then(() => ng('build', '--no-extract-css'))
+      .then(() => ng('build', '--no-extract-css', '--configuration=development'))
       // files were created successfully
       .then(() => expectFileToMatch('dist/test-project/styles.js', '.string-style'))
       .then(() => expectFileToMatch('dist/test-project/styles.js', '.input-style'))

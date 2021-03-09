@@ -9,7 +9,7 @@ export default function() {
 
   return Promise.resolve()
     .then(() => moveFile('node_modules/@angular/router', path.join(tmp, '@angular-router.backup')))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--configuration=development'))
     .then(() => expectFileToExist('./dist/test-project/index.html'))
     .then(() => moveFile(path.join(tmp, '@angular-router.backup'), 'node_modules/@angular/router'));
 }

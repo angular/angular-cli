@@ -26,7 +26,7 @@ export default async function() {
   });
 
   // Build each locale and verify the output.
-  await ng('build');
+  await ng('build', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     // does not exist in this test due to the source locale change
     if (lang === 'en-US') {

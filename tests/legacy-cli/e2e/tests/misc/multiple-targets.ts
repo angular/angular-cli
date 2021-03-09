@@ -9,7 +9,7 @@ export default async function () {
     workspaceJson.defaultProject = undefined;
   });
 
-  await ng('build', 'secondary-app');
+  await ng('build', 'secondary-app', '--configuration=development');
 
   expectFileToExist('dist/secondary-app/index.html');
   expectFileToExist('dist/secondary-app/main.js');

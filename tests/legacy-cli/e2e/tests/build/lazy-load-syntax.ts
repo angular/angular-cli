@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, prependToFile, readFile, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -75,8 +74,8 @@ export default async function () {
   // This way we can use `ng e2e` to test JIT and `ng e2e --prod` to test AOT.
   await updateJsonFile('angular.json', json => {
     const buildTarget = json['projects'][projectName]['architect']['build'];
-    buildTarget['options']['aot'] = false;
-    buildTarget['configurations']['production'] = { aot: true };
+    buildTarget['options']['aot'] = true;
+    buildTarget['configurations']['development']['aot'] = false;
   });
 
   // Test `import()` style lazy load.
@@ -84,7 +83,7 @@ export default async function () {
   await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
 
   await ng('e2e');
-  await ng('e2e', '--prod');
+  await ng('e2e', '--configuration=production');
 
   // Test string import.
   // Both Ivy and View Engine should support it.
@@ -93,5 +92,5 @@ export default async function () {
   });
   await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
   await ng('e2e');
-  await ng('e2e', '--prod');
+  await ng('e2e', '--configuration=production');
 }

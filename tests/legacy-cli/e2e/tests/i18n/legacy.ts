@@ -171,7 +171,9 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
     const serveConfigs = appArchitect['serve'].configurations;
     const e2eConfigs = appArchitect['e2e'].configurations;
 
-    // Make default builds prod.
+    appArchitect['build'].defaultConfiguration = undefined;
+
+    // Always error on missing translations.
     appArchitect['build'].options.optimization = true;
     appArchitect['build'].options.buildOptimizer = true;
     appArchitect['build'].options.aot = true;
@@ -179,9 +181,10 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
       replace: 'src/environments/environment.ts',
       with: 'src/environments/environment.prod.ts',
     }];
-
-    // Always error on missing translations.
     appArchitect['build'].options.i18nMissingTranslation = 'error';
+    appArchitect['build'].options.vendorChunk = true;
+    appArchitect['build'].options.sourceMap = true;
+    appArchitect['build'].options.outputHashing = 'none';
 
     if (useLocalize) {
       // Enable localization for all locales

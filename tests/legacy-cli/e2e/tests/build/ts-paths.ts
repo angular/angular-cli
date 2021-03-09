@@ -27,7 +27,7 @@ export default async function () {
   });
 
   await replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
-  await ng('build');
+  await ng('build', '--configuration=development');
 
   await updateTsConfig(json => {
     json['compilerOptions']['paths']['*'] = [
@@ -52,9 +52,9 @@ export default async function () {
     console.log(meaning5)
   `);
 
-  await ng('build');
+  await ng('build', '--configuration=development');
 
   // Simulate no package.json file which causes Webpack to have an undefined 'descriptionFileData'.
   await rimraf('package.json');
-  await ng('build');
+  await ng('build', '--configuration=development');
 }

@@ -10,7 +10,7 @@ export default async function () {
   });
 
   await writeFile('.browserslistrc', 'last 2 Chrome versions');
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileNotToExist('dist/test-project/polyfills-es5.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="runtime.js" defer></script>
@@ -20,7 +20,7 @@ export default async function () {
   `);
 
   await writeFile('.browserslistrc', 'IE 10');
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="runtime.js" defer></script>

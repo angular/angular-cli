@@ -30,7 +30,7 @@ export default async function () {
     );
   }
 
-  await ng('build', '--prod');
+  await ng('build');
 
   // Add Protractor configuration
   await copyProjectAsset('protractor-saucelabs.conf.js', 'e2e/protractor-saucelabs.conf.js');

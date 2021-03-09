@@ -11,5 +11,5 @@ export default async function () {
   });
 
   // Test it works
-  await ng('e2e', '--prod');
+  await ng('e2e', '--configuration=production');
 }

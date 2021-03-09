@@ -13,7 +13,7 @@ export default async function() {
     // Don't run this test for VE jobs. It only applies to Ivy.
     return;
   }
-  const { stderr, stdout } = await ng('build', '--prod');
+  const { stderr, stdout } = await ng('build');
 
   if (stdout.includes('as esm5') || stderr.includes('as esm5')) {
     throw new Error('ngcc should not process ES5 during differential loading builds.');

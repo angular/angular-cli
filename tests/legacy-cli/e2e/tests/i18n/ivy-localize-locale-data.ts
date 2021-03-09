@@ -53,7 +53,7 @@ export default async function() {
     appProject.architect['build'].options.localize = ['en-x-abc'];
   });
 
-  const { stderr: err3 } = await ng('build');
+  const { stderr: err3 } = await ng('build', '--configuration=development');
   if (err3.includes(`Locale data for 'en-x-abc' cannot be found.  No locale data will be included for this locale.`)) {
     throw new Error('locale data not found warning shown');
   }

@@ -27,7 +27,7 @@ export default async function() {
     ];
   });
 
-  await ng('build', '--extract-css');
+  await ng('build', '--extract-css', '--configuration=development');
 
   await expectFileToMatch('dist/test-project/styles.css', '.string-style');
   await expectFileToMatch('dist/test-project/styles.css', '.input-style');

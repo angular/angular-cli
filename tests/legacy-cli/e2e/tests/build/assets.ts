@@ -8,7 +8,7 @@ export default async function () {
   await writeFile('src/assets/.file', '');
   await writeFile('src/assets/test.abc', 'hello world');
 
-  await ng('build');
+  await ng('build', '--configuration=development');
 
   await expectFileToExist('dist/test-project/favicon.ico');
   await expectFileToExist('dist/test-project/assets/.file');
@@ -28,7 +28,7 @@ export default async function () {
   fs.writeFileSync('dirToSymlink/subdir2/subsubdir1/d.txt', '');
   fs.symlinkSync(process.cwd() + '/dirToSymlink', 'src/assets/symlinkDir');
 
-  await ng('build');
+  await ng('build', '--configuration=development');
 
   await expectFileToExist('dist/test-project/assets/symlinkDir/a.txt');
   await expectFileToExist('dist/test-project/assets/symlinkDir/subdir1/b.txt');

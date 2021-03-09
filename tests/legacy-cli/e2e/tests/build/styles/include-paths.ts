@@ -57,14 +57,14 @@ export default function () {
       };
     }))
     // files were created successfully
-    .then(() => ng('build', '--extract-css'))
+    .then(() => ng('build', '--extract-css', '--configuration=development'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/))
     .then(() => expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/))
     .then(() => expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
     .then(() => expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/))
-    .then(() => ng('build', '--extract-css', '--aot'))
+    .then(() => ng('build', '--extract-css', '--aot', '--configuration=development'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/))
     .then(() => expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/))

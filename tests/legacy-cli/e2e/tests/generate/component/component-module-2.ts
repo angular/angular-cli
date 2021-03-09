@@ -16,5 +16,5 @@ export default function() {
                  /from '..\/..\/other\/test-component\/test-component.component'/.source)))
 
     // Try to run the unit tests.
-    .then(() => ng('build'));
+    .then(() => ng('build', '--configuration=development'));
 }

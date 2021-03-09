@@ -17,5 +17,5 @@ export default function() {
       /import { TestDirective2Directive } from '.\/test-directive2.directive'/))
 
     // Try to run the unit tests.
-    .then(() => ng('build'));
+    .then(() => ng('build', '--configuration=development'));
 }

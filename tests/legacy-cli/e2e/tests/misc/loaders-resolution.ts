@@ -8,7 +8,7 @@ export default async function () {
     'node_modules/@angular-devkit/build-angular/node_modules/@ngtools'
   );
 
-  await ng('build');
+  await ng('build', '--configuration=development');
 
   // Move it back.
   await moveFile(

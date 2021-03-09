@@ -19,7 +19,7 @@ export default function() {
         { input: 'node_modules/bootstrap/dist/js/bootstrap.js' },
       ];
     }))
-    .then(() => ng('build', '--extract-css'))
+    .then(() => ng('build', '--extract-css', '--configuration=development'))
     .then(() => expectFileToMatch('dist/test-project/scripts.js', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
@@ -27,6 +27,7 @@ export default function() {
     `))
     .then(() => ng(
       'build',
+      '--configuration=development',
       '--optimization',
       '--extract-css',
       '--output-hashing=none',

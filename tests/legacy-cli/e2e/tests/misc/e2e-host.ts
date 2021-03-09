@@ -15,6 +15,7 @@ export default async function () {
   try {
     await updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
+      appArchitect.serve.options = appArchitect.serve.options || {};
       appArchitect.serve.options.port = 8888;
       appArchitect.serve.options.host = host;
     });

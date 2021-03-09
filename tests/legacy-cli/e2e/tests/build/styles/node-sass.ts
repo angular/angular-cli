@@ -31,11 +31,11 @@ export default async function () {
 
   await silentExec('rm', '-rf', 'node_modules/node-sass');
   await silentExec('rm', '-rf', 'node_modules/sass');
-  await expectToFail(() => ng('build', '--extract-css', '--source-map'));
+  await expectToFail(() => ng('build', '--extract-css', '--source-map', '--configuration=development'));
 
   await installPackage('node-sass');
   await silentExec('rm', '-rf', 'node_modules/sass');
-  await ng('build', '--extract-css', '--source-map');
+  await ng('build', '--extract-css', '--source-map', '--configuration=development');
 
   await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
   await expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/);
@@ -46,7 +46,7 @@ export default async function () {
   await installPackage('fibers');
   await installPackage('sass');
   await silentExec('rm', '-rf', 'node_modules/node-sass');
-  await ng('build', '--extract-css', '--source-map');
+  await ng('build', '--extract-css', '--source-map', '--configuration=development');
 
   await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
   await expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/);

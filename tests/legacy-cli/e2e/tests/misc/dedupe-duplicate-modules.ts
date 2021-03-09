@@ -30,7 +30,7 @@ export default async function () {
         })
     `);
 
-  const { stderr } = await ng('build', '--verbose', '--no-vendor-chunk', '--no-progress');
+  const { stderr } = await ng('build', '--verbose', '--no-vendor-chunk', '--no-progress', '--configuration=development');
   const outFile = 'dist/test-project/main.js';
 
   if (/\[DedupeModuleResolvePlugin\]:.+tslib-1-copy.+ -> .+tslib-1.+/.test(stderr)) {

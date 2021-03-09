@@ -6,7 +6,7 @@ export default async function () {
     tsconfig.compilerOptions.traceResolution = true;
   });
 
-  const { stdout: stdoutTraced } = await ng('build');
+  const { stdout: stdoutTraced } = await ng('build', '--configuration=development');
   if (!/Resolving module/.test(stdoutTraced)) {
     throw new Error(`Modules resolutions must be printed when 'traceResolution' is enabled.`);
   }
@@ -15,7 +15,7 @@ export default async function () {
     tsconfig.compilerOptions.traceResolution = false;
   });
 
-  const { stdout: stdoutUnTraced } = await ng('build');
+  const { stdout: stdoutUnTraced } = await ng('build', '--configuration=development');
   if (/Resolving module/.test(stdoutUnTraced)) {
     throw new Error(`Modules resolutions must not be printed when 'traceResolution' is disabled.`);
   }

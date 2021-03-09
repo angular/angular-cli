@@ -23,8 +23,8 @@ export default async function() {
 
   // Execute the CLI with Webpack 5
   await ng('test', '--watch=false');
+  await ng('build', '--configuration=development');
   await ng('build');
-  await ng('build', '--prod');
   await ng('e2e');
   try {
     await ngServe();

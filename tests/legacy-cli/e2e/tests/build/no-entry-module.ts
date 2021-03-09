@@ -12,5 +12,5 @@ export default async function() {
     + 'console.log(AppModule);';  // Use AppModule to make sure it's imported properly.
 
   await writeFile('src/main.ts', newMainTs);
-  await ng('build');
+  await ng('build', '--configuration=development');
 }

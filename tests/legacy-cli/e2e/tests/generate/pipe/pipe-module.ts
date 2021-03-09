@@ -17,5 +17,5 @@ export default function() {
       /import { TestPipe2Pipe } from '.\/test-pipe2.pipe'/))
 
     // Try to run the unit tests.
-    .then(() => ng('build'));
+    .then(() => ng('build', '--configuration=development'));
 }

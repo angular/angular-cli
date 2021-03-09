@@ -45,7 +45,7 @@ export default async function () {
     await replaceInFile('src/app/app.component.ts', './app.component.css', `./app.component.${ext}`);
 
     // run build app
-    await ng('build', '--extract-css', '--source-map');
+    await ng('build', '--extract-css', '--source-map', '--configuration=development');
     await writeMultipleFiles({
       [`src/styles.${ext}`]: stripIndents`
           @import "@angular/material/prebuilt-themes/indigo-pink.css";
@@ -55,6 +55,6 @@ export default async function () {
         `,
     });
 
-    await ng('build', '--extract-css');
+    await ng('build', '--extract-css', '--configuration=development');
   }
 }

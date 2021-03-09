@@ -26,6 +26,6 @@ export default function() {
       .then(() => expectToFail(() => expectFileToMatch('package.json', '"jasmine-core":')))
 
       // Try to run a build.
-      .then(() => ng('build'))
+      .then(() => ng('build', '--configuration=development'))
   );
 }

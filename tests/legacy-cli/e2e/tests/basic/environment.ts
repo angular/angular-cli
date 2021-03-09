@@ -8,6 +8,7 @@ export default async function () {
   await updateJsonFile('angular.json', configJson => {
     const appArchitect = configJson.projects['test-project'].architect;
     appArchitect.build.configurations['prod-env'] = {
+      ...appArchitect.build.configurations['development'],
       fileReplacements: [
         {
           src: 'src/environments/environment.ts',

@@ -12,7 +12,7 @@ export default function () {
     .then(() => expectToFail(() => ng('e2e', 'test-project', '--devServerTarget=')))
     // These should work.
     .then(() => ng('e2e', 'test-project'))
-    .then(() => ng('e2e', 'test-project', '--devServerTarget=test-project:serve:production'))
+    .then(() => ng('e2e', 'test-project', '--devServerTarget=test-project:serve'))
     // Should accept different config file
     .then(() => moveFile('./e2e/protractor.conf.js',
       './e2e/renamed-protractor.conf.js'))

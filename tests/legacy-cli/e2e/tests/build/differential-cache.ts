@@ -55,12 +55,12 @@ export default async function() {
   await rimraf('./node_modules/.cache');
 
   let start = Date.now();
-  await ng('build');
+  await ng('build', '--configuration=development');
   let initial = Date.now() - start;
   oldHashes = generateFileHashMap();
 
   start = Date.now();
-  await ng('build');
+  await ng('build', '--configuration=development');
   let cached = Date.now() - start;
   newHashes = generateFileHashMap();
 
@@ -76,12 +76,12 @@ export default async function() {
   await rimraf('./node_modules/.cache');
 
   start = Date.now();
-  await ng('build', '--prod');
+  await ng('build');
   initial = Date.now() - start;
   oldHashes = generateFileHashMap();
 
   start = Date.now();
-  await ng('build', '--prod');
+  await ng('build');
   cached = Date.now() - start;
   newHashes = generateFileHashMap();
 

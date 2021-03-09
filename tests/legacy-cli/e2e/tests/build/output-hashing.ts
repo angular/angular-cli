@@ -14,25 +14,25 @@ export default async function () {
   });
   // use image with file size >10KB to prevent inlining
   await copyProjectAsset('images/spectrum.png', './src/assets/image.png');
-  await ng('build', '--output-hashing=all');
+  await ng('build', '--output-hashing=all', '--configuration=development');
   await expectFileToMatch('dist/test-project/index.html', /runtime\.[0-9a-f]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.(css|js)/);
   await verifyMedia(/styles\.[0-9a-f]{20}\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
 
-  await ng('build', '--output-hashing=none');
+  await ng('build', '--output-hashing=none', '--configuration=development');
   await expectFileToMatch('dist/test-project/index.html', /runtime\.js/);
   await expectFileToMatch('dist/test-project/index.html', /main\.js/);
   await expectFileToMatch('dist/test-project/index.html', /styles\.(css|js)/);
   await verifyMedia(/styles\.(css|js)/, /image\.png/);
 
-  await ng('build', '--output-hashing=media');
+  await ng('build', '--output-hashing=media', '--configuration=development');
   await expectFileToMatch('dist/test-project/index.html', /runtime\.js/);
   await expectFileToMatch('dist/test-project/index.html', /main\.js/);
   await expectFileToMatch('dist/test-project/index.html', /styles\.(css|js)/);
   await verifyMedia(/styles\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
 
-  await ng('build', '--output-hashing=bundles');
+  await ng('build', '--output-hashing=bundles', '--configuration=development');
   await expectFileToMatch('dist/test-project/index.html', /runtime\.[0-9a-f]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.(css|js)/);

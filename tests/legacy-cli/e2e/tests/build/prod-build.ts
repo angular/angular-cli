@@ -43,7 +43,7 @@ export default async function () {
     'IE 11',
   );
 
-  await ng('build', '--prod');
+  await ng('build');
   await expectFileToExist(join(process.cwd(), 'dist'));
   // Check for cache busting hash script src
   await expectFileToMatch('dist/test-project/index.html', /main-es5\.[0-9a-f]{20}\.js/);

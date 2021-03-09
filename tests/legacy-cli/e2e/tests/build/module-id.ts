@@ -7,5 +7,5 @@ export default function() {
     .then(() => replaceInFile('src/app/app.component.ts',
       '@Component({',
       '@Component({ moduleId: module.id,'))
-    .then(() => ng('build'));
+    .then(() => ng('build', '--configuration=development'));
 }

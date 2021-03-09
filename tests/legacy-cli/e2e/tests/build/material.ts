@@ -33,7 +33,7 @@ export default async function () {
 
   await installPackage('moment');
 
-  await ng('build', '--prod');
+  await ng('build');
 
   // Ensure moment adapter works (uses unique importing mechanism for moment)
   // Issue: https://github.com/angular/angular-cli/issues/17320

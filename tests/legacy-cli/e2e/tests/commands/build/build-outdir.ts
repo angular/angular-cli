@@ -11,6 +11,6 @@ export default function() {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.outputPath = './';
     }))
-    .then(() => expectToFail(() => ng('build')))
+    .then(() => expectToFail(() => ng('build', '--configuration=development')))
     .then(() => expectToFail(() => ng('serve')));
 }
