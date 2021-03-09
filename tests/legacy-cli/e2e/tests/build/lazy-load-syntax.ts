@@ -84,13 +84,4 @@ export default async function () {
 
   await ng('e2e');
   await ng('e2e', '--configuration=production');
-
-  // Test string import.
-  // Both Ivy and View Engine should support it.
-  await updateJsonFile('tsconfig.app.json', tsConfig => {
-    tsConfig.files.push('src/app/lazy/lazy.module.ts');
-  });
-  await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
-  await ng('e2e');
-  await ng('e2e', '--configuration=production');
 }

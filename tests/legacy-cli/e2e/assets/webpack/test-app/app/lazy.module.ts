@@ -11,8 +11,8 @@ export class LazyComponent {}
   imports: [
     RouterModule.forChild([
      {path: '', component: LazyComponent, pathMatch: 'full'},
-     {path: 'feature', loadChildren: './feature/feature.module#FeatureModule'},
-     {path: 'lazy-feature', loadChildren: './feature/lazy-feature.module#LazyFeatureModule'}
+     {path: 'feature', loadChildren: () => import( './feature/feature.module').then(m => m.FeatureModule)},
+     {path: 'lazy-feature', loadChildren: () => import( './feature/lazy-feature.module').then(m => m.LazyFeatureModule)},
     ]),
   ],
   declarations: [LazyComponent]
