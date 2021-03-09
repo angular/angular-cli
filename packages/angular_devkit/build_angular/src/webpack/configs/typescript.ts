@@ -36,11 +36,6 @@ function canUseIvyPlugin(wco: WebpackConfigOptions): boolean {
     return false;
   }
 
-  // Lazy modules option uses the deprecated string format for lazy routes
-  if (wco.buildOptions.lazyModules && wco.buildOptions.lazyModules.length > 0) {
-    return false;
-  }
-
   return true;
 }
 
@@ -131,16 +126,6 @@ function _createAotPlugin(
     compilerOptions.enableIvy = false;
   }
 
-  const additionalLazyModules: { [module: string]: string } = {};
-  if (buildOptions.lazyModules) {
-    for (const lazyModule of buildOptions.lazyModules) {
-      additionalLazyModules[lazyModule] = path.resolve(
-        root,
-        lazyModule,
-      );
-    }
-  }
-
   let pluginOptions: AngularCompilerPluginOptions = {
     mainPath: path.join(root, buildOptions.main),
     ...i18nFileAndFormat,
@@ -148,10 +133,8 @@ function _createAotPlugin(
     platform: buildOptions.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
     missingTranslation: buildOptions.i18nMissingTranslation,
     sourceMap: buildOptions.sourceMap.scripts,
-    additionalLazyModules,
     nameLazyFiles: buildOptions.namedChunks,
     forkTypeChecker: buildOptions.forkTypeChecker,
-    contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     logger: wco.logger,
     directTemplateLoading: true,
     ...options,
@@ -246,12 +229,9 @@ export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsCon
     platform: PLATFORM.Browser,
     sourceMap: buildOptions.sourceMap.scripts,
     forkTypeChecker: buildOptions.forkTypeChecker,
-    contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     logger: wco.logger,
     // Run no transformers.
     platformTransformers: [],
-    // Don't attempt lazy route discovery.
-    discoverLazyRoutes: false,
   };
 
   pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);

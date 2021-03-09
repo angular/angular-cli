@@ -16,7 +16,6 @@ import {
   host,
   lazyModuleFiles,
   lazyModuleFnImport,
-  lazyModuleStringImport,
   veEnabled,
 } from '../../test-utils';
 
@@ -54,40 +53,30 @@ describe('Browser Builder lazy modules', () => {
       logs.includes('Module not found');
   }
 
-  const cases: [string, Record<string, string>][] = [
-    ['string', lazyModuleStringImport],
-    ['function', lazyModuleFnImport],
-  ];
-  for (const [name, imports] of cases) {
-    describe(`Load children ${name} syntax`, () => {
-      it('supports lazy bundle for lazy routes with JIT', async () => {
-        host.writeMultipleFiles(lazyModuleFiles);
-        host.writeMultipleFiles(imports);
+  describe(`Load children syntax`, () => {
+    it('supports lazy bundle for lazy routes with JIT', async () => {
+      host.writeMultipleFiles(lazyModuleFiles);
+      host.writeMultipleFiles(lazyModuleFnImport);
 
-        if (name === 'string') {
-          addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
-        }
-
-        const { files } = await browserBuild(architect, host, target);
-        expect('lazy-lazy-module.js' in files).toBe(true);
-      });
-
-      it('supports lazy bundle for lazy routes with AOT', async () => {
-        host.writeMultipleFiles(lazyModuleFiles);
-        host.writeMultipleFiles(imports);
-        addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
-
-        const { files } = await browserBuild(architect, host, target, { aot: true });
-        if (!veEnabled) {
-          const data = await files['lazy-lazy-module.js'];
-          expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
-          expect(data).toContain('LazyModule.ɵmod');
-        } else {
-          expect(files['lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
-        }
-      });
+      const { files } = await browserBuild(architect, host, target);
+      expect('lazy-lazy-module.js' in files).toBe(true);
     });
-  }
+
+    it('supports lazy bundle for lazy routes with AOT', async () => {
+      host.writeMultipleFiles(lazyModuleFiles);
+      host.writeMultipleFiles(lazyModuleFnImport);
+      addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
+
+      const { files } = await browserBuild(architect, host, target, { aot: true });
+      if (!veEnabled) {
+        const data = await files['lazy-lazy-module.js'];
+        expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
+        expect(data).toContain('LazyModule.ɵmod');
+      } else {
+        expect(files['lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
+      }
+    });
+  });
 
   // Errors for missing lazy routes are only supported with function syntax.
   // `ngProgram.listLazyRoutes` will ignore invalid lazy routes in the route map.
@@ -201,70 +190,5 @@ describe('Browser Builder lazy modules', () => {
     expect(files['one.js']).not.toBeUndefined();
     expect(files['two.js']).not.toBeUndefined();
     expect(files['common.js']).toBeUndefined();
-  });
-
-  it(`supports extra lazy modules array in JIT`, async () => {
-    host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles({
-      'src/app/app.component.ts': `
-        import { Component, SystemJsNgModuleLoader } from '@angular/core';
-
-        @Component({
-          selector: 'app-root',
-          templateUrl: './app.component.html',
-          styleUrls: ['./app.component.css'],
-        })
-        export class AppComponent {
-          title = 'app';
-          constructor(loader: SystemJsNgModuleLoader) {
-            // Module will be split at build time and loaded when requested below
-            loader.load('src/app/lazy/lazy.module#LazyModule')
-              .then((factory) => { /* Use factory here */ });
-          }
-        }`,
-    });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
-    addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
-
-    const { files } = await browserBuild(architect, host, target, {
-      lazyModules: ['src/app/lazy/lazy.module'],
-    });
-    expect(files['src-app-lazy-lazy-module.js']).not.toBeUndefined();
-  });
-
-  it(`supports extra lazy modules array in AOT`, async () => {
-    host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles({
-      'src/app/app.component.ts': `
-        import { Component, SystemJsNgModuleLoader } from '@angular/core';
-
-        @Component({
-          selector: 'app-root',
-          templateUrl: './app.component.html',
-          styleUrls: ['./app.component.css'],
-        })
-        export class AppComponent {
-          title = 'app';
-          constructor(loader: SystemJsNgModuleLoader) {
-            // Module will be split at build time and loaded when requested below
-            loader.load('src/app/lazy/lazy.module#LazyModule')
-              .then((factory) => { /* Use factory here */ });
-          }
-        }`,
-    });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
-    addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
-    const { files } = await browserBuild(architect, host, target, {
-      lazyModules: ['src/app/lazy/lazy.module'],
-      aot: true,
-    });
-
-    if (!veEnabled) {
-      const data = await files['src-app-lazy-lazy-module.js'];
-      expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
-      expect(data).toContain('LazyModule.ɵmod');
-    } else {
-      expect(files['src-app-lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
-    }
   });
 });
