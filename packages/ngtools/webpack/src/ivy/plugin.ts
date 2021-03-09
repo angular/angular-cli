@@ -8,11 +8,9 @@
 import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compiler-cli';
 import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
 import { createHash } from 'crypto';
-import * as path from 'path';
 import * as ts from 'typescript';
 import {
   Compiler,
-  ContextReplacementPlugin,
   NormalModuleReplacementPlugin,
   WebpackFourCompiler,
   compilation,
@@ -92,7 +90,6 @@ export class AngularWebpackPlugin {
   private builder?: ts.EmitAndSemanticDiagnosticsBuilderProgram;
   private sourceFileCache?: SourceFileCache;
   private buildTimestamp!: number;
-  private readonly lazyRouteMap: Record<string, string> = {};
   private readonly requiredFilesToEmit = new Set<string>();
   private readonly requiredFilesToEmitCache = new Map<string, EmitFileResult | undefined>();
   private readonly fileEmitHistory = new Map<string, { length: number; hash: Uint8Array }>();
@@ -124,13 +121,6 @@ export class AngularWebpackPlugin {
         value,
       ).apply(compiler);
     }
-
-    // Mimic VE plugin's systemjs module loader resource location for consistency
-    new ContextReplacementPlugin(
-      /\@angular[\\\/]core[\\\/]/,
-      path.join(compiler.context, '$$_lazy_route_resource'),
-      this.lazyRouteMap,
-    ).apply(compiler);
 
     // Set resolver options
     const pathsPlugin = new TypeScriptPathsPlugin();
@@ -497,12 +487,6 @@ export class AngularWebpackPlugin {
         }
       }
 
-      // NOTE: This can be removed once support for the deprecated lazy route string format is removed
-      for (const lazyRoute of angularCompiler.listLazyRoutes()) {
-        const [routeKey] = lazyRoute.route.split('#');
-        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
-      }
-
       return this.createFileEmitter(
         builder,
         mergeTransformers(angularCompiler.prepareEmit().transformers, transformers),
@@ -555,36 +539,8 @@ export class AngularWebpackPlugin {
 
     const transformers = createJitTransformers(builder, this.pluginOptions);
 
-    // Required to support asynchronous resource loading
-    // Must be done before listing lazy routes
-    // NOTE: This can be removed once support for the deprecated lazy route string format is removed
-    const angularProgram = new NgtscProgram(
-      rootNames,
-      compilerOptions,
-      host,
-      this.ngtscNextProgram,
-    );
-    const angularCompiler = angularProgram.compiler;
-    const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
-      for (const lazyRoute of angularCompiler.listLazyRoutes()) {
-        const [routeKey] = lazyRoute.route.split('#');
-        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
-      }
-
-      return this.createFileEmitter(builder, transformers, () => []);
-    });
-    const analyzingFileEmitter: FileEmitter = async (file) => {
-      const innerFileEmitter = await pendingAnalysis;
-
-      return innerFileEmitter(file);
-    };
-
-    if (this.watchMode) {
-      this.ngtscNextProgram = angularProgram;
-    }
-
     return {
-      fileEmitter: analyzingFileEmitter,
+      fileEmitter: this.createFileEmitter(builder, transformers, () => []),
       builder,
       internalFiles: undefined,
     };
