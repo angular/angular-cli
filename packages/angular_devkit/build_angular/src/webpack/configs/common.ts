@@ -503,7 +503,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.
       // https://github.com/angular/angular/issues/11580
-      new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/, projectRoot, {}),
+      new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/, path.normalize(projectRoot), {}),
       new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
       ...extraPlugins,
     ],

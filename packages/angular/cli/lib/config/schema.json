@@ -1036,14 +1036,6 @@
               "description": "Run the TypeScript type checker in a forked process.",
               "default": true
             },
-            "lazyModules": {
-              "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": []
-            },
             "budgets": {
               "description": "Budget thresholds to ensure parts of your application stay within boundaries which you set.",
               "type": "array",
@@ -2008,14 +2000,6 @@
               "type": "boolean",
               "description": "Run the TypeScript type checker in a forked process.",
               "default": true
-            },
-            "lazyModules": {
-              "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules with be discovered automatically.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": []
             }
           },
           "additionalProperties": false,
