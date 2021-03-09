@@ -139,6 +139,11 @@
       "version": "12.0.0-next.2",
       "factory": "./update-12/remove-emit-decorator-metadata",
       "description": "Remove 'emitDecoratorMetadata' TypeScript compiler option. Decorator metadata is no longer needed by Angular. Read more about this here: https://www.typescriptlang.org/docs/handbook/decorators.html#metadata"
+    },
+    "lazy-loading-string-syntax": {
+      "version": "12.0.0-next.4",
+      "factory": "./update-8/#updateLazyModulePaths",
+      "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
     }
   }
 }
