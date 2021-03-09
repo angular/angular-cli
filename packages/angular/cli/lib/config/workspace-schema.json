@@ -1,0 +1,569 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://config/schema.json",
+  "title": "Angular CLI Workspace Configuration",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "$ref": "#/definitions/fileVersion"
+    },
+    "cli": {
+      "$ref": "#/definitions/cliOptions"
+    },
+    "schematics": {
+      "$ref": "#/definitions/schematicOptions"
+    },
+    "newProjectRoot": {
+      "type": "string",
+      "description": "Path where new projects will be created."
+    },
+    "defaultProject": {
+      "type": "string",
+      "description": "Default project name used in commands."
+    },
+    "projects": {
+      "type": "object",
+      "patternProperties": {
+        "^(?:@[a-zA-Z0-9_-]+\/)?[a-zA-Z0-9_-]+$": {
+          "$ref": "#/definitions/project"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "definitions": {
+    "cliOptions": {
+      "type": "object",
+      "properties": {
+        "defaultCollection": {
+          "description": "The default schematics collection to use.",
+          "type": "string"
+        },
+        "packageManager": {
+          "description": "Specify which package manager tool to use.",
+          "type": "string",
+          "enum": [
+            "npm",
+            "cnpm",
+            "yarn",
+            "pnpm"
+          ]
+        },
+        "warnings": {
+          "description": "Control CLI specific console warnings",
+          "type": "object",
+          "properties": {
+            "versionMismatch": {
+              "description": "Show a warning when the global version is newer than the local one.",
+              "type": "boolean"
+            }
+          }
+        },
+        "analytics": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "description": "Share anonymous usage data with the Angular Team at Google."
+        },
+        "analyticsSharing": {
+          "type": "object",
+          "properties": {
+            "tracking": {
+              "description": "Analytics sharing info tracking ID.",
+              "type": "string",
+              "pattern": "^GA-\\d+-\\d+$"
+            },
+            "uuid": {
+              "description": "Analytics sharing info universally unique identifier.",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "schematicOptions": {
+      "type": "object",
+      "properties": {
+        "@schematics/angular:application": {
+          "$ref": "../../../../schematics/angular/application/schema.json"
+        },
+        "@schematics/angular:class": {
+          "$ref": "../../../../schematics/angular/class/schema.json"
+        },
+        "@schematics/angular:component": {
+          "$ref": "../../../../schematics/angular/component/schema.json"
+        },
+        "@schematics/angular:directive": {
+          "$ref": "../../../../schematics/angular/directive/schema.json"
+        },
+        "@schematics/angular:enum": {
+          "$ref": "../../../../schematics/angular/enum/schema.json"
+        },
+        "@schematics/angular:guard": {
+          "$ref": "../../../../schematics/angular/guard/schema.json"
+        },
+        "@schematics/angular:interceptor": {
+          "$ref": "../../../../schematics/angular/interceptor/schema.json"
+        },
+        "@schematics/angular:interface": {
+          "$ref": "../../../../schematics/angular/interface/schema.json"
+        },
+        "@schematics/angular:library": {
+          "$ref": "../../../../schematics/angular/library/schema.json"
+        },
+        "@schematics/angular:pipe": {
+          "$ref": "../../../../schematics/angular/pipe/schema.json"
+        },
+        "@schematics/angular:ng-new": {
+          "$ref": "../../../../schematics/angular/ng-new/schema.json"
+        },
+        "@schematics/angular:resolver": {
+          "$ref": "../../../../schematics/angular/resolver/schema.json"
+        },
+        "@schematics/angular:service": {
+          "$ref": "../../../../schematics/angular/service/schema.json"
+        },
+        "@schematics/angular:web-worker": {
+          "$ref": "../../../../schematics/angular/web-worker/schema.json"
+        }
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "fileVersion": {
+      "type": "integer",
+      "description": "File format version",
+      "minimum": 1
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "cli": {
+          "$ref": "#/definitions/cliOptions"
+        },
+        "schematics": {
+          "$ref": "#/definitions/schematicOptions"
+        },
+        "prefix": {
+          "type": "string",
+          "format": "html-selector",
+          "description": "The prefix to apply to generated selectors."
+        },
+        "root": {
+          "type": "string",
+          "description": "Root of the project files."
+        },
+        "i18n": {
+          "$ref": "#/definitions/project/definitions/i18n"
+        },
+        "sourceRoot": {
+          "type": "string",
+          "description": "The root of the source files, assets and index.html file structure."
+        },
+        "projectType": {
+          "type": "string",
+          "description": "Project type.",
+          "enum": [
+            "application",
+            "library"
+          ]
+        },
+        "architect": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/project/definitions/target"
+          }
+        },
+        "targets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/project/definitions/target"
+          }
+        }
+      },
+      "required": [
+        "root",
+        "projectType"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "architect"
+          ],
+          "not": {
+            "required": [
+              "targets"
+            ]
+          }
+        },
+        {
+          "required": [
+            "targets"
+          ],
+          "not": {
+            "required": [
+              "architect"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "targets",
+              "architect"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z]{1,3}-.*": {}
+      },
+      "definitions": {
+        "i18n": {
+          "description": "Project i18n options",
+          "type": "object",
+          "properties": {
+            "sourceLocale": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "Specifies the source locale of the application.",
+                  "default": "en-US",
+                  "$comment": "IETF BCP 47 language tag (simplified)",
+                  "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+                },
+                {
+                  "type": "object",
+                  "description": "Localization options to use for the source locale",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Specifies the locale code of the source locale",
+                      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+                    },
+                    "baseHref": {
+                      "type": "string",
+                      "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "locales": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Localization file to use for i18n"
+                    },
+                    {
+                      "type": "array",
+                      "description": "Localization files to use for i18n",
+                      "items": {
+                        "type": "string",
+                        "uniqueItems": true
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "description": "Localization options to use for the locale",
+                      "properties": {
+                        "translation": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "description": "Localization file to use for i18n"
+                            },
+                            {
+                              "type": "array",
+                              "description": "Localization files to use for i18n",
+                              "items": {
+                                "type": "string",
+                                "uniqueItems": true
+                              }
+                            }
+                          ]
+                        },
+                        "baseHref": {
+                          "type": "string",
+                          "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "target": {
+          "oneOf": [
+            {
+              "$comment": "Extendable target with custom builder",
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "type": "string",
+                  "description": "The builder used for this package.",
+                  "not": {
+                    "enum": [
+                      "@angular-devkit/build-angular:app-shell",
+                      "@angular-devkit/build-angular:browser",
+                      "@angular-devkit/build-angular:dev-server",
+                      "@angular-devkit/build-angular:extract-i18n",
+                      "@angular-devkit/build-angular:karma",
+                      "@angular-devkit/build-angular:protractor",
+                      "@angular-devkit/build-angular:server",
+                      "@angular-devkit/build-angular:tslint",
+                      "@angular-devkit/build-angular:ng-packagr"
+                    ]
+                  }
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "type": "object"
+                },
+                "configurations": {
+                  "type": "object",
+                  "description": "A map of alternative target options.",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              },
+              "required": [
+                "builder"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:app-shell"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/app-shell/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/app-shell/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:browser"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/browser/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/browser/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:dev-server"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/dev-server/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/dev-server/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:extract-i18n"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/extract-i18n/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/extract-i18n/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:karma"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/karma/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/karma/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:protractor"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/protractor/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/protractor/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:server"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/server/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/server/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:tslint"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/tslint/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/tslint/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:ng-packagr"
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/ng-packagr/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/ng-packagr/schema.json"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "global": {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "format": "uri"
+        },
+        "version": {
+          "$ref": "#/definitions/fileVersion"
+        },
+        "cli": {
+          "$ref": "#/definitions/cliOptions"
+        },
+        "schematics": {
+          "$ref": "#/definitions/schematicOptions"
+        }
+      },
+      "required": [
+        "version"
+      ]
+    }
+  }
+}

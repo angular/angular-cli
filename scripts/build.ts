@@ -263,6 +263,11 @@ export default async function(
           return false;
         }
 
+        // This schema is built and copied later on as schema.json.
+        if (pkg.name === '@angular/cli' && fileName.endsWith('workspace-schema.json')) {
+          return false;
+        }
+
         // Remove Bazel files from NPM.
         if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
           return false;
@@ -303,6 +308,13 @@ export default async function(
   for (const packageName of sortedPackages) {
     const pkg = packages[packageName];
     _copy(path.join(__dirname, '../LICENSE'), path.join(pkg.dist, 'LICENSE'));
+
+    if (pkg.name === '@angular/cli') {
+      _copy(
+        path.join(__dirname, '../dist-schema/packages/angular/cli/lib/config/schema.json'),
+        path.join(pkg.dist, 'lib/config/schema.json'),
+      );
+    }
   }
 
   logger.info('Removing spec files...');

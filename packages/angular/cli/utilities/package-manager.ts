@@ -9,7 +9,7 @@ import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { satisfies, valid } from 'semver';
-import { PackageManager } from '../lib/config/schema';
+import { PackageManager } from '../lib/config/workspace-schema';
 import { getConfiguredPackageManager } from './config';
 
 function supports(name: string): boolean {

@@ -9,7 +9,7 @@ import { analytics, tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
-import { PackageManager } from '../lib/config/schema';
+import { PackageManager } from '../lib/config/workspace-schema';
 import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
