@@ -4,6 +4,7 @@
   "title": "Angular Guard Options Schema",
   "type": "object",
   "description": "Generates a new, generic route guard definition in the given or default project.",
+  "additionalProperties": false,
   "properties": {
     "name": {
       "type": "string",

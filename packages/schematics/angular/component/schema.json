@@ -4,6 +4,7 @@
   "title": "Angular Component Options Schema",
   "type": "object",
   "description": "Creates a new generic component definition in the given or default project.",
+  "additionalProperties": false,
   "properties": {
     "path": {
       "type": "string",

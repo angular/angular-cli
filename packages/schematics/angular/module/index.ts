@@ -20,6 +20,7 @@ import {
   schematic,
   url,
 } from '@angular-devkit/schematics';
+import { Schema as ComponentOptions } from '../component/schema';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
@@ -167,15 +168,20 @@ export default function (options: ModuleOptions): Rule {
     const modulePath =
       `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}.module.ts`;
 
+    const componentOptions: ComponentOptions = {
+      module: modulePath,
+      flat: options.flat,
+      name: options.name,
+      path: options.path,
+      project: options.project,
+    };
+
     return chain([
       !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : noop(),
       addRouteDeclarationToNgModule(options, routingModulePath),
       mergeWith(templateSource),
       isLazyLoadedModuleGen
-        ? schematic('component', {
-            ...options,
-            module: modulePath,
-          })
+        ? schematic('component', componentOptions)
         : noop(),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);

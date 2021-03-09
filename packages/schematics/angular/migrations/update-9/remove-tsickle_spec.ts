@@ -29,7 +29,6 @@ describe('Migration to version 9', () => {
           {
             name: 'migration-test',
             version: '1.2.3',
-            directory: '.',
           },
           tree,
         )

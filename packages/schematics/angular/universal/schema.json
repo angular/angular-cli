@@ -3,6 +3,7 @@
   "id": "SchematicsAngularUniversalApp",
   "title": "Angular Universal App Options Schema",
   "type": "object",
+  "additionalProperties": false,
   "description": "Pass this schematic to the \"run\" command to set up server-side rendering for an app.",
   "properties": {
     "clientProject": {

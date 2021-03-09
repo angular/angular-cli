@@ -3,6 +3,7 @@
   "id": "SchematicsAngularWorkspace",
   "title": "Angular Workspace Options Schema",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "name": {
       "description": "The name of the workspace.",
