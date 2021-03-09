@@ -24,8 +24,6 @@ import {
 import { WebpackConfigOptions } from '../utils/build-options';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { BuilderWatchPlugin, BuilderWatcherFactory } from '../webpack/plugins/builder-watch-plugin';
-import { getEsVersionForFileName } from '../webpack/utils/helpers';
-import { profilingEnabled } from './environment-options';
 import { I18nOptions, configureI18nBuild } from './i18n-options';
 
 export type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
@@ -50,8 +48,6 @@ export async function generateWebpackConfig(
   const ts = await import('typescript');
   const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
 
-  const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;
-
   const buildOptions: NormalizedBrowserBuilderSchema = { ...options, ...extraBuildOptions };
   const wco: BrowserWebpackConfigOptions = {
     root: workspaceRoot,
@@ -67,24 +63,6 @@ export async function generateWebpackConfig(
   wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
 
   const webpackConfig = webpackMerge(webpackPartialGenerator(wco));
-
-  if (profilingEnabled) {
-    const esVersionInFileName = getEsVersionForFileName(
-      tsConfig.options.target,
-      buildOptions.differentialLoadingNeeded,
-    );
-
-    const SpeedMeasurePlugin = await import('speed-measure-webpack-plugin');
-    const smp = new SpeedMeasurePlugin({
-      outputFormat: 'json',
-      outputTarget: path.resolve(
-        workspaceRoot,
-        `speed-measure-plugin${esVersionInFileName}.json`,
-      ),
-    });
-
-    return smp.wrap(webpackConfig);
-  }
 
   return webpackConfig;
 }
