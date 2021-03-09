@@ -5,6 +5,7 @@
   "type": "object",
   "description": "Creates a new generic library project in the current workspace.",
   "long-description": "./library-long.md",
+  "additionalProperties": false,
   "properties": {
     "name": {
       "type": "string",

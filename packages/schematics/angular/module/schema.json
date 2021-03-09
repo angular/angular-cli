@@ -3,6 +3,7 @@
   "id": "SchematicsAngularModule",
   "title": "Angular Module Options Schema",
   "type": "object",
+  "additionalProperties": false,
   "description": "Creates a new generic NgModule definition in the given or default project.",
   "properties": {
     "name": {
