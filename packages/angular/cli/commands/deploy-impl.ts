@@ -28,11 +28,7 @@ export class DeployCommand extends ArchitectCommand<DeployCommandSchema> {
   public readonly target = 'deploy';
   public readonly missingTargetError = BuilderMissing;
 
-  public async run(options: ArchitectCommandOptions & Arguments) {
-    return this.runArchitectTarget(options);
-  }
-
-  public async initialize(options: DeployCommandSchema & Arguments): Promise<void> {
+  public async initialize(options: DeployCommandSchema & Arguments): Promise<number | void> {
     if (!options.help) {
       return super.initialize(options);
     }
