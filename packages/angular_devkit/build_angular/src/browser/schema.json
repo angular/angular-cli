@@ -353,15 +353,6 @@
       "description": "Run the TypeScript type checker in a forked process.",
       "default": true
     },
-    "lazyModules": {
-      "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "x-deprecated": "'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use 'import()' syntax instead.",
-      "default": []
-    },
     "budgets": {
       "description": "Budget thresholds to ensure parts of your application stay within boundaries which you set.",
       "type": "array",

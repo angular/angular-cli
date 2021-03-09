@@ -27,22 +27,4 @@ describe('Browser Builder no entry module', () => {
 
     await browserBuild(architect, host, target, { baseHref: '/myUrl' });
   });
-
-  it('reports warning when no bootstrap code', async () => {
-    if (!veEnabled) {
-      pending('Does not apply to Ivy.');
-
-      return;
-    }
-
-    host.replaceInFile('src/main.ts', /./g, '');
-    host.appendToFile('src/main.ts', `import './app/app.module';`);
-
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
-
-    await browserBuild(architect, host, target, { baseHref: '/myUrl' }, { logger });
-    expect(logs.join().includes('Lazy routes discovery is not enabled')).toBe(true);
-  });
 });
