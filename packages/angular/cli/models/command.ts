@@ -42,9 +42,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     this.analytics = context.analytics || new analytics.NoopAnalytics();
   }
 
-  async initialize(options: T & Arguments): Promise<void> {
-    return;
-  }
+  async initialize(options: T & Arguments): Promise<number | void> {}
 
   async printHelp(): Promise<number> {
     await this.printHelpUsage();
@@ -169,7 +167,10 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     if (!(options.help === true || options.help === 'json' || options.help === 'JSON')) {
       await this.validateScope();
     }
-    await this.initialize(options);
+    let result = await this.initialize(options);
+    if (typeof result === 'number' && result !== 0) {
+      return result;
+    }
 
     if (options.help === true) {
       return this.printHelp();
@@ -180,7 +181,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
       if (this.useReportAnalytics) {
         await this.reportAnalytics([this.description.name], options);
       }
-      const result = await this.run(options);
+      result = await this.run(options);
       const endTime = +new Date();
 
       this.analytics.timing(this.description.name, 'duration', endTime - startTime);
