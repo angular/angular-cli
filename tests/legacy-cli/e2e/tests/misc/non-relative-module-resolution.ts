@@ -18,6 +18,5 @@ export default async function () {
 
   await prependToFile('src/app/app.module.ts', `import './bar';\n`);
 
-  await ng('build');
-  await ng('build', '--aot');
+  await ng('build', '--configuration=development');
 }

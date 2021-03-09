@@ -25,7 +25,7 @@ export default async function () {
     ];
   });
 
-  await ng('build', '--extract-css', '--vendor-chunk', '--optimization');
+  await ng('build', '--extract-css', '--vendor-chunk', '--optimization', '--configuration=development');
 
   // index.html lists the right bundles
   await expectFileToMatch(

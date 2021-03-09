@@ -80,7 +80,7 @@ export async function executeTest() {
   }
 
   // Verify deprecated locale data registration is not present
-  await ng('build', '--configuration=fr', '--optimization=false');
+  await ng('build', '--configuration=fr', '--optimization=false', '--configuration=development');
   await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData('));
   await expectToFail(() =>
     expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('),
@@ -88,10 +88,10 @@ export async function executeTest() {
 
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
-  await ng('build', '--i18n-missing-translation', 'ignore');
+  await ng('build', '--i18n-missing-translation', 'ignore', '--configuration=development');
   await expectFileToMatch(`${baseDir}/fr/main-es5.js`, /Other content/);
   await expectFileToMatch(`${baseDir}/fr/main-es2015.js`, /Other content/);
-  await expectToFail(() => ng('build'));
+  await expectToFail(() => ng('build', '--configuration=development'));
   try {
     await execAndWaitForOutputToMatch(
       'ng',

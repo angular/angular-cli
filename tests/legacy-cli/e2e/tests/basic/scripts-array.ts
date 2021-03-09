@@ -41,7 +41,7 @@ export default async function () {
     ];
   });
 
-  await ng('build', '--extract-css');
+  await ng('build', '--extract-css', '--configuration=development');
 
   // files were created successfully
   await expectFileToMatch('dist/test-project/scripts.js', 'string-script');

@@ -12,12 +12,12 @@ export default async function () {
 
   // The below is needed to cache bundles and verify that sourcemaps are generated
   // corretly when output-hashing is disabled.
-  await ng('build', '--output-hashing=bundles', '--source-map');
-
-  await ng('build', '--prod', '--output-hashing=none', '--source-map');
-  await testForSourceMaps(6);
+  await ng('build', '--output-hashing=bundles', '--source-map', '--configuration=development');
 
   await ng('build', '--output-hashing=none', '--source-map');
+  await testForSourceMaps(6);
+
+  await ng('build', '--output-hashing=none', '--source-map', '--configuration=development');
   await testForSourceMaps(8);
 }
 

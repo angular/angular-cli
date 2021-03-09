@@ -73,8 +73,8 @@ export default async function () {
 
 async function runLibraryTests(prodMode = false): Promise<void> {
   const args = ['build', 'my-lib'];
-  if (prodMode) {
-    args.push('--prod');
+  if (!prodMode) {
+    args.push('--configuration=development');
   }
 
   await ng(...args);

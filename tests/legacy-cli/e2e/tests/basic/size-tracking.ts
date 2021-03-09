@@ -31,7 +31,7 @@ export default async function () {
     await ng('generate', 'module', 'lazy', '--route=lazy', '--module=app.module');
 
     // Build without hashing and with named chunks to keep have consistent file names.
-    await ng('build', '--prod', '--output-hashing=none', '--named-chunks=true');
+    await ng('build', '--output-hashing=none', '--named-chunks=true');
 
     // Upload to the store_artifacts dir listed in .circleci/config.yml
     await moveDirectory('dist', '/tmp/dist');

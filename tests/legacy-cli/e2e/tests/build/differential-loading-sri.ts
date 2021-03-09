@@ -43,7 +43,6 @@ export default async function () {
 
   await ng(
     'build',
-    '--prod',
     '--subresource-integrity',
     '--output-hashing=none',
     '--output-path=dist/first',
@@ -52,7 +51,6 @@ export default async function () {
   // Second build used to ensure cached files use correct integrity values
   await ng(
     'build',
-    '--prod',
     '--subresource-integrity',
     '--output-hashing=none',
     '--output-path=dist/second',

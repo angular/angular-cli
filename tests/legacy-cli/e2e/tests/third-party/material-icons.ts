@@ -16,14 +16,14 @@ export default async function() {
   });
 
   // Build dev application
-  await ng('build', '--extract-css');
+  await ng('build', '--extract-css', '--configuration=development');
 
   // Ensure icons are included
-  await expectFileToMatch('dist/test-project/styles.css', 'Material Icons')
+  await expectFileToMatch('dist/test-project/styles.css', 'Material Icons');
 
   // Build prod application
-  await ng('build', '--prod', '--extract-css', '--output-hashing=none');
+  await ng('build', '--extract-css', '--output-hashing=none');
 
   // Ensure icons are included
-  await expectFileToMatch('dist/test-project/styles.css', 'Material Icons')
+  await expectFileToMatch('dist/test-project/styles.css', 'Material Icons');
 }

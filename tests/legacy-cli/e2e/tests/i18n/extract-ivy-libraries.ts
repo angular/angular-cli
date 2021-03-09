@@ -19,7 +19,7 @@ export default async function() {
   );
 
   // Build library
-  await ng('build', 'i18n-lib-test');
+  await ng('build', 'i18n-lib-test', '--configuration=development');
 
   // Consume library in application
   await writeFile(

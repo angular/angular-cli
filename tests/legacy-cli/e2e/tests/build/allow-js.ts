@@ -15,6 +15,6 @@ export default async function() {
     json['compilerOptions'].allowJs = true;
   });
 
-  await ng('build');
-  await ng('build', '--aot');
+  await ng('build', '--configuration=development');
+  await ng('build', '--aot', '--configuration=development');
 }

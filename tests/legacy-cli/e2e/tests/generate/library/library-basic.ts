@@ -6,6 +6,6 @@ export default function () {
   return ng('generate', 'library', 'my-lib')
     .then(() => expectFileToMatch('angular.json', /\"my-lib\":/))
     .then(() => useCIChrome('projects/my-lib'))
-    .then(() => ng('build', 'my-lib'))
+    .then(() => ng('build', 'my-lib', '--configuration=development'))
     .then(() => ng('test', 'my-lib', '--watch=false'));
 }

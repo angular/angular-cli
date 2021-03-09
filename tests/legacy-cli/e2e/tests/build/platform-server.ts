@@ -74,7 +74,7 @@ export default async function () {
   await replaceInFile('tsconfig.server.json', 'src/main.server.ts', 'server.ts');
   await replaceInFile('angular.json', 'src/main.server.ts', 'server.ts');
 
-  await ng('run', 'test-project:server:production', '--optimization', 'false');
+  await ng('run', 'test-project:server', '--optimization', 'false');
 
   if (veEnabled) {
     await expectFileToMatch('dist/test-project/server/main.js', /exports.*AppServerModuleNgFactory|"AppServerModuleNgFactory":/);
@@ -88,7 +88,7 @@ export default async function () {
   );
 
   // works with optimization and bundleDependencies enabled
-  await ng('run', 'test-project:server:production', '--optimization', '--bundleDependencies');
+  await ng('run', 'test-project:server', '--optimization', '--bundleDependencies');
   await exec(normalize('node'), 'dist/test-project/server/main.js');
   await expectFileToMatch(
     'dist/test-project/server/index.html',

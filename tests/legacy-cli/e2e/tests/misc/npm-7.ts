@@ -43,7 +43,7 @@ export default async function() {
     }
 
     // Ensure `ng build` executes successfully
-    const { stderr: stderrBuild } = await ng('build');
+    const { stderr: stderrBuild } = await ng('build', '--configuration=development');
     if (stderrBuild.includes(warningText)) {
       throw new Error('ng build expected to not show npm version warning.');
     }

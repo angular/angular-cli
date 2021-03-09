@@ -8,7 +8,7 @@ export default async function () {
     'IE 11',
   );
 
-  await execAndWaitForOutputToMatch('ng', ['build', '--watch'], /Initial Total/i);
+  await execAndWaitForOutputToMatch('ng', ['build', '--watch', '--configuration=development'], /Initial Total/i);
   await expectFileToExist('dist/test-project/runtime-es2015.js');
   await expectFileToExist('dist/test-project/main-es2015.js');
 }

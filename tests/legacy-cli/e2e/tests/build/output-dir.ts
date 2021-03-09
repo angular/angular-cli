@@ -8,7 +8,7 @@ import {expectToFail} from '../../utils/utils';
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
-  return ng('build', '--output-path', 'build-output')
+  return ng('build', '--output-path', 'build-output', '--configuration=development')
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean))
@@ -16,7 +16,7 @@ export default function() {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.outputPath = 'config-build-output';
     }))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--configuration=development'))
     .then(() => expectFileToExist('./config-build-output/index.html'))
     .then(() => expectFileToExist('./config-build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean));

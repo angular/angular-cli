@@ -4,8 +4,8 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default async function () {
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToExist('dist/test-project/vendor.js');
-  await ng('build', '--vendor-chunk=false');
+  await ng('build', '--configuration=development', '--vendor-chunk=false');
   await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));
 }

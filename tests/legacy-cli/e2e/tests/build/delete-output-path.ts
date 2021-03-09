@@ -13,6 +13,6 @@ export default function() {
     .then(() => expectToFail(() => ng('build', '--delete-output-path=false')))
     .then(() => expectFileToExist('dist'))
     // By default, output path is always cleared.
-    .then(() => expectToFail(() => ng('build')))
+    .then(() => expectToFail(() => ng('build', '--configuration=development')))
     .then(() => expectToFail(() => expectFileToExist('dist/test-project')));
 }

@@ -19,5 +19,5 @@ export default function() {
       /import { TestComponent2Component } from '.\/test-component2\/test-component2.component'/))
 
     // Try to run the unit tests.
-    .then(() => ng('build'));
+    .then(() => ng('build', '--configuration=development'));
 }

@@ -18,7 +18,7 @@ export default async function() {
 
   // Build each locale and record output file hashes
   const hashes = new Map<string, string>();
-  await ng('build', '--output-hashing=all');
+  await ng('build', '--output-hashing=all', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     for (const entry of fs.readdirSync(outputPath)) {
       const match = entry.match(OUTPUT_RE);
@@ -39,7 +39,7 @@ export default async function() {
   await appendToFile('src/locale/messages.fr.xlf', '\n');
 
   // Build each locale and ensure hashes are different
-  await ng('build', '--output-hashing=all');
+  await ng('build', '--output-hashing=all', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     for (const entry of fs.readdirSync(outputPath)) {
       const match = entry.match(OUTPUT_RE);

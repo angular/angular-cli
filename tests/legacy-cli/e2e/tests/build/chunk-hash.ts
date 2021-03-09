@@ -58,11 +58,11 @@ export default function() {
       RouterModule.forRoot([{ path: "lazy", loadChildren: "./lazy/lazy.module#LazyModule" }]),
       ReactiveFormsModule,
     `))
-    .then(() => ng('build', '--output-hashing=all'))
+    .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       oldHashes = generateFileHashMap();
     })
-    .then(() => ng('build', '--output-hashing=all'))
+    .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       newHashes = generateFileHashMap();
     })
@@ -71,7 +71,7 @@ export default function() {
       oldHashes = newHashes;
     })
     .then(() => writeFile('src/styles.css', 'body { background: blue; }'))
-    .then(() => ng('build', '--output-hashing=all'))
+    .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       newHashes = generateFileHashMap();
     })
@@ -80,7 +80,7 @@ export default function() {
       oldHashes = newHashes;
     })
     .then(() => writeFile('src/app/app.component.css', 'h1 { margin: 10px; }'))
-    .then(() => ng('build', '--output-hashing=all'))
+    .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       newHashes = generateFileHashMap();
     })
@@ -95,7 +95,7 @@ export default function() {
       imports: [
          ReactiveFormsModule,
     `))
-    .then(() => ng('build', '--output-hashing=all'))
+    .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       newHashes = generateFileHashMap();
     })

@@ -22,7 +22,7 @@ export default async function () {
   await writeFile('src/styles.css', '@tailwind base; @tailwind components;');
 
   // Build should succeed and process Tailwind directives
-  await ng('build');
+  await ng('build', '--configuration=development');
 
   // Check for Tailwind output
   await expectFileToMatch('dist/test-project/styles.css', /::placeholder/);
@@ -38,7 +38,7 @@ export default async function () {
   await deleteFile('tailwind.config.js');
 
   // Ensure Tailwind is disabled when no configuration file is present
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/styles.css', '@tailwind base; @tailwind components;');
   await expectFileToMatch('dist/test-project/main.js', '@tailwind base; @tailwind components;');
 
@@ -49,7 +49,7 @@ export default async function () {
   await uninstallPackage('tailwindcss');
 
   // Ensure installation warning is present
-  const { stderr } = await ng('build');
+  const { stderr } = await ng('build', '--configuration=development');
   if (!stderr.includes("To enable Tailwind CSS, please install the 'tailwindcss' package.")) {
     throw new Error('Expected tailwind installation warning');
   }

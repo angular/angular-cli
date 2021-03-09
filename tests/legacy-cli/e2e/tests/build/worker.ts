@@ -29,7 +29,7 @@ export default async function () {
   await expectFileToExist(workerTsConfig);
   await expectFileToMatch(snippetPath, `new Worker('./app.worker', { type: 'module' })`);
 
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToExist('dist/test-project/0-es5.worker.js');
   await expectFileToMatch('dist/test-project/main-es5.js', '0-es5.worker.js');
   await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2015.worker.js'));
@@ -37,7 +37,7 @@ export default async function () {
   await expectFileToMatch('dist/test-project/main-es2015.js', '0-es2015.worker.js');
   await expectToFail(() => expectFileToMatch('dist/test-project/main-es2015.js', '0-es5.worker.js'));
 
-  await ng('build', '--prod', '--output-hashing=none');
+  await ng('build', '--output-hashing=none');
   await expectFileToExist('dist/test-project/0-es5.worker.js');
   await expectFileToMatch('dist/test-project/main-es5.js', '0-es5.worker.js');
   await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2015.worker.js'));

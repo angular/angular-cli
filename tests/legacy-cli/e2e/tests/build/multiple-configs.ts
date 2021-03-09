@@ -11,9 +11,14 @@ export default async function () {
     // sourceMap defaults to true
     appArchitect['build'] = {
       ...appArchitect['build'],
+      defaultConfiguration: undefined,
       options: {
         ...appArchitect['build'].options,
-        extractCss: false,
+        buildOptimizer: false,
+        optimization: false,
+        sourceMap: true,
+        outputHashing: 'none',
+        vendorChunk: true,
         assets: [
           'src/favicon.ico',
           'src/assets',
@@ -22,10 +27,12 @@ export default async function () {
           'src/styles.css',
         ],
         scripts: [],
+        budgets: [],
       },
       configurations: {
-        production: {
-          extractCss: true,
+        development: {
+          sourceMap: true,
+          extractCss: false,
         },
         one: {
           assets: [],
@@ -43,16 +50,15 @@ export default async function () {
   });
 
   // Test the base configuration.
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToExist('dist/test-project/favicon.ico');
   await expectFileToExist('dist/test-project/main.js.map');
   await expectFileToExist('dist/test-project/styles.js');
   await expectFileToExist('dist/test-project/vendor.js');
-  // Test that --prod extracts css.
-  await ng('build', '--prod');
+  await ng('build');
   await expectFileToExist('dist/test-project/styles.css');
   // But using a config overrides prod.
-  await ng('build', '--prod', '--configuration=three');
+  await ng('build', '--configuration=three');
   await expectFileToExist('dist/test-project/styles.js');
   await expectToFail(() => expectFileToExist('dist/test-project/styles.css'));
   // Use two configurations.
@@ -64,8 +70,8 @@ export default async function () {
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
   await expectFileToExist('dist/test-project/main.js.map');
   await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));
-  // Use three configurations and a override, and prod at the end.
-  await ng('build', '--configuration=one,two,three', '--vendor-chunk=false', '--prod');
+  // Use three configuration and check that last on value wins
+  await ng('build', '--configuration=one,two,three', '--vendor-chunk=false');
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
   await expectToFail(() => expectFileToExist('dist/test-project/main.js.map'));
   await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));

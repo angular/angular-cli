@@ -29,7 +29,7 @@ export default function() {
         appArchitect['app-shell'] = {
           builder: '@angular-devkit/build-angular:app-shell',
           options: {
-            browserTarget: 'test-project:build:production',
+            browserTarget: 'test-project:build',
             serverTarget: 'test-project:server',
             route: '/shell',
           },

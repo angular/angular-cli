@@ -33,7 +33,7 @@ export default async function() {
   });
 
   // Attempts to build multiple locales with VE should fail
-  await expectToFail(() => ng('build'));
+  await expectToFail(() => ng('build', '--configuration=development'));
 
   for (const { lang, outputPath, translation } of langTranslations) {
     await ng('build', `--configuration=${lang}`);

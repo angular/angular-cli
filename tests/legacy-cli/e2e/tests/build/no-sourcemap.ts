@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
-  await ng('build', '--prod', '--output-hashing=none', '--source-map', 'false');
+  await ng('build', '--output-hashing=none', '--source-map', 'false');
   await testForSourceMaps(3);
 
-  await ng('build', '--output-hashing=none', '--source-map', 'false');
+  await ng('build', '--output-hashing=none', '--source-map', 'false', '--configuration=development');
   await testForSourceMaps(4);
 }
 

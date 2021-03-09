@@ -79,7 +79,7 @@ export default async function() {
   });
 
   // Build each locale and verify the output.
-  await ng('build');
+  await ng('build', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     // Verify the HTML base HREF attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `href="/test${baseHrefs[lang] || '/'}"`);
@@ -102,7 +102,7 @@ export default async function() {
   }
 
   // Test absolute base href.
-  await ng('build', '--base-href', 'http://www.domain.com/');
+  await ng('build', '--base-href', 'http://www.domain.com/', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     // Verify the HTML base HREF attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `href="http://www.domain.com${baseHrefs[lang] || '/'}"`);

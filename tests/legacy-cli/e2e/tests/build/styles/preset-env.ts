@@ -15,7 +15,7 @@ export default async function () {
     'IE 11',
   );
 
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/styles.css', 'z-index: auto');
   await expectFileToMatch('dist/test-project/styles.css', 'all: initial');
 }

@@ -23,11 +23,11 @@ export default async function () {
     ];
   });
 
-  await ng('build');
+  await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/styles.css', 'red');
   await expectFileToMatch('dist/test-project/styles.css', 'blue');
 
-  await ng('build', '--preserve-symlinks');
+  await ng('build', '--preserve-symlinks', '--configuration=development');
   await expectFileToMatch('dist/test-project/styles.css', 'red');
   await expectFileToMatch('dist/test-project/styles.css', 'blue');
 }

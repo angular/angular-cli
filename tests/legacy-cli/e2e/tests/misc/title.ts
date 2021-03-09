@@ -9,14 +9,14 @@ export default async function() {
   }
 
   try {
-    await execAndWaitForOutputToMatch('ng', ['build', '--watch'], /./);
+    await execAndWaitForOutputToMatch('ng', ['build', '--configuration=development', '--watch'], /./);
 
     const output = await execWithEnv('ps', ['x'], { COLUMNS: '200' });
 
-    if (!output.stdout.match(/ng build --watch/)) {
+    if (!output.stdout.match(/ng build --configuration=development --watch/)) {
       throw new Error('Title of the process was not properly set.');
     }
   } finally {
-    await killAllProcesses();
+    killAllProcesses();
   }
 }

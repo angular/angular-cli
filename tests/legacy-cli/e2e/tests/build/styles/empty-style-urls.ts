@@ -21,5 +21,5 @@ export default function () {
         }
       `
     }))
-    .then(() => ng('build'));
+    .then(() => ng('build', '--configuration=development'));
 }
