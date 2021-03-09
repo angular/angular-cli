@@ -143,7 +143,7 @@
     "lazy-loading-string-syntax": {
       "version": "12.0.0-next.4",
       "factory": "./update-8/#updateLazyModulePaths",
-      "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
+      "description": "Lazy loading syntax migration. Update lazy loading string syntax to use dynamic imports."
     }
   }
 }
