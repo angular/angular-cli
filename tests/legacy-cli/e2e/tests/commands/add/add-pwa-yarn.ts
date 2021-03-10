@@ -13,7 +13,7 @@ export default async function () {
 
     // set yarn as package manager
     await ng('config', 'cli.packageManager', 'yarn');
-    await ng('add', '@angular/pwa');
+    await ng('add', '@angular/pwa', '--skip-confirmation');
     await expectFileToExist(join(process.cwd(), 'src/manifest.webmanifest'));
 
     // Angular PWA doesn't install as a dependency

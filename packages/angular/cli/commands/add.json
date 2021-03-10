@@ -35,6 +35,11 @@
           "description": "Display additional details about internal operations during execution.",
           "type": "boolean",
           "default": false
+        },
+        "skipConfirmation": {
+          "description": "Skip asking a confirmation prompt before installing and executing the package. Ensure package name is correct prior to using this option.",
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [

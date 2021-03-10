@@ -22,7 +22,9 @@ import {
   fetchPackageManifest,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
+import { askConfirmation } from '../utilities/prompt';
 import { Spinner } from '../utilities/spinner';
+import { isTTY } from '../utilities/tty';
 import { Schema as AddCommandSchema } from './add';
 
 const npa = require('npm-package-arg');
@@ -177,6 +179,28 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       spinner.fail(`Unable to fetch package information for '${packageIdentifier}': ${e.message}`);
 
       return 1;
+    }
+
+    if (!options.skipConfirmation) {
+      const confirmationResponse = await askConfirmation(
+        `\nThe package ${colors.blue(packageIdentifier.raw)} will be installed and executed.\n` +
+          'Would you like to proceed?',
+        true,
+        false,
+      );
+
+      if (!confirmationResponse) {
+        if (!isTTY) {
+          this.logger.error(
+            'No terminal detected. ' +
+              `'--skip-confirmation' can be used to bypass installation confirmation. ` +
+              `Ensure package name is correct prior to '--skip-confirmation' option usage.`,
+          );
+        }
+        this.logger.error('Command aborted.');
+
+        return 1;
+      }
     }
 
     try {

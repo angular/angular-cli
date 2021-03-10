@@ -4,6 +4,6 @@ import { ng } from '../../../utils/process';
 
 
 export default async function () {
-  await ng('add', assetDir('add-collection'), '--name=blah');
+  await ng('add', assetDir('add-collection'), '--name=blah', '--skip-confirmation');
   await expectFileToExist('blah');
 }
