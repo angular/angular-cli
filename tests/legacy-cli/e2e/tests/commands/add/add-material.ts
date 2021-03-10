@@ -11,14 +11,14 @@ export default async function () {
   const tag = await isPrereleaseCli() ?  '@next' : '';
 
   try {
-    await ng('add', `@angular/material${tag}`, '--unknown');
+    await ng('add', `@angular/material${tag}`, '--unknown', '--skip-confirmation');
   } catch (error) {
     if (!(error.message && error.message.includes(`Unknown option: '--unknown'`))) {
       throw error;
     }
   }
 
-  await ng('add',  `@angular/material${tag}`, '--theme', 'custom', '--verbose');
+  await ng('add',  `@angular/material${tag}`, '--theme', 'custom', '--verbose', '--skip-confirmation');
   await expectFileToMatch('package.json', /@angular\/material/);
 
   // Clean up existing cdk package

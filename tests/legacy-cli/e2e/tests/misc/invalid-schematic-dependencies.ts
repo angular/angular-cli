@@ -29,7 +29,7 @@ export default async function () {
   await installPackage('@schematics/angular@7');
 
   const tag = (await isPrereleaseCli()) ? '@next' : '';
-  await ng('add', `@angular/material${tag}`);
+  await ng('add', `@angular/material${tag}`, '--skip-confirmation');
   await expectFileToMatch('package.json', /@angular\/material/);
 
   // Clean up existing cdk package

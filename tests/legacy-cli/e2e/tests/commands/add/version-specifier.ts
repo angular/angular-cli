@@ -10,25 +10,25 @@ export default async function () {
 
   const tag = await isPrereleaseCli() ?  '@next' : '';
 
-  await ng('add',  `@angular/localize${tag}`);
+  await ng('add',  `@angular/localize${tag}`, '--skip-confirmation');
   await expectFileToMatch('package.json', /@angular\/localize/);
 
-  const output1 = await ng('add', '@angular/localize');
+  const output1 = await ng('add', '@angular/localize', '--skip-confirmation');
   if (!output1.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation was not skipped');
   }
 
-  const output2 = await ng('add', '@angular/localize@latest');
+  const output2 = await ng('add', '@angular/localize@latest', '--skip-confirmation');
   if (output2.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation should not have been skipped');
   }
 
-  const output3 = await ng('add', '@angular/localize@10.0.0');
+  const output3 = await ng('add', '@angular/localize@10.0.0', '--skip-confirmation');
   if (output3.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation should not have been skipped');
   }
 
-  const output4 = await ng('add', '@angular/localize@10');
+  const output4 = await ng('add', '@angular/localize@10', '--skip-confirmation');
   if (!output4.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation was not skipped');
   }

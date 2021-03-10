@@ -15,9 +15,9 @@ export default async function () {
   process.env['NPM_CONFIG_REGISTRY'] = undefined;
 
   try {
-    await expectToFail(() => ng('add', '@angular/pwa'));
+    await expectToFail(() => ng('add', '@angular/pwa', '--skip-confirmation'));
 
-    await ng('add', `--registry=${testRegistry}`, '@angular/pwa');
+    await ng('add', `--registry=${testRegistry}`, '@angular/pwa', '--skip-confirmation');
     await expectFileToExist('src/manifest.webmanifest');
   } finally {
     process.env['NPM_CONFIG_REGISTRY'] = originalRegistryVariable;

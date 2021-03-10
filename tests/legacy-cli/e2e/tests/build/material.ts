@@ -8,7 +8,7 @@ const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
   const tag = await isPrereleaseCli() ?  '@next' : '';
-  await ng('add', `@angular/material${tag}`);
+  await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
