@@ -25,6 +25,7 @@ import { SourceFileCache } from './cache';
 import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
 import {
   augmentHostWithCaching,
+  augmentHostWithDependencyCollection,
   augmentHostWithNgcc,
   augmentHostWithReplacements,
   augmentHostWithResources,
@@ -91,6 +92,7 @@ export class AngularWebpackPlugin {
   private sourceFileCache?: SourceFileCache;
   private buildTimestamp!: number;
   private readonly lazyRouteMap: Record<string, string> = {};
+  private readonly fileDependencies = new Map<string, Set<string>>();
   private readonly requiredFilesToEmit = new Set<string>();
   private readonly requiredFilesToEmitCache = new Map<string, EmitFileResult | undefined>();
   private readonly fileEmitHistory = new Map<string, { length: number; hash: Uint8Array }>();
@@ -197,6 +199,11 @@ export class AngularWebpackPlugin {
       if (cache) {
         // Invalidate existing cache based on compiler file timestamps
         changedFiles = cache.invalidate(compiler.fileTimestamps, this.buildTimestamp);
+
+        // Invalidate file dependencies of changed files
+        for (const changedFile of changedFiles) {
+          this.fileDependencies.delete(normalizePath(changedFile));
+        }
       } else {
         // Initialize a new cache
         cache = new SourceFileCache();
@@ -213,6 +220,9 @@ export class AngularWebpackPlugin {
         host.getCanonicalFileName.bind(host),
         compilerOptions,
       );
+
+      // Setup source file dependency collection
+      augmentHostWithDependencyCollection(host, this.fileDependencies, moduleResolutionCache);
 
       // Setup on demand ngcc
       augmentHostWithNgcc(host, ngccProcessor, moduleResolutionCache);
@@ -625,7 +635,7 @@ export class AngularWebpackPlugin {
       }
 
       const dependencies = [
-        ...program.getAllDependencies(sourceFile),
+        ...this.fileDependencies.get(filePath) || [],
         ...getExtraDependencies(sourceFile),
       ].map(externalizePath);
 
