@@ -34,63 +34,23 @@ describe('Browser Builder with differential loading', () => {
       'favicon.ico',
       'index.html',
 
-      'main-es2015.js',
-      'main-es2015.js.map',
+      'main-es2017.js',
+      'main-es2017.js.map',
       'main-es5.js',
       'main-es5.js.map',
 
-      'polyfills-es2015.js',
-      'polyfills-es2015.js.map',
+      'polyfills-es2017.js',
+      'polyfills-es2017.js.map',
       'polyfills-es5.js',
       'polyfills-es5.js.map',
 
-      'runtime-es2015.js',
-      'runtime-es2015.js.map',
+      'runtime-es2017.js',
+      'runtime-es2017.js.map',
       'runtime-es5.js',
       'runtime-es5.js.map',
 
-      'vendor-es2015.js',
-      'vendor-es2015.js.map',
-      'vendor-es5.js',
-      'vendor-es5.js.map',
-
-      'styles.css',
-      'styles.css.map',
-    ] as PathFragment[];
-
-    expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
-  });
-
-  it('emits all the neccessary files for target of ES2016', async () => {
-    host.replaceInFile(
-      'tsconfig.json',
-      '"target": "es2015",',
-      `"target": "es2016",`,
-    );
-
-    const { files } = await browserBuild(architect, host, target);
-
-    const expectedOutputs = [
-      'favicon.ico',
-      'index.html',
-
-      'main-es2016.js',
-      'main-es2016.js.map',
-      'main-es5.js',
-      'main-es5.js.map',
-
-      'polyfills-es2016.js',
-      'polyfills-es2016.js.map',
-      'polyfills-es5.js',
-      'polyfills-es5.js.map',
-
-      'runtime-es2016.js',
-      'runtime-es2016.js.map',
-      'runtime-es5.js',
-      'runtime-es5.js.map',
-
-      'vendor-es2016.js',
-      'vendor-es2016.js.map',
+      'vendor-es2017.js',
+      'vendor-es2017.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
 
@@ -104,7 +64,7 @@ describe('Browser Builder with differential loading', () => {
   it('emits all the neccessary files for target of ESNext', async () => {
     host.replaceInFile(
       'tsconfig.json',
-      '"target": "es2015",',
+      '"target": "es2017",',
       `"target": "esnext",`,
     );
 
@@ -148,17 +108,17 @@ describe('Browser Builder with differential loading', () => {
       'favicon.ico',
       'index.html',
 
-      'main-es2015.js',
-      'main-es2015.js.map',
+      'main-es2017.js',
+      'main-es2017.js.map',
 
-      'polyfills-es2015.js',
-      'polyfills-es2015.js.map',
+      'polyfills-es2017.js',
+      'polyfills-es2017.js.map',
 
-      'runtime-es2015.js',
-      'runtime-es2015.js.map',
+      'runtime-es2017.js',
+      'runtime-es2017.js.map',
 
-      'vendor-es2015.js',
-      'vendor-es2015.js.map',
+      'vendor-es2017.js',
+      'vendor-es2017.js.map',
 
       'styles.css',
       'styles.css.map',
@@ -173,21 +133,21 @@ describe('Browser Builder with differential loading', () => {
       vendorChunk: false,
     });
     expect(await files['main-es5.js']).not.toContain('const ');
-    expect(await files['main-es2015.js']).toContain('const ');
+    expect(await files['main-es2017.js']).toContain('const ');
   });
 
   it('wraps ES5 scripts in an IIFE', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: false });
     expect(await files['main-es5.js']).toMatch(/^\(function \(\) \{/);
-    expect(await files['main-es2015.js']).not.toMatch(/^\(function \(\) \{/);
+    expect(await files['main-es2017.js']).not.toMatch(/^\(function \(\) \{/);
   });
 
   it('uses the right zone.js variant', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: false });
     expect(await files['polyfills-es5.js']).toContain('zone.js/plugins/zone-legacy');
     expect(await files['polyfills-es5.js']).toContain('registerElementPatch');
-    expect(await files['polyfills-es2015.js']).not.toContain('zone.js/plugins/zone-legacy');
-    expect(await files['polyfills-es2015.js']).not.toContain('registerElementPatch');
+    expect(await files['polyfills-es2017.js']).not.toContain('zone.js/plugins/zone-legacy');
+    expect(await files['polyfills-es2017.js']).not.toContain('registerElementPatch');
   });
 
   it('adds `type="module"` when differential loading is needed', async () => {
@@ -200,10 +160,10 @@ describe('Browser Builder with differential loading', () => {
 
     const { files } = await browserBuild(architect, host, target, { watch: true });
     expect(await files['index.html']).toContain(
-      '<script src="runtime-es2015.js" type="module"></script>' +
-      '<script src="polyfills-es2015.js" type="module"></script>' +
-      '<script src="vendor-es2015.js" type="module"></script>' +
-      '<script src="main-es2015.js" type="module"></script>',
+      '<script src="runtime-es2017.js" type="module"></script>' +
+      '<script src="polyfills-es2017.js" type="module"></script>' +
+      '<script src="vendor-es2017.js" type="module"></script>' +
+      '<script src="main-es2017.js" type="module"></script>',
     );
   });
 });

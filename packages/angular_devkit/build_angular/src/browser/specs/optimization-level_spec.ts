@@ -26,8 +26,8 @@ describe('Browser Builder optimization level', () => {
     expect(await files['main.js']).not.toContain('AppComponent');
   });
 
-  it('tsconfig target changes optimizations to use ES2015', async () => {
-    host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
+  it('tsconfig target changes optimizations to use es2017', async () => {
+    host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2017"');
 
     const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);

@@ -24,7 +24,7 @@ export default async function () {
 
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="polyfills-es5.js" nomodule defer></script>
-    <script src="polyfills-es2015.js" type="module">
+    <script src="polyfills-es2017.js" type="module">
   `);
 
   const jitPolyfillSize = await getFileSize('dist/test-project/polyfills-es5.js');
@@ -38,6 +38,6 @@ export default async function () {
 
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="polyfills-es5.js" nomodule defer></script>
-    <script src="polyfills-es2015.js" type="module">
+    <script src="polyfills-es2017.js" type="module">
   `);
 }

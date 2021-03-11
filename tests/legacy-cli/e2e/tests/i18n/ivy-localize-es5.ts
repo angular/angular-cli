@@ -22,7 +22,7 @@ export default async function() {
   for (const { lang, outputPath, translation } of langTranslations) {
     await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
-    await expectFileNotToExist(`${outputPath}/main-es2015.js`);
+    await expectFileNotToExist(`${outputPath}/main-es2017.js`);
 
     // Ensure sourcemap for modified file contains content
     const mainSourceMap = JSON.parse(await readFile(`${outputPath}/main.js.map`));

@@ -7,7 +7,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "target": "es2015",
+    "target": "es2017",
     "module": "esnext",
     "typeRoots": [
       "node_modules/@types"
