@@ -90,8 +90,6 @@ describe('Migration to version 9', () => {
           'application',
           {
             name: 'test-app-two',
-            version: '1.2.3',
-            directory: '.',
             style: 'css',
           },
           tree,

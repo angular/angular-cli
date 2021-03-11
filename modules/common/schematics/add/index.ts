@@ -38,14 +38,17 @@ export interface AddUniversalOptions extends UniversalOptions {
 export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
   return async host => {
     const clientProject = await getProject(host, options.clientProject);
+    const universalOptions = {
+      ...options,
+      skipInstall: true
+    };
+
+    delete universalOptions.serverFileName;
 
     return chain([
       clientProject.targets.has('server')
         ? noop()
-        : externalSchematic('@schematics/angular', 'universal', {
-          ...options,
-          skipInstall: true
-        }),
+        : externalSchematic('@schematics/angular', 'universal', universalOptions),
       addScriptsRule(options),
       updateServerTsConfigRule(options),
       updateWorkspaceConfigRule(options),
@@ -100,11 +103,13 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
       project.targets.add({
         name: SERVE_SSR_TARGET_NAME,
         builder: '@nguniversal/builders:ssr-dev-server',
-        options: {
-          browserTarget: `${projectName}:build`,
-          serverTarget: `${projectName}:server`,
-        },
+        defaultConfiguration: 'development',
+        options: {},
         configurations: {
+          development: {
+            browserTarget: `${projectName}:build:development`,
+            serverTarget: `${projectName}:server:development`,
+          },
           production: {
             browserTarget: `${projectName}:build:production`,
             serverTarget: `${projectName}:server:production`,
@@ -120,14 +125,14 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
       project.targets.add({
         name: PRERENDER_TARGET_NAME,
         builder: '@nguniversal/builders:prerender',
+        defaultConfiguration: 'production',
         options: {
-          browserTarget: `${projectName}:build:production`,
-          serverTarget: `${projectName}:server:production`,
           routes: ['/']
         },
-        // Add a dummy production config to be consistent with other targets.
         configurations: {
           production: {
+            browserTarget: `${projectName}:build:production`,
+            serverTarget: `${projectName}:server:production`,
           },
         },
       });
@@ -213,7 +218,7 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
     };
     tsHost.realpath = function (path: string): string {
       return path;
-    },
+    };
     tsHost.getCurrentDirectory = function () {
       return host.root.path;
     };

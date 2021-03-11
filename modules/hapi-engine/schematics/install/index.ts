@@ -86,8 +86,15 @@ function addServerFile(options: UniversalOptions): Rule {
 
 export default function (options: UniversalOptions): Rule {
   return () => {
+    const addUniversalCommonOptions = {
+      ...options
+    };
+
+    delete addUniversalCommonOptions.tsconfigFileName;
+    delete addUniversalCommonOptions.serverPort;
+
     return chain([
-      addUniversalCommonRule(options),
+      addUniversalCommonRule(addUniversalCommonOptions),
       addServerFile(options),
       addDependencies(options),
     ]);
