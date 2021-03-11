@@ -9,6 +9,6 @@ export default async function () {
   );
 
   await execAndWaitForOutputToMatch('ng', ['build', '--watch', '--configuration=development'], /Initial Total/i);
-  await expectFileToExist('dist/test-project/runtime-es2015.js');
-  await expectFileToExist('dist/test-project/main-es2015.js');
+  await expectFileToExist('dist/test-project/runtime-es2017.js');
+  await expectFileToExist('dist/test-project/main-es2017.js');
 }

@@ -40,16 +40,6 @@ describe('Karma Builder', () => {
     await run.stop();
   });
 
-  it('supports ES2015 target', async () => {
-    host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
-
-    const run = await architect.scheduleTarget(karmaTargetSpec);
-
-    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
-
-    await run.stop();
-  });
-
   it('generates and uses global styles', async () => {
     host.writeMultipleFiles({
       'src/styles.css': 'p {display: none}',

@@ -8,10 +8,10 @@ export default async function() {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
-  // Ensure a ES2015 build is used.
+  // Ensure a es2017 build is used.
   await writeFile('.browserslistrc', 'Chrome 65');
   await updateJsonFile('tsconfig.json', config => {
-    config.compilerOptions.target = 'es2015';
+    config.compilerOptions.target = 'es2017';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};
     }

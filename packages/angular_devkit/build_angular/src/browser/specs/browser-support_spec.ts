@@ -18,7 +18,7 @@ describe('Browser Builder browser support', () => {
     architect = (await createArchitect(host.root())).architect;
 
     // target ES5 to disable differential loading which is not needed for the tests
-    host.replaceInFile('tsconfig.json', '"target": "es2015"', '"target": "es5"');
+    host.replaceInFile('tsconfig.json', '"target": "es2017"', '"target": "es5"');
   });
   afterEach(async () => host.restore().toPromise());
 

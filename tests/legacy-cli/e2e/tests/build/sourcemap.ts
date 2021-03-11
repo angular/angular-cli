@@ -23,7 +23,7 @@ export default async function () {
 
 async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> {
   await expectFileToExist('dist/test-project/main-es5.js.map');
-  await expectFileToExist('dist/test-project/main-es2015.js.map');
+  await expectFileToExist('dist/test-project/main-es2017.js.map');
 
   const files = fs.readdirSync('./dist/test-project');
 

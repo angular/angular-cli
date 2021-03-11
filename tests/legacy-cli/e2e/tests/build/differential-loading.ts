@@ -31,19 +31,19 @@ export default async function () {
   await expectFileToMatch(
     'dist/test-project/index.html',
     oneLineTrim`
-    <script src="runtime-es2015.js" type="module"></script>
+    <script src="runtime-es2017.js" type="module"></script>
     <script src="runtime-es5.js" nomodule defer></script>
     <script src="polyfills-es5.js" nomodule defer></script>
-    <script src="polyfills-es2015.js" type="module"></script>
+    <script src="polyfills-es2017.js" type="module"></script>
     <script src="scripts.js" defer></script>
     <script src="renamed-script.js" defer></script>
-    <script src="vendor-es2015.js" type="module"></script>
+    <script src="vendor-es2017.js" type="module"></script>
     <script src="vendor-es5.js" nomodule defer></script>
-    <script src="main-es2015.js" type="module"></script>
+    <script src="main-es2017.js" type="module"></script>
     <script src="main-es5.js" nomodule defer></script>
   `,
   );
 
-  await expectFileToMatch('dist/test-project/vendor-es2015.js', /class \w{constructor\(/);
+  await expectFileToMatch('dist/test-project/vendor-es2017.js', /class \w{constructor\(/);
   await expectToFail(() => expectFileToMatch('dist/test-project/vendor-es5.js', /class \w{constructor\(/));
 }

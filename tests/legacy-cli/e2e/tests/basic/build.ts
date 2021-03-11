@@ -21,14 +21,14 @@ export default async function() {
   // Production build
   const { stderr: stderrProgress, stdout } = await ng('build', '--progress');
   await expectFileToMatch('dist/test-project/index.html', /main-es5\.[a-zA-Z0-9]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es2015\.[a-zA-Z0-9]{20}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /main-es2017\.[a-zA-Z0-9]{20}\.js/);
 
   if (!stdout.includes('Initial ES5 Total')) {
     throw new Error(`Expected stdout not to contain 'Initial ES5 Total' but it did.\n${stdout}`);
   }
 
-  if (!stdout.includes('Initial ES2015 Total')) {
-    throw new Error(`Expected stdout not to contain 'Initial ES2015 Total' but it did.\n${stdout}`);
+  if (!stdout.includes('Initial ES2017 Total')) {
+    throw new Error(`Expected stdout not to contain 'Initial ES2017 Total' but it did.\n${stdout}`);
   }
 
   const logs: string[] = [

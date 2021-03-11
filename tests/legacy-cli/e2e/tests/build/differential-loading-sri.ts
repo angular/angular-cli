@@ -59,13 +59,13 @@ export default async function () {
   const codeHashES5 = createHash('sha384')
     .update(await readFile('dist/first/5-es5.js'))
     .digest('base64');
-  const codeHashES2015 = createHash('sha384')
-    .update(await readFile('dist/first/5-es2015.js'))
+  const codeHashes2017 = createHash('sha384')
+    .update(await readFile('dist/first/5-es2017.js'))
     .digest('base64');
 
   await expectFileToMatch('dist/first/runtime-es5.js', 'sha384-' + codeHashES5);
-  await expectFileToMatch('dist/first/runtime-es2015.js', 'sha384-' + codeHashES2015);
+  await expectFileToMatch('dist/first/runtime-es2017.js', 'sha384-' + codeHashes2017);
 
   await expectFileToMatch('dist/second/runtime-es5.js', 'sha384-' + codeHashES5);
-  await expectFileToMatch('dist/second/runtime-es2015.js', 'sha384-' + codeHashES2015);
+  await expectFileToMatch('dist/second/runtime-es2017.js', 'sha384-' + codeHashes2017);
 }

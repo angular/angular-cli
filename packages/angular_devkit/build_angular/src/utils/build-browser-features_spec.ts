@@ -25,22 +25,22 @@ describe('BuildBrowserFeatures', () => {
   afterEach(async () => host.restore().toPromise());
 
   describe('isDifferentialLoadingNeeded', () => {
-    it('should be true for IE 9-11 and ES2015', () => {
+    it('should be true for IE 9-11 and ES2017', () => {
       host.writeMultipleFiles({
         '.browserslistrc': 'IE 9-11',
       });
 
       const buildBrowserFeatures = new BuildBrowserFeatures(workspaceRootSysPath);
-      expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES2015)).toBe(true);
+      expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES2017)).toBe(true);
     });
 
-    it('should be false for Chrome and ES2015', () => {
+    it('should be false for Chrome and ES2017', () => {
       host.writeMultipleFiles({
         '.browserslistrc': 'last 1 chrome version',
       });
 
       const buildBrowserFeatures = new BuildBrowserFeatures(workspaceRootSysPath);
-      expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES2015)).toBe(false);
+      expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES2017)).toBe(false);
     });
 
     it('detects no need for differential loading for target is ES5', () => {
@@ -52,13 +52,13 @@ describe('BuildBrowserFeatures', () => {
       expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES5)).toBe(false);
     });
 
-    it('should be false for Safari 10.1 when target is ES2015', () => {
+    it('should be false for Safari 10.1 when target is ES2017', () => {
       host.writeMultipleFiles({
         '.browserslistrc': 'Safari 10.1',
       });
 
       const buildBrowserFeatures = new BuildBrowserFeatures(workspaceRootSysPath);
-      expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES2015)).toBe(false);
+      expect(buildBrowserFeatures.isDifferentialLoadingNeeded(ScriptTarget.ES2017)).toBe(false);
     });
   });
 

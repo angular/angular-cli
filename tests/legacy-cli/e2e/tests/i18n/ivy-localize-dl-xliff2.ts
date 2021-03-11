@@ -21,7 +21,7 @@ export async function executeTest() {
   );
 
   await updateJsonFile('tsconfig.json', config => {
-    config.compilerOptions.target = 'es2015';
+    config.compilerOptions.target = 'es2017';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};
     }
@@ -32,13 +32,13 @@ export async function executeTest() {
   await ng('build');
   for (const { lang, outputPath, translation } of langTranslations) {
     await expectFileToMatch(`${outputPath}/main-es5.js`, translation.helloPartial);
-    await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.helloPartial);
+    await expectFileToMatch(`${outputPath}/main-es2017.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main-es5.js`, '$localize`'));
-    await expectToFail(() => expectFileToMatch(`${outputPath}/main-es2015.js`, '$localize`'));
+    await expectToFail(() => expectFileToMatch(`${outputPath}/main-es2017.js`, '$localize`'));
 
     // Verify the locale ID is present
     await expectFileToMatch(`${outputPath}/vendor-es5.js`, lang);
-    await expectFileToMatch(`${outputPath}/vendor-es2015.js`, lang);
+    await expectFileToMatch(`${outputPath}/vendor-es2017.js`, lang);
 
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
@@ -48,18 +48,18 @@ export async function executeTest() {
 
     // Verify the locale data is registered using the global files
     await expectFileToMatch(`${outputPath}/vendor-es5.js`, '.ng.common.locales');
-    await expectFileToMatch(`${outputPath}/vendor-es2015.js`, '.ng.common.locales');
+    await expectFileToMatch(`${outputPath}/vendor-es2017.js`, '.ng.common.locales');
 
     // Verify the locale data is browser compatible
     await expectToFail(() => expectFileToMatch(`${outputPath}/vendor-es5.js`, /\bconst\b/));
-    await expectFileToMatch(`${outputPath}/vendor-es2015.js`, /\bconst\b/);
+    await expectFileToMatch(`${outputPath}/vendor-es2017.js`, /\bconst\b/);
 
     // Verify locale data comments are removed in production
     await expectToFail(() =>
       expectFileToMatch(`${outputPath}/vendor-es5.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
     );
     await expectToFail(() =>
-      expectFileToMatch(`${outputPath}/vendor-es2015.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
+      expectFileToMatch(`${outputPath}/vendor-es2017.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
     );
 
     // Execute Application E2E tests with dev server
@@ -83,14 +83,14 @@ export async function executeTest() {
   await ng('build', '--configuration=fr', '--optimization=false', '--configuration=development');
   await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData('));
   await expectToFail(() =>
-    expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('),
+    expectFileToMatch(`${baseDir}/fr/main-es2017.js`, 'registerLocaleData('),
   );
 
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
   await ng('build', '--i18n-missing-translation', 'ignore', '--configuration=development');
   await expectFileToMatch(`${baseDir}/fr/main-es5.js`, /Other content/);
-  await expectFileToMatch(`${baseDir}/fr/main-es2015.js`, /Other content/);
+  await expectFileToMatch(`${baseDir}/fr/main-es2017.js`, /Other content/);
   await expectToFail(() => ng('build', '--configuration=development'));
   try {
     await execAndWaitForOutputToMatch(
