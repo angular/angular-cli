@@ -4,7 +4,7 @@
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/e2e",
     "module": "commonjs",
-    "target": "es2018",
+    "target": "es2019",
     "types": [
       "jasmine",
       "node"
