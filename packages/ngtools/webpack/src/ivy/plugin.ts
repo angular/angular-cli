@@ -569,7 +569,6 @@ export class AngularWebpackPlugin {
         rootNames,
         compilerOptions,
         host,
-        this.ngtscNextProgram,
       );
       const angularCompiler = angularProgram.compiler;
       const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
@@ -585,10 +584,6 @@ export class AngularWebpackPlugin {
 
         return innerFileEmitter(file);
       };
-
-      if (this.watchMode) {
-        this.ngtscNextProgram = angularProgram;
-      }
 
       return {
         fileEmitter: analyzingFileEmitter,
