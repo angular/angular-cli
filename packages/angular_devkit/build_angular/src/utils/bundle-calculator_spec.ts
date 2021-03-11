@@ -240,7 +240,7 @@ describe('bundle-calculator', () => {
           name: '0',
           // Individual builds are under budget, but combined they are over.
           original: {
-            filename: 'initial-es2015.js',
+            filename: 'initial-es2017.js',
             size: 1.25 * KB,
           },
           downlevel: {
@@ -255,7 +255,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(2);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
-        message: jasmine.stringMatching('bundle initial-es2015 exceeded maximum budget.'),
+        message: jasmine.stringMatching('bundle initial-es2017 exceeded maximum budget.'),
       });
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
