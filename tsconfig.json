@@ -11,9 +11,9 @@
     "rootDir": ".",
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2018",
+    "target": "es2019",
     "lib": [
-      "es2018"
+      "es2019"
     ],
     "baseUrl": "",
     "rootDirs": [
