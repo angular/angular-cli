@@ -137,7 +137,7 @@ export class AngularWebpackPlugin {
       // Example: module -> module__ivy_ngcc
       resolverFactoryHooks.resolveOptions
         .for('normal')
-        .tap(PLUGIN_NAME, (resolveOptions: { mainFields: string[], plugins: unknown[] }) => {
+        .tap(PLUGIN_NAME, (resolveOptions: { mainFields: string[]; plugins: unknown[] }) => {
           const originalMainFields = resolveOptions.mainFields;
           const ivyMainFields = originalMainFields.map((f) => `${f}_ivy_ngcc`);
 
@@ -273,15 +273,12 @@ export class AngularWebpackPlugin {
         const currentUnused = new Set(
           allProgramFiles
             .filter((sourceFile) => !sourceFile.isDeclarationFile)
-            .map((sourceFile) => sourceFile.fileName),
+            .map((sourceFile) => normalizePath(sourceFile.fileName)),
         );
         Array.from(modules).forEach(({ resource }: compilation.Module & { resource?: string }) => {
-          const sourceFile = resource && builder.getSourceFile(resource);
-          if (!sourceFile) {
-            return;
+          if (resource) {
+            this.markResourceUsed(normalizePath(resource), currentUnused);
           }
-
-          builder.getAllDependencies(sourceFile).forEach((dep) => currentUnused.delete(dep));
         });
         for (const unused of currentUnused) {
           if (previousUnused && previousUnused.has(unused)) {
@@ -299,6 +296,24 @@ export class AngularWebpackPlugin {
       // Store file emitter for loader usage
       compilation[AngularPluginSymbol] = fileEmitter;
     });
+  }
+
+  private markResourceUsed(
+    normalizedResourcePath: string,
+    currentUnused: Set<string>,
+  ): void {
+    if (!currentUnused.has(normalizedResourcePath)) {
+      return;
+    }
+
+    currentUnused.delete(normalizedResourcePath);
+    const dependencies = this.fileDependencies.get(normalizedResourcePath);
+    if (!dependencies) {
+      return;
+    }
+    for (const dependency of dependencies) {
+      this.markResourceUsed(normalizePath(dependency), currentUnused);
+    }
   }
 
   private async rebuildRequiredFiles(
@@ -599,7 +614,7 @@ export class AngularWebpackPlugin {
       }
 
       const dependencies = [
-        ...this.fileDependencies.get(filePath) || [],
+        ...(this.fileDependencies.get(filePath) || []),
         ...getExtraDependencies(sourceFile),
       ].map(externalizePath);
 
