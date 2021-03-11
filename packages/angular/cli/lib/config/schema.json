@@ -2147,10 +2147,7 @@
               "default": false
             }
           },
-          "additionalProperties": false,
-          "required": [
-            "project"
-          ]
+          "additionalProperties": false
         }
       }
     },
