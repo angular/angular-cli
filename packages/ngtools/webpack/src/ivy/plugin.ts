@@ -16,6 +16,7 @@ import {
   NormalModuleReplacementPlugin,
   compilation,
 } from 'webpack';
+import { findLazyRoutes } from '../lazy_routes';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
@@ -229,7 +230,7 @@ export class AngularWebpackPlugin {
 
       // Create the file emitter used by the webpack loader
       const { fileEmitter, builder, internalFiles } = this.pluginOptions.jitMode
-        ? this.updateJitProgram(compilerOptions, rootNames, host, diagnosticsReporter)
+        ? this.updateJitProgram(compilerOptions, rootNames, host, diagnosticsReporter, changedFiles)
         : this.updateAotProgram(
             compilerOptions,
             rootNames,
@@ -523,6 +524,7 @@ export class AngularWebpackPlugin {
     rootNames: readonly string[],
     host: CompilerHost,
     diagnosticsReporter: DiagnosticsReporter,
+    changedFiles: Set<string> | undefined,
   ) {
     const builder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
       rootNames,
@@ -547,39 +549,61 @@ export class AngularWebpackPlugin {
 
     const transformers = createJitTransformers(builder, this.pluginOptions);
 
-    // Required to support asynchronous resource loading
-    // Must be done before listing lazy routes
-    // NOTE: This can be removed once support for the deprecated lazy route string format is removed
-    const angularProgram = new NgtscProgram(
-      rootNames,
-      compilerOptions,
-      host,
-      this.ngtscNextProgram,
-    );
-    const angularCompiler = angularProgram.compiler;
-    const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
-      for (const lazyRoute of angularCompiler.listLazyRoutes()) {
-        const [routeKey] = lazyRoute.route.split('#');
-        this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
+    // Only do a full, expensive Angular compiler string lazy route analysis on the first build
+    // `changedFiles` will be undefined on a first build
+    if (!changedFiles) {
+      // Required to support asynchronous resource loading
+      // Must be done before listing lazy routes
+      // NOTE: This can be removed once support for the deprecated lazy route string format is removed
+      const angularProgram = new NgtscProgram(
+        rootNames,
+        compilerOptions,
+        host,
+        this.ngtscNextProgram,
+      );
+      const angularCompiler = angularProgram.compiler;
+      const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
+        for (const lazyRoute of angularCompiler.listLazyRoutes()) {
+          const [routeKey] = lazyRoute.route.split('#');
+          this.lazyRouteMap[routeKey] = lazyRoute.referencedModule.filePath;
+        }
+
+        return this.createFileEmitter(builder, transformers, () => []);
+      });
+      const analyzingFileEmitter: FileEmitter = async (file) => {
+        const innerFileEmitter = await pendingAnalysis;
+
+        return innerFileEmitter(file);
+      };
+
+      if (this.watchMode) {
+        this.ngtscNextProgram = angularProgram;
       }
 
-      return this.createFileEmitter(builder, transformers, () => []);
-    });
-    const analyzingFileEmitter: FileEmitter = async (file) => {
-      const innerFileEmitter = await pendingAnalysis;
+      return {
+        fileEmitter: analyzingFileEmitter,
+        builder,
+        internalFiles: undefined,
+      };
+    } else {
+      // Update lazy route map for changed files using fast but less accurate method
+      for (const changedFile of changedFiles) {
+        if (!builder.getSourceFile(changedFile)) {
+          continue;
+        }
 
-      return innerFileEmitter(file);
-    };
+        const routes = findLazyRoutes(changedFile, host, builder.getProgram());
+        for (const [routeKey, filePath] of Object.entries(routes)) {
+          this.lazyRouteMap[routeKey] = filePath;
+        }
+      }
 
-    if (this.watchMode) {
-      this.ngtscNextProgram = angularProgram;
+      return {
+        fileEmitter: this.createFileEmitter(builder, transformers, () => []),
+        builder,
+        internalFiles: undefined,
+      };
     }
-
-    return {
-      fileEmitter: analyzingFileEmitter,
-      builder,
-      internalFiles: undefined,
-    };
   }
 
   private createFileEmitter(
