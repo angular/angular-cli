@@ -168,7 +168,7 @@ const init: any = (config: any, emitter: any) => {
   webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
   webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
 
-  let compiler: any;
+  let compiler;
   try {
     compiler = webpack(webpackConfig);
   } catch (e) {
@@ -201,11 +201,10 @@ const init: any = (config: any, emitter: any) => {
 
   let lastCompilationHash: string | undefined;
   const statsConfig = getWebpackStatsConfig();
-  compiler.hooks.done.tap('karma', (stats: any) => {
-    if (stats.compilation.errors.length > 0) {
-      const json = stats.toJson(config.stats);
+  compiler.hooks.done.tap('karma', (stats) => {
+    if (stats.hasErrors()) {
       // Print compilation errors.
-      logger.error(statsErrorsToString(json, statsConfig));
+      logger.error(statsErrorsToString(stats.compilation, statsConfig));
       lastCompilationHash = undefined;
       // Emit a failure build event if there are compilation errors.
       failureCb();
