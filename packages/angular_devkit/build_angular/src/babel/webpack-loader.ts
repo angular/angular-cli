@@ -64,6 +64,7 @@ export default custom<AngularCustomOptions>(() => {
     compact: false,
     cacheCompression: false,
     sourceType: 'unambiguous',
+    inputSourceMap: false,
   });
 
   return {
