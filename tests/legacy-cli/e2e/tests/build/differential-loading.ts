@@ -1,5 +1,5 @@
 import { oneLineTrim } from 'common-tags';
-import { appendToFile, expectFileToMatch, replaceInFile, writeMultipleFiles } from '../../utils/fs';
+import { expectFileToMatch, replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
@@ -46,4 +46,9 @@ export default async function () {
 
   await expectFileToMatch('dist/test-project/vendor-es2015.js', /class \w{constructor\(/);
   await expectToFail(() => expectFileToMatch('dist/test-project/vendor-es5.js', /class \w{constructor\(/));
+
+  await expectFileToMatch('dist/test-project/main-es2015.js', 'ɵ');
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2015.js', '\\u0275'));
+  await expectFileToMatch('dist/test-project/main-es5.js', '\\u0275');
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', 'ɵ'));
 }

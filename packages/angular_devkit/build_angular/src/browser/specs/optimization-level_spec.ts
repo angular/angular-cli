@@ -80,7 +80,7 @@ describe('Browser Builder optimization level', () => {
     expect(await files['styles.css']).toContain('color: white');
   });
 
-  it('outputs ASCII only content', async () => {
+  it('outputs unescaped unicode content', async () => {
     const overrides = { aot: true, optimization: true };
 
     host.writeMultipleFiles({
@@ -88,8 +88,6 @@ describe('Browser Builder optimization level', () => {
     });
 
     const { files } = await browserBuild(architect, host, target, overrides);
-    expect(await files['main.js']).not.toContain('ɵ');
-    expect(await files['main.js']).not.toContain('€€€');
-    expect(await files['main.js']).toContain('\\u20ac\\u20ac\\u20ac');
+    expect(await files['main.js']).toContain('€€€');
   });
 });

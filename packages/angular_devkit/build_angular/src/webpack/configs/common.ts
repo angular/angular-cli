@@ -355,11 +355,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
     const terserOptions = {
       warnings: !!buildOptions.verbose,
-      safari10: true,
       output: {
         ecma: terserEcma,
-        // For differential loading, this is handled in the bundle processing.
-        ascii_only: !differentialLoadingMode,
+        // For differential loading, this is handled in the bundle processing for ES5 bundles.
+        ascii_only: tsConfig.options.target === ScriptTarget.ES5,
         // Default behavior (undefined value) is to keep only important comments (licenses, etc.)
         comments: !buildOptions.extractLicenses && undefined,
         webkit: true,

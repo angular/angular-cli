@@ -389,13 +389,13 @@ async function terserMangle(
   // estree -> terser is already supported; need babel -> estree/terser
 
   // Mangle downlevel code
+  const ecma = options.ecma ?? 5;
   const minifyOutput = await minify(options.filename ? { [options.filename]: code } : code, {
     compress: allowMinify && !!options.compress,
-    ecma: options.ecma || 5,
+    ecma,
     mangle: allowMangle,
-    safari10: true,
     format: {
-      ascii_only: true,
+      ascii_only: ecma === 5,
       webkit: true,
       beautify: shouldBeautify,
       wrap_func_args: false,
