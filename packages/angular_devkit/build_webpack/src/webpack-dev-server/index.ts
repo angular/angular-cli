@@ -72,7 +72,7 @@ export function runWebpackDevServer(
   return createWebpack({ ...config, watch: false }).pipe(
     switchMap(webpackCompiler => new Observable<DevServerBuildOutput>(obs => {
       const server = createWebpackDevServer(webpackCompiler, devServerConfig);
-      let result: DevServerBuildOutput;
+      let result: Partial<DevServerBuildOutput>;
 
       webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
         // Log stats.
@@ -82,6 +82,7 @@ export function runWebpackDevServer(
           ...result,
           emittedFiles: getEmittedFiles(stats.compilation),
           success: !stats.hasErrors(),
+          outputPath: stats.compilation.outputOptions.path,
         } as unknown as DevServerBuildOutput);
       });
 
