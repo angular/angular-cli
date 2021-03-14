@@ -257,7 +257,12 @@ export function buildWebpackBrowser(
             const spinner = new Spinner();
             spinner.enabled = options.progress !== false;
 
-            const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
+            const {
+              webpackStats: webpackRawStats,
+              success,
+              emittedFiles = [],
+              outputPath: webpackOutputPath,
+            } = buildEvent;
             if (!webpackRawStats) {
               throw new Error('Webpack stats build result is required.');
             }
@@ -311,8 +316,7 @@ export function buildWebpackBrowser(
                     baseOutputPath,
                     Array.from(outputPaths.values()),
                     scriptsEntryPointName,
-                    // tslint:disable-next-line: no-non-null-assertion
-                    webpackStats.outputPath!,
+                    webpackOutputPath,
                     target <= ScriptTarget.ES5,
                     options.i18nMissingTranslation,
                   );
@@ -386,8 +390,7 @@ export function buildWebpackBrowser(
 
                   // Retrieve the content/map for the file
                   // NOTE: Additional future optimizations will read directly from memory
-                  // tslint:disable-next-line: no-non-null-assertion
-                  let filename = path.join(webpackStats.outputPath!, file.file);
+                  let filename = path.join(webpackOutputPath, file.file);
                   const code = fs.readFileSync(filename, 'utf8');
                   let map;
                   if (actionOptions.sourceMaps) {
@@ -537,12 +540,10 @@ export function buildWebpackBrowser(
                         [
                           {
                             glob: '**/*',
-                            // tslint:disable-next-line: no-non-null-assertion
-                            input: webpackStats.outputPath!,
+                            input: webpackOutputPath,
                             output: '',
                             ignore: [...processedFiles].map(f =>
-                              // tslint:disable-next-line: no-non-null-assertion
-                              path.relative(webpackStats.outputPath!, f),
+                              path.relative(webpackOutputPath, f),
                             ),
                           },
                         ],
@@ -598,8 +599,7 @@ export function buildWebpackBrowser(
                     baseOutputPath,
                     Array.from(outputPaths.values()),
                     scriptsEntryPointName,
-                    // tslint:disable-next-line: no-non-null-assertion
-                    webpackStats.outputPath!,
+                    webpackOutputPath,
                     target <= ScriptTarget.ES5,
                     options.i18nMissingTranslation,
                   );

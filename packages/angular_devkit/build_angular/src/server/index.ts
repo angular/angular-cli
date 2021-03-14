@@ -92,7 +92,7 @@ export function execute(
         },
       }).pipe(
         concatMap(async output => {
-          const { emittedFiles = [], webpackStats } = output;
+          const { emittedFiles = [], outputPath, webpackStats } = output;
           if (!webpackStats) {
             throw new Error('Webpack stats build result is required.');
           }
@@ -108,8 +108,7 @@ export function execute(
               baseOutputPath,
               Array.from(outputPaths.values()),
               [],
-              // tslint:disable-next-line: no-non-null-assertion
-              webpackStats.outputPath!,
+              outputPath,
               target <= ScriptTarget.ES5,
               options.i18nMissingTranslation,
             );
