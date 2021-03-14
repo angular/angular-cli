@@ -26,6 +26,7 @@ export interface WebpackFactory {
 export type BuildResult = BuilderOutput & {
   emittedFiles?: EmittedFiles[];
   webpackStats?: webpack.Stats.ToJsonOutput;
+  outputPath: string;
 };
 
 export function runWebpack(
@@ -77,6 +78,7 @@ export function runWebpack(
           success: !stats.hasErrors(),
           webpackStats: shouldProvideStats ? stats.toJson() : undefined,
           emittedFiles: getEmittedFiles(stats.compilation),
+          outputPath: stats.compilation.outputOptions.path,
         } as unknown as BuildResult);
 
         if (!config.watch) {
