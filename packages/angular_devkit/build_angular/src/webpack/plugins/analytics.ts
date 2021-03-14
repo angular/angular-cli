@@ -196,16 +196,17 @@ export class NgBuildAnalyticsPlugin {
     }
   }
 
-  // We can safely disable no any here since we know the format of the JSON output from webpack.
-  // tslint:disable-next-line:no-any
-  protected _collectBundleStats(json: any) {
-    json.chunks
-      .filter((chunk: { rendered?: boolean }) => chunk.rendered)
-      .forEach((chunk: { files: string[], initial?: boolean, entry?: boolean }) => {
-        const asset = json.assets.find((x: { name: string }) => x.name == chunk.files[0]);
-        const size = asset ? asset.size : 0;
+  protected _collectBundleStats(compilation: compilation.Compilation) {
+    // `compilation.chunks` is a Set in Webpack 5
+    const chunks = Array.from(compilation.chunks);
 
-        if (chunk.entry || chunk.initial) {
+    chunks
+      .filter((chunk: { rendered?: boolean }) => chunk.rendered)
+      .forEach((chunk: { files: string[]; canBeInitial(): boolean }) => {
+        const asset = compilation.assets[chunk.files[0]];
+        const size = asset ? asset.size() : 0;
+
+        if (chunk.canBeInitial()) {
           this._stats.initialChunkSize += size;
         } else {
           this._stats.lazyChunkCount++;
@@ -215,24 +216,26 @@ export class NgBuildAnalyticsPlugin {
         this._stats.totalChunkSize += size;
       });
 
-    json.assets
+    Object.entries<{ size(): number }>(compilation.assets)
       // Filter out chunks. We only count assets that are not JS.
-      .filter((a: { name: string }) => {
-        return json.chunks.every((chunk: { files: string[] }) => chunk.files[0] != a.name);
+      .filter(([name]) => {
+        return chunks.every((chunk: { files: string[] }) => chunk.files[0] != name);
       })
-      .forEach((a: { size?: number }) => {
-        this._stats.assetSize += (a.size || 0);
+      .forEach(([, asset]) => {
+        this._stats.assetSize += asset.size();
         this._stats.assetCount++;
       });
 
-    for (const asset of json.assets) {
-      if (asset.name == 'polyfill') {
-        this._stats.polyfillSize += asset.size || 0;
+    for (const [name, asset] of Object.entries<{ size(): number }>(compilation.assets)) {
+      if (name == 'polyfill') {
+        this._stats.polyfillSize += asset.size();
       }
     }
-    for (const chunk of json.chunks) {
+    for (const chunk of compilation.chunks) {
       if (chunk.files[0] && chunk.files[0].endsWith('.css')) {
-        this._stats.cssSize += chunk.size || 0;
+        const asset = compilation.assets[chunk.files[0]];
+        const size = asset ? asset.size() : 0;
+        this._stats.cssSize += size;
       }
     }
   }
@@ -276,7 +279,7 @@ export class NgBuildAnalyticsPlugin {
 
   protected _done(stats: Stats) {
     this._collectErrors(stats);
-    this._collectBundleStats(stats.toJson());
+    this._collectBundleStats(stats.compilation);
     if (this._built) {
       this._reportRebuildMetrics(stats);
     } else {
