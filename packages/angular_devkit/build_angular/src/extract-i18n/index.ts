@@ -257,6 +257,7 @@ export async function execute(
       return {
         success: false,
         error: `Ivy extraction requires the '@angular/localize' package.`,
+        outputPath: outFile,
        };
     }
   }
@@ -270,13 +271,11 @@ export async function execute(
     },
   ).toPromise();
 
-  // Complete if using VE
-  if (!usingIvy) {
-    return webpackResult;
-  }
+  // Set the outputPath to the extraction output location for downstream consumers
+  webpackResult.outputPath = outFile;
 
-  // Nothing to process if the Webpack build failed
-  if (!webpackResult.success) {
+  // Complete if using VE or if Webpack build failed
+  if (!usingIvy || !webpackResult.success) {
     return webpackResult;
   }
 
