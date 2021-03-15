@@ -55,12 +55,4 @@ export interface AngularCompilerPluginOptions {
 
   host?: virtualFs.Host<fs.Stats>;
   platformTransformers?: ts.TransformerFactory<ts.SourceFile>[];
-
-  /**
-   * Suppress Zone.js incompatibility warning when using ES2017+.
-   * Zone.js does not support native async/await in ES2017+.
-   * These blocks are not intercepted by zone.js and will not triggering change detection.
-   * @see https://github.com/angular/zone.js/pull/1140
-  */
-  suppressZoneJsIncompatibilityWarning?: boolean;
 }
