@@ -17,6 +17,7 @@ const kCommentRe = /<%#([\s\S]+?)%>/g;
 // <% ... %>: Structural template code.
 const kEscapeRe = /<%-([\s\S]+?)%>/g;
 const kEvaluateRe = /<%([\s\S]+?)%>/g;
+const kEvaluateIncludingNewLineRe = /<%([\s\S]+?)%>\r?\n?/g;
 
 /** Used to map characters to HTML entities. */
 const kHtmlEscapes: {[char: string]: string} = {
@@ -38,6 +39,15 @@ export interface TemplateOptions {
   module?: boolean | { exports: {} };
   sourceRoot?: string;
   fileName?: string;
+  /**
+   * If true, remove the new line characters (\r\n or \n) that immediately
+   * follow an evaluation node. For example
+   * <% if (true) { %>\n
+   * foo\n
+   * <% } %>\n
+   * will generate `foo\n` instead of `\nfoo\n\n`.
+   */
+  removeTrailingNewLine?: boolean;
 }
 
 
@@ -126,13 +136,12 @@ export type TemplateAstNode = TemplateAstContent
 /**
  * Given a source text (and a fileName), returns a TemplateAst.
  */
-export function templateParser(sourceText: string, fileName: string): TemplateAst {
-  const children = [];
+function templateParser(sourceText: string, fileName: string, options?: TemplateOptions): TemplateAst {
+  const children: TemplateAstNode[] = [];
 
   // Compile the regexp to match each delimiter.
-  const reExpressions = [kEscapeRe, kCommentRe, kInterpolateRe, kEvaluateRe];
+  const reExpressions = [kEscapeRe, kCommentRe, kInterpolateRe, options?.removeTrailingNewLine ? kEvaluateIncludingNewLineRe : kEvaluateRe];
   const reDelimiters = RegExp(reExpressions.map(x => x.source).join('|') + '|$', 'g');
-
   const parsed = sourceText.split(reDelimiters);
   let offset = 0;
   // Optimization that uses the fact that the end of a node is always the beginning of the next
@@ -146,19 +155,19 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
     if (content) {
       end = _positionFor(sourceText, offset + content.length);
       offset += content.length;
-      children.push({ kind: 'content', content, start, end } as TemplateAstContent);
+      children.push({ kind: 'content', content, start, end });
       start = end;
     }
     if (escape) {
       end = _positionFor(sourceText, offset + escape.length + 5);
       offset += escape.length + 5;
-      children.push({ kind: 'escape', expression: escape, start, end } as TemplateAstEscape);
+      children.push({ kind: 'escape', expression: escape, start, end });
       start = end;
     }
     if (comment) {
       end = _positionFor(sourceText, offset + comment.length + 5);
       offset += comment.length + 5;
-      children.push({ kind: 'comment', text: comment, start, end } as TemplateAstComment);
+      children.push({ kind: 'comment', text: comment, start, end });
       start = end;
     }
     if (interpolate) {
@@ -169,13 +178,13 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
         expression: interpolate,
         start,
         end,
-      } as TemplateAstInterpolate);
+      });
       start = end;
     }
     if (evaluate) {
       end = _positionFor(sourceText, offset + evaluate.length + 5);
       offset += evaluate.length + 5;
-      children.push({ kind: 'evaluate', expression: evaluate, start, end } as TemplateAstEvaluate);
+      children.push({ kind: 'evaluate', expression: evaluate, start, end });
       start = end;
     }
   }
@@ -355,7 +364,7 @@ function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): str
  */
 export function template<T>(content: string, options?: TemplateOptions): (input: T) => string {
   const sourceUrl = options && options.sourceURL || 'ejs';
-  const ast = templateParser(content, sourceUrl);
+  const ast = templateParser(content, sourceUrl, options);
 
   let source: string;
   // If there's no need for source map support, we revert back to the fast implementation.

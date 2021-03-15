@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, normalize, template as templateImpl } from '@angular-devkit/core';
+import { BaseException, TemplateOptions, normalize, template as templateImpl } from '@angular-devkit/core';
 import { TextDecoder } from 'util';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
@@ -50,7 +50,7 @@ export interface PathTemplateOptions {
 
 const decoder = new TextDecoder('utf-8', { fatal: true });
 
-export function applyContentTemplate<T>(options: T): FileOperator {
+export function applyContentTemplate<T>(replacement: T, options?: TemplateOptions): FileOperator {
   return (entry: FileEntry) => {
     const { path, content } = entry;
 
@@ -59,7 +59,7 @@ export function applyContentTemplate<T>(options: T): FileOperator {
 
       return {
         path,
-        content: Buffer.from(templateImpl(decodedContent, {})(options)),
+        content: Buffer.from(templateImpl(decodedContent, options)(replacement)),
       };
     } catch (e) {
       if (e.code === 'ERR_ENCODING_INVALID_ENCODED_DATA') {
@@ -72,8 +72,8 @@ export function applyContentTemplate<T>(options: T): FileOperator {
 }
 
 
-export function contentTemplate<T>(options: T): Rule {
-  return forEach(applyContentTemplate(options));
+export function contentTemplate<T>(replacement: T, options?: TemplateOptions): Rule {
+  return forEach(applyContentTemplate(replacement, options));
 }
 
 
@@ -167,25 +167,25 @@ export function renameTemplateFiles(): Rule {
 }
 
 
-export function template<T>(options: T): Rule {
+export function template<T>(replacement: T, options?: TemplateOptions): Rule {
   return chain([
-    contentTemplate(options),
+    contentTemplate(replacement, options),
     // Force cast to PathTemplateData. We need the type for the actual pathTemplate() call,
     // but in this case we cannot do anything as contentTemplate are more permissive.
     // Since values are coerced to strings in PathTemplates it will be fine in the end.
-    pathTemplate(options as {} as PathTemplateData),
+    pathTemplate(replacement as {} as PathTemplateData),
   ]);
 }
 
 
-export function applyTemplates<T>(options: T): Rule {
+export function applyTemplates<T>(replacement: T, options?: TemplateOptions): Rule {
   return forEach(
     when(
       path => path.endsWith('.template'),
       composeFileOperators([
-        applyContentTemplate(options),
+        applyContentTemplate(replacement),
         // See above for this weird cast.
-        applyPathTemplate(options as {} as PathTemplateData),
+        applyPathTemplate(replacement as {} as PathTemplateData),
         entry => {
           return {
             content: entry.content,

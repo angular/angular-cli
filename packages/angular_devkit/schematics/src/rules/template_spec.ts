@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
-import { normalize } from '@angular-devkit/core';
+import { TemplateOptions, normalize } from '@angular-devkit/core';
 import { UnitTestTree } from '@angular-devkit/schematics/testing';
 import { of as observableOf } from 'rxjs';
 import { SchematicContext } from '../engine/interface';
@@ -116,8 +116,8 @@ describe('applyPathTemplate', () => {
 
 
 describe('contentTemplate', () => {
-  function _applyContentTemplate(content: string, options: {}) {
-    const newEntry = applyContentTemplate(options)(_entry('', content));
+  function _applyContentTemplate(content: string, replacement: {}, options?: TemplateOptions) {
+    const newEntry = applyContentTemplate(replacement, options)(_entry('', content));
     if (newEntry) {
       return newEntry.content.toString('utf-8');
     } else {
@@ -156,6 +156,14 @@ describe('contentTemplate', () => {
     expect(_applyContentTemplate('a<%= value %>b', { value: `'abc'` })).toBe('a\'abc\'b');
     expect(_applyContentTemplate('a<%= \'a\' + "b" %>b', {})).toBe('aabb');
     expect(_applyContentTemplate('a<%= "\\n" + "b" %>b', {})).toBe('a\nbb');
+  });
+
+  it('removes trailing new line when removeTrailingNewLine is true', () => {
+    expect(_applyContentTemplate(`<% if (expr) { %>\nfoo\n<% } %>\n`, {
+      expr: true,
+    }, {
+      removeTrailingNewLine: true,
+    })).toBe(`foo\n`);
   });
 });
 
