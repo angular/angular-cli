@@ -58,7 +58,7 @@
 
   .toolbar #youtube-logo {
     height: 40px;
-    margin-left: 16px;
+    margin: 0 16px;
   }
 
   .toolbar #twitter-logo:hover,
