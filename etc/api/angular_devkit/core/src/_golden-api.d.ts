@@ -1035,12 +1035,11 @@ export interface TemplateOptions {
     module?: boolean | {
         exports: {};
     };
+    removeTrailingNewLine?: boolean;
     sourceMap?: boolean;
     sourceRoot?: string;
     sourceURL?: string;
 }
-
-export declare function templateParser(sourceText: string, fileName: string): TemplateAst;
 
 export interface TemplateTag<R = string> {
     (template: TemplateStringsArray, ...substitutions: any[]): R;

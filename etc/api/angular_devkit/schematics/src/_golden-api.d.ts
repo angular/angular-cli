@@ -24,11 +24,11 @@ export declare class ActionList implements Iterable<Action> {
 
 export declare function apply(source: Source, rules: Rule[]): Source;
 
-export declare function applyContentTemplate<T>(options: T): FileOperator;
+export declare function applyContentTemplate<T>(replacement: T, options?: TemplateOptions): FileOperator;
 
 export declare function applyPathTemplate<T extends PathTemplateData>(data: T, options?: PathTemplateOptions): FileOperator;
 
-export declare function applyTemplates<T>(options: T): Rule;
+export declare function applyTemplates<T>(replacement: T, options?: TemplateOptions): Rule;
 
 export declare function applyToSubtree(path: string, rules: Rule[]): Rule;
 
@@ -104,7 +104,7 @@ export declare class ContentHasMutatedException extends BaseException {
     constructor(path: string);
 }
 
-export declare function contentTemplate<T>(options: T): Rule;
+export declare function contentTemplate<T>(replacement: T, options?: TemplateOptions): Rule;
 
 export interface CreateFileAction extends ActionBase {
     readonly content: Buffer;
@@ -534,7 +534,7 @@ export declare class TaskScheduler {
     schedule<T>(taskConfiguration: TaskConfiguration<T>): TaskId;
 }
 
-export declare function template<T>(options: T): Rule;
+export declare function template<T>(replacement: T, options?: TemplateOptions): Rule;
 
 export declare const TEMPLATE_FILENAME_RE: RegExp;
 
