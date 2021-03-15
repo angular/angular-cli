@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { needsLinking } from '@angular/compiler-cli/linker';
 import { custom } from 'babel-loader';
 import { ScriptTarget } from 'typescript';
 import { ApplicationPresetOptions } from './presets/application';
@@ -16,45 +17,17 @@ interface AngularCustomOptions {
   i18n: ApplicationPresetOptions['i18n'];
 }
 
-/**
- * Cached linker check utility function
- *
- * If undefined, not yet been imported
- * If null, attempted import failed and no linker support
- * If function, import succeeded and linker supported
- */
-let needsLinking: undefined | null | typeof import('@angular/compiler-cli/linker').needsLinking;
-
-async function checkLinking(
+function requiresLinking(
   path: string,
   source: string,
-): Promise<{ hasLinkerSupport?: boolean; requiresLinking: boolean }> {
+): boolean {
   // @angular/core and @angular/compiler will cause false positives
   // Also, TypeScript files do not require linking
   if (/[\\\/]@angular[\\\/](?:compiler|core)|\.tsx?$/.test(path)) {
-    return { requiresLinking: false };
+    return false;
   }
 
-  if (needsLinking !== null) {
-    try {
-      if (needsLinking === undefined) {
-        needsLinking = (await import('@angular/compiler-cli/linker')).needsLinking;
-      }
-
-      // If the linker entry point is present then there is linker support
-      return { hasLinkerSupport: true, requiresLinking: needsLinking(path, source) };
-    } catch {
-      needsLinking = null;
-    }
-  }
-
-  // Fallback for Angular versions less than 11.1.0 with no linker support.
-  // This information is used to issue errors if a partially compiled library is used when unsupported.
-  return {
-    hasLinkerSupport: false,
-    requiresLinking:
-      source.includes('ɵɵngDeclareDirective') || source.includes('ɵɵngDeclareComponent'),
-  };
+  return needsLinking(path, source);
 }
 
 export default custom<AngularCustomOptions>(() => {
@@ -80,15 +53,7 @@ export default custom<AngularCustomOptions>(() => {
       };
 
       // Analyze file for linking
-      const { hasLinkerSupport, requiresLinking } = await checkLinking(this.resourcePath, source);
-      if (requiresLinking && !hasLinkerSupport) {
-        // Cannot link if there is no linker support
-        this.emitError(
-          'File requires the Angular linker. "@angular/compiler-cli" version 11.1.0 or greater is needed.',
-        );
-      } else {
-        customOptions.shouldLink = requiresLinking;
-      }
+      customOptions.shouldLink = await requiresLinking(this.resourcePath, source);
       shouldProcess ||= customOptions.shouldLink;
 
       // Analyze for ES target processing
