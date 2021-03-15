@@ -77,7 +77,7 @@
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the initial project.",
-      "enum": ["Emulated", "Native", "None", "ShadowDom"],
+      "enum": ["Emulated", "None", "ShadowDom"],
       "type": "string",
       "x-user-analytics": 11
     },

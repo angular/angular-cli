@@ -49,7 +49,7 @@
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the new component.",
-      "enum": ["Emulated", "Native", "None", "ShadowDom"],
+      "enum": ["Emulated", "None", "ShadowDom"],
       "type": "string",
       "alias": "v",
       "x-user-analytics": 11
