@@ -187,7 +187,7 @@
     "showCircularDependencies": {
       "type": "boolean",
       "description": "Show circular dependency warnings on builds.",
-      "default": true
+      "default": false
     },
     "namedChunks": {
       "type": "boolean",
