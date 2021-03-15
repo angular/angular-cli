@@ -44,7 +44,6 @@ export interface AngularPluginOptions {
   directTemplateLoading: boolean;
   emitClassMetadata: boolean;
   emitNgModuleScope: boolean;
-  suppressZoneJsIncompatibilityWarning: boolean;
   jitMode: boolean;
 }
 
@@ -105,7 +104,6 @@ export class AngularWebpackPlugin {
       substitutions: {},
       directTemplateLoading: true,
       tsconfig: 'tsconfig.json',
-      suppressZoneJsIncompatibilityWarning: false,
       ...options,
     };
   }
@@ -378,19 +376,6 @@ export class AngularWebpackPlugin {
     compilerOptions.allowEmptyCodegenFiles = false;
     compilerOptions.annotationsAs = 'decorators';
     compilerOptions.enableResourceInlining = false;
-
-    if (
-      !this.pluginOptions.suppressZoneJsIncompatibilityWarning &&
-      compilerOptions.target &&
-      compilerOptions.target >= ts.ScriptTarget.ES2017
-    ) {
-      addWarning(
-        compilation,
-        'Zone.js does not support native async/await in ES2017+.\n' +
-          'These blocks are not intercepted by zone.js and will not triggering change detection.\n' +
-          'See: https://github.com/angular/zone.js/pull/1140 for more information.',
-      );
-    }
 
     return { compilerOptions, rootNames, errors };
   }
