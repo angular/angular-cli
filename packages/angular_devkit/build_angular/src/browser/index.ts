@@ -221,14 +221,6 @@ export function buildWebpackBrowser(
         const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
         const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
 
-        if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
-          context.logger.warn(tags.stripIndent`
-          Warning: Using differential loading with targets ES5 and ES2016 or higher may
-          cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
-          referenced with script[type="module"] but they may not support ES2016+ syntax.
-        `);
-        }
-
         checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
 
         return {
