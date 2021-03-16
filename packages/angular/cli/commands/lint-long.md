@@ -1,7 +1,20 @@
-Takes the name of the project, as specified in the  `projects` section of the `angular.json` workspace configuration file.
-When a project name is not supplied, it will execute for all projects.
+The command takes an optional project name, as specified in the `projects` section of the `angular.json` workspace configuration file.
+When a project name is not supplied, executes the `lint` builder for the default project.
 
-The default linting tool is [TSLint](https://palantir.github.io/tslint/), and the default configuration is specified in the project's `tslint.json` file.
+To use the `ng lint` command, use `ng add` to add a package that implements linting capabilities. Adding the package automatically updates your workspace configuration, adding a lint [CLI builder](guide/cli-builder).
+For example:
 
-**Note**: TSLint has been discontinued and support has been deprecated in the Angular CLI. The options shown below are for the deprecated TSLint builder.
-To opt-in using the community driven ESLint builder, see [angular-eslint](https://github.com/angular-eslint/angular-eslint#migrating-an-angular-cli-project-from-codelyzer-and-tslint) README.
+```json
+"projects": {
+  "my-project": {
+    ...
+    "architect": {
+      ...
+      "lint": {
+        "builder": "@angular-eslint/builder:lint",
+        "options": {}
+      }
+    }
+  }
+}
+ ```
