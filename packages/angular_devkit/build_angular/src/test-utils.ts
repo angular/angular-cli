@@ -81,6 +81,15 @@ export async function browserBuild(
   const output = (await run.result) as BrowserBuilderOutput;
   expect(output.success).toBe(true);
 
+  if (!output.success) {
+    await run.stop();
+
+    return {
+      output,
+      files: {},
+    };
+  }
+
   expect(output.outputPaths[0]).not.toBeUndefined();
   const outputPath = normalize(output.outputPaths[0]);
 
