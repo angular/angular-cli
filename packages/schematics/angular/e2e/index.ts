@@ -62,13 +62,6 @@ export default function (options: E2eOptions): Rule {
       },
     });
 
-    const e2eTsConfig = `${root}/tsconfig.json`;
-    const lintTarget = project.targets.get('lint');
-    if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
-      lintTarget.options.tsConfig =
-        lintTarget.options.tsConfig.concat(e2eTsConfig);
-    }
-
     return chain([
       updateWorkspace(workspace),
       mergeWith(

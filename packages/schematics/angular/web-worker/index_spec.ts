@@ -99,19 +99,6 @@ describe('Web Worker Schematic', () => {
     expect(appComponent).toContain('console.log(`page got message: ${data}`)');
   });
 
-  it('should add worker tsconfig to lint options', async () => {
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
-      .toPromise();
-    const workspace = JSON.parse(tree.readContent('/angular.json'));
-    const lintOptions = workspace.projects.bar.architect.lint.options;
-    expect(lintOptions.tsConfig).toEqual([
-      'projects/bar/tsconfig.app.json',
-      'projects/bar/tsconfig.spec.json',
-      'projects/bar/e2e/tsconfig.json',
-      'projects/bar/tsconfig.worker.json',
-    ]);
-  });
-
   it(`should add 'tsconfig.worker.json' outside of 'src' directory in root app`, async () => {
     const rootAppOptions = { ...appOptions, projectRoot: '', name: 'foo' };
     const workerOptions = { ...defaultOptions, project: 'foo' };

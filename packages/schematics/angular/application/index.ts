@@ -31,7 +31,6 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
 import { Schema as E2eOptions } from '../e2e/schema';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
-import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
@@ -65,28 +64,6 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
     }
 
     return host;
-  };
-}
-
-/**
- * Merges the application tslint.json with the workspace tslint.json
- * when the application being created is a root application
- *
- * @param {Tree} parentHost The root host of the schematic
- */
-function mergeWithRootTsLint(parentHost: Tree) {
-  return (host: Tree) => {
-    const tsLintPath = '/tslint.json';
-    const rulesPath = ['rules'];
-    if (!host.exists(tsLintPath)) {
-      return;
-    }
-
-    const rootTsLintFile = new JSONFile(parentHost, tsLintPath);
-    const rootRules = rootTsLintFile.get(rulesPath) as {};
-    const appRules = new JSONFile(host, tsLintPath).get(rulesPath) as {};
-    rootTsLintFile.modify(rulesPath, { ...rootRules, ...appRules });
-    host.overwrite(tsLintPath, rootTsLintFile.content);
   };
 }
 
@@ -245,18 +222,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           scripts: [],
         },
       },
-      lint: options.minimal ? undefined : {
-        builder: Builders.TsLint,
-        options: {
-          tsConfig: [
-            `${projectRoot}tsconfig.app.json`,
-            `${projectRoot}tsconfig.spec.json`,
-          ],
-          exclude: [
-            '**/node_modules/**',
-          ],
-        },
-      },
     },
   };
 
@@ -272,7 +237,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
   });
 }
 function minimalPathFilter(path: string): boolean {
-  const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js|tslint.json).template$/;
+  const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js).template$/;
 
   return !toRemoveList.test(path);
 }
@@ -327,7 +292,6 @@ export default function (options: ApplicationOptions): Rule {
             appName: options.name,
             isRootApp,
           }),
-          isRootApp ? mergeWithRootTsLint(host) : noop(),
           move(appDir),
         ]), MergeStrategy.Overwrite),
       schematic('module', {

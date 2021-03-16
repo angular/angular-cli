@@ -28,7 +28,6 @@
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
     "@types/jasmine": "~3.6.0",<% } %>
     "@types/node": "^12.11.1",<% if (!minimal) { %>
-    "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~6.0.0",
     "karma": "~6.2.0",
@@ -37,8 +36,7 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
     "protractor": "~7.0.0",
-    "ts-node": "~9.1.1",
-    "tslint": "~6.1.0",<% } %>
+    "ts-node": "~9.1.1",<% } %>
     "typescript": "<%= latestVersions.TypeScript %>"
   }
 }

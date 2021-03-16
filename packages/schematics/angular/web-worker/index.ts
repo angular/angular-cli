@@ -20,7 +20,7 @@ import { JSONFile } from '../utility/json-file';
 import { parseName } from '../utility/parse-name';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
-import { BrowserBuilderOptions, LintBuilderOptions } from '../utility/workspace-models';
+import { BrowserBuilderOptions } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
 
 
@@ -135,13 +135,6 @@ export default function (options: WebWorkerOptions): Rule {
     if (needWebWorkerConfig) {
       const workerConfigPath = join(normalize(root), 'tsconfig.worker.json');
       projectTargetOptions.webWorkerTsConfig = workerConfigPath;
-
-      // add worker tsconfig to lint architect target
-      const lintTarget = project.targets.get('lint');
-      if (lintTarget) {
-        const lintOptions = (lintTarget.options || {}) as unknown as LintBuilderOptions;
-        lintOptions.tsConfig = (lintOptions.tsConfig || []).concat(workerConfigPath);
-      }
     }
 
     const templateSource = apply(url('./files/worker'), [
