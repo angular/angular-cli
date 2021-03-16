@@ -87,7 +87,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a6b42dabedcf7c724bd36a614ebe9fa99c777e62":
   version "0.0.0"
-  uid a6b42dabedcf7c724bd36a614ebe9fa99c777e62
   resolved "https://github.com/angular/dev-infra-private-builds.git#a6b42dabedcf7c724bd36a614ebe9fa99c777e62"
   dependencies:
     "@angular/benchpress" "0.2.1"
@@ -1235,6 +1234,11 @@
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
+
+"@discoveryjs/json-ext@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz#8f03a22a04de437254e8ce8cc84ba39689288752"
+  integrity sha512-HyYEUDeIj5rRQU2Hk5HTB2uHsbRQpF70nvMhVzi+VJR0X+xNEhjPui4/kBf3VeH/wqD28PT4sVOm8qqLjBrSZg==
 
 "@istanbuljs/schema@^0.1.2":
   version "0.1.3"

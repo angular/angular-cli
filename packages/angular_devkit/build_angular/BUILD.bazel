@@ -113,6 +113,7 @@ ts_library(
         "@npm//@babel/preset-env",
         "@npm//@babel/runtime",
         "@npm//@babel/template",
+        "@npm//@discoveryjs/json-ext",
         "@npm//@jsdevtools/coverage-istanbul-loader",
         "@npm//@types/babel__core",
         "@npm//@types/babel__template",
