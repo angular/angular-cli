@@ -18,6 +18,7 @@
     "@babel/preset-env": "7.12.11",
     "@babel/runtime": "7.12.5",
     "@babel/template": "7.12.7",
+    "@discoveryjs/json-ext": "0.5.2",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@ngtools/webpack": "0.0.0",
     "ansi-colors": "4.1.1",
