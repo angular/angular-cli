@@ -89,6 +89,7 @@
     "@bazel/buildifier": "4.0.0",
     "@bazel/jasmine": "3.2.1",
     "@bazel/typescript": "3.2.1",
+    "@discoveryjs/json-ext": "0.5.2",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@types/babel__core": "7.1.12",
     "@types/babel__template": "7.4.0",

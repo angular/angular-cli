@@ -87,7 +87,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#0fd0f441648577e8c3966e9b59a88fefe350f514":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#0fd0f441648577e8c3966e9b59a88fefe350f514"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#a6b42dabedcf7c724bd36a614ebe9fa99c777e62"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^0.29.0"
@@ -103,13 +103,13 @@
     inquirer-autocomplete-prompt "^1.0.2"
     minimatch "^3.0.4"
     multimatch "^4.0.0"
-    node-fetch "^2.6.0"
+    node-fetch "^2.6.1"
     node-uuid "1.4.8"
     ora "^5.0.0"
     protractor "^5.4.2"
     selenium-webdriver "3.5.0"
     semver "^6.3.0"
-    shelljs "^0.8.3"
+    shelljs "^0.8.4"
     ts-node "^8.6.2"
     tslib "^2.0.0"
     typed-graphqlify "^2.3.0"
@@ -1075,6 +1075,11 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
+
+"@discoveryjs/json-ext@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz#8f03a22a04de437254e8ce8cc84ba39689288752"
+  integrity sha512-HyYEUDeIj5rRQU2Hk5HTB2uHsbRQpF70nvMhVzi+VJR0X+xNEhjPui4/kBf3VeH/wqD28PT4sVOm8qqLjBrSZg==
 
 "@istanbuljs/schema@^0.1.2":
   version "0.1.2"

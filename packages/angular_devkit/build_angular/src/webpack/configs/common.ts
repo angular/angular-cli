@@ -10,7 +10,7 @@ import {
   buildOptimizerLoaderPath,
 } from '@angular-devkit/build-optimizer';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import { existsSync } from 'fs';
+import { createWriteStream, existsSync } from 'fs';
 import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
@@ -23,7 +23,6 @@ import {
   compilation,
   debug,
 } from 'webpack';
-import { RawSource } from 'webpack-sources';
 import { AssetPatternClass } from '../../browser/schema';
 import { BuildBrowserFeatures, maxWorkers } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
@@ -339,9 +338,17 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     extraPlugins.push(
       new (class {
         apply(compiler: Compiler) {
-          compiler.hooks.emit.tap('angular-cli-stats', compilation => {
-            const data = JSON.stringify(compilation.getStats().toJson('verbose'), undefined, 2);
-            compilation.assets['stats.json'] = new RawSource(data);
+          compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
+            const { stringifyStream } = await import('@discoveryjs/json-ext');
+            const data = stats.toJson('verbose');
+            const statsOutputPath = path.join(stats.compilation.outputOptions.path, 'stats.json');
+
+            return new Promise<void>((resolve, reject) =>
+              stringifyStream(data)
+                .pipe(createWriteStream(statsOutputPath))
+                .on('close', resolve)
+                .on('error', reject),
+            );
           });
         }
       })(),
