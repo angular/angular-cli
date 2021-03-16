@@ -21,7 +21,8 @@
         "xlf2",
         "xliff2",
         "json",
-        "arb"
+        "arb",
+        "legacy-migrate"
       ]
     },
     "i18nFormat": {
@@ -37,7 +38,8 @@
         "xlf2",
         "xliff2",
         "json",
-        "arb"
+        "arb",
+        "legacy-migrate"
       ]
     },
     "i18nLocale": {
