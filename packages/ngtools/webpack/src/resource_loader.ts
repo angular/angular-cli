@@ -9,6 +9,7 @@ import * as vm from 'vm';
 import { Compiler, compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { normalizePath } from './ivy/paths';
+import { isWebpackFiveOrHigher } from './webpack-version';
 
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
@@ -132,13 +133,25 @@ export class WebpackResourceLoader {
 
     let finalContent: string | undefined;
     let finalMap: string | undefined;
-    childCompiler.hooks.afterCompile.tap('angular-compiler', (childCompilation) => {
-      finalContent = childCompilation.assets[filePath]?.source().toString();
-      finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
+    if (isWebpackFiveOrHigher()) {
+      childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
+        childCompilation.hooks.processAssets.tap('angular-compiler', () => {
+          finalContent = childCompilation.assets[filePath]?.source().toString();
+          finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
 
-      delete childCompilation.assets[filePath];
-      delete childCompilation.assets[filePath + '.map'];
-    });
+          delete childCompilation.assets[filePath];
+          delete childCompilation.assets[filePath + '.map'];
+        });
+      });
+    } else {
+      childCompiler.hooks.afterCompile.tap('angular-compiler', (childCompilation) => {
+        finalContent = childCompilation.assets[filePath]?.source().toString();
+        finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
+
+        delete childCompilation.assets[filePath];
+        delete childCompilation.assets[filePath + '.map'];
+      });
+    }
 
     return new Promise<CompilationOutput>((resolve, reject) => {
       childCompiler.runAsChild((error, _, childCompilation) => {
