@@ -116,18 +116,6 @@ function addLibToWorkspaceFile(
             karmaConfig: `${projectRoot}/karma.conf.js`,
           },
         },
-        lint: {
-          builder: Builders.TsLint,
-          options: {
-            tsConfig: [
-              `${projectRoot}/tsconfig.lib.json`,
-              `${projectRoot}/tsconfig.spec.json`,
-            ],
-            exclude: [
-              '**/node_modules/**',
-            ],
-          },
-        },
       },
     });
   });

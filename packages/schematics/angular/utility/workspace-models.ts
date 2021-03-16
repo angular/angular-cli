@@ -98,11 +98,6 @@ export interface TestBuilderOptions extends Partial<BrowserBuilderBaseOptions> {
     karmaConfig: string;
 }
 
-export interface LintBuilderOptions {
-    tsConfig: string[] | string;
-    exclude?: string[];
-}
-
 export interface ExtractI18nOptions {
     browserTarget: string;
 }
@@ -125,7 +120,6 @@ export type LibraryBuilderTarget = BuilderTarget<Builders.NgPackagr, LibraryBuil
 export type BrowserBuilderTarget = BuilderTarget<Builders.Browser, BrowserBuilderOptions>;
 export type ServerBuilderTarget = BuilderTarget<Builders.Server, ServerBuilderOptions>;
 export type AppShellBuilderTarget = BuilderTarget<Builders.AppShell, AppShellBuilderOptions>;
-export type LintBuilderTarget = BuilderTarget<Builders.TsLint, LintBuilderOptions>;
 export type TestBuilderTarget = BuilderTarget<Builders.Karma, TestBuilderOptions>;
 export type ServeBuilderTarget = BuilderTarget<Builders.DevServer, ServeBuilderOptions>;
 export type ExtractI18nBuilderTarget = BuilderTarget<Builders.ExtractI18n, ExtractI18nOptions>;
@@ -165,7 +159,6 @@ export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType
 export interface WorkspaceTargets<TProjectType extends ProjectType = ProjectType.Application> {
     build?: TProjectType extends ProjectType.Library ? LibraryBuilderTarget : BrowserBuilderTarget;
     server?: ServerBuilderTarget;
-    lint?: LintBuilderTarget;
     test?: TestBuilderTarget;
     serve?: ServeBuilderTarget;
     e2e?: E2EBuilderTarget;

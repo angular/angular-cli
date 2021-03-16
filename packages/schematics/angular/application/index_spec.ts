@@ -51,7 +51,6 @@ describe('Application Schematic', () => {
       '/projects/foo/karma.conf.js',
       '/projects/foo/tsconfig.app.json',
       '/projects/foo/tsconfig.spec.json',
-      '/projects/foo/tslint.json',
       '/projects/foo/src/environments/environment.ts',
       '/projects/foo/src/environments/environment.prod.ts',
       '/projects/foo/src/favicon.ico',
@@ -153,26 +152,6 @@ describe('Application Schematic', () => {
     expect(_extends).toBe('../../tsconfig.json');
   });
 
-  it('should set the right path and prefix in the tslint file', async () => {
-    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
-      .toPromise();
-    const path = '/projects/foo/tslint.json';
-    const content = JSON.parse(tree.readContent(path));
-    expect(content.extends).toMatch('../../tslint.json');
-    expect(content.rules['directive-selector'][2]).toMatch('app');
-    expect(content.rules['component-selector'][2]).toMatch('app');
-  });
-
-  it('should set the right prefix in the tslint file when provided is kebabed', async () => {
-    const options: ApplicationOptions = { ...defaultOptions, prefix: 'foo-bar' };
-    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    const path = '/projects/foo/tslint.json';
-    const content = JSON.parse(tree.readContent(path));
-    expect(content.rules['directive-selector'][2]).toMatch('fooBar');
-    expect(content.rules['component-selector'][2]).toMatch('foo-bar');
-  });
-
   it('should set the right coverage folder in the karma.json file', async () => {
     const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
@@ -180,14 +159,13 @@ describe('Application Schematic', () => {
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 
-  it('minimal=true should not create e2e, lint and test targets', async () => {
+  it('minimal=true should not create e2e and test targets', async () => {
     const options = { ...defaultOptions, minimal: true };
     const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
       .toPromise();
     const config = JSON.parse(tree.readContent('/angular.json'));
     const architect = config.projects.foo.architect;
     expect(architect.test).not.toBeDefined();
-    expect(architect.e2e).not.toBeDefined();
     expect(architect.e2e).not.toBeDefined();
   });
 
@@ -235,7 +213,6 @@ describe('Application Schematic', () => {
     const files = tree.files;
     [
       '/projects/foo/tsconfig.spec.json',
-      '/projects/foo/tslint.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.css',
@@ -264,7 +241,6 @@ describe('Application Schematic', () => {
     const files = tree.files;
     [
       '/projects/foo/tsconfig.spec.json',
-      '/projects/foo/tslint.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.html',
@@ -293,7 +269,6 @@ describe('Application Schematic', () => {
     const files = tree.files;
     [
       '/projects/foo/tsconfig.spec.json',
-      '/projects/foo/tslint.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.css',
@@ -355,18 +330,6 @@ describe('Application Schematic', () => {
       const packageJson = JSON.parse(tree.readContent('package.json'));
       expect(packageJson.devDependencies['@angular-devkit/build-angular']).toBeUndefined();
     });
-
-    it('should set the lint tsConfig option', async () => {
-      const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
-        .toPromise();
-      const workspace = JSON.parse(tree.readContent('/angular.json'));
-      const lintOptions = workspace.projects.foo.architect.lint.options;
-      expect(lintOptions.tsConfig).toEqual([
-        'projects/foo/tsconfig.app.json',
-        'projects/foo/tsconfig.spec.json',
-        'projects/foo/e2e/tsconfig.json',
-      ]);
-    });
   });
 
   describe('custom projectRoot', () => {
@@ -380,7 +343,6 @@ describe('Application Schematic', () => {
         '/karma.conf.js',
         '/tsconfig.app.json',
         '/tsconfig.spec.json',
-        '/tslint.json',
         '/src/environments/environment.ts',
         '/src/environments/environment.prod.ts',
         '/src/favicon.ico',
@@ -446,31 +408,6 @@ describe('Application Schematic', () => {
       const specTsConfig = readJsonFile(tree, '/tsconfig.spec.json');
       expect(specTsConfig.extends).toEqual('./tsconfig.json');
       expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
-    });
-
-    it('should set the relative path and prefix in the tslint file', async () => {
-      const options = { ...defaultOptions, projectRoot: '' };
-
-      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-        .toPromise();
-      const content = JSON.parse(tree.readContent('/tslint.json'));
-      expect(content.extends).toMatch('tslint:recommended');
-      expect(content.rules['directive-selector'][2]).toMatch('app');
-      expect(content.rules['component-selector'][2]).toMatch('app');
-    });
-
-    it('should merge tslint file', async () => {
-      const options = { ...defaultOptions, projectRoot: '' };
-
-      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-        .toPromise();
-      const content = JSON.parse(tree.readContent('/tslint.json'));
-      expect(content.extends).toMatch('tslint:recommended');
-      expect(content.rules['component-selector'][2]).toMatch('app');
-      expect(content.rules['no-console']).toBeDefined();
-      // codelyzer rules should be after base tslint rules
-      expect(Object.keys(content.rules).indexOf('component-selector'))
-        .toBeGreaterThan(Object.keys(content.rules).indexOf('no-console'));
     });
 
     it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
