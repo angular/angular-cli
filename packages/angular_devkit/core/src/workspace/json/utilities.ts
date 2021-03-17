@@ -37,9 +37,13 @@ type ChangeReporter = (
   current?: JsonValue,
 ) => void;
 
+// lib.es5 PropertyKey is string | number | symbol which doesn't overlap ProxyHandler PropertyKey which is string | symbol.
+// See https://github.com/microsoft/TypeScript/issues/42894
+type ProxyPropertyKey = string | symbol;
+
 function findNode(
   parent: JsonAstArray | JsonAstObject,
-  p: PropertyKey,
+  p: ProxyPropertyKey,
 ): { node?: JsonAstNode; parent: JsonAstArray | JsonAstKeyValue | JsonAstObject } {
   if (parent.kind === 'object') {
     const entry = parent.properties.find(entry => entry.key.value === p);
@@ -120,8 +124,8 @@ function create(
   ast: JsonAstObject | JsonAstArray,
   path: string,
   reporter: ChangeReporter,
-  excluded = new Set<PropertyKey>(),
-  included?: Set<PropertyKey>,
+  excluded = new Set<ProxyPropertyKey>(),
+  included?: Set<ProxyPropertyKey>,
   base?: object,
 ) {
   const cache = new Map<string, CacheEntry>();
@@ -137,7 +141,7 @@ function create(
   }
 
   return new Proxy(base, {
-    getOwnPropertyDescriptor(target: {}, p: PropertyKey): PropertyDescriptor | undefined {
+    getOwnPropertyDescriptor(target: {}, p: ProxyPropertyKey): PropertyDescriptor | undefined {
       const descriptor = Reflect.getOwnPropertyDescriptor(target, p);
       if (descriptor || typeof p === 'symbol') {
         return descriptor;
@@ -162,7 +166,7 @@ function create(
 
       return undefined;
     },
-    has(target: {}, p: PropertyKey): boolean {
+    has(target: {}, p: ProxyPropertyKey): boolean {
       if (Reflect.has(target, p)) {
         return true;
       } else if (typeof p === 'symbol' || excluded.has(p)) {
@@ -171,7 +175,7 @@ function create(
 
       return cache.has(path + '/' + escapeKey(p)) || findNode(ast, p) !== undefined;
     },
-    get(target: {}, p: PropertyKey): unknown {
+    get(target: {}, p: ProxyPropertyKey): unknown {
       if (typeof p === 'symbol' || Reflect.has(target, p)) {
         return Reflect.get(target, p);
       } else if (excluded.has(p) || (included && !included.has(p))) {
@@ -206,7 +210,7 @@ function create(
 
       return value;
     },
-    set(target: {}, p: PropertyKey, value: unknown): boolean {
+    set(target: {}, p: ProxyPropertyKey, value: unknown): boolean {
       if (value === undefined) {
         // setting to undefined is equivalent to a delete
         // tslint:disable-next-line: no-non-null-assertion
@@ -242,7 +246,7 @@ function create(
 
       return true;
     },
-    deleteProperty(target: {}, p: PropertyKey): boolean {
+    deleteProperty(target: {}, p: ProxyPropertyKey): boolean {
       if (typeof p === 'symbol' || Reflect.has(target, p)) {
         return Reflect.deleteProperty(target, p);
       } else if (excluded.has(p) || (included && !included.has(p))) {
@@ -279,15 +283,15 @@ function create(
 
       return true;
     },
-    defineProperty(target: {}, p: PropertyKey, attributes: PropertyDescriptor): boolean {
+    defineProperty(target: {}, p: ProxyPropertyKey, attributes: PropertyDescriptor): boolean {
       if (typeof p === 'symbol') {
         return Reflect.defineProperty(target, p, attributes);
       }
 
       return false;
     },
-    ownKeys(target: {}): PropertyKey[] {
-      let keys: PropertyKey[];
+    ownKeys(target: {}): ProxyPropertyKey[] {
+      let keys: ProxyPropertyKey[];
       if (ast.kind === 'object') {
         keys = ast.properties
           .map(entry => entry.key.value)
@@ -299,7 +303,7 @@ function create(
       for (const key of cache.keys()) {
         const relativeKey = key.substr(path.length + 1);
         if (relativeKey.length > 0 && !relativeKey.includes('/')) {
-          keys.push(unescapeKey(relativeKey));
+          keys.push(`${unescapeKey(relativeKey)}`);
         }
       }
 
