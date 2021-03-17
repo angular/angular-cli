@@ -1,47 +1,40 @@
 import { createProjectFromAsset } from '../../utils/assets';
-import { getGlobalVariable } from '../../utils/env';
-import { expectFileMatchToExist, rimraf, writeFile } from '../../utils/fs';
-import { installWorkspacePackages, setRegistry } from '../../utils/packages';
+import { expectFileMatchToExist } from '../../utils/fs';
+import { installPackage, installWorkspacePackages, setRegistry } from '../../utils/packages';
 import { ng, noSilentNg } from '../../utils/process';
-import { isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults } from '../../utils/project';
+import { isPrereleaseCli, useCIChrome, useCIDefaults } from '../../utils/project';
 
 export default async function () {
-  await createProjectFromAsset('8.0-project', true, true);
+  const extraUpdateArgs = await isPrereleaseCli()  || true ? ['--next', '--force'] : [];
 
   // We need to use the public registry because in the local NPM server we don't have
   // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
   try {
-    await setRegistry(false);
+    await createProjectFromAsset('8.0-project', true, true);
 
-    await useBuiltPackages();
+    await setRegistry(false);
     await installWorkspacePackages();
 
-    // Update Angular CLI.
-    await ng('update', '@angular/cli', '--migrate-only', '--from=8');
+    // Update Angular to 9
+    await installPackage('@angular/cli@8');
+    await ng('update', '@angular/cli@9.x', '@angular/core@9.x');
+
+    // Update Angular to 10
+    await ng('update', '@angular/cli@10', '@angular/core@10');
+
+    // Update Angular to 11 (force needed due to codelyzer)
+    await ng('update', '@angular/cli@11', '@angular/core@11', '--force');
   } finally {
     await setRegistry(true);
   }
 
-  if (!getGlobalVariable('ci')) {
-    const testRegistry = getGlobalVariable('package-registry');
-    await writeFile('.npmrc', `registry=${testRegistry}`);
-  }
+  // Update Angular current build
+  await ng('update', '@angular/cli', '@angular/core', ...extraUpdateArgs);
 
-  // Update Angular.
-  const extraUpdateArgs = await isPrereleaseCli() ? ['--next', '--force'] : [];
-  await ng('update', '@angular/core', ...extraUpdateArgs);
-
-  // Use the packages we are building in this commit, and CI Chrome.
-  await useBuiltPackages();
+  // Setup testing to use CI Chrome.
   await useCIChrome('./');
   await useCIChrome('./e2e/');
   await useCIDefaults('eight-project');
-
-  // This is needed as otherwise causes local modules not to override already present modules
-  await rimraf('node_modules/@angular-devkit');
-  await rimraf('node_modules/@angular/cli');
-
-  await installWorkspacePackages();
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
