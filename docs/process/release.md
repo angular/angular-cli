@@ -118,13 +118,13 @@ For the first release of a major version, follow the instructions in
 
 For non-major release, check out the patch branch (e.g. `9.1.x`), then run:
 ```bash
-rm -rf node_modules/ && yarn # Reload dependencies
+rm -rf node_modules/ && yarn install --frozen-lockfile # Reload dependencies
 yarn admin publish --tag latest
 ```
 
 If also publishing a prerelease, check out `master`, then run:
 ```bash
-rm -rf node_modules/ && yarn # Reload dependencies
+rm -rf node_modules/ && yarn install --frozen-lockfile # Reload dependencies
 yarn admin publish --tag next
 ```
 
