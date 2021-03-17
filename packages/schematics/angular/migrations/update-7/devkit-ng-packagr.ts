@@ -23,7 +23,7 @@ export function updateDevkitBuildNgPackagr(): Rule {
       {
         type: existing.type,
         name: '@angular-devkit/build-ng-packagr',
-        version: latestVersions.DevkitBuildNgPackagr,
+        version: '^4.2.0',
         overwrite: true,
       },
     );

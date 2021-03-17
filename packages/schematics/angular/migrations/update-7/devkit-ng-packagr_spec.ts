@@ -47,6 +47,6 @@ describe('updateDevkitBuildNgPackagr', () => {
     const content = tree2.readContent('/package.json');
     const pkg = JSON.parse(content);
     expect(pkg.devDependencies['@angular-devkit/build-ng-packagr'])
-      .toBe(latestVersions.DevkitBuildNgPackagr);
+      .toBe('^4.2.0');
   });
 });
