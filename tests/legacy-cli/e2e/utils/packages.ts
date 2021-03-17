@@ -1,5 +1,6 @@
 import { getGlobalVariable } from './env';
-import { ProcessOutput, silentNpm, silentYarn } from './process';
+import { writeFile } from './fs';
+import { ProcessOutput, npm, silentNpm, silentYarn } from './process';
 
 export function getActivePackageManager(): 'npm' | 'yarn' {
   const value = getGlobalVariable('package-manager');
@@ -37,5 +38,23 @@ export async function uninstallPackage(name: string): Promise<ProcessOutput> {
       return silentNpm('uninstall', name);
     case 'yarn':
       return silentYarn('remove', name);
+  }
+}
+
+export async function setRegistry(useTestRegistry: boolean): Promise<void> {
+  const url = useTestRegistry
+    ? getGlobalVariable('package-registry')
+    : 'https://registry.npmjs.org';
+
+  const isCI = getGlobalVariable('ci');
+
+  // Ensure local test registry is used when outside a project
+  if (isCI) {
+    // Safe to set a user configuration on CI
+    await npm('config', 'set', 'registry', url);
+  } else {
+    // Yarn does not use the environment variable so an .npmrc file is also required
+    await writeFile('.npmrc', `registry=${url}`);
+    process.env['NPM_CONFIG_REGISTRY'] = url;
   }
 }

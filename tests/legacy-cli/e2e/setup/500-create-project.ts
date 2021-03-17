@@ -2,6 +2,7 @@ import { join } from 'path';
 import { getGlobalVariable } from '../utils/env';
 import { expectFileToExist, writeFile } from '../utils/fs';
 import { gitClean } from '../utils/git';
+import { setRegistry as setNPMConfigRegistry } from '../utils/packages';
 import { ng, npm } from '../utils/process';
 import { prepareProjectForE2e, updateJsonFile } from '../utils/project';
 
@@ -21,14 +22,7 @@ export default async function() {
     const isCI = getGlobalVariable('ci');
 
     // Ensure local test registry is used when outside a project
-    if (isCI) {
-      // Safe to set a user configuration on CI
-      await npm('config', 'set', 'registry', testRegistry);
-    } else {
-      // Yarn does not use the environment variable so an .npmrc file is also required
-      await writeFile('.npmrc', `registry=${testRegistry}`);
-      process.env['NPM_CONFIG_REGISTRY'] = testRegistry;
-    }
+    await setNPMConfigRegistry(true);
 
     await ng('new', 'test-project', '--skip-install', ...extraArgs);
     await expectFileToExist(join(process.cwd(), 'test-project'));
