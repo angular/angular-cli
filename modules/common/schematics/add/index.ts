@@ -72,7 +72,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
       ...pkg.scripts,
       'dev:ssr': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,
       'serve:ssr': `node ${serverDist}/main.js`,
-      'build:ssr': `ng build --prod && ng run ${options.clientProject}:server:production`,
+      'build:ssr': `ng build && ng run ${options.clientProject}:server`,
       'prerender': `ng run ${options.clientProject}:${PRERENDER_TARGET_NAME}`,
     };
 
