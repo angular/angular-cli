@@ -205,7 +205,7 @@ jobs:
           name: Execute CLI E2E Tests Subset with Yarn
           command: |
             mkdir /mnt/ramdisk/e2e-yarn
-            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**}"
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
 
   test-browsers:
     executor:
