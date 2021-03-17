@@ -34,6 +34,15 @@ export default async function() {
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
 
+    // Disable the TS version check to make TS updates easier.
+    // Only VE does it, but on Ivy the i18n extraction uses VE.
+    await updateJsonFile('tsconfig.json', config => {
+      if (!config.angularCompilerOptions) {
+        config.angularCompilerOptions = {};
+      }
+      config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
+    });
+
     // If on CI, the user configuration set above will handle project usage
     if (!isCI) {
       // Ensure local test registry is used inside a project

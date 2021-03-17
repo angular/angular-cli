@@ -11,8 +11,8 @@ export const latestVersions = {
   Angular: '~12.0.0-next.4',
   RxJs: '~6.6.0',
   ZoneJs: '~0.11.4',
-  TypeScript: '~4.1.2',
-  TsLib: '^2.0.0',
+  TypeScript: '~4.2.3',
+  TsLib: '^2.1.0',
 
   // The versions below must be manually updated when making a new devkit release.
   // For our e2e tests, these versions must match the latest tag present on the branch.

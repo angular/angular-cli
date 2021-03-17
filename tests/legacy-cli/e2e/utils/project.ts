@@ -34,28 +34,6 @@ export function ngServe(...args: string[]) {
     / Compiled successfully./);
 }
 
-
-export async function createProject(name: string, ...args: string[]) {
-  const extraArgs = [];
-
-  process.chdir(getGlobalVariable('tmp-root'));
-  await ng('new', name, '--skip-install', ...extraArgs, ...args);
-  process.chdir(name);
-
-  if (fs.existsSync('tsconfig.json')) {
-    // Disable the TS version check to make TS updates easier.
-    // Only VE does it, but on Ivy the i18n extraction uses VE.
-    await updateJsonFile('tsconfig.json', config => {
-      if (!config.angularCompilerOptions) {
-        config.angularCompilerOptions = {};
-      }
-      config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
-    });
-  }
-
-  await prepareProjectForE2e(name);
-}
-
 export async function prepareProjectForE2e(name) {
   const argv: string[] = getGlobalVariable('argv');
 
