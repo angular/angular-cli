@@ -13,12 +13,12 @@ export function updateDependencies() {
   return (host: Tree) => {
     const dependenciesToUpdate: Record<string, string> = {
       '@angular/pwa': '^0.803.9',
-      '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
-      '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
-      '@angular-devkit/build-webpack': latestVersions.DevkitBuildWebpack,
-      'zone.js': latestVersions.ZoneJs,
+      '@angular-devkit/build-angular': '~0.803.9',
+      '@angular-devkit/build-ng-packagr': '~0.803.9',
+      '@angular-devkit/build-webpack': '~0.803.9',
+      'zone.js': '~0.10.0',
       tsickle: '^0.37.0',
-      'ng-packagr': latestVersions.ngPackagr,
+      'ng-packagr': '^5.0.0',
       'web-animations-js': '^2.3.2',
     };
 
