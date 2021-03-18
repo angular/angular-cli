@@ -55,18 +55,29 @@
         return aOrder == -1 ? bOrder == -1 ? (a || '').localeCompare(b || '') : 1 : aOrder - bOrder;
     });
 
-  for (const scope of scopes) {
-    // Do feature first, then fixes.
-    const allScopeCommits = commits.filter(x => x.scope === scope);
+  const ALLOWED_TYPES = {
+    'feat': {
+      badgeColor: 'blue',
+      title: 'Feature',
+    },
+    'fix': {
+      badgeColor: 'green',
+      title: 'Bug Fix',
+    },
+    'perf': {
+      badgeColor: 'orange',
+      title: 'Performance Improvement',
+    },
+  };
 
-    const scopeCommits = [
-      ...allScopeCommits.filter(x => x.type === 'feat'),
-      ...allScopeCommits.filter(x => x.type === 'fix'),
-    ];
+  for (const scope of scopes) {
+    const scopeCommits = commits.filter(x => x.scope === scope && !!ALLOWED_TYPES[x.type]);
 
     if (scopeCommits.length == 0) {
         continue;
     }
+
+    scopeCommits.sort((a, b) => a.type - b.type);
 %>
 <tr><td colspan=3><h3><%
   if (scope) {
@@ -83,11 +94,9 @@
 <%
     let nbRows = 0;
     for (const commit of scopeCommits) {
-        nbRows++;
-        switch (commit.type) {
-            case 'fix': %><%= include('./changelog-fix', commit) %><% break;
-            case 'feat': %><%= include('./changelog-feat', commit) %><% break;
-        }
+      nbRows++; %>
+      <%= include('./changelog-commit', { commit, typeInfo: ALLOWED_TYPES[commit.type] }) %>
+      <%
     }
 
     // Add an empty row to get the alternating colors in sync.
