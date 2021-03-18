@@ -155,7 +155,7 @@
     "husky": "5.1.3",
     "inquirer": "8.0.0",
     "jasmine": "^3.3.1",
-    "jasmine-core": "~3.6.0",
+    "jasmine-core": "~3.7.0",
     "jasmine-spec-reporter": "~6.0.0",
     "jest-worker": "26.6.2",
     "jquery": "^3.3.1",
