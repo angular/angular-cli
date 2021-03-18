@@ -11,6 +11,11 @@ import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "watch"', () => {
+    beforeEach(async () => {
+      // Application code is not needed for these tests
+      await harness.writeFile('src/main.ts', '');
+    });
+
     it('does not wait for file changes when false', (done) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
