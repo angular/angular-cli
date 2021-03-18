@@ -136,7 +136,7 @@ export class WebpackResourceLoader {
     if (isWebpackFiveOrHigher()) {
       childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
         // tslint:disable-next-line: no-any
-        (childCompilation.hooks as any).processAssets.tap('angular-compiler', () => {
+        (childCompilation.hooks as any).processAssets.tap({name: 'angular-compiler', stage: 5000}, () => {
           finalContent = childCompilation.assets[filePath]?.source().toString();
           finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
 
