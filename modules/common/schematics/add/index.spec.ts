@@ -59,7 +59,7 @@ describe('Add Schematic Rule', () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
     const {scripts} = JSON.parse(tree.read('package.json')!.toString());
-    expect(scripts['build:ssr']).toBe('ng build --prod && ng run test-app:server:production');
+    expect(scripts['build:ssr']).toBe('ng build && ng run test-app:server');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
     expect(scripts['dev:ssr']).toBe('ng run test-app:serve-ssr');
     expect(scripts['prerender']).toBe('ng run test-app:prerender');

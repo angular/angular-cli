@@ -78,7 +78,7 @@ describe('Migration to version 9', () => {
 
     const { scripts } = JSON.parse(newTree.readContent('/package.json'));
     expect(scripts['build:ssr'])
-      .toBe('ng build --prod && ng run test-app:server:production');
+      .toBe('ng build && ng run test-app:server');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
   });
 
