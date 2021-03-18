@@ -227,7 +227,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#1d0dab59344f11d6e6e54c675cde245aae52dbf5":
   version "0.0.0"
-  uid "1d0dab59344f11d6e6e54c675cde245aae52dbf5"
   resolved "https://github.com/angular/dev-infra-private-builds.git#1d0dab59344f11d6e6e54c675cde245aae52dbf5"
   dependencies:
     "@angular/benchpress" "0.2.1"
