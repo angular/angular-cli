@@ -28,7 +28,7 @@
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
     "@types/jasmine": "~3.6.0",<% } %>
     "@types/node": "^12.11.1",<% if (!minimal) { %>
-    "jasmine-core": "~3.6.0",
+    "jasmine-core": "~3.7.0",
     "jasmine-spec-reporter": "~6.0.0",
     "karma": "~6.2.0",
     "karma-chrome-launcher": "~3.1.0",
