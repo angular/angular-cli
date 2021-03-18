@@ -493,6 +493,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
               options: {
                 cacheDirectory: findCachePath('babel-webpack'),
                 scriptTarget: wco.scriptTarget,
+                aot: buildOptions.aot,
               },
             },
             ...buildOptimizerUseRule,

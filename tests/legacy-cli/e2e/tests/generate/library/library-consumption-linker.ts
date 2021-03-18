@@ -1,8 +1,7 @@
-import { writeFile } from '../../../utils/fs';
-import { getActivePackageManager } from '../../../utils/packages';
-import { ng, silentYarn } from '../../../utils/process';
-import { updateJsonFile } from '../../../utils/project';
 import { getGlobalVariable } from '../../../utils/env';
+import { writeFile } from '../../../utils/fs';
+import { ng } from '../../../utils/process';
+import { updateJsonFile } from '../../../utils/project';
 
 export default async function () {
   if ((getGlobalVariable('argv')['ve'])) {
@@ -13,8 +12,7 @@ export default async function () {
   await ng('generate', 'library', 'my-lib');
 
   // Enable partial compilation mode (linker) for the library
-  // Enable ivy for production as well (current schematic disables ivy in production)
-  await updateJsonFile('projects/my-lib/tsconfig.lib.prod.json', config => {
+  await updateJsonFile('projects/my-lib/tsconfig.lib.json', config => {
     const { angularCompilerOptions = {} } = config;
     angularCompilerOptions.enableIvy = true;
     angularCompilerOptions.compilationMode = 'partial';
@@ -51,7 +49,7 @@ export default async function () {
         template: '<lib-my-lib></lib-my-lib>'
       })
       export class AppComponent {
-        title = 'app';
+        title = 'test-project';
 
         constructor(myLibService: MyLibService) {
           console.log(myLibService);
@@ -85,18 +83,23 @@ export default async function () {
     });
   `);
 
-  await runLibraryTests();
-  await runLibraryTests(true);
+  // Build library in partial mode (development)
+  await ng('build', 'my-lib', '--configuration=development');
+
+  // AOT linking
+  await runTests();
+
+  // JIT linking
+  await updateJsonFile('angular.json', config => {
+    const build = config.projects['test-project'].architect.build;
+    build.options.aot = false;
+    build.configurations.production.buildOptimizer = false;
+  });
+
+  await runTests();
 }
 
-async function runLibraryTests(prodMode = false): Promise<void> {
-  const args = ['build', 'my-lib'];
-  if (!prodMode) {
-    args.push('--configuration=development');
-  }
-
-  await ng(...args);
-
+async function runTests(): Promise<void> {
   // Check that the tests succeeds both with named project, unnamed (should test app), and prod.
   await ng('e2e');
   await ng('e2e', 'test-project', '--devServerTarget=test-project:serve:production');

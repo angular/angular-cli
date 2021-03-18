@@ -16,7 +16,10 @@ export interface ApplicationPresetOptions {
     translation?: unknown;
   };
 
-  angularLinker?: boolean;
+  angularLinker?: {
+    shouldLink: boolean;
+    jitMode: boolean;
+  };
 
   forceES5?: boolean;
   forceAsyncTransformation?: boolean;
@@ -124,13 +127,14 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   const plugins = [];
   let needRuntimeTransform = false;
 
-  if (options.angularLinker) {
+  if (options.angularLinker?.shouldLink) {
     // Babel currently is synchronous so import cannot be used
     const {
       createEs2015LinkerPlugin,
-    } = require('@angular/compiler-cli/linker/babel');
+    } = require('@angular/compiler-cli/linker/babel') as typeof import('@angular/compiler-cli/linker/babel');
 
     plugins.push(createEs2015LinkerPlugin({
+      linkerJitMode: options.angularLinker.jitMode,
       logger: createNgtscLogger(options.diagnosticReporter),
       fileSystem: {
         resolve: path.resolve,
@@ -138,7 +142,9 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
         dirname: path.dirname,
         relative: path.relative,
         readFile: fs.readFileSync,
-      },
+      // Node.JS types don't overlap the Compiler types.
+      // tslint:disable-next-line: no-any
+      } as any,
     }));
   }
 

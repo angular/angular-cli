@@ -10,11 +10,9 @@ import { custom } from 'babel-loader';
 import { ScriptTarget } from 'typescript';
 import { ApplicationPresetOptions } from './presets/application';
 
-interface AngularCustomOptions {
+interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLinker' | 'i18n'> {
   forceAsyncTransformation: boolean;
   forceES5: boolean;
-  shouldLink: boolean;
-  i18n: ApplicationPresetOptions['i18n'];
 }
 
 function requiresLinking(
@@ -41,20 +39,25 @@ export default custom<AngularCustomOptions>(() => {
   });
 
   return {
-    async customOptions({ i18n, scriptTarget, ...rawOptions }, { source }) {
+    async customOptions({ i18n, scriptTarget, aot, ...rawOptions }, { source }) {
       // Must process file if plugins are added
       let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
 
       const customOptions: AngularCustomOptions = {
         forceAsyncTransformation: false,
         forceES5: false,
-        shouldLink: false,
+        angularLinker: undefined,
         i18n: undefined,
       };
 
       // Analyze file for linking
-      customOptions.shouldLink = await requiresLinking(this.resourcePath, source);
-      shouldProcess ||= customOptions.shouldLink;
+      if (await requiresLinking(this.resourcePath, source)) {
+        customOptions.angularLinker = {
+          shouldLink: true,
+          jitMode: aot !== true,
+        };
+        shouldProcess = true;
+      }
 
       // Analyze for ES target processing
       const esTarget = scriptTarget as ScriptTarget | undefined;
@@ -109,10 +112,7 @@ export default custom<AngularCustomOptions>(() => {
           [
             require('./presets/application').default,
             {
-              angularLinker: customOptions.shouldLink,
-              forceES5: customOptions.forceES5,
-              forceAsyncTransformation: customOptions.forceAsyncTransformation,
-              i18n: customOptions.i18n,
+              ...customOptions,
               diagnosticReporter: (type, message) => {
                 switch (type) {
                   case 'error':
