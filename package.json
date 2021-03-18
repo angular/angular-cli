@@ -140,7 +140,7 @@
     "core-js": "3.9.1",
     "critters": "0.0.9",
     "css-loader": "5.0.2",
-    "cssnano": "4.1.10",
+    "cssnano": "5.0.0-rc.2",
     "debug": "^4.1.1",
     "enhanced-resolve": "5.7.0",
     "express": "4.17.1",

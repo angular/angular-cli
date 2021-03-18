@@ -113,7 +113,7 @@ export class OptimizeCssWebpackPlugin {
           const output = await new Promise<Result>((resolve, reject) => {
             // the last parameter is not in the typings
             // tslint:disable-next-line: no-any
-            (cssNano.process as any)(content, postCssOptions, cssNanoOptions)
+            (cssNano(cssNanoOptions).process as any)(content, postCssOptions)
               .then(resolve)
               .catch((err: Error) => reject(new Error(`${file} ${err.message}`)));
           });
