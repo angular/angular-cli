@@ -27,16 +27,19 @@ import { filter, take, tap } from 'rxjs/operators';
 
 export interface TransferHttpResponse {
   body?: any | null;
-  headers?: {[k: string]: string[]};
+  headers?: Record<string, string[]>;
   status?: number;
   statusText?: string;
   url?: string;
 }
 
-function getHeadersMap(headers: HttpHeaders) {
-  const headersMap: Record<string, string[] | null> = {};
+function getHeadersMap(headers: HttpHeaders): Record<string, string[]> {
+  const headersMap: Record<string, string[]> = {};
   for (const key of headers.keys()) {
-    headersMap[key] = headers.getAll(key);
+    const values = headers.getAll(key);
+    if (values !== null) {
+      headersMap[key] = values;
+    }
   }
 
   return headersMap;
@@ -88,7 +91,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
 
     if (this.transferState.hasKey(storeKey)) {
       // Request found in cache. Respond using it.
-      const response = this.transferState.get(storeKey, {} as TransferHttpResponse);
+      const response = this.transferState.get<TransferHttpResponse>(storeKey, {});
 
       return observableOf(new HttpResponse<any>({
         body: response.body,
@@ -105,7 +108,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
         .pipe(
           tap((event: HttpEvent<unknown>) => {
             if (event instanceof HttpResponse) {
-              this.transferState.set(storeKey, {
+              this.transferState.set<TransferHttpResponse>(storeKey, {
                 body: event.body,
                 headers: getHeadersMap(event.headers),
                 status: event.status,
