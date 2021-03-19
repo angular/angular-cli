@@ -13,6 +13,17 @@ import * as vm from 'vm';
 import { RawSource } from 'webpack-sources';
 import { normalizePath } from './ivy/paths';
 
+export interface ResourceLoader {
+  get(file: string): Promise<string>;
+  getModifiedResourceFiles(): Set<string>;
+  getResourceDependencies(file: string): Iterable<string>;
+  setAffectedResources(file: string, resources: Iterable<string>): void;
+  update(
+    parentCompilation: import('webpack').compilation.Compilation,
+    changedFiles?: Iterable<string>,
+  ): void;
+}
+
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
 const LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
@@ -23,6 +34,23 @@ interface CompilationOutput {
   outputName: string;
   source: string;
   success: boolean;
+}
+
+export class NoopResourceLoader implements ResourceLoader {
+  async get(): Promise<string> {
+    return '';
+  }
+
+  getModifiedResourceFiles(): Set<string> {
+    return new Set();
+  }
+
+  getResourceDependencies(): Iterable<string> {
+    return [];
+  }
+
+  setAffectedResources(): void {}
+  update(): void {}
 }
 
 export class WebpackResourceLoader {

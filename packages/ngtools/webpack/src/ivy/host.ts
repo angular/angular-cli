@@ -10,12 +10,12 @@ import { createHash } from 'crypto';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { NgccProcessor } from '../ngcc_processor';
-import { WebpackResourceLoader } from '../resource_loader';
+import { ResourceLoader } from '../resource_loader';
 import { normalizePath } from './paths';
 
 export function augmentHostWithResources(
   host: ts.CompilerHost,
-  resourceLoader: WebpackResourceLoader,
+  resourceLoader: ResourceLoader,
   options: { directTemplateLoading?: boolean } = {},
 ) {
   const resourceHost = host as CompilerHost;
