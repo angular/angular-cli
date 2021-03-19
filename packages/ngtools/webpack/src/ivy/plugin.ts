@@ -19,7 +19,7 @@ import {
 import { findLazyRoutes } from '../lazy_routes';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
-import { WebpackResourceLoader } from '../resource_loader';
+import { NoopResourceLoader, ResourceLoader, WebpackResourceLoader } from '../resource_loader';
 import { addError, addWarning } from '../webpack-diagnostics';
 import { isWebpackFiveOrHigher, mergeResolverMainFields } from '../webpack-version';
 import { SourceFileCache } from './cache';
@@ -158,7 +158,9 @@ export class AngularWebpackPlugin {
     });
 
     let ngccProcessor: NgccProcessor | undefined;
-    const resourceLoader = new WebpackResourceLoader();
+    const resourceLoader = this.pluginOptions.jitMode
+      ? new NoopResourceLoader()
+      : new WebpackResourceLoader();
     let previousUnused: Set<string> | undefined;
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (thisCompilation) => {
       const compilation = thisCompilation as WebpackCompilation;
@@ -231,7 +233,8 @@ export class AngularWebpackPlugin {
       // Setup resource loading
       resourceLoader.update(compilation, changedFiles);
       augmentHostWithResources(host, resourceLoader, {
-        directTemplateLoading: this.pluginOptions.directTemplateLoading,
+        directTemplateLoading:
+          !this.pluginOptions.jitMode && this.pluginOptions.directTemplateLoading,
       });
 
       // Setup source file adjustment options
@@ -403,7 +406,7 @@ export class AngularWebpackPlugin {
     rootNames: string[],
     host: CompilerHost,
     diagnosticsReporter: DiagnosticsReporter,
-    resourceLoader: WebpackResourceLoader,
+    resourceLoader: ResourceLoader,
   ) {
     // Create the Angular specific program that contains the Angular compiler
     const angularProgram = new NgtscProgram(
