@@ -9,12 +9,7 @@ import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compi
 import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
 import { createHash } from 'crypto';
 import * as ts from 'typescript';
-import {
-  Compiler,
-  NormalModuleReplacementPlugin,
-  WebpackFourCompiler,
-  compilation,
-} from 'webpack';
+import { Compiler, NormalModuleReplacementPlugin, WebpackFourCompiler, compilation } from 'webpack';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
@@ -35,6 +30,13 @@ import { externalizePath, normalizePath } from './paths';
 import { AngularPluginSymbol, EmitFileResult, FileEmitter } from './symbol';
 import { InputFileSystemSync, createWebpackSystem } from './system';
 import { createAotTransformers, createJitTransformers, mergeTransformers } from './transformation';
+
+/**
+ * The threshold used to determine whether Angular file diagnostics should optimize for full programs
+ * or single files. If the number of affected files for a build is more than the threshold, full
+ * program optimization will be used.
+ */
+const DIAGNOSTICS_AFFECTED_THRESHOLD = 1;
 
 export interface AngularPluginOptions {
   tsconfig: string;
@@ -296,10 +298,7 @@ export class AngularWebpackPlugin {
     });
   }
 
-  private markResourceUsed(
-    normalizedResourcePath: string,
-    currentUnused: Set<string>,
-  ): void {
+  private markResourceUsed(normalizedResourcePath: string, currentUnused: Set<string>): void {
     if (!currentUnused.has(normalizedResourcePath)) {
       return;
     }
@@ -422,13 +421,37 @@ export class AngularWebpackPlugin {
     }
 
     // Update semantic diagnostics cache
+    const affectedFiles = new Set<ts.SourceFile>();
     while (true) {
-      const result = builder.getSemanticDiagnosticsOfNextAffectedFile(undefined, (sourceFile) =>
-        ignoreForDiagnostics.has(sourceFile),
-      );
+      const result = builder.getSemanticDiagnosticsOfNextAffectedFile(undefined, (sourceFile) => {
+        // If the affected file is a TTC shim, add the shim's original source file.
+        // This ensures that changes that affect TTC are typechecked even when the changes
+        // are otherwise unrelated from a TS perspective and do not result in Ivy codegen changes.
+        // For example, changing @Input property types of a directive used in another component's
+        // template.
+        if (
+          ignoreForDiagnostics.has(sourceFile) &&
+          sourceFile.fileName.endsWith('.ngtypecheck.ts')
+        ) {
+          // This file name conversion relies on internal compiler logic and should be converted
+          // to an official method when available. 15 is length of `.ngtypecheck.ts`
+          const originalFilename = sourceFile.fileName.slice(0, -15) + '.ts';
+          const originalSourceFile = builder.getSourceFile(originalFilename);
+          if (originalSourceFile) {
+            affectedFiles.add(originalSourceFile);
+          }
+
+          return true;
+        }
+
+        return false;
+      });
+
       if (!result) {
         break;
       }
+
+      affectedFiles.add(result.affected as ts.SourceFile);
     }
 
     // Collect non-semantic diagnostics
@@ -468,34 +491,54 @@ export class AngularWebpackPlugin {
       this.requiredFilesToEmit.clear();
 
       for (const sourceFile of builder.getSourceFiles()) {
-        // Collect Angular template diagnostics
-        if (!ignoreForDiagnostics.has(sourceFile)) {
-          // The below check should be removed once support for compiler 11.0 is dropped.
-          // Also, the below require should be changed to an ES6 import.
-          if (angularCompiler.getDiagnosticsForFile) {
-            // @angular/compiler-cli 11.1+
-            const { OptimizeFor } = require('@angular/compiler-cli/src/ngtsc/typecheck/api');
-            diagnosticsReporter(
-              angularCompiler.getDiagnosticsForFile(sourceFile, OptimizeFor.WholeProgram),
-            );
-          } else {
-            // @angular/compiler-cli 11.0+
-            const getDiagnostics = angularCompiler.getDiagnostics as (
-              sourceFile: ts.SourceFile,
-            ) => ts.Diagnostic[];
-            diagnosticsReporter(getDiagnostics.call(angularCompiler, sourceFile));
-          }
+        if (sourceFile.isDeclarationFile) {
+          continue;
         }
 
         // Collect sources that are required to be emitted
         if (
-          !sourceFile.isDeclarationFile &&
           !ignoreForEmit.has(sourceFile) &&
           !angularCompiler.incrementalDriver.safeToSkipEmit(sourceFile)
         ) {
           this.requiredFilesToEmit.add(normalizePath(sourceFile.fileName));
+
+          // If required to emit, diagnostics may have also changed
+          if (!ignoreForDiagnostics.has(sourceFile)) {
+            affectedFiles.add(sourceFile);
+          }
+        } else if (
+          this.sourceFileCache &&
+          !affectedFiles.has(sourceFile) &&
+          !ignoreForDiagnostics.has(sourceFile)
+        ) {
+          // Use cached Angular diagnostics for unchanged and unaffected files
+          const angularDiagnostics = this.sourceFileCache.getAngularDiagnostics(sourceFile);
+          if (angularDiagnostics) {
+            diagnosticsReporter(angularDiagnostics);
+          }
         }
       }
+
+      // Collect new Angular diagnostics for files affected by changes
+      const { OptimizeFor } = require('@angular/compiler-cli/src/ngtsc/typecheck/api');
+      const optimizeDiagnosticsFor =
+        affectedFiles.size <= DIAGNOSTICS_AFFECTED_THRESHOLD
+          ? OptimizeFor.SingleFile
+          : OptimizeFor.WholeProgram;
+      for (const affectedFile of affectedFiles) {
+        const angularDiagnostics = angularCompiler.getDiagnosticsForFile(
+          affectedFile,
+          optimizeDiagnosticsFor,
+        );
+        diagnosticsReporter(angularDiagnostics);
+        this.sourceFileCache?.updateAngularDiagnostics(affectedFile, angularDiagnostics);
+      }
+
+      // NOTE: Workaround to fix stale reuse program. Can be removed once fixed upstream.
+      // tslint:disable-next-line: no-any
+      (angularProgram as any).reuseTsProgram =
+        // tslint:disable-next-line: no-any
+        angularCompiler?.getNextProgram() || (angularCompiler as any)?.getCurrentProgram();
 
       return this.createFileEmitter(
         builder,
