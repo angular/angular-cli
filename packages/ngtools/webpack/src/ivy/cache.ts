@@ -9,6 +9,8 @@ import * as ts from 'typescript';
 import { normalizePath } from './paths';
 
 export class SourceFileCache extends Map<string, ts.SourceFile> {
+  private readonly angularDiagnostics = new Map<ts.SourceFile, ts.Diagnostic[]>();
+
   invalidate(
     fileTimestamps: Map<string, number | { timestamp: number } | null>,
     buildTimestamp: number,
@@ -20,11 +22,27 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
       if (time === null || buildTimestamp < time) {
         // Cache stores paths using the POSIX directory separator
         const normalizedFile = normalizePath(file);
-        this.delete(normalizedFile);
+        const sourceFile = this.get(normalizedFile);
+        if (sourceFile) {
+          this.delete(normalizedFile);
+          this.angularDiagnostics.delete(sourceFile);
+        }
         changedFiles.add(normalizedFile);
       }
     }
 
     return changedFiles;
+  }
+
+  updateAngularDiagnostics(sourceFile: ts.SourceFile, diagnostics: ts.Diagnostic[]): void {
+    if (diagnostics.length > 0) {
+      this.angularDiagnostics.set(sourceFile, diagnostics);
+    } else {
+      this.angularDiagnostics.delete(sourceFile);
+    }
+  }
+
+  getAngularDiagnostics(sourceFile: ts.SourceFile): ts.Diagnostic[] | undefined {
+    return this.angularDiagnostics.get(sourceFile);
   }
 }
