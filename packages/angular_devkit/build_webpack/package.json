@@ -12,7 +12,7 @@
     "rxjs": "6.6.6"
   },
   "peerDependencies": {
-    "webpack": "^4.6.0",
+    "webpack": "^5.0.0",
     "webpack-dev-server": "^3.1.4"
   }
 }
