@@ -10,7 +10,7 @@ import {
   buildOptimizerLoaderPath,
 } from '@angular-devkit/build-optimizer';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import { createWriteStream, existsSync } from 'fs';
+import { createWriteStream, existsSync, promises as fsPromises } from 'fs';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import {
@@ -34,6 +34,7 @@ import {
 } from '../../utils/environment-options';
 import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
+import { addError } from '../../utils/webpack-diagnostics';
 import { isWebpackFiveOrHigher, withWebpackFourOrFive } from '../../utils/webpack-version';
 import {
   DedupeModuleResolvePlugin,
@@ -294,12 +295,21 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
             const data = stats.toJson('verbose');
             const statsOutputPath = path.join(stats.compilation.outputOptions.path, 'stats.json');
 
-            return new Promise<void>((resolve, reject) =>
-              stringifyStream(data)
-                .pipe(createWriteStream(statsOutputPath))
-                .on('close', resolve)
-                .on('error', reject),
-            );
+            try {
+              await fsPromises.mkdir(path.dirname(statsOutputPath), { recursive: true });
+
+              await new Promise<void>((resolve, reject) =>
+                stringifyStream(data)
+                  .pipe(createWriteStream(statsOutputPath))
+                  .on('close', resolve)
+                  .on('error', reject),
+              );
+            } catch (error) {
+              addError(
+                stats.compilation,
+                `Unable to write stats file: ${error.message || 'unknown error'}`,
+              );
+            }
           });
         }
       })(),
