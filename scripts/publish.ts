@@ -111,9 +111,9 @@ function _versionCheck(args: PublishArgs, logger: logging.Logger) {
 export default async function (args: PublishArgs, logger: logging.Logger) {
   const { tag } = args;
   if (!tag) {
-    // NPM requires that all releases have a tag associated, defaulting to
-    // `latest`, so there is no way to allow a publish without a tag.
+    // NPM requires that all releases have a tag associated.
     // https://github.com/npm/npm/issues/10625#issuecomment-162106553
+    // Do not publish without a tag.
     throw new Error('--tag is required.');
   }
 
