@@ -22,9 +22,6 @@ Alan    | Doug
 Charles | Keen
 Filipe  | Joey
 
-## Triaging Issues
-TBD
-
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
@@ -37,7 +34,6 @@ When ready to merge a PR, run the following command:
 ```
 yarn ng-dev pr merge <pr>
 ```
-
 
 ### Maintaining LTS branches
 
@@ -57,26 +53,20 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 ## Before releasing
 
-Make sure the CI is green.
-
-Consider if you need to update [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts) to reflect changes in dependent versions.
+Update `Angular` version in [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts).
 
 ## Shepparding
 
 As commits are cherry-picked when PRs are merged, creating the release should be a matter of creating a tag.
 
-Update the package versions to reflect the new release version in **both**:
-1. [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json#L3)
-1. [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
-
 ```bash
-git add package.json packages/schematics/angular/utility/latest-versions.ts
+git add packages/schematics/angular/utility/latest-versions.ts
 git commit -m 'release: vXX'
 git tag -a 'vXX' -m 'release: tag vXX'
 ```
 
-The package versions we are about to publish are derived from the git tag that
-we just created. Double check that the versions are correct by running the
+The package versions we are about to publish are derived from `version` in the root
+[`package.json`](https://github.com/angular/angular-cli/blob/master/package.json#L3). Double check that the versions are correct by running the
 following command.
 
 ```bash
@@ -95,7 +85,7 @@ git push upstream --follow-tags
 **This can ONLY be done by a Google employee.**
 
 Log in to the Wombat publishing service using your own github and google.com
-account to publish.  This enforces the loging is done using 2Factor auth.
+account to publish.  This enforces the login is done using 2Factor auth.
 
 Run `npm login --registry https://wombat-dressing-room.appspot.com`:
 
@@ -111,7 +101,7 @@ After closing the tab, you have successfully logged in, it is time to publish.
 
 **This can ONLY be done by a Google employee.**
 
-**It is a good idea to wait for CI to be green on the patch branch and tag before doing the release.**
+**Wait for CI to be green after pushing the release commit.**
 
 For the first release of a major version, follow the instructions in
 [Publishing a Major Version](#publishing-a-major-version) section.
@@ -158,6 +148,16 @@ If you have an API token for GitHub you can create a draft automatically by
 using the `--githubToken` flag. You just then have to confirm the draft.
 
 > **Tags containing `next` or `rc` should be marked as pre-release.**
+
+## Post-release Version Update
+
+Update the package versions to reflect the *next* release version in **both**:
+1. `version` in [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json#L3)
+1. `DevkitBuildAngular` in [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
+
+```sh
+git commit package.json packages/schematics/angular/utility/latest-versions.ts -m "build: bump version to vXX"
+```
 
 ### Microsite Publishing
 

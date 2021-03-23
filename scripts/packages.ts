@@ -17,7 +17,7 @@ export default function(args: { json: boolean, version: boolean, releaseCheck: b
   if (args.releaseCheck) {
     const {version: root} = loadRootPackageJson();
     const experimental = stableToExperimentalVersion(root);
-    logger.info(`The expected version for the release is ${colors.bold(root)} (${experimental})`);
+    logger.info(`The expected version for the release is ${colors.bold(root)} (${experimental}) based on root package.json.`);
     logger.info(
       Object.keys(packages)
         .filter(name => !packages[name].private)
