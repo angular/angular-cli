@@ -16,6 +16,7 @@ import {
   addExportToModule,
   addProviderToModule,
   addRouteDeclarationToModule,
+  addSchemaToModule,
   addSymbolToNgModuleMetadata,
   findNodes,
   insertAfterLastOccurrence,
@@ -80,6 +81,23 @@ describe('ast utils', () => {
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
     expect(output).toMatch(/exports: \[FooComponent\]/);
+  });
+
+  it('should add schema to module', () => {
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addSchemaToModule(source, modulePath, 'CUSTOM_ELEMENTS_SCHEMA', '@angular/core');
+    const output = applyChanges(modulePath, moduleContent, changes);
+    expect(output).toMatch(/import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular\/core';/);
+    expect(output).toMatch(/schemas: \[CUSTOM_ELEMENTS_SCHEMA\]/);
+  });
+
+  it('should add schema to module if not indented', () => {
+    moduleContent = tags.stripIndents`${moduleContent}`;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addSchemaToModule(source, modulePath, 'CUSTOM_ELEMENTS_SCHEMA', '@angular/core');
+    const output = applyChanges(modulePath, moduleContent, changes);
+    expect(output).toMatch(/import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular\/core';/);
+    expect(output).toMatch(/schemas: \[CUSTOM_ELEMENTS_SCHEMA\]/);
   });
 
   it('should add declarations to module if not indented', () => {

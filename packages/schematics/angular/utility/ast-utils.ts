@@ -504,6 +504,15 @@ export function addExportToModule(source: ts.SourceFile,
 }
 
 /**
+ * Custom function to insert a schema into NgModule. It also imports it.
+ */
+export function addSchemaToModule(source: ts.SourceFile,
+                                  modulePath: string, classifiedName: string,
+                                  importPath: string): Change[] {
+  return addSymbolToNgModuleMetadata(source, modulePath, 'schemas', classifiedName, importPath);
+}
+
+/**
  * Custom function to insert an export into NgModule. It also imports it.
  */
 export function addBootstrapToModule(source: ts.SourceFile,
