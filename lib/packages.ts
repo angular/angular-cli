@@ -160,25 +160,8 @@ function _getSnapshotHash(_pkg: PackageInfo): string {
 }
 
 
-let stableVersion = '';
-let experimentalVersion = '';
-function _getVersionFromGit(experimental: boolean): string {
-  if (stableVersion && experimentalVersion) {
-    return experimental ? experimentalVersion : stableVersion;
-  }
-
-  const hasLocalChanges = _exec(`git status --porcelain`) != '';
-  const scmVersionTagRaw = _exec(`git describe --match v[0-9]*.[0-9]*.[0-9]* --abbrev=7 --tags`)
-    .slice(1);
-  stableVersion = scmVersionTagRaw.replace(/-([0-9]+)-g/, '+$1.');
-  if (hasLocalChanges) {
-    stableVersion += stableVersion.includes('+') ? '.with-local-changes' : '+with-local-changes';
-  }
-
-  experimentalVersion = stableToExperimentalVersion(stableVersion);
-
-  return experimental ? experimentalVersion : stableVersion;
-}
+const stableVersion = loadRootPackageJson().version;
+const experimentalVersion = stableToExperimentalVersion(stableVersion);
 
 /**
  * Convert a stable version to its experimental equivalent. For example,
@@ -245,9 +228,7 @@ export const packages: PackageMap =
 
         dependencies: [],
         reverseDependencies: [],
-        get version() {
-          return _getVersionFromGit(experimental);
-        },
+        version: experimental ? experimentalVersion : stableVersion,
       };
 
       return packages;
