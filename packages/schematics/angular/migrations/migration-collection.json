@@ -144,6 +144,11 @@
       "version": "12.0.0-next.4",
       "factory": "./update-8/#updateLazyModulePaths",
       "description": "Lazy loading syntax migration. Update lazy loading string syntax to use dynamic imports."
+    },
+    "production-by-default": {
+      "version": "9999.0.0",
+      "factory": "./update-12/production-default-config",
+      "description": "Optional migration to update Angular CLI workspace configurations to 'production' mode by default."
     }
   }
 }

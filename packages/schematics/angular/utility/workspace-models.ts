@@ -76,7 +76,7 @@ export interface ServerBuilderOptions {
   tsConfig: string;
   main: string;
   fileReplacements?: FileReplacements[];
-  optimization?: {
+  optimization?: boolean | {
     scripts?: boolean;
     styles?: boolean;
   };
