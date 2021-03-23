@@ -238,6 +238,7 @@
             },
             "bundleName": {
               "type": "string",
+              "pattern": "^[\\w\\-.]*$",
               "description": "The bundle name for this extra entry point."
             },
             "inject": {
