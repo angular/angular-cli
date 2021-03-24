@@ -180,9 +180,6 @@ jobs:
       nodeversion:
         type: string
         default: *default_nodeversion
-      ve:
-        type: boolean
-        default: false
       snapshots:
         type: boolean
         default: false
@@ -200,12 +197,12 @@ jobs:
           name: Execute CLI E2E Tests
           command: |
             mkdir /mnt/ramdisk/e2e-main
-            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e-main
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e-main
       - run:
           name: Execute CLI E2E Tests Subset with Yarn
           command: |
             mkdir /mnt/ramdisk/e2e-yarn
-            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
 
   test-browsers:
     executor:
@@ -324,27 +321,16 @@ workflows:
           requires:
             - setup
       - e2e-cli:
-          name: e2e-cli<<# matrix.ve >>-ve<</ matrix.ve >>
-          matrix:
-            alias: e2e-cli-renderers
-            parameters:
-              ve: [true, false]
+          name: e2e-cli
           post-steps:
-            - unless:
-                condition: << matrix.ve >>
-                steps:
-                  - store_artifacts:
-                      path: /tmp/dist
-                      destination: cli/new-production
+            - store_artifacts:
+                path: /tmp/dist
+                destination: cli/new-production
           requires:
             - build
       - e2e-cli:
-          name: e2e-cli-ng<<# matrix.ve >>-ve<</ matrix.ve >>-snapshots
+          name: e2e-cli-ng-snapshots
           snapshots: true
-          matrix:
-            alias: e2e-cli-renderers-snapshots
-            parameters:
-              ve: [true, false]
           requires:
             - e2e-cli
           filters:
