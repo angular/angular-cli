@@ -48,7 +48,6 @@ merge:
       - "ci/circleci: test"
       - "ci/circleci: test-win"
       - "ci/circleci: e2e-cli"
-      - "ci/circleci: e2e-cli-ve"
       - "ci/circleci: test-browsers"
       - "ci/angular: size"
       - "cla/google"
