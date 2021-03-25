@@ -395,15 +395,3 @@ LARGE_SPECS = {
     )
     for spec in LARGE_SPECS
 ]
-
-jasmine_node_test(
-    name = "build_angular_browser_ve_test",
-    size = "large",
-    flaky = True,
-    shard_count = 30,
-    tags = ["cpu:2"],
-    templated_args = [
-        "view_engine",
-    ],
-    deps = [":build_angular_browser_test_lib"],
-)
