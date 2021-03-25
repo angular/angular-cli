@@ -106,7 +106,7 @@
     "@types/jasmine": "~3.6.0",
     "@types/karma": "^6.0.0",
     "@types/loader-utils": "^2.0.0",
-    "@types/minimatch": "3.0.3",
+    "@types/minimatch": "3.0.4",
     "@types/minimist": "^1.2.0",
     "@types/node": "~12.12.6",
     "@types/node-fetch": "^2.1.6",
