@@ -161,11 +161,6 @@
       "name": "Schematics Schematics",
       "section": "Schematics",
       "snapshotRepo": "angular/schematics-schematics-builds"
-    },
-    "@schematics/update": {
-      "name": "Package Update Schematics",
-      "section": "Schematics",
-      "snapshotRepo": "angular/schematics-update-builds"
     }
   }
 }
