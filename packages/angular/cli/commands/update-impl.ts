@@ -47,6 +47,11 @@ const NG_VERSION_9_POST_MSG = colors.cyan(
   'For more info, please see: https://v9.angular.io/guide/updating-to-version-9',
 );
 
+const UPDATE_SCHEMATIC_COLLECTION = path.join(
+  __dirname,
+  '../src/commands/update/schematic/collection.json',
+);
+
 /**
  * Disable CLI version mismatch checks and forces usage of the invoked CLI
  * instead of invoking the local installed version.
@@ -384,7 +389,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
     if (packages.length === 0) {
       // Show status
-      const { success } = await this.executeSchematic('@schematics/update', 'update', {
+      const { success } = await this.executeSchematic(UPDATE_SCHEMATIC_COLLECTION, 'update', {
         force: options.force || false,
         next: options.next || false,
         verbose: options.verbose || false,
@@ -630,7 +635,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       return 0;
     }
 
-    const { success } = await this.executeSchematic('@schematics/update', 'update', {
+    const { success } = await this.executeSchematic(UPDATE_SCHEMATIC_COLLECTION, 'update', {
       verbose: options.verbose || false,
       force: options.force || false,
       next: !!options.next,
