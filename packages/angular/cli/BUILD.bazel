@@ -48,6 +48,7 @@ ts_library(
         "//packages/angular/cli:commands/version.ts",
         "//packages/angular/cli:commands/run.ts",
         "//packages/angular/cli:commands/extract-i18n.ts",
+        "//packages/angular/cli:src/commands/update/schematic/schema.ts",
         # @external_end
     ],
     data = glob(
@@ -72,11 +73,13 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tools",
         "@npm//@angular/core",
         "@npm//@types/debug",
         "@npm//@types/inquirer",
         "@npm//@types/node",
+        "@npm//@types/npm-package-arg",
         "@npm//@types/resolve",
         "@npm//@types/rimraf",
         "@npm//@types/semver",
@@ -274,6 +277,11 @@ ts_json_schema(
     ],
 )
 
+ts_json_schema(
+    name = "update_schematic_schema",
+    src = "src/commands/update/schematic/schema.json",
+)
+
 ts_library(
     name = "angular-cli_test_lib",
     testonly = True,
@@ -288,6 +296,10 @@ ts_library(
     deps = [
         ":angular-cli",
         "//packages/angular_devkit/core",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/testing",
+        "@npm//@types/semver",
+        "@npm//rxjs",
     ],
 )
 
