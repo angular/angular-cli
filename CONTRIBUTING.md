@@ -225,7 +225,6 @@ The following is the list of supported scopes:
 * **@ngtools/webpack**
 * **@schematics/angular**
 * **@schematics/schematics**
-* **@schematics/update**
 
 
 ### Subject
