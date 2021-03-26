@@ -7,7 +7,7 @@ export default function() {
   const modulePath = join('src', 'app', 'app.module.ts');
 
   return ng('generate', 'directive', 'test-directive', '--export')
-    .then(() => expectFileToMatch(modulePath, 'exports: [TestDirectiveDirective]'))
+    .then(() => expectFileToMatch(modulePath, /exports: \[\n(\s*)  TestDirectiveDirective\n\1\]/))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--watch=false'));

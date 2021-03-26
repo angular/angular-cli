@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { tags } from '@angular-devkit/core';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, InsertChange, NoopChange } from './change';
 
@@ -365,15 +366,16 @@ export function addSymbolToNgModuleMetadata(
     let toInsert: string;
     if (expr.properties.length == 0) {
       position = expr.getEnd() - 1;
-      toInsert = `  ${metadataField}: [${symbolName}]\n`;
+      toInsert = `\n  ${metadataField}: [\n${tags.indentBy(4)`${symbolName}`}\n  ]\n`;
     } else {
       node = expr.properties[expr.properties.length - 1];
       position = node.getEnd();
       // Get the indentation of the last element, if any.
       const text = node.getFullText(source);
-      const matches = text.match(/^\r?\n\s*/);
-      if (matches && matches.length > 0) {
-        toInsert = `,${matches[0]}${metadataField}: [${symbolName}]`;
+      const matches = text.match(/^(\r?\n)(\s*)/);
+      if (matches) {
+        toInsert = `,${matches[0]}${metadataField}: [${matches[1]}` +
+            `${tags.indentBy(matches[2].length + 2)`${symbolName}`}${matches[0]}]`;
       } else {
         toInsert = `, ${metadataField}: [${symbolName}]`;
       }
@@ -404,8 +406,8 @@ export function addSymbolToNgModuleMetadata(
 
   if (Array.isArray(node)) {
     const nodeArray = node as {} as Array<ts.Node>;
-    const symbolsArray = nodeArray.map(node => node.getText());
-    if (symbolsArray.includes(symbolName)) {
+    const symbolsArray = nodeArray.map(node => tags.oneLine`${node.getText()}`);
+    if (symbolsArray.includes(tags.oneLine`${symbolName}`)) {
       return [];
     }
 
@@ -417,12 +419,13 @@ export function addSymbolToNgModuleMetadata(
   if (node.kind == ts.SyntaxKind.ArrayLiteralExpression) {
     // We found the field but it's empty. Insert it just before the `]`.
     position--;
-    toInsert = `${symbolName}`;
+    toInsert = `\n${tags.indentBy(4)`${symbolName}`}\n  `;
   } else {
     // Get the indentation of the last element, if any.
     const text = node.getFullText(source);
-    if (text.match(/^\r?\n/)) {
-      toInsert = `,${text.match(/^\r?\n(\r?)\s*/)[0]}${symbolName}`;
+    const matches = text.match(/^(\r?\n)(\s*)/);
+    if (matches) {
+      toInsert = `,${matches[1]}${tags.indentBy(matches[2].length)`${symbolName}`}`;
     } else {
       toInsert = `, ${symbolName}`;
     }

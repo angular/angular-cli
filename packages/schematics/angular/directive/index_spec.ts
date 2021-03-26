@@ -93,7 +93,7 @@ describe('Directive Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('directive', options, appTree)
       .toPromise();
     const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(appModuleContent).toMatch(/exports: \[FooDirective\]/);
+    expect(appModuleContent).toMatch(/exports: \[\n(\s*)  FooDirective\n\1\]/);
   });
 
   it('should import into a specified module', async () => {

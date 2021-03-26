@@ -139,7 +139,7 @@ describe('Library Schematic', () => {
   it('should export the component in the NgModule', async () => {
     const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
-    expect(fileContent).toContain('exports: [FooComponent]');
+    expect(fileContent).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
   });
 
   describe(`update package.json`, () => {
