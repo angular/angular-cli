@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { join, normalize } from '@angular-devkit/core';
+import { join, normalize, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -90,8 +90,14 @@ function updateAppModule(mainPath: string): Rule {
     }
 
     // register SW in app module
-    const importText =
-      `ServiceWorkerModule.register('ngsw-worker.js', { enabled: ${importModule}.production })`;
+    const importText = tags.stripIndent`
+      ServiceWorkerModule.register('ngsw-worker.js', {
+        enabled: ${importModule}.production,
+        // Register the ServiceWorker as soon as the app is stable
+        // or after 30 seconds (whichever comes first).
+        registrationStrategy: 'registerWhenStable:30000'
+      })
+    `;
     moduleSource = getTsSourceFile(host, modulePath);
     const metadataChanges = addSymbolToNgModuleMetadata(
       moduleSource, modulePath, 'imports', importText);
