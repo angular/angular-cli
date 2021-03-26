@@ -99,7 +99,7 @@ describe('Pipe Schematic', () => {
 
     const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
     const appModuleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
-    expect(appModuleContent).toMatch(/exports: \[FooPipe\]/);
+    expect(appModuleContent).toMatch(/exports: \[\n(\s*)  FooPipe\n\1\]/);
   });
 
   it('should respect the flat flag', async () => {

@@ -70,7 +70,7 @@ describe('ast utils', () => {
     const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
-    expect(output).toMatch(/exports: \[FooComponent\]/);
+    expect(output).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
   });
 
   it('should add export to module if not indented', () => {
@@ -79,7 +79,7 @@ describe('ast utils', () => {
     const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
-    expect(output).toMatch(/exports: \[FooComponent\]/);
+    expect(output).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
   });
 
   it('should add declarations to module if not indented', () => {
@@ -120,7 +120,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: [\s\S]+,\n\s+HelloWorld\n\s+\]/m);
+    expect(output).toMatch(/imports: \[[^\]]+,\n(\s*)  HelloWorld\n\1\]/);
   });
 
   it('should add metadata (comma)', () => {
@@ -145,7 +145,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: [\s\S]+,\n\s+HelloWorld,\n\s+\]/m);
+    expect(output).toMatch(/imports: \[[^\]]+,\n(\s*)  HelloWorld,\n\1\]/);
   });
 
   it('should add metadata (missing)', () => {
@@ -167,7 +167,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: \[HelloWorld]\r?\n/m);
+    expect(output).toMatch(/imports: \[\n(\s*)  HelloWorld\n\1\]/);
   });
 
   it('should add metadata (empty)', () => {
@@ -190,7 +190,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: \[HelloWorld],\r?\n/m);
+    expect(output).toMatch(/imports: \[\n(\s*)  HelloWorld\n\1\],\n/);
   });
 
   it(`should handle NgModule with newline after '@'`, () => {

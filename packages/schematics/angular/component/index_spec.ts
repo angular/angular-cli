@@ -145,7 +145,7 @@ describe('Component Schematic', () => {
 
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(appModuleContent).toMatch(/exports: \[FooComponent\]/);
+    expect(appModuleContent).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
   });
 
   it('should set the entry component', async () => {
@@ -153,7 +153,7 @@ describe('Component Schematic', () => {
 
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(appModuleContent).toMatch(/entryComponents: \[FooComponent\]/);
+    expect(appModuleContent).toMatch(/entryComponents: \[\n(\s*)  FooComponent\n\1\]/);
   });
 
   it('should import into a specified module', async () => {
