@@ -358,10 +358,6 @@ export function addSymbolToNgModuleMetadata(
     metadataField,
   );
 
-  // Get the last node of the array literal.
-  if (!matchingProperties) {
-    return [];
-  }
   if (matchingProperties.length == 0) {
     // We haven't found the field in the metadata declaration. Insert a new field.
     const expr = node as ts.ObjectLiteralExpression;
@@ -406,13 +402,6 @@ export function addSymbolToNgModuleMetadata(
     node = arrLiteral.elements;
   }
 
-  if (!node) {
-    // tslint:disable-next-line: no-console
-    console.error('No app module found. Please add your new class to your component.');
-
-    return [];
-  }
-
   if (Array.isArray(node)) {
     const nodeArray = node as {} as Array<ts.Node>;
     const symbolsArray = nodeArray.map(node => node.getText());
@@ -425,23 +414,7 @@ export function addSymbolToNgModuleMetadata(
 
   let toInsert: string;
   let position = node.getEnd();
-  if (node.kind == ts.SyntaxKind.ObjectLiteralExpression) {
-    // We haven't found the field in the metadata declaration. Insert a new
-    // field.
-    const expr = node as ts.ObjectLiteralExpression;
-    if (expr.properties.length == 0) {
-      position = expr.getEnd() - 1;
-      toInsert = `  ${symbolName}\n`;
-    } else {
-      // Get the indentation of the last element, if any.
-      const text = node.getFullText(source);
-      if (text.match(/^\r?\r?\n/)) {
-        toInsert = `,${text.match(/^\r?\n\s*/)[0]}${symbolName}`;
-      } else {
-        toInsert = `, ${symbolName}`;
-      }
-    }
-  } else if (node.kind == ts.SyntaxKind.ArrayLiteralExpression) {
+  if (node.kind == ts.SyntaxKind.ArrayLiteralExpression) {
     // We found the field but it's empty. Insert it just before the `]`.
     position--;
     toInsert = `${symbolName}`;
