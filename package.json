@@ -79,7 +79,7 @@
     "@angular/platform-server": "12.0.0-next.5",
     "@angular/router": "12.0.0-next.5",
     "@angular/service-worker": "12.0.0-next.5",
-    "@babel/core": "7.13.10",
+    "@babel/core": "7.13.13",
     "@babel/generator": "7.13.9",
     "@babel/plugin-transform-runtime": "7.13.10",
     "@babel/preset-env": "7.13.12",
