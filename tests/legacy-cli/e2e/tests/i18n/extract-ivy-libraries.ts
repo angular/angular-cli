@@ -61,7 +61,7 @@ export default async function() {
   await installPackage(localizeVersion);
 
   // Extract messages
-  await ng('extract-i18n', '--ivy');
+  await ng('extract-i18n');
   await expectFileToMatch('messages.xlf', 'Hello world');
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
   await expectFileToMatch('messages.xlf', 'src/app/app.component.html');
