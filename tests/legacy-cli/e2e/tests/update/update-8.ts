@@ -17,7 +17,10 @@ export default async function () {
 
     // Update Angular to 9
     await installPackage('@angular/cli@8');
-    await ng('update', '@angular/cli@9.x', '@angular/core@9.x');
+    const { stdout } = await ng('update', '@angular/cli@9.x', '@angular/core@9.x');
+    if (!stdout.includes('Executing migrations of package \'@angular/cli\'')) {
+      throw new Error('Update did not execute migrations. OUTPUT: \n' + stdout);
+    }
 
     // Update Angular to 10
     await ng('update', '@angular/cli@10', '@angular/core@10');
