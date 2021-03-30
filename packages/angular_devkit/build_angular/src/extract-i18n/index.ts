@@ -96,13 +96,8 @@ async function getSerializer(format: Format, sourceLocale: string, basePath: str
   }
 }
 
-function normalizeFormatOption(options: ExtractI18nBuilderOptions) {
-  let format;
-  if (options.i18nFormat !== Format.Xlf) {
-    format = options.i18nFormat;
-  } else {
-    format = options.format;
-  }
+function normalizeFormatOption(options: ExtractI18nBuilderOptions): Format {
+  let format = options.format;
 
   switch (format) {
     case Format.Xlf:
@@ -114,21 +109,10 @@ function normalizeFormatOption(options: ExtractI18nBuilderOptions) {
     case Format.Xliff2:
       format = Format.Xlf2;
       break;
-    case Format.Json:
-      format = Format.Json;
-      break;
-    case Format.Arb:
-      format = Format.Arb;
-      break;
-    case Format.LegacyMigrate:
-      format = Format.LegacyMigrate;
-      break;
-    case undefined:
-      format = Format.Xlf;
-      break;
   }
 
-  return format;
+  // Default format is xliff1
+  return format ?? Format.Xlf;
 }
 
 class NoEmitPlugin {
@@ -183,7 +167,7 @@ export async function execute(
         vendor: true,
       },
       buildOptimizer: false,
-      i18nLocale: options.i18nLocale || i18n.sourceLocale,
+      i18nLocale: i18n.sourceLocale,
       i18nFormat: format,
       i18nFile: outFile,
       aot: true,
