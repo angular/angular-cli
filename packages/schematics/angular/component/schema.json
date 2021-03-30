@@ -132,12 +132,6 @@
       "description": "The declaring NgModule exports this component.",
       "x-user-analytics": 19
     },
-    "entryComponent": {
-      "type": "boolean",
-      "default": false,
-      "description": "The new component is the entry component of the declaring NgModule.",
-      "x-deprecated": "Since version 9.0.0 with Ivy, entryComponents is no longer necessary."
-    },
     "lintFix": {
       "type": "boolean",
       "description": "Apply lint fixes after generating the component.",
