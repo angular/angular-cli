@@ -281,7 +281,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     const CircularDependencyPlugin = require('circular-dependency-plugin');
     extraPlugins.push(
       new CircularDependencyPlugin({
-        exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
+        exclude: /[\\\/]node_modules[\\\/]/,
       }),
     );
   }
@@ -332,8 +332,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     extraRules.push({
       test: /\.m?js$/,
       exclude: vendorSourceMap
-        ? /(ngfactory|ngstyle)\.js$/
-        : [/[\\\/]node_modules[\\\/]/, /(ngfactory|ngstyle)\.js$/],
+        ? undefined
+        : /[\\\/]node_modules[\\\/]/,
       enforce: 'pre',
       loader: require.resolve('source-map-loader'),
     });
@@ -496,7 +496,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         },
         {
           test: /\.[cm]?js$|\.tsx?$/,
-          exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
+          exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/],
           use: [
             {
               loader: require.resolve('../../babel/webpack-loader'),
