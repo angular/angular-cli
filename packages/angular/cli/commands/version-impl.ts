@@ -8,7 +8,6 @@
 import * as path from 'path';
 import { Command } from '../models/command';
 import { colors } from '../utilities/color';
-import { JSONFile } from '../utilities/json-file';
 import { Schema as VersionCommandSchema } from './version';
 
 interface PartialPackageInfo {
@@ -125,7 +124,6 @@ export class VersionCommand extends Command<VersionCommandSchema> {
           return acc;
         }, [])
         .join('\n... ')}
-      Ivy Workspace: ${workspacePackage ? this.getIvyWorkspace() : ''}
 
       Package${namePad.slice(7)}Version
       -------${namePad.replace(/ /g, '-')}------------------
@@ -164,17 +162,5 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     }
 
     return version || '<error>';
-  }
-
-  private getIvyWorkspace(): string {
-    try {
-      const json = new JSONFile(path.resolve(this.context.root, 'tsconfig.json'));
-
-      return json.get(['angularCompilerOptions', 'enableIvy']) === false
-        ? 'No'
-        : 'Yes';
-    } catch {
-      return '<error>';
-    }
   }
 }
