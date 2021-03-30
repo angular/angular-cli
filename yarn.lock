@@ -2184,6 +2184,14 @@
     http-errors "1.8.0"
     http-status-codes "1.4.0"
 
+"@verdaccio/commons-api@^10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@verdaccio/commons-api/-/commons-api-10.0.0.tgz#2d7de8722f94181f1a71891fe91198a7c14e6dea"
+  integrity sha512-UC8wrRI9FvqjfDeB1RijF7aVI0JJhCOI8RkEDibCT/JD8zVngphrNmgSWcjo8Es3lRiu7NugWXDSuggCCeCfUg==
+  dependencies:
+    http-errors "1.8.0"
+    http-status-codes "1.4.0"
+
 "@verdaccio/file-locking@^9.7.2":
   version "9.7.2"
   resolved "https://registry.yarnpkg.com/@verdaccio/file-locking/-/file-locking-9.7.2.tgz#953367a42554ef7019fb4206c6e3af5e2dc217db"
@@ -12974,12 +12982,12 @@ verdaccio-audit@9.7.3:
     express "4.17.1"
     request "2.88.2"
 
-verdaccio-auth-memory@^9.7.2:
-  version "9.7.2"
-  resolved "https://registry.yarnpkg.com/verdaccio-auth-memory/-/verdaccio-auth-memory-9.7.2.tgz#e95ef1f64df9a0a30bcf727eb8f704c4033c945c"
-  integrity sha512-pxFGUk91kAJPrmjRIzHRn/cnLmyuN925nA1iH2Bf6kdP9E0uEGK/pRjMh8BuXWFLsGe9E6N7HR86cub1/qcrzA==
+verdaccio-auth-memory@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/verdaccio-auth-memory/-/verdaccio-auth-memory-10.0.0.tgz#057f7f94e96d21c69b1ba7983c00fe8cb7072fef"
+  integrity sha512-pl6WDwYUNetGvFT6Veh3LuNpWLqxuDBC3i1URvuI+biIfAeqgr2M07ICN9p1cNlyWKdcEC/YILqCYg9aE/KwsQ==
   dependencies:
-    "@verdaccio/commons-api" "^9.7.1"
+    "@verdaccio/commons-api" "^10.0.0"
 
 verdaccio-htpasswd@9.7.2:
   version "9.7.2"
