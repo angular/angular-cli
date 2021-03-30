@@ -73,8 +73,6 @@ describe('build-optimizer', () => {
         '/node_modules/@angular/core/esm2015/core.js',
         '\\node_modules\\@angular\\core\\fesm2015\\core.js',
         '\\node_modules\\@angular\\core\\esm2015\\core.js',
-        '/project/file.ngfactory.js',
-        '/project/file.ngstyle.js',
       ];
 
       inputPaths.forEach((inputFilePath) => {
