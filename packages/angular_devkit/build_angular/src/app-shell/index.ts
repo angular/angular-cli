@@ -72,21 +72,12 @@ async function _renderUniversal(
 
     const {
       AppServerModule,
-      AppServerModuleNgFactory,
       renderModule,
-      renderModuleFactory,
     } = await import(serverBundlePath);
 
-    let renderModuleFn: (module: unknown, options: {}) => Promise<string>;
-    let AppServerModuleDef: unknown;
+    const renderModuleFn: ((module: unknown, options: {}) => Promise<string>) | undefined = renderModule;
 
-    if (renderModuleFactory && AppServerModuleNgFactory) {
-      renderModuleFn = renderModuleFactory;
-      AppServerModuleDef = AppServerModuleNgFactory;
-    } else if (renderModule && AppServerModule) {
-      renderModuleFn = renderModule;
-      AppServerModuleDef = AppServerModule;
-    } else {
+    if (!(renderModuleFn && AppServerModule)) {
       throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
     }
 
@@ -96,7 +87,7 @@ async function _renderUniversal(
       url: options.route,
     };
 
-    let html = await renderModuleFn(AppServerModuleDef, renderOpts);
+    let html = await renderModuleFn(AppServerModule, renderOpts);
     // Overwrite the client index file.
     const outputIndexPath = options.outputIndexPath
       ? path.join(root, options.outputIndexPath)
