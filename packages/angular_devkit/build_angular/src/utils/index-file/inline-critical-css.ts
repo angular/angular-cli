@@ -19,6 +19,7 @@ export interface InlineCriticalCssProcessorOptions {
   deployUrl?: string;
   readAsset?: (path: string) => Promise<string>;
 }
+
 class CrittersExtended extends Critters {
   readonly warnings: string[] = [];
   readonly errors: string[] = [];
@@ -28,9 +29,9 @@ class CrittersExtended extends Critters {
       logger: {
         warn: (s: string) => this.warnings.push(s),
         error: (s: string) => this.errors.push(s),
-        log: () => { },
         info: () => { },
       },
+      logLevel: 'warn',
       path: optionsExtended.outputPath,
       publicPath: optionsExtended.deployUrl,
       compress: !!optionsExtended.minify,
@@ -40,8 +41,7 @@ class CrittersExtended extends Critters {
       preload: 'media',
       noscriptFallback: true,
       inlineFonts: true,
-      // tslint:disable-next-line: no-any
-    } as any);
+    });
   }
 
   protected readFile(path: string): Promise<string> {
