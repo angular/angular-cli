@@ -25,8 +25,8 @@ export default async function () {
     // Update Angular to 10
     await ng('update', '@angular/cli@10', '@angular/core@10');
 
-    // Update Angular to 11 (force needed due to codelyzer)
-    await ng('update', '@angular/cli@11', '@angular/core@11', '--force');
+    // Update Angular to 11
+    await ng('update', '@angular/cli@11', '@angular/core@11');
   } finally {
     await setRegistry(true);
   }
