@@ -29,9 +29,9 @@ class CrittersExtended extends Critters {
       logger: {
         warn: (s: string) => this.warnings.push(s),
         error: (s: string) => this.errors.push(s),
-        log: () => { },
         info: () => { },
       },
+      logLevel: 'warn',
       path: optionsExtended.outputPath,
       publicPath: optionsExtended.deployUrl,
       compress: !!optionsExtended.minify,
@@ -41,10 +41,7 @@ class CrittersExtended extends Critters {
       preload: 'media',
       noscriptFallback: true,
       inlineFonts: true,
-      // Cast any is needed because of logger API is not exposed as part of the options
-      // https://github.com/GoogleChromeLabs/critters/issues/66
-      // tslint:disable-next-line: no-any
-    } as any);
+    });
   }
 
   protected async readFile(path: string): Promise<string> {
