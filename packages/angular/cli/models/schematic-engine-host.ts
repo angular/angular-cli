@@ -32,9 +32,9 @@ function shouldWrapSchematic(schematicFile: string): boolean {
     }
   }
 
-  // Never wrap `@schematics/update` when executed directly
+  // Never wrap the internal update schematic when executed directly
   // It communicates with the update command via `global`
-  if (/[\/\\]node_modules[\/\\]@schematics[\/\\]update[\/\\]/.test(schematicFile)) {
+  if (/[\/\\]node_modules[\/\\]@angular[\/\\]cli[\/\\]/.test(schematicFile)) {
     return false;
   }
 
