@@ -22,11 +22,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import {
-  addDeclarationToModule,
-  addEntryComponentToModule,
-  addExportToModule,
-} from '../utility/ast-utils';
+import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
@@ -92,25 +88,6 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
       }
       host.commitUpdate(exportRecorder);
     }
-
-    if (options.entryComponent) {
-      // Need to refresh the AST because we overwrote the file in the host.
-      const source = readIntoSourceFile(host, modulePath);
-
-      const entryComponentRecorder = host.beginUpdate(modulePath);
-      const entryComponentChanges = addEntryComponentToModule(
-        source, modulePath,
-        strings.classify(options.name) + strings.classify(options.type),
-        relativePath);
-
-      for (const change of entryComponentChanges) {
-        if (change instanceof InsertChange) {
-          entryComponentRecorder.insertLeft(change.pos, change.toAdd);
-        }
-      }
-      host.commitUpdate(entryComponentRecorder);
-    }
-
 
     return host;
   };
