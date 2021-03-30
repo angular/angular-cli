@@ -157,25 +157,11 @@ export class NgBuildAnalyticsPlugin {
       this._stats.numberOfNgOnInit += countOccurrences(module._source.source(), 'ngOnInit', true);
 
       // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
-      // This does not include View Engine AOT compilation, we use the ngfactory for it.
       this._stats.numberOfComponents += countOccurrences(module._source.source(), 'Component({');
       // For Ivy we just count ɵcmp.
       this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵcmp', true);
       // for ascii_only true
       this._stats.numberOfComponents += countOccurrences(module._source.source(), '.\u0275cmp', true);
-    }
-  }
-
-  protected _checkNgFactoryNormalModule(module: NormalModule) {
-    if (module._source) {
-      // PLEASE REMEMBER:
-      // We're dealing with ES5 _or_ ES2015 JavaScript at this point (we don't know for sure).
-
-      // Count the number of `.ɵccf(` strings (case sensitive). They're calls to components
-      // factories.
-      this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵccf(');
-      // for ascii_only true
-      this._stats.numberOfComponents += countOccurrences(module._source.source(), '.\u0275ccf(');
     }
   }
 
@@ -267,8 +253,6 @@ export class NgBuildAnalyticsPlugin {
     // Check that it's a source file from the project.
     if (module.resource.endsWith('.ts')) {
       this._checkTsNormalModule(module);
-    } else if (module.resource.endsWith('.ngfactory.js')) {
-      this._checkNgFactoryNormalModule(module);
     }
   }
 
