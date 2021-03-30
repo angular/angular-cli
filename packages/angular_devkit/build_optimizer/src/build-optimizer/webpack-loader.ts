@@ -17,13 +17,7 @@ interface BuildOptimizerLoaderOptions {
 
 export const buildOptimizerLoaderPath = __filename;
 
-const alwaysProcess = (path: string) =>
-  // Always process TS files.
-  path.endsWith('.ts') ||
-  path.endsWith('.tsx') ||
-  // Always process factory files.
-  path.endsWith('.ngfactory.js') ||
-  path.endsWith('.ngstyle.js');
+const alwaysProcess = (path: string) => path.endsWith('.ts') || path.endsWith('.tsx');
 
 export default function buildOptimizerLoader(
   // Webpack 5 does not provide a LoaderContext type
