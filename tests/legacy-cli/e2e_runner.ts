@@ -84,21 +84,6 @@ let allTests = glob
   .map(name => name.replace(/\\/g, '/'))
   .sort();
 
-// TODO: either update or remove these tests.
-allTests = allTests
-  // IS this test still valid? \/
-  .filter(name => !name.endsWith('/module-id.ts'))
-  // Do we want to support this?
-  .filter(name => !name.endsWith('different-file-format.ts'))
-  // Not sure what this test is meant to test, but with depedency changes it is not valid anymore.
-  .filter(name => !name.endsWith('loaders-resolution.ts'))
-  // NEW COMMAND
-  .filter(name => !name.includes('tests/commands/new/'))
-  // NEEDS devkit change
-  .filter(name => !name.endsWith('/existing-directory.ts'))
-  // Disabled on rc.0 due to needed sync with devkit for changes.
-  .filter(name => !name.endsWith('/service-worker.ts'));
-
 const shardId = 'shard' in argv ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;
 const tests = allTests.filter(name => {
