@@ -12,15 +12,13 @@ module.exports = {
     filename: 'app.main.js'
   },
   plugins: [
-    new ngToolsWebpack.AngularCompilerPlugin({
-      tsConfigPath: './tsconfig.json'
-    })
+    new ngToolsWebpack.ivy.AngularWebpackPlugin(),
   ],
   module: {
     rules: [
-      { test: /\.scss$/, loaders: ['raw-loader', 'sass-loader'] },
+      { test: /\.scss$/, use: ['raw-loader', 'sass-loader'] },
       { test: /\.html$/, loader: 'raw-loader' },
-      { test: /\.ts$/, loader: '@ngtools/webpack' }
+      { test: /\.ts$/, loader: ngToolsWebpack.ivy.AngularWebpackLoaderPath }
     ]
   },
   devServer: {
