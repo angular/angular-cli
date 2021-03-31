@@ -30,7 +30,6 @@ export interface I18nOptions {
   >;
   flatOutput?: boolean;
   readonly shouldInline: boolean;
-  veCompatLocale?: string;
   hasDefinedSourceLocale?: boolean;
 }
 
@@ -160,49 +159,8 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
 
   const buildOptions = { ...options };
   const tsConfig = readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
-  const usingIvy = tsConfig.options.enableIvy !== false;
   const metadata = await context.getProjectMetadata(context.target);
   const i18n = createI18nOptions(metadata, buildOptions.localize);
-
-  // Until 11.0, support deprecated i18n options when not using new localize option
-  // i18nFormat is automatically calculated
-  if (buildOptions.localize === undefined && usingIvy) {
-    mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
-  } else if (buildOptions.localize !== undefined && !usingIvy) {
-    if (
-      buildOptions.localize === true ||
-      (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)
-    ) {
-      throw new Error(
-        `Localization with multiple locales in one build is not supported with View Engine.`,
-      );
-    }
-
-    for (const deprecatedOption of ['i18nLocale', 'i18nFormat', 'i18nFile']) {
-      // tslint:disable-next-line: no-any
-      if (typeof (buildOptions as any)[deprecatedOption] !== 'undefined') {
-        context.logger.warn(
-          `Option 'localize' and deprecated '${deprecatedOption}' found.  Using 'localize'.`,
-        );
-      }
-    }
-
-    if (
-      buildOptions.localize === false ||
-      (Array.isArray(buildOptions.localize) && buildOptions.localize.length === 0)
-    ) {
-      buildOptions.i18nFile = undefined;
-      buildOptions.i18nLocale = undefined;
-      buildOptions.i18nFormat = undefined;
-    }
-  }
-
-  // Clear deprecated options when using Ivy to prevent unintended behavior
-  if (usingIvy) {
-    buildOptions.i18nFile = undefined;
-    buildOptions.i18nFormat = undefined;
-    buildOptions.i18nLocale = undefined;
-  }
 
   // No additional processing needed if no inlining requested and no source locale defined.
   if (!i18n.shouldInline && !i18n.hasDefinedSourceLocale) {
@@ -298,31 +256,6 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
         desc.translation = loadResult.translations;
       }
     }
-
-    // Legacy message id's require the format of the translations
-    if (usedFormats.size > 0) {
-      buildOptions.i18nFormat = [...usedFormats][0];
-    }
-
-    // Provide support for using the Ivy i18n options with VE
-    if (!usingIvy) {
-      i18n.veCompatLocale = buildOptions.i18nLocale = [...i18n.inlineLocales][0];
-
-      if (buildOptions.i18nLocale !== i18n.sourceLocale) {
-        if (i18n.locales[buildOptions.i18nLocale].files.length > 1) {
-          throw new Error(
-            'Localization with View Engine only supports using a single translation file per locale.',
-          );
-        }
-        buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].files[0].path;
-      }
-
-      // Clear inline locales to prevent any new i18n related processing
-      i18n.inlineLocales.clear();
-
-      // Update the output path to include the locale to mimic Ivy localize behavior
-      buildOptions.outputPath = path.join(buildOptions.outputPath, buildOptions.i18nLocale);
-    }
   }
 
   // If inlining store the output in a temporary location to facilitate post-processing
@@ -339,34 +272,6 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   }
 
   return { buildOptions, i18n };
-}
-
-function mergeDeprecatedI18nOptions(
-  i18n: I18nOptions,
-  i18nLocale: string | undefined,
-  i18nFile: string | undefined,
-): I18nOptions {
-  if (i18nFile !== undefined && i18nLocale === undefined) {
-    throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
-  }
-
-  if (i18nLocale !== undefined) {
-    i18n.inlineLocales.clear();
-    i18n.inlineLocales.add(i18nLocale);
-
-    if (i18nFile !== undefined) {
-      i18n.locales[i18nLocale] = { files: [{ path: i18nFile }], baseHref: '' };
-    } else {
-      // If no file, treat the locale as the source locale
-      // This mimics deprecated behavior
-      i18n.sourceLocale = i18nLocale;
-      i18n.locales[i18nLocale] = { files: [], baseHref: '' };
-    }
-
-    i18n.flatOutput = true;
-  }
-
-  return i18n;
 }
 
 function findLocaleDataBasePath(projectRoot: string): string | null {

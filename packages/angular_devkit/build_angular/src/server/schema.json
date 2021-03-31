@@ -120,21 +120,6 @@
       "description": "Log progress to the console while building.",
       "default": true
     },
-    "i18nFile": {
-      "type": "string",
-      "description": "Localization file to use for i18n.",
-      "x-deprecated": "Use 'locales' object in the project metadata instead."
-    },
-    "i18nFormat": {
-      "type": "string",
-      "description": "Format of the localization file specified with --i18n-file.",
-      "x-deprecated": "No longer needed as the format will be determined automatically."
-    },
-    "i18nLocale": {
-      "type": "string",
-      "description": "Locale to use for i18n.",
-      "x-deprecated": "Use 'localize' instead."
-    },
     "i18nMissingTranslation": {
       "type": "string",
       "description": "How to handle missing translations for i18n.",

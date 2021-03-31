@@ -77,12 +77,13 @@ const allSetups = glob
   .sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .sort();
-let allTests = glob
+const allTests = glob
   .sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
   .map(name => path.relative(e2eRoot, name))
   // Replace windows slashes.
   .map(name => name.replace(/\\/g, '/'))
-  .sort();
+  .sort()
+  .filter(name => !name.endsWith('/setup.ts'));
 
 const shardId = 'shard' in argv ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;

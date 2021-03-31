@@ -668,7 +668,7 @@ export function buildWebpackBrowser(
                       const { content, warnings, errors } = await indexHtmlGenerator.process({
                         baseHref: getLocaleBaseHref(i18n, locale) || options.baseHref,
                         // i18nLocale is used when Ivy is disabled
-                        lang: locale || options.i18nLocale,
+                        lang: locale || undefined,
                         outputPath,
                         files: mapEmittedFilesToFileInfo(files),
                         noModuleFiles: mapEmittedFilesToFileInfo(noModuleFiles),

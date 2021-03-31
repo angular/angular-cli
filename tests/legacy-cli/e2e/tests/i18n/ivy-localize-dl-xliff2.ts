@@ -2,11 +2,11 @@ import { appendToFile, expectFileToMatch, replaceInFile } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
-import { baseDir, externalServer, langTranslations, setupI18nConfig } from './legacy';
+import { baseDir, externalServer, langTranslations, setupI18nConfig } from './setup';
 
 export default async function() {
   // Setup i18n tests and config.
-  await setupI18nConfig(true, 'xlf2');
+  await setupI18nConfig('xlf2');
 
   // Execute the tests
   await executeTest();

@@ -6,7 +6,7 @@ import { installWorkspacePackages } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
-import { langTranslations, setupI18nConfig } from './legacy';
+import { langTranslations, setupI18nConfig } from './setup';
 
 const snapshots = require('../../ng-snapshot/package.json');
 

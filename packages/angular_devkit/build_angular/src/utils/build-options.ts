@@ -35,12 +35,6 @@ export interface BuildOptions {
   deployUrl?: string;
   verbose?: boolean;
   progress?: boolean;
-  /** @deprecated since version 9. Use 'locales' object in the project metadata instead.*/
-  i18nFile?: string;
-  /** @deprecated since version 9. No longer needed as the format will be determined automatically.*/
-  i18nFormat?: string;
-  /** @deprecated since version 9. Use 'localize' instead.*/
-  i18nLocale?: string;
   localize?: Localize;
   i18nMissingTranslation?: I18NMissingTranslation;
   /** @deprecated since version 11.0. No longer required to disable CSS extraction for HMR.*/

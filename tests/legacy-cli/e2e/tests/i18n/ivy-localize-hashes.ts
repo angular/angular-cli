@@ -8,13 +8,13 @@
 import * as fs from 'fs';
 import { appendToFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { langTranslations, setupI18nConfig } from './legacy';
+import { langTranslations, setupI18nConfig } from './setup';
 
 const OUTPUT_RE = /^(?<name>(?:main|vendor|\d+))\.(?<hash>[a-z0-9]+)\.js$/i;
 
 export default async function() {
   // Setup i18n tests and config.
-  await setupI18nConfig(true);
+  await setupI18nConfig();
 
   // Build each locale and record output file hashes
   const hashes = new Map<string, string>();
