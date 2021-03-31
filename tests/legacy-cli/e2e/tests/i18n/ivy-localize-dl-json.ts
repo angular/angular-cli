@@ -1,9 +1,9 @@
 import { executeTest } from './ivy-localize-dl-xliff2';
-import { setupI18nConfig } from './legacy';
+import { setupI18nConfig } from './setup';
 
 export default async function() {
   // Setup i18n tests and config.
-  await setupI18nConfig(true, 'json');
+  await setupI18nConfig('json');
 
   // Execute the tests
   await executeTest();

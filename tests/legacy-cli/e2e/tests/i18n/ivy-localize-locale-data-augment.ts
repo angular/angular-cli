@@ -1,7 +1,7 @@
 import { expectFileToMatch, prependToFile, readFile, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { externalServer, langTranslations, setupI18nConfig } from './legacy';
+import { externalServer, langTranslations, setupI18nConfig } from './setup';
 
 export default async function() {
   // Setup i18n tests and config.

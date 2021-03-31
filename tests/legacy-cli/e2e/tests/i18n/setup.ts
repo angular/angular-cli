@@ -100,10 +100,10 @@ export const formats = {
     sourceCheck: '"@@locale": "en-US"',
     replacements: [
     ],
-  }
+  },
 };
 
-export async function setupI18nConfig(useLocalize = true, format: keyof typeof formats = 'xlf') {
+export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
   // Add component with i18n content, both translations and localeData (plural, dates).
   await writeFile('src/app/app.component.ts', `
     import { Component, Inject, LOCALE_ID } from '@angular/core';
@@ -186,34 +186,20 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
     appArchitect['build'].options.sourceMap = true;
     appArchitect['build'].options.outputHashing = 'none';
 
-    if (useLocalize) {
-      // Enable localization for all locales
-      appArchitect['build'].options.localize = true;
-    }
+    // Enable localization for all locales
+    appArchitect['build'].options.localize = true;
 
     // Add i18n config items (app, build, serve, e2e).
     // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = (appProject.i18n = { locales: {} });
-    for (const { lang, outputPath } of langTranslations) {
-      if (!useLocalize) {
-        if (lang == sourceLocale) {
-          buildConfigs[lang] = { outputPath, i18nLocale: lang };
-        } else {
-          buildConfigs[lang] = {
-            outputPath,
-            i18nFile: `src/locale/messages.${lang}.${formats[format].ext}`,
-            i18nFormat: format,
-            i18nLocale: lang,
-          };
-        }
+    for (const { lang } of langTranslations) {
+      if (lang === sourceLocale) {
+        i18n.sourceLocale = lang;
       } else {
-        if (lang == sourceLocale) {
-          i18n.sourceLocale = lang;
-        } else {
-          i18n.locales[lang] = `src/locale/messages.${lang}.${formats[format].ext}`;
-        }
-        buildConfigs[lang] = { localize: [lang] };
+        i18n.locales[lang] = `src/locale/messages.${lang}.${formats[format].ext}`;
       }
+
+      buildConfigs[lang] = { localize: [lang] };
 
       serveConfigs[lang] = { browserTarget: `test-project:build:${lang}` };
       e2eConfigs[lang] = {
@@ -264,40 +250,4 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
       }
     }
   }
-}
-
-export default async function () {
-  // Setup i18n tests and config.
-  await setupI18nConfig(false);
-
-  // Legacy option usage with the en-US locale needs $localize when using ivy
-  // Legacy usage did not need to process en-US and typically no i18nLocale options were present
-  // This will currently be the overwhelmingly common scenario for users updating existing projects
-  await appendToFile('src/polyfills.ts', `import '@angular/localize/init';`);
-
-  // Build each locale and verify the output.
-  for (const { lang, translation, outputPath } of langTranslations) {
-    await ng('build', `--configuration=${lang}`);
-    await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
-
-    // Verify the HTML lang attribute is present
-    await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
-
-    // Execute Application E2E tests with dev server
-    await ng('e2e', `--configuration=${lang}`, '--port=0');
-
-    // Execute Application E2E tests for a production build without dev server
-    const server = externalServer(outputPath);
-    try {
-      await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
-    } finally {
-      server.close();
-    }
-  }
-
-  // Verify missing translation behaviour.
-  await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
-  await ng('build', '--configuration=fr', '--i18n-missing-translation', 'ignore');
-  await expectFileToMatch(`${baseDir}/fr/main.js`, /Other content/);
-  await expectToFail(() => ng('build', '--configuration=fr'));
 }
