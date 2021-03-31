@@ -48,7 +48,6 @@ ts_library(
     module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/core",
         "@npm//@types/node",
         "@npm//@types/webpack",
         "@npm//@types/webpack-dev-server",
