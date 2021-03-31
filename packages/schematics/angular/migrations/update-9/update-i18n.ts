@@ -29,7 +29,7 @@ export function updateI18nConfig(): Rule {
       for (const [, target] of allWorkspaceTargets(workspace)) {
         switch (target.builder) {
           case Builders.Browser:
-          case Builders.Karma:
+          case Builders.Server:
             updateBaseHrefs(target);
             removeFormatOption(target);
             addBuilderI18NOptions(target, logger);
