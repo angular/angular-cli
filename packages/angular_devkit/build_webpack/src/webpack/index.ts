@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -14,7 +13,7 @@ import * as webpack from 'webpack';
 import { EmittedFiles, getEmittedFiles } from '../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
 
-export type WebpackBuilderSchema = json.JsonObject & RealWebpackBuilderSchema;
+export type WebpackBuilderSchema = RealWebpackBuilderSchema;
 
 export interface WebpackLoggingCallback {
   (stats: webpack.Stats, config: webpack.Configuration): void;

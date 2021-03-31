@@ -8,8 +8,11 @@
   "builders": "builders.json",
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
-    "@angular-devkit/core": "0.0.0",
     "rxjs": "6.6.7"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "node-fetch": "2.6.1"
   },
   "peerDependencies": {
     "webpack": "^4.6.0",

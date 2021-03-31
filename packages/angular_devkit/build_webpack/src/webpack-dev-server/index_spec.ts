@@ -8,8 +8,8 @@
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
-import { schema, workspaces } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { schema, workspaces } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
+import { NodeJsSyncHost } from '@angular-devkit/core/node'; // tslint:disable-line:no-implicit-dependencies
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
 import * as path from 'path';
 import { DevServerBuildOutput } from './index';
