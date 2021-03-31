@@ -28,11 +28,11 @@ import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
 // tslint:disable-next-line: no-big-function
 export function createBuilder<
-  OptT extends json.JsonObject,
+  OptT = json.JsonObject,
   OutT extends BuilderOutput = BuilderOutput,
 >(
   fn: BuilderHandlerFn<OptT>,
-): Builder<OptT> {
+): Builder<OptT & json.JsonObject> {
   const cjh = experimental.jobs.createJobHandler;
   const handler = cjh<json.JsonObject, BuilderInput, OutT>((options, context) => {
     const scheduler = context.scheduler;
