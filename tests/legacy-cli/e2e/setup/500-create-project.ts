@@ -42,21 +42,6 @@ export default async function() {
       // Ensure local test registry is used inside a project
       await writeFile('.npmrc', `registry=${testRegistry}`);
     }
-
-    if (argv['ve']) {
-      await updateJsonFile('tsconfig.json', config => {
-        const { angularCompilerOptions = {} } = config;
-        angularCompilerOptions.enableIvy = false;
-        config.angularCompilerOptions = angularCompilerOptions;
-      });
-
-      // In VE non prod builds are non AOT by default
-      await updateJsonFile('angular.json', config => {
-        const build = config.projects['test-project'].architect.build;
-        build.options.aot = true;
-        build.configurations.development.aot = false;
-      });
-    }
   }
 
   await prepareProjectForE2e('test-project');

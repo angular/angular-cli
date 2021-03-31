@@ -21,14 +21,12 @@ export default async function () {
     'IE 11',
   );
 
-  if (!getGlobalVariable('argv')['ve']) {
-    // Workaround for https://github.com/angular/angular/issues/32192
-    await replaceInFile(
-      'src/app/app.component.html',
-      /class="material-icons"/g,
-      '',
-    );
-  }
+  // Workaround for https://github.com/angular/angular/issues/32192
+  await replaceInFile(
+    'src/app/app.component.html',
+    /class="material-icons"/g,
+    '',
+  );
 
   await ng('build');
 

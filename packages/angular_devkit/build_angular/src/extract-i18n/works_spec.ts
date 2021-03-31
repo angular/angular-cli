@@ -7,8 +7,7 @@
  */
 import { Architect } from '@angular-devkit/architect';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, extractI18nTargetSpec, host, veEnabled } from '../test-utils';
-
+import { createArchitect, extractI18nTargetSpec, host } from '../test-utils';
 
 describe('Extract i18n Target', () => {
   const extractionFile = join(normalize('src'), 'messages.xlf');
@@ -65,27 +64,7 @@ describe('Extract i18n Target', () => {
 
     await run.stop();
 
-    const msg = veEnabled
-      ? 'Could not mark an element as translatable inside a translatable section'
-      : 'Cannot mark an element as translatable inside of a translatable section';
-
-    expect(logs.join()).toMatch(msg);
-  }, 30000);
-
-  // DISABLED_FOR_IVY
-  (veEnabled ? it : xit)('supports locale', async () => {
-    host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
-    const overrides = { i18nLocale: 'fr' };
-
-    const run = await architect.scheduleTarget(extractI18nTargetSpec, overrides);
-
-    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
-
-    await run.stop();
-
-    expect(host.scopedSync().exists((extractionFile))).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
-      .toContain('source-language="fr"');
+    expect(logs.join()).toMatch('Cannot mark an element as translatable inside of a translatable section');
   }, 30000);
 
   it('supports out file', async () => {
@@ -139,8 +118,7 @@ describe('Extract i18n Target', () => {
       .toMatch(/i18n test/);
   }, 30000);
 
-  // DISABLED_FOR_VE
-  (veEnabled ? xit : it)('issues warnings for duplicate message identifiers', async () => {
+  it('issues warnings for duplicate message identifiers', async () => {
     host.appendToFile(
       'src/app/app.component.ts',
       'const c = $localize`:@@message-2:message contents`; const d = $localize`:@@message-2:different message contents`;',

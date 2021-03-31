@@ -5,11 +5,6 @@ import { ng } from '../../utils/process';
 import { readNgVersion } from '../../utils/version';
 
 export default async function() {
-  // Ivy only test
-  if (getGlobalVariable('argv')['ve']) {
-    return;
-  }
-
   // Setup a library
   await ng('generate', 'library', 'i18n-lib-test');
   await replaceInFile(

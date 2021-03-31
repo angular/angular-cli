@@ -41,7 +41,7 @@ Error.stackTraceLimit = Infinity;
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['debug', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose', 've'],
+  boolean: ['debug', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose'],
   string: ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
 });
 
@@ -98,12 +98,6 @@ allTests = allTests
   .filter(name => !name.endsWith('/existing-directory.ts'))
   // Disabled on rc.0 due to needed sync with devkit for changes.
   .filter(name => !name.endsWith('/service-worker.ts'));
-
-if (argv.ve) {
-  // Remove Ivy specific tests
-  allTests = allTests
-    .filter(name => !name.includes('tests/i18n/ivy-localize-'));
-}
 
 const shardId = 'shard' in argv ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;
