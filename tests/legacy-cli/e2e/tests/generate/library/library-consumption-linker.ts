@@ -1,14 +1,8 @@
-import { getGlobalVariable } from '../../../utils/env';
 import { writeFile } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
 export default async function () {
-  if ((getGlobalVariable('argv')['ve'])) {
-    // Does not apply to ViewEngine
-    return;
-  }
-
   await ng('generate', 'library', 'my-lib');
 
   // Enable partial compilation mode (linker) for the library

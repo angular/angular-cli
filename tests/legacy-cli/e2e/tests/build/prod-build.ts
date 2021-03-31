@@ -1,6 +1,5 @@
 import { statSync } from 'fs';
 import { join } from 'path';
-import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, expectFileToMatch, readFile, replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
@@ -30,11 +29,7 @@ export default async function () {
 
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  const argv = getGlobalVariable('argv');
-  const veProject = argv['ve'];
-  const bootstrapRegExp = veProject
-    ? /bootstrapModuleFactory\(.?[a-zA-Z]+\)\./
-    : /bootstrapModule\(.?[a-zA-Z]+\)\./;
+  const bootstrapRegExp = /bootstrapModule\(.?[a-zA-Z]+\)\./;
 
   // Enable Differential loading to run both size checks
   await replaceInFile(
@@ -66,11 +61,6 @@ export default async function () {
   );
 
   // Size checks in bytes
-  if (veProject) {
-    verifySize(mainES5Path, 184470);
-    verifySize(mainES2017Path, 163627);
-  } else {
-    verifySize(mainES5Path, 163321);
-    verifySize(mainES2017Path, 141032);
-  }
+  verifySize(mainES5Path, 163321);
+  verifySize(mainES2017Path, 141032);
 }

@@ -223,14 +223,12 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
     }
   });
 
-  // Install the localize package if using ivy
-  if (!getGlobalVariable('argv')['ve']) {
-    let localizeVersion = '@angular/localize@' + readNgVersion();
-    if (getGlobalVariable('argv')['ng-snapshots']) {
-      localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
-    }
-    await installPackage(localizeVersion);
+// Install the localize package if using ivy
+  let localizeVersion = '@angular/localize@' + readNgVersion();
+  if (getGlobalVariable('argv')['ng-snapshots']) {
+    localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
+  await installPackage(localizeVersion);
 
   // Extract the translation messages.
   await ng(
@@ -275,9 +273,7 @@ export default async function () {
   // Legacy option usage with the en-US locale needs $localize when using ivy
   // Legacy usage did not need to process en-US and typically no i18nLocale options were present
   // This will currently be the overwhelmingly common scenario for users updating existing projects
-  if (!getGlobalVariable('argv')['ve']) {
-    await appendToFile('src/polyfills.ts', `import '@angular/localize/init';`);
-  }
+  await appendToFile('src/polyfills.ts', `import '@angular/localize/init';`);
 
   // Build each locale and verify the output.
   for (const { lang, translation, outputPath } of langTranslations) {

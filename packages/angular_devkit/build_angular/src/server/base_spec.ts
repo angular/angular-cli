@@ -10,7 +10,7 @@ import { Architect } from '@angular-devkit/architect';
 import { ServerBuilderOutput } from '@angular-devkit/build-angular';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
-import { createArchitect, host, veEnabled } from '../test-utils';
+import { createArchitect, host } from '../test-utils';
 
 
 describe('Server Builder', () => {
@@ -32,13 +32,7 @@ describe('Server Builder', () => {
 
     const fileName = join(outputPath, 'main.js');
     const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-
-    if (veEnabled) {
-      expect(content).toMatch(/AppServerModuleNgFactory/);
-    } else {
-      expect(content).toMatch(/AppServerModule\.ɵmod/);
-    }
-
+    expect(content).toMatch(/AppServerModule\.ɵmod/);
     await run.stop();
   });
 
@@ -144,11 +138,7 @@ describe('Server Builder', () => {
 
         const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        if (veEnabled) {
-          expect(content).toMatch(/AppServerModuleNgFactory/);
-        } else {
-          expect(content).toMatch(/AppServerModule\.ɵmod/);
-        }
+        expect(content).toMatch(/AppServerModule\.ɵmod/);
       }),
       take(1),
     ).toPromise();

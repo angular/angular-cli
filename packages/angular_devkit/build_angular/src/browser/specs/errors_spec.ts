@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { createArchitect, host, veEnabled } from '../../test-utils';
+import { createArchitect, host } from '../../test-utils';
 
 describe('Browser Builder errors', () => {
   const targetSpec = { project: 'app', target: 'build' };
@@ -68,11 +68,7 @@ describe('Browser Builder errors', () => {
     // Wait for the builder to complete
     await run.stop();
 
-    if (!veEnabled) {
-      expect(logs.join()).toContain('selector must be a string');
-    } else {
-      expect(logs.join()).toContain('Function expressions are not supported in');
-    }
+    expect(logs.join()).toContain('selector must be a string');
   });
 
   it('shows missing export errors', async () => {

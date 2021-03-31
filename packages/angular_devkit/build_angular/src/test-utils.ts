@@ -24,8 +24,6 @@ import {
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
 
-// This flag controls whether AOT compilation uses Ivy or View Engine (VE).
-export let veEnabled = process.argv.some(arg => arg == 'view_engine');
 export const workspaceRoot = join(normalize(__dirname), `../test/hello-world-app/`);
 export const host = new TestProjectHost(workspaceRoot);
 export const outputPath: Path = normalize('dist');
@@ -52,11 +50,6 @@ export async function createArchitect(workspaceRoot: Path) {
     new WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath),
   );
   const architect = new Architect(architectHost, registry);
-
-  // Set AOT compilation to use VE if needed.
-  if (veEnabled) {
-    host.replaceInFile('tsconfig.json', `"enableIvy": true,`, `"enableIvy": false,`);
-  }
 
   return {
     workspace,

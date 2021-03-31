@@ -17,7 +17,6 @@ import {
   workspaces,
 } from '@angular-devkit/core';
 import { map, take, tap } from 'rxjs/operators';
-import { veEnabled } from '../test-utils';
 
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
@@ -46,11 +45,6 @@ describe('NgPackagr Builder', () => {
     );
 
     architect = new Architect(architectHost, registry);
-
-    // Set AOT compilation to use VE if needed.
-    if (veEnabled) {
-      host.replaceInFile('tsconfig.json', `"enableIvy": true,`, `"enableIvy": false,`);
-    }
   });
 
   afterEach(() => host.restore().toPromise());
@@ -68,11 +62,7 @@ describe('NgPackagr Builder', () => {
     );
     expect(content).toContain('lib works');
 
-    if (veEnabled) {
-      expect(content).not.toContain('ɵcmp');
-    } else {
-      expect(content).toContain('ɵcmp');
-    }
+    expect(content).toContain('ɵcmp');
   });
 
   it('rebuilds on TS file changes', async () => {

@@ -16,7 +16,6 @@ import {
   host,
   lazyModuleFiles,
   lazyModuleFnImport,
-  veEnabled,
 } from '../../test-utils';
 
 // tslint:disable-next-line:no-big-function
@@ -68,13 +67,9 @@ describe('Browser Builder lazy modules', () => {
       addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
 
       const { files } = await browserBuild(architect, host, target, { aot: true });
-      if (!veEnabled) {
-        const data = await files['lazy-lazy-module.js'];
-        expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
-        expect(data).toContain('LazyModule.ɵmod');
-      } else {
-        expect(files['lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
-      }
+      const data = await files['lazy-lazy-module.js'];
+      expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
+      expect(data).toContain('LazyModule.ɵmod');
     });
   });
 
