@@ -305,7 +305,7 @@ async function handleAsyncIterator<T>(
 /**
  * A builder handler function. The function signature passed to `createBuilder()`.
  */
-export interface BuilderHandlerFn<A extends json.JsonObject> {
+export interface BuilderHandlerFn<A> {
   /**
    * Builders are defined by users to perform any kind of task, like building, testing or linting,
    * and should use this interface.

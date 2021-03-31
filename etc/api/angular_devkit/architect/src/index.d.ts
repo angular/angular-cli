@@ -26,7 +26,7 @@ export interface BuilderContext {
     validateOptions<T extends json.JsonObject = json.JsonObject>(options: json.JsonObject, builderName: string): Promise<T>;
 }
 
-export interface BuilderHandlerFn<A extends json.JsonObject> {
+export interface BuilderHandlerFn<A> {
     (input: A, context: BuilderContext): BuilderOutputLike;
 }
 
@@ -60,7 +60,7 @@ export interface BuilderRun {
     stop(): Promise<void>;
 }
 
-export declare function createBuilder<OptT extends json.JsonObject, OutT extends BuilderOutput = BuilderOutput>(fn: BuilderHandlerFn<OptT>): Builder<OptT>;
+export declare function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput = BuilderOutput>(fn: BuilderHandlerFn<OptT>): Builder<OptT & json.JsonObject>;
 
 export declare function fromAsyncIterable<T>(iterable: AsyncIterable<T>): Observable<T>;
 
