@@ -9857,10 +9857,10 @@ postcss-image-set-function@^3.0.1:
     postcss "^7.0.2"
     postcss-values-parser "^2.0.0"
 
-postcss-import@14.0.0:
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-14.0.0.tgz#3ed1dadac5a16650bde3f4cdea6633b9c3c78296"
-  integrity sha512-gFDDzXhqr9ELmnLHgCC3TbGfA6Dm/YMb/UN8/f7Uuq4fL7VTk2vOIj6hwINEwbokEmp123bLD7a5m+E+KIetRg==
+postcss-import@14.0.1:
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-14.0.1.tgz#6a3f8f2ce74a95fc7c72ecfe3eddfa0e9124e677"
+  integrity sha512-Xn2+z++vWObbEPhiiKO1a78JiyhqipyrXHBb3AHpv0ks7Cdg+GxQQJ24ODNMTanldf7197gSP3axppO9yaG0lA==
   dependencies:
     postcss-value-parser "^4.0.0"
     read-cache "^1.0.0"
