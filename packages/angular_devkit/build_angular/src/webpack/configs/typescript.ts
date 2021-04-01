@@ -5,38 +5,25 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-import { CompilerOptions } from '@angular/compiler-cli';
 import { buildOptimizerLoaderPath } from '@angular-devkit/build-optimizer';
 import { getSystemPath } from '@angular-devkit/core';
-import {
-  AngularCompilerPlugin,
-  AngularCompilerPluginOptions,
-  NgToolsLoader,
-  PLATFORM,
-  ivy,
-} from '@ngtools/webpack';
-import * as path from 'path';
-import { WebpackConfigOptions, BuildOptions } from '../../utils/build-options';
-import { legacyIvyPluginEnabled } from '../../utils/environment-options';
+import { CompilerOptions } from '@angular/compiler-cli';
+import { ivy } from '@ngtools/webpack';
+import { WebpackConfigOptions } from '../../utils/build-options';
 
-function canUseIvyPlugin(wco: WebpackConfigOptions): boolean {
-  // Can only be used with Ivy
-  if (!wco.tsConfig.options.enableIvy) {
-    return false;
+function ensureIvy(wco: WebpackConfigOptions): void {
+  if (wco.tsConfig.options.enableIvy !== false) {
+    return;
   }
 
-  // Allow fallback to legacy build system via environment variable ('NG_BUILD_IVY_LEGACY=1')
-  if (legacyIvyPluginEnabled) {
-    wco.logger.warn(
-      '"NG_BUILD_IVY_LEGACY" environment variable detected. Using legacy Ivy build system.',
-    );
+  wco.logger.warn(
+    'Project is attempting to disable the Ivy compiler. ' +
+      'Angular versions 12 and higher do not support the deprecated View Engine compiler for applications. ' +
+      'The Ivy compiler will be used to build this project. ' +
+      '\nFor additional information or if the build fails, please see https://angular.io/guide/ivy',
+  );
 
-    return false;
-  }
-
-  return true;
+  wco.tsConfig.options.enableIvy = true;
 }
 
 function createIvyPlugin(
@@ -73,111 +60,34 @@ function createIvyPlugin(
   });
 }
 
-function _pluginOptionsOverrides(
-  buildOptions: BuildOptions,
-  pluginOptions: AngularCompilerPluginOptions
-): AngularCompilerPluginOptions {
-  const compilerOptions = {
-    ...(pluginOptions.compilerOptions || {})
-  }
-
-  const hostReplacementPaths: { [replace: string]: string } = {};
-  if (buildOptions.fileReplacements) {
-    for (const replacement of buildOptions.fileReplacements) {
-      hostReplacementPaths[replacement.replace] = replacement.with;
-    }
-  }
-
-  if (buildOptions.preserveSymlinks) {
-    compilerOptions.preserveSymlinks = true;
-  }
-
-  return {
-    ...pluginOptions,
-    hostReplacementPaths,
-    compilerOptions
-  };
-}
-
-function _createAotPlugin(
-  wco: WebpackConfigOptions,
-  options: AngularCompilerPluginOptions,
-  i18nExtract = false,
-) {
-  const { root, buildOptions } = wco;
-
-  const i18nInFile = buildOptions.i18nFile
-    ? path.resolve(root, buildOptions.i18nFile)
-    : undefined;
-
-  const i18nFileAndFormat = i18nExtract
-    ? {
-      i18nOutFile: buildOptions.i18nFile,
-      i18nOutFormat: buildOptions.i18nFormat,
-    } : {
-      i18nInFile: i18nInFile,
-      i18nInFormat: buildOptions.i18nFormat,
-    };
-
-  const compilerOptions = options.compilerOptions || {};
-  if (i18nExtract) {
-    // Extraction of i18n is still using the legacy VE pipeline
-    compilerOptions.enableIvy = false;
-  }
-
-  let pluginOptions: AngularCompilerPluginOptions = {
-    mainPath: path.join(root, buildOptions.main),
-    ...i18nFileAndFormat,
-    locale: buildOptions.i18nLocale,
-    platform: buildOptions.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
-    missingTranslation: buildOptions.i18nMissingTranslation,
-    sourceMap: buildOptions.sourceMap.scripts,
-    nameLazyFiles: buildOptions.namedChunks,
-    forkTypeChecker: buildOptions.forkTypeChecker,
-    logger: wco.logger,
-    directTemplateLoading: true,
-    ...options,
-    compilerOptions,
-  };
-
-  pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
-
-  return new AngularCompilerPlugin(pluginOptions);
-}
-
 export function getNonAotConfig(wco: WebpackConfigOptions) {
   const { tsConfigPath } = wco;
-  const useIvyOnlyPlugin = canUseIvyPlugin(wco);
 
   return {
     module: {
       rules: [
         {
-          test: useIvyOnlyPlugin ? /\.[jt]sx?$/ : /\.tsx?$/,
-          loader: useIvyOnlyPlugin
-            ? ivy.AngularWebpackLoaderPath
-            : NgToolsLoader,
+          test: /\.[jt]sx?$/,
+          loader: ivy.AngularWebpackLoaderPath,
         },
       ],
     },
     plugins: [
-      useIvyOnlyPlugin
-        ? createIvyPlugin(wco, false, tsConfigPath)
-        : _createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }),
+      createIvyPlugin(wco, false, tsConfigPath),
     ],
   };
 }
 
-export function getAotConfig(wco: WebpackConfigOptions, i18nExtract = false) {
+export function getAotConfig(wco: WebpackConfigOptions) {
   const { tsConfigPath, buildOptions } = wco;
-  const optimize = buildOptions.optimization.scripts;
-  const useIvyOnlyPlugin = canUseIvyPlugin(wco) && !i18nExtract;
+
+  ensureIvy(wco);
 
   return {
     module: {
       rules: [
         {
-          test: useIvyOnlyPlugin ? /\.tsx?$/ : /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/,
+          test: /\.tsx?$/,
           use: [
             ...(buildOptions.buildOptimizer
               ? [
@@ -187,52 +97,22 @@ export function getAotConfig(wco: WebpackConfigOptions, i18nExtract = false) {
                   },
                 ]
               : []),
-            useIvyOnlyPlugin ? ivy.AngularWebpackLoaderPath : NgToolsLoader,
+            ivy.AngularWebpackLoaderPath,
           ],
         },
         // "allowJs" support with ivy plugin - ensures build optimizer is not run twice
-        ...(useIvyOnlyPlugin
-          ? [
-              {
-                test: /\.jsx?$/,
-                use: [ivy.AngularWebpackLoaderPath],
-              },
-            ]
-          : []),
+        {
+          test: /\.jsx?$/,
+          use: [ivy.AngularWebpackLoaderPath],
+        },
       ],
     },
     plugins: [
-      useIvyOnlyPlugin
-        ? createIvyPlugin(wco, true, tsConfigPath)
-        : _createAotPlugin(
-            wco,
-            { tsConfigPath, emitClassMetadata: !optimize, emitNgModuleScope: !optimize },
-            i18nExtract,
-          ),
+      createIvyPlugin(wco, true, tsConfigPath),
     ],
   };
 }
 
 export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {
-  if (canUseIvyPlugin(wco)) {
-    return createIvyPlugin(wco, false, workerTsConfigPath);
-  }
-
-  const { buildOptions } = wco;
-
-  let pluginOptions: AngularCompilerPluginOptions = {
-    skipCodeGeneration: true,
-    tsConfigPath: workerTsConfigPath,
-    mainPath: undefined,
-    platform: PLATFORM.Browser,
-    sourceMap: buildOptions.sourceMap.scripts,
-    forkTypeChecker: buildOptions.forkTypeChecker,
-    logger: wco.logger,
-    // Run no transformers.
-    platformTransformers: [],
-  };
-
-  pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
-
-  return new AngularCompilerPlugin(pluginOptions);
+  return createIvyPlugin(wco, false, workerTsConfigPath);
 }
