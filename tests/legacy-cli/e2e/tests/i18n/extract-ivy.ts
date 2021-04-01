@@ -42,7 +42,7 @@ export default async function() {
   });
 
   // Should show ivy disabled application warning with enableIvy false
-  const { message: message4 } = await expectToFail(() => ng('extract-i18n'));
+  const { stderr: message4 } = await ng('extract-i18n');
   if (!message4.includes(`Ivy extraction enabled but application is not Ivy enabled.`)) {
     throw new Error('Expected ivy disabled application warning');
   }
