@@ -38,12 +38,10 @@ ts_library(
         ],
     ),
     deps = [
-        "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/schematics/angular",
         "@npm//@types/node",
         "@npm//@types/parse5-html-rewriting-stream",
-        "@npm//rxjs",
     ],
 )
 
