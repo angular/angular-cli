@@ -1,5 +1,6 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -10,23 +11,34 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 # @angular-devkit/schematics-cli
-
 ts_library(
     name = "schematics_cli",
     srcs = glob(
-        include = ["bin/**/*.ts"],
+        include = ["**/*.ts"],
         exclude = [
-            "bin/**/*_spec.ts",
-            "bin/**/*_benchmark.ts",
-        ],
-    ),
-    # The attribute below is needed in g3 to turn off strict typechecking
-    # strict_checks = False,
-    data = glob(
-        include = ["**/*.json"],
-        exclude = [
+            "**/*_spec.ts",
+            "schematic/files/**",
+            "blank/project-files/**",
+            "blank/schematic-files/**",
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
+        ],
+    ) + [
+        # @external_begin
+        # These files are generated from the JSON schema
+        "//packages/angular_devkit/schematics_cli:blank/schema.ts",
+        "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
+        # @external_end
+    ],
+    data = glob(
+        include = [
+            "collection.json",
+            "package.json",
+            "blank/schema.json",
+            "blank/project-files/**/*",
+            "blank/schematic-files/**/*",
+            "schematic/schema.json",
+            "schematic/files/**/*",
         ],
     ),
     module_name = "@angular-devkit/schematics-cli",
@@ -37,7 +49,6 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tools",
-        "//packages/schematics/schematics",
         "@npm//@types/inquirer",
         "@npm//@types/minimist",
         "@npm//@types/node",
@@ -65,4 +76,14 @@ ts_library(
 jasmine_node_test(
     name = "schematics_cli_test",
     srcs = [":schematics_cli_test_lib"],
+)
+
+ts_json_schema(
+    name = "blank_schema",
+    src = "blank/schema.json",
+)
+
+ts_json_schema(
+    name = "schematic_schema",
+    src = "schematic/schema.json",
 )
