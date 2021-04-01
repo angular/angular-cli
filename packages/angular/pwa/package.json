@@ -13,7 +13,6 @@
     "save": false
   },
   "dependencies": {
-    "@angular-devkit/core": "0.0.0",
     "@angular-devkit/schematics": "0.0.0",
     "@schematics/angular": "0.0.0",
     "parse5-html-rewriting-stream": "6.0.1"

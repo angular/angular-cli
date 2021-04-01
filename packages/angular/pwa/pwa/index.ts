@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -19,6 +18,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { getWorkspace, updateWorkspace } from '@schematics/angular/utility/workspace';
+import { posix } from 'path';
 import { Readable, Writable } from 'stream';
 import { Schema as PwaOptions } from './schema';
 
@@ -117,7 +117,10 @@ export default function(options: PwaOptions): Rule {
     }
 
     // Add manifest to asset configuration
-    const assetEntry = join(normalize(project.root), 'src', 'manifest.webmanifest');
+    const assetEntry = posix.join(
+      project.sourceRoot ?? posix.join(project.root, 'src'),
+      'manifest.webmanifest',
+    );
     for (const target of [...buildTargets, ...testTargets]) {
       if (target.options) {
         if (Array.isArray(target.options.assets)) {
@@ -149,7 +152,7 @@ export default function(options: PwaOptions): Rule {
     }
 
     // Setup sources for the assets files to add to the project
-    const sourcePath = normalize(project.sourceRoot ?? 'src');
+    const sourcePath = project.sourceRoot ?? posix.join(project.root, 'src');
 
     // Setup service worker schematic options
     const { title, ...swOptions } = options;
@@ -163,7 +166,7 @@ export default function(options: PwaOptions): Rule {
       ])),
       mergeWith(apply(url('./files/assets'), [
         template({ ...options }),
-        move(join(sourcePath, 'assets')),
+        move(posix.join(sourcePath, 'assets')),
       ])),
       ...[...indexFiles].map(path => updateIndexFile(path)),
     ]);
