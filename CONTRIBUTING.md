@@ -224,7 +224,6 @@ The following is the list of supported scopes:
 * **@angular-devkit/schematics-cli**
 * **@ngtools/webpack**
 * **@schematics/angular**
-* **@schematics/schematics**
 
 
 ### Subject

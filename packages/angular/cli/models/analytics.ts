@@ -47,7 +47,6 @@ export const analyticsPackageSafelist = [
   /^@angular-devkit\//,
   /^@ngtools\//,
   '@schematics/angular',
-  '@schematics/schematics',
 ];
 
 export function isPackageNameSafeForAnalytics(name: string): boolean {

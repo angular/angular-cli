@@ -14,10 +14,10 @@
     "code generation",
     "schematics"
   ],
+  "schematics": "./collection.json",
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "@angular-devkit/schematics": "0.0.0",
-    "@schematics/schematics": "0.0.0",
     "ansi-colors": "4.1.1",
     "inquirer": "8.0.0",
     "minimist": "1.2.5",

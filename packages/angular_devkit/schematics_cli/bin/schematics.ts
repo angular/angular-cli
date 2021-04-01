@@ -26,7 +26,7 @@ import * as minimist from 'minimist';
  * and show usage.
  *
  * In the case where a collection name isn't part of the argument, the default is to use the
- * schematics package (@schematics/schematics) as the collection.
+ * schematics package (@angular-devkit/schematics-cli) as the collection.
  *
  * This logic is entirely up to the tooling.
  *
@@ -34,7 +34,7 @@ import * as minimist from 'minimist';
  * @return {{collection: string, schematic: (string)}}
  */
 function parseSchematicName(str: string | null): { collection: string, schematic: string | null } {
-  let collection = '@schematics/schematics';
+  let collection = '@angular-devkit/schematics-cli';
 
   let schematic = str;
   if (schematic && schematic.indexOf(':') != -1) {
@@ -328,7 +328,7 @@ function getUsage(): string {
       --force             Force overwriting files that would otherwise be an error.
 
       --list-schematics   List all schematics from the collection, by name. A collection name
-                          should be suffixed by a colon. Example: '@schematics/schematics:'.
+                          should be suffixed by a colon. Example: '@angular-devkit/schematics-cli:'.
 
       --no-interactive    Disables interactive input prompts.
 
