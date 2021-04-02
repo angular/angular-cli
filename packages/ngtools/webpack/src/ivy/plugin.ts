@@ -38,7 +38,7 @@ import { createAotTransformers, createJitTransformers, mergeTransformers } from 
  */
 const DIAGNOSTICS_AFFECTED_THRESHOLD = 1;
 
-export interface AngularPluginOptions {
+export interface AngularWebpackPluginOptions {
   tsconfig: string;
   compilerOptions?: CompilerOptions;
   fileReplacements: Record<string, string>;
@@ -86,7 +86,7 @@ function hashContent(content: string): Uint8Array {
 const PLUGIN_NAME = 'angular-compiler';
 
 export class AngularWebpackPlugin {
-  private readonly pluginOptions: AngularPluginOptions;
+  private readonly pluginOptions: AngularWebpackPluginOptions;
   private watchMode?: boolean;
   private ngtscNextProgram?: NgtscProgram;
   private builder?: ts.EmitAndSemanticDiagnosticsBuilderProgram;
@@ -97,7 +97,7 @@ export class AngularWebpackPlugin {
   private readonly requiredFilesToEmitCache = new Map<string, EmitFileResult | undefined>();
   private readonly fileEmitHistory = new Map<string, { length: number; hash: Uint8Array }>();
 
-  constructor(options: Partial<AngularPluginOptions> = {}) {
+  constructor(options: Partial<AngularWebpackPluginOptions> = {}) {
     this.pluginOptions = {
       emitClassMetadata: false,
       emitNgModuleScope: false,
@@ -110,7 +110,7 @@ export class AngularWebpackPlugin {
     };
   }
 
-  get options(): AngularPluginOptions {
+  get options(): AngularWebpackPluginOptions {
     return this.pluginOptions;
   }
 
