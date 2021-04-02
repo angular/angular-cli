@@ -6,7 +6,7 @@
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
   "labels": [
-    "target: major",
+    "target: minor",
     "action: merge"
   ],
   "timezone": "America/Tijuana",
