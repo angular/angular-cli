@@ -184,7 +184,7 @@ describe('Dev Server Builder live-reload', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 
   it('works without http -> http proxy', async () => {
     const run = await architect.scheduleTarget(target, overrides);
@@ -215,7 +215,7 @@ describe('Dev Server Builder live-reload', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 
   it('works without https -> http proxy', async () => {
     const run = await architect.scheduleTarget(target, overrides);
@@ -246,7 +246,7 @@ describe('Dev Server Builder live-reload', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 
   it('works without https -> http proxy without websockets (dotnet emulation)', async () => {
     const run = await architect.scheduleTarget(target, overrides);
@@ -279,5 +279,5 @@ describe('Dev Server Builder live-reload', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 });

@@ -52,7 +52,7 @@ describe('Karma Builder code coverage', () => {
       expect(content).toContain('app.component.ts');
       expect(content).toContain('test.ts');
     }
-  }, 120000);
+  });
 
   it('supports code coverage exclude option', async () => {
     const overrides = {
@@ -78,7 +78,7 @@ describe('Karma Builder code coverage', () => {
       const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
       expect(content).not.toContain('test.ts');
     }
-  }, 120000);
+  });
 
   it(`should collect coverage from paths in 'sourceRoot'`, async () => {
     const files: { [path: string]: string } = {
@@ -130,7 +130,7 @@ describe('Karma Builder code coverage', () => {
       const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
       expect(content).not.toContain('my-lib');
     }
-  }, 120000);
+  });
 
   it('should exit with non-zero code when coverage is below threshold', async () => {
     host.replaceInFile('karma.conf.js', 'coverageReporter: {', `
@@ -168,7 +168,7 @@ describe('Karma Builder code coverage', () => {
 
     await run.stop();
 
-  }, 120000);
+  });
 
   it('is able to process coverage plugin provided as string', async () => {
     host.replaceInFile('karma.conf.js', /plugins: \[.+?\]/s, `plugins: [
@@ -183,7 +183,7 @@ describe('Karma Builder code coverage', () => {
     const {success} = await run.result;
     expect(success).toBe(true);
     await run.stop();
-  }, 120000);
+  });
 
   it('is able to process coverage plugins provided as string karma-*', async () => {
     host.replaceInFile('karma.conf.js', /plugins: \[.+?\]/s, `plugins: [
@@ -195,5 +195,5 @@ describe('Karma Builder code coverage', () => {
     const {success} = await run.result;
     expect(success).toBe(true);
     await run.stop();
-  }, 120000);
+  });
 });

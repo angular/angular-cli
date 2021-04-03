@@ -36,7 +36,7 @@ describe('Dev Server Builder', () => {
 
     const response = await fetch('http://localhost:4200/index.html');
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
-  }, 30000);
+  });
 
   it(`doesn't serve files on the cwd directly`, async () => {
     const run = await architect.scheduleTarget(target);
@@ -98,7 +98,7 @@ describe('Dev Server Builder', () => {
     expect(output.success).toBe(true);
     const response = await fetch('http://localhost:4200/index.html');
     expect(response.headers.get('X-Header')).toBe('Hello World');
-  }, 30000);
+  });
 
   it('uses source locale when not localizing', async () => {
     const config = host.scopedSync().read(normalize('angular.json'));
