@@ -112,7 +112,7 @@ describe('Dev Server Builder HMR', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 
   it('works for TS changes', async () => {
     const run = await architect.scheduleTarget(target, overrides);
@@ -147,7 +147,7 @@ describe('Dev Server Builder HMR', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 
   it('restores input and select values', async () => {
     const run = await architect.scheduleTarget(target, overrides);
@@ -191,5 +191,5 @@ describe('Dev Server Builder HMR', () => {
         take(2),
       )
       .toPromise();
-  }, 30000);
+  });
 });

@@ -266,7 +266,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, styles: [`src/styles.scss`] };
     await browserBuild(architect, host, target, overrides);
-  }, 30000);
+  });
 
   it(`supports font-awesome imports (tilde)`, async () => {
     host.writeMultipleFiles({
@@ -278,7 +278,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, styles: [`src/styles.scss`] };
     await browserBuild(architect, host, target, overrides);
-  }, 30000);
+  });
 
   it(`supports font-awesome imports without extractCss`, async () => {
     host.writeMultipleFiles({
@@ -289,7 +289,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: false, styles: [`src/styles.scss`] };
     await browserBuild(architect, host, target, overrides);
-  }, 30000);
+  });
 
   it(`uses autoprefixer`, async () => {
     host.writeMultipleFiles({
@@ -456,7 +456,7 @@ describe('Browser Builder styles', () => {
     main = await files['main.js'];
     expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-  }, 90000);
+  });
 
   it(`supports bootstrap@4 with full path`, async () => {
     const bootstrapPath = dirname(require.resolve('bootstrap/package.json'));

@@ -40,7 +40,7 @@ describe('Dev Server Builder ssl', () => {
       agent: new https.Agent({ rejectUnauthorized: false }),
     });
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
-  }, 30000);
+  });
 
   it('supports key and cert', async () => {
     host.writeMultipleFiles({
@@ -116,5 +116,5 @@ describe('Dev Server Builder ssl', () => {
       agent: new https.Agent({ rejectUnauthorized: false }),
     });
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
-  }, 30000);
+  });
 });

@@ -36,7 +36,7 @@ describe('Extract i18n Target', () => {
       const content = virtualFs.fileBufferToString(host.scopedSync().read(extractionFile));
       expect(content).toContain('i18n test');
     }
-  }, 30000);
+  });
 
   it('does not emit the application files', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
@@ -48,7 +48,7 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(normalize('dist/app/main.js'))).toBeFalse();
-  }, 30000);
+  });
 
   it('shows errors', async () => {
     const logger = new logging.Logger('');
@@ -65,7 +65,7 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(logs.join()).toMatch('Cannot mark an element as translatable inside of a translatable section');
-  }, 30000);
+  });
 
   it('supports out file', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
@@ -82,7 +82,7 @@ describe('Extract i18n Target', () => {
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
     expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
       .toMatch(/i18n test/);
-  }, 30000);
+  });
 
   it('supports output path', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
@@ -100,7 +100,7 @@ describe('Extract i18n Target', () => {
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
     expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
       .toMatch(/i18n test/);
-  }, 30000);
+  });
 
   it('supports i18n format', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
@@ -116,7 +116,7 @@ describe('Extract i18n Target', () => {
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
     expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
       .toMatch(/i18n test/);
-  }, 30000);
+  });
 
   it('issues warnings for duplicate message identifiers', async () => {
     host.appendToFile(
@@ -140,5 +140,5 @@ describe('Extract i18n Target', () => {
       'Duplicate messages with id',
     );
 
-  }, 30000);
+  });
 });

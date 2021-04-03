@@ -25,7 +25,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 30000);
+  });
 
   it('fails with no devServerTarget and no standalone server', async () => {
     const overrides = { devServerTarget: undefined } as unknown as JsonObject;
@@ -34,7 +34,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
 
     await run.stop();
-  }, 30000);
+  });
 
   it('overrides protractor specs', async () => {
     host.scopedSync().rename(
@@ -48,7 +48,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 60000);
+  });
 
   it('overrides protractor suites', async () => {
     host.scopedSync().rename(
@@ -70,7 +70,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 60000);
+  });
 
   it('supports automatic port assignment (port = 0)', async () => {
     const overrides = { port: 0 };
@@ -79,7 +79,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 30000);
+  });
 
   it('supports dev server builder with browser builder base HREF option', async () => {
     host.replaceInFile(
@@ -95,7 +95,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 30000);
+  });
 
   it('supports running tests by pattern', async () => {
     host.writeMultipleFiles({
@@ -112,7 +112,7 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 30000);
+  });
 
   it('supports running tests excluding a pattern', async () => {
     host.writeMultipleFiles({
@@ -129,5 +129,5 @@ describe('Protractor Builder', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     await run.stop();
-  }, 30000);
+  });
 });
