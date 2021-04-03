@@ -19,8 +19,8 @@ module.exports = {
     filename: `[name].js`,
   },
   plugins: [
-    new ngToolsWebpack.AngularCompilerPlugin({
-      tsConfigPath: path.resolve(projectRoot, './src/tsconfig.app.json')
+    new ngToolsWebpack.AngularWebpackPlugin({
+      tsconfig: path.resolve(projectRoot, './src/tsconfig.app.json')
     })
   ],
   module: {
