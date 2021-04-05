@@ -8,7 +8,7 @@
 import { buildOptimizerLoaderPath } from '@angular-devkit/build-optimizer';
 import { getSystemPath } from '@angular-devkit/core';
 import { CompilerOptions } from '@angular/compiler-cli';
-import { ivy } from '@ngtools/webpack';
+import { AngularWebpackLoaderPath, AngularWebpackPlugin } from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
 
 function ensureIvy(wco: WebpackConfigOptions): void {
@@ -30,7 +30,7 @@ function createIvyPlugin(
   wco: WebpackConfigOptions,
   aot: boolean,
   tsconfig: string,
-): ivy.AngularWebpackPlugin {
+): AngularWebpackPlugin {
   const { buildOptions } = wco;
   const optimize = buildOptions.optimization.scripts;
 
@@ -51,7 +51,7 @@ function createIvyPlugin(
     }
   }
 
-  return new ivy.AngularWebpackPlugin({
+  return new AngularWebpackPlugin({
     tsconfig,
     compilerOptions,
     fileReplacements,
@@ -68,7 +68,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
       rules: [
         {
           test: /\.[jt]sx?$/,
-          loader: ivy.AngularWebpackLoaderPath,
+          loader: AngularWebpackLoaderPath,
         },
       ],
     },
@@ -97,13 +97,13 @@ export function getAotConfig(wco: WebpackConfigOptions) {
                   },
                 ]
               : []),
-            ivy.AngularWebpackLoaderPath,
+            AngularWebpackLoaderPath,
           ],
         },
         // "allowJs" support with ivy plugin - ensures build optimizer is not run twice
         {
           test: /\.jsx?$/,
-          use: [ivy.AngularWebpackLoaderPath],
+          use: [AngularWebpackLoaderPath],
         },
       ],
     },
