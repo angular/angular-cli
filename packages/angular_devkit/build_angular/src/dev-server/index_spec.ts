@@ -25,10 +25,10 @@ describe('Dev Server Builder index', () => {
     });
 
     const architect = (await createArchitect(host.root())).architect;
-    const run = await architect.scheduleTarget(targetSpec);
+    const run = await architect.scheduleTarget(targetSpec, { port: 0 });
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    const response = await fetch('http://localhost:4200/index.html');
+    const response = await fetch(output.baseUrl);
     expect(await response.text()).toContain(
       '<script src="runtime.js" type="module"></script>' +
         '<script src="polyfills.js" type="module"></script>' +
@@ -67,10 +67,10 @@ describe('Dev Server Builder index', () => {
     await workspaces.writeWorkspace(workspace, workspaces.createWorkspaceHost(host));
 
     const architect = (await createArchitect(host.root())).architect;
-    const run = await architect.scheduleTarget(targetSpec);
+    const run = await architect.scheduleTarget(targetSpec, { port: 0 });
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    const response = await fetch('http://localhost:4200/index.html');
+    const response = await fetch(output.baseUrl);
     expect(await response.text()).toContain(
       '<script src="runtime.js" type="module"></script>' +
         '<script src="polyfills.js" type="module"></script>' +
@@ -89,10 +89,10 @@ describe('Dev Server Builder index', () => {
     });
 
     const architect = (await createArchitect(host.root())).architect;
-    const run = await architect.scheduleTarget(targetSpec);
+    const run = await architect.scheduleTarget(targetSpec, { port: 0 });
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    const response = await fetch('http://localhost:4200/index.html');
+    const response = await fetch(output.baseUrl);
     expect(await response.text()).toContain(
       '<script src="runtime.js" defer></script>' +
         '<script src="polyfills.js" defer></script>' +
@@ -132,10 +132,10 @@ describe('Dev Server Builder index', () => {
     await workspaces.writeWorkspace(workspace, workspaces.createWorkspaceHost(host));
 
     const architect = (await createArchitect(host.root())).architect;
-    const run = await architect.scheduleTarget(targetSpec);
+    const run = await architect.scheduleTarget(targetSpec, { port: 0 });
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    const response = await fetch('http://localhost:4200/index.html');
+    const response = await fetch(output.baseUrl);
     expect(await response.text()).toContain(`lang="${locale}"`);
     await run.stop();
   });

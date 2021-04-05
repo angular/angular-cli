@@ -47,7 +47,7 @@ describe('Dev Server Builder', () => {
 
   it('should not generate sourcemaps when running prod build', async () => {
     // Production builds have sourcemaps turned off.
-    const run = await architect.scheduleTarget({ ...target, configuration: 'production' });
+    const run = await architect.scheduleTarget({ ...target, configuration: 'production' }, { port: 0 });
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
@@ -57,11 +57,11 @@ describe('Dev Server Builder', () => {
 
   it('serves custom headers', async () => {
     const run = await architect.scheduleTarget(
-        target, {headers: {'X-Header': 'Hello World'}});
+        target, {headers: {'X-Header': 'Hello World'}, port: 0});
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    const response = await fetch('http://localhost:4200/index.html');
+    const response = await fetch(output.baseUrl);
     expect(response.headers.get('X-Header')).toBe('Hello World');
   });
 
@@ -77,13 +77,13 @@ describe('Dev Server Builder', () => {
     });
 
     const architect = (await createArchitect(host.root())).architect;
-    const run = await architect.scheduleTarget(target);
-    const output = await run.result;
+    const run = await architect.scheduleTarget(target, { port: 0 });
+    const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
 
-    const indexResponse = await fetch('http://localhost:4200/index.html');
+    const indexResponse = await fetch(output.baseUrl);
     expect(await indexResponse.text()).toContain('lang="fr"');
-    const vendorResponse = await fetch('http://localhost:4200/vendor.js');
+    const vendorResponse = await fetch(output.baseUrl + 'vendor.js');
     const vendorText = await vendorResponse.text();
     expect(vendorText).toContain('fr');
     expect(vendorText).toContain('octobre');

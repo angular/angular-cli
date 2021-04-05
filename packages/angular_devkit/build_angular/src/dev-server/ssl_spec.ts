@@ -30,13 +30,13 @@ describe('Dev Server Builder ssl', () => {
   });
 
   it('works', async () => {
-    const run = await architect.scheduleTarget(target, { ssl: true });
+    const run = await architect.scheduleTarget(target, { ssl: true, port: 0 });
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('https://localhost:4200/');
+    expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
-    const response = await fetch('https://localhost:4200/index.html', {
+    const response = await fetch(output.baseUrl, {
       agent: new https.Agent({ rejectUnauthorized: false }),
     });
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
@@ -104,15 +104,16 @@ describe('Dev Server Builder ssl', () => {
       ssl: true,
       sslKey: 'ssl/server.key',
       sslCert: 'ssl/server.crt',
+      port: 0,
     };
 
     const run = await architect.scheduleTarget(target, overrides);
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('https://localhost:4200/');
+    expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
-    const response = await fetch('https://localhost:4200/index.html', {
+    const response = await fetch(output.baseUrl, {
       agent: new https.Agent({ rejectUnauthorized: false }),
     });
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
