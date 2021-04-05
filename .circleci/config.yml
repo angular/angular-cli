@@ -17,8 +17,8 @@ orbs:
 ## IMPORTANT
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &cache_key angular_devkit-12.18-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win angular_devkit-win-12.18-{{ checksum "yarn.lock" }}
+var_1: &cache_key v1-angular_devkit-12.18-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v1-angular_devkit-win-12.18-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion "12.18"
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
@@ -139,7 +139,7 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - persist_to_workspace:
           root: *workspace_location
           paths:
@@ -275,13 +275,12 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key_win
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
       - run: yarn build
       - save_cache:
           key: *cache_key_win
           paths:
-            # Get cache dir on windows via `yarn cache dir`
-            - C:\Users\circleci\AppData\Local\Yarn\Cache\v4
+            - ~/.cache/yarn
       # Only jobs downstream from this one will see the updated workspace
       # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
       - persist_to_workspace:
