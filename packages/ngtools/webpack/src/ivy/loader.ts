@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as path from 'path';
-import { AngularPluginSymbol, FileEmitter } from './symbol';
+import { AngularPluginSymbol, FileEmitterCollection } from './symbol';
 
 export function angularWebpackLoader(
   this: import('webpack').loader.LoaderContext,
@@ -20,8 +20,8 @@ export function angularWebpackLoader(
     throw new Error('Invalid webpack version');
   }
 
-  const emitFile = this._compilation[AngularPluginSymbol] as FileEmitter;
-  if (typeof emitFile !== 'function') {
+  const fileEmitter = this._compilation[AngularPluginSymbol] as FileEmitterCollection;
+  if (typeof fileEmitter !== 'object') {
     if (this.resourcePath.endsWith('.js')) {
       // Passthrough for JS files when no plugin is used
       this.callback(undefined, content, map);
@@ -34,7 +34,7 @@ export function angularWebpackLoader(
     return;
   }
 
-  emitFile(this.resourcePath)
+  fileEmitter.emit(this.resourcePath)
     .then((result) => {
       if (!result) {
         if (this.resourcePath.endsWith('.js')) {
