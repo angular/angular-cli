@@ -95,7 +95,7 @@ describe('Web Worker Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const appComponent = tree.readContent('/projects/bar/src/app/app.component.ts');
-    expect(appComponent).toContain(`new Worker('./${defaultOptions.name}.worker`);
+    expect(appComponent).toContain(`new Worker(new URL('./${defaultOptions.name}.worker`);
     expect(appComponent).toContain('console.log(`page got message: ${data}`)');
   });
 

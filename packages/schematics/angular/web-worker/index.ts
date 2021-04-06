@@ -79,7 +79,7 @@ function addSnippet(options: WebWorkerOptions): Rule {
     const workerCreationSnippet = tags.stripIndent`
       if (typeof Worker !== 'undefined') {
         // Create a new
-        const worker = new Worker('./${options.name}.worker', { type: 'module' });
+        const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
         worker.onmessage = ({ data }) => {
           ${logMessage}
         };
