@@ -27,7 +27,7 @@ import {
   augmentProgramWithVersioning,
 } from './host';
 import { externalizePath, normalizePath } from './paths';
-import { AngularPluginSymbol, EmitFileResult, FileEmitter } from './symbol';
+import { AngularPluginSymbol, EmitFileResult, FileEmitter, FileEmitterCollection } from './symbol';
 import { InputFileSystemSync, createWebpackSystem } from './system';
 import { createAotTransformers, createJitTransformers, mergeTransformers } from './transformation';
 
@@ -54,7 +54,7 @@ interface WebpackCompilation extends compilation.Compilation {
   // tslint:disable-next-line: no-any
   compilationDependencies: { add(item: string): any };
   rebuildModule(module: compilation.Module, callback: () => void): void;
-  [AngularPluginSymbol]: FileEmitter;
+  [AngularPluginSymbol]: FileEmitterCollection;
 }
 
 function initializeNgccProcessor(
@@ -155,6 +155,12 @@ export class AngularWebpackPlugin {
     let previousUnused: Set<string> | undefined;
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (thisCompilation) => {
       const compilation = thisCompilation as WebpackCompilation;
+
+      // Register plugin to ensure deterministic emit order in multi-plugin usage
+      if (!compilation[AngularPluginSymbol]) {
+        compilation[AngularPluginSymbol] = new FileEmitterCollection();
+      }
+      const emitRegistration = compilation[AngularPluginSymbol].register();
 
       // Store watch mode; assume true if not present (webpack < 4.23.0)
       this.watchMode = compiler.watchMode ?? true;
@@ -294,7 +300,7 @@ export class AngularWebpackPlugin {
       });
 
       // Store file emitter for loader usage
-      compilation[AngularPluginSymbol] = fileEmitter;
+      emitRegistration.update(fileEmitter);
     });
   }
 
@@ -538,7 +544,7 @@ export class AngularWebpackPlugin {
       // tslint:disable-next-line: no-any
       (angularProgram as any).reuseTsProgram =
         // tslint:disable-next-line: no-any
-        angularCompiler?.getNextProgram() || (angularCompiler as any)?.getCurrentProgram();
+        angularCompiler.getNextProgram?.() || (angularCompiler as any).getCurrentProgram?.();
 
       return this.createFileEmitter(
         builder,
