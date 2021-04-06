@@ -8,7 +8,6 @@
 import { join } from 'path';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { expectToFail } from '../../utils/utils';
 
 export default async function () {
   const workerPath = join('src', 'app', 'app.worker.ts');
@@ -27,23 +26,19 @@ export default async function () {
   await expectFileToExist(workerPath);
   await expectFileToExist(projectTsConfig);
   await expectFileToExist(workerTsConfig);
-  await expectFileToMatch(snippetPath, `new Worker('./app.worker', { type: 'module' })`);
+  await expectFileToMatch(snippetPath, `new Worker(new URL('./app.worker', import.meta.url)`);
 
   await ng('build', '--configuration=development');
-  await expectFileToExist('dist/test-project/0-es5.worker.js');
-  await expectFileToMatch('dist/test-project/main-es5.js', '0-es5.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2017.worker.js'));
-  await expectFileToExist('dist/test-project/0-es2017.worker.js');
-  await expectFileToMatch('dist/test-project/main-es2017.js', '0-es2017.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2017.js', '0-es5.worker.js'));
+  await expectFileToExist('dist/test-project/src_app_app_worker_ts-es5.js');
+  await expectFileToMatch('dist/test-project/main-es5.js', 'src_app_app_worker_ts');
+  await expectFileToExist('dist/test-project/src_app_app_worker_ts-es2017.js');
+  await expectFileToMatch('dist/test-project/main-es2017.js', 'src_app_app_worker_ts');
 
   await ng('build', '--output-hashing=none');
-  await expectFileToExist('dist/test-project/0-es5.worker.js');
-  await expectFileToMatch('dist/test-project/main-es5.js', '0-es5.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2017.worker.js'));
-  await expectFileToExist('dist/test-project/0-es2017.worker.js');
-  await expectFileToMatch('dist/test-project/main-es2017.js', '0-es2017.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2017.js', '0-es5.worker.js'));
+  await expectFileToExist('dist/test-project/609-es5.js');
+  await expectFileToMatch('dist/test-project/main-es5.js', '609');
+  await expectFileToExist('dist/test-project/609-es2017.js');
+  await expectFileToMatch('dist/test-project/main-es2017.js', '609');
 
   // console.warn has to be used because chrome only captures warnings and errors by default
   // https://github.com/angular/protractor/issues/2207
