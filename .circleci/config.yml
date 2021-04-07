@@ -265,10 +265,9 @@ jobs:
             yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
 
   # Windows jobs
-  # CircleCI support for Windows jobs is still in preview.
-  # Docs: https://github.com/CircleCI-Public/windows-preview-docs
-  setup-and-build-win:
+  e2e-cli-win:
     executor: windows-executor
+    parallelism: 8
     steps:
       - custom_attach_workspace
       - setup_windows
@@ -276,33 +275,19 @@ jobs:
           keys:
             - *cache_key_win
       - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
-      - run: yarn build
       - save_cache:
           key: *cache_key_win
           paths:
             - ~/.cache/yarn
-      # Only jobs downstream from this one will see the updated workspace
-      # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
-      - persist_to_workspace:
-          root: *workspace_location
-          paths:
-            - ./*
-
-  test-win:
-    executor: windows-executor
-    steps:
-      - custom_attach_workspace
-      - setup_windows
-      # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
-      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" }
-             
-  e2e-cli-win:
-    executor: windows-executor
-    parallelism: 4
-    steps:
-      - custom_attach_workspace
-      - setup_windows
-      - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+      # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
+      - run:
+          name: Execute E2E Tests
+          command: |
+            if (Test-Path env:CIRCLE_PR_NUMBER) {
+              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+            } else {
+              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+            }
 
 workflows:
   version: 2
@@ -356,24 +341,10 @@ workflows:
             - build
       
       # Windows jobs
-      # These jobs only run after their non-windows counterparts finish successfully.
-      # This isn't strictly necessary as there is no artifact dependency, but helps economize
-      # CI resources by not attempting to build when we know it should fail.
-      - setup-and-build-win:
-          requires:
-            # The Linux setup job also does checkout and rebase, which we get via the workspace.
-            - setup
-            - build
-      - test-win:
+      - e2e-cli-win:
           requires:
             - test
-            - setup-and-build-win
-      - e2e-cli-win:
-          <<: *only_release_branches
-          requires:
-            - setup-and-build-win
-            - e2e-cli
-      
+
       # Publish jobs
       - snapshot_publish:
           <<: *only_release_branches

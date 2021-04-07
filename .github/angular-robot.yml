@@ -42,11 +42,10 @@ merge:
     requiredStatuses:
       - "ci/circleci: build"
       - "ci/circleci: setup"
-      - "ci/circleci: setup-and-build-win"
       - "ci/circleci: lint"
       - "ci/circleci: validate"
       - "ci/circleci: test"
-      - "ci/circleci: test-win"
+      - "ci/circleci: e2e-cli-win"
       - "ci/circleci: e2e-cli"
       - "ci/circleci: test-browsers"
       - "ci/angular: size"
