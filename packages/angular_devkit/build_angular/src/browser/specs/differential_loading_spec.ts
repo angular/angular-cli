@@ -10,8 +10,6 @@ import { Architect } from '@angular-devkit/architect';
 import { PathFragment } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-const TEST_TIMEOUT = 8 * 60 * 1000;
-
 // tslint:disable-next-line: no-big-function
 describe('Browser Builder with differential loading', () => {
   const target = { project: 'app', target: 'build' };
@@ -61,7 +59,7 @@ describe('Browser Builder with differential loading', () => {
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
-  }, TEST_TIMEOUT);
+  });
 
   it('emits all the neccessary files for target of ESNext', async () => {
     host.replaceInFile(
@@ -101,7 +99,7 @@ describe('Browser Builder with differential loading', () => {
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
-  }, TEST_TIMEOUT);
+  });
 
   it('deactivates differential loading for watch mode', async () => {
     const { files } = await browserBuild(architect, host, target, { watch: true });
@@ -127,7 +125,7 @@ describe('Browser Builder with differential loading', () => {
     ] as PathFragment[];
 
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
-  }, TEST_TIMEOUT);
+  });
 
   it('emits the right ES formats', async () => {
     const { files } = await browserBuild(architect, host, target, {
@@ -136,13 +134,13 @@ describe('Browser Builder with differential loading', () => {
     });
     expect(await files['main-es5.js']).not.toContain('const ');
     expect(await files['main-es2017.js']).toContain('const ');
-  }, TEST_TIMEOUT);
+  });
 
   it('wraps ES5 scripts in an IIFE', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: false });
     expect(await files['main-es5.js']).toMatch(/^\(function \(\) \{/);
     expect(await files['main-es2017.js']).not.toMatch(/^\(function \(\) \{/);
-  }, TEST_TIMEOUT);
+  });
 
   it('uses the right zone.js variant', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: false });
@@ -150,7 +148,7 @@ describe('Browser Builder with differential loading', () => {
     expect(await files['polyfills-es5.js']).toContain('registerElementPatch');
     expect(await files['polyfills-es2017.js']).not.toContain('zone.js/plugins/zone-legacy');
     expect(await files['polyfills-es2017.js']).not.toContain('registerElementPatch');
-  }, TEST_TIMEOUT);
+  });
 
   it('adds `type="module"` when differential loading is needed', async () => {
     host.writeMultipleFiles({
@@ -167,5 +165,5 @@ describe('Browser Builder with differential loading', () => {
       '<script src="vendor-es2017.js" type="module"></script>' +
       '<script src="main-es2017.js" type="module"></script>',
     );
-  }, TEST_TIMEOUT);
+  });
 });
