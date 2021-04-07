@@ -19,7 +19,7 @@ orbs:
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-14.15-{{ checksum "yarn.lock" }}
 var_1_win: &cache_key_win v1-angular_devkit-win-12.22-{{ checksum "yarn.lock" }}
-var_3: &default_nodeversion "14.15"
+var_3: &default_nodeversion '14.15'
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
@@ -88,7 +88,7 @@ commands:
         default: CIRCLE_PROJECT_REPONAME
     steps:
       - run:
-          name: "Setup bazel RBE remote execution"
+          name: 'Setup bazel RBE remote execution'
           command: |
             touch .bazelrc.user;
             # We need ensure that the same default digest is used for encoding and decoding
@@ -111,7 +111,7 @@ commands:
   install_python:
     steps:
       - run:
-          name: "Install Python 2"
+          name: 'Install Python 2'
           command: |
             sudo apt-get update > /dev/null 2>&1
             sudo apt-get install -y python
@@ -155,10 +155,10 @@ jobs:
       - custom_attach_workspace
       - run: yarn lint
       - run: 'yarn bazel:format -mode=check ||
-              (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
+          (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
       # Run the skylark linter to check our Bazel rules
       - run: 'yarn bazel:lint ||
-              (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+          (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
 
   validate:
     executor: action-executor
@@ -226,7 +226,7 @@ jobs:
         # too early without Saucelabs not being ready.
       - run: ./scripts/saucelabs/wait-for-tunnel.sh
       - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
-      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts 
+      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
       - run: ./scripts/saucelabs/stop-tunnel.sh
 
   build:
@@ -254,7 +254,7 @@ jobs:
       - custom_attach_workspace
       - run:
           name: Decrypt Credentials
-          # Note: when changing the image, you might have to re-encrypt the credentials with a 
+          # Note: when changing the image, you might have to re-encrypt the credentials with a
           # matching version of openssl.
           # See https://stackoverflow.com/a/43847627/2116927 for more info.
           command: |
@@ -324,7 +324,7 @@ workflows:
                 - master
       - e2e-cli:
           name: e2e-cli-node-12
-          nodeversion: "12.18"
+          nodeversion: '12.18'
           <<: *only_release_branches
           requires:
             - e2e-cli
@@ -334,12 +334,12 @@ workflows:
 
       # Bazel jobs
       # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
-      # will catch any build errors before proceeding to the more lengthy and resource intensive 
+      # will catch any build errors before proceeding to the more lengthy and resource intensive
       # Bazel jobs.
       - test:
           requires:
             - build
-      
+
       # Windows jobs
       - e2e-cli-win:
           requires:
