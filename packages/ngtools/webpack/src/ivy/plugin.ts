@@ -47,6 +47,7 @@ export interface AngularWebpackPluginOptions {
   emitClassMetadata: boolean;
   emitNgModuleScope: boolean;
   jitMode: boolean;
+  inlineStyleMimeType?: string;
 }
 
 // Add support for missing properties in Webpack types as well as the loader's file emitter

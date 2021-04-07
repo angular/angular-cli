@@ -35,13 +35,18 @@ export function createAotTransformers(
 
 export function createJitTransformers(
   builder: ts.BuilderProgram,
-  options: { directTemplateLoading?: boolean },
+  options: { directTemplateLoading?: boolean; inlineStyleMimeType?: string },
 ): ts.CustomTransformers {
   const getTypeChecker = () => builder.getProgram().getTypeChecker();
 
   return {
     before: [
-      replaceResources(() => true, getTypeChecker, options.directTemplateLoading),
+      replaceResources(
+        () => true,
+        getTypeChecker,
+        options.directTemplateLoading,
+        options.inlineStyleMimeType,
+      ),
       constructorParametersDownlevelTransform(builder.getProgram()),
     ],
   };
@@ -89,7 +94,11 @@ export function replaceBootstrap(
             bootstrapImport = nodeFactory.createImportDeclaration(
               undefined,
               undefined,
-              nodeFactory.createImportClause(false, undefined, nodeFactory.createNamespaceImport(bootstrapNamespace)),
+              nodeFactory.createImportClause(
+                false,
+                undefined,
+                nodeFactory.createNamespaceImport(bootstrapNamespace),
+              ),
               nodeFactory.createStringLiteral('@angular/platform-browser'),
             );
           }
