@@ -18,7 +18,7 @@ orbs:
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-14.15-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win v1-angular_devkit-win-14.15-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v1-angular_devkit-win-12.22-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion "14.15"
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
@@ -75,8 +75,8 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
-      - run: nvm install 14.15
-      - run: nvm use 14.15
+      - run: nvm install 12.22.1
+      - run: nvm use 12.22.1
       - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
@@ -294,7 +294,7 @@ jobs:
       - custom_attach_workspace
       - setup_windows
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
-      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts}" }
+      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" }
              
   e2e-cli-win:
     executor: windows-executor
