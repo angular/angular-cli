@@ -285,10 +285,10 @@ LARGE_SPECS = {
         "tags": ["no-remote-exec"],
     },
     "dev-server": {
+        "shards": 10,
+        "size": "large",
         "extra_deps": [
-            "@npm//@types/express",
             "@npm//@types/node-fetch",
-            "@npm//express",
             "@npm//node-fetch",
             "@npm//@types/http-proxy",
             "@npm//http-proxy",
