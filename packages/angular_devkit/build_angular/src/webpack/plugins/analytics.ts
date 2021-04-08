@@ -7,10 +7,10 @@
  */
 import { analytics } from '@angular-devkit/core';
 import {
+  Compilation,
   Compiler,
   Module,
   Stats,
-  compilation,
 } from 'webpack';
 import { OriginalSource } from 'webpack-sources';
 
@@ -182,7 +182,7 @@ export class NgBuildAnalyticsPlugin {
     }
   }
 
-  protected _collectBundleStats(compilation: compilation.Compilation) {
+  protected _collectBundleStats(compilation: Compilation) {
     const chunkAssets = new Set<string>();
     for (const chunk of compilation.chunks) {
       if (!chunk.rendered) {
@@ -231,7 +231,7 @@ export class NgBuildAnalyticsPlugin {
    * Reports a succeed module.
    * @private
    */
-  protected _succeedModule(mod: compilation.Module) {
+  protected _succeedModule(mod: Module) {
     // Only report NormalModule instances.
     if (mod.constructor !== NormalModule) {
       return;
@@ -253,7 +253,7 @@ export class NgBuildAnalyticsPlugin {
     }
   }
 
-  protected _compilation(compiler: Compiler, compilation: compilation.Compilation) {
+  protected _compilation(compiler: Compiler, compilation: Compilation) {
     this._reset();
     compilation.hooks.succeedModule.tap('NgBuildAnalyticsPlugin', this._succeedModule.bind(this));
   }

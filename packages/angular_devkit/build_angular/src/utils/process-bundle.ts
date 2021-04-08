@@ -35,8 +35,6 @@ import { I18nOptions } from './i18n-options';
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
-const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
-
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 
@@ -88,7 +86,7 @@ let i18n: I18nOptions | undefined;
 
 export function setup(data: number[] | { cachePath: string; i18n: I18nOptions }): void {
   const options = Array.isArray(data)
-    ? (deserialize(Buffer.from(data)) as { cachePath: string; i18n: I18nOptions })
+    ? (v8.deserialize(Buffer.from(data)) as { cachePath: string; i18n: I18nOptions })
     : data;
   cachePath = options.cachePath;
   i18n = options.i18n;

@@ -7,7 +7,6 @@
  */
 
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 const webpackOutputOptions = {
   all: false, // Fallback value for stats options when an option is not defined. It has precedence over local webpack defaults.
@@ -43,11 +42,7 @@ const verboseWebpackOutputOptions:  Record<string, boolean | string | number> = 
   logging: 'verbose',
 };
 
-if (isWebpackFiveOrHigher()) {
-  verboseWebpackOutputOptions['modulesSpace'] = Infinity;
-} else {
-  verboseWebpackOutputOptions['maxModules'] = Infinity;
-}
+verboseWebpackOutputOptions['modulesSpace'] = Infinity;
 
 export function getWebpackStatsConfig(verbose = false) {
   return verbose

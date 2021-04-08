@@ -21,8 +21,3 @@ export function isWebpackFiveOrHigher(): boolean {
 
   return cachedIsWebpackFiveOrHigher;
 }
-
-// tslint:disable-next-line: no-any
-export function withWebpackFourOrFive<T, R>(webpackFourValue: T, webpackFiveValue: R): any {
-  return isWebpackFiveOrHigher() ? webpackFiveValue : webpackFourValue;
-}

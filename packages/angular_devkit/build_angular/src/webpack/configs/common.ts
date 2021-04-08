@@ -35,10 +35,8 @@ import {
 import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
 import { addError } from '../../utils/webpack-diagnostics';
-import { isWebpackFiveOrHigher, withWebpackFourOrFive } from '../../utils/webpack-version';
 import {
   DedupeModuleResolvePlugin,
-  NamedLazyChunksPlugin,
   OptimizeCssWebpackPlugin,
   ScriptsWebpackPlugin,
 } from '../plugins';
@@ -46,7 +44,6 @@ import { getEsVersionForFileName, getOutputHashFormat, getWatchOptions, normaliz
 import { IGNORE_WARNINGS } from '../utils/stats';
 
 const TerserPlugin = require('terser-webpack-plugin');
-const PnpWebpackPlugin = require('pnp-webpack-plugin');
 
 // tslint:disable-next-line:no-big-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
@@ -288,18 +285,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  if (buildOptions.namedChunks && !isWebpackFiveOrHigher()) {
-    extraPlugins.push(new NamedLazyChunksPlugin());
-
-    // Provide full names for lazy routes that use the deprecated string format
-    extraPlugins.push(
-      new ContextReplacementPlugin(
-        /\@angular[\\\/]core[\\\/]/,
-        (data: { chunkName?: string }) => (data.chunkName = '[request]'),
-      ),
-    );
-  }
-
   if ((scriptsSourceMap || stylesSourceMap)) {
     extraRules.push({
       test: /\.m?js$/,
@@ -422,7 +407,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-      plugins: isWebpackFiveOrHigher() ? [] : [PnpWebpackPlugin],
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
@@ -433,12 +417,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         'node_modules',
         ...findAllNodeModules(__dirname, projectRoot),
       ],
-      plugins: isWebpackFiveOrHigher() ? [] : [PnpWebpackPlugin.moduleLoader(module)],
     },
     context: root,
     entry: entryPoints,
     output: {
-      ...withWebpackFourOrFive({ futureEmitAssets: true }, {}),
       path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
       filename: ({ chunk }) => {
@@ -455,7 +437,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     performance: {
       hints: false,
     },
-    ...withWebpackFourOrFive({}, { ignoreWarnings: IGNORE_WARNINGS }),
+    ignoreWarnings: IGNORE_WARNINGS,
     module: {
       // Show an error for missing exports instead of a warning.
       strictExportPresence: true,
@@ -494,9 +476,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     cache: !!buildOptions.watch && !cachingDisabled,
     optimization: {
       minimizer: extraMinimizers,
-      moduleIds: withWebpackFourOrFive('hashed', 'deterministic'),
+      moduleIds: 'deterministic',
       chunkIds: buildOptions.namedChunks ? 'named' : 'deterministic',
-      ...withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
+      emitOnErrors: false,
     },
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.

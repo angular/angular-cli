@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Compiler } from 'webpack';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 export type BuilderWatcherCallback = (
   events: Array<{ path: string; type: 'created' | 'modified' | 'deleted'; time?: number }>,
@@ -46,16 +45,7 @@ class TimeInfoMap extends Map<string, { safeTime: number; timestamp: number }> {
   }
 }
 
-type WatchCallback4 = (
-  error: Error | undefined,
-  fileChanges: Set<string>,
-  directoryChanges: Set<string>,
-  missingChanges: Set<string>,
-  files: Map<string, number>,
-  contexts: Map<string, number>,
-  removals: Set<string>,
-) => void;
-type WatchCallback5 = (
+type WatchCallback = (
   error: Error | undefined,
   files: Map<string, { safeTime: number; timestamp: number }>,
   contexts: Map<string, { safeTime: number; timestamp: number }>,
@@ -70,7 +60,7 @@ export interface WebpackWatchFileSystem {
     missing: Iterable<string>,
     startTime: number,
     options: {},
-    callback: WatchCallback4 | WatchCallback5,
+    callback: WatchCallback,
     callbackUndelayed: (file: string, time: number) => void,
   ): WebpackWatcher;
 }
@@ -87,7 +77,7 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
     missing: Iterable<string>,
     startTime: number,
     _options: {},
-    callback: WatchCallback4 | WatchCallback5,
+    callback: WatchCallback,
     callbackUndelayed?: (file: string, time: number) => void,
   ): WebpackWatcher {
     const watchedFiles = new Set(files);
@@ -135,25 +125,13 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
           }
         }
 
-        if (isWebpackFiveOrHigher()) {
-          (callback as WatchCallback5)(
-            undefined,
-            new Map(timeInfo),
-            new Map(timeInfo),
-            new Set([...fileChanges, ...directoryChanges, ...missingChanges]),
-            removals,
-          );
-        } else {
-          (callback as WatchCallback4)(
-            undefined,
-            fileChanges,
-            directoryChanges,
-            missingChanges,
-            timeInfo.toTimestamps(),
-            timeInfo.toTimestamps(),
-            removals,
-          );
-        }
+        callback(
+          undefined,
+          new Map(timeInfo),
+          new Map(timeInfo),
+          new Set([...fileChanges, ...directoryChanges, ...missingChanges]),
+          removals,
+        );
       });
     });
 

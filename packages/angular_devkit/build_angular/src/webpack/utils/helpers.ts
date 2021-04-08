@@ -11,7 +11,6 @@ import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import { Configuration, SourceMapDevToolPlugin } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../browser/schema';
-import { withWebpackFourOrFive } from '../../utils/webpack-version';
 
 export interface HashFormat {
   chunk: string;
@@ -122,7 +121,7 @@ export function isPolyfillsEntry(name: string): boolean {
 export function getWatchOptions(poll: number | undefined): Configuration['watchOptions'] {
   return {
     poll,
-    ignored: poll === undefined ? undefined : withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
+    ignored: poll === undefined ? undefined : 'node_modules/**',
   };
 }
 

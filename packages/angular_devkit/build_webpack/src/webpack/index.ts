@@ -24,7 +24,7 @@ export interface WebpackFactory {
 
 export type BuildResult = BuilderOutput & {
   emittedFiles?: EmittedFiles[];
-  webpackStats?: webpack.Stats.ToJsonOutput;
+  webpackStats?: webpack.StatsCompilation;
   outputPath: string;
 };
 

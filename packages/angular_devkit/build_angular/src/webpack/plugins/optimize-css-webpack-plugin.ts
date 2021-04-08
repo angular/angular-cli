@@ -7,10 +7,8 @@
  */
 import * as cssNano from 'cssnano';
 import { ProcessOptions, Result } from 'postcss';
-import { Compiler, compilation, sources } from 'webpack';
-import { Source } from 'webpack-sources';
+import { Compilation, Compiler, sources } from 'webpack';
 import { addWarning } from '../../utils/webpack-diagnostics';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 export interface OptimizeCssWebpackPluginOptions {
   sourceMap: boolean;
@@ -21,36 +19,14 @@ const PLUGIN_NAME = 'optimize-css-webpack-plugin';
 
 function hook(
   compiler: Compiler,
-  action: (compilation: compilation.Compilation, assetsURI: string[]) => Promise<void>,
+  action: (compilation: Compilation, assetsURI: string[]) => Promise<void>,
 ) {
   compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-    if (isWebpackFiveOrHigher()) {
-      // webpack 5 migration "guide"
-      // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L527-L532
-      // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE;
-      const stage = 100;
-      // tslint:disable-next-line: no-any
-      (compilation.hooks as any)
-        .processAssets.tapPromise({name: PLUGIN_NAME, stage}, (assets: Record<string, Source>) => {
-          return action(compilation, Object.keys(assets));
-      });
-    } else {
-      compilation.hooks.optimizeChunkAssets
-        .tapPromise(PLUGIN_NAME, (chunks) => {
-          const files: string[] = [];
-          for (const chunk of chunks) {
-            if (!chunk.files) {
-              continue;
-            }
-
-            for (const file of chunk.files) {
-              files.push(file);
-            }
-          }
-
-          return action(compilation, files);
-        });
-    }
+    compilation.hooks.processAssets.tapPromise({
+      name: PLUGIN_NAME,
+      stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE,
+    },
+    assets => action(compilation, Object.keys(assets)));
   });
 }
 
@@ -66,7 +42,7 @@ export class OptimizeCssWebpackPlugin {
   }
 
   apply(compiler: Compiler): void {
-    hook(compiler, (compilation: compilation.Compilation, assetsURI: string[]) => {
+    hook(compiler, (compilation: Compilation, assetsURI: string[]) => {
       const files = [...compilation.additionalChunkAssets, ...assetsURI];
 
       const actions = files
