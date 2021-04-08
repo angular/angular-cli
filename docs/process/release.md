@@ -151,13 +151,23 @@ using the `--githubToken` flag. You just then have to confirm the draft.
 
 ## Post-release Version Update
 
+**For each released version**:
+
 Update the package versions to reflect the *next* release version in **both**:
 1. `version` in [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json#L3)
 1. `DevkitBuild*` in [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
 
 ```sh
+git checkout -b release-bump-vXX
 git commit package.json packages/schematics/angular/utility/latest-versions.ts -m "build: bump version to vXX"
+git push -u origin release-bump-vXX
 ```
+
+Then make a PR and assign it to the next primary caretaker.
+
+Don't forget to update the Slack [#tools](https://angular-team.slack.com/archives/C46U16D4Z) channel topic and also post
+links to all the version bump PRs. If anyone else on the team notices these links missing, they should ask the caretaker
+to make sure the post-release version bump is not forgotten.
 
 ### Microsite Publishing
 
