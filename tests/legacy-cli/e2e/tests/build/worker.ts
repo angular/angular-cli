@@ -35,10 +35,11 @@ export default async function () {
   await expectFileToMatch('dist/test-project/main-es2017.js', 'src_app_app_worker_ts');
 
   await ng('build', '--output-hashing=none');
-  await expectFileToExist('dist/test-project/609-es5.js');
-  await expectFileToMatch('dist/test-project/main-es5.js', '609');
-  await expectFileToExist('dist/test-project/609-es2017.js');
-  await expectFileToMatch('dist/test-project/main-es2017.js', '609');
+  const chunkId = '283';
+  await expectFileToExist(`dist/test-project/${chunkId}-es5.js`);
+  await expectFileToMatch('dist/test-project/main-es5.js', chunkId);
+  await expectFileToExist(`dist/test-project/${chunkId}-es2017.js`);
+  await expectFileToMatch('dist/test-project/main-es2017.js', chunkId);
 
   // console.warn has to be used because chrome only captures warnings and errors by default
   // https://github.com/angular/protractor/issues/2207

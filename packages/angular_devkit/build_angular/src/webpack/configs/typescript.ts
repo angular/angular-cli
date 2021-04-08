@@ -57,6 +57,7 @@ function createIvyPlugin(
     fileReplacements,
     jitMode: !aot,
     emitNgModuleScope: !optimize,
+    inlineStyleMimeType: 'text/css',
   });
 }
 

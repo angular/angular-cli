@@ -56,11 +56,12 @@ export default async function () {
     '--output-path=dist/second',
   );
 
+  const chunkId = '751';
   const codeHashES5 = createHash('sha384')
-    .update(await readFile('dist/first/434-es5.js'))
+    .update(await readFile(`dist/first/${chunkId}-es5.js`))
     .digest('base64');
   const codeHashes2017 = createHash('sha384')
-    .update(await readFile('dist/first/434-es2017.js'))
+    .update(await readFile(`dist/first/${chunkId}-es2017.js`))
     .digest('base64');
 
   await expectFileToMatch('dist/first/runtime-es5.js', 'sha384-' + codeHashES5);

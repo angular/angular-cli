@@ -124,6 +124,56 @@ describe('Browser Builder styles', () => {
     await browserBuild(architect, host, target, { extractCss: true });
   });
 
+  it('supports autoprefixer with inline component styles in JIT mode', async () => {
+    host.writeMultipleFiles({
+      './src/app/app.component.ts': `
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styles: ['div { flex: 1 }'],
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `,
+      '.browserslistrc': 'IE 10',
+    });
+
+    // Set target to ES5 to avoid differential loading and unnecessary testing time
+    host.replaceInFile('tsconfig.json', '"target": "es2017"', '"target": "es5"');
+
+    const { files } = await browserBuild(architect, host, target, { aot: false });
+
+    expect(await files['main.js']).toContain('-ms-flex: 1;');
+  });
+
+  it('supports autoprefixer with inline component styles in AOT mode', async () => {
+    host.writeMultipleFiles({
+      './src/app/app.component.ts': `
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styles: ['div { flex: 1 }'],
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `,
+      '.browserslistrc': 'IE 10',
+    });
+
+    // Set target to ES5 to avoid differential loading and unnecessary testing time
+    host.replaceInFile('tsconfig.json', '"target": "es2017"', '"target": "es5"');
+
+    const { files } = await browserBuild(architect, host, target, { aot: true });
+
+    expect(await files['main.js']).toContain('-ms-flex: 1;');
+  });
+
   extensionsWithImportSupport.forEach(ext => {
     it(`supports imports in ${ext} files`, async () => {
       host.writeMultipleFiles({
@@ -456,7 +506,8 @@ describe('Browser Builder styles', () => {
     main = await files['main.js'];
     expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-  });
+  // NOTE: Timeout for large amount of builds in test. Test should be split up when refactored.
+  }, 4 * 60 * 1000);
 
   it(`supports bootstrap@4 with full path`, async () => {
     const bootstrapPath = dirname(require.resolve('bootstrap/package.json'));
