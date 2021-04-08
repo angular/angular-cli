@@ -23,7 +23,6 @@ ng_package(
         ":package.json",
     ],
     entry_point = ":index.ts",
-    nested_packages = ["//modules/hapi-engine/schematics:npm_package"],
     readme_md = ":README.md",
     tags = ["release"],
     deps = [

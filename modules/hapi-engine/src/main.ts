@@ -13,6 +13,8 @@ import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
 
 /**
  * These are the allowed options for the render
+ *
+ * @deprecated use `@nguniversal/common` instead.
  */
 export interface RenderOptions extends ɵRenderOptions {
   req: Request;
@@ -26,6 +28,7 @@ const commonEngine = new CommonEngine();
 
 /**
  * This is an express engine for handling Angular Applications
+ * @deprecated use `@nguniversal/common` instead.
  */
 export async function ngHapiEngine(options: Readonly<RenderOptions>): Promise<string> {
   const req = options.req;

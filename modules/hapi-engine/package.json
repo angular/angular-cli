@@ -21,12 +21,6 @@
     "@nguniversal/common": "0.0.0-PLACEHOLDER",
     "tslib": "TSLIB_VERSION"
   },
-  "schematics": "./schematics/collection.json",
-  "ng-update": {
-    "migrations": "./schematics/migrations/migration-collection.json",
-    "packageGroup": "NG_UPDATE_PACKAGE_GROUP",
-    "packageGroupName": "@nguniversal/hapi-engine"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
