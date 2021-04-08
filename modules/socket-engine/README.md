@@ -2,6 +2,11 @@
 
 Framework and Platform agnostic Angular Universal rendering.
 
+## Deprecated
+This package has been deprecated. Please use [`@nguniversal/common`](../common/README.md) instead.
+
+
+
 ## Usage Server
 
 `npm install @nguniversal/socket-engine @nguniversal/common --save`

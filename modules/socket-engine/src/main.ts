@@ -10,20 +10,31 @@ import { ɵCommonEngine as CommonEngine,
   ɵRenderOptions as RenderOptions } from '@nguniversal/common/engine';
 import * as net from 'net';
 
+/**
+ * @deprecated use `@nguniversal/common` instead.
+ */
 export interface SocketEngineServer {
   close: () => void;
 }
 
+/**
+ * @deprecated use `@nguniversal/common` instead.
+ */
 export interface SocketEngineRenderOptions extends RenderOptions {
   id: number;
 }
-
+/**
+ * @deprecated use `@nguniversal/common` instead.
+ */
 export interface SocketEngineResponse {
   id: number;
   html: string|null;
   error?: Error;
 }
 
+/**
+ * @deprecated use `@nguniversal/common` instead.
+ */
 export function startSocketEngine(
   moduleOrFactory: Type<{}> | NgModuleFactory<{}>,
   providers: StaticProvider[] = [],
