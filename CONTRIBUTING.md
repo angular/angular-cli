@@ -198,9 +198,9 @@ Must be one of the following:
 * **feat**: Creates a new feature [1]
 * **fix**: Fixes a previously discovered failure/bug [1]
 * **perf**: Improves performance without any change in functionality or API [1]
-* **refactor**: Refactor without any change in functionality or API (includes style changes) [1]
+* **refactor**: Refactor without any change in functionality or API (includes style changes) 
 * **release**: A release point in the repository [2]
-* **test**: Improvements or corrections made to the project's test suite [1]
+* **test**: Improvements or corrections made to the project's test suite 
 
 
 <sup>[1] This type MUST have a scope. See the next section for more information.</sup><br/>
