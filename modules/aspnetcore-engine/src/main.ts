@@ -63,6 +63,7 @@ function _getUniversalData(content: string, appSelector: string): IEngineRenderR
 }
 
 const commonEngine = new CommonEngine();
+/** @deprecated use `@nguniversal/common` instead. */
 export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
   : Promise<IEngineRenderResult> {
   if (!options.appSelector) {

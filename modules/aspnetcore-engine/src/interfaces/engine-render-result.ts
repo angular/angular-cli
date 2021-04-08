@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+/** @deprecated use `@nguniversal/common` instead. */
 export interface IEngineRenderResult {
   completeHTML: string;
   html: string;

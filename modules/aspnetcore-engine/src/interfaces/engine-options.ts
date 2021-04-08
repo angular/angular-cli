@@ -9,6 +9,7 @@ import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { RenderOptions } from '@nguniversal/common/engine';
 import { IRequestParams } from './request-params';
 
+/** @deprecated use `@nguniversal/common` instead. */
 export interface IEngineOptions extends Pick<RenderOptions, 'publicPath' | 'inlineCriticalCss'> {
   appSelector: string;                      // e.g., <app-root></app-root>
   request: IRequestParams;                  // e.g., params

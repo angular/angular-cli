@@ -2,7 +2,9 @@
 
 This is an ASP.NET Core Engine for running Angular Apps on the server for server side rendering.
 
----
+## Deprecated
+This package has been deprecated. Please use [`@nguniversal/common`](../common/README.md) instead.
+
 
 ## Installation
 
