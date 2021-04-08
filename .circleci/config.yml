@@ -97,7 +97,7 @@ jobs:
           name: Validate Commit Messages
           command: >
             if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              yarn ng-dev commit-message validate-range --range <<pipeline.git.base_revision>>...<<pipeline.git.revision>>
+              yarn ng-dev commit-message validate-range <<pipeline.git.base_revision>> <<pipeline.git.revision>>
             else
               echo "This build is not over a PR, nothing to do."
             fi
