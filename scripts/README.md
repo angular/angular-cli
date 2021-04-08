@@ -79,10 +79,6 @@ e.g.
 $ devkit-admin release minor-beta --force
 ```
 
-## serialize
-
-Serialize JSON Schema into `.d.ts` files. This script is deprecated and doesn't work anymore.
-
 ## snapshots
 
 Create and upload snapshots. This is used in CI.
@@ -97,14 +93,6 @@ Flags:
 ## templates
 
 Compile and outputs the templates. For now, only README is being built and outputted.
-
-## bazel:test
-
-Run API and unit tests using Bazel.
-
-## bazel:integration
-
-Run integration tests using Bazel.
 
 ## validate
 
