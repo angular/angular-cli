@@ -1,8 +1,10 @@
 import { writeFile } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
+import { updateJsonFile } from '../../../utils/project';
 
 export default async function () {
   await ng('generate', 'library', 'my-lib');
+
   await writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
@@ -33,7 +35,7 @@ export default async function () {
         template: '<lib-my-lib></lib-my-lib>'
       })
       export class AppComponent {
-        title = 'app';
+        title = 'test-project';
 
         constructor(myLibService: MyLibService) {
           console.log(myLibService);
@@ -67,19 +69,24 @@ export default async function () {
     });
   `);
 
-  await runLibraryTests();
-  await runLibraryTests(true);
+  // Build library in partial mode (production)
+  await ng('build', 'my-lib', '--configuration=production');
+
+  // AOT linking
+  await runTests();
+
+  // JIT linking
+  await updateJsonFile('angular.json', config => {
+    const build = config.projects['test-project'].architect.build;
+    build.options.aot = false;
+    build.configurations.production.buildOptimizer = false;
+  });
+
+  await runTests();
 }
 
-async function runLibraryTests(prodMode = false): Promise<void> {
-  const args = ['build', 'my-lib'];
-  if (!prodMode) {
-    args.push('--configuration=development');
-  }
-
-  await ng(...args);
-
-  // Check that the tests succeeds both with named project, unnammed (should test app), and prod.
+async function runTests(): Promise<void> {
+  // Check that the tests succeeds both with named project, unnamed (should test app), and prod.
   await ng('e2e');
   await ng('e2e', 'test-project', '--devServerTarget=test-project:serve:production');
 }

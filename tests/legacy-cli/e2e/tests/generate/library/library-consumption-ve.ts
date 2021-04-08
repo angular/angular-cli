@@ -5,11 +5,11 @@ import { updateJsonFile } from '../../../utils/project';
 export default async function () {
   await ng('generate', 'library', 'my-lib');
 
-  // Enable partial compilation mode (linker) for the library
-  await updateJsonFile('projects/my-lib/tsconfig.lib.json', config => {
+  await updateJsonFile('projects/my-lib/tsconfig.lib.prod.json', config => {
     const { angularCompilerOptions = {} } = config;
-    angularCompilerOptions.enableIvy = true;
-    angularCompilerOptions.compilationMode = 'partial';
+    angularCompilerOptions.enableIvy = false;
+    angularCompilerOptions.skipTemplateCodegen = true;
+    angularCompilerOptions.strictMetadataEmit = true;
     config.angularCompilerOptions = angularCompilerOptions;
   });
 
@@ -77,8 +77,8 @@ export default async function () {
     });
   `);
 
-  // Build library in partial mode (development)
-  await ng('build', 'my-lib', '--configuration=development');
+  // Build library in VE mode (production)
+  await ng('build', 'my-lib', '--configuration=production');
 
   // AOT linking
   await runTests();
