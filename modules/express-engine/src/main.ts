@@ -8,18 +8,18 @@
 import { Request, Response } from 'express';
 
 import { StaticProvider } from '@angular/core';
-import { ɵCommonEngine as CommonEngine, ɵRenderOptions } from '@nguniversal/common/engine';
+import { CommonEngine, RenderOptions as CommonRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
 /**
  * These are the allowed options for the engine
  */
-export type NgSetupOptions = Pick<ɵRenderOptions, 'bootstrap' | 'providers' | 'publicPath' | 'inlineCriticalCss'>;
+export type NgSetupOptions = Pick<CommonRenderOptions, 'bootstrap' | 'providers' | 'publicPath' | 'inlineCriticalCss'>;
 
 /**
  * These are the allowed options for the render
  */
-export interface RenderOptions extends ɵRenderOptions {
+export interface RenderOptions extends CommonRenderOptions {
   req: Request;
   res?: Response;
 }

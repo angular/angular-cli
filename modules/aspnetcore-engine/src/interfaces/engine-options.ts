@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
-import { ɵRenderOptions as RenderOptions } from '@nguniversal/common/engine';
+import { RenderOptions } from '@nguniversal/common/engine';
 import { IRequestParams } from './request-params';
 
 export interface IEngineOptions extends Pick<RenderOptions, 'publicPath' | 'inlineCriticalCss'> {

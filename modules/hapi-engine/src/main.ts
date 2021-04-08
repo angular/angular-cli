@@ -8,7 +8,7 @@
 import { Request, ResponseToolkit } from '@hapi/hapi';
 
 import { StaticProvider } from '@angular/core';
-import { ɵCommonEngine as CommonEngine, ɵRenderOptions } from '@nguniversal/common/engine';
+import { CommonEngine, RenderOptions as CommonRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
 
 /**
@@ -16,7 +16,7 @@ import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
  *
  * @deprecated use `@nguniversal/common` instead.
  */
-export interface RenderOptions extends ɵRenderOptions {
+export interface RenderOptions extends CommonRenderOptions {
   req: Request;
   res?: ResponseToolkit;
 }

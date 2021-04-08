@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
-import { ɵCommonEngine as CommonEngine,
-  ɵRenderOptions as RenderOptions } from '@nguniversal/common/engine';
+import { CommonEngine, RenderOptions } from '@nguniversal/common/engine';
 import * as net from 'net';
 
 /**

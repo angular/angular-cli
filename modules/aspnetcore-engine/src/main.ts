@@ -8,7 +8,7 @@
 import { StaticProvider } from '@angular/core';
 
 import { ORIGIN_URL, REQUEST } from '@nguniversal/aspnetcore-engine/tokens';
-import { ɵCommonEngine as CommonEngine, ɵRenderOptions as RenderOptions } from '@nguniversal/common/engine';
+import { CommonEngine, RenderOptions } from '@nguniversal/common/engine';
 import { createDocument } from 'domino';
 import { IEngineOptions } from './interfaces/engine-options';
 import { IEngineRenderResult } from './interfaces/engine-render-result';
