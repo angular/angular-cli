@@ -1,9 +1,10 @@
 <%
 const counter = Object.create(null);
+const botsAuthorName = ['dependabot[bot]', 'Renovate Bot'];
 
 for (const commit of commits) {
     const name = commit.authorName;
-    if (name) {
+    if (name && !botsAuthorName.includes(name)) {
         counter[name] = (counter[name] || 0) + 1;
     }
 }
