@@ -13,7 +13,6 @@ import * as path from 'path';
 import * as textTable from 'text-table';
 import { colors as ansiColors, removeColor } from '../../utils/color';
 import { Configuration } from 'webpack';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 export interface JsonAssetStats {
   name: string;
@@ -245,13 +244,6 @@ export const IGNORE_WARNINGS = [
   // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
   /Failed to parse source map from/,
 ];
-
-// TODO: remove when Webpack 4 is no longer supported.
-// See: https://webpack.js.org/configuration/other-options/#ignorewarnings
-const ERRONEOUS_WARNINGS_FILTER = isWebpackFiveOrHigher()
-  ? (warning: string) => warning
-  : (warning: string) => !IGNORE_WARNINGS.some(msg => msg.test(warning));
-
 interface WebpackDiagnostic {
   message: string;
   file?: string;
@@ -276,14 +268,8 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
   let output = '';
   for (const warning of warnings as (string | WebpackDiagnostic)[]) {
     if (typeof warning === 'string') {
-      if (!ERRONEOUS_WARNINGS_FILTER(warning)) {
-        continue;
-      }
       output += yb(`Warning: ${warning}\n\n`);
     } else {
-      if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
-        continue;
-      }
       const file = warning.file || warning.moduleName;
       if (file) {
         output += c(file);
@@ -352,8 +338,7 @@ export function statsHasErrors(json: any): boolean {
 }
 
 export function statsHasWarnings(json: any): boolean {
-  return json.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length ||
-    !!json.children?.some((c: any) => c.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length);
+  return json.warnings.length || !!json.children?.some((c: any) => c.warnings.length);
 }
 
 export function createWebpackLoggingCallback(

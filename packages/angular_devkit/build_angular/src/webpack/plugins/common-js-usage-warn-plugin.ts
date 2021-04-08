@@ -7,24 +7,12 @@
  */
 
 import { isAbsolute } from 'path';
-import { Compiler, compilation } from 'webpack';
+import { Compilation, Compiler, Dependency, Module, NormalModule } from 'webpack';
 import { addWarning } from '../../utils/webpack-diagnostics';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 // Webpack doesn't export these so the deep imports can potentially break.
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
-
-// The below is used to remain compatible with both Webpack 4 and 5
-interface WebpackModule {
-  name?: string;
-  rawRequest?: string;
-  dependencies: WebpackModule[];
-  issuer: WebpackModule | null;
-  module: WebpackModule | null;
-  userRequest?: string;
-  request: string;
-}
 
 export interface CommonJsUsageWarnPluginOptions {
   /** A list of CommonJS packages that are allowed to be used without a warning. */
@@ -50,8 +38,8 @@ export class CommonJsUsageWarnPlugin {
           mainEntry.dependencies.map((dep) => compilation.moduleGraph.getModule(dep)),
         );
 
-        for (const module of modules as unknown as WebpackModule[]) {
-          const {dependencies, rawRequest} = module;
+        for (const module of modules) {
+          const {dependencies, rawRequest} = module as NormalModule;
           if (
             !rawRequest ||
             rawRequest.startsWith('.') ||
@@ -91,8 +79,8 @@ export class CommonJsUsageWarnPlugin {
             // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
             // will require CommonJS libraries for live reloading such as 'sockjs-node'.
             // tslint:disable-next-line: no-any
-            if (mainIssuer && mainModules.has(mainIssuer as any)) {
-              const warning = `${issuer?.userRequest} depends on '${rawRequest}'. ` +
+            if (mainIssuer && mainModules.has(mainIssuer)) {
+              const warning = `${(issuer as NormalModule | null)?.userRequest} depends on '${rawRequest}'. ` +
                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
 
@@ -109,8 +97,8 @@ export class CommonJsUsageWarnPlugin {
   }
 
   private hasCommonJsDependencies(
-    compilation: compilation.Compilation,
-    dependencies: WebpackModule[],
+    compilation: Compilation,
+    dependencies: Dependency[],
     checkParentModules = false): boolean {
     for (const dep of dependencies) {
       if (dep instanceof CommonJsRequireDependency || dep instanceof AMDDefineDependency) {
@@ -137,24 +125,18 @@ export class CommonJsUsageWarnPlugin {
   }
 }
 
-function getIssuer(compilation: compilation.Compilation, module: WebpackModule | null): WebpackModule | null {
+function getIssuer(compilation: Compilation, module: Module | null): Module | null {
   if (!module) {
     return null;
   }
 
-  if (!isWebpackFiveOrHigher()) {
-    return module?.issuer;
-  }
-
-  return (compilation as unknown as { moduleGraph: { getIssuer(dependency: WebpackModule): WebpackModule; } })
-    .moduleGraph.getIssuer(module);
+  return compilation.moduleGraph.getIssuer(module);
 }
 
-function getWebpackModule(compilation: compilation.Compilation, dependency: WebpackModule): WebpackModule | null {
-  if (!isWebpackFiveOrHigher()) {
-    return dependency.module;
+function getWebpackModule(compilation: Compilation, dependency: Dependency | null): Module | null {
+  if (!dependency) {
+    return null;
   }
 
-  return (compilation as unknown as { moduleGraph: { getModule(dependency: WebpackModule): WebpackModule; }})
-    .moduleGraph.getModule(dependency);
+  return compilation.moduleGraph.getModule(dependency);
 }

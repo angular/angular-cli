@@ -166,7 +166,6 @@ ts_library(
         "@npm//open",
         "@npm//ora",
         "@npm//parse5-html-rewriting-stream",
-        "@npm//pnp-webpack-plugin",
         "@npm//postcss",
         "@npm//postcss-import",
         "@npm//postcss-loader",

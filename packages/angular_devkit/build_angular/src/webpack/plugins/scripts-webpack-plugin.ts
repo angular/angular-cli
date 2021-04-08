@@ -12,7 +12,6 @@ import { Compiler, loader } from 'webpack';
 import { CachedSource, ConcatSource, OriginalSource, RawSource, Source } from 'webpack-sources';
 import { interpolateName } from 'loader-utils';
 import * as path from 'path';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 const Chunk = require('webpack/lib/Chunk');
 const EntryPoint = require('webpack/lib/Entrypoint');
@@ -48,19 +47,17 @@ export class ScriptsWebpackPlugin {
     }
 
     for (const script of scripts) {
-      const scriptTime = isWebpackFiveOrHigher()
-        ? await new Promise<number | undefined>((resolve, reject) => {
-          compilation.fileSystemInfo.getFileTimestamp(script, (error: unknown, entry: any) => {
-            if (error) {
-              reject(error);
+      const scriptTime = await new Promise<number | undefined>((resolve, reject) => {
+        compilation.fileSystemInfo.getFileTimestamp(script, (error: unknown, entry: any) => {
+          if (error) {
+            reject(error);
 
-              return;
-            }
+            return;
+          }
 
-            resolve(typeof entry !== 'string' ? entry.safeTime : undefined)
-          })
+          resolve(typeof entry !== 'string' ? entry.safeTime : undefined)
         })
-        : compilation.fileTimestamps.get(script);
+      })
 
       if (!scriptTime || scriptTime > this._lastBuildTime) {
         this._lastBuildTime = Date.now();
@@ -76,21 +73,13 @@ export class ScriptsWebpackPlugin {
     chunk.rendered = !cached;
     chunk.id = this.options.name;
     chunk.ids = [chunk.id];
-    if (isWebpackFiveOrHigher()) {
-      chunk.files.add(filename);
-    } else {
-      chunk.files.push(filename);
-    }
+    chunk.files.add(filename);
 
     const entrypoint = new EntryPoint(this.options.name);
     entrypoint.pushChunk(chunk);
     chunk.addGroup(entrypoint);
     compilation.entrypoints.set(this.options.name, entrypoint);
-    if (isWebpackFiveOrHigher()) {
-      compilation.chunks.add(chunk);
-    } else {
-      compilation.chunks.push(chunk);
-    }
+    compilation.chunks.add(chunk);
 
     compilation.assets[filename] = source;
     compilation.hooks.chunkAsset.call(chunk, filename);

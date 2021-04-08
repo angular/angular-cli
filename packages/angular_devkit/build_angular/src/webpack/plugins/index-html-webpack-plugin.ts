@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { basename, dirname, extname } from 'path';
-import { Compiler, compilation } from 'webpack';
+import { Compilation, Compiler } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator, IndexHtmlGeneratorOptions, IndexHtmlGeneratorProcessOptions } from '../../utils/index-file/index-html-generator';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 
 export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions,
   Omit<IndexHtmlGeneratorProcessOptions, 'files' | 'noModuleFiles' | 'moduleFiles'> {
@@ -21,8 +20,8 @@ export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions
 
 const PLUGIN_NAME = 'index-html-webpack-plugin';
 export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
-  private _compilation: compilation.Compilation | undefined;
-  get compilation(): compilation.Compilation {
+  private _compilation: Compilation | undefined;
+  get compilation(): Compilation {
     if (this._compilation) {
       return this._compilation;
     }
@@ -35,23 +34,13 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
   }
 
   apply(compiler: Compiler) {
-    if (isWebpackFiveOrHigher()) {
-      compiler.hooks.thisCompilation.tap(PLUGIN_NAME, compilation => {
-        this._compilation = compilation;
-
-        // webpack 5 migration "guide"
-        // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L535-L539
-        // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1;
-        // tslint:disable-next-line: no-any
-        (compilation.hooks as any).processAssets.tapPromise({ name: PLUGIN_NAME, stage: 101 }, callback);
-      });
-    } else {
-      compiler.hooks.emit.tapPromise(PLUGIN_NAME, async compilation => {
-        this._compilation = compilation;
-
-        await callback(compilation.assets);
-      });
-    }
+    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, compilation => {
+      this._compilation = compilation;
+      compilation.hooks.processAssets.tapPromise({
+        name: PLUGIN_NAME,
+        stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1,
+      }, callback);
+    });
 
     const callback = async (assets: Record<string, unknown>) => {
       // Get all files for selected entrypoints
