@@ -26,8 +26,8 @@ describe('Karma Builder', () => {
       };
       const run = await architect.scheduleTarget(karmaTargetSpec, overrides);
 
-      await expectAsync(run.result).toBeRejectedWith(
-        `Specified patterns: "abc.spec.ts, def.spec.ts" did not match any spec files`,
+      await expectAsync(run.result).toBeRejectedWithError(
+        `Specified patterns: "abc.spec.ts, def.spec.ts" did not match any spec files.`,
       );
 
       await run.stop();
