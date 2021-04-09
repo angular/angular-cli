@@ -72,105 +72,109 @@ export function execute(
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
-    switchMap(
-      ([karma, webpackConfig]) =>
-        new Observable<BuilderOutput>(subscriber => {
-          const karmaOptions: KarmaConfigOptions = {};
+    switchMap(async ([karma, webpackConfig]) => {
+      const karmaOptions: KarmaConfigOptions = {};
 
-          if (options.watch !== undefined) {
-            karmaOptions.singleRun = !options.watch;
-          }
+      if (options.watch !== undefined) {
+        karmaOptions.singleRun = !options.watch;
+      }
 
-          // Convert browsers from a string to an array
-          if (options.browsers) {
-            karmaOptions.browsers = options.browsers.split(',');
-          }
+      // Convert browsers from a string to an array
+      if (options.browsers) {
+        karmaOptions.browsers = options.browsers.split(',');
+      }
 
-          if (options.reporters) {
-            // Split along commas to make it more natural, and remove empty strings.
-            const reporters = options.reporters
-              .reduce<string[]>((acc, curr) => acc.concat(curr.split(',')), [])
-              .filter(x => !!x);
+      if (options.reporters) {
+        // Split along commas to make it more natural, and remove empty strings.
+        const reporters = options.reporters
+          .reduce<string[]>((acc, curr) => acc.concat(curr.split(',')), [])
+          .filter(x => !!x);
 
-            if (reporters.length > 0) {
-              karmaOptions.reporters = reporters;
-            }
-          }
+        if (reporters.length > 0) {
+          karmaOptions.reporters = reporters;
+        }
+      }
 
-          // prepend special webpack loader that will transform test.ts
-          if (options.include && options.include.length > 0) {
-            const mainFilePath = getSystemPath(
-              join(normalize(context.workspaceRoot), options.main),
-            );
-            const files = findTests(options.include, dirname(mainFilePath), context.workspaceRoot);
-            // early exit, no reason to start karma
-            if (!files.length) {
-              subscriber.error(
-                `Specified patterns: "${options.include.join(', ')}" did not match any spec files`,
-              );
-
-              return;
-            }
-
-            // Get the rules and ensure the Webpack configuration is setup properly
-            const rules = webpackConfig.module?.rules || [];
-            if (!webpackConfig.module) {
-              webpackConfig.module = { rules };
-            } else if (!webpackConfig.module.rules) {
-              webpackConfig.module.rules = rules;
-            }
-
-            rules.unshift({
-              test: mainFilePath,
-              use: {
-                // cannot be a simple path as it differs between environments
-                loader: SingleTestTransformLoader,
-                options: {
-                  files,
-                  logger: context.logger,
-                },
-              },
-            });
-          }
-
-          // Assign additional karmaConfig options to the local ngapp config
-          karmaOptions.configFile = resolve(context.workspaceRoot, options.karmaConfig);
-
-          karmaOptions.buildWebpack = {
-            options,
-            webpackConfig,
-            // Pass onto Karma to emit BuildEvents.
-            successCb: () => subscriber.next({ success: true }),
-            failureCb: () => subscriber.next({ success: false }),
-            // Workaround for https://github.com/karma-runner/karma/issues/3154
-            // When this workaround is removed, user projects need to be updated to use a Karma
-            // version that has a fix for this issue.
-            toJSON: () => {},
-            logger: context.logger,
-          };
-
-          // Complete the observable once the Karma server returns.
-          const karmaServer = new karma.Server(
-            transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
-            (exitCode: number) => {
-              subscriber.next({ success: exitCode === 0 });
-              subscriber.complete();
-            },
+      // prepend special webpack loader that will transform test.ts
+      if (options.include && options.include.length > 0) {
+        const mainFilePath = getSystemPath(
+          join(normalize(context.workspaceRoot), options.main),
+        );
+        const files = findTests(options.include, dirname(mainFilePath), context.workspaceRoot);
+        // early exit, no reason to start karma
+        if (!files.length) {
+          throw new Error(
+            `Specified patterns: "${options.include.join(', ')}" did not match any spec files.`,
           );
-          // karma typings incorrectly define start's return value as void
-          // tslint:disable-next-line:no-use-of-empty-return-value
-          const karmaStart = (karmaServer.start() as unknown) as Promise<void>;
+        }
 
-          // Cleanup, signal Karma to exit.
-          return () => {
-            // Karma only has the `stop` method start with 3.1.1, so we must defensively check.
-            const karmaServerWithStop = (karmaServer as unknown) as { stop: () => Promise<void> };
-            if (typeof karmaServerWithStop.stop === 'function') {
-              return karmaStart.then(() => karmaServerWithStop.stop());
-            }
-          };
-        }),
-    ),
+        // Get the rules and ensure the Webpack configuration is setup properly
+        const rules = webpackConfig.module?.rules || [];
+        if (!webpackConfig.module) {
+          webpackConfig.module = { rules };
+        } else if (!webpackConfig.module.rules) {
+          webpackConfig.module.rules = rules;
+        }
+
+        rules.unshift({
+          test: mainFilePath,
+          use: {
+            // cannot be a simple path as it differs between environments
+            loader: SingleTestTransformLoader,
+            options: {
+              files,
+              logger: context.logger,
+            },
+          },
+        });
+      }
+
+      karmaOptions.buildWebpack = {
+        options,
+        webpackConfig,
+        logger: context.logger,
+      };
+
+      // @types/karma doesn't include the last parameter.
+      // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52286
+      // tslint:disable-next-line: no-any
+      const config = await (karma.config.parseConfig as any)(
+        resolve(context.workspaceRoot, options.karmaConfig),
+        transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
+        { promiseConfig: true, throwErrors: true },
+      ) as Promise<KarmaConfigOptions>;
+
+      return [karma, config] as [typeof karma, KarmaConfigOptions];
+    }),
+    switchMap(([karma, karmaConfig]) => new Observable<BuilderOutput>(subscriber => {
+      // Pass onto Karma to emit BuildEvents.
+      karmaConfig.buildWebpack ??= {};
+      if (typeof karmaConfig.buildWebpack === 'object') {
+        // tslint:disable-next-line: no-any
+        (karmaConfig.buildWebpack as any).failureCb ??= () => subscriber.next({ success: false });
+        // tslint:disable-next-line: no-any
+        (karmaConfig.buildWebpack as any).successCb ??= () => subscriber.next({ success: true });
+      }
+
+      // Complete the observable once the Karma server returns.
+      const karmaServer = new karma.Server(
+        karmaConfig,
+        (exitCode: number) => {
+          subscriber.next({ success: exitCode === 0 });
+          subscriber.complete();
+        },
+      );
+      // karma typings incorrectly define start's return value as void
+      // tslint:disable-next-line:no-use-of-empty-return-value
+      const karmaStart = (karmaServer.start() as unknown) as Promise<void>;
+
+      // Cleanup, signal Karma to exit.
+      return () => {
+        const karmaServerWithStop = (karmaServer as unknown) as { stop: () => Promise<void> };
+
+        return karmaStart.then(() => karmaServerWithStop.stop());
+      };
+    })),
     defaultIfEmpty({ success: false }),
   );
 }
