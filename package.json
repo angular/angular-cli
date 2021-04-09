@@ -88,7 +88,7 @@
     "ora": "^5.1.0",
     "protractor": "7.0.0",
     "puppeteer": "8.0.0",
-    "rollup": "~2.28.0",
+    "rollup": "~2.45.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.6.0",
