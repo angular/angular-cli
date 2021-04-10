@@ -233,6 +233,7 @@ export class AngularWebpackPlugin {
       resourceLoader.update(compilation, changedFiles);
       augmentHostWithResources(host, resourceLoader, {
         directTemplateLoading: this.pluginOptions.directTemplateLoading,
+        inlineStyleMimeType: this.pluginOptions.inlineStyleMimeType,
       });
 
       // Setup source file adjustment options

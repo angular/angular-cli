@@ -322,3 +322,75 @@ function getDecoratorOrigin(
 
   return null;
 }
+
+export function workaroundStylePreprocessing(sourceFile: ts.SourceFile): void {
+  const visitNode: ts.Visitor = (node: ts.Node) => {
+    if (ts.isClassDeclaration(node) && node.decorators?.length) {
+      for (const decorator of node.decorators) {
+        visitDecoratorWorkaround(decorator);
+      }
+    }
+
+    return ts.forEachChild(node, visitNode);
+  };
+
+  ts.forEachChild(sourceFile, visitNode);
+}
+
+function visitDecoratorWorkaround(node: ts.Decorator): void {
+  if (!ts.isCallExpression(node.expression)) {
+    return;
+  }
+
+  const decoratorFactory = node.expression;
+  if (
+    !ts.isIdentifier(decoratorFactory.expression) ||
+    decoratorFactory.expression.text !== 'Component'
+  ) {
+    return;
+  }
+
+  const args = decoratorFactory.arguments;
+  if (args.length !== 1 || !ts.isObjectLiteralExpression(args[0])) {
+    // Unsupported component metadata
+    return;
+  }
+
+  const objectExpression = args[0] as ts.ObjectLiteralExpression;
+
+  // check if a `styles` property is present
+  let hasStyles = false;
+  for (const element of objectExpression.properties) {
+    if (!ts.isPropertyAssignment(element) || ts.isComputedPropertyName(element.name)) {
+      continue;
+    }
+
+    if (element.name.text === 'styles') {
+      hasStyles = true;
+      break;
+    }
+  }
+
+  if (hasStyles) {
+    return;
+  }
+
+  const nodeFactory = ts.factory;
+
+  // add a `styles` property to workaround upstream compiler defect
+  const emptyArray = nodeFactory.createArrayLiteralExpression();
+  const stylePropertyName = nodeFactory.createIdentifier('styles');
+  const styleProperty = nodeFactory.createPropertyAssignment(stylePropertyName, emptyArray);
+  // tslint:disable-next-line: no-any
+  (stylePropertyName.parent as any) = styleProperty;
+  // tslint:disable-next-line: no-any
+  (emptyArray.parent as any) = styleProperty;
+  // tslint:disable-next-line: no-any
+  (styleProperty.parent as any) = objectExpression;
+
+  // tslint:disable-next-line: no-any
+  (objectExpression.properties as any) = nodeFactory.createNodeArray([
+    ...objectExpression.properties,
+    styleProperty,
+  ]);
+}

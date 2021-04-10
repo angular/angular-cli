@@ -11,12 +11,13 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { NgccProcessor } from '../ngcc_processor';
 import { WebpackResourceLoader } from '../resource_loader';
+import { workaroundStylePreprocessing } from '../transformers';
 import { normalizePath } from './paths';
 
 export function augmentHostWithResources(
   host: ts.CompilerHost,
   resourceLoader: WebpackResourceLoader,
-  options: { directTemplateLoading?: boolean } = {},
+  options: { directTemplateLoading?: boolean, inlineStyleMimeType?: string } = {},
 ) {
   const resourceHost = host as CompilerHost;
 
@@ -46,6 +47,24 @@ export function augmentHostWithResources(
 
   resourceHost.getModifiedResourceFiles = function () {
     return resourceLoader.getModifiedResourceFiles();
+  };
+
+  resourceHost.transformResource = async function (data, context) {
+    // Only inline style resources are supported currently
+    if (context.resourceFile || context.type !== 'style') {
+      return null;
+    }
+
+    if (options.inlineStyleMimeType) {
+      const content = await resourceLoader.process(
+        data,
+        options.inlineStyleMimeType,
+      );
+
+      return { content };
+    }
+
+    return null;
   };
 }
 
@@ -332,6 +351,11 @@ export function augmentHostWithCaching(
     );
 
     if (file) {
+      // Temporary workaround for upstream transform resource defect
+      if (file && !file.isDeclarationFile && file.text.includes('@Component')) {
+        workaroundStylePreprocessing(file);
+      }
+
       cache.set(fileName, file);
     }
 

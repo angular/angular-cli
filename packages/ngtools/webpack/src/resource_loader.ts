@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as vm from 'vm';
-import { Compilation } from 'webpack';
+import { Compilation, NormalModule } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { normalizePath } from './ivy/paths';
 import { isWebpackFiveOrHigher } from './webpack-version';
@@ -29,6 +29,7 @@ export class WebpackResourceLoader {
 
   private cache = new Map<string, CompilationOutput>();
   private modifiedResources = new Set<string>();
+  private outputPathCounter = 1;
 
   update(
     parentCompilation: Compilation,
@@ -66,19 +67,27 @@ export class WebpackResourceLoader {
     this._reverseDependencies.set(file, new Set(resources));
   }
 
-  private async _compile(filePath: string): Promise<CompilationOutput> {
+  private async _compile(
+    filePath?: string,
+    data?: string,
+    mimeType?: string,
+  ): Promise<CompilationOutput> {
     if (!this._parentCompilation) {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
     }
 
     // Simple sanity check.
-    if (filePath.match(/\.[jt]s$/)) {
+    if (filePath?.match(/\.[jt]s$/)) {
       return Promise.reject(
         `Cannot use a JavaScript or TypeScript file (${filePath}) in a component's styleUrls or templateUrl.`,
       );
     }
 
-    const outputOptions = { filename: filePath };
+    // Create a special URL for reading the resource from memory
+    const angularScheme = 'angular-resource://';
+
+    const outputFilePath = filePath || `angular-resource-output-${this.outputPathCounter++}.css`;
+    const outputOptions = { filename: outputFilePath };
     const context = this._parentCompilation.compiler.context;
     const childCompiler = this._parentCompilation.createChildCompiler(
       'angular-compiler:resource',
@@ -86,53 +95,80 @@ export class WebpackResourceLoader {
       [
         new NodeTemplatePlugin(outputOptions),
         new NodeTargetPlugin(),
-        new SingleEntryPlugin(context, filePath, 'resource'),
+        new SingleEntryPlugin(context, data ? angularScheme : filePath, 'resource'),
         new LibraryTemplatePlugin('resource', 'var'),
       ],
     );
 
-    childCompiler.hooks.thisCompilation.tap('angular-compiler', (compilation) => {
-      compilation.hooks.additionalAssets.tap('angular-compiler', () => {
-        const asset = compilation.assets[filePath];
-        if (!asset) {
-          return;
+    childCompiler.hooks.thisCompilation.tap(
+      'angular-compiler',
+      (compilation, { normalModuleFactory }) => {
+        // If no data is provided, the resource will be read from the filesystem
+        if (data !== undefined) {
+          normalModuleFactory.hooks.resolveForScheme
+            .for('angular-resource')
+            .tap('angular-compiler', (resourceData) => {
+              if (filePath) {
+                resourceData.path = filePath;
+                resourceData.resource = filePath;
+              }
+
+              if (mimeType) {
+                resourceData.data.mimetype = mimeType;
+              }
+
+              return true;
+            });
+          NormalModule.getCompilationHooks(compilation)
+            .readResourceForScheme.for('angular-resource')
+            .tap('angular-compiler', () => data);
         }
 
-        try {
-          const output = this._evaluate(filePath, asset.source().toString());
-
-          if (typeof output === 'string') {
-            // `webpack-sources` package has incomplete typings
-            // tslint:disable-next-line: no-any
-            compilation.assets[filePath] = new RawSource(output) as any;
+        compilation.hooks.additionalAssets.tap('angular-compiler', () => {
+          const asset = compilation.assets[outputFilePath];
+          if (!asset) {
+            return;
           }
-        } catch (error) {
-          // Use compilation errors, as otherwise webpack will choke
-          compilation.errors.push(error);
-        }
-      });
-    });
+
+          try {
+            const output = this._evaluate(outputFilePath, asset.source().toString());
+
+            if (typeof output === 'string') {
+              // `webpack-sources` package has incomplete typings
+              // tslint:disable-next-line: no-any
+              compilation.assets[outputFilePath] = new RawSource(output) as any;
+            }
+          } catch (error) {
+            // Use compilation errors, as otherwise webpack will choke
+            compilation.errors.push(error);
+          }
+        });
+      },
+    );
 
     let finalContent: string | undefined;
     let finalMap: string | undefined;
     if (isWebpackFiveOrHigher()) {
       childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
         // tslint:disable-next-line: no-any
-        (childCompilation.hooks as any).processAssets.tap({name: 'angular-compiler', stage: 5000}, () => {
-          finalContent = childCompilation.assets[filePath]?.source().toString();
-          finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
+        (childCompilation.hooks as any).processAssets.tap(
+          { name: 'angular-compiler', stage: 5000 },
+          () => {
+            finalContent = childCompilation.assets[outputFilePath]?.source().toString();
+            finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
 
-          delete childCompilation.assets[filePath];
-          delete childCompilation.assets[filePath + '.map'];
-        });
+            delete childCompilation.assets[outputFilePath];
+            delete childCompilation.assets[outputFilePath + '.map'];
+          },
+        );
       });
     } else {
       childCompiler.hooks.afterCompile.tap('angular-compiler', (childCompilation) => {
-        finalContent = childCompilation.assets[filePath]?.source().toString();
-        finalMap = childCompilation.assets[filePath + '.map']?.source().toString();
+        finalContent = childCompilation.assets[outputFilePath]?.source().toString();
+        finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
 
-        delete childCompilation.assets[filePath];
-        delete childCompilation.assets[filePath + '.map'];
+        delete childCompilation.assets[outputFilePath];
+        delete childCompilation.assets[outputFilePath + '.map'];
       });
     }
 
@@ -149,14 +185,16 @@ export class WebpackResourceLoader {
         }
 
         // Save the dependencies for this resource.
-        this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
-        for (const file of childCompilation.fileDependencies) {
-          const resolvedFile = normalizePath(file);
-          const entry = this._reverseDependencies.get(resolvedFile);
-          if (entry) {
-            entry.add(filePath);
-          } else {
-            this._reverseDependencies.set(resolvedFile, new Set([filePath]));
+        if (filePath) {
+          this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
+          for (const file of childCompilation.fileDependencies) {
+            const resolvedFile = normalizePath(file);
+            const entry = this._reverseDependencies.get(resolvedFile);
+            if (entry) {
+              entry.add(filePath);
+            } else {
+              this._reverseDependencies.set(resolvedFile, new Set([filePath]));
+            }
           }
         }
 
@@ -202,6 +240,16 @@ export class WebpackResourceLoader {
         this.cache.set(normalizedFile, compilationResult);
       }
     }
+
+    return compilationResult.content;
+  }
+
+  async process(data: string, mimeType: string): Promise<string> {
+    if (data.trim().length === 0) {
+      return '';
+    }
+
+    const compilationResult = await this._compile(undefined, data, mimeType);
 
     return compilationResult.content;
   }
