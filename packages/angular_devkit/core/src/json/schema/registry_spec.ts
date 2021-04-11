@@ -8,6 +8,7 @@
 // tslint:disable:no-any non-null-operator no-big-function
 import { of as observableOf } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
+import { SchemaFormat } from './interface';
 import { CoreSchemaRegistry } from './registry';
 import { addUndefinedDefaults } from './transforms';
 
@@ -162,7 +163,6 @@ describe('CoreSchemaRegistry', () => {
     const format = {
       name: 'is-hotdog',
       formatter: {
-        async: false,
         validate: (str: string) => str === 'hotdog',
       },
     };
@@ -187,11 +187,12 @@ describe('CoreSchemaRegistry', () => {
   it('supports async format', done => {
     const registry = new CoreSchemaRegistry();
     const data = { str: 'hotdog' };
-    const format = {
+
+    const format: SchemaFormat = {
       name: 'is-hotdog',
       formatter: {
         async: true,
-        validate: (str: string) => observableOf(str === 'hotdog'),
+        validate: async (str: string) => str === 'hotdog',
       },
     };
 
@@ -216,7 +217,7 @@ describe('CoreSchemaRegistry', () => {
   it('shows dataPath and message on error', done => {
     const registry = new CoreSchemaRegistry();
     const data = { hotdot: 'hotdog', banana: 'banana' };
-    const format = {
+    const format: SchemaFormat = {
       name: 'is-hotdog',
       formatter: {
         async: false,
@@ -239,7 +240,7 @@ describe('CoreSchemaRegistry', () => {
           expect(result.success).toBe(false);
           expect(result.errors && result.errors[0]).toBeTruthy();
           expect(result.errors && result.errors[0].keyword).toBe('format');
-          expect(result.errors && result.errors[0].dataPath).toBe('.banana');
+          expect(result.errors && result.errors[0].instancePath).toBe('.banana');
           expect(result.errors && (result.errors[0].params as any).format).toBe('is-hotdog');
         }),
       )

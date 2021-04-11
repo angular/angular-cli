@@ -27,7 +27,7 @@ export default function() {
       }`,
       [join(genRoot, 'fake-schema.json')]: `
       {
-        "id": "FakeSchema",
+        "$id": "FakeSchema",
         "title": "Fake Schema",
         "type": "object",
         "properties": {
