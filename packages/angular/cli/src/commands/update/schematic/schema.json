@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsUpdateSchema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsUpdateSchema",
   "title": "Schematic Options Schema",
   "type": "object",
   "properties": {

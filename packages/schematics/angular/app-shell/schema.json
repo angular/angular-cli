@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularAppShell",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularAppShell",
   "title": "Angular AppShell Options Schema",
   "type": "object",
   "description": "Generates an app shell for running a server-side version of an app.",

@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "ArchitectTargets",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ArchitectTargets",
   "title": "Targets schema for validating Architect targets configuration.",
   "type": "object",
   "description": "A map of available project targets.",

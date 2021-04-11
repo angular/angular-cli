@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularServiceWorker",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularServiceWorker",
   "title": "Angular Service Worker Options Schema",
   "type": "object",
   "additionalProperties": false,

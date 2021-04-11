@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "MyFullSchematicsSchema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "MyFullSchematicsSchema",
   "title": "My Full Schematics Schema",
   "type": "object",
   "properties": {

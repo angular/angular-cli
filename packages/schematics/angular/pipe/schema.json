@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularPipe",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularPipe",
   "title": "Angular Pipe Options Schema",
   "type": "object",
   "additionalProperties": false,

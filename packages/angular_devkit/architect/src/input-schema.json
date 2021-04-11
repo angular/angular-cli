@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "BuilderInputSchema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "BuilderInputSchema",
   "title": "Input schema for builders.",
   "type": "object",
   "properties": {

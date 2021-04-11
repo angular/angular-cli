@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "BuildersSchema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "BuildersSchema",
   "title": "Builders schema for validating a list of builders.",
   "type": "object",
   "properties": {

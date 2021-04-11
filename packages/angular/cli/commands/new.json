@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ng-cli://commands/new.json",
   "description": "Creates a new workspace and an initial Angular application.",
   "$longDescription": "./new.md",
