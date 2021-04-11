@@ -37,6 +37,7 @@ ts_library(
     deps = [
         "@npm//@types/node",
         "@npm//ajv",
+        "@npm//ajv-formats",
         "@npm//fast-json-stable-stringify",
         "@npm//magic-string",
         "@npm//rxjs",

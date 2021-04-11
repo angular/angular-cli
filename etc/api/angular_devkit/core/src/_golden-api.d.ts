@@ -1,10 +1,3 @@
-export interface AdditionalPropertiesValidatorError extends SchemaValidatorErrorBase {
-    keyword: 'additionalProperties';
-    params: {
-        additionalProperty: string;
-    };
-}
-
 export declare function addUndefinedDefaults(value: JsonValue, _pointer: JsonPointer, schema?: JsonSchema): JsonValue;
 
 export declare class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
@@ -157,8 +150,8 @@ export interface CordHostRename {
 
 export declare class CoreSchemaRegistry implements SchemaRegistry {
     constructor(formats?: SchemaFormat[]);
-    protected _resolver(ref: string, validate?: ajv.ValidateFunction): {
-        context?: ajv.ValidateFunction;
+    protected _resolver(ref: string, validate?: ValidateFunction): {
+        context?: ValidateFunction;
         schema?: JsonObject;
     };
     addFormat(format: SchemaFormat): void;
@@ -226,13 +219,6 @@ export declare function fileBufferToString(fileBuffer: FileBuffer): string;
 
 export declare class FileDoesNotExistException extends BaseException {
     constructor(path: string);
-}
-
-export interface FormatValidatorError extends SchemaValidatorErrorBase {
-    keyword: 'format';
-    params: {
-        format: string;
-    };
 }
 
 export declare class ForwardingAnalytics implements Analytics {
@@ -450,13 +436,6 @@ export declare class LevelTransformLogger extends Logger {
 }
 
 export declare function levenshtein(a: string, b: string): number;
-
-export interface LimitValidatorError extends SchemaValidatorErrorBase {
-    keyword: 'maxItems' | 'minItems' | 'maxLength' | 'minLength' | 'maxProperties' | 'minProperties';
-    params: {
-        limit: number;
-    };
-}
 
 export interface LogEntry extends LoggerMetadata {
     level: LogLevel;
@@ -746,23 +725,9 @@ export interface ReferenceResolver<ContextT> {
     };
 }
 
-export interface RefValidatorError extends SchemaValidatorErrorBase {
-    keyword: '$ref';
-    params: {
-        ref: string;
-    };
-}
-
 export declare function relative(from: Path, to: Path): Path;
 
 export declare type ReplacementFunction = (path: Path) => Path;
-
-export interface RequiredValidatorError extends SchemaValidatorErrorBase {
-    keyword: 'required';
-    params: {
-        missingProperty: string;
-    };
-}
 
 export declare function resetNormalizeCache(): void;
 
@@ -801,10 +766,7 @@ export interface SchemaFormat {
     name: string;
 }
 
-export interface SchemaFormatter {
-    readonly async: boolean;
-    validate(data: any): boolean | Observable<boolean>;
-}
+export declare type SchemaFormatter = Format;
 
 export interface SchemaKeywordValidator {
     (data: JsonValue, schema: JsonValue, parent: JsonObject | JsonArray | undefined, parentProperty: string | number | undefined, pointer: JsonPointer, rootData: JsonValue): boolean | Observable<boolean>;
@@ -831,14 +793,7 @@ export interface SchemaValidator {
     (data: JsonValue, options?: SchemaValidatorOptions): Observable<SchemaValidatorResult>;
 }
 
-export declare type SchemaValidatorError = RefValidatorError | LimitValidatorError | AdditionalPropertiesValidatorError | FormatValidatorError | RequiredValidatorError;
-
-export interface SchemaValidatorErrorBase {
-    data?: JsonValue;
-    dataPath: string;
-    keyword: string;
-    message?: string;
-}
+export declare type SchemaValidatorError = ErrorObject;
 
 export interface SchemaValidatorOptions {
     applyPostTransforms?: boolean;

@@ -46,6 +46,6 @@ export const htmlSelectorFormat: schema.SchemaFormat = {
   name: 'html-selector',
   formatter: {
     async: false,
-    validate: name => typeof name === 'string' && isValidElementName(name),
+    validate: (name: unknown) => typeof name === 'string' && isValidElementName(name),
   },
 };
