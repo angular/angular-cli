@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ng-cli://commands/extract-i18n.json",
   "description": "Extracts i18n messages from source code.",
   "$longDescription": "",

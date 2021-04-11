@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Webpack browser schema for Build Facade.",
   "description": "Browser target options",
   "type": "object",
@@ -14,8 +14,7 @@
     },
     "main": {
       "type": "string",
-      "description": "The full path for the main entry point to the app, relative to the current workspace.",
-      "$valueDescription": "fileName"
+      "description": "The full path for the main entry point to the app, relative to the current workspace."
     },
     "polyfills": {
       "type": "string",

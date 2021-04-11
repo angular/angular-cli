@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularInterface",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularInterface",
   "title": "Angular Interface Options Schema",
   "type": "object",
   "additionalProperties": false,

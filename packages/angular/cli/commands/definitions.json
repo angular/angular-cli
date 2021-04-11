@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ng-cli://commands/definitions.json",
 
   "definitions": {
@@ -38,6 +38,7 @@
       }
     },
     "schematic": {
+      "type": "object",
       "properties": {
         "dryRun": {
           "type": "boolean",
@@ -54,6 +55,7 @@
       }
     },
     "interactive": {
+      "type": "object",
       "properties": {
         "interactive": {
           "type": "boolean",

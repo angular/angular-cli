@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularComponent",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularComponent",
   "title": "Angular Component Options Schema",
   "type": "object",
   "description": "Creates a new generic component definition in the given or default project.",

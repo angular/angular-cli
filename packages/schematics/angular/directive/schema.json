@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularDirective",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularDirective",
   "title": "Angular Directive Options Schema",
   "type": "object",
   "description": "Creates a new generic directive definition in the given or default project.",

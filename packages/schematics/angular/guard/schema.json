@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularGuard",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularGuard",
   "title": "Angular Guard Options Schema",
   "type": "object",
   "description": "Generates a new, generic route guard definition in the given or default project.",

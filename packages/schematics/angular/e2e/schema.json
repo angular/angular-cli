@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularE2eApp",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularE2eApp",
   "title": "Angular e2e Application Options Schema",
   "type": "object",
   "additionalProperties": false,

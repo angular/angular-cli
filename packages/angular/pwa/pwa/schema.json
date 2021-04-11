@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularPWA",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularPWA",
   "title": "Angular PWA Options Schema",
   "type": "object",
   "properties": {

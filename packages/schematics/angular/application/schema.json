@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularApp",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularApp",
   "title": "Angular Application Options Schema",
   "type": "object",
   "description": "Generates a new basic app definition in the \"projects\" subfolder of the workspace.",

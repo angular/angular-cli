@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ng-cli://commands/deploy.json",
   "description": "Invokes the deploy builder for a specified project or for the default project in the workspace.",
   "$longDescription": "./deploy-long.md",

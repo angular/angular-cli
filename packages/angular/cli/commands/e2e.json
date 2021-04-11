@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ng-cli://commands/e2e.json",
   "description": "Builds and serves an Angular app, then runs end-to-end tests using Protractor.",
   "$longDescription": "./e2e-long.md",
