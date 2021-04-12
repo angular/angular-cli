@@ -87,9 +87,9 @@ export class OptimizeCssWebpackPlugin {
           };
 
           const output = await new Promise<Result>((resolve, reject) => {
-            // the last parameter is not in the typings
+            // @types/cssnano are not up to date with version 5.
             // tslint:disable-next-line: no-any
-            (cssNano.process as any)(content, postCssOptions, cssNanoOptions)
+            (cssNano as any)(cssNanoOptions).process(content, postCssOptions)
               .then(resolve)
               .catch((err: Error) => reject(new Error(`${file} ${err.message}`)));
           });
