@@ -13,7 +13,7 @@ import validateBuildFiles from './validate-build-files';
 import validateLicenses from './validate-licenses';
 import validateUserAnalytics from './validate-user-analytics';
 
-export default async function (options: { verbose: boolean; ci: boolean }, logger: logging.Logger) {
+export default async function (options: { verbose: boolean }, logger: logging.Logger) {
   let error = false;
 
   if (execSync(`git status --porcelain`).toString()) {

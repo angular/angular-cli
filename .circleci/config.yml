@@ -175,7 +175,7 @@ jobs:
               echo "This build is not over a PR, nothing to do."
             fi
       - run:
-          command: yarn -s admin validate --ci
+          command: yarn -s admin validate
 
   e2e-cli:
     parameters:
