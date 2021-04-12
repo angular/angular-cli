@@ -17,6 +17,7 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
+import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
@@ -73,6 +74,11 @@ export default function (options: E2eOptions): Rule {
           }),
           move(root),
         ])),
+      host => addPackageJsonDependency(host, {
+        type: NodeDependencyType.Dev,
+        name: 'protractor',
+        version: '~7.0.0',
+      }),
       addScriptsToPackageJson(),
     ]);
   };

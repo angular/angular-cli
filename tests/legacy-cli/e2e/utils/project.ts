@@ -53,6 +53,8 @@ export async function prepareProjectForE2e(name) {
     'false',
   );
 
+  await ng('generate', '@schematics/angular:e2e', '--related-app-name', name);
+
   await useCIChrome(
     'e2e',
   );
