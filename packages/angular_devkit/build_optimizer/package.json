@@ -16,7 +16,7 @@
     "webpack-sources": "2.2.0"
   },
   "peerDependencies": {
-    "webpack": "^4.0.0 || ^5.30.0"
+    "webpack": "^5.30.0"
   },
   "peerDependenciesMeta": {
     "webpack": {
@@ -24,7 +24,6 @@
     }
   },
   "devDependencies": {
-    "@types/webpack": "^4.41.22",
     "webpack": "5.30.0"
   }
 }

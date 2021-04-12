@@ -9,7 +9,7 @@ import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compi
 import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
 import { createHash } from 'crypto';
 import * as ts from 'typescript';
-import { Compiler, NormalModuleReplacementPlugin, WebpackFourCompiler, compilation } from 'webpack';
+import { Compilation, Compiler, Module, NormalModuleReplacementPlugin } from 'webpack';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
@@ -50,10 +50,7 @@ export interface AngularWebpackPluginOptions {
 }
 
 // Add support for missing properties in Webpack types as well as the loader's file emitter
-interface WebpackCompilation extends compilation.Compilation {
-  // tslint:disable-next-line: no-any
-  compilationDependencies: { add(item: string): any };
-  rebuildModule(module: compilation.Module, callback: () => void): void;
+interface WebpackCompilation extends Compilation {
   [AngularPluginSymbol]: FileEmitterCollection;
 }
 
@@ -114,7 +111,7 @@ export class AngularWebpackPlugin {
     return this.pluginOptions;
   }
 
-  apply(webpackCompiler: Compiler | WebpackFourCompiler): void {
+  apply(webpackCompiler: Compiler): void {
     const compiler = webpackCompiler as Compiler & { watchMode?: boolean };
     // Setup file replacements with webpack
     for (const [key, value] of Object.entries(this.pluginOptions.fileReplacements)) {
@@ -281,7 +278,7 @@ export class AngularWebpackPlugin {
             .filter((sourceFile) => !sourceFile.isDeclarationFile)
             .map((sourceFile) => normalizePath(sourceFile.fileName)),
         );
-        Array.from(modules).forEach(({ resource }: compilation.Module & { resource?: string }) => {
+        Array.from(modules).forEach(({ resource }: Module & { resource?: string }) => {
           if (resource) {
             this.markResourceUsed(normalizePath(resource), currentUnused);
           }
@@ -320,7 +317,7 @@ export class AngularWebpackPlugin {
   }
 
   private async rebuildRequiredFiles(
-    modules: Iterable<compilation.Module>,
+    modules: Iterable<Module>,
     compilation: WebpackCompilation,
     fileEmitter: FileEmitter,
   ): Promise<void> {
@@ -328,7 +325,7 @@ export class AngularWebpackPlugin {
       return;
     }
 
-    const rebuild = (webpackModule: compilation.Module) =>
+    const rebuild = (webpackModule: Module) =>
       new Promise<void>((resolve) => compilation.rebuildModule(webpackModule, () => resolve()));
 
     const filesToRebuild = new Set<string>();
@@ -354,7 +351,7 @@ export class AngularWebpackPlugin {
 
     if (filesToRebuild.size > 0) {
       for (const webpackModule of [...modules]) {
-        const resource = (webpackModule as compilation.Module & { resource?: string }).resource;
+        const resource = (webpackModule as Module & { resource?: string }).resource;
         if (resource && filesToRebuild.has(normalizePath(resource))) {
           await rebuild(webpackModule);
         }

@@ -4,17 +4,15 @@
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
- */
-import * as webpack from 'webpack';
+*/
+import { Compilation, WebpackError } from 'webpack';
 
-const WebpackError = require('webpack/lib/WebpackError');
-
-export function addWarning(compilation: webpack.compilation.Compilation, message: string): void {
+export function addWarning(compilation: Compilation, message: string): void {
   compilation.warnings.push(new WebpackError(message));
 
 }
 
-export function addError(compilation: webpack.compilation.Compilation, message: string): void {
+export function addError(compilation: Compilation, message: string): void {
   compilation.errors.push(new WebpackError(message));
 
 }

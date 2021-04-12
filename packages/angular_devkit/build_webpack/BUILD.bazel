@@ -49,7 +49,6 @@ ts_library(
     deps = [
         "//packages/angular_devkit/architect",
         "@npm//@types/node",
-        "@npm//@types/webpack",
         "@npm//@types/webpack-dev-server",
         "@npm//rxjs",
         "@npm//webpack",

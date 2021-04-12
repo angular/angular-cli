@@ -18,7 +18,7 @@ export interface EmittedFiles {
   extension: string;
 }
 
-export function getEmittedFiles(compilation: webpack.compilation.Compilation): EmittedFiles[] {
+export function getEmittedFiles(compilation: webpack.Compilation): EmittedFiles[] {
   const files: EmittedFiles[] = [];
 
   // adds all chunks to the list of emitted files such as lazy loaded modules

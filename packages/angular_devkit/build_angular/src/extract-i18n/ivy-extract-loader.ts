@@ -14,7 +14,8 @@ interface LocalizeExtractLoaderOptions {
 }
 
 export default function localizeExtractLoader(
-  this: import('webpack').loader.LoaderContext,
+  // tslint:disable-next-line: no-any
+  this: any,
   content: string,
   // Source map types are broken in the webpack type definitions
   // tslint:disable-next-line: no-any

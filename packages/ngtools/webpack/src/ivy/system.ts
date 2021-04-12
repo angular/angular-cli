@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { InputFileSystem } from 'webpack';
+import { Compiler } from 'webpack';
 import { externalizePath } from './paths';
 
+export type InputFileSystem = Compiler['inputFileSystem'];
 export interface InputFileSystemSync extends InputFileSystem {
   readFileSync(path: string): Buffer;
   statSync(path: string): { size: number; mtime: Date; isDirectory(): boolean; isFile(): boolean };

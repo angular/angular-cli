@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as vm from 'vm';
-import { Compiler, compilation } from 'webpack';
+import { Compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { normalizePath } from './ivy/paths';
 import { isWebpackFiveOrHigher } from './webpack-version';
@@ -16,24 +16,6 @@ const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
 const LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
-type WebpackCompilation = compilation.Compilation & {
-  createChildCompiler(
-    name: string,
-    outputOptions: {},
-    plugins: ((compiler: Compiler) => void)[],
-  ): WebpackCompiler;
-};
-
-type WebpackCompiler = Compiler & {
-  runAsChild(
-    callback: (
-      error?: Error,
-      entries?: unknown,
-      compilation?: compilation.Compilation,
-    ) => void,
-  ): void;
-};
-
 interface CompilationOutput {
   content: string;
   map?: string;
@@ -41,7 +23,7 @@ interface CompilationOutput {
 }
 
 export class WebpackResourceLoader {
-  private _parentCompilation?: WebpackCompilation;
+  private _parentCompilation?: Compilation;
   private _fileDependencies = new Map<string, Set<string>>();
   private _reverseDependencies = new Map<string, Set<string>>();
 
@@ -49,10 +31,10 @@ export class WebpackResourceLoader {
   private modifiedResources = new Set<string>();
 
   update(
-    parentCompilation: compilation.Compilation,
+    parentCompilation: Compilation,
     changedFiles?: Iterable<string>,
   ) {
-    this._parentCompilation = parentCompilation as WebpackCompilation;
+    this._parentCompilation = parentCompilation;
 
     // Update resource cache and modified resources
     this.modifiedResources.clear();

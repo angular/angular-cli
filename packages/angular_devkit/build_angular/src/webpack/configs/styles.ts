@@ -142,7 +142,8 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
 
   const { supportedBrowsers } = new BuildBrowserFeatures(wco.projectRoot);
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean | undefined) => {
-    return (loader: webpack.loader.LoaderContext) => ({
+    // tslint:disable-next-line: no-any
+    return (loader: any) => ({
       map: inlineSourcemaps
         ? {
             inline: true,
