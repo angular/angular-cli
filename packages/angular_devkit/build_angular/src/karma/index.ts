@@ -7,6 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize } from '@angular-devkit/core';
+import { Config, ConfigOptions } from 'karma';
 import { dirname, resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
@@ -26,7 +27,7 @@ import { SingleTestTransformLoader } from '../webpack/plugins/single-test-transf
 import { findTests } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
 
-export type KarmaConfigOptions = import('karma').ConfigOptions & {
+export type KarmaConfigOptions = ConfigOptions & {
   buildWebpack?: unknown;
   configFile?: string;
 };
@@ -135,14 +136,11 @@ export function execute(
         logger: context.logger,
       };
 
-      // @types/karma doesn't include the last parameter.
-      // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52286
-      // tslint:disable-next-line: no-any
-      const config = await (karma.config.parseConfig as any)(
+      const config = await karma.config.parseConfig(
         resolve(context.workspaceRoot, options.karmaConfig),
         transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
         { promiseConfig: true, throwErrors: true },
-      ) as Promise<KarmaConfigOptions>;
+      );
 
       return [karma, config] as [typeof karma, KarmaConfigOptions];
     }),
@@ -158,22 +156,17 @@ export function execute(
 
       // Complete the observable once the Karma server returns.
       const karmaServer = new karma.Server(
-        karmaConfig,
-        (exitCode: number) => {
+        karmaConfig as Config,
+        exitCode => {
           subscriber.next({ success: exitCode === 0 });
           subscriber.complete();
         },
       );
-      // karma typings incorrectly define start's return value as void
-      // tslint:disable-next-line:no-use-of-empty-return-value
-      const karmaStart = (karmaServer.start() as unknown) as Promise<void>;
+
+      const karmaStart = karmaServer.start();
 
       // Cleanup, signal Karma to exit.
-      return () => {
-        const karmaServerWithStop = (karmaServer as unknown) as { stop: () => Promise<void> };
-
-        return karmaStart.then(() => karmaServerWithStop.stop());
-      };
+      return () => karmaStart.then(() => karmaServer.stop());
     })),
     defaultIfEmpty({ success: false }),
   );

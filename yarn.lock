@@ -1902,10 +1902,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.7.tgz#98a993516c859eb0d5c4c8f098317a9ea68db9ad"
   integrity sha512-cxWFQVseBm6O9Gbw1IWb8r6OS4OhSt3hPZLkFApLjM8TEXROBuQGLAH2i2gZpcXdLBIrpXuTDhH7Vbm1iXmNGA==
 
-"@types/karma@^6.0.0":
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/@types/karma/-/karma-6.1.0.tgz#fe9dd496e755fe40cc4c6c2007a3aeece21409d6"
-  integrity sha512-JLrEceom1osyv6pUKDCT1Z2WGcecj5UKb99xvEXashYha1B6ntNBNBLTqcVxD2G5PiL5zcpaQodHatnhk3YG+Q==
+"@types/karma@^6.3.0":
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/@types/karma/-/karma-6.3.0.tgz#535928aeee6e957464acf17d0a9e928b3aa0c27f"
+  integrity sha512-NQ6AzL/0UhFKrK69R9aPV1a88MBau7F47Tr3Qwg8IlKALDVfRk9w+8r3VfOso0vrFT/IkztjfAPar090laUMdg==
   dependencies:
     "@types/node" "*"
     log4js "^6.2.1"
