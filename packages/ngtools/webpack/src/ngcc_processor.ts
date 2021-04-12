@@ -13,8 +13,8 @@ import { Resolver, ResolverFactory } from 'enhanced-resolve';
 import { accessSync, constants, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { InputFileSystem } from 'webpack';
 import { time, timeEnd } from './benchmark';
+import { InputFileSystem } from './ivy/system';
 
 // We cannot create a plugin for this, because NGTSC requires addition type
 // information which ngcc creates when processing a package which was compiled with NGC.

@@ -40,6 +40,7 @@ ts_library(
         "@npm//source-map",
         "@npm//tslib",
         "@npm//typescript",
+        "@npm//webpack",
     ],
 )
 

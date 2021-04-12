@@ -32,7 +32,8 @@ export interface PostcssCliResourcesOptions {
   /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
   extracted?: boolean;
   filename: (resourcePath: string) => string;
-  loader: webpack.loader.LoaderContext;
+  // tslint:disable-next-line: no-any
+  loader: any;
   emitFile: boolean;
 }
 
@@ -92,7 +93,7 @@ export default function(options?: PostcssCliResourcesOptions): Plugin {
 
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));
     const resolver = (file: string, base: string) => new Promise<string>((resolve, reject) => {
-      loader.resolve(base, decodeURI(file), (err, result) => {
+      loader.resolve(base, decodeURI(file), (err: Error, result: string) => {
         if (err) {
           reject(err);
 
@@ -113,7 +114,7 @@ export default function(options?: PostcssCliResourcesOptions): Plugin {
         }
 
         let outputPath = interpolateName(
-          {  resourcePath: result } as webpack.loader.LoaderContext,
+          {  resourcePath: result },
           filename(result),
           { content, context: loader.context || loader.rootContext },
         )

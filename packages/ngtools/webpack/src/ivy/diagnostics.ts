@@ -7,12 +7,13 @@
  */
 import { Diagnostics, formatDiagnostics } from '@angular/compiler-cli';
 import { DiagnosticCategory } from 'typescript';
+import { Compilation } from 'webpack';
 import { addError, addWarning } from '../webpack-diagnostics';
 
 export type DiagnosticsReporter = (diagnostics: Diagnostics) => void;
 
 export function createDiagnosticsReporter(
-  compilation: import('webpack').compilation.Compilation,
+  compilation: Compilation,
 ): DiagnosticsReporter {
   return (diagnostics) => {
     for (const diagnostic of diagnostics) {

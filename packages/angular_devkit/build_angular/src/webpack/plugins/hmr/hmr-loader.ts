@@ -12,7 +12,8 @@ export const HmrLoader = __filename;
 const hmrAcceptPath = join(__dirname, './hmr-accept.js').replace(/\\/g, '/');
 
 export default function (
-  this: import('webpack').loader.LoaderContext,
+  // tslint:disable-next-line: no-any
+  this: any,
   content: string,
   // Source map types are broken in the webpack type definitions
   // tslint:disable-next-line: no-any
