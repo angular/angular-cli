@@ -169,31 +169,6 @@ Don't forget to update the Slack [#tools](https://angular-team.slack.com/archive
 links to all the version bump PRs. If anyone else on the team notices these links missing, they should ask the caretaker
 to make sure the post-release version bump is not forgotten.
 
-### Microsite Publishing
-
-The [microsite](https://cli.angular.io/) is the landing page for Angular CLI and
-is a one-page static page.
-
-> **This can ONLY be done by a Google employee.**
->
-> **You will need firebase access to our cli-angular-io firebase site. If you don't have it, escalate.**
-
-Check out if changes were made to the microsite:
-
-```sh
-git log v8.0.0-beta.0..HEAD --oneline etc/cli.angular.io | wc -l
-```
-
-If the number is 0 you can ignore the rest of this section.
-
-To publish, go to the
-[`angular-cli/etc/cli.angular.io`](https://github.com/angular/angular-cli/tree/master/etc/cli.angular.io)
-directory and run `firebase deploy`. You might have to `firebase login` first.
-If you don't have the firebase CLI installed, you can install it using
-`npm install --global firebase-tools` (or use your package manager of choice).
-
-This is detailed in [`etc/cli.angular.io/README.md`](https://github.com/angular/angular-cli/blob/master/etc/cli.angular.io/README.md).
-
 ## Publishing a Major Version
 
 For the first release of a major version, say `v10.0.0`, checkout the major branch
