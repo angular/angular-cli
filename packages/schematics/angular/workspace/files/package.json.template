@@ -35,7 +35,6 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
-    "protractor": "~7.0.0",
     "ts-node": "~9.1.1",<% } %>
     "typescript": "<%= latestVersions.TypeScript %>"
   }

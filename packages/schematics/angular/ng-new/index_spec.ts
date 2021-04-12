@@ -37,10 +37,6 @@ describe('Ng New Schematic', () => {
       '/bar/tsconfig.app.json',
       '/bar/src/main.ts',
       '/bar/src/app/app.module.ts',
-      '/bar/e2e/src/app.po.ts',
-      '/bar/e2e/src/app.e2e-spec.ts',
-      '/bar/e2e/tsconfig.json',
-      '/bar/e2e/protractor.conf.js',
     ]));
   });
 

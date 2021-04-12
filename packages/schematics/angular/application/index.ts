@@ -29,7 +29,6 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
-import { Schema as E2eOptions } from '../e2e/schema';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
@@ -282,11 +281,6 @@ export default function (options: ApplicationOptions): Rule {
       : join(normalize(newProjectRoot), strings.dasherize(options.name));
     const sourceDir = `${appDir}/src/app`;
 
-    const e2eOptions: E2eOptions = {
-      relatedAppName: options.name,
-      rootSelector: appRootSelector,
-    };
-
     return chain([
       addAppToWorkspaceFile(options, appDir),
       mergeWith(
@@ -338,7 +332,6 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
-      options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
       options.lintFix ? applyLintFix(appDir) : noop(),
     ]);
