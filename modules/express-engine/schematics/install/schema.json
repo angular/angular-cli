@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsExpressEngineInstall",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsExpressEngineInstall",
   "title": "Express Engine Install Options Schema",
   "type": "object",
   "properties": {
