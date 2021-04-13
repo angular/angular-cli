@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { basename, dirname, extname } from 'path';
-import { Compilation, Compiler } from 'webpack';
-import { RawSource } from 'webpack-sources';
+import { Compilation, Compiler, sources } from 'webpack';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator, IndexHtmlGeneratorOptions, IndexHtmlGeneratorProcessOptions } from '../../utils/index-file/index-html-generator';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
@@ -80,7 +79,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
           lang: this.options.lang,
         });
 
-        assets[this.options.outputPath] = new RawSource(content);
+        assets[this.options.outputPath] = new sources.RawSource(content);
 
         warnings.forEach(msg => addWarning(this.compilation, msg));
         errors.forEach(msg => addError(this.compilation, msg));

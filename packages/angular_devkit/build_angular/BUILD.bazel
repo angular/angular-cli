@@ -135,7 +135,6 @@ ts_library(
         "@npm//@types/semver",
         "@npm//@types/text-table",
         "@npm//@types/webpack-dev-server",
-        "@npm//@types/webpack-sources",
         "@npm//ajv",
         "@npm//ansi-colors",
         "@npm//babel-loader",
@@ -193,7 +192,6 @@ ts_library(
         "@npm//webpack-dev-middleware",
         "@npm//webpack-dev-server",
         "@npm//webpack-merge",
-        "@npm//webpack-sources",
         "@npm//webpack-subresource-integrity",
     ],
 )
