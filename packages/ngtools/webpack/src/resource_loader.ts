@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as vm from 'vm';
-import { Compilation, EntryPlugin, NormalModule, library, node } from 'webpack';
-import { RawSource } from 'webpack-sources';
+import { Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
 import { normalizePath } from './ivy/paths';
 
 interface CompilationOutput {
@@ -136,9 +135,7 @@ export class WebpackResourceLoader {
             const output = this._evaluate(outputFilePath, asset.source().toString());
 
             if (typeof output === 'string') {
-              // `webpack-sources` package has incomplete typings
-              // tslint:disable-next-line: no-any
-              compilation.assets[outputFilePath] = new RawSource(output) as any;
+              compilation.assets[outputFilePath] = new sources.RawSource(output);
             }
           } catch (error) {
             // Use compilation errors, as otherwise webpack will choke
