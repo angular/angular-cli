@@ -37,11 +37,9 @@ ts_library(
     deps = [
         "@npm//@angular/compiler-cli",
         "@npm//@types/node",
-        "@npm//@types/webpack-sources",
         "@npm//enhanced-resolve",
         "@npm//typescript",
         "@npm//webpack",
-        "@npm//webpack-sources",
     ],
 )
 
