@@ -37,7 +37,7 @@ function* visit(directory: DirEntry): IterableIterator<ts.SourceFile> {
   }
 }
 
-export function updateLazyModulePaths(): Rule {
+export default function(): Rule {
   return tree => {
     for (const sourceFile of visit(tree.root)) {
       let recorder: UpdateRecorder | undefined;

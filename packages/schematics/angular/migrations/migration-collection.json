@@ -1,45 +1,5 @@
 {
   "schematics": {
-    "migration-01": {
-      "version": "6.0.0-beta.8",
-      "factory": "./update-6",
-      "description": "Update an Angular CLI project to version 6."
-    },
-    "migration-02": {
-      "version": "7.0.0-beta.0",
-      "factory": "./update-7",
-      "description": "Update an Angular CLI project to version 7."
-    },
-    "migration-03": {
-      "version": "7.0.0-rc.0",
-      "factory": "./update-7/index#polyfillMetadataRule",
-      "description": "Update an Angular CLI project to version 7."
-    },
-    "migration-04": {
-      "version": "7.1.0-beta.0",
-      "factory": "./update-7/index#typeScriptHelpersRule",
-      "description": "Update an Angular CLI project to version 7."
-    },
-    "migration-05": {
-      "version": "7.0.4",
-      "factory": "./update-7",
-      "description": "Update an Angular CLI project to version 7."
-    },
-    "migration-06": {
-      "version": "7.0.3",
-      "factory": "./update-7/index#updateDevkitBuildNgPackagr",
-      "description": "Update an Angular CLI project to version 7."
-    },
-    "migration-07": {
-      "version": "8.0.0-beta.12",
-      "factory": "./update-8",
-      "description": "Update an Angular CLI project to version 8."
-    },
-    "migration-08": {
-      "version": "8.0.0-beta.14",
-      "factory": "./update-8/#updateLazyModulePaths",
-      "description": "Update an Angular CLI project to version 8."
-    },
     "workspace-version-9": {
       "version": "9.0.0-beta.0",
       "factory": "./update-9",
@@ -47,7 +7,7 @@
     },
     "lazy-loading-syntax": {
       "version": "9.0.0-next.6",
-      "factory": "./update-8/#updateLazyModulePaths",
+      "factory": "./update-12/update-lazy-module-paths",
       "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
     },
     "schematic-options-9": {
@@ -142,7 +102,7 @@
     },
     "lazy-loading-string-syntax": {
       "version": "12.0.0-next.4",
-      "factory": "./update-8/#updateLazyModulePaths",
+      "factory": "./update-12/update-lazy-module-paths",
       "description": "Lazy loading syntax migration. Update lazy loading string syntax to use dynamic imports."
     },
     "remove-deprecated-i18n-options": {
