@@ -51,13 +51,30 @@ function createIvyPlugin(
     }
   }
 
+  let inlineStyleMimeType;
+  switch (buildOptions.inlineStyleLanguage) {
+    case 'less':
+      inlineStyleMimeType = 'text/x-less';
+      break;
+    case 'sass':
+      inlineStyleMimeType = 'text/x-sass';
+      break;
+    case 'scss':
+      inlineStyleMimeType = 'text/x-scss';
+      break;
+    case 'css':
+    default:
+      inlineStyleMimeType = 'text/css';
+      break;
+  }
+
   return new AngularWebpackPlugin({
     tsconfig,
     compilerOptions,
     fileReplacements,
     jitMode: !aot,
     emitNgModuleScope: !optimize,
-    inlineStyleMimeType: 'text/css',
+    inlineStyleMimeType,
   });
 }
 

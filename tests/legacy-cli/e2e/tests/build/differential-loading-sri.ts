@@ -56,7 +56,7 @@ export default async function () {
     '--output-path=dist/second',
   );
 
-  const chunkId = '751';
+  const chunkId = '730';
   const codeHashES5 = createHash('sha384')
     .update(await readFile(`dist/first/${chunkId}-es5.js`))
     .digest('base64');
