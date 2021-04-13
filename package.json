@@ -120,7 +120,6 @@
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
     "@types/webpack-dev-server": "^3.1.7",
-    "@types/webpack-sources": "^2.0.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.1.0",
     "ajv-formats": "2.0.2",
@@ -228,7 +227,6 @@
     "webpack-dev-middleware": "4.1.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.7.3",
-    "webpack-sources": "2.2.0",
     "webpack-subresource-integrity": "1.5.2",
     "zone.js": "^0.11.3"
   }

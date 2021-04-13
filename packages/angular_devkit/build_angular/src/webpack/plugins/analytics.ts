@@ -11,13 +11,13 @@ import {
   Compiler,
   Module,
   Stats,
+  sources,
 } from 'webpack';
-import { OriginalSource } from 'webpack-sources';
 
 const NormalModule = require('webpack/lib/NormalModule');
 
 interface NormalModule extends Module {
-  _source?: OriginalSource | null;
+  _source?: sources.OriginalSource | null;
   resource?: string;
 }
 
@@ -154,14 +154,14 @@ export class NgBuildAnalyticsPlugin {
 
       // Just count the ngOnInit occurences. Comments/Strings/calls occurences should be sparse
       // so we just consider them within the margin of error. We do break on word break though.
-      this._stats.numberOfNgOnInit += countOccurrences(module._source.source(), 'ngOnInit', true);
+      this._stats.numberOfNgOnInit += countOccurrences(module._source.source().toString(), 'ngOnInit', true);
 
       // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
-      this._stats.numberOfComponents += countOccurrences(module._source.source(), 'Component({');
+      this._stats.numberOfComponents += countOccurrences(module._source.source().toString(), 'Component({');
       // For Ivy we just count ɵcmp.
-      this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵcmp', true);
+      this._stats.numberOfComponents += countOccurrences(module._source.source().toString(), '.ɵcmp', true);
       // for ascii_only true
-      this._stats.numberOfComponents += countOccurrences(module._source.source(), '.\u0275cmp', true);
+      this._stats.numberOfComponents += countOccurrences(module._source.source().toString(), '.\u0275cmp', true);
     }
   }
 

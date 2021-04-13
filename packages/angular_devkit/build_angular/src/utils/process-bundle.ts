@@ -23,15 +23,16 @@ import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import * as v8 from 'v8';
-import {
+import { sources } from 'webpack';
+import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
+import { I18nOptions } from './i18n-options';
+
+const {
   ConcatSource,
   OriginalSource,
   ReplaceSource,
-  Source,
   SourceMapSource,
-} from 'webpack-sources';
-import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
-import { I18nOptions } from './i18n-options';
+} = sources;
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
@@ -233,7 +234,7 @@ async function mergeSourceMaps(
     true,
   ).map()!;
 
-  return finalSourceMap;
+  return finalSourceMap as RawSourceMap;
 }
 
 async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
@@ -773,12 +774,12 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
       content.replace(position.start, position.end - 1, code);
     }
 
-    let outputSource: Source = content;
+    let outputSource: sources.Source = content;
     if (options.setLocale) {
       const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});\n`;
 
       // If locale data is provided, load it and prepend to file
-      let localeDataSource: Source | null = null;
+      let localeDataSource: sources.Source | null = null;
       const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
       if (localeDataPath) {
         const localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);
@@ -791,7 +792,10 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
         : new ConcatSource(setLocaleText, content);
     }
 
-    const { source: outputCode, map: outputMap } = outputSource.sourceAndMap();
+    const { source: outputCode, map: outputMap } = outputSource.sourceAndMap() as {
+      source: string;
+      map: RawSourceMap;
+    };
     const outputPath = path.join(
       options.outputPath,
       i18n.flatOutput ? '' : locale,
