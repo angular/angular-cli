@@ -8,12 +8,10 @@
 
 import { interpolateName } from 'loader-utils';
 import * as path from 'path';
-import { Compilation, Compiler } from 'webpack';
+import { Chunk, Compilation, Compiler } from 'webpack';
 import { CachedSource, ConcatSource, OriginalSource, RawSource, Source } from 'webpack-sources';
 
-const Chunk = require('webpack/lib/Chunk');
-const EntryPoint = require('webpack/lib/Entrypoint');
-
+const Entrypoint = require('webpack/lib/Entrypoint');
 export interface ScriptsWebpackPluginOptions {
   name: string;
   sourceMap?: boolean;
@@ -76,7 +74,7 @@ export class ScriptsWebpackPlugin {
     chunk.ids = [chunk.id];
     chunk.files.add(filename);
 
-    const entrypoint = new EntryPoint(this.options.name);
+    const entrypoint = new Entrypoint(this.options.name);
     entrypoint.pushChunk(chunk);
     chunk.addGroup(entrypoint);
     compilation.entrypoints.set(this.options.name, entrypoint);

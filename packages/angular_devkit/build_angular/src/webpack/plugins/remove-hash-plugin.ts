@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Compiler } from 'webpack';
-import { isWebpackFiveOrHigher } from '../../utils/webpack-version';
 import { HashFormat } from '../utils/helpers';
-
 
 export interface RemoveHashPluginOptions {
   chunkNames: string[];
@@ -35,14 +33,7 @@ export class RemoveHashPlugin {
         return path;
       };
 
-      if (isWebpackFiveOrHigher()) {
-        compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-      } else {
-        const mainTemplate = compilation.mainTemplate as typeof compilation.mainTemplate & {
-          hooks: typeof compilation['hooks'];
-        };
-        mainTemplate.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-      }
+      compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
     });
   }
 }
