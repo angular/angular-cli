@@ -16,6 +16,7 @@ export default function buildOptimizerLoader(this: {
     };
     cacheable(): void;
     callback(error?: Error | null, content?: string, sourceMap?: unknown): void;
+    getOptions(): unknown;
 }, content: string, previousSourceMap: RawSourceMap): void;
 
 export declare function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFile>;
