@@ -6,15 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as vm from 'vm';
-import { Compilation, NormalModule } from 'webpack';
+import { Compilation, EntryPlugin, NormalModule, library, node } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { normalizePath } from './ivy/paths';
-import { isWebpackFiveOrHigher } from './webpack-version';
-
-const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
-const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
-const LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
-const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
 interface CompilationOutput {
   content: string;
@@ -76,27 +70,35 @@ export class WebpackResourceLoader {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
     }
 
-    // Simple sanity check.
-    if (filePath?.match(/\.[jt]s$/)) {
-      return Promise.reject(
-        `Cannot use a JavaScript or TypeScript file (${filePath}) in a component's styleUrls or templateUrl.`,
-      );
+    // Create a special URL for reading the resource from memory
+    const entry = data ? 'angular-resource://' : filePath;
+    if (!entry) {
+      throw new Error(`"filePath" or "data" must be specified.`);
     }
 
-    // Create a special URL for reading the resource from memory
-    const angularScheme = 'angular-resource://';
+    // Simple sanity check.
+    if (filePath?.match(/\.[jt]s$/)) {
+      throw new Error(`Cannot use a JavaScript or TypeScript file (${filePath}) in a component's styleUrls or templateUrl.`);
+    }
 
     const outputFilePath = filePath || `angular-resource-output-${this.outputPathCounter++}.css`;
-    const outputOptions = { filename: outputFilePath };
+    const outputOptions = {
+      filename: outputFilePath,
+      library: {
+        type: 'var',
+        name: 'resource',
+      },
+    };
+
     const context = this._parentCompilation.compiler.context;
     const childCompiler = this._parentCompilation.createChildCompiler(
       'angular-compiler:resource',
       outputOptions,
       [
-        new NodeTemplatePlugin(outputOptions),
-        new NodeTargetPlugin(),
-        new SingleEntryPlugin(context, data ? angularScheme : filePath, 'resource'),
-        new LibraryTemplatePlugin('resource', 'var'),
+        new node.NodeTemplatePlugin(outputOptions),
+        new node.NodeTargetPlugin(),
+        new EntryPlugin(context, entry, { name: 'resource' }),
+        new library.EnableLibraryPlugin('var'),
       ],
     );
 
@@ -148,29 +150,18 @@ export class WebpackResourceLoader {
 
     let finalContent: string | undefined;
     let finalMap: string | undefined;
-    if (isWebpackFiveOrHigher()) {
-      childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
-        // tslint:disable-next-line: no-any
-        (childCompilation.hooks as any).processAssets.tap(
-          { name: 'angular-compiler', stage: 5000 },
-          () => {
-            finalContent = childCompilation.assets[outputFilePath]?.source().toString();
-            finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
+    childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
+      childCompilation.hooks.processAssets.tap(
+        { name: 'angular-compiler', stage: Compilation.PROCESS_ASSETS_STAGE_REPORT },
+        () => {
+          finalContent = childCompilation.assets[outputFilePath]?.source().toString();
+          finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
 
-            delete childCompilation.assets[outputFilePath];
-            delete childCompilation.assets[outputFilePath + '.map'];
-          },
-        );
-      });
-    } else {
-      childCompiler.hooks.afterCompile.tap('angular-compiler', (childCompilation) => {
-        finalContent = childCompilation.assets[outputFilePath]?.source().toString();
-        finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
-
-        delete childCompilation.assets[outputFilePath];
-        delete childCompilation.assets[outputFilePath + '.map'];
-      });
-    }
+          delete childCompilation.assets[outputFilePath];
+          delete childCompilation.assets[outputFilePath + '.map'];
+        },
+      );
+    });
 
     return new Promise<CompilationOutput>((resolve, reject) => {
       childCompiler.runAsChild((error, _, childCompilation) => {
