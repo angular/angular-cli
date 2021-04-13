@@ -15,6 +15,7 @@ import {
   ExtraEntryPoint,
   I18NMissingTranslation,
   IndexUnion,
+  InlineStyleLanguage,
   Localize,
   SourceMapClass,
 } from '../browser/schema';
@@ -67,6 +68,7 @@ export interface BuildOptions {
   stylePreprocessorOptions?: { includePaths: string[] };
   platform?: 'browser' | 'server';
   fileReplacements: NormalizedFileReplacement[];
+  inlineStyleLanguage?: InlineStyleLanguage;
 
   allowedCommonJsDependencies?: string[];
 
