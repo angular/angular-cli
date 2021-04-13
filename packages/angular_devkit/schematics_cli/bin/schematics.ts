@@ -336,7 +336,7 @@ function getUsage(): string {
 
       --help              Show this message.
 
-  Any additional option is passed to the Schematics depending on
+  Any additional option is passed to the Schematics depending on its schema.
   `;
 }
 
