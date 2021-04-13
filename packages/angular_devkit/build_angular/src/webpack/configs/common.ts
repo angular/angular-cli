@@ -17,9 +17,9 @@ import {
   Compiler,
   Configuration,
   ContextReplacementPlugin,
+  ProgressPlugin,
   RuleSetRule,
   debug,
-  sources,
 } from 'webpack';
 import { AssetPatternClass } from '../../browser/schema';
 import { BuildBrowserFeatures, maxWorkers } from '../../utils';
@@ -226,7 +226,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.progress) {
-    const ProgressPlugin = require('webpack/lib/ProgressPlugin');
     const spinner = new Spinner();
 
     extraPlugins.push(new ProgressPlugin({

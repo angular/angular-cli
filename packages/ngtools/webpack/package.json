@@ -27,7 +27,7 @@
   "peerDependencies": {
     "@angular/compiler-cli": "^12.0.0-next",
     "typescript": "~4.2.3",
-    "webpack": "^4.0.0 || ^5.30.0"
+    "webpack": "^5.30.0"
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0",

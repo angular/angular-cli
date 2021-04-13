@@ -9,12 +9,11 @@ import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compi
 import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
 import { createHash } from 'crypto';
 import * as ts from 'typescript';
-import { Compilation, Compiler, Module, NormalModuleReplacementPlugin } from 'webpack';
+import { Compilation, Compiler, Module, NormalModuleReplacementPlugin, util } from 'webpack';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
 import { addError, addWarning } from '../webpack-diagnostics';
-import { isWebpackFiveOrHigher, mergeResolverMainFields } from '../webpack-version';
 import { SourceFileCache } from './cache';
 import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
 import {
@@ -144,7 +143,9 @@ export class AngularWebpackPlugin {
           }
           resolveOptions.plugins.push(pathsPlugin);
 
-          return mergeResolverMainFields(resolveOptions, originalMainFields, ivyMainFields);
+          // https://github.com/webpack/webpack/issues/11635#issuecomment-707016779
+          return util.cleverMerge(resolveOptions, { mainFields: [...ivyMainFields, '...'] });
+
         });
     });
 
@@ -256,15 +257,9 @@ export class AngularWebpackPlugin {
         .filter((sourceFile) => !internalFiles?.has(sourceFile));
 
       // Ensure all program files are considered part of the compilation and will be watched
-      if (isWebpackFiveOrHigher()) {
-        allProgramFiles.forEach((sourceFile) =>
-          compilation.fileDependencies.add(sourceFile.fileName),
-        );
-      } else {
-        allProgramFiles.forEach((sourceFile) =>
-          compilation.compilationDependencies.add(sourceFile.fileName),
-        );
-      }
+      allProgramFiles.forEach((sourceFile) =>
+        compilation.fileDependencies.add(sourceFile.fileName),
+      );
 
       compilation.hooks.finishModules.tapPromise(PLUGIN_NAME, async (modules) => {
         // Rebuild any remaining AOT required modules
