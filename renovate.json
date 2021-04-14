@@ -24,11 +24,14 @@
   "ignoreDeps": [
     "@types/node"
   ],
-  "packageFiles": [
+  "includePaths": [
     "WORKSPACE",
     "package.json",
     "modules/**/package.json",
     "integration/**/package.json"
+  ],
+  "ignorePaths": [
+    "modules/builders/testing/**",
   ],
   "packageRules": [
     {
