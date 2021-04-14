@@ -153,9 +153,7 @@ using the `--githubToken` flag. You just then have to confirm the draft.
 
 **For each released version**:
 
-Update the package versions to reflect the *next* release version in **both**:
-1. `version` in [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json#L3)
-1. `DevkitBuildAngular` in [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
+Update `version` in root [`package.json`](/package.json#L3) to the *next* release version.
 
 ```sh
 git checkout -b release-bump-vXX
