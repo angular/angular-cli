@@ -2,7 +2,6 @@
   "name": "@angular-devkit/build-angular",
   "version": "0.0.0",
   "description": "Angular Webpack Build Facade",
-  "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
