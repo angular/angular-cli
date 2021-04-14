@@ -4319,15 +4319,14 @@ cssnano-utils@^2.0.0:
   resolved "https://registry.yarnpkg.com/cssnano-utils/-/cssnano-utils-2.0.0.tgz#b04baaa312aa3dd5a854b7f61d76b9d94be07f74"
   integrity sha512-xvxmTszdrvSyTACdPe8VU5J6p4sm3egpgw54dILvNqt5eBUv6TFjACLhSxtRuEsxYrgy8uDy269YjScO5aKbGA==
 
-cssnano@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-5.0.0.tgz#6d6c19074a17b11601f2a15f5b1488ae64eab528"
-  integrity sha512-beaqJEU9aI0B2PpKWXy+UJdtw+Q2J2c2f2nHVphL/gb2wvkuQV+Zxf5Q5SsNXiPUb9Djo/+ja+UOelQWhHnVow==
+cssnano@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-5.0.1.tgz#ed4822c4a9212f22f6820717859c52a6b7f9cf5c"
+  integrity sha512-5WubEmKcK2cqw43DUAayRBiIlTdX7iX3ZowrWDVxSVcW3hyohVnbJ4K4mbnWtJp5rfJnUwHg5H4mDAGzmuCM3g==
   dependencies:
     cosmiconfig "^7.0.0"
     cssnano-preset-default "^5.0.0"
     is-resolvable "^1.1.0"
-    opencollective-postinstall "^2.0.2"
 
 cssnano@^4.1.10:
   version "4.1.10"
@@ -8546,11 +8545,6 @@ open@8.0.5:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
-
-opencollective-postinstall@^2.0.2:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz#7a0fff978f6dbfa4d006238fbac98ed4198c3259"
-  integrity sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
 
 opn@^5.5.0:
   version "5.5.0"
