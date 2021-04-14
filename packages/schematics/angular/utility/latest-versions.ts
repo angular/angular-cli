@@ -14,11 +14,10 @@ export const latestVersions = {
   TypeScript: '~4.2.3',
   TsLib: '^2.1.0',
 
-  // The versions below must be manually updated when making a new devkit release.
-  // For our e2e tests, these versions must match the latest tag present on the branch.
-  // During RC periods they will not match the latest RC until there's a new git tag, and
-  // should not be updated.
-  DevkitBuildAngular: '~12.1.0-next.0',
+  // Since @angular-devkit/build-angular and @schematics/angular are always
+  // published together from the same monorepo, and they are both
+  // non-experimental, they will always have the same version.
+  DevkitBuildAngular: '~' + require('../package.json')['version'],
 
   ngPackagr: '^12.0.0-next.8',
 };
