@@ -31,7 +31,7 @@
     "integration/**/package.json"
   ],
   "ignorePaths": [
-    "modules/builders/testing/**",
+    "modules/builders/testing/**"
   ],
   "packageRules": [
     {
