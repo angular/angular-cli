@@ -27,6 +27,7 @@
   "packageFiles": [
     "WORKSPACE",
     "package.json",
+    "modules/**/package.json",
     "integration/**/package.json"
   ],
   "packageRules": [
@@ -60,6 +61,14 @@
         "minor",
         "major"
       ],
+      "enabled": false
+    },
+    {
+      "matchCurrentVersion": "0.0.0-PLACEHOLDER",
+      "enabled": false
+    },
+    {
+      "matchCurrentVersion": "/_VERSION$/",
       "enabled": false
     }
   ]
