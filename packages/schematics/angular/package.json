@@ -2,6 +2,7 @@
   "name": "@schematics/angular",
   "version": "0.0.0",
   "description": "Schematics specific to Angular",
+  "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
     "blueprints",
     "code generation",

@@ -3,6 +3,7 @@
   "$id": "SchematicsAngularNgNew",
   "title": "Angular Ng New Options Schema",
   "type": "object",
+  "description": "Creates a new project by combining the workspace and application schematics.",
   "additionalProperties": false,
   "properties": {
     "directory": {
