@@ -1,6 +1,6 @@
 # Angular Compiler Webpack Plugin
 
-Webpack 4.x/5.x plugin for the Angular Ahead-of-Time compiler. The plugin also supports Angular JIT mode.
+Webpack 5.x plugin for the Angular Ahead-of-Time compiler. The plugin also supports Angular JIT mode.
 
 ## Usage
 
