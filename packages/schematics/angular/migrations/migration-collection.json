@@ -150,6 +150,11 @@
       "factory": "./update-9/update-i18n#updateI18nConfig",
       "description": "Remove deprecated ViewEngine-based i18n build and extract options. Options present in the configuration will be converted to use non-deprecated options."
     },
+    "update-web-workers-webpack-5": {
+      "version": "12.0.0-next.7",
+      "factory": "./update-12/update-web-workers",
+      "description": "Updates Web Worker consumer usage to use the new syntax supported directly by Webpack 5."
+    },
     "production-by-default": {
       "version": "9999.0.0",
       "factory": "./update-12/production-default-config",
