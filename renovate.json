@@ -2,7 +2,7 @@
   "pinVersions": false,
   "semanticCommits": true,
   "semanticPrefix": "build",
-  "commitMessage": "{{semanticPrefix}} update {{depName}} to version {{newVersion}}",
+  "commitMessage": "{{semanticPrefix}} update {{#if groupName}}{{{groupName}}} packages{{else}}{{{depName}}} to version {{{newVersion}}}{{/if}}",
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
   "labels": [
