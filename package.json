@@ -18,7 +18,8 @@
   },
   "engines": {
     "node": ">=12.13.0 <15.0.0",
-    "yarn": ">=1.0.0"
+    "yarn": ">=1.21.1 <2",
+    "npm": "Please use yarn instead of NPM to install dependencies"
   },
   "scripts": {
     "postinstall": "ngc -p ./angular-metadata.tsconfig.json && node --preserve-symlinks --preserve-symlinks-main ./tools/postinstall-patches.js && yarn ngcc",
@@ -32,7 +33,6 @@
     "test": "bazel test //modules/...",
     "build:watch": "ibazel build //modules/...",
     "test:watch": "ibazel test //modules/...",
-    "preinstall": "node ./tools/npm/check-npm.js",
     "ngcc": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
     "bazel": "bazel"
   },

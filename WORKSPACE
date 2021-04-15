@@ -30,7 +30,6 @@ yarn_install(
     # Ensure that the script is available when running `postinstall` in the Bazel sandbox.
     data = [
         "//:angular-metadata.tsconfig.json",
-        "//:tools/npm/check-npm.js",
     ],
     package_json = "//:package.json",
     yarn_lock = "//:yarn.lock",
