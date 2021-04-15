@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { buildOptimizerLoaderPath } from '@angular-devkit/build-optimizer';
 import { getSystemPath } from '@angular-devkit/core';
 import { CompilerOptions } from '@angular/compiler-cli';
 import { AngularWebpackLoaderPath, AngularWebpackPlugin } from '@ngtools/webpack';
@@ -78,8 +77,11 @@ function createIvyPlugin(
   });
 }
 
-export function getNonAotConfig(wco: WebpackConfigOptions) {
-  const { tsConfigPath } = wco;
+export function getTypeScriptConfig(wco: WebpackConfigOptions) {
+  const { buildOptions, tsConfigPath } = wco;
+  const aot = !!buildOptions.aot;
+
+  ensureIvy(wco);
 
   return {
     module: {
@@ -91,42 +93,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
       ],
     },
     plugins: [
-      createIvyPlugin(wco, false, tsConfigPath),
-    ],
-  };
-}
-
-export function getAotConfig(wco: WebpackConfigOptions) {
-  const { tsConfigPath, buildOptions } = wco;
-
-  ensureIvy(wco);
-
-  return {
-    module: {
-      rules: [
-        {
-          test: /\.tsx?$/,
-          use: [
-            ...(buildOptions.buildOptimizer
-              ? [
-                  {
-                    loader: buildOptimizerLoaderPath,
-                    options: { sourceMap: buildOptions.sourceMap.scripts },
-                  },
-                ]
-              : []),
-            AngularWebpackLoaderPath,
-          ],
-        },
-        // "allowJs" support with ivy plugin - ensures build optimizer is not run twice
-        {
-          test: /\.jsx?$/,
-          use: [AngularWebpackLoaderPath],
-        },
-      ],
-    },
-    plugins: [
-      createIvyPlugin(wco, true, tsConfigPath),
+      createIvyPlugin(wco, aot, tsConfigPath),
     ],
   };
 }

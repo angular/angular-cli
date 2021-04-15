@@ -18,9 +18,9 @@ import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import {
   getCommonConfig,
-  getNonAotConfig,
   getStylesConfig,
   getTestConfig,
+  getTypeScriptConfig,
   getWorkerConfig,
 } from '../webpack/configs';
 import { SingleTestTransformLoader } from '../webpack/plugins/single-test-transform';
@@ -46,7 +46,7 @@ async function initialize(
     wco => [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getNonAotConfig(wco),
+      getTypeScriptConfig(wco),
       getTestConfig(wco),
       getWorkerConfig(wco),
     ],
