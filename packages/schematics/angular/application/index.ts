@@ -140,6 +140,11 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     ];
   }
 
+  const inlineStyleLanguage =
+    options.style && options.style !== Style.Css && options.style !== Style.Styl
+      ? options.style
+      : undefined;
+
   const project = {
     root: normalize(projectRoot),
     sourceRoot,
@@ -157,6 +162,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           polyfills: `${sourceRoot}/polyfills.ts`,
           tsConfig: `${projectRoot}tsconfig.app.json`,
           aot: true,
+          inlineStyleLanguage,
           assets: [
             `${sourceRoot}/favicon.ico`,
             `${sourceRoot}/assets`,
@@ -212,6 +218,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           polyfills: `${sourceRoot}/polyfills.ts`,
           tsConfig: `${projectRoot}tsconfig.spec.json`,
           karmaConfig: `${projectRoot}karma.conf.js`,
+          inlineStyleLanguage,
           assets: [
             `${sourceRoot}/favicon.ico`,
             `${sourceRoot}/assets`,
