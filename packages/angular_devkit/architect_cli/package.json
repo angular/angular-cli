@@ -19,7 +19,7 @@
     "minimist": "1.2.5",
     "progress": "2.0.3",
     "rxjs": "6.6.7",
-    "symbol-observable": "3.0.0"
+    "symbol-observable": "4.0.0"
   },
   "devDependencies": {
     "@types/progress": "2.0.3"
