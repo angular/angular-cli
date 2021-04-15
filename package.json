@@ -31,7 +31,6 @@
     "lint": "tslint --project tsconfig.json",
     "templates": "node ./bin/devkit-admin templates",
     "validate": "node ./bin/devkit-admin validate",
-    "preinstall": "node ./tools/yarn/check-yarn.js",
     "postinstall": "yarn webdriver-update && yarn ngcc && yarn husky install",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 89.0.4389.0",
@@ -43,7 +42,8 @@
   },
   "engines": {
     "node": ">=12.13.0 <15.0.0",
-    "yarn": ">=1.22.4"
+    "yarn": ">=1.21.1 <2",
+    "npm": "Please use yarn instead of NPM to install dependencies"
   },
   "author": "Angular Authors",
   "license": "MIT",
