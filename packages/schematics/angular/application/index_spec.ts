@@ -399,6 +399,66 @@ describe('Application Schematic', () => {
       expect(tree.exists('src/styles.sass')).toBe(true);
     });
 
+    it('sets "inlineStyleLanguage" in angular.json when using a style preprocessor', async () => {
+      const options = { ...defaultOptions, projectRoot: '', style: Style.Sass };
+      const tree = await schematicRunner
+        .runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+
+      const buildOpt = prj.architect.build.options;
+      expect(buildOpt.inlineStyleLanguage).toBe('sass');
+
+      const testOpt = prj.architect.test.options;
+      expect(testOpt.inlineStyleLanguage).toBe('sass');
+    });
+
+    it('does not set "inlineStyleLanguage" in angular.json when not using a style preprocessor', async () => {
+      const options = { ...defaultOptions, projectRoot: ''};
+      const tree = await schematicRunner
+        .runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+
+      const buildOpt = prj.architect.build.options;
+      expect(buildOpt.inlineStyleLanguage).toBeUndefined();
+
+      const testOpt = prj.architect.test.options;
+      expect(testOpt.inlineStyleLanguage).toBeUndefined();
+    });
+
+    it('does not set "inlineStyleLanguage" in angular.json when using CSS styles', async () => {
+      const options = { ...defaultOptions, projectRoot: '', style: Style.Css };
+      const tree = await schematicRunner
+        .runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+
+      const buildOpt = prj.architect.build.options;
+      expect(buildOpt.inlineStyleLanguage).toBeUndefined();
+
+      const testOpt = prj.architect.test.options;
+      expect(testOpt.inlineStyleLanguage).toBeUndefined();
+    });
+
+    it('does not set "inlineStyleLanguage" in angular.json when using Stylus styles', async () => {
+      const options = { ...defaultOptions, projectRoot: '', style: Style.Styl };
+      const tree = await schematicRunner
+        .runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+
+      const buildOpt = prj.architect.build.options;
+      expect(buildOpt.inlineStyleLanguage).toBeUndefined();
+
+      const testOpt = prj.architect.test.options;
+      expect(testOpt.inlineStyleLanguage).toBeUndefined();
+    });
+
     it('should set the relative tsconfig paths', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
       const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
