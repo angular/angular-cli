@@ -36,7 +36,9 @@
   "packageRules": [
     {
       "packagePatterns": [
-        "^@angular\/.*"
+        "^@angular/.*",
+        "^@angular-devkit/.*",
+        "^@schematics/.*"
       ],
       "groupName": "angular",
       "pinVersions": false
