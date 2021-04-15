@@ -6,20 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics } from '@angular-devkit/core';
-import {
-  Compilation,
-  Compiler,
-  Module,
-  Stats,
-  sources,
-} from 'webpack';
-
-const NormalModule = require('webpack/lib/NormalModule');
-
-interface NormalModule extends Module {
-  _source?: sources.OriginalSource | null;
-  resource?: string;
-}
+import { Compilation, Compiler, Module, NormalModule, Stats } from 'webpack';
 
 const webpackAllErrorMessageRe = /^([^(]+)\(\d+,\d\): (.*)$/gm;
 const webpackTsErrorMessageRe = /^[^(]+\(\d+,\d\): error (TS\d+):/;
@@ -148,21 +135,26 @@ export class NgBuildAnalyticsPlugin {
   }
 
   protected _checkTsNormalModule(module: NormalModule) {
-    if (module._source) {
-      // PLEASE REMEMBER:
-      // We're dealing with ES5 _or_ ES2015 JavaScript at this point (we don't know for sure).
-
-      // Just count the ngOnInit occurences. Comments/Strings/calls occurences should be sparse
-      // so we just consider them within the margin of error. We do break on word break though.
-      this._stats.numberOfNgOnInit += countOccurrences(module._source.source().toString(), 'ngOnInit', true);
-
-      // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
-      this._stats.numberOfComponents += countOccurrences(module._source.source().toString(), 'Component({');
-      // For Ivy we just count ɵcmp.
-      this._stats.numberOfComponents += countOccurrences(module._source.source().toString(), '.ɵcmp', true);
-      // for ascii_only true
-      this._stats.numberOfComponents += countOccurrences(module._source.source().toString(), '.\u0275cmp', true);
+    const originalSource = module.originalSource();
+    if (!originalSource) {
+      return;
     }
+
+    const originalContent = originalSource.source().toString();
+
+    // PLEASE REMEMBER:
+    // We're dealing with ES5 _or_ ES2015 JavaScript at this point (we don't know for sure).
+
+    // Just count the ngOnInit occurences. Comments/Strings/calls occurences should be sparse
+    // so we just consider them within the margin of error. We do break on word break though.
+    this._stats.numberOfNgOnInit += countOccurrences(originalContent, 'ngOnInit', true);
+
+    // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
+    this._stats.numberOfComponents += countOccurrences(originalContent, 'Component({');
+    // For Ivy we just count ɵcmp.
+    this._stats.numberOfComponents += countOccurrences(originalContent, '.ɵcmp', true);
+    // for ascii_only true
+    this._stats.numberOfComponents += countOccurrences(originalContent, '.\u0275cmp', true);
   }
 
   protected _collectErrors(stats: Stats) {
@@ -231,12 +223,11 @@ export class NgBuildAnalyticsPlugin {
    * Reports a succeed module.
    * @private
    */
-  protected _succeedModule(mod: Module) {
+  protected _succeedModule(module: Module) {
     // Only report NormalModule instances.
-    if (mod.constructor !== NormalModule) {
+    if (!(module instanceof NormalModule)) {
       return;
     }
-    const module = mod as {} as NormalModule;
 
     // Only reports modules that are part of the user's project. We also don't do node_modules.
     // There is a chance that someone name a file path `hello_node_modules` or something and we
