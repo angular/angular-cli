@@ -2,6 +2,7 @@
   "name": "@angular-devkit/architect-cli",
   "version": "0.0.0",
   "description": "Angular Architect CLI",
+  "homepage": "https://github.com/angular/angular-cli",
   "experimental": true,
   "bin": {
     "architect": "./bin/architect.js"
