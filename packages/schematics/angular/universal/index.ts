@@ -61,6 +61,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
           i18nMissingTranslation: options?.i18nMissingTranslation,
           preserveSymlinks: options?.preserveSymlinks,
           extractLicenses: options?.extractLicenses,
+          inlineStyleLanguage: options?.inlineStyleLanguage,
         };
       };
 
