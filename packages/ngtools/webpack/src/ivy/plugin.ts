@@ -534,12 +534,6 @@ export class AngularWebpackPlugin {
         this.sourceFileCache?.updateAngularDiagnostics(affectedFile, angularDiagnostics);
       }
 
-      // NOTE: Workaround to fix stale reuse program. Can be removed once fixed upstream.
-      // tslint:disable-next-line: no-any
-      (angularProgram as any).reuseTsProgram =
-        // tslint:disable-next-line: no-any
-        angularCompiler.getNextProgram?.() || (angularCompiler as any).getCurrentProgram?.();
-
       return this.createFileEmitter(
         builder,
         mergeTransformers(angularCompiler.prepareEmit().transformers, transformers),
