@@ -52,12 +52,11 @@ import {
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
 import {
-  getAotConfig,
   getBrowserConfig,
   getCommonConfig,
-  getNonAotConfig,
   getStatsConfig,
   getStylesConfig,
+  getTypeScriptConfig,
   getWorkerConfig,
 } from '../webpack/configs';
 import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
@@ -121,7 +120,7 @@ export function getAnalyticsConfig(
 
 export function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration {
   if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-    return wco.buildOptions.aot ? getAotConfig(wco) : getNonAotConfig(wco);
+    return getTypeScriptConfig(wco);
   }
 
   return {};
