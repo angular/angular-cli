@@ -13,7 +13,7 @@ import {
   resolve,
 } from '@angular-devkit/core';
 import * as path from 'path';
-import * as webpack from 'webpack';
+import { Configuration, JavascriptModulesPlugin } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import {
@@ -33,10 +33,10 @@ export async function generateWebpackConfig(
   projectRoot: string,
   sourceRoot: string | undefined,
   options: NormalizedBrowserBuilderSchema,
-  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
+  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
   logger: logging.LoggerApi,
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>,
-): Promise<webpack.Configuration> {
+): Promise<Configuration> {
   // Ensure Build Optimizer is only used with AOT.
   if (options.buildOptimizer && !options.aot) {
     throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
@@ -70,9 +70,9 @@ export async function generateWebpackConfig(
 export async function generateI18nBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
+  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
-): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string, i18n: I18nOptions }> {
+): Promise<{ config: Configuration; projectRoot: string; projectSourceRoot?: string, i18n: I18nOptions }> {
   const { buildOptions, i18n } = await configureI18nBuild(context, options);
   const result = await generateBrowserWebpackConfigFromContext(
     buildOptions,
@@ -106,25 +106,14 @@ export async function generateI18nBrowserWebpackConfigFromContext(
       (data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'),
       '',
     );
-    if (!config.plugins) {
-      config.plugins = [];
-    }
+
+    config.plugins ??= [];
     config.plugins.push({
-      apply(compiler: webpack.Compiler) {
+      apply(compiler) {
         compiler.hooks.compilation.tap('build-angular', compilation => {
-          // Webpack typings do not contain template hashForChunk hook
-          // tslint:disable-next-line: no-any
-          (compilation.mainTemplate.hooks as any).hashForChunk.tap(
+          JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap(
             'build-angular',
-            (hash: { update(data: string): void }) => {
-              hash.update('$localize' + i18nHash);
-            },
-          );
-          // Webpack typings do not contain hooks property
-          // tslint:disable-next-line: no-any
-          (compilation.chunkTemplate as any).hooks.hashForChunk.tap(
-            'build-angular',
-            (hash: { update(data: string): void }) => {
+            (_, hash) => {
               hash.update('$localize' + i18nHash);
             },
           );
@@ -138,9 +127,9 @@ export async function generateI18nBrowserWebpackConfigFromContext(
 export async function generateBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
+  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
-): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string }> {
+): Promise<{ config: Configuration; projectRoot: string; projectSourceRoot?: string }> {
   const projectName = context.target && context.target.project;
   if (!projectName) {
     throw new Error('The builder requires a target.');
