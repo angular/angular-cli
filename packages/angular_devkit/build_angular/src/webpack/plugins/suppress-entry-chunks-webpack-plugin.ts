@@ -21,7 +21,6 @@ export class SuppressExtractedTextChunksWebpackPlugin {
 
         // Only chunks with a css asset should have JavaScript assets removed
         let hasCssFile = false;
-        // chunk.files is an Array in Webpack 4 and a Set in Webpack 5
         for (const file of chunk.files) {
           if (file.endsWith('.css')) {
             hasCssFile = true;
@@ -35,53 +34,20 @@ export class SuppressExtractedTextChunksWebpackPlugin {
 
         // Only chunks with all CSS entry dependencies should have JavaScript assets removed
         let cssOnly = false;
-        // The any cast is used for default Webpack 4 type compatibility
-        // tslint:disable-next-line: no-any
-        const entryModules = (compilation as any).chunkGraph?.getChunkEntryModulesIterable(chunk);
-        if (entryModules) {
-          // Webpack 5
-          for (const module of entryModules) {
-            cssOnly = module.dependencies.every(
-              (dependency: {}) => dependency.constructor.name === 'CssDependency',
-            );
+        const entryModules = compilation.chunkGraph.getChunkEntryModulesIterable(chunk);
+        for (const module of entryModules) {
+          cssOnly = module.dependencies.every(
+            (dependency: {}) => dependency.constructor.name === 'CssDependency',
+          );
 
-            if (!cssOnly) {
-              break;
-            }
-          }
-        } else {
-          // Webpack 4
-          for (const module of chunk.modulesIterable as Iterable<{ dependencies: {}[] }>) {
-            cssOnly = module.dependencies.every((dependency) => {
-              const name = dependency.constructor.name;
-
-              return (
-                name === 'CssDependency' ||
-                name === 'SingleEntryDependency' ||
-                name === 'MultiEntryDependency' ||
-                name === 'HarmonyCompatibilityDependency' ||
-                name === 'HarmonyExportHeaderDependency' ||
-                name === 'HarmonyInitDependency'
-              );
-            });
-
-            if (!cssOnly) {
-              break;
-            }
+          if (!cssOnly) {
+            break;
           }
         }
 
         if (cssOnly) {
-          if (Array.isArray(chunk.files)) {
-            // Webpack 4
-            (chunk.files as string[]) = chunk.files.filter((file) => file !== filename);
-            delete compilation.assets[filename];
-          } else {
-            // Webpack 5
-            // Casting is used for default Webpack 4 type compatibility
-            ((chunk.files as unknown) as Set<string>).delete(filename);
-            ((compilation as unknown) as { deleteAsset(file: string): void }).deleteAsset(filename);
-          }
+          chunk.files.delete(filename);
+          compilation.deleteAsset(filename);
         }
       });
     });

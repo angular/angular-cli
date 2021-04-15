@@ -21,30 +21,17 @@ export interface DedupeModuleResolvePluginOptions {
 
 // tslint:disable-next-line: no-any
 function getResourceData(resolveData: any): ResourceData {
-  if (resolveData.createData) {
-    // Webpack 5+
-    const {
-      descriptionFileData,
-      relativePath,
-    } = resolveData.createData.resourceResolveData;
+  const {
+    descriptionFileData,
+    relativePath,
+  } = resolveData.createData.resourceResolveData;
 
-    return {
-      packageName: descriptionFileData?.name,
-      packageVersion: descriptionFileData?.version,
-      relativePath,
-      resource: resolveData.createData.resource,
-    };
-  } else {
-    // Webpack 4
-    const { resource, resourceResolveData } = resolveData;
-
-    return {
-      packageName: resourceResolveData.descriptionFileData?.name,
-      packageVersion: resourceResolveData.descriptionFileData?.version,
-      relativePath: resourceResolveData.relativePath,
-      resource: resource,
-    };
-  }
+  return {
+    packageName: descriptionFileData?.name,
+    packageVersion: descriptionFileData?.version,
+    relativePath,
+    resource: resolveData.createData.resource,
+  };
 }
 
 /**
@@ -100,14 +87,9 @@ export class DedupeModuleResolvePlugin {
         }
 
         // Alter current request with previously resolved module.
-        // tslint:disable-next-line: no-any
-        const createData = (result as any).createData;
-        if (createData) {
-          createData.resource = prevResource;
-          createData.userRequest = prevResource;
-        } else {
-          result.request = prevRequest;
-        }
+        const createData = result.createData as { resource: string; userRequest: string };
+        createData.resource = prevResource;
+        createData.userRequest = prevRequest;
       });
     });
   }
