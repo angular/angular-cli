@@ -69,7 +69,7 @@ describe('Migration to version 9', () => {
     export class AppServerModule {}
     `);
 
-    const pkg = JSON.parse(tree.readContent('/package.json'));
+    const pkg = JSON.parse(tree.readContent('/package.json')) as any;
     const scripts = pkg.scripts;
     scripts['compile:server'] = 'old compile:server';
     scripts['serve:ssr'] = 'old serve:ssr';
@@ -87,7 +87,7 @@ describe('Migration to version 9', () => {
   it(`should backup old 'package.json' scripts`, async () => {
     const newTree = await schematicRunner.callRule(version9UpdateRule(''), tree).toPromise();
 
-    const { scripts } = JSON.parse(newTree.read('/package.json')!.toString());
+    const { scripts } = JSON.parse(newTree.read('/package.json')!.toString()) as any;
     expect(scripts['build:client-and-server-bundles']).toBeUndefined();
     expect(scripts['compile:server']).toBeUndefined();
     expect(scripts['serve:ssr']).toBeUndefined();
@@ -100,7 +100,7 @@ describe('Migration to version 9', () => {
   it(`should not backup old 'package.json' scripts when target is missing`, async () => {
     const newTree = await schematicRunner.callRule(version9UpdateRule(''), tree).toPromise();
 
-    const { scripts } = JSON.parse(newTree.read('/package.json')!.toString());
+    const { scripts } = JSON.parse(newTree.read('/package.json')!.toString()) as any;
     expect(scripts['build:ssr']).toBeUndefined();
     expect(scripts['build:ssr_bak']).toBeUndefined();
   });

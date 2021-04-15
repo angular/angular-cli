@@ -34,7 +34,7 @@ describe('Add Schematic Rule', () => {
   it('should update angular.json', async () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
-    const contents = JSON.parse(tree.read('angular.json')!.toString());
+    const contents = JSON.parse(tree.read('angular.json')!.toString()) as any;
     const architect = contents.projects['test-app'].architect;
     expect(architect.build.configurations.production).toBeDefined();
     expect(architect.build.options.outputPath).toBe('dist/test-app/browser');
@@ -58,7 +58,7 @@ describe('Add Schematic Rule', () => {
   it('should add scripts to package.json', async () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
-    const {scripts} = JSON.parse(tree.read('package.json')!.toString());
+    const {scripts} = JSON.parse(tree.read('package.json')!.toString()) as any;
     expect(scripts['build:ssr']).toBe('ng build && ng run test-app:server');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
     expect(scripts['dev:ssr']).toBe('ng run test-app:serve-ssr');
@@ -68,7 +68,7 @@ describe('Add Schematic Rule', () => {
   it('should add devDependency: @nguniversal/builders', async () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
-    const {devDependencies} = JSON.parse(tree.read('package.json')!.toString());
+    const {devDependencies} = JSON.parse(tree.read('package.json')!.toString()) as any;
     expect(Object.keys(devDependencies)).toContain('@nguniversal/builders');
   });
 

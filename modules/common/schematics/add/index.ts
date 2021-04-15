@@ -67,7 +67,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
     }
 
     const serverDist = await getOutputPath(host, options.clientProject, 'server');
-    const pkg = JSON.parse(buffer.toString());
+    const pkg = JSON.parse(buffer.toString()) as any;
     pkg.scripts = {
       ...pkg.scripts,
       'dev:ssr': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,

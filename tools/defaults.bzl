@@ -19,7 +19,7 @@ def _getDefaultTsConfig(testonly):
         return DEFAULT_TSCONFIG_BUILD
 
 def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
-    local_deps = ["@npm//tslib", "@npm//@types/node"] + deps
+    local_deps = ["@npm//tslib", "@npm//@types/node", DEFAULT_TS_TYPINGS] + deps
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
 
@@ -27,7 +27,6 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
         tsconfig = tsconfig,
         testonly = testonly,
         deps = local_deps,
-        node_modules = DEFAULT_TS_TYPINGS,
         **kwargs
     )
 
@@ -87,7 +86,7 @@ GLOBALS = {
 }
 
 def ng_module(name, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
-    deps = deps + ["@npm//tslib", "@npm//@types/node"]
+    deps = deps + ["@npm//tslib", "@npm//@types/node", DEFAULT_TS_TYPINGS]
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
     _ng_module(
@@ -97,7 +96,6 @@ def ng_module(name, tsconfig = None, testonly = False, deps = [], bundle_dts = T
         tsconfig = tsconfig,
         testonly = testonly,
         deps = deps,
-        node_modules = DEFAULT_TS_TYPINGS,
         **kwargs
     )
 

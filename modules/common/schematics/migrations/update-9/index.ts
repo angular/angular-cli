@@ -46,7 +46,7 @@ function backupPackageScriptsRule(): Rule {
       throw new SchematicsException('Could not find package.json');
     }
 
-    const pkg = JSON.parse(buffer.toString());
+    const pkg = JSON.parse(buffer.toString()) as any;
     const scripts = pkg.scripts;
     if (!scripts) {
       return;

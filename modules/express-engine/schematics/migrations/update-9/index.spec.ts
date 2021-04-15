@@ -34,7 +34,7 @@ describe('Migration to version 9', () => {
     tree.create('/projects/test-app/server.ts', 'server content');
     tree.create('/projects/test-app/webpack.server.config.js', 'webpack config content');
 
-    const pkg = JSON.parse(tree.readContent('/package.json'));
+    const pkg = JSON.parse(tree.readContent('/package.json')) as any;
     pkg.devDependencies['@nguniversal/express-engine'] = '0.0.0';
     tree.overwrite('/package.json', JSON.stringify(pkg, null, 2));
   });
@@ -76,7 +76,7 @@ describe('Migration to version 9', () => {
     const newTree =
       await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
 
-    const { scripts } = JSON.parse(newTree.readContent('/package.json'));
+    const { scripts } = JSON.parse(newTree.readContent('/package.json')) as any;
     expect(scripts['build:ssr'])
       .toBe('ng build && ng run test-app:server');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
