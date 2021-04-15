@@ -32,7 +32,7 @@ describe('Prerender Builder', () => {
     const run = await architect.scheduleTarget(target);
     await expectAsync(run.result)
       .toBeRejectedWith(
-        jasmine.objectContaining({ message: jasmine.stringMatching(/Data path "" should match some schema in anyOf./) })
+        jasmine.objectContaining({ message: jasmine.stringMatching(/Data path "" must match a schema in anyOf./) })
       );
     await run.stop();
   });
