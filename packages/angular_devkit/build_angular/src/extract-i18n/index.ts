@@ -22,7 +22,12 @@ import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
-import { getAotConfig, getBrowserConfig, getCommonConfig, getStatsConfig } from '../webpack/configs';
+import {
+  getBrowserConfig,
+  getCommonConfig,
+  getStatsConfig,
+  getTypeScriptConfig,
+} from '../webpack/configs';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Format, Schema } from './schema';
 
@@ -194,7 +199,7 @@ export async function execute(
         { plugins: [new NoEmitPlugin()] },
         getCommonConfig(wco),
         getBrowserConfig(wco),
-        getAotConfig(wco),
+        getTypeScriptConfig(wco),
         getStatsConfig(wco),
       ];
 
