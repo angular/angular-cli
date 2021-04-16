@@ -9,10 +9,8 @@ import { Compilation, WebpackError } from 'webpack';
 
 export function addWarning(compilation: Compilation, message: string): void {
   compilation.warnings.push(new WebpackError(message));
-
 }
 
 export function addError(compilation: Compilation, message: string): void {
   compilation.errors.push(new WebpackError(message));
-
 }

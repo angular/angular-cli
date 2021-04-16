@@ -6,14 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { basename } from 'path';
+import { StatsAsset, StatsChunk, StatsCompilation } from 'webpack';
 import { Budget, Type } from '../browser/schema';
 import { ProcessBundleFile, ProcessBundleResult } from '../utils/process-bundle';
-import {
-  JsonAssetStats,
-  JsonChunkStats,
-  JsonCompilationStats,
-  formatSize,
-} from '../webpack/utils/stats';
+import { formatSize } from '../webpack/utils/stats';
 
 interface Size {
   size: number;
@@ -108,7 +104,7 @@ export function* calculateThresholds(budget: Budget): IterableIterator<Threshold
  */
 function calculateSizes(
   budget: Budget,
-  stats: JsonCompilationStats,
+  stats: StatsCompilation,
   processResults: ProcessBundleResult[],
 ): Size[] {
   if (budget.type === Type.AnyComponentStyle) {
@@ -121,8 +117,8 @@ function calculateSizes(
   type CalculatorTypes = {
     new (
       budget: Budget,
-      chunks: JsonChunkStats[],
-      assets: JsonAssetStats[],
+      chunks: StatsChunk[],
+      assets: StatsAsset[],
       processResults: ProcessBundleResult[],
     ): Calculator;
   };
@@ -152,8 +148,8 @@ function calculateSizes(
 abstract class Calculator {
   constructor (
     protected budget: Budget,
-    protected chunks: JsonChunkStats[],
-    protected assets: JsonAssetStats[],
+    protected chunks: StatsChunk[],
+    protected assets: StatsAsset[],
     protected processResults: ProcessBundleResult[],
   ) {}
 
@@ -161,12 +157,12 @@ abstract class Calculator {
 
   /** Calculates the size of the given chunk for the provided build type. */
   protected calculateChunkSize(
-    chunk: JsonChunkStats,
+    chunk: StatsChunk,
     buildType: DifferentialBuildType,
   ): number {
     // Look for a process result containing different builds for this chunk.
     const processResult = this.processResults
-        .find((processResult) => processResult.name === chunk.id.toString());
+        .find((processResult) => processResult.name === chunk.id?.toString());
 
     if (processResult) {
       // Found a differential build, use the correct size information.
@@ -176,8 +172,11 @@ abstract class Calculator {
       return processResultFile && processResultFile.size || 0;
     } else {
       // No differential builds, get the chunk size by summing its assets.
-      return chunk.files
-          .filter(file => !file.endsWith('.map'))
+      if (!chunk.files) {
+        return 0;
+      }
+
+      return chunk.files.filter(file => !file.endsWith('.map'))
           .map(file => {
             const asset = this.assets.find((asset) => asset.name === file);
             if (!asset) {
@@ -190,7 +189,7 @@ abstract class Calculator {
     }
   }
 
-  protected getAssetSize(asset: JsonAssetStats): number {
+  protected getAssetSize(asset: StatsAsset): number {
     if (asset.name.endsWith('.js')) {
       const processResult = this.processResults
         .find((processResult) => processResult.original && basename(processResult.original.filename) === asset.name);
@@ -219,8 +218,9 @@ class BundleCalculator extends Calculator {
     // each then check afterwards if they are all the same.
     const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
       const size = this.chunks
-        .filter(chunk => chunk.names.includes(budgetName))
-        .map(chunk => this.calculateChunkSize(chunk, buildType))
+        .filter(chunk => chunk?.names?.includes(budgetName))
+        // tslint:disable-next-line: no-non-null-assertion
+        .map(chunk => this.calculateChunkSize(chunk!, buildType))
         .reduce((l, r) => l + r, 0);
 
       return { size, label: `bundle ${this.budget.name}-${buildTypeLabels[buildType]}` };
@@ -358,7 +358,7 @@ function calculateBytes(
 
 export function* checkBudgets(
   budgets: Budget[],
-  webpackStats: JsonCompilationStats,
+  webpackStats: StatsCompilation,
   processResults: ProcessBundleResult[],
 ): IterableIterator<{ severity: ThresholdSeverity, message: string }> {
   // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker`.
