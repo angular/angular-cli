@@ -43,7 +43,7 @@
     "loader-utils": "2.0.0",
     "mini-css-extract-plugin": "1.5.0",
     "minimatch": "3.0.4",
-    "open": "8.0.5",
+    "open": "8.0.6",
     "ora": "5.4.0",
     "parse5-html-rewriting-stream": "6.0.1",
     "postcss": "8.2.10",
