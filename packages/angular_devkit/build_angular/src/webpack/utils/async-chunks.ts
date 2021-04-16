@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { StatsChunk, StatsCompilation } from 'webpack';
 import { NormalizedEntryPoint } from './helpers';
-import { JsonChunkStats, JsonCompilationStats } from './stats';
 
 /**
  * Webpack stats may incorrectly mark extra entry points `initial` chunks, when
@@ -15,18 +15,18 @@ import { JsonChunkStats, JsonCompilationStats } from './stats';
  * whereever necessary. Does not modify {@param webpackStats}.
  */
 export function markAsyncChunksNonInitial(
-  webpackStats: JsonCompilationStats,
+  webpackStats: StatsCompilation,
   extraEntryPoints: NormalizedEntryPoint[],
-): JsonChunkStats[] {
-  const {chunks = [], entrypoints: entryPoints = {}} = webpackStats;
+): StatsChunk[] {
+  const { chunks = [], entrypoints: entryPoints = {} } = webpackStats;
 
   // Find all Webpack chunk IDs not injected into the main bundle. We don't have
   // to worry about transitive dependencies because extra entry points cannot be
   // depended upon in Webpack, thus any extra entry point with `inject: false`,
   // **cannot** be loaded in main bundle.
-  const asyncEntryPoints = extraEntryPoints.filter((entryPoint) => !entryPoint.inject);
-  const asyncChunkIds = flatMap(asyncEntryPoints,
-      (entryPoint) => entryPoints[entryPoint.bundleName].chunks);
+  const asyncChunkIds = extraEntryPoints
+    .filter((entryPoint) => !entryPoint.inject)
+    .flatMap((entryPoint) => entryPoints[entryPoint.bundleName].chunks);
 
   // Find chunks for each ID.
   const asyncChunks = asyncChunkIds.map((chunkId) => {
@@ -40,7 +40,7 @@ export function markAsyncChunksNonInitial(
     })
     // All Webpack chunks are dependent on `runtime`, which is never an async
     // entry point, simply ignore this one.
-    .filter((chunk) => chunk.names.indexOf('runtime') === -1);
+    .filter((chunk) => !!(chunk.names?.includes('runtime')));
 
   // A chunk is considered `initial` only if Webpack already belives it to be initial
   // and the application developer did not mark it async via an extra entry point.
@@ -48,8 +48,4 @@ export function markAsyncChunksNonInitial(
     ...chunk,
     initial: chunk.initial && !asyncChunks.find((asyncChunk) => asyncChunk === chunk),
   }));
-}
-
-function flatMap<T, R>(list: T[], mapper: (item: T, index: number, array: T[]) => R[]): R[] {
-  return ([] as R[]).concat(...list.map(mapper));
 }

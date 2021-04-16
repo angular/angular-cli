@@ -65,8 +65,6 @@ import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 import {
   BundleStats,
   ChunkType,
-  JsonChunkStats,
-  JsonCompilationStats,
   generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
@@ -260,7 +258,7 @@ export function buildWebpackBrowser(
               emittedFiles = [],
               outputPath: webpackOutputPath,
             } = buildEvent;
-            const webpackRawStats = buildEvent.webpackStats as JsonCompilationStats;
+            const webpackRawStats = buildEvent.webpackStats;
             if (!webpackRawStats) {
               throw new Error('Webpack stats build result is required.');
             }
@@ -568,7 +566,7 @@ export function buildWebpackBrowser(
                   executor.stop();
                 }
                 for (const result of processResults) {
-                  const chunk = webpackStats.chunks?.find((chunk) => chunk.id.toString() === result.name);
+                  const chunk = webpackStats.chunks?.find((chunk) => chunk.id?.toString() === result.name);
 
                   if (result.original) {
                     bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
@@ -580,10 +578,10 @@ export function buildWebpackBrowser(
                 }
 
                 const unprocessedChunks = webpackStats.chunks?.filter((chunk) => !processResults
-                  .find((result) => chunk.id.toString() === result.name),
+                  .find((result) => chunk.id?.toString() === result.name),
                 ) || [];
                 for (const chunk of unprocessedChunks) {
-                  const asset = webpackStats.assets?.find(a => a.name === chunk.files[0]);
+                  const asset = webpackStats.assets?.find(a => a.name === chunk.files?.[0]);
                   bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }));
                 }
               } else {
@@ -771,7 +769,7 @@ function assertNever(input: never): never {
 
 function generateBundleInfoStats(
   bundle: ProcessBundleFile,
-  chunk: JsonChunkStats | undefined,
+  chunk: webpack.StatsChunk | undefined,
   chunkType: ChunkType,
 ): BundleStats {
   return generateBundleStats(
@@ -779,7 +777,7 @@ function generateBundleInfoStats(
       size: bundle.size,
       files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
       names: chunk?.names,
-      entry: !!chunk?.names.includes('runtime'),
+      entry: !!chunk?.names?.includes('runtime'),
       initial: !!chunk?.initial,
       rendered: true,
       chunkType,

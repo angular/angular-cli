@@ -28,7 +28,7 @@ import {
   getStylesConfig,
   getTypeScriptConfig,
 } from '../webpack/configs';
-import { JsonCompilationStats, webpackStatsLogger } from '../webpack/utils/stats';
+import { webpackStatsLogger } from '../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
 /**
@@ -119,7 +119,7 @@ export function execute(
             );
           }
 
-          webpackStatsLogger(context.logger, webpackStats as JsonCompilationStats, config);
+          webpackStatsLogger(context.logger, webpackStats, config);
 
           return { ...output, success };
         }),

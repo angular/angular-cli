@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { StatsCompilation } from 'webpack';
 import { Budget, Type } from '../browser/schema';
 import { ThresholdSeverity, checkBudgets } from './bundle-calculator';
 import { ProcessBundleResult } from './process-bundle';
@@ -32,7 +33,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -60,7 +61,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -95,7 +96,7 @@ describe('bundle-calculator', () => {
             size: 0.75 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -121,7 +122,8 @@ describe('bundle-calculator', () => {
           },
         ],
         assets: [],
-      };
+      } as unknown as StatsCompilation;
+
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -164,7 +166,7 @@ describe('bundle-calculator', () => {
           },
         ],
         assets: [],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -211,7 +213,7 @@ describe('bundle-calculator', () => {
             size: 0.75 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -237,7 +239,7 @@ describe('bundle-calculator', () => {
           },
         ],
         assets: [],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -281,7 +283,7 @@ describe('bundle-calculator', () => {
           },
         ],
         assets: [],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -332,7 +334,7 @@ describe('bundle-calculator', () => {
             size: 1.5 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -367,7 +369,7 @@ describe('bundle-calculator', () => {
             size: 0.75 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -402,7 +404,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -433,7 +435,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -468,7 +470,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
 
       const failures = Array.from(checkBudgets(budgets, stats, [] /* processResults */));
 
@@ -499,7 +501,7 @@ describe('bundle-calculator', () => {
             size: 1.25 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -542,7 +544,7 @@ describe('bundle-calculator', () => {
             size: 1.25 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -585,7 +587,7 @@ describe('bundle-calculator', () => {
             size: 1.25 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
@@ -628,7 +630,7 @@ describe('bundle-calculator', () => {
             size: 1.25 * KB,
           },
         ],
-      };
+      } as unknown as StatsCompilation;
       const processResults: ProcessBundleResult[] = [
         {
           name: '0',
