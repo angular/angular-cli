@@ -5,39 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-import { logging, tags } from '@angular-devkit/core';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
+import { logging, tags } from '@angular-devkit/core';
 import * as path from 'path';
 import * as textTable from 'text-table';
+import { Configuration, StatsCompilation } from 'webpack';
 import { colors as ansiColors, removeColor } from '../../utils/color';
-import { Configuration } from 'webpack';
-
-export interface JsonAssetStats {
-  name: string;
-  size: number;
-}
-
-export interface JsonChunkStats {
-  id: number | string;
-  initial?: boolean;
-  files: string[];
-  names: string[];
-}
-
-export interface JsonEntrypointStats {
-  chunks: (number | string)[];
-}
-
-export interface JsonCompilationStats {
-  assets?: JsonAssetStats[];
-  chunks?: JsonChunkStats[];
-  entrypoints?: Record<string, JsonEntrypointStats>;
-  outputPath?: string;
-  warnings?: ({ message: string } | string)[];
-  errors?: ({ message: string } | string)[];
-}
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -49,6 +22,7 @@ export function formatSize(size: number): string {
   const roundedSize = size / Math.pow(1024, index);
   // bytes don't have a fraction
   const fractionDigits = index === 0 ? 0 : 2;
+
   return `${roundedSize.toFixed(fractionDigits)} ${abbreviations[index]}`;
 }
 
@@ -60,12 +34,12 @@ export interface BundleStats {
   initial: boolean;
   stats: BundleStatsData;
   chunkType: ChunkType;
-};
+}
 
 export function generateBundleStats(
   info: {
     size?: number;
-    files: string[];
+    files?: string[];
     names?: string[];
     entry?: boolean;
     initial?: boolean;
@@ -74,7 +48,7 @@ export function generateBundleStats(
   },
 ): BundleStats {
   const size = typeof info.size === 'number' ? info.size : '-';
-  const files = info.files.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ');
+  const files = info.files?.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ') ?? '';
   const names = info.names?.length ? info.names.join(', ') : '-';
   const initial = !!(info.entry || info.initial);
   const chunkType = info.chunkType || 'unknown';
@@ -83,7 +57,7 @@ export function generateBundleStats(
     chunkType,
     initial,
     stats: [files, names, size],
-  }
+  };
 }
 
 function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotalSize: boolean): string {
@@ -178,10 +152,16 @@ function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotal
 
 function generateBuildStats(hash: string, time: number, colors: boolean): string {
   const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
+
   return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 
-function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[]): string {
+// tslint:disable-next-line: no-any
+function statsToString(json: StatsCompilation, statsConfig: any, bundleState?: BundleStats[]): string {
+  if (!json.chunks?.length) {
+    return '';
+  }
+
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? ansiColors.reset(x) : x;
 
@@ -193,8 +173,8 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
         continue;
       }
 
-      const assets = json.assets.filter((asset: any) => chunk.files.includes(asset.name));
-      const summedSize = assets.filter((asset: any) => !asset.name.endsWith(".map")).reduce((total: number, asset: any) => { return total + asset.size }, 0);
+      const assets = json.assets?.filter(asset => chunk.files?.includes(asset.name));
+      const summedSize = assets?.filter(asset => !asset.name.endsWith('.map')).reduce((total, asset) => total + asset.size, 0);
       changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }));
     }
     unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
@@ -218,7 +198,10 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
   // In some cases we do things outside of webpack context
   // Such us index generation, service worker augmentation etc...
   // This will correct the time and include these.
-  const time = (Date.now() - json.builtAt) + json.time;
+  let time = 0;
+  if (json.builtAt !== undefined && json.time !== undefined) {
+    time = (Date.now() - json.builtAt) + json.time;
+  }
 
   if (unchangedChunkNumber > 0) {
     return '\n' + rs(tags.stripIndents`
@@ -226,13 +209,13 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
 
       ${unchangedChunkNumber} unchanged chunks
 
-      ${generateBuildStats(json.hash, time, colors)}
+      ${generateBuildStats(json.hash || '', time, colors)}
       `);
   } else {
     return '\n' + rs(tags.stripIndents`
       ${statsTable}
 
-      ${generateBuildStats(json.hash, time, colors)}
+      ${generateBuildStats(json.hash || '', time, colors)}
       `);
   }
 }
@@ -244,29 +227,24 @@ export const IGNORE_WARNINGS = [
   // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
   /Failed to parse source map from/,
 ];
-interface WebpackDiagnostic {
-  message: string;
-  file?: string;
-  moduleName?: string;
-  loc?: string;
-}
 
-export function statsWarningsToString(json: any, statsConfig: any): string {
+// tslint:disable-next-line: no-any
+export function statsWarningsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
   const c = (x: string) => colors ? ansiColors.reset.cyan(x) : x;
   const y = (x: string) => colors ? ansiColors.reset.yellow(x) : x;
   const yb = (x: string) => colors ? ansiColors.reset.yellowBright(x) : x;
 
-  const warnings = [...json.warnings];
+  const warnings = json.warnings ? [...json.warnings] : [];
   if (json.children) {
     warnings.push(...json.children
-      .map((c: any) => c.warnings)
-      .reduce((a: string[], b: string[]) => [...a, ...b], [])
+      .map(c => c.warnings ?? [])
+      .reduce((a, b) => [...a, ...b], []),
     );
   }
 
   let output = '';
-  for (const warning of warnings as (string | WebpackDiagnostic)[]) {
+  for (const warning of warnings) {
     if (typeof warning === 'string') {
       output += yb(`Warning: ${warning}\n\n`);
     } else {
@@ -285,29 +263,26 @@ export function statsWarningsToString(json: any, statsConfig: any): string {
     }
   }
 
-  if (output) {
-    return '\n' + output;
-  }
-
-  return '';
+  return output ? '\n' + output : output;
 }
 
-export function statsErrorsToString(json: any, statsConfig: any): string {
+// tslint:disable-next-line: no-any
+export function statsErrorsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
   const c = (x: string) => colors ? ansiColors.reset.cyan(x) : x;
   const yb = (x: string) => colors ? ansiColors.reset.yellowBright(x) : x;
   const r = (x: string) => colors ? ansiColors.reset.redBright(x) : x;
 
-  const errors = [...json.errors];
+  const errors = json.errors ? [...json.errors] : [];
   if (json.children) {
     errors.push(...json.children
-      .map((c: any) => c.errors)
-      .reduce((a: string[], b: string[]) => [...a, ...b], [])
+      .map(c => c?.errors || [])
+      .reduce((a, b) => [...a, ...b], []),
     );
   }
 
   let output = '';
-  for (const error of errors as (string | WebpackDiagnostic)[]) {
+  for (const error of errors) {
     if (typeof error === 'string') {
       output += r(`Error: ${error}\n\n`);
     } else {
@@ -326,19 +301,15 @@ export function statsErrorsToString(json: any, statsConfig: any): string {
     }
   }
 
-  if (output) {
-    return '\n' + output;
-  }
-
-  return '';
+  return output ? '\n' + output : output;
 }
 
-export function statsHasErrors(json: any): boolean {
-  return json.errors.length || !!json.children?.some((c: any) => c.errors.length);
+export function statsHasErrors(json: StatsCompilation): boolean {
+  return !!(json.errors?.length || json.children?.some(c => c.errors?.length));
 }
 
-export function statsHasWarnings(json: any): boolean {
-  return json.warnings.length || !!json.children?.some((c: any) => c.warnings.length);
+export function statsHasWarnings(json: StatsCompilation): boolean {
+  return !!(json.warnings?.length || json.children?.some(c => c.warnings?.length));
 }
 
 export function createWebpackLoggingCallback(
@@ -358,7 +329,7 @@ export function createWebpackLoggingCallback(
         builtAt: true,
         assets: true,
         chunks: true,
-      }) as JsonCompilationStats,
+      }),
       config,
     );
   };
@@ -366,7 +337,7 @@ export function createWebpackLoggingCallback(
 
 export function webpackStatsLogger(
   logger: logging.LoggerApi,
-  json: JsonCompilationStats,
+  json: StatsCompilation,
   config: Configuration,
   bundleStats?: BundleStats[],
 ): void {
@@ -378,4 +349,4 @@ export function webpackStatsLogger(
   if (statsHasErrors(json)) {
     logger.error(statsErrorsToString(json, config.stats));
   }
-};
+}

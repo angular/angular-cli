@@ -27,7 +27,10 @@ export class AnyComponentStyleBudgetChecker {
 
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-      const afterOptimizeChunkAssets = () => {
+      compilation.hooks.processAssets.tap({
+        name: PLUGIN_NAME,
+        stage: Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
+      }, () => {
         // In AOT compilations component styles get processed in child compilations.
         if (!compilation.compiler.parentCompilation) {
           return;
@@ -47,10 +50,10 @@ export class AnyComponentStyleBudgetChecker {
             size: compilation.assets[name].size(),
             label: name,
           }));
-        const thresholds = flatMap(this.budgets, (budget) => calculateThresholds(budget));
 
-        for (const {size, label} of componentStyles) {
-          for (const {severity, message} of checkThresholds(thresholds[Symbol.iterator](), size, label)) {
+        const thresholds = this.budgets.flatMap(budget => [...calculateThresholds(budget)]);
+        for (const { size, label } of componentStyles) {
+          for (const { severity, message } of checkThresholds(thresholds[Symbol.iterator](), size, label)) {
             switch (severity) {
               case ThresholdSeverity.Warning:
                 addWarning(compilation, message);
@@ -60,26 +63,14 @@ export class AnyComponentStyleBudgetChecker {
                 break;
               default:
                 assertNever(severity);
-                break;
             }
           }
         }
-      };
-
-      compilation.hooks.processAssets.tap({
-        name: PLUGIN_NAME,
-        stage: Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
-      }, afterOptimizeChunkAssets);
+      });
     });
   }
 }
 
 function assertNever(input: never): never {
-  throw new Error(`Unexpected call to assertNever() with input: ${
-      JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
-}
-
-function flatMap<T, R>(list: T[], mapper: (item: T, index: number, array: T[]) => IterableIterator<R>): R[] {
-  return ([] as R[]).concat(...list.map(mapper).map((iterator) => Array.from(iterator)));
-
+  throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }

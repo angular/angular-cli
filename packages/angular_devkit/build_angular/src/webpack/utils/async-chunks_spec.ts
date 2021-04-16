@@ -62,7 +62,7 @@ describe('async-chunks', () => {
         },
       ];
 
-      const newChunks = markAsyncChunksNonInitial(webpackStats, extraEntryPoints);
+      const newChunks = markAsyncChunksNonInitial(webpackStats as unknown as webpack.StatsCompilation, extraEntryPoints);
 
       expect(newChunks).toEqual([
         {
@@ -83,7 +83,7 @@ describe('async-chunks', () => {
           initial: false, // No longer initial because it was marked async.
           files: [],
         },
-      ]);
+      ] as unknown as webpack.StatsChunk[]);
     });
 
     it('ignores runtime dependency of async chunks', () => {
@@ -116,7 +116,7 @@ describe('async-chunks', () => {
         },
       ];
 
-      const newChunks = markAsyncChunksNonInitial(webpackStats, extraEntryPoints);
+      const newChunks = markAsyncChunksNonInitial(webpackStats as unknown as webpack.StatsCompilation, extraEntryPoints);
 
       expect(newChunks).toEqual([
         {
@@ -131,7 +131,7 @@ describe('async-chunks', () => {
           initial: true, // Still initial, even though its a dependency.
           files: [],
         },
-      ]);
+      ] as unknown as webpack.StatsChunk[]);
     });
   });
 });
