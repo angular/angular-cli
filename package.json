@@ -61,7 +61,7 @@
     "@angular/service-worker": "12.0.0-next.9",
     "@bazel/bazelisk": "1.7.5",
     "@bazel/buildifier": "4.0.1",
-    "@bazel/ibazel": "0.15.9",
+    "@bazel/ibazel": "0.15.10",
     "@bazel/jasmine": "3.4.0",
     "@bazel/typescript": "3.4.0",
     "@hapi/hapi": "^18.4.0",
