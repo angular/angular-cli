@@ -195,7 +195,7 @@
     "resolve-url-loader": "3.1.2",
     "rimraf": "3.0.2",
     "rxjs": "6.6.7",
-    "sass": "1.32.8",
+    "sass": "1.32.10",
     "sass-loader": "11.0.1",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz",
     "semver": "7.3.5",
