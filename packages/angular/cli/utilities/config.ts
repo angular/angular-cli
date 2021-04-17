@@ -48,14 +48,24 @@ function getSchemaLocation(): string {
 
 export const workspaceSchemaPath = getSchemaLocation();
 
-const configNames = [ 'angular.json', '.angular.json' ];
+const configNames = ['angular.json', '.angular.json'];
 const globalFileName = '.angular-config.json';
 
 function xdgConfigHome(home: string, configFile?: string): string {
   // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+  const xdgConfigHome = process.env['XDG_CONFIG_HOME'] || path.join(home, '.config');
+  const xdgAngularHome = path.join(xdgConfigHome, 'angular');
+
+  return configFile ? path.join(xdgAngularHome, configFile) : xdgAngularHome;
+}
+
+function xdgConfigHomeOld(home: string): string {
+  // Check the configuration files in the old location that should be:
+  // - $XDG_CONFIG_HOME/.angular-config.json (if XDG_CONFIG_HOME is set)
+  // - $HOME/.config/angular/.angular-config.json (otherwise)
   const p = process.env['XDG_CONFIG_HOME'] || path.join(home, '.config', 'angular');
 
-  return configFile ? path.join(p, configFile) : p;
+  return path.join(p, '.angular-config.json');
 }
 
 function projectFilePath(projectPath?: string): string | null {
@@ -78,9 +88,21 @@ function globalFilePath(): string | null {
   // note that createGlobalSettings() will continue creating
   // global file in home directory, with this user will have
   // choice to move change its location to meet XDG convention
-  const xdgConfig = xdgConfigHome(home, globalFileName);
+  const xdgConfig = xdgConfigHome(home, 'config.json');
   if (existsSync(xdgConfig)) {
     return xdgConfig;
+  }
+  // NOTE: This check is for the old configuration location, for more
+  // information see https://github.com/angular/angular-cli/pull/20556
+  const xdgConfigOld = xdgConfigHomeOld(home);
+  if (existsSync(xdgConfigOld)) {
+    // tslint:disable: no-console
+    console.warn(
+      `Old configuration location detected: ${xdgConfigOld}\n` +
+        `Please move the file to the new location ~/.config/angular/config.json`,
+    );
+
+    return xdgConfigOld;
   }
 
   const p = path.join(home, globalFileName);
@@ -201,7 +223,9 @@ export function getWorkspaceRaw(
 }
 
 export async function validateWorkspace(data: json.JsonObject): Promise<void> {
-  const schema = readAndParseJson(path.join(__dirname, '../lib/config/schema.json')) as json.schema.JsonSchema;
+  const schema = readAndParseJson(
+    path.join(__dirname, '../lib/config/schema.json'),
+  ) as json.schema.JsonSchema;
   const { formats } = await import('@angular-devkit/schematics');
   const registry = new json.schema.CoreSchemaRegistry(formats.standardFormats);
   const validator = await registry.compile(schema).toPromise();
