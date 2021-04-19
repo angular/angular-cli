@@ -10061,7 +10061,7 @@ quick-lru@^4.0.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
   integrity sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==
 
-quicktype-core@^6.0.69:
+quicktype-core@6.0.69:
   version "6.0.69"
   resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-6.0.69.tgz#955347b64e8a7b6a37af49fe12f5772abc153b8e"
   integrity sha512-wKQ+/fwgdtFOcbeRiZkIBLA2ajvrFvmtTmexdv7PlO1dyp3C7Irbn2/HjwzalD1dYFrtMEYWohB/4rr3Mg75Xw==
