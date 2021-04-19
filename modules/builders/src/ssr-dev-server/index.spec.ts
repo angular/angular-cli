@@ -8,6 +8,7 @@
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import * as browserSync from 'browser-sync';
+import * as http from 'http';
 import * as https from 'https';
 import { from, throwError, timer } from 'rxjs';
 import { concatMap, debounceTime, mergeMap, retryWhen, take } from 'rxjs/operators';
@@ -136,5 +137,38 @@ describe('Serve SSR Builder', () => {
         take(2),
       )
       .toPromise();
+  });
+
+  it('proxies requests based on the proxy configuration file provided in the option', async () => {
+    const proxyServer = http.createServer((request, response) => {
+      if (request.url?.endsWith('/test')) {
+        response.writeHead(200);
+        response.end('TEST_API_RETURN');
+      } else {
+        response.writeHead(404);
+        response.end();
+      }
+    });
+
+    try {
+      await new Promise<void>(resolve => proxyServer.listen(0, '127.0.0.1', resolve));
+      const proxyAddress = proxyServer.address() as import('net').AddressInfo;
+
+      host.writeMultipleFiles({
+        'proxy.config.json': `{ "/api/*": { "logLevel": "debug","target": "http://127.0.0.1:${proxyAddress.port}" } }`,
+      });
+
+      const run = await architect.scheduleTarget(target, { port: 7001, proxyConfig: 'proxy.config.json' });
+      runs.push(run);
+
+      const output = await run.result as SSRDevServerBuilderOutput;
+      expect(output.success).toBe(true);
+      expect(output.baseUrl).toBe('http://localhost:7001');
+      const response = await fetch('http://localhost:7001/api/test');
+      expect(await response?.text()).toContain('TEST_API_RETURN');
+
+    } finally {
+      await new Promise<void>((resolve) => proxyServer.close(() => resolve()));
+    }
   });
 });

@@ -14,6 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { json, logging, tags } from '@angular-devkit/core';
 import * as browserSync from 'browser-sync';
+import { existsSync } from 'fs';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { join, resolve as pathResolve } from 'path';
 import {
@@ -212,7 +213,7 @@ async function initBrowserSync(
     return browserSyncInstance;
   }
 
-  const { port: browserSyncPort, open, host, publicHost } = options;
+  const { port: browserSyncPort, open, host, publicHost, proxyConfig } = options;
   const bsPort = browserSyncPort || await getAvailablePort();
   const bsOptions: browserSync.Options = {
     proxy: {
@@ -284,6 +285,19 @@ async function initBrowserSync(
     }
   }
 
+  if (proxyConfig) {
+    if (!bsOptions.middleware) {
+      bsOptions.middleware = [];
+    } else if (!Array.isArray(bsOptions.middleware)) {
+      bsOptions.middleware = [bsOptions.middleware];
+    }
+
+    bsOptions.middleware = [
+      ...bsOptions.middleware,
+      ...getProxyConfig(context.workspaceRoot, proxyConfig),
+    ];
+  }
+
   return new Promise((resolve, reject) => {
     browserSyncInstance.init(bsOptions, (error, bs) => {
       if (error) {
@@ -320,6 +334,38 @@ function getSslConfig(
   }
 
   return ssl;
+}
+
+function getProxyConfig(
+  root: string,
+  proxyConfig: string,
+): browserSync.MiddlewareHandler[] {
+  const proxyPath = pathResolve(root, proxyConfig);
+  let proxySettings: any;
+  try {
+    proxySettings = require(proxyPath);
+  } catch (error) {
+    if (error.code === 'MODULE_NOT_FOUND') {
+      throw new Error(`Proxy config file ${proxyPath} does not exist.`);
+    }
+
+    throw error;
+  }
+
+  const proxies = Array.isArray(proxySettings) ? proxySettings : [proxySettings];
+
+  return proxies.map(proxy => {
+    const keys = Object.keys(proxy);
+    const context = keys[0];
+
+    if (keys.length === 1 || typeof context === 'string') {
+      const normalizedContext = context.replace(/^\*$/, '**').replace(/\/\*$/, '');
+
+      return createProxyMiddleware(normalizedContext, proxy[context]) as any;
+    }
+
+    return createProxyMiddleware(proxy) as any;
+  });
 }
 
 export default createBuilder<SSRDevServerBuilderOptions, BuilderOutput>(execute);

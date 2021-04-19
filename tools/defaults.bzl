@@ -106,6 +106,7 @@ def jasmine_node_test(deps = [], **kwargs):
 
     _jasmine_node_test(
         deps = local_deps,
+        templated_args = ["--bazel_patch_module_resolver"],
         configuration_env_vars = ["compile"],
         **kwargs
     )

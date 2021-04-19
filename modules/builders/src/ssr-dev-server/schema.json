@@ -55,6 +55,10 @@
     "sslCert": {
       "type": "string",
       "description": "SSL certificate to use for serving HTTPS."
+    },
+    "proxyConfig": {
+      "type": "string",
+      "description": "Proxy configuration file."
     }
   },
   "additionalProperties": false,

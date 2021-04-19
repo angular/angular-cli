@@ -42,4 +42,7 @@ export interface Schema {
 
   /** SSL certificate to use for serving HTTPS. */
   sslCert?: string;
+
+  /** Proxy configuration file */
+  proxyConfig?: string;
 }
