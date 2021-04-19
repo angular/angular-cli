@@ -63,11 +63,6 @@
         "cnpm",
         "pnpm"
       ]
-    },
-    "migrateExternal": {
-      "type": "boolean",
-      "default": false,
-      "hidden": true
     }
   },
   "required": [
