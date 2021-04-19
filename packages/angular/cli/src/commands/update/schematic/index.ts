@@ -10,10 +10,9 @@ import {
   Rule,
   SchematicContext,
   SchematicsException,
-  TaskId,
   Tree,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as npa from 'npm-package-arg';
 import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';
@@ -249,7 +248,6 @@ function _performUpdate(
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
   migrateOnly: boolean,
-  migrateExternal: boolean,
 ): void {
   const packageJsonContent = tree.read('/package.json');
   if (!packageJsonContent) {
@@ -307,11 +305,10 @@ function _performUpdate(
 
   const newContent = JSON.stringify(packageJson, null, 2);
   if (packageJsonContent.toString() != newContent || migrateOnly) {
-    let installTask: TaskId[] = [];
     if (!migrateOnly) {
       // If something changed, also hook up the task.
       tree.overwrite('/package.json', JSON.stringify(packageJson, null, 2));
-      installTask = [context.addTask(new NodePackageInstallTask())];
+      context.addTask(new NodePackageInstallTask());
     }
 
     const externalMigrations: {}[] = [];
@@ -331,25 +328,14 @@ function _performUpdate(
         : ''
       ) + target.updateMetadata.migrations;
 
-      if (migrateExternal) {
-        externalMigrations.push({
-          package: name,
-          collection,
-          from: installed.version,
-          to: target.version,
-        });
+      externalMigrations.push({
+        package: name,
+        collection,
+        from: installed.version,
+        to: target.version,
+      });
 
-        return;
-      }
-
-      context.addTask(new RunSchematicTask('@schematics/update', 'migrate', {
-          package: name,
-          collection,
-          from: installed.version,
-          to: target.version,
-        }),
-        installTask,
-      );
+      return;
     });
 
     if (externalMigrations.length > 0) {
@@ -357,36 +343,6 @@ function _performUpdate(
       (global as any).externalMigrations = externalMigrations;
     }
   }
-}
-
-function _migrateOnly(
-  info: PackageInfo | undefined,
-  context: SchematicContext,
-  from: string,
-  to?: string,
-) {
-  if (!info) {
-    return;
-  }
-
-  const target = info.installed;
-  if (!target || !target.updateMetadata.migrations) {
-    return;
-  }
-
-  const collection = (
-    target.updateMetadata.migrations.match(/^[./]/)
-      ? info.name + '/'
-      : ''
-  ) + target.updateMetadata.migrations;
-
-  context.addTask(new RunSchematicTask('@schematics/update', 'migrate', {
-      package: info.name,
-      collection,
-      from: from,
-      to: to || target.version,
-    }),
-  );
 }
 
 function _getUpdateMetadata(
@@ -920,13 +876,6 @@ export default function(options: UpdateSchema): Rule {
     // Now that we have all the information, check the flags.
     if (packages.size > 0) {
       if (options.migrateOnly && options.from && options.packages) {
-        _migrateOnly(
-          packageInfoMap.get(options.packages[0]),
-          context,
-          options.from,
-          options.to,
-        );
-
         return;
       }
 
@@ -937,7 +886,7 @@ export default function(options: UpdateSchema): Rule {
       );
       _validateUpdatePackages(packageInfoMap, !!options.force, !!options.next, sublog);
 
-      _performUpdate(tree, context, packageInfoMap, logger, !!options.migrateOnly, !!options.migrateExternal);
+      _performUpdate(tree, context, packageInfoMap, logger, !!options.migrateOnly);
     } else {
       _usageMessage(options, packageInfoMap, logger);
     }
