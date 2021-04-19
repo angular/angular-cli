@@ -189,7 +189,7 @@
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "8.0.0",
-    "quicktype-core": "^6.0.69",
+    "quicktype-core": "6.0.69",
     "raw-loader": "4.0.2",
     "regenerator-runtime": "0.13.7",
     "resolve-url-loader": "3.1.2",
