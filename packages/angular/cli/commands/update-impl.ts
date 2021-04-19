@@ -191,10 +191,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   private async executeMigrations(
     packageName: string,
     collectionPath: string,
-    range: semver.Range,
+    from: string,
+    to: string,
     commit?: boolean,
   ): Promise<boolean> {
     const collection = this.workflow.engine.createCollection(collectionPath);
+    const migrationRange = new semver.Range(
+      '>' + (semver.prerelease(from) ? from.split('-')[0] + '-0' : from) + ' <=' + to,
+    );
     const migrations = [];
 
     for (const name of collection.listSchematicNames()) {
@@ -207,7 +211,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         continue;
       }
 
-      if (semver.satisfies(description.version, range, { includePrerelease: true })) {
+      if (semver.satisfies(description.version, migrationRange, { includePrerelease: true })) {
         migrations.push(description as typeof schematic.description & { version: string });
       }
     }
@@ -492,14 +496,11 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           return 1;
         }
 
-        const migrationRange = new semver.Range(
-          '>' + from + ' <=' + (options.to || packageNode.version),
-        );
-
         success = await this.executeMigrations(
           packageName,
           migrations,
-          migrationRange,
+          from,
+          options.to || packageNode.version,
           options.createCommits,
         );
       }
@@ -647,7 +648,6 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       next: !!options.next,
       packageManager: this.packageManager,
       packages: packagesToUpdate,
-      migrateExternal: true,
     });
 
     if (success && options.createCommits) {
@@ -733,7 +733,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         const result = await this.executeMigrations(
           migration.package,
           migrations,
-          new semver.Range('>' + migration.from + ' <=' + migration.to),
+          migration.from,
+          migration.to,
           options.createCommits,
         );
 
