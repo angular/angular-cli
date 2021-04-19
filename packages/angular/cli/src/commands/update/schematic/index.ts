@@ -178,6 +178,7 @@ function _validateReversePeerDependencies(
         'codelyzer',
         '@schematics/update',
         '@angular-devkit/build-ng-packagr',
+        'tsickle',
       ];
       if (ignoredPackages.includes(installed)) {
         continue;
