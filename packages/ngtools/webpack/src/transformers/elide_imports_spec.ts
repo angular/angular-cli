@@ -8,9 +8,7 @@
 // tslint:disable:no-big-function
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript';
-import { getLastNode } from './ast_helpers';
-import { RemoveNodeOperation } from './interfaces';
-import { makeTransform } from './make_transform';
+import { elideImports } from './elide_imports';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
@@ -18,13 +16,42 @@ describe('@ngtools/webpack transformers', () => {
 
     const dummyNode = `const remove = ''`;
 
-    const transformer = (program: ts.Program) => (
-      makeTransform(
-        (sourceFile: ts.SourceFile) =>
-          [new RemoveNodeOperation(sourceFile, getLastNode(sourceFile) as ts.Node)],
-        () => program.getTypeChecker(),
-      )
-    );
+    // Transformer that removes the last node and then elides unused imports
+    const transformer = (program: ts.Program) => {
+      return (context: ts.TransformationContext) => {
+
+        return (sourceFile: ts.SourceFile) => {
+          const lastNode = sourceFile.statements[sourceFile.statements.length - 1];
+          const updatedSourceFile = context.factory.updateSourceFile(
+            sourceFile,
+            ts.setTextRange(
+              context.factory.createNodeArray(sourceFile.statements.slice(0, -1)),
+              sourceFile.statements,
+            ),
+          );
+
+          const importRemovals = elideImports(
+            updatedSourceFile,
+            [lastNode],
+            () => program.getTypeChecker(),
+            context.getCompilerOptions(),
+          ).map((op) => op.target);
+          if (importRemovals.length > 0) {
+            return ts.visitEachChild(
+              updatedSourceFile,
+              function visitForRemoval(node): ts.Node | undefined {
+                return importRemovals.includes(node)
+                  ? undefined
+                  : ts.visitEachChild(node, visitForRemoval, context);
+              },
+              context,
+            );
+          }
+
+          return updatedSourceFile;
+        };
+      };
+    };
 
     const additionalFiles: Record<string, string> = {
       'const.ts': `
