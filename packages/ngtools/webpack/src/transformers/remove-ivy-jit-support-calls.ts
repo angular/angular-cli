@@ -6,56 +6,71 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { collectDeepNodes } from './ast_helpers';
-import { RemoveNodeOperation, StandardTransform, TransformOperation } from './interfaces';
-import { makeTransform } from './make_transform';
+import { elideImports } from './elide_imports';
 
 export function removeIvyJitSupportCalls(
   classMetadata: boolean,
   ngModuleScope: boolean,
   getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
-  const standardTransform: StandardTransform = function(sourceFile: ts.SourceFile) {
-    const ops: TransformOperation[] = [];
+  return (context: ts.TransformationContext) => {
+    const removedNodes: ts.Node[] = [];
 
-    collectDeepNodes<ts.ExpressionStatement>(sourceFile, ts.SyntaxKind.ExpressionStatement)
-      .filter(statement => {
-        const innerStatement = getIifeStatement(statement);
-        if (!innerStatement) {
-          return false;
+    const visitNode: ts.Visitor = (node: ts.Node) => {
+      const innerStatement = ts.isExpressionStatement(node) && getIifeStatement(node);
+      if (innerStatement) {
+        if (
+          ngModuleScope &&
+          ts.isBinaryExpression(innerStatement.expression) &&
+          isIvyPrivateCallExpression(innerStatement.expression.right, 'ɵɵsetNgModuleScope')
+        ) {
+          removedNodes.push(innerStatement);
+
+          return undefined;
         }
 
-        let shouldRemove = false;
+        if (classMetadata) {
+          const expression = ts.isBinaryExpression(innerStatement.expression)
+            ? innerStatement.expression.right
+            : innerStatement.expression;
+          if (isIvyPrivateCallExpression(expression, 'ɵsetClassMetadata')) {
+            removedNodes.push(innerStatement);
 
-        if (ngModuleScope && ts.isBinaryExpression(innerStatement.expression)) {
-          shouldRemove = isIvyPrivateCallExpression(
-            innerStatement.expression.right,
-            'ɵɵsetNgModuleScope',
-          );
-        }
-
-        if (classMetadata && !shouldRemove) {
-          if (ts.isBinaryExpression(innerStatement.expression)) {
-            shouldRemove = isIvyPrivateCallExpression(
-              innerStatement.expression.right,
-              'ɵsetClassMetadata',
-            );
-          } else {
-            shouldRemove = isIvyPrivateCallExpression(
-              innerStatement.expression,
-              'ɵsetClassMetadata',
-            );
+            return undefined;
           }
         }
+      }
 
-        return shouldRemove;
-      })
-      .forEach(statement => ops.push(new RemoveNodeOperation(sourceFile, statement)));
+      return ts.visitEachChild(node, visitNode, context);
+    };
 
-    return ops;
+    return (sourceFile: ts.SourceFile) => {
+      let updatedSourceFile = ts.visitEachChild(sourceFile, visitNode, context);
+
+      if (removedNodes.length > 0) {
+        // Remove any unused imports
+        const importRemovals = elideImports(
+          updatedSourceFile,
+          removedNodes,
+          getTypeChecker,
+          context.getCompilerOptions(),
+        ).map((op) => op.target);
+        if (importRemovals.length > 0) {
+          updatedSourceFile = ts.visitEachChild(
+            updatedSourceFile,
+            function visitForRemoval(node): ts.Node | undefined {
+              return importRemovals.includes(node)
+                ? undefined
+                : ts.visitEachChild(node, visitForRemoval, context);
+            },
+            context,
+          );
+        }
+      }
+
+      return updatedSourceFile;
+    };
   };
-
-  return makeTransform(standardTransform, getTypeChecker);
 }
 
 // Each Ivy private call expression is inside an IIFE
