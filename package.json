@@ -137,7 +137,7 @@
     "copy-webpack-plugin": "8.1.1",
     "core-js": "3.10.1",
     "critters": "0.0.10",
-    "css-loader": "5.2.1",
+    "css-loader": "5.2.4",
     "cssnano": "5.0.1",
     "debug": "^4.1.1",
     "enhanced-resolve": "5.7.0",
