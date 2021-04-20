@@ -107,7 +107,7 @@
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
-      "enum": ["css", "scss", "sass", "less", "styl"],
+      "enum": ["css", "scss", "sass", "less"],
       "x-user-analytics": 5
     },
     "skipTests": {

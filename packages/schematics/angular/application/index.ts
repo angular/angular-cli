@@ -139,8 +139,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     ];
   }
 
-  const inlineStyleLanguage =
-    options.style && options.style !== Style.Css && options.style !== Style.Styl
+  const inlineStyleLanguage = options?.style !== Style.Css
       ? options.style
       : undefined;
 
