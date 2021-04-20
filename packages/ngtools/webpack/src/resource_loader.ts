@@ -44,6 +44,10 @@ export class WebpackResourceLoader {
     }
   }
 
+  clearParentCompilation() {
+    this._parentCompilation = undefined;
+  }
+
   getModifiedResourceFiles() {
     return this.modifiedResources;
   }
@@ -172,6 +176,22 @@ export class WebpackResourceLoader {
           return;
         }
 
+        // Workaround to attempt to reduce memory usage of child compilations.
+        // This removes the child compilation from the main compilation and manually propagates
+        // all dependencies, warnings, and errors.
+        const parent = childCompiler.parentCompilation;
+        if (parent) {
+          parent.children = parent.children.filter((child) => child !== childCompilation);
+
+          parent.fileDependencies.addAll(childCompilation.fileDependencies);
+          parent.contextDependencies.addAll(childCompilation.contextDependencies);
+          parent.missingDependencies.addAll(childCompilation.missingDependencies);
+          parent.buildDependencies.addAll(childCompilation.buildDependencies);
+
+          parent.warnings.push(...childCompilation.warnings);
+          parent.errors.push(...childCompilation.errors);
+        }
+
         // Save the dependencies for this resource.
         if (filePath) {
           this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
@@ -188,7 +208,6 @@ export class WebpackResourceLoader {
 
         resolve({
           content: finalContent ?? '',
-          map: finalMap,
           success: childCompilation.errors?.length === 0,
         });
       });
