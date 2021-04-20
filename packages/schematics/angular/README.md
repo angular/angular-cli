@@ -12,7 +12,6 @@ application | Generates a new basic app definition in the "projects" subfolder o
 class | Creates a new, generic class definition in the given or default project
 component | Creates a new, generic component definition in the given or default project
 directive | Creates a new, generic directive definition in the given or default project
-e2e | Generates a new, generic end-to-end test definition for the given or default project
 enum | Generates a new, generic enum definition for the given or default project
 guard | Generates a new, generic route guard definition in the given or default project
 interceptor | Creates a new, generic interceptor definition in the given or default project
@@ -24,7 +23,6 @@ pipe | Creates a new, generic pipe definition in the given or default project
 resolver | Creates a new, generic resolver definition in the given or default project
 service | Creates a new, generic service definition in the given or default project
 service-worker | Pass this schematic to the "run" command to create a service worker
-universal | Pass this schematic to the "run" command to set up server-side rendering for an app
 web-worker | Creates a new, generic web worker definition in the given or default project
 workspace | Initializes an empty workspace and adds the necessary dependencies required by an Angular application
 
