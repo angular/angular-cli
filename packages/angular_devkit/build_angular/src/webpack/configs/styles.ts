@@ -186,6 +186,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       );
     }
     if (tailwindPackagePath) {
+      if (process.env['TAILWIND_MODE'] === undefined) {
+        process.env['TAILWIND_MODE'] = buildOptions.watch ? 'watch' : 'build';
+      }
       extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
     }
   }
