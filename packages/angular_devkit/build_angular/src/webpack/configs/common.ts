@@ -432,7 +432,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     entry: entryPoints,
     output: {
       path: path.resolve(root, buildOptions.outputPath),
-      publicPath: buildOptions.deployUrl,
+      publicPath: buildOptions.deployUrl ?? '',
       filename: ({ chunk }) => {
         if (chunk?.name === 'polyfills-es5') {
           return `polyfills-es5${hashFormat.chunk}.js`;
