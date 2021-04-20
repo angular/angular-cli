@@ -8,7 +8,7 @@
 import * as cssNano from 'cssnano';
 import { ProcessOptions, Result } from 'postcss';
 import { Compilation, Compiler, sources } from 'webpack';
-import { addWarning } from '../../utils/webpack-diagnostics';
+import { addError, addWarning } from '../../utils/webpack-diagnostics';
 
 export interface OptimizeCssWebpackPluginOptions {
   sourceMap: boolean;
@@ -86,33 +86,39 @@ export class OptimizeCssWebpackPlugin {
             map: map && { annotation: false, prev: map },
           };
 
-          const output = await new Promise<Result>((resolve, reject) => {
-            // @types/cssnano are not up to date with version 5.
-            // tslint:disable-next-line: no-any
-            (cssNano as any)(cssNanoOptions).process(content, postCssOptions)
-              .then(resolve)
-              .catch((err: Error) => reject(new Error(`${file} ${err.message}`)));
-          });
-
-          for (const { text } of output.warnings()) {
-            addWarning(compilation, text);
-          }
-
-          let newSource;
-          if (output.map) {
-            newSource = new sources.SourceMapSource(
-              output.css,
-              file,
+          try {
+            const output = await new Promise<Result>((resolve, reject) => {
+              // @types/cssnano are not up to date with version 5.
               // tslint:disable-next-line: no-any
-              output.map.toString() as any,
-              content,
-              map,
-            );
-          } else {
-            newSource = new sources.RawSource(output.css);
-          }
+              (cssNano as any)(cssNanoOptions).process(content, postCssOptions)
+                .then(resolve)
+                .catch((err: Error) => reject(err));
+            });
 
-          compilation.assets[file] = newSource;
+
+            for (const { text } of output.warnings()) {
+              addWarning(compilation, text);
+            }
+
+            let newSource;
+            if (output.map) {
+              newSource = new sources.SourceMapSource(
+                output.css,
+                file,
+                output.map.toString(),
+                content,
+                map,
+              );
+            } else {
+              newSource = new sources.RawSource(output.css);
+            }
+
+            compilation.assets[file] = newSource;
+          } catch (error) {
+            addError(compilation, error.message);
+
+            return;
+          }
         });
 
       return Promise.all(actions).then(() => {});
