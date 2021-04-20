@@ -135,7 +135,7 @@
     "conventional-changelog": "^3.0.0",
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "8.1.1",
-    "core-js": "3.10.1",
+    "core-js": "3.10.2",
     "critters": "0.0.10",
     "css-loader": "5.2.1",
     "cssnano": "5.0.1",
