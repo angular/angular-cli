@@ -9,7 +9,14 @@ import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compi
 import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
 import { createHash } from 'crypto';
 import * as ts from 'typescript';
-import { Compilation, Compiler, Module, NormalModuleReplacementPlugin, util } from 'webpack';
+import {
+  Compilation,
+  Compiler,
+  Module,
+  NormalModule,
+  NormalModuleReplacementPlugin,
+  util,
+} from 'webpack';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
@@ -59,7 +66,7 @@ function initializeNgccProcessor(
   tsconfig: string,
 ): { processor: NgccProcessor; errors: string[]; warnings: string[] } {
   const { inputFileSystem, options: webpackOptions } = compiler;
-  const mainFields = ([] as string[]).concat(...(webpackOptions.resolve?.mainFields || []));
+  const mainFields = webpackOptions.resolve?.mainFields?.flat() ?? [];
 
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -111,8 +118,7 @@ export class AngularWebpackPlugin {
     return this.pluginOptions;
   }
 
-  apply(webpackCompiler: Compiler): void {
-    const compiler = webpackCompiler as Compiler & { watchMode?: boolean };
+  apply(compiler: Compiler): void {
     // Setup file replacements with webpack
     for (const [key, value] of Object.entries(this.pluginOptions.fileReplacements)) {
       new NormalModuleReplacementPlugin(
@@ -124,28 +130,21 @@ export class AngularWebpackPlugin {
     // Set resolver options
     const pathsPlugin = new TypeScriptPathsPlugin();
     compiler.hooks.afterResolvers.tap('angular-compiler', (compiler) => {
-      // 'resolverFactory' is not present in the Webpack typings
-      // tslint:disable-next-line: no-any
-      const resolverFactoryHooks = (compiler as any).resolverFactory.hooks;
-
       // When Ivy is enabled we need to add the fields added by NGCC
       // to take precedence over the provided mainFields.
       // NGCC adds fields in package.json suffixed with '_ivy_ngcc'
       // Example: module -> module__ivy_ngcc
-      resolverFactoryHooks.resolveOptions
+      compiler.resolverFactory.hooks.resolveOptions
         .for('normal')
-        .tap(PLUGIN_NAME, (resolveOptions: { mainFields: string[]; plugins: unknown[] }) => {
+        .tap(PLUGIN_NAME, (resolveOptions) => {
           const originalMainFields = resolveOptions.mainFields;
-          const ivyMainFields = originalMainFields.map((f) => `${f}_ivy_ngcc`);
+          const ivyMainFields = originalMainFields?.flat().map((f) => `${f}_ivy_ngcc`) ?? [];
 
-          if (!resolveOptions.plugins) {
-            resolveOptions.plugins = [];
-          }
+          resolveOptions.plugins ??= [];
           resolveOptions.plugins.push(pathsPlugin);
 
           // https://github.com/webpack/webpack/issues/11635#issuecomment-707016779
           return util.cleverMerge(resolveOptions, { mainFields: [...ivyMainFields, '...'] });
-
         });
     });
 
@@ -348,7 +347,7 @@ export class AngularWebpackPlugin {
 
     if (filesToRebuild.size > 0) {
       for (const webpackModule of [...modules]) {
-        const resource = (webpackModule as Module & { resource?: string }).resource;
+        const resource = (webpackModule as NormalModule).resource;
         if (resource && filesToRebuild.has(normalizePath(resource))) {
           await rebuild(webpackModule);
         }
