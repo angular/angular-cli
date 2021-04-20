@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { createHash } from 'crypto';
+import * as path from 'path';
 import * as vm from 'vm';
 import { Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
 import { normalizePath } from './ivy/paths';
@@ -206,6 +207,14 @@ export class WebpackResourceLoader {
           this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
           for (const file of childCompilation.fileDependencies) {
             const resolvedFile = normalizePath(file);
+
+            // Skip paths that do not appear to be files (have no extension).
+            // `fileDependencies` can contain directories and not just files which can
+            // cause incorrect cache invalidation on rebuilds.
+            if (!path.extname(resolvedFile)) {
+              continue;
+            }
+
             const entry = this._reverseDependencies.get(resolvedFile);
             if (entry) {
               entry.add(filePath);
