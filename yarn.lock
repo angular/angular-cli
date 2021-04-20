@@ -10074,10 +10074,10 @@ quick-lru@^4.0.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
   integrity sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==
 
-quicktype-core@6.0.69:
-  version "6.0.69"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-6.0.69.tgz#955347b64e8a7b6a37af49fe12f5772abc153b8e"
-  integrity sha512-wKQ+/fwgdtFOcbeRiZkIBLA2ajvrFvmtTmexdv7PlO1dyp3C7Irbn2/HjwzalD1dYFrtMEYWohB/4rr3Mg75Xw==
+quicktype-core@6.0.70:
+  version "6.0.70"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-6.0.70.tgz#3be15eef505d356bc16fad01d2941d726c0a5700"
+  integrity sha512-BMoG1omvauNhgGFzz1AkFVIC0LPXPArE6cCGI5fTeHvXKQsVUCbHt+seee2TaqUkELX9Pk6yA0s8OW8vW3kllA==
   dependencies:
     "@mark.probst/unicode-properties" "~1.1.0"
     browser-or-node "^1.2.1"
