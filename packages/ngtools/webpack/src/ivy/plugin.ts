@@ -150,7 +150,7 @@ export class AngularWebpackPlugin {
     });
 
     let ngccProcessor: NgccProcessor | undefined;
-    const resourceLoader = new WebpackResourceLoader();
+    let resourceLoader: WebpackResourceLoader | undefined;
     let previousUnused: Set<string> | undefined;
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (thisCompilation) => {
       const compilation = thisCompilation as WebpackCompilation;
@@ -163,6 +163,11 @@ export class AngularWebpackPlugin {
 
       // Store watch mode; assume true if not present (webpack < 4.23.0)
       this.watchMode = compiler.watchMode ?? true;
+
+      // Initialize the resource loader if not already setup
+      if (!resourceLoader) {
+        resourceLoader = new WebpackResourceLoader(this.watchMode);
+      }
 
       // Initialize and process eager ngcc if not already setup
       if (!ngccProcessor) {
@@ -266,7 +271,7 @@ export class AngularWebpackPlugin {
         await this.rebuildRequiredFiles(modules, compilation, fileEmitter);
 
         // Clear out the Webpack compilation to avoid an extra retaining reference
-        resourceLoader.clearParentCompilation();
+        resourceLoader?.clearParentCompilation();
 
         // Analyze program for unused files
         if (compilation.errors.length > 0) {
