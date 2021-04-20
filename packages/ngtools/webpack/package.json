@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/webpack",
   "dependencies": {
-    "enhanced-resolve": "5.7.0"
+    "enhanced-resolve": "5.8.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^12.0.0-next",
