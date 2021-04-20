@@ -84,8 +84,7 @@
         "css",
         "scss",
         "sass",
-        "less",
-        "styl"
+        "less"
       ],
       "x-user-analytics": 5
     },
