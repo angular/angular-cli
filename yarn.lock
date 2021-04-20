@@ -84,16 +84,16 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#3346063565e4a710fb7c1daded6edbf50962342a":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#5b8b7a8b04e205eea784168a511c0258fb9995f3":
   version "0.0.0"
-  uid "3346063565e4a710fb7c1daded6edbf50962342a"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#3346063565e4a710fb7c1daded6edbf50962342a"
+  uid "5b8b7a8b04e205eea784168a511c0258fb9995f3"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#5b8b7a8b04e205eea784168a511c0258fb9995f3"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
     "@octokit/graphql" "^4.6.1"
     "@octokit/rest" "16.28.7"
-    "@octokit/types" "^5.5.0"
+    "@octokit/types" "^6.0.0"
     brotli "^1.3.2"
     chalk "^2.3.1"
     clang-format "^1.4.0"
@@ -1458,6 +1458,11 @@
   resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-4.0.4.tgz#96fcce11e929802898646205ac567e5df592f82b"
   integrity sha512-31zY8JIuz3h6RAFOnyA8FbOwhILILiBu1qD81RyZZWY7oMBhIdBn6MaAmnnptLhB4jk0g50nkQkUVP4kUzppcA==
 
+"@octokit/openapi-types@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-6.0.0.tgz#7da8d7d5a72d3282c1a3ff9f951c8133a707480d"
+  integrity sha512-CnDdK7ivHkBtJYzWzZm7gEkanA7gKH6a09Eguz7flHw//GacPJLmkHA3f3N++MJmlxD1Fl+mB7B32EEpSCwztQ==
+
 "@octokit/request-error@^1.0.2":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@octokit/request-error/-/request-error-1.2.1.tgz#ede0714c773f32347576c25649dc013ae6b31801"
@@ -1516,12 +1521,12 @@
   dependencies:
     "@types/node" ">= 8"
 
-"@octokit/types@^5.5.0":
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-5.5.0.tgz#e5f06e8db21246ca102aa28444cdb13ae17a139b"
-  integrity sha512-UZ1pErDue6bZNjYOotCNveTXArOMZQFG6hKJfOnGnulVCMcVVi7YIIuuR4WfBhjo7zgpmzn/BkPDnUXtNx+PcQ==
+"@octokit/types@^6.0.0":
+  version "6.13.0"
+  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-6.13.0.tgz#779e5b7566c8dde68f2f6273861dd2f0409480d0"
+  integrity sha512-W2J9qlVIU11jMwKHUp5/rbVUeErqelCsO5vW5PKNb7wAXQVUz87Rc+imjlEvpvbH8yUb+KHmv8NEjVZdsdpyxA==
   dependencies:
-    "@types/node" ">= 8"
+    "@octokit/openapi-types" "^6.0.0"
 
 "@octokit/types@^6.0.3", "@octokit/types@^6.7.1":
   version "6.8.5"
