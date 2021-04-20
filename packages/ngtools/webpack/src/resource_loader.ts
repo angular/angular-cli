@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { createHash } from 'crypto';
 import * as vm from 'vm';
 import { Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
 import { normalizePath } from './ivy/paths';
@@ -20,9 +21,17 @@ export class WebpackResourceLoader {
   private _fileDependencies = new Map<string, Set<string>>();
   private _reverseDependencies = new Map<string, Set<string>>();
 
-  private cache = new Map<string, CompilationOutput>();
+  private fileCache?: Map<string, CompilationOutput>;
+  private inlineCache?: Map<string, CompilationOutput>;
   private modifiedResources = new Set<string>();
   private outputPathCounter = 1;
+
+  constructor(shouldCache: boolean) {
+    if (shouldCache) {
+      this.fileCache = new Map();
+      this.inlineCache = new Map();
+    }
+  }
 
   update(
     parentCompilation: Compilation,
@@ -35,12 +44,12 @@ export class WebpackResourceLoader {
     if (changedFiles) {
       for (const changedFile of changedFiles) {
         for (const affectedResource of this.getAffectedResources(changedFile)) {
-          this.cache.delete(normalizePath(affectedResource));
+          this.fileCache?.delete(normalizePath(affectedResource));
           this.modifiedResources.add(affectedResource);
         }
       }
     } else {
-      this.cache.clear();
+      this.fileCache?.clear();
     }
   }
 
@@ -236,15 +245,15 @@ export class WebpackResourceLoader {
 
   async get(filePath: string): Promise<string> {
     const normalizedFile = normalizePath(filePath);
-    let compilationResult = this.cache.get(normalizedFile);
+    let compilationResult = this.fileCache?.get(normalizedFile);
 
     if (compilationResult === undefined) {
       // cache miss so compile resource
       compilationResult = await this._compile(filePath);
 
       // Only cache if compilation was successful
-      if (compilationResult.success) {
-        this.cache.set(normalizedFile, compilationResult);
+      if (this.fileCache && compilationResult.success) {
+        this.fileCache.set(normalizedFile, compilationResult);
       }
     }
 
@@ -256,7 +265,16 @@ export class WebpackResourceLoader {
       return '';
     }
 
-    const compilationResult = await this._compile(undefined, data, mimeType);
+    const cacheKey = createHash('md5').update(data).digest('hex');
+    let compilationResult = this.inlineCache?.get(cacheKey);
+
+    if (compilationResult === undefined) {
+      compilationResult = await this._compile(undefined, data, mimeType);
+
+      if (this.inlineCache && compilationResult.success) {
+        this.inlineCache.set(cacheKey, compilationResult);
+      }
+    }
 
     return compilationResult.content;
   }
