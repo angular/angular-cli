@@ -265,6 +265,9 @@ export class AngularWebpackPlugin {
         // Rebuild any remaining AOT required modules
         await this.rebuildRequiredFiles(modules, compilation, fileEmitter);
 
+        // Clear out the Webpack compilation to avoid an extra retaining reference
+        resourceLoader.clearParentCompilation();
+
         // Analyze program for unused files
         if (compilation.errors.length > 0) {
           return;
