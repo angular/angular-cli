@@ -483,7 +483,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         ...extraRules,
       ],
     },
-    cache: !!buildOptions.watch && !cachingDisabled,
+    cache: !!buildOptions.watch && !cachingDisabled && {
+      type: 'memory',
+      maxGenerations: 1,
+    },
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: 'deterministic',
