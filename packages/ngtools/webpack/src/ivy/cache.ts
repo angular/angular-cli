@@ -11,36 +11,12 @@ import { normalizePath } from './paths';
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   private readonly angularDiagnostics = new Map<ts.SourceFile, ts.Diagnostic[]>();
 
-  invalidate(
-    fileTimestamps: Map<string, 'ignore' | number | { safeTime: number } | null>,
-    buildTimestamp: number,
-  ): Set<string> {
-    const changedFiles = new Set<string>();
-    for (const [file, timeOrEntry] of fileTimestamps) {
-      if (timeOrEntry === 'ignore') {
-        continue;
-      }
-
-      let time;
-      if (typeof timeOrEntry === 'number') {
-        time = timeOrEntry;
-      } else if (timeOrEntry) {
-        time = timeOrEntry.safeTime;
-      }
-
-      if (!time || time >= buildTimestamp) {
-        // Cache stores paths using the POSIX directory separator
-        const normalizedFile = normalizePath(file);
-        const sourceFile = this.get(normalizedFile);
-        if (sourceFile) {
-          this.delete(normalizedFile);
-          this.angularDiagnostics.delete(sourceFile);
-        }
-        changedFiles.add(normalizedFile);
-      }
+  invalidate(file: string): void {
+    const sourceFile = this.get(file);
+    if (sourceFile) {
+      this.delete(file);
+      this.angularDiagnostics.delete(sourceFile);
     }
-
-    return changedFiles;
   }
 
   updateAngularDiagnostics(sourceFile: ts.SourceFile, diagnostics: ts.Diagnostic[]): void {
