@@ -95,7 +95,6 @@ export class AngularWebpackPlugin {
   private ngtscNextProgram?: NgtscProgram;
   private builder?: ts.EmitAndSemanticDiagnosticsBuilderProgram;
   private sourceFileCache?: SourceFileCache;
-  private buildTimestamp!: number;
   private readonly fileDependencies = new Map<string, Set<string>>();
   private readonly requiredFilesToEmit = new Set<string>();
   private readonly requiredFilesToEmitCache = new Map<string, EmitFileResult | undefined>();
@@ -204,12 +203,15 @@ export class AngularWebpackPlugin {
       let cache = this.sourceFileCache;
       let changedFiles;
       if (cache) {
-        // Invalidate existing cache based on compiler file timestamps
-        changedFiles = cache.invalidate(compiler.fileTimestamps, this.buildTimestamp);
+        changedFiles = new Set<string>();
+        for (const changedFile of [...compiler.modifiedFiles, ...compiler.removedFiles]) {
+          const normalizedChangedFile = normalizePath(changedFile);
+          // Invalidate file dependencies
+          this.fileDependencies.delete(normalizedChangedFile);
+          // Invalidate existing cache
+          cache.invalidate(normalizedChangedFile);
 
-        // Invalidate file dependencies of changed files
-        for (const changedFile of changedFiles) {
-          this.fileDependencies.delete(normalizePath(changedFile));
+          changedFiles.add(normalizedChangedFile);
         }
       } else {
         // Initialize a new cache
@@ -219,7 +221,6 @@ export class AngularWebpackPlugin {
           this.sourceFileCache = cache;
         }
       }
-      this.buildTimestamp = Date.now();
       augmentHostWithCaching(host, cache);
 
       const moduleResolutionCache = ts.createModuleResolutionCache(
