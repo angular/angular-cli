@@ -121,6 +121,7 @@ export function getDevServerConfig(
       inline: hmr,
       publicPath: servePath,
       liveReload,
+      injectClient: liveReload,
       hotOnly: hmr && !liveReload,
       hot: hmr,
       proxy: addProxyConfig(root, proxyConfig),
