@@ -38,11 +38,11 @@
       "groupName": "angular",
       "pinVersions": false
     },
-   {
+    {
       "packagePatterns": [
         "^@babel\/.*"
       ],
-      "groupName": "Babel",
+      "groupName": "babel",
       "pinVersions": false
     },
     {
@@ -69,6 +69,20 @@
         "major"
       ],
       "enabled": false
+    },
+    {
+      "excludePackagePatterns": [
+        "^@angular/.*"
+      ],
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
     }
   ]
 }
