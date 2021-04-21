@@ -16,7 +16,7 @@ import {
   virtualFs,
   workspaces,
 } from '@angular-devkit/core';
-import { map, take, tap } from 'rxjs/operators';
+import { debounceTime, map, take, tap } from 'rxjs/operators';
 
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
@@ -87,6 +87,7 @@ describe('NgPackagr Builder', () => {
 
     await run.output.pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      debounceTime(1000),
       map(() => {
         const fileName = './dist/lib/fesm2015/lib.js';
         const content = virtualFs.fileBufferToString(
