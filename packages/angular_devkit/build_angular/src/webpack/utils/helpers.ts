@@ -121,7 +121,7 @@ export function isPolyfillsEntry(name: string): boolean {
 export function getWatchOptions(poll: number | undefined): Configuration['watchOptions'] {
   return {
     poll,
-    ignored: poll === undefined ? undefined : 'node_modules/**',
+    ignored: poll === undefined ? '**/$_lazy_route_resources' : 'node_modules/**',
   };
 }
 
