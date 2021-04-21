@@ -13,7 +13,7 @@ export type NormalizedOptimizationOptions = Required<Omit<OptimizationClass, 'fo
   styles: StylesClass,
 };
 
-export function normalizeOptimization(optimization: OptimizationUnion = false): NormalizedOptimizationOptions {
+export function normalizeOptimization(optimization: OptimizationUnion = true): NormalizedOptimizationOptions {
   if (typeof optimization === 'object') {
     return {
       scripts: !!optimization.scripts,

@@ -62,8 +62,8 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       expect(result?.success).toBe(true);
 
       harness.expectFile(MAIN_OUTPUT).toExist();
-      harness.expectFile(NAMED_LAZY_OUTPUT).toExist();
-      harness.expectFile(UNNAMED_LAZY_OUTPUT).toNotExist();
+      harness.expectFile(NAMED_LAZY_OUTPUT).toNotExist();
+      harness.expectFile(UNNAMED_LAZY_OUTPUT).toExist();
     });
   });
 });

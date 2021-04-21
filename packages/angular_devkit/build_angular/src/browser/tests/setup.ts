@@ -24,4 +24,8 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
   outputPath: 'dist',
   tsConfig: 'src/tsconfig.app.json',
   progress: false,
+
+  // Disable optimizations
+  optimization: false,
+  buildOptimizer: false,
 });

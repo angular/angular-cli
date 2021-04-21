@@ -281,6 +281,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         watch: true,
+        aot: false,
       });
 
       const buildCount = await harness

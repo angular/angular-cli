@@ -22,6 +22,13 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "progress": false,
+            "sourceMap": true,
+            "aot": false,
+            "vendorChunk": true,
+            "buildOptimizer": false,
+            "optimization": false,
+            "extractLicenses": false,
+            "namedChunks": true,
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -67,7 +74,10 @@
             "outputPath": "dist-server",
             "main": "src/main.server.ts",
             "tsConfig": "src/tsconfig.server.json",
-            "progress": false
+            "progress": false,
+            "sourceMap": true,
+            "optimization": false,
+            "extractLicenses": false
           }
         },
         "app-shell": {
