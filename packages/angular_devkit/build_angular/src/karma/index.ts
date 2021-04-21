@@ -12,7 +12,7 @@ import { dirname, resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
-import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { OutputHashing, Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
@@ -41,7 +41,18 @@ async function initialize(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
-    { ...((options as unknown) as BrowserBuilderOptions), outputPath: '', budgets: undefined },
+    {
+      ...((options as unknown) as BrowserBuilderOptions),
+      outputPath: '',
+      budgets: undefined,
+      optimization: false,
+      buildOptimizer: false,
+      aot: false,
+      vendorChunk: true,
+      namedChunks: true,
+      extractLicenses: false,
+      outputHashing: OutputHashing.None,
+    },
     context,
     wco => [
       getCommonConfig(wco),

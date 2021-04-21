@@ -22,7 +22,6 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/runtime.js').toExist();
       harness.expectFile('dist/main.js').toExist();
-      harness.expectFile('dist/vendor.js').toExist();
       harness.expectFile('dist/index.html').toExist();
     });
 
@@ -40,7 +39,6 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/runtime.js').toExist();
       harness.expectFile('dist/main.js').toExist();
-      harness.expectFile('dist/vendor.js').toNotExist();
       harness.expectFile('dist/index.html').toExist();
 
       harness.expectFile('dist/main.js').content.toContain(`console.log('main')`);
@@ -61,7 +59,6 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/runtime.js').toNotExist();
       harness.expectFile('dist/main.js').toNotExist();
-      harness.expectFile('dist/vendor.js').toNotExist();
       harness.expectFile('dist/index.html').toNotExist();
     });
   });

@@ -24,6 +24,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         polyfills: 'src/polyfills.ts',
         tsConfig: 'src/tsconfig.app.json',
         progress: false,
+        vendorChunk: true,
         assets: ['src/favicon.ico', 'src/assets'],
         styles: ['src/styles.css'],
         scripts: [],
@@ -33,13 +34,13 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.executeOnce();
 
       // Default files should be in outputPath.
-      expect(harness.hasFile('dist/runtime.js')).toBe(true);
-      expect(harness.hasFile('dist/main.js')).toBe(true);
-      expect(harness.hasFile('dist/polyfills.js')).toBe(true);
-      expect(harness.hasFile('dist/vendor.js')).toBe(true);
-      expect(harness.hasFile('dist/favicon.ico')).toBe(true);
-      expect(harness.hasFile('dist/styles.css')).toBe(true);
-      expect(harness.hasFile('dist/index.html')).toBe(true);
+      expect(harness.hasFile('dist/runtime.js')).toBeTrue();
+      expect(harness.hasFile('dist/main.js')).toBeTrue();
+      expect(harness.hasFile('dist/polyfills.js')).toBeTrue();
+      expect(harness.hasFile('dist/vendor.js')).toBeTrue();
+      expect(harness.hasFile('dist/favicon.ico')).toBeTrue();
+      expect(harness.hasFile('dist/styles.css')).toBeTrue();
+      expect(harness.hasFile('dist/index.html')).toBeTrue();
     });
   });
 });
