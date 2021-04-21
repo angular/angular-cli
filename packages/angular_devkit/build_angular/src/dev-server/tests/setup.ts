@@ -24,7 +24,7 @@ export const DEV_SERVER_BUILDER_INFO = Object.freeze({
 });
 
 /**
- * Contains all required extract-i18n builder fields.
+ * Contains all required dev-server builder fields.
  * The port is also set to zero to ensure a free port is used for each test which
  * supports parallel test execution.
  */

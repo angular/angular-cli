@@ -27,33 +27,20 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
           build: {
             builder: Builders.Browser,
             options: {
-              scripts: [
-                { lazy: true, name: 'bundle-1.js' },
-              ],
+              aot: true,
+              optimization: true,
               experimentalRollupPass: false,
-              sourceMaps: true,
               buildOptimizer: false,
               // tslint:disable-next-line:no-any
             } as any,
             configurations: {
               one: {
                 aot: true,
-                scripts: [
-                  { lazy: true, name: 'bundle-1.js' },
-                  { lazy: false, name: 'bundle-2.js' },
-                  { inject: true, name: 'bundle-3.js' },
-                  'bundle-4.js',
-                ],
-                styles: [
-                  { lazy: true, name: 'bundle-1.css' },
-                  { lazy: false, name: 'bundle-2.css' },
-                  { inject: true, name: 'bundle-3.css' },
-                  'bundle-3.css',
-                ],
               },
               two: {
                 experimentalRollupPass: true,
-                aot: true,
+                aot: false,
+                optimization: false,
               },
               // tslint:disable-next-line:no-any
             } as any,
@@ -85,9 +72,37 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
     const { options, configurations } = getBuildTarget(newTree);
 
     expect(options.experimentalRollupPass).toBeUndefined();
-    expect(options.sourceMaps).toBeTrue();
+    expect(options.buildOptimizer).toBeFalse();
     expect(configurations).toBeDefined();
     expect(configurations?.one.experimentalRollupPass).toBeUndefined();
     expect(configurations?.two.experimentalRollupPass).toBeUndefined();
+  });
+
+  it(`should remove value from "options" section which value is now the new default`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { options, configurations } = getBuildTarget(newTree);
+
+    expect(options.aot).toBeUndefined();
+    expect(configurations?.one.aot).toBeUndefined();
+    expect(configurations?.two.aot).toBeFalse();
+  });
+
+  it(`should remove value from "configuration" section when value is the same as that of "options"`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { options, configurations } = getBuildTarget(newTree);
+
+    expect(options.aot).toBeUndefined();
+    expect(configurations?.one.aot).toBeUndefined();
+    expect(configurations?.two.aot).toBeFalse();
+  });
+
+  it(`should add value in "options" section when option was not defined`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { options, configurations } = getBuildTarget(newTree);
+
+    expect(options.sourceMap).toBeTrue();
+    expect(configurations?.one.sourceMap).toBeUndefined();
+    expect(configurations?.two.sourceMap).toBeUndefined();
+    expect(configurations?.two.optimization).toBeFalse();
   });
 });

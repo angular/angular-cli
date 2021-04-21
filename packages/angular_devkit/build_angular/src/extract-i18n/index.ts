@@ -17,7 +17,7 @@ import type { Diagnostics } from '@angular/localize/src/tools/src/diagnostics';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
-import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { OutputHashing, Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
@@ -177,12 +177,15 @@ export async function execute(
       buildOptimizer: false,
       aot: true,
       progress: options.progress,
+      budgets: [],
       assets: [],
       scripts: [],
       styles: [],
       deleteOutputPath: false,
       extractLicenses: false,
       subresourceIntegrity: false,
+      outputHashing: OutputHashing.None,
+      namedChunks: true,
     },
     context,
     (wco) => {

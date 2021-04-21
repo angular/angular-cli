@@ -39,6 +39,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        vendorChunk: true,
       });
 
       const { result, logs } = await harness.executeOnce();
@@ -87,6 +88,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        vendorChunk: true,
         sourceMap: {
           scripts: true,
         },
@@ -119,6 +121,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        vendorChunk: true,
       });
 
       const { result, logs } = await harness.executeOnce();

@@ -16,6 +16,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     beforeEach(async () => {
       // Application code is not needed for asset tests
       await harness.writeFile('src/main.ts', '');
+      await harness.writeFile('src/polyfills.ts', '');
     });
 
     it('hashes all filenames when set to "all"', async () => {
@@ -27,6 +28,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
+        polyfills: 'src/polyfills.ts',
         outputHashing: OutputHashing.All,
       });
 
@@ -48,6 +50,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        polyfills: 'src/polyfills.ts',
         styles: ['src/styles.css'],
       });
 
@@ -70,6 +73,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
+        polyfills: 'src/polyfills.ts',
         outputHashing: OutputHashing.None,
       });
 
@@ -92,6 +96,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
+        polyfills: 'src/polyfills.ts',
         outputHashing: OutputHashing.Media,
       });
 
@@ -114,6 +119,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
+        polyfills: 'src/polyfills.ts',
         outputHashing: OutputHashing.Bundles,
       });
 
@@ -131,6 +137,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         outputHashing: OutputHashing.All,
+        sourceMap: true,
         styles: [{
           input: 'src/styles.css',
           inject: false,
