@@ -5,9 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { execSync } from 'child_process';
 import * as path from 'path';
 import { Command } from '../models/command';
 import { colors } from '../utilities/color';
+import { getPackageManager } from '../utilities/package-manager';
 import { Schema as VersionCommandSchema } from './version';
 
 interface PartialPackageInfo {
@@ -105,6 +107,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       `
       Angular CLI: ${ngCliVersion}
       Node: ${process.versions.node}
+      Package Manager: ${await this.getPackageManager()}
       OS: ${process.platform} ${process.arch}
 
       Angular: ${angularCoreVersion}
@@ -162,5 +165,16 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     }
 
     return version || '<error>';
+  }
+
+  private async getPackageManager(): Promise<string> {
+    try {
+      const manager = await getPackageManager(this.context.root);
+      const version = execSync(`${manager} --version`, { encoding: 'utf8', stdio: 'pipe' }).trim();
+
+      return `${manager} ${version}`;
+    } catch {
+      return '<error>';
+    }
   }
 }
