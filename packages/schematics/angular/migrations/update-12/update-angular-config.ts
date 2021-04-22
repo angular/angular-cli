@@ -47,6 +47,7 @@ export default function (): Rule {
       for (const [, options] of allTargetOptions(target)) {
         delete options.experimentalRollupPass;
         delete options.lazyModules;
+        delete options.forkTypeChecker;
       }
     }
   });
