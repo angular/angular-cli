@@ -151,7 +151,7 @@ describe('Browser Builder rebuilds', () => {
     `,
     );
 
-    const overrides = { watch: true, forkTypeChecker: false };
+    const overrides = { watch: true };
     const logger = new logging.Logger('');
     let logs: string[] = [];
     logger.subscribe(e => logs.push(e.message));
@@ -344,7 +344,7 @@ describe('Browser Builder rebuilds', () => {
     // `selector must be a string` errors on VE are part of the emit result, but on Ivy they only
     // show up in getNgSemanticDiagnostics. Since getNgSemanticDiagnostics is only called on the
     // type checker, we must disable it to get a failing fourth build with Ivy.
-    const overrides = { watch: true, aot: true, forkTypeChecker: false };
+    const overrides = { watch: true, aot: true };
     const logger = new logging.Logger('');
     let logs: string[] = [];
     logger.subscribe(e => logs.push(e.message));

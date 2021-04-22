@@ -57,7 +57,6 @@ export interface BuildOptions {
   serviceWorker?: boolean;
   webWorkerTsConfig?: string;
   statsJson: boolean;
-  forkTypeChecker: boolean;
   hmr?: boolean;
   main: string;
   polyfills?: string;

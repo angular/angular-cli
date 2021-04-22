@@ -220,11 +220,6 @@
       "description": "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
       "default": false
     },
-    "forkTypeChecker": {
-      "type": "boolean",
-      "description": "Run the TypeScript type checker in a forked process.",
-      "default": true
-    },
     "watch": {
       "type": "boolean",
       "description": "Run build when files change.",
