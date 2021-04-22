@@ -74,11 +74,19 @@ export default function (options: E2eOptions): Rule {
           }),
           move(root),
         ])),
-      host => addPackageJsonDependency(host, {
+      host => [{
         type: NodeDependencyType.Dev,
         name: 'protractor',
         version: '~7.0.0',
-      }),
+      },       {
+        type: NodeDependencyType.Dev,
+        name: 'jasmine-spec-reporter',
+        version: '~7.0.0',
+      },       {
+        type: NodeDependencyType.Dev,
+        name: 'ts-node',
+        version: '~9.1.1',
+      }].forEach(dep => addPackageJsonDependency(host, dep)),
       addScriptsToPackageJson(),
     ]);
   };
