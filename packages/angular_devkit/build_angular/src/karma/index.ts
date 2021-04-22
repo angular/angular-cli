@@ -52,6 +52,11 @@ async function initialize(
       namedChunks: true,
       extractLicenses: false,
       outputHashing: OutputHashing.None,
+      // The webpack tier owns the watch behavior so we want to force it in the config.
+      // When not in watch mode, webpack-dev-middleware will call `compiler.watch` anyway.
+      // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
+      // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
+      watch: true,
     },
     context,
     wco => [
@@ -86,13 +91,16 @@ export function execute(
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
+  let singleRun: boolean | undefined;
+  if (options.watch !== undefined) {
+    singleRun = !options.watch;
+  }
+
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     switchMap(async ([karma, webpackConfig]) => {
-      const karmaOptions: KarmaConfigOptions = {};
-
-      if (options.watch !== undefined) {
-        karmaOptions.singleRun = !options.watch;
-      }
+      const karmaOptions: KarmaConfigOptions = {
+        singleRun,
+      };
 
       // Convert browsers from a string to an array
       if (options.browsers) {
