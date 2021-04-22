@@ -128,12 +128,6 @@ const init: any = (config: any, emitter: any) => {
   config.middleware = config.middleware || [];
   config.middleware.push('@angular-devkit/build-angular--fallback');
 
-  // The webpack tier owns the watch behavior so we want to force it in the config.
-  // When not in watch mode, webpack-dev-middleware will call `compiler.watch` anyway.
-  // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
-  // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
-  webpackConfig.watch = true;
-
   if (config.singleRun) {
     // There's no option to turn off file watching in webpack-dev-server, but
     // we can override the file watcher instead.
