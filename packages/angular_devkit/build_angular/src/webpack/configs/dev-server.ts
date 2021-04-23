@@ -126,7 +126,7 @@ export function getDevServerConfig(
       hot: hmr,
       proxy: addProxyConfig(root, proxyConfig),
       contentBase: false,
-      logLevel: 'silent',
+      logLevel: 'error',
     } as Configuration & { logLevel: Configuration['clientLogLevel'] },
   };
 }
