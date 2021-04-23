@@ -14,6 +14,10 @@ import { ApplicationPresetOptions } from './presets/application';
 interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLinker' | 'i18n'> {
   forceAsyncTransformation: boolean;
   forceES5: boolean;
+  optimize?: {
+    pureTopLevel: boolean;
+    wrapDecorators: boolean;
+  };
 }
 
 function requiresLinking(path: string, source: string): boolean {
@@ -37,7 +41,7 @@ export default custom<AngularCustomOptions>(() => {
   });
 
   return {
-    async customOptions({ i18n, scriptTarget, aot, ...rawOptions }, { source }) {
+    async customOptions({ i18n, scriptTarget, aot, optimize, ...rawOptions }, { source }) {
       // Must process file if plugins are added
       let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
 
@@ -80,6 +84,19 @@ export default custom<AngularCustomOptions>(() => {
         shouldProcess = true;
       }
 
+      if (optimize) {
+        customOptions.optimize = {
+          // Angular packages provide additional tested side effects guarantees and can use
+          // otherwise unsafe optimizations.
+          pureTopLevel: /[\\\/]node_modules[\\\/]@angular[\\\/]/.test(this.resourcePath),
+          // JavaScript modules that are marked as side effect free are considered to have
+          // no decorators that contain non-local effects.
+          wrapDecorators: !!this._module?.factoryMeta?.sideEffectFree,
+        };
+
+        shouldProcess = true;
+      }
+
       // Add provided loader options to default base options
       const loaderOptions: Record<string, unknown> = {
         ...baseOptions,
@@ -101,12 +118,29 @@ export default custom<AngularCustomOptions>(() => {
       return { custom: customOptions, loader: loaderOptions };
     },
     config(configuration, { customOptions }) {
+      const plugins = configuration.options.plugins ?? [];
+      if (customOptions.optimize) {
+        if (customOptions.optimize.pureTopLevel) {
+          plugins.push(require('./plugins/pure-toplevel-functions').default);
+        }
+
+        plugins.push(
+          require('./plugins/elide-angular-metadata').default,
+          require('./plugins/adjust-typescript-enums').default,
+          [
+            require('./plugins/adjust-static-class-members').default,
+            { wrapDecorators: customOptions.optimize.wrapDecorators },
+          ],
+        );
+      }
+
       return {
         ...configuration.options,
         // Workaround for https://github.com/babel/babel-loader/pull/896 is available
         // Delete once the above PR is released
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         inputSourceMap: configuration.options.inputSourceMap || (false as any), // Typings are not correct
+        plugins,
         presets: [
           ...(configuration.options.presets || []),
           [

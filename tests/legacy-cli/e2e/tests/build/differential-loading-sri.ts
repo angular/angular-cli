@@ -41,12 +41,7 @@ export default async function () {
 
   await ng('generate', 'module', 'lazy', '--module=app.module', '--route', 'lazy');
 
-  await ng(
-    'build',
-    '--subresource-integrity',
-    '--output-hashing=none',
-    '--output-path=dist/first',
-  );
+  await ng('build', '--subresource-integrity', '--output-hashing=none', '--output-path=dist/first');
 
   // Second build used to ensure cached files use correct integrity values
   await ng(
@@ -56,7 +51,7 @@ export default async function () {
     '--output-path=dist/second',
   );
 
-  const chunkId = '265';
+  const chunkId = '86';
   const codeHashES5 = createHash('sha384')
     .update(await readFile(`dist/first/${chunkId}-es5.js`))
     .digest('base64');

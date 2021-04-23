@@ -17,11 +17,7 @@ export default async function () {
   const workerTsConfig = 'tsconfig.worker.json';
 
   // Enable Differential loading to run both size checks
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await replaceInFile('.browserslistrc', 'not IE 11', 'IE 11');
 
   await ng('generate', 'web-worker', 'app');
   await expectFileToExist(workerPath);
@@ -36,7 +32,7 @@ export default async function () {
   await expectFileToMatch('dist/test-project/main-es2017.js', 'src_app_app_worker_ts');
 
   await ng('build', '--output-hashing=none');
-  const chunkId = '954';
+  const chunkId = '151';
   await expectFileToExist(`dist/test-project/${chunkId}-es5.js`);
   await expectFileToMatch('dist/test-project/main-es5.js', chunkId);
   await expectFileToExist(`dist/test-project/${chunkId}-es2017.js`);
@@ -46,7 +42,9 @@ export default async function () {
   // https://github.com/angular/protractor/issues/2207
   await replaceInFile('src/app/app.component.ts', 'console.log', 'console.warn');
 
-  await writeFile('e2e/app.e2e-spec.ts', `
+  await writeFile(
+    'e2e/app.e2e-spec.ts',
+    `
     import { AppPage } from './app.po';
     import { browser, logging } from 'protractor';
     describe('worker bundle', () => {
@@ -58,7 +56,8 @@ export default async function () {
         expect(logs[0].message).toContain('page got message: worker response to hello');
       });
     });
-  `);
+  `,
+  );
 
   await ng('e2e');
 }
