@@ -177,7 +177,7 @@
     "npm-registry-client": "8.6.0",
     "open": "8.0.6",
     "ora": "5.4.0",
-    "pacote": "11.3.2",
+    "pacote": "11.3.3",
     "parse5-html-rewriting-stream": "6.0.1",
     "pidtree": "^0.5.0",
     "pidusage": "^2.0.17",
