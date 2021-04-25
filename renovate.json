@@ -22,7 +22,8 @@
     "master"
   ],
   "ignoreDeps": [
-    "@types/node"
+    "@types/node",
+    "quicktype-core"
   ],
   "packageFiles": [
     "WORKSPACE",
