@@ -220,9 +220,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
     extraPlugins.push(new CopyWebpackPlugin({
       patterns: copyWebpackPluginPatterns,
-    // The typings for copy-webpack-plugin use the old @types/webpack package
-    // tslint:disable-next-line: no-any
-    }) as any);
+    }));
   }
 
   if (buildOptions.progress) {
