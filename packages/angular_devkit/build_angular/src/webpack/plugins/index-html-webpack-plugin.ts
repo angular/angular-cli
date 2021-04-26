@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { basename, dirname, extname } from 'path';
 import { Compilation, Compiler, sources } from 'webpack';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
