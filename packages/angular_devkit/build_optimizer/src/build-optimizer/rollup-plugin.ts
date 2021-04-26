@@ -1,11 +1,10 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 /**
  * @fileoverview This adapts the buildOptimizer to run over each file as it is
  * processed by Rollup. We must do this since buildOptimizer expects to see the

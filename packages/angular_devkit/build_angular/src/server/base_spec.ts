@@ -1,11 +1,10 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 import { Architect } from '@angular-devkit/architect';
 import { ServerBuilderOutput } from '@angular-devkit/build-angular';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';

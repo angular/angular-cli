@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of } from 'rxjs';

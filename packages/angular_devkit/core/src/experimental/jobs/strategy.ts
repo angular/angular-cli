@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { Observable, Subject, concat, of } from 'rxjs';
 import { finalize, ignoreElements, share, shareReplay, tap } from 'rxjs/operators';
 import { JsonValue } from '../../json';
