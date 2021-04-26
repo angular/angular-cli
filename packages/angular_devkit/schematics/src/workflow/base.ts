@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { logging, schema, virtualFs } from '@angular-devkit/core';
 import { EMPTY, Observable, Subject, concat, from, of, throwError } from 'rxjs';
 import { concatMap, defaultIfEmpty, ignoreElements, last, tap } from 'rxjs/operators';

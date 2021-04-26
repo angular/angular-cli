@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compiler-cli';
 import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
 import { createHash } from 'crypto';
