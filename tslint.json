@@ -134,7 +134,10 @@
     "curly": true,
     "file-header": [
       true,
-      "Copyright Google Inc\\. All Rights Reserved\\."
+      {
+        "match": "Copyright Google LLC",
+        "allow-single-line-comments": false
+      }
     ],
     "variable-name": [
       true,
