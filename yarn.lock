@@ -86,7 +86,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#5b8b7a8b04e205eea784168a511c0258fb9995f3":
   version "0.0.0"
-  uid "5b8b7a8b04e205eea784168a511c0258fb9995f3"
   resolved "https://github.com/angular/dev-infra-private-builds.git#5b8b7a8b04e205eea784168a511c0258fb9995f3"
   dependencies:
     "@angular/benchpress" "0.2.1"
@@ -1287,28 +1286,28 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@bazel/bazelisk@1.7.5":
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.7.5.tgz#dd1a52e3d23464f72de55aa3dc4777847fa85373"
-  integrity sha512-JHwP9JhfZUSoj4sku471Bjw4uE773U2Agujnx0CdPkeRk25khy1l3VyjaPaHB+z1fmMnM6ED3M7tetQUsovUQg==
+"@bazel/bazelisk@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.8.0.tgz#7bdb7c7068d4779ba8ddbf8cd72afb9b2099bb6e"
+  integrity sha512-RcovBpVPlLptW/+j1+Xbnr4+Ooy1HO8bG2ECAC0pegLvKFWhO6X3twLKKAJ2KQ4jkoeE0xzUUWIL9zyaIsNxLA==
 
 "@bazel/buildifier@4.0.1", "@bazel/buildifier@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.0.1.tgz#52cfbad5cbb86e9183a29dde2370cd465730ea0d"
   integrity sha512-BTmtvJbeeEVrqRApI1gr5hvPgYcHLpdGJ5EXNXEWO692ztMPSj5fB/dH0xUlaW45jn6LimYx8ymqTMhj3538og==
 
-"@bazel/jasmine@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.4.0.tgz#d85d8b9156821f1a2aadca55faedb3d7990bb018"
-  integrity sha512-TnXLJ/4gcM9KyWtfjv8ZrzNbR0teUYRIoLborbJUXVbMYYKjKOQ+rWzwGUIb6Gf4gJ8M7VmfrpzK8vBUjowkJw==
+"@bazel/jasmine@3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-3.4.1.tgz#0f9f4fbf973e4c8b8411c2bf3086a6d2398ffcab"
+  integrity sha512-nbyg5+6m+KUEmxQX5N65gfV+zTUbIjXYq/m3zYFr/hx1Ql/n2tVBBHcxRO4pAbjDhnpuFQgFoAJPzKe5sIL2iA==
   dependencies:
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
-"@bazel/typescript@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.4.0.tgz#031d989682ff8605ed8745f31448c2f76a1b653a"
-  integrity sha512-XlWrlQnsdQHTwsliUAf4mySHOgqRY2S57LKG2rKRjm+a015Lzlmxo6jRQaxjr68UmuhmlklRw0WfCFxdR81AvQ==
+"@bazel/typescript@3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-3.4.1.tgz#ec52292b240157cd2d874ff7ea7857da8416c00c"
+  integrity sha512-OKpfjFRhudsaUBL3xH1oAbat+bwdRyfAOTn2qgMQSO3vR4ZBBVYk7GVMJzWamLkbDS0aY5ws5wLfDScJSKD2ww==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
@@ -9831,7 +9830,16 @@ postcss@7.0.21:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@8.2.10, postcss@^8.2.10:
+postcss@8.2.13:
+  version "8.2.13"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.13.tgz#dbe043e26e3c068e45113b1ed6375d2d37e2129f"
+  integrity sha512-FCE5xLH+hjbzRdpbRb1IMCvPv9yZx2QnDarBEYSN0N0HYk+TcXsEhwdFcFb+SRWOKzKGErhIEbBK2ogyLdTtfQ==
+  dependencies:
+    colorette "^1.2.2"
+    nanoid "^3.1.22"
+    source-map "^0.6.1"
+
+postcss@^8.2.10:
   version "8.2.10"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.10.tgz#ca7a042aa8aff494b334d0ff3e9e77079f6f702b"
   integrity sha512-b/h7CPV7QEdrqIxtAf2j31U5ef05uBDuvoXv6L51Q4rcS1jdlXAVKJv+atCFdUXYl9dyTHGyoMzIepwowRJjFw==
@@ -11725,10 +11733,10 @@ terser-webpack-plugin@^5.1.1:
     source-map "^0.6.1"
     terser "^5.5.1"
 
-terser@5.6.1:
-  version "5.6.1"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-5.6.1.tgz#a48eeac5300c0a09b36854bf90d9c26fb201973c"
-  integrity sha512-yv9YLFQQ+3ZqgWCUk+pvNJwgUTdlIxUk1WTN+RnaFJe2L7ipG2csPT0ra2XRm7Cs8cxN7QXmK1rFzEwYEQkzXw==
+terser@5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.7.0.tgz#a761eeec206bc87b605ab13029876ead938ae693"
+  integrity sha512-HP5/9hp2UaZt5fYkuhNBR8YyRcT8juw8+uFbAme53iN9hblvKnLUTKkmwJG6ocWpIKf8UK4DoeWG4ty0J6S6/g==
   dependencies:
     commander "^2.20.0"
     source-map "~0.7.2"
