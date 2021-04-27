@@ -13,7 +13,7 @@ import { Schema as ServeCommandSchema } from './serve';
 export class ServeCommand extends ArchitectCommand<ServeCommandSchema> {
   public readonly target = 'serve';
 
-  public validate(_options: ArchitectCommandOptions & Arguments) {
+  public validate() {
     return true;
   }
 
