@@ -1,1 +1,9 @@
+/bazel-out/
+/dist-schema/
 /etc/api
+/tests/
+/README.md
+/CONTRIBUTING.md
+.yarn/
+dist/
+third_party/
