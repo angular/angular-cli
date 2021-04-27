@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -96,8 +96,8 @@ class FetchingJSONSchemaStore extends JSONSchemaStore {
 
 /**
  * Create the TS file from the schema, and overwrite the outPath (or log).
- * @param {string} inPath 
- * @param {string} outPath 
+ * @param {string} inPath
+ * @param {string} outPath
  */
 async function main(inPath, outPath) {
   const content = await generate(inPath);

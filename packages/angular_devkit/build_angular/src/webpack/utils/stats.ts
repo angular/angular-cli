@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -191,7 +191,7 @@ function statsToString(json: any, statsConfig: any, bundleState?: BundleStats[])
 
   const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
 
-  // In some cases we do things outside of webpack context 
+  // In some cases we do things outside of webpack context
   // Such us index generation, service worker augmentation etc...
   // This will correct the time and include these.
   const time = (Date.now() - json.builtAt) + json.time;
