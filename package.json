@@ -33,7 +33,7 @@
     "validate": "node ./bin/devkit-admin validate",
     "postinstall": "yarn webdriver-update && yarn ngcc && yarn husky install",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
-    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 89.0.4389.0",
+    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 91.0.4472.19",
     "ngcc": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
   },
   "repository": {
