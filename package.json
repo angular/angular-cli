@@ -41,7 +41,7 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": ">=12.13.0 <15.0.0",
+    "node": "^12.14.1 || ^14.0.0",
     "yarn": ">=1.21.1 <2",
     "npm": "Please use yarn instead of NPM to install dependencies"
   },
