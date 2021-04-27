@@ -9,26 +9,11 @@
 import JestWorker from 'jest-worker';
 import * as os from 'os';
 import * as path from 'path';
-import * as v8 from 'v8';
+import { serialize } from 'v8';
 import { BundleActionCache } from './action-cache';
 import { I18nOptions } from './i18n-options';
 import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 import { maxWorkers } from './workers';
-
-const hasThreadSupport = (() => {
-  try {
-    require('worker_threads');
-
-    return true;
-  } catch {
-    return false;
-  }
-})();
-
-// This is used to normalize serialization messaging across threads and processes
-// Threads use the structured clone algorithm which handles more types
-// Processes use JSON which is much more limited
-const serialize = ((v8 as unknown) as { serialize(value: unknown): Buffer }).serialize;
 
 let workerFile = require.resolve('./process-bundle');
 workerFile =
@@ -77,9 +62,9 @@ export class BundleActionExecutor {
     // The limited number also prevents a large increase in memory usage for an otherwise short operation
     return (this.smallWorker = new JestWorker(workerFile, {
       exposedMethods: ['process', 'inlineLocales'],
-      setupArgs: hasThreadSupport ? [this.workerOptions] : [[...serialize(this.workerOptions)]],
+      setupArgs: [this.workerOptions],
       numWorkers: os.cpus().length < 2 ? 1 : 2,
-      enableWorkerThreads: hasThreadSupport,
+      enableWorkerThreads: true,
     }));
   }
 
