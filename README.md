@@ -49,7 +49,7 @@ To get started locally, follow these instructions:
 
 1. If you haven't done it already, [make a fork of this repo](https://github.com/angular/angular-cli/fork).
 1. Clone to your local computer using `git`.
-1. Make sure that you have Node 10.13 or later installed. See instructions [here](https://nodejs.org/en/download/).
+1. Make sure that you have Node 12.14 or 14.0 installed. See instructions [here](https://nodejs.org/en/download/).
 1. Make sure that you have `yarn` installed; see instructions [here](https://yarnpkg.com/lang/en/docs/install/).
 1. Run `yarn` (no arguments) from the root of your clone of this project to install dependencies.
 
