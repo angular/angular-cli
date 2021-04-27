@@ -435,7 +435,7 @@ function _usageMessage(
         target,
       };
     })
-    .filter(({ name, info, version, target }) => {
+    .filter(({ info, version, target }) => {
       return (target && semver.compare(info.installed.version, version) < 0);
     })
     .filter(({ target }) => {

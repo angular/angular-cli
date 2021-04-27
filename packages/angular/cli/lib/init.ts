@@ -12,7 +12,6 @@ import 'symbol-observable';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
-import { Duplex } from 'stream';
 import { colors } from '../utilities/color';
 import { isWarningEnabled } from '../utilities/config';
 
