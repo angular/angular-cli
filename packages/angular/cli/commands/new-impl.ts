@@ -8,7 +8,6 @@
 
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
-import { ensureCompatibleNpm } from '../utilities/package-manager';
 import { Schema as NewCommandSchema } from './new';
 
 

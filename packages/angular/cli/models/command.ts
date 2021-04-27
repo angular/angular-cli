@@ -52,7 +52,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     return 0;
   }
 
-  async printJsonHelp(_options: T & Arguments): Promise<number> {
+  async printJsonHelp(): Promise<number> {
     const replacer = (key: string, value: string) => key === 'name'
       ? strings.dasherize(value)
       : value;
@@ -176,7 +176,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     if (options.help === true) {
       return this.printHelp();
     } else if (options.help === 'json' || options.help === 'JSON') {
-      return this.printJsonHelp(options);
+      return this.printJsonHelp();
     } else {
       const startTime = +new Date();
       if (this.useReportAnalytics) {
