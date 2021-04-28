@@ -71,7 +71,6 @@ function resolveGlobalStyles(
 // tslint:disable-next-line: no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-  const postcssImports = require('postcss-import');
   const postcssPresetEnv: typeof import('postcss-preset-env') = require('postcss-preset-env');
 
   const { root, buildOptions } = wco;
@@ -167,23 +166,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
           }
         : undefined,
       plugins: [
-        postcssImports({
-          resolve: (url: string) => (url.startsWith('~') ? url.substr(1) : url),
-          load: (filename: string) => {
-            return new Promise<string>((resolve, reject) => {
-              loader.fs.readFile(filename, (err: Error, data: Buffer) => {
-                if (err) {
-                  reject(err);
-
-                  return;
-                }
-
-                const content = data.toString();
-                resolve(content);
-              });
-            });
-          },
-        }),
         PostcssCliResources({
           baseHref: buildOptions.baseHref,
           deployUrl: buildOptions.deployUrl,

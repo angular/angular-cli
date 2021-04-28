@@ -165,7 +165,6 @@ ts_library(
         "@npm//ora",
         "@npm//parse5-html-rewriting-stream",
         "@npm//postcss",
-        "@npm//postcss-import",
         "@npm//postcss-loader",
         "@npm//postcss-preset-env",
         "@npm//raw-loader",
