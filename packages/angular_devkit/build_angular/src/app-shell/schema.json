@@ -33,8 +33,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "browserTarget",
-    "serverTarget"
-  ]
+  "required": ["browserTarget", "serverTarget"]
 }

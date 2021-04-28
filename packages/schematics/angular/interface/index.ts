@@ -23,7 +23,6 @@ import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as InterfaceOptions } from './schema';
 
-
 export default function (options: InterfaceOptions): Rule {
   return async (host: Tree) => {
     if (options.path === undefined) {

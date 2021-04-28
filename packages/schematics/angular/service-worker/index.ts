@@ -21,7 +21,12 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addSymbolToNgModuleMetadata, getEnvironmentExportName, insertImport, isImported } from '../utility/ast-utils';
+import {
+  addSymbolToNgModuleMetadata,
+  getEnvironmentExportName,
+  insertImport,
+  isImported,
+} from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
@@ -101,7 +106,11 @@ function updateAppModule(mainPath: string): Rule {
     `;
     moduleSource = getTsSourceFile(host, modulePath);
     const metadataChanges = addSymbolToNgModuleMetadata(
-      moduleSource, modulePath, 'imports', importText);
+      moduleSource,
+      modulePath,
+      'imports',
+      importText,
+    );
     if (metadataChanges) {
       const recorder = host.beginUpdate(modulePath);
       applyToUpdateRecorder(recorder, metadataChanges);
@@ -137,7 +146,7 @@ export default function (options: ServiceWorkerOptions): Rule {
     if (!buildTarget) {
       throw targetBuildNotFoundError();
     }
-    const buildOptions = (buildTarget.options || {}) as unknown as BrowserBuilderOptions;
+    const buildOptions = ((buildTarget.options || {}) as unknown) as BrowserBuilderOptions;
     const root = project.root;
     buildOptions.serviceWorker = true;
     buildOptions.ngswConfigPath = join(normalize(root), 'ngsw-config.json');

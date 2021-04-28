@@ -134,19 +134,21 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
       createEs2015LinkerPlugin,
     } = require('@angular/compiler-cli/linker/babel') as typeof import('@angular/compiler-cli/linker/babel');
 
-    plugins.push(createEs2015LinkerPlugin({
-      linkerJitMode: options.angularLinker.jitMode,
-      logger: createNgtscLogger(options.diagnosticReporter),
-      fileSystem: {
-        resolve: path.resolve,
-        exists: fs.existsSync,
-        dirname: path.dirname,
-        relative: path.relative,
-        readFile: fs.readFileSync,
-      // Node.JS types don't overlap the Compiler types.
-      // tslint:disable-next-line: no-any
-      } as any,
-    }));
+    plugins.push(
+      createEs2015LinkerPlugin({
+        linkerJitMode: options.angularLinker.jitMode,
+        logger: createNgtscLogger(options.diagnosticReporter),
+        fileSystem: {
+          resolve: path.resolve,
+          exists: fs.existsSync,
+          dirname: path.dirname,
+          relative: path.relative,
+          readFile: fs.readFileSync,
+          // Node.JS types don't overlap the Compiler types.
+          // tslint:disable-next-line: no-any
+        } as any,
+      }),
+    );
   }
 
   if (options.forceES5) {

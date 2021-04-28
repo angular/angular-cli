@@ -13,7 +13,5 @@
       "description": "Author for the new schematic."
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": ["name"]
 }

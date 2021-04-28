@@ -9,7 +9,6 @@
 import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { RunSchematicName, RunSchematicTaskOptions } from './options';
 
-
 export class RunSchematicTask<T> implements TaskConfigurationGenerator<RunSchematicTaskOptions<T>> {
   protected _collection: string | null;
   protected _schematic: string;

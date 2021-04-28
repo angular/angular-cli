@@ -11,38 +11,48 @@ import { toArray } from 'rxjs/operators';
 import { defaultStatsCapture } from './default-stats-capture';
 import { AggregatedProcessStats } from './interfaces';
 
-
 describe('defaultStatsCapture', () => {
   it('works', async () => {
-    const stats$ = new Observable<AggregatedProcessStats>(obs => {
+    const stats$ = new Observable<AggregatedProcessStats>((obs) => {
       const ignoredStats = { ppid: 1, pid: 1, ctime: 1, timestamp: 1 };
       obs.next({
-        processes: 1, cpu: 0, memory: 10 * 1e6, elapsed: 1000,
+        processes: 1,
+        cpu: 0,
+        memory: 10 * 1e6,
+        elapsed: 1000,
         ...ignoredStats,
       });
       obs.next({
-        processes: 3, cpu: 40, memory: 2 * 1e6, elapsed: 2000,
+        processes: 3,
+        cpu: 40,
+        memory: 2 * 1e6,
+        elapsed: 2000,
         ...ignoredStats,
       });
       obs.next({
-        processes: 5, cpu: 20, memory: 3 * 1e6, elapsed: 3000,
+        processes: 5,
+        cpu: 20,
+        memory: 3 * 1e6,
+        elapsed: 3000,
         ...ignoredStats,
       });
       obs.complete();
     });
 
     const res = await defaultStatsCapture(stats$).pipe(toArray()).toPromise();
-    expect(res).toEqual([{
-      name: 'Process Stats',
-      metrics: [
-        { name: 'Elapsed Time', unit: 'ms', value: 3000 },
-        { name: 'Average Process usage', unit: 'process(es)', value: 3 },
-        { name: 'Peak Process usage', unit: 'process(es)', value: 5 },
-        { name: 'Average CPU usage', unit: '%', value: 20 },
-        { name: 'Peak CPU usage', unit: '%', value: 40 },
-        { name: 'Average Memory usage', unit: 'MB', value: 5 },
-        { name: 'Peak Memory usage', unit: 'MB', value: 10 },
-      ],
-    }]);
+    expect(res).toEqual([
+      {
+        name: 'Process Stats',
+        metrics: [
+          { name: 'Elapsed Time', unit: 'ms', value: 3000 },
+          { name: 'Average Process usage', unit: 'process(es)', value: 3 },
+          { name: 'Peak Process usage', unit: 'process(es)', value: 5 },
+          { name: 'Average CPU usage', unit: '%', value: 20 },
+          { name: 'Peak CPU usage', unit: '%', value: 40 },
+          { name: 'Average Memory usage', unit: 'MB', value: 5 },
+          { name: 'Peak Memory usage', unit: 'MB', value: 10 },
+        ],
+      },
+    ]);
   });
 });

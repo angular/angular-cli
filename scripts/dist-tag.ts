@@ -42,7 +42,7 @@ interface DistTagOptions {
 /**
  * This function adds a tag to all public packages in the CLI repo.
  */
-export default function(args: Partial<DistTagOptions>, logger: logging.Logger) {
+export default function (args: Partial<DistTagOptions>, logger: logging.Logger) {
   if (args.help) {
     logger.info(`dist-tag adds a tag to all public packages in the CLI repo.
 
@@ -55,23 +55,25 @@ Usage:
 
     return;
   }
-  const {version, tag, registry: registryArg} = args;
+  const { version, tag, registry: registryArg } = args;
   if (!version || version.startsWith('v')) {
     throw new Error('Version must be specified in format d+.d+.d+');
   }
   if (version.startsWith('0')) {
-    throw new Error(`Major version must be > 0, did you mean ${stableToExperimentalVersion(version)}?`);
+    throw new Error(
+      `Major version must be > 0, did you mean ${stableToExperimentalVersion(version)}?`,
+    );
   }
   if (!tag) {
     throw new Error('Tag must be non-empty, for example: latest, next, v10-lts, etc');
   }
   const registry = registryArg ?? wombat;
-  const publicPackages = Object.values(packages).filter(p => !p.private);
-  for (const {name, experimental} of publicPackages) {
+  const publicPackages = Object.values(packages).filter((p) => !p.private);
+  for (const { name, experimental } of publicPackages) {
     const actualVersion = experimental ? stableToExperimentalVersion(version) : version;
     // See https://docs.npmjs.com/cli/dist-tag for documentation
     const cmd = `npm dist-tag add '${name}@${actualVersion}' '${tag}' --registry '${registry}'`;
-    logger.debug(cmd);  // print debug output by specifying --verbose
+    logger.debug(cmd); // print debug output by specifying --verbose
     const output = execSync(cmd, { encoding: 'utf8' });
     logger.info(output.trim());
   }

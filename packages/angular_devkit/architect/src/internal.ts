@@ -35,7 +35,7 @@ export const BuilderVersionSymbol = Symbol.for('@angular-devkit/architect:versio
 export type BuilderJobHandler<
   A extends json.JsonObject = json.JsonObject,
   I extends BuilderInput = BuilderInput,
-  O extends BuilderOutput = BuilderOutput,
+  O extends BuilderOutput = BuilderOutput
 > = experimental.jobs.JobHandler<A, I, O> & { jobDescription: BuilderDescription };
 
 /**

@@ -29,7 +29,6 @@ import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as PipeOptions } from './schema';
 
-
 function addDeclarationToNgModule(options: PipeOptions): Rule {
   return (host: Tree) => {
     if (options.skipImport || !options.module) {
@@ -44,14 +43,18 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
     const sourceText = text.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
-    const pipePath = `/${options.path}/`
-                     + (options.flat ? '' : strings.dasherize(options.name) + '/')
-                     + strings.dasherize(options.name)
-                     + '.pipe';
+    const pipePath =
+      `/${options.path}/` +
+      (options.flat ? '' : strings.dasherize(options.name) + '/') +
+      strings.dasherize(options.name) +
+      '.pipe';
     const relativePath = buildRelativePath(modulePath, pipePath);
-    const changes = addDeclarationToModule(source, modulePath,
-                                           strings.classify(`${options.name}Pipe`),
-                                           relativePath);
+    const changes = addDeclarationToModule(
+      source,
+      modulePath,
+      strings.classify(`${options.name}Pipe`),
+      relativePath,
+    );
     const recorder = host.beginUpdate(modulePath);
     for (const change of changes) {
       if (change instanceof InsertChange) {
@@ -69,9 +72,12 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
       const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
       const exportRecorder = host.beginUpdate(modulePath);
-      const exportChanges = addExportToModule(source, modulePath,
-                                              strings.classify(`${options.name}Pipe`),
-                                              relativePath);
+      const exportChanges = addExportToModule(
+        source,
+        modulePath,
+        strings.classify(`${options.name}Pipe`),
+        relativePath,
+      );
 
       for (const change of exportChanges) {
         if (change instanceof InsertChange) {
@@ -98,10 +104,10 @@ export default function (options: PipeOptions): Rule {
     options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
-      options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
+      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
       applyTemplates({
         ...strings,
-        'if-flat': (s: string) => options.flat ? '' : s,
+        'if-flat': (s: string) => (options.flat ? '' : s),
         ...options,
       }),
       move(parsedPath.path),

@@ -15,7 +15,6 @@ import { JsonObject, JsonValue, isJsonObject } from '../interface';
  */
 export type JsonSchema = JsonObject | boolean;
 
-
 export function isJsonSchema(value: unknown): value is JsonSchema {
   return isJsonObject(value as JsonValue) || value === false || value === true;
 }

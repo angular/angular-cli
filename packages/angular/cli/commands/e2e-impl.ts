@@ -9,7 +9,6 @@ import { ArchitectCommand } from '../models/architect-command';
 import { Arguments } from '../models/interface';
 import { Schema as E2eCommandSchema } from './e2e';
 
-
 export class E2eCommand extends ArchitectCommand<E2eCommandSchema> {
   public readonly target = 'e2e';
   public readonly multiTarget = true;

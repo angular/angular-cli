@@ -14,12 +14,7 @@ import {
   isObservable,
   of as observableOf,
 } from 'rxjs';
-import {
-  concatMap,
-  ignoreElements,
-  map,
-  mergeMap,
-} from 'rxjs/operators';
+import { concatMap, ignoreElements, map, mergeMap } from 'rxjs/operators';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import {
   Action,
@@ -31,20 +26,16 @@ import {
 } from '../tree/action';
 import { Tree } from '../tree/interface';
 
-
 export interface Sink {
   commit(tree: Tree): Observable<void>;
 }
 
-
-const Noop = function() {};
-
+const Noop = function () {};
 
 export abstract class SimpleSinkBase implements Sink {
-  preCommitAction: (action: Action) => void
-                                     | Action
-                                     | PromiseLike<Action>
-                                     | Observable<Action> = Noop;
+  preCommitAction: (
+    action: Action,
+  ) => void | Action | PromiseLike<Action> | Observable<Action> = Noop;
   postCommitAction: (action: Action) => void | Observable<void> = Noop;
   preCommit: () => void | Observable<void> = Noop;
   postCommit: () => void | Observable<void> = Noop;
@@ -66,44 +57,81 @@ export abstract class SimpleSinkBase implements Sink {
   }
 
   protected _validateOverwriteAction(action: OverwriteFileAction): Observable<void> {
-    return this._validateFileExists(action.path)
-      .pipe(map(b => { if (!b) { this._fileDoesNotExistException(action.path); } }));
+    return this._validateFileExists(action.path).pipe(
+      map((b) => {
+        if (!b) {
+          this._fileDoesNotExistException(action.path);
+        }
+      }),
+    );
   }
   protected _validateCreateAction(action: CreateFileAction): Observable<void> {
-    return this._validateFileExists(action.path)
-      .pipe(map(b => { if (b) { this._fileAlreadyExistException(action.path); } }));
+    return this._validateFileExists(action.path).pipe(
+      map((b) => {
+        if (b) {
+          this._fileAlreadyExistException(action.path);
+        }
+      }),
+    );
   }
   protected _validateRenameAction(action: RenameFileAction): Observable<void> {
     return this._validateFileExists(action.path).pipe(
-      map(b => { if (!b) { this._fileDoesNotExistException(action.path); } }),
+      map((b) => {
+        if (!b) {
+          this._fileDoesNotExistException(action.path);
+        }
+      }),
       mergeMap(() => this._validateFileExists(action.to)),
-      map(b => { if (b) { this._fileAlreadyExistException(action.to); } }));
+      map((b) => {
+        if (b) {
+          this._fileAlreadyExistException(action.to);
+        }
+      }),
+    );
   }
   protected _validateDeleteAction(action: DeleteFileAction): Observable<void> {
-    return this._validateFileExists(action.path)
-      .pipe(map(b => { if (!b) { this._fileDoesNotExistException(action.path); } }));
+    return this._validateFileExists(action.path).pipe(
+      map((b) => {
+        if (!b) {
+          this._fileDoesNotExistException(action.path);
+        }
+      }),
+    );
   }
 
   validateSingleAction(action: Action): Observable<void> {
     switch (action.kind) {
-      case 'o': return this._validateOverwriteAction(action);
-      case 'c': return this._validateCreateAction(action);
-      case 'r': return this._validateRenameAction(action);
-      case 'd': return this._validateDeleteAction(action);
-      default: throw new UnknownActionException(action);
+      case 'o':
+        return this._validateOverwriteAction(action);
+      case 'c':
+        return this._validateCreateAction(action);
+      case 'r':
+        return this._validateRenameAction(action);
+      case 'd':
+        return this._validateDeleteAction(action);
+      default:
+        throw new UnknownActionException(action);
     }
   }
 
   commitSingleAction(action: Action): Observable<void> {
     return concat(
       this.validateSingleAction(action),
-      new Observable<void>(observer => {
+      new Observable<void>((observer) => {
         let committed = null;
         switch (action.kind) {
-          case 'o': committed = this._overwriteFile(action.path, action.content); break;
-          case 'c': committed = this._createFile(action.path, action.content); break;
-          case 'r': committed = this._renameFile(action.path, action.to); break;
-          case 'd': committed = this._deleteFile(action.path); break;
+          case 'o':
+            committed = this._overwriteFile(action.path, action.content);
+            break;
+          case 'c':
+            committed = this._createFile(action.path, action.content);
+            break;
+          case 'r':
+            committed = this._renameFile(action.path, action.to);
+            break;
+          case 'd':
+            committed = this._deleteFile(action.path);
+            break;
         }
 
         if (committed) {
@@ -119,9 +147,9 @@ export abstract class SimpleSinkBase implements Sink {
     const actions = observableFrom(tree.actions);
 
     return concat(
-      (this.preCommit() || observableOf(null)),
+      this.preCommit() || observableOf(null),
       deferObservable(() => actions).pipe(
-        concatMap(action => {
+        concatMap((action) => {
           const maybeAction = this.preCommitAction(action);
 
           if (isObservable(maybeAction) || isPromiseLike(maybeAction)) {
@@ -130,13 +158,13 @@ export abstract class SimpleSinkBase implements Sink {
 
           return observableOf(maybeAction || action);
         }),
-        concatMap(action => {
+        concatMap((action) => {
           return concat(
             this.commitSingleAction(action).pipe(ignoreElements()),
             observableOf(action),
           );
         }),
-        concatMap(action => this.postCommitAction(action) || observableOf(null)),
+        concatMap((action) => this.postCommitAction(action) || observableOf(null)),
       ),
       deferObservable(() => this._done()),
       deferObservable(() => this.postCommit() || observableOf(null)),

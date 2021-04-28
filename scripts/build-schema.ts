@@ -12,7 +12,6 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
-
 function _mkdirp(p: string) {
   // Create parent folder if necessary.
   if (!fs.existsSync(path.dirname(p))) {
@@ -23,27 +22,17 @@ function _mkdirp(p: string) {
   }
 }
 
-
 function _rimraf(p: string) {
-  glob.sync(path.join(p, '**/*'), { dot: true, nodir: true })
-    .forEach(p => fs.unlinkSync(p));
-  glob.sync(path.join(p, '**/*'), { dot: true })
+  glob.sync(path.join(p, '**/*'), { dot: true, nodir: true }).forEach((p) => fs.unlinkSync(p));
+  glob
+    .sync(path.join(p, '**/*'), { dot: true })
     .sort((a, b) => b.length - a.length)
-    .forEach(p => fs.rmdirSync(p));
+    .forEach((p) => fs.rmdirSync(p));
 }
 
-
-export default async function(
-  argv: {},
-  logger: logging.Logger,
-) {
+export default async function (argv: {}, logger: logging.Logger) {
   const allJsonFiles = glob.sync('packages/**/*.json', {
-    ignore: [
-      '**/node_modules/**',
-      '**/files/**',
-      '**/*-files/**',
-      '**/package.json',
-    ],
+    ignore: ['**/node_modules/**', '**/files/**', '**/*-files/**', '**/package.json'],
   });
   const dist = path.join(__dirname, '../dist-schema');
 
@@ -54,8 +43,10 @@ export default async function(
   logger.info('Generating JSON Schema....');
 
   for (const fileName of allJsonFiles) {
-    if (fs.existsSync(fileName.replace(/\.json$/, '.ts'))
-      || fs.existsSync(fileName.replace(/\.json$/, '.d.ts'))) {
+    if (
+      fs.existsSync(fileName.replace(/\.json$/, '.ts')) ||
+      fs.existsSync(fileName.replace(/\.json$/, '.d.ts'))
+    ) {
       // Skip files that already exist.
       continue;
     }

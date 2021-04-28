@@ -31,7 +31,11 @@ import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { generateEntryPoints } from '../utils/package-chunk-sort';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../utils/version';
-import { generateI18nBrowserWebpackConfigFromContext, getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
+import {
+  generateI18nBrowserWebpackConfigFromContext,
+  getIndexInputFile,
+  getIndexOutputFile,
+} from '../utils/webpack-browser-config';
 import { addError, addWarning } from '../utils/webpack-diagnostics';
 import {
   getBrowserConfig,
@@ -100,12 +104,13 @@ export function serveWebpackBrowser(
     locale: string | undefined;
   }> {
     // Get the browser configuration from the target name.
-    const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as json.JsonObject & BrowserBuilderSchema;
+    const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as json.JsonObject &
+      BrowserBuilderSchema;
     options.port = await checkPort(options.port ?? 4200, options.host || 'localhost');
 
     // Override options we need to override, if defined.
     const overrides = (Object.keys(options) as (keyof DevServerBuilderOptions)[])
-      .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
+      .filter((key) => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
       .reduce<json.JsonObject & Partial<BrowserBuilderSchema>>(
         (previous, key) => ({
           ...previous,
@@ -115,10 +120,24 @@ export function serveWebpackBrowser(
       );
 
     // Get dev-server only options.
-    type DevServerOptions = Partial<Omit<Schema,
-      'watch' | 'optimization' | 'aot' | 'sourceMap' | 'vendorChunk' | 'commonChunk' | 'baseHref' | 'progress' | 'poll' | 'verbose' | 'deployUrl'>>;
+    type DevServerOptions = Partial<
+      Omit<
+        Schema,
+        | 'watch'
+        | 'optimization'
+        | 'aot'
+        | 'sourceMap'
+        | 'vendorChunk'
+        | 'commonChunk'
+        | 'baseHref'
+        | 'progress'
+        | 'poll'
+        | 'verbose'
+        | 'deployUrl'
+      >
+    >;
     const devServerOptions: DevServerOptions = (Object.keys(options) as (keyof Schema)[])
-      .filter(key => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
+      .filter((key) => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
       .reduce<DevServerOptions>(
         (previous, key) => ({
           ...previous,
@@ -142,15 +161,15 @@ export function serveWebpackBrowser(
     rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
 
     const browserName = await context.getBuilderNameForTarget(browserTarget);
-    const browserOptions = await context.validateOptions(
+    const browserOptions = (await context.validateOptions(
       { ...rawBrowserOptions, ...overrides },
       browserName,
-    ) as json.JsonObject & BrowserBuilderSchema;
+    )) as json.JsonObject & BrowserBuilderSchema;
 
     const { config, projectRoot, i18n } = await generateI18nBrowserWebpackConfigFromContext(
       browserOptions,
       context,
-      wco => [
+      (wco) => [
         getDevServerConfig(wco),
         getCommonConfig(wco),
         getBrowserConfig(wco),
@@ -164,9 +183,7 @@ export function serveWebpackBrowser(
     );
 
     if (!config.devServer) {
-      throw new Error(
-        'Webpack Dev Server configuration was not set.',
-      );
+      throw new Error('Webpack Dev Server configuration was not set.');
     }
 
     if (options.liveReload && !options.hmr) {
@@ -182,13 +199,20 @@ export function serveWebpackBrowser(
       // Remove live-reload code from all entrypoints but not main.
       // Otherwise this will break SuppressExtractedTextChunksWebpackPlugin because
       // 'addDevServerEntrypoints' adds addional entry-points to all entries.
-      if (config.entry && typeof config.entry === 'object' && !Array.isArray(config.entry) && config.entry.main) {
+      if (
+        config.entry &&
+        typeof config.entry === 'object' &&
+        !Array.isArray(config.entry) &&
+        config.entry.main
+      ) {
         for (const [key, value] of Object.entries(config.entry)) {
           if (key === 'main' || !Array.isArray(value)) {
             continue;
           }
 
-          const webpackClientScriptIndex = value.findIndex(x => x.includes('webpack-dev-server/client/index.js'));
+          const webpackClientScriptIndex = value.findIndex((x) =>
+            x.includes('webpack-dev-server/client/index.js'),
+          );
           if (webpackClientScriptIndex >= 0) {
             // Remove the webpack-dev-server/client script from array.
             value.splice(webpackClientScriptIndex, 1);
@@ -203,9 +227,9 @@ export function serveWebpackBrowser(
     }
 
     if (
-      options.host
-      && !/^127\.\d+\.\d+\.\d+/g.test(options.host)
-      && options.host !== 'localhost'
+      options.host &&
+      !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
+      options.host !== 'localhost'
     ) {
       logger.warn(tags.stripIndent`
         Warning: This is a simple server for use in testing or debugging Angular applications
@@ -310,15 +334,11 @@ export function serveWebpackBrowser(
         `);
       }
 
-      return runWebpackDevServer(
-        webpackConfig,
-        context,
-        {
-          logging: transforms.logging || createWebpackLoggingCallback(!!options.verbose, logger),
-          webpackFactory: require('webpack') as typeof webpack,
-          webpackDevServerFactory: require('webpack-dev-server') as typeof webpackDevServer,
-        },
-      ).pipe(
+      return runWebpackDevServer(webpackConfig, context, {
+        logging: transforms.logging || createWebpackLoggingCallback(!!options.verbose, logger),
+        webpackFactory: require('webpack') as typeof webpack,
+        webpackDevServerFactory: require('webpack-dev-server') as typeof webpackDevServer,
+      }).pipe(
         concatMap(async (buildEvent, index) => {
           // Resolve serve address.
           const serverAddress = url.format({
@@ -329,12 +349,16 @@ export function serveWebpackBrowser(
           });
 
           if (index === 0) {
-            logger.info('\n' + tags.oneLine`
+            logger.info(
+              '\n' +
+                tags.oneLine`
               **
               Angular Live Development Server is listening on ${options.host}:${buildEvent.port},
               open your browser on ${serverAddress}
               **
-            ` + '\n');
+            ` +
+                '\n',
+            );
 
             if (options.open) {
               const open = await import('open');
@@ -371,7 +395,10 @@ async function setupLocalize(
     if (Array.isArray(webpackConfig.entry['main'])) {
       webpackConfig.entry['main'].unshift(localeDescription.dataPath);
     } else {
-      webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main'] as string];
+      webpackConfig.entry['main'] = [
+        localeDescription.dataPath,
+        webpackConfig.entry['main'] as string,
+      ];
     }
   }
 

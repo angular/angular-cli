@@ -2,15 +2,10 @@
   // Consider using no-identical-functions and disabling in faulty tests
   // Consider using cognitive-complexity and refactor
   // Consider using no-useless-cast but it's annoying
-  "extends": [
-    "tslint-no-circular-imports"
-  ],
+  "extends": ["tslint-no-circular-imports"],
   "linterOptions": {
     "format": "codeFrame",
-    "exclude": [
-      "dist-schema/**",
-      "**/third_party/**"
-    ]
+    "exclude": ["dist-schema/**", "**/third_party/**"]
   },
   "rules": {
     // ==================================================================================================
@@ -31,25 +26,13 @@
       // tslint config only for specs.
       ["@angular-devkit/build-angular"]
     ],
-    "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
-    "align": [
-      true,
-      "elements",
-      "members",
-      "parameters",
-      "statements"
-    ],
+    "no-import-side-effect": [true, { "ignore-module": "^(?!rxjs/)" }],
+    "align": [true, "elements", "members", "parameters", "statements"],
     "max-line-length": [true, 140],
     "no-inferrable-types": true,
     "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
-    "indent": [
-      true,
-      "spaces"
-    ],
+    "comment-format": [true, "check-space"],
+    "indent": [true, "spaces"],
     "eofline": true,
     "import-spacing": true,
     "newline-before-return": true,
@@ -80,11 +63,7 @@
       }
     ],
     "prefer-const": true,
-    "quotemark": [
-      true,
-      "single",
-      "avoid-escape"
-    ],
+    "quotemark": [true, "single", "avoid-escape"],
     "semicolon": [true, "always"],
     "trailing-comma": [
       true,

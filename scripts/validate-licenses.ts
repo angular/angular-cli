@@ -15,7 +15,6 @@ require('../lib/bootstrap-local');
 
 const spdxSatisfies = require('spdx-satisfies');
 
-
 /**
  * A general note on some black listed specific licenses:
  * - CC0
@@ -66,9 +65,9 @@ const licenseReplacements: { [key: string]: string } = {
 // Specific packages to ignore, add a reason in a comment. Format: package-name@version.
 const ignoredPackages = [
   // Us.
-  '@angular/devkit-repo@0.0.0',  // Hey, that's us!
+  '@angular/devkit-repo@0.0.0', // Hey, that's us!
   // * Development only
-  'spdx-license-ids@3.0.5',  // CC0 but it's content only (index.json, no code) and not distributed.
+  'spdx-license-ids@3.0.5', // CC0 but it's content only (index.json, no code) and not distributed.
 
   // * Broken license fields
   'pako@1.0.11', // MIT but broken license in package.json
@@ -87,7 +86,6 @@ for (const packageName of Object.keys(packages)) {
 // Find all folders directly under a `node_modules` that have a package.json.
 const checker = require('license-checker');
 
-
 // Check if a license is accepted by an array of accepted licenses
 function _passesSpdx(licenses: string[], accepted: string[]) {
   try {
@@ -97,42 +95,44 @@ function _passesSpdx(licenses: string[], accepted: string[]) {
   }
 }
 
-
 export default function (_options: {}, logger: logging.Logger): Promise<number> {
-  return new Promise(resolve => {
-    checker.init({ start: path.join(__dirname, '..'), excludePrivatePackages: true }, (err: Error, json: JsonObject) => {
-      if (err) {
-        logger.fatal(`Something happened:\n${err.message}`);
-        resolve(1);
-      } else {
-        logger.info(`Testing ${Object.keys(json).length} packages.\n`);
-
-        // Packages with bad licenses are those that neither pass SPDX nor are ignored.
-        const badLicensePackages = Object.keys(json)
-          .map(key => ({
-            id: key,
-            licenses: ([] as string[])
-              .concat((json[key] as JsonObject).licenses as string[])
-              // `*` is used when the license is guessed.
-              .map(x => x.replace(/\*$/, ''))
-              .map(x => x in licenseReplacements ? licenseReplacements[x] : x),
-          }))
-          .filter(pkg => !_passesSpdx(pkg.licenses, allowedLicenses))
-          .filter(pkg => !ignoredPackages.find(ignored => ignored === pkg.id));
-
-        // Report packages with bad licenses
-        if (badLicensePackages.length > 0) {
-          logger.error('Invalid package licences found:');
-          badLicensePackages.forEach(pkg => {
-            logger.error(`${pkg.id}: ${JSON.stringify(pkg.licenses)}`);
-          });
-          logger.fatal(`\n${badLicensePackages.length} total packages with invalid licenses.`);
-          resolve(2);
+  return new Promise((resolve) => {
+    checker.init(
+      { start: path.join(__dirname, '..'), excludePrivatePackages: true },
+      (err: Error, json: JsonObject) => {
+        if (err) {
+          logger.fatal(`Something happened:\n${err.message}`);
+          resolve(1);
         } else {
-          logger.info('All package licenses are valid.');
-          resolve(0);
+          logger.info(`Testing ${Object.keys(json).length} packages.\n`);
+
+          // Packages with bad licenses are those that neither pass SPDX nor are ignored.
+          const badLicensePackages = Object.keys(json)
+            .map((key) => ({
+              id: key,
+              licenses: ([] as string[])
+                .concat((json[key] as JsonObject).licenses as string[])
+                // `*` is used when the license is guessed.
+                .map((x) => x.replace(/\*$/, ''))
+                .map((x) => (x in licenseReplacements ? licenseReplacements[x] : x)),
+            }))
+            .filter((pkg) => !_passesSpdx(pkg.licenses, allowedLicenses))
+            .filter((pkg) => !ignoredPackages.find((ignored) => ignored === pkg.id));
+
+          // Report packages with bad licenses
+          if (badLicensePackages.length > 0) {
+            logger.error('Invalid package licences found:');
+            badLicensePackages.forEach((pkg) => {
+              logger.error(`${pkg.id}: ${JSON.stringify(pkg.licenses)}`);
+            });
+            logger.fatal(`\n${badLicensePackages.length} total packages with invalid licenses.`);
+            resolve(2);
+          } else {
+            logger.info('All package licenses are valid.');
+            resolve(0);
+          }
         }
-      }
-    });
+      },
+    );
   });
 }

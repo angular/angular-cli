@@ -53,9 +53,8 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   }
 
   async printJsonHelp(): Promise<number> {
-    const replacer = (key: string, value: string) => key === 'name'
-      ? strings.dasherize(value)
-      : value;
+    const replacer = (key: string, value: string) =>
+      key === 'name' ? strings.dasherize(value) : value;
     this.logger.info(JSON.stringify(this.description, replacer, 2));
 
     return 0;
@@ -65,10 +64,11 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     this.logger.info(this.description.description);
 
     const name = this.description.name;
-    const args = this.description.options.filter(x => x.positional !== undefined);
-    const opts = this.description.options.filter(x => x.positional === undefined);
+    const args = this.description.options.filter((x) => x.positional !== undefined);
+    const opts = this.description.options.filter((x) => x.positional === undefined);
 
-    const argDisplay = args && args.length > 0 ? ' ' + args.map(a => `<${a.name}>`).join(' ') : '';
+    const argDisplay =
+      args && args.length > 0 ? ' ' + args.map((a) => `<${a.name}>`).join(' ') : '';
     const optionsDisplay = opts && opts.length > 0 ? ` [options]` : ``;
 
     this.logger.info(`usage: ng ${name}${argDisplay}${optionsDisplay}`);
@@ -82,15 +82,15 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   }
 
   protected async printHelpOptions(options: Option[] = this.description.options) {
-    const args = options.filter(opt => opt.positional !== undefined);
-    const opts = options.filter(opt => opt.positional === undefined);
+    const args = options.filter((opt) => opt.positional !== undefined);
+    const opts = options.filter((opt) => opt.positional === undefined);
 
     const formatDescription = (description: string) =>
       `    ${description.replace(/\n/g, '\n    ')}`;
 
     if (args.length > 0) {
       this.logger.info(`arguments:`);
-      args.forEach(o => {
+      args.forEach((o) => {
         this.logger.info(`  ${colors.cyan(o.name)}`);
         if (o.description) {
           this.logger.info(formatDescription(o.description));
@@ -103,12 +103,12 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
       }
       this.logger.info(`options:`);
       opts
-        .filter(o => !o.hidden)
+        .filter((o) => !o.hidden)
         .sort((a, b) => a.name.localeCompare(b.name))
-        .forEach(o => {
+        .forEach((o) => {
           const aliases =
             o.aliases && o.aliases.length > 0
-              ? '(' + o.aliases.map(a => `-${a}`).join(' ') + ')'
+              ? '(' + o.aliases.map((a) => `-${a}`).join(' ') + ')'
               : '';
           this.logger.info(`  ${colors.cyan('--' + strings.dasherize(o.name))} ${aliases}`);
           if (o.description) {

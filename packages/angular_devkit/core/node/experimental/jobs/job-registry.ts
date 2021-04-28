@@ -9,13 +9,16 @@
 import { Observable, of } from 'rxjs';
 import { JsonValue, experimental as core_experimental, schema } from '../../../src';
 
-export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue,
+export class NodeModuleJobRegistry<
+  MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue,
-> implements core_experimental.jobs.Registry<MinimumArgumentValueT,
-  MinimumInputValueT,
-  MinimumOutputValueT> {
-
+  MinimumOutputValueT extends JsonValue = JsonValue
+> implements
+    core_experimental.jobs.Registry<
+      MinimumArgumentValueT,
+      MinimumInputValueT,
+      MinimumOutputValueT
+    > {
   protected _resolve(name: string): string | null {
     try {
       return require.resolve(name);
@@ -33,10 +36,7 @@ export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = Jso
    * @param name The name of the job.
    * @returns A description, or null if the job is not registered.
    */
-  get<A extends MinimumArgumentValueT,
-    I extends MinimumInputValueT,
-    O extends MinimumOutputValueT,
-    >(
+  get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(
     name: core_experimental.jobs.JobName,
   ): Observable<core_experimental.jobs.JobHandler<A, I, O> | null> {
     const [moduleName, exportName] = name.split(/#/, 2);
@@ -53,7 +53,7 @@ export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = Jso
     }
 
     function _getValue(...fields: unknown[]) {
-      return fields.find(x => schema.isJsonSchema(x)) || true;
+      return fields.find((x) => schema.isJsonSchema(x)) || true;
     }
 
     const argument = _getValue(pkg.argument, handler.argument);
@@ -61,13 +61,15 @@ export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = Jso
     const output = _getValue(pkg.output, handler.output);
     const channels = _getValue(pkg.channels, handler.channels);
 
-    return of(Object.assign(handler.bind(undefined), {
-      jobDescription: {
-        argument,
-        input,
-        output,
-        channels,
-      },
-    }));
+    return of(
+      Object.assign(handler.bind(undefined), {
+        jobDescription: {
+          argument,
+          input,
+          output,
+          channels,
+        },
+      }),
+    );
   }
 }

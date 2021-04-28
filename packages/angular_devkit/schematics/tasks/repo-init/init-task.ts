@@ -17,7 +17,6 @@ export interface CommitOptions {
 
 export class RepositoryInitializerTask
   implements TaskConfigurationGenerator<RepositoryInitializerTaskOptions> {
-
   constructor(public workingDirectory?: string, public commitOptions?: CommitOptions) {}
 
   toConfiguration(): TaskConfiguration<RepositoryInitializerTaskOptions> {

@@ -4,7 +4,7 @@
   "description": "Generates and/or modifies files based on a schematic.",
   "$longDescription": "",
 
-  "$aliases": [ "g" ],
+  "$aliases": ["g"],
   "$scope": "in",
   "$type": "schematics",
   "$impl": "./generate-impl#GenerateCommand",
@@ -22,8 +22,7 @@
           }
         }
       },
-      "required": [
-      ]
+      "required": []
     },
     { "$ref": "./definitions.json#/definitions/base" },
     { "$ref": "./definitions.json#/definitions/schematic" },

@@ -8,7 +8,6 @@
 
 import { parseName } from './parse-name';
 
-
 describe('parse-name', () => {
   it('should handle just the name', () => {
     const result = parseName('src/app', 'foo');

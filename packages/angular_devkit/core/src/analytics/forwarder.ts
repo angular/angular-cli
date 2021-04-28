@@ -9,7 +9,6 @@
 import { JsonObject } from '../json';
 import { Analytics, EventOptions, PageviewOptions, ScreenviewOptions, TimingOptions } from './api';
 
-
 export enum AnalyticsReportKind {
   Event = 'event',
   Screenview = 'screenview',
@@ -47,11 +46,10 @@ export interface AnalyticsReportTiming extends AnalyticsReportBase {
 }
 
 export type AnalyticsReport =
-  AnalyticsReportEvent
+  | AnalyticsReportEvent
   | AnalyticsReportScreenview
   | AnalyticsReportPageview
-  | AnalyticsReportTiming
-  ;
+  | AnalyticsReportTiming;
 
 /**
  * A function that can forward analytics along some stream. AnalyticsReport is already a
@@ -105,7 +103,6 @@ export class ForwardingAnalytics implements Analytics {
     return Promise.resolve();
   }
 }
-
 
 export class AnalyticsReporter {
   constructor(protected _analytics: Analytics) {}

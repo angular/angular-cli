@@ -7,6 +7,7 @@ To use it on your Angular CLI app, follow these steps:
 - run `npm install @angular-devkit/build-webpack`.
 - create a webpack configuration.
 - add the following targets inside `angular.json`.
+
 ```
   "projects": {
     "app": {
@@ -27,6 +28,7 @@ To use it on your Angular CLI app, follow these steps:
         }
       }
 ```
+
 - run `ng run app:build-webpack` to build, and `ng run app:serve-webpack` to serve.
 
 All options, including `watch` and `stats`, are looked up inside the webpack configuration.

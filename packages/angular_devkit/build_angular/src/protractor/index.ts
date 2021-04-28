@@ -19,7 +19,6 @@ import { DevServerBuilderOptions } from '../dev-server/index';
 import { runModuleAsObservableFork } from '../utils';
 import { Schema as ProtractorBuilderOptions } from './schema';
 
-
 interface JasmineNodeOpts {
   jasmineNodeOpts: {
     grep?: string;
@@ -41,12 +40,10 @@ function runProtractor(root: string, options: ProtractorBuilderOptions): Promise
   // TODO: Protractor manages process.exit itself, so this target will allways quit the
   // process. To work around this we run it in a subprocess.
   // https://github.com/angular/protractor/issues/4160
-  return runModuleAsObservableFork(
-    root,
-    'protractor/built/launcher',
-    'init',
-    [resolve(root, options.protractorConfig), additionalProtractorConfig],
-  ).toPromise() as Promise<BuilderOutput>;
+  return runModuleAsObservableFork(root, 'protractor/built/launcher', 'init', [
+    resolve(root, options.protractorConfig),
+    additionalProtractorConfig,
+  ]).toPromise() as Promise<BuilderOutput>;
 }
 
 async function updateWebdriver() {
@@ -77,11 +74,11 @@ async function updateWebdriver() {
 
   // run `webdriver-manager update --standalone false --gecko false --quiet`
   // if you change this, update the command comment in prev line
-  return webdriverUpdate.program.run({
+  return webdriverUpdate.program.run(({
     standalone: false,
     gecko: false,
     quiet: true,
-  } as unknown as JSON);
+  } as unknown) as JSON);
 }
 
 export { ProtractorBuilderOptions };
@@ -139,9 +136,7 @@ export async function execute(
     if (typeof serverOptions.publicHost === 'string') {
       let publicHost = serverOptions.publicHost as string;
       if (!/^\w+:\/\//.test(publicHost)) {
-        publicHost = `${serverOptions.ssl
-          ? 'https'
-          : 'http'}://${publicHost}`;
+        publicHost = `${serverOptions.ssl ? 'https' : 'http'}://${publicHost}`;
       }
       const clientUrl = url.parse(publicHost);
       baseUrl = url.format(clientUrl);

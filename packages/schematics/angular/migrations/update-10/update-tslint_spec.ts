@@ -42,25 +42,33 @@ describe('Migration of tslint to version 6', () => {
   });
 
   it('should update tslint dependency', async () => {
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const packageJson = JSON.parse(newTree.readContent(PACKAGE_JSON_PATH));
     expect(packageJson.devDependencies.tslint).toBe(TSLINT_VERSION);
   });
 
   it('should remove old/deprecated rules', async () => {
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['no-use-before-declare']).toBeUndefined();
   });
 
   it('should add new rules', async () => {
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['eofline']).toBe(true);
   });
 
   it('should not update already present rules', async () => {
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['arrow-return-shorthand']).toBe(false);
   });
@@ -68,13 +76,19 @@ describe('Migration of tslint to version 6', () => {
   it(`should not add new rules when not extending 'tslint:recommended'`, async () => {
     tree.overwrite(
       TSLINT_PATH,
-      JSON.stringify({
-        ...TSLINT_CONFIG,
-        extends: 'tslint-config-prettier',
-      }, null, 2),
+      JSON.stringify(
+        {
+          ...TSLINT_CONFIG,
+          extends: 'tslint-config-prettier',
+        },
+        null,
+        2,
+      ),
     );
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['eofline']).toBeUndefined();
   });
@@ -82,16 +96,19 @@ describe('Migration of tslint to version 6', () => {
   it(`should not add new rules when extending multiple configs`, async () => {
     tree.overwrite(
       TSLINT_PATH,
-      JSON.stringify({
-        ...TSLINT_CONFIG,
-        extends: [
-          'tslint:recommended',
-          'tslint-config-prettier',
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          ...TSLINT_CONFIG,
+          extends: ['tslint:recommended', 'tslint-config-prettier'],
+        },
+        null,
+        2,
+      ),
     );
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['eofline']).toBeUndefined();
   });
@@ -99,16 +116,19 @@ describe('Migration of tslint to version 6', () => {
   it(`should remove old/deprecated rules when extending multiple configs`, async () => {
     tree.overwrite(
       TSLINT_PATH,
-      JSON.stringify({
-        ...TSLINT_CONFIG,
-        extends: [
-          'tslint:recommended',
-          'tslint-config-prettier',
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          ...TSLINT_CONFIG,
+          extends: ['tslint:recommended', 'tslint-config-prettier'],
+        },
+        null,
+        2,
+      ),
     );
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-version-6', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-version-6', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['no-use-before-declare']).toBeUndefined();
   });

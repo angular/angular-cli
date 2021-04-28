@@ -54,7 +54,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "protractorConfig"
-  ]
+  "required": ["protractorConfig"]
 }

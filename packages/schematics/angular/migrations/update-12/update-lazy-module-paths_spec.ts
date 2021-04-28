@@ -58,7 +58,8 @@ describe('Migration to version 8', () => {
 
       expect(routes).not.toContain('./lazy/lazy.module#LazyModule');
       expect(routes).toContain(
-        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`,
+      );
     });
 
     it('should replace the module path string in a child path', async () => {
@@ -72,7 +73,8 @@ describe('Migration to version 8', () => {
       expect(routes).not.toContain('./lazy/lazy.module#LazyModule');
 
       expect(routes).toContain(
-        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`,
+      );
     });
 
     it('should replace the module path string when file has BOM', async () => {
@@ -85,8 +87,8 @@ describe('Migration to version 8', () => {
 
       expect(routes).not.toContain('./lazy/lazy.module#LazyModule');
       expect(routes).toContain(
-        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`,
+      );
     });
-
   });
 });

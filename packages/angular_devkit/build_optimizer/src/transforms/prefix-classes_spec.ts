@@ -12,9 +12,8 @@ import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getPrefixClassesTransformer, testPrefixClasses } from './prefix-classes';
 
-
-const transform = (content: string) => transformJavascript(
-  { content, getTransforms: [getPrefixClassesTransformer] }).content;
+const transform = (content: string) =>
+  transformJavascript({ content, getTransforms: [getPrefixClassesTransformer] }).content;
 
 describe('prefix-classes', () => {
   it('prefix TS 2.0 - 2.4 downlevel class', () => {

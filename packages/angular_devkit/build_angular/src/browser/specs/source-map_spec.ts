@@ -60,7 +60,7 @@ describe('Browser Builder source map', () => {
       outputHashing: OutputHashing.All,
     });
 
-    expect(Object.keys(files).some(name => /main\.[0-9a-f]{20}\.js.map/.test(name))).toBeTruthy();
+    expect(Object.keys(files).some((name) => /main\.[0-9a-f]{20}\.js.map/.test(name))).toBeTruthy();
   });
 
   it('does not output source map when disabled', async () => {

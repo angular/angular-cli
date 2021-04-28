@@ -19,7 +19,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "project"
-  ]
+  "required": ["project"]
 }

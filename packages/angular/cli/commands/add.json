@@ -42,8 +42,7 @@
           "default": false
         }
       },
-      "required": [
-      ]
+      "required": []
     },
     {
       "$ref": "./definitions.json#/definitions/interactive"

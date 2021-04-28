@@ -14,7 +14,9 @@ import { findCachePath } from '../cache-path';
 import { cachingDisabled } from '../environment-options';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
-const cacheFontsPath: string | undefined = cachingDisabled ? undefined : findCachePath('angular-build-fonts');
+const cacheFontsPath: string | undefined = cachingDisabled
+  ? undefined
+  : findCachePath('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
 
 const enum UserAgent {
@@ -22,9 +24,7 @@ const enum UserAgent {
   IE = 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11. 0) like Gecko',
 }
 
-const SUPPORTED_PROVIDERS = [
-  'fonts.googleapis.com',
-];
+const SUPPORTED_PROVIDERS = ['fonts.googleapis.com'];
 
 export interface InlineFontsOptions {
   minify?: boolean;
@@ -32,8 +32,7 @@ export interface InlineFontsOptions {
 }
 
 export class InlineFontsProcessor {
-
-  constructor(private options: InlineFontsOptions) { }
+  constructor(private options: InlineFontsOptions) {}
 
   async process(content: string): Promise<string> {
     const hrefList: string[] = [];
@@ -41,7 +40,7 @@ export class InlineFontsProcessor {
     // Collector link tags with href
     const { rewriter: collectorStream } = await htmlRewritingStream(content);
 
-    collectorStream.on('startTag', tag => {
+    collectorStream.on('startTag', (tag) => {
       const { tagName, attrs } = tag;
 
       if (tagName !== 'link') {
@@ -49,15 +48,16 @@ export class InlineFontsProcessor {
       }
 
       // <link tag with rel="stylesheet" and a href.
-      const href = attrs.find(({ name, value }) => name === 'rel' && value === 'stylesheet')
-        && attrs.find(({ name }) => name === 'href')?.value;
+      const href =
+        attrs.find(({ name, value }) => name === 'rel' && value === 'stylesheet') &&
+        attrs.find(({ name }) => name === 'href')?.value;
 
       if (href) {
         hrefList.push(href);
       }
     });
 
-    await new Promise(resolve => collectorStream.on('finish', resolve));
+    await new Promise((resolve) => collectorStream.on('finish', resolve));
 
     // Download stylesheets
     const hrefsContent = await this.processHrefs(hrefList);
@@ -67,7 +67,7 @@ export class InlineFontsProcessor {
 
     // Replace link with style tag.
     const { rewriter, transformedContent } = await htmlRewritingStream(content);
-    rewriter.on('startTag', tag => {
+    rewriter.on('startTag', (tag) => {
       const { tagName, attrs } = tag;
 
       if (tagName !== 'link') {
@@ -76,8 +76,9 @@ export class InlineFontsProcessor {
         return;
       }
 
-      const hrefAttr = attrs.some(({ name, value }) => name === 'rel' && value === 'stylesheet')
-        && attrs.find(({ name, value }) => name === 'href' && hrefsContent.has(value));
+      const hrefAttr =
+        attrs.some(({ name, value }) => name === 'rel' && value === 'stylesheet') &&
+        attrs.find(({ name, value }) => name === 'href' && hrefsContent.has(value));
       if (hrefAttr) {
         const href = hrefAttr.value;
         const cssContent = hrefsContent.get(href);
@@ -109,32 +110,38 @@ export class InlineFontsProcessor {
 
     const data = await new Promise<string>((resolve, reject) => {
       let rawResponse = '';
-      https.get(
-        url,
-        {
-          agent,
-          rejectUnauthorized: false,
-          headers: {
-            'user-agent': userAgent,
+      https
+        .get(
+          url,
+          {
+            agent,
+            rejectUnauthorized: false,
+            headers: {
+              'user-agent': userAgent,
+            },
           },
-        },
-        res => {
-          if (res.statusCode !== 200) {
-            reject(new Error(`Inlining of fonts failed. ${url} returned status code: ${res.statusCode}.`));
+          (res) => {
+            if (res.statusCode !== 200) {
+              reject(
+                new Error(
+                  `Inlining of fonts failed. ${url} returned status code: ${res.statusCode}.`,
+                ),
+              );
 
-            return;
-          }
+              return;
+            }
 
-          res
-            .on('data', chunk => rawResponse += chunk)
-            .on('end', () => resolve(rawResponse));
-        },
-      )
-        .on('error', e =>
-          reject(new Error(
-            `Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
-            e.message,
-          )));
+            res.on('data', (chunk) => (rawResponse += chunk)).on('end', () => resolve(rawResponse));
+          },
+        )
+        .on('error', (e) =>
+          reject(
+            new Error(
+              `Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
+                e.message,
+            ),
+          ),
+        );
     });
 
     if (cacheFontsPath) {
@@ -179,7 +186,7 @@ export class InlineFontsProcessor {
           // New lines.
           .replace(/\n/g, '')
           // Safe spaces.
-          .replace(/\s?[\{\:\;]\s+/g, s => s.trim());
+          .replace(/\s?[\{\:\;]\s+/g, (s) => s.trim());
       }
 
       hrefsContent.set(hrefPath, cssContent);

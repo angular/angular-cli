@@ -51,7 +51,7 @@ describe('Dev Server Builder HMR', () => {
     logs = [];
     runs = [];
     page = await browser.newPage();
-    page.on('console', msg => logs.push(msg.text()));
+    page.on('console', (msg) => logs.push(msg.text()));
 
     host.writeMultipleFiles({
       'src/app/app.component.html': `
@@ -70,7 +70,7 @@ describe('Dev Server Builder HMR', () => {
   afterEach(async () => {
     await host.restore().toPromise();
     await page.close();
-    await Promise.all(runs.map(r => r.stop()));
+    await Promise.all(runs.map((r) => r.stop()));
   });
 
   it('works for CSS changes', async () => {
@@ -81,7 +81,7 @@ describe('Dev Server Builder HMR', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
@@ -123,7 +123,7 @@ describe('Dev Server Builder HMR', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
 
@@ -158,7 +158,7 @@ describe('Dev Server Builder HMR', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
@@ -178,7 +178,9 @@ describe('Dev Server Builder HMR', () => {
               expect(logs).toContain('[NG HMR] Restoring input/textarea values.');
               expect(logs).toContain('[NG HMR] Restoring selected options.');
 
-              const inputValue = await page.evaluate(() => document.querySelector('input.visible').value);
+              const inputValue = await page.evaluate(
+                () => document.querySelector('input.visible').value,
+              );
               expect(inputValue).toBe('input value');
 
               const selectValue = await page.evaluate(() => document.querySelector('select').value);

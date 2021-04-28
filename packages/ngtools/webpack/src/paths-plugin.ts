@@ -18,9 +18,7 @@ interface NormalModuleFactoryRequest {
   typescriptPathMapped?: boolean;
 }
 
-export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {
-
-}
+export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {}
 
 export class TypeScriptPathsPlugin {
   constructor(private options?: TypeScriptPathsPluginOptions) {}
@@ -50,59 +48,58 @@ export class TypeScriptPathsPlugin {
       });
     };
 
-    resolver.getHook('described-resolve').tapPromise(
-      'TypeScriptPathsPlugin',
-      async (request: NormalModuleFactoryRequest, resolveContext: {}) => {
-        if (!this.options) {
-          throw new Error('TypeScriptPathsPlugin options were not provided.');
-        }
-
-        if (!request || request.typescriptPathMapped) {
-          return;
-        }
-
-        const originalRequest = getInnerRequest(resolver, request);
-        if (!originalRequest) {
-          return;
-        }
-
-        // Only work on Javascript/TypeScript issuers.
-        if (!request.context.issuer || !request.context.issuer.match(/\.[jt]sx?$/)) {
-          return;
-        }
-
-        // Relative or absolute requests are not mapped
-        if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
-          return;
-        }
-
-        // Ignore all webpack special requests
-        if (originalRequest.startsWith('!!')) {
-          return;
-        }
-
-        const replacements = findReplacements(originalRequest, this.options.paths || {});
-        for (const potential of replacements) {
-          const potentialRequest = {
-            ...request,
-            request: path.resolve(this.options.baseUrl || '', potential),
-            typescriptPathMapped: true,
-          };
-          const result = await resolveAsync(potentialRequest, resolveContext);
-
-          if (result) {
-            return result;
+    resolver
+      .getHook('described-resolve')
+      .tapPromise(
+        'TypeScriptPathsPlugin',
+        async (request: NormalModuleFactoryRequest, resolveContext: {}) => {
+          if (!this.options) {
+            throw new Error('TypeScriptPathsPlugin options were not provided.');
           }
-        }
-      },
-    );
+
+          if (!request || request.typescriptPathMapped) {
+            return;
+          }
+
+          const originalRequest = getInnerRequest(resolver, request);
+          if (!originalRequest) {
+            return;
+          }
+
+          // Only work on Javascript/TypeScript issuers.
+          if (!request.context.issuer || !request.context.issuer.match(/\.[jt]sx?$/)) {
+            return;
+          }
+
+          // Relative or absolute requests are not mapped
+          if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
+            return;
+          }
+
+          // Ignore all webpack special requests
+          if (originalRequest.startsWith('!!')) {
+            return;
+          }
+
+          const replacements = findReplacements(originalRequest, this.options.paths || {});
+          for (const potential of replacements) {
+            const potentialRequest = {
+              ...request,
+              request: path.resolve(this.options.baseUrl || '', potential),
+              typescriptPathMapped: true,
+            };
+            const result = await resolveAsync(potentialRequest, resolveContext);
+
+            if (result) {
+              return result;
+            }
+          }
+        },
+      );
   }
 }
 
-function findReplacements(
-  originalRequest: string,
-  paths: MapLike<string[]>,
-): Iterable<string> {
+function findReplacements(originalRequest: string, paths: MapLike<string[]>): Iterable<string> {
   // check if any path mapping rules are relevant
   const pathMapOptions = [];
   for (const pattern in paths) {
@@ -169,7 +166,7 @@ function findReplacements(
   });
 
   const replacements: string[] = [];
-  pathMapOptions.forEach(option => {
+  pathMapOptions.forEach((option) => {
     for (const potential of option.potentials) {
       let replacement;
       const starIndex = potential.indexOf('*');

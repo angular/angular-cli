@@ -9,7 +9,6 @@
 import { test } from '../virtual-fs/host';
 import { WorkspaceHost, createWorkspaceHost } from './host';
 
-
 describe('createWorkspaceHost', () => {
   let testHost: test.TestHost;
   let workspaceHost: WorkspaceHost;
@@ -53,15 +52,10 @@ describe('createWorkspaceHost', () => {
 
   it('supports writeFile', async (done) => {
     await workspaceHost.writeFile('newfile', 'baz');
-    expect(testHost.files.sort() as string[]).toEqual([
-      '/abc.txt',
-      '/foo/bar.json',
-      '/newfile',
-    ]);
+    expect(testHost.files.sort() as string[]).toEqual(['/abc.txt', '/foo/bar.json', '/newfile']);
 
     expect(testHost.$read('newfile')).toBe('baz');
 
     done();
   });
-
 });

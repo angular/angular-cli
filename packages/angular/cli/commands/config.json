@@ -36,8 +36,7 @@
           "aliases": ["g"]
         }
       },
-      "required": [
-      ]
+      "required": []
     },
     { "$ref": "./definitions.json#/definitions/base" }
   ]

@@ -16,11 +16,7 @@ import { getSourceMapDevTool } from '../utils/helpers';
  * @param wco Options which include the build options and app config
  */
 export function getServerConfig(wco: WebpackConfigOptions): Configuration {
-  const {
-    sourceMap,
-    bundleDependencies,
-    externalDependencies = [],
-  } = wco.buildOptions;
+  const { sourceMap, bundleDependencies, externalDependencies = [] } = wco.buildOptions;
 
   const extraPlugins = [];
   const { scripts, styles, hidden } = sourceMap;

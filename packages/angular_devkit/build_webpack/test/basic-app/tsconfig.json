@@ -9,13 +9,8 @@
     "experimentalDecorators": true,
     "target": "es2017",
     "module": "esnext",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2017",
-      "dom"
-    ]
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"]
   },
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true

@@ -9,7 +9,6 @@
 import { Architect } from '@angular-devkit/architect';
 import { createArchitect, host, karmaTargetSpec } from '../test-utils';
 
-
 // tslint:disable-next-line:no-big-function
 describe('Karma Builder', () => {
   let architect: Architect;
@@ -192,10 +191,12 @@ describe('Karma Builder', () => {
     });
 
     const overrides = {
-      fileReplacements: [{
-        replace: '/src/meaning.ts',
-        with: '/src/meaning-too.ts',
-      }],
+      fileReplacements: [
+        {
+          replace: '/src/meaning.ts',
+          with: '/src/meaning-too.ts',
+        },
+      ],
     };
 
     const run = await architect.scheduleTarget(karmaTargetSpec, overrides);

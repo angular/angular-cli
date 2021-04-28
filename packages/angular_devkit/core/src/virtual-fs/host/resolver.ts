@@ -26,7 +26,9 @@ export abstract class ResolverHost<T extends object> implements Host<T> {
 
   constructor(protected _delegate: Host<T>) {}
 
-  get capabilities(): HostCapabilities { return this._delegate.capabilities; }
+  get capabilities(): HostCapabilities {
+    return this._delegate.capabilities;
+  }
 
   write(path: Path, content: FileBuffer): Observable<void> {
     return this._delegate.write(this._resolve(path), content);

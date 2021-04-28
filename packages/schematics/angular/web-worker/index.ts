@@ -6,16 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { dirname, join, normalize, strings, tags } from '@angular-devkit/core';
 import {
-  dirname,
-  join,
-  normalize,
-  strings,
-  tags,
-} from '@angular-devkit/core';
-import {
-  Rule, SchematicContext, SchematicsException, Tree,
-  apply, applyTemplates, chain, mergeWith, move, noop, url,
+  Rule,
+  SchematicContext,
+  SchematicsException,
+  Tree,
+  apply,
+  applyTemplates,
+  chain,
+  mergeWith,
+  move,
+  noop,
+  url,
 } from '@angular-devkit/schematics';
 import { JSONFile } from '../utility/json-file';
 import { parseName } from '../utility/parse-name';
@@ -23,7 +26,6 @@ import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
-
 
 function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -63,10 +65,11 @@ function addSnippet(options: WebWorkerOptions): Rule {
     }
 
     const fileRegExp = new RegExp(`^${options.name}.*\.ts`);
-    const siblingModules = host.getDir(options.path).subfiles
-      // Find all files that start with the same name, are ts files,
+    const siblingModules = host
+      .getDir(options.path)
+      .subfiles // Find all files that start with the same name, are ts files,
       // and aren't spec or module files.
-      .filter(f => fileRegExp.test(f) && !/(module|spec)\.ts$/.test(f))
+      .filter((f) => fileRegExp.test(f) && !/(module|spec)\.ts$/.test(f))
       // Sort alphabetically for consistency.
       .sort();
 
@@ -122,7 +125,8 @@ export default function (options: WebWorkerOptions): Rule {
     if (!projectTarget) {
       throw new Error(`Target is not defined for this project.`);
     }
-    const projectTargetOptions = (projectTarget.options || {}) as unknown as BrowserBuilderOptions;
+    const projectTargetOptions = ((projectTarget.options ||
+      {}) as unknown) as BrowserBuilderOptions;
 
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);

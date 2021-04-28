@@ -10,7 +10,6 @@ import { join, normalize } from '@angular-devkit/core';
 import { Rule } from '../engine/interface';
 import { noop } from './base';
 
-
 export function move(from: string, to?: string): Rule {
   if (to === undefined) {
     to = from;
@@ -24,13 +23,13 @@ export function move(from: string, to?: string): Rule {
     return noop;
   }
 
-  return tree => {
+  return (tree) => {
     if (tree.exists(fromPath)) {
       // fromPath is a file
       tree.rename(fromPath, toPath);
     } else {
       // fromPath is a directory
-      tree.getDir(fromPath).visit(path => {
+      tree.getDir(fromPath).visit((path) => {
         tree.rename(path, join(toPath, path.substr(fromPath.length)));
       });
     }

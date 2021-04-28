@@ -19,16 +19,14 @@ describe('AliasHost', () => {
     host.write(normalize('/some/file'), content).subscribe();
 
     const aHost = new AliasHost(host);
-    aHost.read(normalize('/some/file'))
-      .subscribe(x => expect(x).toBe(content));
+    aHost.read(normalize('/some/file')).subscribe((x) => expect(x).toBe(content));
     aHost.aliases.set(normalize('/some/file'), normalize('/other/path'));
 
     // This file will not exist because /other/path does not exist.
     try {
-      aHost.read(normalize('/some/file'))
-        .subscribe(undefined, err => {
-          expect(err.message).toMatch(/does not exist/);
-        });
+      aHost.read(normalize('/some/file')).subscribe(undefined, (err) => {
+        expect(err.message).toMatch(/does not exist/);
+      });
     } catch {
       // Ignore it. RxJS <6 still throw errors when they happen synchronously.
     }
@@ -42,19 +40,18 @@ describe('AliasHost', () => {
     host.write(normalize('/some/folder/file'), content).subscribe();
 
     const aHost = new AliasHost(host);
-    aHost.read(normalize('/some/folder/file'))
-        .subscribe(x => expect(x).toBe(content));
+    aHost.read(normalize('/some/folder/file')).subscribe((x) => expect(x).toBe(content));
     aHost.aliases.set(normalize('/some'), normalize('/other'));
 
     // This file will not exist because /other/path does not exist.
     try {
-      aHost.read(normalize('/some/folder/file'))
-        .subscribe(undefined, err => expect(err.message).toMatch(/does not exist/));
+      aHost
+        .read(normalize('/some/folder/file'))
+        .subscribe(undefined, (err) => expect(err.message).toMatch(/does not exist/));
     } catch {}
 
     // Create the file with new content and verify that this has the new content.
     aHost.write(normalize('/other/folder/file'), content2).subscribe();
-    aHost.read(normalize('/some/folder/file'))
-        .subscribe(x => expect(x).toBe(content2));
+    aHost.read(normalize('/some/folder/file')).subscribe((x) => expect(x).toBe(content2));
   });
 });

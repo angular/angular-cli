@@ -7,13 +7,16 @@
  */
 import { join, normalize } from '@angular-devkit/core';
 import { Rule } from '@angular-devkit/schematics';
-import { NodeDependencyType, addPackageJsonDependency, removePackageJsonDependency } from '../../utility/dependencies';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+  removePackageJsonDependency,
+} from '../../utility/dependencies';
 import { getWorkspace } from '../../utility/workspace';
 import { ProjectType } from '../../utility/workspace-models';
 
-
 export default function (): Rule {
-  return async host => {
+  return async (host) => {
     const workspace = await getWorkspace(host);
 
     for (const [, project] of workspace.projects) {
@@ -31,11 +34,15 @@ export default function (): Rule {
       removePackageJsonDependency(host, 'tslib', packageJsonPath);
 
       // Add tslib as a direct dependency
-      addPackageJsonDependency(host, {
-        name: 'tslib',
-        version: '^2.0.0',
-        type: NodeDependencyType.Default,
-      }, packageJsonPath);
+      addPackageJsonDependency(
+        host,
+        {
+          name: 'tslib',
+          version: '^2.0.0',
+          type: NodeDependencyType.Default,
+        },
+        packageJsonPath,
+      );
     }
   };
 }

@@ -5,8 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable-next-line: no-implicit-dependencies
-import { ApplicationRef, PlatformRef, Type, isDevMode, ɵresetCompiledComponents } from '@angular/core';
+import {
+  ApplicationRef,
+  PlatformRef,
+  Type,
+  isDevMode,
+  ɵresetCompiledComponents,
+  // tslint:disable-next-line: no-implicit-dependencies
+} from '@angular/core';
 import { filter, take } from 'rxjs/operators';
 
 // For the time being we cannot use the DOM lib because it conflicts with @types/node,
@@ -27,7 +33,9 @@ export default function (mod: any): void {
   }
 
   if (!isDevMode()) {
-    console.error(`[NG HMR] Cannot use HMR when Angular is running in production mode. To prevent production mode, do not call 'enableProdMode()'.`);
+    console.error(
+      `[NG HMR] Cannot use HMR when Angular is running in production mode. To prevent production mode, do not call 'enableProdMode()'.`,
+    );
 
     return;
   }
@@ -35,7 +43,9 @@ export default function (mod: any): void {
   mod['hot'].accept();
   mod['hot'].dispose(() => {
     if (typeof ng === 'undefined') {
-      console.warn(`[NG HMR] Cannot find global 'ng'. Likely this is caused because scripts optimization is enabled.`);
+      console.warn(
+        `[NG HMR] Cannot find global 'ng'. Likely this is caused because scripts optimization is enabled.`,
+      );
 
       return;
     }
@@ -62,17 +72,13 @@ export default function (mod: any): void {
     const oldOptions = document.querySelectorAll('option');
 
     // Create new application
-    appRef.components
-      .forEach(cp => {
-        const element = cp.location.nativeElement;
-        const parentNode = element.parentNode;
-        parentNode.insertBefore(
-          document.createElement(element.tagName),
-          element,
-        );
+    appRef.components.forEach((cp) => {
+      const element = cp.location.nativeElement;
+      const parentNode = element.parentNode;
+      parentNode.insertBefore(document.createElement(element.tagName), element);
 
-        parentNode.removeChild(element);
-      });
+      parentNode.removeChild(element);
+    });
 
     // Destroy old application, injectors, <style..., etc..
     const platformRef = getPlatformRef(appRoot);
@@ -82,7 +88,7 @@ export default function (mod: any): void {
 
     // Restore all inputs and options
     const bodyElement = document.body;
-    if ((oldInputs.length + oldOptions.length) === 0 || !bodyElement) {
+    if (oldInputs.length + oldOptions.length === 0 || !bodyElement) {
       return;
     }
 
@@ -104,16 +110,15 @@ export default function (mod: any): void {
       // Wait until the application isStable to restore the form values
       newAppRef.isStable
         .pipe(
-          filter(isStable => !!isStable),
+          filter((isStable) => !!isStable),
           take(1),
         )
         .subscribe(() => restoreFormValues(oldInputs, oldOptions));
-    })
-      .observe(bodyElement, {
-        attributes: true,
-        subtree: true,
-        attributeFilter: ['ng-version'],
-      });
+    }).observe(bodyElement, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['ng-version'],
+    });
   });
 }
 
@@ -128,8 +133,8 @@ function getAppRoot(): any {
   return appRoot;
 }
 
-function getToken<T>(appRoot: any, token: Type<T> ): T | undefined {
-  return typeof ng === 'object' && ng.getInjector(appRoot).get(token) || undefined;
+function getToken<T>(appRoot: any, token: Type<T>): T | undefined {
+  return (typeof ng === 'object' && ng.getInjector(appRoot).get(token)) || undefined;
 }
 
 function getApplicationRef(appRoot: any): ApplicationRef | undefined {
@@ -155,10 +160,12 @@ function getPlatformRef(appRoot: any): PlatformRef | undefined {
 }
 
 function dispatchEvents(element: any): void {
-  element.dispatchEvent(new Event('input', {
-    bubbles: true,
-    cancelable: true,
-  }));
+  element.dispatchEvent(
+    new Event('input', {
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
 
   element.blur();
 

@@ -13,13 +13,13 @@
       "hidden": true
     },
     "service-worker": {
-      "aliases": [ "serviceWorker" ],
+      "aliases": ["serviceWorker"],
       "factory": "./service-worker",
       "description": "Initializes a service worker setup.",
       "schema": "./service-worker/schema.json"
     },
     "application": {
-      "aliases": [ "app" ],
+      "aliases": ["app"],
       "factory": "./application",
       "schema": "./application/schema.json",
       "description": "Create an Angular application."
@@ -31,37 +31,37 @@
       "hidden": true
     },
     "class": {
-      "aliases": [ "cl" ],
+      "aliases": ["cl"],
       "factory": "./class",
       "description": "Create a class.",
       "schema": "./class/schema.json"
     },
     "component": {
-      "aliases": [ "c" ],
+      "aliases": ["c"],
       "factory": "./component",
       "description": "Create an Angular component.",
       "schema": "./component/schema.json"
     },
     "directive": {
-      "aliases": [ "d" ],
+      "aliases": ["d"],
       "factory": "./directive",
       "description": "Create an Angular directive.",
       "schema": "./directive/schema.json"
     },
     "enum": {
-      "aliases": [ "e" ],
+      "aliases": ["e"],
       "factory": "./enum",
       "description": "Create an enumeration.",
       "schema": "./enum/schema.json"
     },
     "guard": {
-      "aliases": [ "g" ],
+      "aliases": ["g"],
       "factory": "./guard",
       "description": "Create a guard.",
       "schema": "./guard/schema.json"
     },
     "resolver": {
-      "aliases": [ "r" ],
+      "aliases": ["r"],
       "factory": "./resolver",
       "description": "Create a resolver.",
       "schema": "./resolver/schema.json"
@@ -72,25 +72,25 @@
       "schema": "./interceptor/schema.json"
     },
     "interface": {
-      "aliases": [ "i" ],
+      "aliases": ["i"],
       "factory": "./interface",
       "description": "Create an interface.",
       "schema": "./interface/schema.json"
     },
     "module": {
-      "aliases": [ "m" ],
+      "aliases": ["m"],
       "factory": "./module",
       "description": "Create an Angular module.",
       "schema": "./module/schema.json"
     },
     "pipe": {
-      "aliases": [ "p" ],
+      "aliases": ["p"],
       "factory": "./pipe",
       "description": "Create an Angular pipe.",
       "schema": "./pipe/schema.json"
     },
     "service": {
-      "aliases": [ "s" ],
+      "aliases": ["s"],
       "factory": "./service",
       "description": "Create an Angular service.",
       "schema": "./service/schema.json"
@@ -102,7 +102,7 @@
       "hidden": true
     },
     "app-shell": {
-      "aliases": [ "appShell" ],
+      "aliases": ["appShell"],
       "factory": "./app-shell",
       "description": "Create an app shell.",
       "schema": "./app-shell/schema.json"

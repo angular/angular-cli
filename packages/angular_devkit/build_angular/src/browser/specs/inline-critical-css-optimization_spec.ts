@@ -39,14 +39,21 @@ describe('Browser Builder inline critical CSS optimization', () => {
   it('works', async () => {
     const { files } = await browserBuild(architect, host, target, overrides);
     const html = await files['index.html'];
-    expect(html).toContain(`<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`);
+    expect(html).toContain(
+      `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
+    );
     expect(html).toContain(`body{color:#000;}`);
   });
 
   it('works with deployUrl', async () => {
-    const { files } = await browserBuild(architect, host, target, { ...overrides, deployUrl: 'http://cdn.com/' });
+    const { files } = await browserBuild(architect, host, target, {
+      ...overrides,
+      deployUrl: 'http://cdn.com/',
+    });
     const html = await files['index.html'];
-    expect(html).toContain(`<link rel="stylesheet" href="http://cdn.com/styles.css" media="print" onload="this.media='all'">`);
+    expect(html).toContain(
+      `<link rel="stylesheet" href="http://cdn.com/styles.css" media="print" onload="this.media='all'">`,
+    );
     expect(html).toContain(`body{color:#000;}`);
   });
 

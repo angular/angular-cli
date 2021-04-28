@@ -13,16 +13,15 @@ export interface Position {
   readonly character: number;
 }
 
-
-export type JsonAstNode = JsonAstNumber
-    | JsonAstString
-    | JsonAstIdentifier
-    | JsonAstArray
-    | JsonAstObject
-    | JsonAstConstantFalse
-    | JsonAstConstantNull
-    | JsonAstConstantTrue;
-
+export type JsonAstNode =
+  | JsonAstNumber
+  | JsonAstString
+  | JsonAstIdentifier
+  | JsonAstArray
+  | JsonAstObject
+  | JsonAstConstantFalse
+  | JsonAstConstantNull
+  | JsonAstConstantTrue;
 
 export interface JsonAstNodeBase {
   readonly start: Position;
@@ -32,27 +31,22 @@ export interface JsonAstNodeBase {
   readonly comments?: (JsonAstComment | JsonAstMultilineComment)[];
 }
 
-
 export interface JsonAstNumber extends JsonAstNodeBase {
   readonly kind: 'number';
   readonly value: number;
 }
-
 
 export interface JsonAstString extends JsonAstNodeBase {
   readonly kind: 'string';
   readonly value: string;
 }
 
-
 export interface JsonAstIdentifier extends JsonAstNodeBase {
   readonly kind: 'identifier';
   readonly value: string;
 }
 
-
 export interface JsonArray extends Array<JsonValue> {}
-
 
 export interface JsonAstArray extends JsonAstNodeBase {
   readonly kind: 'array';
@@ -60,11 +54,9 @@ export interface JsonAstArray extends JsonAstNodeBase {
   readonly value: JsonArray;
 }
 
-
 export interface JsonObject {
   [prop: string]: JsonValue;
 }
-
 
 export interface JsonAstKeyValue extends JsonAstNodeBase {
   readonly kind: 'keyvalue';
@@ -72,31 +64,26 @@ export interface JsonAstKeyValue extends JsonAstNodeBase {
   readonly value: JsonAstNode;
 }
 
-
 export interface JsonAstObject extends JsonAstNodeBase {
   readonly kind: 'object';
   readonly properties: JsonAstKeyValue[];
   readonly value: JsonObject;
 }
 
-
 export interface JsonAstConstantFalse extends JsonAstNodeBase {
   readonly kind: 'false';
   readonly value: false;
 }
-
 
 export interface JsonAstConstantNull extends JsonAstNodeBase {
   readonly kind: 'null';
   readonly value: null;
 }
 
-
 export interface JsonAstConstantTrue extends JsonAstNodeBase {
   readonly kind: 'true';
   readonly value: true;
 }
-
 
 // Loose mode AST.
 export interface JsonAstMultilineComment extends JsonAstNodeBase {
@@ -107,7 +94,6 @@ export interface JsonAstComment extends JsonAstNodeBase {
   readonly kind: 'comment';
   readonly content: string;
 }
-
 
 export type JsonValue = JsonAstNode['value'];
 

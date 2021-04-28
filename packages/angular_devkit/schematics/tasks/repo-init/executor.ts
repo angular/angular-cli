@@ -15,8 +15,7 @@ import {
   RepositoryInitializerTaskOptions,
 } from './options';
 
-
-export default function(
+export default function (
   factoryOptions: RepositoryInitializerTaskFactoryOptions = {},
 ): TaskExecutor<RepositoryInitializerTaskOptions> {
   const rootDirectory = factoryOptions.rootDirectory || process.cwd();
@@ -29,42 +28,41 @@ export default function(
       const outputStream = 'ignore';
       const errorStream = ignoreErrorStream ? 'ignore' : process.stderr;
       const spawnOptions: SpawnOptions = {
-        stdio:  [ process.stdin, outputStream, errorStream ],
+        stdio: [process.stdin, outputStream, errorStream],
         shell: true,
         cwd: path.join(rootDirectory, options.workingDirectory || ''),
         env: {
           ...process.env,
-          ...(authorName
-            ? { GIT_AUTHOR_NAME: authorName, GIT_COMMITTER_NAME: authorName }
-            : {}
-          ),
+          ...(authorName ? { GIT_AUTHOR_NAME: authorName, GIT_COMMITTER_NAME: authorName } : {}),
           ...(authorEmail
             ? { GIT_AUTHOR_EMAIL: authorEmail, GIT_COMMITTER_EMAIL: authorEmail }
-            : {}
-          ),
+            : {}),
         },
       };
 
       return new Promise<void>((resolve, reject) => {
-        spawn('git', args, spawnOptions)
-          .on('close', (code: number) => {
-            if (code === 0) {
-              resolve();
-            } else {
-              reject(code);
-            }
+        spawn('git', args, spawnOptions).on('close', (code: number) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(code);
+          }
         });
       });
     };
 
-    const hasCommand = await execute(['--version'])
-      .then(() => true, () => false);
+    const hasCommand = await execute(['--version']).then(
+      () => true,
+      () => false,
+    );
     if (!hasCommand) {
       return;
     }
 
-    const insideRepo = await execute(['rev-parse', '--is-inside-work-tree'], true)
-      .then(() => true, () => false);
+    const insideRepo = await execute(['rev-parse', '--is-inside-work-tree'], true).then(
+      () => true,
+      () => false,
+    );
     if (insideRepo) {
       context.logger.info(tags.oneLine`
         Directory is already under version control.

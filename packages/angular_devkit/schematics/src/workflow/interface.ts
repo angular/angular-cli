@@ -23,9 +23,13 @@ export interface WorkflowExecutionContext extends RequiredWorkflowExecutionConte
 }
 
 export interface LifeCycleEvent {
-  kind: 'start' | 'end'  // Start and end of the full workflow execution.
-    | 'workflow-start' | 'workflow-end'  // Start and end of a workflow execution. Can be more.
-    | 'post-tasks-start' | 'post-tasks-end';  // Start and end of the post tasks execution.
+  kind:
+    | 'start'
+    | 'end' // Start and end of the full workflow execution.
+    | 'workflow-start'
+    | 'workflow-end' // Start and end of a workflow execution. Can be more.
+    | 'post-tasks-start'
+    | 'post-tasks-end'; // Start and end of the post tasks execution.
 }
 
 export interface Workflow {

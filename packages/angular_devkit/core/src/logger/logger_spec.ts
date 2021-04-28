@@ -11,11 +11,11 @@ import { toArray } from 'rxjs/operators';
 import { JsonValue } from '../json/interface';
 import { Logger } from './logger';
 
-
 describe('Logger', () => {
   it('works', (done: DoneFn) => {
     const logger = new Logger('test');
-    logger.pipe(toArray())
+    logger
+      .pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
@@ -23,7 +23,10 @@ describe('Logger', () => {
           jasmine.objectContaining({ message: 'world', level: 'info', name: 'test' }) as any,
         ]);
       })
-      .then(() => done(), err => done.fail(err));
+      .then(
+        () => done(),
+        (err) => done.fail(err),
+      );
 
     logger.debug('hello');
     logger.info('world');
@@ -33,7 +36,8 @@ describe('Logger', () => {
   it('works with children', (done: DoneFn) => {
     const logger = new Logger('test');
     let hasCompleted = false;
-    logger.pipe(toArray())
+    logger
+      .pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
@@ -42,10 +46,13 @@ describe('Logger', () => {
         ]);
         expect(hasCompleted).toBe(true);
       })
-      .then(() => done(), err => done.fail(err));
+      .then(
+        () => done(),
+        (err) => done.fail(err),
+      );
 
     const childLogger = new Logger('child', logger);
-    childLogger.subscribe(undefined, undefined, () => hasCompleted = true);
+    childLogger.subscribe(undefined, undefined, () => (hasCompleted = true));
     childLogger.debug('hello');
     childLogger.info('world');
     logger.complete();
@@ -55,14 +62,18 @@ describe('Logger', () => {
     const logger = new Logger('test');
     logger.debug('woah');
 
-    logger.pipe(toArray())
+    logger
+      .pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
           jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'test' }) as any,
         ]);
       })
-      .then(() => done(), err => done.fail(err));
+      .then(
+        () => done(),
+        (err) => done.fail(err),
+      );
 
     logger.debug('hello');
     logger.complete();

@@ -40,11 +40,7 @@ describe('Browser Builder AOT', () => {
       aot: true,
     };
 
-    host.replaceInFile(
-      'src/app/app.component.ts',
-      'app.component.css',
-      'app.component.scss',
-    );
+    host.replaceInFile('src/app/app.component.ts', 'app.component.css', 'app.component.scss');
 
     host.writeMultipleFiles({
       'src/app/app.component.scss': `
@@ -54,7 +50,7 @@ describe('Browser Builder AOT', () => {
 
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;

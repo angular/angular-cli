@@ -35,14 +35,15 @@ import { Schema as ServerBuilderOptions } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
-  baseOutputPath: string;
-  outputPaths: string[];
-  /**
-   * @deprecated in version 9. Use 'outputPaths' instead.
-   */
-  outputPath: string;
-};
+export type ServerBuilderOutput = json.JsonObject &
+  BuilderOutput & {
+    baseOutputPath: string;
+    outputPaths: string[];
+    /**
+     * @deprecated in version 9. Use 'outputPaths' instead.
+     */
+    outputPath: string;
+  };
 
 export { ServerBuilderOptions };
 
@@ -68,7 +69,9 @@ export function execute(
 
   if (typeof options.bundleDependencies === 'string') {
     options.bundleDependencies = options.bundleDependencies === 'all';
-    context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
+    context.logger.warn(
+      `Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`,
+    );
   }
 
   if (!options.bundleDependencies && tsConfig.options.enableIvy) {
@@ -97,7 +100,7 @@ export function execute(
           }
         },
       }).pipe(
-        concatMap(async output => {
+        concatMap(async (output) => {
           const { emittedFiles = [], outputPath, webpackStats } = output;
           if (!webpackStats) {
             throw new Error('Webpack stats build result is required.');
@@ -126,7 +129,7 @@ export function execute(
         }),
       );
     }),
-    map(output => {
+    map((output) => {
       if (!output.success) {
         return output as ServerBuilderOutput;
       }
@@ -141,9 +144,7 @@ export function execute(
   );
 }
 
-export default createBuilder<json.JsonObject & ServerBuilderOptions, ServerBuilderOutput>(
-  execute,
-);
+export default createBuilder<json.JsonObject & ServerBuilderOptions, ServerBuilderOutput>(execute);
 
 async function initialize(
   options: ServerBuilderOptions,
@@ -162,7 +163,7 @@ async function initialize(
       platform: 'server',
     } as NormalizedBrowserBuilderSchema,
     context,
-    wco => [
+    (wco) => [
       getCommonConfig(wco),
       getServerConfig(wco),
       getStylesConfig(wco),
@@ -177,10 +178,7 @@ async function initialize(
   }
 
   if (options.deleteOutputPath) {
-    deleteOutputDir(
-      context.workspaceRoot,
-      originalOutputPath,
-    );
+    deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
   return { config: transformedConfig || config, i18n };

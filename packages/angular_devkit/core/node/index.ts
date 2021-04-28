@@ -10,7 +10,4 @@ import * as fs from './fs';
 export * from './cli-logger';
 export * from './host';
 
-export {
-  experimental,
-  fs,
-};
+export { experimental, fs };

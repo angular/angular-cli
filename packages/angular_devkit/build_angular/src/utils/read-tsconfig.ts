@@ -16,9 +16,7 @@ import * as path from 'path';
  * it will resolve 'tsconfigPath' from this path.
  */
 export function readTsconfig(tsconfigPath: string, workspaceRoot?: string): ParsedConfiguration {
-  const tsConfigFullPath = workspaceRoot
-    ? path.resolve(workspaceRoot, tsconfigPath)
-    : tsconfigPath;
+  const tsConfigFullPath = workspaceRoot ? path.resolve(workspaceRoot, tsconfigPath) : tsconfigPath;
 
   // We use 'ng' instead of 'ts' here because 'ts' is not aware of 'angularCompilerOptions'
   // and will not merged them if they are at un upper level tsconfig file when using `extends`.

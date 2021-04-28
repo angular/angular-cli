@@ -69,7 +69,7 @@ function _visitJsonRecursive<ContextT>(
   const value = visitor(json, ptr, schema as JsonObject, root);
 
   return (isObservable<JsonValue>(value) ? value : observableOf(value)).pipe(
-    concatMap(value => {
+    concatMap((value) => {
       if (Array.isArray(value)) {
         return concat(
           from(value).pipe(
@@ -82,7 +82,7 @@ function _visitJsonRecursive<ContextT>(
                 refResolver,
                 context,
                 root || value,
-              ).pipe(tap<JsonValue>(x => (value[i] = x)));
+              ).pipe(tap<JsonValue>((x) => (value[i] = x)));
             }),
             ignoreElements(),
           ),
@@ -91,7 +91,7 @@ function _visitJsonRecursive<ContextT>(
       } else if (typeof value == 'object' && value !== null) {
         return concat(
           from(Object.getOwnPropertyNames(value)).pipe(
-            mergeMap(key => {
+            mergeMap((key) => {
               return _visitJsonRecursive(
                 value[key],
                 visitor,
@@ -101,7 +101,7 @@ function _visitJsonRecursive<ContextT>(
                 context,
                 root || value,
               ).pipe(
-                tap<JsonValue>(x => {
+                tap<JsonValue>((x) => {
                   const descriptor = Object.getOwnPropertyDescriptor(value, key);
                   if (descriptor && descriptor.writable && value[key] !== x) {
                     value[key] = x;

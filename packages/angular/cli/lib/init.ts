@@ -91,9 +91,7 @@ if (process.env['NG_CLI_PROFILING']) {
           .version;
       } catch (error) {
         // tslint:disable-next-line no-console
-        console.error(
-          'Version mismatch check skipped. Unable to retrieve local version: ' + error,
-        );
+        console.error('Version mismatch check skipped. Unable to retrieve local version: ' + error);
       }
     }
 
@@ -134,17 +132,19 @@ if (process.env['NG_CLI_PROFILING']) {
   }
 
   return cli;
-})().then(cli => {
-  return cli({
-    cliArgs: process.argv.slice(2),
-    inputStream: process.stdin,
-    outputStream: process.stdout,
+})()
+  .then((cli) => {
+    return cli({
+      cliArgs: process.argv.slice(2),
+      inputStream: process.stdin,
+      outputStream: process.stdout,
+    });
+  })
+  .then((exitCode: number) => {
+    process.exit(exitCode);
+  })
+  .catch((err: Error) => {
+    // tslint:disable-next-line no-console
+    console.error('Unknown error: ' + err.toString());
+    process.exit(127);
   });
-}).then((exitCode: number) => {
-  process.exit(exitCode);
-})
-.catch((err: Error) => {
-  // tslint:disable-next-line no-console
-  console.error('Unknown error: ' + err.toString());
-  process.exit(127);
-});

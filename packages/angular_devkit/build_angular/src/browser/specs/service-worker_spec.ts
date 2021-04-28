@@ -20,13 +20,7 @@ describe('Browser Builder service worker', () => {
         name: 'app',
         installMode: 'prefetch',
         resources: {
-          files: [
-            '/favicon.ico',
-            '/index.html',
-            '/*.bundle.css',
-            '/*.bundle.js',
-            '/*.chunk.js',
-          ],
+          files: ['/favicon.ico', '/index.html', '/*.bundle.css', '/*.bundle.js', '/*.chunk.js'],
         },
       },
       {
@@ -34,10 +28,7 @@ describe('Browser Builder service worker', () => {
         installMode: 'lazy',
         updateMode: 'prefetch',
         resources: {
-          files: [
-            '/assets/**',
-            '/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)',
-          ],
+          files: ['/assets/**', '/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)'],
         },
       },
     ],
@@ -75,54 +66,51 @@ describe('Browser Builder service worker', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     expect(host.scopedSync().exists(normalize('dist/ngsw.json'))).toBeTrue();
-    const ngswJson = JSON.parse(virtualFs.fileBufferToString(
-      host.scopedSync().read(normalize('dist/ngsw.json'))));
+    const ngswJson = JSON.parse(
+      virtualFs.fileBufferToString(host.scopedSync().read(normalize('dist/ngsw.json'))),
+    );
     // Verify index and assets are there.
-    expect(ngswJson).toEqual(jasmine.objectContaining({
-      configVersion: 1,
-      index: '/index.html',
-      navigationUrls: [
-        { positive: true, regex: '^\\\/.*$' },
-        { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*\\.[^\/]*$' },
-        { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*$' },
-        { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*\\\/.*$' },
-      ],
-      assetGroups: [
-        {
-          name: 'app',
-          installMode: 'prefetch',
-          updateMode: 'prefetch',
-          urls: [
-            '/favicon.ico',
-            '/index.html',
-          ],
-          cacheQueryOptions: {
-            ignoreVary: true,
+    expect(ngswJson).toEqual(
+      jasmine.objectContaining({
+        configVersion: 1,
+        index: '/index.html',
+        navigationUrls: [
+          { positive: true, regex: '^\\/.*$' },
+          { positive: false, regex: '^\\/(?:.+\\/)?[^/]*\\.[^/]*$' },
+          { positive: false, regex: '^\\/(?:.+\\/)?[^/]*__[^/]*$' },
+          { positive: false, regex: '^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$' },
+        ],
+        assetGroups: [
+          {
+            name: 'app',
+            installMode: 'prefetch',
+            updateMode: 'prefetch',
+            urls: ['/favicon.ico', '/index.html'],
+            cacheQueryOptions: {
+              ignoreVary: true,
+            },
+            patterns: [],
           },
-          patterns: [],
-        },
-        {
-          name: 'assets',
-          installMode: 'lazy',
-          updateMode: 'prefetch',
-          urls: [
-            '/assets/folder-asset.txt',
-            '/spectrum.png',
-          ],
-          cacheQueryOptions: {
-            ignoreVary: true,
+          {
+            name: 'assets',
+            installMode: 'lazy',
+            updateMode: 'prefetch',
+            urls: ['/assets/folder-asset.txt', '/spectrum.png'],
+            cacheQueryOptions: {
+              ignoreVary: true,
+            },
+            patterns: [],
           },
-          patterns: [],
+        ],
+        dataGroups: [],
+        hashTable: {
+          '/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
+          '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
+          '/index.html': 'f0bea8ced1dfbeeb771a5f48651fbcff52a625eb',
+          '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
         },
-      ],
-      dataGroups: [],
-      hashTable: {
-        '/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
-        '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-        '/index.html': 'f0bea8ced1dfbeeb771a5f48651fbcff52a625eb',
-        '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
-      },
-    }));
+      }),
+    );
 
     await run.stop();
   });
@@ -141,12 +129,14 @@ describe('Browser Builder service worker', () => {
     await run.output
       .pipe(
         debounceTime(3000),
-        tap(buildEvent => {
+        tap((buildEvent) => {
           expect(buildEvent.success).toBeTrue();
 
           const ngswJsonPath = normalize('dist/ngsw.json');
           expect(host.scopedSync().exists(ngswJsonPath)).toBeTrue();
-          const ngswJson = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(ngswJsonPath)));
+          const ngswJson = JSON.parse(
+            virtualFs.fileBufferToString(host.scopedSync().read(ngswJsonPath)),
+          );
 
           const hashTableEntries = Object.keys(ngswJson.hashTable);
 
@@ -193,52 +183,50 @@ describe('Browser Builder service worker', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     expect(host.scopedSync().exists(normalize('dist/ngsw.json'))).toBeTrue();
-    const ngswJson = JSON.parse(virtualFs.fileBufferToString(
-      host.scopedSync().read(normalize('dist/ngsw.json'))));
+    const ngswJson = JSON.parse(
+      virtualFs.fileBufferToString(host.scopedSync().read(normalize('dist/ngsw.json'))),
+    );
     // Verify index and assets include the base href.
-    expect(ngswJson).toEqual(jasmine.objectContaining({
-      configVersion: 1,
-      index: '/foo/bar/index.html',
-      navigationUrls: [
-        { positive: true, regex: '^\\\/.*$' },
-        { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*\\.[^\/]*$' },
-        { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*$' },
-        { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*\\\/.*$' },
-      ],
-      assetGroups: [
-        {
-          name: 'app',
-          installMode: 'prefetch',
-          updateMode: 'prefetch',
-          urls: [
-            '/foo/bar/favicon.ico',
-            '/foo/bar/index.html',
-          ],
-          patterns: [],
-          cacheQueryOptions: {
-            ignoreVary: true,
+    expect(ngswJson).toEqual(
+      jasmine.objectContaining({
+        configVersion: 1,
+        index: '/foo/bar/index.html',
+        navigationUrls: [
+          { positive: true, regex: '^\\/.*$' },
+          { positive: false, regex: '^\\/(?:.+\\/)?[^/]*\\.[^/]*$' },
+          { positive: false, regex: '^\\/(?:.+\\/)?[^/]*__[^/]*$' },
+          { positive: false, regex: '^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$' },
+        ],
+        assetGroups: [
+          {
+            name: 'app',
+            installMode: 'prefetch',
+            updateMode: 'prefetch',
+            urls: ['/foo/bar/favicon.ico', '/foo/bar/index.html'],
+            patterns: [],
+            cacheQueryOptions: {
+              ignoreVary: true,
+            },
           },
-        },
-        {
-          name: 'assets',
-          installMode: 'lazy',
-          updateMode: 'prefetch',
-          urls: [
-            '/foo/bar/assets/folder-asset.txt',
-          ],
-          patterns: [],
-          cacheQueryOptions: {
-            ignoreVary: true,
+          {
+            name: 'assets',
+            installMode: 'lazy',
+            updateMode: 'prefetch',
+            urls: ['/foo/bar/assets/folder-asset.txt'],
+            patterns: [],
+            cacheQueryOptions: {
+              ignoreVary: true,
+            },
           },
+        ],
+        dataGroups: [],
+        hashTable: {
+          '/foo/bar/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
+          '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
+          '/foo/bar/index.html': 'f6650ac91428c6933dfe4c24079b3b15400da1ba',
         },
-      ],
-      dataGroups: [],
-      hashTable: {
-        '/foo/bar/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
-        '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-        '/foo/bar/index.html': 'f6650ac91428c6933dfe4c24079b3b15400da1ba',
-      },
-    }));
+      }),
+    );
 
     await run.stop();
   });

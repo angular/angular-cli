@@ -10,7 +10,6 @@ import { SchematicsException } from '../exception/exception';
 import { FilterHostTree, HostTree } from './host-tree';
 import { FilePredicate, MergeStrategy, Tree } from './interface';
 
-
 export function empty() {
   return new HostTree();
 }

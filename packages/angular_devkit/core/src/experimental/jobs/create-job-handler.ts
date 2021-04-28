@@ -21,7 +21,6 @@ import {
   JobOutboundMessageKind,
 } from './api';
 
-
 export class ChannelAlreadyExistException extends BaseException {
   constructor(name: string) {
     super(`Channel ${JSON.stringify(name)} already exist.`);
@@ -35,12 +34,11 @@ export class ChannelAlreadyExistException extends BaseException {
 export interface SimpleJobHandlerContext<
   A extends JsonValue,
   I extends JsonValue,
-  O extends JsonValue,
+  O extends JsonValue
 > extends JobHandlerContext<A, I, O> {
   createChannel: (name: string) => Observer<JsonValue>;
   input: Observable<I>;
 }
-
 
 /**
  * A simple version of the JobHandler. This simplifies a lot of the interaction with the job
@@ -51,7 +49,6 @@ export type SimpleJobHandlerFn<A extends JsonValue, I extends JsonValue, O exten
   input: A,
   context: SimpleJobHandlerContext<A, I, O>,
 ) => O | Promise<O> | Observable<O>;
-
 
 /**
  * Make a simple job handler that sets start and end from a function that's synchronous.
@@ -70,7 +67,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
     const inputChannel = new Subject<I>();
     let subscription: Subscription;
 
-    return new Observable<JobOutboundMessage<O>>(subject => {
+    return new Observable<JobOutboundMessage<O>>((subject) => {
       function complete() {
         if (subscription) {
           subscription.unsubscribe();
@@ -81,7 +78,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
       }
 
       // Handle input.
-      const inboundSub = inboundBus.subscribe(message => {
+      const inboundSub = inboundBus.subscribe((message) => {
         switch (message.kind) {
           case JobInboundMessageKind.Ping:
             subject.next({ kind: JobOutboundMessageKind.Pong, description, id: message.id });
@@ -111,12 +108,15 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
           }
           const channelSubject = new Subject<JsonValue>();
           const channelSub = channelSubject.subscribe(
-            message => {
+            (message) => {
               subject.next({
-                kind: JobOutboundMessageKind.ChannelMessage, description, name, message,
+                kind: JobOutboundMessageKind.ChannelMessage,
+                description,
+                name,
+                message,
               });
             },
-            error => {
+            (error) => {
               subject.next({ kind: JobOutboundMessageKind.ChannelError, description, name, error });
               // This can be reopened.
               channels.delete(name);
@@ -148,7 +148,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
 
       subscription = (result as Observable<O>).subscribe(
         (value: O) => subject.next({ kind: JobOutboundMessageKind.Output, description, value }),
-        error => subject.error(error),
+        (error) => subject.error(error),
         () => complete(),
       );
       subscription.add(inboundSub);
@@ -160,7 +160,6 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
   return Object.assign(handler, { jobDescription: options });
 }
 
-
 /**
  * Lazily create a job using a function.
  * @param loader A factory function that returns a promise/observable of a JobHandler.
@@ -171,13 +170,11 @@ export function createJobFactory<A extends JsonValue, I extends JsonValue, O ext
   options: Partial<JobDescription> = {},
 ): JobHandler<A, I, O> {
   const handler = (argument: A, context: JobHandlerContext<A, I, O>) => {
-    return from(loader())
-      .pipe(switchMap(fn => fn(argument, context)));
+    return from(loader()).pipe(switchMap((fn) => fn(argument, context)));
   };
 
   return Object.assign(handler, { jobDescription: options });
 }
-
 
 /**
  * Creates a job that logs out input/output messages of another Job. The messages are still
@@ -188,14 +185,14 @@ export function createLoggerJob<A extends JsonValue, I extends JsonValue, O exte
   logger: LoggerApi,
 ): JobHandler<A, I, O> {
   const handler = (argument: A, context: JobHandlerContext<A, I, O>) => {
-    context.inboundBus.pipe(
-      tap(message => logger.info(`Input: ${JSON.stringify(message)}`)),
-    ).subscribe();
+    context.inboundBus
+      .pipe(tap((message) => logger.info(`Input: ${JSON.stringify(message)}`)))
+      .subscribe();
 
     return job(argument, context).pipe(
       tap(
-        message => logger.info(`Message: ${JSON.stringify(message)}`),
-        error => logger.warn(`Error: ${JSON.stringify(error)}`),
+        (message) => logger.info(`Message: ${JSON.stringify(message)}`),
+        (error) => logger.warn(`Error: ${JSON.stringify(error)}`),
         () => logger.info(`Completed`),
       ),
     );

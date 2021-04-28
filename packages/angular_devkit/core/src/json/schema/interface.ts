@@ -60,15 +60,16 @@ export interface PromptDefinition {
   default?: string | string[] | number | boolean | null;
   validator?: (value: JsonValue) => boolean | string | Promise<boolean | string>;
 
-  items?: Array<string | { value: JsonValue, label: string }>;
+  items?: Array<string | { value: JsonValue; label: string }>;
 
   raw?: string | JsonObject;
   multiselect?: boolean;
   propertyTypes: Set<string>;
 }
 
-export type PromptProvider = (definitions: Array<PromptDefinition>)
-  => SubscribableOrPromise<{ [id: string]: JsonValue }>;
+export type PromptProvider = (
+  definitions: Array<PromptDefinition>,
+) => SubscribableOrPromise<{ [id: string]: JsonValue }>;
 
 export interface SchemaRegistry {
   compile(schema: Object): Observable<SchemaValidator>;
@@ -110,10 +111,7 @@ export interface JsonSchemaVisitor {
 }
 
 export interface JsonVisitor {
-  (
-    value: JsonValue,
-    pointer: JsonPointer,
-    schema?: JsonObject,
-    root?: JsonObject | JsonArray,
-  ): Observable<JsonValue> | JsonValue;
+  (value: JsonValue, pointer: JsonPointer, schema?: JsonObject, root?: JsonObject | JsonArray):
+    | Observable<JsonValue>
+    | JsonValue;
 }

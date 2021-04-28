@@ -8,6 +8,4 @@
 
 import * as jobs from './jobs';
 
-export {
-  jobs,
-};
+export { jobs };

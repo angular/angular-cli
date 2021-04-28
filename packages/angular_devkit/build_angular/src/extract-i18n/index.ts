@@ -6,11 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  BuilderContext,
-  createBuilder,
-  targetFromTargetString,
-} from '@angular-devkit/architect';
+import { BuilderContext, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import { BuildResult, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
@@ -54,42 +50,60 @@ function getI18nOutfile(format: string | undefined) {
   }
 }
 
-async function getSerializer(format: Format, sourceLocale: string, basePath: string, useLegacyIds: boolean, diagnostics: Diagnostics) {
+async function getSerializer(
+  format: Format,
+  sourceLocale: string,
+  basePath: string,
+  useLegacyIds: boolean,
+  diagnostics: Diagnostics,
+) {
   switch (format) {
     case Format.Xmb:
-      const { XmbTranslationSerializer } =
-      await import('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer');
+      const { XmbTranslationSerializer } = await import(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'
+      );
 
       // tslint:disable-next-line: no-any
       return new XmbTranslationSerializer(basePath as any, useLegacyIds);
     case Format.Xlf:
     case Format.Xlif:
     case Format.Xliff:
-      const { Xliff1TranslationSerializer } =
-        await import('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer');
+      const { Xliff1TranslationSerializer } = await import(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'
+      );
 
       // tslint:disable-next-line: no-any
       return new Xliff1TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
     case Format.Xlf2:
     case Format.Xliff2:
-      const { Xliff2TranslationSerializer } =
-        await import('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer');
+      const { Xliff2TranslationSerializer } = await import(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'
+      );
 
       // tslint:disable-next-line: no-any
       return new Xliff2TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
     case Format.Json:
-      const { SimpleJsonTranslationSerializer } =
-        await import('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer');
+      const { SimpleJsonTranslationSerializer } = await import(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'
+      );
 
       return new SimpleJsonTranslationSerializer(sourceLocale);
     case Format.LegacyMigrate:
-      const { LegacyMessageIdMigrationSerializer } =
-        await import('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer');
+      const { LegacyMessageIdMigrationSerializer } = await import(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'
+      );
 
       return new LegacyMessageIdMigrationSerializer(diagnostics);
     case Format.Arb:
-      const { ArbTranslationSerializer } =
-        await import('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer');
+      const { ArbTranslationSerializer } = await import(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'
+      );
 
       const fileSystem = {
         relative(from: string, to: string): string {

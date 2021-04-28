@@ -80,12 +80,7 @@
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
       "default": "css",
-      "enum": [
-        "css",
-        "scss",
-        "sass",
-        "less"
-      ],
+      "enum": ["css", "scss", "sass", "less"],
       "x-user-analytics": 5
     },
     "type": {
@@ -120,7 +115,7 @@
       "default": false,
       "description": "Specifies if the component should have a selector or not."
     },
-    "module":  {
+    "module": {
       "type": "string",
       "description": "The declaring NgModule.",
       "alias": "m"
@@ -138,7 +133,5 @@
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": ["name"]
 }

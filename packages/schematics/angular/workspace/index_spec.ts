@@ -11,7 +11,6 @@ import { parse as parseJson } from 'jsonc-parser';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from './schema';
 
-
 describe('Workspace Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -27,14 +26,16 @@ describe('Workspace Schematic', () => {
 
     const tree = await schematicRunner.runSchematicAsync('workspace', options).toPromise();
     const files = tree.files;
-    expect(files).toEqual(jasmine.arrayContaining([
-      '/.editorconfig',
-      '/angular.json',
-      '/.gitignore',
-      '/package.json',
-      '/README.md',
-      '/tsconfig.json',
-    ]));
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/.editorconfig',
+        '/angular.json',
+        '/.gitignore',
+        '/package.json',
+        '/README.md',
+        '/tsconfig.json',
+      ]),
+    );
   });
 
   it('should set the name in package.json', async () => {
@@ -59,15 +60,19 @@ describe('Workspace Schematic', () => {
   });
 
   it('should create correct files when using minimal', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, minimal: true }).toPromise();
+    const tree = await schematicRunner
+      .runSchematicAsync('workspace', { ...defaultOptions, minimal: true })
+      .toPromise();
     const files = tree.files;
-    expect(files).toEqual(jasmine.arrayContaining([
-      '/angular.json',
-      '/.gitignore',
-      '/package.json',
-      '/README.md',
-      '/tsconfig.json',
-    ]));
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/angular.json',
+        '/.gitignore',
+        '/package.json',
+        '/README.md',
+        '/tsconfig.json',
+      ]),
+    );
 
     expect(files).not.toContain('/.editorconfig');
   });
@@ -81,16 +86,22 @@ describe('Workspace Schematic', () => {
   });
 
   it('should not add strict compiler options when false', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
+    const tree = await schematicRunner
+      .runSchematicAsync('workspace', { ...defaultOptions, strict: false })
+      .toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
       parseJson(tree.readContent('tsconfig.json').toString()) as any;
     expect(compilerOptions.strict).toBeUndefined();
-    expect(Object.keys(angularCompilerOptions).filter(option => option.startsWith('strict'))).toEqual([]);
+    expect(
+      Object.keys(angularCompilerOptions).filter((option) => option.startsWith('strict')),
+    ).toEqual([]);
   });
 
   it('should add strict compiler options when true', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
+    const tree = await schematicRunner
+      .runSchematicAsync('workspace', { ...defaultOptions, strict: true })
+      .toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
       parseJson(tree.readContent('tsconfig.json').toString()) as any;

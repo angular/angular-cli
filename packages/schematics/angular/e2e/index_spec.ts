@@ -39,44 +39,50 @@ describe('Application Schematic', () => {
   let applicationTree: UnitTestTree;
 
   beforeEach(async () => {
-    const workspaceTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    applicationTree = await schematicRunner.runSchematicAsync(
-      'application',
-      defaultAppOptions,
-      workspaceTree,
-    ).toPromise();
+    const workspaceTree = await schematicRunner
+      .runSchematicAsync('workspace', workspaceOptions)
+      .toPromise();
+    applicationTree = await schematicRunner
+      .runSchematicAsync('application', defaultAppOptions, workspaceTree)
+      .toPromise();
   });
 
   it('should create all files of e2e in an application', async () => {
-    const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('e2e', defaultOptions, applicationTree)
       .toPromise();
     const files = tree.files;
-    expect(files).toEqual(jasmine.arrayContaining([
-      '/projects/foo/e2e/protractor.conf.js',
-      '/projects/foo/e2e/tsconfig.json',
-      '/projects/foo/e2e/src/app.e2e-spec.ts',
-      '/projects/foo/e2e/src/app.po.ts',
-    ]));
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/projects/foo/e2e/protractor.conf.js',
+        '/projects/foo/e2e/tsconfig.json',
+        '/projects/foo/e2e/src/app.e2e-spec.ts',
+        '/projects/foo/e2e/src/app.po.ts',
+      ]),
+    );
   });
 
   it('should set the rootSelector in the app.po.ts', async () => {
-    const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('e2e', defaultOptions, applicationTree)
       .toPromise();
     const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
     expect(content).toMatch(/app\-root/);
   });
 
   it('should set the rootSelector in the app.po.ts from the option', async () => {
-    const options = {...defaultOptions, rootSelector: 't-a-c-o'};
-    const tree = await schematicRunner.runSchematicAsync('e2e', options, applicationTree)
+    const options = { ...defaultOptions, rootSelector: 't-a-c-o' };
+    const tree = await schematicRunner
+      .runSchematicAsync('e2e', options, applicationTree)
       .toPromise();
     const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
     expect(content).toMatch(/t\-a\-c\-o/);
   });
 
   it('should set the rootSelector in the app.po.ts from the option with emoji', async () => {
-    const options = {...defaultOptions, rootSelector: '🌮-🌯'};
-    const tree = await schematicRunner.runSchematicAsync('e2e', options, applicationTree)
+    const options = { ...defaultOptions, rootSelector: '🌮-🌯' };
+    const tree = await schematicRunner
+      .runSchematicAsync('e2e', options, applicationTree)
       .toPromise();
     const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
     expect(content).toMatch(/🌮-🌯/);
@@ -84,7 +90,8 @@ describe('Application Schematic', () => {
 
   describe('workspace config', () => {
     it('should add e2e targets for the app', async () => {
-      const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+      const tree = await schematicRunner
+        .runSchematicAsync('e2e', defaultOptions, applicationTree)
         .toPromise();
       const workspace = JSON.parse(tree.readContent('/angular.json'));
       const targets = workspace.projects.foo.architect;
@@ -92,7 +99,8 @@ describe('Application Schematic', () => {
     });
 
     it('should set the e2e options', async () => {
-      const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+      const tree = await schematicRunner
+        .runSchematicAsync('e2e', defaultOptions, applicationTree)
         .toPromise();
       const workspace = JSON.parse(tree.readContent('/angular.json'));
       const { options, configurations } = workspace.projects.foo.architect.e2e;
@@ -102,7 +110,8 @@ describe('Application Schematic', () => {
   });
 
   it('should add an e2e script in package.json', async () => {
-    const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('e2e', defaultOptions, applicationTree)
       .toPromise();
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.scripts['e2e']).toBe('ng e2e');

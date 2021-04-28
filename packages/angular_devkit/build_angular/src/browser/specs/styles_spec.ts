@@ -175,7 +175,7 @@ describe('Browser Builder styles', () => {
     expect(await files['main.js']).toContain('-ms-flex: 1;');
   });
 
-  extensionsWithImportSupport.forEach(ext => {
+  extensionsWithImportSupport.forEach((ext) => {
     it(`supports imports in ${ext} files`, async () => {
       host.writeMultipleFiles({
         [`src/styles.${ext}`]: `
@@ -229,7 +229,7 @@ describe('Browser Builder styles', () => {
     });
   });
 
-  extensionsWithImportSupport.forEach(ext => {
+  extensionsWithImportSupport.forEach((ext) => {
     it(`supports material imports in ${ext} files`, async () => {
       host.writeMultipleFiles({
         [`src/styles.${ext}`]: `
@@ -255,7 +255,7 @@ describe('Browser Builder styles', () => {
     });
   });
 
-  extensionsWithVariableSupport.forEach(ext => {
+  extensionsWithVariableSupport.forEach((ext) => {
     it(`supports ${ext} includePaths`, async () => {
       let variableAssignment = '';
       let variablereference = '';
@@ -405,110 +405,126 @@ describe('Browser Builder styles', () => {
   });
 
   // TODO: consider making this a unit test in the url processing plugins.
-  it(`supports baseHref/deployUrl in resource urls`, async () => {
-    // Use a large image for the relative ref so it cannot be inlined.
-    host.copyFile('src/spectrum.png', './src/assets/global-img-relative.png');
-    host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
-    host.writeMultipleFiles({
-      'src/styles.css': `
+  it(
+    `supports baseHref/deployUrl in resource urls`,
+    async () => {
+      // Use a large image for the relative ref so it cannot be inlined.
+      host.copyFile('src/spectrum.png', './src/assets/global-img-relative.png');
+      host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
+      host.writeMultipleFiles({
+        'src/styles.css': `
         h1 { background: url('/assets/global-img-absolute.svg'); }
         h2 { background: url('./assets/global-img-relative.png'); }
       `,
-      'src/app/app.component.css': `
+        'src/app/app.component.css': `
         h3 { background: url('/assets/component-img-absolute.svg'); }
         h4 { background: url('../assets/component-img-relative.png'); }
       `,
-      'src/assets/global-img-absolute.svg': imgSvg,
-      'src/assets/component-img-absolute.svg': imgSvg,
-    });
+        'src/assets/global-img-absolute.svg': imgSvg,
+        'src/assets/component-img-absolute.svg': imgSvg,
+      });
 
-    let { files } = await browserBuild(architect, host, target, { aot: true, extractCss: true });
+      let { files } = await browserBuild(architect, host, target, { aot: true, extractCss: true });
 
-    // Check base paths are correctly generated.
-    let styles = await files['styles.css'];
-    let main = await files['main.js'];
+      // Check base paths are correctly generated.
+      let styles = await files['styles.css'];
+      let main = await files['main.js'];
 
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(styles).toContain(`url('global-img-relative.png')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-    expect(main).toContain(`url('component-img-relative.png')`);
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(styles).toContain(`url('global-img-relative.png')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      expect(main).toContain(`url('component-img-relative.png')`);
 
-    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
-      true,
-    );
-    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png'))).toBe(true);
+      expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
+      expect(host.scopedSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
+      expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
+        true,
+      );
+      expect(host.scopedSync().exists(normalize('dist/component-img-relative.png'))).toBe(true);
 
-    // Check urls with deploy-url scheme are used as is.
-    files = (await browserBuild(architect, host, target, {
-      extractCss: true,
-      baseHref: '/base/',
-      deployUrl: 'http://deploy.url/',
-    })).files;
+      // Check urls with deploy-url scheme are used as is.
+      files = (
+        await browserBuild(architect, host, target, {
+          extractCss: true,
+          baseHref: '/base/',
+          deployUrl: 'http://deploy.url/',
+        })
+      ).files;
 
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      styles = await files['styles.css'];
+      main = await files['main.js'];
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
 
-    // Check urls with base-href scheme are used as is (with deploy-url).
-    files = (await browserBuild(architect, host, target, {
-      extractCss: true,
-      baseHref: 'http://base.url/',
-      deployUrl: 'deploy/',
-    })).files;
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      // Check urls with base-href scheme are used as is (with deploy-url).
+      files = (
+        await browserBuild(architect, host, target, {
+          extractCss: true,
+          baseHref: 'http://base.url/',
+          deployUrl: 'deploy/',
+        })
+      ).files;
+      styles = await files['styles.css'];
+      main = await files['main.js'];
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
 
-    // Check urls with deploy-url and base-href scheme only use deploy-url.
-    files = (await browserBuild(architect, host, target, {
-      extractCss: true,
-      baseHref: 'http://base.url/',
-      deployUrl: 'http://deploy.url/',
-    })).files;
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      // Check urls with deploy-url and base-href scheme only use deploy-url.
+      files = (
+        await browserBuild(architect, host, target, {
+          extractCss: true,
+          baseHref: 'http://base.url/',
+          deployUrl: 'http://deploy.url/',
+        })
+      ).files;
+      styles = await files['styles.css'];
+      main = await files['main.js'];
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
 
-    // Check with schemeless base-href and deploy-url flags.
-    files = (await browserBuild(architect, host, target, {
-      extractCss: true,
-      baseHref: '/base/',
-      deployUrl: 'deploy/',
-    })).files;
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      // Check with schemeless base-href and deploy-url flags.
+      files = (
+        await browserBuild(architect, host, target, {
+          extractCss: true,
+          baseHref: '/base/',
+          deployUrl: 'deploy/',
+        })
+      ).files;
+      styles = await files['styles.css'];
+      main = await files['main.js'];
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
 
-    // Check with identical base-href and deploy-url flags.
-    files = (await browserBuild(architect, host, target, {
-      extractCss: true,
-      baseHref: '/base/',
-      deployUrl: '/base/',
-    })).files;
+      // Check with identical base-href and deploy-url flags.
+      files = (
+        await browserBuild(architect, host, target, {
+          extractCss: true,
+          baseHref: '/base/',
+          deployUrl: '/base/',
+        })
+      ).files;
 
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      styles = await files['styles.css'];
+      main = await files['main.js'];
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
 
-    // Check with only base-href flag.
-    files = (await browserBuild(architect, host, target, {
-      extractCss: true,
-      baseHref: '/base/',
-    })).files;
+      // Check with only base-href flag.
+      files = (
+        await browserBuild(architect, host, target, {
+          extractCss: true,
+          baseHref: '/base/',
+        })
+      ).files;
 
-    styles = await files['styles.css'];
-    main = await files['main.js'];
-    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-  // NOTE: Timeout for large amount of builds in test. Test should be split up when refactored.
-  }, 4 * 60 * 1000);
+      styles = await files['styles.css'];
+      main = await files['main.js'];
+      expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+      expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      // NOTE: Timeout for large amount of builds in test. Test should be split up when refactored.
+    },
+    4 * 60 * 1000,
+  );
 
   it(`supports bootstrap@4 with full path`, async () => {
     const bootstrapPath = dirname(require.resolve('bootstrap/package.json'));
@@ -607,7 +623,7 @@ describe('Browser Builder styles', () => {
     expect(output.success).toBe(true);
   });
 
-  extensionsWithImportSupport.forEach(ext => {
+  extensionsWithImportSupport.forEach((ext) => {
     it(`retains declarations order in ${ext} files with extractCss when using @import`, async () => {
       host.writeMultipleFiles({
         [`src/styles-one.${ext}`]: tags.stripIndents`
@@ -623,7 +639,9 @@ describe('Browser Builder styles', () => {
         // LESS doesn't support css imports by default.
         // See: https://github.com/less/less.js/issues/3188#issuecomment-374690630
         [`src/styles-three.${ext}`]: tags.stripIndents`
-            @import ${ext === 'less' ? ' (css) ' : ''}url("https://fonts.googleapis.com/css?family=Roboto:400");
+            @import ${
+              ext === 'less' ? ' (css) ' : ''
+            }url("https://fonts.googleapis.com/css?family=Roboto:400");
             .three {
               color: #fff;
             }
@@ -632,18 +650,14 @@ describe('Browser Builder styles', () => {
 
       const overrides = {
         extractCss: true,
-        styles: [
-          `src/styles-one.${ext}`,
-          `src/styles-two.${ext}`,
-          `src/styles-three.${ext}`,
-        ],
+        styles: [`src/styles-one.${ext}`, `src/styles-two.${ext}`, `src/styles-three.${ext}`],
       };
       const { files } = await browserBuild(architect, host, target, overrides);
       expect(await files['styles.css']).toMatch(/\.one(.|\n|\r)*\.two(.|\n|\r)*\.three/);
     });
   });
 
-  extensionsWithImportSupport.forEach(ext => {
+  extensionsWithImportSupport.forEach((ext) => {
     it(`adjusts relative resource URLs when using @import in ${ext} (global)`, async () => {
       host.copyFile('src/spectrum.png', './src/more-styles/images/global-img-relative.png');
       host.writeMultipleFiles({
@@ -660,12 +674,10 @@ describe('Browser Builder styles', () => {
       const overrides = {
         sourceMap: false,
         extractCss: true,
-        styles: [
-          `src/styles-one.${ext}`,
-        ],
+        styles: [`src/styles-one.${ext}`],
       };
       const { files } = await browserBuild(architect, host, target, overrides);
-      expect(await files['styles.css']).toContain('\'global-img-relative.png\'');
+      expect(await files['styles.css']).toContain("'global-img-relative.png'");
     });
 
     it(`adjusts relative resource URLs when using @import in ${ext} (component)`, async () => {

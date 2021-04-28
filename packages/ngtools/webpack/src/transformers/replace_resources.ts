@@ -133,9 +133,12 @@ function visitDecorator(
 
   return nodeFactory.updateDecorator(
     node,
-    nodeFactory.updateCallExpression(decoratorFactory, decoratorFactory.expression, decoratorFactory.typeArguments, [
-      nodeFactory.updateObjectLiteralExpression(objectExpression, properties),
-    ]),
+    nodeFactory.updateCallExpression(
+      decoratorFactory,
+      decoratorFactory.expression,
+      decoratorFactory.typeArguments,
+      [nodeFactory.updateObjectLiteralExpression(objectExpression, properties)],
+    ),
   );
 }
 
@@ -185,7 +188,7 @@ function visitComponentMetadata(
       }
 
       const isInlineStyle = name === 'styles';
-      const styles = ts.visitNodes(node.initializer.elements, node => {
+      const styles = ts.visitNodes(node.initializer.elements, (node) => {
         if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
           return node;
         }
@@ -254,21 +257,21 @@ function createResourceImport(
 
   if (moduleKind < ts.ModuleKind.ES2015) {
     return nodeFactory.createPropertyAccessExpression(
-      nodeFactory.createCallExpression(
-        nodeFactory.createIdentifier('require'),
-        [],
-        [urlLiteral],
-      ),
+      nodeFactory.createCallExpression(nodeFactory.createIdentifier('require'), [], [urlLiteral]),
       'default',
     );
   } else {
-    const importName = nodeFactory.createIdentifier(`__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`);
-    resourceImportDeclarations.push(nodeFactory.createImportDeclaration(
-      undefined,
-      undefined,
-      nodeFactory.createImportClause(false, importName, undefined),
-      urlLiteral,
-    ));
+    const importName = nodeFactory.createIdentifier(
+      `__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`,
+    );
+    resourceImportDeclarations.push(
+      nodeFactory.createImportDeclaration(
+        undefined,
+        undefined,
+        nodeFactory.createImportClause(false, importName, undefined),
+        urlLiteral,
+      ),
+    );
 
     return importName;
   }

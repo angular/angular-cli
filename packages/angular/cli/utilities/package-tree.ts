@@ -66,7 +66,7 @@ export async function getProjectDependencies(dir: string): Promise<Map<string, P
     throw new Error('Could not find package.json');
   }
 
-  const results = new Map<string, PackageTreeNode> ();
+  const results = new Map<string, PackageTreeNode>();
   for (const [name, version] of getAllDependencies(pkg)) {
     const packageJsonPath = findPackageJson(dir, name);
     if (!packageJsonPath) {

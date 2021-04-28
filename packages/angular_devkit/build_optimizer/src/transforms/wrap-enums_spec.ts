@@ -11,9 +11,8 @@ import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getWrapEnumsTransformer } from './wrap-enums';
 
-
-const transform = (content: string) => transformJavascript(
-  { content, getTransforms: [getWrapEnumsTransformer] }).content;
+const transform = (content: string) =>
+  transformJavascript({ content, getTransforms: [getWrapEnumsTransformer] }).content;
 
 // tslint:disable:no-big-function
 describe('wrap enums and classes transformer', () => {
@@ -464,7 +463,6 @@ describe('wrap enums and classes transformer', () => {
 
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
-
 
     it('wraps ts >2.3 enums in IIFE', () => {
       const input = tags.stripIndent`

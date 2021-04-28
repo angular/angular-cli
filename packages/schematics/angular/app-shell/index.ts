@@ -45,14 +45,10 @@ function getSourceFile(host: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-function getServerModulePath(
-  host: Tree,
-  sourceRoot: string,
-  mainPath: string,
-): string | null {
+function getServerModulePath(host: Tree, sourceRoot: string, mainPath: string): string | null {
   const mainSource = getSourceFile(host, join(normalize(sourceRoot), mainPath));
   const allNodes = getSourceNodes(mainSource);
-  const expNode = allNodes.find(node => ts.isExportDeclaration(node));
+  const expNode = allNodes.find((node) => ts.isExportDeclaration(node));
   if (!expNode) {
     return null;
   }
@@ -95,10 +91,7 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
   return template;
 }
 
-function getBootstrapComponentPath(
-  host: Tree,
-  mainPath: string,
-): string {
+function getBootstrapComponentPath(host: Tree, mainPath: string): string {
   const modulePath = getAppModulePath(host, mainPath);
   const moduleSource = getSourceFile(host, modulePath);
 
@@ -112,10 +105,10 @@ function getBootstrapComponentPath(
 
   const relativePath = getSourceNodes(moduleSource)
     .filter(ts.isImportDeclaration)
-    .filter(imp => {
+    .filter((imp) => {
       return findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
     })
-    .map(imp => {
+    .map((imp) => {
       const pathStringLiteral = imp.moduleSpecifier as ts.StringLiteral;
 
       return pathStringLiteral.text;
@@ -133,8 +126,7 @@ function validateProject(mainPath: string): Rule {
     const tmpl = getComponentTemplateInfo(host, componentPath);
     const template = getComponentTemplate(host, componentPath, tmpl);
     if (!routerOutletCheckRegex.test(template)) {
-      const errorMsg =
-        `Prerequisite for app shell is to define a router-outlet in your root component.`;
+      const errorMsg = `Prerequisite for app shell is to define a router-outlet in your root component.`;
       context.logger.error(errorMsg);
       throw new SchematicsException(errorMsg);
     }
@@ -161,7 +153,7 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
       throw new SchematicsException(`Route is not defined`);
     }
 
-    return updateWorkspace(workspace => {
+    return updateWorkspace((workspace) => {
       const project = workspace.projects.get(options.clientProject);
       if (!project) {
         return;
@@ -180,13 +172,17 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
       const configurations: Record<string, {}> = {};
       for (const key of configurationNames) {
         if (!serverConfigKeys[key]) {
-          context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "server" target.`);
+          context.logger.warn(
+            `Skipped adding "${key}" configuration to "app-shell" target as it's missing from "server" target.`,
+          );
 
           continue;
         }
 
         if (!buildConfigKeys[key]) {
-          context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "build" target.`);
+          context.logger.warn(
+            `Skipped adding "${key}" configuration to "app-shell" target as it's missing from "build" target.`,
+          );
 
           continue;
         }
@@ -225,19 +221,17 @@ function addRouterModule(mainPath: string): Rule {
 
 function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.PropertyAssignment {
   const properties = (metadata as ts.ObjectLiteralExpression).properties;
-  const property = properties
-    .filter(ts.isPropertyAssignment)
-    .filter((prop) => {
-      const name = prop.name;
-      switch (name.kind) {
-        case ts.SyntaxKind.Identifier:
-          return (name as ts.Identifier).getText() === propertyName;
-        case ts.SyntaxKind.StringLiteral:
-          return (name as ts.StringLiteral).text === propertyName;
-      }
+  const property = properties.filter(ts.isPropertyAssignment).filter((prop) => {
+    const name = prop.name;
+    switch (name.kind) {
+      case ts.SyntaxKind.Identifier:
+        return (name as ts.Identifier).getText() === propertyName;
+      case ts.SyntaxKind.StringLiteral:
+        return (name as ts.StringLiteral).text === propertyName;
+    }
 
-      return false;
-    })[0];
+    return false;
+  })[0];
 
   return property as ts.PropertyAssignment;
 }
@@ -254,11 +248,15 @@ function addServerRoutes(options: AppShellOptions): Rule {
     if (!clientServerTarget) {
       throw new Error('Universal schematic did not add server target to client project.');
     }
-    const clientServerOptions = clientServerTarget.options as unknown as ServerBuilderOptions;
+    const clientServerOptions = (clientServerTarget.options as unknown) as ServerBuilderOptions;
     if (!clientServerOptions) {
       throw new SchematicsException('Server target does not contain options.');
     }
-    const modulePath = getServerModulePath(host, clientProject.sourceRoot || 'src', options.main as string);
+    const modulePath = getServerModulePath(
+      host,
+      clientProject.sourceRoot || 'src',
+      options.main as string,
+    );
     if (modulePath === null) {
       throw new SchematicsException('Universal/server module not found.');
     }
@@ -266,20 +264,16 @@ function addServerRoutes(options: AppShellOptions): Rule {
     let moduleSource = getSourceFile(host, modulePath);
     if (!isImported(moduleSource, 'Routes', '@angular/router')) {
       const recorder = host.beginUpdate(modulePath);
-      const routesChange = insertImport(moduleSource,
-        modulePath,
-        'Routes',
-        '@angular/router');
+      const routesChange = insertImport(moduleSource, modulePath, 'Routes', '@angular/router');
       if (routesChange) {
         applyToUpdateRecorder(recorder, [routesChange]);
       }
 
       const imports = getSourceNodes(moduleSource)
-        .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+        .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
         .sort((a, b) => a.getStart() - b.getStart());
       const insertPosition = imports[imports.length - 1].getEnd();
-      const routeText =
-        `\n\nconst routes: Routes = [ { path: '${options.route}', component: AppShellComponent }];`;
+      const routeText = `\n\nconst routes: Routes = [ { path: '${options.route}', component: AppShellComponent }];`;
       recorder.insertRight(insertPosition, routeText);
       host.commitUpdate(recorder);
     }
@@ -287,17 +281,23 @@ function addServerRoutes(options: AppShellOptions): Rule {
     moduleSource = getSourceFile(host, modulePath);
     if (!isImported(moduleSource, 'RouterModule', '@angular/router')) {
       const recorder = host.beginUpdate(modulePath);
-      const routerModuleChange = insertImport(moduleSource,
+      const routerModuleChange = insertImport(
+        moduleSource,
         modulePath,
         'RouterModule',
-        '@angular/router');
+        '@angular/router',
+      );
 
       if (routerModuleChange) {
         applyToUpdateRecorder(recorder, [routerModuleChange]);
       }
 
       const metadataChange = addSymbolToNgModuleMetadata(
-        moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
+        moduleSource,
+        modulePath,
+        'imports',
+        'RouterModule.forRoot(routes)',
+      );
       if (metadataChange) {
         applyToUpdateRecorder(recorder, metadataChange);
       }
@@ -317,7 +317,7 @@ function addShellComponent(options: AppShellOptions): Rule {
 }
 
 export default function (options: AppShellOptions): Rule {
-  return async tree => {
+  return async (tree) => {
     const workspace = await getWorkspace(tree);
     const clientProject = workspace.projects.get(options.clientProject);
     if (!clientProject || clientProject.extensions.projectType !== 'application') {
@@ -327,8 +327,8 @@ export default function (options: AppShellOptions): Rule {
     if (!clientBuildTarget) {
       throw targetBuildNotFoundError();
     }
-    const clientBuildOptions =
-      (clientBuildTarget.options || {}) as unknown as BrowserBuilderOptions;
+    const clientBuildOptions = ((clientBuildTarget.options ||
+      {}) as unknown) as BrowserBuilderOptions;
 
     return chain([
       validateProject(clientBuildOptions.main),

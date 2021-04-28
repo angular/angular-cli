@@ -9,7 +9,12 @@
 import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { BuilderTarget, Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
+import {
+  BuilderTarget,
+  Builders,
+  ProjectType,
+  WorkspaceSchema,
+} from '../../utility/workspace-models';
 
 function getBuildTarget(tree: UnitTestTree): BuilderTarget<Builders.Browser, JsonObject> {
   return JSON.parse(tree.readContent('/angular.json')).projects.app.architect.build;
@@ -31,7 +36,7 @@ function createWorkSpaceConfig(tree: UnitTestTree, es5BrowserSupport: boolean | 
               es5BrowserSupport,
               sourceMaps: true,
               buildOptimizer: false,
-            // tslint:disable-next-line:no-any
+              // tslint:disable-next-line:no-any
             } as any,
             configurations: {
               one: {
@@ -45,7 +50,7 @@ function createWorkSpaceConfig(tree: UnitTestTree, es5BrowserSupport: boolean | 
                 buildOptimizer: true,
                 sourceMaps: false,
               },
-            // tslint:disable-next-line:no-any
+              // tslint:disable-next-line:no-any
             } as any,
           },
         },

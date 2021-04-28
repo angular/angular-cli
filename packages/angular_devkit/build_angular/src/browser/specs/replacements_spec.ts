@@ -11,7 +11,6 @@ import { of, race } from 'rxjs';
 import { delay, filter, map, take, takeUntil, takeWhile, tap, timeout } from 'rxjs/operators';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder file replacements', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;
@@ -22,16 +21,18 @@ describe('Browser Builder file replacements', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
-  beforeEach(() => host.writeMultipleFiles({
-    'src/meaning-too.ts': 'export var meaning = 42;',
-    'src/meaning.ts': `export var meaning = 10;`,
+  beforeEach(() =>
+    host.writeMultipleFiles({
+      'src/meaning-too.ts': 'export var meaning = 42;',
+      'src/meaning.ts': `export var meaning = 10;`,
 
-    'src/main.ts': `
+      'src/main.ts': `
         import { meaning } from './meaning';
 
         console.log(meaning);
       `,
-  }));
+    }),
+  );
 
   it('allows file replacements', async () => {
     const overrides = {
@@ -114,45 +115,48 @@ describe('Browser Builder file replacements', () => {
     let phase = 1;
 
     const run = await architect.scheduleTarget(target, overrides);
-    await run.output.pipe(
-      timeout(30000),
-      tap((result) => {
-        expect(result.success).toBe(true, 'build should succeed');
+    await run.output
+      .pipe(
+        timeout(30000),
+        tap((result) => {
+          expect(result.success).toBe(true, 'build should succeed');
 
-        const fileName = normalize('dist/main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
-        const has42 = /meaning\s*=\s*42/.test(content);
-        buildCount++;
-        switch (phase) {
-          case 1:
-            const has10 = /meaning\s*=\s*10/.test(content);
+          const fileName = normalize('dist/main.js');
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
+          const has42 = /meaning\s*=\s*42/.test(content);
+          buildCount++;
+          switch (phase) {
+            case 1:
+              const has10 = /meaning\s*=\s*10/.test(content);
 
-            if (has42 && !has10) {
-              phase = 2;
-              host.writeMultipleFiles({
-                'src/meaning-too.ts': 'export var meaning = 84;',
-              });
-            }
-            break;
+              if (has42 && !has10) {
+                phase = 2;
+                host.writeMultipleFiles({
+                  'src/meaning-too.ts': 'export var meaning = 84;',
+                });
+              }
+              break;
 
-          case 2:
-            const has84 = /meaning\s*=\s*84/.test(content);
+            case 2:
+              const has84 = /meaning\s*=\s*84/.test(content);
 
-            if (has84 && !has42) {
-              phase = 3;
-            } else {
-              // try triggering a rebuild again
-              host.writeMultipleFiles({
-                'src/meaning-too.ts': 'export var meaning = 84;',
-              });
-            }
-            break;
-        }
-      }),
-      takeWhile(() => phase < 3),
-    ).toPromise().catch(() => {
-      throw new Error(`stuck at phase ${phase} [builds: ${buildCount}]`);
-    });
+              if (has84 && !has42) {
+                phase = 3;
+              } else {
+                // try triggering a rebuild again
+                host.writeMultipleFiles({
+                  'src/meaning-too.ts': 'export var meaning = 84;',
+                });
+              }
+              break;
+          }
+        }),
+        takeWhile(() => phase < 3),
+      )
+      .toPromise()
+      .catch(() => {
+        throw new Error(`stuck at phase ${phase} [builds: ${buildCount}]`);
+      });
 
     await run.stop();
   });
@@ -168,10 +172,12 @@ describe('Browser Builder file replacements', () => {
     });
 
     const overrides = {
-      fileReplacements: [{
-        replace: normalize('/src/file.ts'),
-        with: normalize('/src/file-replaced.ts'),
-      }],
+      fileReplacements: [
+        {
+          replace: normalize('/src/file.ts'),
+          with: normalize('/src/file-replaced.ts'),
+        },
+      ],
       watch: true,
     };
 
@@ -182,27 +188,29 @@ describe('Browser Builder file replacements', () => {
 
     // Race between a timeout and the expected log entry.
     const stop$ = race<null | string>(
-      of(null).pipe(delay(45000 * 2 / 3)),
+      of(null).pipe(delay((45000 * 2) / 3)),
       logger.pipe(
-        filter(entry => entry.message.includes(expectedError)),
-        map(entry => entry.message),
+        filter((entry) => entry.message.includes(expectedError)),
+        map((entry) => entry.message),
         take(1),
       ),
     );
 
     let errorAdded = false;
     const run = await architect.scheduleTarget(target, overrides, { logger });
-    run.output.pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
-      tap(() => {
-        // Introduce a known type error to detect in the logger filter.
-        if (!errorAdded) {
-          host.appendToFile('src/main.ts', 'console.log({}.prop);');
-          errorAdded = true;
-        }
-      }),
-      takeUntil(stop$),
-    ).subscribe();
+    run.output
+      .pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
+        tap(() => {
+          // Introduce a known type error to detect in the logger filter.
+          if (!errorAdded) {
+            host.appendToFile('src/main.ts', 'console.log({}.prop);');
+            errorAdded = true;
+          }
+        }),
+        takeUntil(stop$),
+      )
+      .subscribe();
 
     const res = await stop$.toPromise();
     expect(res).not.toBe(null, 'Test timed out.');

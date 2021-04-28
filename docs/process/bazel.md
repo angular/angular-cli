@@ -52,7 +52,6 @@ Then you will find the intermediate test files in `bazel-out/k8-fastbuild/bin`, 
 Tests that are sharded, via the `shard_count` attribute, can fail if you reduce the number of tests or focus only a few.
 This will cause some shards to execute 0 tests, which makes the exit with an error code.
 
-
 Tests that are marked as flaky, via the `flaky` attribute, will repeat when they fail.
 This will cause any focused test to be repeated multiple time, since the presence of focused tests
 causes jasmine to exit with a non-zero exit code.
@@ -67,4 +66,3 @@ with the yarn workspace symlinks in node_modules.
 
 1. Yarn workspaces is not compatible with Bazel-managed deps
    [(#12736)](https://github.com/angular/angular-cli/issues/12736)
-

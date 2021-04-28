@@ -9,7 +9,12 @@
 import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { BuilderTarget, Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
+import {
+  BuilderTarget,
+  Builders,
+  ProjectType,
+  WorkspaceSchema,
+} from '../../utility/workspace-models';
 
 function getBuildTarget(tree: UnitTestTree): BuilderTarget<Builders.Browser, JsonObject> {
   return JSON.parse(tree.readContent('/angular.json')).projects.app.architect.build;
@@ -28,9 +33,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
           build: {
             builder: Builders.Browser,
             options: {
-              scripts: [
-                { lazy: true, name: 'bundle-1.js' },
-              ],
+              scripts: [{ lazy: true, name: 'bundle-1.js' }],
               extractCss: false,
               sourceMaps: true,
               buildOptimizer: false,
@@ -109,8 +112,6 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
       'bundle-3.css',
     ]);
 
-    expect(options.scripts).toEqual([
-      { inject: false, name: 'bundle-1.js' },
-    ]);
+    expect(options.scripts).toEqual([{ inject: false, name: 'bundle-1.js' }]);
   });
 });

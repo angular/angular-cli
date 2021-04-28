@@ -32,7 +32,7 @@ function updateIndexFile(path: string): Rule {
 
     const rewriter = new (await import('parse5-html-rewriting-stream'))();
     let needsNoScript = true;
-    rewriter.on('startTag', startTag => {
+    rewriter.on('startTag', (startTag) => {
       if (startTag.tagName === 'noscript') {
         needsNoScript = false;
       }
@@ -40,7 +40,7 @@ function updateIndexFile(path: string): Rule {
       rewriter.emitStartTag(startTag);
     });
 
-    rewriter.on('endTag', endTag => {
+    rewriter.on('endTag', (endTag) => {
       if (endTag.tagName === 'head') {
         rewriter.emitRaw('  <link rel="manifest" href="manifest.webmanifest">\n');
         rewriter.emitRaw('  <meta name="theme-color" content="#1976d2">\n');
@@ -53,7 +53,7 @@ function updateIndexFile(path: string): Rule {
       rewriter.emitEndTag(endTag);
     });
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       const input = new Readable({
         encoding: 'utf8',
         read(): void {
@@ -81,8 +81,8 @@ function updateIndexFile(path: string): Rule {
   };
 }
 
-export default function(options: PwaOptions): Rule {
-  return async host => {
+export default function (options: PwaOptions): Rule {
+  return async (host) => {
     if (!options.title) {
       options.title = options.project;
     }
@@ -161,15 +161,14 @@ export default function(options: PwaOptions): Rule {
     return chain([
       updateWorkspace(workspace),
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
-      mergeWith(apply(url('./files/root'), [
-        template({ ...options }),
-        move(sourcePath),
-      ])),
-      mergeWith(apply(url('./files/assets'), [
-        template({ ...options }),
-        move(posix.join(sourcePath, 'assets')),
-      ])),
-      ...[...indexFiles].map(path => updateIndexFile(path)),
+      mergeWith(apply(url('./files/root'), [template({ ...options }), move(sourcePath)])),
+      mergeWith(
+        apply(url('./files/assets'), [
+          template({ ...options }),
+          move(posix.join(sourcePath, 'assets')),
+        ]),
+      ),
+      ...[...indexFiles].map((path) => updateIndexFile(path)),
     ]);
   };
 }

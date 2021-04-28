@@ -33,13 +33,13 @@ async function _renderUniversal(
 ): Promise<BrowserBuilderOutput> {
   // Get browser target options.
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject & BrowserBuilderSchema;
+  const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject &
+    BrowserBuilderSchema;
   const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderSchema>(
     rawBrowserOptions,
     browserBuilderName,
   );
-
 
   // Initialize zone.js
   const root = context.workspaceRoot;
@@ -52,34 +52,37 @@ async function _renderUniversal(
   }
 
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = resolve(
-    normalize(root),
-    normalize((projectMetadata.root as string) || ''),
-  );
+  const projectRoot = resolve(normalize(root), normalize((projectMetadata.root as string) || ''));
 
   const { styles } = normalizeOptimization(browserOptions.optimization);
   const inlineCriticalCssProcessor = styles.inlineCritical
     ? new InlineCriticalCssProcessor({
-      minify: styles.minify,
-      deployUrl: browserOptions.deployUrl,
-    })
+        minify: styles.minify,
+        deployUrl: browserOptions.deployUrl,
+      })
     : undefined;
 
   for (const outputPath of browserResult.outputPaths) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
     const browserIndexOutputPath = path.join(outputPath, 'index.html');
     const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
-    const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
+    const serverBundlePath = await _getServerModuleBundlePath(
+      options,
+      context,
+      serverResult,
+      localeDirectory,
+    );
 
-    const {
-      AppServerModule,
-      renderModule,
-    } = await import(serverBundlePath);
+    const { AppServerModule, renderModule } = await import(serverBundlePath);
 
-    const renderModuleFn: ((module: unknown, options: {}) => Promise<string>) | undefined = renderModule;
+    const renderModuleFn:
+      | ((module: unknown, options: {}) => Promise<string>)
+      | undefined = renderModule;
 
     if (!(renderModuleFn && AppServerModule)) {
-      throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
+      throw new Error(
+        `renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`,
+      );
     }
 
     // Load platform server module renderer
@@ -95,13 +98,15 @@ async function _renderUniversal(
       : browserIndexOutputPath;
 
     if (inlineCriticalCssProcessor) {
-      const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, { outputPath });
+      const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
+        outputPath,
+      });
       html = content;
 
       if (warnings.length || errors.length) {
         spinner.stop();
-        warnings.forEach(m => context.logger.warn(m));
-        errors.forEach(m => context.logger.error(m));
+        warnings.forEach((m) => context.logger.warn(m));
+        errors.forEach((m) => context.logger.error(m));
         spinner.start();
       }
     }
@@ -140,7 +145,7 @@ async function _getServerModuleBundlePath(
   }
 
   const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?js$/;
-  const maybeMain = fs.readdirSync(outputPath).find(x => re.test(x));
+  const maybeMain = fs.readdirSync(outputPath).find((x) => re.test(x));
 
   if (!maybeMain) {
     throw new Error('Could not find the main bundle.');
@@ -158,7 +163,8 @@ async function _appShellBuilder(
 
   // Never run the browser target in watch mode.
   // If service worker is needed, it will be added in _renderUniversal();
-  const browserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject & BrowserBuilderSchema;
+  const browserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject &
+    BrowserBuilderSchema;
 
   const optimization = normalizeOptimization(browserOptions.optimization);
   optimization.styles.inlineCritical = false;
@@ -166,7 +172,7 @@ async function _appShellBuilder(
   const browserTargetRun = await context.scheduleTarget(browserTarget, {
     watch: false,
     serviceWorker: false,
-    optimization: (optimization as unknown as JsonObject),
+    optimization: (optimization as unknown) as JsonObject,
   });
   const serverTargetRun = await context.scheduleTarget(serverTarget, {
     watch: false,
@@ -176,8 +182,8 @@ async function _appShellBuilder(
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as unknown as BrowserBuilderOutput,
-      serverTargetRun.result as unknown as ServerBuilderOutput,
+      (browserTargetRun.result as unknown) as BrowserBuilderOutput,
+      (serverTargetRun.result as unknown) as ServerBuilderOutput,
     ]);
 
     if (browserResult.success === false || browserResult.baseOutputPath === undefined) {

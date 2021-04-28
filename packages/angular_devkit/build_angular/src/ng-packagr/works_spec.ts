@@ -22,7 +22,6 @@ import { debounceTime, map, take, tap } from 'rxjs/operators';
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
 
-
 describe('NgPackagr Builder', () => {
   const workspaceRoot = join(normalize(__dirname), `../../test/hello-world-lib/`);
   const host = new TestProjectHost(workspaceRoot);
@@ -86,34 +85,34 @@ describe('NgPackagr Builder', () => {
 
     let buildNumber = 0;
 
-    await run.output.pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      debounceTime(1000),
-      map(() => {
-        const fileName = './dist/lib/fesm2015/lib.js';
-        const content = virtualFs.fileBufferToString(
-          host.scopedSync().read(normalize(fileName)),
-        );
+    await run.output
+      .pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+        debounceTime(1000),
+        map(() => {
+          const fileName = './dist/lib/fesm2015/lib.js';
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
 
-        return content;
-      }),
-      tap(content => {
-        buildNumber += 1;
-        switch (buildNumber) {
-          case 1:
-            expect(content).toMatch(/lib works/);
-            host.writeMultipleFiles(goldenValueFiles);
-            break;
+          return content;
+        }),
+        tap((content) => {
+          buildNumber += 1;
+          switch (buildNumber) {
+            case 1:
+              expect(content).toMatch(/lib works/);
+              host.writeMultipleFiles(goldenValueFiles);
+              break;
 
-          case 2:
-            expect(content).toMatch(/lib update works/);
-            break;
-          default:
-            break;
-        }
-      }),
-      take(2),
-    ).toPromise();
+            case 2:
+              expect(content).toMatch(/lib update works/);
+              break;
+            default:
+              break;
+          }
+        }),
+        take(2),
+      )
+      .toPromise();
 
     await run.stop();
   });

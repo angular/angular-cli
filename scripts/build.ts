@@ -19,12 +19,11 @@ import buildSchema from './build-schema';
 const minimatch = require('minimatch');
 const tar = require('tar');
 
-const gitIgnoreFiles = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
-  .split('\n');
+const gitIgnoreFiles = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8').split('\n');
 const gitIgnore = gitIgnoreFiles
-  .map(line => line.replace(/#.*/, ''))
+  .map((line) => line.replace(/#.*/, ''))
   .filter((line) => !line.startsWith('!'))
-  .filter(line => !line.match(/^\s*$/));
+  .filter((line) => !line.match(/^\s*$/));
 const gitIgnoreExcept = gitIgnoreFiles
   .filter((line) => line.startsWith('!'))
   .map((line) => line.substr(1));
@@ -36,9 +35,8 @@ function _gitIgnoreMatch(p: string): boolean {
     return false;
   }
 
-  return gitIgnore.some(line => minimatch(p, line));
+  return gitIgnore.some((line) => minimatch(p, line));
 }
-
 
 function _mkdirp(p: string) {
   // Create parent folder if necessary.
@@ -57,18 +55,19 @@ function _recursiveFileList(p: string): string[] {
 
   const list = fs.readdirSync(p);
 
-  return list
-    .map(subpath => {
-      const subpathList = _recursiveFileList(path.join(p, subpath));
+  return (
+    list
+      .map((subpath) => {
+        const subpathList = _recursiveFileList(path.join(p, subpath));
 
-      return [ subpath, ...subpathList.map(sp => path.join(subpath, sp))];
-    })
-    // Flatten.
-    .reduce((acc, curr) => [...acc, ...curr], [])
-    // Filter out directories.
-    .filter(sp => !fs.statSync(path.join(p, sp)).isDirectory());
+        return [subpath, ...subpathList.map((sp) => path.join(subpath, sp))];
+      })
+      // Flatten.
+      .reduce((acc, curr) => [...acc, ...curr], [])
+      // Filter out directories.
+      .filter((sp) => !fs.statSync(path.join(p, sp)).isDirectory())
+  );
 }
-
 
 // This method mimics how npm pack tars packages.
 function _tar(out: string, dir: string) {
@@ -80,20 +79,22 @@ function _tar(out: string, dir: string) {
 
   const files = _recursiveFileList(dir).map((f) => `./${f}`);
 
-  return tar.create({
-    gzip: true,
-    strict: true,
-    portable: true,
-    cwd: dir,
-    prefix: 'package/',
-    file: out,
-    sync: true,
-    // Provide a specific date in the 1980s for the benefit of zip,
-    // which is confounded by files dated at the Unix epoch 0.
-    mtime: new Date('1985-10-26T08:15:00.000Z'),
-  }, files);
+  return tar.create(
+    {
+      gzip: true,
+      strict: true,
+      portable: true,
+      cwd: dir,
+      prefix: 'package/',
+      file: out,
+      sync: true,
+      // Provide a specific date in the 1980s for the benefit of zip,
+      // which is confounded by files dated at the Unix epoch 0.
+      mtime: new Date('1985-10-26T08:15:00.000Z'),
+    },
+    files,
+  );
 }
-
 
 function _copy(from: string, to: string) {
   // Create parent folder if necessary.
@@ -113,21 +114,19 @@ function _copy(from: string, to: string) {
   fs.writeFileSync(to, buffer);
 }
 
-
 function _recursiveCopy(from: string, to: string, logger: logging.Logger) {
   if (!fs.existsSync(from)) {
     logger.error(`File "${from}" does not exist.`);
     process.exit(4);
   }
   if (fs.statSync(from).isDirectory()) {
-    fs.readdirSync(from).forEach(fileName => {
+    fs.readdirSync(from).forEach((fileName) => {
       _recursiveCopy(path.join(from, fileName), path.join(to, fileName), logger);
     });
   } else {
     _copy(from, to);
   }
 }
-
 
 function _rm(p: string) {
   p = path.relative(process.cwd(), p);
@@ -139,7 +138,6 @@ function _clean(logger: logging.Logger) {
   logger.info('  Removing dist/...');
   rimraf.sync(path.join(__dirname, '../dist'));
 }
-
 
 function _sortPackages() {
   // Order packages in order of dependency.
@@ -157,8 +155,7 @@ function _sortPackages() {
 
         if (packages[a].dependencies.indexOf(b) != -1) {
           // Swap them.
-          [sortedPackages[i], sortedPackages[i + 1]]
-            = [sortedPackages[i + 1], sortedPackages[i]];
+          [sortedPackages[i], sortedPackages[i + 1]] = [sortedPackages[i + 1], sortedPackages[i]];
           swapped = true;
         }
       }
@@ -175,7 +172,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   });
 
   if (status != 0) {
-    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    logger.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
     if (error) {
       logger.error('Error: ' + (error ? error.message : 'undefined'));
     } else {
@@ -186,20 +183,14 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   }
 }
 
-
 function _build(logger: logging.Logger) {
   logger.info('Building...');
-  _exec('node', [
-    require.resolve('typescript/bin/tsc'),
-    '-p',
-    'tsconfig.json',
-  ], {}, logger);
+  _exec('node', [require.resolve('typescript/bin/tsc'), '-p', 'tsconfig.json'], {}, logger);
 }
 
-
 // tslint:disable-next-line:no-big-function
-export default async function(
-  argv: { local?: boolean, snapshot?: boolean },
+export default async function (
+  argv: { local?: boolean; snapshot?: boolean },
   logger: logging.Logger,
 ) {
   _clean(logger);
@@ -241,14 +232,16 @@ export default async function(
     subSubLogger.info(`${files.length} files total...`);
     const resources = files
       .map((fileName) => path.relative(pkg.root, fileName))
-      .filter(fileName => {
+      .filter((fileName) => {
         if (/(?:^|[\/\\])node_modules[\/\\]/.test(fileName)) {
           return false;
         }
 
         // Schematics template files.
-        if (pkgJson['schematics'] &&
-         (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)\w+-files(\/|\\)/))) {
+        if (
+          pkgJson['schematics'] &&
+          (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)\w+-files(\/|\\)/))
+        ) {
           return true;
         }
 
@@ -300,7 +293,7 @@ export default async function(
       });
 
     subSubLogger.info(`${resources.length} resources...`);
-    resources.forEach(fileName => {
+    resources.forEach((fileName) => {
       _copy(path.join(pkg.root, fileName), path.join(pkg.dist, fileName));
     });
   }
@@ -330,7 +323,7 @@ export default async function(
 
     specLogger.info(packageName);
     specLogger.info(`  ${files.length} spec files found...`);
-    files.forEach(fileName => _rm(fileName));
+    files.forEach((fileName) => _rm(fileName));
   }
 
   logger.info('Building ejs templates...');
@@ -346,7 +339,7 @@ export default async function(
 
     templateLogger.info(packageName);
     templateLogger.info(`  ${files.length} ejs files found...`);
-    files.forEach(fileName => {
+    files.forEach((fileName) => {
       const p = path.relative(
         path.dirname(__dirname),
         path.join(pkg.root, path.relative(pkg.dist, fileName)),
@@ -399,8 +392,8 @@ export default async function(
             const pkg = packages[depName];
             if (!pkg.snapshotRepo) {
               versionLogger.error(
-                `Package ${JSON.stringify(depName)} is not published as a snapshot. `
-                + `Fixing to current version ${v}.`,
+                `Package ${JSON.stringify(depName)} is not published as a snapshot. ` +
+                  `Fixing to current version ${v}.`,
               );
               obj[depName] = v;
             } else {
@@ -418,7 +411,7 @@ export default async function(
 
   logger.info('Tarring all packages...');
   const tarLogger = logger.createChild('license');
-  Object.keys(packages).forEach(pkgName => {
+  Object.keys(packages).forEach((pkgName) => {
     const pkg = packages[pkgName];
     if (!pkg.private) {
       tarLogger.info(`${pkgName} => ${pkg.tar}`);

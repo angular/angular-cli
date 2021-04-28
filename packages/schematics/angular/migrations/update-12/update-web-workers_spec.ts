@@ -75,9 +75,7 @@ describe('Migration to update Web Workers for Webpack 5', () => {
     const consumer = tree.readContent(workerConsumerPath);
 
     expect(consumer).toContain(`new Worker('./app/app.worker'`);
-    expect(consumer).not.toContain(
-      `new Worker(new URL('42', import.meta.url), { type: 'xyz' });`,
-    );
+    expect(consumer).not.toContain(`new Worker(new URL('42', import.meta.url), { type: 'xyz' });`);
   });
 
   it('should replace the module path string when file has BOM', async () => {

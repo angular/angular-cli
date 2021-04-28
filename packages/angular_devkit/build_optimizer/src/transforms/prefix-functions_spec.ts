@@ -11,9 +11,8 @@ import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getPrefixFunctionsTransformer } from './prefix-functions';
 
-
-const transform = (content: string) => transformJavascript(
-  { content, getTransforms: [getPrefixFunctionsTransformer] }).content;
+const transform = (content: string) =>
+  transformJavascript({ content, getTransforms: [getPrefixFunctionsTransformer] }).content;
 
 describe('prefix-functions', () => {
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
@@ -54,7 +53,7 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('doesn\'t add comment when inside function declarations or expressions', () => {
+    it("doesn't add comment when inside function declarations or expressions", () => {
       const input = tags.stripIndent`
         function funcDecl() {
           var newClazz = Clazz();
@@ -73,7 +72,7 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('doesn\'t add comment to downlevel namespaces', () => {
+    it("doesn't add comment to downlevel namespaces", () => {
       const input = tags.stripIndent`
         function MyFunction() { }
 
@@ -91,7 +90,7 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('doesn\'t add comment when inside class', () => {
+    it("doesn't add comment when inside class", () => {
       const input = tags.stripIndent`
         class Foo {
           constructor(e) {
@@ -109,7 +108,7 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('doesn\'t add comment when inside arrow function', () => {
+    it("doesn't add comment when inside arrow function", () => {
       const input = tags.stripIndent`
         export const subscribeToArray = (array) => (subscriber) => {
             for (let i = 0, len = array.length; i < len && !subscriber.closed; i++) {
@@ -127,7 +126,7 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('doesn\'t add comment when inside object literal method', () => {
+    it("doesn't add comment when inside object literal method", () => {
       const input = tags.stripIndent`
         const literal = {
           method() {
@@ -143,7 +142,7 @@ describe('prefix-functions', () => {
     });
   });
 
-  it('doesn\'t add comment to downlevel arrow function', () => {
+  it("doesn't add comment to downlevel arrow function", () => {
     const input = tags.stripIndent`
       var populate = (function (props, rawData, entity) {
           props.forEach(function (prop) { });
@@ -156,7 +155,7 @@ describe('prefix-functions', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('doesn\'t add comment inside arrow function', () => {
+  it("doesn't add comment inside arrow function", () => {
     const input = tags.stripIndent`
       const populate = ((props, rawData, entity) => {
           props.forEach(x => x);
@@ -169,7 +168,7 @@ describe('prefix-functions', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('doesn\'t add comment when inside class expression', () => {
+  it("doesn't add comment when inside class expression", () => {
     const input = tags.stripIndent`
       let Foo = class Foo {
         constructor() {

@@ -1,6 +1,6 @@
 # `/docs` Folder
 
-This folder is used for all documentation. It contains a number of subfolders with short 
+This folder is used for all documentation. It contains a number of subfolders with short
 descriptions here.
 
 ## `/docs/design`

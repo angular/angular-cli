@@ -10,8 +10,8 @@ import { json } from '@angular-devkit/core';
 import { Rule } from '@angular-devkit/schematics';
 import { updateWorkspace } from '../../utility/workspace';
 
-export default function(): Rule {
-  return updateWorkspace(workspace => {
+export default function (): Rule {
+  return updateWorkspace((workspace) => {
     // Update root level schematics options if present
     const rootSchematics = workspace.extensions.schematics;
     if (rootSchematics && json.isJsonObject(rootSchematics)) {

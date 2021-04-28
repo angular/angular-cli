@@ -33,9 +33,9 @@ export function runWebpack(
   config: webpack.Configuration,
   context: BuilderContext,
   options: {
-    logging?: WebpackLoggingCallback,
-    webpackFactory?: WebpackFactory,
-    shouldProvideStats?: boolean,
+    logging?: WebpackLoggingCallback;
+    webpackFactory?: WebpackFactory;
+    shouldProvideStats?: boolean;
   } = {},
 ): Observable<BuildResult> {
   const {
@@ -56,63 +56,67 @@ export function runWebpack(
   };
 
   return createWebpack({ ...config, watch: false }).pipe(
-    switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
-      // Webpack 5 has a compiler level close function
-      const compilerClose = (webpackCompiler as { close?(callback: () => void): void }).close?.bind(
-        webpackCompiler,
-      );
+    switchMap(
+      (webpackCompiler) =>
+        new Observable<BuildResult>((obs) => {
+          // Webpack 5 has a compiler level close function
+          const compilerClose = (webpackCompiler as {
+            close?(callback: () => void): void;
+          }).close?.bind(webpackCompiler);
 
-      const callback = (err?: Error, stats?: webpack.Stats) => {
-        if (err) {
-          return obs.error(err);
-        }
+          const callback = (err?: Error, stats?: webpack.Stats) => {
+            if (err) {
+              return obs.error(err);
+            }
 
-        if (!stats) {
-          return;
-        }
+            if (!stats) {
+              return;
+            }
 
-        // Log stats.
-        log(stats, config);
+            // Log stats.
+            log(stats, config);
 
-        obs.next({
-          success: !stats.hasErrors(),
-          webpackStats: shouldProvideStats ? stats.toJson() : undefined,
-          emittedFiles: getEmittedFiles(stats.compilation),
-          outputPath: stats.compilation.outputOptions.path,
-        } as unknown as BuildResult);
+            obs.next(({
+              success: !stats.hasErrors(),
+              webpackStats: shouldProvideStats ? stats.toJson() : undefined,
+              emittedFiles: getEmittedFiles(stats.compilation),
+              outputPath: stats.compilation.outputOptions.path,
+            } as unknown) as BuildResult);
 
-        if (!config.watch) {
-          if (compilerClose) {
-            compilerClose(() => obs.complete());
-          } else {
-            obs.complete();
-          }
-        }
-      };
-
-      try {
-        if (config.watch) {
-          const watchOptions = config.watchOptions || {};
-          const watching = webpackCompiler.watch(watchOptions, callback);
-
-          // Teardown logic. Close the watcher when unsubscribed from.
-          return () => {
-            watching.close(() => { });
-            compilerClose?.(() => { });
+            if (!config.watch) {
+              if (compilerClose) {
+                compilerClose(() => obs.complete());
+              } else {
+                obs.complete();
+              }
+            }
           };
-        } else {
-          webpackCompiler.run(callback);
-        }
-      } catch (err) {
-        if (err) {
-          context.logger.error(`\nAn error occurred during the build:\n${err && err.stack || err}`);
-        }
-        throw err;
-      }
-    }),
-  ));
-}
 
+          try {
+            if (config.watch) {
+              const watchOptions = config.watchOptions || {};
+              const watching = webpackCompiler.watch(watchOptions, callback);
+
+              // Teardown logic. Close the watcher when unsubscribed from.
+              return () => {
+                watching.close(() => {});
+                compilerClose?.(() => {});
+              };
+            } else {
+              webpackCompiler.run(callback);
+            }
+          } catch (err) {
+            if (err) {
+              context.logger.error(
+                `\nAn error occurred during the build:\n${(err && err.stack) || err}`,
+              );
+            }
+            throw err;
+          }
+        }),
+    ),
+  );
+}
 
 export default createBuilder<WebpackBuilderSchema>((options, context) => {
   const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);

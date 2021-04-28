@@ -18,7 +18,6 @@ import {
 import { WorkspaceDefinition } from './definitions';
 import { WorkspaceHost } from './host';
 
-
 describe('readWorkspace', () => {
   it('attempts to read from specified file path [angular.json]', async (done) => {
     const requestedPath = '/path/to/workspace/angular.json';
@@ -196,10 +195,12 @@ describe('readWorkspace', () => {
 
     await readWorkspace(requestedPath, host);
     isFileChecks.sort();
-    expect(isFileChecks).toEqual([
-      getSystemPath(join(normalize(requestedPath), 'angular.json')),
-      getSystemPath(join(normalize(requestedPath), '.angular.json')),
-    ].sort());
+    expect(isFileChecks).toEqual(
+      [
+        getSystemPath(join(normalize(requestedPath), 'angular.json')),
+        getSystemPath(join(normalize(requestedPath), '.angular.json')),
+      ].sort(),
+    );
 
     done();
   });
@@ -241,14 +242,10 @@ describe('readWorkspace', () => {
     }
 
     isFileChecks.sort();
-    expect(isFileChecks).toEqual([
-      getSystemPath(join(normalize(requestedPath), 'angular.json')),
-    ]);
+    expect(isFileChecks).toEqual([getSystemPath(join(normalize(requestedPath), 'angular.json'))]);
 
     readFileChecks.sort();
-    expect(readFileChecks).toEqual([
-      getSystemPath(join(normalize(requestedPath), 'angular.json')),
-    ]);
+    expect(readFileChecks).toEqual([getSystemPath(join(normalize(requestedPath), 'angular.json'))]);
 
     done();
   });
@@ -286,7 +283,6 @@ describe('readWorkspace', () => {
 
     done();
   });
-
 });
 
 describe('writeWorkspace', () => {
@@ -331,16 +327,18 @@ describe('writeWorkspace', () => {
 
         return '';
       },
-      async writeFile() { fail(); },
+      async writeFile() {
+        fail();
+      },
       async isFile() {
         fail();
 
         return false;
       },
       async isDirectory() {
-          fail();
+        fail();
 
-          return false;
+        return false;
       },
     };
 
@@ -363,16 +361,18 @@ describe('writeWorkspace', () => {
 
         return '';
       },
-      async writeFile() { fail(); },
+      async writeFile() {
+        fail();
+      },
       async isFile() {
         fail();
 
         return false;
       },
       async isDirectory() {
-          fail();
+        fail();
 
-          return false;
+        return false;
       },
     };
 
@@ -385,5 +385,4 @@ describe('writeWorkspace', () => {
 
     done();
   });
-
 });

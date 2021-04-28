@@ -18,14 +18,12 @@ import {
   TypedSchematicContext,
 } from '../src';
 
-
 export interface FileSystemCollectionDescription {
   readonly name: string;
   readonly path: string;
   readonly version?: string;
   readonly schematics: { [name: string]: FileSystemSchematicDesc };
 }
-
 
 export interface FileSystemSchematicJsonDescription {
   readonly aliases?: string[];
@@ -46,21 +44,31 @@ export interface FileSystemSchematicDescription extends FileSystemSchematicJsonD
   readonly factoryFn: RuleFactory<{}>;
 }
 
-
 /**
  * Used to simplify typings.
  */
-export declare type FileSystemEngine
-  = Engine<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemEngineHost
-  = EngineHost<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemCollection
-  = Collection<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemSchematic
-  = Schematic<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemCollectionDesc
-  = CollectionDescription<FileSystemCollectionDescription>;
-export declare type FileSystemSchematicDesc
-  = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemSchematicContext
-  = TypedSchematicContext<FileSystemCollectionDescription, FileSystemSchematicDescription>;
+export declare type FileSystemEngine = Engine<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+>;
+export declare type FileSystemEngineHost = EngineHost<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+>;
+export declare type FileSystemCollection = Collection<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+>;
+export declare type FileSystemSchematic = Schematic<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+>;
+export declare type FileSystemCollectionDesc = CollectionDescription<FileSystemCollectionDescription>;
+export declare type FileSystemSchematicDesc = SchematicDescription<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+>;
+export declare type FileSystemSchematicContext = TypedSchematicContext<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+>;

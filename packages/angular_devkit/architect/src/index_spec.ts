@@ -40,26 +40,35 @@ describe('architect', () => {
 
     options = {};
     called = 0;
-    testArchitectHost.addBuilder('package:test', createBuilder(async o => {
-      called++;
-      options = o;
+    testArchitectHost.addBuilder(
+      'package:test',
+      createBuilder(async (o) => {
+        called++;
+        options = o;
 
-      return new Promise<BuilderOutput>(resolve => {
-        setTimeout(() => resolve({ success: true }), 10);
-      });
-    }));
-    testArchitectHost.addBuilder('package:test-options', createBuilder(o => {
-      options = o;
+        return new Promise<BuilderOutput>((resolve) => {
+          setTimeout(() => resolve({ success: true }), 10);
+        });
+      }),
+    );
+    testArchitectHost.addBuilder(
+      'package:test-options',
+      createBuilder((o) => {
+        options = o;
 
-      return { success: true };
-    }));
+        return { success: true };
+      }),
+    );
 
     testArchitectHost.addTarget(target1, 'package:test');
     testArchitectHost.addTarget(target2, 'package:test');
   });
 
   it('works', async () => {
-    testArchitectHost.addBuilder('package:test', createBuilder(() => ({ success: true })));
+    testArchitectHost.addBuilder(
+      'package:test',
+      createBuilder(() => ({ success: true })),
+    );
 
     const run = await architect.scheduleBuilder('package:test', {});
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
@@ -67,7 +76,10 @@ describe('architect', () => {
   });
 
   it('works with async builders', async () => {
-    testArchitectHost.addBuilder('package:test', createBuilder(async () => ({ success: true })));
+    testArchitectHost.addBuilder(
+      'package:test',
+      createBuilder(async () => ({ success: true })),
+    );
 
     const run = await architect.scheduleBuilder('package:test', {});
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
@@ -75,7 +87,12 @@ describe('architect', () => {
   });
 
   it('supports async generator builders', async () => {
-    testArchitectHost.addBuilder('package:test', createBuilder(async function*() { yield { success: true }; }));
+    testArchitectHost.addBuilder(
+      'package:test',
+      createBuilder(async function* () {
+        yield { success: true };
+      }),
+    );
 
     const run = await architect.scheduleBuilder('package:test', {});
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
@@ -133,25 +150,27 @@ describe('architect', () => {
     try {
       await architect.scheduleBuilder('non:existent', {});
       expect('to throw').not.toEqual('to throw');
-    } catch {
-    }
+    } catch {}
   });
 
   it('works with watching observable builders', async () => {
     let results = 0;
-    testArchitectHost.addBuilder('package:test-watch', createBuilder((_, context) => {
-      called++;
+    testArchitectHost.addBuilder(
+      'package:test-watch',
+      createBuilder((_, context) => {
+        called++;
 
-      return timer(10, 10).pipe(
-        take(10),
-        map(() => {
-          context.reportRunning();
+        return timer(10, 10).pipe(
+          take(10),
+          map(() => {
+            context.reportRunning();
 
-          return { success: true };
-        }),
-        tap(() => results++),
-      );
-    }));
+            return { success: true };
+          }),
+          tap(() => results++),
+        );
+      }),
+    );
 
     const run = await architect.scheduleBuilder('package:test-watch', {});
     await run.result;
@@ -166,16 +185,19 @@ describe('architect', () => {
 
   it('works with watching async generator builders', async () => {
     let results = 0;
-    testArchitectHost.addBuilder('package:test-watch-gen', createBuilder(async function*(_, context) {
-      called++;
+    testArchitectHost.addBuilder(
+      'package:test-watch-gen',
+      createBuilder(async function* (_, context) {
+        called++;
 
-      for (let x = 0; x < 10; x++) {
-        await new Promise(setImmediate);
-        context.reportRunning();
-        yield { success: true };
-        results++;
-      }
-    }));
+        for (let x = 0; x < 10; x++) {
+          await new Promise(setImmediate);
+          context.reportRunning();
+          yield { success: true };
+          results++;
+        }
+      }),
+    );
 
     const run = await architect.scheduleBuilder('package:test-watch-gen', {});
     await run.result;
@@ -189,9 +211,12 @@ describe('architect', () => {
   });
 
   it('reports errors in the builder', async () => {
-    testArchitectHost.addBuilder('package:error', createBuilder(() => {
-      throw new Error('Error in the builder.');
-    }));
+    testArchitectHost.addBuilder(
+      'package:error',
+      createBuilder(() => {
+        throw new Error('Error in the builder.');
+      }),
+    );
 
     let run: BuilderRun | undefined = undefined;
     try {
@@ -206,17 +231,19 @@ describe('architect', () => {
       // This should throw.
       await run.result;
       expect('to throw').not.toEqual('to throw');
-    } catch {
-    }
+    } catch {}
     if (run) {
       await run.stop();
     }
   });
 
   it('reports errors in the builder (async)', async () => {
-    testArchitectHost.addBuilder('package:error', createBuilder(() => {
-      return Promise.reject(new Error('Error async'));
-    }));
+    testArchitectHost.addBuilder(
+      'package:error',
+      createBuilder(() => {
+        return Promise.reject(new Error('Error async'));
+      }),
+    );
 
     let run: BuilderRun | undefined = undefined;
     try {
@@ -231,8 +258,7 @@ describe('architect', () => {
       // This should throw.
       await run.result;
       expect('to throw').not.toEqual('to throw');
-    } catch {
-    }
+    } catch {}
     if (run) {
       await run.stop();
     }
@@ -246,7 +272,8 @@ describe('architect', () => {
 
     const run = await architect.scheduleBuilder(builderName, { extraProp: true });
     await expectAsync(run.result).toBeRejectedWith(
-      jasmine.objectContaining({ message: jasmine.stringMatching('extraProp') }));
+      jasmine.objectContaining({ message: jasmine.stringMatching('extraProp') }),
+    );
     await run.stop();
   });
 
@@ -262,11 +289,14 @@ describe('architect', () => {
     };
     testArchitectHost.addTarget(target, 'package:target', goldenOptions);
 
-    testArchitectHost.addBuilder('package:getTargetOptions', createBuilder(async (_, context) => {
-      options = await context.getTargetOptions(target);
+    testArchitectHost.addBuilder(
+      'package:getTargetOptions',
+      createBuilder(async (_, context) => {
+        options = await context.getTargetOptions(target);
 
-      return { success: true };
-    }));
+        return { success: true };
+      }),
+    );
 
     const run = await architect.scheduleBuilder('package:getTargetOptions', {});
     const output = await run.output.toPromise();
@@ -291,7 +321,10 @@ describe('architect', () => {
 
   it('exposes getBuilderNameForTarget()', async () => {
     const builderName = 'ImBlue:DabadeeDabada';
-    testArchitectHost.addBuilder(builderName, createBuilder(() => ({ success: true })));
+    testArchitectHost.addBuilder(
+      builderName,
+      createBuilder(() => ({ success: true })),
+    );
 
     const target = {
       project: 'some-project',
@@ -300,11 +333,14 @@ describe('architect', () => {
     testArchitectHost.addTarget(target, builderName);
 
     let actualBuilderName = '';
-    testArchitectHost.addBuilder('package:do-it', createBuilder(async (_, context) => {
-      actualBuilderName = await context.getBuilderNameForTarget(target);
+    testArchitectHost.addBuilder(
+      'package:do-it',
+      createBuilder(async (_, context) => {
+        actualBuilderName = await context.getBuilderNameForTarget(target);
 
-      return { success: true };
-    }));
+        return { success: true };
+      }),
+    );
 
     const run = await architect.scheduleBuilder('package:do-it', {});
     const output = await run.output.toPromise();
@@ -329,23 +365,29 @@ describe('architect', () => {
 
   it('exposes validateOptions()', async () => {
     const builderName = 'Hello:World';
-    testArchitectHost.addBuilder(builderName, createBuilder(() => ({ success: true })), '', {
-      type: 'object',
-      properties: {
-        p0: { type: 'number', default: 123 },
-        p1: { type: 'string' },
+    testArchitectHost.addBuilder(
+      builderName,
+      createBuilder(() => ({ success: true })),
+      '',
+      {
+        type: 'object',
+        properties: {
+          p0: { type: 'number', default: 123 },
+          p1: { type: 'string' },
+        },
+        required: ['p1'],
       },
-      required: [
-        'p1',
-      ],
-    });
+    );
 
     let actualOptions: json.JsonObject = {};
-    testArchitectHost.addBuilder('package:do-it', createBuilder(async (options, context) => {
-      actualOptions = await context.validateOptions(options, builderName);
+    testArchitectHost.addBuilder(
+      'package:do-it',
+      createBuilder(async (options, context) => {
+        actualOptions = await context.validateOptions(options, builderName);
 
-      return { success: true };
-    }));
+        return { success: true };
+      }),
+    );
 
     const run = await architect.scheduleBuilder('package:do-it', { p1: 'hello' });
     const output = await run.output.toPromise();
@@ -359,8 +401,9 @@ describe('architect', () => {
     // Should also error.
     const run2 = await architect.scheduleBuilder('package:do-it', {});
 
-    await expectAsync(run2.output.toPromise())
-      .toBeRejectedWith(jasmine.objectContaining({ message: jasmine.stringMatching('p1')}));
+    await expectAsync(run2.output.toPromise()).toBeRejectedWith(
+      jasmine.objectContaining({ message: jasmine.stringMatching('p1') }),
+    );
 
     await run2.stop();
   });

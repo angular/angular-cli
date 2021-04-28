@@ -43,19 +43,22 @@ describe('Web Worker Schematic', () => {
 
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('application', appOptions, appTree)
       .toPromise();
   });
 
   it('should put the worker file in the project root', async () => {
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const path = '/projects/bar/src/app/app.worker.ts';
     expect(tree.exists(path)).toEqual(true);
   });
 
   it('should put the tsconfig.worker.json file in the project root', async () => {
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const path = '/projects/bar/tsconfig.worker.json';
     expect(tree.exists(path)).toEqual(true);
@@ -66,34 +69,33 @@ describe('Web Worker Schematic', () => {
   });
 
   it('should add the webWorkerTsConfig option to workspace', async () => {
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
-    expect(projects.bar.architect.build.options.webWorkerTsConfig)
-      .toBe('projects/bar/tsconfig.worker.json');
+    expect(projects.bar.architect.build.options.webWorkerTsConfig).toBe(
+      'projects/bar/tsconfig.worker.json',
+    );
   });
 
   it('should add exclusions to tsconfig.app.json', async () => {
     const oldTsConfig = {
       extends: '../../tsconfig.json',
-      include: [
-        'src/**/*.ts',
-      ],
-      exclude: [
-        'src/test.ts',
-        'src/**/*.spec.ts',
-      ],
+      include: ['src/**/*.ts'],
+      exclude: ['src/test.ts', 'src/**/*.spec.ts'],
     };
     appTree.overwrite('projects/bar/tsconfig.app.json', JSON.stringify(oldTsConfig, undefined, 2));
 
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const { exclude } = JSON.parse(tree.readContent('/projects/bar/tsconfig.app.json'));
     expect(exclude).toContain('src/**/*.worker.ts');
   });
 
   it('should add snippet to sibling file', async () => {
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const appComponent = tree.readContent('/projects/bar/src/app/app.component.ts');
     expect(appComponent).toContain(`new Worker(new URL('./${defaultOptions.name}.worker`);
@@ -104,9 +106,11 @@ describe('Web Worker Schematic', () => {
     const rootAppOptions = { ...appOptions, projectRoot: '', name: 'foo' };
     const workerOptions = { ...defaultOptions, project: 'foo' };
 
-    appTree = await schematicRunner.runSchematicAsync('application', rootAppOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('application', rootAppOptions, appTree)
       .toPromise();
-    const tree = await schematicRunner.runSchematicAsync('web-worker', workerOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', workerOptions, appTree)
       .toPromise();
 
     const path = '/tsconfig.worker.json';
@@ -125,17 +129,13 @@ describe('Web Worker Schematic', () => {
 
     const oldTsConfig = {
       extends: '../../../tsconfig.json',
-      include: [
-        '**/*.ts',
-      ],
-      exclude: [
-        'test.ts',
-        '**/*.spec.ts',
-      ],
+      include: ['**/*.ts'],
+      exclude: ['test.ts', '**/*.spec.ts'],
     };
     appTree.create('projects/bar/src/tsconfig.app.json', JSON.stringify(oldTsConfig, undefined, 2));
 
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('web-worker', defaultOptions, appTree)
       .toPromise();
     const { exclude } = JSON.parse(tree.readContent(tsConfigPath));
     expect(exclude).toContain('**/*.worker.ts');

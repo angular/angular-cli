@@ -13,7 +13,6 @@ import * as https from 'https';
 import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
 import { createArchitect, host } from '../test-utils';
 
-
 describe('Dev Server Builder ssl', () => {
   const target = { project: 'app', target: 'serve' };
   let architect: Architect;
@@ -27,13 +26,13 @@ describe('Dev Server Builder ssl', () => {
   });
   afterEach(async () => {
     await host.restore().toPromise();
-    await Promise.all(runs.map(r => r.stop()));
+    await Promise.all(runs.map((r) => r.stop()));
   });
 
   it('works', async () => {
     const run = await architect.scheduleTarget(target, { ssl: true, port: 0 });
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
+    const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
@@ -110,7 +109,7 @@ describe('Dev Server Builder ssl', () => {
 
     const run = await architect.scheduleTarget(target, overrides);
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
+    const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 

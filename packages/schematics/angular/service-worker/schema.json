@@ -24,7 +24,5 @@
       "x-deprecated": "No longer has an effect."
     }
   },
-  "required": [
-    "project"
-  ]
+  "required": ["project"]
 }

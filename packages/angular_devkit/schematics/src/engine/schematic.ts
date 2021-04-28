@@ -22,28 +22,31 @@ import {
   TypedSchematicContext,
 } from './interface';
 
-
 export class InvalidSchematicsNameException extends BaseException {
   constructor(name: string) {
     super(`Schematics has invalid name: "${name}".`);
   }
 }
 
-
 export class SchematicImpl<CollectionT extends object, SchematicT extends object>
-    implements Schematic<CollectionT, SchematicT> {
-
-  constructor(private _description: SchematicDescription<CollectionT, SchematicT>,
-              private _factory: RuleFactory<{}>,
-              private _collection: Collection<CollectionT, SchematicT>,
-              private _engine: Engine<CollectionT, SchematicT>) {
+  implements Schematic<CollectionT, SchematicT> {
+  constructor(
+    private _description: SchematicDescription<CollectionT, SchematicT>,
+    private _factory: RuleFactory<{}>,
+    private _collection: Collection<CollectionT, SchematicT>,
+    private _engine: Engine<CollectionT, SchematicT>,
+  ) {
     if (!_description.name.match(/^[-@/_.a-zA-Z0-9]+$/)) {
       throw new InvalidSchematicsNameException(_description.name);
     }
   }
 
-  get description() { return this._description; }
-  get collection() { return this._collection; }
+  get description() {
+    return this._description;
+  }
+  get collection() {
+    return this._collection;
+  }
 
   call<OptionT extends object>(
     options: OptionT,
@@ -53,36 +56,37 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
   ): Observable<Tree> {
     const context = this._engine.createContext(this, parentContext, executionOptions);
 
-    return host
-      .pipe(
-        first(),
-        concatMap(tree => this._engine.transformOptions(this, options, context).pipe(
-          map(o => [tree, o] as [Tree, OptionT]),
-        )),
-        concatMap(([tree, transformedOptions]) => {
-          let input: Tree;
-          let scoped = false;
-          if (executionOptions && executionOptions.scope) {
-            scoped = true;
-            input = new ScopedTree(tree, executionOptions.scope);
-          } else {
-            input = tree;
-          }
+    return host.pipe(
+      first(),
+      concatMap((tree) =>
+        this._engine
+          .transformOptions(this, options, context)
+          .pipe(map((o) => [tree, o] as [Tree, OptionT])),
+      ),
+      concatMap(([tree, transformedOptions]) => {
+        let input: Tree;
+        let scoped = false;
+        if (executionOptions && executionOptions.scope) {
+          scoped = true;
+          input = new ScopedTree(tree, executionOptions.scope);
+        } else {
+          input = tree;
+        }
 
-          return callRule(this._factory(transformedOptions), observableOf(input), context).pipe(
-            map(output => {
-              if (output === input) {
-                return tree;
-              } else if (scoped) {
-                tree.merge(output);
+        return callRule(this._factory(transformedOptions), observableOf(input), context).pipe(
+          map((output) => {
+            if (output === input) {
+              return tree;
+            } else if (scoped) {
+              tree.merge(output);
 
-                return tree;
-              } else {
-                return output;
-              }
-            }),
-          );
-        }),
-      );
+              return tree;
+            } else {
+              return output;
+            }
+          }),
+        );
+      }),
+    );
   }
 }

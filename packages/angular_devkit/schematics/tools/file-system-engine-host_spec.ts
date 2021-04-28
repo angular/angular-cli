@@ -13,11 +13,13 @@ import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
 import { from, of as observableOf } from 'rxjs';
 
-
 describe('FileSystemEngineHost', () => {
   // We need to resolve a file that actually exists, and not just a folder.
   // tslint:disable-next-line:max-line-length
-  const root = path.join(path.dirname(require.resolve(__filename)), '../../../../tests/angular_devkit/schematics/tools/file-system-engine-host');
+  const root = path.join(
+    path.dirname(require.resolve(__filename)),
+    '../../../../tests/angular_devkit/schematics/tools/file-system-engine-host',
+  );
 
   it('works', () => {
     const engineHost = new FileSystemEngineHost(root);
@@ -59,7 +61,6 @@ describe('FileSystemEngineHost', () => {
     expect(schematic3.description.name).toBe('schematic1');
   });
 
-
   it('allows dupe aliases for a single schematic', () => {
     const engineHost = new FileSystemEngineHost(root);
     const engine = new SchematicEngine(engineHost);
@@ -98,8 +99,7 @@ describe('FileSystemEngineHost', () => {
     const testCollection = engine.createCollection('extends-basic-string');
 
     expect(testCollection.baseDescriptions).not.toBeUndefined();
-    expect(testCollection.baseDescriptions
-           && testCollection.baseDescriptions.length).toBe(1);
+    expect(testCollection.baseDescriptions && testCollection.baseDescriptions.length).toBe(1);
 
     const schematic1 = engine.createSchematic('schematic1', testCollection);
 
@@ -123,8 +123,7 @@ describe('FileSystemEngineHost', () => {
     const testCollection = engine.createCollection('extends-basic');
 
     expect(testCollection.baseDescriptions).not.toBeUndefined();
-    expect(testCollection.baseDescriptions
-           && testCollection.baseDescriptions.length).toBe(1);
+    expect(testCollection.baseDescriptions && testCollection.baseDescriptions.length).toBe(1);
 
     const schematic1 = engine.createSchematic('schematic1', testCollection);
 
@@ -148,8 +147,7 @@ describe('FileSystemEngineHost', () => {
     const testCollection = engine.createCollection('extends-deep');
 
     expect(testCollection.baseDescriptions).not.toBeUndefined();
-    expect(testCollection.baseDescriptions
-           && testCollection.baseDescriptions.length).toBe(2);
+    expect(testCollection.baseDescriptions && testCollection.baseDescriptions.length).toBe(2);
 
     const schematic1 = engine.createSchematic('schematic1', testCollection);
 
@@ -173,8 +171,7 @@ describe('FileSystemEngineHost', () => {
     const testCollection = engine.createCollection('extends-replace');
 
     expect(testCollection.baseDescriptions).not.toBeUndefined();
-    expect(testCollection.baseDescriptions
-           && testCollection.baseDescriptions.length).toBe(1);
+    expect(testCollection.baseDescriptions && testCollection.baseDescriptions.length).toBe(1);
 
     const schematic1 = engine.createSchematic('schematic1', testCollection);
 
@@ -195,8 +192,7 @@ describe('FileSystemEngineHost', () => {
     const testCollection = engine.createCollection('extends-multiple');
 
     expect(testCollection.baseDescriptions).not.toBeUndefined();
-    expect(testCollection.baseDescriptions
-           && testCollection.baseDescriptions.length).toBe(4);
+    expect(testCollection.baseDescriptions && testCollection.baseDescriptions.length).toBe(4);
 
     const schematic1 = engine.createSchematic('schematic1', testCollection);
 
@@ -255,10 +251,7 @@ describe('FileSystemEngineHost', () => {
     const engine = new SchematicEngine(engineHost);
     const collection = engine.createCollection('hidden-schematics');
 
-    expect(collection.listSchematicNames()).toEqual([
-      'schematic-1',
-      'schematic-2',
-    ]);
+    expect(collection.listSchematicNames()).toEqual(['schematic-1', 'schematic-2']);
   });
 
   it('does not list private schematics', () => {
@@ -266,10 +259,7 @@ describe('FileSystemEngineHost', () => {
     const engine = new SchematicEngine(engineHost);
     const collection = engine.createCollection('private-schematics');
 
-    expect(collection.listSchematicNames()).toEqual([
-      'schematic-1',
-      'schematic-2',
-    ]);
+    expect(collection.listSchematicNames()).toEqual(['schematic-1', 'schematic-2']);
   });
 
   it('cannot instanciate a private schematic', () => {
@@ -282,7 +272,7 @@ describe('FileSystemEngineHost', () => {
     expect(() => collection.createSchematic('private-schematic')).toThrow();
   });
 
-  it('allows extra properties on schema', done => {
+  it('allows extra properties on schema', (done) => {
     const engineHost = new FileSystemEngineHost(root);
     const engine = new SchematicEngine(engineHost);
     const host = new virtualFs.test.TestHost();
@@ -290,14 +280,17 @@ describe('FileSystemEngineHost', () => {
     const collection = engine.createCollection('extra-properties');
     const schematic = collection.createSchematic('schematic1');
 
-    schematic.call({}, observableOf(new HostTree(host))).toPromise()
-      .then(tree => {
+    schematic
+      .call({}, observableOf(new HostTree(host)))
+      .toPromise()
+      .then((tree) => {
         return new HostSink(host).commit(tree).toPromise();
       })
       .then(() => {
         expect(host.files as string[]).toEqual(['/extra-schematic']);
-        expect(host.sync.read(normalize('/extra-schematic')).toString())
-          .toEqual('extra-collection');
+        expect(host.sync.read(normalize('/extra-schematic')).toString()).toEqual(
+          'extra-collection',
+        );
       })
       .then(done, done.fail);
   });
@@ -308,16 +301,21 @@ describe('FileSystemEngineHost', () => {
     expect(engineHost.hasTaskExecutor('file-tasks/file-task.js')).toBeTruthy();
   });
 
-  it('creates a file-based task', done => {
+  it('creates a file-based task', (done) => {
     const engineHost = new FileSystemEngineHost(root);
 
-    engineHost.createTaskExecutor('file-tasks/file-task.js').subscribe(executor => {
+    engineHost.createTaskExecutor('file-tasks/file-task.js').subscribe((executor) => {
       expect(executor).toBeTruthy();
-      from(executor(undefined, undefined as any)).toPromise().then(() => done.fail, () => done());
+      from(executor(undefined, undefined as any))
+        .toPromise()
+        .then(
+          () => done.fail,
+          () => done(),
+        );
     }, done.fail);
   });
 
-  it('allows executing a schematic with a file-based task', done => {
+  it('allows executing a schematic with a file-based task', (done) => {
     const engineHost = new FileSystemEngineHost(root);
     const engine = new SchematicEngine(engineHost);
     const host = new virtualFs.test.TestHost();
@@ -325,11 +323,13 @@ describe('FileSystemEngineHost', () => {
     const collection = engine.createCollection('file-tasks');
     const schematic = collection.createSchematic('schematic-1');
 
-    schematic.call({}, observableOf(new HostTree(host))).toPromise()
-      .then(tree => new HostSink(host).commit(tree).toPromise())
+    schematic
+      .call({}, observableOf(new HostTree(host)))
+      .toPromise()
+      .then((tree) => new HostSink(host).commit(tree).toPromise())
       .then(() => engine.executePostTasks().toPromise())
       .then(() => done.fail())
-      .catch(reason => {
+      .catch((reason) => {
         if (reason.message === 'task exception') {
           done();
         } else {

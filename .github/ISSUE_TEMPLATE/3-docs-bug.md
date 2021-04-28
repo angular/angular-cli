@@ -1,7 +1,6 @@
 ---
-name: "📚 Docs or angular.io issue report"
+name: '📚 Docs or angular.io issue report'
 about: Report an issue in Angular's documentation or angular.io application
-
 ---
 
 🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑
