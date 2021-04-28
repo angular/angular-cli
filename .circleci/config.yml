@@ -173,6 +173,9 @@ jobs:
               echo "This build is not over a PR, nothing to do."
             fi
       - run:
+          name: Validate Code Formatting
+          command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
+      - run:
           command: yarn -s admin validate
 
   e2e-cli:
