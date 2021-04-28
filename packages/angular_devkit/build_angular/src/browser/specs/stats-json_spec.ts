@@ -9,7 +9,6 @@
 import { Architect } from '@angular-devkit/architect';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder stats json', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;

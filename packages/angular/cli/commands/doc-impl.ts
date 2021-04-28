@@ -39,7 +39,7 @@ export class DocCommand extends Command<DocCommandSchema> {
         /* tslint:disable-next-line:no-implicit-dependencies */
         const currentNgVersion = (await import('@angular/core')).VERSION.major;
         domain = `v${currentNgVersion}.angular.io`;
-      } catch (e) { }
+      } catch (e) {}
     }
 
     let searchUrl = `https://${domain}/api?query=${options.keyword}`;

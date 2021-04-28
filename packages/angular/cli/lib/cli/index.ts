@@ -17,41 +17,38 @@ import { findWorkspaceFile } from '../../utilities/project';
 export { VERSION, Version } from '../../models/version';
 
 const debugEnv = process.env['NG_DEBUG'];
-const isDebug =
-  debugEnv !== undefined &&
-  debugEnv !== '0' &&
-  debugEnv.toLowerCase() !== 'false';
+const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCase() !== 'false';
 
 // tslint:disable: no-console
-export default async function(options: { testing?: boolean; cliArgs: string[] }) {
+export default async function (options: { testing?: boolean; cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
-  const version = process.versions.node.split('.').map(part => Number(part));
+  const version = process.versions.node.split('.').map((part) => Number(part));
   if (version[0] < 12 || (version[0] === 12 && version[1] < 14)) {
     process.stderr.write(
       `Node.js version ${process.version} detected.\n` +
-      'The Angular CLI requires a minimum v12.14.\n\n' +
-      'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
+        'The Angular CLI requires a minimum v12.14.\n\n' +
+        'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
     );
 
     return 3;
   }
 
   const logger = createConsoleLogger(isDebug, process.stdout, process.stderr, {
-    info: s => (colors.enabled ? s : removeColor(s)),
-    debug: s => (colors.enabled ? s : removeColor(s)),
-    warn: s => (colors.enabled ? colors.bold.yellow(s) : removeColor(s)),
-    error: s => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
-    fatal: s => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
+    info: (s) => (colors.enabled ? s : removeColor(s)),
+    debug: (s) => (colors.enabled ? s : removeColor(s)),
+    warn: (s) => (colors.enabled ? colors.bold.yellow(s) : removeColor(s)),
+    error: (s) => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
+    fatal: (s) => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
   });
 
   // Redirect console to logger
-  console.info = console.log = function(...args) {
+  console.info = console.log = function (...args) {
     logger.info(format(...args));
   };
-  console.warn = function(...args) {
+  console.warn = function (...args) {
     logger.warn(format(...args));
   };
-  console.error = function(...args) {
+  console.error = function (...args) {
     logger.error(format(...args));
   };
 

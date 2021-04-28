@@ -35,7 +35,7 @@ export function execute(
   context: BuilderContext,
 ): Observable<BuilderOutput> {
   return from(initialize(options, context.workspaceRoot)).pipe(
-    switchMap(packager => options.watch ? packager.watch() : packager.build()),
+    switchMap((packager) => (options.watch ? packager.watch() : packager.build())),
     mapTo({ success: true }),
   );
 }

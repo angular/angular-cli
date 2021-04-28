@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-const STRING_DASHERIZE_REGEXP = (/[ _]/g);
-const STRING_DECAMELIZE_REGEXP = (/([a-z\d])([A-Z])/g);
-const STRING_CAMELIZE_REGEXP = (/(-|_|\.|\s)+(.)?/g);
-const STRING_UNDERSCORE_REGEXP_1 = (/([a-z\d])([A-Z]+)/g);
-const STRING_UNDERSCORE_REGEXP_2 = (/-|\s+/g);
+const STRING_DASHERIZE_REGEXP = /[ _]/g;
+const STRING_DECAMELIZE_REGEXP = /([a-z\d])([A-Z])/g;
+const STRING_CAMELIZE_REGEXP = /(-|_|\.|\s)+(.)?/g;
+const STRING_UNDERSCORE_REGEXP_1 = /([a-z\d])([A-Z]+)/g;
+const STRING_UNDERSCORE_REGEXP_2 = /-|\s+/g;
 
 /**
  * Converts a camelized string into all lower case separated by underscores.
@@ -86,7 +86,10 @@ export function camelize(str: string): string {
  @return {String} the classified string
  */
 export function classify(str: string): string {
-  return str.split('.').map(part => capitalize(camelize(part))).join('.');
+  return str
+    .split('.')
+    .map((part) => capitalize(camelize(part)))
+    .join('.');
 }
 
 /**

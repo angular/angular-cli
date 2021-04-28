@@ -60,7 +60,7 @@ async function initialize(
       watch: true,
     },
     context,
-    wco => [
+    (wco) => [
       getCommonConfig(wco),
       getStylesConfig(wco),
       getTypeScriptConfig(wco),
@@ -112,7 +112,7 @@ export function execute(
         // Split along commas to make it more natural, and remove empty strings.
         const reporters = options.reporters
           .reduce<string[]>((acc, curr) => acc.concat(curr.split(',')), [])
-          .filter(x => !!x);
+          .filter((x) => !!x);
 
         if (reporters.length > 0) {
           karmaOptions.reporters = reporters;
@@ -121,9 +121,7 @@ export function execute(
 
       // prepend special webpack loader that will transform test.ts
       if (options.include && options.include.length > 0) {
-        const mainFilePath = getSystemPath(
-          join(normalize(context.workspaceRoot), options.main),
-        );
+        const mainFilePath = getSystemPath(join(normalize(context.workspaceRoot), options.main));
         const files = findTests(options.include, dirname(mainFilePath), context.workspaceRoot);
         // early exit, no reason to start karma
         if (!files.length) {
@@ -167,30 +165,32 @@ export function execute(
 
       return [karma, config] as [typeof karma, KarmaConfigOptions];
     }),
-    switchMap(([karma, karmaConfig]) => new Observable<BuilderOutput>(subscriber => {
-      // Pass onto Karma to emit BuildEvents.
-      karmaConfig.buildWebpack ??= {};
-      if (typeof karmaConfig.buildWebpack === 'object') {
-        // tslint:disable-next-line: no-any
-        (karmaConfig.buildWebpack as any).failureCb ??= () => subscriber.next({ success: false });
-        // tslint:disable-next-line: no-any
-        (karmaConfig.buildWebpack as any).successCb ??= () => subscriber.next({ success: true });
-      }
+    switchMap(
+      ([karma, karmaConfig]) =>
+        new Observable<BuilderOutput>((subscriber) => {
+          // Pass onto Karma to emit BuildEvents.
+          karmaConfig.buildWebpack ??= {};
+          if (typeof karmaConfig.buildWebpack === 'object') {
+            // tslint:disable-next-line: no-any
+            (karmaConfig.buildWebpack as any).failureCb ??= () =>
+              subscriber.next({ success: false });
+            // tslint:disable-next-line: no-any
+            (karmaConfig.buildWebpack as any).successCb ??= () =>
+              subscriber.next({ success: true });
+          }
 
-      // Complete the observable once the Karma server returns.
-      const karmaServer = new karma.Server(
-        karmaConfig as Config,
-        exitCode => {
-          subscriber.next({ success: exitCode === 0 });
-          subscriber.complete();
-        },
-      );
+          // Complete the observable once the Karma server returns.
+          const karmaServer = new karma.Server(karmaConfig as Config, (exitCode) => {
+            subscriber.next({ success: exitCode === 0 });
+            subscriber.complete();
+          });
 
-      const karmaStart = karmaServer.start();
+          const karmaStart = karmaServer.start();
 
-      // Cleanup, signal Karma to exit.
-      return () => karmaStart.then(() => karmaServer.stop());
-    })),
+          // Cleanup, signal Karma to exit.
+          return () => karmaStart.then(() => karmaServer.stop());
+        }),
+    ),
     defaultIfEmpty({ success: false }),
   );
 }

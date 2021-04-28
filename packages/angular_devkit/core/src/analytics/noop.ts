@@ -16,5 +16,7 @@ export class NoopAnalytics implements Analytics {
   screenview() {}
   pageview() {}
   timing() {}
-  flush(): Promise<void> { return Promise.resolve(); }
+  flush(): Promise<void> {
+    return Promise.resolve();
+  }
 }

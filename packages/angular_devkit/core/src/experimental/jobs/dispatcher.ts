@@ -8,24 +8,14 @@
 
 import { JsonValue } from '../../json/index';
 import { Readwrite } from '../../utils/index';
-import {
-  Job,
-  JobDescription,
-  JobHandler,
-  JobHandlerContext,
-  JobName,
-  isJobHandler,
-} from './api';
+import { Job, JobDescription, JobHandler, JobHandlerContext, JobName, isJobHandler } from './api';
 import { JobDoesNotExistException } from './exception';
 
 /**
  * A JobDispatcher can be used to dispatch between multiple jobs.
  */
-export interface JobDispatcher<
-  A extends JsonValue,
-  I extends JsonValue,
-  O extends JsonValue,
-> extends JobHandler<A, I, O> {
+export interface JobDispatcher<A extends JsonValue, I extends JsonValue, O extends JsonValue>
+  extends JobHandler<A, I, O> {
   /**
    * Set the default job if all conditionals failed.
    * @param name The default name if all conditions are false.
@@ -40,44 +30,39 @@ export interface JobDispatcher<
   addConditionalJob(predicate: (args: A) => boolean, name: string): void;
 }
 
-
 /**
  * OnReady a dispatcher that can dispatch to a sub job, depending on conditions.
  * @param options
  */
-export function createDispatcher<
-  A extends JsonValue,
-  I extends JsonValue,
-  O extends JsonValue,
->(
+export function createDispatcher<A extends JsonValue, I extends JsonValue, O extends JsonValue>(
   options: Partial<Readwrite<JobDescription>> = {},
 ): JobDispatcher<A, I, O> {
   let defaultDelegate: JobName | null = null;
   const conditionalDelegateList: [(args: JsonValue) => boolean, JobName][] = [];
 
   const job: JobHandler<JsonValue, JsonValue, JsonValue> = Object.assign(
-      (argument: JsonValue, context: JobHandlerContext) => {
-        const maybeDelegate = conditionalDelegateList.find(([predicate]) => predicate(argument));
-        let delegate: Job<JsonValue, JsonValue, JsonValue> | null = null;
+    (argument: JsonValue, context: JobHandlerContext) => {
+      const maybeDelegate = conditionalDelegateList.find(([predicate]) => predicate(argument));
+      let delegate: Job<JsonValue, JsonValue, JsonValue> | null = null;
 
-        if (maybeDelegate) {
-          delegate = context.scheduler.schedule(maybeDelegate[1], argument);
-        } else if (defaultDelegate) {
-          delegate = context.scheduler.schedule(defaultDelegate, argument);
-        } else {
-          throw new JobDoesNotExistException('<null>');
-        }
+      if (maybeDelegate) {
+        delegate = context.scheduler.schedule(maybeDelegate[1], argument);
+      } else if (defaultDelegate) {
+        delegate = context.scheduler.schedule(defaultDelegate, argument);
+      } else {
+        throw new JobDoesNotExistException('<null>');
+      }
 
-        context.inboundBus.subscribe(delegate.inboundBus);
+      context.inboundBus.subscribe(delegate.inboundBus);
 
-        return delegate.outboundBus;
-      },
-      {
-        jobDescription: options,
-      },
+      return delegate.outboundBus;
+    },
+    {
+      jobDescription: options,
+    },
   );
 
-  return Object.assign(job, {
+  return (Object.assign(job, {
     setDefaultJob(name: JobName | null | JobHandler<JsonValue, JsonValue, JsonValue>) {
       if (isJobHandler(name)) {
         name = name.jobDescription.name === undefined ? null : name.jobDescription.name;
@@ -88,6 +73,6 @@ export function createDispatcher<
     addConditionalJob(predicate: (args: JsonValue) => boolean, name: JobName) {
       conditionalDelegateList.push([predicate, name]);
     },
-  // TODO: Remove return-only generic from createDispatcher() API.
-  }) as unknown as JobDispatcher<A, I, O>;
+    // TODO: Remove return-only generic from createDispatcher() API.
+  }) as unknown) as JobDispatcher<A, I, O>;
 }

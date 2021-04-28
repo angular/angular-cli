@@ -13,10 +13,7 @@ import {
 } from '@angular-devkit/core';
 import { dirname, join, resolve } from 'path';
 import { RuleFactory } from '../src';
-import {
-  FileSystemCollectionDesc,
-  FileSystemSchematicDesc,
-} from './description';
+import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
 import { ExportStringRef } from './export-ref';
 import {
   CollectionCannotBeResolvedException,
@@ -33,12 +30,13 @@ export class NodePackageDoesNotSupportSchematics extends BaseException {
   }
 }
 
-
 /**
  * A simple EngineHost that uses NodeModules to resolve collections.
  */
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
-  constructor(private readonly paths?: string[]) { super(); }
+  constructor(private readonly paths?: string[]) {
+    super();
+  }
 
   private resolve(name: string, requester?: string, references = new Set<string>()): string {
     if (requester) {
@@ -107,7 +105,8 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
       return collectionPath;
     } catch (e) {
       if (
-        e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException
+        e instanceof InvalidJsonCharacterException ||
+        e instanceof UnexpectedEndOfInputException
       ) {
         throw new InvalidCollectionJsonException(name, collectionPath, e);
       } else {

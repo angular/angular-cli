@@ -8,7 +8,6 @@
 
 import { dirname, resolve } from 'path';
 
-
 export class ExportStringRef<T> {
   private _ref?: T;
   private _module: string;
@@ -27,7 +26,13 @@ export class ExportStringRef<T> {
     }
   }
 
-  get ref() { return this._ref; }
-  get module() { return this._module; }
-  get path() { return this._path; }
+  get ref() {
+    return this._ref;
+  }
+  get module() {
+    return this._module;
+  }
+  get path() {
+    return this._path;
+  }
 }

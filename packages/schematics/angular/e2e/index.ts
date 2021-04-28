@@ -26,7 +26,7 @@ import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
 
 function addScriptsToPackageJson(): Rule {
-  return host => {
+  return (host) => {
     const pkgJson = new JSONFile(host, 'package.json');
     const e2eScriptPath = ['scripts', 'e2e'];
 
@@ -74,20 +74,26 @@ export default function (options: E2eOptions): Rule {
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
           }),
           move(root),
-        ])),
-      host => [{
-        type: NodeDependencyType.Dev,
-        name: 'protractor',
-        version: '~7.0.0',
-      },       {
-        type: NodeDependencyType.Dev,
-        name: 'jasmine-spec-reporter',
-        version: '~7.0.0',
-      },       {
-        type: NodeDependencyType.Dev,
-        name: 'ts-node',
-        version: '~9.1.1',
-      }].forEach(dep => addPackageJsonDependency(host, dep)),
+        ]),
+      ),
+      (host) =>
+        [
+          {
+            type: NodeDependencyType.Dev,
+            name: 'protractor',
+            version: '~7.0.0',
+          },
+          {
+            type: NodeDependencyType.Dev,
+            name: 'jasmine-spec-reporter',
+            version: '~7.0.0',
+          },
+          {
+            type: NodeDependencyType.Dev,
+            name: 'ts-node',
+            version: '~9.1.1',
+          },
+        ].forEach((dep) => addPackageJsonDependency(host, dep)),
       addScriptsToPackageJson(),
     ]);
   };

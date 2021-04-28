@@ -2,9 +2,10 @@
 
 1. Clone the Angular-CLI repo. A local copy works just fine.
 1. Create an upstream remote:
-  ```bash
-  $ git remote add upstream https://github.com/angular/angular-cli.git
-  ```
+
+```bash
+$ git remote add upstream https://github.com/angular/angular-cli.git
+```
 
 # Caretaker
 
@@ -16,21 +17,22 @@ Each shift consists of two caretakers. The primary caretaker is responsible for
 merging PRs to master and patch whereas the secondary caretaker is responsible
 for the release. Primary-secondary pairs are as follows:
 
-Primary | Secondary
---------|----------
-Alan    | Doug
-Charles | Keen
-Filipe  | Joey
+| Primary | Secondary |
+| ------- | --------- |
+| Alan    | Doug      |
+| Charles | Keen      |
+| Filipe  | Joey      |
 
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
 be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22PR+action%3A+merge%22+-is%3Adraft).
 This list should be checked daily and any ready PRs should be merged. For each PR, check the
-`target` label to understand where it should be merged to.  You can find which branches a specific
+`target` label to understand where it should be merged to. You can find which branches a specific
 PR will be merged into with the `yarn ng-dev pr check-target-branches <pr>` command.
 
 When ready to merge a PR, run the following command:
+
 ```
 yarn ng-dev pr merge <pr>
 ```
@@ -85,7 +87,7 @@ git push upstream --follow-tags
 **This can ONLY be done by a Google employee.**
 
 Log in to the Wombat publishing service using your own github and google.com
-account to publish.  This enforces the login is done using 2Factor auth.
+account to publish. This enforces the login is done using 2Factor auth.
 
 Run `npm login --registry https://wombat-dressing-room.appspot.com`:
 
@@ -107,12 +109,14 @@ For the first release of a major version, follow the instructions in
 [Publishing a Major Version](#publishing-a-major-version) section.
 
 For non-major release, check out the patch branch (e.g. `9.1.x`), then run:
+
 ```bash
 rm -rf node_modules/ && yarn install --frozen-lockfile # Reload dependencies
 yarn admin publish --tag latest
 ```
 
 If also publishing a prerelease, check out `master`, then run:
+
 ```bash
 rm -rf node_modules/ && yarn install --frozen-lockfile # Reload dependencies
 yarn admin publish --tag next
@@ -153,7 +157,7 @@ using the `--githubToken` flag. You just then have to confirm the draft.
 
 **For each released version**:
 
-Update `version` in root [`package.json`](/package.json#L3) to the *next* release version.
+Update `version` in root [`package.json`](/package.json#L3) to the _next_ release version.
 
 ```sh
 git checkout -b release-bump-vXX

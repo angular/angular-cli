@@ -54,10 +54,12 @@ describe('Extract i18n Target', () => {
   it('shows errors', async () => {
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
-    host.appendToFile('src/app/app.component.html',
-      '<p i18n>Hello world <span i18n>inner</span></p>');
+    host.appendToFile(
+      'src/app/app.component.html',
+      '<p i18n>Hello world <span i18n>inner</span></p>',
+    );
 
     const run = await architect.scheduleTarget(extractI18nTargetSpec, undefined, { logger });
 
@@ -65,7 +67,9 @@ describe('Extract i18n Target', () => {
 
     await run.stop();
 
-    expect(logs.join()).toMatch('Cannot mark an element as translatable inside of a translatable section');
+    expect(logs.join()).toMatch(
+      'Cannot mark an element as translatable inside of a translatable section',
+    );
   });
 
   it('supports out file', async () => {
@@ -81,8 +85,9 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
-      .toMatch(/i18n test/);
+    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile))).toMatch(
+      /i18n test/,
+    );
   });
 
   it('supports output path', async () => {
@@ -99,8 +104,9 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
-      .toMatch(/i18n test/);
+    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile))).toMatch(
+      /i18n test/,
+    );
   });
 
   it('supports i18n format', async () => {
@@ -115,8 +121,9 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
-      .toMatch(/i18n test/);
+    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile))).toMatch(
+      /i18n test/,
+    );
   });
 
   it('issues warnings for duplicate message identifiers', async () => {
@@ -137,9 +144,6 @@ describe('Extract i18n Target', () => {
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
 
     const fullLog = logs.join();
-    expect(fullLog).toContain(
-      'Duplicate messages with id',
-    );
-
+    expect(fullLog).toContain('Duplicate messages with id');
   });
 });

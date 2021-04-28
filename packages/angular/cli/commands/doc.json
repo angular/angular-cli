@@ -4,7 +4,7 @@
   "description": "Opens the official Angular documentation (angular.io) in a browser, and searches for a given keyword.",
   "$longDescription": "",
 
-  "$aliases": [ "d" ],
+  "$aliases": ["d"],
   "$type": "native",
   "$impl": "./doc-impl#DocCommand",
 
@@ -26,7 +26,7 @@
           "default": false,
           "description": "Search all of angular.io. Otherwise, searches only API reference documentation."
         },
-        "version" : {
+        "version": {
           "oneOf": [
             {
               "type": "number",
@@ -39,8 +39,7 @@
           "description": "Contains the version of Angular to use for the documentation. If not provided, the command uses your current Angular core version."
         }
       },
-      "required": [
-      ]
+      "required": []
     },
     { "$ref": "./definitions.json#/definitions/base" }
   ]

@@ -27,10 +27,8 @@ class CliFilesystem implements Filesystem {
   hash(file: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const hash = crypto.createHash('sha1').setEncoding('hex');
-      pipeline(
-        createReadStream(this._resolve(file)),
-        hash,
-        (error) => error ? reject(error) : resolve(hash.read()),
+      pipeline(createReadStream(this._resolve(file)), hash, (error) =>
+        error ? reject(error) : resolve(hash.read()),
       );
     });
   }

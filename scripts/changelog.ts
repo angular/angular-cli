@@ -40,7 +40,7 @@ function exec(command: string, input?: string): string {
   }).trim();
 }
 
-export default async function(args: ChangelogOptions, logger: logging.Logger) {
+export default async function (args: ChangelogOptions, logger: logging.Logger) {
   const commits: JsonObject[] = [];
   let toSha: string | null = null;
 
@@ -79,13 +79,13 @@ export default async function(args: ChangelogOptions, logger: logging.Logger) {
     }
   }
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     (gitRawCommits({
       from: args.from,
       to: args.to || 'HEAD',
       format: '%B%n-hash-%n%H%n-gitTags-%n%D%n-committerDate-%n%ci%n-authorName-%n%aN%n',
     }) as NodeJS.ReadStream)
-      .on('error', err => {
+      .on('error', (err) => {
         logger.fatal('An error happened: ' + err.message);
         process.exit(1);
       })
@@ -115,7 +115,7 @@ export default async function(args: ChangelogOptions, logger: logging.Logger) {
             const tags = maybeTag && maybeTag[1].split(/,/g);
             chunk['tags'] = tags;
 
-            if (tags && tags.find(x => x == args.to)) {
+            if (tags && tags.find((x) => x == args.to)) {
               toSha = chunk.hash as string;
             }
             if (!cherryPicked.has(chunk.hash as string)) {

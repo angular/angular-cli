@@ -20,7 +20,6 @@ import { Stats } from 'fs';
 import { EMPTY, Observable, from, of } from 'rxjs';
 import { concatMap, delay, finalize, map, mergeMap, retry, tap } from 'rxjs/operators';
 
-
 /**
  * @deprecated
  */
@@ -49,36 +48,38 @@ export class TestProjectHost extends NodeJsSyncHost {
   }
 
   initialize(): Observable<void> {
-    const recursiveList = (path: Path): Observable<Path> => this.list(path).pipe(
-      // Emit each fragment individually.
-      concatMap(fragments => from(fragments)),
-      // Join the path with fragment.
-      map(fragment => join(path, fragment)),
-      // Emit directory content paths instead of the directory path.
-      mergeMap(path => this.isDirectory(path).pipe(
-        concatMap(isDir => isDir ? recursiveList(path) : of(path)),
-      )),
-    );
+    const recursiveList = (path: Path): Observable<Path> =>
+      this.list(path).pipe(
+        // Emit each fragment individually.
+        concatMap((fragments) => from(fragments)),
+        // Join the path with fragment.
+        map((fragment) => join(path, fragment)),
+        // Emit directory content paths instead of the directory path.
+        mergeMap((path) =>
+          this.isDirectory(path).pipe(
+            concatMap((isDir) => (isDir ? recursiveList(path) : of(path))),
+          ),
+        ),
+      );
 
     // Find a unique folder that we can write to to use as current root.
     return this.findUniqueFolderPath().pipe(
       // Save the path and create a scoped host for it.
-      tap(newFolderPath => {
+      tap((newFolderPath) => {
         this._currentRoot = newFolderPath;
         this._scopedSyncHost = new virtualFs.SyncDelegateHost(
-          new virtualFs.ScopedHost(this, this.root()));
+          new virtualFs.ScopedHost(this, this.root()),
+        );
       }),
       // List all files in root.
       concatMap(() => recursiveList(this._templateRoot)),
       // Copy them over to the current root.
-      concatMap(from => {
+      concatMap((from) => {
         const to = join(this.root(), relative(this._templateRoot, from));
 
-        return this.read(from).pipe(
-          concatMap(buffer => this.write(to, buffer)),
-        );
+        return this.read(from).pipe(concatMap((buffer) => this.write(to, buffer)));
       }),
-      map(() => { }),
+      map(() => {}),
     );
   }
 
@@ -91,7 +92,7 @@ export class TestProjectHost extends NodeJsSyncHost {
     // Wait 50ms and retry up to 10 times, to give time for file locks to clear.
     return this.exists(this.root()).pipe(
       delay(50),
-      concatMap(exists => exists ? this.delete(this.root()) : EMPTY),
+      concatMap((exists) => (exists ? this.delete(this.root()) : EMPTY)),
       retry(10),
       finalize(() => {
         this._currentRoot = null;
@@ -101,38 +102,35 @@ export class TestProjectHost extends NodeJsSyncHost {
   }
 
   writeMultipleFiles(files: { [path: string]: string | ArrayBufferLike | Buffer }): void {
-    Object.keys(files).forEach(fileName => {
+    Object.keys(files).forEach((fileName) => {
       let content = files[fileName];
       if (typeof content == 'string') {
         content = virtualFs.stringToFileBuffer(content);
       } else if (content instanceof Buffer) {
-        content = content.buffer.slice(
-          content.byteOffset,
-          content.byteOffset + content.byteLength,
-        );
+        content = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
       }
 
-      this.scopedSync().write(
-        normalize(fileName),
-        content,
-      );
+      this.scopedSync().write(normalize(fileName), content);
     });
   }
 
   replaceInFile(path: string, match: RegExp | string, replacement: string) {
     const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
-    this.scopedSync().write(normalize(path),
-      virtualFs.stringToFileBuffer(content.replace(match, replacement)));
+    this.scopedSync().write(
+      normalize(path),
+      virtualFs.stringToFileBuffer(content.replace(match, replacement)),
+    );
   }
 
   appendToFile(path: string, str: string) {
     const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
-    this.scopedSync().write(normalize(path),
-      virtualFs.stringToFileBuffer(content.concat(str)));
+    this.scopedSync().write(normalize(path), virtualFs.stringToFileBuffer(content.concat(str)));
   }
 
   fileMatchExists(dir: string, regex: RegExp): PathFragment | undefined {
-    const [fileName] = this.scopedSync().list(normalize(dir)).filter(name => name.match(regex));
+    const [fileName] = this.scopedSync()
+      .list(normalize(dir))
+      .filter((name) => name.match(regex));
 
     return fileName || undefined;
   }
@@ -149,7 +147,7 @@ export class TestProjectHost extends NodeJsSyncHost {
     const newFolderPath = join(dirname(this._templateRoot), newFolderName);
 
     return this.exists(newFolderPath).pipe(
-      concatMap(exists => exists ? this.findUniqueFolderPath() : of(newFolderPath)),
+      concatMap((exists) => (exists ? this.findUniqueFolderPath() : of(newFolderPath))),
     );
   }
 }

@@ -48,7 +48,10 @@ describe('Dev Server Builder index', () => {
       'test.js': 'console.log("test");',
     });
 
-    const { workspace } = await workspaces.readWorkspace(host.root(), workspaces.createWorkspaceHost(host));
+    const { workspace } = await workspaces.readWorkspace(
+      host.root(),
+      workspaces.createWorkspaceHost(host),
+    );
     const app = workspace.projects.get('app');
     if (!app) {
       fail('Test application "app" not found.');
@@ -105,7 +108,10 @@ describe('Dev Server Builder index', () => {
 
   it('sets HTML lang attribute with the active locale', async () => {
     const locale = 'fr';
-    const { workspace } = await workspaces.readWorkspace(host.root(), workspaces.createWorkspaceHost(host));
+    const { workspace } = await workspaces.readWorkspace(
+      host.root(),
+      workspaces.createWorkspaceHost(host),
+    );
     const app = workspace.projects.get('app');
     if (!app) {
       fail('Test application "app" not found.');

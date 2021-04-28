@@ -19,7 +19,6 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema } from './schema';
 
-
 export default function (options: Schema): Rule {
   const schematicsVersion = require('@angular-devkit/schematics/package.json').version;
   const coreVersion = require('@angular-devkit/core/package.json').version;
@@ -27,18 +26,20 @@ export default function (options: Schema): Rule {
   return (_, context) => {
     context.addTask(new NodePackageInstallTask(options.name));
 
-    return mergeWith(apply(url('./files'), [
-      partitionApplyMerge(
-        (p) => !/\/src\/.*?\/files\//.test(p),
-        template({
-          ...options,
-          coreVersion,
-          schematicsVersion,
-          dot: '.',
-          dasherize: strings.dasherize,
-        }),
-      ),
-      move(options.name),
-    ]));
+    return mergeWith(
+      apply(url('./files'), [
+        partitionApplyMerge(
+          (p) => !/\/src\/.*?\/files\//.test(p),
+          template({
+            ...options,
+            coreVersion,
+            schematicsVersion,
+            dot: '.',
+            dasherize: strings.dasherize,
+          }),
+        ),
+        move(options.name),
+      ]),
+    );
   };
 }

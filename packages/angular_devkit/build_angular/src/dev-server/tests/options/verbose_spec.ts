@@ -7,7 +7,12 @@
  */
 
 import { serveWebpackBrowser } from '../../index';
-import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO, describeBuilder, setupBrowserTarget } from '../setup';
+import {
+  BASE_OPTIONS,
+  DEV_SERVER_BUILDER_INFO,
+  describeBuilder,
+  setupBrowserTarget,
+} from '../setup';
 
 const VERBOSE_LOG_TEXT = /\[emitted\] \(name: main\)/;
 

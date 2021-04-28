@@ -11,42 +11,44 @@ import { allTargetOptions, allWorkspaceTargets, updateWorkspace } from '../../ut
 import { Builders } from '../../utility/workspace-models';
 
 export default function (): Rule {
-  return async (_host, context) => updateWorkspace(workspace => {
-    for (const [name, target] of allWorkspaceTargets(workspace)) {
-      let defaultConfiguration: string | undefined;
+  return async (_host, context) =>
+    updateWorkspace((workspace) => {
+      for (const [name, target] of allWorkspaceTargets(workspace)) {
+        let defaultConfiguration: string | undefined;
 
-      // Only interested in 1st party builders
-      switch (target.builder) {
-        case Builders.AppShell:
-        case Builders.Browser:
-        case Builders.Server:
-        case Builders.NgPackagr:
-          defaultConfiguration = 'production';
-          break;
-        case Builders.DevServer:
-        case Builders.Protractor:
-        case '@nguniversal/builders:ssr-dev-server':
-          defaultConfiguration = 'development';
-          break;
-        case Builders.TsLint:
-        case Builders.ExtractI18n:
-        case Builders.Karma:
-          // Nothing to update
-          break;
-        default:
-          context.logger.warn(tags.stripIndents`Cannot update "${name}" target configuration as it's using "${target.builder}"
+        // Only interested in 1st party builders
+        switch (target.builder) {
+          case Builders.AppShell:
+          case Builders.Browser:
+          case Builders.Server:
+          case Builders.NgPackagr:
+            defaultConfiguration = 'production';
+            break;
+          case Builders.DevServer:
+          case Builders.Protractor:
+          case '@nguniversal/builders:ssr-dev-server':
+            defaultConfiguration = 'development';
+            break;
+          case Builders.TsLint:
+          case Builders.ExtractI18n:
+          case Builders.Karma:
+            // Nothing to update
+            break;
+          default:
+            context.logger
+              .warn(tags.stripIndents`Cannot update "${name}" target configuration as it's using "${target.builder}"
           which is a third-party builder. This target configuration will require manual review.`);
 
+            continue;
+        }
+
+        if (!defaultConfiguration) {
           continue;
-      }
+        }
 
-      if (!defaultConfiguration) {
-        continue;
+        updateTarget(name, target, context.logger, defaultConfiguration);
       }
-
-      updateTarget(name, target, context.logger, defaultConfiguration);
-    }
-  });
+    });
 }
 
 function getArchitectTargetWithConfig(currentTarget: string, overrideConfig?: string): string {
@@ -66,13 +68,17 @@ function updateTarget(
   }
 
   if (target.configurations?.development) {
-    logger.info(tags.stripIndents`Skipping updating "${targetName}" target configuration as a "development" configuration is already defined.`);
+    logger.info(
+      tags.stripIndents`Skipping updating "${targetName}" target configuration as a "development" configuration is already defined.`,
+    );
 
     return;
   }
 
   if (!target.configurations?.production) {
-    logger.info(tags.stripIndents`Skipping updating "${targetName}" target configuration as a "production" configuration is not defined.`);
+    logger.info(
+      tags.stripIndents`Skipping updating "${targetName}" target configuration as a "production" configuration is not defined.`,
+    );
 
     return;
   }
@@ -86,7 +92,10 @@ function updateTarget(
     if (typeof options.serverTarget === 'string') {
       options.serverTarget = getArchitectTargetWithConfig(options.serverTarget);
       if (!developmentOptions.serverTarget) {
-        developmentOptions.serverTarget = getArchitectTargetWithConfig(options.serverTarget, 'development');
+        developmentOptions.serverTarget = getArchitectTargetWithConfig(
+          options.serverTarget,
+          'development',
+        );
       }
     } else {
       serverTarget = false;
@@ -95,7 +104,10 @@ function updateTarget(
     if (typeof options.browserTarget === 'string') {
       options.browserTarget = getArchitectTargetWithConfig(options.browserTarget);
       if (!developmentOptions.browserTarget) {
-        developmentOptions.browserTarget = getArchitectTargetWithConfig(options.browserTarget, 'development');
+        developmentOptions.browserTarget = getArchitectTargetWithConfig(
+          options.browserTarget,
+          'development',
+        );
       }
     } else {
       browserTarget = false;
@@ -104,7 +116,10 @@ function updateTarget(
     if (typeof options.devServerTarget === 'string') {
       options.devServerTarget = getArchitectTargetWithConfig(options.devServerTarget);
       if (!developmentOptions.devServerTarget) {
-        developmentOptions.devServerTarget = getArchitectTargetWithConfig(options.devServerTarget, 'development');
+        developmentOptions.devServerTarget = getArchitectTargetWithConfig(
+          options.devServerTarget,
+          'development',
+        );
       }
     } else {
       devServerTarget = false;

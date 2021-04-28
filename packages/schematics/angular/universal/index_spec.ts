@@ -57,24 +57,25 @@ describe('Universal Schematic', () => {
 
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner.runSchematicAsync(
-      'application',
-      initialWorkspaceAppOptions,
-      appTree,
-    ).toPromise();
-    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('application', initialWorkspaceAppOptions, appTree)
+      .toPromise();
+    appTree = await schematicRunner
+      .runSchematicAsync('application', appOptions, appTree)
       .toPromise();
   });
 
   it('should create a root module file', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     expect(tree.exists(filePath)).toEqual(true);
   });
 
   it('should create a main file', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/main.server.ts';
     expect(tree.exists(filePath)).toEqual(true);
@@ -97,20 +98,20 @@ describe('Universal Schematic', () => {
         target: 'es2019',
         types: ['node'],
       },
-      files: [
-        'src/main.server.ts',
-      ],
+      files: ['src/main.server.ts'],
       angularCompilerOptions: {
         entryModule: './src/app/app.server.module#AppServerModule',
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
-    expect(angularConfig.projects.workspace.architect
-      .server.options.tsConfig).toEqual('tsconfig.server.json');
+    expect(angularConfig.projects.workspace.architect.server.options.tsConfig).toEqual(
+      'tsconfig.server.json',
+    );
   });
 
   it('should create a tsconfig file for a generated application', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
@@ -123,20 +124,20 @@ describe('Universal Schematic', () => {
         target: 'es2019',
         types: ['node'],
       },
-      files: [
-        'src/main.server.ts',
-      ],
+      files: ['src/main.server.ts'],
       angularCompilerOptions: {
         entryModule: './src/app/app.server.module#AppServerModule',
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
-    expect(angularConfig.projects.bar.architect
-      .server.options.tsConfig).toEqual('projects/bar/tsconfig.server.json');
+    expect(angularConfig.projects.bar.architect.server.options.tsConfig).toEqual(
+      'projects/bar/tsconfig.server.json',
+    );
   });
 
   it('should add dependency: @angular/platform-server', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
@@ -144,7 +145,8 @@ describe('Universal Schematic', () => {
   });
 
   it('should update workspace with a server target', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/angular.json';
     const contents = tree.readContent(filePath);
@@ -158,12 +160,17 @@ describe('Universal Schematic', () => {
     expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
     const configurations = targets.server.configurations;
     expect(configurations.production.fileReplacements.length).toEqual(1);
-    expect(configurations.production.fileReplacements[0].replace).toEqual('projects/bar/src/environments/environment.ts');
-    expect(configurations.production.fileReplacements[0].with).toEqual('projects/bar/src/environments/environment.prod.ts');
+    expect(configurations.production.fileReplacements[0].replace).toEqual(
+      'projects/bar/src/environments/environment.ts',
+    );
+    expect(configurations.production.fileReplacements[0].with).toEqual(
+      'projects/bar/src/environments/environment.prod.ts',
+    );
   });
 
   it('should update workspace with a build target outputPath', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/angular.json';
     const contents = tree.readContent(filePath);
@@ -173,7 +180,8 @@ describe('Universal Schematic', () => {
   });
 
   it('should add a server transition to BrowerModule import', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/app/app.module.ts';
     const contents = tree.readContent(filePath);
@@ -181,12 +189,12 @@ describe('Universal Schematic', () => {
   });
 
   it('should wrap the bootstrap call in a DOMContentLoaded event handler', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/main.ts';
     const contents = tree.readContent(filePath);
-    expect(contents)
-      .toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
+    expect(contents).toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
   });
 
   it('should wrap the bootstrap declaration in a DOMContentLoaded event handler', async () => {
@@ -212,7 +220,8 @@ describe('Universal Schematic', () => {
       `,
     );
 
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(
@@ -224,7 +233,7 @@ describe('Universal Schematic', () => {
     await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree).toPromise();
     expect(schematicRunner.tasks.length).toBe(1);
     expect(schematicRunner.tasks[0].name).toBe('node-package');
-    expect((schematicRunner.tasks[0].options as {command: string}).command).toBe('install');
+    expect((schematicRunner.tasks[0].options as { command: string }).command).toBe('install');
   });
 
   it(`should work when 'tsconfig.app.json' has comments`, async () => {
@@ -232,7 +241,8 @@ describe('Universal Schematic', () => {
     const appTsConfigContent = appTree.readContent(appTsConfigPath);
     appTree.overwrite(appTsConfigPath, '// comment in json file\n' + appTsConfigContent);
 
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
 
     const filePath = '/projects/bar/tsconfig.server.json';
@@ -240,15 +250,17 @@ describe('Universal Schematic', () => {
   });
 
   it(`should add import to '@angular/platform-server/init' in main file`, async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);
-    expect(contents).toContain('import \'@angular/platform-server/init\'');
+    expect(contents).toContain("import '@angular/platform-server/init'");
   });
 
   it(`should not add import to '@angular/localize' in main file when it's not a depedency`, async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);
@@ -257,12 +269,13 @@ describe('Universal Schematic', () => {
 
   it(`should add import to '@angular/localize' in main file when it's a depedency`, async () => {
     addPackageJsonDependency(appTree, {
-       name: '@angular/localize',
-       type: NodeDependencyType.Default,
-       version: 'latest',
+      name: '@angular/localize',
+      type: NodeDependencyType.Default,
+      version: 'latest',
     });
 
-    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
     const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);

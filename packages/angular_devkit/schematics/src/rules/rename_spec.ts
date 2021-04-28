@@ -13,12 +13,10 @@ import { HostTree } from '../tree/host-tree';
 import { callRule } from './call';
 import { rename } from './rename';
 
-
-const context: SchematicContext = null !;
-
+const context: SchematicContext = null!;
 
 describe('rename', () => {
-  it('works', done => {
+  it('works', (done) => {
     const tree = new HostTree();
     tree.create('a/b/file1', 'hello world');
     tree.create('a/b/file2', 'hello world');
@@ -27,9 +25,16 @@ describe('rename', () => {
     let i = 0;
 
     // Rename all files that contain 'b' to 'hello'.
-    callRule(rename(x => !!x.match(/b/), () => 'hello' + (i++)), observableOf(tree), context)
+    callRule(
+      rename(
+        (x) => !!x.match(/b/),
+        () => 'hello' + i++,
+      ),
+      observableOf(tree),
+      context,
+    )
       .toPromise()
-      .then(result => {
+      .then((result) => {
         expect(result.exists('a/b/file1')).toBe(false);
         expect(result.exists('a/b/file2')).toBe(false);
         expect(result.exists('hello0')).toBe(true);
@@ -39,7 +44,7 @@ describe('rename', () => {
       .then(done, done.fail);
   });
 
-  it('works (2)', done => {
+  it('works (2)', (done) => {
     const tree = new HostTree();
     tree.create('a/b/file1', 'hello world');
     tree.create('a/b/file2', 'hello world');
@@ -48,9 +53,16 @@ describe('rename', () => {
     let i = 0;
 
     // Rename all files that contain 'b' to 'hello'.
-    callRule(rename(x => !!x.match(/b/), x => x + (i++)), observableOf(tree), context)
+    callRule(
+      rename(
+        (x) => !!x.match(/b/),
+        (x) => x + i++,
+      ),
+      observableOf(tree),
+      context,
+    )
       .toPromise()
-      .then(result => {
+      .then((result) => {
         expect(result.exists('a/b/file1')).toBe(false);
         expect(result.exists('a/b/file2')).toBe(false);
         expect(result.exists('a/b/file10')).toBe(true);

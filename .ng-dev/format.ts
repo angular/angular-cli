@@ -5,6 +5,6 @@ import { FormatConfig } from '@angular/dev-infra-private/format/config';
  */
 export const format: FormatConfig = {
   'prettier': {
-    matchers: ['**/*.{ts,js,json,yml,yaml,md}']
+    matchers: ['**/*.{ts,js,json,yml,yaml,md}'],
   },
-}
+};

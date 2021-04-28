@@ -15,9 +15,7 @@
       }
     }
   },
-  "required": [
-    "builders"
-  ],
+  "required": ["builders"],
   "definitions": {
     "builder": {
       "type": "object",
@@ -34,10 +32,7 @@
               "description": "Builder description."
             }
           },
-          "required": [
-            "schema",
-            "description"
-          ]
+          "required": ["schema", "description"]
         },
         {
           "anyOf": [
@@ -48,9 +43,7 @@
                   "description": "The next generation builder module."
                 }
               },
-              "required": [
-                "implementation"
-              ]
+              "required": ["implementation"]
             },
             {
               "properties": {
@@ -59,9 +52,7 @@
                   "description": "The builder class module."
                 }
               },
-              "required": [
-                "class"
-              ]
+              "required": ["class"]
             }
           ]
         }

@@ -38,13 +38,16 @@ describe('Interceptor Schematic', () => {
   let appTree: UnitTestTree;
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree).toPromise();
+    appTree = await schematicRunner
+      .runSchematicAsync('application', appOptions, appTree)
+      .toPromise();
   });
 
   it('should create an interceptor', async () => {
     const options = { ...defaultOptions };
 
-    const tree = await schematicRunner.runSchematicAsync('interceptor', options, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('interceptor', options, appTree)
       .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
@@ -54,7 +57,8 @@ describe('Interceptor Schematic', () => {
   it('should respect the skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
-    const tree = await schematicRunner.runSchematicAsync('interceptor', options, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('interceptor', options, appTree)
       .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.ts');
@@ -65,7 +69,8 @@ describe('Interceptor Schematic', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = await schematicRunner.runSchematicAsync('interceptor', defaultOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('interceptor', defaultOptions, appTree)
       .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.interceptor.ts');
   });

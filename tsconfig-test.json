@@ -7,9 +7,6 @@
     // Istanbul (not Constantinople) as well, and applying both source maps to get the original
     // source in devtools.
     "inlineSources": true,
-    "types": [
-      "node",
-      "jasmine"
-    ]
-  },
+    "types": ["node", "jasmine"]
+  }
 }

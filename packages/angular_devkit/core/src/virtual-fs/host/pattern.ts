@@ -9,9 +9,7 @@
 import { Path } from '../path';
 import { ResolverHost } from './resolver';
 
-
 export type ReplacementFunction = (path: Path) => Path;
-
 
 /**
  */
@@ -20,17 +18,25 @@ export class PatternMatchingHost<StatsT extends object = {}> extends ResolverHos
 
   addPattern(pattern: string | string[], replacementFn: ReplacementFunction) {
     // Simple GLOB pattern replacement.
-    const reString = '^('
-      + (Array.isArray(pattern) ? pattern : [pattern])
-        .map(ex => '('
-          + ex.split(/[\/\\]/g).map(f => f
-            .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
-            .replace(/^\*\*/g, '(.+?)?')
-            .replace(/\*/g, '[^/\\\\]*'))
-            .join('[\/\\\\]')
-          + ')')
-        .join('|')
-      + ')($|/|\\\\)';
+    const reString =
+      '^(' +
+      (Array.isArray(pattern) ? pattern : [pattern])
+        .map(
+          (ex) =>
+            '(' +
+            ex
+              .split(/[\/\\]/g)
+              .map((f) =>
+                f
+                  .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
+                  .replace(/^\*\*/g, '(.+?)?')
+                  .replace(/\*/g, '[^/\\\\]*'),
+              )
+              .join('[/\\\\]') +
+            ')',
+        )
+        .join('|') +
+      ')($|/|\\\\)';
 
     this._patterns.set(new RegExp(reString), replacementFn);
   }

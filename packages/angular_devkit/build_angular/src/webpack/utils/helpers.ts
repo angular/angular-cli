@@ -45,7 +45,7 @@ export function normalizeExtraEntryPoints(
   extraEntryPoints: ExtraEntryPoint[],
   defaultBundleName: string,
 ): NormalizedEntryPoint[] {
-  return extraEntryPoints.map(entry => {
+  return extraEntryPoints.map((entry) => {
     if (typeof entry === 'string') {
       return { input: entry, inject: true, bundleName: defaultBundleName };
     }
@@ -56,9 +56,7 @@ export function normalizeExtraEntryPoints(
       bundleName = entry.bundleName;
     } else if (!inject) {
       // Lazy entry points use the file name as bundle name.
-      bundleName = basename(
-        normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-      );
+      bundleName = basename(normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')));
     } else {
       bundleName = defaultBundleName;
     }

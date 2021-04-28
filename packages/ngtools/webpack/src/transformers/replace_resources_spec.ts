@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
+import { tags } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript';
 import { replaceResources } from './replace_resources';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
@@ -19,10 +19,17 @@ function transform(
   module: ts.ModuleKind = ts.ModuleKind.ESNext,
   inlineStyleMimeType?: string,
 ) {
-  const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, { importHelpers, module });
+  const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, {
+    importHelpers,
+    module,
+  });
   const getTypeChecker = () => program.getTypeChecker();
   const transformer = replaceResources(
-    () => shouldTransform, getTypeChecker, directTemplateLoading, inlineStyleMimeType);
+    () => shouldTransform,
+    getTypeChecker,
+    directTemplateLoading,
+    inlineStyleMimeType,
+  );
 
   return transformTypescript(input, [transformer], program, compilerHost);
 }
@@ -107,7 +114,7 @@ describe('@ngtools/webpack transformers', () => {
     });
 
     it('should not replace resources when directTemplateLoading is false', () => {
-        const input = tags.stripIndent`
+      const input = tags.stripIndent`
           import { Component } from '@angular/core';
 
           @Component({
@@ -122,7 +129,7 @@ describe('@ngtools/webpack transformers', () => {
             title = 'app';
           }
         `;
-        const output = tags.stripIndent`
+      const output = tags.stripIndent`
           import { __decorate } from "tslib";
           import __NG_CLI_RESOURCE__0 from "./app.component.html";
           import __NG_CLI_RESOURCE__1 from "./app.component.css";
@@ -143,10 +150,9 @@ describe('@ngtools/webpack transformers', () => {
           export { AppComponent };
         `;
 
-        const result = transform(input, true, false);
-        expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-      });
-
+      const result = transform(input, true, false);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
 
     it('should should support svg as templates', () => {
       const input = tags.stripIndent`

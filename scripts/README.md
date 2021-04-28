@@ -18,8 +18,8 @@ installed (the result of `npm pack` on that package), and a directory using the 
 
 Flags:
 
-* `--local`. Enable building packages with dependencies to their pack files (instead of versions).
-* `--snapshot`. Enable building packages with dependencies to their snapshot repos (instead of versions).
+- `--local`. Enable building packages with dependencies to their pack files (instead of versions).
+- `--snapshot`. Enable building packages with dependencies to their snapshot repos (instead of versions).
 
 ## changelog
 
@@ -27,13 +27,13 @@ Creates a changelog draft in GitHub releases.
 
 Flags:
 
-* `--from=<git-ref>`. **[Required]** The git ref (SHA, tag or ref) to start the CHANGELOG at.
-* `--to=<tag>`. **[Required]** The git ref (tag) to end the CHANGELOG at. This will also be used to name the changelog
+- `--from=<git-ref>`. **[Required]** The git ref (SHA, tag or ref) to start the CHANGELOG at.
+- `--to=<tag>`. **[Required]** The git ref (tag) to end the CHANGELOG at. This will also be used to name the changelog
   on GitHub.
-* `--githubToken=<string>`. The github token to update the changelog with. If this is not specified, the release notes
+- `--githubToken=<string>`. The github token to update the changelog with. If this is not specified, the release notes
   will be outputted to stdout.
-* `--githubTokenFile=<path>`. Reads the githubToken from a file instead of the command line (for CI).
-* `--stdout`. Skip the whole release note process and output the markdown to stdout instead.
+- `--githubTokenFile=<path>`. Reads the githubToken from a file instead of the command line (for CI).
+- `--stdout`. Skip the whole release note process and output the markdown to stdout instead.
 
 ## packages
 
@@ -45,7 +45,7 @@ Builds and published the packages to npm.
 
 Flags:
 
-* `--tag=<name>`. Publishes under the npm dist-tag specified.
+- `--tag=<name>`. Publishes under the npm dist-tag specified.
 
 ## release
 
@@ -62,13 +62,13 @@ the repo (such as private schematics). With the `--verbose` flag will output the
 
 By adding a command, the `release` script will update the version;
 
-* `major-beta`. Set the version of packages to the next beta of the next major.
-* `major-rc`. Set the version of packages to the next RC of the next major.
-* `major`. Increment the major version of packages.
-* `minor-beta`. Set the version of packages to the next beta of the next minor.
-* `minor-rc`. Set the version of packages to the next RC of the next minor.
-* `minor`. Increment the minor version of packages.
-* `patch`. Increment the patch version of packages.
+- `major-beta`. Set the version of packages to the next beta of the next major.
+- `major-rc`. Set the version of packages to the next RC of the next major.
+- `major`. Increment the major version of packages.
+- `minor-beta`. Set the version of packages to the next beta of the next minor.
+- `minor-rc`. Set the version of packages to the next RC of the next minor.
+- `minor`. Increment the minor version of packages.
+- `patch`. Increment the patch version of packages.
 
 By default, the release script will increment versions of packages that have changed. Use the `--force` flag to change
 the version of all packages, even those who haven't changed.
@@ -85,10 +85,10 @@ Create and upload snapshots. This is used in CI.
 
 Flags:
 
-* `--force`. Force push the snapshot to github.
-* `--githubToken=<string>`. The github token to update the changelog with. Either this of `--githubTokenFile` is
+- `--force`. Force push the snapshot to github.
+- `--githubToken=<string>`. The github token to update the changelog with. Either this of `--githubTokenFile` is
   required.
-* `--githubTokenFile=<path>`. Reads the githubToken from a file instead of the command line (for CI).
+- `--githubTokenFile=<path>`. Reads the githubToken from a file instead of the command line (for CI).
 
 ## templates
 
@@ -100,4 +100,4 @@ Performs BUILD files and license validation.
 
 Flags:
 
-* `--verbose`. Ignore errors and continue showing outputs.
+- `--verbose`. Ignore errors and continue showing outputs.

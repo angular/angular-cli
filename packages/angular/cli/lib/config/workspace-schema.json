@@ -27,7 +27,7 @@
     "projects": {
       "type": "object",
       "patternProperties": {
-        "^(?:@[a-zA-Z0-9_-]+\/)?[a-zA-Z0-9_-]+$": {
+        "^(?:@[a-zA-Z0-9_-]+/)?[a-zA-Z0-9_-]+$": {
           "$ref": "#/definitions/project"
         }
       },
@@ -35,9 +35,7 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "version"
-  ],
+  "required": ["version"],
   "definitions": {
     "cliOptions": {
       "type": "object",
@@ -49,12 +47,7 @@
         "packageManager": {
           "description": "Specify which package manager tool to use.",
           "type": "string",
-          "enum": [
-            "npm",
-            "cnpm",
-            "yarn",
-            "pnpm"
-          ]
+          "enum": ["npm", "cnpm", "yarn", "pnpm"]
         },
         "warnings": {
           "description": "Control CLI specific console warnings",
@@ -67,10 +60,7 @@
           }
         },
         "analytics": {
-          "type": [
-            "boolean",
-            "string"
-          ],
+          "type": ["boolean", "string"],
           "description": "Share anonymous usage data with the Angular Team at Google."
         },
         "analyticsSharing": {
@@ -173,10 +163,7 @@
         "projectType": {
           "type": "string",
           "description": "Project type.",
-          "enum": [
-            "application",
-            "library"
-          ]
+          "enum": ["application", "library"]
         },
         "architect": {
           "type": "object",
@@ -191,37 +178,23 @@
           }
         }
       },
-      "required": [
-        "root",
-        "projectType"
-      ],
+      "required": ["root", "projectType"],
       "anyOf": [
         {
-          "required": [
-            "architect"
-          ],
+          "required": ["architect"],
           "not": {
-            "required": [
-              "targets"
-            ]
+            "required": ["targets"]
           }
         },
         {
-          "required": [
-            "targets"
-          ],
+          "required": ["targets"],
           "not": {
-            "required": [
-              "architect"
-            ]
+            "required": ["architect"]
           }
         },
         {
           "not": {
-            "required": [
-              "targets",
-              "architect"
-            ]
+            "required": ["targets", "architect"]
           }
         }
       ],
@@ -351,9 +324,7 @@
                   }
                 }
               },
-              "required": [
-                "builder"
-              ]
+              "required": ["builder"]
             },
             {
               "type": "object",
@@ -561,9 +532,7 @@
           "$ref": "#/definitions/schematicOptions"
         }
       },
-      "required": [
-        "version"
-      ]
+      "required": ["version"]
     }
   }
 }

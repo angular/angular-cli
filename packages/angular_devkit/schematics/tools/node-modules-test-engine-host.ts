@@ -10,7 +10,6 @@ import { TaskConfiguration, TaskConfigurationGenerator, TaskId } from '../src/en
 import { FileSystemSchematicContext } from './description';
 import { NodeModulesEngineHost } from './node-module-engine-host';
 
-
 /**
  * An EngineHost that uses a registry to super seed locations of collection.json files, but
  * revert back to using node modules resolution. This is done for testing.
@@ -19,9 +18,13 @@ export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
   private _collections = new Map<string, string>();
   private _tasks = [] as TaskConfiguration[];
 
-  get tasks() { return this._tasks; }
+  get tasks() {
+    return this._tasks;
+  }
 
-  clearTasks() { this._tasks = []; }
+  clearTasks() {
+    this._tasks = [];
+  }
 
   registerCollection(name: string, path: string) {
     this._collections.set(name, path);

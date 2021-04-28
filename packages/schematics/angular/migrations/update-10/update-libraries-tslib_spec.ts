@@ -39,18 +39,27 @@ describe(`Migration to add tslib as a direct dependency in library projects`, ()
     tree = new UnitTestTree(new EmptyTree());
     createWorkSpaceConfig(tree);
 
-    tree.create('/project/lib/package.json', JSON.stringify({
-      peerDependencies: {
-        '@angular/common': '^9.0.0',
-        '@angular/core': '^9.0.0',
-        'tslib': '1.0.0',
-      },
-    }, undefined, 2));
+    tree.create(
+      '/project/lib/package.json',
+      JSON.stringify(
+        {
+          peerDependencies: {
+            '@angular/common': '^9.0.0',
+            '@angular/core': '^9.0.0',
+            'tslib': '1.0.0',
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
   });
 
   it(`should update tslib to version 2 as a direct dependency`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    const { peerDependencies, dependencies } = JSON.parse(newTree.readContent('/project/lib/package.json'));
+    const { peerDependencies, dependencies } = JSON.parse(
+      newTree.readContent('/project/lib/package.json'),
+    );
     expect(peerDependencies['tslib']).toBeUndefined();
     expect(dependencies['tslib']).toBe('^2.0.0');
   });

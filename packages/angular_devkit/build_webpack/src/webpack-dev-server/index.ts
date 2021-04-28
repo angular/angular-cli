@@ -29,10 +29,10 @@ export function runWebpackDevServer(
   config: webpack.Configuration,
   context: BuilderContext,
   options: {
-    devServerConfig?: WebpackDevServer.Configuration,
-    logging?: WebpackLoggingCallback,
-    webpackFactory?: WebpackFactory,
-    webpackDevServerFactory?: WebpackDevServerFactory,
+    devServerConfig?: WebpackDevServer.Configuration;
+    logging?: WebpackLoggingCallback;
+    webpackFactory?: WebpackFactory;
+    webpackDevServerFactory?: WebpackDevServerFactory;
   } = {},
 ): Observable<DevServerBuildOutput> {
   const createWebpack = (c: webpack.Configuration) => {
@@ -63,8 +63,8 @@ export function runWebpackDevServer(
     return new WebpackDevServer(webpack as any, config);
   };
 
-  const log: WebpackLoggingCallback = options.logging
-    || ((stats, config) => context.logger.info(stats.toString(config.stats)));
+  const log: WebpackLoggingCallback =
+    options.logging || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
   // tslint:disable-next-line: no-any
   const devServerConfig = options.devServerConfig || (config as any).devServer || {};
@@ -75,55 +75,57 @@ export function runWebpackDevServer(
   devServerConfig.stats = false;
 
   return createWebpack({ ...config, watch: false }).pipe(
-    switchMap(webpackCompiler => new Observable<DevServerBuildOutput>(obs => {
-      const server = createWebpackDevServer(webpackCompiler, devServerConfig);
-      let result: Partial<DevServerBuildOutput>;
+    switchMap(
+      (webpackCompiler) =>
+        new Observable<DevServerBuildOutput>((obs) => {
+          const server = createWebpackDevServer(webpackCompiler, devServerConfig);
+          let result: Partial<DevServerBuildOutput>;
 
-      webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
-        // Log stats.
-        log(stats, config);
+          webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
+            // Log stats.
+            log(stats, config);
 
-        obs.next({
-          ...result,
-          emittedFiles: getEmittedFiles(stats.compilation),
-          success: !stats.hasErrors(),
-          outputPath: stats.compilation.outputOptions.path,
-        } as unknown as DevServerBuildOutput);
-      });
+            obs.next(({
+              ...result,
+              emittedFiles: getEmittedFiles(stats.compilation),
+              success: !stats.hasErrors(),
+              outputPath: stats.compilation.outputOptions.path,
+            } as unknown) as DevServerBuildOutput);
+          });
 
-      server.listen(
-        devServerConfig.port === undefined ? 8080 : devServerConfig.port,
-        devServerConfig.host === undefined ? 'localhost' : devServerConfig.host,
-        function (this: net.Server, err) {
-          if (err) {
-            obs.error(err);
-          } else {
-            const address = this.address();
-            if (!address) {
-              obs.error(new Error(`Dev-server address info is not defined.`));
+          server.listen(
+            devServerConfig.port === undefined ? 8080 : devServerConfig.port,
+            devServerConfig.host === undefined ? 'localhost' : devServerConfig.host,
+            function (this: net.Server, err) {
+              if (err) {
+                obs.error(err);
+              } else {
+                const address = this.address();
+                if (!address) {
+                  obs.error(new Error(`Dev-server address info is not defined.`));
 
-              return;
-            }
+                  return;
+                }
 
-            result = {
-              success: true,
-              port: typeof address === 'string' ? 0 : address.port,
-              family: typeof address === 'string' ? '' : address.family,
-              address: typeof address === 'string' ? address : address.address,
-            };
-          }
-        },
-      );
+                result = {
+                  success: true,
+                  port: typeof address === 'string' ? 0 : address.port,
+                  family: typeof address === 'string' ? '' : address.family,
+                  address: typeof address === 'string' ? address : address.address,
+                };
+              }
+            },
+          );
 
-      // Teardown logic. Close the server when unsubscribed from.
-      return (() => {
-        server.close();
-        webpackCompiler.close?.(() => {});
-      });
-    })),
+          // Teardown logic. Close the server when unsubscribed from.
+          return () => {
+            server.close();
+            webpackCompiler.close?.(() => {});
+          };
+        }),
+    ),
   );
 }
-
 
 export default createBuilder<WebpackDevServerBuilderSchema, DevServerBuildOutput>(
   (options, context) => {

@@ -13,7 +13,6 @@ import { main } from './main';
 // tslint:disable-next-line:no-implicit-dependencies
 const temp = require('temp');
 
-
 // We only care about the write method in these mocks of NodeJS.WriteStream.
 class MockWriteStream {
   lines: string[] = [];
@@ -40,7 +39,9 @@ describe('benchmark binary', () => {
   });
 
   afterEach(() => {
-    if (existsSync(outputFile)) { unlinkSync(outputFile); }
+    if (existsSync(outputFile)) {
+      unlinkSync(outputFile);
+    }
   });
 
   it('works', async () => {
@@ -53,8 +54,7 @@ describe('benchmark binary', () => {
   it('fails with no command', async () => {
     const args: string[] = [];
     const res = await main({ args, stdout, stderr });
-    expect(stderr.lines).toContain(
-      '[benchmark] Missing command, see benchmark --help for help.\n');
+    expect(stderr.lines).toContain('[benchmark] Missing command, see benchmark --help for help.\n');
     expect(res).toEqual(1);
   });
 
@@ -62,7 +62,8 @@ describe('benchmark binary', () => {
     const args: string[] = ['--', 'node', exitCodeOneScript];
     const res = await main({ args, stdout, stderr });
     expect(stderr.lines).toContain(
-      '[benchmark] Maximum number of retries (5) for command was exceeded.\n');
+      '[benchmark] Maximum number of retries (5) for command was exceeded.\n',
+    );
     expect(res).toEqual(1);
   });
 
@@ -92,7 +93,8 @@ describe('benchmark binary', () => {
     const args = ['--iterations', '3', '--', 'node', benchmarkScript, '30'];
     const res = await main({ args, stdout, stderr });
     expect(stdout.lines).toContain(
-      '[benchmark] Benchmarking process over 3 iterations, with up to 5 retries.\n');
+      '[benchmark] Benchmarking process over 3 iterations, with up to 5 retries.\n',
+    );
     expect(res).toEqual(0);
   });
 
@@ -100,7 +102,8 @@ describe('benchmark binary', () => {
     const args = ['--retries', '3', '--', 'node', benchmarkScript, '30'];
     const res = await main({ args, stdout, stderr });
     expect(stdout.lines).toContain(
-      '[benchmark] Benchmarking process over 5 iterations, with up to 3 retries.\n');
+      '[benchmark] Benchmarking process over 5 iterations, with up to 3 retries.\n',
+    );
     expect(res).toEqual(0);
   });
 
@@ -131,8 +134,13 @@ describe('benchmark binary', () => {
   it('overwrites output-file', async () => {
     writeFileSync(outputFile, 'existing line');
     const args = [
-      '--output-file', outputFile, '--overwrite-output-file',
-      '--', 'node', benchmarkScript, '30',
+      '--output-file',
+      outputFile,
+      '--overwrite-output-file',
+      '--',
+      'node',
+      benchmarkScript,
+      '30',
     ];
     const res = await main({ args, stdout, stderr });
     expect(res).toEqual(0);
@@ -143,7 +151,7 @@ describe('benchmark binary', () => {
   it('uses prefix', async () => {
     const args = ['--prefix', '[abc]', '--', 'node', benchmarkScript, '30'];
     const res = await main({ args, stdout, stderr });
-    stdout.lines.forEach(line => expect(line).toMatch(/^\[abc\]/));
+    stdout.lines.forEach((line) => expect(line).toMatch(/^\[abc\]/));
     expect(res).toEqual(0);
   });
 
@@ -173,7 +181,9 @@ describe('benchmark binary', () => {
       exitCodeOneScript,
     ];
     const res = await main({ args, stdout, stderr });
-    expect(stderr.lines).toContain('[benchmark] Maximum number of retries (5) for command was exceeded.\n');
+    expect(stderr.lines).toContain(
+      '[benchmark] Maximum number of retries (5) for command was exceeded.\n',
+    );
     expect(res).toEqual(1);
   });
 

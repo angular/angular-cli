@@ -10,7 +10,6 @@ import { ServerBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host } from '../test-utils';
 
-
 describe('Server Builder external dependencies', () => {
   const target = { project: 'app', target: 'server' };
   let architect: Architect;
@@ -26,13 +25,11 @@ describe('Server Builder external dependencies', () => {
   it('should not bundle an given external dependency', async () => {
     const overrides = {
       bundleDependencies: true,
-      externalDependencies: [
-        '@angular/core',
-      ],
+      externalDependencies: ['@angular/core'],
     };
 
     const run = await architect.scheduleTarget(target, overrides);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     const fileName = join(outputPath, 'main.js');

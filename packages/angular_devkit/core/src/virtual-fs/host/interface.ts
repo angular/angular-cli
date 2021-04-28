@@ -9,7 +9,6 @@
 import { Observable } from 'rxjs';
 import { Path, PathFragment } from '../path';
 
-
 export type FileBuffer = ArrayBuffer;
 export type FileBufferLike = ArrayBufferLike;
 
@@ -18,12 +17,11 @@ export interface HostWatchOptions {
   readonly recursive?: boolean;
 }
 
-
 export const enum HostWatchEventType {
   Changed = 0,
   Created = 1,
   Deleted = 2,
-  Renamed = 3,  // Applied to the original file path.
+  Renamed = 3, // Applied to the original file path.
 }
 
 export type Stats<T extends object = {}> = T & {

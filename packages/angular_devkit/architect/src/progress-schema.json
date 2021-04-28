@@ -12,40 +12,30 @@
           "properties": {
             "state": {
               "type": "string",
-              "enum": [
-                "stopped"
-              ]
+              "enum": ["stopped"]
             }
           },
-          "required": [
-            "state"
-          ]
+          "required": ["state"]
         },
         {
           "type": "object",
           "properties": {
             "state": {
               "type": "string",
-              "enum": [
-                "waiting"
-              ]
+              "enum": ["waiting"]
             },
             "status": {
               "type": "string"
             }
           },
-          "required": [
-            "state"
-          ]
+          "required": ["state"]
         },
         {
           "type": "object",
           "properties": {
             "state": {
               "type": "string",
-              "enum": [
-                "running"
-              ]
+              "enum": ["running"]
             },
             "current": {
               "type": "number",
@@ -59,24 +49,18 @@
               "type": "string"
             }
           },
-          "required": [
-            "state"
-          ]
+          "required": ["state"]
         },
         {
           "type": "object",
           "properties": {
             "state": {
               "type": "string",
-              "enum": [
-                "error"
-              ]
+              "enum": ["error"]
             },
             "error": true
           },
-          "required": [
-            "state"
-          ]
+          "required": ["state"]
         }
       ]
     },
@@ -93,10 +77,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "builder",
-        "id"
-      ]
+      "required": ["builder", "id"]
     }
   ]
 }

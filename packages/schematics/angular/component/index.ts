@@ -53,17 +53,20 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
     const modulePath = options.module;
     const source = readIntoSourceFile(host, modulePath);
 
-    const componentPath = `/${options.path}/`
-                          + (options.flat ? '' : strings.dasherize(options.name) + '/')
-                          + strings.dasherize(options.name)
-                          + (options.type ? '.' : '')
-                          + strings.dasherize(options.type);
+    const componentPath =
+      `/${options.path}/` +
+      (options.flat ? '' : strings.dasherize(options.name) + '/') +
+      strings.dasherize(options.name) +
+      (options.type ? '.' : '') +
+      strings.dasherize(options.type);
     const relativePath = buildRelativePath(modulePath, componentPath);
     const classifiedName = strings.classify(options.name) + strings.classify(options.type);
-    const declarationChanges = addDeclarationToModule(source,
-                                                      modulePath,
-                                                      classifiedName,
-                                                      relativePath);
+    const declarationChanges = addDeclarationToModule(
+      source,
+      modulePath,
+      classifiedName,
+      relativePath,
+    );
 
     const declarationRecorder = host.beginUpdate(modulePath);
     for (const change of declarationChanges) {
@@ -78,9 +81,12 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
       const source = readIntoSourceFile(host, modulePath);
 
       const exportRecorder = host.beginUpdate(modulePath);
-      const exportChanges = addExportToModule(source, modulePath,
-                                              strings.classify(options.name) + strings.classify(options.type),
-                                              relativePath);
+      const exportChanges = addExportToModule(
+        source,
+        modulePath,
+        strings.classify(options.name) + strings.classify(options.type),
+        relativePath,
+      );
 
       for (const change of exportChanges) {
         if (change instanceof InsertChange) {
@@ -94,7 +100,6 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
   };
 }
 
-
 function buildSelector(options: ComponentOptions, projectPrefix: string) {
   let selector = strings.dasherize(options.name);
   if (options.prefix) {
@@ -105,7 +110,6 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
 
   return selector;
 }
-
 
 export default function (options: ComponentOptions): Rule {
   return async (host: Tree) => {
@@ -121,28 +125,31 @@ export default function (options: ComponentOptions): Rule {
     const parsedPath = parseName(options.path as string, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-    options.selector = options.selector || buildSelector(options, project && project.prefix || '');
+    options.selector =
+      options.selector || buildSelector(options, (project && project.prefix) || '');
 
     validateName(options.name);
     validateHtmlSelector(options.selector);
 
     const templateSource = apply(url('./files'), [
-      options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
-      options.inlineStyle ? filter(path => !path.endsWith('.__style__.template')) : noop(),
-      options.inlineTemplate ? filter(path => !path.endsWith('.html.template')) : noop(),
+      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
+      options.inlineStyle ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
+      options.inlineTemplate ? filter((path) => !path.endsWith('.html.template')) : noop(),
       applyTemplates({
         ...strings,
-        'if-flat': (s: string) => options.flat ? '' : s,
+        'if-flat': (s: string) => (options.flat ? '' : s),
         ...options,
       }),
-      !options.type ? forEach((file => {
-        return file.path.includes('..')
-          ? {
-            content: file.content,
-            path: file.path.replace('..', '.'),
-          }
-          : file;
-      }) as FileOperator) : noop(),
+      !options.type
+        ? forEach(((file) => {
+            return file.path.includes('..')
+              ? {
+                  content: file.content,
+                  path: file.path.replace('..', '.'),
+                }
+              : file;
+          }) as FileOperator)
+        : noop(),
       move(parsedPath.path),
     ]);
 

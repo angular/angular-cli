@@ -31,7 +31,7 @@ describe('Browser Builder external source map', () => {
 
     const { files } = await browserBuild(architect, host, target, overrides);
     const sourcePaths: string[] = JSON.parse(await files['vendor.js.map']).sources;
-    const hasTsSourcePaths = sourcePaths.some(p => path.extname(p) == '.ts');
+    const hasTsSourcePaths = sourcePaths.some((p) => path.extname(p) == '.ts');
     expect(hasTsSourcePaths).toBe(true, `vendor.js.map should have '.ts' extentions`);
   });
 
@@ -46,7 +46,7 @@ describe('Browser Builder external source map', () => {
 
     const { files } = await browserBuild(architect, host, target, overrides);
     const sourcePaths: string[] = JSON.parse(await files['vendor.js.map']).sources;
-    const hasTsSourcePaths = sourcePaths.some(p => path.extname(p) == '.ts');
+    const hasTsSourcePaths = sourcePaths.some((p) => path.extname(p) == '.ts');
     expect(hasTsSourcePaths).toBe(false, `vendor.js.map not should have '.ts' extentions`);
   });
 });

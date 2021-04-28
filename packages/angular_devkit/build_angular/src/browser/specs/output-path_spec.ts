@@ -10,7 +10,6 @@ import { getSystemPath, join, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder output path', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;
@@ -23,10 +22,9 @@ describe('Browser Builder output path', () => {
 
   it('deletes output path', async () => {
     // Write a file to the output path to later verify it was deleted.
-    await host.write(
-      join(host.root(), 'dist/file.txt'),
-      virtualFs.stringToFileBuffer('file'),
-    ).toPromise();
+    await host
+      .write(join(host.root(), 'dist/file.txt'), virtualFs.stringToFileBuffer('file'))
+      .toPromise();
 
     // Delete an app file to force a failed compilation.
     // Failed compilations still delete files, but don't output any.
@@ -74,7 +72,7 @@ describe('Browser Builder output path', () => {
     try {
       await run.result;
       expect('THE ABOVE LINE SHOULD THROW').toBe('');
-    } catch { }
+    } catch {}
     await run.stop();
   });
 

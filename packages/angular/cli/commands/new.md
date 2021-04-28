@@ -3,13 +3,13 @@ Creates and initializes a new Angular application that is the default project fo
 Provides interactive prompts for optional configuration, such as adding routing support.
 All prompts can safely be allowed to default.
 
-* The new workspace folder is given the specified project name, and contains configuration files at the top level.
+- The new workspace folder is given the specified project name, and contains configuration files at the top level.
 
-* By default, the files for a new initial application (with the same name as the workspace) are placed in the `src/` subfolder. Corresponding end-to-end tests are placed in the `e2e/` subfolder.
+- By default, the files for a new initial application (with the same name as the workspace) are placed in the `src/` subfolder. Corresponding end-to-end tests are placed in the `e2e/` subfolder.
 
-* The new application's configuration appears in the `projects` section of the `angular.json` workspace configuration file, under its project name.
+- The new application's configuration appears in the `projects` section of the `angular.json` workspace configuration file, under its project name.
 
-* Subsequent applications that you generate in the workspace reside in the `projects/` subfolder.
+- Subsequent applications that you generate in the workspace reside in the `projects/` subfolder.
 
 If you plan to have multiple applications in the workspace, you can create an empty workspace by setting the `--createApplication` option to false.
 You can then use `ng generate application` to create an initial application.

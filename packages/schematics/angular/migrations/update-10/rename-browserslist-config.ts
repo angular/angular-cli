@@ -28,7 +28,7 @@ function* visit(directory: DirEntry): IterableIterator<string> {
 }
 
 export default function (): Rule {
-  return tree => {
+  return (tree) => {
     for (const path of visit(tree.root)) {
       tree.rename(path, path.replace(/browserslist$/, '.browserslistrc'));
     }

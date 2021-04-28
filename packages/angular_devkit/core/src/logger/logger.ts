@@ -9,7 +9,6 @@
 import { Observable, Operator, PartialObserver, Subject, Subscription, empty } from 'rxjs';
 import { JsonObject } from '../json/interface';
 
-
 export interface LoggerMetadata extends JsonObject {
   name: string;
   path: string[];
@@ -31,7 +30,6 @@ export interface LoggerApi {
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
-
 export class Logger extends Observable<LogEntry> implements LoggerApi {
   protected readonly _subject: Subject<LogEntry> = new Subject<LogEntry>();
   protected _metadata: LoggerMetadata;
@@ -39,27 +37,33 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
   private _obs: Observable<LogEntry> = empty();
   private _subscription: Subscription | null = null;
 
-  protected get _observable() { return this._obs; }
+  protected get _observable() {
+    return this._obs;
+  }
   protected set _observable(v: Observable<LogEntry>) {
     if (this._subscription) {
       this._subscription.unsubscribe();
     }
     this._obs = v;
     if (this.parent) {
-      this._subscription = this.subscribe((value: LogEntry) => {
-        if (this.parent) {
-          this.parent._subject.next(value);
-        }
-      }, (error: Error) => {
-        if (this.parent) {
-          this.parent._subject.error(error);
-        }
-      }, () => {
-        if (this._subscription) {
-          this._subscription.unsubscribe();
-        }
-        this._subscription = null;
-      });
+      this._subscription = this.subscribe(
+        (value: LogEntry) => {
+          if (this.parent) {
+            this.parent._subject.next(value);
+          }
+        },
+        (error: Error) => {
+          if (this.parent) {
+            this.parent._subject.error(error);
+          }
+        },
+        () => {
+          if (this._subscription) {
+            this._subscription.unsubscribe();
+          }
+          this._subscription = null;
+        },
+      );
     }
   }
 
@@ -104,7 +108,9 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
 
   log(level: LogLevel, message: string, metadata: JsonObject = {}): void {
     const entry: LogEntry = Object.assign({}, metadata, this._metadata, {
-      level, message, timestamp: +Date.now(),
+      level,
+      message,
+      timestamp: +Date.now(),
     });
     this._subject.next(entry);
   }
@@ -138,11 +144,16 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
 
   subscribe(): Subscription;
   subscribe(observer: PartialObserver<LogEntry>): Subscription;
-  subscribe(next?: (value: LogEntry) => void, error?: (error: Error) => void,
-            complete?: () => void): Subscription;
-  subscribe(_observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
-            _error?: (error: Error) => void,
-            _complete?: () => void): Subscription {
+  subscribe(
+    next?: (value: LogEntry) => void,
+    error?: (error: Error) => void,
+    complete?: () => void,
+  ): Subscription;
+  subscribe(
+    _observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
+    _error?: (error: Error) => void,
+    _complete?: () => void,
+  ): Subscription {
     return this._observable.subscribe.apply(
       this._observable,
       (arguments as unknown) as Parameters<Observable<LogEntry>['subscribe']>,

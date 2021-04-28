@@ -51,7 +51,7 @@ function _createJobHandlerFromBuilderInfo(
   function handler(argument: json.JsonObject, context: experimental.jobs.JobHandlerContext) {
     // Add input validation to the inbound bus.
     const inboundBusWithInputValidation = context.inboundBus.pipe(
-      concatMap(message => {
+      concatMap((message) => {
         if (message.kind === experimental.jobs.JobInboundMessageKind.Input) {
           const v = message.value as BuilderInput;
           const options = {
@@ -61,7 +61,7 @@ function _createJobHandlerFromBuilderInfo(
 
           // Validate v against the options schema.
           return registry.compile(info.optionSchema).pipe(
-            concatMap(validation => validation(options)),
+            concatMap((validation) => validation(options)),
             map((validationResult: json.schema.SchemaValidatorResult) => {
               const { data, success, errors } = validationResult;
               if (success) {
@@ -70,7 +70,7 @@ function _createJobHandlerFromBuilderInfo(
 
               throw new json.schema.SchemaValidationException(errors);
             }),
-            map(value => ({ ...message, value })),
+            map((value) => ({ ...message, value })),
           );
         } else {
           return of(message as experimental.jobs.JobInboundMessage<BuilderInput>);
@@ -86,20 +86,20 @@ function _createJobHandlerFromBuilderInfo(
     const inboundBus = onErrorResumeNext(inboundBusWithInputValidation);
 
     const output = from(host.loadBuilder(info)).pipe(
-      concatMap(builder => {
+      concatMap((builder) => {
         if (builder === null) {
           throw new Error(`Cannot load builder for builderInfo ${JSON.stringify(info, null, 2)}`);
         }
 
         return builder.handler(argument, { ...context, inboundBus }).pipe(
-          map(output => {
+          map((output) => {
             if (output.kind === experimental.jobs.JobOutboundMessageKind.Output) {
               // Add target to it.
               return {
                 ...output,
                 value: {
                   ...output.value,
-                  ...target ? { target } : 0,
+                  ...(target ? { target } : 0),
                 } as json.JsonObject,
               };
             } else {
@@ -131,7 +131,6 @@ export interface ScheduleOptions {
   analytics?: analytics.Analytics;
 }
 
-
 /**
  * A JobRegistry that resolves builder targets from the host.
  */
@@ -151,9 +150,7 @@ class ArchitectBuilderJobRegistry implements BuilderRegistry {
         return maybeCache;
       }
 
-      const info = from(this._host.resolveBuilder(name)).pipe(
-        shareReplay(1),
-      );
+      const info = from(this._host.resolveBuilder(name)).pipe(shareReplay(1));
       cache.set(name, info);
 
       return info;
@@ -208,7 +205,7 @@ class ArchitectBuilderJobRegistry implements BuilderRegistry {
     }
 
     return from(this._resolveBuilder(name)).pipe(
-      concatMap(builderInfo => (builderInfo ? this._createBuilder(builderInfo) : of(null))),
+      concatMap((builderInfo) => (builderInfo ? this._createBuilder(builderInfo) : of(null))),
       first(null, null),
     ) as Observable<experimental.jobs.JobHandler<A, I, O> | null>;
   }
@@ -244,7 +241,7 @@ class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
         }
 
         return this._resolveBuilder(builderStr).pipe(
-          concatMap(builderInfo => {
+          concatMap((builderInfo) => {
             if (builderInfo === null) {
               return of(null);
             }
@@ -258,11 +255,10 @@ class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
   }
 }
 
-
 function _getTargetOptionsFactory(host: ArchitectHost) {
   return experimental.jobs.createJobHandler<Target, json.JsonValue, json.JsonObject>(
-    target => {
-      return host.getOptionsForTarget(target).then(options => {
+    (target) => {
+      return host.getOptionsForTarget(target).then((options) => {
         if (options === null) {
           throw new Error(`Invalid target: ${JSON.stringify(target)}.`);
         }
@@ -280,8 +276,8 @@ function _getTargetOptionsFactory(host: ArchitectHost) {
 
 function _getProjectMetadataFactory(host: ArchitectHost) {
   return experimental.jobs.createJobHandler<Target, json.JsonValue, json.JsonObject>(
-    target => {
-      return host.getProjectMetadata(target).then(options => {
+    (target) => {
+      return host.getProjectMetadata(target).then((options) => {
         if (options === null) {
           throw new Error(`Invalid target: ${JSON.stringify(target)}.`);
         }
@@ -293,28 +289,28 @@ function _getProjectMetadataFactory(host: ArchitectHost) {
       name: '..getProjectMetadata',
       output: { type: 'object' },
       argument: {
-        oneOf: [
-          { type: 'string' },
-          inputSchema.properties.target,
-        ],
+        oneOf: [{ type: 'string' }, inputSchema.properties.target],
       },
     },
   );
 }
 
 function _getBuilderNameForTargetFactory(host: ArchitectHost) {
-  return experimental.jobs.createJobHandler<Target, never, string>(async target => {
-    const builderName = await host.getBuilderNameForTarget(target);
-    if (!builderName) {
-      throw new Error(`No builder were found for target ${targetStringFromTarget(target)}.`);
-    }
+  return experimental.jobs.createJobHandler<Target, never, string>(
+    async (target) => {
+      const builderName = await host.getBuilderNameForTarget(target);
+      if (!builderName) {
+        throw new Error(`No builder were found for target ${targetStringFromTarget(target)}.`);
+      }
 
-    return builderName;
-  }, {
-    name: '..getBuilderNameForTarget',
-    output: { type: 'string' },
-    argument: inputSchema.properties.target,
-  });
+      return builderName;
+    },
+    {
+      name: '..getBuilderNameForTarget',
+      output: { type: 'string' },
+      argument: inputSchema.properties.target,
+    },
+  );
 }
 
 function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.SchemaRegistry) {
@@ -326,31 +322,30 @@ function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.Sche
         throw new Error(`No builder info were found for builder ${JSON.stringify(builderName)}.`);
       }
 
-      return registry.compile(builderInfo.optionSchema).pipe(
-        concatMap(validation => validation(options)),
-        switchMap(({ data, success, errors }) => {
-          if (success) {
-            return of(data as json.JsonObject);
-          }
+      return registry
+        .compile(builderInfo.optionSchema)
+        .pipe(
+          concatMap((validation) => validation(options)),
+          switchMap(({ data, success, errors }) => {
+            if (success) {
+              return of(data as json.JsonObject);
+            }
 
-          throw new json.schema.SchemaValidationException(errors);
-        }),
-      ).toPromise();
+            throw new json.schema.SchemaValidationException(errors);
+          }),
+        )
+        .toPromise();
     },
     {
       name: '..validateOptions',
       output: { type: 'object' },
       argument: {
         type: 'array',
-        items: [
-          { type: 'string' },
-          { type: 'object' },
-        ],
+        items: [{ type: 'string' }, { type: 'object' }],
       },
     },
   );
 }
-
 
 export class Architect {
   private readonly _scheduler: experimental.jobs.Scheduler;

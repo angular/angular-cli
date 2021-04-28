@@ -45,7 +45,5 @@
       "default": false
     }
   },
-  "required": [
-    "clientProject"
-  ]
+  "required": ["clientProject"]
 }

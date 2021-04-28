@@ -8,6 +8,4 @@
 
 import * as jobs from './experimental/jobs/index';
 
-export {
-  jobs,
-};
+export { jobs };

@@ -8,10 +8,7 @@
 
 import { Rule } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import {
-  addPackageJsonDependency,
-  getPackageJsonDependency,
-} from '../../utility/dependencies';
+import { addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
 export default function (): Rule {
@@ -64,9 +61,9 @@ export default function (): Rule {
     if (getPackageJsonDependency(host, 'rxjs-compat')) {
       context.logger.info(
         `Package "rxjs-compat" found in the workspace package.json. ` +
-        'This package typically was used during migration from RxJs version 5 to 6 during the Angular 5 ' +
-        'timeframe and may no longer be needed.\n' +
-        'Read more about this: https://rxjs-dev.firebaseapp.com/guide/v6/migration',
+          'This package typically was used during migration from RxJs version 5 to 6 during the Angular 5 ' +
+          'timeframe and may no longer be needed.\n' +
+          'Read more about this: https://rxjs-dev.firebaseapp.com/guide/v6/migration',
       );
     }
   };

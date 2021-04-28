@@ -35,22 +35,19 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
               tsConfig: 'tsconfig.app.json',
               aot: true,
               sourceMap: true,
-              assets: [
-                'src/favicon.ico',
-                'src/assets',
-              ],
-              styles: [
-                'src/styles.css',
-              ],
+              assets: ['src/favicon.ico', 'src/assets'],
+              styles: ['src/styles.css'],
               scripts: [],
             },
             configurations: {
               production: {
                 deployUrl: 'http://cdn.com',
-                fileReplacements: [{
-                  replace: 'src/environments/environment.ts',
-                  with: 'src/environments/environment.prod.ts',
-                }],
+                fileReplacements: [
+                  {
+                    replace: 'src/environments/environment.ts',
+                    with: 'src/environments/environment.prod.ts',
+                  },
+                ],
                 optimization: true,
                 outputHashing: 'all',
                 sourceMap: false,
@@ -59,11 +56,13 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
                 vendorChunk: false,
                 buildOptimizer: true,
                 watch: true,
-                budgets: [{
-                  type: 'initial',
-                  maximumWarning: '2mb',
-                  maximumError: '5mb',
-                }],
+                budgets: [
+                  {
+                    type: 'initial',
+                    maximumWarning: '2mb',
+                    maximumError: '5mb',
+                  },
+                ],
               },
               optimization_sm: {
                 sourceMap: true,
@@ -194,15 +193,19 @@ describe(`Migration to update 'angular.json' configurations to production by def
           vendorChunk: false,
           buildOptimizer: true,
           watch: true,
-          fileReplacements: [{
-            replace: 'src/environments/environment.ts',
-            with: 'src/environments/environment.prod.ts',
-          }],
-          budgets: [{
-            type: 'initial',
-            maximumWarning: '2mb',
-            maximumError: '5mb',
-          }],
+          fileReplacements: [
+            {
+              replace: 'src/environments/environment.ts',
+              with: 'src/environments/environment.prod.ts',
+            },
+          ],
+          budgets: [
+            {
+              type: 'initial',
+              maximumWarning: '2mb',
+              maximumError: '5mb',
+            },
+          ],
         },
         optimization_sm: {
           sourceMap: true,
@@ -267,10 +270,12 @@ describe(`Migration to update 'angular.json' configurations to production by def
       configurations: {
         optimization_sm: { sourceMap: true, optimization: true },
         production: {
-          fileReplacements: [{
-            replace: 'src/environments/environment.ts',
-            with: 'src/environments/environment.prod.ts',
-          }],
+          fileReplacements: [
+            {
+              replace: 'src/environments/environment.ts',
+              with: 'src/environments/environment.prod.ts',
+            },
+          ],
           sourceMap: false,
           optimization: true,
         },

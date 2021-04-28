@@ -1,20 +1,23 @@
 # Usage Metrics Gathering
+
 This document list exactly what is gathered and how.
 
 Any change to analytics should most probably include a change to this document.
 
 # Pageview
+
 Each command creates a pageview with the path `/command/${commandName}/${subcommandName}`. IE.
 `ng generate component my-component --dryRun` would create a page view with the path
 `/command/generate/@schematics_angular/component`.
 
 We use page views to keep track of sessions more effectively, and to tag events to a page.
 
-Project names and target names will be removed. 
+Project names and target names will be removed.
 The command `ng run some-project:lint:some-configuration` will create a page view with the path
 `/command/run`.
 
 # Dimensions
+
 Google Analytics Custom Dimensions are used to track system values and flag values. These
 dimensions are aggregated automatically on the backend.
 
@@ -37,6 +40,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 Note: There's a limit of 20 custom dimensions.
 
 ### List Of All Dimensions
+
 <!--DIMENSIONS_TABLE_BEGIN-->
 | Id | Flag | Type |
 |:---:|:---|:---|
@@ -65,6 +69,7 @@ Note: There's a limit of 20 custom dimensions.
 # Metrics
 
 ### List of All Metrics
+
 <!--METRICS_TABLE_BEGIN-->
 | Id | Flag | Type |
 |:---:|:---|:---|
@@ -86,12 +91,14 @@ Note: There's a limit of 20 custom dimensions.
 <!--METRICS_TABLE_END-->
 
 # Operating System and Node Version
+
 A User Agent string is built to "fool" Google Analytics into reading the Operating System and
 version fields from it. The base dimensions are used for those.
 
 Node version is our App ID, but a dimension is also used to get the numeric MAJOR.MINOR of node.
 
 # Debugging
+
 Using `DEBUG=universal-analytics` will report all calls to the universal-analytics library,
 including queuing events and sending them to the server.
 
@@ -105,6 +112,7 @@ Using `DEBUG=ng:analytics:log` will show what we actually send to GA.
 See [the `debug` NPM library](https://www.npmjs.com/package/debug) for more information.
 
 # Disabling Usage Analytics
+
 There are 2 ways of disabling usage analytics:
 
 1. using `ng analytics off` (or changing the global configuration file yourself). This is the same
@@ -115,9 +123,10 @@ There are 2 ways of disabling usage analytics:
    below).
 
 # CI
+
 A special user named `ci` is used for analytics for tracking CI information. This is a convention
 and is in no way enforced.
 
 Running on CI by default will disable analytics (because of a lack of TTY on STDIN/OUT). It can be
 manually enabled using either a global configuration with a value of `ci`, or using the
-`NG_CLI_ANALYTICS=ci` environment variable. 
+`NG_CLI_ANALYTICS=ci` environment variable.

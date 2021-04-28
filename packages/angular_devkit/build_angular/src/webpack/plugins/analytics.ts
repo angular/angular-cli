@@ -31,7 +31,7 @@ export function countOccurrences(source: string, match: string, wordBreak = fals
     const re = /\w/;
     for (let pos = source.lastIndexOf(match); pos >= 0; pos = source.lastIndexOf(match, pos)) {
       if (!(re.test(source[pos - 1] || '') || re.test(source[pos + match.length] || ''))) {
-        count++;  // 1 match, AH! AH! AH! 2 matches, AH! AH! AH!
+        count++; // 1 match, AH! AH! AH! 2 matches, AH! AH! AH!
       }
 
       pos -= match.length;
@@ -41,7 +41,7 @@ export function countOccurrences(source: string, match: string, wordBreak = fals
     }
   } else {
     for (let pos = source.lastIndexOf(match); pos >= 0; pos = source.lastIndexOf(match, pos)) {
-      count++;  // 1 match, AH! AH! AH! 2 matches, AH! AH! AH!
+      count++; // 1 match, AH! AH! AH! 2 matches, AH! AH! AH!
       pos -= match.length;
       if (pos < 0) {
         break;
@@ -51,7 +51,6 @@ export function countOccurrences(source: string, match: string, wordBreak = fals
 
   return count;
 }
-
 
 /**
  * Holder of statistics related to the build.
@@ -71,7 +70,6 @@ class AnalyticsBuildStats {
   public cssSize = 0;
 }
 
-
 /**
  * Analytics plugin that reports the analytics we want from the CLI.
  */
@@ -84,8 +82,7 @@ export class NgBuildAnalyticsPlugin {
     protected _analytics: analytics.Analytics,
     protected _category: string,
     private _isIvy: boolean,
-  ) {
-  }
+  ) {}
 
   protected _reset() {
     this._stats = new AnalyticsBuildStats();
@@ -95,7 +92,7 @@ export class NgBuildAnalyticsPlugin {
     const startTime = +(stats.startTime || 0);
     const endTime = +(stats.endTime || 0);
     const metrics: (string | number)[] = [];
-    metrics[analytics.NgCliAnalyticsMetrics.BuildTime] = (endTime - startTime);
+    metrics[analytics.NgCliAnalyticsMetrics.BuildTime] = endTime - startTime;
     metrics[analytics.NgCliAnalyticsMetrics.NgOnInitCount] = this._stats.numberOfNgOnInit;
     metrics[analytics.NgCliAnalyticsMetrics.NgComponentCount] = this._stats.numberOfComponents;
     metrics[analytics.NgCliAnalyticsMetrics.InitialChunkSize] = this._stats.initialChunkSize;
@@ -163,7 +160,7 @@ export class NgBuildAnalyticsPlugin {
       for (const errObject of stats.compilation.errors) {
         if (errObject instanceof Error) {
           const allErrors = errObject.message.match(webpackAllErrorMessageRe);
-          for (const err of [...allErrors || []].slice(1)) {
+          for (const err of [...(allErrors || [])].slice(1)) {
             const message = (err.match(webpackTsErrorMessageRe) || [])[1];
             if (message) {
               // At this point this should be a TS1234.
@@ -233,9 +230,11 @@ export class NgBuildAnalyticsPlugin {
     // Only reports modules that are part of the user's project. We also don't do node_modules.
     // There is a chance that someone name a file path `hello_node_modules` or something and we
     // will ignore that file for the purpose of gathering, but we're willing to take the risk.
-    if (!module.resource
-        || !module.resource.startsWith(this._projectRoot)
-        || module.resource.indexOf('node_modules') >= 0) {
+    if (
+      !module.resource ||
+      !module.resource.startsWith(this._projectRoot) ||
+      module.resource.indexOf('node_modules') >= 0
+    ) {
       return;
     }
 

@@ -8,6 +8,7 @@ This document describes a top level view of the functionality in `@angular-devki
 Deprecated or soon to be removed features are not described here.
 
 In broad strokes the main areas are:
+
 - loading and processing sources
 - code splitting
 - production optimizations
@@ -15,7 +16,6 @@ In broad strokes the main areas are:
 
 Many tools are used in this process, and most of these steps happen within a [Webpack](https://webpack.js.org/) build.
 We maintain a number of Webpack-centric plugins in this repository, some of these are public but most are private since they are very specific to our setup.
-
 
 ## Overview diagram
 
@@ -30,7 +30,6 @@ Relative paths, such as `./raw-css-loader.ts`, refer to internal plugins, while 
 
 Sources for Angular CLI browser apps are comprised of TypeScript files, style sheets, assets, scripts, and third party dependencies.
 A given build will load these sources from disk, process them, and bundle them together.
-
 
 ### TypeScript and Ahead-Of-Time Compilation
 
@@ -58,19 +57,16 @@ Global stylesheets are injected into the `index.html` file, while component styl
 The build system supports plain CSS stylesheets as well as the Sass, LESS and Stylus CSS pre-processors.
 Stylesheet processing functionality is provided by `sass-loader`, `less-loader`, `stylus-loader`, `postcss-loader`, `postcss-import`, augmented in the build system by custom webpack plugins.
 
-
 ### Assets
 
 Assets in the build system refer specifically to a list of files or directories that are meant to be copied verbatim as build artifacts.
 These files are not processed and commonly include images, favicons, pdfs and other generic file types.
 They are loaded into the compilation using `copy-webpack-plugin`.
 
-
 ### Scripts
 
 Scripts in the build system refer specifically to JavaScript files that are meant to be loaded directly on `index.html` without being processed.
 They are loaded into the compilation using a custom webpack plugin.
-
 
 ### Third party dependencies
 
@@ -89,7 +85,6 @@ Once the actual JavaScript file is determined, it is loaded into the compilation
 
 This resolution strategy supports the [Angular Package Format](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/edit#heading=h.k0mh3o8u5hx).
 
-
 ## Code splitting
 
 Code is automatically split into different files (or chunks, for js files) based on a few different triggers.
@@ -102,12 +97,10 @@ If multiple asynchronous chunks contain a reference to the same module, it is pl
 
 There is also a special chunk called `runtime` that contains the module loading logic and is loaded before the others.
 
-
 ## Optimizations
 
 The build system contains optimizations aimed at improving the performance (for development builds) or the size of artifacts (for production builds).
 These are often mutually exclusive and thus we cannot just default to always using them.
-
 
 ### Development optimizations
 
@@ -124,7 +117,6 @@ In development however, we skip the CSS extraction and leave it as JavaScript co
 
 Watched builds split the processing load of TypeScript compilation between file emission on the main process and type checking on a forked process.
 Large projects can also opt-out of AOT compilation for faster rebuilds.
-
 
 ### Production optimizations
 
@@ -153,7 +145,6 @@ Modules that were concatenated when lazy modules are not present might not be co
 
 Aside from tree-shaking, scripts and styles (as defined in the sources above) also undergo optimizations via [Terser](https://github.com/terser/terser) and [CleanCSS](https://github.com/jakubpawlowicz/clean-css) respectively.
 
-
 ## Post-processing steps
 
 There are some steps that are meant to operate over whole applications and thus happen after the compilation finishes and outputs files.
@@ -161,29 +152,31 @@ The steps are described in the order in which they are executed during a build.
 The execution order was determined based on the complexity of the step with a primary goal of minimizing the repetition of computationally expensive operations.
 
 ### Differential Loading
+
 Differential loading is a strategy that allows your web application to support multiple browsers, but only load the necessary code that the browser needs.
 When differential loading is enabled, the CLI generates two distinct variants of application bundles.
 
-* The first contains ES2015 syntax, takes advantage of built-in support in modern browsers, ships fewer polyfills, and results in a smaller total size.
-* The second contains code in the older ES5 syntax, along with all necessary polyfills for Angular to function. This results in a larger total size, but supports older browsers.
+- The first contains ES2015 syntax, takes advantage of built-in support in modern browsers, ships fewer polyfills, and results in a smaller total size.
+- The second contains code in the older ES5 syntax, along with all necessary polyfills for Angular to function. This results in a larger total size, but supports older browsers.
 
 This process as designed has the advantage that only one full compilation of the application in ES2015 syntax is required.
 This removes a large amount of otherwise unnecessary and duplicate processing such as module resolution and dead code elimination.
 It also guarantees that the application is ES5 compliant including third-party code.
 The two variants of application bundles are created by the following steps:
-1) A full build of the application is performed using an ES2015 output target.
-The application's global stylesheets, scripts, and assets are also processed during this step via the full build.  These elements are reused for both of application variants.
-2) A copy of the JavaScript output application files are transformed (commonly referred to as down-leveled) to ES5 compatible syntax.
-ES2015+ syntax elements such as classes are converted into functionally equivalent ES5 code structures.
-3) An additional ES5-only polyfills file is generated that contains the required Angular polyfills for ES5-only browsers.
-4) A single index HTML file is created that references both application variants and is designed to only load the appropriate files for each browser.
+
+1. A full build of the application is performed using an ES2015 output target.
+   The application's global stylesheets, scripts, and assets are also processed during this step via the full build. These elements are reused for both of application variants.
+2. A copy of the JavaScript output application files are transformed (commonly referred to as down-leveled) to ES5 compatible syntax.
+   ES2015+ syntax elements such as classes are converted into functionally equivalent ES5 code structures.
+3. An additional ES5-only polyfills file is generated that contains the required Angular polyfills for ES5-only browsers.
+4. A single index HTML file is created that references both application variants and is designed to only load the appropriate files for each browser.
 
 To support loading the file sets in the appropriate browsers, the HTML `script` element's `type` and `nomodule` attributes are leveraged.
 Browsers will only load a script with a known type.
 The ES2015 files are referenced using a type of `module` which is only supported on browsers that support ES2015+ code.
 Since browsers that do not support ES2015+ code also do not support the `module` script type, these scripts are ignored for browsers that cannot parse and execute the ES2015 code.
 Browsers that support the `module` script type also support the `nomodule` attribute.
-This attribute instructs a browser that supports module scripts to ignore the script with the attribute.  There is one browser exception in this case: Safari 10.1.
+This attribute instructs a browser that supports module scripts to ignore the script with the attribute. There is one browser exception in this case: Safari 10.1.
 This browser supports module scripts but does not support the `nomodule` attribute.
 To support this case, a special polyfill script is included to provide a workaround for the browser.
 This arrangement of script elements ensures that ES5-only browsers will only execute the ES5 script files and browsers that support ES2015+ will only execute the ES2015 script files.

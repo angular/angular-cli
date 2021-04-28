@@ -1,8 +1,8 @@
 ---
 name: "\U0001F680 Feature request"
 about: Suggest a feature for Angular CLI
-
 ---
+
 <!--🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅
 
 Oh hi there! 😄
@@ -12,13 +12,13 @@ Existing issues often contain information about workarounds, resolution, or prog
 
 🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅-->
 
-
 # 🚀 Feature request
 
-
 ### Command (mark with an `x`)
+
 <!-- Can you pin-point the command or commands that are relevant for this feature request? -->
 <!-- ✍️edit: -->
+
 - [ ] new
 - [ ] build
 - [ ] serve
@@ -36,12 +36,13 @@ Existing issues often contain information about workarounds, resolution, or prog
 - [ ] doc
 
 ### Description
+
 <!-- ✍️--> A clear and concise description of the problem or missing capability...
 
-
 ### Describe the solution you'd like
+
 <!-- ✍️--> If you have a solution in mind, please describe it.
 
-
 ### Describe alternatives you've considered
+
 <!-- ✍️--> Have you considered any alternative solutions or workarounds?

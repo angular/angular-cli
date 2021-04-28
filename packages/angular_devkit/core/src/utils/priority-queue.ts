@@ -16,7 +16,7 @@ export class PriorityQueue<T> {
   }
 
   push(item: T) {
-    const index = this._items.findIndex(existing => this._comparator(item, existing) <= 0);
+    const index = this._items.findIndex((existing) => this._comparator(item, existing) <= 0);
 
     if (index === -1) {
       this._items.push(item);

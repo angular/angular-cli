@@ -5,16 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  BaseException,
-  Path,
-  getSystemPath,
-  join,
-  normalize,
-} from '@angular-devkit/core';
+import { BaseException, Path, getSystemPath, join, normalize } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import { FileReplacement } from '../browser/schema';
-
 
 export class MissingFileReplacementException extends BaseException {
   constructor(path: String) {
@@ -35,8 +28,9 @@ export function normalizeFileReplacements(
     return [];
   }
 
-  const normalizedReplacement = fileReplacements
-    .map(replacement => normalizeFileReplacement(replacement, root));
+  const normalizedReplacement = fileReplacements.map((replacement) =>
+    normalizeFileReplacement(replacement, root),
+  );
 
   for (const { replace, with: replacementWith } of normalizedReplacement) {
     if (!existsSync(getSystemPath(replacementWith))) {

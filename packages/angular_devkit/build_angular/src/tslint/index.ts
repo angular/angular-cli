@@ -17,7 +17,6 @@ import { Program } from 'typescript';
 import { stripBom } from '../utils/strip-bom';
 import { Schema as RealTslintBuilderOptions } from './schema';
 
-
 type TslintBuilderOptions = RealTslintBuilderOptions & json.JsonObject;
 interface LintResult extends tslint.LintResult {
   fileNames: string[];
@@ -29,7 +28,7 @@ async function _run(
 ): Promise<BuilderOutput> {
   context.logger.warn(
     `TSLint's support is discontinued and we're deprecating its support in Angular CLI.\n` +
-    'To opt-in using the community driven ESLint builder, see: https://github.com/angular-eslint/angular-eslint#migrating-an-angular-cli-project-from-codelyzer-and-tslint.',
+      'To opt-in using the community driven ESLint builder, see: https://github.com/angular-eslint/angular-eslint#migrating-an-angular-cli-project-from-codelyzer-and-tslint.',
   );
 
   const systemRoot = context.workspaceRoot;
@@ -65,7 +64,7 @@ async function _run(
   if (options.tsConfig) {
     const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
     context.reportProgress(0, tsConfigs.length);
-    const allPrograms = tsConfigs.map(tsConfig => {
+    const allPrograms = tsConfigs.map((tsConfig) => {
       return Linter.createProgram(path.resolve(systemRoot, tsConfig));
     });
 
@@ -83,8 +82,8 @@ async function _run(
         result = partial;
       } else {
         result.failures = result.failures
-          .filter(curr => {
-            return !partial.failures.some(prev => curr.equals(prev));
+          .filter((curr) => {
+            return !partial.failures.some((prev) => curr.equals(prev));
           })
           .concat(partial.failures);
 
@@ -139,10 +138,8 @@ async function _run(
   };
 }
 
-
 /** @deprecated since version 11 as part of the TSLint deprecation. */
 export default createBuilder<TslintBuilderOptions>(_run);
-
 
 async function _lint(
   projectTslint: typeof tslint,
@@ -169,7 +166,7 @@ async function _lint(
   for (const file of files) {
     if (program && allPrograms) {
       // If it cannot be found in ANY program, then this is an error.
-      if (allPrograms.every(p => p.getSourceFile(file) === undefined)) {
+      if (allPrograms.every((p) => p.getSourceFile(file) === undefined)) {
         throw new Error(
           `File ${JSON.stringify(file)} is not part of a TypeScript project '${options.tsConfig}'.`,
         );
@@ -213,9 +210,9 @@ function getFilesToLint(
 
   if (files.length > 0) {
     return files
-      .map(file => glob.sync(file, { cwd: root, ignore, nodir: true }))
+      .map((file) => glob.sync(file, { cwd: root, ignore, nodir: true }))
       .reduce((prev, curr) => prev.concat(curr), [])
-      .map(file => path.join(root, file));
+      .map((file) => path.join(root, file));
   }
 
   if (!program) {
@@ -226,11 +223,13 @@ function getFilesToLint(
 
   if (ignore && ignore.length > 0) {
     // normalize to support ./ paths
-    const ignoreMatchers = ignore
-      .map(pattern => new Minimatch(path.normalize(pattern), { dot: true }));
+    const ignoreMatchers = ignore.map(
+      (pattern) => new Minimatch(path.normalize(pattern), { dot: true }),
+    );
 
-    programFiles = programFiles
-      .filter(file => !ignoreMatchers.some(matcher => matcher.match(path.relative(root, file))));
+    programFiles = programFiles.filter(
+      (file) => !ignoreMatchers.some((matcher) => matcher.match(path.relative(root, file))),
+    );
   }
 
   return programFiles;

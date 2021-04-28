@@ -34,19 +34,17 @@ export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
 
     if (schematic.schema && schematic.schemaJson) {
       // Make a deep copy of options.
-      return registry
-        .compile(schematic.schemaJson)
-        .pipe(
-          mergeMap(validator => validator(options, { withPrompts })),
-          first(),
-          map(result => {
-            if (!result.success) {
-              throw new InvalidInputOptions(options, result.errors || []);
-            }
+      return registry.compile(schematic.schemaJson).pipe(
+        mergeMap((validator) => validator(options, { withPrompts })),
+        first(),
+        map((result) => {
+          if (!result.success) {
+            throw new InvalidInputOptions(options, result.errors || []);
+          }
 
-            return options;
-          }),
-        );
+          return options;
+        }),
+      );
     }
 
     return observableOf(options);

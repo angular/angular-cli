@@ -117,7 +117,7 @@ describe('BuilderHarness', () => {
     const mockHandler = jasmine.createSpy().and.returnValue({ success: true });
 
     const harness = new BuilderHarness(async (_, context) => {
-      const run = await context.scheduleTarget({project: 'test', target: 'another' });
+      const run = await context.scheduleTarget({ project: 'test', target: 'another' });
       expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
       await run.stop();
 

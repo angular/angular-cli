@@ -19,10 +19,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     });
 
     it('hashes all filenames when set to "all"', async () => {
-      await harness.writeFile(
-        'src/styles.css',
-        `h1 { background: url('./spectrum.png')}`,
-      );
+      await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -42,10 +39,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     });
 
     it(`doesn't hash any filenames when not set`, async () => {
-      await harness.writeFile(
-        'src/styles.css',
-        `h1 { background: url('./spectrum.png')}`,
-      );
+      await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -64,10 +58,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     });
 
     it(`doesn't hash any filenames when set to "none"`, async () => {
-      await harness.writeFile(
-        'src/styles.css',
-        `h1 { background: url('./spectrum.png')}`,
-      );
+      await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -87,10 +78,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     });
 
     it(`hashes CSS resources filenames only when set to "media"`, async () => {
-      await harness.writeFile(
-        'src/styles.css',
-        `h1 { background: url('./spectrum.png')}`,
-      );
+      await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -110,10 +98,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     });
 
     it(`hashes bundles filenames only when set to "bundles"`, async () => {
-      await harness.writeFile(
-        'src/styles.css',
-        `h1 { background: url('./spectrum.png')}`,
-      );
+      await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -137,10 +122,12 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         ...BASE_OPTIONS,
         outputHashing: OutputHashing.All,
         sourceMap: true,
-        styles: [{
-          input: 'src/styles.css',
-          inject: false,
-        }],
+        styles: [
+          {
+            input: 'src/styles.css',
+            inject: false,
+          },
+        ],
       });
 
       const { result } = await harness.executeOnce();

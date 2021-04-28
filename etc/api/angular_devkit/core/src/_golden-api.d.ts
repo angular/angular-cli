@@ -596,7 +596,7 @@ export declare class PartiallyOrderedSet<T> implements Set<T> {
     get size(): number;
     [Symbol.iterator](): Generator<T, void, unknown>;
     protected _checkCircularDependencies(item: T, deps: Set<T>): void;
-    add(item: T, deps?: (Set<T> | T[])): this;
+    add(item: T, deps?: Set<T> | T[]): this;
     clear(): void;
     delete(item: T): boolean;
     entries(): IterableIterator<[T, T]>;

@@ -12,7 +12,6 @@ export interface TemplateTag<R = string> {
   (template: TemplateStringsArray, ...substitutions: any[]): R;
 }
 
-
 // tslint:disable-next-line:no-any
 export function oneLine(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
@@ -31,7 +30,6 @@ export function indentBy(indentations: number): TemplateTag {
   };
 }
 
-
 // tslint:disable-next-line:no-any
 export function stripIndent(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
@@ -44,18 +42,17 @@ export function stripIndent(strings: TemplateStringsArray, ...values: any[]) {
     return endResult;
   }
 
-  const indent = Math.min(...match.map(el => el.length));
+  const indent = Math.min(...match.map((el) => el.length));
   const regexp = new RegExp('^[ \\t]{' + indent + '}', 'gm');
 
   return (indent > 0 ? endResult.replace(regexp, '') : endResult).trim();
 }
 
-
 // tslint:disable-next-line:no-any
 export function stripIndents(strings: TemplateStringsArray, ...values: any[]) {
   return String.raw(strings, ...values)
     .split('\n')
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .join('\n')
     .trim();
 }
@@ -64,9 +61,11 @@ export function stripIndents(strings: TemplateStringsArray, ...values: any[]) {
 export function trimNewlines(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
 
-  return endResult
-    // Remove the newline at the start.
-    .replace(/^(?:\r?\n)+/, '')
-    // Remove the newline at the end and following whitespace.
-    .replace(/(?:\r?\n(?:\s*))$/, '');
+  return (
+    endResult
+      // Remove the newline at the start.
+      .replace(/^(?:\r?\n)+/, '')
+      // Remove the newline at the end and following whitespace.
+      .replace(/(?:\r?\n(?:\s*))$/, '')
+  );
 }

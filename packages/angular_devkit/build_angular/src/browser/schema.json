@@ -44,12 +44,7 @@
       "description": "The stylesheet language to use for the application's inline component styles.",
       "type": "string",
       "default": "css",
-      "enum": [
-        "css",
-        "less",
-        "sass",
-        "scss"
-      ]
+      "enum": ["css", "less", "sass", "scss"]
     },
     "stylePreprocessorOptions": {
       "description": "Options to pass to style preprocessors.",
@@ -257,12 +252,7 @@
       "type": "string",
       "description": "Define the output filename cache-busting hashing mode.",
       "default": "none",
-      "enum": [
-        "none",
-        "all",
-        "media",
-        "bundles"
-      ]
+      "enum": ["none", "all", "media", "bundles"]
     },
     "poll": {
       "type": "number",
@@ -360,11 +350,7 @@
       "type": "string",
       "description": "Define the crossorigin attribute setting of elements that provide CORS support.",
       "default": "none",
-      "enum": [
-        "none",
-        "anonymous",
-        "use-credentials"
-      ]
+      "enum": ["none", "anonymous", "use-credentials"]
     },
     "allowedCommonJsDependencies": {
       "description": "A list of CommonJS packages that are allowed to be used without a build time warning.",
@@ -376,12 +362,7 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "outputPath",
-    "index",
-    "main",
-    "tsConfig"
-  ],
+  "required": ["outputPath", "index", "main", "tsConfig"],
   "definitions": {
     "assetPattern": {
       "oneOf": [
@@ -414,11 +395,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "glob",
-            "input",
-            "output"
-          ]
+          "required": ["glob", "input", "output"]
         },
         {
           "type": "string"
@@ -440,10 +417,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "src",
-            "replaceWith"
-          ]
+          "required": ["src", "replaceWith"]
         },
         {
           "type": "object",
@@ -458,10 +432,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "replace",
-            "with"
-          ]
+          "required": ["replace", "with"]
         }
       ]
     },
@@ -486,9 +457,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "input"
-          ]
+          "required": ["input"]
         },
         {
           "type": "string",
@@ -502,15 +471,7 @@
         "type": {
           "type": "string",
           "description": "The type of budget.",
-          "enum": [
-            "all",
-            "allScript",
-            "any",
-            "anyScript",
-            "anyComponentStyle",
-            "bundle",
-            "initial"
-          ]
+          "enum": ["all", "allScript", "any", "anyScript", "anyComponentStyle", "bundle", "initial"]
         },
         "name": {
           "type": "string",
@@ -546,9 +507,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "type"
-      ]
+      "required": ["type"]
     }
   }
 }

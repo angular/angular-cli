@@ -14,7 +14,6 @@ import {
 } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 
-
 /**
  * Read a file and returns its content. This supports different file encoding.
  */
@@ -24,7 +23,7 @@ export function readFile(fileName: string): string {
   }
   const buffer = readFileSync(fileName);
   let len = buffer.length;
-  if (len >= 2 && buffer[0] === 0xFE && buffer[1] === 0xFF) {
+  if (len >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff) {
     // Big endian UTF-16 byte order mark detected. Since big endian is not supported by node.js,
     // flip all byte pairs and treat as little endian.
     len &= ~1;
@@ -36,11 +35,11 @@ export function readFile(fileName: string): string {
 
     return buffer.toString('utf16le', 2);
   }
-  if (len >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {
+  if (len >= 2 && buffer[0] === 0xff && buffer[1] === 0xfe) {
     // Little endian UTF-16 byte order mark detected
     return buffer.toString('utf16le', 2);
   }
-  if (len >= 3 && buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+  if (len >= 3 && buffer[0] === 0xef && buffer[1] === 0xbb && buffer[2] === 0xbf) {
     // UTF-8 byte order mark detected
     return buffer.toString('utf8', 3);
   }
@@ -48,7 +47,6 @@ export function readFile(fileName: string): string {
   // Default is UTF-8 with no byte order mark
   return buffer.toString('utf8');
 }
-
 
 export function readJsonFile(path: string): JsonValue {
   return parseJson(readFile(path), JsonParseMode.Loose);

@@ -7,20 +7,18 @@
  */
 
 // tslint:disable:no-big-function
-import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
+import { tags } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript';
 import { elideImports } from './elide_imports';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('elide_imports', () => {
-
     const dummyNode = `const remove = ''`;
 
     // Transformer that removes the last node and then elides unused imports
     const transformer = (program: ts.Program) => {
       return (context: ts.TransformationContext) => {
-
         return (sourceFile: ts.SourceFile) => {
           const lastNode = sourceFile.statements[sourceFile.statements.length - 1];
           const updatedSourceFile = context.factory.updateSourceFile(
@@ -372,8 +370,18 @@ describe('@ngtools/webpack transformers', () => {
           export { Foo };
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -414,7 +422,13 @@ describe('@ngtools/webpack transformers', () => {
         export { Foo };
       `;
 
-      const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions, true);
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+        true,
+      );
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -422,8 +436,8 @@ describe('@ngtools/webpack transformers', () => {
 
     describe('should not elide imports decorator type references when emitDecoratorMetadata is true', () => {
       const extraCompilerOptions: ts.CompilerOptions = {
-         emitDecoratorMetadata: true,
-         experimentalDecorators: true,
+        emitDecoratorMetadata: true,
+        experimentalDecorators: true,
       };
 
       it('should not remove ctor parameter type reference', () => {
@@ -450,8 +464,18 @@ describe('@ngtools/webpack transformers', () => {
           export { Foo };
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -478,8 +502,18 @@ describe('@ngtools/webpack transformers', () => {
           __decorate([ Decorator(), __metadata("design:type", Service) ], Foo.prototype, "foo", void 0);
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -510,8 +544,18 @@ describe('@ngtools/webpack transformers', () => {
           __decorate([ Decorator(), __metadata("design:type", Service), __metadata("design:paramtypes", [Service]) ], Foo.prototype, "name", null);
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -542,8 +586,18 @@ describe('@ngtools/webpack transformers', () => {
          __decorate([ Decorator(), __metadata("design:type", Service), __metadata("design:paramtypes", []) ], Foo.prototype, "name", null);
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -573,8 +627,18 @@ describe('@ngtools/webpack transformers', () => {
           __metadata("design:paramtypes", []), __metadata("design:returntype", Service) ], Foo.prototype, "name", null);
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -605,8 +669,18 @@ describe('@ngtools/webpack transformers', () => {
           __metadata("design:returntype", void 0) ], Foo.prototype, "name", null);
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
@@ -639,23 +713,35 @@ describe('@ngtools/webpack transformers', () => {
           Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service]) ], Foo);
         `;
 
-        const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
-        const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
       });
 
       describe('NGTSC - ShorthandPropertyAssignment to PropertyAssignment', () => {
-        const transformShorthandPropertyAssignment = (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
-          const visit: ts.Visitor = node => {
+        const transformShorthandPropertyAssignment = (
+          context: ts.TransformationContext,
+        ): ts.Transformer<ts.SourceFile> => {
+          const visit: ts.Visitor = (node) => {
             if (ts.isShorthandPropertyAssignment(node)) {
               return ts.createPropertyAssignment(node.name, node.name);
             }
 
-            return ts.visitEachChild(node, child => visit(child), context);
+            return ts.visitEachChild(node, (child) => visit(child), context);
           };
 
-          return node => ts.visitNode(node, visit);
+          return (node) => ts.visitNode(node, visit);
         };
 
         it('should not elide import when ShorthandPropertyAssignment is transformed to PropertyAssignment', () => {
@@ -674,10 +760,12 @@ describe('@ngtools/webpack transformers', () => {
           `;
 
           const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
-          const result = transformTypescript(undefined, [
-            transformShorthandPropertyAssignment,
-            transformer(program),
-          ], program, compilerHost);
+          const result = transformTypescript(
+            undefined,
+            [transformShorthandPropertyAssignment, transformer(program)],
+            program,
+            compilerHost,
+          );
 
           expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
         });

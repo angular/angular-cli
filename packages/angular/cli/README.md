@@ -1,6 +1,7 @@
 ## Angular CLI
 
 <!-- Badges section here. -->
+
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 
@@ -13,7 +14,6 @@
 
 [![GitHub forks](https://img.shields.io/github/forks/angular/angular-cli.svg?style=social&label=Fork)](https://github.com/angular/angular-cli/fork)
 [![GitHub stars](https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star)](https://github.com/angular/angular-cli)
-
 
 ## Note
 
@@ -30,25 +30,27 @@ with NPM 5.5.1 or higher.
 
 ## Table of Contents
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
-* [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
-* [Updating Angular CLI](#updating-angular-cli)
-* [Development Hints for working on Angular CLI](#development-hints-for-working-on-angular-cli)
-* [Documentation](#documentation)
-* [License](#license)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
+- [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
+- [Updating Angular CLI](#updating-angular-cli)
+- [Development Hints for working on Angular CLI](#development-hints-for-working-on-angular-cli)
+- [Documentation](#documentation)
+- [License](#license)
 
 ## Installation
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 
 ### Install Globally
+
 ```bash
 npm install -g @angular/cli
 ```
 
 ### Install Locally
+
 ```bash
 npm install @angular/cli
 ```
@@ -58,6 +60,7 @@ To run a locally installed version of the angular-cli, you can call `ng` command
 Alternatively, you can install [npx](https://www.npmjs.com/package/npx) and run `npx ng <command>` within the local directory where `npm install @angular/cli` was run, which will use the locally installed angular-cli.
 
 ### Install Specific Version (Example: 6.1.1)
+
 ```bash
 npm install -g @angular/cli@6.1.1
 ```
@@ -75,6 +78,7 @@ ng new PROJECT-NAME
 cd PROJECT-NAME
 ng serve
 ```
+
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 You can configure the default HTTP host and port used by the development server with two command-line options :
@@ -102,33 +106,32 @@ ng g component ./newer-cmp
 ng g component feature/new-cmp
 # and your component will be generated in src/app/feature/new-cmp
 ```
+
 You can find all possible blueprints in the table below:
 
-Scaffold  | Usage
----       | ---
-[Component](https://angular.io/cli/generate#component)      | `ng g component my-new-component`
-[Directive](https://angular.io/cli/generate#directive)      | `ng g directive my-new-directive`
-[Pipe](https://angular.io/cli/generate#pipe)                | `ng g pipe my-new-pipe`
-[Service](https://angular.io/cli/generate#service)          | `ng g service my-new-service`
-[Class](https://angular.io/cli/generate#class)              | `ng g class my-new-class`
-[Guard](https://angular.io/cli/generate#guard)              | `ng g guard my-new-guard`
-[Interface](https://angular.io/cli/generate#interface)      | `ng g interface my-new-interface`
-[Enum](https://angular.io/cli/generate#enum)                | `ng g enum my-new-enum`
-[Module](https://angular.io/cli/generate#module)            | `ng g module my-module`
-
-
-
+| Scaffold                                               | Usage                             |
+| ------------------------------------------------------ | --------------------------------- |
+| [Component](https://angular.io/cli/generate#component) | `ng g component my-new-component` |
+| [Directive](https://angular.io/cli/generate#directive) | `ng g directive my-new-directive` |
+| [Pipe](https://angular.io/cli/generate#pipe)           | `ng g pipe my-new-pipe`           |
+| [Service](https://angular.io/cli/generate#service)     | `ng g service my-new-service`     |
+| [Class](https://angular.io/cli/generate#class)         | `ng g class my-new-class`         |
+| [Guard](https://angular.io/cli/generate#guard)         | `ng g guard my-new-guard`         |
+| [Interface](https://angular.io/cli/generate#interface) | `ng g interface my-new-interface` |
+| [Enum](https://angular.io/cli/generate#enum)           | `ng g enum my-new-enum`           |
+| [Module](https://angular.io/cli/generate#module)       | `ng g module my-module`           |
 
 angular-cli will add reference to `components`, `directives` and `pipes` automatically in the `app.module.ts`. If you need to add this references to another custom module, follow these steps:
 
- 1. `ng g module new-module` to create a new module
- 2.  call `ng g component new-module/new-component`
+1. `ng g module new-module` to create a new module
+2. call `ng g component new-module/new-component`
 
 This should add the new `component`, `directive` or `pipe` reference to the `new-module` you've created.
 
 ### Updating Angular CLI
 
 If you're using Angular CLI `1.0.0-beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
+
 ```bash
 npm uninstall -g angular-cli
 npm uninstall --save-dev angular-cli
@@ -137,6 +140,7 @@ npm uninstall --save-dev angular-cli
 To update Angular CLI to a new version, you must update both the global package and your project's local package.
 
 Global package:
+
 ```bash
 npm uninstall -g @angular/cli
 npm cache verify
@@ -145,6 +149,7 @@ npm install -g @angular/cli@latest
 ```
 
 Local project package:
+
 ```bash
 rm -rf node_modules dist # use rmdir /S/Q node_modules dist in Windows Command Prompt; use rm -r -fo node_modules,dist in Windows PowerShell
 npm install --save-dev @angular/cli@latest
@@ -154,7 +159,6 @@ npm install
 If you are updating to 1.0 from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
 
 You can find more details about changes between versions in [the Releases tab on GitHub](https://github.com/angular/angular-cli/releases).
-
 
 ## Development Hints for working on Angular CLI
 
@@ -231,15 +235,17 @@ For more informations about Node.js debugging in VS Code, see the related [VS Co
 In order to investigate performance issues, CPU profiling is often useful.
 
 To capture a CPU profiling, you can:
+
 1. install the v8-profiler-node8 dependency: `npm install v8-profiler-node8 --no-save`
 1. set the NG_CLI_PROFILING Environment variable to the file name you want:
-    * on Unix systems (Linux & Mac OS X): ̀`export NG_CLI_PROFILING=my-profile`
-    * on Windows: ̀̀`setx NG_CLI_PROFILING my-profile`
+   - on Unix systems (Linux & Mac OS X): ̀`export NG_CLI_PROFILING=my-profile`
+   - on Windows: ̀̀`setx NG_CLI_PROFILING my-profile`
 
 Then, just run the ng command on which you want to capture a CPU profile.
 You will then obtain a `my-profile.cpuprofile` file in the folder from which you ran the ng command.
 
 You can use the Chrome Devtools to process it. To do so:
+
 1. open `chrome://inspect/#devices` in Chrome
 1. click on "Open dedicated DevTools for Node"
 1. go to the "profiler" tab
@@ -256,7 +262,6 @@ The documentation for the Angular CLI is located on our [documentation website](
 
 [MIT](https://github.com/angular/angular-cli/blob/master/LICENSE)
 
-
 [travis-badge]: https://travis-ci.org/angular/angular-cli.svg?branch=master
 [travis-badge-url]: https://travis-ci.org/angular/angular-cli
 [david-badge]: https://david-dm.org/angular/angular-cli.svg
@@ -266,4 +271,3 @@ The documentation for the Angular CLI is located on our [documentation website](
 [npm-badge]: https://img.shields.io/npm/v/@angular/cli.svg
 [npm-badge-url]: https://www.npmjs.com/package/@angular/cli
 [license-url]: https://github.com/angular/angular-cli/blob/master/LICENSE
-

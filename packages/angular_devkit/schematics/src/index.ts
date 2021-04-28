@@ -9,7 +9,6 @@
 import { FilePredicate, MergeStrategy, Tree as TreeInterface } from './tree/interface';
 import { branch, empty, merge, partition } from './tree/static';
 
-
 export { SchematicsException } from './exception/exception';
 
 export * from './tree/action';
@@ -48,15 +47,23 @@ export interface TreeConstructor {
 
 export type Tree = TreeInterface;
 export const Tree: TreeConstructor = {
-  empty() { return empty(); },
-  branch(tree: TreeInterface) { return branch(tree); },
-  merge(tree: TreeInterface,
-        other: TreeInterface,
-        strategy: MergeStrategy = MergeStrategy.Default) {
+  empty() {
+    return empty();
+  },
+  branch(tree: TreeInterface) {
+    return branch(tree);
+  },
+  merge(
+    tree: TreeInterface,
+    other: TreeInterface,
+    strategy: MergeStrategy = MergeStrategy.Default,
+  ) {
     return merge(tree, other, strategy);
   },
   partition(tree: TreeInterface, predicate: FilePredicate<boolean>) {
     return partition(tree, predicate);
   },
-  optimize(tree: TreeInterface) { return tree; },
+  optimize(tree: TreeInterface) {
+    return tree;
+  },
 };

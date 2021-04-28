@@ -50,7 +50,7 @@ export async function readJsonWorkspace(
   }
 
   // Version check
-  const versionNode = ast.properties.find(pair => pair.key.value === 'version');
+  const versionNode = ast.properties.find((pair) => pair.key.value === 'version');
   if (!versionNode) {
     throw new Error('Unknown format - version specifier not found.');
   }
@@ -295,7 +295,7 @@ function parseTargetsObject(
     const name = key.value;
     if (context.trackChanges) {
       targets[name] = createVirtualAstObject<TargetDefinition>(value, {
-        include: [ 'builder', 'options', 'configurations', 'defaultConfiguration' ],
+        include: ['builder', 'options', 'configurations', 'defaultConfiguration'],
         listener(op, path, node, value) {
           jsonMetadata.addChange(
             op,
@@ -306,7 +306,7 @@ function parseTargetsObject(
         },
       });
     } else {
-      targets[name] = value.value as unknown as TargetDefinition;
+      targets[name] = (value.value as unknown) as TargetDefinition;
     }
   }
 

@@ -8,7 +8,6 @@
 
 import { countOccurrences } from './analytics';
 
-
 function _randomString(len: number) {
   const charSpace = `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
 
@@ -23,16 +22,16 @@ function _randomString(len: number) {
 describe('countOccurrences', () => {
   // Every use cases is a text, search, word break or not, and expected result.
   const useCases: [string, string, boolean, number][] = [
-    ['abc1def1ghi1jkl1mno1pqrs1tuvw1xyz', '1', false, 7],  // 0
-    ['abc1def12ghi1jkl1mno12pqrs12tuvw1xyz12', '12', false, 4],  // 1
-    ['abc', 'abc', false, 1],  // 2
-    ['abc', 'abc', true, 1],  // 3
-    ['aaaaa', 'aaa', false, 1],  // 4
-    ['aa aaa', 'aaa', true, 1],  // 5
-    ['aaaaaa', 'aaa', false, 2],  // 6
-    ['aaa aaa', 'aaa', true, 2],  // 7
-    ['a', 'a', false, 1],  // 8
-    ['a', 'a', true, 1],  // 9
+    ['abc1def1ghi1jkl1mno1pqrs1tuvw1xyz', '1', false, 7], // 0
+    ['abc1def12ghi1jkl1mno12pqrs12tuvw1xyz12', '12', false, 4], // 1
+    ['abc', 'abc', false, 1], // 2
+    ['abc', 'abc', true, 1], // 3
+    ['aaaaa', 'aaa', false, 1], // 4
+    ['aa aaa', 'aaa', true, 1], // 5
+    ['aaaaaa', 'aaa', false, 2], // 6
+    ['aaa aaa', 'aaa', true, 2], // 7
+    ['a', 'a', false, 1], // 8
+    ['a', 'a', true, 1], // 9
   ];
 
   useCases.forEach(([text, search, wordBreak, expected], i) => {
@@ -49,13 +48,14 @@ describe('countOccurrences', () => {
     const nb = Math.floor(Math.random() * 200 + 100);
 
     // Insert nb search string in.
-    new Array(nb).fill(0)
+    new Array(nb)
+      .fill(0)
       // Map it with a random position.
       .map(() => Math.floor(Math.random() * text.length))
       // Sort from highest to lowest.
       .sort((a, b) => b - a)
       // Insert the search string for each position created this way.
-      .forEach(pos => {
+      .forEach((pos) => {
         text = text.slice(0, pos) + search + text.slice(pos);
       });
 
@@ -70,13 +70,14 @@ describe('countOccurrences', () => {
     let nb = Math.floor(Math.random() * 200 + 100);
 
     // Insert nb search string in.
-    new Array(nb).fill(0)
-    // Map it with a random position.
+    new Array(nb)
+      .fill(0)
+      // Map it with a random position.
       .map(() => Math.floor(Math.random() * text.length))
       // Sort from highest to lowest.
       .sort((a, b) => b - a)
       // Insert the search string for each position created this way.
-      .forEach(pos => {
+      .forEach((pos) => {
         switch (Math.floor(Math.random() * 5)) {
           case 0:
             // Do not insert a wordbreak.
@@ -84,10 +85,18 @@ describe('countOccurrences', () => {
             nb--;
             break;
 
-          case 1: text = text.slice(0, pos) + ' ' + search + ' ' + text.slice(pos); break;
-          case 2: text = text.slice(0, pos) + '(' + search + '$' + text.slice(pos); break;
-          case 3: text = text.slice(0, pos) + '|' + search + ')' + text.slice(pos); break;
-          case 4: text = text.slice(0, pos) + '-' + search + '.' + text.slice(pos); break;
+          case 1:
+            text = text.slice(0, pos) + ' ' + search + ' ' + text.slice(pos);
+            break;
+          case 2:
+            text = text.slice(0, pos) + '(' + search + '$' + text.slice(pos);
+            break;
+          case 3:
+            text = text.slice(0, pos) + '|' + search + ')' + text.slice(pos);
+            break;
+          case 4:
+            text = text.slice(0, pos) + '-' + search + '.' + text.slice(pos);
+            break;
         }
       });
 

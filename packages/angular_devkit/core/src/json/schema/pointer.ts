@@ -8,14 +8,13 @@
 
 import { JsonPointer } from './interface';
 
-
 export function buildJsonPointer(fragments: string[]): JsonPointer {
-  return (
-    '/' + fragments.map(f => {
-      return f.replace(/~/g, '~0')
-              .replace(/\//g, '~1');
-    }).join('/')
-  ) as JsonPointer;
+  return ('/' +
+    fragments
+      .map((f) => {
+        return f.replace(/~/g, '~0').replace(/\//g, '~1');
+      })
+      .join('/')) as JsonPointer;
 }
 export function joinJsonPointer(root: JsonPointer, ...others: string[]): JsonPointer {
   if (root == '/') {
@@ -25,8 +24,15 @@ export function joinJsonPointer(root: JsonPointer, ...others: string[]): JsonPoi
   return (root + buildJsonPointer(others)) as JsonPointer;
 }
 export function parseJsonPointer(pointer: JsonPointer): string[] {
-  if (pointer === '') { return []; }
-  if (pointer.charAt(0) !== '/') { throw new Error('Relative pointer: ' + pointer); }
+  if (pointer === '') {
+    return [];
+  }
+  if (pointer.charAt(0) !== '/') {
+    throw new Error('Relative pointer: ' + pointer);
+  }
 
-  return pointer.substring(1).split(/\//).map(str => str.replace(/~1/g, '/').replace(/~0/g, '~'));
+  return pointer
+    .substring(1)
+    .split(/\//)
+    .map((str) => str.replace(/~1/g, '/').replace(/~0/g, '~'));
 }

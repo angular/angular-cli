@@ -9,8 +9,7 @@
 import { SchematicContext, TaskExecutor } from '../../src';
 import { RunSchematicTaskOptions } from './options';
 
-
-export default function(): TaskExecutor<RunSchematicTaskOptions<{}>> {
+export default function (): TaskExecutor<RunSchematicTaskOptions<{}>> {
   return (options: RunSchematicTaskOptions<{}> | undefined, context: SchematicContext) => {
     if (!options?.name) {
       throw new Error(

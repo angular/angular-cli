@@ -34,7 +34,9 @@ import { Schema as LibraryOptions } from './schema';
 
 function updateTsConfig(packageName: string, ...paths: string[]) {
   return (host: Tree) => {
-    if (!host.exists('tsconfig.json')) { return host; }
+    if (!host.exists('tsconfig.json')) {
+      return host;
+    }
 
     const file = new JSONFile(host, 'tsconfig.json');
     const jsonPath = ['compilerOptions', 'paths', packageName];
@@ -71,7 +73,7 @@ function addDependenciesToPackageJson() {
         name: 'typescript',
         version: latestVersions.TypeScript,
       },
-    ].forEach(dependency => addPackageJsonDependency(host, dependency));
+    ].forEach((dependency) => addPackageJsonDependency(host, dependency));
 
     return host;
   };
@@ -82,7 +84,7 @@ function addLibToWorkspaceFile(
   projectRoot: string,
   projectName: string,
 ): Rule {
-  return updateWorkspace(workspace => {
+  return updateWorkspace((workspace) => {
     if (workspace.projects.size === 0) {
       workspace.extensions.defaultProject = projectName;
     }
@@ -142,7 +144,7 @@ export default function (options: LibraryOptions): Rule {
     }
 
     const workspace = await getWorkspace(host);
-    const newProjectRoot = workspace.extensions.newProjectRoot as (string | undefined) || '';
+    const newProjectRoot = (workspace.extensions.newProjectRoot as string | undefined) || '';
 
     const scopeFolder = scopeName ? strings.dasherize(scopeName) + '/' : '';
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;

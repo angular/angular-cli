@@ -39,7 +39,7 @@ export abstract class ArchitectCommand<
   public async initialize(options: T & Arguments): Promise<number | void> {
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
-    this._registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
+    this._registry.useXDeprecatedProvider((msg) => this.logger.warn(msg));
 
     if (!this.workspace) {
       this.logger.fatal('A workspace is required for this command.');
@@ -47,7 +47,10 @@ export abstract class ArchitectCommand<
       return 1;
     }
 
-    this._architectHost = new WorkspaceNodeModulesArchitectHost(this.workspace, this.workspace.basePath);
+    this._architectHost = new WorkspaceNodeModulesArchitectHost(
+      this.workspace,
+      this.workspace.basePath,
+    );
     this._architect = new Architect(this._architectHost, this._registry);
 
     if (!this.target) {
@@ -82,14 +85,18 @@ export abstract class ArchitectCommand<
     }
 
     if (targetProjectNames.length === 0) {
-      this.logger.fatal(this.missingTargetError || `No projects support the '${this.target}' target.`);
+      this.logger.fatal(
+        this.missingTargetError || `No projects support the '${this.target}' target.`,
+      );
 
       return 1;
     }
 
     if (projectName && !targetProjectNames.includes(projectName)) {
-      this.logger.fatal(this.missingTargetError ||
-        `Project '${projectName}' does not support the '${this.target}' target.`);
+      this.logger.fatal(
+        this.missingTargetError ||
+          `Project '${projectName}' does not support the '${this.target}' target.`,
+      );
 
       return 1;
     }
@@ -117,7 +124,9 @@ export abstract class ArchitectCommand<
         const builderLeftovers = parsedOptions['--'] || [];
         leftoverMap.set(name, { optionDefs, parsedOptions });
 
-        potentialProjectNames = new Set(builderLeftovers.filter(x => potentialProjectNames.has(x)));
+        potentialProjectNames = new Set(
+          builderLeftovers.filter((x) => potentialProjectNames.has(x)),
+        );
       }
 
       if (potentialProjectNames.size === 1) {
@@ -170,7 +179,9 @@ export abstract class ArchitectCommand<
         // This is a special case where we just return.
         return;
       } else {
-        this.logger.fatal(this.missingTargetError || 'Cannot determine project or target for command.');
+        this.logger.fatal(
+          this.missingTargetError || 'Cannot determine project or target for command.',
+        );
 
         return 1;
       }
@@ -203,10 +214,7 @@ export abstract class ArchitectCommand<
     return await this.runArchitectTarget(options);
   }
 
-  protected async runSingleTarget(
-    target: Target,
-    targetOptions: string[],
-  ) {
+  protected async runSingleTarget(target: Target, targetOptions: string[]) {
     // We need to build the builderSpec twice because architect does not understand
     // overrides separately (getting the configuration builds the whole project, including
     // overrides).
@@ -222,7 +230,7 @@ export abstract class ArchitectCommand<
       typeof builderDesc.optionSchema === 'object' && builderDesc.optionSchema.additionalProperties;
 
     if (overrides['--'] && !allowAdditionalProperties) {
-      (overrides['--'] || []).forEach(additional => {
+      (overrides['--'] || []).forEach((additional) => {
         this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
       });
 
@@ -230,7 +238,7 @@ export abstract class ArchitectCommand<
     }
 
     await this.reportAnalytics([this.description.name], {
-      ...await this._architectHost.getOptionsForTarget(target) as unknown as T,
+      ...(((await this._architectHost.getOptionsForTarget(target)) as unknown) as T),
       ...overrides,
     });
 
@@ -261,10 +269,7 @@ export abstract class ArchitectCommand<
         // Running them in parallel would jumble the log messages.
         let result = 0;
         for (const project of this.getProjectNamesByTarget(this.target)) {
-          result |= await this.runSingleTarget(
-            { ...targetSpec, project } as Target,
-            extra,
-          );
+          result |= await this.runSingleTarget({ ...targetSpec, project } as Target, extra);
         }
 
         return result;
@@ -341,12 +346,15 @@ export abstract class ArchitectCommand<
       if (commandOptions.prod) {
         // The --prod flag will always be the first configuration, available to be overwritten
         // by following configurations.
-        this.logger.warn('Option "--prod" is deprecated: Use "--configuration production" instead.');
+        this.logger.warn(
+          'Option "--prod" is deprecated: Use "--configuration production" instead.',
+        );
         configuration = 'production';
       }
       if (commandOptions.configuration) {
-        configuration =
-          `${configuration ? `${configuration},` : ''}${commandOptions.configuration}`;
+        configuration = `${configuration ? `${configuration},` : ''}${
+          commandOptions.configuration
+        }`;
       }
     }
 

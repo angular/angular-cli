@@ -8,24 +8,19 @@
 
 import { BaseException, Path } from '@angular-devkit/core';
 
-
 export class UnknownActionException extends BaseException {
-  constructor(action: Action) { super(`Unknown action: "${action.kind}".`); }
+  constructor(action: Action) {
+    super(`Unknown action: "${action.kind}".`);
+  }
 }
 
-
-export type Action = CreateFileAction
-                   | OverwriteFileAction
-                   | RenameFileAction
-                   | DeleteFileAction;
-
+export type Action = CreateFileAction | OverwriteFileAction | RenameFileAction | DeleteFileAction;
 
 export interface ActionBase {
   readonly id: number;
   readonly parent: number;
   readonly path: Path;
 }
-
 
 let _id = 1;
 
@@ -34,7 +29,7 @@ export class ActionList implements Iterable<Action> {
 
   protected _action(action: Partial<Action>) {
     this._actions.push({
-      ...action as Action,
+      ...(action as Action),
       id: _id++,
       parent: this._actions[this._actions.length - 1]?.id ?? 0,
     });
@@ -52,7 +47,6 @@ export class ActionList implements Iterable<Action> {
   delete(path: Path) {
     this._action({ kind: 'd', path });
   }
-
 
   optimize() {
     const toCreate = new Map<Path, Buffer>();
@@ -110,7 +104,7 @@ export class ActionList implements Iterable<Action> {
     }
 
     this._actions = [];
-    toDelete.forEach(x => {
+    toDelete.forEach((x) => {
       this.delete(x);
     });
 
@@ -127,8 +121,12 @@ export class ActionList implements Iterable<Action> {
     });
   }
 
-  push(action: Action) { this._actions.push(action); }
-  get(i: number) { return this._actions[i]; }
+  push(action: Action) {
+    this._actions.push(action);
+  }
+  get(i: number) {
+    return this._actions[i];
+  }
   has(action: Action) {
     for (let i = 0; i < this._actions.length; i++) {
       const a = this._actions[i];
@@ -148,10 +146,13 @@ export class ActionList implements Iterable<Action> {
   forEach(fn: (value: Action, index: number, array: Action[]) => void, thisArg?: {}) {
     this._actions.forEach(fn, thisArg);
   }
-  get length() { return this._actions.length; }
-  [Symbol.iterator]() { return this._actions[Symbol.iterator](); }
+  get length() {
+    return this._actions.length;
+  }
+  [Symbol.iterator]() {
+    return this._actions[Symbol.iterator]();
+  }
 }
-
 
 export function isContentAction(action: Action): action is CreateFileAction | OverwriteFileAction {
   return action.kind == 'c' || action.kind == 'o';
@@ -160,15 +161,17 @@ export function isContentAction(action: Action): action is CreateFileAction | Ov
 /**
  * @deprecated since version 11.0. not used anymore can be removed in future version.
  */
-export function isAction(action: any): action is Action {  // tslint:disable-line:no-any
+// tslint:disable-next-line:no-any
+export function isAction(action: any): action is Action {
   const kind = action && action.kind;
 
-  return action !== null
-      && typeof action.id == 'number'
-      && typeof action.path == 'string'
-      && (kind == 'c' || kind == 'o' || kind == 'r' || kind == 'd');
+  return (
+    action !== null &&
+    typeof action.id == 'number' &&
+    typeof action.path == 'string' &&
+    (kind == 'c' || kind == 'o' || kind == 'r' || kind == 'd')
+  );
 }
-
 
 // Create a file. If the file already exists then this is an error.
 export interface CreateFileAction extends ActionBase {

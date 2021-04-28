@@ -29,7 +29,5 @@
     }
   },
   "additionalProperties": true,
-  "required": [
-    "success"
-  ]
+  "required": ["success"]
 }

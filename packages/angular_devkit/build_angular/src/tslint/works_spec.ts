@@ -9,15 +9,9 @@
 import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
-import {
-  logging,
-  normalize,
-  schema,
-  workspaces,
-} from '@angular-devkit/core';
+import { logging, normalize, schema, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { workspaceRoot } from '../test-utils';
-
 
 const lintTarget: Target = { project: 'app', target: 'lint' };
 
@@ -55,13 +49,13 @@ describe('Tslint Target', () => {
     // Check logs.
     const logger = new logging.Logger('lint-info');
     const allLogs: string[] = [];
-    logger.subscribe(entry => allLogs.push(entry.message));
+    logger.subscribe((entry) => allLogs.push(entry.message));
 
     const run = await architect.scheduleTarget(lintTarget, {}, { logger });
 
     // Check status updates.
     const allStatus: string[] = [];
-    run.progress.subscribe(progress => {
+    run.progress.subscribe((progress) => {
       if (progress.status !== undefined) {
         allStatus.push(progress.status);
       }
@@ -82,13 +76,13 @@ describe('Tslint Target', () => {
     // Check logs.
     const logger = new logging.Logger('lint-info');
     const allLogs: string[] = [];
-    logger.subscribe(entry => allLogs.push(entry.message));
+    logger.subscribe((entry) => allLogs.push(entry.message));
 
     const run = await architect.scheduleTarget(lintTarget, overrides, { logger });
 
     // Check status updates.
     const allStatus: string[] = [];
-    run.progress.subscribe(progress => {
+    run.progress.subscribe((progress) => {
       if (progress.status !== undefined) {
         allStatus.push(progress.status);
       }

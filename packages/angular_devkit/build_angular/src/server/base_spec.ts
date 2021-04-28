@@ -11,7 +11,6 @@ import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core'
 import { take, tap } from 'rxjs/operators';
 import { createArchitect, host } from '../test-utils';
 
-
 describe('Server Builder', () => {
   const target = { project: 'app', target: 'server' };
   let architect: Architect;
@@ -26,7 +25,7 @@ describe('Server Builder', () => {
 
   it('works (base)', async () => {
     const run = await architect.scheduleTarget(target);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     const fileName = join(outputPath, 'main.js');
@@ -37,7 +36,7 @@ describe('Server Builder', () => {
 
   it('should not emit polyfills', async () => {
     const run = await architect.scheduleTarget(target);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     expect(host.fileMatchExists(getSystemPath(outputPath), /polyfills/)).not.toBeDefined();
@@ -54,7 +53,7 @@ describe('Server Builder', () => {
     });
 
     const run = await architect.scheduleTarget(target);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     expect(host.fileMatchExists(getSystemPath(outputPath), /polyfills/)).not.toBeDefined();
@@ -66,7 +65,7 @@ describe('Server Builder', () => {
   it('supports sourcemaps', async () => {
     const overrides = { sourceMap: true };
     const run = await architect.scheduleTarget(target, overrides);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
     await run.stop();
@@ -84,7 +83,7 @@ describe('Server Builder', () => {
         scripts: true,
       },
     });
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
@@ -112,7 +111,7 @@ describe('Server Builder', () => {
     });
 
     const run = await architect.scheduleTarget(target, overrides);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
@@ -131,16 +130,18 @@ describe('Server Builder', () => {
 
     const run = await architect.scheduleTarget(target, overrides);
 
-    await run.output.pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(true);
+    await run.output
+      .pipe(
+        tap((buildEvent) => {
+          expect(buildEvent.success).toBe(true);
 
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/AppServerModule\.ɵmod/);
-      }),
-      take(1),
-    ).toPromise();
+          const fileName = join(outputPath, 'main.js');
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+          expect(content).toMatch(/AppServerModule\.ɵmod/);
+        }),
+        take(1),
+      )
+      .toPromise();
 
     await run.stop();
   });

@@ -19,7 +19,9 @@ describe('SimpleJobRegistry', () => {
 
   it('works for a simple case', async () => {
     registry.register(
-      'add', createJobHandler((arg: number[]) => arg.reduce((a, c) => a + c, 0)), {
+      'add',
+      createJobHandler((arg: number[]) => arg.reduce((a, c) => a + c, 0)),
+      {
         argument: { items: { type: 'number' } },
         output: { type: 'number' },
       },

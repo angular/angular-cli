@@ -25,7 +25,6 @@ import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
 import { Implement as GuardInterface, Schema as GuardOptions } from './schema';
 
-
 export default function (options: GuardOptions): Rule {
   return async (host: Tree) => {
     if (options.path === undefined) {
@@ -37,16 +36,13 @@ export default function (options: GuardOptions): Rule {
     }
 
     const implementations = options.implements
-      .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
+      .map((implement) => (implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement))
       .join(', ');
     const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
     const routerNamedImports: string[] = [...options.implements, 'UrlTree'];
 
     if (options.implements.includes(GuardInterface.CanLoad)) {
-      routerNamedImports.push(
-        'Route',
-        'UrlSegment',
-      );
+      routerNamedImports.push('Route', 'UrlSegment');
 
       if (options.implements.length > 1) {
         routerNamedImports.push(...commonRouterNameImports);
@@ -63,7 +59,7 @@ export default function (options: GuardOptions): Rule {
     options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
-      options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
+      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
       applyTemplates({
         implementations,
         implementationImports,

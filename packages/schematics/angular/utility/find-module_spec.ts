@@ -10,10 +10,8 @@ import { Path } from '@angular-devkit/core';
 import { EmptyTree, Tree } from '@angular-devkit/schematics';
 import { ModuleOptions, buildRelativePath, findModule, findModuleFromOptions } from './find-module';
 
-
 describe('find-module', () => {
   describe('findModule', () => {
-
     let host: Tree;
     const modulePath = '/foo/src/app/app.module.ts';
     beforeEach(() => {
@@ -84,15 +82,16 @@ describe('find-module', () => {
       const foundModule = findModule(host, 'foo/src/app/bar', '_module.ts');
       expect(foundModule).toBe(modulePath);
       // Should not find module if using default ext
-      expect(() => findModule(host, 'foo/src/app/bar'))
-        .toThrowError(/Could not find an NgModule/);
+      expect(() => findModule(host, 'foo/src/app/bar')).toThrowError(/Could not find an NgModule/);
     });
 
     it('should not find module if ext is invalid', () => {
-      expect(() => findModule(host, 'foo/src/app/bar', '-module.ts'))
-        .toThrowError(/Could not find an NgModule/);
-      expect(() => findModule(host, 'foo/src/app/bar', '_module.ts'))
-        .toThrowError(/Could not find an NgModule/);
+      expect(() => findModule(host, 'foo/src/app/bar', '-module.ts')).toThrowError(
+        /Could not find an NgModule/,
+      );
+      expect(() => findModule(host, 'foo/src/app/bar', '_module.ts')).toThrowError(
+        /Could not find an NgModule/,
+      );
     });
   });
 
@@ -166,11 +165,13 @@ describe('find-module', () => {
       // Should not find module if using invalid ext
       options.moduleExt = '-module.ts';
       expect(() => findModuleFromOptions(tree, options)).toThrowError(
-        /Specified module 'app' does not exist/);
+        /Specified module 'app' does not exist/,
+      );
       // Should not find module if using default ext
-      options.moduleExt = undefined;   // use default ext
+      options.moduleExt = undefined; // use default ext
       expect(() => findModuleFromOptions(tree, options)).toThrowError(
-        /Specified module 'app' does not exist/);
+        /Specified module 'app' does not exist/,
+      );
     });
 
     it('should ignore custom ext if module or ${module}.ts exists', () => {
@@ -193,14 +194,10 @@ describe('find-module', () => {
 
   describe('buildRelativePath', () => {
     it('works', () => {
-      expect(buildRelativePath('/test/module', '/test/service'))
-          .toEqual('./service');
-      expect(buildRelativePath('/test/module', '/other/service'))
-          .toEqual('../other/service');
-      expect(buildRelativePath('/module', '/test/service'))
-          .toEqual('./test/service');
-      expect(buildRelativePath('/test/service', '/module'))
-          .toEqual('../module');
+      expect(buildRelativePath('/test/module', '/test/service')).toEqual('./service');
+      expect(buildRelativePath('/test/module', '/other/service')).toEqual('../other/service');
+      expect(buildRelativePath('/module', '/test/service')).toEqual('./test/service');
+      expect(buildRelativePath('/test/service', '/module')).toEqual('../module');
     });
   });
 });

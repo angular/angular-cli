@@ -41,7 +41,12 @@ import {
   OptimizeCssWebpackPlugin,
   ScriptsWebpackPlugin,
 } from '../plugins';
-import { getEsVersionForFileName, getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
+import {
+  getEsVersionForFileName,
+  getOutputHashFormat,
+  getWatchOptions,
+  normalizeExtraEntryPoints,
+} from '../utils/helpers';
 import { IGNORE_WARNINGS } from '../utils/stats';
 
 const TerserPlugin = require('terser-webpack-plugin');
@@ -51,15 +56,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const { root, projectRoot, buildOptions, tsConfig } = wco;
   const {
     platform = 'browser',
-    sourceMap: {
-      styles: stylesSourceMap,
-      scripts: scriptsSourceMap,
-      vendor: vendorSourceMap,
-    },
-    optimization: {
-      styles: stylesOptimization,
-      scripts: scriptsOptimization,
-    },
+    sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap },
+    optimization: { styles: stylesOptimization, scripts: scriptsOptimization },
   } = buildOptions;
 
   const extraPlugins: { apply(compiler: Compiler): void }[] = [];
@@ -82,9 +80,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const differentialLoadingMode = buildOptions.differentialLoadingNeeded && !buildOptions.watch;
   if (platform !== 'server') {
     if (differentialLoadingMode || tsConfig.options.target === ScriptTarget.ES5) {
-      const buildBrowserFeatures = new BuildBrowserFeatures(
-        projectRoot,
-      );
+      const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
 
       if (buildBrowserFeatures.isEs5SupportNeeded()) {
         const polyfillsChunkName = 'polyfills-es5';
@@ -146,13 +142,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       }
     }
 
-    const existingEntry = prev.find(el => el.bundleName === bundleName);
+    const existingEntry = prev.find((el) => el.bundleName === bundleName);
     if (existingEntry) {
       if (existingEntry.inject && !inject) {
         // All entries have to be lazy for the bundle to be lazy.
-        throw new Error(
-          `The ${bundleName} bundle is mixing injected and non-injected scripts.`,
-        );
+        throw new Error(`The ${bundleName} bundle is mixing injected and non-injected scripts.`);
       }
 
       existingEntry.paths.push(resolvedPath);
@@ -173,13 +167,15 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     const hash = script.inject ? hashFormat.script : '';
     const bundleName = script.bundleName;
 
-    extraPlugins.push(new ScriptsWebpackPlugin({
-      name: bundleName,
-      sourceMap: scriptsSourceMap,
-      filename: `${path.basename(bundleName)}${hash}.js`,
-      scripts: script.paths,
-      basePath: projectRoot,
-    }));
+    extraPlugins.push(
+      new ScriptsWebpackPlugin({
+        name: bundleName,
+        sourceMap: scriptsSourceMap,
+        filename: `${path.basename(bundleName)}${hash}.js`,
+        scripts: script.paths,
+        basePath: projectRoot,
+      }),
+    );
   }
 
   // process asset entries
@@ -214,45 +210,53 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
             // causes negate patterns not to match.
             // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
             ...ignore,
-          ].map(i => path.posix.join(input, i)),
+          ].map((i) => path.posix.join(input, i)),
         },
       };
     });
 
-    extraPlugins.push(new CopyWebpackPlugin({
-      patterns: copyWebpackPluginPatterns,
-    }));
+    extraPlugins.push(
+      new CopyWebpackPlugin({
+        patterns: copyWebpackPluginPatterns,
+      }),
+    );
   }
 
   if (buildOptions.progress) {
     const spinner = new Spinner();
 
     let previousPercentage: number | undefined;
-    extraPlugins.push(new ProgressPlugin({
-      handler: (percentage: number, message: string) => {
-        if (previousPercentage === 1 && percentage !== 0) {
-          // In some scenarios in Webpack 5 percentage goes from 1 back to 0.99.
-          // Ex: 0.99 -> 1 -> 0.99 -> 1
-          // This causes the "complete" message to be displayed multiple times.
+    extraPlugins.push(
+      new ProgressPlugin({
+        handler: (percentage: number, message: string) => {
+          if (previousPercentage === 1 && percentage !== 0) {
+            // In some scenarios in Webpack 5 percentage goes from 1 back to 0.99.
+            // Ex: 0.99 -> 1 -> 0.99 -> 1
+            // This causes the "complete" message to be displayed multiple times.
 
-          return;
-        }
+            return;
+          }
 
-        switch (percentage) {
-          case 0:
-            spinner.start(`Generating ${platform} application bundles...`);
-            break;
-          case 1:
-            spinner.succeed(`${platform.replace(/^\w/, s => s.toUpperCase())} application bundle generation complete.`);
-            break;
-          default:
-            spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
-            break;
-        }
+          switch (percentage) {
+            case 0:
+              spinner.start(`Generating ${platform} application bundles...`);
+              break;
+            case 1:
+              spinner.succeed(
+                `${platform.replace(/^\w/, (s) =>
+                  s.toUpperCase(),
+                )} application bundle generation complete.`,
+              );
+              break;
+            default:
+              spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
+              break;
+          }
 
-        previousPercentage = percentage;
-      },
-    }));
+          previousPercentage = percentage;
+        },
+      }),
+    );
   }
 
   if (buildOptions.showCircularDependencies) {
@@ -294,12 +298,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  if ((scriptsSourceMap || stylesSourceMap)) {
+  if (scriptsSourceMap || stylesSourceMap) {
     extraRules.push({
       test: /\.m?js$/,
-      exclude: vendorSourceMap
-        ? undefined
-        : /[\\\/]node_modules[\\\/]/,
+      exclude: vendorSourceMap ? undefined : /[\\\/]node_modules[\\\/]/,
       enforce: 'pre',
       loader: require.resolve('source-map-loader'),
     });
@@ -322,13 +324,16 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       new OptimizeCssWebpackPlugin({
         sourceMap: stylesSourceMap,
         // component styles retain their original file name
-        test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),
+        test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
       }),
     );
   }
 
   if (scriptsOptimization) {
-    const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = require('@angular/compiler-cli');
+    const {
+      GLOBAL_DEFS_FOR_TERSER,
+      GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+    } = require('@angular/compiler-cli');
     const angularGlobalDefinitions = buildOptions.aot
       ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
       : GLOBAL_DEFS_FOR_TERSER;
@@ -355,25 +360,25 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         allowMinify &&
         (platform === 'server'
           ? {
-            ecma: terserEcma,
-            global_defs: angularGlobalDefinitions,
-            keep_fnames: true,
-          }
+              ecma: terserEcma,
+              global_defs: angularGlobalDefinitions,
+              keep_fnames: true,
+            }
           : {
-            ecma: terserEcma,
-            pure_getters: buildOptions.buildOptimizer,
-            // PURE comments work best with 3 passes.
-            // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-            passes: buildOptions.buildOptimizer ? 3 : 1,
-            global_defs: angularGlobalDefinitions,
-            pure_funcs: ['forwardRef'],
-          }),
+              ecma: terserEcma,
+              pure_getters: buildOptions.buildOptimizer,
+              // PURE comments work best with 3 passes.
+              // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+              passes: buildOptions.buildOptimizer ? 3 : 1,
+              global_defs: angularGlobalDefinitions,
+              pure_funcs: ['forwardRef'],
+            }),
       // We also want to avoid mangling on server.
       // Name mangling is handled within the browser builder
       mangle: allowMangle && platform !== 'server' && !differentialLoadingMode,
     };
 
-    const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
+    const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
     extraMinimizers.push(
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
@@ -482,10 +487,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         ...extraRules,
       ],
     },
-    cache: !!buildOptions.watch && !cachingDisabled && {
-      type: 'memory',
-      maxGenerations: 1,
-    },
+    cache: !!buildOptions.watch &&
+      !cachingDisabled && {
+        type: 'memory',
+        maxGenerations: 1,
+      },
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: 'deterministic',
@@ -495,7 +501,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.
       // https://github.com/angular/angular/issues/11580
-      new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/, path.join(projectRoot, '$_lazy_route_resources'), {}),
+      new ContextReplacementPlugin(
+        /\@angular(\\|\/)core(\\|\/)/,
+        path.join(projectRoot, '$_lazy_route_resources'),
+        {},
+      ),
       new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
       ...extraPlugins,
     ],

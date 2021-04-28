@@ -244,9 +244,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
         harness.useTarget('build', {
           ...BASE_OPTIONS,
-          assets: [
-            { glob: '**/*', input: 'src/files', output: '.', ignore: ['another.file'] },
-          ],
+          assets: [{ glob: '**/*', input: 'src/files', output: '.', ignore: ['another.file'] }],
         });
 
         const { result } = await harness.executeOnce();
@@ -267,9 +265,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
         harness.useTarget('build', {
           ...BASE_OPTIONS,
-          assets: [
-            { glob: '**/*', input: 'src/files', output: '.', ignore: ['**/*.file'] },
-          ],
+          assets: [{ glob: '**/*', input: 'src/files', output: '.', ignore: ['**/*.file'] }],
         });
 
         const { result } = await harness.executeOnce();

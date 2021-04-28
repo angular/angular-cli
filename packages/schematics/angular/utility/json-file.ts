@@ -7,7 +7,16 @@
  */
 import { JsonValue } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
-import { Node, ParseError, applyEdits, findNodeAtLocation, getNodeValue, modify, parseTree, printParseErrorCode } from 'jsonc-parser';
+import {
+  Node,
+  ParseError,
+  applyEdits,
+  findNodeAtLocation,
+  getNodeValue,
+  modify,
+  parseTree,
+  printParseErrorCode,
+} from 'jsonc-parser';
 
 export type InsertionIndex = (properties: string[]) => number;
 export type JSONPath = (string | number)[];
@@ -16,10 +25,7 @@ export type JSONPath = (string | number)[];
 export class JSONFile {
   content: string;
 
-  constructor(
-    private readonly host: Tree,
-    private readonly path: string,
-  ) {
+  constructor(private readonly host: Tree, private readonly path: string) {
     const buffer = this.host.read(this.path);
     if (buffer) {
       this.content = buffer.toString();
@@ -38,7 +44,11 @@ export class JSONFile {
     this._jsonAst = parseTree(this.content, errors, { allowTrailingComma: true });
     if (errors.length) {
       const { error, offset } = errors[0];
-      throw new Error(`Failed to parse "${this.path}" as JSON AST Object. ${printParseErrorCode(error)} at location: ${offset}.`);
+      throw new Error(
+        `Failed to parse "${this.path}" as JSON AST Object. ${printParseErrorCode(
+          error,
+        )} at location: ${offset}.`,
+      );
     }
 
     return this._jsonAst;
@@ -59,27 +69,27 @@ export class JSONFile {
     return node === undefined ? undefined : getNodeValue(node);
   }
 
-  modify(jsonPath: JSONPath, value: JsonValue | undefined, insertInOrder?: InsertionIndex | false): void {
+  modify(
+    jsonPath: JSONPath,
+    value: JsonValue | undefined,
+    insertInOrder?: InsertionIndex | false,
+  ): void {
     let getInsertionIndex: InsertionIndex | undefined;
     if (insertInOrder === undefined) {
       const property = jsonPath.slice(-1)[0];
-      getInsertionIndex = properties => [...properties, property].sort().findIndex(p => p === property);
+      getInsertionIndex = (properties) =>
+        [...properties, property].sort().findIndex((p) => p === property);
     } else if (insertInOrder !== false) {
       getInsertionIndex = insertInOrder;
     }
 
-    const edits = modify(
-      this.content,
-      jsonPath,
-      value,
-      {
-        getInsertionIndex,
-        formattingOptions: {
-          insertSpaces: true,
-          tabSize: 2,
-        },
+    const edits = modify(this.content, jsonPath, value, {
+      getInsertionIndex,
+      formattingOptions: {
+        insertSpaces: true,
+        tabSize: 2,
       },
-    );
+    });
 
     this.content = applyEdits(this.content, edits);
     this.host.overwrite(this.path, this.content);

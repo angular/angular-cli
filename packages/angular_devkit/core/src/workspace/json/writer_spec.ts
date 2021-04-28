@@ -41,7 +41,9 @@ function createTestCaseHost(inputData = '') {
     async writeFile(path: string, data: string) {
       try {
         const testCase = readFileSync(
-          require.resolve(join(__dirname, 'test', 'cases', path) + '.json'), 'utf8');
+          require.resolve(join(__dirname, 'test', 'cases', path) + '.json'),
+          'utf8',
+        );
         expect(data).toEqual(testCase);
       } catch (e) {
         fail(`Unable to load test case '${path}': ${e.message || e}`);
@@ -275,7 +277,7 @@ describe('writeJsonWorkpaceFile', () => {
     await writeJsonWorkspace(workspace, host, 'AddProjectWithTargets');
   });
 
-  it('modifies a project\'s properties', async () => {
+  it("modifies a project's properties", async () => {
     const host = createTestCaseHost(representativeFile);
 
     const workspace = await readJsonWorkspace('', host);
@@ -292,7 +294,7 @@ describe('writeJsonWorkpaceFile', () => {
     await writeJsonWorkspace(workspace, host, 'ProjectModifyProperties');
   });
 
-  it('sets a project\'s properties', async () => {
+  it("sets a project's properties", async () => {
     const host = createTestCaseHost(representativeFile);
 
     const workspace = await readJsonWorkspace('', host);
@@ -579,7 +581,7 @@ describe('writeJsonWorkpaceFile', () => {
 
     const workspace = await readJsonWorkspace('', host);
 
-    workspace.extensions['x-foo'] = { };
+    workspace.extensions['x-foo'] = {};
 
     await writeJsonWorkspace(workspace, host, 'ObjectReplace2');
   });

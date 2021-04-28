@@ -14,21 +14,29 @@ import { SimpleMemoryHost, SimpleMemoryHostStats } from './memory';
 import { SyncDelegateHost } from './sync';
 
 export namespace test {
-
-  export type TestLogRecord = {
-    kind: 'write' | 'read' | 'delete' | 'list' | 'exists' | 'isDirectory' | 'isFile' | 'stat'
-    | 'watch';
-    path: Path;
-  } | {
-    kind: 'rename';
-    from: Path;
-    to: Path;
-  };
-
+  export type TestLogRecord =
+    | {
+        kind:
+          | 'write'
+          | 'read'
+          | 'delete'
+          | 'list'
+          | 'exists'
+          | 'isDirectory'
+          | 'isFile'
+          | 'stat'
+          | 'watch';
+        path: Path;
+      }
+    | {
+        kind: 'rename';
+        from: Path;
+        to: Path;
+      };
 
   export class TestHost extends SimpleMemoryHost {
     protected _records: TestLogRecord[] = [];
-    protected _sync: SyncDelegateHost<{}>|null = null;
+    protected _sync: SyncDelegateHost<{}> | null = null;
 
     constructor(map: { [path: string]: string } = {}) {
       super();
@@ -48,8 +56,9 @@ export namespace test {
     get files(): Path[] {
       const sync = this.sync;
       function _visit(p: Path): Path[] {
-        return sync.list(p)
-          .map(fragment => join(p, fragment))
+        return sync
+          .list(p)
+          .map((fragment) => join(p, fragment))
           .reduce((files, path) => {
             if (sync.isDirectory(path)) {
               return files.concat(_visit(path));
@@ -153,5 +162,4 @@ export namespace test {
       return super._isFile(normalize(path));
     }
   }
-
 }

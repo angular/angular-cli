@@ -57,14 +57,8 @@
       "description": "The preferred package manager configuration files to use for registry settings.",
       "type": "string",
       "default": "npm",
-      "enum": [
-        "npm",
-        "yarn",
-        "cnpm",
-        "pnpm"
-      ]
+      "enum": ["npm", "yarn", "cnpm", "pnpm"]
     }
   },
-  "required": [
-  ]
+  "required": []
 }

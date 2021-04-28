@@ -29,8 +29,7 @@ import { validateProjectName } from '../utility/validation';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as NgNewOptions } from './schema';
 
-
-export default function(options: NgNewOptions): Rule {
+export default function (options: NgNewOptions): Rule {
   if (!options.name) {
     throw new SchematicsException(`Invalid options, "name" is required.`);
   }
@@ -92,15 +91,11 @@ export default function(options: NgNewOptions): Rule {
         }
       }
       if (!options.skipGit) {
-        const commit = typeof options.commit == 'object'
-          ? options.commit
-          : (!!options.commit ? {} : false);
+        const commit =
+          typeof options.commit == 'object' ? options.commit : !!options.commit ? {} : false;
 
         context.addTask(
-          new RepositoryInitializerTask(
-            options.directory,
-            commit,
-          ),
+          new RepositoryInitializerTask(options.directory, commit),
           packageTask ? [packageTask] : [],
         );
       }

@@ -27,15 +27,17 @@ export default function (): Rule {
         }
 
         const isES5Needed = await isES5SupportNeeded(
-          resolve(
-            normalize(host.root.path),
-            normalize(project.root),
-          ),
+          resolve(normalize(host.root.path), normalize(project.root)),
         );
 
         // Check options
         if (target.options) {
-          target.options = removeE5BrowserSupportOption(projectName, target.options, isES5Needed, context.logger);
+          target.options = removeE5BrowserSupportOption(
+            projectName,
+            target.options,
+            isES5Needed,
+            context.logger,
+          );
         }
 
         // Go through each configuration entry
@@ -77,14 +79,18 @@ function removeE5BrowserSupportOption(
   if (options.es5BrowserSupport && isES5Needed === false) {
     logger.warn(
       `Project '${projectName}' doesn't require ES5 support, but '${configurationPath}es5BrowserSupport' was set to 'true'.\n` +
-      `ES5 polyfills will no longer be added when building this project${configurationName ? ` with '${configurationName}' configuration.` : '.'}\n` +
-      `If ES5 polyfills are needed, add the supported ES5 browsers in the browserslist configuration.`,
+        `ES5 polyfills will no longer be added when building this project${
+          configurationName ? ` with '${configurationName}' configuration.` : '.'
+        }\n` +
+        `If ES5 polyfills are needed, add the supported ES5 browsers in the browserslist configuration.`,
     );
   } else if (!options.es5BrowserSupport && isES5Needed === true) {
     logger.warn(
       `Project '${projectName}' requires ES5 support, but '${configurationPath}es5BrowserSupport' was set to 'false'.\n` +
-      `ES5 polyfills will be added when building this project${configurationName ? ` with '${configurationName}' configuration.` : '.'}\n` +
-      `If ES5 polyfills are not needed, remove the unsupported ES5 browsers from the browserslist configuration.`,
+        `ES5 polyfills will be added when building this project${
+          configurationName ? ` with '${configurationName}' configuration.` : '.'
+        }\n` +
+        `If ES5 polyfills are not needed, remove the unsupported ES5 browsers from the browserslist configuration.`,
     );
   }
 
@@ -102,10 +108,7 @@ async function isES5SupportNeeded(projectRoot: Path): Promise<boolean | undefine
   // n: feature is unavailable
   // a: feature is partially supported
   // x: feature is prefixed
-  const criteria = [
-    'y',
-    'a',
-  ];
+  const criteria = ['y', 'a'];
 
   try {
     // tslint:disable-next-line:no-implicit-dependencies
@@ -118,18 +121,17 @@ async function isES5SupportNeeded(projectRoot: Path): Promise<boolean | undefine
     const { feature, features } = await import('caniuse-lite');
     const data = feature(features['es6-module']);
 
-    return supportedBrowsers
-      .some(browser => {
-        const [agentId, version] = browser.split(' ');
+    return supportedBrowsers.some((browser) => {
+      const [agentId, version] = browser.split(' ');
 
-        const browserData = data.stats[agentId];
-        const featureStatus = (browserData && browserData[version]) as string | undefined;
+      const browserData = data.stats[agentId];
+      const featureStatus = (browserData && browserData[version]) as string | undefined;
 
-        // We are only interested in the first character
-        // Ex: when 'a #4 #5', we only need to check for 'a'
-        // as for such cases we should polyfill these features as needed
-        return !featureStatus || !criteria.includes(featureStatus.charAt(0));
-      });
+      // We are only interested in the first character
+      // Ex: when 'a #4 #5', we only need to check for 'a'
+      // as for such cases we should polyfill these features as needed
+      return !featureStatus || !criteria.includes(featureStatus.charAt(0));
+    });
   } catch {
     return undefined;
   }

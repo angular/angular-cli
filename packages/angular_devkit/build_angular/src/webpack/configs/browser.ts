@@ -34,31 +34,37 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
 
   if (subresourceIntegrity) {
     const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
-    extraPlugins.push(new SubresourceIntegrityPlugin({
-      hashFuncNames: ['sha384'],
-    }));
+    extraPlugins.push(
+      new SubresourceIntegrityPlugin({
+        hashFuncNames: ['sha384'],
+      }),
+    );
   }
 
   if (extractLicenses) {
     const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
-    extraPlugins.push(new LicenseWebpackPlugin({
-      stats: {
-        warnings: false,
-        errors: false,
-      },
-      perChunkOutput: false,
-      outputFilename: '3rdpartylicenses.txt',
-      skipChildCompilers: true,
-    }));
+    extraPlugins.push(
+      new LicenseWebpackPlugin({
+        stats: {
+          warnings: false,
+          errors: false,
+        },
+        perChunkOutput: false,
+        outputFilename: '3rdpartylicenses.txt',
+        skipChildCompilers: true,
+      }),
+    );
   }
 
   if (scriptsSourceMap || stylesSourceMap) {
-    extraPlugins.push(getSourceMapDevTool(
-      scriptsSourceMap,
-      stylesSourceMap,
-      buildOptions.differentialLoadingNeeded && !buildOptions.watch ? true : hiddenSourceMap,
-      false,
-    ));
+    extraPlugins.push(
+      getSourceMapDevTool(
+        scriptsSourceMap,
+        stylesSourceMap,
+        buildOptions.differentialLoadingNeeded && !buildOptions.watch ? true : hiddenSourceMap,
+        false,
+      ),
+    );
   }
 
   let crossOriginLoading: 'anonymous' | 'use-credentials' | false = false;
@@ -68,9 +74,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     crossOriginLoading = crossOrigin;
   }
 
-  const buildBrowserFeatures = new BuildBrowserFeatures(
-    wco.projectRoot,
-  );
+  const buildBrowserFeatures = new BuildBrowserFeatures(wco.projectRoot);
 
   return {
     devtool: false,

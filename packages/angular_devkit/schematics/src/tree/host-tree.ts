@@ -49,9 +49,7 @@ import {
 import { UpdateRecorderBase } from './recorder';
 import { ScopedTree } from './scoped';
 
-
 let _uniqueId = 0;
-
 
 export class HostDirEntry implements DirEntry {
   constructor(
@@ -59,15 +57,17 @@ export class HostDirEntry implements DirEntry {
     readonly path: Path,
     protected _host: virtualFs.SyncDelegateHost,
     protected _tree: Tree,
-  ) { }
+  ) {}
 
   get subdirs(): PathFragment[] {
-    return this._host.list(this.path)
-      .filter(fragment => this._host.isDirectory(join(this.path, fragment)));
+    return this._host
+      .list(this.path)
+      .filter((fragment) => this._host.isDirectory(join(this.path, fragment)));
   }
   get subfiles(): PathFragment[] {
-    return this._host.list(this.path)
-      .filter(fragment => this._host.isFile(join(this.path, fragment)));
+    return this._host
+      .list(this.path)
+      .filter((fragment) => this._host.isFile(join(this.path, fragment)));
   }
 
   dir(name: PathFragment): DirEntry {
@@ -79,7 +79,7 @@ export class HostDirEntry implements DirEntry {
 
   visit(visitor: FileVisitor): void {
     try {
-      this.getSubfilesRecursively().forEach(file => visitor(file.path, file));
+      this.getSubfilesRecursively().forEach((file) => visitor(file.path, file));
     } catch (e) {
       if (e !== FileVisitorCancelToken) {
         throw e;
@@ -89,16 +89,15 @@ export class HostDirEntry implements DirEntry {
 
   private getSubfilesRecursively() {
     function _recurse(entry: DirEntry): FileEntry[] {
-      return entry.subdirs.reduce((files, subdir) => [
-        ...files,
-        ..._recurse(entry.dir(subdir)),
-      ], entry.subfiles.map(subfile => entry.file(subfile) as FileEntry));
+      return entry.subdirs.reduce(
+        (files, subdir) => [...files, ..._recurse(entry.dir(subdir))],
+        entry.subfiles.map((subfile) => entry.file(subfile) as FileEntry),
+      );
     }
 
     return _recurse(this);
   }
 }
-
 
 export class HostTree implements Tree {
   private readonly _id = --_uniqueId;
@@ -107,7 +106,6 @@ export class HostTree implements Tree {
   private _ancestry = new Set<number>();
 
   private _dirCache = new Map<Path, HostDirEntry>();
-
 
   [TreeSymbol]() {
     return this;
@@ -164,10 +162,10 @@ export class HostTree implements Tree {
       return tree._ancestry.has(this._id);
     }
     if (tree instanceof DelegateTree) {
-      return this.isAncestorOf((tree as unknown as { _other: Tree})._other);
+      return this.isAncestorOf(((tree as unknown) as { _other: Tree })._other);
     }
     if (tree instanceof ScopedTree) {
-      return this.isAncestorOf((tree as unknown as { _base: Tree})._base);
+      return this.isAncestorOf(((tree as unknown) as { _base: Tree })._base);
     }
 
     return false;
@@ -192,7 +190,7 @@ export class HostTree implements Tree {
     const deleteConflictAllowed =
       (strategy & MergeStrategy.AllowDeleteConflict) == MergeStrategy.AllowDeleteConflict;
 
-    other.actions.forEach(action => {
+    other.actions.forEach((action) => {
       switch (action.kind) {
         case 'c': {
           const { path, content } = action;
@@ -208,9 +206,9 @@ export class HostTree implements Tree {
               throw new MergeConflictException(path);
             }
 
-            this._record.overwrite(path, content as {} as virtualFs.FileBuffer).subscribe();
+            this._record.overwrite(path, (content as {}) as virtualFs.FileBuffer).subscribe();
           } else {
-            this._record.create(path, content as {} as virtualFs.FileBuffer).subscribe();
+            this._record.create(path, (content as {}) as virtualFs.FileBuffer).subscribe();
           }
 
           return;
@@ -236,7 +234,7 @@ export class HostTree implements Tree {
           }
           // We use write here as merge validation has already been done, and we want to let
           // the CordHost do its job.
-          this._record.write(path, content as {} as virtualFs.FileBuffer).subscribe();
+          this._record.write(path, (content as {}) as virtualFs.FileBuffer).subscribe();
 
           return;
         }
@@ -339,7 +337,7 @@ export class HostTree implements Tree {
       throw new FileDoesNotExistException(p);
     }
     const c = typeof content == 'string' ? Buffer.from(content) : content;
-    this._record.overwrite(p, c as {} as virtualFs.FileBuffer).subscribe();
+    this._record.overwrite(p, (c as {}) as virtualFs.FileBuffer).subscribe();
   }
   beginUpdate(path: string): UpdateRecorder {
     const entry = this.get(path);
@@ -373,7 +371,7 @@ export class HostTree implements Tree {
       throw new FileAlreadyExistException(p);
     }
     const c = typeof content == 'string' ? Buffer.from(content) : content;
-    this._record.create(p, c as {} as virtualFs.FileBuffer).subscribe();
+    this._record.create(p, (c as {}) as virtualFs.FileBuffer).subscribe();
   }
   delete(path: string): void {
     this._recordSync.delete(this._normalizePath(path));
@@ -440,7 +438,7 @@ export class HostCreateTree extends HostTree {
     super();
 
     const tempHost = new HostTree(host);
-    tempHost.visit(path => {
+    tempHost.visit((path) => {
       const content = tempHost.read(path);
       if (content) {
         this.create(path, content);
@@ -455,33 +453,32 @@ export class FilterHostTree extends HostTree {
     // cast to allow access
     const originalBackend = (tree as FilterHostTree)._backend;
 
-    const recurse: (base: Path) => Observable<void> = base => {
-      return originalBackend.list(base)
-        .pipe(
-          mergeMap(x => x),
-          map(path => join(base, path)),
-          concatMap(path => {
-            let isDirectory = false;
-            originalBackend.isDirectory(path).subscribe(val => isDirectory = val);
-            if (isDirectory) {
-              return recurse(path);
-            }
+    const recurse: (base: Path) => Observable<void> = (base) => {
+      return originalBackend.list(base).pipe(
+        mergeMap((x) => x),
+        map((path) => join(base, path)),
+        concatMap((path) => {
+          let isDirectory = false;
+          originalBackend.isDirectory(path).subscribe((val) => (isDirectory = val));
+          if (isDirectory) {
+            return recurse(path);
+          }
 
-            let isFile = false;
-            originalBackend.isFile(path).subscribe(val => isFile = val);
-            if (!isFile || !filter(path)) {
-              return EMPTY;
-            }
+          let isFile = false;
+          originalBackend.isFile(path).subscribe((val) => (isFile = val));
+          if (!isFile || !filter(path)) {
+            return EMPTY;
+          }
 
-            let content: ArrayBuffer | null = null;
-            originalBackend.read(path).subscribe(val => content = val);
-            if (!content) {
-              return EMPTY;
-            }
+          let content: ArrayBuffer | null = null;
+          originalBackend.read(path).subscribe((val) => (content = val));
+          if (!content) {
+            return EMPTY;
+          }
 
-            return newBackend.write(path, content as {} as virtualFs.FileBuffer);
-          }),
-        );
+          return newBackend.write(path, (content as {}) as virtualFs.FileBuffer);
+        }),
+      );
     };
 
     recurse(normalize('/')).subscribe();

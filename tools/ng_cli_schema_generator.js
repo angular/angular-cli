@@ -24,8 +24,8 @@ function generate(inPath, outPath) {
       const definitionKey = value
         .replace(/(\.json|src)/g, '')
         .split(/\\|\/|_|-|\./)
-        .filter(p => !!p)
-        .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+        .filter((p) => !!p)
+        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
         .join('');
 
       const nestedSchemaPath = resolve(dirname(inPath), value);
@@ -56,12 +56,12 @@ function generate(inPath, outPath) {
 
     return key === ''
       ? {
-        ...value,
-        definitions: {
-          ...value.definitions,
-          ...nestedDefinitions,
+          ...value,
+          definitions: {
+            ...value.definitions,
+            ...nestedDefinitions,
+          },
         }
-      }
       : value;
   });
 

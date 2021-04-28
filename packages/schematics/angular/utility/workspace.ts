@@ -36,18 +36,16 @@ function createHost(tree: Tree): workspaces.WorkspaceHost {
 export function updateWorkspace(
   updater: (workspace: workspaces.WorkspaceDefinition) => void | Rule | PromiseLike<void | Rule>,
 ): Rule;
+export function updateWorkspace(workspace: workspaces.WorkspaceDefinition): Rule;
 export function updateWorkspace(
-  workspace: workspaces.WorkspaceDefinition,
-): Rule;
-export function updateWorkspace(
-  updaterOrWorkspace: workspaces.WorkspaceDefinition
+  updaterOrWorkspace:
+    | workspaces.WorkspaceDefinition
     | ((workspace: workspaces.WorkspaceDefinition) => void | Rule | PromiseLike<void | Rule>),
 ): Rule {
   return async (tree: Tree) => {
     const host = createHost(tree);
 
     if (typeof updaterOrWorkspace === 'function') {
-
       const { workspace } = await workspaces.readWorkspace('/', host);
 
       const result = await updaterOrWorkspace(workspace);
@@ -77,7 +75,8 @@ export async function getWorkspace(tree: Tree, path = '/') {
  */
 export function buildDefaultPath(project: workspaces.ProjectDefinition): string {
   const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
-  const projectDirName = project.extensions['projectType'] === ProjectType.Application ? 'app' : 'lib';
+  const projectDirName =
+    project.extensions['projectType'] === ProjectType.Application ? 'app' : 'lib';
 
   return `${root}${projectDirName}`;
 }
@@ -97,7 +96,7 @@ export function* allWorkspaceTargets(
 ): Iterable<[string, workspaces.TargetDefinition, string, workspaces.ProjectDefinition]> {
   for (const [projectName, project] of workspace.projects) {
     for (const [targetName, target] of project.targets) {
-      yield [targetName, target, projectName, project] ;
+      yield [targetName, target, projectName, project];
     }
   }
 }

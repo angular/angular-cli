@@ -26,7 +26,7 @@ const webpackOutputOptions = {
   moduleTrace: false,
 };
 
-const verboseWebpackOutputOptions:  Record<string, boolean | string | number> = {
+const verboseWebpackOutputOptions: Record<string, boolean | string | number> = {
   // The verbose output will most likely be piped to a file, so colors just mess it up.
   colors: false,
   usedExports: true,

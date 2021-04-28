@@ -31,7 +31,6 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema } from './schema';
 
-
 function appendPropertyInAstObject(
   recorder: UpdateRecorder,
   node: JsonAstObject,
@@ -49,9 +48,9 @@ function appendPropertyInAstObject(
 
   recorder.insertLeft(
     node.end.offset - 1,
-    '  '
-    + `"${propertyName}": ${JSON.stringify(value, null, 2).replace(/\n/g, indentStr)}`
-    + indentStr.slice(0, -2),
+    '  ' +
+      `"${propertyName}": ${JSON.stringify(value, null, 2).replace(/\n/g, indentStr)}` +
+      indentStr.slice(0, -2),
   );
 }
 
@@ -88,7 +87,6 @@ function addSchematicToCollectionJson(
   };
 }
 
-
 export default function (options: Schema): Rule {
   const schematicsVersion = require('@angular-devkit/schematics/package.json').version;
   const coreVersion = require('@angular-devkit/core/package.json').version;
@@ -105,7 +103,9 @@ export default function (options: Schema): Rule {
       if (packageJsonContent) {
         // In google3 the return value of JSON.parse() must be immediately typed,
         // otherwise it defaults to `any`, which is prohibited.
-        const packageJson = JSON.parse(packageJsonContent.toString('utf-8')) as { schematics: unknown };
+        const packageJson = JSON.parse(packageJsonContent.toString('utf-8')) as {
+          schematics: unknown;
+        };
         if (typeof packageJson.schematics === 'string') {
           const p = normalize(packageJson.schematics);
           if (tree.exists(p)) {
@@ -116,22 +116,22 @@ export default function (options: Schema): Rule {
     } catch {}
 
     let source = apply(url('./schematic-files'), [
-        applyTemplates({
-          ...options,
-          coreVersion,
-          schematicsVersion,
-          dot: '.',
-          camelize: strings.camelize,
-          dasherize: strings.dasherize,
-        }),
-      ]);
+      applyTemplates({
+        ...options,
+        coreVersion,
+        schematicsVersion,
+        dot: '.',
+        camelize: strings.camelize,
+        dasherize: strings.dasherize,
+      }),
+    ]);
 
     // Simply create a new schematic project.
     if (!collectionPath) {
       collectionPath = normalize('/' + options.name + '/src/collection.json');
       source = apply(url('./project-files'), [
         applyTemplates({
-          ...options as object,
+          ...(options as object),
           coreVersion,
           schematicsVersion,
           dot: '.',
@@ -149,8 +149,8 @@ export default function (options: Schema): Rule {
       mergeWith(source),
       addSchematicToCollectionJson(collectionPath, strings.dasherize(options.name), {
         description: 'A blank schematic.',
-        factory: './' + strings.dasherize(options.name) + '/index#' +
-          strings.camelize(options.name),
+        factory:
+          './' + strings.dasherize(options.name) + '/index#' + strings.camelize(options.name),
       }),
     ]);
   };

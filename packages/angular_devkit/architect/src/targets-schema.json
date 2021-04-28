@@ -29,10 +29,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "builder",
-        "options"
-      ]
+      "required": ["builder", "options"]
     },
     "options": {
       "type": "object",
