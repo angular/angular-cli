@@ -14,7 +14,7 @@ import {
   resolve,
 } from '@angular-devkit/core';
 import * as path from 'path';
-import { Configuration, JavascriptModulesPlugin } from 'webpack';
+import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import {
@@ -112,7 +112,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
     config.plugins.push({
       apply(compiler) {
         compiler.hooks.compilation.tap('build-angular', compilation => {
-          JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap(
+          javascript.JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap(
             'build-angular',
             (_, hash) => {
               hash.update('$localize' + i18nHash);
