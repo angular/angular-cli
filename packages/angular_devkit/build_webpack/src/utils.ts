@@ -41,6 +41,8 @@ export function getEmittedFiles(compilation: webpack.Compilation): EmittedFiles[
   }
 
   // dedupe
-  return files.filter(({ file, name }, index) =>
-    files.findIndex(f => f.file === file && (!name || name === f.name)) === index);
+  return files.filter(
+    ({ file, name }, index) =>
+      files.findIndex((f) => f.file === file && (!name || name === f.name)) === index,
+  );
 }

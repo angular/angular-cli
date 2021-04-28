@@ -10,7 +10,6 @@ import { JsonObject, JsonValue, schema } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-
 export function formatValidator(
   data: JsonValue,
   dataSchema: JsonObject,
@@ -22,7 +21,5 @@ export function formatValidator(
     registry.addFormat(format);
   }
 
-  return registry
-    .compile(dataSchema)
-    .pipe(mergeMap(validator => validator(data)));
+  return registry.compile(dataSchema).pipe(mergeMap((validator) => validator(data)));
 }

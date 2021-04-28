@@ -23,7 +23,6 @@ import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema } from './schema';
 
-
 export default function (options: Schema): Rule {
   return async (host: Tree) => {
     if (options.path === undefined) {
@@ -35,7 +34,7 @@ export default function (options: Schema): Rule {
     options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
-      options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
+      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
       applyTemplates({
         ...strings,
         ...options,
@@ -43,8 +42,6 @@ export default function (options: Schema): Rule {
       move(parsedPath.path + (options.flat ? '' : '/' + strings.dasherize(options.name))),
     ]);
 
-    return chain([
-      mergeWith(templateSource),
-    ]);
+    return chain([mergeWith(templateSource)]);
   };
 }

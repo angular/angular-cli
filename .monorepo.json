@@ -41,12 +41,9 @@
     "Angular CLI": "http://github.com/angular/angular-cli"
   },
   "packages": {
-    "@_/benchmark": {
-    },
-    "@_/builders": {
-    },
-    "devkit": {
-    },
+    "@_/benchmark": {},
+    "@_/builders": {},
+    "devkit": {},
     "@angular/cli": {
       "name": "Angular CLI",
       "section": "Tooling",

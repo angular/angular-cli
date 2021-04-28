@@ -13,7 +13,7 @@ const pureFunctionComment = '@__PURE__';
 
 // We include only exports that start with '__' because tslib helpers
 // all start with a suffix of two underscores.
-const tslibHelpers = new Set<string>(Object.keys(tslib).filter(h => h.startsWith('__')));
+const tslibHelpers = new Set<string>(Object.keys(tslib).filter((h) => h.startsWith('__')));
 
 // Find all nodes from the AST in the subtree of node of SyntaxKind kind.
 export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T[] {
@@ -45,7 +45,7 @@ export function hasPureComment(node: ts.Node): boolean {
 
   const leadingComment = ts.getSyntheticLeadingComments(node);
 
-  return !!leadingComment && leadingComment.some(comment => comment.text === pureFunctionComment);
+  return !!leadingComment && leadingComment.some((comment) => comment.text === pureFunctionComment);
 }
 
 export function isHelperName(name: string): boolean {

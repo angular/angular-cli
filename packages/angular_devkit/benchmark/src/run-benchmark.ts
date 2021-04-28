@@ -31,9 +31,13 @@ export class MaximumRetriesExceeded extends BaseException {
 }
 
 export function runBenchmark({
-  command, captures, reporters = [], iterations = 5, retries = 5, logger = new logging.NullLogger(),
+  command,
+  captures,
+  reporters = [],
+  iterations = 5,
+  retries = 5,
+  logger = new logging.NullLogger(),
 }: RunBenchmarkOptions): Observable<MetricGroup[]> {
-
   let successfulRuns = 0;
   let failedRuns = 0;
   const notDoneYet = new BaseException('Not done yet.');
@@ -42,20 +46,22 @@ export function runBenchmark({
   let aggregatedMetricGroups: MetricGroup[] = [];
 
   // Run the process and captures, wait for both to finish, and average out the metrics.
-  return new Observable<[LocalMonitoredProcess, ...Observable<MetricGroup>[]]>(obs => {
+  return new Observable<[LocalMonitoredProcess, ...Observable<MetricGroup>[]]>((obs) => {
     const monitoredProcess = new LocalMonitoredProcess(command);
-    const metric$ = captures.map(capture => capture(monitoredProcess.stats$));
+    const metric$ = captures.map((capture) => capture(monitoredProcess.stats$));
     obs.next([monitoredProcess, ...metric$]);
   }).pipe(
     tap(() => logger.debug(`${debugPrefix()} starting`)),
     concatMap(([monitoredProcess, ...metric$]) => forkJoin(monitoredProcess.run(), ...metric$)),
     throwIfEmpty(() => new Error('Nothing was captured')),
-    concatMap(results => {
+    concatMap((results) => {
       const [processExitCode, ...metrics] = results;
 
       if ((processExitCode as number) != command.expectedExitCode) {
-        logger.debug(`${debugPrefix()} exited with ${processExitCode} but `
-          + `${command.expectedExitCode} was expected`);
+        logger.debug(
+          `${debugPrefix()} exited with ${processExitCode} but ` +
+            `${command.expectedExitCode} was expected`,
+        );
 
         return throwError(processFailed);
       }
@@ -64,7 +70,7 @@ export function runBenchmark({
 
       return of(metrics as MetricGroup[]);
     }),
-    map(newMetricGroups => {
+    map((newMetricGroups) => {
       // Aggregate metric groups into a single one.
       if (aggregatedMetricGroups.length === 0) {
         aggregatedMetricGroups = newMetricGroups;
@@ -78,22 +84,32 @@ export function runBenchmark({
 
       return aggregatedMetricGroups;
     }),
-    concatMap(val => successfulRuns < iterations ? throwError(notDoneYet) : of(val)),
+    concatMap((val) => (successfulRuns < iterations ? throwError(notDoneYet) : of(val))),
     // This is where we control when the process should be run again.
-    retryWhen(errors => errors.pipe(concatMap(val => {
-      // Always run again while we are not done yet.
-      if (val === notDoneYet) { return of(val); }
+    retryWhen((errors) =>
+      errors.pipe(
+        concatMap((val) => {
+          // Always run again while we are not done yet.
+          if (val === notDoneYet) {
+            return of(val);
+          }
 
-      // Otherwise check if we're still within the retry threshold.
-      failedRuns += 1;
-      if (failedRuns < retries) { return of(val); }
+          // Otherwise check if we're still within the retry threshold.
+          failedRuns += 1;
+          if (failedRuns < retries) {
+            return of(val);
+          }
 
-      if (val === processFailed) { return throwError(new MaximumRetriesExceeded(retries)); }
+          if (val === processFailed) {
+            return throwError(new MaximumRetriesExceeded(retries));
+          }
 
-      // Not really sure what happened here, just re-throw it.
-      return throwError(val);
-    }))),
-    tap(groups => reporters.forEach(reporter => reporter(command, groups))),
+          // Not really sure what happened here, just re-throw it.
+          return throwError(val);
+        }),
+      ),
+    ),
+    tap((groups) => reporters.forEach((reporter) => reporter(command, groups))),
     take(1),
   );
 }

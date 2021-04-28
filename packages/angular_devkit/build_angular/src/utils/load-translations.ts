@@ -62,32 +62,41 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
 
 async function importParsers() {
   try {
-
     const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
     const diagnostics = new localizeDiag.Diagnostics();
 
     const parsers = {
-      arb: new (await import(
-        // tslint:disable-next-line:trailing-comma
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/arb_translation_parser'
-        )).ArbTranslationParser(),
-      json: new (await import(
-        // tslint:disable-next-line:trailing-comma
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'
-      )).SimpleJsonTranslationParser(),
-      xlf: new (await import(
-        // tslint:disable-next-line:trailing-comma
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'
-      )).Xliff1TranslationParser(),
-      xlf2: new (await import(
-        // tslint:disable-next-line:trailing-comma
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'
-      )).Xliff2TranslationParser(),
+      arb: new (
+        await import(
+          // tslint:disable-next-line:trailing-comma
+          '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/arb_translation_parser'
+        )
+      ).ArbTranslationParser(),
+      json: new (
+        await import(
+          // tslint:disable-next-line:trailing-comma
+          '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'
+        )
+      ).SimpleJsonTranslationParser(),
+      xlf: new (
+        await import(
+          // tslint:disable-next-line:trailing-comma
+          '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'
+        )
+      ).Xliff1TranslationParser(),
+      xlf2: new (
+        await import(
+          // tslint:disable-next-line:trailing-comma
+          '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'
+        )
+      ).Xliff2TranslationParser(),
       // The name ('xmb') needs to match the AOT compiler option
-      xmb: new (await import(
-        // tslint:disable-next-line:trailing-comma
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'
-      )).XtbTranslationParser(),
+      xmb: new (
+        await import(
+          // tslint:disable-next-line:trailing-comma
+          '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'
+        )
+      ).XtbTranslationParser(),
     };
 
     return { parsers, diagnostics };

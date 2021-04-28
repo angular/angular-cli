@@ -92,10 +92,11 @@ function updateTsConfig(
 
     // Add stricter file inclusions to avoid unused file warning during compilation
     if (builderConfig.builder !== Builders.Karma) {
-
       const include = tsConfigJson.get(['include']);
       if (include && Array.isArray(include)) {
-        const tsInclude = include.findIndex((value) => typeof value === 'string' && value.endsWith('**/*.ts'));
+        const tsInclude = include.findIndex(
+          (value) => typeof value === 'string' && value.endsWith('**/*.ts'),
+        );
         if (tsInclude !== -1) {
           // Replace ts includes with d.ts
           tsConfigJson.modify(['include', tsInclude], include[tsInclude].replace('.ts', '.d.ts'));
@@ -104,9 +105,10 @@ function updateTsConfig(
         // Includes are not present, add includes to dts files
         // By default when 'include' nor 'files' fields are used TypeScript
         // will include all ts files.
-        const include = projectSourceRoot !== undefined
-          ? join(normalize(projectSourceRoot), '**/*.d.ts')
-          : '**/*.d.ts';
+        const include =
+          projectSourceRoot !== undefined
+            ? join(normalize(projectSourceRoot), '**/*.d.ts')
+            : '**/*.d.ts';
 
         tsConfigJson.modify(['include'], [include]);
       }
@@ -118,14 +120,12 @@ function updateTsConfig(
 
         const mainOption = options.main;
         if (mainOption && typeof mainOption === 'string') {
-          newFiles.push(
-            forwardSlashPath(relative(tsConfigDir, forwardSlashPath(mainOption))));
+          newFiles.push(forwardSlashPath(relative(tsConfigDir, forwardSlashPath(mainOption))));
         }
 
         const polyfillsOption = options.polyfills;
         if (polyfillsOption && typeof polyfillsOption === 'string') {
-          newFiles.push(
-            forwardSlashPath(relative(tsConfigDir, forwardSlashPath(polyfillsOption))));
+          newFiles.push(forwardSlashPath(relative(tsConfigDir, forwardSlashPath(polyfillsOption))));
         }
 
         if (newFiles.length) {

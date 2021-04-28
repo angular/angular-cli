@@ -9,7 +9,9 @@ import { JsonValue, workspaces } from '@angular-devkit/core';
 import { Rule } from '@angular-devkit/schematics';
 import { allTargetOptions, allWorkspaceTargets, updateWorkspace } from '../../utility/workspace';
 
-type BuilderOptionsType = Readonly<[optionName: string, oldDefault: JsonValue | undefined, newDefault: JsonValue | undefined][]>;
+type BuilderOptionsType = Readonly<
+  [optionName: string, oldDefault: JsonValue | undefined, newDefault: JsonValue | undefined][]
+>;
 
 const BrowserBuilderOptions: BuilderOptionsType = [
   ['aot', false, true],
@@ -27,7 +29,7 @@ const ServerBuilderOptions: BuilderOptionsType = [
 ];
 
 export default function (): Rule {
-  return updateWorkspace(workspace => {
+  return updateWorkspace((workspace) => {
     for (const [, target] of allWorkspaceTargets(workspace)) {
       if (!target?.builder.startsWith('@angular-devkit/build-angular')) {
         continue;
@@ -53,7 +55,8 @@ export default function (): Rule {
 }
 
 function updateOptions(
-  target: workspaces.TargetDefinition, optionsToUpdate: typeof ServerBuilderOptions | typeof BrowserBuilderOptions,
+  target: workspaces.TargetDefinition,
+  optionsToUpdate: typeof ServerBuilderOptions | typeof BrowserBuilderOptions,
 ): void {
   if (!target.options) {
     target.options = {};
@@ -73,7 +76,8 @@ function updateOptions(
     }
 
     // Remove overrides in configurations which are no longer needed.
-    configurationOptions?.filter(o => o && o[optionName] === value)
-      .forEach(o => o && delete o[optionName]);
+    configurationOptions
+      ?.filter((o) => o && o[optionName] === value)
+      .forEach((o) => o && delete o[optionName]);
   }
 }

@@ -14,7 +14,7 @@ import * as webpack from 'webpack';
 
 function wrapUrl(url: string): string {
   let wrappedUrl;
-  const hasSingleQuotes = url.indexOf('\'') >= 0;
+  const hasSingleQuotes = url.indexOf("'") >= 0;
 
   if (hasSingleQuotes) {
     wrappedUrl = `"${url}"`;
@@ -52,7 +52,7 @@ async function resolve(
 
 export const postcss = true;
 
-export default function(options?: PostcssCliResourcesOptions): Plugin {
+export default function (options?: PostcssCliResourcesOptions): Plugin {
   if (!options) {
     throw new Error('No options were specified to "postcss-cli-resources".');
   }
@@ -93,16 +93,17 @@ export default function(options?: PostcssCliResourcesOptions): Plugin {
     }
 
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));
-    const resolver = (file: string, base: string) => new Promise<string>((resolve, reject) => {
-      loader.resolve(base, decodeURI(file), (err: Error, result: string) => {
-        if (err) {
-          reject(err);
+    const resolver = (file: string, base: string) =>
+      new Promise<string>((resolve, reject) => {
+        loader.resolve(base, decodeURI(file), (err: Error, result: string) => {
+          if (err) {
+            reject(err);
 
-          return;
-        }
-        resolve(result);
+            return;
+          }
+          resolve(result);
+        });
       });
-    });
 
     const result = await resolve(pathname as string, context, resolver);
 
@@ -114,12 +115,10 @@ export default function(options?: PostcssCliResourcesOptions): Plugin {
           return;
         }
 
-        let outputPath = interpolateName(
-          {  resourcePath: result },
-          filename(result),
-          { content, context: loader.context || loader.rootContext },
-        )
-        .replace(/\\|\//g, '-');
+        let outputPath = interpolateName({ resourcePath: result }, filename(result), {
+          content,
+          context: loader.context || loader.rootContext,
+        }).replace(/\\|\//g, '-');
 
         if (resourcesOutputPath) {
           outputPath = path.posix.join(resourcesOutputPath, outputPath);
@@ -165,10 +164,10 @@ export default function(options?: PostcssCliResourcesOptions): Plugin {
 
       // We want to load it relative to the file that imports
       const inputFile = decl.source && decl.source.input.file;
-      const context = inputFile && path.dirname(inputFile) || loader.context;
+      const context = (inputFile && path.dirname(inputFile)) || loader.context;
 
       // tslint:disable-next-line:no-conditional-assignment
-      while (match = urlRegex.exec(value)) {
+      while ((match = urlRegex.exec(value))) {
         const originalUrl = match[1] || match[2] || match[3];
         let processedUrl;
         try {

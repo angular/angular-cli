@@ -10,7 +10,6 @@ import { JsonObject } from '@angular-devkit/core';
 import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { TslintFixName, TslintFixTaskOptions, TslintFixTaskOptionsBase } from './options';
 
-
 /** @deprecated since version 11. Use `ng lint --fix` directly instead. */
 export class TslintFixTask implements TaskConfigurationGenerator<TslintFixTaskOptions> {
   protected _configOrPath: null | string | JsonObject;
@@ -34,9 +33,10 @@ export class TslintFixTask implements TaskConfigurationGenerator<TslintFixTaskOp
 
   toConfiguration(): TaskConfiguration<TslintFixTaskOptions> {
     const path = typeof this._configOrPath == 'string' ? { tslintPath: this._configOrPath } : {};
-    const config = typeof this._configOrPath == 'object' && this._configOrPath !== null
-                 ? { tslintConfig: this._configOrPath }
-                 : {};
+    const config =
+      typeof this._configOrPath == 'object' && this._configOrPath !== null
+        ? { tslintConfig: this._configOrPath }
+        : {};
     const options = {
       ...this._options,
       ...path,

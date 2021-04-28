@@ -38,16 +38,18 @@ function* visit(directory: DirEntry): IterableIterator<ts.SourceFile> {
   }
 }
 
-export default function(): Rule {
-  return tree => {
+export default function (): Rule {
+  return (tree) => {
     for (const sourceFile of visit(tree.root)) {
       let recorder: UpdateRecorder | undefined;
 
       ts.forEachChild(sourceFile, function analyze(node) {
-        if (ts.isPropertyAssignment(node) &&
-            (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) &&
-            node.name.text === 'loadChildren' &&
-            ts.isStringLiteral(node.initializer)) {
+        if (
+          ts.isPropertyAssignment(node) &&
+          (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) &&
+          node.name.text === 'loadChildren' &&
+          ts.isStringLiteral(node.initializer)
+        ) {
           const valueNode = node.initializer;
           const parts = valueNode.text.split('#');
           const path = parts[0];
@@ -61,9 +63,7 @@ export default function(): Rule {
 
           const index = valueNode.getStart();
           const length = valueNode.getWidth();
-          recorder
-            .remove(index, length)
-            .insertLeft(index, fix);
+          recorder.remove(index, length).insertLeft(index, fix);
         }
 
         ts.forEachChild(node, analyze);

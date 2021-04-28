@@ -55,8 +55,16 @@ export interface FileInfo {
  */
 export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
   const {
-    loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints,
-    sri, deployUrl = '', lang, baseHref, html,
+    loadOutputFile,
+    files,
+    noModuleFiles = [],
+    moduleFiles = [],
+    entrypoints,
+    sri,
+    deployUrl = '',
+    lang,
+    baseHref,
+    html,
   } = params;
 
   let { crossOrigin = 'none' } = params;
@@ -125,10 +133,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
 
   let linkTags: string[] = [];
   for (const stylesheet of stylesheets) {
-    const attrs = [
-      `rel="stylesheet"`,
-      `href="${deployUrl}${stylesheet}"`,
-    ];
+    const attrs = [`rel="stylesheet"`, `href="${deployUrl}${stylesheet}"`];
 
     if (crossOrigin !== 'none') {
       attrs.push(`crossorigin="${crossOrigin}"`);
@@ -146,7 +151,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
   const baseTagExists = html.includes('<base');
 
   rewriter
-    .on('startTag', tag => {
+    .on('startTag', (tag) => {
       switch (tag.tagName) {
         case 'html':
           // Adjust document locale if specified
@@ -173,7 +178,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
 
       rewriter.emitStartTag(tag);
     })
-    .on('endTag', tag => {
+    .on('endTag', (tag) => {
       switch (tag.tagName) {
         case 'head':
           for (const linkTag of linkTags) {
@@ -207,15 +212,17 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
 
 function generateSriAttributes(content: string): string {
   const algo = 'sha384';
-  const hash = createHash(algo)
-    .update(content, 'utf8')
-    .digest('base64');
+  const hash = createHash(algo).update(content, 'utf8').digest('base64');
 
   return `integrity="${algo}-${hash}"`;
 }
 
-function updateAttribute(tag: { attrs: { name: string, value: string }[] }, name: string, value: string): void {
-  const index = tag.attrs.findIndex(a => a.name === name);
+function updateAttribute(
+  tag: { attrs: { name: string; value: string }[] },
+  name: string,
+  value: string,
+): void {
+  const index = tag.attrs.findIndex((a) => a.name === name);
   const newValue = { name, value };
 
   if (index === -1) {

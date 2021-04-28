@@ -17,10 +17,4 @@ export * from './json/index';
 export * from './utils/index';
 export * from './virtual-fs/index';
 
-export {
-  analytics,
-  experimental,
-  json,
-  logging,
-  workspaces,
-};
+export { analytics, experimental, json, logging, workspaces };

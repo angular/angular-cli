@@ -7,21 +7,12 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import {
-  getSystemPath,
-  logging,
-  normalize,
-  resolve,
-} from '@angular-devkit/core';
+import { getSystemPath, logging, normalize, resolve } from '@angular-devkit/core';
 import * as path from 'path';
 import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import {
-  NormalizedBrowserBuilderSchema,
-  defaultProgress,
-  normalizeBrowserSchema,
-} from '../utils';
+import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { BuilderWatchPlugin, BuilderWatcherFactory } from '../webpack/plugins/builder-watch-plugin';
@@ -73,7 +64,12 @@ export async function generateI18nBrowserWebpackConfigFromContext(
   context: BuilderContext,
   webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
-): Promise<{ config: Configuration; projectRoot: string; projectSourceRoot?: string, i18n: I18nOptions }> {
+): Promise<{
+  config: Configuration;
+  projectRoot: string;
+  projectSourceRoot?: string;
+  i18n: I18nOptions;
+}> {
   const { buildOptions, i18n } = await configureI18nBuild(context, options);
   const result = await generateBrowserWebpackConfigFromContext(
     buildOptions,
@@ -111,7 +107,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
     config.plugins ??= [];
     config.plugins.push({
       apply(compiler) {
-        compiler.hooks.compilation.tap('build-angular', compilation => {
+        compiler.hooks.compilation.tap('build-angular', (compilation) => {
           javascript.JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap(
             'build-angular',
             (_, hash) => {
@@ -144,12 +140,7 @@ export async function generateBrowserWebpackConfigFromContext(
     ? resolve(workspaceRoot, normalize(projectSourceRoot))
     : undefined;
 
-  const normalizedOptions = normalizeBrowserSchema(
-    workspaceRoot,
-    projectRoot,
-    sourceRoot,
-    options,
-  );
+  const normalizedOptions = normalizeBrowserSchema(workspaceRoot, projectRoot, sourceRoot, options);
 
   const config = await generateWebpackConfig(
     getSystemPath(workspaceRoot),

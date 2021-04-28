@@ -9,7 +9,6 @@
 import * as ts from 'typescript';
 import { RemoveNodeOperation, TransformOperation } from './interfaces';
 
-
 // Remove imports for which all identifiers have been removed.
 // Needs type checker, and works even if it's not the first transformer.
 // Works by removing imports for symbols whose identifiers have all been removed.
@@ -76,9 +75,12 @@ export function elideImports(
           // - A constructor parameter can be decorated or the class itself is decorated.
           // - The parent of the parameter is decorated example a method declaration or a set accessor.
           // In all cases we need the type reference not to be elided.
-          isTypeReferenceForDecoratoredNode = !!(parent.decorators?.length ||
+          isTypeReferenceForDecoratoredNode = !!(
+            parent.decorators?.length ||
             (ts.isSetAccessor(parent.parent) && !!parent.parent.decorators?.length) ||
-            (ts.isConstructorDeclaration(parent.parent) && !!parent.parent.parent.decorators?.length));
+            (ts.isConstructorDeclaration(parent.parent) &&
+              !!parent.parent.parent.decorators?.length)
+          );
           break;
       }
 
@@ -155,9 +157,8 @@ export function elideImports(
           if (isUnused(specifier.name)) {
             removedClausesCount++;
             // in case we don't have any more namedImports we should remove the parent ie the {}
-            const nodeToRemove = clausesCount === removedClausesCount
-              ? specifier.parent
-              : specifier;
+            const nodeToRemove =
+              clausesCount === removedClausesCount ? specifier.parent : specifier;
 
             specifierOps.push(new RemoveNodeOperation(sourceFile, nodeToRemove));
           }

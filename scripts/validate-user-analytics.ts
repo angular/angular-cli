@@ -31,7 +31,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   });
 
   if (status != 0) {
-    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    logger.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
     throw error;
   }
 
@@ -39,7 +39,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
 }
 
 async function _checkDimensions(dimensionsTable: string, logger: logging.Logger) {
-  const data: { userAnalytics: number, type: string, name: string }[] = new Array(200);
+  const data: { userAnalytics: number; type: string; name: string }[] = new Array(200);
 
   function _updateData(userAnalytics: number, name: string, type: string) {
     if (data[userAnalytics]) {
@@ -60,8 +60,8 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 
   // Create the data with dimensions missing from schema.json:
   const allFixedDimensions = Object.keys(analytics.NgCliAnalyticsDimensions)
-  // tslint:disable-next-line:no-any
-    .filter(x => typeof analytics.NgCliAnalyticsDimensions[x as any] === 'number');
+    // tslint:disable-next-line:no-any
+    .filter((x) => typeof analytics.NgCliAnalyticsDimensions[x as any] === 'number');
 
   for (const name of allFixedDimensions) {
     // tslint:disable-next-line:no-any
@@ -80,7 +80,6 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
     }
     _updateData(userAnalytics, flagName, type);
   }
-
 
   // Creating a new project and reading the help.
   logger.info('Creating temporary project for gathering help...');
@@ -134,7 +133,7 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 }
 
 async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
-  const data: { userAnalytics: number, type: string, name: string }[] = new Array(200);
+  const data: { userAnalytics: number; type: string; name: string }[] = new Array(200);
 
   function _updateData(userAnalytics: number, name: string, type: string) {
     if (data[userAnalytics]) {
@@ -155,8 +154,8 @@ async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
 
   // Create the data with dimensions missing from schema.json:
   const allFixedMetrics = Object.keys(analytics.NgCliAnalyticsMetrics)
-  // tslint:disable-next-line:no-any
-    .filter(x => typeof analytics.NgCliAnalyticsMetrics[x as any] === 'number');
+    // tslint:disable-next-line:no-any
+    .filter((x) => typeof analytics.NgCliAnalyticsMetrics[x as any] === 'number');
 
   for (const name of allFixedMetrics) {
     // tslint:disable-next-line:no-any

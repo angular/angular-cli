@@ -36,9 +36,7 @@ export class BundleActionCache {
 
   generateIntegrityValue(content: string): string {
     const algorithm = this.integrityAlgorithm || 'sha1';
-    const codeHash = createHash(algorithm)
-      .update(content)
-      .digest('base64');
+    const codeHash = createHash(algorithm).update(content).digest('base64');
 
     return `${algorithm}-${codeHash}`;
   }
@@ -64,7 +62,8 @@ export class BundleActionCache {
     // sourceMappingURL is added at the very end which causes the code to be the same when sourcemaps are enabled/disabled
     // When using hiddenSourceMaps we can omit the postfix since sourceMappingURL will not be added.
     // When having sourcemaps a hashed file and non hashed file can have the same content. But the sourceMappingURL will differ.
-    const sourceMapPostFix = action.sourceMaps && !action.hiddenSourceMaps ? `|sourcemap|${action.filename}` : '';
+    const sourceMapPostFix =
+      action.sourceMaps && !action.hiddenSourceMaps ? `|sourcemap|${action.filename}` : '';
 
     const baseCacheKey = this.generateBaseCacheKey(action.code);
 
@@ -118,7 +117,7 @@ export class BundleActionCache {
   }
 
   async getCachedBundleResult(action: ProcessBundleOptions): Promise<ProcessBundleResult | null> {
-    const entries = action.cacheKeys && await this.getCacheEntries(action.cacheKeys);
+    const entries = action.cacheKeys && (await this.getCacheEntries(action.cacheKeys));
     if (!entries) {
       return null;
     }

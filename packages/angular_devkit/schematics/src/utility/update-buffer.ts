@@ -9,7 +9,6 @@
 import { BaseException } from '@angular-devkit/core';
 import { LinkedList } from './linked-list';
 
-
 export class IndexOutOfBoundException extends BaseException {
   constructor(index: number, min: number, max = Infinity) {
     super(`Index ${index} outside of range [${min}, ${max}].`);
@@ -20,7 +19,6 @@ export class ContentCannotBeRemovedException extends BaseException {
     super(`User tried to remove content that was marked essential.`);
   }
 }
-
 
 /**
  * A Chunk description, including left/right content that has been inserted.
@@ -44,14 +42,18 @@ export class Chunk {
   }
 
   get length() {
-    return (this._left ? this._left.length : 0)
-         + (this._content ? this._content.length : 0)
-         + (this._right ? this._right.length : 0);
+    return (
+      (this._left ? this._left.length : 0) +
+      (this._content ? this._content.length : 0) +
+      (this._right ? this._right.length : 0)
+    );
   }
   toString(encoding = 'utf-8') {
-    return (this._left ? this._left.toString(encoding) : '')
-         + (this._content ? this._content.toString(encoding) : '')
-         + (this._right ? this._right.toString(encoding) : '');
+    return (
+      (this._left ? this._left.toString(encoding) : '') +
+      (this._content ? this._content.toString(encoding) : '') +
+      (this._right ? this._right.toString(encoding) : '')
+    );
   }
 
   slice(start: number) {
@@ -174,7 +176,6 @@ export class Chunk {
   }
 }
 
-
 /**
  * An utility class that allows buffers to be inserted to the _right or _left, or deleted, while
  * keeping indices to the original buffer.
@@ -205,7 +206,7 @@ export class UpdateBuffer {
     this._assertIndex(index);
 
     // Find the chunk by going through the list.
-    const h = this._linkedList.find(chunk => index <= chunk.end);
+    const h = this._linkedList.find((chunk) => index <= chunk.end);
     if (!h) {
       throw Error('Chunk cannot be found.');
     }
@@ -239,7 +240,7 @@ export class UpdateBuffer {
   generate(): Buffer {
     const result = Buffer.allocUnsafe(this.length);
     let i = 0;
-    this._linkedList.forEach(chunk => {
+    this._linkedList.forEach((chunk) => {
       chunk.copy(result, i);
       i += chunk.length;
     });

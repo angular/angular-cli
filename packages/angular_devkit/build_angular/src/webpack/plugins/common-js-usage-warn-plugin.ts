@@ -27,8 +27,8 @@ export class CommonJsUsageWarnPlugin {
   }
 
   apply(compiler: Compiler) {
-    compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
-      compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
+    compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', (compilation) => {
+      compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', (modules) => {
         const mainEntry = compilation.entries.get('main');
         if (!mainEntry) {
           return;
@@ -38,7 +38,7 @@ export class CommonJsUsageWarnPlugin {
         );
 
         for (const module of modules) {
-          const {dependencies, rawRequest} = module as NormalModule;
+          const { dependencies, rawRequest } = module as NormalModule;
           if (
             !rawRequest ||
             rawRequest.startsWith('.') ||
@@ -62,7 +62,10 @@ export class CommonJsUsageWarnPlugin {
             // Check if it's parent issuer is also a CommonJS dependency.
             // In case it is skip as an warning will be show for the parent CommonJS dependency.
             const parentDependencies = getIssuer(compilation, issuer)?.dependencies;
-            if (parentDependencies && this.hasCommonJsDependencies(compilation, parentDependencies, true)) {
+            if (
+              parentDependencies &&
+              this.hasCommonJsDependencies(compilation, parentDependencies, true)
+            ) {
               continue;
             }
 
@@ -79,7 +82,8 @@ export class CommonJsUsageWarnPlugin {
             // will require CommonJS libraries for live reloading such as 'sockjs-node'.
             // tslint:disable-next-line: no-any
             if (mainIssuer && mainModules.has(mainIssuer)) {
-              const warning = `${(issuer as NormalModule | null)?.userRequest} depends on '${rawRequest}'. ` +
+              const warning =
+                `${(issuer as NormalModule | null)?.userRequest} depends on '${rawRequest}'. ` +
                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
 
@@ -98,7 +102,8 @@ export class CommonJsUsageWarnPlugin {
   private hasCommonJsDependencies(
     compilation: Compilation,
     dependencies: Dependency[],
-    checkParentModules = false): boolean {
+    checkParentModules = false,
+  ): boolean {
     for (const dep of dependencies) {
       if (dep instanceof CommonJsRequireDependency || dep instanceof AMDDefineDependency) {
         return true;
@@ -117,10 +122,10 @@ export class CommonJsUsageWarnPlugin {
 
   private rawRequestToPackageName(rawRequest: string): string {
     return rawRequest.startsWith('@')
-      // Scoped request ex: @angular/common/locale/en -> @angular/common
-      ? rawRequest.split('/', 2).join('/')
-      // Non-scoped request ex: lodash/isEmpty -> lodash
-      : rawRequest.split('/', 1)[0];
+      ? // Scoped request ex: @angular/common/locale/en -> @angular/common
+        rawRequest.split('/', 2).join('/')
+      : // Non-scoped request ex: lodash/isEmpty -> lodash
+        rawRequest.split('/', 1)[0];
   }
 }
 

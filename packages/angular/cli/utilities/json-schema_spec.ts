@@ -24,9 +24,7 @@ describe('parseJsonSchemaToCommandDescription', () => {
     '$impl': './version-impl#VersionCommand',
 
     'type': 'object',
-    'allOf': [
-      { '$ref': './definitions.json#/definitions/base' },
-    ],
+    'allOf': [{ '$ref': './definitions.json#/definitions/base' }],
   };
 
   beforeEach(() => {
@@ -34,7 +32,9 @@ describe('parseJsonSchemaToCommandDescription', () => {
     registry.registerUriHandler((uri: string) => {
       if (uri.startsWith('ng-cli://')) {
         const content = readFileSync(
-          join(__dirname, '..', uri.substr('ng-cli://'.length)), 'utf-8');
+          join(__dirname, '..', uri.substr('ng-cli://'.length)),
+          'utf-8',
+        );
 
         return Promise.resolve(JSON.parse(content));
       } else {

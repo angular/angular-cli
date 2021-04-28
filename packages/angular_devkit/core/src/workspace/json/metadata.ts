@@ -35,7 +35,7 @@ export interface JsonChange<T extends keyof ChangeValues = keyof ChangeValues> {
 export class JsonWorkspaceMetadata {
   readonly changes: JsonChange[] = [];
 
-  constructor(readonly filePath: string, readonly ast: JsonAstObject, readonly raw: string) { }
+  constructor(readonly filePath: string, readonly ast: JsonAstObject, readonly raw: string) {}
 
   get hasChanges(): boolean {
     return this.changes.length > 0;
@@ -46,7 +46,7 @@ export class JsonWorkspaceMetadata {
   }
 
   findChangesForPath(path: string): JsonChange[] {
-    return this.changes.filter(c => c.path === path);
+    return this.changes.filter((c) => c.path === path);
   }
 
   addChange<T extends keyof ChangeValues = keyof ChangeValues>(

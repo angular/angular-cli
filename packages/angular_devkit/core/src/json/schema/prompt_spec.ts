@@ -10,13 +10,12 @@
 import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 
-
 describe('Prompt Provider', () => {
-  it('sets properties with answer', done => {
+  it('sets properties with answer', (done) => {
     const registry = new CoreSchemaRegistry();
     const data: any = {};
 
-    registry.usePromptProvider(async definitions => {
+    registry.usePromptProvider(async (definitions) => {
       return { [definitions[0].id]: true };
     });
 
@@ -30,19 +29,20 @@ describe('Prompt Provider', () => {
         },
       })
       .pipe(
-        mergeMap(validator => validator(data)),
+        mergeMap((validator) => validator(data)),
         map(() => {
           expect(data.test).toBe(true);
         }),
       )
-      .toPromise().then(done, done.fail);
-    });
+      .toPromise()
+      .then(done, done.fail);
+  });
 
-  it('supports mixed schema references', done => {
+  it('supports mixed schema references', (done) => {
     const registry = new CoreSchemaRegistry();
     const data: any = {};
 
-    registry.usePromptProvider(async definitions => {
+    registry.usePromptProvider(async (definitions) => {
       return {
         '/bool': true,
         '/test': 'two',
@@ -58,11 +58,7 @@ describe('Prompt Provider', () => {
           },
           test: {
             type: 'string',
-            enum: [
-              'one',
-              'two',
-              'three',
-            ],
+            enum: ['one', 'two', 'three'],
             'x-prompt': {
               type: 'list',
               'message': 'other-message',
@@ -92,23 +88,24 @@ describe('Prompt Provider', () => {
         },
       })
       .pipe(
-        mergeMap(validator => validator(data)),
-        map(result => {
+        mergeMap((validator) => validator(data)),
+        map((result) => {
           expect(result.success).toBe(true);
           expect(data.bool).toBe(true);
           expect(data.test).toBe('two');
           expect(data.obj.deep.three).toEqual('test3-answer');
         }),
       )
-      .toPromise().then(done, done.fail);
+      .toPromise()
+      .then(done, done.fail);
   });
 
   describe('with shorthand', () => {
-    it('supports message value', done => {
+    it('supports message value', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].message).toBe('test-message');
 
@@ -124,24 +121,19 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes enums', done => {
+    it('analyzes enums', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
-        expect(definitions[0].items).toEqual([
-          'one',
-          'two',
-          'three',
-        ]);
+        expect(definitions[0].items).toEqual(['one', 'two', 'three']);
 
         return {};
       });
@@ -151,26 +143,21 @@ describe('Prompt Provider', () => {
           properties: {
             test: {
               type: 'string',
-              enum: [
-                'one',
-                'two',
-                'three',
-              ],
+              enum: ['one', 'two', 'three'],
               'x-prompt': 'test-message',
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes boolean properties', done => {
+    it('analyzes boolean properties', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('confirmation');
         expect(definitions[0].items).toBeUndefined();
@@ -187,20 +174,18 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
-
   });
 
   describe('with longhand', () => {
-    it('supports message option', done => {
+    it('supports message option', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].message).toBe('test-message');
 
@@ -218,24 +203,19 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes enums WITH explicit list type', done => {
+    it('analyzes enums WITH explicit list type', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
-        expect(definitions[0].items).toEqual([
-          'one',
-          'two',
-          'three',
-        ]);
+        expect(definitions[0].items).toEqual(['one', 'two', 'three']);
 
         return { [definitions[0].id]: 'one' };
       });
@@ -245,11 +225,7 @@ describe('Prompt Provider', () => {
           properties: {
             test: {
               type: 'string',
-              enum: [
-                'one',
-                'two',
-                'three',
-              ],
+              enum: ['one', 'two', 'three'],
               'x-prompt': {
                 'type': 'list',
                 'message': 'test-message',
@@ -257,17 +233,16 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes list with true multiselect option and object items', done => {
+    it('analyzes list with true multiselect option and object items', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
         expect(definitions[0].multiselect).toBe(true);
@@ -296,17 +271,16 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes list with false multiselect option and object items', done => {
+    it('analyzes list with false multiselect option and object items', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
         expect(definitions[0].multiselect).toBe(false);
@@ -335,17 +309,16 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes list without multiselect option and object items', done => {
+    it('analyzes list without multiselect option and object items', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
         expect(definitions[0].multiselect).toBe(true);
@@ -373,25 +346,20 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes enums WITHOUT explicit list type', done => {
+    it('analyzes enums WITHOUT explicit list type', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
         expect(definitions[0].multiselect).toBeFalsy();
-        expect(definitions[0].items).toEqual([
-          'one',
-          'two',
-          'three',
-        ]);
+        expect(definitions[0].items).toEqual(['one', 'two', 'three']);
 
         return {};
       });
@@ -401,36 +369,27 @@ describe('Prompt Provider', () => {
           properties: {
             test: {
               type: 'string',
-              enum: [
-                'one',
-                'two',
-                'three',
-              ],
+              enum: ['one', 'two', 'three'],
               'x-prompt': {
                 'message': 'test-message',
               },
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes enums WITHOUT explicit list type and multiselect', done => {
+    it('analyzes enums WITHOUT explicit list type and multiselect', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
         expect(definitions[0].multiselect).toBe(true);
-        expect(definitions[0].items).toEqual([
-          'one',
-          'two',
-          'three',
-        ]);
+        expect(definitions[0].items).toEqual(['one', 'two', 'three']);
 
         return {};
       });
@@ -441,27 +400,22 @@ describe('Prompt Provider', () => {
             test: {
               type: 'array',
               items: {
-                enum: [
-                  'one',
-                  'two',
-                  'three',
-                ],
+                enum: ['one', 'two', 'three'],
               },
               'x-prompt': 'test-message',
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('analyzes boolean properties', done => {
+    it('analyzes boolean properties', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('confirmation');
         expect(definitions[0].items).toBeUndefined();
@@ -480,17 +434,16 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
 
-    it('allows prompt type override', done => {
+    it('allows prompt type override', (done) => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
-      registry.usePromptProvider(async definitions => {
+      registry.usePromptProvider(async (definitions) => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('input');
         expect(definitions[0].items).toBeUndefined();
@@ -510,12 +463,9 @@ describe('Prompt Provider', () => {
             },
           },
         })
-        .pipe(
-          mergeMap(validator => validator(data)),
-        )
-        .toPromise().then(done, done.fail);
+        .pipe(mergeMap((validator) => validator(data)))
+        .toPromise()
+        .then(done, done.fail);
     });
-
   });
-
 });

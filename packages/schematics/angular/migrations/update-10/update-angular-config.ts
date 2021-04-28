@@ -11,7 +11,7 @@ import { updateWorkspace } from '../../utility/workspace';
 import { Builders, ProjectType } from '../../utility/workspace-models';
 
 export default function (): Rule {
-  return updateWorkspace(workspace => {
+  return updateWorkspace((workspace) => {
     // Remove deprecated CLI root level options
     removeDeprecatedCLIOptions(workspace.extensions);
 

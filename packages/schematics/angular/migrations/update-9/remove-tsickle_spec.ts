@@ -43,7 +43,10 @@ describe('Migration to version 9', () => {
         )
         .toPromise();
 
-      tree.overwrite('/angular.json', tree.readContent('/angular.json').replace(Builders.NgPackagr, Builders.DeprecatedNgPackagr));
+      tree.overwrite(
+        '/angular.json',
+        tree.readContent('/angular.json').replace(Builders.NgPackagr, Builders.DeprecatedNgPackagr),
+      );
     });
 
     it(`should remove 'annotateForClosureCompiler' from library tsconfig`, async () => {
@@ -60,7 +63,9 @@ describe('Migration to version 9', () => {
 
       tree.overwrite(libTsConfig, JSON.stringify(tsconfig, undefined, 2));
 
-      const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+      const tree2 = await schematicRunner
+        .runSchematicAsync('workspace-version-9', {}, tree.branch())
+        .toPromise();
       const { angularCompilerOptions } = JSON.parse(tree2.readContent(libTsConfig));
       expect(angularCompilerOptions).toEqual({ enableIvy: false, skipTemplateCodegen: true });
     });
@@ -76,7 +81,9 @@ describe('Migration to version 9', () => {
       };
 
       tree.overwrite('/package.json', JSON.stringify(packageJson, undefined, 2));
-      const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+      const tree2 = await schematicRunner
+        .runSchematicAsync('workspace-version-9', {}, tree.branch())
+        .toPromise();
       const { dependencies, devDependencies } = JSON.parse(tree2.readContent('/package.json'));
       expect(dependencies['tsickle']).toBeUndefined();
       expect(devDependencies['tsickle']).toBeUndefined();

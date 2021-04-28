@@ -105,12 +105,14 @@ export function getAnalyticsConfig(
 
     // The category is the builder name if it's an angular builder.
     return {
-      plugins: [new NgBuildAnalyticsPlugin(
-        wco.projectRoot,
-        context.analytics,
-        category,
-        !!wco.tsConfig.options.enableIvy,
-      )],
+      plugins: [
+        new NgBuildAnalyticsPlugin(
+          wco.projectRoot,
+          context.analytics,
+          category,
+          !!wco.tsConfig.options.enableIvy,
+        ),
+      ],
     };
   }
 
@@ -149,7 +151,7 @@ async function initialize(
   } = await generateI18nBrowserWebpackConfigFromContext(
     adjustedOptions,
     context,
-    wco => [
+    (wco) => [
       getCommonConfig(wco),
       getBrowserConfig(wco),
       getStylesConfig(wco),
@@ -213,52 +215,63 @@ export function buildWebpackBrowser(
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
-  return from(context.getProjectMetadata(projectName))
-    .pipe(
-      switchMap(async projectMetadata => {
-        const sysProjectRoot = getSystemPath(
-          resolve(normalize(context.workspaceRoot),
-            normalize((projectMetadata.root as string) ?? '')),
-        );
+  return from(context.getProjectMetadata(projectName)).pipe(
+    switchMap(async (projectMetadata) => {
+      const sysProjectRoot = getSystemPath(
+        resolve(
+          normalize(context.workspaceRoot),
+          normalize((projectMetadata.root as string) ?? ''),
+        ),
+      );
 
-        const { options: compilerOptions } = readTsconfig(options.tsConfig, context.workspaceRoot);
-        const target = compilerOptions.target || ScriptTarget.ES5;
-        const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
-        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
+      const { options: compilerOptions } = readTsconfig(options.tsConfig, context.workspaceRoot);
+      const target = compilerOptions.target || ScriptTarget.ES5;
+      const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
+      const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
 
-        checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
+      checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
 
-        return {
-          ...(await initialize(options, context, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
-          buildBrowserFeatures,
+      return {
+        ...(await initialize(
+          options,
+          context,
           isDifferentialLoadingNeeded,
-          target,
-        };
-      }),
-      // tslint:disable-next-line: no-big-function
-      switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
+          transforms.webpackConfiguration,
+        )),
+        buildBrowserFeatures,
+        isDifferentialLoadingNeeded,
+        target,
+      };
+    }),
+    // tslint:disable-next-line: no-big-function
+    switchMap(
+      ({
+        config,
+        projectRoot,
+        projectSourceRoot,
+        i18n,
+        buildBrowserFeatures,
+        isDifferentialLoadingNeeded,
+        target,
+      }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
 
         return runWebpack(config, context, {
           webpackFactory: require('webpack') as typeof webpack,
-          logging: transforms.logging || (
-            (stats, config) => {
+          logging:
+            transforms.logging ||
+            ((stats, config) => {
               if (options.verbose) {
                 context.logger.info(stats.toString(config.stats));
               }
-            }
-          ),
+            }),
         }).pipe(
           // tslint:disable-next-line: no-big-function
-          concatMap(async buildEvent => {
+          concatMap(async (buildEvent) => {
             const spinner = new Spinner();
             spinner.enabled = options.progress !== false;
 
-            const {
-              success,
-              emittedFiles = [],
-              outputPath: webpackOutputPath,
-            } = buildEvent;
+            const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
             const webpackRawStats = buildEvent.webpackStats;
             if (!webpackRawStats) {
               throw new Error('Webpack stats build result is required.');
@@ -298,12 +311,13 @@ export function buildWebpackBrowser(
               const scriptsEntryPointName = normalizeExtraEntryPoints(
                 options.scripts || [],
                 'scripts',
-              ).map(x => x.bundleName);
+              ).map((x) => x.bundleName);
 
               if (isDifferentialLoadingNeeded && options.watch) {
                 moduleFiles = emittedFiles;
                 files = moduleFiles.filter(
-                  x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)),
+                  (x) =>
+                    x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)),
                 );
                 if (i18n.shouldInline) {
                   const success = await i18nInlineEmittedFiles(
@@ -396,7 +410,7 @@ export function buildWebpackBrowser(
                       if (es5Polyfills) {
                         fs.unlinkSync(filename + '.map');
                       }
-                    } catch { }
+                    } catch {}
                   }
 
                   if (es5Polyfills) {
@@ -465,7 +479,9 @@ export function buildWebpackBrowser(
                       supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
                     };
                     processResults.push(
-                      await import('../utils/process-bundle').then(m => m.process(runtimeOptions)),
+                      await import('../utils/process-bundle').then((m) =>
+                        m.process(runtimeOptions),
+                      ),
                     );
                   }
 
@@ -539,7 +555,7 @@ export function buildWebpackBrowser(
                             glob: '**/*',
                             input: webpackOutputPath,
                             output: '',
-                            ignore: [...processedFiles].map(f =>
+                            ignore: [...processedFiles].map((f) =>
                               path.relative(webpackOutputPath, f),
                             ),
                           },
@@ -567,27 +583,33 @@ export function buildWebpackBrowser(
                   executor.stop();
                 }
                 for (const result of processResults) {
-                  const chunk = webpackStats.chunks?.find((chunk) => chunk.id?.toString() === result.name);
+                  const chunk = webpackStats.chunks?.find(
+                    (chunk) => chunk.id?.toString() === result.name,
+                  );
 
                   if (result.original) {
                     bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
                   }
 
                   if (result.downlevel) {
-                    bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
+                    bundleInfoStats.push(
+                      generateBundleInfoStats(result.downlevel, chunk, 'legacy'),
+                    );
                   }
                 }
 
-                const unprocessedChunks = webpackStats.chunks?.filter((chunk) => !processResults
-                  .find((result) => chunk.id?.toString() === result.name),
-                ) || [];
+                const unprocessedChunks =
+                  webpackStats.chunks?.filter(
+                    (chunk) =>
+                      !processResults.find((result) => chunk.id?.toString() === result.name),
+                  ) || [];
                 for (const chunk of unprocessedChunks) {
-                  const asset = webpackStats.assets?.find(a => a.name === chunk.files?.[0]);
+                  const asset = webpackStats.assets?.find((a) => a.name === chunk.files?.[0]);
                   bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }));
                 }
               } else {
-                files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
-                noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
+                files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
+                noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
                 if (i18n.shouldInline) {
                   const success = await i18nInlineEmittedFiles(
                     context,
@@ -613,10 +635,10 @@ export function buildWebpackBrowser(
                 for (const { severity, message } of budgetFailures) {
                   switch (severity) {
                     case ThresholdSeverity.Warning:
-                      webpackStats.warnings?.push({message});
+                      webpackStats.warnings?.push({ message });
                       break;
                     case ThresholdSeverity.Error:
-                      webpackStats.errors?.push({message});
+                      webpackStats.errors?.push({ message });
                       break;
                     default:
                       assertNever(severity);
@@ -682,8 +704,8 @@ export function buildWebpackBrowser(
 
                       if (warnings.length || errors.length) {
                         spinner.stop();
-                        warnings.forEach(m => context.logger.warn(m));
-                        errors.forEach(m => context.logger.error(m));
+                        warnings.forEach((m) => context.logger.warn(m));
+                        errors.forEach((m) => context.logger.error(m));
                         spinner.start();
                       }
 
@@ -728,24 +750,22 @@ export function buildWebpackBrowser(
             }
           }),
           map(
-            event =>
+            (event) =>
               ({
                 ...event,
                 baseOutputPath,
                 outputPath: baseOutputPath,
-                outputPaths: outputPaths && Array.from(outputPaths.values()) || [baseOutputPath],
+                outputPaths: (outputPaths && Array.from(outputPaths.values())) || [baseOutputPath],
               } as BrowserBuilderOutput),
           ),
         );
-      }),
-    );
+      },
+    ),
+  );
 
   function getLocaleBaseHref(i18n: I18nOptions, locale: string): string | undefined {
     if (i18n.locales[locale] && i18n.locales[locale]?.baseHref !== '') {
-      return urlJoin(
-        options.baseHref || '',
-        i18n.locales[locale].baseHref ?? `/${locale}/`,
-      );
+      return urlJoin(options.baseHref || '', i18n.locales[locale].baseHref ?? `/${locale}/`);
     }
 
     return undefined;
@@ -765,7 +785,13 @@ function mapErrorToMessage(error: unknown): string | undefined {
 }
 
 function assertNever(input: never): never {
-  throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
+  throw new Error(
+    `Unexpected call to assertNever() with input: ${JSON.stringify(
+      input,
+      null /* replacer */,
+      4 /* tabSize */,
+    )}`,
+  );
 }
 
 function generateBundleInfoStats(
@@ -773,17 +799,15 @@ function generateBundleInfoStats(
   chunk: webpack.StatsChunk | undefined,
   chunkType: ChunkType,
 ): BundleStats {
-  return generateBundleStats(
-    {
-      size: bundle.size,
-      files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
-      names: chunk?.names,
-      entry: !!chunk?.names?.includes('runtime'),
-      initial: !!chunk?.initial,
-      rendered: true,
-      chunkType,
-    },
-  );
+  return generateBundleStats({
+    size: bundle.size,
+    files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
+    names: chunk?.names,
+    entry: !!chunk?.names?.includes('runtime'),
+    initial: !!chunk?.initial,
+    rendered: true,
+    chunkType,
+  });
 }
 
 function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
@@ -797,7 +821,10 @@ function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
   return filteredFiles;
 }
 
-function checkInternetExplorerSupport(supportedBrowsers: string[], logger: logging.LoggerApi): void {
+function checkInternetExplorerSupport(
+  supportedBrowsers: string[],
+  logger: logging.LoggerApi,
+): void {
   const hasIE9 = supportedBrowsers.includes('ie 9');
   const hasIE10 = supportedBrowsers.includes('ie 10');
   const hasIE11 = supportedBrowsers.includes('ie 11');
@@ -806,17 +833,17 @@ function checkInternetExplorerSupport(supportedBrowsers: string[], logger: loggi
     const browsers = (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
     logger.warn(
       `Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
-      (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
-      ' no longer officially supported with Angular v11 and higher.' +
-      '\nFor more information, see https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
+        (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
+        ' no longer officially supported with Angular v11 and higher.' +
+        '\nFor more information, see https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
     );
   }
 
   if (hasIE11) {
     logger.warn(
       `Warning: Support was requested for IE 11 in the project's browserslist configuration. ` +
-      'IE 11 support is deprecated since Angular v12.' +
-      '\nFor more information, see https://angular.io/guide/browser-support',
+        'IE 11 support is deprecated since Angular v12.' +
+        '\nFor more information, see https://angular.io/guide/browser-support',
     );
   }
 }

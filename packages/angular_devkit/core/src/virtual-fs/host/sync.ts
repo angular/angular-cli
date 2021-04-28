@@ -19,9 +19,10 @@ import {
   Stats,
 } from './interface';
 
-
 export class SynchronousDelegateExpectedException extends BaseException {
-  constructor() { super(`Expected a synchronous delegate but got an asynchronous one.`); }
+  constructor() {
+    super(`Expected a synchronous delegate but got an asynchronous one.`);
+  }
 }
 
 /**
@@ -41,9 +42,9 @@ export class SyncDelegateHost<T extends object = {}> {
     // Perf note: this is not using an observer object to avoid a performance penalty in RxJS.
     // See https://github.com/ReactiveX/rxjs/pull/5646 for details.
     observable.subscribe(
-      (x: ResultT) => result = x,
-      (err: Error) => errorResult = err,
-      () => completed = true,
+      (x: ResultT) => (result = x),
+      (err: Error) => (errorResult = err),
+      () => (completed = true),
     );
 
     if (errorResult !== undefined) {
@@ -57,7 +58,7 @@ export class SyncDelegateHost<T extends object = {}> {
     // but ResultT could be void, which is undefined in JavaScript, so this doesn't change the
     // behaviour.
     // tslint:disable-next-line:no-non-null-assertion
-    return result !;
+    return result!;
   }
 
   get capabilities(): HostCapabilities {

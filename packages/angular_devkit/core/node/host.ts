@@ -23,13 +23,7 @@ import {
 } from 'fs';
 import { dirname as pathDirname, join as pathJoin } from 'path';
 import { Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
-import {
-  concatMap,
-  map,
-  mergeMap,
-  publish,
-  refCount,
-} from 'rxjs/operators';
+import { concatMap, map, mergeMap, publish, refCount } from 'rxjs/operators';
 import {
   Path,
   PathFragment,
@@ -41,9 +35,8 @@ import {
   virtualFs,
 } from '../src';
 
-
 interface ChokidarWatcher {
-  new(options: {}): ChokidarWatcher;
+  new (options: {}): ChokidarWatcher;
 
   add(path: string): ChokidarWatcher;
   on(type: 'change', cb: (path: string) => void): ChokidarWatcher;
@@ -74,8 +67,10 @@ function loadFSWatcher() {
       FSWatcher = require('chokidar').FSWatcher;
     } catch (e) {
       if (e.code !== 'MODULE_NOT_FOUND') {
-        throw new Error('As of angular-devkit version 8.0, the "chokidar" package ' +
-          'must be installed in order to use watch() features.');
+        throw new Error(
+          'As of angular-devkit version 8.0, the "chokidar" package ' +
+            'must be installed in order to use watch() features.',
+        );
       }
       throw e;
     }
@@ -92,25 +87,23 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
   }
 
   write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
-    return observableFrom(fsPromises.mkdir(getSystemPath(dirname(path)), { recursive: true }))
-      .pipe(
-        mergeMap(() => fsPromises.writeFile(getSystemPath(path), content)),
-      );
+    return observableFrom(fsPromises.mkdir(getSystemPath(dirname(path)), { recursive: true })).pipe(
+      mergeMap(() => fsPromises.writeFile(getSystemPath(path), content)),
+    );
   }
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
-    return observableFrom(fsPromises.readFile(getSystemPath(path)))
-      .pipe(
-        map(buffer => new Uint8Array(buffer).buffer as virtualFs.FileBuffer),
-      );
+    return observableFrom(fsPromises.readFile(getSystemPath(path))).pipe(
+      map((buffer) => new Uint8Array(buffer).buffer as virtualFs.FileBuffer),
+    );
   }
 
   delete(path: Path): Observable<void> {
     return this.isDirectory(path).pipe(
-      mergeMap(async isDirectory => {
+      mergeMap(async (isDirectory) => {
         if (isDirectory) {
           const recursiveDelete = async (dirPath: string) => {
-            for (const fragment of (await fsPromises.readdir(dirPath))) {
+            for (const fragment of await fsPromises.readdir(dirPath)) {
               const sysPath = pathJoin(dirPath, fragment);
               const stats = await fsPromises.stat(sysPath);
 
@@ -137,7 +130,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
 
   list(path: Path): Observable<PathFragment[]> {
     return observableFrom(fsPromises.readdir(getSystemPath(path))).pipe(
-      map((names) => names.map(name => fragment(name))),
+      map((names) => names.map((name) => fragment(name))),
     );
   }
 
@@ -146,14 +139,10 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
   }
 
   isDirectory(path: Path): Observable<boolean> {
-    return this.stat(path).pipe(
-      map(stat => stat.isDirectory()),
-    );
+    return this.stat(path).pipe(map((stat) => stat.isDirectory()));
   }
   isFile(path: Path): Observable<boolean> {
-    return this.stat(path).pipe(
-      map(stat => stat.isFile()),
-    );
+    return this.stat(path).pipe(map((stat) => stat.isFile()));
   }
 
   // Some hosts may not support stat.
@@ -166,26 +155,26 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
     path: Path,
     _options?: virtualFs.HostWatchOptions,
   ): Observable<virtualFs.HostWatchEvent> | null {
-    return new Observable<virtualFs.HostWatchEvent>(obs => {
+    return new Observable<virtualFs.HostWatchEvent>((obs) => {
       loadFSWatcher();
       const watcher = new FSWatcher({ persistent: true }).add(getSystemPath(path));
 
       watcher
-        .on('change', path => {
+        .on('change', (path) => {
           obs.next({
             path: normalize(path),
             time: new Date(),
             type: virtualFs.HostWatchEventType.Changed,
           });
         })
-        .on('add', path => {
+        .on('add', (path) => {
           obs.next({
             path: normalize(path),
             time: new Date(),
             type: virtualFs.HostWatchEventType.Created,
           });
         })
-        .on('unlink', path => {
+        .on('unlink', (path) => {
           obs.next({
             path: normalize(path),
             time: new Date(),
@@ -194,13 +183,9 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
         });
 
       return () => watcher.close();
-    }).pipe(
-      publish(),
-      refCount(),
-    );
+    }).pipe(publish(), refCount());
   }
 }
-
 
 /**
  * An implementation of the Virtual FS using Node as the backend, synchronously.
@@ -211,7 +196,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   }
 
   write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
-    return new Observable(obs => {
+    return new Observable((obs) => {
       mkdirSync(getSystemPath(dirname(path)), { recursive: true });
       writeFileSync(getSystemPath(path), new Uint8Array(content));
       obs.next();
@@ -220,7 +205,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   }
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
-    return new Observable(obs => {
+    return new Observable((obs) => {
       const buffer = readFileSync(getSystemPath(path));
 
       obs.next(new Uint8Array(buffer).buffer as virtualFs.FileBuffer);
@@ -230,7 +215,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
 
   delete(path: Path): Observable<void> {
     return this.isDirectory(path).pipe(
-      concatMap(isDir => {
+      concatMap((isDir) => {
         if (isDir) {
           const dirPaths = readdirSync(getSystemPath(path));
           const rmDirComplete = new Observable<void>((obs) => {
@@ -238,10 +223,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
             obs.complete();
           });
 
-          return concat(
-            ...dirPaths.map(name => this.delete(join(path, name))),
-            rmDirComplete,
-          );
+          return concat(...dirPaths.map((name) => this.delete(join(path, name))), rmDirComplete);
         } else {
           try {
             unlinkSync(getSystemPath(path));
@@ -256,7 +238,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   }
 
   rename(from: Path, to: Path): Observable<void> {
-    return new Observable(obs => {
+    return new Observable((obs) => {
       const toSystemPath = getSystemPath(to);
       mkdirSync(pathDirname(toSystemPath), { recursive: true });
       renameSync(getSystemPath(from), toSystemPath);
@@ -266,15 +248,15 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return new Observable(obs => {
+    return new Observable((obs) => {
       const names = readdirSync(getSystemPath(path));
-      obs.next(names.map(name => fragment(name)));
+      obs.next(names.map((name) => fragment(name)));
       obs.complete();
     });
   }
 
   exists(path: Path): Observable<boolean> {
-    return new Observable(obs => {
+    return new Observable((obs) => {
       obs.next(existsSync(getSystemPath(path)));
       obs.complete();
     });
@@ -282,16 +264,16 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
 
   isDirectory(path: Path): Observable<boolean> {
     // tslint:disable-next-line:no-non-null-assertion
-    return this.stat(path)!.pipe(map(stat => stat.isDirectory()));
+    return this.stat(path)!.pipe(map((stat) => stat.isDirectory()));
   }
   isFile(path: Path): Observable<boolean> {
     // tslint:disable-next-line:no-non-null-assertion
-    return this.stat(path)!.pipe(map(stat => stat.isFile()));
+    return this.stat(path)!.pipe(map((stat) => stat.isFile()));
   }
 
   // Some hosts may not support stat.
   stat(path: Path): Observable<virtualFs.Stats<Stats>> {
-    return new Observable(obs => {
+    return new Observable((obs) => {
       obs.next(statSync(getSystemPath(path)));
       obs.complete();
     });
@@ -302,27 +284,27 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
     path: Path,
     _options?: virtualFs.HostWatchOptions,
   ): Observable<virtualFs.HostWatchEvent> | null {
-    return new Observable<virtualFs.HostWatchEvent>(obs => {
+    return new Observable<virtualFs.HostWatchEvent>((obs) => {
       const opts = { persistent: false };
       loadFSWatcher();
       const watcher = new FSWatcher(opts).add(getSystemPath(path));
 
       watcher
-        .on('change', path => {
+        .on('change', (path) => {
           obs.next({
             path: normalize(path),
             time: new Date(),
             type: virtualFs.HostWatchEventType.Changed,
           });
         })
-        .on('add', path => {
+        .on('add', (path) => {
           obs.next({
             path: normalize(path),
             time: new Date(),
             type: virtualFs.HostWatchEventType.Created,
           });
         })
-        .on('unlink', path => {
+        .on('unlink', (path) => {
           obs.next({
             path: normalize(path),
             time: new Date(),
@@ -331,9 +313,6 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
         });
 
       return () => watcher.close();
-    }).pipe(
-      publish(),
-      refCount(),
-    );
+    }).pipe(publish(), refCount());
   }
 }

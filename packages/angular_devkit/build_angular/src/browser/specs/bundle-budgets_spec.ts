@@ -10,7 +10,6 @@ import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
 import { createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder bundle budgets', () => {
   const cssExtensions = ['css', 'scss', 'less', 'styl'];
   const targetSpec = { project: 'app', target: 'build' };
@@ -29,7 +28,7 @@ describe('Browser Builder bundle budgets', () => {
     };
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;
@@ -57,7 +56,7 @@ describe('Browser Builder bundle budgets', () => {
     };
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;
@@ -66,7 +65,7 @@ describe('Browser Builder bundle budgets', () => {
     await run.stop();
   });
 
-  cssExtensions.forEach(ext => {
+  cssExtensions.forEach((ext) => {
     it(`shows warnings for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
       const overrides = {
         aot: true,
@@ -95,7 +94,7 @@ describe('Browser Builder bundle budgets', () => {
 
       const logger = new logging.Logger('');
       const logs: string[] = [];
-      logger.subscribe(e => logs.push(e.message));
+      logger.subscribe((e) => logs.push(e.message));
 
       const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
       const output = await run.result;
@@ -105,7 +104,7 @@ describe('Browser Builder bundle budgets', () => {
     });
   });
 
-  cssExtensions.forEach(ext => {
+  cssExtensions.forEach((ext) => {
     it(`shows error for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
       const overrides = {
         aot: true,
@@ -134,7 +133,7 @@ describe('Browser Builder bundle budgets', () => {
 
       const logger = new logging.Logger('');
       const logs: string[] = [];
-      logger.subscribe(e => logs.push(e.message));
+      logger.subscribe((e) => logs.push(e.message));
 
       const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
       const output = await run.result;

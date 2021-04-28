@@ -45,43 +45,45 @@ describe('Karma Builder watch mode', () => {
     // The current linux-based CI environments may not fully settled in regards to filesystem
     // changes from previous tests which reuse the same directory and fileset.
     // The initial delay helps mitigate false positive rebuild triggers in such scenarios.
-    const { run } = await timer(1000).pipe(
-      switchMap(() => architect.scheduleTarget(karmaTargetSpec, { watch: true })),
-      switchMap(run => run.output.pipe(map(output => ({ run, output })))),
-      debounceTime(500),
-      tap(({ output }) => {
-        buildCount += 1;
-        switch (phase) {
-          case 1:
-            // Karma run should succeed.
-            // Add a compilation error.
-            expect(output.success).toBe(true);
-            // Add an syntax error to a non-main file.
-            host.appendToFile('src/app/app.component.spec.ts', `]]]`);
-            phase = 2;
-            break;
+    const { run } = await timer(1000)
+      .pipe(
+        switchMap(() => architect.scheduleTarget(karmaTargetSpec, { watch: true })),
+        switchMap((run) => run.output.pipe(map((output) => ({ run, output })))),
+        debounceTime(500),
+        tap(({ output }) => {
+          buildCount += 1;
+          switch (phase) {
+            case 1:
+              // Karma run should succeed.
+              // Add a compilation error.
+              expect(output.success).toBe(true);
+              // Add an syntax error to a non-main file.
+              host.appendToFile('src/app/app.component.spec.ts', `]]]`);
+              phase = 2;
+              break;
 
-          case 2:
-            // Karma run should fail due to compilation error. Fix it.
-            expect(output.success).toBe(false);
-            host.replaceInFile('src/app/app.component.spec.ts', `]]]`, '');
-            phase = 3;
-            break;
+            case 2:
+              // Karma run should fail due to compilation error. Fix it.
+              expect(output.success).toBe(false);
+              host.replaceInFile('src/app/app.component.spec.ts', `]]]`, '');
+              phase = 3;
+              break;
 
-          case 3:
-            // Karma run should succeed again.
-            expect(output.success).toBe(true);
-            phase = 4;
-            break;
-        }
-      }),
-      takeWhile(() => phase < 4),
-      catchError((_, caught) => {
-        fail(`stuck at phase ${phase} [builds: ${buildCount}]`);
+            case 3:
+              // Karma run should succeed again.
+              expect(output.success).toBe(true);
+              phase = 4;
+              break;
+          }
+        }),
+        takeWhile(() => phase < 4),
+        catchError((_, caught) => {
+          fail(`stuck at phase ${phase} [builds: ${buildCount}]`);
 
-        return caught;
-      }),
-    ).toPromise();
+          return caught;
+        }),
+      )
+      .toPromise();
 
     await run.stop();
   });
@@ -95,31 +97,33 @@ describe('Karma Builder watch mode', () => {
     // The current linux-based CI environments may not fully settled in regards to filesystem
     // changes from previous tests which reuse the same directory and fileset.
     // The initial delay helps mitigate false positive rebuild triggers in such scenarios.
-    const { run } = await timer(1000).pipe(
-      switchMap(() => architect.scheduleTarget(karmaTargetSpec, { watch: true })),
-      switchMap(run => run.output.pipe(map(output => ({ run, output })))),
-      debounceTime(500),
-      tap(({ output }) => {
-        switch (phase) {
-          case 1:
-            // Karma run should succeed.
-            expect(output.success).toBe(true);
-            // Touch the file.
-            host.appendToFile('src/app/app.component.spec.ts', ``);
-            // Signal the stopper, which delays emission by 5s.
-            // If there's no rebuild within that time then the test is successful.
-            stopSubject.next();
-            phase = 2;
-            break;
+    const { run } = await timer(1000)
+      .pipe(
+        switchMap(() => architect.scheduleTarget(karmaTargetSpec, { watch: true })),
+        switchMap((run) => run.output.pipe(map((output) => ({ run, output })))),
+        debounceTime(500),
+        tap(({ output }) => {
+          switch (phase) {
+            case 1:
+              // Karma run should succeed.
+              expect(output.success).toBe(true);
+              // Touch the file.
+              host.appendToFile('src/app/app.component.spec.ts', ``);
+              // Signal the stopper, which delays emission by 5s.
+              // If there's no rebuild within that time then the test is successful.
+              stopSubject.next();
+              phase = 2;
+              break;
 
-          case 2:
-            // Should never trigger this second build.
-            fail('Should not trigger second build.');
-            break;
-        }
-      }),
-      takeUntil(stop$),
-    ).toPromise();
+            case 2:
+              // Should never trigger this second build.
+              fail('Should not trigger second build.');
+              break;
+          }
+        }),
+        takeUntil(stop$),
+      )
+      .toPromise();
 
     await run.stop();
   });

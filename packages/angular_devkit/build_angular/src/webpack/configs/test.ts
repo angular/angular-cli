@@ -24,10 +24,7 @@ export function getTestConfig(
   const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
 
   if (codeCoverage) {
-    const exclude: (string | RegExp)[] = [
-      /\.(e2e|spec)\.tsx?$/,
-      /node_modules/,
-    ];
+    const exclude: (string | RegExp)[] = [/\.(e2e|spec)\.tsx?$/, /node_modules/];
 
     if (codeCoverageExclude) {
       for (const excludeGlob of codeCoverageExclude) {
@@ -48,12 +45,7 @@ export function getTestConfig(
   }
 
   if (sourceMap.scripts || sourceMap.styles) {
-    extraPlugins.push(getSourceMapDevTool(
-      sourceMap.scripts,
-      sourceMap.styles,
-      false,
-      true,
-    ));
+    extraPlugins.push(getSourceMapDevTool(sourceMap.scripts, sourceMap.styles, false, true));
   }
 
   return {

@@ -28,27 +28,25 @@ describe('Browser Builder lazy modules', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
-  function addLazyLoadedModulesInTsConfig(host: TestProjectHost, lazyModuleFiles: Record<string, string>) {
-    const files = [
-      ...Object.keys(lazyModuleFiles),
-      'main.ts',
-    ]
-    .map(f => '"' + f.replace('src/', '') + '"')
-    .join(', ');
+  function addLazyLoadedModulesInTsConfig(
+    host: TestProjectHost,
+    lazyModuleFiles: Record<string, string>,
+  ) {
+    const files = [...Object.keys(lazyModuleFiles), 'main.ts']
+      .map((f) => '"' + f.replace('src/', '') + '"')
+      .join(', ');
 
-    host.replaceInFile(
-      'src/tsconfig.app.json',
-      '"main.ts"',
-      `${files}`,
-    );
+    host.replaceInFile('src/tsconfig.app.json', '"main.ts"', `${files}`);
   }
 
   function hasMissingModuleError(logs: string): boolean {
     // TS type error when using import().
-    return logs.includes('Cannot find module') ||
+    return (
+      logs.includes('Cannot find module') ||
       // Webpack error when using import() on a rebuild.
       // There is no TS error because the type checker is forked on rebuilds.
-      logs.includes('Module not found');
+      logs.includes('Module not found')
+    );
   }
 
   describe(`Load children syntax`, () => {
@@ -82,7 +80,7 @@ describe('Browser Builder lazy modules', () => {
 
       const logger = new logging.Logger('');
       const logs: string[] = [];
-      logger.subscribe(e => logs.push(e.message));
+      logger.subscribe((e) => logs.push(e.message));
 
       const run = await architect.scheduleTarget(target, {}, { logger });
       const output = await run.result;
@@ -101,7 +99,7 @@ describe('Browser Builder lazy modules', () => {
       await run.output
         .pipe(
           debounceTime(3000),
-          tap(buildEvent => {
+          tap((buildEvent) => {
             buildNumber++;
             switch (buildNumber) {
               case 1:
@@ -138,11 +136,7 @@ describe('Browser Builder lazy modules', () => {
         import(/*webpackChunkName: '[request]'*/'./lazy-' + lazyFileName);
       `,
     });
-    host.replaceInFile(
-      'src/tsconfig.app.json',
-      '"main.ts"',
-      `"main.ts","lazy-module.ts"`,
-    );
+    host.replaceInFile('src/tsconfig.app.json', '"main.ts"', `"main.ts","lazy-module.ts"`);
 
     const { files } = await browserBuild(architect, host, target);
     expect(files['lazy-module.js']).not.toBeUndefined();
@@ -158,7 +152,9 @@ describe('Browser Builder lazy modules', () => {
     const { files } = await browserBuild(architect, host, target);
     expect(files['src_one_ts.js']).not.toBeUndefined();
     expect(files['src_two_ts.js']).not.toBeUndefined();
-    expect(files['default-node_modules_angular_common___ivy_ngcc___fesm2015_http_js.js']).toBeDefined();
+    expect(
+      files['default-node_modules_angular_common___ivy_ngcc___fesm2015_http_js.js'],
+    ).toBeDefined();
   });
 
   it(`supports disabling the common bundle`, async () => {
@@ -171,6 +167,8 @@ describe('Browser Builder lazy modules', () => {
     const { files } = await browserBuild(architect, host, target, { commonChunk: false });
     expect(files['src_one_ts.js']).not.toBeUndefined();
     expect(files['src_two_ts.js']).not.toBeUndefined();
-    expect(files['default-node_modules_angular_common___ivy_ngcc___fesm2015_http_js.js']).toBeUndefined();
+    expect(
+      files['default-node_modules_angular_common___ivy_ngcc___fesm2015_http_js.js'],
+    ).toBeUndefined();
   });
 });

@@ -26,10 +26,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "project",
-        "target"
-      ]
+      "required": ["project", "target"]
     },
     "info": {
       "type": "object"
@@ -38,10 +35,5 @@
       "type": "object"
     }
   },
-  "required": [
-    "currentDirectory",
-    "id",
-    "info",
-    "workspaceRoot"
-  ]
+  "required": ["currentDirectory", "id", "info", "workspaceRoot"]
 }

@@ -36,10 +36,16 @@ export interface RunBenchmarkWatchOptions extends RunBenchmarkOptions {
 }
 
 export function runBenchmarkWatch({
-  command, captures, reporters = [], iterations = 5, retries = 5, logger = new logging.NullLogger(),
-  watchMatcher, watchTimeout = 10000, watchCommand,
+  command,
+  captures,
+  reporters = [],
+  iterations = 5,
+  retries = 5,
+  logger = new logging.NullLogger(),
+  watchMatcher,
+  watchTimeout = 10000,
+  watchCommand,
 }: RunBenchmarkWatchOptions): Observable<MetricGroup[]> {
-
   let successfulRuns = 0;
   let failedRuns = 0;
   const debugPrefix = () => `Run #${successfulRuns + 1}:`;
@@ -50,26 +56,30 @@ export function runBenchmarkWatch({
 
   // Gather stats until the stdout contains the matched text.
   const stats$ = monitoredProcess.stats$.pipe(
-    takeUntil(monitoredProcess.stdout$.pipe(
-      first(stdout => stdout.toString().includes(watchMatcher)),
-      timeout(watchTimeout),
-    )),
+    takeUntil(
+      monitoredProcess.stdout$.pipe(
+        first((stdout) => stdout.toString().includes(watchMatcher)),
+        timeout(watchTimeout),
+      ),
+    ),
   );
 
   return combineLatest([
     monitoredProcess.run().pipe(
       startWith(undefined),
-      tap(processExitCode => {
+      tap((processExitCode) => {
         if (processExitCode !== undefined && processExitCode != command.expectedExitCode) {
-          logger.debug(`${debugPrefix()} exited with ${processExitCode} but `
-            + `${command.expectedExitCode} was expected`);
+          logger.debug(
+            `${debugPrefix()} exited with ${processExitCode} but ` +
+              `${command.expectedExitCode} was expected`,
+          );
 
           throw processFailed;
         }
       }),
     ),
     monitoredProcess.stdout$.pipe(
-      filter(stdout => stdout.toString().includes(watchMatcher)),
+      filter((stdout) => stdout.toString().includes(watchMatcher)),
       take(1),
     ),
   ]).pipe(
@@ -78,54 +88,53 @@ export function runBenchmarkWatch({
       const { cmd, cwd, args } = watchCommand;
       failedRuns = 0;
 
-      return of(null)
-        .pipe(
-          tap(() => {
-            const { status, error } = spawnSync(cmd, args, { cwd });
-            monitoredProcess.resetElapsedTimer();
+      return of(null).pipe(
+        tap(() => {
+          const { status, error } = spawnSync(cmd, args, { cwd });
+          monitoredProcess.resetElapsedTimer();
 
-            if (status != command.expectedExitCode) {
-              logger.debug(`${debugPrefix()} exited with ${status}\n${error?.message}`);
-              throw processFailed;
-            }
+          if (status != command.expectedExitCode) {
+            logger.debug(`${debugPrefix()} exited with ${status}\n${error?.message}`);
+            throw processFailed;
+          }
 
-            // Reset fail counter for this iteration.
-            failedRuns = 0;
-          }),
-          tap(() => logger.debug(`${debugPrefix()} starting`)),
-          concatMap(() => forkJoin(captures.map(capture => capture(stats$)))),
-          throwIfEmpty(() => new Error('Nothing was captured')),
-          tap(() => logger.debug(`${debugPrefix()} finished successfully`)),
-          tap(() => successfulRuns++),
-          repeat(iterations),
-          retryWhen(errors => errors
-            .pipe(concatMap(val => {
+          // Reset fail counter for this iteration.
+          failedRuns = 0;
+        }),
+        tap(() => logger.debug(`${debugPrefix()} starting`)),
+        concatMap(() => forkJoin(captures.map((capture) => capture(stats$)))),
+        throwIfEmpty(() => new Error('Nothing was captured')),
+        tap(() => logger.debug(`${debugPrefix()} finished successfully`)),
+        tap(() => successfulRuns++),
+        repeat(iterations),
+        retryWhen((errors) =>
+          errors.pipe(
+            concatMap((val) => {
               // Check if we're still within the retry threshold.
               failedRuns++;
 
               return failedRuns < retries ? of(val) : throwError(val);
-            })),
+            }),
           ),
-        );
+        ),
+      );
     }),
-    retryWhen(errors => errors
-      .pipe(concatMap(val => {
-        // Check if we're still within the retry threshold.
-        failedRuns++;
+    retryWhen((errors) =>
+      errors.pipe(
+        concatMap((val) => {
+          // Check if we're still within the retry threshold.
+          failedRuns++;
 
-        if (failedRuns < retries) {
-          return of(val);
-        }
+          if (failedRuns < retries) {
+            return of(val);
+          }
 
-        return throwError(
-          val === processFailed ?
-            new MaximumRetriesExceeded(retries) :
-            val,
-        );
-      })),
+          return throwError(val === processFailed ? new MaximumRetriesExceeded(retries) : val);
+        }),
+      ),
     ),
     take(iterations),
     reduce((acc, val) => acc.map((_, idx) => aggregateMetricGroups(acc[idx], val[idx]))),
-    tap(groups => reporters.forEach(reporter => reporter(command, groups))),
+    tap((groups) => reporters.forEach((reporter) => reporter(command, groups))),
   );
 }

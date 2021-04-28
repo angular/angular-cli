@@ -46,7 +46,6 @@ import {
 } from './api';
 import { JobDoesNotExistException } from './exception';
 
-
 export class JobArgumentSchemaValidationError extends schema.SchemaValidationException {
   constructor(errors?: schema.SchemaValidatorError[]) {
     super(errors, 'Job Argument failed to validate. Errors: ');
@@ -63,7 +62,6 @@ export class JobOutputSchemaValidationError extends schema.SchemaValidationExcep
   }
 }
 
-
 interface JobHandlerWithExtra extends JobHandler<JsonValue, JsonValue, JsonValue> {
   jobDescription: JobDescription;
 
@@ -71,7 +69,6 @@ interface JobHandlerWithExtra extends JobHandler<JsonValue, JsonValue, JsonValue
   outputV: Observable<schema.SchemaValidator>;
   inputV: Observable<schema.SchemaValidator>;
 }
-
 
 function _jobShare<T>(): MonoTypeOperatorFunction<T> {
   // This is the same code as a `shareReplay()` operator, but uses a dumber Subject rather than a
@@ -83,7 +80,7 @@ function _jobShare<T>(): MonoTypeOperatorFunction<T> {
     let isComplete = false;
     let subscription: Subscription;
 
-    return new Observable<T>(subscriber => {
+    return new Observable<T>((subscriber) => {
       let innerSub: Subscription;
       refCount++;
       if (!subject) {
@@ -91,7 +88,9 @@ function _jobShare<T>(): MonoTypeOperatorFunction<T> {
 
         innerSub = subject.subscribe(subscriber);
         subscription = source.subscribe({
-          next(value) { subject.next(value); },
+          next(value) {
+            subject.next(value);
+          },
           error(err) {
             hasError = true;
             subject.error(err);
@@ -116,14 +115,13 @@ function _jobShare<T>(): MonoTypeOperatorFunction<T> {
   };
 }
 
-
 /**
  * Simple scheduler. Should be the base of all registries and schedulers.
  */
 export class SimpleScheduler<
   MinimumArgumentT extends JsonValue = JsonValue,
   MinimumInputT extends JsonValue = JsonValue,
-  MinimumOutputT extends JsonValue = JsonValue,
+  MinimumOutputT extends JsonValue = JsonValue
 > implements Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT> {
   private _internalJobDescriptionMap = new Map<JobName, JobHandlerWithExtra>();
   private _queue: (() => void)[] = [];
@@ -143,7 +141,7 @@ export class SimpleScheduler<
     const handler = this._jobRegistry.get<MinimumArgumentT, MinimumInputT, MinimumOutputT>(name);
 
     return handler.pipe(
-      switchMap(handler => {
+      switchMap((handler) => {
         if (handler === null) {
           return of(null);
         }
@@ -179,11 +177,9 @@ export class SimpleScheduler<
    */
   getDescription(name: JobName) {
     return concat(
-      this._getInternalDescription(name).pipe(map(x => x && x.jobDescription)),
+      this._getInternalDescription(name).pipe(map((x) => x && x.jobDescription)),
       of(null),
-    ).pipe(
-      first(),
-    );
+    ).pipe(first());
   }
 
   /**
@@ -192,9 +188,7 @@ export class SimpleScheduler<
    * @returns True if the job exists, false otherwise.
    */
   has(name: JobName) {
-    return this.getDescription(name).pipe(
-      map(x => x !== null),
-    );
+    return this.getDescription(name).pipe(map((x) => x !== null));
   }
 
   /**
@@ -216,7 +210,7 @@ export class SimpleScheduler<
           // Resume the queue.
           const q = this._queue;
           this._queue = [];
-          q.forEach(fn => fn());
+          q.forEach((fn) => fn());
         }
       }
     };
@@ -306,101 +300,107 @@ export class SimpleScheduler<
 
     // Create the input channel by having a filter.
     const input = new Subject<JsonValue>();
-    input.pipe(
-      concatMap(message => handler.pipe(
-        switchMap(handler => {
-          if (handler === null) {
-            throw new JobDoesNotExistException(name);
-          } else {
-            return handler.inputV.pipe(
-              switchMap(validate => validate(message)),
-            );
-          }
-        }),
-      )),
-      filter(result => result.success),
-      map(result => result.data as I),
-    ).subscribe(
-      value => inboundBus.next({ kind: JobInboundMessageKind.Input, value }),
-    );
+    input
+      .pipe(
+        concatMap((message) =>
+          handler.pipe(
+            switchMap((handler) => {
+              if (handler === null) {
+                throw new JobDoesNotExistException(name);
+              } else {
+                return handler.inputV.pipe(switchMap((validate) => validate(message)));
+              }
+            }),
+          ),
+        ),
+        filter((result) => result.success),
+        map((result) => result.data as I),
+      )
+      .subscribe((value) => inboundBus.next({ kind: JobInboundMessageKind.Input, value }));
 
     outboundBus = concat(
       outboundBus,
       // Add an End message at completion. This will be filtered out if the job actually send an
       // End.
-      handler.pipe(switchMap(handler => {
-        if (handler) {
-          return of<JobOutboundMessage<O>>({
-            kind: JobOutboundMessageKind.End, description: handler.jobDescription,
-          });
-        } else {
-          return EMPTY as Observable<JobOutboundMessage<O>>;
-        }
-      })),
+      handler.pipe(
+        switchMap((handler) => {
+          if (handler) {
+            return of<JobOutboundMessage<O>>({
+              kind: JobOutboundMessageKind.End,
+              description: handler.jobDescription,
+            });
+          } else {
+            return EMPTY as Observable<JobOutboundMessage<O>>;
+          }
+        }),
+      ),
     ).pipe(
-      filter(message => this._filterJobOutboundMessages(message, state)),
+      filter((message) => this._filterJobOutboundMessages(message, state)),
       // Update internal logic and Job<> members.
-      tap(message => {
-        // Update the state.
-        state = this._updateState(message, state);
+      tap(
+        (message) => {
+          // Update the state.
+          state = this._updateState(message, state);
 
-        switch (message.kind) {
-          case JobOutboundMessageKind.ChannelCreate: {
-            const maybeSubject = channelsSubject.get(message.name);
-            // If it doesn't exist or it's closed on the other end.
-            if (!maybeSubject) {
-              const s = new Subject<JsonValue>();
-              channelsSubject.set(message.name, s);
-              channels.set(message.name, s.asObservable());
+          switch (message.kind) {
+            case JobOutboundMessageKind.ChannelCreate: {
+              const maybeSubject = channelsSubject.get(message.name);
+              // If it doesn't exist or it's closed on the other end.
+              if (!maybeSubject) {
+                const s = new Subject<JsonValue>();
+                channelsSubject.set(message.name, s);
+                channels.set(message.name, s.asObservable());
+              }
+              break;
             }
-            break;
-          }
 
-          case JobOutboundMessageKind.ChannelMessage: {
-            const maybeSubject = channelsSubject.get(message.name);
-            if (maybeSubject) {
-              maybeSubject.next(message.message);
+            case JobOutboundMessageKind.ChannelMessage: {
+              const maybeSubject = channelsSubject.get(message.name);
+              if (maybeSubject) {
+                maybeSubject.next(message.message);
+              }
+              break;
             }
-            break;
-          }
 
-          case JobOutboundMessageKind.ChannelComplete: {
-            const maybeSubject = channelsSubject.get(message.name);
-            if (maybeSubject) {
-              maybeSubject.complete();
-              channelsSubject.delete(message.name);
+            case JobOutboundMessageKind.ChannelComplete: {
+              const maybeSubject = channelsSubject.get(message.name);
+              if (maybeSubject) {
+                maybeSubject.complete();
+                channelsSubject.delete(message.name);
+              }
+              break;
             }
-            break;
-          }
 
-          case JobOutboundMessageKind.ChannelError: {
-            const maybeSubject = channelsSubject.get(message.name);
-            if (maybeSubject) {
-              maybeSubject.error(message.error);
-              channelsSubject.delete(message.name);
+            case JobOutboundMessageKind.ChannelError: {
+              const maybeSubject = channelsSubject.get(message.name);
+              if (maybeSubject) {
+                maybeSubject.error(message.error);
+                channelsSubject.delete(message.name);
+              }
+              break;
             }
-            break;
           }
-        }
-      }, () => {
-        state = JobState.Errored;
-      }),
+        },
+        () => {
+          state = JobState.Errored;
+        },
+      ),
 
       // Do output validation (might include default values so this might have side
       // effects). We keep all messages in order.
-      concatMap(message => {
+      concatMap((message) => {
         if (message.kind !== JobOutboundMessageKind.Output) {
           return of(message);
         }
 
         return handler.pipe(
-          switchMap(handler => {
+          switchMap((handler) => {
             if (handler === null) {
               throw new JobDoesNotExistException(name);
             } else {
               return handler.outputV.pipe(
-                switchMap(validate => validate(message.value)),
-                switchMap(output => {
+                switchMap((validate) => validate(message.value)),
+                switchMap((output) => {
                   if (!output.success) {
                     throw new JobOutputSchemaValidationError(output.errors);
                   }
@@ -419,17 +419,19 @@ export class SimpleScheduler<
     );
 
     const output = outboundBus.pipe(
-      filter(x => x.kind == JobOutboundMessageKind.Output),
+      filter((x) => x.kind == JobOutboundMessageKind.Output),
       map((x) => (x as JobOutboundMessageOutput<O>).value),
       shareReplay(1),
     );
 
     // Return the Job.
     return {
-      get state() { return state; },
+      get state() {
+        return state;
+      },
       argument,
       description: handler.pipe(
-        switchMap(handler => {
+        switchMap((handler) => {
           if (handler === null) {
             throw new JobDoesNotExistException(name);
           } else {
@@ -445,7 +447,7 @@ export class SimpleScheduler<
         let maybeObservable = channels.get(name);
         if (!maybeObservable) {
           const s = new Subject<T>();
-          channelsSubject.set(name, s as unknown as Subject<JsonValue>);
+          channelsSubject.set(name, (s as unknown) as Subject<JsonValue>);
           channels.set(name, s.asObservable());
 
           maybeObservable = s.asObservable();
@@ -453,15 +455,13 @@ export class SimpleScheduler<
 
         return maybeObservable.pipe(
           // Keep the order of messages.
-          concatMap(
-            message => {
-              return schemaRegistry.compile(schema).pipe(
-                switchMap(validate => validate(message)),
-                filter(x => x.success),
-                map(x => x.data as T),
-              );
-            },
-          ),
+          concatMap((message) => {
+            return schemaRegistry.compile(schema).pipe(
+              switchMap((validate) => validate(message)),
+              filter((x) => x.success),
+              map((x) => x.data as T),
+            );
+          }),
         );
       },
       ping() {
@@ -469,7 +469,7 @@ export class SimpleScheduler<
         inboundBus.next({ kind: JobInboundMessageKind.Ping, id });
 
         return outboundBus.pipe(
-          filter(x => x.kind === JobOutboundMessageKind.Pong && x.id == id),
+          filter((x) => x.kind === JobOutboundMessageKind.Pong && x.id == id),
           first(),
           ignoreElements(),
         );
@@ -486,7 +486,7 @@ export class SimpleScheduler<
   protected _scheduleJob<
     A extends MinimumArgumentT,
     I extends MinimumInputT,
-    O extends MinimumOutputT,
+    O extends MinimumOutputT
   >(
     name: JobName,
     argument: A,
@@ -503,41 +503,45 @@ export class SimpleScheduler<
     const outboundBus = concat(
       // Wait for dependencies, make sure to not report messages from dependencies. Subscribe to
       // all dependencies at the same time so they run concurrently.
-      merge(...dependencies.map(x => x.outboundBus)).pipe(ignoreElements()),
+      merge(...dependencies.map((x) => x.outboundBus)).pipe(ignoreElements()),
 
       // Wait for pause() to clear (if necessary).
       waitable,
 
       from(handler).pipe(
-        switchMap(handler => new Observable<JobOutboundMessage<O>>(
-                      (subscriber: Observer<JobOutboundMessage<O>>) => {
-          if (!handler) {
-            throw new JobDoesNotExistException(name);
-          }
-
-          // Validate the argument.
-          return handler.argumentV.pipe(
-            switchMap(validate => validate(argument)),
-            switchMap(output => {
-              if (!output.success) {
-                throw new JobArgumentSchemaValidationError(output.errors);
+        switchMap(
+          (handler) =>
+            new Observable<JobOutboundMessage<O>>((subscriber: Observer<JobOutboundMessage<O>>) => {
+              if (!handler) {
+                throw new JobDoesNotExistException(name);
               }
 
-              const argument: A = output.data as A;
-              const description = handler.jobDescription;
-              subscriber.next({ kind: JobOutboundMessageKind.OnReady, description });
+              // Validate the argument.
+              return handler.argumentV
+                .pipe(
+                  switchMap((validate) => validate(argument)),
+                  switchMap((output) => {
+                    if (!output.success) {
+                      throw new JobArgumentSchemaValidationError(output.errors);
+                    }
 
-              const context = {
-                description,
-                dependencies: [...dependencies],
-                inboundBus: inboundBus.asObservable(),
-                scheduler: this as Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT>,
-              };
+                    const argument: A = output.data as A;
+                    const description = handler.jobDescription;
+                    subscriber.next({ kind: JobOutboundMessageKind.OnReady, description });
 
-              return handler(argument, context);
+                    const context = {
+                      description,
+                      dependencies: [...dependencies],
+                      inboundBus: inboundBus.asObservable(),
+                      scheduler: this as Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT>,
+                    };
+
+                    return handler(argument, context);
+                  }),
+                )
+                .subscribe(subscriber as Observer<JobOutboundMessage<JsonValue>>);
             }),
-          ).subscribe(subscriber as Observer<JobOutboundMessage<JsonValue>>);
-        })),
+        ),
       ),
     );
 

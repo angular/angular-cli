@@ -35,10 +35,10 @@ export default function (options: InterceptorOptions): Rule {
     options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
-      options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
+      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
       applyTemplates({
         ...strings,
-        'if-flat': (s: string) => options.flat ? '' : s,
+        'if-flat': (s: string) => (options.flat ? '' : s),
         ...options,
       }),
       move(parsedPath.path),

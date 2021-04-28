@@ -128,9 +128,13 @@ describe('AppShell Builder', () => {
   };
 
   it('works (basic)', async () => {
-    host.replaceInFile('src/app/app.module.ts', /    BrowserModule/, `
+    host.replaceInFile(
+      'src/app/app.module.ts',
+      /    BrowserModule/,
+      `
       BrowserModule.withServerTransition({ appId: 'some-app' })
-    `);
+    `,
+    );
 
     const run = await architect.scheduleTarget(target);
     const output = await run.result;
@@ -292,6 +296,8 @@ describe('AppShell Builder', () => {
 
     expect(content).toContain('app-shell works!');
     expect(content).toContain('p{color:#000;}');
-    expect(content).toMatch(/<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" onload="this\.media='all'">/);
+    expect(content).toMatch(
+      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" onload="this\.media='all'">/,
+    );
   });
 });

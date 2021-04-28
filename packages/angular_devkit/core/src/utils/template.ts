@@ -20,7 +20,7 @@ const kEscapeRe = /<%-([\s\S]+?)%>/g;
 const kEvaluateRe = /<%([\s\S]+?)%>/g;
 
 /** Used to map characters to HTML entities. */
-const kHtmlEscapes: {[char: string]: string} = {
+const kHtmlEscapes: { [char: string]: string } = {
   '&': '&amp;',
   '<': '&lt;',
   '>': '&gt;',
@@ -40,7 +40,6 @@ export interface TemplateOptions {
   sourceRoot?: string;
   fileName?: string;
 }
-
 
 function _positionFor(content: string, offset: number): Position {
   let line = 1;
@@ -118,11 +117,12 @@ export interface TemplateAstInterpolate extends TemplateAstBase {
   expression: string;
 }
 
-export type TemplateAstNode = TemplateAstContent
-                            | TemplateAstEvaluate
-                            | TemplateAstComment
-                            | TemplateAstEscape
-                            | TemplateAstInterpolate;
+export type TemplateAstNode =
+  | TemplateAstContent
+  | TemplateAstEvaluate
+  | TemplateAstComment
+  | TemplateAstEscape
+  | TemplateAstInterpolate;
 
 /**
  * Given a source text (and a fileName), returns a TemplateAst.
@@ -132,7 +132,7 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
 
   // Compile the regexp to match each delimiter.
   const reExpressions = [kEscapeRe, kCommentRe, kInterpolateRe, kEvaluateRe];
-  const reDelimiters = RegExp(reExpressions.map(x => x.source).join('|') + '|$', 'g');
+  const reDelimiters = RegExp(reExpressions.map((x) => x.source).join('|') + '|$', 'g');
 
   const parsed = sourceText.split(reDelimiters);
   let offset = 0;
@@ -194,7 +194,7 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
  */
 function templateFast(ast: TemplateAst, options?: TemplateOptions): string {
   const module = options && options.module ? 'module.exports.default =' : '';
-  const reHtmlEscape = reUnescapedHtml.source.replace(/[']/g, '\\\\\\\'');
+  const reHtmlEscape = reUnescapedHtml.source.replace(/[']/g, "\\\\\\'");
 
   return `
     return ${module} function(obj) {
@@ -208,7 +208,8 @@ function templateFast(ast: TemplateAst, options?: TemplateOptions): string {
         return s ? s.replace(__escapesre, function(key) { return __escapes[key]; }) : '';
       };
       with (obj) {
-        ${ast.children.map(node => {
+        ${ast.children
+          .map((node) => {
             switch (node.kind) {
               case 'content':
                 return `__p += ${JSON.stringify(node.content)};`;
@@ -219,8 +220,8 @@ function templateFast(ast: TemplateAst, options?: TemplateOptions): string {
               case 'evaluate':
                 return node.expression;
             }
-          }).join('\n')
-        }
+          })
+          .join('\n')}
       }
 
       return __p;
@@ -234,10 +235,10 @@ function templateFast(ast: TemplateAst, options?: TemplateOptions): string {
 function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): string {
   const sourceUrl = ast.fileName;
   const module = options && options.module ? 'module.exports.default =' : '';
-  const reHtmlEscape = reUnescapedHtml.source.replace(/[']/g, '\\\\\\\'');
+  const reHtmlEscape = reUnescapedHtml.source.replace(/[']/g, "\\\\\\'");
 
-  const preamble = (new SourceNode(1, 0, sourceUrl, ''))
-    .add(new SourceNode(1, 0, sourceUrl, [
+  const preamble = new SourceNode(1, 0, sourceUrl, '').add(
+    new SourceNode(1, 0, sourceUrl, [
       `return ${module} function(obj) {\n`,
       '  obj || (obj = {});\n',
       '  let __t;\n',
@@ -249,95 +250,94 @@ function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): str
       `    return s ? s.replace(__escapesre, function(key) { return __escapes[key]; }) : '';`,
       `  };\n`,
       `  with (obj) {\n`,
-    ]));
+    ]),
+  );
 
   const end = ast.children.length
     ? ast.children[ast.children.length - 1].end
     : { line: 0, column: 0 };
-  const nodes = ast.children.reduce((chunk, node) => {
-    let code: string | SourceNode | (SourceNode | string)[] = '';
-    switch (node.kind) {
-      case 'content':
-        code = [
-          new SourceNode(node.start.line, node.start.column, sourceUrl, '__p = __p'),
-          ...node.content.split('\n').map((line, i, arr) => {
-            return new SourceNode(
-              node.start.line + i,
-              i == 0 ? node.start.column : 0,
-              sourceUrl,
-              '\n    + '
-              + JSON.stringify(line + (i == arr.length - 1 ? '' : '\n')),
-            );
-          }),
-          new SourceNode(node.end.line, node.end.column, sourceUrl, ';\n'),
-        ];
-        break;
-      case 'interpolate':
-        code = [
-          new SourceNode(node.start.line, node.start.column, sourceUrl, '__p += ((__t = '),
-          ...node.expression.split('\n').map((line, i, arr) => {
-            return new SourceNode(
-              node.start.line + i,
-              i == 0 ? node.start.column : 0,
-              sourceUrl,
-              line + ((i == arr.length - 1) ? '' : '\n'),
-            );
-          }),
-          new SourceNode(node.end.line, node.end.column, sourceUrl, ') == null ? "" : __t);\n'),
-        ];
-        break;
-      case 'escape':
-        code = [
-          new SourceNode(node.start.line, node.start.column, sourceUrl, '__p += __e('),
-          ...node.expression.split('\n').map((line, i, arr) => {
-            return new SourceNode(
-              node.start.line + i,
-              i == 0 ? node.start.column : 0,
-              sourceUrl,
-              line + ((i == arr.length - 1) ? '' : '\n'),
-            );
-          }),
-          new SourceNode(node.end.line, node.end.column, sourceUrl, ');\n'),
-        ];
-        break;
-      case 'evaluate':
-        code = [
-          ...node.expression.split('\n').map((line, i, arr) => {
-            return new SourceNode(
-              node.start.line + i,
-              i == 0 ? node.start.column : 0,
-              sourceUrl,
-              line + ((i == arr.length - 1) ? '' : '\n'),
-            );
-          }),
-          new SourceNode(node.end.line, node.end.column, sourceUrl, '\n'),
-        ];
-        break;
-    }
+  const nodes = ast.children
+    .reduce((chunk, node) => {
+      let code: string | SourceNode | (SourceNode | string)[] = '';
+      switch (node.kind) {
+        case 'content':
+          code = [
+            new SourceNode(node.start.line, node.start.column, sourceUrl, '__p = __p'),
+            ...node.content.split('\n').map((line, i, arr) => {
+              return new SourceNode(
+                node.start.line + i,
+                i == 0 ? node.start.column : 0,
+                sourceUrl,
+                '\n    + ' + JSON.stringify(line + (i == arr.length - 1 ? '' : '\n')),
+              );
+            }),
+            new SourceNode(node.end.line, node.end.column, sourceUrl, ';\n'),
+          ];
+          break;
+        case 'interpolate':
+          code = [
+            new SourceNode(node.start.line, node.start.column, sourceUrl, '__p += ((__t = '),
+            ...node.expression.split('\n').map((line, i, arr) => {
+              return new SourceNode(
+                node.start.line + i,
+                i == 0 ? node.start.column : 0,
+                sourceUrl,
+                line + (i == arr.length - 1 ? '' : '\n'),
+              );
+            }),
+            new SourceNode(node.end.line, node.end.column, sourceUrl, ') == null ? "" : __t);\n'),
+          ];
+          break;
+        case 'escape':
+          code = [
+            new SourceNode(node.start.line, node.start.column, sourceUrl, '__p += __e('),
+            ...node.expression.split('\n').map((line, i, arr) => {
+              return new SourceNode(
+                node.start.line + i,
+                i == 0 ? node.start.column : 0,
+                sourceUrl,
+                line + (i == arr.length - 1 ? '' : '\n'),
+              );
+            }),
+            new SourceNode(node.end.line, node.end.column, sourceUrl, ');\n'),
+          ];
+          break;
+        case 'evaluate':
+          code = [
+            ...node.expression.split('\n').map((line, i, arr) => {
+              return new SourceNode(
+                node.start.line + i,
+                i == 0 ? node.start.column : 0,
+                sourceUrl,
+                line + (i == arr.length - 1 ? '' : '\n'),
+              );
+            }),
+            new SourceNode(node.end.line, node.end.column, sourceUrl, '\n'),
+          ];
+          break;
+      }
 
-    return chunk.add(new SourceNode(node.start.line, node.start.column, sourceUrl, code));
-  }, preamble)
-  .add(new SourceNode(end.line, end.column, sourceUrl, [
-    '  };\n',
-    '\n',
-    '  return __p;\n',
-    '}\n',
-  ]));
+      return chunk.add(new SourceNode(node.start.line, node.start.column, sourceUrl, code));
+    }, preamble)
+    .add(
+      new SourceNode(end.line, end.column, sourceUrl, ['  };\n', '\n', '  return __p;\n', '}\n']),
+    );
 
   const code = nodes.toStringWithSourceMap({
     file: sourceUrl,
-    sourceRoot: options && options.sourceRoot || '.',
+    sourceRoot: (options && options.sourceRoot) || '.',
   });
 
   // Set the source content in the source map, otherwise the sourceUrl is not enough
   // to find the content.
   code.map.setSourceContent(sourceUrl, ast.content);
 
-  return code.code
-       + '\n//# sourceMappingURL=data:application/json;base64,'
-       + Buffer.from(code.map.toString()).toString('base64');
+  return (
+    code.code +
+    '\n//# sourceMappingURL=data:application/json;base64,' +
+    Buffer.from(code.map.toString()).toString('base64')
+  );
 }
-
 
 /**
  * An equivalent of EJS templates, which is based on John Resig's `tmpl` implementation
@@ -355,7 +355,7 @@ function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): str
  *         of the template with the input applied.
  */
 export function template<T>(content: string, options?: TemplateOptions): (input: T) => string {
-  const sourceUrl = options && options.sourceURL || 'ejs';
+  const sourceUrl = (options && options.sourceURL) || 'ejs';
   const ast = templateParser(content, sourceUrl);
 
   let source: string;
@@ -370,9 +370,8 @@ export function template<T>(content: string, options?: TemplateOptions): (input:
   // need to only use the source, not the function itself. Otherwise expect a module object to be
   // passed, and we use that one.
   const fn = Function('module', source);
-  const module = options && options.module
-               ? (options.module === true ? { exports: {} } : options.module)
-               : null;
+  const module =
+    options && options.module ? (options.module === true ? { exports: {} } : options.module) : null;
   const result = fn(module);
 
   // Provide the compiled function's source by its `toString` method or

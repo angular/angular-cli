@@ -1,7 +1,7 @@
- For help with individual commands, use the `--help` or `-h` option with the command.
+For help with individual commands, use the `--help` or `-h` option with the command.
 
- For example,
+For example,
 
- ```sh
- ng help serve
- ```
+```sh
+ng help serve
+```

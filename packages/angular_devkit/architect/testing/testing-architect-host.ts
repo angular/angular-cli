@@ -13,7 +13,7 @@ import { ArchitectHost, Builder } from '../src/internal';
 export class TestingArchitectHost implements ArchitectHost {
   private _builderImportMap = new Map<string, Builder>();
   private _builderMap = new Map<string, BuilderInfo>();
-  private _targetMap = new Map<string, { builderName: string, options: json.JsonObject }>();
+  private _targetMap = new Map<string, { builderName: string; options: json.JsonObject }>();
 
   /**
    * Can provide a backend host, in case of integration tests.
@@ -56,7 +56,9 @@ export class TestingArchitectHost implements ArchitectHost {
     for (const builderName of Object.keys(builders)) {
       const b = builders[builderName];
       // TODO: remove this check as v1 is not supported anymore.
-      if (!b.implementation) { continue; }
+      if (!b.implementation) {
+        continue;
+      }
       const handler = (await import(builderJsonPath + '/../' + b.implementation)).default;
       const optionsSchema = await import(builderJsonPath + '/../' + b.schema);
       this.addBuilder(`${packageJson.name}:${builderName}`, handler, b.description, optionsSchema);
@@ -84,8 +86,10 @@ export class TestingArchitectHost implements ArchitectHost {
    * @returns All the info needed for the builder itself.
    */
   async resolveBuilder(builderName: string): Promise<BuilderInfo | null> {
-    return this._builderMap.get(builderName)
-        || (this._backendHost && this._backendHost.resolveBuilder(builderName));
+    return (
+      this._builderMap.get(builderName) ||
+      (this._backendHost && this._backendHost.resolveBuilder(builderName))
+    );
   }
 
   async getCurrentDirectory(): Promise<string> {
@@ -110,8 +114,9 @@ export class TestingArchitectHost implements ArchitectHost {
   }
 
   async loadBuilder(info: BuilderInfo): Promise<Builder | null> {
-    return this._builderImportMap.get(info.builderName)
-        || (this._backendHost && this._backendHost.loadBuilder(info));
+    return (
+      this._builderImportMap.get(info.builderName) ||
+      (this._backendHost && this._backendHost.loadBuilder(info))
+    );
   }
-
 }

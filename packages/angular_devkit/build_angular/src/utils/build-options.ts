@@ -78,7 +78,9 @@ export interface WebpackTestOptions extends BuildOptions {
   codeCoverageExclude?: string[];
 }
 
-export interface WebpackDevServerOptions extends BuildOptions, Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'browserTarget'> { }
+export interface WebpackDevServerOptions
+  extends BuildOptions,
+    Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'browserTarget'> {}
 
 export interface WebpackConfigOptions<T = BuildOptions> {
   root: string;

@@ -51,21 +51,12 @@
       "uniqueItems": true,
       "minItems": 1,
       "items": {
-        "enum": [
-          "CanActivate",
-          "CanActivateChild",
-          "CanDeactivate",
-          "CanLoad"
-        ],
+        "enum": ["CanActivate", "CanActivateChild", "CanDeactivate", "CanLoad"],
         "type": "string"
       },
-      "default": [
-        "CanActivate"
-      ],
+      "default": ["CanActivate"],
       "x-prompt": "Which interfaces would you like to implement?"
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": ["name"]
 }

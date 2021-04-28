@@ -18,20 +18,19 @@ export class MultiAnalytics implements Analytics {
   }
 
   event(category: string, action: string, options?: EventOptions): void {
-    this._backends.forEach(be => be.event(category, action, options));
+    this._backends.forEach((be) => be.event(category, action, options));
   }
   screenview(screenName: string, appName: string, options?: ScreenviewOptions): void {
-    this._backends.forEach(be => be.screenview(screenName, appName, options));
+    this._backends.forEach((be) => be.screenview(screenName, appName, options));
   }
   pageview(path: string, options?: PageviewOptions): void {
-    this._backends.forEach(be => be.pageview(path, options));
+    this._backends.forEach((be) => be.pageview(path, options));
   }
   timing(category: string, variable: string, time: string | number, options?: TimingOptions): void {
-    this._backends.forEach(be => be.timing(category, variable, time, options));
+    this._backends.forEach((be) => be.timing(category, variable, time, options));
   }
 
-
   flush(): Promise<void> {
-    return Promise.all(this._backends.map(x => x.flush())).then(() => {});
+    return Promise.all(this._backends.map((x) => x.flush())).then(() => {});
   }
 }

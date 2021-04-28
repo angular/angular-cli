@@ -93,9 +93,7 @@ export function getTypeScriptConfig(wco: WebpackConfigOptions) {
         },
       ],
     },
-    plugins: [
-      createIvyPlugin(wco, aot, tsConfigPath),
-    ],
+    plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
   };
 }
 

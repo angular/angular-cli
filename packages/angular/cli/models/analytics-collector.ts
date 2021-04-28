@@ -85,10 +85,7 @@ export class AnalyticsCollector implements analytics.Analytics {
   private readonly parameters: Record<string, string | number | boolean> = {};
   private readonly analyticsLogDebug = debug('ng:analytics:log');
 
-  constructor(
-    trackingId: string,
-    userId: string,
-  ) {
+  constructor(trackingId: string, userId: string) {
     // API Version
     this.parameters['v'] = '1';
     // User ID
@@ -113,8 +110,12 @@ export class AnalyticsCollector implements analytics.Analytics {
     this.parameters['cd' + analytics.NgCliAnalyticsDimensions.CpuCount] = os.cpus().length;
     // Get the first CPU's speed. It's very rare to have multiple CPUs of different speed (in most
     // non-ARM configurations anyway), so that's all we care about.
-    this.parameters['cd' + analytics.NgCliAnalyticsDimensions.CpuSpeed] = Math.floor(os.cpus()[0].speed);
-    this.parameters['cd' + analytics.NgCliAnalyticsDimensions.RamInGigabytes] = Math.round(os.totalmem() / (1024 * 1024 * 1024));
+    this.parameters['cd' + analytics.NgCliAnalyticsDimensions.CpuSpeed] = Math.floor(
+      os.cpus()[0].speed,
+    );
+    this.parameters['cd' + analytics.NgCliAnalyticsDimensions.RamInGigabytes] = Math.round(
+      os.totalmem() / (1024 * 1024 * 1024),
+    );
     this.parameters['cd' + analytics.NgCliAnalyticsDimensions.NodeVersion] = nodeVersion;
   }
 
@@ -128,7 +129,12 @@ export class AnalyticsCollector implements analytics.Analytics {
     this.addToQueue('pageview', { dp, dh, dt, metrics, dimensions });
   }
 
-  timing(utc: string, utv: string, utt: string | number, options: analytics.TimingOptions = {}): void {
+  timing(
+    utc: string,
+    utv: string,
+    utt: string | number,
+    options: analytics.TimingOptions = {},
+  ): void {
     const { label: utl, metrics, dimensions } = options;
     this.addToQueue('timing', { utc, utv, utt, utl, metrics, dimensions });
   }
@@ -163,7 +169,10 @@ export class AnalyticsCollector implements analytics.Analytics {
   private addToQueue(eventType: 'pageview', parameters: PageviewParameters): void;
   private addToQueue(eventType: 'timing', parameters: TimingParameters): void;
   private addToQueue(eventType: 'screenview', parameters: ScreenviewParameters): void;
-  private addToQueue(eventType: 'event' | 'pageview' | 'timing' | 'screenview', parameters: BaseParameters): void {
+  private addToQueue(
+    eventType: 'event' | 'pageview' | 'timing' | 'screenview',
+    parameters: BaseParameters,
+  ): void {
     const { metrics, dimensions, ...restParameters } = parameters;
     const data = {
       ...this.parameters,
@@ -180,21 +189,26 @@ export class AnalyticsCollector implements analytics.Analytics {
     this.analyticsLogDebug('send event: %j', data);
 
     return new Promise<void>((resolve, reject) => {
-      const request = https.request({
-        host: 'www.google-analytics.com',
-        method: 'POST',
-        path: data.length > 1 ? '/batch' : '/collect',
-      }, response => {
-        if (response.statusCode !== 200) {
-          reject(new Error(`Analytics reporting failed with status code: ${response.statusCode}.`));
+      const request = https.request(
+        {
+          host: 'www.google-analytics.com',
+          method: 'POST',
+          path: data.length > 1 ? '/batch' : '/collect',
+        },
+        (response) => {
+          if (response.statusCode !== 200) {
+            reject(
+              new Error(`Analytics reporting failed with status code: ${response.statusCode}.`),
+            );
 
-          return;
-        }
-      });
+            return;
+          }
+        },
+      );
 
       request.on('error', reject);
 
-      const queryParameters = data.map(p => querystring.stringify(p)).join('\n');
+      const queryParameters = data.map((p) => querystring.stringify(p)).join('\n');
       request.write(queryParameters);
       request.end(resolve);
     });
@@ -204,12 +218,14 @@ export class AnalyticsCollector implements analytics.Analytics {
    * Creates the dimension and metrics variables to add to the queue.
    * @private
    */
-  private customVariables(options: analytics.CustomDimensionsAndMetricsOptions): Record<string, string | number | boolean> {
+  private customVariables(
+    options: analytics.CustomDimensionsAndMetricsOptions,
+  ): Record<string, string | number | boolean> {
     const additionals: Record<string, string | number | boolean> = {};
 
     const { dimensions, metrics } = options;
-    dimensions?.forEach((v, i) => additionals[`cd${i}`] = v);
-    metrics?.forEach((v, i) => additionals[`cm${i}`] = v);
+    dimensions?.forEach((v, i) => (additionals[`cd${i}`] = v));
+    metrics?.forEach((v, i) => (additionals[`cm${i}`] = v));
 
     return additionals;
   }
@@ -282,7 +298,6 @@ function _buildUserAgentString() {
   }
 }
 
-
 /**
  * Get a language code.
  * @private
@@ -311,7 +326,7 @@ function _getWindowsLanguageCode(): string | undefined {
     // This is true on Windows XP, 7, 8 and 10 AFAIK. Would return empty string or fail if it
     // doesn't work.
     return execSync('wmic.exe os get locale').toString().trim();
-  } catch { }
+  } catch {}
 
   return undefined;
 }

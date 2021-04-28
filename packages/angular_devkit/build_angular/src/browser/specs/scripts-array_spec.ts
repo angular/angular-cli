@@ -9,19 +9,18 @@ import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder scripts array', () => {
   const scripts: { [path: string]: string } = {
-    'src/input-script.js': 'console.log(\'input-script\'); var number = 1+1;',
-    'src/zinput-script.js': 'console.log(\'zinput-script\');',
-    'src/finput-script.js': 'console.log(\'finput-script\');',
-    'src/uinput-script.js': 'console.log(\'uinput-script\');',
-    'src/binput-script.js': 'console.log(\'binput-script\');',
-    'src/ainput-script.js': 'console.log(\'ainput-script\');',
-    'src/cinput-script.js': 'console.log(\'cinput-script\');',
-    'src/lazy-script.js': 'console.log(\'lazy-script\');',
-    'src/pre-rename-script.js': 'console.log(\'pre-rename-script\');',
-    'src/pre-rename-lazy-script.js': 'console.log(\'pre-rename-lazy-script\');',
+    'src/input-script.js': "console.log('input-script'); var number = 1+1;",
+    'src/zinput-script.js': "console.log('zinput-script');",
+    'src/finput-script.js': "console.log('finput-script');",
+    'src/uinput-script.js': "console.log('uinput-script');",
+    'src/binput-script.js': "console.log('binput-script');",
+    'src/ainput-script.js': "console.log('ainput-script');",
+    'src/cinput-script.js': "console.log('cinput-script');",
+    'src/lazy-script.js': "console.log('lazy-script');",
+    'src/pre-rename-script.js': "console.log('pre-rename-script');",
+    'src/pre-rename-lazy-script.js': "console.log('pre-rename-lazy-script');",
   };
   const getScriptsOption = () => [
     'src/input-script.js',
@@ -52,16 +51,17 @@ describe('Browser Builder scripts array', () => {
       'renamed-script.js': 'pre-rename-script',
       'renamed-lazy-script.js': 'pre-rename-lazy-script',
       'main.js': 'input-script',
-      'index.html': '<script src="runtime.js" defer></script>'
-        + '<script src="polyfills.js" defer></script>'
-        + '<script src="scripts.js" defer></script>'
-        + '<script src="renamed-script.js" defer></script>'
-        + '<script src="vendor.js" defer></script>'
-        + '<script src="main.js" defer></script>',
+      'index.html':
+        '<script src="runtime.js" defer></script>' +
+        '<script src="polyfills.js" defer></script>' +
+        '<script src="scripts.js" defer></script>' +
+        '<script src="renamed-script.js" defer></script>' +
+        '<script src="vendor.js" defer></script>' +
+        '<script src="main.js" defer></script>',
     };
 
     host.writeMultipleFiles(scripts);
-    host.appendToFile('src/main.ts', '\nimport \'./input-script.js\';');
+    host.appendToFile('src/main.ts', "\nimport './input-script.js';");
 
     // Remove styles so we don't have to account for them in the index.html order check.
     const { files } = await browserBuild(architect, host, target, {
@@ -81,16 +81,17 @@ describe('Browser Builder scripts array', () => {
       'renamed-script.js': 'pre-rename-script',
       'renamed-lazy-script.js': 'pre-rename-lazy-script',
       'main-es2017.js': 'input-script',
-      'index.html': '<script src="runtime-es2017.js" type="module"></script>'
-        + '<script src="polyfills-es2017.js" type="module"></script>'
-        + '<script src="scripts.js" defer></script>'
-        + '<script src="renamed-script.js" defer></script>'
-        + '<script src="vendor-es2017.js" type="module"></script>'
-        + '<script src="main-es2017.js" type="module"></script>',
+      'index.html':
+        '<script src="runtime-es2017.js" type="module"></script>' +
+        '<script src="polyfills-es2017.js" type="module"></script>' +
+        '<script src="scripts.js" defer></script>' +
+        '<script src="renamed-script.js" defer></script>' +
+        '<script src="vendor-es2017.js" type="module"></script>' +
+        '<script src="main-es2017.js" type="module"></script>',
     };
 
     host.writeMultipleFiles(scripts);
-    host.appendToFile('src/main.ts', '\nimport \'./input-script.js\';');
+    host.appendToFile('src/main.ts', "\nimport './input-script.js';");
 
     // Enable differential loading
     host.appendToFile('.browserslistrc', '\nIE 11');
@@ -118,14 +119,14 @@ describe('Browser Builder scripts array', () => {
     } as {});
 
     const fileNames = Object.keys(files);
-    const scriptsBundle = fileNames.find(n => /scripts\.[0-9a-f]{20}\.js/.test(n));
+    const scriptsBundle = fileNames.find((n) => /scripts\.[0-9a-f]{20}\.js/.test(n));
     expect(scriptsBundle).toBeTruthy();
     expect(await files[scriptsBundle || '']).toMatch('var number=2;');
 
-    expect(fileNames.some(n => /scripts\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
-    expect(fileNames.some(n => /renamed-script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
-    expect(fileNames.some(n => /renamed-script\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
-    expect(fileNames.some(n => /script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /scripts\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /renamed-script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /renamed-script\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
     expect(await files['lazy-script.js']).not.toBeUndefined();
     expect(await files['lazy-script.js.map']).not.toBeUndefined();
     expect(await files['renamed-lazy-script.js']).not.toBeUndefined();
@@ -139,15 +140,17 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     } as {});
 
-    expect(await files['scripts.js']).toMatch(new RegExp(
-      /.*['"]input-script['"](.|\n|\r)*/.source
-      + /['"]zinput-script['"](.|\n|\r)*/.source
-      + /['"]finput-script['"](.|\n|\r)*/.source
-      + /['"]uinput-script['"](.|\n|\r)*/.source
-      + /['"]binput-script['"](.|\n|\r)*/.source
-      + /['"]ainput-script['"](.|\n|\r)*/.source
-      + /['"]cinput-script['"]/.source,
-    ));
+    expect(await files['scripts.js']).toMatch(
+      new RegExp(
+        /.*['"]input-script['"](.|\n|\r)*/.source +
+          /['"]zinput-script['"](.|\n|\r)*/.source +
+          /['"]finput-script['"](.|\n|\r)*/.source +
+          /['"]uinput-script['"](.|\n|\r)*/.source +
+          /['"]binput-script['"](.|\n|\r)*/.source +
+          /['"]ainput-script['"](.|\n|\r)*/.source +
+          /['"]cinput-script['"]/.source,
+      ),
+    );
   });
 
   it('chunk in entry', async () => {
@@ -177,14 +180,10 @@ describe('Browser Builder scripts array', () => {
   });
 
   it(`should error when a script doesn't exist`, async () => {
-    await expectAsync(browserBuild(
-      architect,
-      host,
-      target,
-      {
+    await expectAsync(
+      browserBuild(architect, host, target, {
         scripts: ['./invalid.js'],
-      },
-    ))
-      .toBeRejectedWithError(`Script file ./invalid.js does not exist.`);
+      }),
+    ).toBeRejectedWithError(`Script file ./invalid.js does not exist.`);
   });
 });

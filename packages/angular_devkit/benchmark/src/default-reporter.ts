@@ -15,11 +15,15 @@ export const defaultReporter = (logger: logging.Logger): BenchmarkReporter => (p
 
   const formatMetric = (metric: Metric | AggregatedMetric) => tags.oneLine`
     ${metric.name}: ${metric.value.toFixed(2)} ${metric.unit}
-    ${metric.componentValues ? `(${metric.componentValues.map(v => v.toFixed(2)).join(', ')})` : ''}
+    ${
+      metric.componentValues
+        ? `(${metric.componentValues.map((v) => v.toFixed(2)).join(', ')})`
+        : ''
+    }
   `;
 
-  groups.forEach(group => {
+  groups.forEach((group) => {
     toplevelLogger.info(`${group.name}`);
-    group.metrics.forEach(metric => indentLogger.info(formatMetric(metric)));
+    group.metrics.forEach((metric) => indentLogger.info(formatMetric(metric)));
   });
 };

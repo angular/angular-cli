@@ -12,44 +12,34 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2019",
-    "lib": [
-      "es2019"
-    ],
+    "lib": ["es2019"],
     "baseUrl": "",
-    "rootDirs": [
-      ".",
-      "./dist-schema/",
-      "./bazel-bin/"
-    ],
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
-    "types": [
-      "node"
-    ],
+    "rootDirs": [".", "./dist-schema/", "./bazel-bin/"],
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node"],
     "paths": {
-      "@angular-devkit/core": [ "./packages/angular_devkit/core/src/index" ],
-      "@angular-devkit/core/node": [ "./packages/angular_devkit/core/node/index" ],
-      "@angular-devkit/core/node/testing": [ "./packages/angular_devkit/core/node/testing/index" ],
-      "@angular-devkit/schematics": [ "./packages/angular_devkit/schematics/src/index" ],
-      "@angular-devkit/schematics/tasks": [ "./packages/angular_devkit/schematics/tasks/index" ],
-      "@angular-devkit/schematics/tasks/node": [ "./packages/angular_devkit/schematics/tasks/node/index" ],
-      "@angular-devkit/schematics/tools": [ "./packages/angular_devkit/schematics/tools/index" ],
-      "@angular-devkit/schematics/testing": [ "./packages/angular_devkit/schematics/testing/index" ],
-      "@angular-devkit/build-optimizer": [ "./packages/angular_devkit/build_optimizer/src/index" ],
-      "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ],
-      "@angular-devkit/architect/testing": [ "./packages/angular_devkit/architect/testing/index" ],
-      "@angular-devkit/build-angular": [ "./packages/angular_devkit/build_angular/src/index" ],
-      "@angular-devkit/build-webpack": [ "./packages/angular_devkit/build_webpack/src/index" ],
-      "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
-      "@schematics/angular": [ "./packages/schematics/angular/index" ]
+      "@angular-devkit/core": ["./packages/angular_devkit/core/src/index"],
+      "@angular-devkit/core/node": ["./packages/angular_devkit/core/node/index"],
+      "@angular-devkit/core/node/testing": ["./packages/angular_devkit/core/node/testing/index"],
+      "@angular-devkit/schematics": ["./packages/angular_devkit/schematics/src/index"],
+      "@angular-devkit/schematics/tasks": ["./packages/angular_devkit/schematics/tasks/index"],
+      "@angular-devkit/schematics/tasks/node": [
+        "./packages/angular_devkit/schematics/tasks/node/index"
+      ],
+      "@angular-devkit/schematics/tools": ["./packages/angular_devkit/schematics/tools/index"],
+      "@angular-devkit/schematics/testing": ["./packages/angular_devkit/schematics/testing/index"],
+      "@angular-devkit/build-optimizer": ["./packages/angular_devkit/build_optimizer/src/index"],
+      "@angular-devkit/architect": ["./packages/angular_devkit/architect/src/index"],
+      "@angular-devkit/architect/testing": ["./packages/angular_devkit/architect/testing/index"],
+      "@angular-devkit/build-angular": ["./packages/angular_devkit/build_angular/src/index"],
+      "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack/src/index"],
+      "@ngtools/webpack": ["./packages/ngtools/webpack/src/index"],
+      "@schematics/angular": ["./packages/schematics/angular/index"]
     },
     "plugins": [
       {
         "name": "@bazel/tsetse",
-        "disabledRules": [
-          "must-type-assert-json-parse"
-        ]
+        "disabledRules": ["must-type-assert-json-parse"]
       }
     ]
   },

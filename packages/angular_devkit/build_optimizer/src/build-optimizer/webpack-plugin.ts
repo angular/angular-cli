@@ -14,7 +14,7 @@ interface ModuleData {
 
 export class BuildOptimizerWebpackPlugin {
   apply(compiler: Compiler) {
-    compiler.hooks.normalModuleFactory.tap('BuildOptimizerWebpackPlugin', nmf => {
+    compiler.hooks.normalModuleFactory.tap('BuildOptimizerWebpackPlugin', (nmf) => {
       // tslint:disable-next-line: no-any
       nmf.hooks.module.tap('BuildOptimizerWebpackPlugin', (module: Module, data: ModuleData) => {
         if (data.resourceResolveData?.descriptionFileData) {

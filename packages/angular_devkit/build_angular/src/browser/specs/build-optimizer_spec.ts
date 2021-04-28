@@ -11,7 +11,6 @@ import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder build optimizer', () => {
   const targetSpec = { project: 'app', target: 'build' };
   let architect: Architect;
@@ -43,7 +42,7 @@ describe('Browser Builder build optimizer', () => {
     const boOverrides = { ...noBoOverrides, buildOptimizer: true };
 
     const run = await architect.scheduleTarget(targetSpec, noBoOverrides);
-    const output = await run.result as BrowserBuilderOutput;
+    const output = (await run.result) as BrowserBuilderOutput;
 
     expect(output.success).toBe(true);
 
@@ -55,7 +54,7 @@ describe('Browser Builder build optimizer', () => {
     await run.stop();
 
     const boRun = await architect.scheduleTarget(targetSpec, boOverrides);
-    const boOutput = await run.result as BrowserBuilderOutput;
+    const boOutput = (await run.result) as BrowserBuilderOutput;
     expect(boOutput.success).toBe(true);
 
     const boStats = await host.stat(join(normalize(output.outputPath), 'main.js')).toPromise();
@@ -67,13 +66,16 @@ describe('Browser Builder build optimizer', () => {
 
     const sizeDiff = Math.round(((boSize - noBoSize) / noBoSize) * 10000) / 100;
     if (sizeDiff > -1 && sizeDiff < 0) {
-      throw new Error('Total size difference is too small, '
-        + 'build optimizer does not seem to have made any optimizations.');
+      throw new Error(
+        'Total size difference is too small, ' +
+          'build optimizer does not seem to have made any optimizations.',
+      );
     }
 
     if (sizeDiff > 1) {
-      throw new Error('Total size difference is positive, '
-        + 'build optimizer made the bundle bigger.');
+      throw new Error(
+        'Total size difference is positive, ' + 'build optimizer made the bundle bigger.',
+      );
     }
   });
 });

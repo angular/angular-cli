@@ -10,8 +10,7 @@ import { Rule } from '@angular-devkit/schematics';
 import { updateWorkspace } from '../../utility/workspace';
 
 export default function (): Rule {
-  return updateWorkspace(workspace => {
-
+  return updateWorkspace((workspace) => {
     const optionsToRemove: Record<string, undefined> = {
       environment: undefined,
       extractCss: undefined,
@@ -53,7 +52,10 @@ export default function (): Rule {
 type TargetOptions = workspaces.TargetDefinition['options'];
 
 function updateLazyScriptsStyleOption(options: TargetOptions): TargetOptions {
-  function visitor(options: NonNullable<TargetOptions>, type: 'scripts' | 'styles'): JsonArray | undefined {
+  function visitor(
+    options: NonNullable<TargetOptions>,
+    type: 'scripts' | 'styles',
+  ): JsonArray | undefined {
     // tslint:disable-next-line: no-non-null-assertion
     if (!options[type] || !isJsonArray(options[type]!)) {
       return undefined;

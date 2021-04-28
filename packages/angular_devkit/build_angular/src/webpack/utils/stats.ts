@@ -37,19 +37,21 @@ export interface BundleStats {
   chunkType: ChunkType;
 }
 
-export function generateBundleStats(
-  info: {
-    size?: number;
-    files?: string[];
-    names?: string[];
-    entry?: boolean;
-    initial?: boolean;
-    rendered?: boolean;
-    chunkType?: ChunkType,
-  },
-): BundleStats {
+export function generateBundleStats(info: {
+  size?: number;
+  files?: string[];
+  names?: string[];
+  entry?: boolean;
+  initial?: boolean;
+  rendered?: boolean;
+  chunkType?: ChunkType;
+}): BundleStats {
   const size = typeof info.size === 'number' ? info.size : '-';
-  const files = info.files?.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ') ?? '';
+  const files =
+    info.files
+      ?.filter((f) => !f.endsWith('.map'))
+      .map((f) => path.basename(f))
+      .join(', ') ?? '';
   const names = info.names?.length ? info.names.join(', ') : '-';
   const initial = !!(info.entry || info.initial);
   const chunkType = info.chunkType || 'unknown';
@@ -61,11 +63,15 @@ export function generateBundleStats(
   };
 }
 
-function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotalSize: boolean): string {
-  const g = (x: string) => colors ? ansiColors.greenBright(x) : x;
-  const c = (x: string) => colors ? ansiColors.cyanBright(x) : x;
-  const bold = (x: string) => colors ? ansiColors.bold(x) : x;
-  const dim = (x: string) => colors ? ansiColors.dim(x) : x;
+function generateBuildStatsTable(
+  data: BundleStats[],
+  colors: boolean,
+  showTotalSize: boolean,
+): string {
+  const g = (x: string) => (colors ? ansiColors.greenBright(x) : x);
+  const c = (x: string) => (colors ? ansiColors.cyanBright(x) : x);
+  const bold = (x: string) => (colors ? ansiColors.bold(x) : x);
+  const dim = (x: string) => (colors ? ansiColors.dim(x) : x);
 
   const changedEntryChunksStats: BundleStatsData[] = [];
   const changedLazyChunksStats: BundleStatsData[] = [];
@@ -113,10 +119,7 @@ function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotal
 
   // Entry chunks
   if (changedEntryChunksStats.length) {
-    bundleInfo.push(
-      ['Initial Chunk Files', 'Names', 'Size'].map(bold),
-      ...changedEntryChunksStats,
-    );
+    bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
 
     if (showTotalSize) {
       bundleInfo.push([]);
@@ -138,33 +141,34 @@ function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotal
 
   // Lazy chunks
   if (changedLazyChunksStats.length) {
-    bundleInfo.push(
-      ['Lazy Chunk Files', 'Names', 'Size'].map(bold),
-      ...changedLazyChunksStats,
-    );
+    bundleInfo.push(['Lazy Chunk Files', 'Names', 'Size'].map(bold), ...changedLazyChunksStats);
   }
 
   return textTable(bundleInfo, {
     hsep: dim(' | '),
-    stringLength: s => removeColor(s).length,
+    stringLength: (s) => removeColor(s).length,
     align: ['l', 'l', 'r'],
   });
 }
 
 function generateBuildStats(hash: string, time: number, colors: boolean): string {
-  const w = (x: string) => colors ? ansiColors.bold.white(x) : x;
+  const w = (x: string) => (colors ? ansiColors.bold.white(x) : x);
 
   return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 
-// tslint:disable-next-line: no-any
-function statsToString(json: StatsCompilation, statsConfig: any, bundleState?: BundleStats[]): string {
+function statsToString(
+  json: StatsCompilation,
+  // tslint:disable-next-line: no-any
+  statsConfig: any,
+  bundleState?: BundleStats[],
+): string {
   if (!json.chunks?.length) {
     return '';
   }
 
   const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? ansiColors.reset(x) : x;
+  const rs = (x: string) => (colors ? ansiColors.reset(x) : x);
 
   const changedChunksStats: BundleStats[] = bundleState ?? [];
   let unchangedChunkNumber = 0;
@@ -174,8 +178,10 @@ function statsToString(json: StatsCompilation, statsConfig: any, bundleState?: B
         continue;
       }
 
-      const assets = json.assets?.filter(asset => chunk.files?.includes(asset.name));
-      const summedSize = assets?.filter(asset => !asset.name.endsWith('.map')).reduce((total, asset) => total + asset.size, 0);
+      const assets = json.assets?.filter((asset) => chunk.files?.includes(asset.name));
+      const summedSize = assets
+        ?.filter((asset) => !asset.name.endsWith('.map'))
+        .reduce((total, asset) => total + asset.size, 0);
       changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }));
     }
     unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
@@ -194,30 +200,40 @@ function statsToString(json: StatsCompilation, statsConfig: any, bundleState?: B
     return 0;
   });
 
-  const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
+  const statsTable = generateBuildStatsTable(
+    changedChunksStats,
+    colors,
+    unchangedChunkNumber === 0,
+  );
 
   // In some cases we do things outside of webpack context
   // Such us index generation, service worker augmentation etc...
   // This will correct the time and include these.
   let time = 0;
   if (json.builtAt !== undefined && json.time !== undefined) {
-    time = (Date.now() - json.builtAt) + json.time;
+    time = Date.now() - json.builtAt + json.time;
   }
 
   if (unchangedChunkNumber > 0) {
-    return '\n' + rs(tags.stripIndents`
+    return (
+      '\n' +
+      rs(tags.stripIndents`
       ${statsTable}
 
       ${unchangedChunkNumber} unchanged chunks
 
       ${generateBuildStats(json.hash || '', time, colors)}
-      `);
+      `)
+    );
   } else {
-    return '\n' + rs(tags.stripIndents`
+    return (
+      '\n' +
+      rs(tags.stripIndents`
       ${statsTable}
 
       ${generateBuildStats(json.hash || '', time, colors)}
-      `);
+      `)
+    );
   }
 }
 
@@ -232,16 +248,13 @@ export const IGNORE_WARNINGS = [
 // tslint:disable-next-line: no-any
 export function statsWarningsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
-  const c = (x: string) => colors ? ansiColors.reset.cyan(x) : x;
-  const y = (x: string) => colors ? ansiColors.reset.yellow(x) : x;
-  const yb = (x: string) => colors ? ansiColors.reset.yellowBright(x) : x;
+  const c = (x: string) => (colors ? ansiColors.reset.cyan(x) : x);
+  const y = (x: string) => (colors ? ansiColors.reset.yellow(x) : x);
+  const yb = (x: string) => (colors ? ansiColors.reset.yellowBright(x) : x);
 
   const warnings = json.warnings ? [...json.warnings] : [];
   if (json.children) {
-    warnings.push(...json.children
-      .map(c => c.warnings ?? [])
-      .reduce((a, b) => [...a, ...b], []),
-    );
+    warnings.push(...json.children.map((c) => c.warnings ?? []).reduce((a, b) => [...a, ...b], []));
   }
 
   let output = '';
@@ -270,16 +283,13 @@ export function statsWarningsToString(json: StatsCompilation, statsConfig: any):
 // tslint:disable-next-line: no-any
 export function statsErrorsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
-  const c = (x: string) => colors ? ansiColors.reset.cyan(x) : x;
-  const yb = (x: string) => colors ? ansiColors.reset.yellowBright(x) : x;
-  const r = (x: string) => colors ? ansiColors.reset.redBright(x) : x;
+  const c = (x: string) => (colors ? ansiColors.reset.cyan(x) : x);
+  const yb = (x: string) => (colors ? ansiColors.reset.yellowBright(x) : x);
+  const r = (x: string) => (colors ? ansiColors.reset.redBright(x) : x);
 
   const errors = json.errors ? [...json.errors] : [];
   if (json.children) {
-    errors.push(...json.children
-      .map(c => c?.errors || [])
-      .reduce((a, b) => [...a, ...b], []),
-    );
+    errors.push(...json.children.map((c) => c?.errors || []).reduce((a, b) => [...a, ...b], []));
   }
 
   let output = '';
@@ -306,11 +316,11 @@ export function statsErrorsToString(json: StatsCompilation, statsConfig: any): s
 }
 
 export function statsHasErrors(json: StatsCompilation): boolean {
-  return !!(json.errors?.length || json.children?.some(c => c.errors?.length));
+  return !!(json.errors?.length || json.children?.some((c) => c.errors?.length));
 }
 
 export function statsHasWarnings(json: StatsCompilation): boolean {
-  return !!(json.warnings?.length || json.children?.some(c => c.warnings?.length));
+  return !!(json.warnings?.length || json.children?.some((c) => c.warnings?.length));
 }
 
 export function createWebpackLoggingCallback(

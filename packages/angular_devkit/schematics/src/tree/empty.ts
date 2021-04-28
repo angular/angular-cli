@@ -8,7 +8,8 @@
 
 import { HostTree } from './host-tree';
 
-
 export class EmptyTree extends HostTree {
-  constructor() { super(); }
+  constructor() {
+    super();
+  }
 }

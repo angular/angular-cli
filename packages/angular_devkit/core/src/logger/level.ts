@@ -28,7 +28,7 @@ export class LevelTransformLogger extends Logger {
 }
 
 export class LevelCapLogger extends LevelTransformLogger {
-  static levelMap: {[cap: string]: {[level: string]: string}} = {
+  static levelMap: { [cap: string]: { [level: string]: string } } = {
     debug: { debug: 'debug', info: 'debug', warn: 'debug', error: 'debug', fatal: 'debug' },
     info: { debug: 'debug', info: 'info', warn: 'info', error: 'info', fatal: 'info' },
     warn: { debug: 'debug', info: 'info', warn: 'warn', error: 'warn', fatal: 'warn' },

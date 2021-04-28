@@ -15,12 +15,8 @@ import {
 } from '../helpers/transform-javascript';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
-import {
-  createScrubFileTransformerFactory,
-  testScrubFile,
-} from '../transforms/scrub-file';
+import { createScrubFileTransformerFactory, testScrubFile } from '../transforms/scrub-file';
 import { getWrapEnumsTransformer } from '../transforms/wrap-enums';
-
 
 // Angular packages are known to have no side effects.
 const knownSideEffectFreeAngularModules = [

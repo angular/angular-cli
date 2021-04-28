@@ -17,20 +17,27 @@ export function testPrefixClasses(content: string) {
   const regexes = [
     [
       /^/,
-      exportVarSetter, multiLineComment,
-      /\(/, multiLineComment,
-      /\s*function \(\) {/, newLine,
+      exportVarSetter,
       multiLineComment,
-      /function (?:\S+)\([^\)]*\) \{/, newLine,
+      /\(/,
+      multiLineComment,
+      /\s*function \(\) {/,
+      newLine,
+      multiLineComment,
+      /function (?:\S+)\([^\)]*\) \{/,
+      newLine,
     ],
     [
       /^/,
-      exportVarSetter, multiLineComment,
-      /\(/, multiLineComment,
-      /\s*function \(_super\) {/, newLine,
+      exportVarSetter,
+      multiLineComment,
+      /\(/,
+      multiLineComment,
+      /\s*function \(_super\) {/,
+      newLine,
       /\S*\.?__extends\(\S+, _super\);/,
     ],
-  ].map(arr => new RegExp(arr.map(x => x.source).join(''), 'm'));
+  ].map((arr) => new RegExp(arr.map((x) => x.source).join(''), 'm'));
 
   return regexes.some((regex) => regex.test(content));
 }
@@ -42,7 +49,6 @@ export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFi
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
       const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
-
         // Add pure comment to downleveled classes.
         if (ts.isVariableStatement(node) && isDownleveledClass(node)) {
           const varDecl = node.declarationList.declarations[0];
@@ -52,17 +58,14 @@ export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFi
           const newNode = ts.updateVariableStatement(
             node,
             node.modifiers,
-            ts.updateVariableDeclarationList(
-              node.declarationList,
-              [
-                ts.updateVariableDeclaration(
-                  varDecl,
-                  varDecl.name,
-                  varDecl.type,
-                  addPureComment(varInitializer),
-                ),
-              ],
-            ),
+            ts.updateVariableDeclarationList(node.declarationList, [
+              ts.updateVariableDeclaration(
+                varDecl,
+                varDecl.name,
+                varDecl.type,
+                addPureComment(varInitializer),
+              ),
+            ]),
           );
 
           // Replace node with modified one.
@@ -82,7 +85,6 @@ export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFi
 
 // Determine if a node matched the structure of a downleveled TS class.
 function isDownleveledClass(node: ts.Node): boolean {
-
   if (!ts.isVariableStatement(node)) {
     return false;
   }
@@ -93,8 +95,7 @@ function isDownleveledClass(node: ts.Node): boolean {
 
   const variableDeclaration = node.declarationList.declarations[0];
 
-  if (!ts.isIdentifier(variableDeclaration.name)
-      || !variableDeclaration.initializer) {
+  if (!ts.isIdentifier(variableDeclaration.name) || !variableDeclaration.initializer) {
     return false;
   }
 
@@ -114,8 +115,10 @@ function isDownleveledClass(node: ts.Node): boolean {
   let wrapperBody: ts.Block;
   if (ts.isFunctionExpression(potentialClass.expression)) {
     wrapperBody = potentialClass.expression.body;
-  } else if (ts.isArrowFunction(potentialClass.expression)
-             && ts.isBlock(potentialClass.expression.body)) {
+  } else if (
+    ts.isArrowFunction(potentialClass.expression) &&
+    ts.isBlock(potentialClass.expression.body)
+  ) {
     wrapperBody = potentialClass.expression.body;
   } else {
     return false;
@@ -144,17 +147,21 @@ function isDownleveledClass(node: ts.Node): boolean {
     }
   }
 
-  if (returnStatement == undefined
-      || returnStatement.expression == undefined
-      || !ts.isIdentifier(returnStatement.expression)) {
+  if (
+    returnStatement == undefined ||
+    returnStatement.expression == undefined ||
+    !ts.isIdentifier(returnStatement.expression)
+  ) {
     return false;
   }
 
   if (functionExpression.parameters.length === 0) {
     // potential non-extended class or wrapped es2015 class
-    return (ts.isFunctionDeclaration(firstStatement) || ts.isClassDeclaration(firstStatement))
-           && firstStatement.name !== undefined
-           && returnStatement.expression.text === firstStatement.name.text;
+    return (
+      (ts.isFunctionDeclaration(firstStatement) || ts.isClassDeclaration(firstStatement)) &&
+      firstStatement.name !== undefined &&
+      returnStatement.expression.text === firstStatement.name.text
+    );
   } else if (functionExpression.parameters.length !== 1) {
     return false;
   }
@@ -163,8 +170,10 @@ function isDownleveledClass(node: ts.Node): boolean {
 
   const functionParameter = functionExpression.parameters[0];
 
-  if (!ts.isIdentifier(functionParameter.name)
-      || functionParameter.name.text !== superParameterName) {
+  if (
+    !ts.isIdentifier(functionParameter.name) ||
+    functionParameter.name.text !== superParameterName
+  ) {
     return false;
   }
 
@@ -201,7 +210,9 @@ function isDownleveledClass(node: ts.Node): boolean {
 
   const secondStatement = functionStatements[1];
 
-  return ts.isFunctionDeclaration(secondStatement)
-         && secondStatement.name !== undefined
-         && returnStatement.expression.text === secondStatement.name.text;
+  return (
+    ts.isFunctionDeclaration(secondStatement) &&
+    secondStatement.name !== undefined &&
+    returnStatement.expression.text === secondStatement.name.text
+  );
 }

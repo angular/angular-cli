@@ -17,9 +17,7 @@ import { maxWorkers } from './workers';
 
 let workerFile = require.resolve('./process-bundle');
 workerFile =
-  path.extname(workerFile) === '.ts'
-    ? require.resolve('./process-bundle-bootstrap')
-    : workerFile;
+  path.extname(workerFile) === '.ts' ? require.resolve('./process-bundle-bootstrap') : workerFile;
 
 export class BundleActionExecutor {
   private largeWorker?: JestWorker;
@@ -95,7 +93,7 @@ export class BundleActionExecutor {
   }
 
   processAll(actions: Iterable<ProcessBundleOptions>): AsyncIterable<ProcessBundleResult> {
-    return BundleActionExecutor.executeAll(actions, action => this.process(action));
+    return BundleActionExecutor.executeAll(actions, (action) => this.process(action));
   }
 
   async inline(
@@ -105,7 +103,7 @@ export class BundleActionExecutor {
   }
 
   inlineAll(actions: Iterable<InlineOptions>) {
-    return BundleActionExecutor.executeAll(actions, action => this.inline(action));
+    return BundleActionExecutor.executeAll(actions, (action) => this.inline(action));
   }
 
   private static async *executeAll<I, O>(
@@ -117,7 +115,7 @@ export class BundleActionExecutor {
       const execution = executor(action);
       executions.set(
         execution,
-        execution.then(result => {
+        execution.then((result) => {
           executions.delete(execution);
 
           return result;

@@ -32,7 +32,7 @@ describe('UpdateRecorderBase', () => {
   });
 
   it('can create the proper recorder', () => {
-    const e = new SimpleFileEntry(normalize('/some/path'),  Buffer.from('hello'));
+    const e = new SimpleFileEntry(normalize('/some/path'), Buffer.from('hello'));
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBase).toBe(true);
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBom).toBe(false);
   });
@@ -44,7 +44,7 @@ describe('UpdateRecorderBase', () => {
   });
 
   it('supports empty files', () => {
-    const e = new SimpleFileEntry(normalize('/some/path'),  Buffer.from(''));
+    const e = new SimpleFileEntry(normalize('/some/path'), Buffer.from(''));
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBase).toBe(true);
   });
 

@@ -9,7 +9,6 @@
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import { Schema as NgNewOptions } from './schema';
 
-
 describe('Ng New Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -34,11 +33,13 @@ describe('Ng New Schematic', () => {
 
     const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const files = tree.files;
-    expect(files).toEqual(jasmine.arrayContaining([
-      '/bar/tsconfig.app.json',
-      '/bar/src/main.ts',
-      '/bar/src/app/app.module.ts',
-    ]));
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/bar/tsconfig.app.json',
+        '/bar/src/main.ts',
+        '/bar/src/app/app.module.ts',
+      ]),
+    );
   });
 
   it('should should set the prefix in angular.json and in app.component.ts', async () => {

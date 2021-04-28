@@ -111,31 +111,29 @@ describe('augment-index-html', () => {
     `);
   });
 
-  it(
-    `should not add 'module' and 'non-module' attr to js files which are in both module formats`,
-    async () => {
-      const es2017JsFiles: FileInfo[] = [
-        { file: 'scripts.js', extension: '.js', name: 'scripts' },
-        { file: 'main-es2017.js', extension: '.js', name: 'main' },
-      ];
+  it(`should not add 'module' and 'non-module' attr to js files which are in both module formats`, async () => {
+    const es2017JsFiles: FileInfo[] = [
+      { file: 'scripts.js', extension: '.js', name: 'scripts' },
+      { file: 'main-es2017.js', extension: '.js', name: 'main' },
+    ];
 
-      const es5JsFiles: FileInfo[] = [
-        { file: 'scripts.js', extension: '.js', name: 'scripts' },
-        { file: 'main-es5.js', extension: '.js', name: 'main' },
-      ];
+    const es5JsFiles: FileInfo[] = [
+      { file: 'scripts.js', extension: '.js', name: 'scripts' },
+      { file: 'main-es5.js', extension: '.js', name: 'main' },
+    ];
 
-      const source = augmentIndexHtml({
-        ...indexGeneratorOptions,
-        files: [
-          { file: 'styles.css', extension: '.css', name: 'styles' },
-          { file: 'styles.css', extension: '.css', name: 'styles' },
-        ],
-        moduleFiles: es2017JsFiles,
-        noModuleFiles: es5JsFiles,
-      });
+    const source = augmentIndexHtml({
+      ...indexGeneratorOptions,
+      files: [
+        { file: 'styles.css', extension: '.css', name: 'styles' },
+        { file: 'styles.css', extension: '.css', name: 'styles' },
+      ],
+      moduleFiles: es2017JsFiles,
+      noModuleFiles: es5JsFiles,
+    });
 
-      const html = await source;
-      expect(html).toEqual(oneLineHtml`
+    const html = await source;
+    expect(html).toEqual(oneLineHtml`
       <html>
         <head>
           <base href="/">
@@ -148,7 +146,7 @@ describe('augment-index-html', () => {
         </body>
       </html>
     `);
-    });
+  });
 
   it('should add lang attribute', async () => {
     const source = augmentIndexHtml({

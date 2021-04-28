@@ -51,7 +51,7 @@ export const analyticsPackageSafelist = [
 ];
 
 export function isPackageNameSafeForAnalytics(name: string): boolean {
-  return analyticsPackageSafelist.some(pattern => {
+  return analyticsPackageSafelist.some((pattern) => {
     if (typeof pattern == 'string') {
       return pattern === name;
     } else {
@@ -86,7 +86,6 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
   config.save();
 
   analyticsDebug('done');
-
 }
 
 /**
@@ -207,7 +206,7 @@ export async function hasGlobalAnalyticsConfiguration(): Promise<boolean> {
     if (analyticsConfig !== null && analyticsConfig !== undefined) {
       return true;
     }
-  } catch { }
+  } catch {}
 
   return false;
 }
@@ -278,14 +277,13 @@ export async function getGlobalAnalytics(): Promise<AnalyticsCollector | undefin
 export async function hasWorkspaceAnalyticsConfiguration(): Promise<boolean> {
   try {
     const globalWorkspace = await getWorkspace('local');
-    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace
-      && globalWorkspace.getCli()
-      && globalWorkspace.getCli()['analytics'];
+    const analyticsConfig: string | undefined | null | { uid?: string } =
+      globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analytics'];
 
     if (analyticsConfig !== undefined) {
       return true;
     }
-  } catch { }
+  } catch {}
 
   return false;
 }
@@ -300,7 +298,9 @@ export async function getWorkspaceAnalytics(): Promise<AnalyticsCollector | unde
   analyticsDebug('getWorkspaceAnalytics');
   try {
     const globalWorkspace = await getWorkspace('local');
-    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace?.getCli()['analytics'];
+    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace?.getCli()[
+      'analytics'
+    ];
     analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
 
     if (analyticsConfig === false) {
@@ -331,7 +331,6 @@ export async function getWorkspaceAnalytics(): Promise<AnalyticsCollector | unde
 
     return undefined;
   }
-
 }
 
 /**

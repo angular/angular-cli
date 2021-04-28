@@ -88,8 +88,7 @@ function createProxy(target: string, secure: boolean, ws = true): ProxyInstance 
       -----END CERTIFICATE-----
     `,
     },
-  })
-    .listen(proxyPort);
+  }).listen(proxyPort);
 
   return {
     server,
@@ -101,7 +100,9 @@ async function goToPageAndWaitForSockJs(page: Page, url: string): Promise<void> 
   const socksRequest = `${url.endsWith('/') ? url : url + '/'}sockjs-node/info?t=`;
 
   await Promise.all([
-    page.waitForResponse((r: HTTPResponse) => r.url().startsWith(socksRequest) && r.status() === 200),
+    page.waitForResponse(
+      (r: HTTPResponse) => r.url().startsWith(socksRequest) && r.status() === 200,
+    ),
     page.goto(url),
   ]);
 }
@@ -125,10 +126,7 @@ describe('Dev Server Builder live-reload', () => {
       // tslint:disable-next-line: max-line-length
       // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
       ignoreHTTPSErrors: true,
-      args: [
-        '--no-sandbox',
-        '--disable-gpu',
-      ],
+      args: ['--no-sandbox', '--disable-gpu'],
     });
   });
 
@@ -155,7 +153,7 @@ describe('Dev Server Builder live-reload', () => {
     proxy = undefined;
     await host.restore().toPromise();
     await page.close();
-    await Promise.all(runs.map(r => r.stop()));
+    await Promise.all(runs.map((r) => r.stop()));
   });
 
   it('works without proxy', async () => {
@@ -166,7 +164,7 @@ describe('Dev Server Builder live-reload', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
@@ -196,7 +194,7 @@ describe('Dev Server Builder live-reload', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
@@ -227,7 +225,7 @@ describe('Dev Server Builder live-reload', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
@@ -259,14 +257,17 @@ describe('Dev Server Builder live-reload', () => {
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async buildEvent => {
+        switchMap(async (buildEvent) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
             case 0:
               proxy = createProxy(url, true, false);
               await goToPageAndWaitForSockJs(page, proxy.url);
-              await page.waitForResponse((response: HTTPResponse) => response.url().includes('xhr_streaming') && response.status() === 200);
+              await page.waitForResponse(
+                (response: HTTPResponse) =>
+                  response.url().includes('xhr_streaming') && response.status() === 200,
+              );
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
               break;
             case 1:

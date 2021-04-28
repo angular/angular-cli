@@ -20,7 +20,10 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   let tree: UnitTestTree;
   beforeEach(() => {
     tree = new UnitTestTree(new EmptyTree());
-    tree.create('/package.json', JSON.stringify({ 'dependencies': { 'zone.js': '~0.10.0' } }, undefined, 2));
+    tree.create(
+      '/package.json',
+      JSON.stringify({ 'dependencies': { 'zone.js': '~0.10.0' } }, undefined, 2),
+    );
   });
 
   it(`should update 'zone.js' dependency in 'package.json'`, async () => {
@@ -29,12 +32,15 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   });
 
   it(`should update 'zone.js/dist/zone' import`, async () => {
-    tree.create('file.ts', `
+    tree.create(
+      'file.ts',
+      `
       import 'zone.js';
       import 'zone.js/dist/zone';
       import "zone.js/dist/zone";
       // import "zone.js/dist/zone";
-    `);
+    `,
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(newTree.readContent('file.ts')).toBe(`
@@ -46,12 +52,15 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   });
 
   it(`should update 'zone.js/dist/zone' require`, async () => {
-    tree.create('file.ts', `
+    tree.create(
+      'file.ts',
+      `
       require('zone.js');
       require('zone.js/dist/zone');
       require("zone.js/dist/zone");
       // require("zone.js/dist/zone");
-    `);
+    `,
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(newTree.readContent('file.ts')).toBe(`
@@ -63,12 +72,15 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   });
 
   it(`should update 'zone.js/dist/zone-error' import`, async () => {
-    tree.create('file.ts', `
+    tree.create(
+      'file.ts',
+      `
       import 'zone.js/plugins/zone-error';
       import 'zone.js/dist/zone-error';
       import "zone.js/dist/zone-error";
       // import "zone.js/dist/zone-error";
-    `);
+    `,
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(newTree.readContent('file.ts')).toBe(`
@@ -80,12 +92,15 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   });
 
   it(`should update 'zone.js/dist/zone-error' require`, async () => {
-    tree.create('file.ts', `
+    tree.create(
+      'file.ts',
+      `
       require('zone.js/plugins/zone-error');
       require('zone.js/dist/zone-error');
       require("zone.js/dist/zone-error");
       // require("zone.js/dist/zone-error");
-    `);
+    `,
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(newTree.readContent('file.ts')).toBe(`
@@ -97,12 +112,15 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   });
 
   it(`should update 'zone.js/dist/zone-testing' import`, async () => {
-    tree.create('file.ts', `
+    tree.create(
+      'file.ts',
+      `
       import 'zone.js/testing';
       import 'zone.js/dist/zone-testing';
       import "zone.js/dist/zone-testing";
       // import "zone.js/dist/zone-testing";
-    `);
+    `,
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(newTree.readContent('file.ts')).toBe(`
@@ -114,12 +132,15 @@ describe(`Migration to update 'zone.js' to 0.11.x. ${schematicName}`, () => {
   });
 
   it(`should update 'zone.js/dist/zone-testing' require`, async () => {
-    tree.create('file.ts', `
+    tree.create(
+      'file.ts',
+      `
       require('zone.js/testing');
       require('zone.js/dist/zone-testing');
       require("zone.js/dist/zone-testing");
       // require("zone.js/dist/zone-testing");
-    `);
+    `,
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(newTree.readContent('file.ts')).toBe(`

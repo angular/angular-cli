@@ -6,14 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  JsonValue,
-  Path,
-  basename,
-  join,
-  normalize,
-  strings,
-} from '@angular-devkit/core';
+import { JsonValue, Path, basename, join, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -26,9 +19,7 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
-import {
-  NodePackageInstallTask,
-} from '@angular-devkit/schematics/tasks';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
@@ -41,7 +32,7 @@ import { BrowserBuilderOptions, Builders } from '../utility/workspace-models';
 import { Schema as UniversalOptions } from './schema';
 
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
-  return updateWorkspace(workspace => {
+  return updateWorkspace((workspace) => {
     const clientProject = workspace.projects.get(options.clientProject);
 
     if (clientProject) {
@@ -87,7 +78,11 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         defaultConfiguration: 'production',
         options: {
           outputPath: `dist/${options.clientProject}/server`,
-          main: join(normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
+          main: join(
+            normalize(clientProject.root),
+            'src',
+            mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts',
+          ),
           tsConfig: serverTsConfig,
           ...(buildTarget?.options ? getServerOptions(buildTarget?.options) : {}),
         },
@@ -145,8 +140,9 @@ function wrapBootstrapCall(mainFile: string): Rule {
 
     // indent contents
     const triviaWidth = bootstrapCall.getLeadingTriviaWidth();
-    const beforeText = `document.addEventListener('DOMContentLoaded', () => {\n`
-      + ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
+    const beforeText =
+      `document.addEventListener('DOMContentLoaded', () => {\n` +
+      ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
     const afterText = `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''}});`;
 
     // in some cases we need to cater for a trailing semicolon such as;
@@ -166,15 +162,15 @@ function wrapBootstrapCall(mainFile: string): Rule {
 
 function findCallExpressionNode(node: ts.Node, text: string): ts.Node | null {
   if (
-    ts.isCallExpression(node)
-    && ts.isIdentifier(node.expression)
-    && node.expression.text === text
+    ts.isCallExpression(node) &&
+    ts.isIdentifier(node.expression) &&
+    node.expression.text === text
   ) {
     return node;
   }
 
   let foundNode: ts.Node | null = null;
-  ts.forEachChild(node, childNode => {
+  ts.forEachChild(node, (childNode) => {
     foundNode = findCallExpressionNode(childNode, text);
 
     if (foundNode) {
@@ -195,14 +191,14 @@ function addServerTransition(
 
     const bootstrapModuleRelativePath = findBootstrapModulePath(host, mainPath);
     const bootstrapModulePath = normalize(
-      `/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`);
+      `/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`,
+    );
 
     const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
     const appId = options.appId;
     const transitionCall = `.withServerTransition({ appId: '${appId}' })`;
     const position = browserModuleImport.pos + browserModuleImport.getFullText().length;
-    const transitionCallChange = new InsertChange(
-      bootstrapModulePath, position, transitionCall);
+    const transitionCallChange = new InsertChange(bootstrapModulePath, position, transitionCall);
 
     const transitionCallRecorder = host.beginUpdate(bootstrapModulePath);
     transitionCallRecorder.insertLeft(transitionCallChange.pos, transitionCallChange.toAdd);
@@ -240,8 +236,8 @@ export default function (options: UniversalOptions): Rule {
       throw targetBuildNotFoundError();
     }
 
-    const clientBuildOptions =
-      (clientBuildTarget.options || {}) as unknown as BrowserBuilderOptions;
+    const clientBuildOptions = ((clientBuildTarget.options ||
+      {}) as unknown) as BrowserBuilderOptions;
 
     const clientTsConfig = normalize(clientBuildOptions.tsConfig);
     const tsConfigExtends = basename(clientTsConfig);
@@ -257,7 +253,7 @@ export default function (options: UniversalOptions): Rule {
     const templateSource = apply(url('./files/src'), [
       applyTemplates({
         ...strings,
-        ...options as object,
+        ...(options as object),
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
       }),
@@ -267,7 +263,7 @@ export default function (options: UniversalOptions): Rule {
     const rootSource = apply(url('./files/root'), [
       applyTemplates({
         ...strings,
-        ...options as object,
+        ...(options as object),
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         tsConfigExtends,
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),

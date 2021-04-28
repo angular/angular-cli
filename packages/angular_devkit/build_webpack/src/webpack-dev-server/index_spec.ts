@@ -11,10 +11,9 @@ import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/nod
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { schema, workspaces } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { NodeJsSyncHost } from '@angular-devkit/core/node'; // tslint:disable-line:no-implicit-dependencies
-import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
+import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
 import * as path from 'path';
 import { DevServerBuildOutput } from './index';
-
 
 describe('Dev Server Builder', () => {
   let testArchitectHost: TestingArchitectHost;
@@ -34,8 +33,11 @@ describe('Dev Server Builder', () => {
       workspaces.createWorkspaceHost(vfHost),
     );
 
-    testArchitectHost = new TestingArchitectHost(workspaceRoot, workspaceRoot,
-      new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot));
+    testArchitectHost = new TestingArchitectHost(
+      workspaceRoot,
+      workspaceRoot,
+      new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot),
+    );
     architect = new Architect(testArchitectHost, registry);
   }
 
@@ -47,7 +49,7 @@ describe('Dev Server Builder', () => {
 
   it('works', async () => {
     const run = await architect.scheduleTarget(webpackTargetSpec);
-    const output = await run.result as DevServerBuildOutput;
+    const output = (await run.result) as DevServerBuildOutput;
     expect(output.success).toBe(true);
 
     const response = await fetch(`http://${output.address}:${output.port}/bundle.js`);
@@ -58,7 +60,7 @@ describe('Dev Server Builder', () => {
 
   it('works and returns emitted files', async () => {
     const run = await architect.scheduleTarget(webpackTargetSpec);
-    const output = await run.result as DevServerBuildOutput;
+    const output = (await run.result) as DevServerBuildOutput;
 
     expect(output.success).toBe(true);
     expect(output.emittedFiles).toContain({

@@ -20,19 +20,11 @@ describe('Browser Builder errors', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('shows error when files are not part of the compilation', async () => {
-    host.replaceInFile(
-      'src/tsconfig.app.json',
-      /,\r?\n?\s*"polyfills\.ts"/,
-      '',
-    );
-    host.replaceInFile(
-      'src/tsconfig.app.json',
-      '"**/*.ts"',
-      '"**/*.d.ts"',
-    );
+    host.replaceInFile('src/tsconfig.app.json', /,\r?\n?\s*"polyfills\.ts"/, '');
+    host.replaceInFile('src/tsconfig.app.json', '"**/*.ts"', '"**/*.d.ts"');
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, {}, { logger });
     const output = await run.result;
@@ -45,7 +37,7 @@ describe('Browser Builder errors', () => {
     host.appendToFile('src/app/app.component.ts', ']]]');
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, {}, { logger });
     const output = await run.result;
@@ -58,7 +50,7 @@ describe('Browser Builder errors', () => {
     host.replaceInFile('src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, { aot: true }, { logger });
     const output = await run.result;
@@ -80,7 +72,7 @@ describe('Browser Builder errors', () => {
     const overrides = { main: 'src/not-main.js' };
     const logger = new logging.Logger('');
     const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
+    logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;
@@ -89,6 +81,8 @@ describe('Browser Builder errors', () => {
     // Wait for the builder to complete
     await run.stop();
 
-    expect(logs.join()).toContain(`export 'missingExport' (imported as 'missingExport') was not found in 'rxjs'`);
+    expect(logs.join()).toContain(
+      `export 'missingExport' (imported as 'missingExport') was not found in 'rxjs'`,
+    );
   });
 });

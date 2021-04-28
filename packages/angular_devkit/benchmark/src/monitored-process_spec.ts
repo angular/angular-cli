@@ -26,7 +26,7 @@ describe('LocalMonitoredProcess', () => {
   it('captures stdout', async () => {
     const process = new LocalMonitoredProcess(cmd);
     const stdoutOutput: string[] = [];
-    process.stdout$.subscribe(data => stdoutOutput.push(data.toString()));
+    process.stdout$.subscribe((data) => stdoutOutput.push(data.toString()));
     await process.run().pipe().toPromise();
     expect(stdoutOutput).toEqual(['stdout start\n', 'stdout end\n']);
   });
@@ -34,7 +34,7 @@ describe('LocalMonitoredProcess', () => {
   it('captures stderr', async () => {
     const process = new LocalMonitoredProcess(cmd);
     const stdoutOutput: string[] = [];
-    process.stderr$.subscribe(data => stdoutOutput.push(data.toString()));
+    process.stderr$.subscribe((data) => stdoutOutput.push(data.toString()));
     await process.run().pipe().toPromise();
     expect(stdoutOutput).toEqual(['stderr start\n', 'stderr end\n']);
   });
@@ -42,7 +42,7 @@ describe('LocalMonitoredProcess', () => {
   it('captures stats', async () => {
     const process = new LocalMonitoredProcess(cmd);
     const statsOutput: string[] = [];
-    process.stderr$.subscribe(data => statsOutput.push(data.toString()));
+    process.stderr$.subscribe((data) => statsOutput.push(data.toString()));
     await process.run().pipe().toPromise();
     expect(statsOutput.length).toBeGreaterThan(0);
   });

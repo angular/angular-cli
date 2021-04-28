@@ -28,12 +28,7 @@ import { sources } from 'webpack';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 
-const {
-  ConcatSource,
-  OriginalSource,
-  ReplaceSource,
-  SourceMapSource,
-} = sources;
+const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = sources;
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
@@ -94,7 +89,11 @@ export function setup(data: number[] | { cachePath: string; i18n: I18nOptions })
   i18n = options.i18n;
 }
 
-async function cachePut(content: string, key: string | undefined, integrity?: string): Promise<void> {
+async function cachePut(
+  content: string,
+  key: string | undefined,
+  integrity?: string,
+): Promise<void> {
   if (cachePath && key) {
     await cacache.put(cachePath, key, content, {
       metadata: { integrity },
@@ -128,7 +127,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   let downlevelCode;
   let downlevelMap;
   if (downlevel) {
-    const {supportedBrowsers: targets = []} = options;
+    const { supportedBrowsers: targets = [] } = options;
 
     // todo: revisit this in version 10, when we update our defaults browserslist
     // Without this workaround bundles will not be downlevelled because Babel doesn't know handle to 'op_mini all'
@@ -148,17 +147,19 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
       inputSourceMap: false as any,
       babelrc: false,
       configFile: false,
-      presets: [[
-        require.resolve('@babel/preset-env'),
-        {
-          // browserslist-compatible query or object of minimum environment versions to support
-          targets,
-          // modules aren't needed since the bundles use webpack's custom module loading
-          modules: false,
-          // 'transform-typeof-symbol' generates slower code
-          exclude: ['transform-typeof-symbol'],
-        },
-      ]],
+      presets: [
+        [
+          require.resolve('@babel/preset-env'),
+          {
+            // browserslist-compatible query or object of minimum environment versions to support
+            targets,
+            // modules aren't needed since the bundles use webpack's custom module loading
+            modules: false,
+            // 'transform-typeof-symbol' generates slower code
+            exclude: ['transform-typeof-symbol'],
+          },
+        ],
+      ],
       plugins: [
         createIifeWrapperPlugin(),
         ...(options.replacements ? [createReplacePlugin(options.replacements)] : []),
@@ -245,9 +246,9 @@ async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
   // sourcemap package adds the sourceRoot to all position source paths if not removed
   delete first.sourceRoot;
 
-  await SourceMapConsumer.with(first, null, originalConsumer => {
-    return SourceMapConsumer.with(second, null, newConsumer => {
-      newConsumer.eachMapping(mapping => {
+  await SourceMapConsumer.with(first, null, (originalConsumer) => {
+    return SourceMapConsumer.with(second, null, (newConsumer) => {
+      newConsumer.eachMapping((mapping) => {
         if (mapping.originalLine === null) {
           return;
         }
@@ -321,14 +322,14 @@ async function processBundle(
     hiddenSourceMaps,
     cacheKeys = [],
     integrityAlgorithm,
-   } = options;
+  } = options;
 
-  const rawMap = typeof map === 'string' ? JSON.parse(map) as RawSourceMap : map;
+  const rawMap = typeof map === 'string' ? (JSON.parse(map) as RawSourceMap) : map;
   const filename = path.basename(filepath);
 
   let result: {
-    code: string,
-    map: RawSourceMap | undefined,
+    code: string;
+    map: RawSourceMap | undefined;
   };
 
   if (rawMap) {
@@ -364,12 +365,7 @@ async function processBundle(
     fs.writeFileSync(filepath + '.map', mapContent);
   }
 
-  const fileResult = createFileEntry(
-    filepath,
-    result.code,
-    mapContent,
-    integrityAlgorithm,
-  );
+  const fileResult = createFileEntry(filepath, result.code, mapContent, integrityAlgorithm);
 
   await cachePut(
     result.code,
@@ -418,7 +414,7 @@ async function terserMangle(
       code,
       options.map,
       outputCode,
-      minifyOutput.map as unknown as RawSourceMap,
+      (minifyOutput.map as unknown) as RawSourceMap,
       options.filename || '0',
       code.length > FAST_SOURCEMAP_THRESHOLD,
     );
@@ -447,13 +443,7 @@ function createFileEntry(
 }
 
 function generateIntegrityValue(hashAlgorithm: string, code: string) {
-  return (
-    hashAlgorithm +
-    '-' +
-    createHash(hashAlgorithm)
-      .update(code)
-      .digest('base64')
-  );
+  return hashAlgorithm + '-' + createHash(hashAlgorithm).update(code).digest('base64');
 }
 
 // The webpack runtime chunk is already ES5.
@@ -788,8 +778,8 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
       }
 
       outputSource = localeDataSource
-        // The semicolon ensures that there is no syntax error between statements
-        ? new ConcatSource(setLocaleText, localeDataSource, ';\n', content)
+        ? // The semicolon ensures that there is no syntax error between statements
+          new ConcatSource(setLocaleText, localeDataSource, ';\n', content)
         : new ConcatSource(setLocaleText, content);
     }
 

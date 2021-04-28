@@ -9,21 +9,20 @@ import { JsonValue, tags } from '@angular-devkit/core';
 import { v4 as uuidV4 } from 'uuid';
 import { Command } from '../models/command';
 import { Arguments, CommandScope } from '../models/interface';
-import {
-  getWorkspaceRaw,
-  migrateLegacyGlobalConfig,
-  validateWorkspace,
-} from '../utilities/config';
+import { getWorkspaceRaw, migrateLegacyGlobalConfig, validateWorkspace } from '../utilities/config';
 import { JSONFile, parseJson } from '../utilities/json-file';
 import { Schema as ConfigCommandSchema } from './config';
 
-const validCliPaths = new Map<string, ((arg: string | number | boolean | undefined) => string) | undefined>([
+const validCliPaths = new Map<
+  string,
+  ((arg: string | number | boolean | undefined) => string) | undefined
+>([
   ['cli.warnings.versionMismatch', undefined],
   ['cli.defaultCollection', undefined],
   ['cli.packageManager', undefined],
   ['cli.analytics', undefined],
   ['cli.analyticsSharing.tracking', undefined],
-  ['cli.analyticsSharing.uuid', v => v ? `${v}` : uuidV4()],
+  ['cli.analyticsSharing.uuid', (v) => (v ? `${v}` : uuidV4())],
 ]);
 
 /**
@@ -54,12 +53,12 @@ function parseJsonPath(path: string): (string | number)[] {
       const indices = match[2]
         .slice(1, -1)
         .split('][')
-        .map(x => (/^\d$/.test(x) ? +x : x.replace(/\"|\'/g, '')));
+        .map((x) => (/^\d$/.test(x) ? +x : x.replace(/\"|\'/g, '')));
       result.push(...indices);
     }
   }
 
-  return result.filter(fragment => fragment != null);
+  return result.filter((fragment) => fragment != null);
 }
 
 function normalizeValue(value: string | undefined | boolean | number): JsonValue | undefined {
@@ -93,7 +92,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
             We found a global configuration that was used in Angular CLI 1.
             It has been automatically migrated.`);
         }
-      } catch { }
+      } catch {}
     }
 
     if (options.value == undefined) {

@@ -23,7 +23,6 @@ import {
   applyTemplates,
 } from './template';
 
-
 function _entry(path?: string, content?: string): FileEntry {
   if (!path) {
     path = 'a/b/c';
@@ -37,7 +36,6 @@ function _entry(path?: string, content?: string): FileEntry {
     content: Buffer.from(content),
   };
 }
-
 
 describe('applyPathTemplate', () => {
   function _applyPathTemplate(path: string, options: {}): string | null {
@@ -62,26 +60,29 @@ describe('applyPathTemplate', () => {
   });
 
   it('works with complex _________...', () => {
-    expect(_applyPathTemplate(
-      '/_____' + 'a' + '___a__' + '_/' + '__a___/__b___',
-      { _a: 0, a: 1, b: 2, _: '.' },
-    )).toBe('/.a0_/1_/2_');
+    expect(
+      _applyPathTemplate('/_____' + 'a' + '___a__' + '_/' + '__a___/__b___', {
+        _a: 0,
+        a: 1,
+        b: 2,
+        _: '.',
+      }),
+    ).toBe('/.a0_/1_/2_');
 
-    expect(_applyPathTemplate(
-      '_____' + '_____' + '_____' + '___',
-      { _: '.' },
-    )).toBe('...___');
+    expect(_applyPathTemplate('_____' + '_____' + '_____' + '___', { _: '.' })).toBe('...___');
   });
 
   it('works with functions', () => {
     let arg = '';
-    expect(_applyPathTemplate('/a__c__b', {
-      c: (x: string) => {
-        arg = x;
+    expect(
+      _applyPathTemplate('/a__c__b', {
+        c: (x: string) => {
+          arg = x;
 
-        return 'hello';
-      },
-    })).toBe('/ahellob');
+          return 'hello';
+        },
+      }),
+    ).toBe('/ahellob');
     expect(arg).toBe('/a__c__b');
   });
 
@@ -89,17 +90,21 @@ describe('applyPathTemplate', () => {
     let called = '';
     let called2 = '';
 
-    expect(_applyPathTemplate('/a__c@d__b', {
-      c: 1,
-      d: (x: string) => (called = x, 2),
-    })).toBe('/a2b');
+    expect(
+      _applyPathTemplate('/a__c@d__b', {
+        c: 1,
+        d: (x: string) => ((called = x), 2),
+      }),
+    ).toBe('/a2b');
     expect(called).toBe('1');
 
-    expect(_applyPathTemplate('/a__c@d@e__b', {
-      c: 10,
-      d: (x: string) => (called = x, 20),
-      e: (x: string) => (called2 = x, 30),
-    })).toBe('/a30b');
+    expect(
+      _applyPathTemplate('/a__c@d@e__b', {
+        c: 10,
+        d: (x: string) => ((called = x), 20),
+        e: (x: string) => ((called2 = x), 30),
+      }),
+    ).toBe('/a30b');
     expect(called).toBe('10');
     expect(called2).toBe('20');
   });
@@ -110,11 +115,11 @@ describe('applyPathTemplate', () => {
 
   it('errors out on undefined or invalid pipes', () => {
     expect(() => _applyPathTemplate('/a__b@d__c', { b: 1 })).toThrow(new UnknownPipeException('d'));
-    expect(() => _applyPathTemplate('/a__b@d__c', { b: 1, d: 1 }))
-      .toThrow(new InvalidPipeException('d'));
+    expect(() => _applyPathTemplate('/a__b@d__c', { b: 1, d: 1 })).toThrow(
+      new InvalidPipeException('d'),
+    );
   });
 });
-
 
 describe('contentTemplate', () => {
   function _applyContentTemplate(content: string, options: {}) {
@@ -131,38 +136,45 @@ describe('contentTemplate', () => {
   });
 
   it('works with if', () => {
-    expect(_applyContentTemplate('a<% if (a) { %>b<% } %>c', {
-      value: 123,
-      a: true,
-    })).toBe('abc');
-    expect(_applyContentTemplate('a<% if (a) { %>b<% } %>c', {
-      value: 123,
-      a: false,
-    })).toBe('ac');
+    expect(
+      _applyContentTemplate('a<% if (a) { %>b<% } %>c', {
+        value: 123,
+        a: true,
+      }),
+    ).toBe('abc');
+    expect(
+      _applyContentTemplate('a<% if (a) { %>b<% } %>c', {
+        value: 123,
+        a: false,
+      }),
+    ).toBe('ac');
   });
 
   it('works with for', () => {
-    expect(_applyContentTemplate('a<% for (let i = 0; i < value; i++) { %>1<% } %>b', {
-      value: 5,
-    })).toBe('a11111b');
+    expect(
+      _applyContentTemplate('a<% for (let i = 0; i < value; i++) { %>1<% } %>b', {
+        value: 5,
+      }),
+    ).toBe('a11111b');
   });
 
   it('escapes HTML', () => {
-    expect(_applyContentTemplate('a<%- html %>b', {
-      html: '<script>',
-    })).toBe('a&lt;script&gt;b');
+    expect(
+      _applyContentTemplate('a<%- html %>b', {
+        html: '<script>',
+      }),
+    ).toBe('a&lt;script&gt;b');
   });
 
   it('escapes strings properly', () => {
-    expect(_applyContentTemplate('a<%= value %>b', { value: `'abc'` })).toBe('a\'abc\'b');
+    expect(_applyContentTemplate('a<%= value %>b', { value: `'abc'` })).toBe("a'abc'b");
     expect(_applyContentTemplate('a<%= \'a\' + "b" %>b', {})).toBe('aabb');
     expect(_applyContentTemplate('a<%= "\\n" + "b" %>b', {})).toBe('a\nbb');
   });
 });
 
-
 describe('applyTemplateFiles', () => {
-  it('works with template files exclusively', done => {
+  it('works with template files exclusively', (done) => {
     const tree = new UnitTestTree(new HostTree());
     tree.create('a/b/file1', 'hello world');
     tree.create('a/b/file2', 'hello world');

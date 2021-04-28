@@ -43,7 +43,7 @@ export function chain(rules: Rule[]): Rule {
  * Apply multiple rules to a source, and returns the source transformed.
  */
 export function apply(source: Source, rules: Rule[]): Source {
-  return context => callRule(chain(rules), callSource(source, context), context);
+  return (context) => callRule(chain(rules), callSource(source, context), context);
 }
 
 /**
@@ -52,7 +52,7 @@ export function apply(source: Source, rules: Rule[]): Source {
 export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrategy.Default): Rule {
   return (tree, context) => {
     return callSource(source, context).pipe(
-      map(sourceTree => tree.merge(sourceTree, strategy || context.strategy)),
+      map((sourceTree) => tree.merge(sourceTree, strategy || context.strategy)),
       mapTo(tree),
     );
   };
@@ -63,23 +63,23 @@ export function noop(): Rule {
 }
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
-  return ((tree: Tree) => {
+  return (tree: Tree) => {
     if (HostTree.isHostTree(tree)) {
       return new FilterHostTree(tree, predicate);
     } else {
       throw new SchematicsException('Tree type is not supported.');
     }
-  });
+  };
 }
 
 export function asSource(rule: Rule): Source {
-  return context => callRule(rule, staticEmpty(), context);
+  return (context) => callRule(rule, staticEmpty(), context);
 }
 
 export function branchAndMerge(rule: Rule, strategy = MergeStrategy.Default): Rule {
   return (tree, context) => {
     return callRule(rule, tree.branch(), context).pipe(
-      map(branch => tree.merge(branch, strategy || context.strategy)),
+      map((branch) => tree.merge(branch, strategy || context.strategy)),
       mapTo(tree),
     );
   };
@@ -103,10 +103,7 @@ export function partitionApplyMerge(
   return (tree, context) => {
     const [yes, no] = partition(tree, predicate);
 
-    return concat(
-      callRule(ruleYes, yes, context),
-      callRule(ruleNo || noop(), no, context),
-    ).pipe(
+    return concat(callRule(ruleYes, yes, context), callRule(ruleNo || noop(), no, context)).pipe(
       toArray(),
       map(([yesTree, noTree]) => {
         yesTree.merge(noTree, context.strategy);
@@ -163,7 +160,7 @@ export function applyToSubtree(path: string, rules: Rule[]): Rule {
     const scoped = new ScopedTree(tree, path);
 
     return callRule(chain(rules), scoped, context).pipe(
-      map(result => {
+      map((result) => {
         if (result === scoped) {
           return tree;
         } else {

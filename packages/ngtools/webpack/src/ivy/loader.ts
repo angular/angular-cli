@@ -36,7 +36,8 @@ export function angularWebpackLoader(
     return;
   }
 
-  fileEmitter.emit(this.resourcePath)
+  fileEmitter
+    .emit(this.resourcePath)
     .then((result) => {
       if (!result) {
         if (this.resourcePath.endsWith('.js')) {

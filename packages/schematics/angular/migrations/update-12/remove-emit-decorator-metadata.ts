@@ -29,7 +29,7 @@ function* visitJsonFiles(directory: DirEntry): IterableIterator<string> {
 }
 
 export default function (): Rule {
-  return tree => {
+  return (tree) => {
     for (const path of visitJsonFiles(tree.root)) {
       const content = tree.read(path);
       if (content?.toString().includes('"emitDecoratorMetadata"')) {

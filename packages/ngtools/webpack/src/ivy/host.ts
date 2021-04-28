@@ -18,7 +18,7 @@ import { normalizePath } from './paths';
 export function augmentHostWithResources(
   host: ts.CompilerHost,
   resourceLoader: WebpackResourceLoader,
-  options: { directTemplateLoading?: boolean, inlineStyleMimeType?: string } = {},
+  options: { directTemplateLoading?: boolean; inlineStyleMimeType?: string } = {},
 ) {
   const resourceHost = host as CompilerHost;
 
@@ -57,10 +57,7 @@ export function augmentHostWithResources(
     }
 
     if (options.inlineStyleMimeType) {
-      const content = await resourceLoader.process(
-        data,
-        options.inlineStyleMimeType,
-      );
+      const content = await resourceLoader.process(data, options.inlineStyleMimeType);
 
       return { content };
     }
@@ -131,7 +128,12 @@ export function augmentHostWithDependencyCollection(
 ): void {
   if (host.resolveModuleNames) {
     const baseResolveModuleNames = host.resolveModuleNames;
-    host.resolveModuleNames = function (moduleNames: string[], containingFile: string, ...parameters) {
+    host.resolveModuleNames = function (
+      moduleNames: string[],
+      containingFile: string,
+      // tslint:disable-next-line: trailing-comma
+      ...parameters
+    ) {
       const results = baseResolveModuleNames.call(host, moduleNames, containingFile, ...parameters);
 
       const containingFilePath = normalizePath(containingFile);

@@ -23,7 +23,8 @@ export type JsonSchemaForNpmPackageJsonFiles = CoreProperties &
     | {
         bundledDependencies?: BundledDependency;
         [k: string]: any;
-      }) & {
+      }
+  ) & {
     [k: string]: any;
   };
 /**

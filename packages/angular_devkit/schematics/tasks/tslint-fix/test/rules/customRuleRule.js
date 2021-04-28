@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -7,15 +7,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, '__esModule', { value: true });
 const Lint = require('tslint');
-
 
 class Rule extends Lint.Rules.AbstractRule {
   apply(sourceFile) {
     const shouldPass = this.getOptions().ruleArguments[0];
     if (!shouldPass) {
-      return [ new Lint.RuleFailure(sourceFile, 0, 0, 'custom-rule fail', this.ruleName) ];
+      return [new Lint.RuleFailure(sourceFile, 0, 0, 'custom-rule fail', this.ruleName)];
     } else {
       return [];
     }

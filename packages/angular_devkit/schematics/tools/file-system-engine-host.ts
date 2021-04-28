@@ -20,13 +20,14 @@ import {
   SchematicMissingFieldsException,
 } from './file-system-engine-host-base';
 
-
 /**
  * A simple EngineHost that uses a root with one directory per collection inside of it. The
  * collection declaration follows the same rules as the regular FileSystemEngineHostBase.
  */
 export class FileSystemEngineHost extends FileSystemEngineHostBase {
-  constructor(protected _root: string) { super(); }
+  constructor(protected _root: string) {
+    super();
+  }
 
   protected _resolveCollectionPath(name: string): string {
     try {
@@ -35,7 +36,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       if (existsSync(maybePath)) {
         return maybePath;
       }
-    } catch (error) { }
+    } catch (error) {}
 
     try {
       // Allow `${_root}/${name}/collection.json.
@@ -43,8 +44,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       if (existsSync(maybePath)) {
         return maybePath;
       }
-    } catch (error) { }
-
+    } catch (error) {}
 
     throw new CollectionCannotBeResolvedException(name);
   }
@@ -105,7 +105,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       try {
         const path = require.resolve(join(this._root, name));
 
-        return from(import(path).then(mod => mod.default())).pipe(
+        return from(import(path).then((mod) => mod.default())).pipe(
           catchError(() => throwError(new UnregisteredTaskException(name))),
         );
       } catch {}

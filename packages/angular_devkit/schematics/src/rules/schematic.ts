@@ -12,7 +12,6 @@ import { ExecutionOptions, Rule, SchematicContext } from '../engine/interface';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch } from '../tree/static';
 
-
 /**
  * Run a schematic from a separate collection.
  *
@@ -27,12 +26,15 @@ export function externalSchematic<OptionT extends object>(
   executionOptions?: Partial<ExecutionOptions>,
 ): Rule {
   return (input: Tree, context: SchematicContext) => {
-    const collection = context.engine.createCollection(collectionName, context.schematic.collection);
+    const collection = context.engine.createCollection(
+      collectionName,
+      context.schematic.collection,
+    );
     const schematic = collection.createSchematic(schematicName);
 
     return schematic.call(options, observableOf(branch(input)), context, executionOptions).pipe(
       last(),
-      map(x => {
+      map((x) => {
         input.merge(x, MergeStrategy.AllowOverwriteConflict);
 
         return input;
@@ -40,7 +42,6 @@ export function externalSchematic<OptionT extends object>(
     );
   };
 }
-
 
 /**
  * Run a schematic from the same collection.
@@ -59,7 +60,7 @@ export function schematic<OptionT extends object>(
 
     return schematic.call(options, observableOf(branch(input)), context, executionOptions).pipe(
       last(),
-      map(x => {
+      map((x) => {
         // We allow overwrite conflict here because they're the only merge conflict we particularly
         // don't want to deal with; the input tree might have an OVERWRITE which the sub
         input.merge(x, MergeStrategy.AllowOverwriteConflict);

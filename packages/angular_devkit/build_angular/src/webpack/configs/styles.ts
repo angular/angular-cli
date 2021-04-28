@@ -99,10 +99,10 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
   }
 
-  if (globalStylePaths.some(p => p.endsWith('.styl'))) {
+  if (globalStylePaths.some((p) => p.endsWith('.styl'))) {
     wco.logger.warn(
       'Stylus usage is deprecated and will be removed in a future major version. ' +
-      'To opt-out of the deprecated behaviour, please migrate to another stylesheet language.',
+        'To opt-out of the deprecated behaviour, please migrate to another stylesheet language.',
     );
   }
 

@@ -8,7 +8,7 @@
 import { AggregatedMetric, Metric, MetricGroup } from './interfaces';
 
 // Prefers to keep v1 when both are equal.
-export const max = (v1: number, v2: number) => v2 > v1 ? v2 : v1;
+export const max = (v1: number, v2: number) => (v2 > v1 ? v2 : v1);
 
 export const cumulativeMovingAverage = (acc: number, val: number, accSize: number) =>
   (val + accSize * acc) / (accSize + 1);
@@ -17,7 +17,7 @@ export const aggregateMetrics = (
   m1: Metric | AggregatedMetric,
   m2: Metric | AggregatedMetric,
 ): AggregatedMetric => {
-  if ((m1.name != m2.name) || (m1.unit != m2.unit)) {
+  if (m1.name != m2.name || m1.unit != m2.unit) {
     throw new Error('Cannot aggregate metrics with different names or units:');
   }
 

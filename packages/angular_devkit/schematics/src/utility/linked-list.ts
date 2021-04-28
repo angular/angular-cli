@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export class LinkedList<T extends {next: T | null}> {
+export class LinkedList<T extends { next: T | null }> {
   constructor(private _head: T) {}
 
   get(l: number) {
@@ -18,7 +18,9 @@ export class LinkedList<T extends {next: T | null}> {
     return c;
   }
 
-  get head() { return this._head; }
+  get head() {
+    return this._head;
+  }
   get length() {
     let c: T | null = this._head;
     let i = 0;

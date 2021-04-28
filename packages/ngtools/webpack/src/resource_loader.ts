@@ -35,10 +35,7 @@ export class WebpackResourceLoader {
     }
   }
 
-  update(
-    parentCompilation: Compilation,
-    changedFiles?: Iterable<string>,
-  ) {
+  update(parentCompilation: Compilation, changedFiles?: Iterable<string>) {
     this._parentCompilation = parentCompilation;
 
     // Update resource cache and modified resources
@@ -92,7 +89,9 @@ export class WebpackResourceLoader {
 
     // Simple sanity check.
     if (filePath?.match(/\.[jt]s$/)) {
-      throw new Error(`Cannot use a JavaScript or TypeScript file (${filePath}) in a component's styleUrls or templateUrl.`);
+      throw new Error(
+        `Cannot use a JavaScript or TypeScript file (${filePath}) in a component's styleUrls or templateUrl.`,
+      );
     }
 
     const outputFilePath = filePath || `angular-resource-output-${this.outputPathCounter++}.css`;

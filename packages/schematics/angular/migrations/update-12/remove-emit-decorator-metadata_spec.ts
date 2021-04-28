@@ -29,12 +29,19 @@ describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
   });
 
   it(`should rename 'emitDecoratorMetadata' when set to false`, async () => {
-    tree.create('/tsconfig.json', JSON.stringify({
-      compilerOptions: {
-        emitDecoratorMetadata: false,
-        strict: true,
-      },
-    }, undefined, 2));
+    tree.create(
+      '/tsconfig.json',
+      JSON.stringify(
+        {
+          compilerOptions: {
+            emitDecoratorMetadata: false,
+            strict: true,
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { compilerOptions } = readJsonFile(newTree, '/tsconfig.json');
@@ -43,12 +50,19 @@ describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
   });
 
   it(`should rename 'emitDecoratorMetadata' when set to true`, async () => {
-    tree.create('/tsconfig.json', JSON.stringify({
-      compilerOptions: {
-        emitDecoratorMetadata: true,
-        strict: true,
-      },
-    }, undefined, 2));
+    tree.create(
+      '/tsconfig.json',
+      JSON.stringify(
+        {
+          compilerOptions: {
+            emitDecoratorMetadata: true,
+            strict: true,
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { compilerOptions } = readJsonFile(newTree, '/tsconfig.json');
@@ -57,11 +71,18 @@ describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
   });
 
   it(`should not rename 'emitDecoratorMetadata' when it's not under 'compilerOptions'`, async () => {
-    tree.create('/foo.json', JSON.stringify({
-      options: {
-        emitDecoratorMetadata: true,
-      },
-    }, undefined, 2));
+    tree.create(
+      '/foo.json',
+      JSON.stringify(
+        {
+          options: {
+            emitDecoratorMetadata: true,
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { options } = readJsonFile(newTree, '/foo.json');

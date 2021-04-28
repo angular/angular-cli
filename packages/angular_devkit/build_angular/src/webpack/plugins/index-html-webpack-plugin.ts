@@ -9,11 +9,16 @@
 import { basename, dirname, extname } from 'path';
 import { Compilation, Compiler, sources } from 'webpack';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
-import { IndexHtmlGenerator, IndexHtmlGeneratorOptions, IndexHtmlGeneratorProcessOptions } from '../../utils/index-file/index-html-generator';
+import {
+  IndexHtmlGenerator,
+  IndexHtmlGeneratorOptions,
+  IndexHtmlGeneratorProcessOptions,
+} from '../../utils/index-file/index-html-generator';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
 
-export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions,
-  Omit<IndexHtmlGeneratorProcessOptions, 'files' | 'noModuleFiles' | 'moduleFiles'> {
+export interface IndexHtmlWebpackPluginOptions
+  extends IndexHtmlGeneratorOptions,
+    Omit<IndexHtmlGeneratorProcessOptions, 'files' | 'noModuleFiles' | 'moduleFiles'> {
   noModuleEntrypoints: string[];
   moduleEntrypoints: string[];
 }
@@ -34,12 +39,15 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
   }
 
   apply(compiler: Compiler) {
-    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, compilation => {
+    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
       this._compilation = compilation;
-      compilation.hooks.processAssets.tapPromise({
-        name: PLUGIN_NAME,
-        stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1,
-      }, callback);
+      compilation.hooks.processAssets.tapPromise(
+        {
+          name: PLUGIN_NAME,
+          stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1,
+        },
+        callback,
+      );
     });
 
     const callback = async (assets: Record<string, unknown>) => {
@@ -82,8 +90,8 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
 
         assets[this.options.outputPath] = new sources.RawSource(content);
 
-        warnings.forEach(msg => addWarning(this.compilation, msg));
-        errors.forEach(msg => addError(this.compilation, msg));
+        warnings.forEach((msg) => addWarning(this.compilation, msg));
+        errors.forEach((msg) => addError(this.compilation, msg));
       } catch (error) {
         addError(this.compilation, error.message);
       }

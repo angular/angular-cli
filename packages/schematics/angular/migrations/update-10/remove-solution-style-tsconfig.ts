@@ -58,20 +58,25 @@ export default function (): Rule {
     // Iterate over all tsconfig files and change the extends from 'tsconfig.base.json' to 'tsconfig.json'.
     const extendsJsonPath = ['extends'];
     for (const path of visitExtendedJsonFiles(host.root)) {
-
       try {
         const tsConfigDir = dirname(normalize(path));
         const tsConfigJson = new JSONFile(host, path);
         const extendsValue = tsConfigJson.get(extendsJsonPath);
 
-        if (typeof extendsValue === 'string' && '/tsconfig.base.json' === resolve(tsConfigDir, normalize(extendsValue))) {
+        if (
+          typeof extendsValue === 'string' &&
+          '/tsconfig.base.json' === resolve(tsConfigDir, normalize(extendsValue))
+        ) {
           // tsconfig extends the workspace tsconfig path.
-          tsConfigJson.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
+          tsConfigJson.modify(
+            extendsJsonPath,
+            extendsValue.replace('tsconfig.base.json', 'tsconfig.json'),
+          );
         }
       } catch (error) {
         logger.warn(
           `${error.message || error}\n` +
-          'If this is a TypeScript configuration file you will need to update the "extends" value manually.',
+            'If this is a TypeScript configuration file you will need to update the "extends" value manually.',
         );
 
         continue;

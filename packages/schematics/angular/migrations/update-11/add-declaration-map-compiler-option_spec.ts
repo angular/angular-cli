@@ -58,7 +58,9 @@ describe(`Migration to add 'declarationMap' compiler option`, () => {
 
   it(`should be added with a value of 'false' in a prod tsconfig`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    const { compilerOptions } = JSON.parse(newTree.readContent('/projects/lib/tsconfig.lib.prod.json'));
+    const { compilerOptions } = JSON.parse(
+      newTree.readContent('/projects/lib/tsconfig.lib.prod.json'),
+    );
     expect(compilerOptions.declarationMap).toBeFalse();
   });
 
@@ -70,11 +72,18 @@ describe(`Migration to add 'declarationMap' compiler option`, () => {
 
   it('should not be overriden when already set', async () => {
     const tsConfigPath = '/projects/lib/tsconfig.lib.json';
-    tree.overwrite(tsConfigPath, JSON.stringify({
-      compilerOptions: {
-        declarationMap: false,
-      },
-    }, undefined, 2));
+    tree.overwrite(
+      tsConfigPath,
+      JSON.stringify(
+        {
+          compilerOptions: {
+            declarationMap: false,
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
 
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { compilerOptions } = JSON.parse(newTree.readContent(tsConfigPath));

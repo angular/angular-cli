@@ -12,7 +12,6 @@ import { ServerBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host } from '../test-utils';
 
-
 describe('Server Builder styles resources output path (No emit assets)', () => {
   function writeFiles() {
     host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
@@ -43,7 +42,7 @@ describe('Server Builder styles resources output path (No emit assets)', () => {
     };
 
     const run = await architect.scheduleTarget(target, overrides);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     const fileName = join(outputPath, 'main.js');
@@ -53,15 +52,16 @@ describe('Server Builder styles resources output path (No emit assets)', () => {
     expect(content).toContain(`url('/assets/component-img-absolute.png')`);
     expect(content).toContain(`url('out-assets/component-img-relative.png')`);
 
-    expect(host.scopedSync().exists(normalize(`${outputPath}/out-assets/component-img-relative.png`)))
-      .toBe(false);
+    expect(
+      host.scopedSync().exists(normalize(`${outputPath}/out-assets/component-img-relative.png`)),
+    ).toBe(false);
   });
 
   it(`supports blank resourcesOutputPath`, async () => {
     writeFiles();
 
     const run = await architect.scheduleTarget(target);
-    const output = await run.result as ServerBuilderOutput;
+    const output = (await run.result) as ServerBuilderOutput;
     expect(output.success).toBe(true);
 
     const fileName = join(outputPath, 'main.js');
@@ -70,7 +70,8 @@ describe('Server Builder styles resources output path (No emit assets)', () => {
     expect(content).toContain(`url('/assets/component-img-absolute.png')`);
     expect(content).toContain(`url('component-img-relative.png')`);
 
-    expect(host.scopedSync().exists(normalize(`${outputPath}/component-img-relative.png`)))
-      .toBe(false);
+    expect(host.scopedSync().exists(normalize(`${outputPath}/component-img-relative.png`))).toBe(
+      false,
+    );
   });
 });

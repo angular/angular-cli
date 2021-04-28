@@ -17,12 +17,7 @@
       "description": "The stylesheet language to use for the application's inline component styles.",
       "type": "string",
       "default": "css",
-      "enum": [
-        "css",
-        "less",
-        "sass",
-        "scss"
-      ]
+      "enum": ["css", "less", "sass", "scss"]
     },
     "stylePreprocessorOptions": {
       "description": "Options to pass to style preprocessors",
@@ -159,12 +154,7 @@
       "type": "string",
       "description": "Define the output filename cache-busting hashing mode.",
       "default": "none",
-      "enum": [
-        "none",
-        "all",
-        "media",
-        "bundles"
-      ]
+      "enum": ["none", "all", "media", "bundles"]
     },
     "deleteOutputPath": {
       "type": "boolean",
@@ -200,10 +190,7 @@
         },
         {
           "type": "string",
-          "enum": [
-            "none",
-            "all"
-          ]
+          "enum": ["none", "all"]
         }
       ]
     },
@@ -231,11 +218,7 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "outputPath",
-    "main",
-    "tsConfig"
-  ],
+  "required": ["outputPath", "main", "tsConfig"],
   "definitions": {
     "fileReplacement": {
       "oneOf": [
@@ -252,10 +235,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "src",
-            "replaceWith"
-          ]
+          "required": ["src", "replaceWith"]
         },
         {
           "type": "object",
@@ -270,10 +250,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "replace",
-            "with"
-          ]
+          "required": ["replace", "with"]
         }
       ]
     }

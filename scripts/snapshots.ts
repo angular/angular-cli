@@ -16,7 +16,6 @@ import { PackageInfo, packages } from '../lib/packages';
 import build from './build';
 import create from './create';
 
-
 // Added to the README.md of the snapshot. This is markdown.
 const readmeHeaderFn = (pkg: PackageInfo) => `
 # Snapshot build of ${pkg.name}
@@ -36,23 +35,20 @@ npm install git+https://github.com/${pkg.snapshotRepo}.git
 ----
 `;
 
-
 function _copy(from: string, to: string) {
-  fs.readdirSync(from)
-    .forEach(name => {
-      const fromPath = path.join(from, name);
-      const toPath = path.join(to, name);
-      if (fs.statSync(fromPath).isDirectory()) {
-        if (!fs.existsSync(toPath)) {
-          fs.mkdirSync(toPath);
-        }
-        _copy(fromPath, toPath);
-      } else {
-        fs.writeFileSync(toPath, fs.readFileSync(fromPath));
+  fs.readdirSync(from).forEach((name) => {
+    const fromPath = path.join(from, name);
+    const toPath = path.join(to, name);
+    if (fs.statSync(fromPath).isDirectory()) {
+      if (!fs.existsSync(toPath)) {
+        fs.mkdirSync(toPath);
       }
-    });
+      _copy(fromPath, toPath);
+    } else {
+      fs.writeFileSync(toPath, fs.readFileSync(fromPath));
+    }
+  });
 }
-
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
   const { status, error, stdout } = spawnSync(command, args, {
@@ -61,7 +57,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   });
 
   if (status != 0) {
-    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    logger.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
     throw error;
   }
 
@@ -102,7 +98,7 @@ async function _publishSnapshot(
 
   // Clear snapshot directory before publishing to remove deleted build files.
   try {
-    _exec('git', ['rm', '-rf', './'], {cwd: destPath}, publishLogger);
+    _exec('git', ['rm', '-rf', './'], { cwd: destPath }, publishLogger);
   } catch {
     // Ignore errors on delete. :shrug:
   }
@@ -133,7 +129,6 @@ async function _publishSnapshot(
   _exec('git', ['push', '--tags', 'origin', branch], { cwd: destPath }, publishLogger);
 }
 
-
 export interface SnapshotsOptions {
   force?: boolean;
   githubTokenFile?: string;
@@ -141,7 +136,7 @@ export interface SnapshotsOptions {
   branch?: string;
 }
 
-export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
+export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
   // Get the SHA.
   if (execSync(`git status --porcelain`).toString() && !opts.force) {
     logger.error('You cannot run snapshots with local changes.');
@@ -158,9 +153,9 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
   }
 
   const githubToken = (
-    opts.githubToken
-    || (opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8'))
-    || ''
+    opts.githubToken ||
+    (opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8')) ||
+    ''
   ).trim();
 
   if (githubToken) {

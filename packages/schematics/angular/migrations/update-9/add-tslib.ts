@@ -7,11 +7,16 @@
  */
 
 import { Rule } from '@angular-devkit/schematics';
-import { NodeDependencyType, addPackageJsonDependency, getPackageJsonDependency, removePackageJsonDependency } from '../../utility/dependencies';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+  getPackageJsonDependency,
+  removePackageJsonDependency,
+} from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
 export function addTsLib(): Rule {
-  return host => {
+  return (host) => {
     const tslibDep = getPackageJsonDependency(host, 'tslib');
 
     if (tslibDep && tslibDep.type !== NodeDependencyType.Default) {

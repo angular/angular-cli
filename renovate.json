@@ -4,26 +4,14 @@
   "semanticPrefix": "build",
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
-  "labels": [
-    "target: minor",
-    "action: merge"
-  ],
+  "labels": ["target: minor", "action: merge"],
   "timezone": "America/Tijuana",
   "lockFileMaintenance": {
     "enabled": true
   },
-  "schedule": [
-    "after 10pm every weekday",
-    "before 4am every weekday",
-    "every weekend"
-  ],
-  "baseBranches": [
-    "master"
-  ],
-  "ignoreDeps": [
-    "@types/node",
-    "quicktype-core"
-  ],
+  "schedule": ["after 10pm every weekday", "before 4am every weekday", "every weekend"],
+  "baseBranches": ["master"],
+  "ignoreDeps": ["@types/node", "quicktype-core"],
   "packageFiles": [
     "WORKSPACE",
     "package.json",
@@ -32,55 +20,33 @@
   ],
   "packageRules": [
     {
-      "packagePatterns": [
-        "^@angular\/.*"
-      ],
+      "packagePatterns": ["^@angular/.*"],
       "groupName": "angular",
       "pinVersions": false
     },
     {
-      "packagePatterns": [
-        "^@babel\/.*"
-      ],
+      "packagePatterns": ["^@babel/.*"],
       "groupName": "babel",
       "pinVersions": false
     },
     {
-      "packagePatterns": [
-        "^@bazel\/.*",
-        "^build_bazel.*",
-        "bazel_toolchains"
-      ],
+      "packagePatterns": ["^@bazel/.*", "^build_bazel.*", "bazel_toolchains"],
       "groupName": "bazel",
       "pinVersions": false
     },
     {
-      "packageNames": [
-        "typescript"
-      ],
+      "packageNames": ["typescript"],
       "separateMinorPatch": true
     },
     {
-      "packageNames": [
-        "typescript"
-      ],
-      "updateTypes": [
-        "minor",
-        "major"
-      ],
+      "packageNames": ["typescript"],
+      "updateTypes": ["minor", "major"],
       "enabled": false
     },
     {
-      "excludePackagePatterns": [
-        "^@angular/.*"
-      ],
-      "matchPackagePatterns": [
-        "*"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
+      "excludePackagePatterns": ["^@angular/.*"],
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
     }

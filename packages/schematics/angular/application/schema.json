@@ -56,20 +56,24 @@
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
       "default": "css",
-      "enum": [
-        "css",
-        "scss",
-        "sass",
-        "less"
-      ],
+      "enum": ["css", "scss", "sass", "less"],
       "x-prompt": {
         "message": "Which stylesheet format would you like to use?",
         "type": "list",
         "items": [
-          { "value": "css",  "label": "CSS" },
-          { "value": "scss", "label": "SCSS   [ https://sass-lang.com/documentation/syntax#scss                ]" },
-          { "value": "sass", "label": "Sass   [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]" },
-          { "value": "less", "label": "Less   [ http://lesscss.org                                             ]" }
+          { "value": "css", "label": "CSS" },
+          {
+            "value": "scss",
+            "label": "SCSS   [ https://sass-lang.com/documentation/syntax#scss                ]"
+          },
+          {
+            "value": "sass",
+            "label": "Sass   [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]"
+          },
+          {
+            "value": "less",
+            "label": "Less   [ http://lesscss.org                                             ]"
+          }
         ]
       },
       "x-user-analytics": 5
@@ -116,7 +120,5 @@
       "x-deprecated": "Legacy browsers support is deprecated since version 12. For more information, see https://angular.io/guide/browser-support"
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": ["name"]
 }

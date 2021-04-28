@@ -33,7 +33,9 @@ class ScopedFileEntry implements FileEntry {
     return join(NormalizedRoot, relative(this.scope, this._base.path));
   }
 
-  get content(): Buffer { return this._base.content; }
+  get content(): Buffer {
+    return this._base.content;
+  }
 }
 
 class ScopedDirEntry implements DirEntry {
@@ -88,23 +90,31 @@ export class ScopedTree implements Tree {
     this._root = new ScopedDirEntry(this._base.getDir(normalizedScope), normalizedScope);
   }
 
-  get root(): DirEntry { return this._root; }
+  get root(): DirEntry {
+    return this._root;
+  }
 
-  branch(): Tree { return new ScopedTree(this._base.branch(), this._root.scope); }
+  branch(): Tree {
+    return new ScopedTree(this._base.branch(), this._root.scope);
+  }
   merge(other: Tree, strategy?: MergeStrategy): void {
     const self = this;
-    const delegate = new class extends DelegateTree {
+    const delegate = new (class extends DelegateTree {
       get actions(): Action[] {
-        return other.actions.map(action => self._fullPathAction(action));
+        return other.actions.map((action) => self._fullPathAction(action));
       }
-    }(other);
+    })(other);
 
     this._base.merge(delegate, strategy);
   }
 
   // Readonly.
-  read(path: string): Buffer | null { return this._base.read(this._fullPath(path)); }
-  exists(path: string): boolean { return this._base.exists(this._fullPath(path)); }
+  read(path: string): Buffer | null {
+    return this._base.read(this._fullPath(path));
+  }
+  exists(path: string): boolean {
+    return this._base.exists(this._fullPath(path));
+  }
   get(path: string): FileEntry | null {
     const entry = this._base.get(this._fullPath(path));
 
@@ -115,7 +125,9 @@ export class ScopedTree implements Tree {
 
     return entry && new ScopedDirEntry(entry, this._root.scope);
   }
-  visit(visitor: FileVisitor): void { return this._root.visit(visitor); }
+  visit(visitor: FileVisitor): void {
+    return this._root.visit(visitor);
+  }
 
   // Change content of host files.
   overwrite(path: string, content: Buffer | string): void {
@@ -124,13 +136,17 @@ export class ScopedTree implements Tree {
   beginUpdate(path: string): UpdateRecorder {
     return this._base.beginUpdate(this._fullPath(path));
   }
-  commitUpdate(record: UpdateRecorder): void { return this._base.commitUpdate(record); }
+  commitUpdate(record: UpdateRecorder): void {
+    return this._base.commitUpdate(record);
+  }
 
   // Structural methods.
   create(path: string, content: Buffer | string): void {
     return this._base.create(this._fullPath(path), content);
   }
-  delete(path: string): void { return this._base.delete(this._fullPath(path)); }
+  delete(path: string): void {
+    return this._base.delete(this._fullPath(path));
+  }
   rename(from: string, to: string): void {
     return this._base.rename(this._fullPath(from), this._fullPath(to));
   }

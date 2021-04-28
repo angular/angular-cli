@@ -11,7 +11,6 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as EnumOptions } from './schema';
 
-
 describe('Enum Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -39,19 +38,22 @@ describe('Enum Schematic', () => {
   let appTree: UnitTestTree;
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('application', appOptions, appTree)
       .toPromise();
   });
 
   it('should create an enumeration', async () => {
-    const tree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('enum', defaultOptions, appTree)
       .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.enum.ts');
   });
 
   it('should create an enumeration', async () => {
-    const tree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('enum', defaultOptions, appTree)
       .toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo.enum.ts');
     expect(content).toMatch('export enum Foo {');
@@ -61,8 +63,7 @@ describe('Enum Schematic', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree).toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.enum.ts');
   });
 });

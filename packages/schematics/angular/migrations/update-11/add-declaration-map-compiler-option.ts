@@ -11,7 +11,7 @@ import { getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
 
 export default function (): Rule {
-  return async host => {
+  return async (host) => {
     const workspace = await getWorkspace(host);
 
     for (const [, project] of workspace.projects) {

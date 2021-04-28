@@ -47,7 +47,7 @@ function findNode(
   p: ProxyPropertyKey,
 ): { node?: JsonAstNode; parent: JsonAstArray | JsonAstKeyValue | JsonAstObject } {
   if (parent.kind === 'object') {
-    const entry = parent.properties.find(entry => entry.key.value === p);
+    const entry = parent.properties.find((entry) => entry.key.value === p);
     if (entry) {
       return { node: entry.value, parent: entry };
     }
@@ -102,12 +102,7 @@ export function createVirtualAstObject<T extends object = JsonObject>(
       }
 
       const op = old === undefined ? 'add' : current === undefined ? 'remove' : 'replace';
-      options.listener(
-        op,
-        path,
-        parent,
-        current,
-      );
+      options.listener(op, path, parent, current);
     }
   };
 
@@ -193,15 +188,11 @@ function create(
       let value;
       if (node) {
         if (node.kind === 'object' || node.kind === 'array') {
-          value = create(
-            node,
-            propertyPath,
-            (path, parent, vnode, old, current) => {
-              if (!alteredNodes.has(node)) {
-                reporter(path, parent, vnode, old, current);
-              }
-            },
-          );
+          value = create(node, propertyPath, (path, parent, vnode, old, current) => {
+            if (!alteredNodes.has(node)) {
+              reporter(path, parent, vnode, old, current);
+            }
+          });
         } else {
           value = node.value;
         }
@@ -295,8 +286,8 @@ function create(
       let keys: ProxyPropertyKey[];
       if (ast.kind === 'object') {
         keys = ast.properties
-          .map(entry => entry.key.value)
-          .filter(p => !excluded.has(p) && (!included || included.has(p)));
+          .map((entry) => entry.key.value)
+          .filter((p) => !excluded.has(p) && (!included || included.has(p)));
       } else {
         keys = [];
       }
