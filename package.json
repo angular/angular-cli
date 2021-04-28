@@ -210,7 +210,7 @@
     "tar": "^6.0.0",
     "temp": "^0.9.0",
     "terser": "5.7.0",
-    "terser-webpack-plugin": "4.2.3",
+    "terser-webpack-plugin": "5.1.1",
     "text-table": "0.2.0",
     "through2": "^4.0.0",
     "tree-kill": "1.2.2",
