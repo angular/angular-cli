@@ -1,6 +1,9 @@
 /bazel-out/
+/docs/design/analytics.md
 /dist-schema/
-/etc/api
+/etc/api/
+/packages/angular_devkit/build_angular/test/
+/packages/angular_devkit/core/src/workspace/json/test/
 /tests/
 /README.md
 /CONTRIBUTING.md
