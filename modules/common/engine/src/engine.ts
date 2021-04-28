@@ -118,9 +118,9 @@ export class CommonEngine {
     });
 
     // tslint:disable-next-line: no-console
-    warnings.forEach(m => console.warn(m));
+    warnings?.forEach(m => console.warn(m));
     // tslint:disable-next-line: no-console
-    errors.forEach(m => console.error(m));
+    errors?.forEach(m => console.error(m));
 
     return content;
   }

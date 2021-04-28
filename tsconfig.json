@@ -26,7 +26,7 @@
     "baseUrl": "./",
     "rootDir": "./",
     "paths": {
-      "@nguniversal/*": ["./modules/*"]
+      "@nguniversal/*": ["./modules/*"],
     }
   },
   "exclude": [

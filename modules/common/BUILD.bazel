@@ -22,11 +22,15 @@ ng_package(
     name = "npm_package",
     srcs = [":package.json"],
     entry_point = ":index.ts",
-    nested_packages = ["//modules/common/schematics:npm_package"],
+    nested_packages = [
+        "//modules/common/schematics:npm_package",
+        "//modules/common/clover/server:npm_package",
+    ],
     readme_md = ":README.md",
     tags = ["release"],
     deps = [
         ":common",
+        "//modules/common/clover",
         "//modules/common/engine",
         "@npm//critters",
     ],

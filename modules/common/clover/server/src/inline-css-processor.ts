@@ -7,7 +7,7 @@
  */
 
 import Critters from 'critters';
-import * as fs from 'fs';
+import { promises } from 'fs';
 
 export interface InlineCriticalCssProcessOptions {
   outputPath?: string;
@@ -30,7 +30,7 @@ class CrittersExtended extends Critters {
 
   constructor(
     private readonly optionsExtended: InlineCriticalCssProcessorOptions & InlineCriticalCssProcessOptions,
-    private readonly resourceCache: Map<string, string>,
+    private readonly resourceCache: Map<string, Buffer>,
   ) {
     super({
       logger: {
@@ -54,18 +54,16 @@ class CrittersExtended extends Critters {
   protected async readFile(path: string): Promise<string> {
     let resourceContent = this.resourceCache.get(path);
     if (resourceContent === undefined) {
-      resourceContent = await fs.promises.readFile(path, 'utf-8');
+      resourceContent = await promises.readFile(path);
       this.resourceCache.set(path, resourceContent);
     }
 
-    return resourceContent;
+    return resourceContent.toString();
   }
 }
 
 export class InlineCriticalCssProcessor {
-  private readonly resourceCache = new Map<string, string>();
-
-  constructor(protected readonly options: InlineCriticalCssProcessorOptions) { }
+  constructor(protected readonly options: InlineCriticalCssProcessorOptions, private readonly resourceCache: Map<string, Buffer>) { }
 
   async process(html: string, options: InlineCriticalCssProcessOptions): Promise<InlineCriticalCssResult> {
     const critters = new CrittersExtended({ ...this.options, ...options }, this.resourceCache);

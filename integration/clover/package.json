@@ -1,0 +1,36 @@
+{
+  "name": "universal-integration",
+  "version": "0.0.0",
+  "description": "Integration tests for @nguniversal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal.git"
+  },
+  "scripts": {
+    "ng": "ng",
+    "test": "yarn build && node test.js",
+    "build": "ng build --configuration production"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "file:../../node_modules/@angular/animations",
+    "@angular/common": "file:../../node_modules/@angular/common",
+    "@angular/compiler": "file:../../node_modules/@angular/compiler",
+    "@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
+    "@angular/core": "file:../../node_modules/@angular/core",
+    "@angular/platform-browser": "file:../../node_modules/@angular/platform-browser",
+    "@angular/platform-browser-dynamic": "file:../../node_modules/@angular/platform-browser-dynamic",
+    "@angular/platform-server": "file:../../node_modules/@angular/platform-server",
+    "@angular/router": "file:../../node_modules/@angular/router",
+    "@nguniversal/common": "file:../../dist/modules-dist/common",
+    "rxjs": "file:../../node_modules/rxjs",
+    "zone.js": "file:../../node_modules/zone.js"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "file:../../node_modules/@angular-devkit/build-angular",
+    "@angular/cli": "file:../../node_modules/@angular/cli",
+    "@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
+    "@types/node": "file:../../node_modules/@types/node",
+    "typescript": "file:../../node_modules/typescript"
+  }
+}
