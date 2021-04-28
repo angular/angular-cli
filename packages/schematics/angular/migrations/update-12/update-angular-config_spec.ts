@@ -32,6 +32,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
               optimization: true,
               experimentalRollupPass: false,
               buildOptimizer: false,
+              namedChunks: true,
               // tslint:disable-next-line:no-any
             } as any,
             configurations: {
@@ -105,5 +106,13 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
     expect(configurations?.one.sourceMap).toBeUndefined();
     expect(configurations?.two.sourceMap).toBeUndefined();
     expect(configurations?.two.optimization).toBeFalse();
+  });
+
+  it(`should not remove value in "options" when value is not the new default`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { options } = getBuildTarget(newTree);
+
+    expect(options.namedChunks).toBeTrue();
+    expect(options.buildOptimizer).toBeFalse();
   });
 });
