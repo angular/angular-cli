@@ -86,7 +86,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#5b8b7a8b04e205eea784168a511c0258fb9995f3":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#5b8b7a8b04e205eea784168a511c0258fb9995f3"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#8e28890cecf2ac5d0d5ca590fafc323dea5f133f"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -94,7 +94,7 @@
     "@octokit/rest" "16.28.7"
     "@octokit/types" "^6.0.0"
     brotli "^1.3.2"
-    chalk "^2.3.1"
+    chalk "^4.1.0"
     clang-format "^1.4.0"
     cli-progress "^3.7.0"
     conventional-commits-parser "^3.2.1"
@@ -113,7 +113,7 @@
     shelljs "^0.8.4"
     ts-node "^9.1.1"
     tslib "^2.1.0"
-    typed-graphqlify "^2.3.0"
+    typed-graphqlify "^3.1.1"
     typescript "~4.2.4"
     yaml "^1.10.0"
     yargs "^16.2.0"
@@ -5647,11 +5647,6 @@ immediate@~3.0.5:
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
   integrity sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=
 
-immutable@^3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.2.tgz#c2439951455bb39913daf281376f1530e104adf3"
-  integrity sha1-wkOZUUVbs5kT2vKBN28VMOEErfM=
-
 import-fresh@^3.2.1:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/import-fresh/-/import-fresh-3.3.0.tgz#37162c25fcb9ebaa2e6e53d5b4d88ce17d9e0c2b"
@@ -10926,13 +10921,6 @@ tslint-no-circular-imports@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/tslint-no-circular-imports/-/tslint-no-circular-imports-0.7.0.tgz#9df0a15654d66b172e0b7843eed073fa5ae99b5f"
   integrity sha512-k3wxpeMC4ef40UbpfBVHEHIzKfNZq5/SCtAO1YjGsaNTklo+K53/TWLrym+poA65RJFDiYgYNWvkeIIkJNA0Vw==
-
-tslint-sonarts@1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/tslint-sonarts/-/tslint-sonarts-1.9.0.tgz#feb593e92db328c0328b430b838adbe65d504de9"
-  integrity sha512-CJWt+IiYI8qggb2O/JPkS6CkC5DY1IcqRsm9EHJ+AxoWK70lvtP7jguochyNDMP2vIz/giGdWCfEM39x/I/Vnw==
-  dependencies:
-    immutable "^3.8.2"
 
 tslint@^6.1.3:
   version "6.1.3"

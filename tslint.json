@@ -5,9 +5,6 @@
   "extends": [
     "tslint-no-circular-imports"
   ],
-  "rulesDirectory": [
-    "node_modules/tslint-sonarts/lib/rules"
-  ],
   "linterOptions": {
     "format": "codeFrame",
     "exclude": [
@@ -16,31 +13,6 @@
     ]
   },
   "rules": {
-    // ==================================================================================================
-    // tslint-sonarts rules. See https://github.com/SonarSource/SonarTS
-    // These rules are part of the bug detection section of tslint-sonarts
-    "no-big-function": true,
-    "no-all-duplicated-branches": true,
-    "no-case-with-or": true,
-    "no-collection-size-mischeck": true,
-    "no-element-overwrite": true,
-    "no-empty-destructuring": true,
-    "no-identical-conditions": true,
-    "no-ignored-initial-value": true,
-    "no-ignored-return": true,
-    "no-in-misuse": true,
-    "no-misleading-array-reverse": true,
-    "no-misspelled-operator": true,
-    "no-self-assignment": true,
-    "no-unthrown-error": true,
-    "no-use-of-empty-return-value": true,
-    "no-useless-increment": true,
-    "no-invalid-await": true,
-    "prefer-promise-shorthand": true,
-
-    //These rules are part of the code smell detection section of tslint-sonarts
-    "no-dead-store": true,
-    "no-useless-intersection": true,
     // ==================================================================================================
     // base tslint rules
     "arrow-return-shorthand": true,
