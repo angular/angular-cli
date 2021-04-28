@@ -1,0 +1,11 @@
+/bazel-out/
+/dist-schema/
+/goldens/public-api
+/packages/angular_devkit/build_angular/test/
+/packages/angular_devkit/build_webpack/test/
+/packages/angular_devkit/schematics_cli/schematic/files/
+/tests/
+.yarn/
+dist/
+node_modules/
+third_party/

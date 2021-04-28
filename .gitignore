@@ -44,6 +44,7 @@ yarn-error.log*
 .ng-dev.user*
 .husky/_
 .bazelrc.user
+.eslintcache
 
 # Mac OSX Finder files.
 **/.DS_Store
