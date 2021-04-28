@@ -37,7 +37,7 @@ describe('Karma Builder', () => {
     it('should fail when main test file does not include require.context usage', async () => {
       let lastErrorLogEntry: logging.LogEntry | undefined;
       const logger = new logging.Logger('test');
-      logger.subscribe(m => {
+      logger.subscribe((m) => {
         if (m.level === 'error') {
           lastErrorLogEntry = m;
         }
@@ -71,13 +71,17 @@ describe('Karma Builder', () => {
 
     it('should work with test.ts that filters found keys', async () => {
       // the replacement below is only to prove a point that resulting test.ts file will compile!
-      host.replaceInFile('src/test.ts', 'context.keys().map(context);', 'context.keys().filter(k => !!k).map(context);');
+      host.replaceInFile(
+        'src/test.ts',
+        'context.keys().map(context);',
+        'context.keys().filter(k => !!k).map(context);',
+      );
 
       const overrides = {
         include: ['src/app/app.component.spec.ts'],
       };
       const logger = new logging.Logger('test');
-      logger.subscribe(m => {
+      logger.subscribe((m) => {
         if (m.level === 'error') {
           fail(m);
         }
@@ -89,7 +93,6 @@ describe('Karma Builder', () => {
       await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
       await run.stop();
-
     });
 
     [
@@ -148,7 +151,7 @@ describe('Karma Builder', () => {
           include: options.input,
         };
         const logger = new logging.Logger('test');
-        logger.subscribe(m => {
+        logger.subscribe((m) => {
           if (m.level === 'error') {
             fail(m);
           }

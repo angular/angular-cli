@@ -10,7 +10,6 @@ import { UnitTestTree } from '../../testing';
 import { HostTree } from './host-tree';
 import { ScopedTree } from './scoped';
 
-
 describe('ScopedTree', () => {
   let base: HostTree;
   let scoped: ScopedTree;
@@ -98,7 +97,7 @@ describe('ScopedTree', () => {
     expect(scoped.get('/file-1-1')).not.toBeNull();
 
     const file = scoped.get('file-1-1');
-    expect(file && file.path as string).toBe('/file-1-1');
+    expect(file && (file.path as string)).toBe('/file-1-1');
 
     expect(scoped.get('/file-0-1')).toBeNull();
     expect(scoped.get('file-0-1')).toBeNull();
@@ -111,18 +110,14 @@ describe('ScopedTree', () => {
     expect(dir.path as string).toBe('/level-2');
     expect(dir.parent).not.toBeNull();
     const files: string[] = [];
-    dir.visit(path => files.push(path));
+    dir.visit((path) => files.push(path));
     files.sort();
-    expect(files).toEqual([
-      '/level-2/file-2-1',
-      '/level-2/file-2-2',
-      '/level-2/file-2-3',
-    ]);
+    expect(files).toEqual(['/level-2/file-2-1', '/level-2/file-2-2', '/level-2/file-2-3']);
   });
 
   it('supports visit', () => {
     const files: string[] = [];
-    scoped.visit(path => files.push(path));
+    scoped.visit((path) => files.push(path));
     files.sort();
     expect(files).toEqual([
       '/file-1-1',

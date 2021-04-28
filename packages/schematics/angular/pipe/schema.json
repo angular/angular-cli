@@ -64,7 +64,5 @@
       "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": ["name"]
 }

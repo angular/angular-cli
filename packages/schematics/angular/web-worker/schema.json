@@ -39,8 +39,5 @@
       "description": "Add a worker creation snippet in a sibling file of the same name."
     }
   },
-  "required": [
-    "name",
-    "project"
-  ]
+  "required": ["name", "project"]
 }

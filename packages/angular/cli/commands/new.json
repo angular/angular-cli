@@ -4,7 +4,7 @@
   "description": "Creates a new workspace and an initial Angular application.",
   "$longDescription": "./new.md",
 
-  "$aliases": [ "n" ],
+  "$aliases": ["n"],
   "$scope": "out",
   "$type": "schematic",
   "$impl": "./new-impl#NewCommand",
@@ -15,13 +15,13 @@
       "properties": {
         "collection": {
           "type": "string",
-          "aliases": [ "c" ],
+          "aliases": ["c"],
           "description": "A collection of schematics to use in generating the initial application."
         },
         "verbose": {
           "type": "boolean",
           "default": false,
-          "aliases": [ "v" ],
+          "aliases": ["v"],
           "description": "Add more details to output logging."
         }
       },

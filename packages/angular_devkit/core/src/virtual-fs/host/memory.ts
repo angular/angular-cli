@@ -34,7 +34,6 @@ import {
   Stats,
 } from './interface';
 
-
 export interface SimpleMemoryHostStats {
   readonly content: FileBuffer | null;
 }
@@ -45,10 +44,16 @@ export class SimpleMemoryHost implements Host<{}> {
 
   protected _newDirStats() {
     return {
-      inspect() { return '<Directory>'; },
+      inspect() {
+        return '<Directory>';
+      },
 
-      isFile() { return false; },
-      isDirectory() { return true; },
+      isFile() {
+        return false;
+      },
+      isDirectory() {
+        return true;
+      },
       size: 0,
 
       atime: new Date(),
@@ -61,10 +66,16 @@ export class SimpleMemoryHost implements Host<{}> {
   }
   protected _newFileStats(content: FileBuffer, oldStats?: Stats<SimpleMemoryHostStats>) {
     return {
-      inspect() { return `<File size(${content.byteLength})>`; },
+      inspect() {
+        return `<File size(${content.byteLength})>`;
+      },
 
-      isFile() { return true; },
-      isDirectory() { return false; },
+      isFile() {
+        return true;
+      },
+      isDirectory() {
+        return false;
+      },
       size: content.byteLength,
 
       atime: oldStats ? oldStats.atime : new Date(),
@@ -96,7 +107,7 @@ export class SimpleMemoryHost implements Host<{}> {
 
     const maybeWatcher = this._watchers.get(currentPath);
     if (maybeWatcher) {
-      maybeWatcher.forEach(watcher => {
+      maybeWatcher.forEach((watcher) => {
         const [options, subject] = watcher;
         subject.next({ path, time, type });
 
@@ -113,7 +124,7 @@ export class SimpleMemoryHost implements Host<{}> {
 
       const maybeWatcher = this._watchers.get(currentPath);
       if (maybeWatcher) {
-        maybeWatcher.forEach(watcher => {
+        maybeWatcher.forEach((watcher) => {
           const [options, subject] = watcher;
           if (!options.recursive) {
             return;
@@ -302,7 +313,7 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   write(path: Path, content: FileBuffer): Observable<void> {
-    return new Observable<void>(obs => {
+    return new Observable<void>((obs) => {
       this._write(path, content);
       obs.next();
       obs.complete();
@@ -310,7 +321,7 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   read(path: Path): Observable<FileBuffer> {
-    return new Observable<FileBuffer>(obs => {
+    return new Observable<FileBuffer>((obs) => {
       const content = this._read(path);
       obs.next(content);
       obs.complete();
@@ -318,7 +329,7 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   delete(path: Path): Observable<void> {
-    return new Observable<void>(obs => {
+    return new Observable<void>((obs) => {
       this._delete(path);
       obs.next();
       obs.complete();
@@ -326,7 +337,7 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   rename(from: Path, to: Path): Observable<void> {
-    return new Observable<void>(obs => {
+    return new Observable<void>((obs) => {
       this._rename(from, to);
       obs.next();
       obs.complete();
@@ -334,28 +345,28 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return new Observable<PathFragment[]>(obs => {
+    return new Observable<PathFragment[]>((obs) => {
       obs.next(this._list(path));
       obs.complete();
     });
   }
 
   exists(path: Path): Observable<boolean> {
-    return new Observable<boolean>(obs => {
+    return new Observable<boolean>((obs) => {
       obs.next(this._exists(path));
       obs.complete();
     });
   }
 
   isDirectory(path: Path): Observable<boolean> {
-    return new Observable<boolean>(obs => {
+    return new Observable<boolean>((obs) => {
       obs.next(this._isDirectory(path));
       obs.complete();
     });
   }
 
   isFile(path: Path): Observable<boolean> {
-    return new Observable<boolean>(obs => {
+    return new Observable<boolean>((obs) => {
       obs.next(this._isFile(path));
       obs.complete();
     });
@@ -363,7 +374,7 @@ export class SimpleMemoryHost implements Host<{}> {
 
   // Some hosts may not support stat.
   stat(path: Path): Observable<Stats<{}> | null> | null {
-    return new Observable<Stats<{}> | null>(obs => {
+    return new Observable<Stats<{}> | null>((obs) => {
       obs.next(this._stat(path));
       obs.complete();
     });

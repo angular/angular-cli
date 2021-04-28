@@ -15,7 +15,6 @@ import {
 } from './definitions';
 
 describe('ProjectDefinitionCollection', () => {
-
   it('can be created without initial values or a listener', () => {
     const collection = new ProjectDefinitionCollection();
 
@@ -55,7 +54,9 @@ describe('ProjectDefinitionCollection', () => {
   });
 
   it('can be created with a listener', () => {
-    const listener = () => { fail('listener should not execute on initialization'); };
+    const listener = () => {
+      fail('listener should not execute on initialization');
+    };
 
     const collection = new ProjectDefinitionCollection(undefined, listener);
 
@@ -73,7 +74,9 @@ describe('ProjectDefinitionCollection', () => {
       builder: 'build-builder',
     });
 
-    const listener = () => { fail('listener should not execute on initialization'); };
+    const listener = () => {
+      fail('listener should not execute on initialization');
+    };
 
     const collection = new ProjectDefinitionCollection(initial, listener);
 
@@ -104,10 +107,11 @@ describe('ProjectDefinitionCollection', () => {
 
     const collection = new ProjectDefinitionCollection(undefined, listener);
 
-    collection.set(
-      'my-app',
-      { root: 'src/my-app', extensions: {}, targets: new TargetDefinitionCollection() },
-    );
+    collection.set('my-app', {
+      root: 'src/my-app',
+      extensions: {},
+      targets: new TargetDefinitionCollection(),
+    });
   });
 
   it('listens to an addition via add', () => {
@@ -168,16 +172,15 @@ describe('ProjectDefinitionCollection', () => {
 
     const collection = new ProjectDefinitionCollection(initial, listener);
 
-    collection.set(
-      'my-app',
-      { root: 'src/my-app2', extensions: {}, targets: new TargetDefinitionCollection() },
-    );
+    collection.set('my-app', {
+      root: 'src/my-app2',
+      extensions: {},
+      targets: new TargetDefinitionCollection(),
+    });
   });
-
 });
 
 describe('TargetDefinitionCollection', () => {
-
   it('can be created without initial values or a listener', () => {
     const collection = new TargetDefinitionCollection();
 
@@ -207,7 +210,9 @@ describe('TargetDefinitionCollection', () => {
   });
 
   it('can be created with a listener', () => {
-    const listener = () => { fail('listener should not execute on initialization'); };
+    const listener = () => {
+      fail('listener should not execute on initialization');
+    };
 
     const collection = new TargetDefinitionCollection(undefined, listener);
 
@@ -220,7 +225,9 @@ describe('TargetDefinitionCollection', () => {
       'test': { builder: 'builder:test' },
     };
 
-    const listener = () => { fail('listener should not execute on initialization'); };
+    const listener = () => {
+      fail('listener should not execute on initialization');
+    };
 
     const collection = new TargetDefinitionCollection(initial, listener);
 
@@ -246,10 +253,7 @@ describe('TargetDefinitionCollection', () => {
 
     const collection = new TargetDefinitionCollection(undefined, listener);
 
-    collection.set(
-      'build',
-      { builder: 'builder:build' },
-    );
+    collection.set('build', { builder: 'builder:build' });
   });
 
   it('listens to an addition via add', () => {
@@ -310,10 +314,6 @@ describe('TargetDefinitionCollection', () => {
 
     const collection = new TargetDefinitionCollection(initial, listener);
 
-    collection.set(
-      'build',
-      { builder: 'builder:test' },
-    );
+    collection.set('build', { builder: 'builder:test' });
   });
-
 });

@@ -12,7 +12,6 @@ import { addPureComment, getCleanHelperName, hasPureComment } from '../helpers/a
 export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
-
       const topLevelFunctions = findTopLevelFunctions(sf);
 
       const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
@@ -45,10 +44,11 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
     // need to mark function calls inside them as pure.
     // Class static initializers in ES2015 are an exception we don't cover. They would need similar
     // processing as enums to prevent property setting from causing the class to be retained.
-    if (ts.isFunctionLike(node)
-      || ts.isClassLike(node)
-      || ts.isArrowFunction(node)
-      || ts.isMethodDeclaration(node)
+    if (
+      ts.isFunctionLike(node) ||
+      ts.isClassLike(node) ||
+      ts.isArrowFunction(node) ||
+      ts.isMethodDeclaration(node)
     ) {
       return;
     }
@@ -64,11 +64,13 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
       return;
     }
 
-    if ((ts.isFunctionExpression(innerNode) || ts.isArrowFunction(innerNode))
-      && ts.isParenthesizedExpression(node)) {
-        // pure functions can be wrapped in parentizes
-        // we should not add pure comments to this sort of syntax.
-        // example var foo = (() => x)
+    if (
+      (ts.isFunctionExpression(innerNode) || ts.isArrowFunction(innerNode)) &&
+      ts.isParenthesizedExpression(node)
+    ) {
+      // pure functions can be wrapped in parentizes
+      // we should not add pure comments to this sort of syntax.
+      // example var foo = (() => x)
       return;
     }
 

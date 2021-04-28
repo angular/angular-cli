@@ -14,7 +14,6 @@ import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { BuildResult } from './index';
 
-
 describe('Webpack Builder basic test', () => {
   let testArchitectHost: TestingArchitectHost;
   let architect: Architect;
@@ -31,8 +30,11 @@ describe('Webpack Builder basic test', () => {
       workspaces.createWorkspaceHost(vfHost),
     );
 
-    testArchitectHost = new TestingArchitectHost(workspaceRoot, workspaceRoot,
-      new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot));
+    testArchitectHost = new TestingArchitectHost(
+      workspaceRoot,
+      workspaceRoot,
+      new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot),
+    );
     architect = new Architect(testArchitectHost, registry);
   }
 
@@ -56,7 +58,7 @@ describe('Webpack Builder basic test', () => {
 
     it('works and returns emitted files', async () => {
       const run = await architect.scheduleTarget({ project: 'app', target: 'build' });
-      const output = await run.result as BuildResult;
+      const output = (await run.result) as BuildResult;
 
       expect(output.success).toBe(true);
       expect(output.emittedFiles).toContain({
@@ -82,7 +84,11 @@ describe('Webpack Builder basic test', () => {
     });
 
     it('works', async () => {
-      const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' }, {}, {logger: createConsoleLogger()});
+      const run = await architect.scheduleTarget(
+        { project: 'app', target: 'build-webpack' },
+        {},
+        { logger: createConsoleLogger() },
+      );
       const output = await run.result;
 
       expect(output.success).toBe(true);
@@ -93,12 +99,18 @@ describe('Webpack Builder basic test', () => {
 
     it('works and returns emitted files', async () => {
       const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' });
-      const output = await run.result as BuildResult;
+      const output = (await run.result) as BuildResult;
 
       expect(output.success).toBe(true);
       expect(output.emittedFiles).toContain(
         { id: 'main', name: 'main', initial: true, file: 'main.js', extension: '.js' },
-        { id: 'polyfills', name: 'polyfills', initial: true, file: 'polyfills.js', extension: '.js' },
+        {
+          id: 'polyfills',
+          name: 'polyfills',
+          initial: true,
+          file: 'polyfills.js',
+          extension: '.js',
+        },
       );
 
       await run.stop();

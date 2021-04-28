@@ -14,13 +14,7 @@
     {
       "properties": {
         "settingOrProject": {
-          "enum": [
-            "on",
-            "off",
-            "ci",
-            "project",
-            "prompt"
-          ],
+          "enum": ["on", "off", "ci", "project", "prompt"],
           "description": "Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, or sets the default status for the project.",
           "$default": {
             "$source": "argv",
@@ -28,11 +22,7 @@
           }
         },
         "projectSetting": {
-          "enum": [
-            "on",
-            "off",
-            "prompt"
-          ],
+          "enum": ["on", "off", "prompt"],
           "description": "Sets the default analytics enablement status for the project.",
           "$default": {
             "$source": "argv",
@@ -40,9 +30,7 @@
           }
         }
       },
-      "required": [
-        "settingOrProject"
-      ]
+      "required": ["settingOrProject"]
     },
     { "$ref": "./definitions.json#/definitions/base" }
   ]

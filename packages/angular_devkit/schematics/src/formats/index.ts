@@ -11,7 +11,4 @@ export { htmlSelectorFormat } from './html-selector';
 import { pathFormat } from './path';
 export { pathFormat } from './path';
 
-export const standardFormats: schema.SchemaFormat[] = [
-  htmlSelectorFormat,
-  pathFormat,
-];
+export const standardFormats: schema.SchemaFormat[] = [htmlSelectorFormat, pathFormat];

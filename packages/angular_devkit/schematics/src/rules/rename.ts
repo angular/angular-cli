@@ -11,9 +11,8 @@ import { Rule } from '../engine/interface';
 import { FilePredicate } from '../tree/interface';
 import { forEach } from './base';
 
-
 export function rename(match: FilePredicate<boolean>, to: FilePredicate<string>): Rule {
-  return forEach(entry => {
+  return forEach((entry) => {
     if (match(entry.path, entry)) {
       return {
         content: entry.content,

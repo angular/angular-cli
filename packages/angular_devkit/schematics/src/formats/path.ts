@@ -7,7 +7,6 @@
  */
 import { normalize, schema } from '@angular-devkit/core';
 
-
 export const pathFormat: schema.SchemaFormat = {
   name: 'path',
   formatter: {

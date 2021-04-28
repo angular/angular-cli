@@ -14,7 +14,6 @@ constant while varying the third should allow for meaningful benchmarks over tim
 In the context of the DevKit, we publish many CLI tools and have access to their source code.
 By tracking tool resource usage we can catch performance regressions or improvements on our CI.
 
-
 ## STABILITY AND SUPPORT DISCLAIMER
 
 This package is not currently stable. Usage, output and API may change at any time.
@@ -26,12 +25,12 @@ You can install the benchmark tool via `npm install -g benchmark` for a global i
 `-g` for a local install.
 Installing globally gives you access to the `benchmark` binary in your `PATH`.
 
-
 ## CLI Usage
 
 Call the `benchmark` binary, followed by options, then double dash, then the command to benchmark.
 
 For more information on the available options, run `benchmark --help`:
+
 ```
 $ benchmark --help
 [benchmark] benchmark [options] -- [command to benchmark]
@@ -46,10 +45,10 @@ Example:
     benchmark --iterations=3 -- node my-script.js
 ```
 
-
 ## Example
 
 Given the naive implementation of a fibonacci number calculator below:
+
 ```
 // fibonacci.js
 const fib = (n) => n > 1 ? fib(n - 1) + fib(n - 2) : n;
@@ -74,7 +73,7 @@ $ benchmark -- node fibonacci.js 40
 
 ## Example in watch mode
 
-`watch-script` accepts a node script when using the CLI. When using the API you can provide a `Command` instance. 
+`watch-script` accepts a node script when using the CLI. When using the API you can provide a `Command` instance.
 
 ```
 benchmark --verbose --watch-timeout 10000 --watch-matcher "Compiled successfully" --watch-script watch-script.js -- ng serve

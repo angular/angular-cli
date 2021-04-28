@@ -25,7 +25,7 @@ export interface Options {
 export default function optimizer(options: Options) {
   // Normalize paths for comparison.
   if (options.sideEffectFreeModules) {
-    options.sideEffectFreeModules = options.sideEffectFreeModules.map(p => p.replace(/\\/g, '/'));
+    options.sideEffectFreeModules = options.sideEffectFreeModules.map((p) => p.replace(/\\/g, '/'));
   }
 
   return {
@@ -34,10 +34,10 @@ export default function optimizer(options: Options) {
       const normalizedId = id.replace(/\\/g, '/');
       const isSideEffectFree =
         options.sideEffectFreeModules &&
-        options.sideEffectFreeModules.some(m => normalizedId.indexOf(m) >= 0);
+        options.sideEffectFreeModules.some((m) => normalizedId.indexOf(m) >= 0);
       const isAngularCoreFile =
         options.angularCoreModules &&
-        options.angularCoreModules.some(m => normalizedId.indexOf(m) >= 0);
+        options.angularCoreModules.some((m) => normalizedId.indexOf(m) >= 0);
       const { content: code, sourceMap: map } = buildOptimizer({
         content,
         inputFilePath: id,

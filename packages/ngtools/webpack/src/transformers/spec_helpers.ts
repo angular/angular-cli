@@ -37,10 +37,7 @@ export function createTypescriptContext(
   };
 
   // Create compiler host.
-  const compilerHost = ts.createCompilerHost(
-    compilerOptions,
-    true,
-  );
+  const compilerHost = ts.createCompilerHost(compilerOptions, true);
 
   const baseFileExists = compilerHost.fileExists;
   compilerHost.fileExists = function (compilerFileName: string) {
@@ -52,7 +49,7 @@ export function createTypescriptContext(
   };
 
   const baseReadFile = compilerHost.readFile;
-  compilerHost.readFile = function(compilerFileName: string) {
+  compilerHost.readFile = function (compilerFileName: string) {
     if (compilerFileName === fileName) {
       return content;
     } else if (additionalFiles?.[basename(compilerFileName)]) {
@@ -91,11 +88,15 @@ export function transformTypescript(
   let outputContent;
   // Emit.
   const { emitSkipped, diagnostics } = program.emit(
-    undefined, (filename, data) => {
+    undefined,
+    (filename, data) => {
       if (filename === outputFileName) {
         outputContent = data;
       }
-    }, undefined, undefined, { before: transformers },
+    },
+    undefined,
+    undefined,
+    { before: transformers },
   );
 
   // Throw error with diagnostics if emit wasn't successfull.

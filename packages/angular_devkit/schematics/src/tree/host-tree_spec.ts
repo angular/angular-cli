@@ -58,9 +58,9 @@ describe('FilterHostTree', () => {
     tree.create('/file2', '');
     tree.create('/file3', '');
 
-    const filtered = new FilterHostTree(tree, p => p != '/file2');
+    const filtered = new FilterHostTree(tree, (p) => p != '/file2');
     const filteredFiles: string[] = [];
-    filtered.visit(path => filteredFiles.push(path));
+    filtered.visit((path) => filteredFiles.push(path));
     filteredFiles.sort();
     expect(filteredFiles).toEqual(['/file1', '/file3'].map(normalize));
     expect(filtered.actions.length).toEqual(2);
@@ -72,13 +72,13 @@ describe('FilterHostTree', () => {
     tree.create('/file2', '');
     tree.create('/file3', '');
 
-    const filtered = new FilterHostTree(tree, p => p != '/file2');
-    const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
+    const filtered = new FilterHostTree(tree, (p) => p != '/file2');
+    const filtered2 = new FilterHostTree(filtered, (p) => p != '/file3');
     const filteredFiles: string[] = [];
-    filtered2.visit(path => filteredFiles.push(path));
+    filtered2.visit((path) => filteredFiles.push(path));
     filteredFiles.sort();
     expect(filteredFiles).toEqual(['/file1'].map(normalize));
-    expect(filtered2.actions.map(a => a.kind)).toEqual(['c']);
+    expect(filtered2.actions.map((a) => a.kind)).toEqual(['c']);
   });
 
   it('works with underlying files', () => {
@@ -89,13 +89,13 @@ describe('FilterHostTree', () => {
     tree.create('/file2', '');
     tree.create('/file3', '');
 
-    const filtered = new FilterHostTree(tree, p => p != '/file2');
-    const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
+    const filtered = new FilterHostTree(tree, (p) => p != '/file2');
+    const filtered2 = new FilterHostTree(filtered, (p) => p != '/file3');
     const filteredFiles: string[] = [];
-    filtered2.visit(path => filteredFiles.push(path));
+    filtered2.visit((path) => filteredFiles.push(path));
     filteredFiles.sort();
     expect(filteredFiles).toEqual(['/file1'].map(normalize));
-    expect(filtered2.actions.map(a => a.kind)).toEqual([]);
+    expect(filtered2.actions.map((a) => a.kind)).toEqual([]);
   });
 
   it('works with created paths and files', () => {
@@ -104,13 +104,13 @@ describe('FilterHostTree', () => {
     tree.create('/dir2/file2', '');
     tree.create('/file3', '');
 
-    const filtered = new FilterHostTree(tree, p => p != '/dir2/file2');
-    const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
+    const filtered = new FilterHostTree(tree, (p) => p != '/dir2/file2');
+    const filtered2 = new FilterHostTree(filtered, (p) => p != '/file3');
     const filteredFiles: string[] = [];
-    filtered2.visit(path => filteredFiles.push(path));
+    filtered2.visit((path) => filteredFiles.push(path));
     filteredFiles.sort();
     expect(filteredFiles).toEqual(['/dir1/file1'].map(normalize));
-    expect(filtered2.actions.map(a => a.kind)).toEqual(['c']);
+    expect(filtered2.actions.map((a) => a.kind)).toEqual(['c']);
   });
 
   it('works with underlying paths and files', () => {
@@ -121,13 +121,13 @@ describe('FilterHostTree', () => {
     const tree = new HostTree(fs);
     tree.create('/file3', '');
 
-    const filtered = new FilterHostTree(tree, p => p != '/dir2/file2');
-    const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
+    const filtered = new FilterHostTree(tree, (p) => p != '/dir2/file2');
+    const filtered2 = new FilterHostTree(filtered, (p) => p != '/file3');
     const filteredFiles: string[] = [];
-    filtered2.visit(path => filteredFiles.push(path));
+    filtered2.visit((path) => filteredFiles.push(path));
     filteredFiles.sort();
     expect(filteredFiles).toEqual(['/dir1/file1'].map(normalize));
-    expect(filtered2.actions.map(a => a.kind)).toEqual([]);
+    expect(filtered2.actions.map((a) => a.kind)).toEqual([]);
   });
 
   it('subdirs only contains directories', () => {

@@ -32,7 +32,7 @@ export function supportsNpm(): boolean {
 }
 
 export async function getPackageManager(root: string): Promise<PackageManager> {
-  let packageManager = await getConfiguredPackageManager() as PackageManager | null;
+  let packageManager = (await getConfiguredPackageManager()) as PackageManager | null;
   if (packageManager) {
     return packageManager;
   }
@@ -66,7 +66,7 @@ export async function ensureCompatibleNpm(root: string): Promise<void> {
   }
 
   try {
-    const versionText = execSync('npm --version', {encoding: 'utf8', stdio: 'pipe'}).trim();
+    const versionText = execSync('npm --version', { encoding: 'utf8', stdio: 'pipe' }).trim();
     const version = valid(versionText);
     if (!version) {
       return;

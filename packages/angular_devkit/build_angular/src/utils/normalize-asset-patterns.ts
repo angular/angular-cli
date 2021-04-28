@@ -20,7 +20,6 @@ import {
 import { statSync } from 'fs';
 import { AssetPattern, AssetPatternClass } from '../browser/schema';
 
-
 export class MissingAssetSourceRootException extends BaseException {
   constructor(path: String) {
     super(`The ${path} asset path must start with the project source root.`);
@@ -41,47 +40,46 @@ export function normalizeAssetPatterns(
     return [];
   }
 
-  return assetPatterns
-    .map(assetPattern => {
-      // Normalize string asset patterns to objects.
-      if (typeof assetPattern === 'string') {
-        const assetPath = normalize(assetPattern);
-        const resolvedAssetPath = resolve(root, assetPath);
+  return assetPatterns.map((assetPattern) => {
+    // Normalize string asset patterns to objects.
+    if (typeof assetPattern === 'string') {
+      const assetPath = normalize(assetPattern);
+      const resolvedAssetPath = resolve(root, assetPath);
 
-        // Check if the string asset is within sourceRoot.
-        if (!resolvedAssetPath.startsWith(resolvedSourceRoot)) {
-          throw new MissingAssetSourceRootException(assetPattern);
-        }
-
-        let glob: string, input: Path, output: Path;
-        let isDirectory = false;
-
-        try {
-          isDirectory = statSync(getSystemPath(resolvedAssetPath)).isDirectory();
-        } catch {
-          isDirectory = true;
-        }
-
-        if (isDirectory) {
-          // Folders get a recursive star glob.
-          glob = '**/*';
-          // Input directory is their original path.
-          input = assetPath;
-        } else {
-          // Files are their own glob.
-          glob = basename(assetPath);
-          // Input directory is their original dirname.
-          input = dirname(assetPath);
-        }
-
-        // Output directory for both is the relative path from source root to input.
-        output = relative(resolvedSourceRoot, resolve(root, input));
-
-        // Return the asset pattern in object format.
-        return { glob, input, output };
-      } else {
-        // It's already an AssetPatternObject, no need to convert.
-        return assetPattern;
+      // Check if the string asset is within sourceRoot.
+      if (!resolvedAssetPath.startsWith(resolvedSourceRoot)) {
+        throw new MissingAssetSourceRootException(assetPattern);
       }
-    });
+
+      let glob: string, input: Path, output: Path;
+      let isDirectory = false;
+
+      try {
+        isDirectory = statSync(getSystemPath(resolvedAssetPath)).isDirectory();
+      } catch {
+        isDirectory = true;
+      }
+
+      if (isDirectory) {
+        // Folders get a recursive star glob.
+        glob = '**/*';
+        // Input directory is their original path.
+        input = assetPath;
+      } else {
+        // Files are their own glob.
+        glob = basename(assetPath);
+        // Input directory is their original dirname.
+        input = dirname(assetPath);
+      }
+
+      // Output directory for both is the relative path from source root to input.
+      output = relative(resolvedSourceRoot, resolve(root, input));
+
+      // Return the asset pattern in object format.
+      return { glob, input, output };
+    } else {
+      // It's already an AssetPatternObject, no need to convert.
+      return assetPattern;
+    }
+  });
 }

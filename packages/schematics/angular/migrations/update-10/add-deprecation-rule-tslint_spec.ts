@@ -41,7 +41,9 @@ describe('Migration of tslint to version 6', () => {
     };
     tree.create(TSLINT_PATH, JSON.stringify(config, null, 2));
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-add-deprecation-rule', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-add-deprecation-rule', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['deprecation'].severity).toBe('warning');
   });
@@ -58,7 +60,9 @@ describe('Migration of tslint to version 6', () => {
     };
     tree.create(TSLINT_PATH, JSON.stringify(config, null, 2));
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-add-deprecation-rule', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-add-deprecation-rule', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['deprecation']).toBe(false);
   });
@@ -77,7 +81,9 @@ describe('Migration of tslint to version 6', () => {
     };
     tree.create(TSLINT_PATH, JSON.stringify(config, null, 2));
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-add-deprecation-rule', {}, tree).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('tslint-add-deprecation-rule', {}, tree)
+      .toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['deprecation'].severity).toBe('error');
   });

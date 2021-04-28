@@ -17,12 +17,7 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, statSync } from 'fs';
 import { dirname, isAbsolute, join, resolve } from 'path';
-import {
-  Observable,
-  from as observableFrom,
-  isObservable,
-  throwError,
-} from 'rxjs';
+import { Observable, from as observableFrom, isObservable, throwError } from 'rxjs';
 import { Url } from 'url';
 import {
   HostCreateTree,
@@ -41,16 +36,14 @@ import {
 } from './description';
 import { readJsonFile } from './file-system-utility';
 
-
-export declare type OptionTransform<T extends object, R extends object>
-    = (
-      schematic: FileSystemSchematicDescription,
-      options: T,
-      context?: FileSystemSchematicContext,
-    ) => Observable<R> | PromiseLike<R> | R;
-export declare type ContextTransform
-    = (context: FileSystemSchematicContext) => FileSystemSchematicContext;
-
+export declare type OptionTransform<T extends object, R extends object> = (
+  schematic: FileSystemSchematicDescription,
+  options: T,
+  context?: FileSystemSchematicContext,
+) => Observable<R> | PromiseLike<R> | R;
+export declare type ContextTransform = (
+  context: FileSystemSchematicContext,
+) => FileSystemSchematicContext;
 
 export class CollectionCannotBeResolvedException extends BaseException {
   constructor(name: string) {
@@ -83,24 +76,33 @@ export class FactoryCannotBeResolvedException extends BaseException {
   }
 }
 export class CollectionMissingSchematicsMapException extends BaseException {
-  constructor(name: string) { super(`Collection "${name}" does not have a schematics map.`); }
+  constructor(name: string) {
+    super(`Collection "${name}" does not have a schematics map.`);
+  }
 }
 export class CollectionMissingFieldsException extends BaseException {
-  constructor(name: string) { super(`Collection "${name}" is missing fields.`); }
+  constructor(name: string) {
+    super(`Collection "${name}" is missing fields.`);
+  }
 }
 export class SchematicMissingFieldsException extends BaseException {
-  constructor(name: string) { super(`Schematic "${name}" is missing fields.`); }
+  constructor(name: string) {
+    super(`Schematic "${name}" is missing fields.`);
+  }
 }
 export class SchematicMissingDescriptionException extends BaseException {
-  constructor(name: string) { super(`Schematics "${name}" does not have a description.`); }
+  constructor(name: string) {
+    super(`Schematics "${name}" does not have a description.`);
+  }
 }
 export class SchematicNameCollisionException extends BaseException {
   constructor(name: string) {
-    super(`Schematics/alias ${JSON.stringify(name)} collides with another alias or schematic`
-          + ' name.');
+    super(
+      `Schematics/alias ${JSON.stringify(name)} collides with another alias or schematic` +
+        ' name.',
+    );
   }
 }
-
 
 /**
  * A EngineHost base class that uses the file system to resolve collections. This is the base of
@@ -109,13 +111,18 @@ export class SchematicNameCollisionException extends BaseException {
 export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
   protected abstract _resolveCollectionPath(name: string, requester?: string): string;
   protected abstract _resolveReferenceString(
-      name: string, parentPath: string): { ref: RuleFactory<{}>, path: string } | null;
+    name: string,
+    parentPath: string,
+  ): { ref: RuleFactory<{}>; path: string } | null;
   protected abstract _transformCollectionDescription(
-      name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc;
+    name: string,
+    desc: Partial<FileSystemCollectionDesc>,
+  ): FileSystemCollectionDesc;
   protected abstract _transformSchematicDescription(
-      name: string,
-      collection: FileSystemCollectionDesc,
-      desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
+    name: string,
+    collection: FileSystemCollectionDesc,
+    desc: Partial<FileSystemSchematicDesc>,
+  ): FileSystemSchematicDesc;
 
   // tslint:disable-next-line:no-any
   private _transforms: OptionTransform<any, any>[] = [];
@@ -222,8 +229,8 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     if (partialDesc.extends) {
       const index = partialDesc.extends.indexOf(':');
       const collectionName = index !== -1 ? partialDesc.extends.substr(0, index) : null;
-      const schematicName = index === -1 ?
-        partialDesc.extends : partialDesc.extends.substr(index + 1);
+      const schematicName =
+        index === -1 ? partialDesc.extends : partialDesc.extends.substr(index + 1);
 
       if (collectionName !== null) {
         const extendCollection = this.createCollectionDescription(collectionName);
@@ -258,8 +265,8 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     // This is needed because on Bazel under Windows the data files (such as the collection or
     // url files) are not in the same place as the compiled JS.
     const maybePath = join(collectionPath, partialDesc.factory);
-    const path = existsSync(maybePath) && statSync(maybePath).isDirectory()
-      ? maybePath : dirname(maybePath);
+    const path =
+      existsSync(maybePath) && statSync(maybePath).isDirectory() ? maybePath : dirname(maybePath);
 
     return this._transformSchematicDescription(name, collection, {
       ...partialDesc,
@@ -280,7 +287,9 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
           // Check if context has necessary FileSystemSchematicContext path property
           const fileDescription = context.schematic.description as { path?: string };
           if (fileDescription.path === undefined) {
-            throw new Error('Unsupported schematic context. Expected a FileSystemSchematicContext.');
+            throw new Error(
+              'Unsupported schematic context. Expected a FileSystemSchematicContext.',
+            );
           }
 
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
@@ -303,13 +312,15 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
       let transformedOptions = options;
       for (const transformer of this._transforms) {
         const transformerResult = transformer(schematic, transformedOptions, context);
-        transformedOptions = await (isObservable(transformerResult) ? transformerResult.toPromise() : transformerResult);
+        transformedOptions = await (isObservable(transformerResult)
+          ? transformerResult.toPromise()
+          : transformerResult);
       }
 
       return transformedOptions;
     };
 
-    return observableFrom(transform()) as unknown as Observable<ResultT>;
+    return (observableFrom(transform()) as unknown) as Observable<ResultT>;
   }
 
   transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
@@ -319,7 +330,8 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
 
   getSchematicRuleFactory<OptionT extends object>(
     schematic: FileSystemSchematicDesc,
-    _collection: FileSystemCollectionDesc): RuleFactory<OptionT> {
+    _collection: FileSystemCollectionDesc,
+  ): RuleFactory<OptionT> {
     return schematic.factoryFn;
   }
 

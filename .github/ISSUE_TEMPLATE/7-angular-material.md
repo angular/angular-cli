@@ -1,7 +1,6 @@
 ---
 name: "\U0001F48E Angular Material"
 about: Issues and feature requests for Angular Material
-
 ---
 
 🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑

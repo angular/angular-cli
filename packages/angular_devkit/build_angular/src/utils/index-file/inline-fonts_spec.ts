@@ -67,8 +67,7 @@ describe('InlineFontsProcessor', () => {
       minify: false,
     });
 
-    const html = await inlineFontsProcessor
-      .process(content.replace('https://', 'http://'));
+    const html = await inlineFontsProcessor.process(content.replace('https://', 'http://'));
     expect(html).toContain(`format('woff2');`);
   });
 
@@ -78,8 +77,7 @@ describe('InlineFontsProcessor', () => {
       minify: false,
     });
 
-    const html = await inlineFontsProcessor
-      .process(content.replace('https://', '//'));
+    const html = await inlineFontsProcessor.process(content.replace('https://', '//'));
     expect(html).toContain(`format('woff2');`);
   });
 

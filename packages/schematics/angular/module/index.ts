@@ -25,7 +25,12 @@ import { Schema as ComponentOptions } from '../component/schema';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { MODULE_EXT, ROUTING_MODULE_EXT, buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import {
+  MODULE_EXT,
+  ROUTING_MODULE_EXT,
+  buildRelativePath,
+  findModuleFromOptions,
+} from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
@@ -33,10 +38,10 @@ import { RoutingScope, Schema as ModuleOptions } from './schema';
 
 function buildRelativeModulePath(options: ModuleOptions, modulePath: string): string {
   const importModulePath = normalize(
-    `/${options.path}/`
-    + (options.flat ? '' : strings.dasherize(options.name) + '/')
-    + strings.dasherize(options.name)
-    + '.module',
+    `/${options.path}/` +
+      (options.flat ? '' : strings.dasherize(options.name) + '/') +
+      strings.dasherize(options.name) +
+      '.module',
   );
 
   return buildRelativePath(modulePath, importModulePath);
@@ -58,10 +63,12 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const relativePath = buildRelativeModulePath(options, modulePath);
-    const changes = addImportToModule(source,
-                                      modulePath,
-                                      strings.classify(`${options.name}Module`),
-                                      relativePath);
+    const changes = addImportToModule(
+      source,
+      modulePath,
+      strings.classify(`${options.name}Module`),
+      relativePath,
+    );
 
     const recorder = host.beginUpdate(modulePath);
     for (const change of changes) {
@@ -154,10 +161,10 @@ export default function (options: ModuleOptions): Rule {
     const templateSource = apply(url('./files'), [
       options.routing || (isLazyLoadedModuleGen && routingModulePath)
         ? noop()
-        : filter(path => !path.endsWith('-routing.module.ts.template')),
+        : filter((path) => !path.endsWith('-routing.module.ts.template')),
       applyTemplates({
         ...strings,
-        'if-flat': (s: string) => options.flat ? '' : s,
+        'if-flat': (s: string) => (options.flat ? '' : s),
         lazyRoute: isLazyLoadedModuleGen,
         lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
         lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
@@ -166,8 +173,9 @@ export default function (options: ModuleOptions): Rule {
       move(parsedPath.path),
     ]);
     const moduleDasherized = strings.dasherize(options.name);
-    const modulePath =
-      `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}.module.ts`;
+    const modulePath = `${
+      !options.flat ? moduleDasherized + '/' : ''
+    }${moduleDasherized}.module.ts`;
 
     const componentOptions: ComponentOptions = {
       module: modulePath,
@@ -181,9 +189,7 @@ export default function (options: ModuleOptions): Rule {
       !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : noop(),
       addRouteDeclarationToNgModule(options, routingModulePath),
       mergeWith(templateSource),
-      isLazyLoadedModuleGen
-        ? schematic('component', componentOptions)
-        : noop(),
+      isLazyLoadedModuleGen ? schematic('component', componentOptions) : noop(),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };

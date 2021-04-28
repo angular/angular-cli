@@ -20,7 +20,6 @@ import {
   Value,
 } from '../models/interface';
 
-
 export class CommandJsonPathException extends BaseException {
   constructor(public readonly path: string, public readonly name: string) {
     super(`File ${path} was not found while constructing the subcommand ${name}.`);
@@ -37,7 +36,7 @@ function _getEnumFromValue<E, T extends E[keyof E]>(
   }
 
   if (Object.values(enumeration).includes(value)) {
-    return value as unknown as T;
+    return (value as unknown) as T;
   }
 
   return defaultValue;
@@ -53,14 +52,14 @@ export async function parseJsonSchemaToSubCommandDescription(
 
   const aliases: string[] = [];
   if (json.isJsonArray(schema.$aliases)) {
-    schema.$aliases.forEach(value => {
+    schema.$aliases.forEach((value) => {
       if (typeof value == 'string') {
         aliases.push(value);
       }
     });
   }
   if (json.isJsonArray(schema.aliases)) {
-    schema.aliases.forEach(value => {
+    schema.aliases.forEach((value) => {
       if (typeof value == 'string') {
         aliases.push(value);
       }
@@ -107,8 +106,7 @@ export async function parseJsonSchemaToCommandDescription(
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
 ): Promise<CommandDescription> {
-  const subcommand =
-    await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema);
+  const subcommand = await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema);
 
   // Before doing any work, let's validate the implementation.
   if (typeof schema.$impl != 'string') {
@@ -173,27 +171,31 @@ export async function parseJsonSchemaToOptions(
     }
 
     // We only support number, string or boolean (or array of those), so remove everything else.
-    const types = [...typeSet].filter(x => {
-      switch (x) {
-        case 'boolean':
-        case 'number':
-        case 'string':
-          return true;
-
-        case 'array':
-          // Only include arrays if they're boolean, string or number.
-          if (json.isJsonObject(current.items)
-              && typeof current.items.type == 'string'
-              && ['boolean', 'number', 'string'].includes(current.items.type)) {
+    const types = [...typeSet]
+      .filter((x) => {
+        switch (x) {
+          case 'boolean':
+          case 'number':
+          case 'string':
             return true;
-          }
 
-          return false;
+          case 'array':
+            // Only include arrays if they're boolean, string or number.
+            if (
+              json.isJsonObject(current.items) &&
+              typeof current.items.type == 'string' &&
+              ['boolean', 'number', 'string'].includes(current.items.type)
+            ) {
+              return true;
+            }
 
-        default:
-          return false;
-      }
-    }).map(x => _getEnumFromValue(x, OptionType, OptionType.String));
+            return false;
+
+          default:
+            return false;
+        }
+      })
+      .map((x) => _getEnumFromValue(x, OptionType, OptionType.String));
 
     if (types.length == 0) {
       // This means it's not usable on the command line. e.g. an Object.
@@ -201,7 +203,7 @@ export async function parseJsonSchemaToOptions(
     }
 
     // Only keep enum values we support (booleans, numbers and strings).
-    const enumValues = (json.isJsonArray(current.enum) && current.enum || []).filter(x => {
+    const enumValues = ((json.isJsonArray(current.enum) && current.enum) || []).filter((x) => {
       switch (typeof x) {
         case 'boolean':
         case 'number':
@@ -236,15 +238,19 @@ export async function parseJsonSchemaToOptions(
 
     const type = types[0];
     const $default = current.$default;
-    const $defaultIndex = (json.isJsonObject($default) && $default['$source'] == 'argv')
-      ? $default['index'] : undefined;
-    const positional: number | undefined = typeof $defaultIndex == 'number'
-      ? $defaultIndex : undefined;
+    const $defaultIndex =
+      json.isJsonObject($default) && $default['$source'] == 'argv' ? $default['index'] : undefined;
+    const positional: number | undefined =
+      typeof $defaultIndex == 'number' ? $defaultIndex : undefined;
 
     const required = json.isJsonArray(current.required)
-      ? current.required.indexOf(name) != -1 : false;
-    const aliases = json.isJsonArray(current.aliases) ? [...current.aliases].map(x => '' + x)
-      : current.alias ? ['' + current.alias] : [];
+      ? current.required.indexOf(name) != -1
+      : false;
+    const aliases = json.isJsonArray(current.aliases)
+      ? [...current.aliases].map((x) => '' + x)
+      : current.alias
+      ? ['' + current.alias]
+      : [];
     const format = typeof current.format == 'string' ? current.format : undefined;
     const visible = current.visible === undefined || current.visible === true;
     const hidden = !!current.hidden || !visible;
@@ -254,22 +260,22 @@ export async function parseJsonSchemaToOptions(
 
     // Deprecated is set only if it's true or a string.
     const xDeprecated = current['x-deprecated'];
-    const deprecated = (xDeprecated === true || typeof xDeprecated === 'string')
-      ? xDeprecated : undefined;
+    const deprecated =
+      xDeprecated === true || typeof xDeprecated === 'string' ? xDeprecated : undefined;
 
     const option: Option = {
       name,
       description: '' + (current.description === undefined ? '' : current.description),
-      ...types.length == 1 ? { type } : { type, types },
-      ...defaultValue !== undefined ? { default: defaultValue } : {},
-      ...enumValues && enumValues.length > 0 ? { enum: enumValues } : {},
+      ...(types.length == 1 ? { type } : { type, types }),
+      ...(defaultValue !== undefined ? { default: defaultValue } : {}),
+      ...(enumValues && enumValues.length > 0 ? { enum: enumValues } : {}),
       required,
       aliases,
-      ...format !== undefined ? { format } : {},
+      ...(format !== undefined ? { format } : {}),
       hidden,
-      ...userAnalytics ? { userAnalytics } : {},
-      ...deprecated !== undefined ? { deprecated } : {},
-      ...positional !== undefined ? { positional } : {},
+      ...(userAnalytics ? { userAnalytics } : {}),
+      ...(deprecated !== undefined ? { deprecated } : {}),
+      ...(positional !== undefined ? { positional } : {}),
     };
 
     options.push(option);

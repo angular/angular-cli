@@ -11,7 +11,6 @@ import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder styles resources output path', () => {
   const imgSvg = `
     <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
@@ -64,14 +63,16 @@ describe('Browser Builder styles resources output path', () => {
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
     expect(main).toContain(`url('out-assets/component-img-relative.png')`);
 
-    expect(host.scopedSync()
-      .exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
-    expect(host.scopedSync()
-      .exists(normalize('dist/out-assets/global-img-relative.png'))).toBe(true);
-    expect(host.scopedSync()
-      .exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(true);
-    expect(host.scopedSync()
-      .exists(normalize('dist/out-assets/component-img-relative.png'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/out-assets/global-img-relative.png'))).toBe(
+      true,
+    );
+    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
+      true,
+    );
+    expect(host.scopedSync().exists(normalize('dist/out-assets/component-img-relative.png'))).toBe(
+      true,
+    );
   });
 
   it(`supports blank resourcesOutputPath`, async () => {
@@ -87,13 +88,11 @@ describe('Browser Builder styles resources output path', () => {
     expect(styles).toContain(`url('global-img-relative.png')`);
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
     expect(main).toContain(`url('component-img-relative.png')`);
-    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png')))
-      .toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
+      true,
+    );
+    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png'))).toBe(true);
   });
 });

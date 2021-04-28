@@ -13,17 +13,7 @@
       "type": "string",
       "description": "Output format for the generated file.",
       "default": "xlf",
-      "enum": [
-        "xmb",
-        "xlf",
-        "xlif",
-        "xliff",
-        "xlf2",
-        "xliff2",
-        "json",
-        "arb",
-        "legacy-migrate"
-      ]
+      "enum": ["xmb", "xlf", "xlif", "xliff", "xlf2", "xliff2", "json", "arb", "legacy-migrate"]
     },
     "progress": {
       "type": "boolean",
@@ -40,7 +30,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "browserTarget"
-  ]
+  "required": ["browserTarget"]
 }

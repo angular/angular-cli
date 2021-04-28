@@ -16,7 +16,7 @@ declare const TextEncoder: {
 };
 
 declare const TextDecoder: {
-  new(encoding: string): {
+  new (encoding: string): {
     decode(bytes: Uint8Array): string;
   };
 };
@@ -47,11 +47,9 @@ export function stringToFileBuffer(str: string): FileBuffer {
   }
 }
 
-
 export const fileBuffer: TemplateTag<FileBuffer> = (strings, ...values) => {
   return stringToFileBuffer(String.raw(strings, ...values));
 };
-
 
 export function fileBufferToString(fileBuffer: FileBuffer): string {
   if (fileBuffer.toString.length == 1) {

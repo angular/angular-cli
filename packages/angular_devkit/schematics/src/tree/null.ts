@@ -6,24 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  BaseException,
-  Path,
-  PathFragment,
-  dirname,
-  join,
-  normalize,
-} from '@angular-devkit/core';
+import { BaseException, Path, PathFragment, dirname, join, normalize } from '@angular-devkit/core';
 import { FileDoesNotExistException } from '../exception/exception';
 import { Action } from './action';
 import { DirEntry, MergeStrategy, Tree, TreeSymbol, UpdateRecorder } from './interface';
 import { UpdateRecorderBase } from './recorder';
 
-
 export class CannotCreateFileException extends BaseException {
-  constructor(path: string) { super(`Cannot create file "${path}".`); }
+  constructor(path: string) {
+    super(`Cannot create file "${path}".`);
+  }
 }
-
 
 export class NullTreeDirEntry implements DirEntry {
   get parent(): DirEntry | null {
@@ -38,11 +31,12 @@ export class NullTreeDirEntry implements DirEntry {
   dir(name: PathFragment): DirEntry {
     return new NullTreeDirEntry(join(this.path, name));
   }
-  file(_name: PathFragment) { return null; }
+  file(_name: PathFragment) {
+    return null;
+  }
 
   visit() {}
 }
-
 
 export class NullTree implements Tree {
   [TreeSymbol]() {
@@ -57,10 +51,18 @@ export class NullTree implements Tree {
   readonly root: DirEntry = new NullTreeDirEntry(normalize('/'));
 
   // Simple readonly file system operations.
-  exists(_path: string) { return false; }
-  read(_path: string) { return null; }
-  get(_path: string) { return null; }
-  getDir(path: string) { return new NullTreeDirEntry(normalize('/' + path)); }
+  exists(_path: string) {
+    return false;
+  }
+  read(_path: string) {
+    return null;
+  }
+  get(_path: string) {
+    return null;
+  }
+  getDir(path: string) {
+    return new NullTreeDirEntry(normalize('/' + path));
+  }
   visit() {}
 
   // Change content of host files.
@@ -68,9 +70,9 @@ export class NullTree implements Tree {
     throw new FileDoesNotExistException(path);
   }
   commitUpdate(record: UpdateRecorder): never {
-    throw new FileDoesNotExistException(record instanceof UpdateRecorderBase
-      ? record.path
-      : '<unknown>');
+    throw new FileDoesNotExistException(
+      record instanceof UpdateRecorderBase ? record.path : '<unknown>',
+    );
   }
 
   // Change structure of the host.

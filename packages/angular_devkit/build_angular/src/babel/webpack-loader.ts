@@ -16,10 +16,7 @@ interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLi
   forceES5: boolean;
 }
 
-function requiresLinking(
-  path: string,
-  source: string,
-): boolean {
+function requiresLinking(path: string, source: string): boolean {
   // @angular/core and @angular/compiler will cause false positives
   // Also, TypeScript files do not require linking
   if (/[\\\/]@angular[\\\/](?:compiler|core)|\.tsx?$/.test(path)) {
@@ -67,7 +64,8 @@ export default custom<AngularCustomOptions>(() => {
           // TypeScript files will have already been downlevelled
           customOptions.forceES5 = !/\.tsx?$/.test(this.resourcePath);
         } else if (esTarget >= ScriptTarget.ES2017) {
-          customOptions.forceAsyncTransformation = !/[\\\/][_f]?esm2015[\\\/]/.test(this.resourcePath) && source.includes('async');
+          customOptions.forceAsyncTransformation =
+            !/[\\\/][_f]?esm2015[\\\/]/.test(this.resourcePath) && source.includes('async');
         }
         shouldProcess ||= customOptions.forceAsyncTransformation || customOptions.forceES5;
       }
@@ -108,7 +106,7 @@ export default custom<AngularCustomOptions>(() => {
         // Workaround for https://github.com/babel/babel-loader/pull/896 is available
         // Delete once the above PR is released
         // tslint:disable-next-line: no-any
-        inputSourceMap: (configuration.options.inputSourceMap || false as any), // Typings are not correct
+        inputSourceMap: configuration.options.inputSourceMap || (false as any), // Typings are not correct
         presets: [
           ...(configuration.options.presets || []),
           [

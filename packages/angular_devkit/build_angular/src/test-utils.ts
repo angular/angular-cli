@@ -21,7 +21,6 @@ import {
   workspaces,
 } from '@angular-devkit/core';
 
-
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
 
@@ -103,7 +102,7 @@ export async function browserBuild(
         cache = host
           .read(join(outputPath, path))
           .toPromise()
-          .then(content => virtualFs.fileBufferToString(content));
+          .then((content) => virtualFs.fileBufferToString(content));
 
         return cache;
       },

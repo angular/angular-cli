@@ -22,7 +22,6 @@ import { normalizeSourceMaps } from '../../../utils/index';
 
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 
-
 let blocked: any[] = [];
 let isBlocked = false;
 let webpackMiddleware: any;
@@ -34,14 +33,14 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
   const defaults = {
     included: true,
     served: true,
-    watched: true
+    watched: true,
   };
 
   const processedFiles = newFiles
     // Remove globs that do not match any files, otherwise Karma will show a warning for these.
-    .filter(file => glob.sync(file.pattern, { nodir: true }).length != 0)
+    .filter((file) => glob.sync(file.pattern, { nodir: true }).length != 0)
     // Fill in pattern properties with defaults.
-    .map(file => ({ ...defaults, ...file }));
+    .map((file) => ({ ...defaults, ...file }));
 
   // It's important to not replace the array, because
   // karma already has a reference to the existing array.
@@ -54,9 +53,10 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 
 const init: any = (config: any, emitter: any) => {
   if (!config.buildWebpack) {
-    throw new Error(`The '@angular-devkit/build-angular/plugins/karma' karma plugin is meant to` +
-      ` be used from within Angular CLI and will not work correctly outside of it.`
-    )
+    throw new Error(
+      `The '@angular-devkit/build-angular/plugins/karma' karma plugin is meant to` +
+        ` be used from within Angular CLI and will not work correctly outside of it.`,
+    );
   }
   const options = config.buildWebpack.options as WebpackTestOptions;
   const logger: logging.Logger = config.buildWebpack.logger || createConsoleLogger();
@@ -73,10 +73,14 @@ const init: any = (config: any, emitter: any) => {
     const smsPath = path.dirname(require.resolve('source-map-support'));
     const ksmsPath = path.dirname(require.resolve('karma-source-map-support'));
 
-    addKarmaFiles(config.files, [
-      { pattern: path.join(smsPath, 'browser-source-map-support.js'), watched: false },
-      { pattern: path.join(ksmsPath, 'client.js'), watched: false }
-    ], true);
+    addKarmaFiles(
+      config.files,
+      [
+        { pattern: path.join(smsPath, 'browser-source-map-support.js'), watched: false },
+        { pattern: path.join(ksmsPath, 'client.js'), watched: false },
+      ],
+      true,
+    );
   }
 
   config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
@@ -87,7 +91,9 @@ const init: any = (config: any, emitter: any) => {
     config.reporters = config.reporters || [];
     const { plugins, reporters } = config;
     const hasCoveragePlugin = plugins.some(isPlugin('karma-coverage', 'reporter:coverage'));
-    const hasIstanbulPlugin = plugins.some(isPlugin('karma-coverage-istanbul-reporter', 'reporter:coverage-istanbul'));
+    const hasIstanbulPlugin = plugins.some(
+      isPlugin('karma-coverage-istanbul-reporter', 'reporter:coverage-istanbul'),
+    );
     const hasCoverageReporter = reporters.includes('coverage');
     const hasIstanbulReporter = reporters.includes('coverage-istanbul');
     if (hasCoveragePlugin && !hasCoverageReporter) {
@@ -100,9 +106,11 @@ const init: any = (config: any, emitter: any) => {
     }
 
     if (hasIstanbulPlugin) {
-      logger.warn(`'karma-coverage-istanbul-reporter' usage has been deprecated since version 11.\n` +
-        `Please install 'karma-coverage' and update 'karma.conf.js.' ` +
-        'For more info, see https://github.com/karma-runner/karma-coverage/blob/master/README.md');
+      logger.warn(
+        `'karma-coverage-istanbul-reporter' usage has been deprecated since version 11.\n` +
+          `Please install 'karma-coverage' and update 'karma.conf.js.' ` +
+          'For more info, see https://github.com/karma-runner/karma-coverage/blob/master/README.md',
+      );
     }
   }
 
@@ -116,7 +124,7 @@ const init: any = (config: any, emitter: any) => {
 
   // Use existing config if any.
   config.webpack = { ...webpackConfig, ...config.webpack };
-  config.webpackMiddleware = { ...webpackMiddlewareConfig, ...config.webpackMiddleware }
+  config.webpackMiddleware = { ...webpackMiddlewareConfig, ...config.webpackMiddleware };
 
   // Our custom context and debug files list the webpack bundles directly instead of using
   // the karma files array.
@@ -133,9 +141,10 @@ const init: any = (config: any, emitter: any) => {
     // There's no option to turn off file watching in webpack-dev-server, but
     // we can override the file watcher instead.
     webpackConfig.plugins.unshift({
-      apply: (compiler: any) => { // tslint:disable-line:no-any
+      apply: (compiler: any) => {
+        // tslint:disable-line:no-any
         compiler.hooks.afterEnvironment.tap('karma', () => {
-          compiler.watchFileSystem = { watch: () => { } };
+          compiler.watchFileSystem = { watch: () => {} };
         });
       },
     });
@@ -162,7 +171,7 @@ const init: any = (config: any, emitter: any) => {
 
       // Notify potential listeners of the compile error.
       emitter.emit('compile_error', {
-        errors: statsJson.errors?.map(e => e.message),
+        errors: statsJson.errors?.map((e) => e.message),
       });
 
       // Finish Karma run early in case of compilation error.
@@ -229,12 +238,12 @@ function requestBlocker() {
 // browser log, because it is an utility reporter,
 // unless it's alone in the "reporters" option and base reporter is used.
 function muteDuplicateReporterLogging(context: any, config: any) {
-  context.writeCommonMsg = () => { }
+  context.writeCommonMsg = () => {};
   const reporterName = '@angular/cli';
   const hasTrailingReporters = config.reporters.slice(-1).pop() !== reporterName;
 
   if (hasTrailingReporters) {
-    context.writeCommonMsg = () => { };
+    context.writeCommonMsg = () => {};
   }
 }
 
@@ -250,10 +259,10 @@ const eventReporter: any = function (this: any, baseReporterDecorator: any, conf
     } else {
       failureCb();
     }
-  }
+  };
 
   // avoid duplicate failure message
-  this.specFailure = () => { };
+  this.specFailure = () => {};
 };
 
 eventReporter.$inject = ['baseReporterDecorator', 'config'];
@@ -272,10 +281,10 @@ const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, 
   };
 
   // avoid duplicate complete message
-  this.onRunComplete = () => { };
+  this.onRunComplete = () => {};
 
   // avoid duplicate failure message
-  this.specFailure = () => { };
+  this.specFailure = () => {};
 };
 
 sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
@@ -327,12 +336,12 @@ function isPlugin(moduleId: string, pluginName: string) {
         try {
           require.resolve(moduleId);
           return true;
-        } catch { }
+        } catch {}
       }
       return false;
     }
     return pluginName in plugin;
-  }
+  };
 }
 
 module.exports = {
@@ -340,5 +349,5 @@ module.exports = {
   'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
   'reporter:@angular-devkit/build-angular--event-reporter': ['type', eventReporter],
   'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker],
-  'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware]
+  'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware],
 };

@@ -90,7 +90,8 @@ describe('readJsonWorkpace Parsing', () => {
   it(`doesn't remove falsy values when using the spread operator`, async () => {
     const host = createTestHost(representativeFile);
     const workspace = await readJsonWorkspace('', host);
-    const prodConfig = workspace.projects.get('my-app')!.targets.get('build')!.configurations!.production!;
+    const prodConfig = workspace.projects.get('my-app')!.targets.get('build')!.configurations!
+      .production!;
     expect({ ...prodConfig }).toEqual(prodConfig);
   });
 
@@ -201,8 +202,14 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     expect(workspace.extensions['x-baz']).toEqual({ a: 1, b: 2, c: { d: 'abc' } });
 
     Object.assign(value, { x: 9, y: 8, z: 7 });
-    expect(workspace.extensions['x-baz'])
-      .toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+    expect(workspace.extensions['x-baz']).toEqual({
+      a: 1,
+      b: 2,
+      c: { d: 'abc' },
+      x: 9,
+      y: 8,
+      z: 7,
+    });
 
     const metadata = getMetadata(workspace);
 
@@ -227,8 +234,14 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     expect(workspace.extensions['x-baz']).toEqual({ a: 1, b: 2, c: { d: 'abc' } });
 
     workspace.extensions['x-baz'] = Object.assign(value, { x: 9, y: 8, z: 7 });
-    expect(workspace.extensions['x-baz'])
-      .toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+    expect(workspace.extensions['x-baz']).toEqual({
+      a: 1,
+      b: 2,
+      c: { d: 'abc' },
+      x: 9,
+      y: 8,
+      z: 7,
+    });
 
     const metadata = getMetadata(workspace);
 
@@ -253,8 +266,14 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     expect(workspace.extensions['x-baz']).toEqual({ a: 1, b: 2, c: { d: 'abc' } });
 
     workspace.extensions['x-baz'] = { ...value, ...{ x: 9, y: 8 }, z: 7 };
-    expect(workspace.extensions['x-baz'])
-      .toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+    expect(workspace.extensions['x-baz']).toEqual({
+      a: 1,
+      b: 2,
+      c: { d: 'abc' },
+      x: 9,
+      y: 8,
+      z: 7,
+    });
 
     const metadata = getMetadata(workspace);
 
@@ -275,10 +294,16 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-foo'] = {
-      ...workspace.extensions['x-foo'] as JsonObject,
-      ...{ x: 9, y: 8 }, z: 7 };
-    expect(workspace.extensions['x-foo'])
-      .toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+      ...(workspace.extensions['x-foo'] as JsonObject),
+      ...{ x: 9, y: 8 },
+      z: 7,
+    };
+    expect(workspace.extensions['x-foo']).toEqual({
+      is: ['good', 'great', 'awesome'],
+      x: 9,
+      y: 8,
+      z: 7,
+    });
 
     const metadata = getMetadata(workspace);
 
@@ -298,13 +323,13 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
 
     const workspace = await readJsonWorkspace('', host);
 
-    Object.assign(
-      workspace.extensions['x-foo'],
-      { x: 9, y: 8 },
-      { z: 7 },
-    );
-    expect(workspace.extensions['x-foo'])
-      .toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+    Object.assign(workspace.extensions['x-foo'], { x: 9, y: 8 }, { z: 7 });
+    expect(workspace.extensions['x-foo']).toEqual({
+      is: ['good', 'great', 'awesome'],
+      x: 9,
+      y: 8,
+      z: 7,
+    });
 
     const metadata = getMetadata(workspace);
 
@@ -343,8 +368,12 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
       { x: 9, y: 8 },
       { z: 7 },
     );
-    expect(workspace.extensions['x-foo'])
-      .toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+    expect(workspace.extensions['x-foo']).toEqual({
+      is: ['good', 'great', 'awesome'],
+      x: 9,
+      y: 8,
+      z: 7,
+    });
 
     const metadata = getMetadata(workspace);
 

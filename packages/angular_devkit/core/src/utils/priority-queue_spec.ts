@@ -8,7 +8,6 @@
 
 import { PriorityQueue } from './priority-queue';
 
-
 describe('PriorityQueue', () => {
   it('adds an item', () => {
     const queue = new PriorityQueue<number>((x, y) => x - y);

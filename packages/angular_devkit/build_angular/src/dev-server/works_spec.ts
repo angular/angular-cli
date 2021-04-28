@@ -12,7 +12,6 @@ import { normalize, virtualFs } from '@angular-devkit/core';
 import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
 import { createArchitect, host } from '../test-utils';
 
-
 describe('Dev Server Builder', () => {
   const target = { project: 'app', target: 'serve' };
   let architect: Architect;
@@ -25,13 +24,13 @@ describe('Dev Server Builder', () => {
   });
   afterEach(async () => {
     await host.restore().toPromise();
-    await Promise.all(runs.map(r => r.stop()));
+    await Promise.all(runs.map((r) => r.stop()));
   });
 
   it(`doesn't serve files on the cwd directly`, async () => {
     const run = await architect.scheduleTarget(target);
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
+    const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
 
     // When webpack-dev-server doesn't have `contentBase: false`, this will serve the repo README.
@@ -48,19 +47,25 @@ describe('Dev Server Builder', () => {
 
   it('should not generate sourcemaps when running prod build', async () => {
     // Production builds have sourcemaps turned off.
-    const run = await architect.scheduleTarget({ ...target, configuration: 'production' }, { port: 0 });
+    const run = await architect.scheduleTarget(
+      { ...target, configuration: 'production' },
+      { port: 0 },
+    );
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
+    const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    const hasSourceMaps = output.emittedFiles && output.emittedFiles.some(f => f.extension === '.map');
+    const hasSourceMaps =
+      output.emittedFiles && output.emittedFiles.some((f) => f.extension === '.map');
     expect(hasSourceMaps).toBe(false, `Expected emitted files not to contain '.map' files.`);
   });
 
   it('serves custom headers', async () => {
-    const run = await architect.scheduleTarget(
-        target, {headers: {'X-Header': 'Hello World'}, port: 0});
+    const run = await architect.scheduleTarget(target, {
+      headers: { 'X-Header': 'Hello World' },
+      port: 0,
+    });
     runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
+    const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
     const response = await fetch(output.baseUrl);
     expect(response.headers.get('X-Header')).toBe('Hello World');
@@ -79,7 +84,7 @@ describe('Dev Server Builder', () => {
 
     const architect = (await createArchitect(host.root())).architect;
     const run = await architect.scheduleTarget(target, { port: 0 });
-    const output = await run.result as DevServerBuilderOutput;
+    const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
 
     const indexResponse = await fetch(output.baseUrl);
@@ -91,5 +96,4 @@ describe('Dev Server Builder', () => {
 
     await run.stop();
   });
-
 });

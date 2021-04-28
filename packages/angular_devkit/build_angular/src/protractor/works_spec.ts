@@ -29,7 +29,7 @@ describe('Protractor Builder', () => {
   });
 
   it('fails with no devServerTarget and no standalone server', async () => {
-    const overrides = { devServerTarget: undefined } as unknown as JsonObject;
+    const overrides = ({ devServerTarget: undefined } as unknown) as JsonObject;
     const run = await architect.scheduleTarget(protractorTargetSpec, overrides);
 
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
@@ -38,10 +38,9 @@ describe('Protractor Builder', () => {
   });
 
   it('overrides protractor specs', async () => {
-    host.scopedSync().rename(
-      normalize('./e2e/app.e2e-spec.ts'),
-      normalize('./e2e/renamed-app.e2e.spec.ts'),
-    );
+    host
+      .scopedSync()
+      .rename(normalize('./e2e/app.e2e-spec.ts'), normalize('./e2e/renamed-app.e2e.spec.ts'));
 
     const overrides = { specs: ['./e2e/renamed-app.e2e.spec.ts'] };
     const run = await architect.scheduleTarget(protractorTargetSpec, overrides);
@@ -52,18 +51,21 @@ describe('Protractor Builder', () => {
   });
 
   it('overrides protractor suites', async () => {
-    host.scopedSync().rename(
-      normalize('./e2e/app.e2e-spec.ts'),
-      normalize('./e2e/renamed-app.e2e-spec.ts'),
-    );
+    host
+      .scopedSync()
+      .rename(normalize('./e2e/app.e2e-spec.ts'), normalize('./e2e/renamed-app.e2e-spec.ts'));
 
     // Suites block needs to be added in the protractor.conf.js file to test suites
-    host.replaceInFile('protractor.conf.js', `allScriptsTimeout: 11000,`, `
+    host.replaceInFile(
+      'protractor.conf.js',
+      `allScriptsTimeout: 11000,`,
+      `
       allScriptsTimeout: 11000,
       suites: {
         app: './e2e/app.e2e-spec.ts'
       },
-    `);
+    `,
+    );
 
     const overrides = { suite: 'app' };
     const run = await architect.scheduleTarget(protractorTargetSpec, overrides);

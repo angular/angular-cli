@@ -9,17 +9,21 @@
 import { BaseException } from '../exception';
 import { TemplateTag } from '../utils/literals';
 
-
 export class InvalidPathException extends BaseException {
-  constructor(path: string) { super(`Path ${JSON.stringify(path)} is invalid.`); }
+  constructor(path: string) {
+    super(`Path ${JSON.stringify(path)} is invalid.`);
+  }
 }
 export class PathMustBeAbsoluteException extends BaseException {
-  constructor(path: string) { super(`Path ${JSON.stringify(path)} must be absolute.`); }
+  constructor(path: string) {
+    super(`Path ${JSON.stringify(path)} must be absolute.`);
+  }
 }
 export class PathCannotBeFragmentException extends BaseException {
-  constructor(path: string) { super(`Path ${JSON.stringify(path)} cannot be made a fragment.`); }
+  constructor(path: string) {
+    super(`Path ${JSON.stringify(path)} cannot be made a fragment.`);
+  }
 }
-
 
 /**
  * A Path recognized by most methods in the DevKit.
@@ -35,20 +39,17 @@ export type PathFragment = Path & {
   __PRIVATE_DEVKIT_PATH_FRAGMENT: void;
 };
 
-
 /**
  * The Separator for normalized path.
  * @type {Path}
  */
 export const NormalizedSep = '/' as Path;
 
-
 /**
  * The root of a normalized path.
  * @type {Path}
  */
 export const NormalizedRoot = NormalizedSep as Path;
-
 
 /**
  * Split a path into multiple path fragments. Each fragments except the last one will end with
@@ -57,7 +58,7 @@ export const NormalizedRoot = NormalizedSep as Path;
  * @returns {Path[]} An array of path fragments.
  */
 export function split(path: Path): PathFragment[] {
-  const fragments = path.split(NormalizedSep).map(x => fragment(x));
+  const fragments = path.split(NormalizedSep).map((x) => fragment(x));
   if (fragments[fragments.length - 1].length === 0) {
     fragments.pop();
   }
@@ -78,7 +79,6 @@ export function extname(path: Path): string {
   }
 }
 
-
 /**
  * Return the basename of the path, as a Path. See path.basename
  */
@@ -90,7 +90,6 @@ export function basename(path: Path): PathFragment {
     return fragment(path.substr(path.lastIndexOf(NormalizedSep) + 1));
   }
 }
-
 
 /**
  * Return the dirname of the path, as a Path. See path.dirname
@@ -106,7 +105,6 @@ export function dirname(path: Path): Path {
   return normalize(path.substr(0, endIndex));
 }
 
-
 /**
  * Join multiple paths together, and normalize the result. Accepts strings that will be
  * normalized as well (but the original must be a path).
@@ -119,14 +117,12 @@ export function join(p1: Path, ...others: string[]): Path {
   }
 }
 
-
 /**
  * Returns true if a path is absolute.
  */
 export function isAbsolute(p: Path) {
   return p.startsWith(NormalizedSep);
 }
-
 
 /**
  * Returns a path such that `join(from, relative(from, to)) == to`.
@@ -156,13 +152,15 @@ export function relative(from: Path, to: Path): Path {
     if (splitFrom.length == 0) {
       p = splitTo.join(NormalizedSep);
     } else {
-      p = splitFrom.map(_ => '..').concat(splitTo).join(NormalizedSep);
+      p = splitFrom
+        .map((_) => '..')
+        .concat(splitTo)
+        .join(NormalizedSep);
     }
   }
 
   return normalize(p);
 }
-
 
 /**
  * Returns a Path that is the resolution of p2, from p1. If p2 is absolute, it will return p2,
@@ -176,7 +174,6 @@ export function resolve(p1: Path, p2: Path) {
   }
 }
 
-
 export function fragment(path: string): PathFragment {
   if (path.indexOf(NormalizedSep) != -1) {
     throw new PathCannotBeFragmentException(path);
@@ -185,13 +182,11 @@ export function fragment(path: string): PathFragment {
   return path as PathFragment;
 }
 
-
 /**
  * normalize() cache to reduce computation. For now this grows and we never flush it, but in the
  * future we might want to add a few cache flush to prevent this from growing too large.
  */
 let normalizedCache = new Map<string, Path>();
-
 
 /**
  * Reset the cache. This is only useful for testing.
@@ -200,7 +195,6 @@ let normalizedCache = new Map<string, Path>();
 export function resetNormalizeCache() {
   normalizedCache = new Map<string, Path>();
 }
-
 
 /**
  * Normalize a string into a Path. This is the only mean to get a Path type from a string that
@@ -225,7 +219,6 @@ export function normalize(path: string): Path {
 
   return maybePath;
 }
-
 
 /**
  * The no cache version of the normalize() function. Used for benchmarking and testing.
@@ -274,7 +267,7 @@ export function noCacheNormalize(path: string): Path {
   }
 
   if (p.length == 1) {
-    return p[0] == '' ? NormalizedSep : '' as Path;
+    return p[0] == '' ? NormalizedSep : ('' as Path);
   } else {
     if (p[0] == '.') {
       p.shift();
@@ -284,11 +277,9 @@ export function noCacheNormalize(path: string): Path {
   }
 }
 
-
 export const path: TemplateTag<Path> = (strings, ...values) => {
   return normalize(String.raw(strings, ...values));
 };
-
 
 // Platform-specific paths.
 export type WindowsPath = string & {
@@ -310,7 +301,7 @@ export function asWindowsPath(path: Path): WindowsPath {
 }
 
 export function asPosixPath(path: Path): PosixPath {
-  return path as string as PosixPath;
+  return (path as string) as PosixPath;
 }
 
 export function getSystemPath(path: Path): string {

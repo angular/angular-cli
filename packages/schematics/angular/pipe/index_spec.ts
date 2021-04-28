@@ -12,7 +12,6 @@ import { createAppModule, getFileContent } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as PipeOptions } from './schema';
 
-
 describe('Pipe Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -43,7 +42,8 @@ describe('Pipe Schematic', () => {
   let appTree: UnitTestTree;
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('application', appOptions, appTree)
       .toPromise();
   });
 
@@ -82,11 +82,9 @@ describe('Pipe Schematic', () => {
   });
 
   it('should handle a path in the name and module options', async () => {
-    appTree = await schematicRunner.runSchematicAsync(
-      'module',
-      { name: 'admin/module', project: 'bar' },
-      appTree,
-    ).toPromise();
+    appTree = await schematicRunner
+      .runSchematicAsync('module', { name: 'admin/module', project: 'bar' }, appTree)
+      .toPromise();
 
     const options = { ...defaultOptions, module: 'admin/module' };
     appTree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();

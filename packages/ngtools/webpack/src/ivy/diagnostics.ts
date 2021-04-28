@@ -13,9 +13,7 @@ import { addError, addWarning } from '../webpack-diagnostics';
 
 export type DiagnosticsReporter = (diagnostics: Diagnostics) => void;
 
-export function createDiagnosticsReporter(
-  compilation: Compilation,
-): DiagnosticsReporter {
+export function createDiagnosticsReporter(compilation: Compilation): DiagnosticsReporter {
   return (diagnostics) => {
     for (const diagnostic of diagnostics) {
       const text = formatDiagnostics([diagnostic]);

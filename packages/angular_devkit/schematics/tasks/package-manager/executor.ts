@@ -35,7 +35,7 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
       installAll: 'install',
       installPackage: 'install',
     },
-   },
+  },
   'yarn': {
     quietArgument: '--silent',
     commands: {
@@ -57,7 +57,7 @@ export class UnknownPackageManagerException extends BaseException {
   }
 }
 
-export default function(
+export default function (
   factoryOptions: NodePackageTaskFactoryOptions = {},
 ): TaskExecutor<NodePackageTaskOptions> {
   const packageManagerName = factoryOptions.packageManager || 'npm';
@@ -79,7 +79,7 @@ export default function(
       taskPackageManagerName = options.packageManager;
     }
 
-    const bufferedOutput: {stream: NodeJS.WriteStream, data: Buffer}[] = [];
+    const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
     const spawnOptions: SpawnOptions = {
       stdio: !!options.hideOutput ? 'pipe' : 'inherit',
       shell: true,
@@ -104,14 +104,15 @@ export default function(
       args.push(`--registry="${factoryOptions.registry}"`);
     }
 
-    return new Observable(obs => {
+    return new Observable((obs) => {
       const spinner = ora({
         text: `Installing packages (${taskPackageManagerName})...`,
         // Workaround for https://github.com/sindresorhus/ora/issues/136.
         discardStdin: process.platform != 'win32',
       }).start();
-      const childProcess = spawn(taskPackageManagerName, args, spawnOptions)
-        .on('close', (code: number) => {
+      const childProcess = spawn(taskPackageManagerName, args, spawnOptions).on(
+        'close',
+        (code: number) => {
           if (code === 0) {
             spinner.succeed('Packages installed successfully.');
             spinner.stop();
@@ -124,14 +125,16 @@ export default function(
             spinner.fail('Package install failed, see above.');
             obs.error(new UnsuccessfulWorkflowExecution());
           }
-      });
+        },
+      );
       if (options.hideOutput) {
         childProcess.stdout?.on('data', (data: Buffer) =>
-          bufferedOutput.push({ stream: process.stdout, data: data }));
+          bufferedOutput.push({ stream: process.stdout, data: data }),
+        );
         childProcess.stderr?.on('data', (data: Buffer) =>
-          bufferedOutput.push({ stream: process.stderr, data: data }));
+          bufferedOutput.push({ stream: process.stderr, data: data }),
+        );
       }
     });
-
   };
 }

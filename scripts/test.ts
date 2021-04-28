@@ -39,7 +39,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   });
 
   if (status != 0) {
-    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    logger.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
     throw error;
   }
 
@@ -82,12 +82,12 @@ runner.onComplete((success: boolean) => {
 
 glob
   .sync('packages/**/*.spec.ts')
-  .filter(p => !/\/schematics\/.*\/(other-)?files\//.test(p))
-  .forEach(path => {
+  .filter((p) => !/\/schematics\/.*\/(other-)?files\//.test(p))
+  .forEach((path) => {
     console.error(`Invalid spec file name: ${path}. You're using the old convention.`);
   });
 
-export default function(args: ParsedArgs, logger: logging.Logger) {
+export default function (args: ParsedArgs, logger: logging.Logger) {
   const specGlob = '*_spec.ts';
   const regex = args.glob ? args.glob : `packages/**/${specGlob}`;
 
@@ -104,7 +104,7 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   }
 
   // Run the tests.
-  const allTests = glob.sync(regex).map(p => relative(projectBaseDir, p));
+  const allTests = glob.sync(regex).map((p) => relative(projectBaseDir, p));
 
   const tsConfigPath = join(__dirname, '../tsconfig.json');
   const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
@@ -112,11 +112,11 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
     '^(' +
     (tsConfig.config.exclude as string[])
       .map(
-        ex =>
+        (ex) =>
           '(' +
           ex
             .split(/[\/\\]/g)
-            .map(f =>
+            .map((f) =>
               f
                 .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
                 .replace(/^\*\*/g, '(.+?)?')
@@ -128,40 +128,34 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
       .join('|') +
     ')($|/|\\\\)';
   const excludeRe = new RegExp(pattern);
-  let tests = allTests.filter(x => !excludeRe.test(x));
+  let tests = allTests.filter((x) => !excludeRe.test(x));
 
   if (!args.full) {
     // Find the point where this branch merged with master.
     const branch = _exec('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {}, logger).trim();
-    const masterRevList = _exec('git', ['rev-list', 'master'], {}, logger)
-      .trim()
-      .split('\n');
-    const branchRevList = _exec('git', ['rev-list', branch], {}, logger)
-      .trim()
-      .split('\n');
-    const sha = branchRevList.find(s => masterRevList.includes(s));
+    const masterRevList = _exec('git', ['rev-list', 'master'], {}, logger).trim().split('\n');
+    const branchRevList = _exec('git', ['rev-list', branch], {}, logger).trim().split('\n');
+    const sha = branchRevList.find((s) => masterRevList.includes(s));
 
     if (sha) {
       const diffFiles = [
         // Get diff between $SHA and HEAD.
-        ..._exec('git', ['diff', sha, 'HEAD', '--name-only'], {}, logger)
-          .trim()
-          .split('\n'),
+        ..._exec('git', ['diff', sha, 'HEAD', '--name-only'], {}, logger).trim().split('\n'),
         // And add the current status to it (so it takes the non-committed changes).
         ..._exec('git', ['status', '--short', '--show-stash'], {}, logger)
           .split('\n')
-          .map(x => x.slice(2).trim()),
+          .map((x) => x.slice(2).trim()),
       ]
-        .map(x => normalize(x))
-        .filter(x => x !== '.' && x !== ''); // Empty paths will be normalized to dot.
+        .map((x) => normalize(x))
+        .filter((x) => x !== '.' && x !== ''); // Empty paths will be normalized to dot.
 
       const diffPackages = new Set();
       for (const pkgName of Object.keys(packages)) {
         const relativeRoot = relative(projectBaseDir, packages[pkgName].root);
-        if (diffFiles.some(x => x.startsWith(relativeRoot))) {
+        if (diffFiles.some((x) => x.startsWith(relativeRoot))) {
           diffPackages.add(pkgName);
           // Add all reverse dependents too.
-          packages[pkgName].reverseDependencies.forEach(d => diffPackages.add(d));
+          packages[pkgName].reverseDependencies.forEach((d) => diffPackages.add(d));
         }
       }
 
@@ -170,8 +164,8 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
       logger.info(JSON.stringify([...diffPackages], null, 2));
 
       // Remove the tests from packages that haven't changed.
-      tests = tests.filter(p =>
-        Object.keys(packages).some(name => {
+      tests = tests.filter((p) =>
+        Object.keys(packages).some((name) => {
           const relativeRoot = relative(projectBaseDir, packages[name].root);
 
           return p.startsWith(relativeRoot) && diffPackages.has(name);
@@ -188,7 +182,9 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   }
 
   // Filter in/out flakes according to the --flakey flag.
-  tests = tests.filter(test => !!args.flakey == knownFlakes.includes(test.replace(/[\/\\]/g, '/')));
+  tests = tests.filter(
+    (test) => !!args.flakey == knownFlakes.includes(test.replace(/[\/\\]/g, '/')),
+  );
 
   if (args.shard !== undefined) {
     // Remove tests that are not part of this shard.
@@ -197,7 +193,7 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
     tests = tests.filter((name, i) => i % nbShards == shardId);
   }
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     runner.onComplete((passed: boolean) => resolve(passed ? 0 : 1));
     if (args.seed != undefined) {
       runner.seed(args.seed);

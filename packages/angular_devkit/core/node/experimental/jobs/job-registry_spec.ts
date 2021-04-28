@@ -15,7 +15,6 @@ const root = path.join(
   '../../../../../../tests/angular_devkit/core/node/jobs',
 );
 
-
 describe('NodeModuleJobScheduler', () => {
   it('works', async () => {
     const registry = new NodeModuleJobRegistry();

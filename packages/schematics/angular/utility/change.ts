@@ -13,7 +13,6 @@ export interface Host {
   read(path: string): Promise<string>;
 }
 
-
 export interface Change {
   apply(host: Host): Promise<void>;
 
@@ -29,7 +28,6 @@ export interface Change {
   readonly description: string;
 }
 
-
 /**
  * An operation that does nothing.
  */
@@ -37,15 +35,15 @@ export class NoopChange implements Change {
   description = 'No operation.';
   order = Infinity;
   path = null;
-  apply() { return Promise.resolve(); }
+  apply() {
+    return Promise.resolve();
+  }
 }
-
 
 /**
  * Will add text to the source code.
  */
 export class InsertChange implements Change {
-
   order: number;
   description: string;
 
@@ -61,7 +59,7 @@ export class InsertChange implements Change {
    * This method does not insert spaces if there is none in the original string.
    */
   apply(host: Host) {
-    return host.read(this.path).then(content => {
+    return host.read(this.path).then((content) => {
       const prefix = content.substring(0, this.pos);
       const suffix = content.substring(this.pos);
 
@@ -74,7 +72,6 @@ export class InsertChange implements Change {
  * Will remove text from the source code.
  */
 export class RemoveChange implements Change {
-
   order: number;
   description: string;
 
@@ -87,7 +84,7 @@ export class RemoveChange implements Change {
   }
 
   apply(host: Host): Promise<void> {
-    return host.read(this.path).then(content => {
+    return host.read(this.path).then((content) => {
       const prefix = content.substring(0, this.pos);
       const suffix = content.substring(this.pos + this.toRemove.length);
 
@@ -104,8 +101,12 @@ export class ReplaceChange implements Change {
   order: number;
   description: string;
 
-  constructor(public path: string, private pos: number, public oldText: string,
-              public newText: string) {
+  constructor(
+    public path: string,
+    private pos: number,
+    public oldText: string,
+    public newText: string,
+  ) {
     if (pos < 0) {
       throw new Error('Negative positions are invalid');
     }
@@ -114,7 +115,7 @@ export class ReplaceChange implements Change {
   }
 
   apply(host: Host): Promise<void> {
-    return host.read(this.path).then(content => {
+    return host.read(this.path).then((content) => {
       const prefix = content.substring(0, this.pos);
       const suffix = content.substring(this.pos + this.oldText.length);
       const text = content.substring(this.pos, this.pos + this.oldText.length);

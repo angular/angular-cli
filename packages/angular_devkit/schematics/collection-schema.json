@@ -59,17 +59,12 @@
             "description": "Whether or not this schematic can be called from an external schematic, or a tool. This implies hidden: true."
           }
         },
-        "required": [
-          "factory",
-          "description"
-        ]
+        "required": ["factory", "description"]
       }
     },
     "version": {
       "type": "string"
     }
   },
-  "required": [
-    "schematics"
-  ]
+  "required": ["schematics"]
 }

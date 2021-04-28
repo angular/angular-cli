@@ -111,9 +111,7 @@ function convertJsonTarget(target: TargetDefinition): JsonObject {
   };
 }
 
-function convertJsonTargetCollection(
-  collection: Iterable<[string, TargetDefinition]>,
-): JsonObject {
+function convertJsonTargetCollection(collection: Iterable<[string, TargetDefinition]>): JsonObject {
   const targets = Object.create(null) as JsonObject;
 
   for (const [projectName, target] of collection) {
@@ -209,8 +207,10 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
   const data = new MagicString(metadata.raw);
   const indent = data.getIndentString();
   const removedCommas = new Set<number>();
-  const nodeChanges =
-    new Map<JsonAstNode | JsonAstKeyValue, (JsonAstNode | JsonAstKeyValue | string)[]>();
+  const nodeChanges = new Map<
+    JsonAstNode | JsonAstKeyValue,
+    (JsonAstNode | JsonAstKeyValue | string)[]
+  >();
 
   for (const { op, path, node, value, type } of metadata.changes) {
     // targets/projects are typically large objects so always use multiline
@@ -269,7 +269,7 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
       case 'remove':
         let removalIndex = -1;
         if (node.kind === 'object') {
-          removalIndex = elements.findIndex(e => {
+          removalIndex = elements.findIndex((e) => {
             return typeof e != 'string' && e.kind === 'keyvalue' && e.key.value === propertyOrIndex;
           });
         } else if (node.kind === 'array') {
@@ -326,10 +326,8 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
   }
 
   for (const [node, elements] of nodeChanges.entries()) {
-    let parentPoint = 1 + data.original.indexOf(
-      node.kind === 'array' ? '[' : '{',
-      node.start.offset,
-    );
+    let parentPoint =
+      1 + data.original.indexOf(node.kind === 'array' ? '[' : '{', node.start.offset);
 
     // Short-circuit for simple case
     if (elements.length === 1 && typeof elements[0] === 'string') {
@@ -351,16 +349,12 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
     let prefixComma = false;
     for (const element of optimizedElements) {
       if (typeof element === 'string') {
-        data.appendRight(
-          parentPoint,
-          (prefixComma ? ',' : '') + element,
-        );
+        data.appendRight(parentPoint, (prefixComma ? ',' : '') + element);
       } else {
         parentPoint = findFullEnd(element, data.original);
         prefixComma = data.original[parentPoint - 1] !== ',' || removedCommas.has(parentPoint - 1);
       }
     }
-
   }
 
   const result = data.toString();

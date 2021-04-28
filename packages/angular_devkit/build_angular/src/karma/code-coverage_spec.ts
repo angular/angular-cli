@@ -36,7 +36,7 @@ describe('Karma Builder code coverage', () => {
   it('supports code coverage option', async () => {
     const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
 
-    const {success} = await run.result;
+    const { success } = await run.result;
     expect(success).toBe(true);
 
     await run.stop();
@@ -56,14 +56,12 @@ describe('Karma Builder code coverage', () => {
   it('supports code coverage exclude option', async () => {
     const overrides = {
       codeCoverage: true,
-      codeCoverageExclude: [
-        '**/test.ts',
-      ],
+      codeCoverageExclude: ['**/test.ts'],
     };
 
     const run = await architect.scheduleTarget(karmaTargetSpec, overrides);
 
-    const {success} = await run.result;
+    const { success } = await run.result;
     expect(success).toBe(true);
 
     await run.stop();
@@ -104,18 +102,22 @@ describe('Karma Builder code coverage', () => {
 
     host.writeMultipleFiles(files);
 
-    host.replaceInFile('tsconfig.json', /"baseUrl": ".\/",/, `
+    host.replaceInFile(
+      'tsconfig.json',
+      /"baseUrl": ".\/",/,
+      `
       "baseUrl": "./",
       "paths": {
         "my-lib": [
           "./dist/my-lib"
         ]
       },
-    `);
+    `,
+    );
 
     const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
 
-    const {success} = await run.result;
+    const { success } = await run.result;
     expect(success).toBe(true);
 
     await run.stop();
@@ -132,7 +134,10 @@ describe('Karma Builder code coverage', () => {
   });
 
   it('should exit with non-zero code when coverage is below threshold', async () => {
-    host.replaceInFile('karma.conf.js', 'coverageReporter: {', `
+    host.replaceInFile(
+      'karma.conf.js',
+      'coverageReporter: {',
+      `
       coverageReporter: {
         check: {
           global: {
@@ -142,13 +147,17 @@ describe('Karma Builder code coverage', () => {
             functions: 100
           }
         },
-    `);
+    `,
+    );
 
-    host.appendToFile('src/app/app.component.ts', `
+    host.appendToFile(
+      'src/app/app.component.ts',
+      `
       export function nonCovered(): boolean {
         return true;
       }
-    `);
+    `,
+    );
 
     const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
 
@@ -160,38 +169,47 @@ describe('Karma Builder code coverage', () => {
 
     // However the program must exit with non-zero exit code.
     // This is a more common use case of coverage testing and must be supported.
-    await run.output.pipe(
-      last(),
-      tap(buildEvent => expect(buildEvent.success).toBeFalse()),
-    ).toPromise();
+    await run.output
+      .pipe(
+        last(),
+        tap((buildEvent) => expect(buildEvent.success).toBeFalse()),
+      )
+      .toPromise();
 
     await run.stop();
-
   });
 
   it('is able to process coverage plugin provided as string', async () => {
-    host.replaceInFile('karma.conf.js', /plugins: \[.+?\]/s, `plugins: [
+    host.replaceInFile(
+      'karma.conf.js',
+      /plugins: \[.+?\]/s,
+      `plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('@angular-devkit/build-angular/plugins/karma'),
       'karma-coverage', // instead of require('karma-coverage')
-    ]`);
+    ]`,
+    );
     const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
 
-    const {success} = await run.result;
+    const { success } = await run.result;
     expect(success).toBe(true);
     await run.stop();
   });
 
   it('is able to process coverage plugins provided as string karma-*', async () => {
-    host.replaceInFile('karma.conf.js', /plugins: \[.+?\]/s, `plugins: [
+    host.replaceInFile(
+      'karma.conf.js',
+      /plugins: \[.+?\]/s,
+      `plugins: [
       'karma-*',
       require('@angular-devkit/build-angular/plugins/karma'),
-    ]`);
+    ]`,
+    );
     const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
 
-    const {success} = await run.result;
+    const { success } = await run.result;
     expect(success).toBe(true);
     await run.stop();
   });

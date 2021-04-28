@@ -92,13 +92,13 @@ async function _executeTarget(
   delete argv['help'];
   const logger = new logging.Logger('jobs');
   const logs: logging.LogEntry[] = [];
-  logger.subscribe(entry => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
+  logger.subscribe((entry) => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
 
   const { _, ...options } = argv;
   const run = await architect.scheduleTarget(targetSpec, options, { logger });
   const bars = new MultiProgressBar<number, BarInfo>(':name :bar (:current/:total) :status');
 
-  run.progress.subscribe(update => {
+  run.progress.subscribe((update) => {
     const data = bars.get(update.id) || {
       id: update.id,
       builder: update.builder,
@@ -142,7 +142,7 @@ async function _executeTarget(
   try {
     const { success } = await run.output
       .pipe(
-        tap(result => {
+        tap((result) => {
           if (result.success) {
             parentLogger.info(colors.green('SUCCESS'));
           } else {
@@ -151,7 +151,7 @@ async function _executeTarget(
           parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
 
           parentLogger.info('\nLogs:');
-          logs.forEach(l => parentLogger.next(l));
+          logs.forEach((l) => parentLogger.next(l));
           logs.splice(0);
         }),
       )
@@ -164,7 +164,7 @@ async function _executeTarget(
   } catch (err) {
     parentLogger.info(colors.red('ERROR'));
     parentLogger.info('\nLogs:');
-    logs.forEach(l => parentLogger.next(l));
+    logs.forEach((l) => parentLogger.next(l));
 
     parentLogger.fatal('Exception:');
     parentLogger.fatal(err.stack);
@@ -179,11 +179,11 @@ async function main(args: string[]): Promise<number> {
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(argv['verbose'], process.stdout, process.stderr, {
-    info: s => s,
-    debug: s => s,
-    warn: s => colors.bold.yellow(s),
-    error: s => colors.bold.red(s),
-    fatal: s => colors.bold.red(s),
+    info: (s) => s,
+    debug: (s) => s,
+    warn: (s) => colors.bold.yellow(s),
+    error: (s) => colors.bold.red(s),
+    fatal: (s) => colors.bold.red(s),
   });
 
   // Check the target.
@@ -214,7 +214,7 @@ async function main(args: string[]): Promise<number> {
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
   // Show usage of deprecated options
-  registry.useXDeprecatedProvider(msg => logger.warn(msg));
+  registry.useXDeprecatedProvider((msg) => logger.warn(msg));
 
   const { workspace } = await workspaces.readWorkspace(
     configFilePath,
@@ -228,10 +228,10 @@ async function main(args: string[]): Promise<number> {
 }
 
 main(process.argv.slice(2)).then(
-  code => {
+  (code) => {
     process.exit(code);
   },
-  err => {
+  (err) => {
     // tslint:disable-next-line: no-console
     console.error('Error: ' + err.stack || err.message || err);
     process.exit(-1);

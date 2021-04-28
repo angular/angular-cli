@@ -41,10 +41,7 @@ export type DefinitionCollectionListener<V extends object> = (
 class DefinitionCollection<V extends object> implements ReadonlyMap<string, V> {
   private _map: Map<string, V>;
 
-  constructor(
-    initial?: Record<string, V>,
-    private _listener?: DefinitionCollectionListener<V>,
-  ) {
+  constructor(initial?: Record<string, V>, private _listener?: DefinitionCollectionListener<V>) {
     this._map = new Map(initial && Object.entries(initial));
   }
 
@@ -134,7 +131,6 @@ function isJsonValue(value: unknown): value is JsonValue {
 }
 
 export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDefinition> {
-
   constructor(
     initial?: Record<string, ProjectDefinition>,
     listener?: DefinitionCollectionListener<ProjectDefinition>,
@@ -142,16 +138,14 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
     super(initial, listener);
   }
 
-  add(
-    definition: {
-      name: string,
-      root: string,
-      sourceRoot?: string,
-      prefix?: string,
-      targets?: Record<string, TargetDefinition | undefined>,
-      [key: string]: unknown,
-    },
-  ): ProjectDefinition {
+  add(definition: {
+    name: string;
+    root: string;
+    sourceRoot?: string;
+    prefix?: string;
+    targets?: Record<string, TargetDefinition | undefined>;
+    [key: string]: unknown;
+  }): ProjectDefinition {
     if (this.has(definition.name)) {
       throw new Error('Project name already exists.');
     }
@@ -209,11 +203,9 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
       throw new Error('Project name must be a valid npm package name.');
     }
   }
-
 }
 
 export class TargetDefinitionCollection extends DefinitionCollection<TargetDefinition> {
-
   constructor(
     initial?: Record<string, TargetDefinition>,
     listener?: DefinitionCollectionListener<TargetDefinition>,
@@ -223,7 +215,7 @@ export class TargetDefinitionCollection extends DefinitionCollection<TargetDefin
 
   add(
     definition: {
-      name: string,
+      name: string;
     } & TargetDefinition,
   ): TargetDefinition {
     if (this.has(definition.name)) {
@@ -256,5 +248,4 @@ export class TargetDefinitionCollection extends DefinitionCollection<TargetDefin
       throw new TypeError('Target name must be a string.');
     }
   }
-
 }

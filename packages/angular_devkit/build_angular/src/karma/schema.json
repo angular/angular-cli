@@ -48,12 +48,7 @@
       "description": "The stylesheet language to use for the application's inline component styles.",
       "type": "string",
       "default": "css",
-      "enum": [
-        "css",
-        "less",
-        "sass",
-        "scss"
-      ]
+      "enum": ["css", "less", "sass", "scss"]
     },
     "stylePreprocessorOptions": {
       "description": "Options to pass to style preprocessors",
@@ -157,10 +152,7 @@
               }
             },
             "additionalProperties": false,
-            "required": [
-              "src",
-              "replaceWith"
-            ]
+            "required": ["src", "replaceWith"]
           },
           {
             "type": "object",
@@ -173,10 +165,7 @@
               }
             },
             "additionalProperties": false,
-            "required": [
-              "replace",
-              "with"
-            ]
+            "required": ["replace", "with"]
           }
         ]
       },
@@ -195,11 +184,7 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "main",
-    "tsConfig",
-    "karmaConfig"
-  ],
+  "required": ["main", "tsConfig", "karmaConfig"],
   "definitions": {
     "assetPattern": {
       "oneOf": [
@@ -227,11 +212,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "glob",
-            "input",
-            "output"
-          ]
+          "required": ["glob", "input", "output"]
         },
         {
           "type": "string"
@@ -259,9 +240,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "input"
-          ]
+          "required": ["input"]
         },
         {
           "type": "string",

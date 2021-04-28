@@ -9,7 +9,6 @@
 import { parse } from 'url';
 import { SchematicContext, Source } from '../engine/interface';
 
-
 export function url(urlString: string): Source {
   const url = parse(urlString);
 

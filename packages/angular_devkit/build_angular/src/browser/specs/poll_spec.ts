@@ -9,7 +9,6 @@ import { Architect } from '@angular-devkit/architect';
 import { debounceTime, take, tap } from 'rxjs/operators';
 import { createArchitect, host } from '../../test-utils';
 
-
 describe('Browser Builder poll', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;
@@ -26,19 +25,21 @@ describe('Browser Builder poll', () => {
     let startTime: number | undefined;
 
     const run = await architect.scheduleTarget(target, overrides);
-    await run.output.pipe(
-      // Debounce 1s, otherwise changes are too close together and polling doesn't work.
-      debounceTime(1000),
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(true);
-        if (startTime != undefined) {
-          intervals.push(Date.now() - startTime - 1000);
-        }
-        startTime = Date.now();
-        host.appendToFile('src/main.ts', 'console.log(1);');
-      }),
-      take(4),
-    ).toPromise();
+    await run.output
+      .pipe(
+        // Debounce 1s, otherwise changes are too close together and polling doesn't work.
+        debounceTime(1000),
+        tap((buildEvent) => {
+          expect(buildEvent.success).toBe(true);
+          if (startTime != undefined) {
+            intervals.push(Date.now() - startTime - 1000);
+          }
+          startTime = Date.now();
+          host.appendToFile('src/main.ts', 'console.log(1);');
+        }),
+        take(4),
+      )
+      .toPromise();
 
     intervals.sort();
     const median = intervals[Math.trunc(intervals.length / 2)];

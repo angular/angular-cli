@@ -15,7 +15,6 @@ import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { ProjectSetting, Schema as AnalyticsCommandSchema, SettingOrProject } from './analytics';
 
-
 export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
   public async run(options: AnalyticsCommandSchema & Arguments) {
     // Our parser does not support positional enums (won't report invalid parameters). Do the
@@ -34,10 +33,14 @@ export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
 
         return 2;
       }
-    } else if (options.settingOrProject == SettingOrProject.Project
-               && options.projectSetting === undefined) {
-      this.logger.error(`Argument ${JSON.stringify(options.settingOrProject)} requires a second `
-                      + `argument of one of the following value: on, off.`);
+    } else if (
+      options.settingOrProject == SettingOrProject.Project &&
+      options.projectSetting === undefined
+    ) {
+      this.logger.error(
+        `Argument ${JSON.stringify(options.settingOrProject)} requires a second ` +
+          `argument of one of the following value: on, off.`,
+      );
 
       return 2;
     }

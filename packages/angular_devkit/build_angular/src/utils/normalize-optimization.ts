@@ -7,22 +7,32 @@
  */
 import { FontsClass, OptimizationClass, OptimizationUnion, StylesClass } from '../browser/schema';
 
-export type NormalizedOptimizationOptions = Required<Omit<OptimizationClass, 'fonts' | 'styles'>> & {
-  fonts: FontsClass,
-  styles: StylesClass,
+export type NormalizedOptimizationOptions = Required<
+  Omit<OptimizationClass, 'fonts' | 'styles'>
+> & {
+  fonts: FontsClass;
+  styles: StylesClass;
 };
 
-export function normalizeOptimization(optimization: OptimizationUnion = true): NormalizedOptimizationOptions {
+export function normalizeOptimization(
+  optimization: OptimizationUnion = true,
+): NormalizedOptimizationOptions {
   if (typeof optimization === 'object') {
     return {
       scripts: !!optimization.scripts,
-      styles: typeof optimization.styles === 'object' ? optimization.styles : {
-        minify: !!optimization.styles,
-        inlineCritical: !!optimization.styles,
-      },
-      fonts: typeof optimization.fonts === 'object' ? optimization.fonts : {
-        inline: !!optimization.fonts,
-      },
+      styles:
+        typeof optimization.styles === 'object'
+          ? optimization.styles
+          : {
+              minify: !!optimization.styles,
+              inlineCritical: !!optimization.styles,
+            },
+      fonts:
+        typeof optimization.fonts === 'object'
+          ? optimization.fonts
+          : {
+              inline: !!optimization.fonts,
+            },
     };
   }
 

@@ -41,18 +41,16 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
 
   logger.info('');
   logger.info('Running license validation...');
-  error = await validateLicenses({}, logger.createChild('validate-commits')) != 0
-       || error;
+  error = (await validateLicenses({}, logger.createChild('validate-commits'))) != 0 || error;
 
   logger.info('');
   logger.info('Running BUILD files validation...');
-  error = await validateBuildFiles({}, logger.createChild('validate-build-files')) != 0
-       || error;
+  error = (await validateBuildFiles({}, logger.createChild('validate-build-files'))) != 0 || error;
 
   logger.info('');
   logger.info('Running User Analytics validation...');
-  error = await validateUserAnalytics({}, logger.createChild('validate-user-analytics')) != 0
-    || error;
+  error =
+    (await validateUserAnalytics({}, logger.createChild('validate-user-analytics'))) != 0 || error;
 
   if (error) {
     return 101;

@@ -19,7 +19,7 @@ import { Builders } from '../../utility/workspace-models';
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
 export function updateLibraries(): Rule {
-  return updateWorkspace(workspace => {
+  return updateWorkspace((workspace) => {
     const followupRules: Rule[] = [];
 
     for (const [, project] of workspace.projects) {

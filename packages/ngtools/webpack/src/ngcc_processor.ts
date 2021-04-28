@@ -130,14 +130,14 @@ export class NgccProcessor {
       process.execPath,
       [
         require.resolve('@angular/compiler-cli/ngcc/main-ngcc.js'),
-        '--source', /** basePath */
+        '--source' /** basePath */,
         this._nodeModulesDirectory,
-        '--properties', /** propertiesToConsider */
+        '--properties' /** propertiesToConsider */,
         ...this.propertiesToConsider,
-        '--first-only', /** compileAllFormats */
-        '--create-ivy-entry-points', /** createNewEntryPointFormats */
+        '--first-only' /** compileAllFormats */,
+        '--create-ivy-entry-points' /** createNewEntryPointFormats */,
         '--async',
-        '--tsconfig', /** tsConfigPath */
+        '--tsconfig' /** tsConfigPath */,
         this.tsConfigPath,
         '--use-program-dependencies',
       ],
@@ -172,8 +172,11 @@ export class NgccProcessor {
     resolvedModule: ts.ResolvedModule | ts.ResolvedTypeReferenceDirective,
   ): void {
     const resolvedFileName = resolvedModule.resolvedFileName;
-    if (!resolvedFileName || moduleName.startsWith('.')
-      || this._processedModules.has(resolvedFileName)) {
+    if (
+      !resolvedFileName ||
+      moduleName.startsWith('.') ||
+      this._processedModules.has(resolvedFileName)
+    ) {
       // Skip when module is unknown, relative or NGCC compiler is not found or already processed.
       return;
     }
@@ -220,7 +223,11 @@ export class NgccProcessor {
    */
   private tryResolvePackage(moduleName: string, resolvedFileName: string): string | undefined {
     try {
-      const resolvedPath = this._resolver.resolveSync({}, resolvedFileName, `${moduleName}/package.json`);
+      const resolvedPath = this._resolver.resolveSync(
+        {},
+        resolvedFileName,
+        `${moduleName}/package.json`,
+      );
 
       return resolvedPath || undefined;
     } catch {
@@ -253,9 +260,9 @@ class NgccLogger implements Logger {
   constructor(
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
-  ) { }
+  ) {}
 
-  debug(..._args: string[]) { }
+  debug(..._args: string[]) {}
 
   info(...args: string[]) {
     // Log to stderr because it's a progress-like info message.

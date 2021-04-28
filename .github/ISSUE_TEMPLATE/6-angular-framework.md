@@ -1,7 +1,6 @@
 ---
-name: "⚡Angular Framework"
+name: '⚡Angular Framework'
 about: Issues and feature requests for Angular Framework
-
 ---
 
 🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑

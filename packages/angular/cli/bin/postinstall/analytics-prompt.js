@@ -10,7 +10,7 @@ try {
 
   analytics
     .hasGlobalAnalyticsConfiguration()
-    .then(hasGlobalConfig => {
+    .then((hasGlobalConfig) => {
       if (!hasGlobalConfig) {
         return analytics.promptGlobalAnalytics();
       }

@@ -19,14 +19,15 @@ import { CreateFileAction } from '../tree/action';
 import { UpdateBuffer } from '../utility/update-buffer';
 import { SimpleSinkBase } from './sink';
 
-
 export class HostSink extends SimpleSinkBase {
   protected _filesToDelete = new Set<Path>();
   protected _filesToRename = new Set<[Path, Path]>();
   protected _filesToCreate = new Map<Path, UpdateBuffer>();
   protected _filesToUpdate = new Map<Path, UpdateBuffer>();
 
-  constructor(protected _host: virtualFs.Host, protected _force = false) { super(); }
+  constructor(protected _host: virtualFs.Host, protected _force = false) {
+    super();
+  }
 
   protected _validateCreateAction(action: CreateFileAction): Observable<void> {
     return this._force ? EMPTY : super._validateCreateAction(action);
@@ -74,19 +75,21 @@ export class HostSink extends SimpleSinkBase {
     // Really commit everything to the actual filesystem.
     return concatObservables(
       observableFrom([...this._filesToDelete.values()]).pipe(
-        concatMap(path => this._host.delete(path)),
+        concatMap((path) => this._host.delete(path)),
       ),
       observableFrom([...this._filesToRename.entries()]).pipe(
         concatMap(([_, [path, to]]) => this._host.rename(path, to)),
       ),
       observableFrom([...this._filesToCreate.entries()]).pipe(
         concatMap(([path, buffer]) => {
-          return this._host.write(path, buffer.generate() as {} as virtualFs.FileBuffer);
-        })),
+          return this._host.write(path, (buffer.generate() as {}) as virtualFs.FileBuffer);
+        }),
+      ),
       observableFrom([...this._filesToUpdate.entries()]).pipe(
         concatMap(([path, buffer]) => {
-          return this._host.write(path, buffer.generate() as {} as virtualFs.FileBuffer);
-        })),
+          return this._host.write(path, (buffer.generate() as {}) as virtualFs.FileBuffer);
+        }),
+      ),
     ).pipe(reduce(() => {}));
   }
 }

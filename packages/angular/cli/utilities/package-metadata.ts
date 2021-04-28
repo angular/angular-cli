@@ -66,12 +66,12 @@ function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boo
   if (!npmrc) {
     try {
       npmrc = readOptions(logger, false, verbose);
-    } catch { }
+    } catch {}
 
     if (usingYarn) {
       try {
         npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
-      } catch { }
+      } catch {}
     }
   }
 }
@@ -145,7 +145,7 @@ function readOptions(
               const cafile = path.resolve(path.dirname(location), value);
               try {
                 options['ca'] = readFileSync(cafile, 'utf8').replace(/\r?\n/g, '\n');
-              } catch { }
+              } catch {}
             }
             break;
           default:

@@ -6,14 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  logging,
-  normalize,
-  schema,
-  strings,
-  tags,
-  workspaces,
-} from '@angular-devkit/core';
+import { logging, normalize, schema, strings, tags, workspaces } from '@angular-devkit/core';
 import {
   DryRunEvent,
   UnsuccessfulWorkflowExecution,
@@ -89,7 +82,7 @@ export abstract class SchematicCommand<
         schematic.description.schemaJson || {},
       );
 
-      this.description.options.push(...options.filter(x => !x.hidden));
+      this.description.options.push(...options.filter((x) => !x.hidden));
 
       // Remove any user analytics from schematics that are NOT part of our safelist.
       for (const o of this.description.options) {
@@ -104,7 +97,7 @@ export abstract class SchematicCommand<
     await super.printHelp();
     this.logger.info('');
 
-    const subCommandOption = this.description.options.filter(x => x.subcommands)[0];
+    const subCommandOption = this.description.options.filter((x) => x.subcommands)[0];
 
     if (!subCommandOption || !subCommandOption.subcommands) {
       return 0;
@@ -116,7 +109,7 @@ export abstract class SchematicCommand<
       this.logger.info('Available Schematics:');
 
       const namesPerCollection: { [c: string]: string[] } = {};
-      schematicNames.forEach(name => {
+      schematicNames.forEach((name) => {
         let [collectionName, schematicName] = name.split(/:/, 2);
         if (!schematicName) {
           schematicName = collectionName;
@@ -131,11 +124,11 @@ export abstract class SchematicCommand<
       });
 
       const defaultCollection = await this.getDefaultSchematicCollection();
-      Object.keys(namesPerCollection).forEach(collectionName => {
+      Object.keys(namesPerCollection).forEach((collectionName) => {
         const isDefault = defaultCollection == collectionName;
         this.logger.info(`  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`);
 
-        namesPerCollection[collectionName].forEach(schematicName => {
+        namesPerCollection[collectionName].forEach((schematicName) => {
           this.logger.info(`    ${schematicName}`);
         });
       });
@@ -148,7 +141,7 @@ export abstract class SchematicCommand<
   }
 
   async printHelpUsage() {
-    const subCommandOption = this.description.options.filter(x => x.subcommands)[0];
+    const subCommandOption = this.description.options.filter((x) => x.subcommands)[0];
 
     if (!subCommandOption || !subCommandOption.subcommands) {
       return;
@@ -158,7 +151,7 @@ export abstract class SchematicCommand<
     if (schematicNames.length == 1) {
       this.logger.info(this.description.description);
 
-      const opts = this.description.options.filter(x => x.positional === undefined);
+      const opts = this.description.options.filter((x) => x.positional === undefined);
       const [collectionName, schematicName] = schematicNames[0].split(/:/)[0];
 
       // Display <collectionName:schematicName> if this is not the default collectionName,
@@ -169,10 +162,10 @@ export abstract class SchematicCommand<
           : schematicNames[0];
 
       const schematicOptions = subCommandOption.subcommands[schematicNames[0]].options;
-      const schematicArgs = schematicOptions.filter(x => x.positional !== undefined);
+      const schematicArgs = schematicOptions.filter((x) => x.positional !== undefined);
       const argDisplay =
         schematicArgs.length > 0
-          ? ' ' + schematicArgs.map(a => `<${strings.dasherize(a.name)}>`).join(' ')
+          ? ' ' + schematicArgs.map((a) => `<${strings.dasherize(a.name)}>`).join(' ')
           : '';
 
       this.logger.info(tags.oneLine`
@@ -214,16 +207,13 @@ export abstract class SchematicCommand<
     }
 
     return options
-      .filter(o => o.format === 'path')
-      .map(o => o.name)
-      .reduce(
-        (acc, curr) => {
-          acc[curr] = workingDir;
+      .filter((o) => o.format === 'path')
+      .map((o) => o.name)
+      .reduce((acc, curr) => {
+        acc[curr] = workingDir;
 
-          return acc;
-        },
-        {} as { [name: string]: string },
-      );
+        return acc;
+      }, {} as { [name: string]: string });
   }
 
   /*
@@ -244,18 +234,22 @@ export abstract class SchematicCommand<
       // A schema registry is required to allow customizing addUndefinedDefaults
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
       resolvePaths: this.workspace
-        // Workspace
-        ? this.collectionName === this.defaultCollectionName
-          // Favor __dirname for @schematics/angular to use the build-in version
-          ? [__dirname, process.cwd(), root]
+        ? // Workspace
+          this.collectionName === this.defaultCollectionName
+          ? // Favor __dirname for @schematics/angular to use the build-in version
+            [__dirname, process.cwd(), root]
           : [process.cwd(), root, __dirname]
-        // Global
-        : [__dirname, process.cwd()],
+        : // Global
+          [__dirname, process.cwd()],
       schemaValidation: true,
       optionTransforms: [
         // Add configuration file defaults
         async (schematic, current) => ({
-          ...(await getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName())),
+          ...(await getSchematicDefaults(
+            schematic.collection.name,
+            schematic.name,
+            getProjectName(),
+          )),
           ...current,
         }),
       ],
@@ -264,7 +258,11 @@ export abstract class SchematicCommand<
 
     const getProjectName = () => {
       if (this.workspace) {
-        const projectNames = getProjectsByPath(this.workspace, process.cwd(), this.workspace.basePath);
+        const projectNames = getProjectsByPath(
+          this.workspace,
+          process.cwd(),
+          this.workspace.basePath,
+        );
 
         if (projectNames.length === 1) {
           return projectNames[0];
@@ -289,7 +287,7 @@ export abstract class SchematicCommand<
 
     workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
     workflow.registry.addSmartDefaultProvider('projectName', getProjectName);
-    workflow.registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
+    workflow.registry.useXDeprecatedProvider((msg) => this.logger.warn(msg));
 
     let shouldReportAnalytics = true;
     workflow.engineHost.registerOptionsTransform(async (_, options) => {
@@ -304,8 +302,8 @@ export abstract class SchematicCommand<
     if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
         const questions: inquirer.QuestionCollection = definitions
-          .filter(definition => !options.defaults || definition.default === undefined)
-          .map(definition => {
+          .filter((definition) => !options.defaults || definition.default === undefined)
+          .map((definition) => {
             const question: inquirer.Question = {
               name: definition.id,
               message: definition.message,
@@ -314,7 +312,7 @@ export abstract class SchematicCommand<
 
             const validator = definition.validator;
             if (validator) {
-              question.validate = input => validator(input);
+              question.validate = (input) => validator(input);
 
               // Filter allows transformation of the value prior to validation
               question.filter = async (input) => {
@@ -349,13 +347,13 @@ export abstract class SchematicCommand<
                 break;
               case 'list':
                 question.type = definition.multiselect ? 'checkbox' : 'list';
-                (question as inquirer.CheckboxQuestion).choices = definition.items?.map(item => {
+                (question as inquirer.CheckboxQuestion).choices = definition.items?.map((item) => {
                   return typeof item == 'string'
                     ? item
                     : {
-                      name: item.label,
-                      value: item.value,
-                    };
+                        name: item.label,
+                        value: item.value,
+                      };
                 });
                 break;
               default:
@@ -438,10 +436,11 @@ export abstract class SchematicCommand<
     }
 
     const allowAdditionalProperties =
-      typeof schematic.description.schemaJson === 'object' && schematic.description.schemaJson.additionalProperties;
+      typeof schematic.description.schemaJson === 'object' &&
+      schematic.description.schemaJson.additionalProperties;
 
     if (args['--'] && !allowAdditionalProperties) {
-      args['--'].forEach(additional => {
+      args['--'].forEach((additional) => {
         this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
       });
 
@@ -492,11 +491,11 @@ export abstract class SchematicCommand<
       }
     });
 
-    workflow.lifeCycle.subscribe(event => {
+    workflow.lifeCycle.subscribe((event) => {
       if (event.kind == 'end' || event.kind == 'post-tasks-start') {
         if (!error) {
           // Output the logging queue, no error happened.
-          loggingQueue.forEach(log => this.logger.info(log));
+          loggingQueue.forEach((log) => this.logger.info(log));
         }
 
         loggingQueue = [];
@@ -514,7 +513,7 @@ export abstract class SchematicCommand<
       }
     }
 
-    return new Promise<number | void>(resolve => {
+    return new Promise<number | void>((resolve) => {
       workflow
         .execute({
           collection: collectionName,
@@ -586,7 +585,7 @@ function getProjectsByPath(
 
   const projects = Array.from(workspace.projects.entries())
     .map(([name, project]) => [systemPath.resolve(root, project.root), name] as [string, string])
-    .filter(tuple => isInside(tuple[0], path))
+    .filter((tuple) => isInside(tuple[0], path))
     // Sort tuples by depth, with the deeper ones first. Since the first member is a path and
     // we filtered all invalid paths, the longest will be the deepest (and in case of equality
     // the sort is stable and the first declared project will win).
@@ -597,7 +596,7 @@ function getProjectsByPath(
   } else if (projects.length > 1) {
     const firstPath = projects[0][0];
 
-    return projects.filter(v => v[0] === firstPath).map(v => v[1]);
+    return projects.filter((v) => v[0] === firstPath).map((v) => v[1]);
   }
 
   return [];

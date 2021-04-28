@@ -15,23 +15,28 @@ import { Schema as OperatorSchema } from './operator-schema';
 export default createBuilder<json.JsonObject & OperatorSchema>((options, context) => {
   const allRuns: (() => Promise<BuilderRun>)[] = [];
 
-  context.reportProgress(0,
-    (options.targets ? options.targets.length : 0)
-    + (options.builders ? options.builders.length : 0),
+  context.reportProgress(
+    0,
+    (options.targets ? options.targets.length : 0) +
+      (options.builders ? options.builders.length : 0),
   );
 
   if (options.targets) {
-    allRuns.push(...options.targets.map(({ target: targetStr, overrides }) => {
-      const [project, target, configuration] = targetStr.split(/:/g, 3);
+    allRuns.push(
+      ...options.targets.map(({ target: targetStr, overrides }) => {
+        const [project, target, configuration] = targetStr.split(/:/g, 3);
 
-      return () => context.scheduleTarget({ project, target, configuration }, overrides || {});
-    }));
+        return () => context.scheduleTarget({ project, target, configuration }, overrides || {});
+      }),
+    );
   }
 
   if (options.builders) {
-    allRuns.push(...options.builders.map(({ builder, options }) => {
-      return () => context.scheduleBuilder(builder, options || {});
-    }));
+    allRuns.push(
+      ...options.builders.map(({ builder, options }) => {
+        return () => context.scheduleBuilder(builder, options || {});
+      }),
+    );
   }
 
   let stop: BuilderOutput | null = null;
@@ -39,15 +44,17 @@ export default createBuilder<json.JsonObject & OperatorSchema>((options, context
   context.reportProgress(i++, allRuns.length);
 
   return from(allRuns).pipe(
-    concatMap(fn => stop ? of(null) : from(fn()).pipe(
-      switchMap(run => run === null ? of(null) : run.output.pipe(first())),
-    )),
-    map(output => {
+    concatMap((fn) =>
+      stop
+        ? of(null)
+        : from(fn()).pipe(switchMap((run) => (run === null ? of(null) : run.output.pipe(first())))),
+    ),
+    map((output) => {
       context.reportProgress(i++, allRuns.length);
       if (output === null || stop !== null) {
         return stop || { success: false };
       } else if (output.success === false) {
-        return stop = output;
+        return (stop = output);
       } else {
         return output;
       }

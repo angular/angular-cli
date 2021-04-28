@@ -27,31 +27,23 @@ export class SafeReadonlyHost<StatsT extends object = {}> implements ReadonlyHos
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return this._delegate.list(path).pipe(
-      catchError(() => of([])),
-    );
+    return this._delegate.list(path).pipe(catchError(() => of([])));
   }
 
   exists(path: Path): Observable<boolean> {
     return this._delegate.exists(path);
   }
   isDirectory(path: Path): Observable<boolean> {
-    return this._delegate.isDirectory(path).pipe(
-      catchError(() => of(false)),
-    );
+    return this._delegate.isDirectory(path).pipe(catchError(() => of(false)));
   }
   isFile(path: Path): Observable<boolean> {
-    return this._delegate.isFile(path).pipe(
-      catchError(() => of(false)),
-    );
+    return this._delegate.isFile(path).pipe(catchError(() => of(false)));
   }
 
   // Some hosts may not support stats.
   stat(path: Path): Observable<Stats<StatsT> | null> | null {
     const maybeStat = this._delegate.stat(path);
 
-    return maybeStat && maybeStat.pipe(
-      catchError(() => of(null)),
-    );
+    return maybeStat && maybeStat.pipe(catchError(() => of(null)));
   }
 }

@@ -53,7 +53,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
       }
     }
 
-    this.description.options.forEach(option => {
+    this.description.options.forEach((option) => {
       if (option.name == 'schematic') {
         option.subcommands = subcommands;
       }
@@ -90,7 +90,9 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     );
   }
 
-  private async parseSchematicInfo(options: GenerateCommandSchema): Promise<[string, string | undefined]> {
+  private async parseSchematicInfo(
+    options: GenerateCommandSchema,
+  ): Promise<[string, string | undefined]> {
     let collectionName = await this.getDefaultSchematicCollection();
 
     let schematicName = options.schematic;
@@ -107,7 +109,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
 
     this.logger.info('');
     // Find the generate subcommand.
-    const subcommand = this.description.options.filter(x => x.subcommands)[0];
+    const subcommand = this.description.options.filter((x) => x.subcommands)[0];
     if (Object.keys((subcommand && subcommand.subcommands) || {}).length == 1) {
       this.logger.info(`\nTo see help for a schematic run:`);
       this.logger.info(colors.cyan(`  ng generate <schematic> --help`));

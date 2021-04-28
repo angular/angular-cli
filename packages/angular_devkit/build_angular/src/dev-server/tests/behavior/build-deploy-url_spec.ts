@@ -8,7 +8,12 @@
 
 import { serveWebpackBrowser } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
-import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO, describeBuilder, setupBrowserTarget } from '../setup';
+import {
+  BASE_OPTIONS,
+  DEV_SERVER_BUILDER_INFO,
+  describeBuilder,
+  setupBrowserTarget,
+} from '../setup';
 
 describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
   describe('Behavior: "browser builder deployUrl"', () => {

@@ -11,7 +11,6 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { Observable, Subject, of } from 'rxjs';
 import { HostSink } from './host';
 
-
 export interface DryRunErrorEvent {
   kind: 'error';
   description: 'alreadyExist' | 'doesNotExist';
@@ -37,12 +36,12 @@ export interface DryRunRenameEvent {
   to: string;
 }
 
-export type DryRunEvent = DryRunErrorEvent
-                        | DryRunDeleteEvent
-                        | DryRunCreateEvent
-                        | DryRunUpdateEvent
-                        | DryRunRenameEvent;
-
+export type DryRunEvent =
+  | DryRunErrorEvent
+  | DryRunDeleteEvent
+  | DryRunCreateEvent
+  | DryRunUpdateEvent
+  | DryRunRenameEvent;
 
 export class DryRunSink extends HostSink {
   protected _subject = new Subject<DryRunEvent>();
@@ -58,9 +57,10 @@ export class DryRunSink extends HostSink {
   constructor(host: virtualFs.Host, force?: boolean);
 
   constructor(host: virtualFs.Host | string, force = false) {
-    super(typeof host == 'string'
-      ? new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(host))
-      : host,
+    super(
+      typeof host == 'string'
+        ? new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(host))
+        : host,
       force,
     );
   }
@@ -73,14 +73,14 @@ export class DryRunSink extends HostSink {
   }
 
   _done() {
-    this._fileAlreadyExistExceptionSet.forEach(path => {
+    this._fileAlreadyExistExceptionSet.forEach((path) => {
       this._subject.next({
         kind: 'error',
         description: 'alreadyExist',
         path,
       });
     });
-    this._fileDoesNotExistExceptionSet.forEach(path => {
+    this._fileDoesNotExistExceptionSet.forEach((path) => {
       this._subject.next({
         kind: 'error',
         description: 'doesNotExist',
@@ -88,7 +88,7 @@ export class DryRunSink extends HostSink {
       });
     });
 
-    this._filesToDelete.forEach(path => {
+    this._filesToDelete.forEach((path) => {
       // Check if this is a renaming.
       for (const [from] of this._filesToRename) {
         if (from == path) {
@@ -110,8 +110,10 @@ export class DryRunSink extends HostSink {
           return;
         }
       }
-      if (this._fileAlreadyExistExceptionSet.has(path)
-          || this._fileDoesNotExistExceptionSet.has(path)) {
+      if (
+        this._fileAlreadyExistExceptionSet.has(path) ||
+        this._fileDoesNotExistExceptionSet.has(path)
+      ) {
         return;
       }
 

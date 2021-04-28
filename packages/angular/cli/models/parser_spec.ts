@@ -13,27 +13,47 @@ import { ParseArgumentException, parseArguments } from './parser';
 
 describe('parseArguments', () => {
   const options: Option[] = [
-    { name: 'bool', aliases: [ 'b' ], type: OptionType.Boolean, description: '' },
-    { name: 'num', aliases: [ 'n' ], type: OptionType.Number, description: '' },
-    { name: 'str', aliases: [ 's' ], type: OptionType.String, description: '' },
-    { name: 'strUpper', aliases: [ 'S' ], type: OptionType.String, description: '' },
+    { name: 'bool', aliases: ['b'], type: OptionType.Boolean, description: '' },
+    { name: 'num', aliases: ['n'], type: OptionType.Number, description: '' },
+    { name: 'str', aliases: ['s'], type: OptionType.String, description: '' },
+    { name: 'strUpper', aliases: ['S'], type: OptionType.String, description: '' },
     { name: 'helloWorld', aliases: [], type: OptionType.String, description: '' },
     { name: 'helloBool', aliases: [], type: OptionType.Boolean, description: '' },
-    { name: 'arr', aliases: [ 'a' ], type: OptionType.Array, description: '' },
+    { name: 'arr', aliases: ['a'], type: OptionType.Array, description: '' },
     { name: 'p1', positional: 0, aliases: [], type: OptionType.String, description: '' },
     { name: 'p2', positional: 1, aliases: [], type: OptionType.String, description: '' },
     { name: 'p3', positional: 2, aliases: [], type: OptionType.Number, description: '' },
-    { name: 't1', aliases: [], type: OptionType.Boolean,
-      types: [OptionType.Boolean, OptionType.String], description: '' },
-    { name: 't2', aliases: [], type: OptionType.Boolean,
-      types: [OptionType.Boolean, OptionType.Number], description: '' },
-    { name: 't3', aliases: [], type: OptionType.Number,
-      types: [OptionType.Number, OptionType.Any], description: '' },
+    {
+      name: 't1',
+      aliases: [],
+      type: OptionType.Boolean,
+      types: [OptionType.Boolean, OptionType.String],
+      description: '',
+    },
+    {
+      name: 't2',
+      aliases: [],
+      type: OptionType.Boolean,
+      types: [OptionType.Boolean, OptionType.Number],
+      description: '',
+    },
+    {
+      name: 't3',
+      aliases: [],
+      type: OptionType.Number,
+      types: [OptionType.Number, OptionType.Any],
+      description: '',
+    },
     { name: 'e1', aliases: [], type: OptionType.String, enum: ['hello', 'world'], description: '' },
     { name: 'e2', aliases: [], type: OptionType.String, enum: ['hello', ''], description: '' },
-    { name: 'e3', aliases: [], type: OptionType.Boolean,
-      types: [OptionType.Boolean, OptionType.String], enum: ['json', true, false],
-      description: '' },
+    {
+      name: 'e3',
+      aliases: [],
+      type: OptionType.Boolean,
+      types: [OptionType.Boolean, OptionType.String],
+      enum: ['json', true, false],
+      description: '',
+    },
   ];
 
   const tests: { [test: string]: Partial<Arguments> | ['!!!', Partial<Arguments>, string[]] } = {
@@ -75,10 +95,15 @@ describe('parseArguments', () => {
     '--bool val1 --etc --num val2 --v': [
       '!!!',
       { bool: true, p1: 'val1', p2: 'val2', '--': ['--etc', '--v'] },
-      ['--num' ],
+      ['--num'],
     ],
-    '--bool val1 --etc --num=1 val2 --v': { bool: true, num: 1, p1: 'val1', p2: 'val2',
-                                            '--': ['--etc', '--v'] },
+    '--bool val1 --etc --num=1 val2 --v': {
+      bool: true,
+      num: 1,
+      p1: 'val1',
+      p2: 'val2',
+      '--': ['--etc', '--v'],
+    },
     '--arr=a d': { arr: ['a'], p1: 'd' },
     '--arr=a --arr=b --arr c d': { arr: ['a', 'b', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d': { arr: ['1', '', 'c'], p1: 'd' },
@@ -121,7 +146,7 @@ describe('parseArguments', () => {
     '--e1=yellow': ['!!!', {}, ['--e1=yellow']],
     '--e1': ['!!!', {}, ['--e1']],
     '--e1 true': ['!!!', { p1: 'true' }, ['--e1']],
-    '--e1=true': ['!!!', {},  ['--e1=true']],
+    '--e1=true': ['!!!', {}, ['--e1=true']],
     '--e2 hello': { e2: 'hello' },
     '--e2=hello': { e2: 'hello' },
     '--e2 yellow': { p1: 'yellow', e2: '' },
@@ -138,13 +163,13 @@ describe('parseArguments', () => {
     '--e3=true': { e3: true },
     'a b c 1': { p1: 'a', p2: 'b', '--': ['c', '1'] },
 
-    '-p=1 -c=prod': {'--': ['-p=1', '-c=prod'] },
-    '--p --c': {'--': ['--p', '--c'] },
-    '--p=123': {'--': ['--p=123'] },
-    '--p -c': {'--': ['--p', '-c'] },
-    '-p --c': {'--': ['-p', '--c'] },
-    '-p --c 123': {'--': ['-p', '--c', '123'] },
-    '--c 123 -p': {'--': ['--c', '123', '-p'] },
+    '-p=1 -c=prod': { '--': ['-p=1', '-c=prod'] },
+    '--p --c': { '--': ['--p', '--c'] },
+    '--p=123': { '--': ['--p=123'] },
+    '--p -c': { '--': ['--p', '-c'] },
+    '-p --c': { '--': ['-p', '--c'] },
+    '-p --c 123': { '--': ['-p', '--c', '123'] },
+    '--c 123 -p': { '--': ['--c', '123', '-p'] },
   };
 
   Object.entries(tests).forEach(([str, expected]) => {
@@ -172,14 +197,12 @@ describe('parseArguments', () => {
   });
 
   it('handles a flag being added multiple times', () => {
-    const options = [
-      { name: 'bool', aliases: [], type: OptionType.Boolean, description: '' },
-    ];
+    const options = [{ name: 'bool', aliases: [], type: OptionType.Boolean, description: '' }];
 
     const logger = new logging.Logger('');
     const messages: string[] = [];
 
-    logger.subscribe(entry => messages.push(entry.message));
+    logger.subscribe((entry) => messages.push(entry.message));
 
     let result = parseArguments(['--bool'], options, logger);
     expect(result).toEqual({ bool: true });

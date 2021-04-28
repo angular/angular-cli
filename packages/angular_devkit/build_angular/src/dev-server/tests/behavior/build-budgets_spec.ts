@@ -8,7 +8,12 @@
 
 import { Type as BudgetType } from '../../../';
 import { serveWebpackBrowser } from '../../index';
-import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO, describeBuilder, setupBrowserTarget } from '../setup';
+import {
+  BASE_OPTIONS,
+  DEV_SERVER_BUILDER_INFO,
+  describeBuilder,
+  setupBrowserTarget,
+} from '../setup';
 
 describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
   describe('Behavior: "browser builder budgets"', () => {

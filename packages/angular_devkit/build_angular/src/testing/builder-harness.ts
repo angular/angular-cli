@@ -317,9 +317,10 @@ export class BuilderHarness<T> {
   }
 
   hasFileMatch(directory: string, pattern: RegExp): boolean {
-    return this.host.scopedSync()
+    return this.host
+      .scopedSync()
       .list(normalize(directory))
-      .some(name => pattern.test(name));
+      .some((name) => pattern.test(name));
   }
 
   readFile(path: string): string {

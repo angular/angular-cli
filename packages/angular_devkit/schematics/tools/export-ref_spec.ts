@@ -10,7 +10,6 @@ import * as path from 'path';
 import { CollectionCannotBeResolvedException } from '.';
 import { ExportStringRef } from './export-ref';
 
-
 describe('ExportStringRef', () => {
   // Depending on how the package is built the module might be either .js or .ts.
   // To make expectations easier, we strip the extension.

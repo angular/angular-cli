@@ -23,11 +23,13 @@ function hook(
   action: (compilation: Compilation, assetsURI: string[]) => Promise<void>,
 ) {
   compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-    compilation.hooks.processAssets.tapPromise({
-      name: PLUGIN_NAME,
-      stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE,
-    },
-    assets => action(compilation, Object.keys(assets)));
+    compilation.hooks.processAssets.tapPromise(
+      {
+        name: PLUGIN_NAME,
+        stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE,
+      },
+      (assets) => action(compilation, Object.keys(assets)),
+    );
   });
 }
 
@@ -37,7 +39,7 @@ export class OptimizeCssWebpackPlugin {
   constructor(options: Partial<OptimizeCssWebpackPluginOptions>) {
     this._options = {
       sourceMap: false,
-      test: file => file.endsWith('.css'),
+      test: (file) => file.endsWith('.css'),
       ...options,
     };
   }
@@ -47,8 +49,8 @@ export class OptimizeCssWebpackPlugin {
       const files = [...compilation.additionalChunkAssets, ...assetsURI];
 
       const actions = files
-        .filter(file => this._options.test(file))
-        .map(async file => {
+        .filter((file) => this._options.test(file))
+        .map(async (file) => {
           const asset = compilation.assets[file];
           if (!asset) {
             return;
@@ -74,12 +76,15 @@ export class OptimizeCssWebpackPlugin {
           }
 
           const cssNanoOptions: cssNano.CssNanoOptions = {
-            preset: ['default', {
-              // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
-              svgo: false,
-              // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
-              calc: false,
-            }],
+            preset: [
+              'default',
+              {
+                // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
+                svgo: false,
+                // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+                calc: false,
+              },
+            ],
           };
 
           const postCssOptions: ProcessOptions = {
@@ -91,11 +96,11 @@ export class OptimizeCssWebpackPlugin {
             const output = await new Promise<Result>((resolve, reject) => {
               // @types/cssnano are not up to date with version 5.
               // tslint:disable-next-line: no-any
-              (cssNano as any)(cssNanoOptions).process(content, postCssOptions)
+              (cssNano as any)(cssNanoOptions)
+                .process(content, postCssOptions)
                 .then(resolve)
                 .catch((err: Error) => reject(err));
             });
-
 
             for (const { text } of output.warnings()) {
               addWarning(compilation, text);

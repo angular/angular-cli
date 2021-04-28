@@ -17,7 +17,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "relatedAppName"
-  ]
+  "required": ["relatedAppName"]
 }

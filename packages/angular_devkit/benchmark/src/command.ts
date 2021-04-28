@@ -11,7 +11,7 @@ export class Command {
     public args: string[] = [],
     public cwd: string = process.cwd(),
     public expectedExitCode = 0,
-  ) { }
+  ) {}
 
   toString() {
     const { cmd, args, cwd } = this;

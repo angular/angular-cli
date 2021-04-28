@@ -28,13 +28,15 @@ describe('SimpleScheduler', () => {
 
   it('works for a simple case', async () => {
     registry.register(
-      'add', createJobHandler((arg: number[]) => arg.reduce((a, c) => a + c, 0)), {
+      'add',
+      createJobHandler((arg: number[]) => arg.reduce((a, c) => a + c, 0)),
+      {
         argument: { items: { type: 'number' } },
         output: { type: 'number' },
       },
     );
 
-    const sum = await (scheduler.schedule('add', [1, 2, 3, 4])).output.toPromise();
+    const sum = await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
     expect(sum).toBe(10);
   });
 
@@ -47,8 +49,8 @@ describe('SimpleScheduler', () => {
       createJobHandler((argument: number[]) => {
         started++;
 
-        return new Promise<number>(
-          resolve => setTimeout(() => {
+        return new Promise<number>((resolve) =>
+          setTimeout(() => {
             finished++;
             resolve(argument.reduce((a, c) => a + c, 0));
           }, 10),
@@ -83,15 +85,17 @@ describe('SimpleScheduler', () => {
 
   it('validates arguments', async () => {
     registry.register(
-      'add', createJobHandler((arg: number[]) => arg.reduce((a, c) => a + c, 0)), {
+      'add',
+      createJobHandler((arg: number[]) => arg.reduce((a, c) => a + c, 0)),
+      {
         argument: { items: { type: 'number' } },
         output: { type: 'number' },
       },
     );
 
-    await (scheduler.schedule('add', [1, 2, 3, 4])).output.toPromise();
+    await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
     try {
-      await (scheduler.schedule('add', ['1', 2, 3, 4])).output.toPromise();
+      await scheduler.schedule('add', ['1', 2, 3, 4]).output.toPromise();
       expect(true).toBe(false);
     } catch (e) {
       // TODO: enable this when https://github.com/bazelbuild/rules_typescript/commit/37807e2c4
@@ -104,13 +108,15 @@ describe('SimpleScheduler', () => {
 
   it('validates outputs', async () => {
     registry.register(
-      'add', createJobHandler(() => 'hello world'), {
+      'add',
+      createJobHandler(() => 'hello world'),
+      {
         output: { type: 'number' },
       },
     );
 
     try {
-      await (scheduler.schedule('add', [1, 2, 3, 4])).output.toPromise();
+      await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
       expect(true).toBe(false);
     } catch (e) {
       // TODO: enable this when https://github.com/bazelbuild/rules_typescript/commit/37807e2c4
@@ -127,10 +133,12 @@ describe('SimpleScheduler', () => {
     registry.register(
       'job',
       createJobHandler<number, number, number>((argument) => {
-        return new Promise(resolve => setImmediate(() => {
-          done.push(argument);
-          resolve(argument);
-        }));
+        return new Promise((resolve) =>
+          setImmediate(() => {
+            done.push(argument);
+            resolve(argument);
+          }),
+        );
       }),
       { argument: true, output: true },
     );
@@ -192,10 +200,12 @@ describe('SimpleScheduler', () => {
       createJobHandler<number, number, number>((argument: number) => {
         started.push(argument);
 
-        return new Promise(resolve => setTimeout(() => {
-          done.push(argument);
-          resolve(argument);
-        }, 10));
+        return new Promise((resolve) =>
+          setTimeout(() => {
+            done.push(argument);
+            resolve(argument);
+          }, 10),
+        );
       }),
       { argument: true, output: true },
     );
@@ -259,30 +269,30 @@ describe('SimpleScheduler', () => {
 
     // Run the job once. Wait for it to finish. We should have a `resume()` and the scheduler will
     // be paused.
-    const p0 = (scheduler.schedule('job', 0)).output.toPromise();
+    const p0 = scheduler.schedule('job', 0).output.toPromise();
     expect(await p0).toBe(0);
 
     // This will wait.
-    const p1 = (scheduler.schedule('job', 1)).output.toPromise();
+    const p1 = scheduler.schedule('job', 1).output.toPromise();
     await Promise.resolve();
 
     expect(resume).not.toBeNull();
-    resume !();
+    resume!();
     resume = null;
 
     // Running p1.
     expect(await p1).toBe(1);
     expect(resume).not.toBeNull();
 
-    const p2 = (scheduler.schedule('job', 2)).output.toPromise();
+    const p2 = scheduler.schedule('job', 2).output.toPromise();
 
     await Promise.resolve();
-    resume !();
+    resume!();
     resume = null;
     expect(await p2).toBe(2);
     expect(resume).not.toBeNull();
 
-    resume !();
+    resume!();
     // Should not error since all jobs have run.
     await Promise.resolve();
   });
@@ -295,16 +305,15 @@ describe('SimpleScheduler', () => {
       createJobHandler((argument: number) => {
         done.push(argument);
 
-        return Promise.resolve()
-          .then(() => argument);
+        return Promise.resolve().then(() => argument);
       }),
     );
 
     // Pause manually.
     const resume = scheduler.pause();
-    const p10 = (scheduler.schedule('jobA', 10)).output.toPromise();
-    const p11 = (scheduler.schedule('jobA', 11)).output.toPromise();
-    const p12 = (scheduler.schedule('jobA', 12)).output.toPromise();
+    const p10 = scheduler.schedule('jobA', 10).output.toPromise();
+    const p11 = scheduler.schedule('jobA', 11).output.toPromise();
+    const p12 = scheduler.schedule('jobA', 12).output.toPromise();
     await flush();
 
     expect(done).toEqual([]);
@@ -325,10 +334,10 @@ describe('SimpleScheduler', () => {
     registry.register(
       'job',
       createJobHandler((argument: number) => {
-        return new Observable<number>(observer => {
+        return new Observable<number>((observer) => {
           function fn() {
             if (keepGoing) {
-              const p = new Promise<void>(r => resolves.push(r));
+              const p = new Promise<void>((r) => resolves.push(r));
 
               observer.next(argument);
               done.push(argument);
@@ -352,22 +361,22 @@ describe('SimpleScheduler', () => {
     );
 
     const job = scheduler.schedule('job', 0);
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
     expect(job.state).toBe(JobState.Queued);
     const subscription = job.output.subscribe();
 
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
     expect(job.state).toBe(JobState.Started);
     expect(done).toEqual([0]);
     expect(resolves.length).toBe(1);
     resolves[0]();
 
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
     expect(done).toEqual([0, 1]);
     expect(resolves.length).toBe(2);
     resolves[1]();
 
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
     expect(done).toEqual([0, 1, 2]);
     expect(resolves.length).toBe(3);
     subscription.unsubscribe();
@@ -381,46 +390,66 @@ describe('SimpleScheduler', () => {
   });
 
   it('sequences raw outputs properly for all use cases', async () => {
-    registry.register('job-sync', createJobHandler<number, number, number>(arg => arg + 1));
-    registry.register('job-promise', createJobHandler<number, number, number>(arg => {
-      return Promise.resolve(arg + 1);
-    }));
-    registry.register('job-obs-sync', createJobHandler<number, number, number>(arg => of(arg + 1)));
-    registry.register('job-obs-async', createJobHandler<number, number, number>(arg => {
-      return timer(1).pipe(
-        take(3),
-        take(1),
-        map(() => arg + 1),
-      );
-    }));
+    registry.register(
+      'job-sync',
+      createJobHandler<number, number, number>((arg) => arg + 1),
+    );
+    registry.register(
+      'job-promise',
+      createJobHandler<number, number, number>((arg) => {
+        return Promise.resolve(arg + 1);
+      }),
+    );
+    registry.register(
+      'job-obs-sync',
+      createJobHandler<number, number, number>((arg) => of(arg + 1)),
+    );
+    registry.register(
+      'job-obs-async',
+      createJobHandler<number, number, number>((arg) => {
+        return timer(1).pipe(
+          take(3),
+          take(1),
+          map(() => arg + 1),
+        );
+      }),
+    );
 
     const job1 = scheduler.schedule('job-sync', 100);
-    const job1OutboundBus = await job1.outboundBus.pipe(
-      // Descriptions are going to differ, so get rid of those.
-      map(x => ({ ...x, description: null })),
-      toArray(),
-    ).toPromise();
+    const job1OutboundBus = await job1.outboundBus
+      .pipe(
+        // Descriptions are going to differ, so get rid of those.
+        map((x) => ({ ...x, description: null })),
+        toArray(),
+      )
+      .toPromise();
 
     const job2 = scheduler.schedule('job-promise', 100);
-    const job2OutboundBus = await job2.outboundBus.pipe(
-      // Descriptions are going to differ, so get rid of those.
-      map(x => ({ ...x, description: null })),
-      toArray(),
-    ).toPromise();
+    const job2OutboundBus = await job2.outboundBus
+      .pipe(
+        // Descriptions are going to differ, so get rid of those.
+        map((x) => ({ ...x, description: null })),
+        toArray(),
+      )
+      .toPromise();
 
     const job3 = scheduler.schedule('job-obs-sync', 100);
-    const job3OutboundBus = await job3.outboundBus.pipe(
-      // Descriptions are going to differ, so get rid of those.
-      map(x => ({ ...x, description: null })),
-      toArray(),
-    ).toPromise();
+    const job3OutboundBus = await job3.outboundBus
+      .pipe(
+        // Descriptions are going to differ, so get rid of those.
+        map((x) => ({ ...x, description: null })),
+        toArray(),
+      )
+      .toPromise();
 
     const job4 = scheduler.schedule('job-obs-async', 100);
-    const job4OutboundBus = await job4.outboundBus.pipe(
-      // Descriptions are going to differ, so get rid of those.
-      map(x => ({ ...x, description: null })),
-      toArray(),
-    ).toPromise();
+    const job4OutboundBus = await job4.outboundBus
+      .pipe(
+        // Descriptions are going to differ, so get rid of those.
+        map((x) => ({ ...x, description: null })),
+        toArray(),
+      )
+      .toPromise();
 
     // The should all report the same stuff.
     expect(job1OutboundBus).toEqual(job4OutboundBus);
@@ -444,7 +473,7 @@ describe('SimpleScheduler', () => {
       const job = scheduler.schedule('job', 0);
       let sideValue = '';
       const c = job.getChannel('any') as Observable<string>;
-      c.subscribe(x => sideValue = x);
+      c.subscribe((x) => (sideValue = x));
 
       expect(await job.output.toPromise()).toBe(0);
       expect(sideValue).toBe('hello world');
@@ -459,7 +488,8 @@ describe('SimpleScheduler', () => {
           channel.complete();
 
           return 0;
-        }), {
+        }),
+        {
           argument: true,
           output: true,
         },
@@ -471,7 +501,7 @@ describe('SimpleScheduler', () => {
       expect(c).toBeDefined(null);
 
       if (c) {
-        c.subscribe(x => sideValue = x);
+        c.subscribe((x) => (sideValue = x));
       }
 
       expect(await job.output.toPromise()).toBe(0);
@@ -482,7 +512,7 @@ describe('SimpleScheduler', () => {
   describe('lifecycle messages', () => {
     it('sequences double start once', async () => {
       const fn = (_: never, { description }: JobHandlerContext) => {
-        return new Observable<JobOutboundMessage<never>>(observer => {
+        return new Observable<JobOutboundMessage<never>>((observer) => {
           observer.next({ kind: JobOutboundMessageKind.Start, description });
           observer.next({ kind: JobOutboundMessageKind.Start, description });
           observer.next({ kind: JobOutboundMessageKind.End, description });
@@ -491,11 +521,9 @@ describe('SimpleScheduler', () => {
       };
 
       registry.register('job', Object.assign(fn, { jobDescription: {} }));
-      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(
-        toArray(),
-      ).toPromise();
+      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(toArray()).toPromise();
 
-      expect(allOutput.map(x => ({ ...x, description: null }))).toEqual([
+      expect(allOutput.map((x) => ({ ...x, description: null }))).toEqual([
         { kind: JobOutboundMessageKind.OnReady, description: null },
         { kind: JobOutboundMessageKind.Start, description: null },
         { kind: JobOutboundMessageKind.End, description: null },
@@ -506,11 +534,9 @@ describe('SimpleScheduler', () => {
       const fn = () => EMPTY;
 
       registry.register('job', Object.assign(fn, { jobDescription: {} }));
-      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(
-        toArray(),
-      ).toPromise();
+      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(toArray()).toPromise();
 
-      expect(allOutput.map(x => ({ ...x, description: null }))).toEqual([
+      expect(allOutput.map((x) => ({ ...x, description: null }))).toEqual([
         { kind: JobOutboundMessageKind.OnReady, description: null },
         { kind: JobOutboundMessageKind.End, description: null },
       ]);
@@ -518,7 +544,7 @@ describe('SimpleScheduler', () => {
 
     it('only one End', async () => {
       const fn = (_: never, { description }: JobHandlerContext) => {
-        return new Observable<JobOutboundMessage<never>>(observer => {
+        return new Observable<JobOutboundMessage<never>>((observer) => {
           observer.next({ kind: JobOutboundMessageKind.End, description });
           observer.next({ kind: JobOutboundMessageKind.End, description });
           observer.complete();
@@ -526,11 +552,9 @@ describe('SimpleScheduler', () => {
       };
 
       registry.register('job', Object.assign(fn, { jobDescription: {} }));
-      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(
-        toArray(),
-      ).toPromise();
+      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(toArray()).toPromise();
 
-      expect(allOutput.map(x => ({ ...x, description: null }))).toEqual([
+      expect(allOutput.map((x) => ({ ...x, description: null }))).toEqual([
         { kind: JobOutboundMessageKind.OnReady, description: null },
         { kind: JobOutboundMessageKind.End, description: null },
       ]);
@@ -542,8 +566,8 @@ describe('SimpleScheduler', () => {
       registry.register(
         'job',
         createJobHandler<number, number, number>((argument, context) => {
-          return new Observable<number>(subscriber => {
-            context.input.subscribe(x => {
+          return new Observable<number>((subscriber) => {
+            context.input.subscribe((x) => {
               if (x === null) {
                 subscriber.complete();
               } else {
@@ -557,7 +581,7 @@ describe('SimpleScheduler', () => {
       const job = scheduler.schedule('job', 100);
       const outputs: number[] = [];
 
-      job.output.subscribe(x => outputs.push(x as number));
+      job.output.subscribe((x) => outputs.push(x as number));
 
       job.input.next(1);
       job.input.next('2');
@@ -569,26 +593,29 @@ describe('SimpleScheduler', () => {
     });
 
     it('validates', async () => {
-      const handler = createJobHandler<number, number, number>((argument, context) => {
-        return new Observable<number>(subscriber => {
-          context.input.subscribe(x => {
-            if (x === null) {
-              subscriber.complete();
-            } else {
-              subscriber.next(parseInt('' + x) + argument);
-            }
+      const handler = createJobHandler<number, number, number>(
+        (argument, context) => {
+          return new Observable<number>((subscriber) => {
+            context.input.subscribe((x) => {
+              if (x === null) {
+                subscriber.complete();
+              } else {
+                subscriber.next(parseInt('' + x) + argument);
+              }
+            });
           });
-        });
-      }, {
-        input: { anyOf: [{ type: 'number' }, { type: 'null' }] },
-      });
+        },
+        {
+          input: { anyOf: [{ type: 'number' }, { type: 'null' }] },
+        },
+      );
 
       registry.register('job', handler);
 
       const job = scheduler.schedule('job', 100);
       const outputs: number[] = [];
 
-      job.output.subscribe(x => outputs.push(x as number));
+      job.output.subscribe((x) => outputs.push(x as number));
 
       job.input.next(1);
       job.input.next('2');
@@ -604,8 +631,8 @@ describe('SimpleScheduler', () => {
       registry.register(
         'job',
         createJobHandler<number, number, number>((argument, context) => {
-          return new Observable<number>(subscriber => {
-            context.input.subscribe(x => {
+          return new Observable<number>((subscriber) => {
+            context.input.subscribe((x) => {
               if (x === null) {
                 setTimeout(() => subscriber.complete(), 10);
               } else {
@@ -619,7 +646,7 @@ describe('SimpleScheduler', () => {
       const job = scheduler.schedule('job', 100);
       const outputs: number[] = [];
 
-      job.output.subscribe(x => outputs.push(x as number));
+      job.output.subscribe((x) => outputs.push(x as number));
 
       job.input.next(1);
       job.input.next(2);
@@ -632,7 +659,12 @@ describe('SimpleScheduler', () => {
   });
 
   it('propagates errors', async () => {
-    registry.register('job', createJobHandler(() => { throw 1; }));
+    registry.register(
+      'job',
+      createJobHandler(() => {
+        throw 1;
+      }),
+    );
     const job = scheduler.schedule('job', 0);
 
     try {

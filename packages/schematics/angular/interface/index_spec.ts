@@ -11,7 +11,6 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as InterfaceOptions } from './schema';
 
-
 describe('Interface Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -41,18 +40,21 @@ describe('Interface Schematic', () => {
   let appTree: UnitTestTree;
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('application', appOptions, appTree)
       .toPromise();
   });
 
   it('should create one file', async () => {
-    const tree = await schematicRunner.runSchematicAsync('interface', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('interface', defaultOptions, appTree)
       .toPromise();
     expect(tree.files).toContain('/projects/bar/src/app/foo.ts');
   });
 
   it('should create an interface named "Foo"', async () => {
-    const tree = await schematicRunner.runSchematicAsync('interface', defaultOptions, appTree)
+    const tree = await schematicRunner
+      .runSchematicAsync('interface', defaultOptions, appTree)
       .toPromise();
     const fileContent = tree.readContent('/projects/bar/src/app/foo.ts');
     expect(fileContent).toMatch(/export interface Foo/);
@@ -61,8 +63,7 @@ describe('Interface Schematic', () => {
   it('should put type in the file name', async () => {
     const options = { ...defaultOptions, type: 'model' };
 
-    const tree = await schematicRunner.runSchematicAsync('interface', options, appTree)
-      .toPromise();
+    const tree = await schematicRunner.runSchematicAsync('interface', options, appTree).toPromise();
     expect(tree.files).toContain('/projects/bar/src/app/foo.model.ts');
   });
 
@@ -70,7 +71,8 @@ describe('Interface Schematic', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = await schematicRunner.runSchematicAsync('interface', defaultOptions, appTree)
+    appTree = await schematicRunner
+      .runSchematicAsync('interface', defaultOptions, appTree)
       .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.ts');
   });

@@ -42,7 +42,9 @@ export function getDevServerConfig(
   } = wco;
 
   const servePath = buildServePath(wco.buildOptions, logger);
-  const { styles: stylesOptimization, scripts: scriptsOptimization } = normalizeOptimization(optimization);
+  const { styles: stylesOptimization, scripts: scriptsOptimization } = normalizeOptimization(
+    optimization,
+  );
 
   const extraPlugins = [];
 
@@ -66,7 +68,7 @@ export function getDevServerConfig(
       // tslint:disable-next-line:no-any
       apply: (compiler: any) => {
         compiler.hooks.afterEnvironment.tap('angular-cli', () => {
-          compiler.watchFileSystem = { watch: () => { } };
+          compiler.watchFileSystem = { watch: () => {} };
         });
       },
     });
@@ -76,7 +78,7 @@ export function getDevServerConfig(
   if (hmr) {
     extraRules.push({
       loader: HmrLoader,
-      include: [main].map(p => resolve(wco.root, p)),
+      include: [main].map((p) => resolve(wco.root, p)),
     });
   }
 
@@ -99,7 +101,7 @@ export function getDevServerConfig(
         rewrites: [
           {
             from: new RegExp(`^(?!${servePath})/.*`),
-            to: context => url.format(context.parsedUrl),
+            to: (context) => url.format(context.parsedUrl),
           },
         ],
       },
@@ -129,7 +131,6 @@ export function getDevServerConfig(
     } as Configuration & { logLevel: Configuration['clientLogLevel'] },
   };
 }
-
 
 /**
  * Resolve and build a URL _path_ that will be the root of the server. This resolved base href and
@@ -166,10 +167,7 @@ export function buildServePath(
  * Private method to enhance a webpack config with SSL configuration.
  * @private
  */
-function getSslConfig(
-  root: string,
-  options: WebpackDevServerOptions,
-) {
+function getSslConfig(root: string, options: WebpackDevServerOptions) {
   const { ssl, sslCert, sslKey } = options;
   if (ssl && sslCert && sslKey) {
     return {
@@ -185,10 +183,7 @@ function getSslConfig(
  * Private method to enhance a webpack config with Proxy configuration.
  * @private
  */
-function addProxyConfig(
-  root: string,
-  proxyConfig: string | undefined,
-) {
+function addProxyConfig(root: string, proxyConfig: string | undefined) {
   if (!proxyConfig) {
     return undefined;
   }
@@ -220,7 +215,7 @@ function findDefaultServePath(baseHref?: string, deployUrl?: string): string | n
   // normalize baseHref
   // for ng serve the starting base is always `/` so a relative
   // and root relative value are identical
-  const baseHrefParts = (baseHref || '').split('/').filter(part => part !== '');
+  const baseHrefParts = (baseHref || '').split('/').filter((part) => part !== '');
   if (baseHref && !baseHref.endsWith('/')) {
     baseHrefParts.pop();
   }

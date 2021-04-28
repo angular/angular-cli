@@ -8,7 +8,6 @@
 
 import { Tree } from '@angular-devkit/schematics';
 
-
 export function getFileContent(tree: Tree, path: string): string {
   const fileEntry = tree.get(path);
 

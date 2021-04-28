@@ -19,8 +19,8 @@ export function generateEntryPoints(appConfig: {
     defaultBundleName: string,
   ): string[] => {
     const entryPoints = normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
-      .filter(entry => entry.inject)
-      .map(entry => entry.bundleName);
+      .filter((entry) => entry.inject)
+      .map((entry) => entry.bundleName);
 
     // remove duplicates
     return [...new Set(entryPoints)];
@@ -38,7 +38,7 @@ export function generateEntryPoints(appConfig: {
   ];
 
   const duplicates = [
-    ...new Set(entryPoints.filter(x => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x))),
+    ...new Set(entryPoints.filter((x) => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x))),
   ];
 
   if (duplicates.length > 0) {

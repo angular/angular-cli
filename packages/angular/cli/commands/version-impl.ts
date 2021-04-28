@@ -51,19 +51,16 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     ];
 
     const versions = packageNames
-      .filter(x => patterns.some(p => p.test(x)))
-      .reduce(
-        (acc, name) => {
-          if (name in acc) {
-            return acc;
-          }
-
-          acc[name] = this.getVersion(name);
-
+      .filter((x) => patterns.some((p) => p.test(x)))
+      .reduce((acc, name) => {
+        if (name in acc) {
           return acc;
-        },
-        {} as { [module: string]: string },
-      );
+        }
+
+        acc[name] = this.getVersion(name);
+
+        return acc;
+      }, {} as { [module: string]: string });
 
     const ngCliVersion = cliPackage.version;
     let angularCoreVersion = '';
@@ -100,7 +97,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
                 |___/
     `
       .split('\n')
-      .map(x => colors.red(x))
+      .map((x) => colors.red(x))
       .join('\n');
 
     this.logger.info(asciiArt);
@@ -132,7 +129,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       Package${namePad.slice(7)}Version
       -------${namePad.replace(/ /g, '-')}------------------
       ${Object.keys(versions)
-        .map(module => `${module}${namePad.slice(module.length)}${versions[module]}`)
+        .map((module) => `${module}${namePad.slice(module.length)}${versions[module]}`)
         .sort()
         .join('\n')}
     `.replace(/^ {6}/gm, ''),
@@ -145,7 +142,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
     // Try to find the package in the workspace
     try {
-      packagePath = require.resolve(`${moduleName}/package.json`, { paths: [ this.context.root ]});
+      packagePath = require.resolve(`${moduleName}/package.json`, { paths: [this.context.root] });
     } catch {}
 
     // If not found, try to find within the CLI

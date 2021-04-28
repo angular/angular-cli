@@ -16,9 +16,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "builder"
-        ]
+        "required": ["builder"]
       },
       "minItems": 1
     },
@@ -35,9 +33,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "target"
-        ]
+        "required": ["target"]
       },
       "minItems": 1
     }

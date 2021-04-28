@@ -20,8 +20,9 @@ describe('NodeModulesEngineHost', () => {
   let previousDir!: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(TMP_DIR,
-        'angular-devkit-schematics-tools-node-module-engine-host'));
+    tmpDir = fs.mkdtempSync(
+      path.join(TMP_DIR, 'angular-devkit-schematics-tools-node-module-engine-host'),
+    );
     previousDir = process.cwd();
     process.chdir(tmpDir);
   });
@@ -34,10 +35,14 @@ describe('NodeModulesEngineHost', () => {
     fs.mkdirSync(path.join(tmpDir, 'node_modules/@angular/'));
     fs.mkdirSync(path.join(tmpDir, 'node_modules/@angular/core'));
     fs.mkdirSync(path.join(tmpDir, 'node_modules/@angular/core/schematics'));
-    fs.writeFileSync(path.join(tmpDir, 'node_modules/@angular/core/package.json'),
-      JSON.stringify({name: '@angular/core'}));
-    fs.writeFileSync(path.join(tmpDir, 'node_modules/@angular/core/schematics/migrations.json'),
-      JSON.stringify({schematics: {}}));
+    fs.writeFileSync(
+      path.join(tmpDir, 'node_modules/@angular/core/package.json'),
+      JSON.stringify({ name: '@angular/core' }),
+    );
+    fs.writeFileSync(
+      path.join(tmpDir, 'node_modules/@angular/core/schematics/migrations.json'),
+      JSON.stringify({ schematics: {} }),
+    );
   }
 
   it('should properly create collections with explicit collection path', () => {

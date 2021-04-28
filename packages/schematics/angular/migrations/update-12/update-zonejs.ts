@@ -65,26 +65,25 @@ export default function (): Rule {
       // - require('zone.js/dist/zone-error') -> require('zone.js/plugins/zone-error')
       tree.overwrite(
         path,
-        content
-          .replace(
-            /(?<=(?:require\s*\(|import\s+)['"]zone\.js)\/dist\/zone-?\w*(?=['"]\)?)/g,
-            match => {
-              switch (match) {
-                case '/dist/zone':
-                case '/dist/zone-evergreen':
-                  return '';
-                case '/dist/zone-testing':
-                case '/dist/zone-evergreen-testing':
-                  return '/testing';
-                case '/dist/zone-node':
-                  return '/node';
-                case '/dist/zone-mix':
-                  return '/mix';
-                default:
-                  return `/plugins${match.substr(5)}`;
-              }
-            },
-          ),
+        content.replace(
+          /(?<=(?:require\s*\(|import\s+)['"]zone\.js)\/dist\/zone-?\w*(?=['"]\)?)/g,
+          (match) => {
+            switch (match) {
+              case '/dist/zone':
+              case '/dist/zone-evergreen':
+                return '';
+              case '/dist/zone-testing':
+              case '/dist/zone-evergreen-testing':
+                return '/testing';
+              case '/dist/zone-node':
+                return '/node';
+              case '/dist/zone-mix':
+                return '/mix';
+              default:
+                return `/plugins${match.substr(5)}`;
+            }
+          },
+        ),
       );
     }
   };

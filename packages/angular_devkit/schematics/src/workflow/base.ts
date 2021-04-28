@@ -24,7 +24,6 @@ import {
   WorkflowExecutionContext,
 } from './interface';
 
-
 export interface BaseWorkflowOptions {
   host: virtualFs.Host;
   engineHost: EngineHost<{}, {}>;
@@ -107,9 +106,9 @@ export abstract class BaseWorkflow implements Workflow {
     let error = false;
 
     const dryRunSink = new DryRunSink(this._host, this._force);
-    const dryRunSubscriber = dryRunSink.reporter.subscribe(event => {
+    const dryRunSubscriber = dryRunSink.reporter.subscribe((event) => {
       this._reporter.next(event);
-      error = error || (event.kind == 'error');
+      error = error || event.kind == 'error';
     });
 
     // We need two sinks if we want to output what will happen, and actually do the work.
@@ -144,8 +143,8 @@ export abstract class BaseWorkflow implements Workflow {
     /** Create the collection and the schematic. */
     const collection = this._engine.createCollection(options.collection);
     // Only allow private schematics if called from the same collection.
-    const allowPrivate = options.allowPrivate
-      || (parentContext && parentContext.collection === options.collection);
+    const allowPrivate =
+      options.allowPrivate || (parentContext && parentContext.collection === options.collection);
     const schematic = collection.createSchematic(options.schematic, allowPrivate);
 
     const sinks = this._createSinks();
@@ -160,43 +159,44 @@ export abstract class BaseWorkflow implements Workflow {
     };
     this._context.push(context);
 
-    return schematic.call(
-      options.options,
-      of(new HostTree(this._host)),
-      { logger: context.logger },
-    ).pipe(
-      concatMap((tree: Tree) => {
-        // Process all sinks.
-        return concat(
-          from(sinks).pipe(
-            concatMap(sink => sink.commit(tree)),
-            ignoreElements(),
-          ),
-          of(tree),
-        );
-      }),
-      concatMap(() => {
-        if (this._dryRun) {
-          return EMPTY;
-        }
-
-        this._lifeCycle.next({ kind: 'post-tasks-start' });
-
-        return this._engine.executePostTasks()
-          .pipe(
-            tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
-            defaultIfEmpty(),
-            last(),
+    return schematic
+      .call(options.options, of(new HostTree(this._host)), { logger: context.logger })
+      .pipe(
+        concatMap((tree: Tree) => {
+          // Process all sinks.
+          return concat(
+            from(sinks).pipe(
+              concatMap((sink) => sink.commit(tree)),
+              ignoreElements(),
+            ),
+            of(tree),
           );
-      }),
-      tap({ complete: () => {
-          this._lifeCycle.next({ kind: 'workflow-end' });
-          this._context.pop();
-
-          if (this._context.length == 0) {
-            this._lifeCycle.next({ kind: 'end' });
+        }),
+        concatMap(() => {
+          if (this._dryRun) {
+            return EMPTY;
           }
-        }}),
-    );
+
+          this._lifeCycle.next({ kind: 'post-tasks-start' });
+
+          return this._engine
+            .executePostTasks()
+            .pipe(
+              tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
+              defaultIfEmpty(),
+              last(),
+            );
+        }),
+        tap({
+          complete: () => {
+            this._lifeCycle.next({ kind: 'workflow-end' });
+            this._context.pop();
+
+            if (this._context.length == 0) {
+              this._lifeCycle.next({ kind: 'end' });
+            }
+          },
+        }),
+      );
   }
 }

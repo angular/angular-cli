@@ -45,9 +45,7 @@ function readOptions(
     path.join(homedir(), dotFilename),
   ];
 
-  const projectConfigLocations: string[] = [
-    path.join(cwd, dotFilename),
-  ];
+  const projectConfigLocations: string[] = [path.join(cwd, dotFilename)];
   const root = path.parse(cwd).root;
   for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
     projectConfigLocations.unshift(path.join(curDir, dotFilename));
@@ -92,7 +90,7 @@ function readOptions(
               const cafile = path.resolve(path.dirname(location), value);
               try {
                 options['ca'] = readFileSync(cafile, 'utf8').replace(/\r?\n/g, '\n');
-              } catch { }
+              } catch {}
             }
             break;
           default:
@@ -141,23 +139,20 @@ export function getNpmPackageJson(
   if (!npmrc) {
     try {
       npmrc = readOptions(logger, false, options && options.verbose);
-    } catch { }
+    } catch {}
 
     if (options && options.usingYarn) {
       try {
         npmrc = { ...npmrc, ...readOptions(logger, true, options && options.verbose) };
-      } catch { }
+      } catch {}
     }
   }
 
-  const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(
-    packageName,
-    {
-      fullMetadata: true,
-      ...npmrc,
-      ...(options && options.registryUrl ? { registry: options.registryUrl } : {}),
-    },
-  );
+  const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(packageName, {
+    fullMetadata: true,
+    ...npmrc,
+    ...(options && options.registryUrl ? { registry: options.registryUrl } : {}),
+  });
 
   // TODO: find some way to test this
   const response = resultPromise.catch((err) => {

@@ -23,7 +23,7 @@ export abstract class TransformOperation {
     public kind: OPERATION_KIND,
     public sourceFile: ts.SourceFile,
     public target: ts.Node,
-  ) { }
+  ) {}
 }
 
 export class RemoveNodeOperation extends TransformOperation {
@@ -33,8 +33,12 @@ export class RemoveNodeOperation extends TransformOperation {
 }
 
 export class AddNodeOperation extends TransformOperation {
-  constructor(sourceFile: ts.SourceFile, target: ts.Node,
-              public before?: ts.Node, public after?: ts.Node) {
+  constructor(
+    sourceFile: ts.SourceFile,
+    target: ts.Node,
+    public before?: ts.Node,
+    public after?: ts.Node,
+  ) {
     super(OPERATION_KIND.Add, sourceFile, target);
   }
 }

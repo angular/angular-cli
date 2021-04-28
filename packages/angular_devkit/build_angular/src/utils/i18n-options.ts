@@ -80,7 +80,10 @@ export function createI18nOptions(
   let rawSourceLocaleBaseHref;
   if (json.isJsonObject(metadata.sourceLocale)) {
     rawSourceLocale = metadata.sourceLocale.code;
-    if (metadata.sourceLocale.baseHref !== undefined && typeof metadata.sourceLocale.baseHref !== 'string') {
+    if (
+      metadata.sourceLocale.baseHref !== undefined &&
+      typeof metadata.sourceLocale.baseHref !== 'string'
+    ) {
       throw new Error('Project i18n sourceLocale baseHref field is malformed. Expected a string.');
     }
     rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
@@ -133,7 +136,7 @@ export function createI18nOptions(
 
   if (inline === true) {
     i18n.inlineLocales.add(i18n.sourceLocale);
-    Object.keys(i18n.locales).forEach(locale => i18n.inlineLocales.add(locale));
+    Object.keys(i18n.locales).forEach((locale) => i18n.inlineLocales.add(locale));
   } else if (inline) {
     for (const locale of inline) {
       if (!i18n.locales[locale] && i18n.sourceLocale !== locale) {
@@ -217,9 +220,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
 
       for (const diagnostics of loadResult.diagnostics.messages) {
         if (diagnostics.type === 'error') {
-          throw new Error(
-            `Error parsing translation file '${file.path}': ${diagnostics.message}`,
-          );
+          throw new Error(`Error parsing translation file '${file.path}': ${diagnostics.message}`);
         } else {
           context.logger.warn(`WARNING [${file.path}]: ${diagnostics.message}`);
         }

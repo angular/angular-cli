@@ -9,28 +9,24 @@
 import { Path, PathFragment } from '@angular-devkit/core';
 import { Action } from './action';
 
-
 export enum MergeStrategy {
-  AllowOverwriteConflict    = 1 << 1,
-  AllowCreationConflict     = 1 << 2,
-  AllowDeleteConflict       = 1 << 3,
+  AllowOverwriteConflict = 1 << 1,
+  AllowCreationConflict = 1 << 2,
+  AllowDeleteConflict = 1 << 3,
 
   // Uses the default strategy.
-  Default                   = 0,
+  Default = 0,
 
   // Error out if 2 files have the same path. It is useful to have a different value than
   // Default in this case as the tooling Default might differ.
-  Error                     = 1 << 0,
+  Error = 1 << 0,
 
   // Only content conflicts are overwritten.
-  ContentOnly               = AllowOverwriteConflict,
+  ContentOnly = AllowOverwriteConflict,
 
   // Overwrite everything with the latest change.
-  Overwrite                 = AllowOverwriteConflict
-                            + AllowCreationConflict
-                            + AllowDeleteConflict,
+  Overwrite = AllowOverwriteConflict + AllowCreationConflict + AllowDeleteConflict,
 }
-
 
 export const FileVisitorCancelToken: symbol = Symbol();
 export type FileVisitor = FilePredicate<void>;
@@ -57,14 +53,15 @@ export interface FilePredicate<T> {
   (path: Path, entry?: Readonly<FileEntry> | null): T;
 }
 
-declare const window: { Symbol: { schematicTree: symbol }, window: {} };
-declare const self: { Symbol: { schematicTree: symbol }, self: {} };
-declare const global: { Symbol: { schematicTree: symbol }, global: {} };
+declare const window: { Symbol: { schematicTree: symbol }; window: {} };
+declare const self: { Symbol: { schematicTree: symbol }; self: {} };
+declare const global: { Symbol: { schematicTree: symbol }; global: {} };
 
-export const TreeSymbol: symbol = (function() {
-  const globalSymbol = (typeof window == 'object' && window.window === window && window.Symbol)
-                    || (typeof self == 'object' && self.self === self && self.Symbol)
-                    || (typeof global == 'object' && global.global === global && global.Symbol);
+export const TreeSymbol: symbol = (function () {
+  const globalSymbol =
+    (typeof window == 'object' && window.window === window && window.Symbol) ||
+    (typeof self == 'object' && self.self === self && self.Symbol) ||
+    (typeof global == 'object' && global.global === global && global.Symbol);
 
   if (!globalSymbol) {
     return Symbol('schematic-tree');
@@ -76,7 +73,6 @@ export const TreeSymbol: symbol = (function() {
 
   return globalSymbol.schematicTree;
 })();
-
 
 export interface Tree {
   branch(): Tree;
@@ -105,13 +101,11 @@ export interface Tree {
   readonly actions: Action[];
 }
 
-
 namespace Tree {
   export function isTree(maybeTree: object): maybeTree is Tree {
     return TreeSymbol in maybeTree;
   }
 }
-
 
 export interface UpdateRecorder {
   // These just record changes.

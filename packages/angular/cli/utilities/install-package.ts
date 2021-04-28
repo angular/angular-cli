@@ -45,12 +45,16 @@ export function installPackage(
     installArgs.push(packageManagerArgs.saveDev);
   }
 
-  const { status, stderr, stdout, error } = spawnSync(packageManager, [...installArgs, ...extraArgs], {
-    stdio: 'pipe',
-    shell: true,
-    encoding: 'utf8',
-    cwd,
-  });
+  const { status, stderr, stdout, error } = spawnSync(
+    packageManager,
+    [...installArgs, ...extraArgs],
+    {
+      stdio: 'pipe',
+      shell: true,
+      encoding: 'utf8',
+      cwd,
+    },
+  );
 
   if (status !== 0) {
     let errorMessage = ((error && error.message) || stderr || stdout || '').trim();
@@ -75,7 +79,7 @@ export function installTempPackage(
   process.on('exit', () => {
     try {
       rimraf.sync(tempPath);
-    } catch { }
+    } catch {}
   });
 
   // NPM will warn when a `package.json` is not found in the install directory
@@ -87,12 +91,15 @@ export function installTempPackage(
 
   // While we can use `npm init -y` we will end up needing to update the 'package.json' anyways
   // because of missing fields.
-  writeFileSync(join(tempPath, 'package.json'), JSON.stringify({
-    name: 'temp-cli-install',
-    description: 'temp-cli-install',
-    repository: 'temp-cli-install',
-    license: 'MIT',
-  }));
+  writeFileSync(
+    join(tempPath, 'package.json'),
+    JSON.stringify({
+      name: 'temp-cli-install',
+      description: 'temp-cli-install',
+      repository: 'temp-cli-install',
+      license: 'MIT',
+    }),
+  );
 
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);

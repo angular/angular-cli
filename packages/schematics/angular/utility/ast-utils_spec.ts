@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -21,7 +20,6 @@ import {
   findNodes,
   insertAfterLastOccurrence,
 } from './ast-utils';
-
 
 function getTsSource(path: string, content: string): ts.SourceFile {
   return ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
@@ -263,7 +261,7 @@ describe('ast utils', () => {
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
-        elements as unknown as ts.Node[],
+        (elements as unknown) as ts.Node[],
         `, 'bar'`,
         filePath,
         elements.pos,
@@ -273,7 +271,6 @@ describe('ast utils', () => {
 
       expect(output).toMatch(/const arr = \['foo', 'bar'\];/);
     });
-
 
     it('should work without occurrences', () => {
       const fileContent = `const arr = [];`;
@@ -285,7 +282,7 @@ describe('ast utils', () => {
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
-        elements as unknown as ts.Node[],
+        (elements as unknown) as ts.Node[],
         `'bar'`,
         filePath,
         elements.pos,
@@ -422,7 +419,8 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const changes = addRouteDeclarationToModule(
         source,
-        './src/app', `{ path: 'foo', component: FooComponent }`,
+        './src/app',
+        `{ path: 'foo', component: FooComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
 
@@ -455,7 +453,8 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const changes = addRouteDeclarationToModule(
         source,
-        './src/app', `{ path: 'bar', component: BarComponent }`,
+        './src/app',
+        `{ path: 'bar', component: BarComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
 
@@ -524,7 +523,8 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const changes = addRouteDeclarationToModule(
         source,
-        './src/app', `{ path: 'bar', component: BarComponent }`,
+        './src/app',
+        `{ path: 'bar', component: BarComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
       // tslint:disable:max-line-length
@@ -560,7 +560,8 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const changes = addRouteDeclarationToModule(
         source,
-        './src/app', `{ path: 'bar', component: BarComponent }`,
+        './src/app',
+        `{ path: 'bar', component: BarComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
       expect(output).toMatch(
@@ -591,7 +592,8 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const changes = addRouteDeclarationToModule(
         source,
-        './src/app', `{ path: 'foo', component: FooComponent }`,
+        './src/app',
+        `{ path: 'foo', component: FooComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
 
@@ -623,7 +625,8 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const changes = addRouteDeclarationToModule(
         source,
-        './src/app', `{ path: 'bar', component: BarComponent }`,
+        './src/app',
+        `{ path: 'bar', component: BarComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
 

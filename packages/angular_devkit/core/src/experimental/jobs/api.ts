@@ -15,23 +15,20 @@ import { DeepReadonly } from '../../utils/index';
  */
 export type JobName = string;
 
-
 /**
  * The job handler function, which is a method that's executed for the job.
  */
 export interface JobHandler<
   ArgT extends JsonValue,
   InputT extends JsonValue,
-  OutputT extends JsonValue,
+  OutputT extends JsonValue
 > {
-  (
-    argument: ArgT,
-    context: JobHandlerContext<ArgT, InputT, OutputT>,
-  ): Observable<JobOutboundMessage<OutputT>>;
+  (argument: ArgT, context: JobHandlerContext<ArgT, InputT, OutputT>): Observable<
+    JobOutboundMessage<OutputT>
+  >;
 
   jobDescription: Partial<JobDescription>;
 }
-
 
 /**
  * The context in which the job is run.
@@ -39,7 +36,7 @@ export interface JobHandler<
 export interface JobHandlerContext<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue,
+  MinimumOutputValueT extends JsonValue = JsonValue
 > {
   readonly description: JobDescription;
   readonly scheduler: Scheduler<JsonValue, JsonValue, JsonValue>;
@@ -49,7 +46,6 @@ export interface JobHandlerContext<
 
   readonly inboundBus: Observable<JobInboundMessage<MinimumInputValueT>>;
 }
-
 
 /**
  * Metadata associated with a job.
@@ -119,10 +115,9 @@ export interface JobInboundMessageInput<InputT extends JsonValue> extends JobInb
 }
 
 export type JobInboundMessage<InputT extends JsonValue> =
-  JobInboundMessagePing
+  | JobInboundMessagePing
   | JobInboundMessageStop
-  | JobInboundMessageInput<InputT>
-  ;
+  | JobInboundMessageInput<InputT>;
 
 /**
  * Kind of messages that can be outputted from a job.
@@ -174,9 +169,8 @@ export interface JobOutboundMessageStart extends JobOutboundMessageBase {
 /**
  * An output value is available.
  */
-export interface JobOutboundMessageOutput<
-  OutputT extends JsonValue,
-> extends JobOutboundMessageBase {
+export interface JobOutboundMessageOutput<OutputT extends JsonValue>
+  extends JobOutboundMessageBase {
   readonly kind: JobOutboundMessageKind.Output;
 
   /**
@@ -184,7 +178,6 @@ export interface JobOutboundMessageOutput<
    */
   readonly value: OutputT;
 }
-
 
 /**
  * Base interface for all job message related to channels.
@@ -263,7 +256,7 @@ export interface JobOutboundMessagePong extends JobOutboundMessageBase {
  * Generic message type.
  */
 export type JobOutboundMessage<OutputT extends JsonValue> =
-  JobOutboundMessageOnReady
+  | JobOutboundMessageOnReady
   | JobOutboundMessageStart
   | JobOutboundMessageOutput<OutputT>
   | JobOutboundMessageChannelCreate
@@ -271,9 +264,7 @@ export type JobOutboundMessage<OutputT extends JsonValue> =
   | JobOutboundMessageChannelError
   | JobOutboundMessageChannelComplete
   | JobOutboundMessageEnd
-  | JobOutboundMessagePong
-  ;
-
+  | JobOutboundMessagePong;
 
 /**
  * The state of a job. These are changed as the job reports a new state through its messages.
@@ -303,14 +294,13 @@ export enum JobState {
   Errored = 'errored',
 }
 
-
 /**
  * A Job instance, returned from scheduling a job. A Job instance is _not_ serializable.
  */
 export interface Job<
   ArgumentT extends JsonValue = JsonValue,
   InputT extends JsonValue = JsonValue,
-  OutputT extends JsonValue = JsonValue,
+  OutputT extends JsonValue = JsonValue
 > {
   /**
    * Description of the job. Resolving the job's description can be done asynchronously, so this
@@ -381,17 +371,15 @@ export interface ScheduleJobOptions {
 export interface Registry<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue,
+  MinimumOutputValueT extends JsonValue = JsonValue
 > {
   /**
    * Get a job handler.
    * @param name The name of the job to get a handler from.
    */
-  get<
-    A extends MinimumArgumentValueT,
-    I extends MinimumInputValueT,
-    O extends MinimumOutputValueT,
-  >(name: JobName): Observable<JobHandler<A, I, O> | null>;
+  get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(
+    name: JobName,
+  ): Observable<JobHandler<A, I, O> | null>;
 }
 
 /**
@@ -400,7 +388,7 @@ export interface Registry<
 export interface Scheduler<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue,
+  MinimumOutputValueT extends JsonValue = JsonValue
 > {
   /**
    * Get a job description for a named job.
@@ -441,7 +429,7 @@ export interface Scheduler<
   schedule<
     A extends MinimumArgumentValueT,
     I extends MinimumInputValueT,
-    O extends MinimumOutputValueT,
+    O extends MinimumOutputValueT
   >(
     name: JobName,
     argument: A,
@@ -449,15 +437,12 @@ export interface Scheduler<
   ): Job<A, I, O>;
 }
 
-
-export function isJobHandler<
-  A extends JsonValue,
-  I extends JsonValue,
-  O extends JsonValue,
->(value: unknown): value is JobHandler<A, I, O> {
+export function isJobHandler<A extends JsonValue, I extends JsonValue, O extends JsonValue>(
+  value: unknown,
+): value is JobHandler<A, I, O> {
   const job = value as JobHandler<A, I, O>;
 
-  return typeof job == 'function'
-      && typeof job.jobDescription == 'object'
-      && job.jobDescription !== null;
+  return (
+    typeof job == 'function' && typeof job.jobDescription == 'object' && job.jobDescription !== null
+  );
 }

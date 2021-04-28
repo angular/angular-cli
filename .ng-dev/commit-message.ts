@@ -1,5 +1,9 @@
 // tslint:disable-next-line: no-implicit-dependencies
-import { COMMIT_TYPES, CommitMessageConfig, ScopeRequirement } from '@angular/dev-infra-private/commit-message/config';
+import {
+  COMMIT_TYPES,
+  CommitMessageConfig,
+  ScopeRequirement,
+} from '@angular/dev-infra-private/commit-message/config';
 import { packages } from '../lib/packages';
 
 /**
@@ -16,7 +20,5 @@ export const commitMessage: CommitMessageConfig = {
   maxLineLength: Infinity,
   minBodyLength: 0,
   minBodyLengthTypeExcludes: ['docs'],
-  scopes: [
-    ...Object.keys(packages),
-  ],
+  scopes: [...Object.keys(packages)],
 };

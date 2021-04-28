@@ -13,7 +13,7 @@ export interface BuilderContext {
     logger: logging.LoggerApi;
     target?: Target;
     workspaceRoot: string;
-    addTeardown(teardown: () => (Promise<void> | void)): void;
+    addTeardown(teardown: () => Promise<void> | void): void;
     getBuilderNameForTarget(target: Target): Promise<string>;
     getProjectMetadata(projectName: string): Promise<json.JsonObject>;
     getProjectMetadata(target: Target): Promise<json.JsonObject>;
@@ -44,10 +44,10 @@ export declare type BuilderOutputLike = AsyncIterable<BuilderOutput> | Subscriba
 
 export declare type BuilderProgress = json.JsonObject & RealBuilderProgress & TypedBuilderProgress;
 
-export declare type BuilderProgressReport = BuilderProgress & ({
+export declare type BuilderProgressReport = BuilderProgress & {
     target?: Target;
     builder: BuilderInfo;
-});
+};
 
 export declare type BuilderRegistry = experimental.jobs.Registry<json.JsonObject, BuilderInput, BuilderOutput>;
 
@@ -79,7 +79,7 @@ export declare function targetFromTargetString(str: string): Target;
 
 export declare function targetStringFromTarget({ project, target, configuration }: Target): string;
 
-export declare type TypedBuilderProgress = ({
+export declare type TypedBuilderProgress = {
     state: BuilderProgressState.Stopped;
 } | {
     state: BuilderProgressState.Error;
@@ -92,4 +92,4 @@ export declare type TypedBuilderProgress = ({
     status?: string;
     current: number;
     total?: number;
-});
+};
