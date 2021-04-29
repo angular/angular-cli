@@ -97,7 +97,7 @@ commands:
             openssl aes-256-cbc -d -in .circleci/gcp_token -md md5 -k "${<< parameters.key >>}" -out /home/circleci/.gcp_credentials;
             sudo bash -c "echo -e 'build --google_credentials=/home/circleci/.gcp_credentials' >> .bazelrc.user";
             # Upload/don't upload local results to cache based on environment
-            if [[ -n "{$CIRCLE_PR_NUMBER}" ]]; then
+            if [[ -n "{$CIRCLE_PULL_REQUEST}" ]]; then
               sudo bash -c "echo -e 'build:remote --remote_upload_local_results=false\n' >> .bazelrc.user";
               echo "Not uploading local build results to remote cache.";
             else
@@ -287,7 +287,7 @@ jobs:
       - run:
           name: Execute E2E Tests
           command: |
-            if (Test-Path env:CIRCLE_PR_NUMBER) {
+            if (Test-Path env:CIRCLE_PULL_REQUEST) {
               node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
             } else {
               node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
