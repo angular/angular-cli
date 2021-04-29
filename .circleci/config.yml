@@ -154,11 +154,6 @@ jobs:
     steps:
       - custom_attach_workspace
       - run: yarn lint
-      - run: 'yarn bazel:format -mode=check ||
-          (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
-      # Run the skylark linter to check our Bazel rules
-      - run: 'yarn bazel:lint ||
-          (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
 
   validate:
     executor: action-executor
@@ -175,6 +170,12 @@ jobs:
       - run:
           name: Validate Code Formatting
           command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
+      - run:
+          name: Validate NgBot Configuration
+          command: yarn ng-dev ngbot verify
+      - run:
+          name: Validate Circular Dependencies
+          command: yarn ts-circular-deps:check
       - run:
           command: yarn -s admin validate
 
