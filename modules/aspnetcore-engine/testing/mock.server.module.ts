@@ -9,14 +9,12 @@ import { Component, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ServerModule } from '@angular/platform-server';
 
-@Component({selector: 'root', template: 'some template'})
-export class MockComponent {
-}
+@Component({ selector: 'root', template: 'some template' })
+export class MockComponent {}
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [MockComponent],
   bootstrap: [MockComponent],
 })
-export class MockServerModule {
-}
+export class MockServerModule {}

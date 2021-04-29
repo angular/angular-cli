@@ -8,12 +8,13 @@ try {
   // is introduced in node 10.2.0
   console.warn(
     `Running postinstall-patches.js script in an external repository requires --preserve-symlinks-main node flag introduced in node 10.2.0. ` +
-    `Current node version is ${process.version}. Node called with '${process.argv.join(" ")}'.`);
+      `Current node version is ${process.version}. Node called with '${process.argv.join(' ')}'.`,
+  );
   process.exit(0);
 }
 
-const {set, cd, sed, echo, ls} = require('shelljs');
-const {readFileSync} = require('fs');
+const { set, cd, sed, echo, ls } = require('shelljs');
+const { readFileSync } = require('fs');
 const path = require('path');
 const log = console.log;
 
@@ -41,14 +42,17 @@ sed('-i', '(\'response\' in xhr)', '(\'response\' in (xhr as any))',
 // TypeScript doesn't understand typings without "declare module" unless
 // they are actually resolved by the @types default mechanism
 log('\n# patch: @types/hapi__* adding declare module wrappers');
-ls('node_modules/@types').filter(f => f.startsWith('hapi__')).forEach(pkg => {
-  const modName = '@' + pkg.replace('__', '/');
-  const typingsFile = `node_modules/@types/${pkg}/index.d.ts`;
-  // Only add the patch if it is not already there.
-  if (readFileSync(typingsFile, 'utf8').indexOf('/*added by tools/postinstall_patches.js*/') ===
-    -1) {
-    const insertPrefix = `/*added by tools/postinstall_patches.js*/ declare module "${modName}" { `;
-    sed('-i', `(// Type definitions for ${modName})`, insertPrefix + '$1', typingsFile);
-    echo('}').toEnd(typingsFile);
-  }
-});
+ls('node_modules/@types')
+  .filter((f) => f.startsWith('hapi__'))
+  .forEach((pkg) => {
+    const modName = '@' + pkg.replace('__', '/');
+    const typingsFile = `node_modules/@types/${pkg}/index.d.ts`;
+    // Only add the patch if it is not already there.
+    if (
+      readFileSync(typingsFile, 'utf8').indexOf('/*added by tools/postinstall_patches.js*/') === -1
+    ) {
+      const insertPrefix = `/*added by tools/postinstall_patches.js*/ declare module "${modName}" { `;
+      sed('-i', `(// Type definitions for ${modName})`, insertPrefix + '$1', typingsFile);
+      echo('}').toEnd(typingsFile);
+    }
+  });

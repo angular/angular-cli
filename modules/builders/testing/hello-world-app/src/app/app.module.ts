@@ -7,16 +7,9 @@ import { FooComponent } from './foo/foo.component';
 import { FooBarComponent } from './foo-bar/foo-bar.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    FooComponent,
-    FooBarComponent
-  ],
-  imports: [
-    BrowserModule.withServerTransition({ appId: 'serverApp' }),
-    AppRoutingModule
-  ],
+  declarations: [AppComponent, FooComponent, FooBarComponent],
+  imports: [BrowserModule.withServerTransition({ appId: 'serverApp' }), AppRoutingModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

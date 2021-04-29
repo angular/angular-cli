@@ -23,12 +23,12 @@ import { Builders } from '@schematics/angular/utility/workspace-models';
 import * as ts from 'typescript';
 
 export function version9UpdateRule(collectionPath: string): Rule {
-  return async host => {
+  return async (host) => {
     return chain([
       backupPackageScriptsRule(),
       updateProjectsStructureRule(collectionPath),
       (tree, context) => {
-        const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
+        const packageChanges = tree.actions.some((a) => a.path.endsWith('/package.json'));
         if (context && packageChanges) {
           context.addTask(new NodePackageInstallTask());
         }
@@ -38,7 +38,7 @@ export function version9UpdateRule(collectionPath: string): Rule {
 }
 
 function backupPackageScriptsRule(): Rule {
-  return tree => {
+  return (tree) => {
     // Remove old scripts in 'package.json'
     const pkgPath = '/package.json';
     const buffer = tree.read(pkgPath);
@@ -53,27 +53,24 @@ function backupPackageScriptsRule(): Rule {
     }
 
     // Backup script targets
-    [
-      'compile:server',
-      'build:ssr',
-      'serve:ssr',
-      'build:client-and-server-bundles',
-    ].forEach(key => {
-      const keyBackup = `${key}_bak`;
-      const scriptValue = scripts[key];
-      // Check if script target exists and it has not been already backed up
-      if (scriptValue && !scripts[keyBackup]) {
-        scripts[keyBackup] = scriptValue;
-        scripts[key] = undefined;
-      }
-    });
+    ['compile:server', 'build:ssr', 'serve:ssr', 'build:client-and-server-bundles'].forEach(
+      (key) => {
+        const keyBackup = `${key}_bak`;
+        const scriptValue = scripts[key];
+        // Check if script target exists and it has not been already backed up
+        if (scriptValue && !scripts[keyBackup]) {
+          scripts[keyBackup] = scriptValue;
+          scripts[key] = undefined;
+        }
+      },
+    );
 
     tree.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
   };
 }
 
 function updateProjectsStructureRule(collectionPath: string): Rule {
-  return async tree => {
+  return async (tree) => {
     const workspace = await getWorkspace(tree);
     const installRules: Rule[] = [];
 
@@ -87,13 +84,10 @@ function updateProjectsStructureRule(collectionPath: string): Rule {
       const root = normalize(projectDefinition.root);
 
       // Backup old files
-      [
-        'server.ts',
-        'webpack.server.config.js',
-      ]
-        .map(f => join(root, f))
-        .filter(f => tree.exists(f))
-        .forEach(f => tree.rename(f, `${f}.bak`));
+      ['server.ts', 'webpack.server.config.js']
+        .map((f) => join(root, f))
+        .filter((f) => tree.exists(f))
+        .forEach((f) => tree.rename(f, `${f}.bak`));
 
       const installOptions: UniversalOptions = {
         clientProject: projectName,
@@ -104,9 +98,7 @@ function updateProjectsStructureRule(collectionPath: string): Rule {
       // Run the install schematic again so that we re-create the entire stucture.
       installRules.push(
         removeModuleMapNgfactoryLoaderRule(normalize(projectDefinition.sourceRoot)),
-        collectionPath
-          ? externalSchematic(collectionPath, 'ng-add', installOptions)
-          : noop(),
+        collectionPath ? externalSchematic(collectionPath, 'ng-add', installOptions) : noop(),
       );
     }
 
@@ -115,18 +107,22 @@ function updateProjectsStructureRule(collectionPath: string): Rule {
 }
 
 function removeModuleMapNgfactoryLoaderRule(sourceRoot: Path): Rule {
-  return tree => {
+  return (tree) => {
     const moduleMapLoaderPackageName = '@nguniversal/module-map-ngfactory-loader';
 
     // Strip BOM as otherwise TSC methods (Ex: getWidth) will return an offset which
     // which breaks the CLI UpdateRecorder.
     // See: https://github.com/angular/angular/pull/30719
-    const createSourceFile = (path: string) => ts.createSourceFile(
-      path,
-      tree.read(path).toString().replace(/^\uFEFF/, ''),
-      ts.ScriptTarget.Latest,
-      true,
-    );
+    const createSourceFile = (path: string) =>
+      ts.createSourceFile(
+        path,
+        tree
+          .read(path)
+          .toString()
+          .replace(/^\uFEFF/, ''),
+        ts.ScriptTarget.Latest,
+        true,
+      );
 
     // Update main.server file
     const mainServerPath = join(sourceRoot, 'main.server.ts');
@@ -135,14 +131,14 @@ function removeModuleMapNgfactoryLoaderRule(sourceRoot: Path): Rule {
 
       // Remove exports of '@nguniversal/module-map-ngfactory-loader'
       createSourceFile(mainServerPath)
-        .statements
-        .filter(s => (
-          ts.isExportDeclaration(s) &&
-          s.moduleSpecifier &&
-          ts.isStringLiteral(s.moduleSpecifier) &&
-          s.moduleSpecifier.text === moduleMapLoaderPackageName
-        ))
-        .forEach(node => {
+        .statements.filter(
+          (s) =>
+            ts.isExportDeclaration(s) &&
+            s.moduleSpecifier &&
+            ts.isStringLiteral(s.moduleSpecifier) &&
+            s.moduleSpecifier.text === moduleMapLoaderPackageName,
+        )
+        .forEach((node) => {
           const index = node.getFullStart();
           const length = node.getFullWidth();
           recorder.remove(index, length);
@@ -157,27 +153,26 @@ function removeModuleMapNgfactoryLoaderRule(sourceRoot: Path): Rule {
       const appServerSourceFile = createSourceFile(appServerModule);
 
       // Remove imports of '@nguniversal/module-map-ngfactory-loader'
-      appServerSourceFile
-        .statements
-        .filter(s => (
-          ts.isImportDeclaration(s) &&
-          s.moduleSpecifier &&
-          ts.isStringLiteral(s.moduleSpecifier) &&
-          s.moduleSpecifier.text === moduleMapLoaderPackageName
-        ))
-        .forEach(node => {
+      appServerSourceFile.statements
+        .filter(
+          (s) =>
+            ts.isImportDeclaration(s) &&
+            s.moduleSpecifier &&
+            ts.isStringLiteral(s.moduleSpecifier) &&
+            s.moduleSpecifier.text === moduleMapLoaderPackageName,
+        )
+        .forEach((node) => {
           const index = node.getFullStart();
           const length = node.getFullWidth();
           recorder.remove(index, length);
         });
 
-
       // Create a TS printer to get the text
       const printer = ts.createPrinter();
 
       // Remove 'ModuleMapLoaderModule' from 'NgModule' imports
-      getDecoratorMetadata(appServerSourceFile, 'NgModule', '@angular/core')
-        .forEach((metadata: ts.ObjectLiteralExpression) => {
+      getDecoratorMetadata(appServerSourceFile, 'NgModule', '@angular/core').forEach(
+        (metadata: ts.ObjectLiteralExpression) => {
           const matchingProperties = getMetadataField(metadata, 'imports');
 
           if (!matchingProperties) {
@@ -190,8 +185,9 @@ function removeModuleMapNgfactoryLoaderRule(sourceRoot: Path): Rule {
           }
 
           const arrayLiteral = assignment.initializer;
-          const newImports = arrayLiteral.elements
-            .filter(n => !(ts.isIdentifier(n) && n.text === 'ModuleMapLoaderModule'));
+          const newImports = arrayLiteral.elements.filter(
+            (n) => !(ts.isIdentifier(n) && n.text === 'ModuleMapLoaderModule'),
+          );
 
           if (arrayLiteral.elements.length !== newImports.length) {
             const newImportsText = printer.printNode(
@@ -203,11 +199,10 @@ function removeModuleMapNgfactoryLoaderRule(sourceRoot: Path): Rule {
             const index = arrayLiteral.getStart();
             const length = arrayLiteral.getWidth();
 
-            recorder
-              .remove(index, length)
-              .insertLeft(index, newImportsText);
+            recorder.remove(index, length).insertLeft(index, newImportsText);
           }
-        });
+        },
+      );
 
       tree.commitUpdate(recorder);
     }

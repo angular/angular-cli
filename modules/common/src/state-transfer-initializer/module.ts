@@ -9,28 +9,32 @@
 import { DOCUMENT } from '@angular/common';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 
+export function domContentLoadedFactory(doc: Document): () => Promise<void> {
+  return () =>
+    new Promise((resolve, _reject) => {
+      if (doc.readyState === 'complete' || doc.readyState === 'interactive') {
+        resolve();
 
-export function domContentLoadedFactory(doc: Document): () => Promise<void>  {
-  return () => new Promise ((resolve, _reject) => {
-    if (doc.readyState === 'complete' || doc.readyState === 'interactive') {
-      resolve();
+        return;
+      }
 
-      return;
-    }
+      const contentLoaded = () => {
+        doc.removeEventListener('DOMContentLoaded', contentLoaded);
+        resolve();
+      };
 
-    const contentLoaded = () => {
-      doc.removeEventListener('DOMContentLoaded', contentLoaded);
-      resolve();
-    };
-
-    doc.addEventListener('DOMContentLoaded', contentLoaded);
-  });
+      doc.addEventListener('DOMContentLoaded', contentLoaded);
+    });
 }
-
 
 @NgModule({
   providers: [
-    {provide: APP_INITIALIZER, multi: true, useFactory: domContentLoadedFactory, deps: [DOCUMENT]},
-  ]
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: domContentLoadedFactory,
+      deps: [DOCUMENT],
+    },
+  ],
 })
 export class StateTransferInitializerModule {}

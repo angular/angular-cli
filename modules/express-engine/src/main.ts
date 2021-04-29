@@ -14,7 +14,10 @@ import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 /**
  * These are the allowed options for the engine
  */
-export type NgSetupOptions = Pick<CommonRenderOptions, 'bootstrap' | 'providers' | 'publicPath' | 'inlineCriticalCss'>;
+export type NgSetupOptions = Pick<
+  CommonRenderOptions,
+  'bootstrap' | 'providers' | 'publicPath' | 'inlineCriticalCss'
+>;
 
 /**
  * These are the allowed options for the render
@@ -30,9 +33,11 @@ export interface RenderOptions extends CommonRenderOptions {
 export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
   const engine = new CommonEngine(setupOptions.bootstrap, setupOptions.providers);
 
-  return function (filePath: string,
-                   options: object,
-                   callback: (err?: Error | null, html?: string) => void) {
+  return function (
+    filePath: string,
+    options: object,
+    callback: (err?: Error | null, html?: string) => void,
+  ) {
     try {
       const renderOptions = { ...options } as RenderOptions;
       if (!setupOptions.bootstrap && !renderOptions.bootstrap) {
@@ -43,14 +48,17 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
       const res = renderOptions.res || req.res;
 
       renderOptions.url =
-      renderOptions.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`;
+        renderOptions.url || `${req.protocol}://${req.get('host') || ''}${req.originalUrl}`;
       renderOptions.documentFilePath = renderOptions.documentFilePath || filePath;
       renderOptions.providers = [...(renderOptions.providers || []), getReqResProviders(req, res)];
-      renderOptions.publicPath = renderOptions.publicPath ?? setupOptions.publicPath ?? (options as any).settings?.views,
-      renderOptions.inlineCriticalCss = renderOptions.inlineCriticalCss ?? setupOptions.inlineCriticalCss;
+      (renderOptions.publicPath =
+        renderOptions.publicPath ?? setupOptions.publicPath ?? (options as any).settings?.views),
+        (renderOptions.inlineCriticalCss =
+          renderOptions.inlineCriticalCss ?? setupOptions.inlineCriticalCss);
 
-      engine.render(renderOptions)
-        .then(html => callback(null, html))
+      engine
+        .render(renderOptions)
+        .then((html) => callback(null, html))
         .catch(callback);
     } catch (err) {
       callback(err);
@@ -65,13 +73,13 @@ function getReqResProviders(req: Request, res?: Response): StaticProvider[] {
   const providers: StaticProvider[] = [
     {
       provide: REQUEST,
-      useValue: req
-    }
+      useValue: req,
+    },
   ];
   if (res) {
     providers.push({
       provide: RESPONSE,
-      useValue: res
+      useValue: res,
     });
   }
 

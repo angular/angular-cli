@@ -7,7 +7,11 @@
  */
 import { ResourceLoader } from '@angular/compiler';
 import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
-import { INITIAL_CONFIG, platformDynamicServer, renderModuleFactory } from '@angular/platform-server';
+import {
+  INITIAL_CONFIG,
+  platformDynamicServer,
+  renderModuleFactory,
+} from '@angular/platform-server';
 import * as fs from 'fs';
 import { dirname, resolve } from 'path';
 import { URL } from 'url';
@@ -40,14 +44,15 @@ export interface RenderOptions {
  * the document loader
  */
 export class CommonEngine {
-
   private readonly factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor: InlineCriticalCssProcessor;
   private readonly pageExists = new Map<string, boolean>();
 
-  constructor(private moduleOrFactory?: Type<{}> | NgModuleFactory<{}>,
-              private providers: StaticProvider[] = []) {
+  constructor(
+    private moduleOrFactory?: Type<{}> | NgModuleFactory<{}>,
+    private providers: StaticProvider[] = [],
+  ) {
     this.inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       minify: true,
     });
@@ -63,7 +68,7 @@ export class CommonEngine {
     if (opts.publicPath && opts.documentFilePath && opts.url !== undefined) {
       const url = new URL(opts.url);
       // Remove leading forward slash.
-      const pathname  = url.pathname.substring(1);
+      const pathname = url.pathname.substring(1);
       const pagePath = resolve(opts.publicPath, pathname, 'index.html');
 
       if (pagePath !== resolve(opts.documentFilePath)) {
@@ -82,10 +87,7 @@ export class CommonEngine {
     }
 
     // if opts.document dosen't exist then opts.documentFilePath must
-    const extraProviders = [
-      ...(opts.providers || []),
-      ...(this.providers || []),
-    ];
+    const extraProviders = [...(opts.providers || []), ...(this.providers || [])];
 
     let doc = opts.document;
     if (!doc && opts.documentFilePath) {
@@ -97,11 +99,14 @@ export class CommonEngine {
         provide: INITIAL_CONFIG,
         useValue: {
           document: inlineCriticalCss
-            // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-            ? doc.replace(/ media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g, '>')
+            ? // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
+              doc.replace(
+                / media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g,
+                '>',
+              )
             : doc,
-          url: opts.url
-        }
+          url: opts.url,
+        },
       });
     }
 
@@ -114,19 +119,22 @@ export class CommonEngine {
     }
 
     const { content, errors, warnings } = await this.inlineCriticalCssProcessor.process(html, {
-      outputPath: opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : undefined),
+      outputPath:
+        opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : undefined),
     });
 
     // tslint:disable-next-line: no-console
-    warnings?.forEach(m => console.warn(m));
+    warnings?.forEach((m) => console.warn(m));
     // tslint:disable-next-line: no-console
-    errors?.forEach(m => console.error(m));
+    errors?.forEach((m) => console.error(m));
 
     return content;
   }
 
   /** Return the factory for a given engine instance */
-  private async getFactory(moduleOrFactory: Type<{}> | NgModuleFactory<{}>): Promise<NgModuleFactory<{}>> {
+  private async getFactory(
+    moduleOrFactory: Type<{}> | NgModuleFactory<{}>,
+  ): Promise<NgModuleFactory<{}>> {
     // If module has been compiled AoT
     if (moduleOrFactory instanceof NgModuleFactory) {
       return moduleOrFactory;
@@ -164,7 +172,7 @@ export class CommonEngine {
     const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
 
     return compilerFactory.createCompiler([
-      { providers: [{ provide: ResourceLoader, useClass: FileLoader, deps: [] }] }
+      { providers: [{ provide: ResourceLoader, useClass: FileLoader, deps: [] }] },
     ]);
   }
 }

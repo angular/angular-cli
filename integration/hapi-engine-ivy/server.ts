@@ -16,8 +16,8 @@ export async function app() {
     port,
     routes: {
       files: {
-        relativeTo: distFolder
-      }
+        relativeTo: distFolder,
+      },
     },
   });
 
@@ -28,13 +28,14 @@ export async function app() {
   server.route({
     method: 'GET',
     path: '/{path*}',
-    handler: (req: Request) => ngHapiEngine({
-      bootstrap: AppServerModule,
-      documentFilePath,
-      publicPath: distFolder,
-      inlineCriticalCss: true,
-      req,
-    })
+    handler: (req: Request) =>
+      ngHapiEngine({
+        bootstrap: AppServerModule,
+        documentFilePath,
+        publicPath: distFolder,
+        inlineCriticalCss: true,
+        req,
+      }),
   });
 
   await server.register(inert);
@@ -44,7 +45,7 @@ export async function app() {
     method: 'GET',
     path: '/{filename}.{ext}',
     handler: (req: Request, res: ResponseToolkit) =>
-      res.file(`${req.params.filename}.${req.params.ext}`)
+      res.file(`${req.params.filename}.${req.params.ext}`),
   });
 
   return server;
@@ -61,9 +62,9 @@ async function run(): Promise<void> {
 // The below code is to ensure that the server is run only when not requiring the bundle.
 declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
-const moduleFilename = mainModule && mainModule.filename || '';
+const moduleFilename = (mainModule && mainModule.filename) || '';
 if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
-  run().catch(error => {
+  run().catch((error) => {
     console.error(`Error: ${error.toString()}`);
     process.exit(1);
   });

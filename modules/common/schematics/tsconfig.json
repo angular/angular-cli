@@ -10,18 +10,12 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "ES2019",
-    "types": [
-      "jasmine",
-      "node"
-    ],
+    "types": ["jasmine", "node"],
     "paths": {
       "@nguniversal/*": ["../../*"]
     }
   },
-  "exclude": [
-    "**/*.spec.ts",
-    "*/files/**/*"
-  ],
+  "exclude": ["**/*.spec.ts", "*/files/**/*"],
   "bazelOptions": {
     "suppressTsconfigOverrideWarnings": true
   }

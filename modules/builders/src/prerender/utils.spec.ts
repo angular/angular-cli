@@ -15,7 +15,6 @@ import * as guessParser from 'guess-parser';
 import { PrerenderBuilderOptions } from './models';
 import { getIndexOutputFile, getRoutes, shardArray } from './utils';
 
-
 describe('Prerender Builder Utils', () => {
   describe('#getRoutes', () => {
     const ROUTES_FILE = './routes.txt';
@@ -29,23 +28,23 @@ describe('Prerender Builder Utils', () => {
     ];
 
     const TSCONFIG_PATH = 'tsconfig.app.json';
-    const CONTEXT = {
+    const CONTEXT = ({
       workspaceRoot: '/path/to/angular/json',
       logger: new logging.NullLogger(),
-    } as unknown as BuilderContext;
+    } as unknown) as BuilderContext;
 
     let parseAngularRoutesSpy: jasmine.Spy;
     let loggerErrorSpy: jasmine.Spy;
 
     beforeEach(() => {
       spyOn(fs, 'readFileSync').and.returnValue(ROUTES_FILE_CONTENT);
-      parseAngularRoutesSpy = spyOn(guessParser, 'parseAngularRoutes')
-        .and.returnValue(GUESSED_ROUTES);
+      parseAngularRoutesSpy = spyOn(guessParser, 'parseAngularRoutes').and.returnValue(
+        GUESSED_ROUTES,
+      );
       loggerErrorSpy = spyOn(CONTEXT.logger, 'error');
     });
 
-    it('Should return the union of the routes from routes, routesFile, and the extracted routes without any parameterized routes',
-    async () => {
+    it('Should return the union of the routes from routes, routesFile, and the extracted routes without any parameterized routes', async () => {
       const options = {
         routes: ROUTES,
         routesFile: ROUTES_FILE,
@@ -53,43 +52,27 @@ describe('Prerender Builder Utils', () => {
       } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
       expect(routes).toEqual(
-        jasmine.arrayContaining([
-          '/route1',
-          '/route2',
-          '/route3',
-          '/route4',
-          '/route5',
-        ])
+        jasmine.arrayContaining(['/route1', '/route2', '/route3', '/route4', '/route5']),
       );
     });
 
     it('Should return only the given routes', async () => {
       const options = { routes: ROUTES } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
-      expect(routes).toEqual(jasmine.arrayContaining([
-        '/route3',
-        '/route4',
-      ]));
+      expect(routes).toEqual(jasmine.arrayContaining(['/route3', '/route4']));
     });
 
     it('Should return the routes from the routesFile', async () => {
       const options = { routesFile: ROUTES_FILE } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
-      expect(routes).toEqual(jasmine.arrayContaining([
-        '/route1',
-        '/route2',
-        '/route3',
-      ]));
+      expect(routes).toEqual(jasmine.arrayContaining(['/route1', '/route2', '/route3']));
     });
 
     it('Should catch errors thrown by parseAngularRoutes', async () => {
       const options = { routes: ROUTES, guessRoutes: true } as PrerenderBuilderOptions;
       parseAngularRoutesSpy.and.throwError('Test Error');
       const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
-      expect(routes).toEqual(jasmine.arrayContaining([
-        '/route3',
-        '/route4',
-      ]));
+      expect(routes).toEqual(jasmine.arrayContaining(['/route3', '/route4']));
       expect(loggerErrorSpy).toHaveBeenCalled();
     });
   });
@@ -103,7 +86,10 @@ describe('Prerender Builder Utils', () => {
       const result4 = shardArray(ARRAY, 4);
       const result5 = shardArray(ARRAY, 5);
       expect(result1).toEqual([[0, 1, 2, 3, 4]]);
-      expect(result2).toEqual([[0, 2, 4], [1, 3]]);
+      expect(result2).toEqual([
+        [0, 2, 4],
+        [1, 3],
+      ]);
       expect(result3).toEqual([[0, 3], [1, 4], [2]]);
       expect(result4).toEqual([[0, 4], [1], [2], [3]]);
       expect(result5).toEqual([[0], [1], [2], [3], [4]]);
@@ -129,8 +115,9 @@ describe('Prerender Builder Utils', () => {
     });
 
     it('Should return full file path when index is an object', () => {
-      const options =
-        { index: { input: 'src/index.html', output: 'src/home.html' } } as BrowserBuilderOptions;
+      const options = {
+        index: { input: 'src/index.html', output: 'src/home.html' },
+      } as BrowserBuilderOptions;
       expect(getIndexOutputFile(options)).toBe('src/home.html');
     });
   });

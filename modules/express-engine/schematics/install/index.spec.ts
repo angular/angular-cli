@@ -29,8 +29,8 @@ describe('Universal Schematic', () => {
 
   it('should add dependency: @nguniversal/express-engine', async () => {
     const tree = await schematicRunner
-                     .runSchematicAsync('ng-add', defaultOptions, appTree)
-                     .toPromise();
+      .runSchematicAsync('ng-add', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/\"@nguniversal\/express-engine\": \"/);
@@ -38,20 +38,18 @@ describe('Universal Schematic', () => {
 
   it('should add dependency: express', async () => {
     const tree = await schematicRunner
-                     .runSchematicAsync('ng-add', defaultOptions, appTree)
-                     .toPromise();
+      .runSchematicAsync('ng-add', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/\"express\": \"/);
   });
 
   it('should install npm dependencies', async () => {
-    await schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree)
-        .toPromise();
+    await schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise();
     expect(schematicRunner.tasks.length).toBe(1);
     expect(schematicRunner.tasks[0].name).toBe('node-package');
-    expect((schematicRunner.tasks[0].options as {command: string}).command)
-        .toBe('install');
+    expect((schematicRunner.tasks[0].options as { command: string }).command).toBe('install');
   });
 
   it(`should update 'tsconfig.server.json' files with Express main file`, async () => {
@@ -64,10 +62,7 @@ describe('Universal Schematic', () => {
       JsonParseMode.Loose,
     ) as any;
 
-    expect(files).toEqual([
-      'src/main.server.ts',
-      'server.ts',
-    ]);
+    expect(files).toEqual(['src/main.server.ts', 'server.ts']);
   });
 
   it(`should add export to main file in 'server.ts'`, async () => {
@@ -85,7 +80,6 @@ describe('Universal Schematic', () => {
       .toPromise();
 
     const content = tree.readContent('/projects/test-app/server.ts');
-    expect(content)
-      .toContain(`const distFolder = join(process.cwd(), 'dist/test-app/browser');`);
+    expect(content).toContain(`const distFolder = join(process.cwd(), 'dist/test-app/browser');`);
   });
 });

@@ -10,55 +10,50 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ServerModule } from '@angular/platform-server';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
-@Component({selector: 'root', template: 'some template'})
-export class MockComponent {
-}
+@Component({ selector: 'root', template: 'some template' })
+export class MockComponent {}
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [MockComponent],
   bootstrap: [MockComponent],
 })
-export class MockServerModule {
-}
+export class MockServerModule {}
 
-@Component({selector: 'root', template: `url:{{_req.url}}`})
+@Component({ selector: 'root', template: `url:{{ _req.url }}` })
 export class RequestComponent {
   constructor(@Inject(REQUEST) public readonly _req: any) {}
 }
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [RequestComponent],
   bootstrap: [RequestComponent],
 })
-export class RequestServerModule {
-}
+export class RequestServerModule {}
 
-@Component({selector: 'root', template: `statusCode:{{_res.statusCode}}`})
+@Component({ selector: 'root', template: `statusCode:{{ _res.statusCode }}` })
 export class ResponseComponent {
   constructor(@Inject(RESPONSE) public readonly _res: any) {}
 }
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [ResponseComponent],
   bootstrap: [ResponseComponent],
 })
-export class ResponseServerModule {
-}
+export class ResponseServerModule {}
 
 export const SOME_TOKEN = new InjectionToken<string>('SOME_TOKEN');
 
-@Component({selector: 'root', template: `message:{{_someToken.message}}`})
+@Component({ selector: 'root', template: `message:{{ _someToken.message }}` })
 export class TokenComponent {
   constructor(@Inject(SOME_TOKEN) public readonly _someToken: any) {}
 }
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [TokenComponent],
   bootstrap: [TokenComponent],
 })
-export class TokenServerModule {
-}
+export class TokenServerModule {}

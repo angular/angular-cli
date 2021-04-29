@@ -17,14 +17,7 @@ import * as browserSync from 'browser-sync';
 import { existsSync } from 'fs';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { join, resolve as pathResolve } from 'path';
-import {
-  EMPTY,
-  Observable,
-  combineLatest,
-  from,
-  of,
-  zip,
-} from 'rxjs';
+import { EMPTY, Observable, combineLatest, from, of, zip } from 'rxjs';
 import {
   catchError,
   concatMap,
@@ -47,9 +40,8 @@ import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from 
 /** Log messages to ignore and not rely to the logger */
 const IGNORED_STDOUT_MESSAGES = [
   'server listening on',
-  'Angular is running in development mode. Call enableProdMode() to enable production mode.'
+  'Angular is running in development mode. Call enableProdMode() to enable production mode.',
 ];
-
 
 export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
 export type SSRDevServerBuilderOutput = BuilderOutput & {
@@ -62,7 +54,8 @@ export function execute(
 ): Observable<SSRDevServerBuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
-  const getBaseUrl = (bs: browserSync.BrowserSyncInstance) => `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
+  const getBaseUrl = (bs: browserSync.BrowserSyncInstance) =>
+    `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
   const browserTargetRun = context.scheduleTarget(browserTarget, {
     serviceWorker: false,
     watch: true,
@@ -85,11 +78,7 @@ export function execute(
   ****************************************************************************************
  `);
 
-  return zip(
-    browserTargetRun,
-    serverTargetRun,
-    getAvailablePort(),
-  ).pipe(
+  return zip(browserTargetRun, serverTargetRun, getAvailablePort()).pipe(
     switchMap(([br, sr, nodeServerPort]) => {
       return combineLatest([br.output, sr.output]).pipe(
         // This is needed so that if both server and browser emit close to each other
@@ -102,28 +91,33 @@ export function execute(
 
           return startNodeServer(s, nodeServerPort, context.logger, !!options.inspect).pipe(
             mapTo([b, s]),
-            catchError(err => {
+            catchError((err) => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
 
               return EMPTY;
             }),
           );
         }),
-        map(([b, s]) => ([
-          {
-            success: b.success && s.success,
-            error: b.error || s.error,
-          },
-          nodeServerPort,
-        ] as [SSRDevServerBuilderOutput, number])),
+        map(
+          ([b, s]) =>
+            [
+              {
+                success: b.success && s.success,
+                error: b.error || s.error,
+              },
+              nodeServerPort,
+            ] as [SSRDevServerBuilderOutput, number],
+        ),
         tap(([builderOutput]) => {
           if (builderOutput.success) {
             context.logger.info('\nCompiled successfully.');
           }
         }),
-        debounce(([builderOutput]) => builderOutput.success && !options.inspect
-          ? waitUntilServerIsListening(nodeServerPort)
-          : EMPTY)
+        debounce(([builderOutput]) =>
+          builderOutput.success && !options.inspect
+            ? waitUntilServerIsListening(nodeServerPort)
+            : EMPTY,
+        ),
       );
     }),
     concatMap(([builderOutput, nodeServerPort]) => {
@@ -136,36 +130,40 @@ export function execute(
 
         return of(builderOutput);
       } else {
-        return from(initBrowserSync(bsInstance, nodeServerPort, options, context))
-          .pipe(
-            tap(bs => {
-              const baseUrl = getBaseUrl(bs);
-              context.logger.info(tags.oneLine`
+        return from(initBrowserSync(bsInstance, nodeServerPort, options, context)).pipe(
+          tap((bs) => {
+            const baseUrl = getBaseUrl(bs);
+            context.logger.info(tags.oneLine`
                 **
                 Angular Universal Live Development Server is listening on ${baseUrl},
                 open your browser on ${baseUrl}
                 **
               `);
-            }),
-            mapTo(builderOutput),
-          );
+          }),
+          mapTo(builderOutput),
+        );
       }
     }),
-    map(builderOutput => ({
-      success: builderOutput.success,
-      error: builderOutput.error,
-      baseUrl: bsInstance && getBaseUrl(bsInstance),
-    } as SSRDevServerBuilderOutput)),
+    map(
+      (builderOutput) =>
+        ({
+          success: builderOutput.success,
+          error: builderOutput.error,
+          baseUrl: bsInstance && getBaseUrl(bsInstance),
+        } as SSRDevServerBuilderOutput),
+    ),
     finalize(() => {
       if (bsInstance) {
         bsInstance.exit();
         bsInstance.cleanup();
       }
     }),
-    catchError(error => of({
-      success: false,
-      error: mapErrorToMessage(error),
-    })),
+    catchError((error) =>
+      of({
+        success: false,
+        error: mapErrorToMessage(error),
+      }),
+    ),
   );
 }
 
@@ -184,23 +182,22 @@ function startNodeServer(
     args.unshift('--inspect-brk');
   }
 
-  return of(null)
-    .pipe(
-      delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-      switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
-      tap(({ stderr, stdout }) => {
-        if (stderr) {
-          logger.error(stderr);
-        }
+  return of(null).pipe(
+    delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
+    switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
+    tap(({ stderr, stdout }) => {
+      if (stderr) {
+        logger.error(stderr);
+      }
 
-        if (stdout && !IGNORED_STDOUT_MESSAGES.some(x => stdout.includes(x))) {
-          logger.info(stdout);
-        }
-      }),
-      ignoreElements(),
-      // Emit a signal after the process has been started
-      startWith(undefined),
-    );
+      if (stdout && !IGNORED_STDOUT_MESSAGES.some((x) => stdout.includes(x))) {
+        logger.info(stdout);
+      }
+    }),
+    ignoreElements(),
+    // Emit a signal after the process has been started
+    startWith(undefined),
+  );
 }
 
 async function initBrowserSync(
@@ -214,20 +211,20 @@ async function initBrowserSync(
   }
 
   const { port: browserSyncPort, open, host, publicHost, proxyConfig } = options;
-  const bsPort = browserSyncPort || await getAvailablePort();
+  const bsPort = browserSyncPort || (await getAvailablePort());
   const bsOptions: browserSync.Options = {
     proxy: {
       target: `localhost:${nodeServerPort}`,
       proxyOptions: {
-        xfwd: true
+        xfwd: true,
       },
       proxyRes: [
-        proxyRes => {
+        (proxyRes) => {
           if ('headers' in proxyRes) {
             proxyRes.headers['cache-control'] = undefined;
           }
         },
-      ]
+      ],
       // proxyOptions is not in the typings
     } as browserSync.ProxyOptions & { proxyOptions: { xfwd: boolean } },
     host,
@@ -241,9 +238,10 @@ async function initBrowserSync(
     https: getSslConfig(context.workspaceRoot, options),
   };
 
-  const publicHostNormalized = publicHost && publicHost.endsWith('/')
-    ? publicHost.substring(0, publicHost.length - 1)
-    : publicHost;
+  const publicHostNormalized =
+    publicHost && publicHost.endsWith('/')
+      ? publicHost.substring(0, publicHost.length - 1)
+      : publicHost;
 
   if (publicHostNormalized) {
     const { protocol, hostname, port, pathname } = url.parse(publicHostNormalized);
@@ -269,8 +267,8 @@ async function initBrowserSync(
     // ex: http://testinghost.com/ssr -> http://localhost:4200 which will result in a 404.
     if (hasPathname) {
       // Remove leading slash
-      bsOptions.scriptPath = p => p.substring(1),
-        bsOptions.middleware = [
+      (bsOptions.scriptPath = (p) => p.substring(1)),
+        (bsOptions.middleware = [
           createProxyMiddleware(defaultSocketIoPath, {
             target: url.format({
               protocol: 'http',
@@ -281,7 +279,7 @@ async function initBrowserSync(
             ws: true,
             logLevel: 'silent',
           }) as any,
-        ];
+        ]);
     }
   }
 
@@ -336,10 +334,7 @@ function getSslConfig(
   return ssl;
 }
 
-function getProxyConfig(
-  root: string,
-  proxyConfig: string,
-): browserSync.MiddlewareHandler[] {
+function getProxyConfig(root: string, proxyConfig: string): browserSync.MiddlewareHandler[] {
   const proxyPath = pathResolve(root, proxyConfig);
   let proxySettings: any;
   try {
@@ -354,7 +349,7 @@ function getProxyConfig(
 
   const proxies = Array.isArray(proxySettings) ? proxySettings : [proxySettings];
 
-  return proxies.map(proxy => {
+  return proxies.map((proxy) => {
     const keys = Object.keys(proxy);
     const context = keys[0];
 

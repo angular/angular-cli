@@ -10,11 +10,7 @@ import { PokedexComponent } from './pokedex.component';
 import { HomepageComponent } from './homepage.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    PokedexComponent,
-    HomepageComponent
-  ],
+  declarations: [AppComponent, PokedexComponent, HomepageComponent],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
@@ -23,11 +19,9 @@ import { HomepageComponent } from './homepage.component';
     // The HttpClientInMemoryWebApiModule module intercepts HTTP requests
     // and returns simulated server responses.
 
-    HttpClientInMemoryWebApiModule.forRoot(
-      PokemonService, { dataEncapsulation: false }
-    )
+    HttpClientInMemoryWebApiModule.forRoot(PokemonService, { dataEncapsulation: false }),
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

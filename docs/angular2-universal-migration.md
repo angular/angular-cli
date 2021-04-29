@@ -10,7 +10,7 @@ npm i --S @angular/platform-server @angular/animations
 
 As for your individual root files, there actually aren't many changes you'll need to do!
 
-## Server.ts 
+## Server.ts
 
 When it comes the underlying express-engine, things will remain fairly similar except that now, you're going to be instead doing `import { ngExpressEngine } from '@nguniversal/express-engine';` [More detailed information on the express-engine here](https://github.com/angular/universal/tree/master/modules/express-engine)
 
@@ -24,24 +24,26 @@ import 'reflect-metadata';
 As for your main NgModule's, one major thing you'll notice is that we no longer use `UniversalModule`.
 
 ## Browser-app.module.ts
+
 So UniversalModule has now been replaced with `BrowserModule`, and notice we pass in an `appId` that we want to make sure is the same name as the one included on the app.server.ts file.
 
 ```typescript
 import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
-	bootstrap: [ AppComponent ],
-	imports: [
-    BrowserModule.withServerTransition({ 
-      appId: 'my-app-id' // <-- 
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule.withServerTransition({
+      appId: 'my-app-id', // <--
     }),
-    AppModule
-	]
+    AppModule,
+  ],
 })
 export class BrowserAppModule {}
 ```
 
 ## Server-app.module.ts
+
 Notice here we import not only a BrowserModule, but a ServerModule as well.
 
 ```typescript
@@ -52,13 +54,13 @@ import { ServerModule } from '@angular/platform-server';
   bootstrap: [AppComponent],
   imports: [
     BrowserModule.withServerTransition({
-      appId: 'my-app-id' // <-- same name
+      appId: 'my-app-id', // <-- same name
     }),
     ServerModule, // <--
-    AppModule
-  ]
+    AppModule,
+  ],
 })
-export class ServerAppModule { }
+export class ServerAppModule {}
 ```
 
 ## Angular 4 / platform-server example

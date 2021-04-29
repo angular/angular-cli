@@ -25,8 +25,8 @@ describe('Serve SSR Builder', () => {
   let runs: BuilderRun[] = [];
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-  beforeAll(() => jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000);
-  afterAll(() => jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout);
+  beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000));
+  afterAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout));
 
   beforeEach(async () => {
     await host.initialize().toPromise();
@@ -34,7 +34,7 @@ describe('Serve SSR Builder', () => {
   });
 
   afterEach(async () => {
-    await Promise.all(runs.map(r => r.stop()));
+    await Promise.all(runs.map((r) => r.stop()));
     browserSync.reset();
     await host.restore().toPromise();
     runs = [];
@@ -61,24 +61,26 @@ describe('Serve SSR Builder', () => {
           this.headers = this.request.headers;
         }
       }
-      `
+      `,
     });
 
     const run = await architect.scheduleTarget(target);
     runs.push(run);
-    const output = await run.result as SSRDevServerBuilderOutput;
+    const output = (await run.result) as SSRDevServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(output.baseUrl).toBe('http://localhost:4200');
 
-    const response = await from(fetch(output.baseUrl as string)).pipe(
-      retryWhen(err => err.pipe(
-        mergeMap((error, attempts) => {
-          return attempts > 10 || error.code !== 'ECONNRESET'
-            ? throwError(error)
-            : timer(200);
-        }),
-      )),
-    ).toPromise() as any;
+    const response = (await from(fetch(output.baseUrl as string))
+      .pipe(
+        retryWhen((err) =>
+          err.pipe(
+            mergeMap((error, attempts) => {
+              return attempts > 10 || error.code !== 'ECONNRESET' ? throwError(error) : timer(200);
+            }),
+          ),
+        ),
+      )
+      .toPromise()) as any;
 
     expect(await response.text()).toContain(`"x-forwarded-host": "localhost:4200"`);
   });
@@ -86,7 +88,7 @@ describe('Serve SSR Builder', () => {
   it('works with port 0', async () => {
     const run = await architect.scheduleTarget(target, { port: 0 });
     runs.push(run);
-    const output = await run.result as SSRDevServerBuilderOutput;
+    const output = (await run.result) as SSRDevServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(output.baseUrl).not.toContain('4200');
   });
@@ -94,7 +96,7 @@ describe('Serve SSR Builder', () => {
   it('works with SSL', async () => {
     const run = await architect.scheduleTarget(target, { ssl: true });
     runs.push(run);
-    const output = await run.result as SSRDevServerBuilderOutput;
+    const output = (await run.result) as SSRDevServerBuilderOutput;
     expect(output.success).toBe(true);
     expect(output.baseUrl).toBe('https://localhost:4200');
 
@@ -151,22 +153,24 @@ describe('Serve SSR Builder', () => {
     });
 
     try {
-      await new Promise<void>(resolve => proxyServer.listen(0, '127.0.0.1', resolve));
+      await new Promise<void>((resolve) => proxyServer.listen(0, '127.0.0.1', resolve));
       const proxyAddress = proxyServer.address() as import('net').AddressInfo;
 
       host.writeMultipleFiles({
         'proxy.config.json': `{ "/api/*": { "logLevel": "debug","target": "http://127.0.0.1:${proxyAddress.port}" } }`,
       });
 
-      const run = await architect.scheduleTarget(target, { port: 7001, proxyConfig: 'proxy.config.json' });
+      const run = await architect.scheduleTarget(target, {
+        port: 7001,
+        proxyConfig: 'proxy.config.json',
+      });
       runs.push(run);
 
-      const output = await run.result as SSRDevServerBuilderOutput;
+      const output = (await run.result) as SSRDevServerBuilderOutput;
       expect(output.success).toBe(true);
       expect(output.baseUrl).toBe('http://localhost:7001');
       const response = await fetch('http://localhost:7001/api/test');
       expect(await response?.text()).toContain('TEST_API_RETURN');
-
     } finally {
       await new Promise<void>((resolve) => proxyServer.close(() => resolve()));
     }

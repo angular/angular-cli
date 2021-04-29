@@ -13,9 +13,12 @@ export function app() {
   const distFolder = join(__dirname, '../browser');
 
   // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-  server.engine('html', ngExpressEngine({
-    bootstrap: AppServerModule,
-  }));
+  server.engine(
+    'html',
+    ngExpressEngine({
+      bootstrap: AppServerModule,
+    }),
+  );
 
   server.set('view engine', 'html');
   server.set('views', distFolder);
@@ -23,9 +26,12 @@ export function app() {
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
   // Serve static files from /browser
-  server.get('*.*', express.static(distFolder, {
-    maxAge: '1y'
-  }));
+  server.get(
+    '*.*',
+    express.static(distFolder, {
+      maxAge: '1y',
+    }),
+  );
 
   // All regular routes use the Universal engine
   server.get('*', (req, res) => {

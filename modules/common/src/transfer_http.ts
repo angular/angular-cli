@@ -13,14 +13,14 @@ import {
   HttpInterceptor,
   HttpParams,
   HttpRequest,
-  HttpResponse
+  HttpResponse,
 } from '@angular/common/http';
 import { ApplicationRef, Injectable, NgModule } from '@angular/core';
 import {
   BrowserTransferStateModule,
   StateKey,
   TransferState,
-  makeStateKey
+  makeStateKey,
 } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { filter, take, tap } from 'rxjs/operators';
@@ -47,17 +47,21 @@ function getHeadersMap(headers: HttpHeaders): Record<string, string[]> {
 
 @Injectable()
 export class TransferHttpCacheInterceptor implements HttpInterceptor {
-
   private isCacheActive = true;
 
   private invalidateCacheEntry(url: string) {
-    Object.keys(this.transferState['store'])
-      .forEach(key => key.includes(url) ? this.transferState.remove(makeStateKey(key)) : null);
+    Object.keys(this.transferState['store']).forEach((key) =>
+      key.includes(url) ? this.transferState.remove(makeStateKey(key)) : null,
+    );
   }
 
   private makeCacheKey(method: string, url: string, params: HttpParams): StateKey<string> {
     // make the params encoded same as a url so it's easy to identify
-    const encodedParams = params.keys().sort().map(k => `${k}=${params.getAll(k)}`).join('&');
+    const encodedParams = params
+      .keys()
+      .sort()
+      .map((k) => `${k}=${params.getAll(k)}`)
+      .join('&');
     const key = (method === 'GET' ? 'G.' : 'H.') + url + '?' + encodedParams;
 
     return makeStateKey<TransferHttpResponse>(key);
@@ -70,9 +74,12 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     appRef.isStable
       .pipe(
         filter((isStable: boolean) => isStable),
-        take(1)
-      ).toPromise()
-      .then(() => { this.isCacheActive = false; });
+        take(1),
+      )
+      .toPromise()
+      .then(() => {
+        this.isCacheActive = false;
+      });
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -93,31 +100,32 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
       // Request found in cache. Respond using it.
       const response = this.transferState.get<TransferHttpResponse>(storeKey, {});
 
-      return observableOf(new HttpResponse<any>({
-        body: response.body,
-        headers: new HttpHeaders(response.headers),
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url,
-      }));
+      return observableOf(
+        new HttpResponse<any>({
+          body: response.body,
+          headers: new HttpHeaders(response.headers),
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+        }),
+      );
     } else {
       // Request not found in cache. Make the request and cache it.
       const httpEvent = next.handle(req);
 
-      return httpEvent
-        .pipe(
-          tap((event: HttpEvent<unknown>) => {
-            if (event instanceof HttpResponse) {
-              this.transferState.set<TransferHttpResponse>(storeKey, {
-                body: event.body,
-                headers: getHeadersMap(event.headers),
-                status: event.status,
-                statusText: event.statusText,
-                url: event.url || '',
-              });
-            }
-          })
-        );
+      return httpEvent.pipe(
+        tap((event: HttpEvent<unknown>) => {
+          if (event instanceof HttpResponse) {
+            this.transferState.set<TransferHttpResponse>(storeKey, {
+              body: event.body,
+              headers: getHeadersMap(event.headers),
+              status: event.status,
+              statusText: event.statusText,
+              url: event.url || '',
+            });
+          }
+        }),
+      );
     }
   }
 }
@@ -130,7 +138,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
   imports: [BrowserTransferStateModule],
   providers: [
     TransferHttpCacheInterceptor,
-    {provide: HTTP_INTERCEPTORS, useExisting: TransferHttpCacheInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useExisting: TransferHttpCacheInterceptor, multi: true },
   ],
 })
 export class TransferHttpCacheModule {}

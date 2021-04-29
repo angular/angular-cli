@@ -3,10 +3,7 @@
 // with AOT compilation, NGC needs the "ngsummary.json" files.
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "es2015"
-    ],
+    "lib": ["dom", "es2015"],
     "experimentalDecorators": true,
     "types": [],
     "skipLibCheck": true,
@@ -17,9 +14,7 @@
     "enableIvy": false,
     "enableSummariesForJit": true
   },
-  "include": [
-    "node_modules/@angular/**/*"
-  ],
+  "include": ["node_modules/@angular/**/*"],
   "exclude": [
     "node_modules/@angular/bazel/**",
     "node_modules/@angular/core/schematics/**",
@@ -29,4 +24,3 @@
     "node_modules/@angular/common/upgrade*"
   ]
 }
-

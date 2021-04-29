@@ -41,18 +41,17 @@ primitive version of both `window` and `location` exist through the `DOCUMENT` o
 
 ```ts
 // example.service.ts
-import {Injectable, Inject} from '@angular/core';
-import {DOCUMENT} from '@angular/common';
+import { Injectable, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable()
 export class ExampleService {
-  constructor(@Inject(DOCUMENT) private _doc: Document) {
-  }
+  constructor(@Inject(DOCUMENT) private _doc: Document) {}
 
   getWindow(): Window | null {
     return this._doc.defaultView;
   }
-  
+
   getLocation(): Location {
     return this._doc.location;
   }
@@ -64,8 +63,8 @@ export class ExampleService {
 ```
 
 Please be judicious about using these references, and lower your expectations about their capabilities. `localStorage`
-is one frequently-requested API that won't work how you want it to out of the box. If you need to write your own library 
-components, please consider using this method to provide similar functionality on the server (this is what Angular CDK 
+is one frequently-requested API that won't work how you want it to out of the box. If you need to write your own library
+components, please consider using this method to provide similar functionality on the server (this is what Angular CDK
 and Material do).
 
 #### Strategy 2: Guards
@@ -80,12 +79,12 @@ You may read online and elsewhere that the recommended approach is to use `isPla
 code branches in your application code. This not only increases the size of your application unnecessarily,
 but it also adds complexity that then has to be maintained. By separating code into separate platform-specific
 modules and implementations, your base code can remain about business logic, and platform-specific exceptions
-are handled as they should be: on a case-by-case abstraction basis. This can be accomplished using Angular's Dependency 
+are handled as they should be: on a case-by-case abstraction basis. This can be accomplished using Angular's Dependency
 Injection (DI) in order to remove the offending code and drop in a replacement at runtime. Here's an example:
 
 ```ts
 // window-service.ts
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class WindowService {
@@ -97,14 +96,14 @@ export class WindowService {
 
 ```ts
 // server-window.service.ts
-import {Injectable} from '@angular/core';
-import {WindowService} from './window.service';
+import { Injectable } from '@angular/core';
+import { WindowService } from './window.service';
 
 @Injectable()
 export class ServerWindowService extends WindowService {
   getWidth(): number {
     return 0;
-  } 
+  }
 }
 ```
 
@@ -131,15 +130,14 @@ to drop in for the library component. Here's an example:
 
 ```ts
 // example.component.ts
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'example-component',
-  template: `<library-component></library-component>` // this is provided by a third-party lib
-                                                      // that causes issues rendering on Universal
+  template: `<library-component></library-component>`, // this is provided by a third-party lib
+  // that causes issues rendering on Universal
 })
-export class ExampleComponent {
-}
+export class ExampleComponent {}
 ```
 
 ```ts
@@ -165,28 +163,26 @@ import {AppModule} from './app.module';
 
 ```ts
 // library-shim.component.ts
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'library-component',
-  template: ''
+  template: '',
 })
-export class LibraryShimComponent {
-}
+export class LibraryShimComponent {}
 ```
 
 ```ts
 // server.app.module.ts
-import {NgModule} from '@angular/core';
-import {LibraryShimComponent} from './library-shim.component';
-import {AppModule} from './app.module';
+import { NgModule } from '@angular/core';
+import { LibraryShimComponent } from './library-shim.component';
+import { AppModule } from './app.module';
 
 @NgModule({
   imports: [AppModule],
   declarations: [LibraryShimComponent],
 })
-export class ServerAppModule {
-}
+export class ServerAppModule {}
 ```
 
 #### Strategy 3: Shims
@@ -204,7 +200,7 @@ global['window'] = {
 This can be applied to any undefined element. Please be careful when you do this, as playing with the global
 scope is generally considered an anti-pattern.
 
-> Fun fact: a shim is a patch for functionality that will never be supported on a given platform. A 
+> Fun fact: a shim is a patch for functionality that will never be supported on a given platform. A
 > polyfill is a patch for functionality that is planned to be supported, or is supported on newer versions
 
 ## Application is slow, or worse, won't render
@@ -219,7 +215,7 @@ it's in at that time is returned to the user.
 
 This means that if there is a process, like a microtask, that takes up ticks to complete, or a long-standing
 HTTP request, the rendering process will not complete, or will take longer. Macrotasks include calls to globals
-like `setTimeout` and `setInterval`, and `Observables`. Calling these without cancelling them, or letting them run 
+like `setTimeout` and `setInterval`, and `Observables`. Calling these without cancelling them, or letting them run
 longer than needed on the server could result in suboptimal rendering.
 
 > It may be worth brushing up on the JavaScript event loop and learning the difference between microtasks

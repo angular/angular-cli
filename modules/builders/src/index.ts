@@ -12,10 +12,5 @@ export {
   SSRDevServerBuilderOutput,
 } from './ssr-dev-server';
 
-export {
-  execute as executePrerenderBuilder,
-} from './prerender';
-export {
-  PrerenderBuilderOptions,
-  PrerenderBuilderOutput,
-} from './prerender/models';
+export { execute as executePrerenderBuilder } from './prerender';
+export { PrerenderBuilderOptions, PrerenderBuilderOutput } from './prerender/models';

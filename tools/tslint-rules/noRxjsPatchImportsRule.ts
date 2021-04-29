@@ -16,7 +16,6 @@ export class Rule extends Lint.Rules.AbstractRule {
 }
 
 class Walker extends Lint.RuleWalker {
-
   /** Whether the walker should check the current source file. */
   private _enabled: boolean;
 
@@ -30,7 +29,7 @@ class Walker extends Lint.RuleWalker {
     const relativeFilePath = path.relative(process.cwd(), sourceFile.fileName);
 
     // Whether the file should be checked at all.
-    this._enabled = fileGlobs.some(p => minimatch(relativeFilePath, p));
+    this._enabled = fileGlobs.some((p) => minimatch(relativeFilePath, p));
   }
 
   visitImportDeclaration(node: ts.ImportDeclaration) {

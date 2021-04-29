@@ -28,9 +28,10 @@ export async function getRoutes(
   if (options.routesFile) {
     const routesFilePath = path.join(workspaceRoot, options.routesFile);
     routes = routes.concat(
-      fs.readFileSync(routesFilePath, 'utf8')
+      fs
+        .readFileSync(routesFilePath, 'utf8')
         .split(/\r?\n/)
-        .filter(v => !!v)
+        .filter((v) => !!v),
     );
   }
 
@@ -38,15 +39,15 @@ export async function getRoutes(
     try {
       routes = routes.concat(
         parseAngularRoutes(path.join(workspaceRoot, tsConfigPath))
-          .map(routeObj => routeObj.path)
-          .filter(route => !route.includes('*') && !route.includes(':'))
+          .map((routeObj) => routeObj.path)
+          .filter((route) => !route.includes('*') && !route.includes(':')),
       );
     } catch (e) {
       logger.error('Unable to extract routes from application.', e);
     }
   }
 
-  routes = routes.map(r => r === '' ? '/' : r);
+  routes = routes.map((r) => (r === '' ? '/' : r));
 
   return [...new Set(routes)];
 }
@@ -55,13 +56,11 @@ export async function getRoutes(
  * Evenly shards items in an array.
  * e.g. shardArray([1, 2, 3, 4], 2) => [[1, 2], [3, 4]]
  */
-export function shardArray<T>(items: T[], maxNoOfShards = (os.cpus().length - 1) || 1): T[][] {
+export function shardArray<T>(items: T[], maxNoOfShards = os.cpus().length - 1 || 1): T[][] {
   const shardedArray = [];
   const numShards = Math.min(maxNoOfShards, items.length);
   for (let i = 0; i < numShards; i++) {
-    shardedArray.push(
-      items.filter((_, index) => index % numShards === i)
-    );
+    shardedArray.push(items.filter((_, index) => index % numShards === i));
   }
 
   return shardedArray;

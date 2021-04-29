@@ -27,7 +27,7 @@ export interface SocketEngineRenderOptions extends RenderOptions {
  */
 export interface SocketEngineResponse {
   id: number;
-  html: string|null;
+  html: string | null;
   error?: Error;
 }
 
@@ -38,31 +38,32 @@ export function startSocketEngine(
   moduleOrFactory: Type<{}> | NgModuleFactory<{}>,
   providers: StaticProvider[] = [],
   host = 'localhost',
-  port = 9090
+  port = 9090,
 ): Promise<SocketEngineServer> {
   return new Promise((resolve, _reject) => {
     const engine = new CommonEngine(moduleOrFactory, providers);
 
-    const server = net.createServer(socket => {
-      socket.on('data', async buff => {
+    const server = net.createServer((socket) => {
+      socket.on('data', async (buff) => {
         const message = buff.toString();
         const renderOptions = JSON.parse(message) as SocketEngineRenderOptions;
         try {
           const html = await engine.render(renderOptions);
-          socket.write(JSON.stringify({html, id: renderOptions.id} as SocketEngineResponse));
+          socket.write(JSON.stringify({ html, id: renderOptions.id } as SocketEngineResponse));
         } catch (error) {
           // send the error down to the client then rethrow it
-          socket.write(JSON.stringify({
-            html: null,
-            id: renderOptions.id,
-            error: error.toString(),
-          } as SocketEngineResponse));
+          socket.write(
+            JSON.stringify({
+              html: null,
+              id: renderOptions.id,
+              error: error.toString(),
+            } as SocketEngineResponse),
+          );
         }
       });
     });
 
     server.listen(port, host);
-    resolve({close: () => server.close()});
+    resolve({ close: () => server.close() });
   });
 }
-

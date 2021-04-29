@@ -9,13 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
-import {
-  Path,
-  getSystemPath,
-  normalize,
-  schema,
-  workspaces,
-} from '@angular-devkit/core';
+import { Path, getSystemPath, normalize, schema, workspaces } from '@angular-devkit/core';
 import { existsSync, mkdirSync, symlinkSync } from 'fs';
 import * as path from 'path';
 import { cp } from 'shelljs';
@@ -26,21 +20,17 @@ const templateRoot = path.join(
   `hello-world-app-${Math.random().toString(36).slice(2)}`,
 );
 
-const testingAppSrc = path.dirname(require.resolve(
-  `nguniversal/modules/builders/testing/hello-world-app/package.json`,
-));
-
-cp(
-  '-ru',
-  testingAppSrc,
-  templateRoot,
+const testingAppSrc = path.dirname(
+  require.resolve(`nguniversal/modules/builders/testing/hello-world-app/package.json`),
 );
+
+cp('-ru', testingAppSrc, templateRoot);
 
 // link node packages
 symlinkSync(
   path.join(require.resolve('npm/node_modules/@angular/core/package.json'), '../../../'),
   path.join(process.env.TEST_TMPDIR as string, 'node_modules'),
-  'junction'
+  'junction',
 );
 
 export const workspaceRoot = normalize(templateRoot);
@@ -66,7 +56,9 @@ export async function createArchitect(root: Path) {
     cp(
       '-ru',
       path.join(
-        require.resolve('nguniversal/modules/express-engine/npm_package/package.json'), '../'),
+        require.resolve('nguniversal/modules/express-engine/npm_package/package.json'),
+        '../',
+      ),
       ngUniversalExpressNodePackages,
     );
   }
@@ -75,9 +67,8 @@ export async function createArchitect(root: Path) {
   if (!existsSync(ngUniveralCommonmNodePackages)) {
     cp(
       '-ru',
-      path.join(
-        require.resolve('nguniversal/modules/common/npm_package/package.json'), '../'),
-        ngUniveralCommonmNodePackages,
+      path.join(require.resolve('nguniversal/modules/common/npm_package/package.json'), '../'),
+      ngUniveralCommonmNodePackages,
     );
   }
 

@@ -3,16 +3,11 @@
 // node_modules/@angular/core/core.ngsummary.json
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "es2015"
-    ],
+    "lib": ["dom", "es2015"],
     "experimentalDecorators": true,
     "types": []
   },
-  "include": [
-    "node_modules/@angular/**/*"
-  ],
+  "include": ["node_modules/@angular/**/*"],
   "exclude": [
     "node_modules/@angular/bazel/**",
     "node_modules/@angular/compiler-cli/**",

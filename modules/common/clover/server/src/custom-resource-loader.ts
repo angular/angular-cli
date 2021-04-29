@@ -33,7 +33,7 @@ export class CustomResourceLoader extends ResourceLoader {
       return filePromise;
     }
 
-    const promise = promises.readFile(path).then(content => {
+    const promise = promises.readFile(path).then((content) => {
       this.fileCache.set(path, content);
 
       return content;

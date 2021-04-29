@@ -39,26 +39,31 @@ export async function getOutputPath(
   const project = await getProject(host, projectName);
   const serverTarget = project.targets.get(target);
   if (!serverTarget || !serverTarget.options) {
-    throw new SchematicsException
-      (`Cannot find 'options' for ${projectName} ${target} target.`);
+    throw new SchematicsException(`Cannot find 'options' for ${projectName} ${target} target.`);
   }
 
   const { outputPath } = serverTarget.options;
   if (typeof outputPath !== 'string') {
-    throw new SchematicsException
-      (`outputPath for ${projectName} ${target} target is not a string.`);
+    throw new SchematicsException(
+      `outputPath for ${projectName} ${target} target is not a string.`,
+    );
   }
 
   return outputPath;
 }
 
-export function findImport(sourceFile: ts.SourceFile,
-                           moduleName: string,
-                           symbolName: string): ts.NamedImports | null {
+export function findImport(
+  sourceFile: ts.SourceFile,
+  moduleName: string,
+  symbolName: string,
+): ts.NamedImports | null {
   // Only look through the top-level imports.
   for (const node of sourceFile.statements) {
-    if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier) ||
-      node.moduleSpecifier.text !== moduleName) {
+    if (
+      !ts.isImportDeclaration(node) ||
+      !ts.isStringLiteral(node.moduleSpecifier) ||
+      node.moduleSpecifier.text !== moduleName
+    ) {
       continue;
     }
 
@@ -68,7 +73,7 @@ export function findImport(sourceFile: ts.SourceFile,
       continue;
     }
 
-    if (namedBindings.elements.some(element => element.name.text === symbolName)) {
+    if (namedBindings.elements.some((element) => element.name.text === symbolName)) {
       return namedBindings;
     }
   }
@@ -77,14 +82,16 @@ export function findImport(sourceFile: ts.SourceFile,
 }
 
 export type Import = {
-  name: string,
-  importModule: string,
-  node: ts.ImportDeclaration
+  name: string;
+  importModule: string;
+  node: ts.ImportDeclaration;
 };
 
 /** Gets import information about the specified identifier by using the Type checker. */
-export function getImportOfIdentifier(typeChecker: ts.TypeChecker,
-                                      node: ts.Identifier): Import | null {
+export function getImportOfIdentifier(
+  typeChecker: ts.TypeChecker,
+  node: ts.Identifier,
+): Import | null {
   const symbol = typeChecker.getSymbolAtLocation(node);
 
   if (!symbol || !symbol.declarations.length) {
@@ -107,7 +114,7 @@ export function getImportOfIdentifier(typeChecker: ts.TypeChecker,
     // Handles aliased imports: e.g. "import {Component as myComp} from ...";
     name: decl.propertyName ? decl.propertyName.text : decl.name.text,
     importModule: importDecl.moduleSpecifier.text,
-    node: importDecl
+    node: importDecl,
   };
 }
 
@@ -115,9 +122,15 @@ export function addInitialNavigation(node: ts.CallExpression): ts.CallExpression
   const existingOptions = node.arguments[1] as ts.ObjectLiteralExpression | undefined;
 
   // If the user has explicitly set initialNavigation, we respect that
-  if (existingOptions && existingOptions.properties.some(exp =>
-    ts.isPropertyAssignment(exp) && ts.isIdentifier(exp.name) &&
-    exp.name.text === 'initialNavigation')) {
+  if (
+    existingOptions &&
+    existingOptions.properties.some(
+      (exp) =>
+        ts.isPropertyAssignment(exp) &&
+        ts.isIdentifier(exp.name) &&
+        exp.name.text === 'initialNavigation',
+    )
+  ) {
     return node;
   }
 
@@ -127,13 +140,15 @@ export function addInitialNavigation(node: ts.CallExpression): ts.CallExpression
   // tslint:disable-next-line: no-any
   (enabledLiteral as any).singleQuote = true;
 
-  const initialNavigationProperty
-    = ts.createPropertyAssignment('initialNavigation', enabledLiteral);
+  const initialNavigationProperty = ts.createPropertyAssignment(
+    'initialNavigation',
+    enabledLiteral,
+  );
   const routerOptions = existingOptions
-    ? ts.updateObjectLiteral(existingOptions, ts.createNodeArray([
-      ...existingOptions.properties,
-      initialNavigationProperty
-    ]))
+    ? ts.updateObjectLiteral(
+        existingOptions,
+        ts.createNodeArray([...existingOptions.properties, initialNavigationProperty]),
+      )
     : ts.createObjectLiteral([initialNavigationProperty], true);
   const args = [node.arguments[0], routerOptions];
 

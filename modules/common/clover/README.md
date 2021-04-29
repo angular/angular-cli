@@ -16,8 +16,8 @@ All of the above can be achieved by emulating the DOM on the server layer. In th
 - [x] Hybrid rendering
 - [x] Server side rendering
 
-
 # Planned features
+
 - [ ] App-shell
 - [ ] Pre-rendering
 - [ ] Schematics
@@ -25,6 +25,7 @@ All of the above can be achieved by emulating the DOM on the server layer. In th
 ## Try it out
 
 ### Install the dependencies
+
 ```
 npm install @nguniversal/common express --save
 ```
@@ -63,6 +64,7 @@ export class AppModule { }
 ```
 
 #### server.js
+
 ```ts
 const express = require('express');
 const { Engine } = require('@nguniversal/common/clover/server');
@@ -75,11 +77,13 @@ const DIST = join(__dirname, 'dist');
 const app = express();
 app.set('views', DIST);
 
-app.get('*.*', express.static(DIST, {
-  maxAge: '1y',
-  fallthrough: false,
-}));
-
+app.get(
+  '*.*',
+  express.static(DIST, {
+    maxAge: '1y',
+    fallthrough: false,
+  }),
+);
 
 // Redirect to default locale
 // app.get(/^(\/|\/favicon\.ico)$/, (req, res) => {
@@ -88,18 +92,19 @@ app.get('*.*', express.static(DIST, {
 
 const ssr = new Engine();
 app.get('*', (req, res, next) => {
-  ssr.render({
-    publicPath: DIST,
-    url: format({
-      protocol: req.protocol,
-      host: `localhost:${PORT}`,
-      pathname: req.path,
-      query: req.query,
-    }),
-    headers: req.headers,
-  })
-    .then(html => res.send(html))
-    .catch(err => next(err));
+  ssr
+    .render({
+      publicPath: DIST,
+      url: format({
+        protocol: req.protocol,
+        host: `localhost:${PORT}`,
+        pathname: req.path,
+        query: req.query,
+      }),
+      headers: req.headers,
+    })
+    .then((html) => res.send(html))
+    .catch((err) => next(err));
 });
 
 app.listen(PORT, () => {
@@ -108,6 +113,7 @@ app.listen(PORT, () => {
 ```
 
 ### Running the application
+
 ```
 ng build
 node server.js

@@ -11,10 +11,10 @@ import { IRequestParams } from './request-params';
 
 /** @deprecated use `@nguniversal/common` instead. */
 export interface IEngineOptions extends Pick<RenderOptions, 'publicPath' | 'inlineCriticalCss'> {
-  appSelector: string;                      // e.g., <app-root></app-root>
-  request: IRequestParams;                  // e.g., params
-  url?: string;                             // e.g., http://testhost.com
-  document?: string;                        // e.g., <html>...</html>
+  appSelector: string; // e.g., <app-root></app-root>
+  request: IRequestParams; // e.g., params
+  url?: string; // e.g., http://testhost.com
+  document?: string; // e.g., <html>...</html>
   ngModule: Type<{}> | NgModuleFactory<{}>; // e.g., AppModule
-  providers?: StaticProvider[];             // StaticProvider[]
+  providers?: StaticProvider[]; // StaticProvider[]
 }

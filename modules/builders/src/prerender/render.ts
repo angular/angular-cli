@@ -48,7 +48,9 @@ async function getServerBundle(bundlePath: string) {
     };
   }
 
-  throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
+  throw new Error(
+    `renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`,
+  );
 }
 
 /**
@@ -88,9 +90,9 @@ async function getServerBundle(bundlePath: string) {
         });
 
         // tslint:disable-next-line: no-non-null-assertion
-        warnings?.forEach(message => process.send!({ logLevel: 'warn', message }));
+        warnings?.forEach((message) => process.send!({ logLevel: 'warn', message }));
         // tslint:disable-next-line: no-non-null-assertion
-        errors?.forEach(message => process.send!({ logLevel: 'error', message }));
+        errors?.forEach((message) => process.send!({ logLevel: 'error', message }));
         html = content;
       }
 

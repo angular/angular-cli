@@ -37,4 +37,3 @@ function getCurrentGitUser() {
 
   return `${userName} <${userEmail}>`;
 }
-

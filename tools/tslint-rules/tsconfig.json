@@ -11,9 +11,7 @@
     "noImplicitAny": false,
     "target": "es5",
     "removeComments": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "baseUrl": "."
   }
 }

@@ -23,10 +23,7 @@ function _getUniversalData(content: string, appSelector: string): IEngineRenderR
   const links: string[] = [];
 
   // tslint:disable: no-non-null-assertion
-  const elements = [
-    ...Array.from(doc.head!.children),
-    ...Array.from(doc.body!.children),
-  ];
+  const elements = [...Array.from(doc.head!.children), ...Array.from(doc.body!.children)];
   // tslint:enable: no-non-null-assertion
 
   for (const element of elements) {
@@ -57,31 +54,33 @@ function _getUniversalData(content: string, appSelector: string): IEngineRenderR
       scripts: scripts.join('\n'),
       styles: styles.join('\n'),
       meta: meta.join('\n'),
-      links: links.join('\n')
-    }
+      links: links.join('\n'),
+    },
   };
 }
 
 const commonEngine = new CommonEngine();
 /** @deprecated use `@nguniversal/common` instead. */
-export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
-  : Promise<IEngineRenderResult> {
+export async function ngAspnetCoreEngine(
+  options: Readonly<IEngineOptions>,
+): Promise<IEngineRenderResult> {
   if (!options.appSelector) {
     const selector = `" appSelector: '<app-root></app-root>' "`;
     throw new Error(`appSelector is required! Pass in ${selector},
      for your root App component.`);
   }
 
-
   const renderOptions: RenderOptions = {
     url: options.url || options.request.absoluteUrl,
     document: options.document || options.appSelector,
-    providers: [...(options.providers || []), getReqResProviders(options.request.origin, options.request.data.request)],
+    providers: [
+      ...(options.providers || []),
+      getReqResProviders(options.request.origin, options.request.data.request),
+    ],
     bootstrap: options.ngModule,
     inlineCriticalCss: options.inlineCriticalCss,
     publicPath: options.publicPath,
   };
-
 
   // Grab the DOM "selector" from the passed in Template <app-root> for example = "app-root"
   const appSelector = options.appSelector.substring(1, options.appSelector.indexOf('>'));
@@ -97,14 +96,13 @@ function getReqResProviders(origin: string, request: string): StaticProvider[] {
   const providers: StaticProvider[] = [
     {
       provide: ORIGIN_URL,
-      useValue: origin
+      useValue: origin,
     },
     {
       provide: REQUEST,
-      useValue: request
-    }
+      useValue: request,
+    },
   ];
 
   return providers;
 }
-

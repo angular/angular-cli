@@ -28,21 +28,21 @@ export function getAvailablePort(): Promise<number> {
 export function spawnAsObservable(
   command: string,
   args: string[] = [],
-  options: SpawnOptions = {}
-): Observable<{ stdout?: string, stderr?: string }> {
-  return new Observable(obs => {
+  options: SpawnOptions = {},
+): Observable<{ stdout?: string; stderr?: string }> {
+  return new Observable((obs) => {
     const proc = spawn(command, args, options);
     if (proc.stdout) {
-      proc.stdout.on('data', data => obs.next({ stdout: data.toString() }));
+      proc.stdout.on('data', (data) => obs.next({ stdout: data.toString() }));
     }
 
     if (proc.stderr) {
-      proc.stderr.on('data', data => obs.next({ stderr: data.toString() }));
+      proc.stderr.on('data', (data) => obs.next({ stderr: data.toString() }));
     }
 
     proc
-      .on('error', err => obs.error(err))
-      .on('close', code => {
+      .on('error', (err) => obs.error(err))
+      .on('close', (code) => {
         if (code !== 0) {
           obs.error(new Error(`${command} exited with ${code} code.`));
         }
@@ -58,35 +58,29 @@ export function spawnAsObservable(
   });
 }
 
-export function waitUntilServerIsListening(
-  port: number,
-  host?: string,
-): Observable<undefined> {
-  const allowedErrorCodes = [
-    'ECONNREFUSED',
-    'ECONNRESET',
-  ];
+export function waitUntilServerIsListening(port: number, host?: string): Observable<undefined> {
+  const allowedErrorCodes = ['ECONNREFUSED', 'ECONNRESET'];
 
-  return new Observable<undefined>(obs => {
+  return new Observable<undefined>((obs) => {
     const client = createConnection({ host, port }, () => {
       obs.next(undefined);
       obs.complete();
-    })
-    .on('error', err => obs.error(err));
+    }).on('error', (err) => obs.error(err));
 
     return () => {
       if (!client.destroyed) {
         client.destroy();
       }
     };
-  })
-  .pipe(
-    retryWhen(err => err.pipe(
-      mergeMap((error, attempts) => {
-        return attempts > 10 || !allowedErrorCodes.includes(error.code)
-          ? throwError(error)
-          : timer(100 * (attempts * 1));
-      }),
-    ))
+  }).pipe(
+    retryWhen((err) =>
+      err.pipe(
+        mergeMap((error, attempts) => {
+          return attempts > 10 || !allowedErrorCodes.includes(error.code)
+            ? throwError(error)
+            : timer(100 * (attempts * 1));
+        }),
+      ),
+    ),
   );
 }

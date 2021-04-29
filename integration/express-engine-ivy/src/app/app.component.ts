@@ -5,13 +5,15 @@ import { DOCUMENT } from '@angular/common';
   selector: 'app-root',
   template: `
     <div>Hello {{ title }}!</div>
-    <span class="href-check">{{href}}</span>
+    <span class="href-check">{{ href }}</span>
   `,
-  styles: [`
-    div {
-      font-weight: bold;
-    }
-  `]
+  styles: [
+    `
+      div {
+        font-weight: bold;
+      }
+    `,
+  ],
 })
 export class AppComponent {
   title = 'world';

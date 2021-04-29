@@ -17,7 +17,8 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import {
-  BrowserModule, TransferState,
+  BrowserModule,
+  TransferState,
   ɵDomSharedStylesHost as DomSharedStylesHost,
   ɵSharedStylesHost as SharedStylesHost,
   ɵescapeHtml as escapeHtml,
@@ -47,13 +48,17 @@ export class RendererModule {
   ) {
     if (typeof ngRenderMode !== 'undefined' && ngRenderMode) {
       ngRenderMode = {
-        getSerializedState: () => this.transferState ? escapeHtml(this.transferState.toJson()) : undefined,
+        getSerializedState: () =>
+          this.transferState ? escapeHtml(this.transferState.toJson()) : undefined,
         appId: this.appId,
-        getWhenStable: () => this.applicationRef.isStable.pipe(
-          filter(isStable => isStable),
-          take(1),
-          mapTo(undefined)
-        ).toPromise(),
+        getWhenStable: () =>
+          this.applicationRef.isStable
+            .pipe(
+              filter((isStable) => isStable),
+              take(1),
+              mapTo(undefined),
+            )
+            .toPromise(),
       };
     }
   }
@@ -64,16 +69,13 @@ export class RendererModule {
       providers: [
         ...(typeof ngRenderMode !== 'undefined' && ngRenderMode
           ? [
-            { provide: PLATFORM_ID, useValue: PLATFORM_SERVER_ID },
-            { provide: SSRStylesHost, useClass: SSRStylesHost, deps: [DOCUMENT, APP_ID] },
-          ]
-          : [
-            { provide: SSRStylesHost, useClass: SSRStylesHost, deps: [DOCUMENT] },
-          ]
-        ),
+              { provide: PLATFORM_ID, useValue: PLATFORM_SERVER_ID },
+              { provide: SSRStylesHost, useClass: SSRStylesHost, deps: [DOCUMENT, APP_ID] },
+            ]
+          : [{ provide: SSRStylesHost, useClass: SSRStylesHost, deps: [DOCUMENT] }]),
         { provide: SharedStylesHost, useExisting: SSRStylesHost },
         { provide: DomSharedStylesHost, useClass: SSRStylesHost },
-      ]
+      ],
     };
   }
 }

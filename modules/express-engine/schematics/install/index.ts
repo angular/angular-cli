@@ -19,11 +19,7 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { addUniversalCommonRule } from '@nguniversal/common/schematics/add';
-import {
-  getOutputPath,
-  getProject,
-  stripTsExtension,
-} from '@nguniversal/common/schematics/utils';
+import { getOutputPath, getProject, stripTsExtension } from '@nguniversal/common/schematics/utils';
 import {
   NodeDependencyType,
   addPackageJsonDependency,
@@ -56,20 +52,20 @@ function addDependencies(options: UniversalOptions): Rule {
 }
 
 function addServerFile(options: UniversalOptions): Rule {
-  return async host => {
+  return async (host) => {
     const clientProject = await getProject(host, options.clientProject);
     const browserDistDirectory = await getOutputPath(host, options.clientProject, 'build');
 
     return mergeWith(
-        apply(url('./files'), [
+      apply(url('./files'), [
         template({
           ...strings,
           ...options,
           stripTsExtension,
           browserDistDirectory,
         }),
-        move(clientProject.root)
-      ])
+        move(clientProject.root),
+      ]),
     );
   };
 }
@@ -77,7 +73,7 @@ function addServerFile(options: UniversalOptions): Rule {
 export default function (options: UniversalOptions): Rule {
   return () => {
     const addUniversalCommonOptions = {
-      ...options
+      ...options,
     };
 
     delete addUniversalCommonOptions.serverPort;

@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
+import {
+  BuilderContext,
+  BuilderOutput,
+  createBuilder,
+  targetFromTargetString,
+} from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
@@ -21,7 +26,6 @@ import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getIndexOutputFile, getRoutes, shardArray } from './utils';
 
 export const readFile = promisify(fs.readFile);
-
 
 type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
@@ -39,7 +43,7 @@ type ScheduleBuildsOutput = BuilderOutput & {
  */
 async function _scheduleBuilds(
   options: PrerenderBuilderOptions,
-  context: BuilderContext
+  context: BuilderContext,
 ): Promise<ScheduleBuildsOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
@@ -55,13 +59,13 @@ async function _scheduleBuilds(
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as unknown as BuildBuilderOutput,
-      serverTargetRun.result as unknown as BuildBuilderOutput,
+      (browserTargetRun.result as unknown) as BuildBuilderOutput,
+      (serverTargetRun.result as unknown) as BuildBuilderOutput,
     ]);
 
     const success =
       browserResult.success && serverResult.success && browserResult.baseOutputPath !== undefined;
-    const error = browserResult.error || serverResult.error as string;
+    const error = browserResult.error || (serverResult.error as string);
 
     return { success, error, browserResult, serverResult };
   } catch (e) {
@@ -91,14 +95,13 @@ async function _renderUniversal(
 
   const root = normalize(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = resolvePath(
-    root,
-    normalize((projectMetadata.root as string) || ''),
-  );
+  const projectRoot = resolvePath(root, normalize((projectMetadata.root as string) || ''));
 
   // Users can specify a different base html file e.g. "src/home.html"
   const indexFile = getIndexOutputFile(browserOptions);
-  const { styles: normalizedStylesOptimization } = normalizeOptimization(browserOptions.optimization);
+  const { styles: normalizedStylesOptimization } = normalizeOptimization(
+    browserOptions.optimization,
+  );
 
   // We need to render the routes for each locale from the browser output.
   for (const outputPath of browserResult.outputPaths) {
@@ -107,7 +110,10 @@ async function _renderUniversal(
 
     if (normalizedStylesOptimization.inlineCritical) {
       // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-      indexHtml = indexHtml.replace(/ media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g, '>');
+      indexHtml = indexHtml.replace(
+        / media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g,
+        '>',
+      );
     }
 
     const { baseOutputPath = '' } = serverResult;
@@ -121,22 +127,27 @@ async function _renderUniversal(
 
     try {
       const workerFile = path.join(__dirname, 'render.js');
-      const childProcesses = shardArray(routes, numProcesses)
-        .map(routesShard =>
+      const childProcesses = shardArray(routes, numProcesses).map(
+        (routesShard) =>
           new Promise((resolve, reject) => {
             fork(workerFile, [
-              indexHtml.replace('</html>', '<!-- This page was prerendered with Angular Universal -->\n</html>'),
+              indexHtml.replace(
+                '</html>',
+                '<!-- This page was prerendered with Angular Universal -->\n</html>',
+              ),
               indexFile,
               serverBundlePath,
               outputPath,
               browserOptions.deployUrl || '',
-              normalizedStylesOptimization.inlineCritical ? 'true' : 'false' ,
-              normalizedStylesOptimization.minify ? 'true' : 'false' ,
+              normalizedStylesOptimization.inlineCritical ? 'true' : 'false',
+              normalizedStylesOptimization.minify ? 'true' : 'false',
               ...routesShard,
             ])
-              .on('message', data => {
+              .on('message', (data) => {
                 if (data.success === false) {
-                  reject(new Error(`Unable to render ${data.outputIndexPath}.\nError: ${data.error}`));
+                  reject(
+                    new Error(`Unable to render ${data.outputIndexPath}.\nError: ${data.error}`),
+                  );
 
                   return;
                 }
@@ -149,8 +160,8 @@ async function _renderUniversal(
               })
               .on('exit', resolve)
               .on('error', reject);
-          })
-        );
+          }),
+      );
 
       await Promise.all(childProcesses);
     } catch (error) {
@@ -191,11 +202,12 @@ async function _renderUniversal(
  */
 export async function execute(
   options: PrerenderBuilderOptions,
-  context: BuilderContext
+  context: BuilderContext,
 ): Promise<PrerenderBuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const browserOptions =
-    await context.getTargetOptions(browserTarget) as unknown as BrowserBuilderOptions;
+  const browserOptions = ((await context.getTargetOptions(
+    browserTarget,
+  )) as unknown) as BrowserBuilderOptions;
   const tsConfigPath =
     typeof browserOptions.tsConfig === 'string' ? browserOptions.tsConfig : undefined;
 

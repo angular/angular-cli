@@ -18,4 +18,4 @@ import { TransferHttpCacheInterceptor } from './transfer-http-cache.interceptor'
     { provide: HTTP_INTERCEPTORS, useExisting: TransferHttpCacheInterceptor, multi: true },
   ],
 })
-export class TransferHttpCacheModule { }
+export class TransferHttpCacheModule {}

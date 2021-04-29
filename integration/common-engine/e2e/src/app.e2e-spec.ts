@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {browser, by, element} from 'protractor';
+import { browser, by, element } from 'protractor';
 
-import {verifyNoBrowserErrors, waitForAppRootElement} from './util';
+import { verifyNoBrowserErrors, waitForAppRootElement } from './util';
 
 describe('Hello world E2E Tests', () => {
   beforeAll(async () => {

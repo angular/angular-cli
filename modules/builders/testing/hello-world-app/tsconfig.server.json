@@ -3,14 +3,9 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app-server",
     "module": "commonjs",
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "files": [
-    "src/main.server.ts",
-    "server.ts"
-  ],
+  "files": ["src/main.server.ts", "server.ts"],
   "angularCompilerOptions": {
     "entryModule": "./src/app/app.server.module#AppServerModule"
   }

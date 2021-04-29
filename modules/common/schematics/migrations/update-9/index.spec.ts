@@ -12,14 +12,11 @@ import { version9UpdateRule } from './index';
 
 // tslint:disable: no-non-null-assertion
 describe('Migration to version 9', () => {
-  const schematicRunner = new SchematicTestRunner(
-    'migrations',
-    collectionPath,
-  );
+  const schematicRunner = new SchematicTestRunner('migrations', collectionPath);
 
   let tree: UnitTestTree;
   beforeEach(async () => {
-    tree =  await createTestApp();
+    tree = await createTestApp();
     tree = await schematicRunner
       .runExternalSchematicAsync(
         '@schematics/angular',
@@ -35,7 +32,9 @@ describe('Migration to version 9', () => {
     tree.create('/projects/test-app/server.ts', 'server content');
     tree.create('/projects/test-app/webpack.server.config.js', 'webpack config content');
 
-    tree.overwrite('/projects/test-app/src/main.server.ts', `
+    tree.overwrite(
+      '/projects/test-app/src/main.server.ts',
+      `
     import { enableProdMode } from '@angular/core';
 
     import { environment } from './environments/environment';
@@ -48,9 +47,12 @@ describe('Migration to version 9', () => {
     export { renderModule, renderModuleFactory } from '@angular/platform-server';
     export { ngExpressEngine } from '@nguniversal/express-engine';
     export { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
-    `);
+    `,
+    );
 
-    tree.overwrite('/projects/test-app/src/app/app.server.module.ts', `
+    tree.overwrite(
+      '/projects/test-app/src/app/app.server.module.ts',
+      `
     import { NgModule } from '@angular/core';
     import { ServerModule } from '@angular/platform-server';
 
@@ -67,7 +69,8 @@ describe('Migration to version 9', () => {
       bootstrap: [AppComponent],
     })
     export class AppServerModule {}
-    `);
+    `,
+    );
 
     const pkg = JSON.parse(tree.readContent('/package.json')) as any;
     const scripts = pkg.scripts;
@@ -108,8 +111,9 @@ describe('Migration to version 9', () => {
   it(`should remove '@nguniversal/module-map-ngfactory-loader' references`, async () => {
     const newTree = await schematicRunner.callRule(version9UpdateRule(''), tree).toPromise();
 
-    const appServerModule =
-      newTree.read('/projects/test-app/src/app/app.server.module.ts')!.toString();
+    const appServerModule = newTree
+      .read('/projects/test-app/src/app/app.server.module.ts')!
+      .toString();
     expect(appServerModule).not.toContain(`from '@nguniversal/module-map-ngfactory-loader';`);
     expect(appServerModule).not.toContain('ModuleMapLoaderModule');
 

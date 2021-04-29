@@ -39,7 +39,7 @@ export async function ngHapiEngine(options: Readonly<RenderOptions>): Promise<st
   const protocol = req.server.info.protocol;
   const filePath = req.raw.req.url as string;
 
-  const renderOptions: RenderOptions = {...options};
+  const renderOptions: RenderOptions = { ...options };
 
   const moduleOrFactory = options.bootstrap;
 
@@ -61,12 +61,12 @@ function getReqProviders(req: Request): StaticProvider[] {
   const providers: StaticProvider[] = [
     {
       provide: REQUEST,
-      useValue: req
-    }
+      useValue: req,
+    },
   ];
   providers.push({
     provide: RESPONSE,
-    useValue: req.raw.res
+    useValue: req.raw.res,
   });
 
   return providers;

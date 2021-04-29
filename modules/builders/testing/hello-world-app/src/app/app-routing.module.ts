@@ -4,7 +4,6 @@ import { FooBarComponent } from './foo-bar/foo-bar.component';
 import { FooComponent } from './foo/foo.component';
 import { AppComponent } from './app.component';
 
-
 const routes: Routes = [
   {
     path: '',
@@ -22,6 +21,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

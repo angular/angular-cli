@@ -9,19 +9,17 @@ import { Component, Inject, InjectionToken, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ServerModule } from '@angular/platform-server';
 
-@Component({selector: 'root', template: 'some template'})
-export class MockComponent {
-}
+@Component({ selector: 'root', template: 'some template' })
+export class MockComponent {}
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [MockComponent],
   bootstrap: [MockComponent],
 })
-export class MockServerModule {
-}
+export class MockServerModule {}
 
-@Component({selector: 'root', template: 'some template'})
+@Component({ selector: 'root', template: 'some template' })
 export class ErrorComponent {
   constructor() {
     throw new Error('Error!');
@@ -29,24 +27,22 @@ export class ErrorComponent {
 }
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [ErrorComponent],
   bootstrap: [ErrorComponent],
 })
-export class ErrorServerModule {
-}
+export class ErrorServerModule {}
 
 export const SOME_TOKEN = new InjectionToken<string>('SOME_TOKEN');
 
-@Component({selector: 'root', template: `message:{{_someToken.message}}`})
+@Component({ selector: 'root', template: `message:{{ _someToken.message }}` })
 export class TokenComponent {
   constructor(@Inject(SOME_TOKEN) public readonly _someToken: any) {}
 }
 
 @NgModule({
-  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'mock' }), ServerModule],
   declarations: [TokenComponent],
   bootstrap: [TokenComponent],
 })
-export class TokenServerModule {
-}
+export class TokenServerModule {}

@@ -1,7 +1,5 @@
 {
-  "rulesDirectory": [
-    "./tools/tslint-rules/"
-  ],
+  "rulesDirectory": ["./tools/tslint-rules/"],
   "rules": {
     // Disable this flag because of SHA tslint#48b0c597f9257712c7d1f04b55ed0aa60e333f6a
     // TSLint now shows warnings if types for properties are inferred. This rule needs to be
@@ -19,41 +17,19 @@
     "no-import-side-effect": [
       true,
       {
-        "ignore-module": "^(?!rxjs\/)"
+        "ignore-module": "^(?!rxjs/)"
       }
     ],
-    "align": [
-      true,
-      "elements",
-      "members",
-      "parameters",
-      "statements"
-    ],
+    "align": [true, "elements", "members", "parameters", "statements"],
     "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
-    "indent": [
-      true,
-      "spaces",
-      2
-    ],
-    "array-type": [
-      true,
-      "array-simple"
-    ],
-    "deprecation": {
-      "severity": "warning"
-    },
+    "comment-format": [true, "check-space"],
+    "indent": [true, "spaces", 2],
+    "array-type": [true, "array-simple"],
     "eofline": true,
     "import-spacing": false,
     "match-default-export-name": true,
     "newline-before-return": true,
-    "no-consecutive-blank-lines": [
-      true,
-      2
-    ],
+    "no-consecutive-blank-lines": [true, 2],
     "no-duplicate-variable": true,
     "no-eval": true,
     "no-arg": true,
@@ -81,15 +57,8 @@
       }
     ],
     "prefer-const": true,
-    "quotemark": [
-      true,
-      "single",
-      "avoid-escape"
-    ],
-    "semicolon": [
-      true,
-      "always"
-    ],
+    "quotemark": [true, "single", "avoid-escape"],
+    "semicolon": [true, "always"],
     "typedef-whitespace": [
       true,
       {
@@ -122,18 +91,10 @@
     // Bans jasmine helper functions that will prevent the CI from properly running tests.
     "ban": [
       true,
-      [
-        "fit"
-      ],
-      [
-        "fdescribe"
-      ],
-      [
-        "xit"
-      ],
-      [
-        "xdescribe"
-      ],
+      ["fit"],
+      ["fdescribe"],
+      ["xit"],
+      ["xdescribe"],
       {
         "name": "Object.assign",
         "message": "Use the spread operator instead."
@@ -141,27 +102,15 @@
     ],
     // Disallows importing the whole RxJS library. Submodules can be still imported.
     // Avoids inconsistent linebreak styles in source files. Forces developers to use LF linebreaks.
-    "linebreak-style": [
-      true,
-      "LF"
-    ],
+    "linebreak-style": [true, "LF"],
     // Namespaces are no allowed, because of Closure compiler.
     "no-namespace": true,
-    "jsdoc-format": [
-      true,
-      "check-multiline-start"
-    ],
+    "jsdoc-format": [true, "check-multiline-start"],
     // Custom Rules
     "ts-loader": true,
     "no-exposed-todo": true,
-    "require-license-banner": [
-      true,
-      "modules/**/!(*.spec).ts"
-    ],
-    "no-rxjs-patch-imports": [
-      true,
-      "modules/**/*.ts"
-    ]
+    "require-license-banner": [true, "modules/**/!(*.spec).ts"],
+    "no-rxjs-patch-imports": [true, "modules/**/*.ts"]
   },
   "linterOptions": {
     "format": "codeFrame",

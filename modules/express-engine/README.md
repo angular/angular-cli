@@ -15,16 +15,19 @@ import { ngExpressEngine } from '@nguniversal/express-engine';
 const app = express();
 
 // Set the engine
-app.engine('html', ngExpressEngine({
-  bootstrap: ServerAppModule // Give it a module to bootstrap
-}));
+app.engine(
+  'html',
+  ngExpressEngine({
+    bootstrap: ServerAppModule, // Give it a module to bootstrap
+  }),
+);
 
 app.set('view engine', 'html');
 
 app.get('/**/*', (req: Request, res: Response) => {
   res.render('../dist/index', {
     req,
-    res
+    res,
   });
 });
 ```
@@ -42,7 +45,7 @@ app.get('/**/*', (req: Request, res: Response) => {
     req,
     res,
     url,
-    document: doc
+    document: doc,
   });
 });
 ```
@@ -52,12 +55,13 @@ app.get('/**/*', (req: Request, res: Response) => {
 Extra Providers can be provided either on engine setup
 
 ```ts
-app.engine('html', ngExpressEngine({
-  bootstrap: ServerAppModule,
-  providers: [
-    ServerService
-  ]
-}));
+app.engine(
+  'html',
+  ngExpressEngine({
+    bootstrap: ServerAppModule,
+    providers: [ServerService],
+  }),
+);
 ```
 
 ## Advanced Usage
@@ -72,9 +76,7 @@ app.get('/**/*', (req: Request, res: Response) => {
     req,
     res,
     bootstrap: OtherServerAppModule,
-    providers: [
-      OtherServerService
-    ]
+    providers: [OtherServerService],
   });
 });
 ```
@@ -102,11 +104,15 @@ You can also use a custom callback to better handle your errors
 
 ```ts
 app.get('/**/*', (req: Request, res: Response) => {
-  res.render('../dist/index', {
-    req,
-    res
-  }, (err: Error, html: string) => {
-    res.status(html ? 200 : 500).send(html || err.message);
-  });
+  res.render(
+    '../dist/index',
+    {
+      req,
+      res,
+    },
+    (err: Error, html: string) => {
+      res.status(html ? 200 : 500).send(html || err.message);
+    },
+  );
 });
 ```

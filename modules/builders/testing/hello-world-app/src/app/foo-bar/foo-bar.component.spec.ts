@@ -8,9 +8,8 @@ describe('FooBarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FooBarComponent ]
-    })
-    .compileComponents();
+      declarations: [FooBarComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

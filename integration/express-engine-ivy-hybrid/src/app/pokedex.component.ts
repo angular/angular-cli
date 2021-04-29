@@ -6,12 +6,12 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-pokedex',
   template: `
-  <div *ngIf="pokemonObservable | async as pokemon">
-    <h1>{{ pokemon.name }}</h1>
-    <img src="{{ pokemon.img }}">
-  </div>
+    <div *ngIf="pokemonObservable | async as pokemon">
+      <h1>{{ pokemon.name }}</h1>
+      <img src="{{ pokemon.img }}" />
+    </div>
   `,
-  styleUrls: []
+  styleUrls: [],
 })
 export class PokedexComponent {
   pokemonObservable: Observable<any>;

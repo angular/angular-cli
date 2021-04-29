@@ -3,19 +3,18 @@ import { SOME_TOKEN } from '../testing/mock.server.module';
 import {
   ErrorServerModuleNgFactory,
   MockServerModuleNgFactory,
-  TokenServerModuleNgFactory
+  TokenServerModuleNgFactory,
 } from '../testing/mock.server.module.ngfactory';
 
 import {
   SocketEngineRenderOptions,
   SocketEngineResponse,
-  startSocketEngine
- } from '@nguniversal/socket-engine';
+  startSocketEngine,
+} from '@nguniversal/socket-engine';
 import * as net from 'net';
 
 async function sendAndRecieve(renderOptions: SocketEngineRenderOptions) {
-  return new Promise<SocketEngineResponse>(async(resolve, _reject) => {
-
+  return new Promise<SocketEngineResponse>(async (resolve, _reject) => {
     const server = await startSocketEngine(MockServerModuleNgFactory);
 
     const client = net.createConnection(9090, 'localhost', () => {
@@ -32,16 +31,22 @@ async function sendAndRecieve(renderOptions: SocketEngineRenderOptions) {
 
 describe('test runner', () => {
   it('should render a basic template', async () => {
-    const renderOptions = {id: 1, url: '/path',
-                           document: '<root></root>'} as SocketEngineRenderOptions;
+    const renderOptions = {
+      id: 1,
+      url: '/path',
+      document: '<root></root>',
+    } as SocketEngineRenderOptions;
     const result = await sendAndRecieve(renderOptions);
     expect(result.html).toContain('some template');
   });
 
   it('should return the same id', async () => {
     const id = Math.random();
-    const renderOptions = {id , url: '/path',
-                           document: '<root></root>'} as SocketEngineRenderOptions;
+    const renderOptions = {
+      id,
+      url: '/path',
+      document: '<root></root>',
+    } as SocketEngineRenderOptions;
     const result = await sendAndRecieve(renderOptions);
     expect(result.id).toEqual(id);
   });
@@ -50,8 +55,11 @@ describe('test runner', () => {
     const server = await startSocketEngine(ErrorServerModuleNgFactory);
 
     const client = net.createConnection(9090, 'localhost', () => {
-      const renderOptions = {id: 1, url: '/path',
-                             document: '<root></root>'} as SocketEngineRenderOptions;
+      const renderOptions = {
+        id: 1,
+        url: '/path',
+        document: '<root></root>',
+      } as SocketEngineRenderOptions;
       client.write(JSON.stringify(renderOptions));
     });
 
@@ -64,21 +72,27 @@ describe('test runner', () => {
   });
 
   it('should not return an error if it can render', async () => {
-    const renderOptions = {id: 1, url: '/path',
-                           document: '<root></root>'} as SocketEngineRenderOptions;
+    const renderOptions = {
+      id: 1,
+      url: '/path',
+      document: '<root></root>',
+    } as SocketEngineRenderOptions;
     const result = await sendAndRecieve(renderOptions);
     expect(result.error).toBeUndefined();
   });
 
   it('should be able to inject some token', async (done) => {
-    const someValue = {message: 'value' + new Date()};
-    const server =
-      await startSocketEngine(
-        TokenServerModuleNgFactory, [{provide: SOME_TOKEN, useValue: someValue}]);
+    const someValue = { message: 'value' + new Date() };
+    const server = await startSocketEngine(TokenServerModuleNgFactory, [
+      { provide: SOME_TOKEN, useValue: someValue },
+    ]);
 
     const client = net.createConnection(9090, 'localhost', () => {
-      const renderOptions = {id: 1, url: '/path',
-                             document: '<root></root>'} as SocketEngineRenderOptions;
+      const renderOptions = {
+        id: 1,
+        url: '/path',
+        document: '<root></root>',
+      } as SocketEngineRenderOptions;
       client.write(JSON.stringify(renderOptions));
     });
 

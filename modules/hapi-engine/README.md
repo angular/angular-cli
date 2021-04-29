@@ -2,8 +2,8 @@
 
 This is a Hapi Engine for running Angular Apps on the server for server side rendering.
 
-
 ## Deprecated
+
 This package has been deprecated. Please use [`@nguniversal/common`](../common/README.md) instead.
 
 ## Usage
@@ -19,13 +19,13 @@ import { ngHapiEngine } from '@nguniversal/hapi-engine';
 const server = new Server();
 server.connection({
   host: 'localhost',
-  port: 8000
+  port: 8000,
 });
 
 server.route({
   method: 'GET',
   path: '/{path*}',
-  handler: (req: Request) => ngHapiEngine({req, bootstrap: ServerAppModule})
+  handler: (req: Request) => ngHapiEngine({ req, bootstrap: ServerAppModule }),
 });
 ```
 
@@ -46,7 +46,7 @@ server.route({
       url,
       document,
     });
-  }
+  },
 });
 ```
 
@@ -57,9 +57,7 @@ Extra Providers can be provided either on engine setup
 ```ts
 const hapiEngine = ngHapiEngine({
   bootstrap: ServerAppModule,
-  providers: [
-    ServerService
-  ]
+  providers: [ServerService],
 });
 ```
 
@@ -73,14 +71,12 @@ The Bootstrap module as well as more providers can be passed on request
 server.route({
   method: 'GET',
   path: '/{path*}',
-  handler: (req: Request) => 
+  handler: (req: Request) =>
     ngHapiEngine({
       bootstrap: OtherServerAppModule,
-      providers: [
-        OtherServerService
-      ],
-      req
-    })
+      providers: [OtherServerService],
+      req,
+    }),
 });
 ```
 

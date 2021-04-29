@@ -9,10 +9,10 @@ describe('ASPNETCore Engine', () => {
       appSelector: '<root></root>',
       request: {
         data: {
-          request: 'localhost'
-        }
+          request: 'localhost',
+        },
       } as any,
-      ngModule: MockServerModule
+      ngModule: MockServerModule,
     });
 
     expect(html).toContain('some template');

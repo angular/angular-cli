@@ -1,5 +1,5 @@
-import {browser, by, element} from 'protractor';
-import {waitForAppRootElement, isPrerendered} from './util';
+import { browser, by, element } from 'protractor';
+import { waitForAppRootElement, isPrerendered } from './util';
 
 describe('workspace-project App', () => {
   beforeAll(async () => {
@@ -26,7 +26,7 @@ describe('workspace-project App', () => {
 
   // This also verifies that we are using index.original.html to
   // render pages (instead of index.html)
-  it(`should serve SSR'd version of the page when not prerendered.` , async () => {
+  it(`should serve SSR'd version of the page when not prerendered.`, async () => {
     await browser.driver.get(browser.baseUrl + 'pokemon/charmander');
     expect(element(by.css('h1')).getText()).toMatch('charmander');
     expect(await isPrerendered()).toBe(false);

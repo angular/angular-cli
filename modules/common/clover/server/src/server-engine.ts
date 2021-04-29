@@ -42,20 +42,27 @@ export class Engine {
       return prerenderedSnapshot;
     }
 
-    let htmlContent = await this.getHtmlTemplate(options.publicPath, pathname, options.htmlFilename);
+    let htmlContent = await this.getHtmlTemplate(
+      options.publicPath,
+      pathname,
+      options.htmlFilename,
+    );
     const inlineCriticalCss = options.inlineCriticalCss !== false;
 
     const customResourceLoader = new CustomResourceLoader(
       origin,
       options.publicPath,
-      this.resourceLoaderCache
+      this.resourceLoaderCache,
     );
 
     let dom: JSDOM | undefined;
 
     if (inlineCriticalCss) {
       // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-      htmlContent = htmlContent.replace(/ media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g, '>');
+      htmlContent = htmlContent.replace(
+        / media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g,
+        '>',
+      );
     }
 
     try {
@@ -65,7 +72,7 @@ export class Engine {
         url: options.url,
         referrer: options.headers?.referrer as string | undefined,
         userAgent: options.headers?.['user-agent'] as string | undefined,
-        beforeParse: window => {
+        beforeParse: (window) => {
           window.ngRenderMode = true;
         },
       });
@@ -78,7 +85,7 @@ export class Engine {
       }, 60000);
 
       // tslint:disable-next-line: no-shadowed-variable
-      const ngRenderMode = await new Promise<NGRenderModeAPI>(resolve => {
+      const ngRenderMode = await new Promise<NGRenderModeAPI>((resolve) => {
         const interval = setInterval(() => {
           const ngDOMMode = dom?.window.ngRenderMode as NGRenderMode;
           if (ngDOMMode && typeof ngDOMMode === 'object') {
@@ -109,14 +116,18 @@ export class Engine {
       }
 
       const baseHref = doc.querySelector('base[href]')?.getAttribute('href') ?? '';
-      const { content: contentWithInlineCSS, warnings, errors } = await this.inlineCriticalCssProcessor.process(content, {
+      const {
+        content: contentWithInlineCSS,
+        warnings,
+        errors,
+      } = await this.inlineCriticalCssProcessor.process(content, {
         outputPath: path.join(options.publicPath, baseHref),
       });
 
       // tslint:disable-next-line: no-console
-      warnings?.forEach(m => console.warn(m));
+      warnings?.forEach((m) => console.warn(m));
       // tslint:disable-next-line: no-console
-      errors?.forEach(m => console.error(m));
+      errors?.forEach((m) => console.error(m));
 
       return contentWithInlineCSS;
     } finally {
@@ -124,7 +135,10 @@ export class Engine {
     }
   }
 
-  private async getPrerenderedSnapshot(publicPath: string, pathname: string): Promise<string | undefined> {
+  private async getPrerenderedSnapshot(
+    publicPath: string,
+    pathname: string,
+  ): Promise<string | undefined> {
     // Remove leading forward slash.
     const pagePath = path.resolve(publicPath, pathname.substring(1), 'index.html');
     const content = await this.readHTMLFile(pagePath);
@@ -134,10 +148,12 @@ export class Engine {
       : undefined;
   }
 
-  private async getHtmlTemplate(publicPath: string, pathname: string, htmlFilename = 'index.html'): Promise<string> {
-    const files = [
-      path.join(publicPath, htmlFilename),
-    ];
+  private async getHtmlTemplate(
+    publicPath: string,
+    pathname: string,
+    htmlFilename = 'index.html',
+  ): Promise<string> {
+    const files = [path.join(publicPath, htmlFilename)];
 
     const potentialLocalePath = pathname.split('/', 2)[1]; // potential base href
     if (potentialLocalePath) {
@@ -187,4 +203,3 @@ export class Engine {
     return undefined;
   }
 }
-

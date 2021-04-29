@@ -40,16 +40,18 @@ describe('Migration to version 9', () => {
   });
 
   it(`should backup old 'server.ts' and 'webpack.server.config.js'`, async () => {
-    const newTree =
-      await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('update-9', {}, tree.branch())
+      .toPromise();
 
     expect(newTree.exists('/projects/test-app/server.ts.bak')).toBeTruthy();
     expect(newTree.exists('/projects/test-app/webpack.server.config.js.bak')).toBeTruthy();
   });
 
   it(`should create new 'server.ts'`, async () => {
-    const newTree =
-      await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('update-9', {}, tree.branch())
+      .toPromise();
 
     expect(newTree.exists('/projects/test-app/server.ts')).toBeTruthy();
     const serverContent = newTree.readContent('/projects/test-app/server.ts');
@@ -58,27 +60,25 @@ describe('Migration to version 9', () => {
   });
 
   it(`should add 'server.ts' to 'tsconfig.server.json' files`, async () => {
-    const newTree =
-      await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('update-9', {}, tree.branch())
+      .toPromise();
 
     const { files } = parseJson(
       newTree.readContent('/projects/test-app/tsconfig.server.json'),
       JsonParseMode.Loose,
     ) as any;
 
-    expect(files).toEqual([
-      'src/main.server.ts',
-      'server.ts',
-    ]);
+    expect(files).toEqual(['src/main.server.ts', 'server.ts']);
   });
 
   it(`should update 'package.json' scripts`, async () => {
-    const newTree =
-      await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+    const newTree = await schematicRunner
+      .runSchematicAsync('update-9', {}, tree.branch())
+      .toPromise();
 
     const { scripts } = JSON.parse(newTree.readContent('/package.json')) as any;
-    expect(scripts['build:ssr'])
-      .toBe('ng build && ng run test-app:server');
+    expect(scripts['build:ssr']).toBe('ng build && ng run test-app:server');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
   });
 
@@ -112,17 +112,18 @@ describe('Migration to version 9', () => {
     });
 
     it(`should backup old 'server.ts' and 'webpack.server.config.js'`, async () => {
-      const newTree =
-        await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+      const newTree = await schematicRunner
+        .runSchematicAsync('update-9', {}, tree.branch())
+        .toPromise();
 
       expect(newTree.exists('/projects/test-app-two/server.ts.bak')).toBeTruthy();
-      expect(newTree.exists('/projects/test-app-two/webpack.server.config.js.bak'))
-        .toBeTruthy();
+      expect(newTree.exists('/projects/test-app-two/webpack.server.config.js.bak')).toBeTruthy();
     });
 
     it(`should create new 'server.ts'`, async () => {
-      const newTree =
-        await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+      const newTree = await schematicRunner
+        .runSchematicAsync('update-9', {}, tree.branch())
+        .toPromise();
 
       expect(newTree.exists('/projects/test-app-two/server.ts')).toBeTruthy();
       const serverContent = newTree.readContent('/projects/test-app-two/server.ts');
@@ -131,18 +132,16 @@ describe('Migration to version 9', () => {
     });
 
     it(`should add 'server.ts' to 'tsconfig.server.json' files`, async () => {
-      const newTree =
-        await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
+      const newTree = await schematicRunner
+        .runSchematicAsync('update-9', {}, tree.branch())
+        .toPromise();
 
       const { files } = parseJson(
         newTree.readContent('/projects/test-app-two/tsconfig.server.json'),
         JsonParseMode.Loose,
       ) as any;
 
-      expect(files).toEqual([
-        'src/main.server.ts',
-        'server.ts',
-      ]);
+      expect(files).toEqual(['src/main.server.ts', 'server.ts']);
     });
   });
 });

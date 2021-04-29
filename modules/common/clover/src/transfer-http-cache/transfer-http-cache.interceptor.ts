@@ -13,7 +13,7 @@ import {
   HttpInterceptor,
   HttpParams,
   HttpRequest,
-  HttpResponse
+  HttpResponse,
 } from '@angular/common/http';
 import { ApplicationRef, Injectable } from '@angular/core';
 import { StateKey, TransferState, makeStateKey } from '@angular/platform-browser';
@@ -30,12 +30,15 @@ interface TransferHttpResponse {
 
 @Injectable()
 export class TransferHttpCacheInterceptor implements HttpInterceptor {
-
   private isCacheActive = true;
 
   private makeCacheKey(method: string, url: string, params: HttpParams): StateKey<string> {
     // make the params encoded same as a url so it's easy to identify
-    const encodedParams = params.keys().sort().map(k => `${k}=${params.getAll(k)}`).join('&');
+    const encodedParams = params
+      .keys()
+      .sort()
+      .map((k) => `${k}=${params.getAll(k)}`)
+      .join('&');
     const key = (method === 'GET' ? 'G.' : 'H.') + url + '?' + encodedParams;
 
     return makeStateKey(key);
@@ -46,10 +49,11 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     // complete.
     appRef.isStable
       .pipe(
-        filter(isStable => isStable),
+        filter((isStable) => isStable),
         take(1),
-        tap(() => this.isCacheActive = false),
-      ).subscribe();
+        tap(() => (this.isCacheActive = false)),
+      )
+      .subscribe();
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -64,32 +68,33 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
       // Request found in cache. Respond using it.
       const response = this.transferState.get<TransferHttpResponse>(storeKey, {});
 
-      return of(new HttpResponse<any>({
-        body: response.body,
-        headers: new HttpHeaders(response.headers),
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url,
-      }));
+      return of(
+        new HttpResponse<any>({
+          body: response.body,
+          headers: new HttpHeaders(response.headers),
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+        }),
+      );
     }
 
     // Request not found in cache. Make the request and cache it.
     const httpEvent = next.handle(req);
 
-    return httpEvent
-      .pipe(
-        tap((event: HttpEvent<unknown>) => {
-          if (event instanceof HttpResponse) {
-            this.transferState.set<TransferHttpResponse> (storeKey, {
-              body: event.body,
-              headers: this.getHeaders(event.headers),
-              status: event.status,
-              statusText: event.statusText,
-              url: event.url ?? '',
-            });
-          }
-        })
-      );
+    return httpEvent.pipe(
+      tap((event: HttpEvent<unknown>) => {
+        if (event instanceof HttpResponse) {
+          this.transferState.set<TransferHttpResponse>(storeKey, {
+            body: event.body,
+            headers: this.getHeaders(event.headers),
+            status: event.status,
+            statusText: event.statusText,
+            url: event.url ?? '',
+          });
+        }
+      }),
+    );
   }
 
   private getHeaders(headers: HttpHeaders): Record<string, string[]> {
@@ -104,5 +109,4 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
 
     return headersMap;
   }
-
 }

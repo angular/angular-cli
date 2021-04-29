@@ -38,13 +38,7 @@
       "minimum": 1
     }
   },
-  "required": [
-    "browserTarget",
-    "serverTarget"
-  ],
-  "anyOf": [
-    { "required": ["routes"] },
-    { "required": ["routesFile"] }
-  ],
+  "required": ["browserTarget", "serverTarget"],
+  "anyOf": [{ "required": ["routes"] }, { "required": ["routesFile"] }],
   "additionalProperties": false
 }

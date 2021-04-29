@@ -1,9 +1,9 @@
 {
-    "extends": "../../../bazel-tsconfig-build.json",
-    "compilerOptions": {
-      "target": "ES2019",
-      "module": "commonjs",
-      "lib": ["es2019", "dom"],
-      "esModuleInterop": true
-    }
+  "extends": "../../../bazel-tsconfig-build.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "lib": ["es2019", "dom"],
+    "esModuleInterop": true
   }
+}

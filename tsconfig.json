@@ -13,29 +13,17 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "typeRoots": ["node_modules/@types"],
     "types": ["jasmine", "node", "shelljs"],
-    "lib": [
-      "dom",
-      "es6",
-      "es2015"
-    ],
+    "lib": ["dom", "es6", "es2015"],
     "noStrictGenericChecks": true,
     "baseUrl": "./",
     "rootDir": "./",
     "paths": {
-      "@nguniversal/*": ["./modules/*"],
+      "@nguniversal/*": ["./modules/*"]
     }
   },
-  "exclude": [
-    "bazel-out",
-    "dist",
-    "node_modules",
-    "**/*/node_modules",
-    "**/hello-world-app"
-  ],
+  "exclude": ["bazel-out", "dist", "node_modules", "**/*/node_modules", "**/hello-world-app"],
   "compileOnSave": false,
   "buildOnSave": false,
   "atom": {

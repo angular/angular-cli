@@ -1,10 +1,12 @@
 # Version 8 Upgrade Guide
 
 ## Introduction
-Angular Version 8 changes the way how lazy loaded chunks are included as part of the Router. The new syntax uses dynamic import 
+
+Angular Version 8 changes the way how lazy loaded chunks are included as part of the Router. The new syntax uses dynamic import
 syntax directly to load lazy loaded chunks.
 
 ### Before
+
 ```ts
 const routes: Routes = [
   { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' },
@@ -13,9 +15,10 @@ const routes: Routes = [
 ```
 
 ### After
+
 ```ts
 const routes: Routes = [
-  { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) },
+  { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then((m) => m.LazyModule) },
   { path: '', component: HomeComponent },
 ];
 ```
@@ -48,18 +51,18 @@ TypeError: Cannot read property 'call' of undefined
     at drainMicroTaskQueue (/home/viks/projects/v8-lazy/dist/server.js:746:35)
     at ZoneTask.invokeTask (/home/viks/projects/v8-lazy/dist/server.js:647:21)
     at Server.ZoneTask.invoke (/home/viks/projects/v8-lazy/dist/server.js:632:48)
-  ```
+```
 
-## Fix 
+## Fix
 
 The following example commit shows the different steps required to fix the issue: [Commit](https://github.com/vikerman/v8-lazy/commit/515239be1b233946e4a1d15a8712a0bc9f5490cc)
 
 The different changes required are:
 
 1. Export `ngExpressEngine` (or `ngHapiEngine`) ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/src/main.server.ts#L12)),
-`provideModuleMap` from `src/main.server.ts` ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/src/main.server.ts#L15))
+   `provideModuleMap` from `src/main.server.ts` ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/src/main.server.ts#L15))
 1. Change `server.ts` to remove all references to `@angular` and `@nguniversal` and use the rexport from `main` instead and remove `enableProdMode` ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/server.ts))
 1. Change `webpack.server.config.js` to put `'./dist/server/main'` in `externals` ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/webpack.server.config.js#L13)) and don't parse the polyfills ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/webpack.server.config.js#L26))
 1. (Optional) It is now possible use `bundleDependencies=all` when building the server bundle ([Link](https://github.com/vikerman/v8-lazy/blob/515239be1b233946e4a1d15a8712a0bc9f5490cc/package.json#L14))
 
-**NOTE:** You will not encounter this problem if you did `ng add @nguniversal/express-engine` *after* upgrading to version 8.
+**NOTE:** You will not encounter this problem if you did `ng add @nguniversal/express-engine` _after_ upgrading to version 8.

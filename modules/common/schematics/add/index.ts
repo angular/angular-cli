@@ -14,7 +14,10 @@ import {
   noop,
 } from '@angular-devkit/schematics';
 import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
-import { NodeDependencyType, addPackageJsonDependency } from '@schematics/angular/utility/dependencies';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+} from '@schematics/angular/utility/dependencies';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { updateWorkspace } from '@schematics/angular/utility/workspace';
 import * as ts from 'typescript';
@@ -36,11 +39,11 @@ export interface AddUniversalOptions extends UniversalOptions {
 }
 
 export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
-  return async host => {
+  return async (host) => {
     const clientProject = await getProject(host, options.clientProject);
     const universalOptions = {
       ...options,
-      skipInstall: true
+      skipInstall: true,
     };
 
     delete universalOptions.serverFileName;
@@ -59,7 +62,7 @@ export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
 }
 
 function addScriptsRule(options: AddUniversalOptions): Rule {
-  return async host => {
+  return async (host) => {
     const pkgPath = '/package.json';
     const buffer = host.read(pkgPath);
     if (buffer === null) {
@@ -82,7 +85,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
 
 function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
   return () => {
-    return updateWorkspace(workspace => {
+    return updateWorkspace((workspace) => {
       const projectName = options.clientProject;
       const project = workspace.projects.get(projectName);
       if (!project) {
@@ -127,7 +130,7 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
         builder: '@nguniversal/builders:prerender',
         defaultConfiguration: 'production',
         options: {
-          routes: ['/']
+          routes: ['/'],
         },
         configurations: {
           production: {
@@ -141,7 +144,7 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
 }
 
 function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
-  return async host => {
+  return async (host) => {
     const clientProject = await getProject(host, options.clientProject);
     const serverTarget = clientProject.targets.get('server');
     if (!serverTarget || !serverTarget.options) {
@@ -158,16 +161,13 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
     const filesAstNode = tsConfig.get(['files']);
     const serverFilePath = stripTsExtension(options.serverFileName) + '.ts';
     if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
-      tsConfig.modify(['files'], [
-        ...filesAstNode,
-        serverFilePath
-      ]);
+      tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
     }
   };
 }
 
 function routingInitialNavigationRule(options: UniversalOptions): Rule {
-  return async host => {
+  return async (host) => {
     const clientProject = await getProject(host, options.clientProject);
     const serverTarget = clientProject.targets.get('server');
     if (!serverTarget || !serverTarget.options) {
@@ -201,7 +201,10 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
     // which breaks the CLI UpdateRecorder.
     // See: https://github.com/angular/angular/pull/30719
     tsHost.readFile = function (fileName: string): string {
-      return host.read(fileName).toString().replace(/^\uFEFF/, '');
+      return host
+        .read(fileName)
+        .toString()
+        .replace(/^\uFEFF/, '');
     };
     tsHost.directoryExists = function (directoryName: string): boolean {
       // When the path is file getDir will throw.
@@ -225,13 +228,14 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
 
     const program = ts.createProgram(parsed.fileNames, parsed.options, tsHost);
     const typeChecker = program.getTypeChecker();
-    const sourceFiles = program.getSourceFiles().filter(
-      f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f));
+    const sourceFiles = program
+      .getSourceFiles()
+      .filter((f) => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f));
     const printer = ts.createPrinter();
     const routerModule = 'RouterModule';
     const routerSource = '@angular/router';
 
-    sourceFiles.forEach(sourceFile => {
+    sourceFiles.forEach((sourceFile) => {
       const routerImport = findImport(sourceFile, routerSource, routerModule);
       if (!routerImport) {
         return;
@@ -239,8 +243,12 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
 
       let routerModuleNode: ts.CallExpression;
       ts.forEachChild(sourceFile, function visitNode(node: ts.Node) {
-        if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) &&
-          ts.isIdentifier(node.expression.expression) && node.expression.name.text === 'forRoot') {
+        if (
+          ts.isCallExpression(node) &&
+          ts.isPropertyAccessExpression(node.expression) &&
+          ts.isIdentifier(node.expression.expression) &&
+          node.expression.name.text === 'forRoot'
+        ) {
           const imp = getImportOfIdentifier(typeChecker, node.expression.expression);
 
           if (imp && imp.name === routerModule && imp.importModule === routerSource) {
@@ -253,8 +261,10 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
 
       if (routerModuleNode) {
         const print = printer.printNode(
-          ts.EmitHint.Unspecified, addInitialNavigation(routerModuleNode),
-          sourceFile);
+          ts.EmitHint.Unspecified,
+          addInitialNavigation(routerModuleNode),
+          sourceFile,
+        );
 
         const recorder = host.beginUpdate(sourceFile.fileName);
         recorder.remove(routerModuleNode.getStart(), routerModuleNode.getWidth());
@@ -266,7 +276,7 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
 }
 
 function addDependencies(): Rule {
-  return host => {
+  return (host) => {
     addPackageJsonDependency(host, {
       name: '@nguniversal/builders',
       type: NodeDependencyType.Dev,

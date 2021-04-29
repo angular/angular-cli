@@ -11,7 +11,7 @@ import { version9UpdateRule } from '@nguniversal/common/schematics/migrations/up
 import { getPackageJsonDependency } from '@schematics/angular/utility/dependencies';
 
 export default function (): Rule {
-  return async host => {
+  return async (host) => {
     if (!getPackageJsonDependency(host, '@nguniversal/express-engine')) {
       throw new SchematicsException('Could not find dependency on @nguniversal/express-engine');
     }

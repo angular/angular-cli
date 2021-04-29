@@ -15,9 +15,8 @@ describe('Prerender Builder', () => {
   let architect: Architect;
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-  beforeAll(() => jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000);
-  afterAll(() => jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout);
-
+  beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000));
+  afterAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout));
 
   beforeEach(async () => {
     await host.initialize().toPromise();
@@ -30,17 +29,20 @@ describe('Prerender Builder', () => {
 
   it('fails with error when .routes nor .routesFile are defined', async () => {
     const run = await architect.scheduleTarget(target);
-    await expectAsync(run.result)
-      .toBeRejectedWith(
-        jasmine.objectContaining({ message: jasmine.stringMatching(/Data path "" must match a schema in anyOf./) })
-      );
+    await expectAsync(run.result).toBeRejectedWith(
+      jasmine.objectContaining({
+        message: jasmine.stringMatching(/Data path "" must match a schema in anyOf./),
+      }),
+    );
     await run.stop();
   });
 
   it('fails with error when no routes are provided', async () => {
     const run = await architect.scheduleTarget(target, { routes: [], guessRoutes: false });
     await expectAsync(run.result).toBeRejectedWith(
-      jasmine.objectContaining({ message: jasmine.stringMatching(/Could not find any routes to prerender/) })
+      jasmine.objectContaining({
+        message: jasmine.stringMatching(/Could not find any routes to prerender/),
+      }),
     );
     await run.stop();
   });
@@ -51,7 +53,7 @@ describe('Prerender Builder', () => {
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html')),
     );
 
     expect(content).toContain('foo works!');
@@ -65,17 +67,17 @@ describe('Prerender Builder', () => {
     expect(output.success).toBe(true);
 
     let content = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html')),
     );
     expect(content).toContain('foo works!');
 
     content = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'index.original.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'index.original.html')),
     );
     expect(content).not.toContain('<router-outlet');
 
     content = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'index.html')),
     );
 
     expect(content).toContain('<router-outlet');
@@ -83,12 +85,12 @@ describe('Prerender Builder', () => {
   });
 
   it('should generate output for routes when provided with a file', async () => {
-    await host.write(
-      join(host.root(), 'routes-file.txt'),
-      virtualFs.stringToFileBuffer(
-        ['/foo', '/foo/bar'].join('\n')
-      ),
-    ).toPromise();
+    await host
+      .write(
+        join(host.root(), 'routes-file.txt'),
+        virtualFs.stringToFileBuffer(['/foo', '/foo/bar'].join('\n')),
+      )
+      .toPromise();
     const run = await architect.scheduleTarget(target, {
       routes: ['/foo', '/'],
       routesFile: './routes-file.txt',
@@ -97,13 +99,13 @@ describe('Prerender Builder', () => {
     expect(output.success).toBe(true);
 
     const fooContent = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html')),
     );
     const fooBarContent = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/bar/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/bar/index.html')),
     );
     const appContent = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'index.html')),
     );
 
     expect(appContent).toContain('app app is running!');
@@ -123,7 +125,7 @@ describe('Prerender Builder', () => {
       routesFile: './nonexistent-file.txt',
     });
     await expectAsync(run.result).toBeRejectedWith(
-      jasmine.objectContaining({ message: jasmine.stringMatching(/no such file or directory/) })
+      jasmine.objectContaining({ message: jasmine.stringMatching(/no such file or directory/) }),
     );
     await run.stop();
   });
@@ -137,13 +139,13 @@ describe('Prerender Builder', () => {
     const output = await run.result;
 
     const fooContent = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html')),
     );
     const fooBarContent = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/bar/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/bar/index.html')),
     );
     const appContent = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'index.html')),
     );
 
     expect(output.success).toBe(true);
@@ -168,9 +170,7 @@ describe('Prerender Builder', () => {
           name: 'app',
           installMode: 'prefetch',
           resources: {
-            files: [
-              '/index.html',
-            ],
+            files: ['/index.html'],
           },
         },
       ],
@@ -180,7 +180,10 @@ describe('Prerender Builder', () => {
       'ngsw-config.json': JSON.stringify(manifest),
     });
 
-    const run = await architect.scheduleTarget(target, { routes: ['foo'], browserTarget: 'app:build:sw' });
+    const run = await architect.scheduleTarget(target, {
+      routes: ['foo'],
+      browserTarget: 'app:build:sw',
+    });
     const output = await run.result;
     expect(output.success).toBe(true);
 
@@ -191,15 +194,20 @@ describe('Prerender Builder', () => {
 
   it('should inline critical css for route', async () => {
     host.appendToFile('src/styles.css', 'p{color:red;}');
-    const run = await architect.scheduleTarget({ ...target, configuration: 'production' }, { routes: ['foo'] });
+    const run = await architect.scheduleTarget(
+      { ...target, configuration: 'production' },
+      { routes: ['foo'] },
+    );
     const output = await run.result;
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
-      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html')),
     );
 
-    expect(content).toMatch(/<style>p{color:red;}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this.media='all'">/);
+    expect(content).toMatch(
+      /<style>p{color:red;}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this.media='all'">/,
+    );
     await run.stop();
   });
 });

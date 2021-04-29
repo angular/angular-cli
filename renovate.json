@@ -4,67 +4,39 @@
   "semanticPrefix": "build",
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
-  "labels": [
-    "target: minor",
-    "action: merge"
-  ],
+  "labels": ["target: minor", "action: merge"],
   "timezone": "America/Tijuana",
   "lockFileMaintenance": {
     "enabled": true
   },
-  "schedule": [
-    "after 10pm every weekday",
-    "before 4am every weekday",
-    "every weekend"
-  ],
-  "baseBranches": [
-    "master"
-  ],
-  "ignoreDeps": [
-    "@types/node"
-  ],
+  "schedule": ["after 10pm every weekday", "before 4am every weekday", "every weekend"],
+  "baseBranches": ["master"],
+  "ignoreDeps": ["@types/node"],
   "includePaths": [
     "WORKSPACE",
     "package.json",
     "modules/**/package.json",
     "integration/**/package.json"
   ],
-  "ignorePaths": [
-    "modules/builders/testing/**"
-  ],
+  "ignorePaths": ["modules/builders/testing/**"],
   "packageRules": [
     {
-      "packagePatterns": [
-        "^@angular/.*",
-        "^@angular-devkit/.*",
-        "^@schematics/.*"
-      ],
+      "packagePatterns": ["^@angular/.*", "^@angular-devkit/.*", "^@schematics/.*"],
       "groupName": "angular",
       "pinVersions": false
     },
     {
-      "packagePatterns": [
-        "^@bazel\/.*",
-        "^build_bazel.*",
-        "^bazel_toolchains$"
-      ],
+      "packagePatterns": ["^@bazel/.*", "^build_bazel.*", "^bazel_toolchains$"],
       "groupName": "bazel",
       "pinVersions": false
     },
     {
-      "packageNames": [
-        "typescript"
-      ],
+      "packageNames": ["typescript"],
       "separateMinorPatch": true
     },
     {
-      "packageNames": [
-        "typescript"
-      ],
-      "updateTypes": [
-        "minor",
-        "major"
-      ],
+      "packageNames": ["typescript"],
+      "updateTypes": ["minor", "major"],
       "enabled": false
     },
     {

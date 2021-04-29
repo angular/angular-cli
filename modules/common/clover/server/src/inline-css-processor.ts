@@ -29,14 +29,15 @@ class CrittersExtended extends Critters {
   readonly errors: string[] = [];
 
   constructor(
-    private readonly optionsExtended: InlineCriticalCssProcessorOptions & InlineCriticalCssProcessOptions,
+    private readonly optionsExtended: InlineCriticalCssProcessorOptions &
+      InlineCriticalCssProcessOptions,
     private readonly resourceCache: Map<string, Buffer>,
   ) {
     super({
       logger: {
         warn: (s: string) => this.warnings.push(s),
         error: (s: string) => this.errors.push(s),
-        info: () => { },
+        info: () => {},
       },
       logLevel: 'warn',
       path: optionsExtended.outputPath,
@@ -63,9 +64,15 @@ class CrittersExtended extends Critters {
 }
 
 export class InlineCriticalCssProcessor {
-  constructor(protected readonly options: InlineCriticalCssProcessorOptions, private readonly resourceCache: Map<string, Buffer>) { }
+  constructor(
+    protected readonly options: InlineCriticalCssProcessorOptions,
+    private readonly resourceCache: Map<string, Buffer>,
+  ) {}
 
-  async process(html: string, options: InlineCriticalCssProcessOptions): Promise<InlineCriticalCssResult> {
+  async process(
+    html: string,
+    options: InlineCriticalCssProcessOptions,
+  ): Promise<InlineCriticalCssResult> {
     const critters = new CrittersExtended({ ...this.options, ...options }, this.resourceCache);
     const content = await critters.process(html);
 

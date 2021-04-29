@@ -25,29 +25,23 @@ import {TransferHttpCacheModule} from '@nguniversal/common';
 })
 export class AppBrowserModule() {}
 ```
+
 Then, import `ServerTransferStateModule` in your Server module.
 
 ```ts
-import { NgModule } from "@angular/core";
-import {
-  ServerModule,
-  ServerTransferStateModule
-} from "@angular/platform-server";
+import { NgModule } from '@angular/core';
+import { ServerModule, ServerTransferStateModule } from '@angular/platform-server';
 
-import { AppModule } from "./app.module";
-import { AppComponent } from "./app.component";
+import { AppModule } from './app.module';
+import { AppComponent } from './app.component';
 
 @NgModule({
-  imports: [
-    AppModule,
-    ServerModule,
-    ServerTransferStateModule
-  ],
-  bootstrap: [AppComponent]
+  imports: [AppModule, ServerModule, ServerTransferStateModule],
+  bootstrap: [AppComponent],
 })
 export class AppServerModule {}
-
 ```
+
 Finally, in `main.ts` change this:
 
 ```ts
@@ -55,7 +49,8 @@ Finally, in `main.ts` change this:
 
 platformBrowserDynamic().bootstrapModule(AppBrowserModule);
 ```
-To this: 
+
+To this:
 
 ```ts
 ...

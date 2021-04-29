@@ -13,21 +13,25 @@ export const collectionPath = require.resolve('../collection.json');
 
 /** Create a base app used for testing. */
 export async function createTestApp(appOptions = {}): Promise<UnitTestTree> {
-  const baseRunner =
-    new SchematicTestRunner('universal-schematics', collectionPath);
+  const baseRunner = new SchematicTestRunner('universal-schematics', collectionPath);
 
-  const tree = await baseRunner.runExternalSchematicAsync('@schematics/angular', 'workspace', {
-    name: 'workspace',
-    version: '6.0.0',
-    newProjectRoot: 'projects',
-  }).toPromise();
+  const tree = await baseRunner
+    .runExternalSchematicAsync('@schematics/angular', 'workspace', {
+      name: 'workspace',
+      version: '6.0.0',
+      newProjectRoot: 'projects',
+    })
+    .toPromise();
 
-  return baseRunner.runExternalSchematicAsync(
-    '@schematics/angular', 'application',
-    {
-      ...appOptions,
-      name: 'test-app',
-    },
-    tree
-  ).toPromise();
+  return baseRunner
+    .runExternalSchematicAsync(
+      '@schematics/angular',
+      'application',
+      {
+        ...appOptions,
+        name: 'test-app',
+      },
+      tree,
+    )
+    .toPromise();
 }
