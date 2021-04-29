@@ -15,7 +15,7 @@ import {
   JsonValue,
 } from '../../json';
 
-import stableStringify = require('fast-json-stable-stringify');
+const stableStringify = require('fast-json-stable-stringify');
 
 interface CacheEntry {
   value?: JsonValue;
@@ -205,7 +205,7 @@ function create(
     set(target: {}, p: ProxyPropertyKey, value: unknown): boolean {
       if (value === undefined) {
         // setting to undefined is equivalent to a delete
-        // tslint:disable-next-line: no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this.deleteProperty!(target, p);
       }
 

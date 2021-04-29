@@ -13,7 +13,7 @@ import { SchematicsException } from '../exception/exception';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
 import { ScopedTree } from '../tree/scoped';
-import { empty as staticEmpty, partition } from '../tree/static';
+import { partition, empty as staticEmpty } from '../tree/static';
 import { callRule, callSource } from './call';
 
 /**

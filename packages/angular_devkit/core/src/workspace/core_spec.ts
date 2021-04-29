@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { getSystemPath, join, normalize } from '../virtual-fs';
 import {
   WorkspaceFormat,

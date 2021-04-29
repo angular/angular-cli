@@ -26,6 +26,7 @@ export const ROUTING_MODULE_EXT = '-routing.module.ts';
  * Find the module referred by a set of options passed to the schematics.
  */
 export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path | undefined {
+  // eslint-disable-next-line no-prototype-builtins
   if (options.hasOwnProperty('skipImport') && options.skipImport) {
     return undefined;
   }

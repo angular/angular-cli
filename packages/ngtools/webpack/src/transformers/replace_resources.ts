@@ -385,14 +385,14 @@ function visitDecoratorWorkaround(node: ts.Decorator): void {
   const emptyArray = nodeFactory.createArrayLiteralExpression();
   const stylePropertyName = nodeFactory.createIdentifier('styles');
   const styleProperty = nodeFactory.createPropertyAssignment(stylePropertyName, emptyArray);
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (stylePropertyName.parent as any) = styleProperty;
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (emptyArray.parent as any) = styleProperty;
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (styleProperty.parent as any) = objectExpression;
 
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (objectExpression.properties as any) = nodeFactory.createNodeArray([
     ...objectExpression.properties,
     styleProperty,

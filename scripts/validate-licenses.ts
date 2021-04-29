@@ -6,13 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 
+// eslint-disable-next-line import/no-unassigned-import
 require('../lib/bootstrap-local');
 
+const checker = require('license-checker');
 const spdxSatisfies = require('spdx-satisfies');
 
 /**
@@ -84,7 +85,6 @@ for (const packageName of Object.keys(packages)) {
 }
 
 // Find all folders directly under a `node_modules` that have a package.json.
-const checker = require('license-checker');
 
 // Check if a license is accepted by an array of accepted licenses
 function _passesSpdx(licenses: string[], accepted: string[]) {

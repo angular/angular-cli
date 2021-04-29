@@ -81,7 +81,7 @@ export default function (
 
     const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
     const spawnOptions: SpawnOptions = {
-      stdio: !!options.hideOutput ? 'pipe' : 'inherit',
+      stdio: options.hideOutput ? 'pipe' : 'inherit',
       shell: true,
       cwd: path.join(rootDirectory, options.workingDirectory || ''),
     };

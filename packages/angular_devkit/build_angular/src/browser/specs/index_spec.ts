@@ -11,7 +11,6 @@ import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, tags, virtualFs, workspaces } from '@angular-devkit/core';
 import { createArchitect, host } from '../../test-utils';
 
-// tslint:disable-next-line:no-big-function
 describe('Browser Builder index HTML processing', () => {
   const targetSpec = { project: 'app', target: 'build' };
   let architect: Architect;

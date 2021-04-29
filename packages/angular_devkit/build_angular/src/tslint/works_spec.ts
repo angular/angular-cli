@@ -15,7 +15,6 @@ import { workspaceRoot } from '../test-utils';
 
 const lintTarget: Target = { project: 'app', target: 'lint' };
 
-// tslint:disable-next-line:no-big-function
 describe('Tslint Target', () => {
   // const filesWithErrors = { 'src/foo.ts': 'const foo = "";\n' };
   let testArchitectHost: TestingArchitectHost;

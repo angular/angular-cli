@@ -8,11 +8,11 @@
 
 export interface TemplateTag<R = string> {
   // Any is the only way here.
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (template: TemplateStringsArray, ...substitutions: any[]): R;
 }
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function oneLine(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
 
@@ -30,7 +30,7 @@ export function indentBy(indentations: number): TemplateTag {
   };
 }
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function stripIndent(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
 
@@ -48,7 +48,7 @@ export function stripIndent(strings: TemplateStringsArray, ...values: any[]) {
   return (indent > 0 ? endResult.replace(regexp, '') : endResult).trim();
 }
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function stripIndents(strings: TemplateStringsArray, ...values: any[]) {
   return String.raw(strings, ...values)
     .split('\n')
@@ -57,7 +57,7 @@ export function stripIndents(strings: TemplateStringsArray, ...values: any[]) {
     .trim();
 }
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function trimNewlines(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
 

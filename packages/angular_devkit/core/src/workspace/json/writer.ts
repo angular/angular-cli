@@ -331,7 +331,7 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
 
     // Short-circuit for simple case
     if (elements.length === 1 && typeof elements[0] === 'string') {
-      data.appendRight(parentPoint, elements[0] as string);
+      data.appendRight(parentPoint, elements[0]);
       continue;
     }
 

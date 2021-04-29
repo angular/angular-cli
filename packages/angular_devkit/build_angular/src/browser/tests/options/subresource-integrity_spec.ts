@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { logging } from '@angular-devkit/core';
 import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';

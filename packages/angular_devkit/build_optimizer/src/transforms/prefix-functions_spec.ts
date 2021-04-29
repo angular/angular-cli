@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getPrefixFunctionsTransformer } from './prefix-functions';

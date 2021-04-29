@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-any
-// tslint:disable:no-implicit-dependencies
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MergeStrategy } from '@angular-devkit/schematics';
 import { of as observableOf } from 'rxjs';
 import { Rule, SchematicContext, Source } from '../engine/interface';

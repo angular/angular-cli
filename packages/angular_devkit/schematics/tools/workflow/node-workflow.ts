@@ -8,7 +8,7 @@
 
 import { Path, getSystemPath, normalize, schema, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { workflow } from '@angular-devkit/schematics'; // tslint:disable-line:no-implicit-dependencies
+import { workflow } from '@angular-devkit/schematics';
 import { BuiltinTaskExecutor } from '../../tasks/node';
 import { FileSystemEngine } from '../description';
 import { OptionTransform } from '../file-system-engine-host-base';

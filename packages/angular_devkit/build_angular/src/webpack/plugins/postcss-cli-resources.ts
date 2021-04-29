@@ -10,7 +10,6 @@ import { interpolateName } from 'loader-utils';
 import * as path from 'path';
 import { Declaration, Plugin } from 'postcss';
 import * as url from 'url';
-import * as webpack from 'webpack';
 
 function wrapUrl(url: string): string {
   let wrappedUrl;
@@ -33,7 +32,7 @@ export interface PostcssCliResourcesOptions {
   /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
   extracted?: boolean;
   filename: (resourcePath: string) => string;
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   loader: any;
   emitFile: boolean;
 }
@@ -166,7 +165,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
       const inputFile = decl.source && decl.source.input.file;
       const context = (inputFile && path.dirname(inputFile)) || loader.context;
 
-      // tslint:disable-next-line:no-conditional-assignment
+      // eslint-disable-next-line no-cond-assign
       while ((match = urlRegex.exec(value))) {
         const originalUrl = match[1] || match[2] || match[3];
         let processedUrl;

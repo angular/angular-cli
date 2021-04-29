@@ -17,7 +17,6 @@ import { createBuilder } from './create-builder';
 
 const flush = promisify(setImmediate);
 
-// tslint:disable-next-line:no-big-function
 describe('architect', () => {
   let testArchitectHost: TestingArchitectHost;
   let architect: Architect;

@@ -98,6 +98,7 @@ export class ScopedTree implements Tree {
     return new ScopedTree(this._base.branch(), this._root.scope);
   }
   merge(other: Tree, strategy?: MergeStrategy): void {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     const delegate = new (class extends DelegateTree {
       get actions(): Action[] {

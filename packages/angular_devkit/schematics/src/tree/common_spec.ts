@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-non-null-assertion
 import { normalize } from '@angular-devkit/core';
 import { Tree } from './interface';
 
@@ -43,6 +42,7 @@ export function testTreeVisit({ createTree, sets }: VisitTestSpec) {
         const normalizedRoot = normalize(root);
 
         if (exception != null) {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           expect(() => tree.getDir(normalizedRoot).visit(() => {})).toThrow(
             exception({ path: normalizedRoot }),
           );
@@ -53,10 +53,12 @@ export function testTreeVisit({ createTree, sets }: VisitTestSpec) {
         const allPaths: string[] = [];
         tree.getDir(normalizedRoot).visit((path, entry) => {
           expect(entry).not.toBeNull();
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           expect(entry!.content.toString()).toEqual(path);
           allPaths.push(path);
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(allPaths).toEqual(expected!);
       });
     });

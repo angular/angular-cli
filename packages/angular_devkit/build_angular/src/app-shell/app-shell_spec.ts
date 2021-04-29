@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
-import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
+import * as express from 'express'; // eslint-disable-line import/no-extraneous-dependencies
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { createArchitect, host } from '../test-utils';
@@ -130,7 +129,7 @@ describe('AppShell Builder', () => {
   it('works (basic)', async () => {
     host.replaceInFile(
       'src/app/app.module.ts',
-      /    BrowserModule/,
+      / {4}BrowserModule/,
       `
       BrowserModule.withServerTransition({ appId: 'some-app' })
     `,

@@ -13,6 +13,7 @@ import { FileBuffer, HostWatchEvent, HostWatchOptions, Stats } from './interface
 import { SimpleMemoryHost, SimpleMemoryHostStats } from './memory';
 import { SyncDelegateHost } from './sync';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace test {
   export type TestLogRecord =
     | {

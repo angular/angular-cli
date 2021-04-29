@@ -16,7 +16,7 @@ export interface Location {
 
 export function parseName(path: string, name: string): Location {
   const nameWithoutPath = basename(normalize(name));
-  const namePath = dirname(join(normalize(path), name) as Path);
+  const namePath = dirname(join(normalize(path), name));
 
   return {
     name: nameWithoutPath,

@@ -8,7 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { getSystemPath, json, logging, normalize, resolve, tags } from '@angular-devkit/core';
+import { getSystemPath, json, logging, normalize, resolve } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
@@ -192,7 +192,7 @@ async function initialize(
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-// tslint:disable-next-line: no-big-function
+// eslint-disable-next-line max-lines-per-function
 export function buildWebpackBrowser(
   options: BrowserBuilderSchema,
   context: BuilderContext,
@@ -243,8 +243,8 @@ export function buildWebpackBrowser(
         target,
       };
     }),
-    // tslint:disable-next-line: no-big-function
     switchMap(
+      // eslint-disable-next-line max-lines-per-function
       ({
         config,
         projectRoot,
@@ -266,7 +266,7 @@ export function buildWebpackBrowser(
               }
             }),
         }).pipe(
-          // tslint:disable-next-line: no-big-function
+          // eslint-disable-next-line max-lines-per-function
           concatMap(async (buildEvent) => {
             const spinner = new Spinner();
             spinner.enabled = options.progress !== false;
@@ -389,7 +389,7 @@ export function buildWebpackBrowser(
                   seen.add(file.file);
 
                   if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
-                    // tslint:disable-next-line: no-non-null-assertion
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     mainChunkId = file.id!.toString();
                   }
 
@@ -428,7 +428,7 @@ export function buildWebpackBrowser(
                     code,
                     map,
                     // id is always present for non-assets
-                    // tslint:disable-next-line: no-non-null-assertion
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     name: file.id!,
                     runtime: file.file.startsWith('runtime'),
                     ignoreOriginal: es5Polyfills,

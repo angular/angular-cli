@@ -68,7 +68,7 @@ function resolveGlobalStyles(
   return { entryPoints, noInjectNames, paths };
 }
 
-// tslint:disable-next-line: no-big-function
+// eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const MiniCssExtractPlugin = require('mini-css-extract-plugin');
   const postcssImports = require('postcss-import');
@@ -108,7 +108,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
 
   let sassImplementation: {} | undefined;
   try {
-    // tslint:disable-next-line:no-implicit-dependencies
     sassImplementation = require('node-sass');
     wco.logger.warn(
       `'node-sass' usage is deprecated and will be removed in a future major version. ` +
@@ -158,7 +157,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
 
   const { supportedBrowsers } = new BuildBrowserFeatures(wco.projectRoot);
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean | undefined) => {
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const optionGenerator = (loader: any) => ({
       map: inlineSourcemaps
         ? {
@@ -195,7 +194,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
         }),
         ...extraPostcssPlugins,
         postcssPresetEnv({
-          // tslint:disable-next-line: no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           browsers: supportedBrowsers as any, // Typings only allow a string
           autoprefixer: true,
           stage: 3,
@@ -295,7 +294,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
               includePaths,
               // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
               // Ex: /* autoprefixer grid: autoplace */
-              // tslint:disable-next-line: max-line-length
               // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
               outputStyle: 'expanded',
             },
@@ -325,7 +323,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
               includePaths,
               // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
               // Ex: /* autoprefixer grid: autoplace */
-              // tslint:disable-next-line: max-line-length
               // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
               outputStyle: 'expanded',
             },

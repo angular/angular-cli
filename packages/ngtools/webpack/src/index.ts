@@ -7,6 +7,7 @@
  */
 
 import * as ivyInternal from './ivy';
+
 export {
   AngularWebpackLoaderPath,
   AngularWebpackPlugin,
@@ -17,6 +18,7 @@ export {
 /** @deprecated Deprecated as of v12, please use the direct exports
  * (`AngularWebpackPlugin` instead of `ivy.AngularWebpackPlugin`)
  */
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ivy {
   export const AngularWebpackLoaderPath = ivyInternal.AngularWebpackLoaderPath;
   export const AngularWebpackPlugin = ivyInternal.AngularWebpackPlugin;

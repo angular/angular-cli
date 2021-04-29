@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-console
-// tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
@@ -15,12 +13,11 @@ import * as path from 'path';
 import * as semver from 'semver';
 import { packages } from '../lib/packages';
 
-const changelogTemplate = require('./templates/changelog').default;
-
 const conventionalCommitsParser = require('conventional-commits-parser');
-const gitRawCommits = require('git-raw-commits');
 const ghGot = require('gh-got');
+const gitRawCommits = require('git-raw-commits');
 const through = require('through2');
+const changelogTemplate = require('./templates/changelog').default;
 
 export interface ChangelogOptions {
   from: string;

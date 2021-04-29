@@ -39,7 +39,6 @@ function applyChanges(path: string, content: string, changes: Change[]): string 
   return getFileContent(tree, path);
 }
 
-// tslint:disable-next-line:no-big-function
 describe('ast utils', () => {
   let modulePath: string;
   let moduleContent: string;
@@ -69,7 +68,7 @@ describe('ast utils', () => {
     const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
-    expect(output).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
+    expect(output).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
   });
 
   it('should add export to module if not indented', () => {
@@ -78,7 +77,7 @@ describe('ast utils', () => {
     const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
-    expect(output).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
+    expect(output).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
   });
 
   it('should add declarations to module if not indented', () => {
@@ -119,7 +118,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: \[[^\]]+,\n(\s*)  HelloWorld\n\1\]/);
+    expect(output).toMatch(/imports: \[[^\]]+,\n(\s*) {2}HelloWorld\n\1\]/);
   });
 
   it('should add metadata (comma)', () => {
@@ -144,7 +143,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: \[[^\]]+,\n(\s*)  HelloWorld,\n\1\]/);
+    expect(output).toMatch(/imports: \[[^\]]+,\n(\s*) {2}HelloWorld,\n\1\]/);
   });
 
   it('should add metadata (missing)', () => {
@@ -166,7 +165,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: \[\n(\s*)  HelloWorld\n\1\]/);
+    expect(output).toMatch(/imports: \[\n(\s*) {2}HelloWorld\n\1\]/);
   });
 
   it('should add metadata (empty)', () => {
@@ -189,7 +188,7 @@ describe('ast utils', () => {
     expect(changes).not.toBeNull();
 
     const output = applyChanges(modulePath, moduleContent, changes || []);
-    expect(output).toMatch(/imports: \[\n(\s*)  HelloWorld\n\1\],\n/);
+    expect(output).toMatch(/imports: \[\n(\s*) {2}HelloWorld\n\1\],\n/);
   });
 
   it(`should handle NgModule with newline after '@'`, () => {
@@ -294,7 +293,6 @@ describe('ast utils', () => {
     });
   });
 
-  // tslint:disable-next-line:no-big-function
   describe('addRouteDeclarationToModule', () => {
     it('should throw an error when there is no router module', () => {
       const moduleContent = `
@@ -527,11 +525,11 @@ describe('ast utils', () => {
         `{ path: 'bar', component: BarComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
-      // tslint:disable:max-line-length
+      /* eslint-disable max-len */
       expect(output).toMatch(
         /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent, canLoad: \[Guard\] },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
       );
-      // tslint:enable:max-line-length
+      /* eslint-enable max-len */
     });
 
     it('should add a route to the routes to the correct array when having nested object literal', () => {
@@ -565,7 +563,7 @@ describe('ast utils', () => {
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
       expect(output).toMatch(
-        // tslint:disable-next-line:max-line-length
+        // eslint-disable-next-line max-len
         /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent, data: { path: 'test' }},\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
       );
     });
@@ -602,7 +600,6 @@ describe('ast utils', () => {
       );
     });
 
-    // tslint:disable-next-line:max-line-length
     it('should add a route to the routes argument of RouterModule when there are multiple declarations', () => {
       const moduleContent = `
         import { BrowserModule } from '@angular/platform-browser';
@@ -631,7 +628,7 @@ describe('ast utils', () => {
       const output = applyChanges(modulePath, moduleContent, [changes]);
 
       expect(output).toMatch(
-        // tslint:disable-next-line:max-line-length
+        // eslint-disable-next-line max-len
         /RouterModule\.forRoot\(\[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]\)/,
       );
     });

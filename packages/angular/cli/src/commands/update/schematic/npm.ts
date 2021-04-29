@@ -12,8 +12,8 @@ import { homedir } from 'os';
 import * as path from 'path';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
-const ini = require('ini');
 const lockfile = require('@yarnpkg/lockfile');
+const ini = require('ini');
 const pacote = require('pacote');
 
 type PackageManagerOptions = Record<string, unknown>;

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { of as observableOf } from 'rxjs';
 import { SchematicContext } from '../engine/interface';
 import { HostTree } from '../tree/host-tree';

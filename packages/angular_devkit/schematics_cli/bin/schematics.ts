@@ -8,7 +8,6 @@
  */
 // symbol polyfill must go first
 import 'symbol-observable';
-// tslint:disable-next-line:ordered-imports import-groups
 import { logging, schema, tags } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
@@ -84,7 +83,7 @@ function _createPromptProvider(): schema.PromptProvider {
         case 'list':
           return {
             ...question,
-            type: !!definition.multiselect ? 'checkbox' : 'list',
+            type: definition.multiselect ? 'checkbox' : 'list',
             choices:
               definition.items &&
               definition.items.map((item) => {
@@ -107,7 +106,6 @@ function _createPromptProvider(): schema.PromptProvider {
   };
 }
 
-// tslint:disable-next-line: no-big-function
 export async function main({
   args,
   stdout = process.stdout,

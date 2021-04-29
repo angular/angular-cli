@@ -10,7 +10,7 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { main } from './main';
 
-// tslint:disable-next-line:no-implicit-dependencies
+// eslint-disable-next-line import/no-extraneous-dependencies
 const temp = require('temp');
 
 // We only care about the write method in these mocks of NodeJS.WriteStream.

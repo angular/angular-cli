@@ -132,11 +132,11 @@ export class BundleActionExecutor {
     // Floating promises are intentional here
     // https://github.com/facebook/jest/tree/56079a5aceacf32333089cea50c64385885fee26/packages/jest-worker#end
     if (this.largeWorker) {
-      // tslint:disable-next-line: no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.largeWorker.end();
     }
     if (this.smallWorker) {
-      // tslint:disable-next-line: no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.smallWorker.end();
     }
   }

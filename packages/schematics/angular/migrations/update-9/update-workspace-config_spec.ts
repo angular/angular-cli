@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { WorkspaceTargets } from '../../utility/workspace-models';
 import { ANY_COMPONENT_STYLE_BUDGET } from './update-workspace-config';
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getWorkspaceTargets(tree: UnitTestTree, project = 'migration-test'): any {
   return JSON.parse(tree.readContent(workspacePath)).projects[project].architect;
 }
@@ -55,7 +55,6 @@ const stylesExpectWithLazy = [
 
 const workspacePath = '/angular.json';
 
-// tslint:disable:no-big-function
 describe('Migration to version 9', () => {
   describe('Migrate workspace config', () => {
     const schematicRunner = new SchematicTestRunner(

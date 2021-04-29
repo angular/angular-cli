@@ -68,7 +68,6 @@ async function updateWebdriver() {
     `);
   }
 
-  // tslint:disable-next-line:max-line-length no-implicit-dependencies
   const webdriverUpdate = await import(path);
   // const webdriverUpdate = await import(path) as typeof import ('webdriver-manager/built/lib/cmds/update');
 

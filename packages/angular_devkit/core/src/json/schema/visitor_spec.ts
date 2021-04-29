@@ -28,7 +28,7 @@ function syncObs<T>(obs: Observable<T>): T {
     throw new Error('Async observable.');
   }
 
-  return value!; // tslint:disable-line:no-non-null-assertion
+  return value!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
 }
 
 describe('visitJson', () => {

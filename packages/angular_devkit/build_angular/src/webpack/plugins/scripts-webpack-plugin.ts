@@ -10,6 +10,7 @@ import * as path from 'path';
 import { Chunk, Compilation, Compiler, sources as webpackSources } from 'webpack';
 
 const Entrypoint = require('webpack/lib/Entrypoint');
+
 export interface ScriptsWebpackPluginOptions {
   name: string;
   sourceMap?: boolean;
@@ -34,7 +35,6 @@ export class ScriptsWebpackPlugin {
 
   constructor(private options: ScriptsWebpackPluginOptions) {}
 
-  // tslint:disable-next-line: no-any
   async shouldSkip(compilation: Compilation, scripts: string[]): Promise<boolean> {
     if (this._lastBuildTime == undefined) {
       this._lastBuildTime = Date.now();
@@ -82,7 +82,7 @@ export class ScriptsWebpackPlugin {
     compilation.entrypoints.set(this.options.name, entrypoint);
     compilation.chunks.add(chunk);
 
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     compilation.assets[filename] = source as any;
     compilation.hooks.chunkAsset.call(chunk, filename);
   }
@@ -151,7 +151,9 @@ export class ScriptsWebpackPlugin {
         const filename = interpolateName(
           { resourcePath: 'scripts.js' },
           this.options.filename as string,
-          { content: combinedSource.source() },
+          {
+            content: combinedSource.source(),
+          },
         );
 
         const output = { filename, source: combinedSource };

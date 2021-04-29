@@ -10,12 +10,11 @@ import { mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 import { addUndefinedDefaults } from './transforms';
 
-// tslint:disable-next-line: no-big-function
 describe('addUndefinedDefaults', () => {
   it('should add defaults to undefined properties (1)', async () => {
     const registry = new CoreSchemaRegistry();
     registry.addPreTransform(addUndefinedDefaults);
-    const data: any = {}; // tslint:disable-line:no-any
+    const data: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const result = await registry
       .compile({
@@ -64,7 +63,7 @@ describe('addUndefinedDefaults', () => {
   it('should add defaults to undefined properties (2)', async () => {
     const registry = new CoreSchemaRegistry();
     registry.addPreTransform(addUndefinedDefaults);
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: any = {
       bool: undefined,
       str: undefined,
@@ -97,11 +96,11 @@ describe('addUndefinedDefaults', () => {
   it('should add defaults to undefined properties when using oneOf', async () => {
     const registry = new CoreSchemaRegistry();
     registry.addPreTransform(addUndefinedDefaults);
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataNoObj: any = {
       bool: undefined,
     };
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataObj: any = {
       bool: undefined,
       obj: {
@@ -165,11 +164,11 @@ describe('addUndefinedDefaults', () => {
   it('should add defaults to undefined properties when using anyOf', async () => {
     const registry = new CoreSchemaRegistry();
     registry.addPreTransform(addUndefinedDefaults);
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataNoObj: any = {
       bool: undefined,
     };
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataObj: any = {
       bool: undefined,
       obj: {

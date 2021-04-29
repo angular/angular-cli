@@ -19,7 +19,7 @@ export { VERSION, Version } from '../../models/version';
 const debugEnv = process.env['NG_DEBUG'];
 const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCase() !== 'false';
 
-// tslint:disable: no-console
+/* eslint-disable no-console */
 export default async function (options: { testing?: boolean; cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
   const version = process.versions.node.split('.').map((part) => Number(part));
@@ -111,7 +111,7 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
     }
 
     if (options.testing) {
-      // tslint:disable-next-line: no-debugger
+      // eslint-disable-next-line no-debugger
       debugger;
       throw err;
     }

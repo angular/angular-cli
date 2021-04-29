@@ -18,6 +18,7 @@ interface NormalModuleFactoryRequest {
   typescriptPathMapped?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {}
 
 export class TypeScriptPathsPlugin {
@@ -27,7 +28,7 @@ export class TypeScriptPathsPlugin {
     this.options = options;
   }
 
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   apply(resolver: any) {
     const target = resolver.ensureHook('resolve');
     const resolveAsync = (request: NormalModuleFactoryRequest, requestContext: {}) => {

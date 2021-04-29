@@ -9,8 +9,8 @@
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
-import { join, normalize, schema, workspaces } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
-import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node'; // tslint:disable-line:no-implicit-dependencies
+import { join, normalize, schema, workspaces } from '@angular-devkit/core';
+import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { BuildResult } from './index';
 

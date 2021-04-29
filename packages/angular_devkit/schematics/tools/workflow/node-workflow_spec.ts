@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
