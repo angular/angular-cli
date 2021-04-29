@@ -1,0 +1,3 @@
+/bazel-out/
+dist/
+**/files/**

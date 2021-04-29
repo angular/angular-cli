@@ -101,14 +101,9 @@ jobs:
             else
               echo "This build is not over a PR, nothing to do."
             fi
-      # Enforce that BUILD files are formatted. Note that this uses the version of buildifier
-      # from the docker image above - take care that you use the same version when you run
-      # buildifier locally on your change.
-      - run: 'yarn bazel:format -mode=check ||
-                  (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
-      # Run the skylark linter to check our Bazel rules
-      - run: 'yarn bazel:lint ||
-                  (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+      - run:
+          name: Validate Code Formatting
+          command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
       - run: yarn lint
 
   # We run the integration tests outside of Bazel for now.
@@ -124,7 +119,7 @@ jobs:
       - browser-tools/install-chrome
       # Run a step to setup an environment variable.
       - run:
-          name: "Setup custom environment variables"
+          name: 'Setup custom environment variables'
           # Use matching versions of Chromium (via puppeteer) and ChromeDriver.
           # https://github.com/GoogleChrome/puppeteer/releases
           # http://chromedriver.chromium.org/downloads
@@ -136,22 +131,22 @@ workflows:
   version: 2
   default_workflow:
     jobs:
-    - setup
-    - build:
-        requires:
-          - setup
-    - lint:
-        requires:
-          - setup
-    - integration_test:
-        requires:
-          - build
+      - setup
+      - build:
+          requires:
+            - setup
+      - lint:
+          requires:
+            - setup
+      - integration_test:
+          requires:
+            - build
 
 general:
   branches:
     only:
-    - master
-    # 5.2.x, 6.0.x, etc
-    - /\d+\.\d+\.x/
-    # 5.x, 6.x, etc
-    - /\d+\.x/
+      - master
+      # 5.2.x, 6.0.x, etc
+      - /\d+\.\d+\.x/
+      # 5.x, 6.x, etc
+      - /\d+\.x/
