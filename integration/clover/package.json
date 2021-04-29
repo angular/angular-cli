@@ -9,9 +9,12 @@
   "scripts": {
     "ng": "ng",
     "test": "yarn build && node test.js",
-    "build": "ng build --configuration production"
+    "build": "ng run clover:build-static"
   },
   "private": true,
+  "resolutions": {
+    "@nguniversal/common": "file:../../dist/modules-dist/common"
+  },
   "dependencies": {
     "@angular/animations": "file:../../node_modules/@angular/animations",
     "@angular/common": "file:../../node_modules/@angular/common",
@@ -23,6 +26,7 @@
     "@angular/platform-server": "file:../../node_modules/@angular/platform-server",
     "@angular/router": "file:../../node_modules/@angular/router",
     "@nguniversal/common": "file:../../dist/modules-dist/common",
+    "angular-in-memory-web-api": "^0.11.0",
     "rxjs": "file:../../node_modules/rxjs",
     "zone.js": "file:../../node_modules/zone.js"
   },
@@ -30,6 +34,7 @@
     "@angular-devkit/build-angular": "file:../../node_modules/@angular-devkit/build-angular",
     "@angular/cli": "file:../../node_modules/@angular/cli",
     "@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
+    "@nguniversal/builders": "file:../../dist/modules-dist/builders",
     "@types/node": "file:../../node_modules/@types/node",
     "typescript": "file:../../node_modules/typescript"
   }

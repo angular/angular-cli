@@ -1,25 +1,8 @@
-import { Component, Inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  template: `
-    <div>Hello {{ title }}!</div>
-    <span class="href-check">{{ href }}</span>
-  `,
-  styles: [
-    `
-      div {
-        font-weight: bold;
-      }
-    `,
-  ],
+  template: '<router-outlet></router-outlet>',
+  styleUrls: [],
 })
-export class AppComponent {
-  title = 'world';
-  href: string;
-
-  constructor(@Inject(DOCUMENT) doc: Document) {
-    this.href = doc.location.href;
-  }
-}
+export class AppComponent {}

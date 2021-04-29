@@ -1,28 +1,24 @@
-const { Engine } = require('@nguniversal/common/clover/server');
 const { join } = require('path');
-const { format } = require('url');
+const glob = require('glob');
+const { readFileSync } = require('fs');
 
 const DIST = join(__dirname, 'dist/clover/browser');
+const pages = glob.sync('**/index.html', {
+  cwd: DIST,
+});
 
-const ssr = new Engine();
-ssr
-  .render({
-    publicPath: DIST,
-    url: format({
-      protocol: 'http',
-      host: 'localhost:8000',
-      pathname: '',
-    }),
-  })
-  .then((html) => {
-    if (html.includes('Hello world')) {
-      console.log(`Response contained "Hello world"`);
-    } else {
-      console.log(html);
-      throw new Error(`Response didn't include "Hello world"`);
-    }
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+console.log({
+  pages,
+});
+
+const expectedNumberOfPages = 5;
+if (pages.length !== expectedNumberOfPages) {
+  throw new Error(`Expected to have ${expectedNumberOfPages} index pages, but got ${pages.length}`);
+}
+
+for (const page of pages) {
+  const content = readFileSync(join(DIST, page), 'utf8');
+  if (!content.includes('ng-clover')) {
+    throw new Error(`Page ${page} didn't contain ng-clover marker.`);
+  }
+}

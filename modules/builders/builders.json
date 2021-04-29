@@ -10,6 +10,11 @@
       "implementation": "./src/prerender/index",
       "schema": "./src/prerender/schema.json",
       "description": "Perform build-time prerendering of chosen routes."
+    },
+    "static-generator": {
+      "implementation": "./src/static-generator/index",
+      "schema": "./src/static-generator/schema.json",
+      "description": "Perform build-time rendering of chosen routes."
     }
   }
 }

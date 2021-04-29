@@ -52,6 +52,19 @@
               ]
             }
           }
+        },
+        "build-static": {
+          "builder": "@nguniversal/builders:static-generator",
+          "options": {
+            "browserTarget": "clover:build:production",
+            "routes": [
+              "/",
+              "pokemon/pikachu",
+              "pokemon/charmander",
+              "pokemon/squirtle",
+              "pokemon/bulbasaur"
+            ]
+          }
         }
       }
     }

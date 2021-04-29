@@ -23,6 +23,7 @@ ts_library(
     module_name = "@nguniversal/builders",
     tsconfig = ":bazel-tsconfig-build.json",
     deps = [
+        "//modules/common/clover/server",
         "//modules/common/engine",
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/build-angular",
@@ -31,6 +32,7 @@ ts_library(
         "@npm//browser-sync",
         "@npm//guess-parser",
         "@npm//http-proxy-middleware",
+        "@npm//jest-worker",
         "@npm//ora",
         "@npm//rxjs",
         "@npm//tree-kill",

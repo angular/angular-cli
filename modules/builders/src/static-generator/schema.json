@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Static Page Generator",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "routes": {
+      "type": "array",
+      "description": "The routes to render.",
+      "items": {
+        "minItems": 1,
+        "type": "string",
+        "uniqueItems": true
+      }
+    },
+    "routesFile": {
+      "type": "string",
+      "description": "The path to a file containing routes separated by newlines."
+    },
+    "guessRoutes": {
+      "type": "boolean",
+      "description": "Whether or not the builder should extract routes and guess which paths to render.",
+      "default": true
+    }
+  },
+  "required": ["browserTarget"],
+  "additionalProperties": false
+}
