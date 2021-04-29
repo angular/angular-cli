@@ -281,18 +281,18 @@ To test if your change effect the public API you need to run the API guardian on
 For example in case `@angular-devkit/core` package was modified you need to run:
 
 ```bash
-yarn bazel test //etc/api:angular_devkit_core_api
+yarn bazel test //goldens/public-api:angular_devkit_core_api
 ```
 
 You can also test all packages by running:
 ```bash
-yarn bazel test //etc/api ...
+yarn bazel test //goldens/public-api ...
 ```
 
 If you modified the public API, the test will fail. To update the golden files you need to run:
 
 ```bash
-yarn bazel run //etc/api:angular_devkit_core_api.accept
+yarn bazel run //goldens/public-api:angular_devkit_core_api.accept
 ```
 
 **Note**: In some cases we use aliased symbols to create namespaces.
