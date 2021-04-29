@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { Architect } from '@angular-devkit/architect';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';

@@ -92,7 +92,7 @@ export default function (options: NgNewOptions): Rule {
       }
       if (!options.skipGit) {
         const commit =
-          typeof options.commit == 'object' ? options.commit : !!options.commit ? {} : false;
+          typeof options.commit == 'object' ? options.commit : options.commit ? {} : false;
 
         context.addTask(
           new RepositoryInitializerTask(options.directory, commit),

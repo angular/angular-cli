@@ -34,7 +34,7 @@ import {
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
-import { RoutingScope, Schema as ModuleOptions } from './schema';
+import { Schema as ModuleOptions, RoutingScope } from './schema';
 
 function buildRelativeModulePath(options: ModuleOptions, modulePath: string): string {
   const importModulePath = normalize(

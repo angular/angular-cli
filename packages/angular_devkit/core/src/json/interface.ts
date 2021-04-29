@@ -46,6 +46,7 @@ export interface JsonAstIdentifier extends JsonAstNodeBase {
   readonly value: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface JsonArray extends Array<JsonValue> {}
 
 export interface JsonAstArray extends JsonAstNodeBase {

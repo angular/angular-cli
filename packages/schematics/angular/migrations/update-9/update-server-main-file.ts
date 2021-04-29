@@ -86,7 +86,7 @@ export function updateServerMainFile(): Rule {
 
       // Add missing exports
       if (platformServerExports.length) {
-        const { exportClause } = platformServerExports[0] as ts.ExportDeclaration;
+        const { exportClause } = platformServerExports[0];
         if (!exportClause || ts.isNamespaceExport(exportClause)) {
           continue;
         }
@@ -114,7 +114,7 @@ export function updateServerMainFile(): Rule {
 
       // TypeScript will emit the Node with double quotes.
       // In schematics we usually write code with a single quotes
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (moduleSpecifier as any).singleQuote = true;
 
       const newExportDeclarationText = printer.printNode(

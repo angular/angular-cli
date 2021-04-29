@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-any
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-implicit-dependencies
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable import/no-extraneous-dependencies */
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsAsyncHost, NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';

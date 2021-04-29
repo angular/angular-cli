@@ -11,7 +11,6 @@ import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
 import { createArchitect, host } from '../../test-utils';
 
-// tslint:disable-next-line: no-big-function
 describe('Browser Builder service worker', () => {
   const manifest = {
     index: '/index.html',

@@ -11,7 +11,6 @@ import { browserBuild, createArchitect, host } from '../../test-utils';
 
 const TEST_TIMEOUT = 8 * 60 * 1000;
 
-// tslint:disable-next-line: no-big-function
 describe('Browser Builder with differential loading', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;

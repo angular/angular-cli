@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function no-non-null-assertion
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
 

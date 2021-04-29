@@ -36,7 +36,7 @@ function createWorkSpaceConfig(tree: UnitTestTree, es5BrowserSupport: boolean | 
               es5BrowserSupport,
               sourceMaps: true,
               buildOptimizer: false,
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
             configurations: {
               one: {
@@ -50,7 +50,7 @@ function createWorkSpaceConfig(tree: UnitTestTree, es5BrowserSupport: boolean | 
                 buildOptimizer: true,
                 sourceMaps: false,
               },
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
           },
         },

@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-global-tslint-disable no-big-function
 import { logging } from '@angular-devkit/core';
 import { Arguments, Option, OptionType } from './interface';
 import { ParseArgumentException, parseArguments } from './parser';

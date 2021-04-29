@@ -23,7 +23,7 @@ describe('Migration to update target and module compiler options', () => {
     tree.create(filePath, JSON.stringify(content, undefined, 2));
   }
 
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function readJsonFile(tree: UnitTestTree, filePath: string): any {
     return parseJson(tree.readContent(filePath).toString());
   }

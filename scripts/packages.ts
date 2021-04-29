@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
 import * as colors from 'ansi-colors';
 

@@ -11,7 +11,6 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ModuleOptions } from './schema';
 
-// tslint:disable-next-line: no-big-function
 describe('Module Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',

@@ -15,13 +15,14 @@ interface LocalizeExtractLoaderOptions {
 }
 
 export default function localizeExtractLoader(
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   this: any,
   content: string,
   // Source map types are broken in the webpack type definitions
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: any,
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const loaderContext = this;
 
   // Casts are needed to workaround the loader-utils typings limited support for option values
@@ -32,7 +33,7 @@ export default function localizeExtractLoader(
     // level 2 is warnings
     level: 2,
     debug(...args: string[]): void {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.debug(...args);
     },
     info(...args: string[]): void {
@@ -79,9 +80,9 @@ export default function localizeExtractLoader(
     },
   };
 
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const extractor = new MessageExtractor(filesystem as any, logger, {
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     basePath: this.rootContext as any,
     useSourceMaps: !!map,
   });

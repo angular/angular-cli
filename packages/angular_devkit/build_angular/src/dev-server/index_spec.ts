@@ -8,7 +8,7 @@
 
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { workspaces } from '@angular-devkit/core';
-import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
+import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
 import { createArchitect, host } from '../test-utils';
 
 describe('Dev Server Builder index', () => {

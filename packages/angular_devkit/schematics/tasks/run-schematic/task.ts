@@ -25,7 +25,7 @@ export class RunSchematicTask<T> implements TaskConfigurationGenerator<RunSchema
     }
 
     this._collection = c;
-    this._schematic = s as string;
+    this._schematic = s;
     this._options = o as T;
   }
 

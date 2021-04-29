@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+/* eslint-disable @typescript-eslint/unbound-method */
 import { CompilerHost } from '@angular/compiler-cli';
 import { createHash } from 'crypto';
 import * as path from 'path';
@@ -131,7 +132,6 @@ export function augmentHostWithDependencyCollection(
     host.resolveModuleNames = function (
       moduleNames: string[],
       containingFile: string,
-      // tslint:disable-next-line: trailing-comma
       ...parameters
     ) {
       const results = baseResolveModuleNames.call(host, moduleNames, containingFile, ...parameters);
@@ -337,7 +337,6 @@ export function augmentHostWithCaching(
     languageVersion,
     onError,
     shouldCreateNewSourceFile,
-    // tslint:disable-next-line: trailing-comma
     ...parameters
   ) {
     if (!shouldCreateNewSourceFile && cache.has(fileName)) {

@@ -19,16 +19,16 @@ export function mapObject<T, V>(
 
 const copySymbol = Symbol();
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function deepCopy<T extends any>(value: T): T {
   if (Array.isArray(value)) {
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (value.map((o: any) => deepCopy(o)) as unknown) as T;
   } else if (value && typeof value === 'object') {
     const valueCasted = value as {
       [copySymbol]?: T;
       toJSON?: () => string;
-      // tslint:disable-next-line:no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [key: string]: any;
     };
 

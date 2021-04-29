@@ -48,7 +48,7 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
   };
 
   // TODO: `parser.canParse()` is deprecated; remove this polyfill once we are sure all parsers provide the `parser.analyze()` method.
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function analyze(parser: any, path: string, content: string) {
     if (parser.analyze !== undefined) {
       return parser.analyze(path, content);
@@ -68,32 +68,27 @@ async function importParsers() {
     const parsers = {
       arb: new (
         await import(
-          // tslint:disable-next-line:trailing-comma
           '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/arb_translation_parser'
         )
       ).ArbTranslationParser(),
       json: new (
         await import(
-          // tslint:disable-next-line:trailing-comma
           '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'
         )
       ).SimpleJsonTranslationParser(),
       xlf: new (
         await import(
-          // tslint:disable-next-line:trailing-comma
           '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'
         )
       ).Xliff1TranslationParser(),
       xlf2: new (
         await import(
-          // tslint:disable-next-line:trailing-comma
           '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'
         )
       ).Xliff2TranslationParser(),
       // The name ('xmb') needs to match the AOT compiler option
       xmb: new (
         await import(
-          // tslint:disable-next-line:trailing-comma
           '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'
         )
       ).XtbTranslationParser(),

@@ -41,7 +41,7 @@ export class PartiallyOrderedSet<T> implements Set<T> {
   }
   forEach(
     callbackfn: (value: T, value2: T, set: PartiallyOrderedSet<T>) => void,
-    thisArg?: any, // tslint:disable-line:no-any
+    thisArg?: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   ): void {
     for (const x of this) {
       callbackfn.call(thisArg, x, x, this);

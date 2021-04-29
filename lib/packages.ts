@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable-next-line: no-global-tslint-disable
-// tslint:disable: no-implicit-dependencies
 import { JsonObject } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import * as fs from 'fs';

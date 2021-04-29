@@ -48,7 +48,7 @@ export class BuilderHarness<T> {
   private options = new Map<string | null, T>();
   private builderTargets = new Map<
     string,
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { handler: BuilderHandlerFn<any>; info: BuilderInfo; options: json.JsonObject }
   >();
   private watcherNotifier?: WatcherNotifier;
@@ -223,9 +223,9 @@ export class BuilderHarness<T> {
       map((buildResult) => ({ result: buildResult, error: undefined })),
       catchError((error) => {
         if (outputLogsOnException) {
-          // tslint:disable-next-line: no-console
+          // eslint-disable-next-line no-console
           console.error(logs.map((entry) => entry.message).join('\n'));
-          // tslint:disable-next-line: no-console
+          // eslint-disable-next-line no-console
           console.error(error);
         }
 
@@ -233,7 +233,7 @@ export class BuilderHarness<T> {
       }),
       map(({ result, error }) => {
         if (outputLogsOnFailure && result?.success === false && logs.length > 0) {
-          // tslint:disable-next-line: no-console
+          // eslint-disable-next-line no-console
           console.error(logs.map((entry) => entry.message).join('\n'));
         }
 
@@ -247,6 +247,7 @@ export class BuilderHarness<T> {
         this.watcherNotifier = undefined;
 
         for (const teardown of context.teardowns) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           teardown();
         }
       }),

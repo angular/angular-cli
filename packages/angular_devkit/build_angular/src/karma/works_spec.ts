@@ -9,7 +9,6 @@
 import { Architect } from '@angular-devkit/architect';
 import { createArchitect, host, karmaTargetSpec } from '../test-utils';
 
-// tslint:disable-next-line:no-big-function
 describe('Karma Builder', () => {
   let architect: Architect;
 

@@ -8,8 +8,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as tsLint from 'tslint'; // tslint:disable-line:no-implicit-dependencies
-import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
+import * as tsLint from 'tslint'; // eslint-disable-line import/no-extraneous-dependencies
+import * as ts from 'typescript'; // eslint-disable-line import/no-extraneous-dependencies
 import { SchematicContext, TaskExecutor } from '../../src';
 import { TslintFixTaskOptions } from './options';
 
@@ -80,7 +80,7 @@ function _listAllFiles(root: string): string[] {
 export default function (): TaskExecutor<TslintFixTaskOptions> {
   return async (options: TslintFixTaskOptions = {}, context: SchematicContext) => {
     const root = process.cwd();
-    const tslint = await import('tslint'); // tslint:disable-line:no-implicit-dependencies
+    const tslint = await import('tslint'); // eslint-disable-line import/no-extraneous-dependencies
 
     const includes = Array.isArray(options.includes)
       ? options.includes
@@ -113,7 +113,7 @@ export default function (): TaskExecutor<TslintFixTaskOptions> {
       const allFilesRel = _listAllFiles(root);
       const pattern =
         '^(' +
-        (includes as string[])
+        includes
           .map(
             (ex) =>
               '(' +

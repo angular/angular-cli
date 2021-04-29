@@ -21,7 +21,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
         architect: {
           build: {
             builder: Builders.DeprecatedNgPackagr,
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         },
       },

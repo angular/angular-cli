@@ -9,7 +9,7 @@ import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Builders, WorkspaceTargets } from '../../utility/workspace-models';
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getWorkspaceTargets(tree: UnitTestTree): any {
   return JSON.parse(tree.readContent(workspacePath)).projects['migration-lib'].architect;
 }
@@ -23,7 +23,6 @@ function updateWorkspaceTargets(tree: UnitTestTree, workspaceTargets: WorkspaceT
 const workspacePath = '/angular.json';
 const libProdTsConfig = 'migration-lib/tsconfig.lib.prod.json';
 
-// tslint:disable:no-big-function
 describe('Migration to version 9', () => {
   describe('Migrate Ivy Libraries', () => {
     const schematicRunner = new SchematicTestRunner(

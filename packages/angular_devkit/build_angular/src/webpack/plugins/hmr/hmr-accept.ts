@@ -11,7 +11,7 @@ import {
   Type,
   isDevMode,
   ɵresetCompiledComponents,
-  // tslint:disable-next-line: no-implicit-dependencies
+  // eslint-disable-next-line import/no-extraneous-dependencies
 } from '@angular/core';
 import { filter, take } from 'rxjs/operators';
 
@@ -19,8 +19,8 @@ import { filter, take } from 'rxjs/operators';
 // In future when we remove `yarn admin build` we should have this as a seperate compilation unit
 // which includes DOM lib.
 
-// tslint:disable: no-console
-// tslint:disable: no-any
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare const ng: any;
 declare const document: any;
 declare const MutationObserver: any;

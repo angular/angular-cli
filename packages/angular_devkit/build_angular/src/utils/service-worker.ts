@@ -9,7 +9,7 @@
 import { Path, getSystemPath, normalize } from '@angular-devkit/core';
 import { Config, Filesystem, Generator } from '@angular/service-worker/config';
 import * as crypto from 'crypto';
-import { constants as fsConstants, createReadStream, promises as fs } from 'fs';
+import { createReadStream, promises as fs, constants as fsConstants } from 'fs';
 import * as path from 'path';
 import { pipeline } from 'stream';
 

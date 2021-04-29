@@ -79,9 +79,7 @@ describe('Workspace Schematic', () => {
 
   it('should set the `enableI18nLegacyMessageIdFormat` Angular compiler option', async () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
-    const { angularCompilerOptions } =
-      // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.json').toString()) as any;
+    const { angularCompilerOptions } = parseJson(tree.readContent('tsconfig.json').toString());
     expect(angularCompilerOptions.enableI18nLegacyMessageIdFormat).toBe(false);
   });
 
@@ -89,9 +87,9 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('workspace', { ...defaultOptions, strict: false })
       .toPromise();
-    const { compilerOptions, angularCompilerOptions } =
-      // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.json').toString()) as any;
+    const { compilerOptions, angularCompilerOptions } = parseJson(
+      tree.readContent('tsconfig.json').toString(),
+    );
     expect(compilerOptions.strict).toBeUndefined();
     expect(
       Object.keys(angularCompilerOptions).filter((option) => option.startsWith('strict')),
@@ -102,9 +100,9 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('workspace', { ...defaultOptions, strict: true })
       .toPromise();
-    const { compilerOptions, angularCompilerOptions } =
-      // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.json').toString()) as any;
+    const { compilerOptions, angularCompilerOptions } = parseJson(
+      tree.readContent('tsconfig.json').toString(),
+    );
     expect(compilerOptions.strict).toBe(true);
     expect(angularCompilerOptions.strictTemplates).toBe(true);
   });

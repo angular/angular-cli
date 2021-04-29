@@ -275,7 +275,6 @@ function _performUpdate(
 
   const toInstall = [...infoMap.values()]
     .map((x) => [x.name, x.target, x.installed])
-    // tslint:disable-next-line:no-non-null-assertion
     .filter(([name, target, installed]) => {
       return !!name && !!target && !!installed;
     }) as [string, PackageVersionInfo, PackageVersionInfo][];
@@ -342,7 +341,7 @@ function _performUpdate(
     });
 
     if (externalMigrations.length > 0) {
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (global as any).externalMigrations = externalMigrations;
     }
   }

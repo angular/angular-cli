@@ -18,8 +18,9 @@ import {
   JobOutboundMessageKind,
 } from './api';
 
-import stableStringify = require('fast-json-stable-stringify');
+const stableStringify = require('fast-json-stable-stringify');
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace strategy {
   export type JobStrategy<
     A extends JsonValue = JsonValue,

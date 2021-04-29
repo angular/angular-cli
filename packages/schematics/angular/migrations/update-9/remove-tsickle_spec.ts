@@ -9,7 +9,6 @@ import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Builders } from '../../utility/workspace-models';
 
-// tslint:disable:no-big-function
 describe('Migration to version 9', () => {
   describe('Remove tsickle and annotateForClosureCompiler', () => {
     const schematicRunner = new SchematicTestRunner(

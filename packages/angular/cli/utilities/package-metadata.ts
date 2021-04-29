@@ -11,8 +11,8 @@ import { existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import * as path from 'path';
 
-const ini = require('ini');
 const lockfile = require('@yarnpkg/lockfile');
+const ini = require('ini');
 const pacote = require('pacote');
 
 export interface PackageDependencies {
