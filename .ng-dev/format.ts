@@ -7,4 +7,5 @@ export const format: FormatConfig = {
   'prettier': {
     matchers: ['**/*.{ts,js,json,yml,yaml,md}'],
   },
+  'buildifier': true,
 };
