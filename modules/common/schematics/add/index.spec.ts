@@ -56,8 +56,8 @@ describe('Add Schematic Rule', () => {
 
     const productionConfig = architect.server.configurations.production;
     expect(productionConfig.fileReplacements).toBeDefined();
-    expect(productionConfig.sourceMap).toBeDefined();
-    expect(productionConfig.optimization).toBeDefined();
+    expect(productionConfig.sourceMap).toBeUndefined();
+    expect(productionConfig.optimization).toBeUndefined();
 
     const productionServeSSRConfig = architect['serve-ssr'].configurations.production;
     expect(productionServeSSRConfig.serverTarget).toBe('test-app:server:production');
