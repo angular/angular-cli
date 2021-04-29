@@ -34,7 +34,9 @@
     "postinstall": "yarn webdriver-update && yarn ngcc && yarn husky install",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 91.0.4472.19",
-    "ngcc": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
+    "ngcc": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
+    "ts-circular-deps:check": "ng-dev ts-circular-deps check --config ./packages/circular-deps-test.conf.js",
+    "ts-circular-deps:approve": "ng-dev ts-circular-deps approve --config ./packages/circular-deps-test.conf.js"
   },
   "repository": {
     "type": "git",
@@ -218,7 +220,6 @@
     "ts-node": "^9.0.0",
     "tslib": "^2.0.0",
     "tslint": "^6.1.3",
-    "tslint-no-circular-imports": "^0.7.0",
     "typescript": "4.2.4",
     "verdaccio": "5.0.4",
     "verdaccio-auth-memory": "^10.0.0",
