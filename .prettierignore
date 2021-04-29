@@ -1,7 +1,7 @@
 /bazel-out/
 /docs/design/analytics.md
 /dist-schema/
-/etc/api/
+/goldens/public-api
 /packages/angular_devkit/build_angular/test/
 /packages/angular_devkit/core/src/workspace/json/test/
 /tests/

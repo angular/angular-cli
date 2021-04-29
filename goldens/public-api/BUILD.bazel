@@ -29,7 +29,7 @@ load("@npm//ts-api-guardian:index.bzl", "ts_api_guardian_test")
             bundle[1],
         ),
     ],
-    golden = "angular_cli/etc/api/%s/%s/%s.d.ts" % (
+    golden = "angular_cli/goldens/public-api/%s/%s/%s.d.ts" % (
         bundle[0],
         bundle[1],
         bundle[2],
