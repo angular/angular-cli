@@ -179,7 +179,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     );
   }
 
-  // Load locale data and translations (if present)
+  // Load locale data and translations (if present)
   let loader;
   const usedFormats = new Set<string>();
   for (const [locale, desc] of Object.entries(i18n.locales)) {

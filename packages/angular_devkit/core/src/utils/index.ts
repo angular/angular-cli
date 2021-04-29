@@ -27,6 +27,7 @@ export type DeepReadonly<T> = T extends (infer R)[]
   : T;
 
 // This should be ReadonlyArray but it has implications.
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DeepReadonlyArray<T> extends Array<DeepReadonly<T>> {}
 
 export type DeepReadonlyObject<T> = {

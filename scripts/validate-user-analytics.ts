@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
 import { analytics, logging, tags } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
@@ -60,11 +59,11 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 
   // Create the data with dimensions missing from schema.json:
   const allFixedDimensions = Object.keys(analytics.NgCliAnalyticsDimensions)
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .filter((x) => typeof analytics.NgCliAnalyticsDimensions[x as any] === 'number');
 
   for (const name of allFixedDimensions) {
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userAnalytics = analytics.NgCliAnalyticsDimensions[name as any];
     if (!(name in analytics.NgCliAnalyticsDimensionsFlagInfo)) {
       throw new Error(
@@ -154,11 +153,11 @@ async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
 
   // Create the data with dimensions missing from schema.json:
   const allFixedMetrics = Object.keys(analytics.NgCliAnalyticsMetrics)
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .filter((x) => typeof analytics.NgCliAnalyticsMetrics[x as any] === 'number');
 
   for (const name of allFixedMetrics) {
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userAnalytics = analytics.NgCliAnalyticsMetrics[name as any];
     if (!(name in analytics.NgCliAnalyticsMetricsFlagInfo)) {
       throw new Error(

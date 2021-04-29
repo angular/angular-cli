@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { parse as parseJson } from 'jsonc-parser';
 import { getWorkspaceTargets, updateWorkspaceTargets } from './update-workspace-config_spec';
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readJsonFile(tree: UnitTestTree, path: string): any {
   return parseJson(tree.readContent(path).toString());
 }
@@ -32,7 +32,6 @@ const defaultTsConfigOptions = {
   },
 };
 
-// tslint:disable:no-big-function
 describe('Migration to version 9', () => {
   describe('Update applications tsconfig', () => {
     const schematicRunner = new SchematicTestRunner(

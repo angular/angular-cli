@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable
+/* eslint-disable */
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 import * as http from 'http';
 import * as path from 'path';
@@ -142,7 +142,6 @@ const init: any = (config: any, emitter: any) => {
     // we can override the file watcher instead.
     webpackConfig.plugins.unshift({
       apply: (compiler: any) => {
-        // tslint:disable-line:no-any
         compiler.hooks.afterEnvironment.tap('karma', () => {
           compiler.watchFileSystem = { watch: () => {} };
         });

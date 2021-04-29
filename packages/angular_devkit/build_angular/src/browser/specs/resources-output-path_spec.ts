@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../test-utils';

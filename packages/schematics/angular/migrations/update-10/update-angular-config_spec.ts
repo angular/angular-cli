@@ -50,7 +50,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
               vendorSourceMap: true,
               evalSourceMap: false,
               buildOptimizer: true,
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
             configurations: {
               one: {
@@ -70,7 +70,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
                 skipAppShell: true,
                 buildOptimizer: true,
               },
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
           },
         },

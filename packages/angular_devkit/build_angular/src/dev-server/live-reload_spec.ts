@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable: no-implicit-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
 import { createProxyServer } from 'http-proxy';
@@ -17,7 +17,7 @@ import puppeteer from 'puppeteer/lib/cjs/puppeteer/node';
 import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../test-utils';
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const document: any;
 
 interface ProxyInstance {
@@ -123,7 +123,7 @@ describe('Dev Server Builder live-reload', () => {
       // MacOSX users need to set the local binary manually because Chrome has lib files with
       // spaces in them which Bazel does not support in runfiles
       // See: https://github.com/angular/angular-cli/pull/17624
-      // tslint:disable-next-line: max-line-length
+      // eslint-disable-next-line max-len
       // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
       ignoreHTTPSErrors: true,
       args: ['--no-sandbox', '--disable-gpu'],

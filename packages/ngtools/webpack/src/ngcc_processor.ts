@@ -45,7 +45,7 @@ export class NgccProcessor {
 
     this._resolver = ResolverFactory.createResolver({
       // NOTE: @types/webpack InputFileSystem is missing some methods
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fileSystem: this.inputFileSystem as any,
       extensions: ['.json'],
       useSyncFileSystemCalls: true,
@@ -207,7 +207,7 @@ export class NgccProcessor {
     // Purge this file from cache, since NGCC add new mainFields. Ex: module_ivy_ngcc
     // which are unknown in the cached file.
     if (this.inputFileSystem.purge) {
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.inputFileSystem.purge as any)(packageJsonPath);
     }
 
@@ -262,7 +262,8 @@ class NgccLogger implements Logger {
     private readonly compilationErrors: (Error | string)[],
   ) {}
 
-  debug(..._args: string[]) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  debug() {}
 
   info(...args: string[]) {
     // Log to stderr because it's a progress-like info message.

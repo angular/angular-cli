@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
-// tslint:disable:no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Path, virtualFs } from '@angular-devkit/core';
 import { HostTree, MergeStrategy, partitionApplyMerge } from '@angular-devkit/schematics';
 import { of as observableOf } from 'rxjs';

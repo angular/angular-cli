@@ -15,7 +15,7 @@ import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
 import { AnalyticsCollector } from './analytics-collector';
 
-// tslint:disable: no-console
+/* eslint-disable no-console */
 const analyticsDebug = debug('ng:analytics'); // Generate analytics, including settings and users.
 
 let _defaultAngularCliPropertyCache: string;

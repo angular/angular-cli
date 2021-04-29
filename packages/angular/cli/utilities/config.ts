@@ -96,7 +96,7 @@ function globalFilePath(): string | null {
   // information see https://github.com/angular/angular-cli/pull/20556
   const xdgConfigOld = xdgConfigHomeOld(home);
   if (existsSync(xdgConfigOld)) {
-    // tslint:disable: no-console
+    /* eslint-disable no-console */
     console.warn(
       `Old configuration location detected: ${xdgConfigOld}\n` +
         `Please move the file to the new location ~/.config/angular/config.json`,
@@ -130,12 +130,12 @@ export class AngularWorkspace {
 
   // Temporary helper functions to support refactoring
 
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getCli(): Record<string, any> {
     return (this.workspace.extensions['cli'] as Record<string, unknown>) || {};
   }
 
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getProjectCli(projectName: string): Record<string, any> {
     const project = this.workspace.projects.get(projectName);
 

@@ -11,7 +11,7 @@ import { Observable, SubscribableOrPromise, Subscriber, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
 import { Schema as RealBuilderOutput } from './output-schema';
-import { Schema as RealBuilderProgress, State as BuilderProgressState } from './progress-schema';
+import { State as BuilderProgressState, Schema as RealBuilderProgress } from './progress-schema';
 
 export type Target = json.JsonObject & RealTarget;
 export { BuilderProgressState };
@@ -262,7 +262,7 @@ export type BuilderOutputLike =
   | SubscribableOrPromise<BuilderOutput>
   | BuilderOutput;
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isBuilderOutput(obj: any): obj is BuilderOutput {
   if (!obj || typeof obj.then === 'function' || typeof obj.subscribe === 'function') {
     return false;
@@ -385,7 +385,7 @@ export function scheduleTargetAndForget(
             subscription.unsubscribe();
             // We can properly ignore the floating promise as it's a "reverse" promise; the teardown
             // is waiting for the resolve.
-            // tslint:disable-next-line:no-floating-promises
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             run.stop().then(resolve);
           };
         }),

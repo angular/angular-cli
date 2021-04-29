@@ -57,7 +57,7 @@ export class OptimizeCssWebpackPlugin {
           }
 
           let content: string | Buffer;
-          // tslint:disable-next-line: no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let map: any;
           if (this._options.sourceMap && asset.sourceAndMap) {
             const sourceAndMap = asset.sourceAndMap({});
@@ -95,7 +95,7 @@ export class OptimizeCssWebpackPlugin {
           try {
             const output = await new Promise<Result>((resolve, reject) => {
               // @types/cssnano are not up to date with version 5.
-              // tslint:disable-next-line: no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (cssNano as any)(cssNanoOptions)
                 .process(content, postCssOptions)
                 .then(resolve)
@@ -127,6 +127,7 @@ export class OptimizeCssWebpackPlugin {
           }
         });
 
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       return Promise.all(actions).then(() => {});
     });
   }

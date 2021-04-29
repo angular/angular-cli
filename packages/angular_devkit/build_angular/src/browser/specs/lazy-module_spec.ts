@@ -17,7 +17,6 @@ import {
   lazyModuleFnImport,
 } from '../../test-utils';
 
-// tslint:disable-next-line:no-big-function
 describe('Browser Builder lazy modules', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;

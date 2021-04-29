@@ -98,8 +98,7 @@ function getBootstrapComponentPath(host: Tree, mainPath: string): string {
   const metadataNode = getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
   const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
 
-  const arrLiteral = (bootstrapProperty as ts.PropertyAssignment)
-    .initializer as ts.ArrayLiteralExpression;
+  const arrLiteral = bootstrapProperty.initializer as ts.ArrayLiteralExpression;
 
   const componentSymbol = arrLiteral.elements[0].getText();
 
@@ -225,15 +224,15 @@ function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.Proper
     const name = prop.name;
     switch (name.kind) {
       case ts.SyntaxKind.Identifier:
-        return (name as ts.Identifier).getText() === propertyName;
+        return name.getText() === propertyName;
       case ts.SyntaxKind.StringLiteral:
-        return (name as ts.StringLiteral).text === propertyName;
+        return name.text === propertyName;
     }
 
     return false;
   })[0];
 
-  return property as ts.PropertyAssignment;
+  return property;
 }
 
 function addServerRoutes(options: AppShellOptions): Rule {

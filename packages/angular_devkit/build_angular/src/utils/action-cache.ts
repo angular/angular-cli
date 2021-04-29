@@ -104,7 +104,7 @@ export class BundleActionCache {
         }
         cacheEntries.push({
           path: entry.path,
-          // tslint:disable-next-line: no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           size: (entry as any).size,
           integrity: entry.metadata && entry.metadata.integrity,
         });

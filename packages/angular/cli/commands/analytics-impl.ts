@@ -13,7 +13,7 @@ import {
 } from '../models/analytics';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
-import { ProjectSetting, Schema as AnalyticsCommandSchema, SettingOrProject } from './analytics';
+import { Schema as AnalyticsCommandSchema, ProjectSetting, SettingOrProject } from './analytics';
 
 export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
   public async run(options: AnalyticsCommandSchema & Arguments) {

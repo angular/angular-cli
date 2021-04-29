@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
 import { Path, normalize, virtualFs } from '@angular-devkit/core';
 import { toArray } from 'rxjs/operators';
 import { HostCreateTree, HostTree } from '../tree/host-tree';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
+/* eslint-disable import/no-extraneous-dependencies, no-prototype-builtins */
 import { logging } from '@angular-devkit/core';
 import cli from '@angular/cli/lib/cli';
 import * as child_process from 'child_process';

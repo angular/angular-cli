@@ -6,12 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-console
-// tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
 import { execSync, spawnSync } from 'child_process';
 import * as glob from 'glob';
-import 'jasmine';
 import { SpecReporter as JasmineSpecReporter, StacktraceOption } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, normalize, relative } from 'path';
@@ -107,7 +104,7 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
   const allTests = glob.sync(regex).map((p) => relative(projectBaseDir, p));
 
   const tsConfigPath = join(__dirname, '../tsconfig.json');
-  const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+  const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile.bind(ts.sys));
   const pattern =
     '^(' +
     (tsConfig.config.exclude as string[])

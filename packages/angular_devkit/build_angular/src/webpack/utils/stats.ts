@@ -159,7 +159,7 @@ function generateBuildStats(hash: string, time: number, colors: boolean): string
 
 function statsToString(
   json: StatsCompilation,
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   statsConfig: any,
   bundleState?: BundleStats[],
 ): string {
@@ -245,7 +245,7 @@ export const IGNORE_WARNINGS = [
   /Failed to parse source map from/,
 ];
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function statsWarningsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
   const c = (x: string) => (colors ? ansiColors.reset.cyan(x) : x);
@@ -280,7 +280,7 @@ export function statsWarningsToString(json: StatsCompilation, statsConfig: any):
   return output ? '\n' + output : output;
 }
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function statsErrorsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
   const c = (x: string) => (colors ? ansiColors.reset.cyan(x) : x);

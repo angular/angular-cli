@@ -20,7 +20,7 @@ export interface DedupeModuleResolvePluginOptions {
   verbose?: boolean;
 }
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getResourceData(resolveData: any): ResourceData {
   const { descriptionFileData, relativePath } = resolveData.createData.resourceResolveData;
 

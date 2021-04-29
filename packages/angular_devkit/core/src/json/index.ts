@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as schema from './schema/index';
+
 export * from './interface';
 export * from './parser';
-
-import * as schema from './schema/index';
 export { schema };

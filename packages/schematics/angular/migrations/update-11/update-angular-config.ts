@@ -56,7 +56,7 @@ function updateLazyScriptsStyleOption(options: TargetOptions): TargetOptions {
     options: NonNullable<TargetOptions>,
     type: 'scripts' | 'styles',
   ): JsonArray | undefined {
-    // tslint:disable-next-line: no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (!options[type] || !isJsonArray(options[type]!)) {
       return undefined;
     }

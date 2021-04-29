@@ -13,9 +13,7 @@ import { ProcessBundleResult } from './process-bundle';
 
 const KB = 1024;
 
-// tslint:disable-next-line: no-big-function
 describe('bundle-calculator', () => {
-  // tslint:disable-next-line: no-big-function
   describe('checkBudgets()', () => {
     it('yields maximum budgets exceeded', () => {
       const budgets: Budget[] = [

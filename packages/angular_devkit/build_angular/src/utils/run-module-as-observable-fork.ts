@@ -10,13 +10,14 @@ import { BuilderOutput } from '@angular-devkit/architect';
 import { ForkOptions, fork } from 'child_process';
 import { resolve } from 'path';
 import { Observable } from 'rxjs';
+
 const treeKill = require('tree-kill');
 
 export function runModuleAsObservableFork(
   cwd: string,
   modulePath: string,
   exportName: string | undefined,
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any[],
 ): Observable<BuilderOutput> {
   return new Observable((obs) => {

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { deepCopy } from './object';
 
 describe('object', () => {

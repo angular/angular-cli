@@ -11,8 +11,8 @@ import {
   Stats,
   constants,
   existsSync,
-  mkdirSync,
   promises as fsPromises,
+  mkdirSync,
   readFileSync,
   readdirSync,
   renameSync,
@@ -36,6 +36,7 @@ import {
 } from '../src';
 
 interface ChokidarWatcher {
+  // eslint-disable-next-line @typescript-eslint/no-misused-new
   new (options: {}): ChokidarWatcher;
 
   add(path: string): ChokidarWatcher;
@@ -63,7 +64,7 @@ let FSWatcher: ChokidarWatcher;
 function loadFSWatcher() {
   if (!FSWatcher) {
     try {
-      // tslint:disable-next-line:no-implicit-dependencies
+      // eslint-disable-next-line import/no-extraneous-dependencies
       FSWatcher = require('chokidar').FSWatcher;
     } catch (e) {
       if (e.code !== 'MODULE_NOT_FOUND') {
@@ -263,11 +264,11 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   }
 
   isDirectory(path: Path): Observable<boolean> {
-    // tslint:disable-next-line:no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.stat(path)!.pipe(map((stat) => stat.isDirectory()));
   }
   isFile(path: Path): Observable<boolean> {
-    // tslint:disable-next-line:no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.stat(path)!.pipe(map((stat) => stat.isFile()));
   }
 

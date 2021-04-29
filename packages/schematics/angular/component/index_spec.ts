@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { createAppModule } from '../utility/test';
@@ -146,7 +145,7 @@ describe('Component Schematic', () => {
 
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(appModuleContent).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
+    expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
   });
 
   it('should import into a specified module', async () => {
@@ -246,21 +245,21 @@ describe('Component Schematic', () => {
     const options = { ...defaultOptions, displayBlock: true };
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.css');
-    expect(content).toMatch(/:host {\r?\n  display: block;\r?\n}/);
+    expect(content).toMatch(/:host {\r?\n {2}display: block;\r?\n}/);
   });
 
   it('should respect the displayBlock option when inlineStyle is `false` and use correct syntax for `scss`', async () => {
     const options = { ...defaultOptions, displayBlock: true, style: 'scss' };
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.scss');
-    expect(content).toMatch(/:host {\r?\n  display: block;\r?\n}/);
+    expect(content).toMatch(/:host {\r?\n {2}display: block;\r?\n}/);
   });
 
   it('should respect the displayBlock option when inlineStyle is `false` and use correct syntax for `sass', async () => {
     const options = { ...defaultOptions, displayBlock: true, style: 'sass' };
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.sass');
-    expect(content).toMatch(/\\:host\r?\n  display: block;\r?\n/);
+    expect(content).toMatch(/\\:host\r?\n {2}display: block;\r?\n/);
   });
 
   it('should respect the displayBlock option when inlineStyle is `true`', async () => {

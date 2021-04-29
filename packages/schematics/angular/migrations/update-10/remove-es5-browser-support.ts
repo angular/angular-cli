@@ -111,13 +111,13 @@ async function isES5SupportNeeded(projectRoot: Path): Promise<boolean | undefine
   const criteria = ['y', 'a'];
 
   try {
-    // tslint:disable-next-line:no-implicit-dependencies
+    // eslint-disable-next-line import/no-extraneous-dependencies
     const browserslist = await import('browserslist');
     const supportedBrowsers = browserslist(undefined, {
       path: getSystemPath(projectRoot),
     });
 
-    // tslint:disable-next-line:no-implicit-dependencies
+    // eslint-disable-next-line import/no-extraneous-dependencies
     const { feature, features } = await import('caniuse-lite');
     const data = feature(features['es6-module']);
 

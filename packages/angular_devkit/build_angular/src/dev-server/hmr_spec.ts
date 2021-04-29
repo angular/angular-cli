@@ -7,18 +7,18 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-// tslint:disable: no-implicit-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser';
 import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page';
 import puppeteer from 'puppeteer/lib/cjs/puppeteer/node';
-// tslint:enable: no-implicit-dependencies
+/* eslint-enable import/no-extraneous-dependencies */
 import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../test-utils';
 
-// tslint:disable: no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare const document: any;
 declare const getComputedStyle: any;
-// tslint:enable: no-any
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 describe('Dev Server Builder HMR', () => {
   const target = { project: 'app', target: 'serve' };
@@ -34,7 +34,7 @@ describe('Dev Server Builder HMR', () => {
       // MacOSX users need to set the local binary manually because Chrome has lib files with
       // spaces in them which Bazel does not support in runfiles
       // See: https://github.com/angular/angular-cli/pull/17624
-      // tslint:disable-next-line: max-line-length
+      // eslint-disable-next-line max-len
       // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-800071/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
       args: ['--no-sandbox', '--disable-gpu'],
     });

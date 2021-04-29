@@ -74,7 +74,7 @@ export class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> 
         maybeAlias = join(maybeAlias, ...remaining);
       }
       // Allow non-null-operator because we know sp.length > 0 (condition on while).
-      remaining.unshift(sp.pop()!); // tslint:disable-line:no-non-null-assertion
+      remaining.unshift(sp.pop()!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
     }
 
     return maybeAlias || path;

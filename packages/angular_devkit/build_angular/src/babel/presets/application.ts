@@ -145,7 +145,7 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
           relative: path.relative,
           readFile: fs.readFileSync,
           // Node.JS types don't overlap the Compiler types.
-          // tslint:disable-next-line: no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
       }),
     );

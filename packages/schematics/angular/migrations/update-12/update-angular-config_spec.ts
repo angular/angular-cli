@@ -38,7 +38,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
               experimentalRollupPass: false,
               buildOptimizer: false,
               namedChunks: true,
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
             configurations: {
               one: {
@@ -49,7 +49,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
                 aot: false,
                 optimization: false,
               },
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
           },
         },

@@ -40,8 +40,6 @@ export type FallbackContext = TypedSchematicContext<
 export class FallbackEngineHost implements EngineHost<{}, {}> {
   private _hosts: EngineHost<{}, {}>[] = [];
 
-  constructor() {}
-
   addHost<CollectionT extends object, SchematicT extends object>(
     host: EngineHost<CollectionT, SchematicT>,
   ) {
@@ -91,7 +89,7 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     options: OptionT,
     context?: FallbackContext,
   ): Observable<ResultT> {
-    // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return ((observableOf(options) as any).pipe(
       ...this._hosts.map((host) =>
         mergeMap((opt: {}) => host.transformOptions(schematic, opt, context)),

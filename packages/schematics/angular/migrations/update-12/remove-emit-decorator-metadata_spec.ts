@@ -18,7 +18,7 @@ describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
     require.resolve('../migration-collection.json'),
   );
 
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function readJsonFile(tree: UnitTestTree, filePath: string): any {
     return parseJson(tree.readContent(filePath).toString());
   }

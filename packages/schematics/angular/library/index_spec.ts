@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
 import { getFileContent } from '../../angular/utility/test';
@@ -15,7 +14,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as GenerateLibrarySchema } from './schema';
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getJsonFileContent(tree: UnitTestTree, path: string): any {
   return parseJson(tree.readContent(path).toString());
 }
@@ -174,7 +173,7 @@ describe('Library Schematic', () => {
       .runSchematicAsync('library', defaultOptions, workspaceTree)
       .toPromise();
     const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
-    expect(fileContent).toMatch(/exports: \[\n(\s*)  FooComponent\n\1\]/);
+    expect(fileContent).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
   });
 
   describe(`update package.json`, () => {
