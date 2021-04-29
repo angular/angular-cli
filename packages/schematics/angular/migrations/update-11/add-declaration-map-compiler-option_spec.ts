@@ -29,7 +29,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
                 tsConfig: 'projects/lib/tsconfig.lib.prod.json',
               },
             },
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         },
       },

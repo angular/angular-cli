@@ -10,7 +10,7 @@ import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { tags } from '@angular-devkit/core';
 import * as https from 'https';
-import fetch from 'node-fetch'; // tslint:disable-line:no-implicit-dependencies
+import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
 import { createArchitect, host } from '../test-utils';
 
 describe('Dev Server Builder ssl', () => {

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-any no-big-function no-implicit-dependencies
+/* eslint-disable @typescript-eslint/no-explicit-any, import/no-extraneous-dependencies */
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostSink, HostTree, SchematicEngine } from '@angular-devkit/schematics';
 import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
@@ -15,7 +15,6 @@ import { from, of as observableOf } from 'rxjs';
 
 describe('FileSystemEngineHost', () => {
   // We need to resolve a file that actually exists, and not just a folder.
-  // tslint:disable-next-line:max-line-length
   const root = path.join(
     path.dirname(require.resolve(__filename)),
     '../../../../tests/angular_devkit/schematics/tools/file-system-engine-host',

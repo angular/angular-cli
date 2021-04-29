@@ -47,7 +47,7 @@ export default function optimizer(options: Options) {
       });
       if (!code) {
         if (DEBUG) {
-          // tslint:disable-next-line: no-console
+          // eslint-disable-next-line no-console
           console.error(
             'no transforms produced by buildOptimizer for ' + path.relative(process.cwd(), id),
           );

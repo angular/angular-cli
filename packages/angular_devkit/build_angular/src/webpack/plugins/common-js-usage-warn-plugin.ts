@@ -10,8 +10,8 @@ import { Compilation, Compiler, Dependency, Module, NormalModule } from 'webpack
 import { addWarning } from '../../utils/webpack-diagnostics';
 
 // Webpack doesn't export these so the deep imports can potentially break.
-const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
+const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 
 export interface CommonJsUsageWarnPluginOptions {
   /** A list of CommonJS packages that are allowed to be used without a warning. */
@@ -80,7 +80,6 @@ export class CommonJsUsageWarnPlugin {
             // Only show warnings for modules from main entrypoint.
             // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
             // will require CommonJS libraries for live reloading such as 'sockjs-node'.
-            // tslint:disable-next-line: no-any
             if (mainIssuer && mainModules.has(mainIssuer)) {
               const warning =
                 `${(issuer as NormalModule | null)?.userRequest} depends on '${rawRequest}'. ` +

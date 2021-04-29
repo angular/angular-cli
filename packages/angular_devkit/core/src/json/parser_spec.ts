@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { JsonParseMode, parseJson, parseJsonAst } from './parser';
 
 // Node 6 compatibility.
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function entries(x: { [key: string]: any }): any {
   return Object.keys(x).map((k) => [k, x[k]]);
 }

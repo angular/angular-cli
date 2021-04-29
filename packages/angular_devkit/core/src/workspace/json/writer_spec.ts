@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { JsonArray, JsonObject } from '../../json';
@@ -63,7 +62,7 @@ function createTestCaseHost(inputData = '') {
 describe('writeJsonWorkpaceFile', () => {
   it('does not modify a file without changes', async () => {
     const host = {
-      async readFile(path: string) {
+      async readFile() {
         return representativeFile;
       },
       async writeFile() {

@@ -37,7 +37,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
               extractCss: false,
               sourceMaps: true,
               buildOptimizer: false,
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
             configurations: {
               one: {
@@ -59,7 +59,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
                 extractCss: true,
                 aot: true,
               },
-              // tslint:disable-next-line:no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
           },
         },

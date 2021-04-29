@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { EMPTY, Observable, of, timer } from 'rxjs';
 import { map, take, toArray } from 'rxjs/operators';
 import { promisify } from 'util';
@@ -343,7 +343,7 @@ describe('SimpleScheduler', () => {
               done.push(argument);
               argument++;
 
-              // tslint:disable-next-line:no-floating-promises
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
               p.then(fn);
             } else {
               done.push(-1);
@@ -662,6 +662,7 @@ describe('SimpleScheduler', () => {
     registry.register(
       'job',
       createJobHandler(() => {
+        // eslint-disable-next-line no-throw-literal
         throw 1;
       }),
     );

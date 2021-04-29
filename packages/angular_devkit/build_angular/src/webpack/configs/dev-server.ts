@@ -65,9 +65,10 @@ export function getDevServerConfig(
     // There's no option to turn off file watching in webpack-dev-server, but
     // we can override the file watcher instead.
     extraPlugins.push({
-      // tslint:disable-next-line:no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       apply: (compiler: any) => {
         compiler.hooks.afterEnvironment.tap('angular-cli', () => {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           compiler.watchFileSystem = { watch: () => {} };
         });
       },

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-any no-big-function
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 

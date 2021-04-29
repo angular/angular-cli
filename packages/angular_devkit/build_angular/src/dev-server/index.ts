@@ -20,7 +20,7 @@ import * as url from 'url';
 import * as webpack from 'webpack';
 import * as webpackDevServer from 'webpack-dev-server';
 import { getAnalyticsConfig, getCompilerConfig } from '../browser';
-import { OutputHashing, Schema as BrowserBuilderSchema } from '../browser/schema';
+import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
@@ -36,7 +36,6 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
-import { addError, addWarning } from '../utils/webpack-diagnostics';
 import {
   getBrowserConfig,
   getCommonConfig,
@@ -81,7 +80,7 @@ export type DevServerBuilderOutput = DevServerBuildOutput & {
  *
  * @experimental Direct usage of this function is considered experimental.
  */
-// tslint:disable-next-line: no-big-function
+// eslint-disable-next-line max-lines-per-function
 export function serveWebpackBrowser(
   options: DevServerBuilderOptions,
   context: BuilderContext,
@@ -190,7 +189,7 @@ export function serveWebpackBrowser(
       // This is needed because we cannot use the inline option directly in the config
       // because of the SuppressExtractedTextChunksWebpackPlugin
       // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       webpackDevServer.addDevServerEntrypoints(config as any, {
         ...config.devServer,
         inline: true,

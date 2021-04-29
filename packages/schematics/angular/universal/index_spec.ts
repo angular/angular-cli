@@ -13,7 +13,6 @@ import { NodeDependencyType, addPackageJsonDependency } from '../utility/depende
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as UniversalOptions } from './schema';
 
-// tslint:disable-next-line:no-big-function
 describe('Universal Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -89,8 +88,7 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
-    // tslint:disable-next-line: no-any
-    const contents = parseJson(tree.readContent(filePath).toString()) as any;
+    const contents = parseJson(tree.readContent(filePath).toString());
     expect(contents).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
@@ -115,8 +113,7 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/projects/bar/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
-    // tslint:disable-next-line: no-any
-    const contents = parseJson(tree.readContent(filePath).toString()) as any;
+    const contents = parseJson(tree.readContent(filePath).toString());
     expect(contents).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {

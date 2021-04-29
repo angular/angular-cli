@@ -10,8 +10,8 @@ import {
   Observable,
   concat,
   defer as deferObservable,
-  from as observableFrom,
   isObservable,
+  from as observableFrom,
   of as observableOf,
 } from 'rxjs';
 import { concatMap, ignoreElements, map, mergeMap } from 'rxjs/operators';

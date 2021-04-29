@@ -246,10 +246,7 @@ export function insertAfterLastOccurrence(
   return new InsertChange(file, lastItemPosition, toInsert);
 }
 
-function _angularImportsFromNode(
-  node: ts.ImportDeclaration,
-  _sourceFile: ts.SourceFile,
-): { [name: string]: string } {
+function _angularImportsFromNode(node: ts.ImportDeclaration): { [name: string]: string } {
   const ms = node.moduleSpecifier;
   let modulePath: string;
   switch (ms.kind) {
@@ -273,11 +270,11 @@ function _angularImportsFromNode(
       if (nb.kind == ts.SyntaxKind.NamespaceImport) {
         // This is of the form `import * as name from 'path'`. Return `name.`.
         return {
-          [(nb as ts.NamespaceImport).name.text + '.']: modulePath,
+          [nb.name.text + '.']: modulePath,
         };
       } else {
         // This is of the form `import {a,b,c} from 'path'`
-        const namedImports = nb as ts.NamedImports;
+        const namedImports = nb;
 
         return namedImports.elements
           .map((is: ts.ImportSpecifier) => (is.propertyName ? is.propertyName.text : is.name.text))
@@ -302,7 +299,7 @@ export function getDecoratorMetadata(
   module: string,
 ): ts.Node[] {
   const angularImports = findNodes(source, ts.isImportDeclaration)
-    .map((node) => _angularImportsFromNode(node, source))
+    .map((node) => _angularImportsFromNode(node))
     .reduce((acc, current) => {
       for (const key of Object.keys(current)) {
         acc[key] = current[key];
@@ -370,7 +367,7 @@ export function addSymbolToNgModuleMetadata(
   importPath: string | null = null,
 ): Change[] {
   const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
-  let node: any = nodes[0]; // tslint:disable-line:no-any
+  let node: any = nodes[0]; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   // Find the decorator declaration.
   if (!node) {
@@ -606,7 +603,7 @@ export function getEnvironmentExportName(source: ts.SourceFile): string | null {
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
 export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
-  const result = getDecoratorMetadata(source, 'NgModule', '@angular/core') as ts.Node[];
+  const result = getDecoratorMetadata(source, 'NgModule', '@angular/core');
   const node = result[0] as ts.ObjectLiteralExpression;
   const matchingProperties = getMetadataField(node, 'imports');
 

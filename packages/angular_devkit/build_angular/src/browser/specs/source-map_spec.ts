@@ -10,7 +10,6 @@ import { Architect } from '@angular-devkit/architect';
 import { OutputHashing } from '@angular-devkit/build-angular';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 
-// tslint:disable-next-line:no-big-function
 describe('Browser Builder source map', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;

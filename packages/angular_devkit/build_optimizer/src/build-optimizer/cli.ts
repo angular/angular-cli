@@ -11,7 +11,7 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { buildOptimizer } from './build-optimizer';
 
-// tslint:disable: no-console
+/* eslint-disable no-console */
 if (process.argv.length < 3 || process.argv.length > 4) {
   throw new Error(`
     build-optimizer should be called with either one or two arguments:

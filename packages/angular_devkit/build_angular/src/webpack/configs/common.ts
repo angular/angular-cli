@@ -51,7 +51,7 @@ import { IGNORE_WARNINGS } from '../utils/stats';
 
 const TerserPlugin = require('terser-webpack-plugin');
 
-// tslint:disable-next-line:no-big-function
+// eslint-disable-next-line max-lines-per-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const { root, projectRoot, buildOptions, tsConfig } = wco;
   const {
@@ -182,7 +182,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   if (buildOptions.assets.length) {
     const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternClass) => {
       // Resolve input paths relative to workspace root and add slash at the end.
-      // tslint:disable-next-line: prefer-const
+      // eslint-disable-next-line prefer-const
       let { input, output, ignore = [], glob } = asset;
       input = path.resolve(root, input).replace(/\\/g, '/');
       input = input.endsWith('/') ? input : input + '/';

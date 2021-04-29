@@ -26,11 +26,12 @@ import {
 import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
-// tslint:disable-next-line: no-big-function
+// eslint-disable-next-line max-lines-per-function
 export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput = BuilderOutput>(
   fn: BuilderHandlerFn<OptT>,
 ): Builder<OptT & json.JsonObject> {
   const cjh = experimental.jobs.createJobHandler;
+  // eslint-disable-next-line max-lines-per-function
   const handler = cjh<json.JsonObject, BuilderInput, OutT>((options, context) => {
     const scheduler = context.scheduler;
     const progressChannel = context.createChannel('progress');

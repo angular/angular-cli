@@ -30,7 +30,7 @@ export default function (options: ClassOptions): Rule {
       options.path = await createDefaultPath(host, options.project as string);
     }
 
-    options.type = !!options.type ? `.${options.type}` : '';
+    options.type = options.type ? `.${options.type}` : '';
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;

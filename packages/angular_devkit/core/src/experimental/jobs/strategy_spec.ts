@@ -39,7 +39,7 @@ describe('strategy.serialize()', () => {
               resolve(input.reduce((a, c) => a + c, 0));
             }, 10),
           );
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
       ),
       {
@@ -96,7 +96,7 @@ describe('strategy.serialize()', () => {
               resolve(input.reduce((a, c) => a + c, 0));
             }, 10),
           );
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
       ),
       {
@@ -116,7 +116,7 @@ describe('strategy.serialize()', () => {
               resolve(input.reduce((a, c) => a + c, 100));
             }, 10),
           );
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
       ),
       {
@@ -181,7 +181,7 @@ describe('strategy.reuse()', () => {
               resolve(input.reduce((a, c) => a + c, 0));
             }, 10),
           );
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
       ),
       {
@@ -256,7 +256,7 @@ describe('strategy.memoize()', () => {
               resolve(input.reduce((a, c) => a + c, 0));
             }, 10),
           );
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
       ),
       {

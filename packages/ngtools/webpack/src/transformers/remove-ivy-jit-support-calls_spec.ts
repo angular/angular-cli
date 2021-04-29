@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { tags } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
+/* eslint-disable max-len */
+import { tags } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { removeIvyJitSupportCalls } from './remove-ivy-jit-support-calls';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
@@ -80,9 +81,7 @@ const inputNoPure = tags.stripIndent`
       }], null, null); })();
 `;
 
-// tslint:disable-next-line: no-big-function
 describe('@ngtools/webpack transformers', () => {
-  // tslint:disable-next-line: no-big-function
   describe('remove-ivy-dev-calls', () => {
     it('should allow removing only set class metadata with pure annotation', () => {
       const output = tags.stripIndent`

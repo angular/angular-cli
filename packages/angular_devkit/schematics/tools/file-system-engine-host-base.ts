@@ -17,7 +17,7 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, statSync } from 'fs';
 import { dirname, isAbsolute, join, resolve } from 'path';
-import { Observable, from as observableFrom, isObservable, throwError } from 'rxjs';
+import { Observable, isObservable, from as observableFrom, throwError } from 'rxjs';
 import { Url } from 'url';
 import {
   HostCreateTree,
@@ -124,7 +124,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     desc: Partial<FileSystemSchematicDesc>,
   ): FileSystemSchematicDesc;
 
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _transforms: OptionTransform<any, any>[] = [];
   private _contextTransforms: ContextTransform[] = [];
   private _taskFactories = new Map<string, () => Observable<TaskExecutor>>();
@@ -324,7 +324,6 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
   }
 
   transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
-    // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
     return this._contextTransforms.reduce((acc, curr) => curr(acc), context);
   }
 

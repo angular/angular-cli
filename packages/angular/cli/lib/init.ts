@@ -8,7 +8,6 @@
 
 import 'symbol-observable';
 // symbol polyfill must go first
-// tslint:disable-next-line:ordered-imports import-groups
 import * as fs from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
@@ -22,7 +21,7 @@ if (process.env['NG_CLI_PROFILING']) {
     stopProfiling: (name?: string) => unknown;
   };
   try {
-    profiler = require('v8-profiler-node8'); // tslint:disable-line:no-implicit-dependencies
+    profiler = require('v8-profiler-node8'); // eslint-disable-line import/no-extraneous-dependencies
   } catch (err) {
     throw new Error(
       `Could not require 'v8-profiler-node8'. You must install it separetely with ` +
@@ -90,7 +89,7 @@ if (process.env['NG_CLI_PROFILING']) {
         localVersion = require(path.join(path.dirname(projectLocalCli), '../../package.json'))
           .version;
       } catch (error) {
-        // tslint:disable-next-line no-console
+        // eslint-disable-next-line  no-console
         console.error('Version mismatch check skipped. Unable to retrieve local version: ' + error);
       }
     }
@@ -99,7 +98,7 @@ if (process.env['NG_CLI_PROFILING']) {
     try {
       isGlobalGreater = !!localVersion && globalVersion.compare(localVersion) > 0;
     } catch (error) {
-      // tslint:disable-next-line no-console
+      // eslint-disable-next-line  no-console
       console.error('Version mismatch check skipped. Unable to compare local version: ' + error);
     }
 
@@ -115,7 +114,7 @@ if (process.env['NG_CLI_PROFILING']) {
           `version (${localVersion}). The local Angular CLI version is used.\n\n` +
           'To disable this warning use "ng config -g cli.warnings.versionMismatch false".';
 
-        // tslint:disable-next-line no-console
+        // eslint-disable-next-line  no-console
         console.error(colors.yellow(warning));
       }
     }
@@ -144,7 +143,7 @@ if (process.env['NG_CLI_PROFILING']) {
     process.exit(exitCode);
   })
   .catch((err: Error) => {
-    // tslint:disable-next-line no-console
+    // eslint-disable-next-line  no-console
     console.error('Unknown error: ' + err.toString());
     process.exit(127);
   });

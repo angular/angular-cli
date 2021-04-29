@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getWrapEnumsTransformer } from './wrap-enums';
@@ -14,7 +13,6 @@ import { getWrapEnumsTransformer } from './wrap-enums';
 const transform = (content: string) =>
   transformJavascript({ content, getTransforms: [getWrapEnumsTransformer] }).content;
 
-// tslint:disable:no-big-function
 describe('wrap enums and classes transformer', () => {
   describe('wraps class declarations', () => {
     it('should wrap default exported classes', () => {

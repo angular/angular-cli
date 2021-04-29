@@ -49,7 +49,7 @@ export const NormalizedSep = '/' as Path;
  * The root of a normalized path.
  * @type {Path}
  */
-export const NormalizedRoot = NormalizedSep as Path;
+export const NormalizedRoot = NormalizedSep;
 
 /**
  * Split a path into multiple path fragments. Each fragments except the last one will end with
@@ -153,7 +153,7 @@ export function relative(from: Path, to: Path): Path {
       p = splitTo.join(NormalizedSep);
     } else {
       p = splitFrom
-        .map((_) => '..')
+        .map(() => '..')
         .concat(splitTo)
         .join(NormalizedSep);
     }

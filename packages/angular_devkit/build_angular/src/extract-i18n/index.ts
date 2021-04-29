@@ -14,7 +14,7 @@ import type { Diagnostics } from '@angular/localize/src/tools/src/diagnostics';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
-import { OutputHashing, Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
@@ -60,48 +60,42 @@ async function getSerializer(
   switch (format) {
     case Format.Xmb:
       const { XmbTranslationSerializer } = await import(
-        // tslint:disable-next-line: trailing-comma
         '@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'
       );
 
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new XmbTranslationSerializer(basePath as any, useLegacyIds);
     case Format.Xlf:
     case Format.Xlif:
     case Format.Xliff:
       const { Xliff1TranslationSerializer } = await import(
-        // tslint:disable-next-line: trailing-comma
         '@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'
       );
 
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new Xliff1TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
     case Format.Xlf2:
     case Format.Xliff2:
       const { Xliff2TranslationSerializer } = await import(
-        // tslint:disable-next-line: trailing-comma
         '@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'
       );
 
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new Xliff2TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
     case Format.Json:
       const { SimpleJsonTranslationSerializer } = await import(
-        // tslint:disable-next-line: trailing-comma
         '@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'
       );
 
       return new SimpleJsonTranslationSerializer(sourceLocale);
     case Format.LegacyMigrate:
       const { LegacyMessageIdMigrationSerializer } = await import(
-        // tslint:disable-next-line: trailing-comma
         '@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'
       );
 
       return new LegacyMessageIdMigrationSerializer(diagnostics);
     case Format.Arb:
       const { ArbTranslationSerializer } = await import(
-        // tslint:disable-next-line: trailing-comma
         '@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'
       );
 
@@ -111,7 +105,7 @@ async function getSerializer(
         },
       };
 
-      // tslint:disable-next-line: no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new ArbTranslationSerializer(sourceLocale, basePath as any, fileSystem as any);
   }
 }
@@ -280,7 +274,6 @@ export async function execute(
   const basePath = config.context || projectRoot;
 
   const { checkDuplicateMessages } = await import(
-    // tslint:disable-next-line: trailing-comma
     '@angular/localize/src/tools/src/extract/duplicates'
   );
 
@@ -292,11 +285,11 @@ export async function execute(
     },
   };
   const diagnostics = checkDuplicateMessages(
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checkFileSystem as any,
     ivyMessages,
     'warning',
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     basePath as any,
   );
   if (diagnostics.messages.length > 0) {

@@ -60,11 +60,9 @@ describe('Karma Builder', () => {
       expect(lastErrorLogEntry && lastErrorLogEntry.message).toContain(
         'const context = require.context',
       );
-      expect(lastErrorLogEntry && lastErrorLogEntry.message)
-        // tslint:disable-next-line:max-line-length
-        .toContain(
-          "The 'include' option requires that the 'main' file for tests includes the below line:",
-        );
+      expect(lastErrorLogEntry && lastErrorLogEntry.message).toContain(
+        "The 'include' option requires that the 'main' file for tests includes the below line:",
+      );
 
       await run.stop();
     });

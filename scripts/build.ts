@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
@@ -188,7 +187,6 @@ function _build(logger: logging.Logger) {
   _exec('node', [require.resolve('typescript/bin/tsc'), '-p', 'tsconfig.json'], {}, logger);
 }
 
-// tslint:disable-next-line:no-big-function
 export default async function (
   argv: { local?: boolean; snapshot?: boolean },
   logger: logging.Logger,

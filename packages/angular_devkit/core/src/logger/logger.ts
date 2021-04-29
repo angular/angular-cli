@@ -154,8 +154,10 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     _error?: (error: Error) => void,
     _complete?: () => void,
   ): Subscription {
+    // eslint-disable-next-line prefer-spread
     return this._observable.subscribe.apply(
       this._observable,
+      // eslint-disable-next-line prefer-rest-params
       (arguments as unknown) as Parameters<Observable<LogEntry>['subscribe']>,
     );
   }

@@ -107,7 +107,7 @@ export class JSONFile {
   }
 }
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function readAndParseJson(path: string): any {
   const errors: ParseError[] = [];
   const content = parse(readFileSync(path, 'utf-8'), errors, { allowTrailingComma: true });
@@ -127,7 +127,7 @@ function formatError(path: string, errors: ParseError[]): never {
   );
 }
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseJson(content: string): any {
   return parse(content, undefined, { allowTrailingComma: true });
 }

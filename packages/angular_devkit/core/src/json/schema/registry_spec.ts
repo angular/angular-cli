@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-any non-null-operator no-big-function
-import { of as observableOf } from 'rxjs';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { map, mergeMap } from 'rxjs/operators';
 import { SchemaFormat } from './interface';
 import { CoreSchemaRegistry } from './registry';
@@ -17,7 +16,7 @@ describe('CoreSchemaRegistry', () => {
   it('works asynchronously', (done) => {
     const registry = new CoreSchemaRegistry();
     registry.addPostTransform(addUndefinedDefaults);
-    const data: any = {}; // tslint:disable-line:no-any
+    const data: any = {};
 
     registry
       .compile({
@@ -50,7 +49,7 @@ describe('CoreSchemaRegistry', () => {
   it('supports pre transforms', (done) => {
     const registry = new CoreSchemaRegistry();
     registry.addPostTransform(addUndefinedDefaults);
-    const data: any = {}; // tslint:disable-line:no-any
+    const data = {};
 
     registry.addPreTransform((data, ptr) => {
       if (ptr == '/') {
@@ -353,7 +352,7 @@ describe('CoreSchemaRegistry', () => {
   it('works with true as a schema and post-transforms', async () => {
     const registry = new CoreSchemaRegistry();
     registry.addPostTransform(addUndefinedDefaults);
-    const data: any = { a: 1, b: 2 }; // tslint:disable-line:no-any
+    const data = { a: 1, b: 2 };
 
     const validate = await registry.compile(true).toPromise();
     const result = await validate(data).toPromise();

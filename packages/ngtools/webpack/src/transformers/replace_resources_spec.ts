@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { tags } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
+import { tags } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { replaceResources } from './replace_resources';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
@@ -34,10 +34,8 @@ function transform(
   return transformTypescript(input, [transformer], program, compilerHost);
 }
 
-// tslint:disable-next-line:no-big-function
 describe('@ngtools/webpack transformers', () => {
-  // tslint:disable:max-line-length
-  // tslint:disable-next-line:no-big-function
+  /* eslint-disable max-len */
   describe('find_resources', () => {
     it('should replace resources', () => {
       const input = tags.stripIndent`

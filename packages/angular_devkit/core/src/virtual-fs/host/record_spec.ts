@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-any no-big-function
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { path } from '../path';
 import { fileBuffer } from './buffer';
 import { CordHost } from './record';

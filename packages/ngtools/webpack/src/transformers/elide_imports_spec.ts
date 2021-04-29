@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
-import { tags } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
+/* eslint-disable max-len */
+import { tags } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { elideImports } from './elide_imports';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';

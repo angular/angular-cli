@@ -34,7 +34,7 @@ export default function (options: InterfaceOptions): Rule {
     options.path = parsedPath.path;
 
     options.prefix = options.prefix ? options.prefix : '';
-    options.type = !!options.type ? `.${options.type}` : '';
+    options.type = options.type ? `.${options.type}` : '';
 
     const templateSource = apply(url('./files'), [
       applyTemplates({

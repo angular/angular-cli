@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+/* eslint-disable no-constant-condition */
 import { BaseException } from '../exception';
 import {
   JsonArray,

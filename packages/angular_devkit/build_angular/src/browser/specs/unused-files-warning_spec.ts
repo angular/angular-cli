@@ -12,7 +12,6 @@ import { logging } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
 import { createArchitect, host } from '../../test-utils';
 
-// tslint:disable-next-line:no-big-function
 describe('Browser Builder unused files warnings', () => {
   const warningMessageSuffix = `is part of the TypeScript compilation but it's unused`;
   const targetSpec = { project: 'app', target: 'build' };

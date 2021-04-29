@@ -25,7 +25,7 @@ export function createAotTransformers(
   const removeClassMetadata = !options.emitClassMetadata;
   const removeNgModuleScope = !options.emitNgModuleScope;
   if (removeClassMetadata || removeNgModuleScope) {
-    // tslint:disable-next-line: no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     transformers.before!.push(
       removeIvyJitSupportCalls(removeClassMetadata, removeNgModuleScope, getTypeChecker),
     );

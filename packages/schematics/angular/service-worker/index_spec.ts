@@ -11,7 +11,6 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ServiceWorkerOptions } from './schema';
 
-// tslint:disable-next-line:no-big-function
 describe('Service Worker Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',

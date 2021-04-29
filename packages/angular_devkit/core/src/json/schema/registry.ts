@@ -231,6 +231,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._currentCompilationSchemaInfo = undefined;
     const validate = await this._ajv.compileAsync(schema);
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
     function visitor(
@@ -244,10 +245,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         parentSchema &&
         index &&
         isJsonObject(current) &&
-        current.hasOwnProperty('$ref') &&
+        Object.prototype.hasOwnProperty.call(current, '$ref') &&
         typeof current['$ref'] == 'string'
       ) {
-        const resolved = self._resolver(current['$ref'] as string, validate);
+        const resolved = self._resolver(current['$ref'], validate);
 
         if (resolved.schema) {
           (parentSchema as JsonObject)[index] = resolved.schema;
@@ -580,7 +581,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   }
 
   private static _set(
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any,
     fragments: string[],
     value: unknown,
@@ -609,7 +610,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   ): Promise<void> {
     for (const [pointer, schema] of smartDefaults.entries()) {
       const fragments = JSON.parse(pointer);
-      const source = this._sourceMap.get((schema as JsonObject).$source as string);
+      const source = this._sourceMap.get(schema.$source as string);
       if (!source) {
         continue;
       }
@@ -650,7 +651,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       schema.$id = schema.id;
       delete schema.id;
 
-      // tslint:disable-next-line:no-console
+      // eslint-disable-next-line no-console
       console.warn(
         `"${schema.$id}" schema is using the keyword "id" which its support is deprecated. Use "$id" for schema ID.`,
       );

@@ -28,6 +28,7 @@ export enum MergeStrategy {
   Overwrite = AllowOverwriteConflict + AllowCreationConflict + AllowDeleteConflict,
 }
 
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 export const FileVisitorCancelToken: symbol = Symbol();
 export type FileVisitor = FilePredicate<void>;
 
@@ -101,6 +102,7 @@ export interface Tree {
   readonly actions: Action[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace Tree {
   export function isTree(maybeTree: object): maybeTree is Tree {
     return TreeSymbol in maybeTree;

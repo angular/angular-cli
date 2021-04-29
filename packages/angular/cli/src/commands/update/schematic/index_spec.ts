@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-big-function
-
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { map } from 'rxjs/operators'; // tslint:disable-line: no-implicit-dependencies
+import { map } from 'rxjs/operators';
 import * as semver from 'semver';
 import { angularMajorCompatGuarantee } from './index';
 

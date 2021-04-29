@@ -13,7 +13,7 @@ import { dirname, resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
-import { OutputHashing, Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
@@ -171,10 +171,10 @@ export function execute(
           // Pass onto Karma to emit BuildEvents.
           karmaConfig.buildWebpack ??= {};
           if (typeof karmaConfig.buildWebpack === 'object') {
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (karmaConfig.buildWebpack as any).failureCb ??= () =>
               subscriber.next({ success: false });
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (karmaConfig.buildWebpack as any).successCb ??= () =>
               subscriber.next({ success: true });
           }

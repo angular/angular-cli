@@ -222,8 +222,7 @@ class BundleCalculator extends Calculator {
     const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
       const size = this.chunks
         .filter((chunk) => chunk?.names?.includes(budgetName))
-        // tslint:disable-next-line: no-non-null-assertion
-        .map((chunk) => this.calculateChunkSize(chunk!, buildType))
+        .map((chunk) => this.calculateChunkSize(chunk, buildType))
         .reduce((l, r) => l + r, 0);
 
       return { size, label: `bundle ${this.budget.name}-${buildTypeLabels[buildType]}` };

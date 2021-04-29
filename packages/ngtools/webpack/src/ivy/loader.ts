@@ -10,11 +10,11 @@ import * as path from 'path';
 import { AngularPluginSymbol, FileEmitterCollection } from './symbol';
 
 export function angularWebpackLoader(
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   this: any,
   content: string,
   // Source map types are broken in the webpack type definitions
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: any,
 ) {
   const callback = this.async();

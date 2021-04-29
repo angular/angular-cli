@@ -51,7 +51,7 @@ export function normalizeAssetPatterns(
         throw new MissingAssetSourceRootException(assetPattern);
       }
 
-      let glob: string, input: Path, output: Path;
+      let glob: string, input: Path;
       let isDirectory = false;
 
       try {
@@ -73,7 +73,7 @@ export function normalizeAssetPatterns(
       }
 
       // Output directory for both is the relative path from source root to input.
-      output = relative(resolvedSourceRoot, resolve(root, input));
+      const output = relative(resolvedSourceRoot, resolve(root, input));
 
       // Return the asset pattern in object format.
       return { glob, input, output };

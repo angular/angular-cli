@@ -105,7 +105,7 @@ export default custom<AngularCustomOptions>(() => {
         ...configuration.options,
         // Workaround for https://github.com/babel/babel-loader/pull/896 is available
         // Delete once the above PR is released
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         inputSourceMap: configuration.options.inputSourceMap || (false as any), // Typings are not correct
         presets: [
           ...(configuration.options.presets || []),

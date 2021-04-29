@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-implicit-dependencies
-// tslint:disable:no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { fragment, normalize } from '@angular-devkit/core';
 import { stringToFileBuffer } from './buffer';
 import { SimpleMemoryHost } from './memory';
