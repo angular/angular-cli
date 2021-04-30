@@ -11,7 +11,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 
 import { Schema as NgAddOptions } from './schema';
 
-describe('Universal Schematic', () => {
+describe('ng-add schematic (clover)', () => {
   const defaultOptions: NgAddOptions = {
     clientProject: 'foo',
     prerender: false,
