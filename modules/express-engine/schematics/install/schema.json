@@ -33,11 +33,6 @@
       "default": 4000,
       "description": "The port for the Express server."
     },
-    "tsconfigFileName": {
-      "type": "string",
-      "default": "tsconfig.server",
-      "description": "The name of the TypeScript configuration file."
-    },
     "appDir": {
       "type": "string",
       "format": "path",
