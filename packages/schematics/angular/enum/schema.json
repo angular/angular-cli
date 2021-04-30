@@ -28,6 +28,10 @@
         "$source": "projectName"
       }
     },
+    "type": {
+      "type": "string",
+      "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\"."
+    },
     "lintFix": {
       "type": "boolean",
       "description": "Apply lint fixes after generating the enum.",

@@ -48,14 +48,14 @@ describe('Enum Schematic', () => {
       .runSchematicAsync('enum', defaultOptions, appTree)
       .toPromise();
     const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo.enum.ts');
+    expect(files).toContain('/projects/bar/src/app/foo.ts');
   });
 
   it('should create an enumeration', async () => {
     const tree = await schematicRunner
       .runSchematicAsync('enum', defaultOptions, appTree)
       .toPromise();
-    const content = tree.readContent('/projects/bar/src/app/foo.enum.ts');
+    const content = tree.readContent('/projects/bar/src/app/foo.ts');
     expect(content).toMatch('export enum Foo {');
   });
 
@@ -64,6 +64,13 @@ describe('Enum Schematic', () => {
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
     appTree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree).toPromise();
-    expect(appTree.files).toContain('/projects/bar/custom/app/foo.enum.ts');
+    expect(appTree.files).toContain('/projects/bar/custom/app/foo.ts');
+  });
+
+  it('should put type in the file name', async () => {
+    const options = { ...defaultOptions, type: 'enum' };
+
+    const tree = await schematicRunner.runSchematicAsync('enum', options, appTree).toPromise();
+    expect(tree.files).toContain('/projects/bar/src/app/foo.enum.ts');
   });
 });
