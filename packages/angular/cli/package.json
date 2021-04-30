@@ -47,7 +47,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "rxjs": "6.6.7"
+    "rxjs": "7.0.0"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",

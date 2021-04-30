@@ -15,6 +15,6 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "ora": "5.4.0",
-    "rxjs": "6.6.7"
+    "rxjs": "7.0.0"
   }
 }
