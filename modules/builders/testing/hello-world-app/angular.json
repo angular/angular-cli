@@ -14,7 +14,6 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "progress": false,
-            "forkTypeChecker": false,
             "preserveSymlinks": true,
             "outputPath": "dist/app/browser",
             "index": "src/index.html",
@@ -118,7 +117,6 @@
           "builder": "@angular-devkit/build-angular:server",
           "options": {
             "progress": false,
-            "forkTypeChecker": false,
             "outputPath": "dist/app/server",
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
