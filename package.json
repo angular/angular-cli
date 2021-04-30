@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.36.1"
+    "**/@types/copy-webpack-plugin/webpack": "5.36.2"
   },
   "devDependencies": {
     "@angular/animations": "12.0.0-rc.1",
@@ -80,11 +80,11 @@
     "@angular/platform-server": "12.0.0-rc.1",
     "@angular/router": "12.0.0-rc.1",
     "@angular/service-worker": "12.0.0-rc.1",
-    "@babel/core": "7.13.16",
-    "@babel/generator": "7.13.16",
+    "@babel/core": "7.14.0",
+    "@babel/generator": "7.14.0",
     "@babel/plugin-transform-runtime": "7.13.15",
-    "@babel/preset-env": "7.13.15",
-    "@babel/runtime": "7.13.17",
+    "@babel/preset-env": "7.14.0",
+    "@babel/runtime": "7.14.0",
     "@babel/template": "7.12.13",
     "@bazel/bazelisk": "1.8.0",
     "@bazel/buildifier": "4.0.1",
@@ -171,7 +171,7 @@
     "license-checker": "^25.0.0",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
-    "mini-css-extract-plugin": "1.5.1",
+    "mini-css-extract-plugin": "1.6.0",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
     "ng-packagr": "~12.0.0-next.0",
@@ -223,7 +223,7 @@
     "typescript": "4.2.4",
     "verdaccio": "5.0.4",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.36.1",
+    "webpack": "5.36.2",
     "webpack-dev-middleware": "4.1.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.7.3",
