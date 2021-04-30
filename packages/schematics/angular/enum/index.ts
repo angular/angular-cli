@@ -33,6 +33,8 @@ export default function (options: EnumOptions): Rule {
     options.name = parsedPath.name;
     options.path = parsedPath.path;
 
+    options.type = options.type ? `.${options.type}` : '';
+
     const templateSource = apply(url('./files'), [
       applyTemplates({
         ...strings,
