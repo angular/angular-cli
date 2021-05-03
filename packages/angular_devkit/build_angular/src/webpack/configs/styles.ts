@@ -194,8 +194,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
         }),
         ...extraPostcssPlugins,
         postcssPresetEnv({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          browsers: supportedBrowsers as any, // Typings only allow a string
+          browsers: supportedBrowsers,
           autoprefixer: true,
           stage: 3,
         }),
