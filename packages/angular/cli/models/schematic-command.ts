@@ -82,6 +82,7 @@ export abstract class SchematicCommand<
         schematic.description.schemaJson || {},
       );
 
+      this.description.description = schematic.description.description;
       this.description.options.push(...options.filter((x) => !x.hidden));
 
       // Remove any user analytics from schematics that are NOT part of our safelist.
@@ -132,9 +133,6 @@ export abstract class SchematicCommand<
           this.logger.info(`    ${schematicName}`);
         });
       });
-    } else if (schematicNames.length == 1) {
-      this.logger.info('Help for schematic ' + schematicNames[0]);
-      await this.printHelpSubcommand(subCommandOption.subcommands[schematicNames[0]]);
     }
 
     return 0;
