@@ -331,9 +331,6 @@ export class AngularWebpackPlugin {
       return;
     }
 
-    const rebuild = (webpackModule: Module) =>
-      new Promise<void>((resolve) => compilation.rebuildModule(webpackModule, () => resolve()));
-
     const filesToRebuild = new Set<string>();
     for (const requiredFile of this.requiredFilesToEmit) {
       const history = this.fileEmitHistory.get(requiredFile);
@@ -356,12 +353,17 @@ export class AngularWebpackPlugin {
     }
 
     if (filesToRebuild.size > 0) {
-      for (const webpackModule of [...modules]) {
+      const rebuild = (webpackModule: Module) =>
+        new Promise<void>((resolve) => compilation.rebuildModule(webpackModule, () => resolve()));
+
+      const modulesToRebuild = [];
+      for (const webpackModule of modules) {
         const resource = (webpackModule as NormalModule).resource;
         if (resource && filesToRebuild.has(normalizePath(resource))) {
-          await rebuild(webpackModule);
+          modulesToRebuild.push(webpackModule);
         }
       }
+      await Promise.all(modulesToRebuild.map((webpackModule) => rebuild(webpackModule)));
     }
 
     this.requiredFilesToEmit.clear();
