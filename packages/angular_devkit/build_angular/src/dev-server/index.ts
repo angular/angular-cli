@@ -189,8 +189,7 @@ export function serveWebpackBrowser(
       // This is needed because we cannot use the inline option directly in the config
       // because of the SuppressExtractedTextChunksWebpackPlugin
       // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      webpackDevServer.addDevServerEntrypoints(config as any, {
+      webpackDevServer.addDevServerEntrypoints(config, {
         ...config.devServer,
         inline: true,
       });
