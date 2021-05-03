@@ -84,10 +84,9 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#00bbf3f530406c78cf25d5b37641c5bdac5d047e":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#106d8c0d9de461c133e15a21ab6fae93890164f7":
   version "0.0.0"
-  uid "00bbf3f530406c78cf25d5b37641c5bdac5d047e"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#00bbf3f530406c78cf25d5b37641c5bdac5d047e"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#106d8c0d9de461c133e15a21ab6fae93890164f7"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -117,7 +116,7 @@
     typed-graphqlify "^3.1.1"
     typescript "~4.2.4"
     yaml "^1.10.0"
-    yargs "^16.2.0"
+    yargs "^17.0.0"
 
 "@angular/forms@12.0.0-rc.1":
   version "12.0.0-rc.1"
@@ -10238,7 +10237,6 @@ sass@1.32.12, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
@@ -12414,6 +12412,19 @@ yargs@^16.0.0, yargs@^16.1.1, yargs@^16.2.0:
   version "16.2.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-16.2.0.tgz#1c82bf0f6b6a66eafce7ef30e376f49a12477f66"
   integrity sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==
+  dependencies:
+    cliui "^7.0.2"
+    escalade "^3.1.1"
+    get-caller-file "^2.0.5"
+    require-directory "^2.1.1"
+    string-width "^4.2.0"
+    y18n "^5.0.5"
+    yargs-parser "^20.2.2"
+
+yargs@^17.0.0:
+  version "17.0.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.0.1.tgz#6a1ced4ed5ee0b388010ba9fd67af83b9362e0bb"
+  integrity sha512-xBBulfCc8Y6gLFcrPvtqKz9hz8SO0l1Ni8GgDekvBX2ro0HRQImDGnikfc33cgzcYUSncapnNcZDjVFIH3f6KQ==
   dependencies:
     cliui "^7.0.2"
     escalade "^3.1.1"

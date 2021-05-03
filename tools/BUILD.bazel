@@ -26,23 +26,11 @@ nodejs_binary(
 )
 
 platform(
-    name = "rbe_ubuntu1604-angular",
-    parents = ["@rbe_ubuntu1604_angular//config:platform"],
-    remote_execution_properties = """
-        {PARENT_REMOTE_EXECUTION_PROPERTIES}
-        properties: {
-            name: "dockerAddCapabilities"
-            value: "SYS_ADMIN"
-        }
-        properties: {
-            name: "dockerNetwork"
-            value: "standard"
-        }
-        properties: {
-            name: "Pool"
-            value: "default"
-        }
-        """,
+    name = "rbe_platform_with_network_access",
+    exec_properties = {
+        "dockerNetwork": "standard",
+    },
+    parents = ["@npm//@angular/dev-infra-private/bazel/remote-execution:platform"],
 )
 
 # @external_end
