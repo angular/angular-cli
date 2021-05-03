@@ -75,12 +75,6 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     this.logger.info('');
   }
 
-  protected async printHelpSubcommand(subcommand: SubCommandDescription) {
-    this.logger.info(subcommand.description);
-
-    await this.printHelpOptions(subcommand.options);
-  }
-
   protected async printHelpOptions(options: Option[] = this.description.options) {
     const args = options.filter((opt) => opt.positional !== undefined);
     const opts = options.filter((opt) => opt.positional === undefined);
