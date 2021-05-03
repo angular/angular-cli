@@ -1,3 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 exports_files(["angular-metadata.tsconfig.json"])
+
+# Detect if the build is running under --stamp
+config_setting(
+    name = "stamp",
+    values = {"stamp": "true"},
+)

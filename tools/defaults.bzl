@@ -139,11 +139,39 @@ def ng_package(globals = {}, deps = [], **kwargs):
     deps = deps + [
         "@npm//tslib",
     ]
-    _ng_package(globals = globals, deps = deps, substitutions = PKG_GROUP_REPLACEMENTS, **kwargs)
 
-def pkg_npm(name, substitutions = {}, **kwargs):
+    common_substitutions = dict(kwargs.pop("substitutions", {}), **PKG_GROUP_REPLACEMENTS)
+    substitutions = dict(common_substitutions, **{
+        "0.0.0-PLACEHOLDER": "0.0.0",
+    })
+    stamped_substitutions = dict(common_substitutions, **{
+        "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
+    })
+
+    _ng_package(
+        globals = globals,
+        deps = deps,
+        substitutions = select({
+            "//:stamp": stamped_substitutions,
+            "//conditions:default": substitutions,
+        }),
+        **kwargs
+    )
+
+def pkg_npm(name, **kwargs):
+    common_substitutions = dict(kwargs.pop("substitutions", {}), **PKG_GROUP_REPLACEMENTS)
+    substitutions = dict(common_substitutions, **{
+        "0.0.0-PLACEHOLDER": "0.0.0",
+    })
+    stamped_substitutions = dict(common_substitutions, **{
+        "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
+    })
+
     _pkg_npm(
         name = name,
-        substitutions = dict(substitutions, **PKG_GROUP_REPLACEMENTS),
+        substitutions = select({
+            "//:stamp": stamped_substitutions,
+            "//conditions:default": substitutions,
+        }),
         **kwargs
     )
