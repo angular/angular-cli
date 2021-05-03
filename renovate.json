@@ -30,7 +30,7 @@
       "pinVersions": false
     },
     {
-      "packagePatterns": ["^@bazel/.*", "^build_bazel.*", "bazel_toolchains"],
+      "packagePatterns": ["^@bazel/.*", "^build_bazel.*"],
       "groupName": "bazel",
       "pinVersions": false
     },

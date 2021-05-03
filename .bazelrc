@@ -105,20 +105,15 @@ build:remote --remote_executor=remotebuildexecution.googleapis.com
 build:remote --remote_timeout=600
 build:remote --jobs=150
 
- # Setup the toolchain and platform for the remote build execution. The platform
-# is automatically configured by the "rbe_autoconfig" rule in the project workpsace.
-build:remote --host_javabase=@rbe_ubuntu1604_angular//java:jdk
-build:remote --javabase=@rbe_ubuntu1604_angular//java:jdk
-build:remote --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_hostjdk8
-build:remote --java_toolchain=@bazel_tools//tools/jdk:toolchain_hostjdk8
-build:remote --crosstool_top=@rbe_ubuntu1604_angular//cc:toolchain
-build:remote --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
-build:remote --extra_toolchains=@rbe_ubuntu1604_angular//config:cc-toolchain
-build:remote --extra_execution_platforms=//tools:rbe_ubuntu1604-angular
-build:remote --host_platform=//tools:rbe_ubuntu1604-angular
-build:remote --platforms=//tools:rbe_ubuntu1604-angular
+# Setup the toolchain and platform for the remote build execution. The platform
+# is provided by the shared dev-infra package and targets k8 remote containers.
+build:remote --crosstool_top=@npm//@angular/dev-infra-private/bazel/remote-execution/cpp:cc_toolchain_suite
+build:remote --extra_toolchains=@npm//@angular/dev-infra-private/bazel/remote-execution/cpp:cc_toolchain
+build:remote --extra_execution_platforms=//tools:rbe_platform_with_network_access
+build:remote --host_platform=//tools:rbe_platform_with_network_access
+build:remote --platforms=//tools:rbe_platform_with_network_access
 
- # Set remote caching settings
+# Set remote caching settings
 build:remote --remote_accept_cached=true
 
 # Force remote executions to consider the entire run as linux.
