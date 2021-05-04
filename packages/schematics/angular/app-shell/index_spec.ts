@@ -17,7 +17,7 @@ describe('App Shell Schematic', () => {
     require.resolve('../collection.json'),
   );
   const defaultOptions: AppShellOptions = {
-    clientProject: 'bar',
+    project: 'bar',
   };
 
   const workspaceOptions: WorkspaceOptions = {
