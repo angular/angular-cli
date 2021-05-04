@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { isAbsolute } from 'path';
 import { Compilation, Compiler, Dependency, Module, NormalModule } from 'webpack';
 import { addWarning } from '../../utils/webpack-diagnostics';
