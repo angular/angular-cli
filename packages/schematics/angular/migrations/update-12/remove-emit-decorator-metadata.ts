@@ -9,6 +9,7 @@
 import { join } from '@angular-devkit/core';
 import { DirEntry, Rule } from '@angular-devkit/schematics';
 import { JSONFile } from '../../utility/json-file';
+import { allWorkspaceTargets, getWorkspace } from '../../utility/workspace';
 
 function* visitJsonFiles(directory: DirEntry): IterableIterator<string> {
   for (const path of directory.subfiles) {
@@ -29,7 +30,26 @@ function* visitJsonFiles(directory: DirEntry): IterableIterator<string> {
 }
 
 export default function (): Rule {
-  return (tree) => {
+  return async (tree, { logger }) => {
+    const workspace = await getWorkspace(tree);
+    const hasThirdPartyBuilders = [...allWorkspaceTargets(workspace)].some(([, target]) => {
+      const { builder } = target;
+
+      return !(
+        builder.startsWith('@angular-devkit/build-angular') ||
+        builder.startsWith('@nguniversal/builders')
+      );
+    });
+
+    if (hasThirdPartyBuilders) {
+      logger.warn(
+        'Skipping migration as the workspace uses third-party builders which may ' +
+          'require "emitDecoratorMetadata" TypeScript compiler option.',
+      );
+
+      return;
+    }
+
     for (const path of visitJsonFiles(tree.root)) {
       const content = tree.read(path);
       if (content?.toString().includes('"emitDecoratorMetadata"')) {

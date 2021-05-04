@@ -9,6 +9,7 @@
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
+import { Builders } from '../../utility/workspace-models';
 
 describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
   const schematicName = 'remove-emit-decorator-metadata';
@@ -26,6 +27,28 @@ describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
   let tree: UnitTestTree;
   beforeEach(() => {
     tree = new UnitTestTree(new EmptyTree());
+    tree.create(
+      '/angular.json',
+      JSON.stringify(
+        {
+          version: 1,
+          projects: {
+            app: {
+              root: '',
+              sourceRoot: 'src',
+              prefix: 'app',
+              architect: {
+                browser: {
+                  builder: Builders.Browser,
+                },
+              },
+            },
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
   });
 
   it(`should rename 'emitDecoratorMetadata' when set to false`, async () => {
@@ -87,5 +110,46 @@ describe('Migration to remove "emitDecoratorMetadata" compiler option', () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { options } = readJsonFile(newTree, '/foo.json');
     expect(options['emitDecoratorMetadata']).toBeTrue();
+  });
+
+  it(`should not remove 'emitDecoratorMetadata' when one of the builders is a third-party`, async () => {
+    tree.create(
+      '/tsconfig.json',
+      JSON.stringify(
+        {
+          compilerOptions: {
+            emitDecoratorMetadata: true,
+            strict: true,
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
+    tree.overwrite(
+      '/angular.json',
+      JSON.stringify(
+        {
+          version: 1,
+          projects: {
+            app: {
+              root: '',
+              sourceRoot: 'src',
+              prefix: 'app',
+              architect: {
+                browser: {
+                  builder: '@nrwl/jest',
+                },
+              },
+            },
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { compilerOptions } = readJsonFile(newTree, '/tsconfig.json');
+    expect(compilerOptions['emitDecoratorMetadata']).toBeTrue();
   });
 });
