@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
   Angular: '~12.0.0-next.9',
