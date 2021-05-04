@@ -19,6 +19,7 @@
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION"
   },
+  "schematics": "./schematics/collection.json",
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP",
     "packageGroupName": "@nguniversal/common"
