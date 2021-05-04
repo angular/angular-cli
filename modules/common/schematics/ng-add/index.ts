@@ -32,6 +32,7 @@ import {
 } from '@schematics/angular/utility/dependencies';
 import { findBootstrapModulePath } from '@schematics/angular/utility/ng-ast-utils';
 import { getWorkspace, updateWorkspace } from '@schematics/angular/utility/workspace';
+import { posix } from 'path';
 import * as ts from 'typescript';
 
 import { Schema as NgAddOptions } from './schema';
@@ -123,8 +124,8 @@ function addScriptsRule(options: NgAddOptions): Rule {
     if (options.ssr) {
       pkg.scripts = {
         ...pkg.scripts,
-        'build:client-and-server': `ng build ${options.clientProject} && ng build ${options.clientProject}:server`,
-        'build:server': `ng build ${options.clientProject}:server`,
+        'build:client-and-server': `ng build ${options.clientProject} && ng run ${options.clientProject}:server`,
+        'build:server': `ng run ${options.clientProject}:server`,
         'serve:ssr': `node dist/${options.clientProject}/server/main.js`,
       };
     }
@@ -142,8 +143,8 @@ function updateWorkspaceRule(options: NgAddOptions): Rule {
         builder: '@angular-devkit/build-angular:server',
         options: {
           outputPath: `dist/${options.clientProject}/server`,
-          main: `${project.sourceRoot}/server.ts`,
-          tsConfig: `${project.root}/tsconfig.server.json`,
+          main: posix.join(project.sourceRoot ?? '', 'server.ts'),
+          tsConfig: posix.join(project.root, 'tsconfig.server.json'),
           bundleDependencies: false,
           optimization: false,
         },
