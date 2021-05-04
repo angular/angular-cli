@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { LogLevel, Logger, process as mainNgcc } from '@angular/compiler-cli/ngcc';
 import { spawnSync } from 'child_process';
 import { createHash } from 'crypto';

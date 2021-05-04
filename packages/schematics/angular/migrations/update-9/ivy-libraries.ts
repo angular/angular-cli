@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { join, normalize } from '@angular-devkit/core';
 import { Rule, Tree, chain } from '@angular-devkit/schematics';
 import { JSONFile } from '../../utility/json-file';
