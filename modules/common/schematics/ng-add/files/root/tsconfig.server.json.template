@@ -4,7 +4,6 @@
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/server",
     "target": "es2019",
-    "esModuleInterop": true,
     "types": [
       "node"
     ]
