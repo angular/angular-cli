@@ -24,7 +24,20 @@
     "@typescript-eslint/no-unnecessary-qualifier": "error",
     "@typescript-eslint/no-unused-expressions": "error",
     "curly": "error",
-    "header/header": ["error", "block", [{ "pattern": "Copyright Google LLC" }]],
+    "header/header": [
+      "error",
+      "block",
+      [
+        "*",
+        " * @license",
+        " * Copyright Google LLC All Rights Reserved.",
+        " *",
+        " * Use of this source code is governed by an MIT-style license that can be",
+        " * found in the LICENSE file at https://angular.io/license",
+        " "
+      ],
+      2
+    ],
     "import/first": "error",
     "import/newline-after-import": "error",
     "import/no-absolute-path": "error",
