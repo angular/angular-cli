@@ -66,10 +66,11 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   private workflow!: NodeWorkflow;
   private packageManager = PackageManager.Npm;
 
-  async initialize() {
+  async initialize(options: UpdateCommandSchema & Arguments) {
     this.packageManager = await getPackageManager(this.context.root);
     this.workflow = new NodeWorkflow(this.context.root, {
       packageManager: this.packageManager,
+      packageManagerForce: options.force,
       // __dirname -> favor @schematics/update from this package
       // Otherwise, use packages from the active workspace (migrations)
       resolvePaths: [__dirname, this.context.root],

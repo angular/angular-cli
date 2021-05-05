@@ -28,7 +28,7 @@
           }
         },
         "force": {
-          "description": "If false, will error out if installed packages are incompatible with the update.",
+          "description": "Ignore peer dependency version mismatches. Passes the `--force` flag to the package manager when installing packages.",
           "default": false,
           "type": "boolean"
         },
