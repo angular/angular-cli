@@ -13,6 +13,7 @@ export interface NodePackageTaskFactoryOptions {
   packageManager?: string;
   allowPackageManagerOverride?: boolean;
   registry?: string;
+  force?: boolean;
 }
 
 export interface NodePackageTaskOptions {
