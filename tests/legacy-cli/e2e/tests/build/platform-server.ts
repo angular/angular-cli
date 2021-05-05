@@ -8,7 +8,7 @@ import { updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  await ng('generate', 'universal', '--client-project', 'test-project');
+  await ng('generate', 'universal', '--project', 'test-project');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
@@ -48,7 +48,10 @@ export default async function () {
 
   await ng('run', 'test-project:server', '--optimization', 'false');
 
-  await expectFileToMatch('dist/test-project/server/main.js', /exports.*AppServerModule|"AppServerModule":/);
+  await expectFileToMatch(
+    'dist/test-project/server/main.js',
+    /exports.*AppServerModule|"AppServerModule":/,
+  );
   await exec(normalize('node'), 'dist/test-project/server/main.js');
   await expectFileToMatch(
     'dist/test-project/server/index.html',
