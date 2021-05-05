@@ -104,6 +104,10 @@ export default function (
       args.push(`--registry="${factoryOptions.registry}"`);
     }
 
+    if (factoryOptions.force) {
+      args.push('--force');
+    }
+
     return new Observable((obs) => {
       const spinner = ora({
         text: `Installing packages (${taskPackageManagerName})...`,
