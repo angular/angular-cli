@@ -202,36 +202,34 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
-    try {
-      spinner.start('Installing package...');
-      if (savePackage === false) {
-        // Temporary packages are located in a different directory
-        // Hence we need to resolve them using the temp path
-        const tempPath = installTempPackage(
-          packageIdentifier.raw,
-          undefined,
-          packageManager,
-          options.registry ? [`--registry="${options.registry}"`] : undefined,
-        );
-        const resolvedCollectionPath = require.resolve(join(collectionName, 'package.json'), {
-          paths: [tempPath],
-        });
+    if (savePackage === false) {
+      // Temporary packages are located in a different directory
+      // Hence we need to resolve them using the temp path
+      const { status, tempPath } = await installTempPackage(
+        packageIdentifier.raw,
+        packageManager,
+        options.registry ? [`--registry="${options.registry}"`] : undefined,
+      );
+      const resolvedCollectionPath = require.resolve(join(collectionName, 'package.json'), {
+        paths: [tempPath],
+      });
 
-        collectionName = dirname(resolvedCollectionPath);
-      } else {
-        installPackage(
-          packageIdentifier.raw,
-          undefined,
-          packageManager,
-          savePackage,
-          options.registry ? [`--registry="${options.registry}"`] : undefined,
-        );
+      if (status !== 0) {
+        return status;
       }
-      spinner.succeed('Package successfully installed.');
-    } catch (error) {
-      spinner.fail(`Package installation failed: ${error.message}`);
 
-      return 1;
+      collectionName = dirname(resolvedCollectionPath);
+    } else {
+      const status = await installPackage(
+        packageIdentifier.raw,
+        packageManager,
+        savePackage,
+        options.registry ? [`--registry="${options.registry}"`] : undefined,
+      );
+
+      if (status !== 0) {
+        return status;
+      }
     }
 
     return this.executeSchematic(collectionName, options['--']);

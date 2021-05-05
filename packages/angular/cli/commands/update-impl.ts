@@ -285,7 +285,6 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
       return runTempPackageBin(
         `@angular/cli@${options.next ? 'next' : 'latest'}`,
-        this.logger,
         this.packageManager,
         process.argv.slice(2),
       );
