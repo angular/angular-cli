@@ -83,6 +83,8 @@ export class OptimizeCssWebpackPlugin {
                 svgo: false,
                 // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
                 calc: false,
+                // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
+                cssDeclarationSorter: false,
               },
             ],
           };
