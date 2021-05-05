@@ -251,7 +251,7 @@ describe('Migration to version 9', () => {
           require.resolve('../../collection.json'),
           'universal',
           {
-            clientProject: 'migration-test',
+            project: 'migration-test',
           },
           tree,
         )

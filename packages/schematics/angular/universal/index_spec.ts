@@ -19,10 +19,10 @@ describe('Universal Schematic', () => {
     require.resolve('../collection.json'),
   );
   const defaultOptions: UniversalOptions = {
-    clientProject: 'bar',
+    project: 'bar',
   };
   const workspaceUniversalOptions: UniversalOptions = {
-    clientProject: 'workspace',
+    project: 'workspace',
   };
 
   const workspaceOptions: WorkspaceOptions = {

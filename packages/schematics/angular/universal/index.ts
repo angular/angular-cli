@@ -33,7 +33,7 @@ import { Schema as UniversalOptions } from './schema';
 
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
   return updateWorkspace((workspace) => {
-    const clientProject = workspace.projects.get(options.clientProject);
+    const clientProject = workspace.projects.get(options.project);
 
     if (clientProject) {
       // In case the browser builder hashes the assets
@@ -59,7 +59,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
 
       const buildTarget = clientProject.targets.get('build');
       if (buildTarget?.options) {
-        buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+        buildTarget.options.outputPath = `dist/${options.project}/browser`;
       }
 
       const buildConfigurations = buildTarget?.configurations;
@@ -77,7 +77,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         builder: Builders.Server,
         defaultConfiguration: 'production',
         options: {
-          outputPath: `dist/${options.clientProject}/server`,
+          outputPath: `dist/${options.project}/server`,
           main: join(
             normalize(clientProject.root),
             'src',
@@ -226,7 +226,7 @@ export default function (options: UniversalOptions): Rule {
   return async (host: Tree, context: SchematicContext) => {
     const workspace = await getWorkspace(host);
 
-    const clientProject = workspace.projects.get(options.clientProject);
+    const clientProject = workspace.projects.get(options.project);
     if (!clientProject || clientProject.extensions.projectType !== 'application') {
       throw new SchematicsException(`Universal requires a project type of "application".`);
     }
