@@ -153,7 +153,7 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
     }
 
     return updateWorkspace((workspace) => {
-      const project = workspace.projects.get(options.clientProject);
+      const project = workspace.projects.get(options.project);
       if (!project) {
         return;
       }
@@ -187,8 +187,8 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
         }
 
         configurations[key] = {
-          browserTarget: `${options.clientProject}:build:${key}`,
-          serverTarget: `${options.clientProject}:server:${key}`,
+          browserTarget: `${options.project}:build:${key}`,
+          serverTarget: `${options.project}:server:${key}`,
         };
       }
 
@@ -239,7 +239,7 @@ function addServerRoutes(options: AppShellOptions): Rule {
   return async (host: Tree) => {
     // The workspace gets updated so this needs to be reloaded
     const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(options.clientProject);
+    const clientProject = workspace.projects.get(options.project);
     if (!clientProject) {
       throw new Error('Universal schematic removed client project.');
     }
@@ -309,7 +309,7 @@ function addShellComponent(options: AppShellOptions): Rule {
   const componentOptions: ComponentOptions = {
     name: 'app-shell',
     module: options.rootModuleFileName,
-    project: options.clientProject,
+    project: options.project,
   };
 
   return schematic('component', componentOptions);
@@ -318,7 +318,7 @@ function addShellComponent(options: AppShellOptions): Rule {
 export default function (options: AppShellOptions): Rule {
   return async (tree) => {
     const workspace = await getWorkspace(tree);
-    const clientProject = workspace.projects.get(options.clientProject);
+    const clientProject = workspace.projects.get(options.project);
     if (!clientProject || clientProject.extensions.projectType !== 'application') {
       throw new SchematicsException(`A client project type of "application" is required.`);
     }

@@ -6,9 +6,12 @@
   "additionalProperties": false,
   "description": "Pass this schematic to the \"run\" command to set up server-side rendering for an app.",
   "properties": {
-    "clientProject": {
+    "project": {
       "type": "string",
-      "description": "The name of the related client app. Required in place of \"project\"."
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
     },
     "appId": {
       "type": "string",
@@ -45,5 +48,5 @@
       "default": false
     }
   },
-  "required": ["clientProject"]
+  "required": ["project"]
 }

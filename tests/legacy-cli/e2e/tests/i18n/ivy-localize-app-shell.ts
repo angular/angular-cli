@@ -21,7 +21,7 @@ export default async function () {
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
 
-  await updateJsonFile('package.json', packageJson => {
+  await updateJsonFile('package.json', (packageJson) => {
     const dependencies = packageJson['dependencies'];
     dependencies['@angular/localize'] = isSnapshotBuild
       ? snapshots.dependencies['@angular/localize']
@@ -29,10 +29,10 @@ export default async function () {
   });
 
   await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
-  await ng('generate', 'appShell', '--client-project', 'test-project');
+  await ng('generate', 'appShell', '--project', 'test-project');
 
   if (isSnapshotBuild) {
-    await updateJsonFile('package.json', packageJson => {
+    await updateJsonFile('package.json', (packageJson) => {
       const dependencies = packageJson['dependencies'];
       dependencies['@angular/platform-server'] = snapshots.dependencies['@angular/platform-server'];
       dependencies['@angular/router'] = snapshots.dependencies['@angular/router'];
@@ -49,7 +49,7 @@ export default async function () {
     { lang: 'fr', translation: 'Bonjour i18n!' },
   ];
 
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     const appArchitect = appProject.architect || appProject.targets;
     const buildOptions = appArchitect['build'].options;
@@ -111,10 +111,7 @@ export default async function () {
 
   // Clean up app.component.html so that we can easily
   // find the translation text
-  await writeFile(
-    'src/app/app.component.html',
-    '<router-outlet></router-outlet>',
-  );
+  await writeFile('src/app/app.component.html', '<router-outlet></router-outlet>');
 
   for (const { lang, translation } of langTranslations) {
     if (lang != 'en-US') {

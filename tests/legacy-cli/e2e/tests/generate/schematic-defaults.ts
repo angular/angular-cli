@@ -13,7 +13,6 @@ export default async function () {
   // Generate component in application to verify that it's minimal
   const { stdout } = await ng('generate', 'component', 'foo');
   if (!stdout.includes('foo.component.scss')) {
-    console.log(stdout);
     throw new Error('Expected "foo.component.scss" to exist.');
   }
 
@@ -36,7 +35,6 @@ export default async function () {
     'test-project-two',
   );
   if (!stdout2.includes('foo.component.less')) {
-    console.log(stdout2);
     throw new Error('Expected "foo.component.less" to exist.');
   }
 }
