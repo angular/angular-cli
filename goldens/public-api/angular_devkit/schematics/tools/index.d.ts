@@ -138,6 +138,7 @@ export interface NodeWorkflowOptions {
     force?: boolean;
     optionTransforms?: OptionTransform<object, object>[];
     packageManager?: string;
+    packageManagerForce?: boolean;
     packageRegistry?: string;
     registry?: schema.CoreSchemaRegistry;
     resolvePaths?: string[];

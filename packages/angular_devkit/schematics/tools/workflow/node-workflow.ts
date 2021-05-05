@@ -19,6 +19,7 @@ export interface NodeWorkflowOptions {
   force?: boolean;
   dryRun?: boolean;
   packageManager?: string;
+  packageManagerForce?: boolean;
   packageRegistry?: string;
   registry?: schema.CoreSchemaRegistry;
   resolvePaths?: string[];
@@ -60,6 +61,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage, {
       allowPackageManagerOverride: true,
       packageManager: options.packageManager,
+      force: options.packageManagerForce,
       rootDirectory: root && getSystemPath(root),
       registry: options.packageRegistry,
     });
