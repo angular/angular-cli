@@ -16,7 +16,7 @@ import { Schema as UniversalOptions } from './schema';
 
 describe('Universal Schematic', () => {
   const defaultOptions: UniversalOptions = {
-    clientProject: 'test-app',
+    project: 'test-app',
   };
 
   let schematicRunner: SchematicTestRunner;

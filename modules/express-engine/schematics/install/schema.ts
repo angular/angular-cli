@@ -10,7 +10,7 @@ export interface Schema {
   /**
    * Name or index of related client app.
    */
-  clientProject: string;
+  project: string;
   /**
    * The appId to use withServerTransition.
    */

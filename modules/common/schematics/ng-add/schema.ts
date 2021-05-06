@@ -7,7 +7,7 @@
  */
 
 export interface Schema {
-  clientProject: string;
+  project: string;
   appId?: string;
   ssr?: boolean;
   prerender?: boolean;

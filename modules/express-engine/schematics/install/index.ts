@@ -52,14 +52,14 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
       throw new SchematicsException('Could not find package.json');
     }
 
-    const serverDist = await getOutputPath(host, options.clientProject, 'server');
+    const serverDist = await getOutputPath(host, options.project, 'server');
     const pkg = JSON.parse(buffer.toString()) as any;
     pkg.scripts = {
       ...pkg.scripts,
-      'dev:ssr': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,
+      'dev:ssr': `ng run ${options.project}:${SERVE_SSR_TARGET_NAME}`,
       'serve:ssr': `node ${serverDist}/main.js`,
-      'build:ssr': `ng build && ng run ${options.clientProject}:server`,
-      'prerender': `ng run ${options.clientProject}:${PRERENDER_TARGET_NAME}`,
+      'build:ssr': `ng build && ng run ${options.project}:server`,
+      'prerender': `ng run ${options.project}:${PRERENDER_TARGET_NAME}`,
     };
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
@@ -69,7 +69,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
 function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
   return () => {
     return updateWorkspace((workspace) => {
-      const projectName = options.clientProject;
+      const projectName = options.project;
       const project = workspace.projects.get(projectName);
       if (!project) {
         return;
@@ -117,10 +117,10 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
         },
         configurations: {
           production: {
-            browserTarget: `${options.clientProject}:build:production`,
+            browserTarget: `${options.project}:build:production`,
           },
           development: {
-            browserTarget: `${options.clientProject}:build:development`,
+            browserTarget: `${options.project}:build:development`,
           },
         },
       });
@@ -130,8 +130,8 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
 
 function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
   return async (host) => {
-    const clientProject = await getProject(host, options.clientProject);
-    const serverTarget = clientProject.targets.get('server');
+    const project = await getProject(host, options.project);
+    const serverTarget = project.targets.get('server');
     if (!serverTarget || !serverTarget.options) {
       return;
     }
@@ -153,8 +153,8 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
 
 function routingInitialNavigationRule(options: UniversalOptions): Rule {
   return async (host) => {
-    const clientProject = await getProject(host, options.clientProject);
-    const serverTarget = clientProject.targets.get('server');
+    const project = await getProject(host, options.project);
+    const serverTarget = project.targets.get('server');
     if (!serverTarget || !serverTarget.options) {
       return;
     }
@@ -293,8 +293,8 @@ function addDependencies(options: UniversalOptions): Rule {
 
 function addServerFile(options: UniversalOptions): Rule {
   return async (host) => {
-    const clientProject = await getProject(host, options.clientProject);
-    const browserDistDirectory = await getOutputPath(host, options.clientProject, 'build');
+    const project = await getProject(host, options.project);
+    const browserDistDirectory = await getOutputPath(host, options.project, 'build');
 
     return mergeWith(
       apply(url('./files'), [
@@ -304,7 +304,7 @@ function addServerFile(options: UniversalOptions): Rule {
           stripTsExtension,
           browserDistDirectory,
         }),
-        move(clientProject.root),
+        move(project.root),
       ]),
     );
   };
@@ -312,7 +312,7 @@ function addServerFile(options: UniversalOptions): Rule {
 
 export default function (options: AddUniversalOptions): Rule {
   return async (host) => {
-    const clientProject = await getProject(host, options.clientProject);
+    const project = await getProject(host, options.project);
     const universalOptions = {
       ...options,
       skipInstall: true,
@@ -322,7 +322,7 @@ export default function (options: AddUniversalOptions): Rule {
     delete universalOptions.serverPort;
 
     return chain([
-      clientProject.targets.has('server')
+      project.targets.has('server')
         ? noop()
         : externalSchematic('@schematics/angular', 'universal', universalOptions),
       addScriptsRule(options),

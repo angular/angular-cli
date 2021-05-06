@@ -40,13 +40,13 @@ import { Schema as NgAddOptions } from './schema';
 export default function (options: NgAddOptions): Rule {
   return async (host, context) => {
     const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(options.clientProject);
+    const project = workspace.projects.get(options.project);
 
-    if (clientProject.extensions.projectType !== 'application') {
+    if (project.extensions.projectType !== 'application') {
       throw new SchematicsException(`Universal requires a project type of "application".`);
     }
 
-    const clientBuildTarget = clientProject.targets.get('build');
+    const clientBuildTarget = project.targets.get('build');
     if (!clientBuildTarget) {
       throw new SchematicsException(`Project target "build" not found.`);
     }
@@ -56,8 +56,8 @@ export default function (options: NgAddOptions): Rule {
     }
 
     return chain([
-      augmentAppModuleRule(clientProject, clientBuildTarget, options),
-      options.ssr ? addSSRRule(clientProject, clientBuildTarget) : noop(),
+      augmentAppModuleRule(project, clientBuildTarget, options),
+      options.ssr ? addSSRRule(project, clientBuildTarget) : noop(),
       options.prerender ? addPreRenderRule() : noop(),
       addScriptsRule(options),
       updateWorkspaceRule(options),
@@ -117,16 +117,16 @@ function addScriptsRule(options: NgAddOptions): Rule {
     if (options.prerender) {
       pkg.scripts = {
         ...pkg.scripts,
-        'prerender': `ng run ${options.clientProject}:prerender`,
+        'prerender': `ng run ${options.project}:prerender`,
       };
     }
 
     if (options.ssr) {
       pkg.scripts = {
         ...pkg.scripts,
-        'build:client-and-server': `ng build ${options.clientProject} && ng run ${options.clientProject}:server`,
-        'build:server': `ng run ${options.clientProject}:server`,
-        'serve:ssr': `node dist/${options.clientProject}/server/main.js`,
+        'build:client-and-server': `ng build ${options.project} && ng run ${options.project}:server`,
+        'build:server': `ng run ${options.project}:server`,
+        'serve:ssr': `node dist/${options.project}/server/main.js`,
       };
     }
 
@@ -136,13 +136,13 @@ function addScriptsRule(options: NgAddOptions): Rule {
 
 function updateWorkspaceRule(options: NgAddOptions): Rule {
   return updateWorkspace((workspace) => {
-    const project = workspace.projects.get(options.clientProject);
+    const project = workspace.projects.get(options.project);
     if (options.ssr) {
       project.targets.add({
         name: 'server',
         builder: '@angular-devkit/build-angular:server',
         options: {
-          outputPath: `dist/${options.clientProject}/server`,
+          outputPath: `dist/${options.project}/server`,
           main: posix.join(project.sourceRoot ?? '', 'server.ts'),
           tsConfig: posix.join(project.root, 'tsconfig.server.json'),
           bundleDependencies: false,
@@ -152,7 +152,7 @@ function updateWorkspaceRule(options: NgAddOptions): Rule {
 
       const buildTarget = project.targets.get('build');
       if (project.targets.get('build')?.options) {
-        buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+        buildTarget.options.outputPath = `dist/${options.project}/browser`;
       }
     }
 
@@ -164,10 +164,10 @@ function updateWorkspaceRule(options: NgAddOptions): Rule {
         options: {},
         configurations: {
           production: {
-            browserTarget: `${options.clientProject}:build:production`,
+            browserTarget: `${options.project}:build:production`,
           },
           development: {
-            browserTarget: `${options.clientProject}:build:development`,
+            browserTarget: `${options.project}:build:development`,
           },
         },
       });

@@ -13,7 +13,7 @@ import { Schema as NgAddOptions } from './schema';
 
 describe('ng-add schematic (clover)', () => {
   const defaultOptions: NgAddOptions = {
-    clientProject: 'foo',
+    project: 'foo',
     prerender: false,
     ssr: false,
     skipInstall: true,

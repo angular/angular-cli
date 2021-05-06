@@ -4,9 +4,9 @@
   "title": "Express Engine Install Options Schema",
   "type": "object",
   "properties": {
-    "clientProject": {
+    "project": {
       "type": "string",
-      "description": "Name of related client app.",
+      "description": "The name of the project.",
       "$default": {
         "$source": "projectName"
       }
@@ -56,6 +56,6 @@
       "default": false
     }
   },
-  "required": ["clientProject"],
+  "required": ["project"],
   "additionalProperties": false
 }
