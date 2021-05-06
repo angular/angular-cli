@@ -9,92 +9,55 @@ import { installWorkspacePackages } from './packages';
 import { execAndWaitForOutputToMatch, git, ng } from './process';
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
-  return readFile(filePath)
-    .then(tsConfigJson => {
-      // Remove single and multiline comments
-      const tsConfig = JSON.parse(tsConfigJson.replace(/\/\*\s(.|\n|\r)*\s\*\/|\/\/.*/g, ''));
-      const result = fn(tsConfig) || tsConfig;
+  return readFile(filePath).then((tsConfigJson) => {
+    // Remove single and multiline comments
+    const tsConfig = JSON.parse(tsConfigJson.replace(/\/\*\s(.|\n|\r)*\s\*\/|\/\/.*/g, ''));
+    const result = fn(tsConfig) || tsConfig;
 
-      return writeFile(filePath, JSON.stringify(result, null, 2));
-    });
+    return writeFile(filePath, JSON.stringify(result, null, 2));
+  });
 }
-
 
 export function updateTsConfig(fn: (json: any) => any | void) {
   return updateJsonFile('tsconfig.json', fn);
 }
 
-
 export function ngServe(...args: string[]) {
-  return execAndWaitForOutputToMatch('ng',
-    ['serve', ...args],
-    / Compiled successfully./);
+  return execAndWaitForOutputToMatch('ng', ['serve', ...args], / Compiled successfully./);
 }
 
 export async function prepareProjectForE2e(name) {
   const argv: string[] = getGlobalVariable('argv');
 
-  await git(
-    'config',
-    'user.email',
-    'angular-core+e2e@google.com',
-  );
-  await git(
-    'config',
-    'user.name',
-    'Angular CLI E2e',
-  );
-  await git(
-    'config',
-    'commit.gpgSign',
-    'false',
-  );
+  await git('config', 'user.email', 'angular-core+e2e@google.com');
+  await git('config', 'user.name', 'Angular CLI E2e');
+  await git('config', 'commit.gpgSign', 'false');
 
   await ng('generate', '@schematics/angular:e2e', '--related-app-name', name);
 
-  await useCIChrome(
-    'e2e',
-  );
-  await useCIChrome(
-    '',
-  );
+  await useCIChrome('e2e');
+  await useCIChrome('');
 
   // legacy projects
-  await useCIChrome(
-    'src',
-  );
+  await useCIChrome('src');
 
   if (argv['ng-snapshots'] || argv['ng-tag']) {
     await useSha();
   }
 
-  console.log(
-    `Project ${name} created... Installing npm.`,
-  );
+  console.log(`Project ${name} created... Installing npm.`);
   await installWorkspacePackages();
-  await useCIDefaults(
-    name,
-  );
+  await useCIDefaults(name);
   // Force sourcemaps to be from the root of the filesystem.
-  await updateJsonFile(
-    'tsconfig.json',
-    json => {
-      json[
-        'compilerOptions'
-      ][
-        'sourceRoot'
-      ] =
-        '/';
-    },
-  );
-  await gitCommit(
-    'prepare-project-for-e2e',
-  );
+  await updateJsonFile('tsconfig.json', (json) => {
+    json['compilerOptions']['sourceRoot'] = '/';
+  });
+  await gitCommit('prepare-project-for-e2e');
 }
 
 export function useBuiltPackages() {
-  return Promise.resolve()
-    .then(() => updateJsonFile('package.json', json => {
+  return Promise.resolve().then(() =>
+    updateJsonFile('package.json', (json) => {
       if (!json['dependencies']) {
         json['dependencies'] = {};
       }
@@ -103,14 +66,14 @@ export function useBuiltPackages() {
       }
 
       for (const packageName of Object.keys(packages)) {
-        if (json['dependencies'].hasOwnProperty(packageName)
-        ) {
+        if (json['dependencies'].hasOwnProperty(packageName)) {
           json['dependencies'][packageName] = packages[packageName].tar;
         } else if (json['devDependencies'].hasOwnProperty(packageName)) {
           json['devDependencies'][packageName] = packages[packageName].tar;
         }
       }
-    }));
+    }),
+  );
 }
 
 export function useSha() {
@@ -121,20 +84,19 @@ export function useSha() {
     // 6.1.6+4a8d56a
     const label = argv['ng-tag'] ? argv['ng-tag'] : '';
     const ngSnapshotVersions = require('../ng-snapshot/package.json');
-    return updateJsonFile('package.json', json => {
+    return updateJsonFile('package.json', (json) => {
       // Install over the project with snapshot builds.
       function replaceDependencies(key: string) {
         const missingSnapshots = [];
         Object.keys(json[key] || {})
-          .filter(name => name.match(/^@angular\//))
-          .forEach(name => {
+          .filter((name) => name.match(/^@angular\//))
+          .forEach((name) => {
             const pkgName = name.split(/\//)[1];
             if (pkgName == 'cli') {
               return;
             }
             if (label) {
-              json[key][`@angular/${pkgName}`]
-                = `github:angular/${pkgName}-builds${label}`;
+              json[key][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds${label}`;
             } else {
               const replacement = ngSnapshotVersions.dependencies[`@angular/${pkgName}`];
               if (!replacement) {
@@ -144,8 +106,11 @@ export function useSha() {
             }
           });
         if (missingSnapshots.length > 0) {
-          throw new Error('e2e test with --ng-snapshots requires all angular packages be ' +
-            'listed in tests/legacy-cli/e2e/ng-snapshot/package.json.\nErrors:\n' + missingSnapshots.join('\n  '));
+          throw new Error(
+            'e2e test with --ng-snapshots requires all angular packages be ' +
+              'listed in tests/legacy-cli/e2e/ng-snapshot/package.json.\nErrors:\n' +
+              missingSnapshots.join('\n  '),
+          );
         }
       }
       try {
@@ -161,11 +126,11 @@ export function useSha() {
 }
 
 export function useNgVersion(version: string) {
-  return updateJsonFile('package.json', json => {
+  return updateJsonFile('package.json', (json) => {
     // Install over the project with specific versions.
     Object.keys(json['dependencies'] || {})
-      .filter(name => name.match(/^@angular\//))
-      .forEach(name => {
+      .filter((name) => name.match(/^@angular\//))
+      .forEach((name) => {
         const pkgName = name.split(/\//)[1];
         if (pkgName == 'cli') {
           return;
@@ -174,8 +139,8 @@ export function useNgVersion(version: string) {
       });
 
     Object.keys(json['devDependencies'] || {})
-      .filter(name => name.match(/^@angular\//))
-      .forEach(name => {
+      .filter((name) => name.match(/^@angular\//))
+      .forEach((name) => {
         const pkgName = name.split(/\//)[1];
         if (pkgName == 'cli') {
           return;
@@ -201,7 +166,7 @@ export function useNgVersion(version: string) {
 }
 
 export function useCIDefaults(projectName = 'test-project') {
-  return updateJsonFile('angular.json', workspaceJson => {
+  return updateJsonFile('angular.json', (workspaceJson) => {
     // Disable progress reporting on CI to reduce spam.
     const project = workspaceJson.projects[projectName];
     const appTargets = project.targets || project.architect;
