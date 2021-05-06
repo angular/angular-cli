@@ -129,7 +129,7 @@
     "ajv-formats": "2.1.0",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
-    "bootstrap": "^4.0.0",
+    "bootstrap": "^5.0.0",
     "browserslist": "^4.9.1",
     "cacache": "15.0.6",
     "caniuse-lite": "^1.0.30001032",
