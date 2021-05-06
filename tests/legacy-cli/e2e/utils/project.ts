@@ -8,9 +8,6 @@ import { gitCommit } from './git';
 import { installWorkspacePackages } from './packages';
 import { execAndWaitForOutputToMatch, git, ng } from './process';
 
-const tsConfigPath = 'tsconfig.json';
-
-
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath)
     .then(tsConfigJson => {
@@ -24,7 +21,7 @@ export function updateJsonFile(filePath: string, fn: (json: any) => any | void) 
 
 
 export function updateTsConfig(fn: (json: any) => any | void) {
-  return updateJsonFile(tsConfigPath, fn);
+  return updateJsonFile('tsconfig.json', fn);
 }
 
 
@@ -263,9 +260,8 @@ export async function useCIChrome(projectDir: string = ''): Promise<void> {
   }
 }
 
-export async function isPrereleaseCli() {
-  const angularCliPkgJson = JSON.parse(await readFile('node_modules/@angular/cli/package.json'));
-  const pre = prerelease(angularCliPkgJson.version);
+export function isPrereleaseCli(): boolean {
+  const pre = prerelease(packages['@angular/cli'].version);
 
   return pre && pre.length > 0;
 }
