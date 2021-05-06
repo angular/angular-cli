@@ -5,8 +5,6 @@ import { ng, noSilentNg } from '../../utils/process';
 import { isPrereleaseCli, useCIChrome, useCIDefaults } from '../../utils/project';
 
 export default async function () {
-  const extraUpdateArgs = await isPrereleaseCli()  || true ? ['--next', '--force'] : [];
-
   // We need to use the public registry because in the local NPM server we don't have
   // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
   try {
@@ -32,7 +30,12 @@ export default async function () {
   }
 
   // Update Angular current build
-  await ng('update', '@angular/cli', '@angular/core', ...extraUpdateArgs);
+  const extraUpdateArgs = isPrereleaseCli() ? ['--next', '--force'] : [];
+  // For the latest/next release we purposely don't add `@angular/core`.
+  // This is due to our bumping strategy, which causes a period were `@angular/cli@latest` (v12.0.0) `@angular/core@latest` (v11.2.x)
+  // are of different major/minor version on the local NPM server. This causes `ng update` to fail.
+  // NB: `ng update @angula/cli` will still cause `@angular/core` packages to be updated.
+  await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Setup testing to use CI Chrome.
   await useCIChrome('./');
