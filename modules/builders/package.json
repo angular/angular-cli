@@ -33,7 +33,7 @@
     "@nguniversal/common": "0.0.0-PLACEHOLDER",
     "browser-sync": "^2.26.7",
     "guess-parser": "^0.4.12",
-    "http-proxy-middleware": "^1.0.0",
+    "http-proxy-middleware": "^2.0.0",
     "jest-worker": "26.6.2",
     "ora": "^5.1.0",
     "rxjs": "RXJS_VERSION",

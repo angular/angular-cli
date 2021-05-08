@@ -76,7 +76,7 @@
     "domino": "^2.1.2",
     "express": "^4.15.2",
     "guess-parser": "^0.4.12",
-    "http-proxy-middleware": "^1.0.0",
+    "http-proxy-middleware": "^2.0.0",
     "jasmine": "^3.6.0",
     "jasmine-core": "^3.6.0",
     "jest-worker": "26.6.2",
