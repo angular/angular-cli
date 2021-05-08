@@ -8,6 +8,7 @@
 
 import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'child_process';
+import { existsSync } from 'fs';
 import * as ora from 'ora';
 import * as path from 'path';
 import { Observable } from 'rxjs';
@@ -51,6 +52,14 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
   },
 };
 
+export function detectPackageManager(rootDirectory: string) {
+  return existsSync(path.join(rootDirectory, 'yarn.lock'))
+    ? 'yarn'
+    : existsSync(path.join(rootDirectory, 'pnpm-lock.yaml'))
+    ? 'pnpm'
+    : 'npm';
+}
+
 export class UnknownPackageManagerException extends BaseException {
   constructor(name: string) {
     super(`Unknown package manager "${name}".`);
@@ -60,13 +69,14 @@ export class UnknownPackageManagerException extends BaseException {
 export default function (
   factoryOptions: NodePackageTaskFactoryOptions = {},
 ): TaskExecutor<NodePackageTaskOptions> {
-  const packageManagerName = factoryOptions.packageManager || 'npm';
+  const rootDirectory = factoryOptions.rootDirectory || process.cwd();
+
+  const packageManagerName = factoryOptions.packageManager || detectPackageManager(rootDirectory);
+
   const packageManagerProfile = packageManagers[packageManagerName];
   if (!packageManagerProfile) {
     throw new UnknownPackageManagerException(packageManagerName);
   }
-
-  const rootDirectory = factoryOptions.rootDirectory || process.cwd();
 
   return (options: NodePackageTaskOptions = { command: 'install' }) => {
     let taskPackageManagerProfile = packageManagerProfile;
