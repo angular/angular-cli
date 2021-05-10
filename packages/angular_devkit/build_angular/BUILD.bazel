@@ -132,6 +132,7 @@ ts_library(
         "@npm//@types/parse5-html-rewriting-stream",
         "@npm//@types/postcss-preset-env",
         "@npm//@types/rimraf",
+        "@npm//@types/sass",
         "@npm//@types/semver",
         "@npm//@types/text-table",
         "@npm//@types/webpack-dev-server",
