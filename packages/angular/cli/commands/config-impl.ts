@@ -21,6 +21,7 @@ const validCliPaths = new Map<
   ['cli.warnings.versionMismatch', undefined],
   ['cli.defaultCollection', undefined],
   ['cli.packageManager', undefined],
+
   ['cli.analytics', undefined],
   ['cli.analyticsSharing.tracking', undefined],
   ['cli.analyticsSharing.uuid', (v) => (v ? `${v}` : uuidV4())],
@@ -64,15 +65,22 @@ function parseJsonPath(path: string): (string | number)[] {
 
 function normalizeValue(value: string | undefined | boolean | number): JsonValue | undefined {
   const valueString = `${value}`.trim();
-  if (valueString === 'true') {
-    return true;
-  } else if (valueString === 'false') {
-    return false;
-  } else if (isFinite(+valueString)) {
+  switch (valueString) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    case 'null':
+      return null;
+    case 'undefined':
+      return undefined;
+  }
+
+  if (isFinite(+valueString)) {
     return +valueString;
   }
 
-  return value || undefined;
+  return value ?? undefined;
 }
 
 export class ConfigCommand extends Command<ConfigCommandSchema> {
