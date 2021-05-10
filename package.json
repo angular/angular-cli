@@ -119,6 +119,7 @@
     "@types/progress": "^2.0.3",
     "@types/resolve": "^1.17.1",
     "@types/rimraf": "^3.0.0",
+    "@types/sass": "^1.16.0",
     "@types/semver": "^7.0.0",
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
