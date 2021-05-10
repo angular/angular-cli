@@ -30,8 +30,8 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0",
-    "@angular/compiler": "12.0.0-rc.1",
-    "@angular/compiler-cli": "12.0.0-rc.1",
+    "@angular/compiler": "12.0.0-rc.2",
+    "@angular/compiler-cli": "12.0.0-rc.2",
     "typescript": "4.2.4",
     "webpack": "5.36.2"
   }
