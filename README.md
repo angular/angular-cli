@@ -11,7 +11,6 @@
 - [Getting Started with Universal](#getting-started)
 - [Packages](#packages)
 - [Universal "Gotchas"](#universal-gotchas)
-- [Roadmap](#roadmap)
 - [Preboot](#preboot)
 - [What's in a name?](#whats-in-a-name)
 - [Universal Team](#universal-team)
@@ -45,30 +44,6 @@ The packages from this repo are published as scoped packages under [@nguniversal
 # Universal "Gotchas"
 
 Moved to [/docs/gotchas.md](/docs/gotchas.md)
-
-# Roadmap
-
-## Completed
-
-- Integrate the platform API into core
-- Support Title and Meta services on the server
-- Develop Express, ASP.NET Core, Hapi engines
-- Angular CLI support for Universal
-- Provide a DOM implementation on the server
-- Hooks in `renderModule*` to do stuff just before rendering to string
-- Generic state transfer API in the platform
-- Http Transfer State Module that uses HTTP interceptors and state transfer API
-- Material 2 works on Universal
-- Write documentation for core API
-- Support [AppShell](https://developers.google.com/web/updates/2015/11/app-shell) use cases
-- Development server/watch mode builder with livereload for CLI
-
-## Planning
-
-- Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
-- Better internal performance and stress tests
-- Make it easier to write unit tests for Universal components
-- Node.js bridge protocol to communicate with different language backends - Django, Go, PHP etc.
 
 # Preboot
 
