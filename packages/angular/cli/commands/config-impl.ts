@@ -80,7 +80,7 @@ function normalizeValue(value: string | undefined | boolean | number): JsonValue
     return +valueString;
   }
 
-  return value ?? undefined;
+  return parseJson(valueString) ?? value ?? undefined;
 }
 
 export class ConfigCommand extends Command<ConfigCommandSchema> {

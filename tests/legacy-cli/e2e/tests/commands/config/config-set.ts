@@ -15,14 +15,13 @@ export default async function () {
     throw new Error(`Expected "yarn", received "${JSON.stringify(stdout2)}".`);
   }
 
-  await ng('config', 'schematics.@schematics/angular:component.style', 'css');
-  const { stdout: stdout3 } = await ng('config', '@schematics/angular:component.style');
-  if (!stdout2.includes('css')) {
-    throw new Error(`Expected "css", received "${JSON.stringify(stdout3)}".`);
+  await ng('config', 'schematics', '{"@schematics/angular:component":{"style": "scss"}}');
+  const { stdout: stdout3 } = await ng('config', 'schematics.@schematics/angular:component.style');
+  if (!stdout3.includes('scss')) {
+    throw new Error(`Expected "scss", received "${JSON.stringify(stdout3)}".`);
   }
 
-  const { stderr } = await ng('config', 'schematics', 'undefined');
-  if (!stderr.includes('Value cannot be found.')) {
-    throw new Error(`Expected "Value cannot be found", received "${JSON.stringify(stderr)}".`);
-  }
+  await ng('config', 'schematics');
+  await ng('config', 'schematics', 'undefined');
+  await expectToFail(() => ng('config', 'schematics'));
 }
