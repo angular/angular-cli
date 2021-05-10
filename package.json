@@ -200,7 +200,7 @@
     "quicktype-core": "6.0.69",
     "raw-loader": "4.0.2",
     "regenerator-runtime": "0.13.7",
-    "resolve-url-loader": "3.1.2",
+    "resolve-url-loader": "4.0.0",
     "rimraf": "3.0.2",
     "rxjs": "6.6.7",
     "sass": "1.32.12",
