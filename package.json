@@ -62,7 +62,8 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.36.2"
+    "**/@types/copy-webpack-plugin/webpack": "5.36.2",
+    "ajv-formats/ajv": "8.3.0"
   },
   "devDependencies": {
     "@angular/animations": "12.0.0-rc.1",
