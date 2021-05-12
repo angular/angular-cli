@@ -8,6 +8,12 @@
 
 import { Importer, ImporterReturnType, Options, Result, SassException } from 'sass';
 import { MessageChannel, Worker } from 'worker_threads';
+import { maxWorkers } from '../utils/environment-options';
+
+/**
+ * The maximum number of Workers that will be created to execute render requests.
+ */
+const MAX_RENDER_WORKERS = maxWorkers;
 
 /**
  * The callback type for the `dart-sass` asynchronous render function.
@@ -19,6 +25,7 @@ type RenderCallback = (error?: SassException, result?: Result) => void;
  */
 interface RenderRequest {
   id: number;
+  workerIndex: number;
   callback: RenderCallback;
   importers?: Importer[];
 }
@@ -39,9 +46,11 @@ interface RenderResponseMessage {
  * the worker which can be up to two times faster than the asynchronous variant.
  */
 export class SassWorkerImplementation {
-  private worker?: Worker;
+  private readonly workers: Worker[] = [];
+  private readonly availableWorkers: number[] = [];
   private readonly requests = new Map<number, RenderRequest>();
   private idCounter = 1;
+  private nextWorkerIndex = 0;
 
   /**
    * Provides information about the Sass implementation.
@@ -74,14 +83,23 @@ export class SassWorkerImplementation {
       throw new Error('Sass custom functions are not supported.');
     }
 
-    if (!this.worker) {
-      this.worker = this.createWorker();
+    let workerIndex = this.availableWorkers.pop();
+    if (workerIndex === undefined) {
+      if (this.workers.length < MAX_RENDER_WORKERS) {
+        workerIndex = this.workers.length;
+        this.workers.push(this.createWorker());
+      } else {
+        workerIndex = this.nextWorkerIndex++;
+        if (this.nextWorkerIndex >= this.workers.length) {
+          this.nextWorkerIndex = 0;
+        }
+      }
     }
 
-    const request = this.createRequest(callback, importer);
+    const request = this.createRequest(workerIndex, callback, importer);
     this.requests.set(request.id, request);
 
-    this.worker.postMessage({
+    this.workers[workerIndex].postMessage({
       id: request.id,
       hasImporter: !!importer,
       options: serializableOptions,
@@ -96,7 +114,9 @@ export class SassWorkerImplementation {
    * is only needed if early cleanup is needed.
    */
   close(): void {
-    this.worker?.terminate();
+    for (const worker of this.workers) {
+      void worker.terminate();
+    }
     this.requests.clear();
   }
 
@@ -117,6 +137,7 @@ export class SassWorkerImplementation {
       }
 
       this.requests.delete(response.id);
+      this.availableWorkers.push(request.workerIndex);
 
       if (response.result) {
         // The results are expected to be Node.js `Buffer` objects but will each be transferred as
@@ -193,11 +214,13 @@ export class SassWorkerImplementation {
   }
 
   private createRequest(
+    workerIndex: number,
     callback: RenderCallback,
     importer: Importer | Importer[] | undefined,
   ): RenderRequest {
     return {
       id: this.idCounter++,
+      workerIndex,
       callback,
       importers: !importer || Array.isArray(importer) ? importer : [importer],
     };
