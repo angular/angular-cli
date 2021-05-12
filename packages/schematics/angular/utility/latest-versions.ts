@@ -8,7 +8,7 @@
 
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
-  Angular: '~12.0.0-rc.3',
+  Angular: '~12.0.0',
   RxJs: '~6.6.0',
   ZoneJs: '~0.11.4',
   TypeScript: '~4.2.3',
@@ -19,5 +19,5 @@ export const latestVersions = {
   // non-experimental, they will always have the same version.
   DevkitBuildAngular: '~' + require('../package.json')['version'],
 
-  ngPackagr: '^12.0.0-next.8',
+  ngPackagr: '^12.0.0',
 };
