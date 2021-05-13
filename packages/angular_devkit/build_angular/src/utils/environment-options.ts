@@ -83,3 +83,15 @@ export const cachingBasePath = (() => {
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 export const profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
+
+/**
+ * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
+ * This cause `Error: Call retries were exceeded` errors when trying to use them.
+ *
+ * @see https://github.com/nodejs/node/issues/28762
+ * @see https://github.com/webpack-contrib/terser-webpack-plugin/issues/143
+ * @see https://ithub.com/angular/angular-cli/issues/16860#issuecomment-588828079
+ *
+ */
+const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
+export const maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
