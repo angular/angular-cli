@@ -214,7 +214,7 @@
     "spdx-satisfies": "^5.0.0",
     "style-loader": "2.0.0",
     "stylus": "0.54.8",
-    "stylus-loader": "5.0.0",
+    "stylus-loader": "6.0.0",
     "symbol-observable": "4.0.0",
     "tar": "^6.0.0",
     "temp": "^0.9.0",
