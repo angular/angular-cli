@@ -36,11 +36,7 @@ import {
 import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
 import { addError } from '../../utils/webpack-diagnostics';
-import {
-  DedupeModuleResolvePlugin,
-  OptimizeCssWebpackPlugin,
-  ScriptsWebpackPlugin,
-} from '../plugins';
+import { DedupeModuleResolvePlugin, ScriptsWebpackPlugin } from '../plugins';
 import {
   getEsVersionForFileName,
   getOutputHashFormat,
@@ -48,8 +44,6 @@ import {
   normalizeExtraEntryPoints,
 } from '../utils/helpers';
 import { IGNORE_WARNINGS } from '../utils/stats';
-
-const TerserPlugin = require('terser-webpack-plugin');
 
 // eslint-disable-next-line max-lines-per-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
@@ -320,20 +314,37 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   const extraMinimizers = [];
   if (stylesOptimization.minify) {
+    const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
     extraMinimizers.push(
-      new OptimizeCssWebpackPlugin({
-        sourceMap: stylesSourceMap,
+      new CssMinimizerPlugin({
         // component styles retain their original file name
-        test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
+        test: /\.(?:css|scss|sass|less|styl)$/,
+        parallel: maxWorkers,
+        minify: [CssMinimizerPlugin.cssnanoMinify],
+        minimizerOptions: {
+          preset: [
+            'default',
+            {
+              // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
+              svgo: false,
+              // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+              calc: false,
+              // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
+              cssDeclarationSorter: false,
+            },
+          ],
+        },
       }),
     );
   }
 
   if (scriptsOptimization) {
+    const TerserPlugin = require('terser-webpack-plugin');
     const {
       GLOBAL_DEFS_FOR_TERSER,
       GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
     } = require('@angular/compiler-cli');
+
     const angularGlobalDefinitions = buildOptions.aot
       ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
       : GLOBAL_DEFS_FOR_TERSER;
