@@ -237,6 +237,10 @@ export async function execute(
             /\.(css|scss|sass|styl|less)$/,
             path.join(__dirname, 'empty-export-default.js'),
           ),
+          new webpack.NormalModuleReplacementPlugin(
+            /^angular-resource:\/\//,
+            path.join(__dirname, 'empty-export-default.js'),
+          ),
         ],
       });
 
