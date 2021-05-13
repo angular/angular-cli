@@ -86,8 +86,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#53070e11fceeba814266e19e932531e706357cf0":
   version "0.0.0"
-  uid "53070e11fceeba814266e19e932531e706357cf0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#53070e11fceeba814266e19e932531e706357cf0"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#47233b68d11ff433e924afe2e20b5379f0f53eef"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -1563,13 +1562,6 @@
   version "2.8.10"
   resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.10.tgz#61cc8469849e5bcdd0c7044122265c39cec10cf4"
   integrity sha512-C7srjHiVG3Ey1nR6d511dtDkCEjxuN9W1HWAEjGq8kpcwmNM6JJkpC0xvabM7BXTG2wDq8Eu33iH9aQKa7IvLQ==
-
-"@types/cssnano@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@types/cssnano/-/cssnano-4.0.0.tgz#f1bb29d6d0813861a3d87e02946b2988d0110d4e"
-  integrity sha512-BC/2ibKZfPIaBLBNzkitdW1IvvX/LKW6/QXGc4Su/tAJ7mQ3f2CKBuGCCKaqGAnoKwzfuC7G/recpkARwdOwuA==
-  dependencies:
-    postcss "5 - 7"
 
 "@types/debug@^4.1.2":
   version "4.1.5"
@@ -3863,6 +3855,19 @@ css-loader@5.2.4:
     schema-utils "^3.0.0"
     semver "^7.3.5"
 
+css-minimizer-webpack-plugin@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/css-minimizer-webpack-plugin/-/css-minimizer-webpack-plugin-3.0.0.tgz#5b1edbffe1a3e6450d8cb53fb4f4c5013b7af313"
+  integrity sha512-yIrqG0pPphR1RoNx2wDxYmxRf2ubRChLDXxv7ccipEm5bRKsZRYp8n+2peeXehtTF5s3yNxlqsdz3WQOsAgUkw==
+  dependencies:
+    cssnano "^5.0.0"
+    jest-worker "^26.3.0"
+    p-limit "^3.0.2"
+    postcss "^8.2.9"
+    schema-utils "^3.0.0"
+    serialize-javascript "^5.0.1"
+    source-map "^0.6.1"
+
 css-parse@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/css-parse/-/css-parse-2.0.0.tgz#a468ee667c16d81ccf05c58c38d2a97c780dbfd4"
@@ -3990,7 +3995,7 @@ cssnano-utils@^2.0.0:
   resolved "https://registry.yarnpkg.com/cssnano-utils/-/cssnano-utils-2.0.0.tgz#b04baaa312aa3dd5a854b7f61d76b9d94be07f74"
   integrity sha512-xvxmTszdrvSyTACdPe8VU5J6p4sm3egpgw54dILvNqt5eBUv6TFjACLhSxtRuEsxYrgy8uDy269YjScO5aKbGA==
 
-cssnano@5.0.2, cssnano@^5.0.0:
+cssnano@^5.0.0:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-5.0.2.tgz#3f6de4fd5ecb7b5fb636c1a606de5f38cd241493"
   integrity sha512-8JK3EnPsjQsULme9/e5M2hF564f/480hwsdcHvQ7ZtAIMfQ1O3SCfs+b8Mjf5KJxhYApyRshR2QSovEJi2K72Q==
@@ -6616,7 +6621,7 @@ jasminewd2@^2.1.0:
   resolved "https://registry.yarnpkg.com/jasminewd2/-/jasminewd2-2.2.0.tgz#e37cf0b17f199cce23bea71b2039395246b4ec4e"
   integrity sha1-43zwsX8ZnM4jvqcbIDk5Uka07E4=
 
-jest-worker@26.6.2, jest-worker@^26.5.0, jest-worker@^26.6.2:
+jest-worker@26.6.2, jest-worker@^26.3.0, jest-worker@^26.5.0, jest-worker@^26.6.2:
   version "26.6.2"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-26.6.2.tgz#7f72cbc4d643c365e27b9fd775f9d0eaa9c7a8ed"
   integrity sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==
@@ -9304,7 +9309,7 @@ postcss-values-parser@^2.0.0, postcss-values-parser@^2.0.1:
     indexes-of "^1.0.1"
     uniq "^1.0.1"
 
-"postcss@5 - 7", postcss@7.x.x, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2, postcss@^7.0.32, postcss@^7.0.35, postcss@^7.0.5, postcss@^7.0.6:
+postcss@7.x.x, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2, postcss@^7.0.32, postcss@^7.0.35, postcss@^7.0.5, postcss@^7.0.6:
   version "7.0.35"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.35.tgz#d2be00b998f7f211d8a276974079f2e92b970e24"
   integrity sha512-3QT8bBJeX/S5zKTTjTCIjRF3If4avAT6kqxcASlTWEtAFCb9NH0OUxNDfgZSWdP5fJnBYCMEWkIFfWeugjzYMg==
@@ -9313,7 +9318,7 @@ postcss-values-parser@^2.0.0, postcss-values-parser@^2.0.1:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@8.2.15, postcss@^8.2.10, postcss@^8.2.4:
+postcss@8.2.15, postcss@^8.2.10, postcss@^8.2.4, postcss@^8.2.9:
   version "8.2.15"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.15.tgz#9e66ccf07292817d226fc315cbbf9bc148fbca65"
   integrity sha512-2zO3b26eJD/8rb106Qu2o7Qgg52ND5HPjcyQiK2B98O388h43A448LCslC0dI2P97wCAQRJsFvwTRcXxTKds+Q==
@@ -10167,7 +10172,6 @@ sass@1.32.13, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
