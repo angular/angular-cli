@@ -23,13 +23,14 @@ import {
   debug,
 } from 'webpack';
 import { AssetPatternClass } from '../../browser/schema';
-import { BuildBrowserFeatures, maxWorkers } from '../../utils';
+import { BuildBrowserFeatures } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { findCachePath } from '../../utils/cache-path';
 import {
   allowMangle,
   allowMinify,
   cachingDisabled,
+  maxWorkers,
   profilingEnabled,
   shouldBeautify,
 } from '../../utils/environment-options';
