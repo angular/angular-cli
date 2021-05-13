@@ -90,11 +90,11 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     buildOptions.stylePreprocessorOptions?.includePaths?.map((p) => path.resolve(root, p)) ?? [];
 
   // Process global styles.
-  const { entryPoints, noInjectNames, paths: globalStylePaths } = resolveGlobalStyles(
-    buildOptions.styles,
-    root,
-    !!buildOptions.preserveSymlinks,
-  );
+  const {
+    entryPoints,
+    noInjectNames,
+    paths: globalStylePaths,
+  } = resolveGlobalStyles(buildOptions.styles, root, !!buildOptions.preserveSymlinks);
   if (noInjectNames.length > 0) {
     // Add plugin to remove hashes from lazy styles.
     extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
