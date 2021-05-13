@@ -11,9 +11,9 @@ import * as os from 'os';
 import * as path from 'path';
 import { serialize } from 'v8';
 import { BundleActionCache } from './action-cache';
+import { maxWorkers } from './environment-options';
 import { I18nOptions } from './i18n-options';
 import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
-import { maxWorkers } from './workers';
 
 let workerFile = require.resolve('./process-bundle');
 workerFile =
@@ -35,7 +35,7 @@ export class BundleActionExecutor {
   }
 
   private static executeMethod<O>(worker: JestWorker, method: string, input: unknown): Promise<O> {
-    return ((worker as unknown) as Record<string, (i: unknown) => Promise<O>>)[method](input);
+    return (worker as unknown as Record<string, (i: unknown) => Promise<O>>)[method](input);
   }
 
   private ensureLarge(): JestWorker {
