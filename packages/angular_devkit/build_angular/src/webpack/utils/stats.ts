@@ -12,6 +12,7 @@ import * as path from 'path';
 import * as textTable from 'text-table';
 import { Configuration, StatsCompilation } from 'webpack';
 import { colors as ansiColors, removeColor } from '../../utils/color';
+import { getWebpackStatsConfig } from '../configs/stats';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -332,17 +333,7 @@ export function createWebpackLoggingCallback(
       logger.info(stats.toString(config.stats));
     }
 
-    webpackStatsLogger(
-      logger,
-      stats.toJson({
-        errors: true,
-        warnings: true,
-        builtAt: true,
-        assets: true,
-        chunks: true,
-      }),
-      config,
-    );
+    webpackStatsLogger(logger, stats.toJson(getWebpackStatsConfig(false)), config);
   };
 }
 
