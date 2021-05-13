@@ -487,6 +487,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         ...extraRules,
       ],
     },
+    experiments: {
+      syncWebAssembly: true,
+      asyncWebAssembly: true,
+    },
     cache: !!buildOptions.watch &&
       !cachingDisabled && {
         type: 'memory',
