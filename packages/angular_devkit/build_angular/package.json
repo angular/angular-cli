@@ -63,7 +63,7 @@
     "source-map-support": "0.5.19",
     "style-loader": "2.0.0",
     "stylus": "0.54.8",
-    "stylus-loader": "5.0.0",
+    "stylus-loader": "6.0.0",
     "terser": "5.7.0",
     "terser-webpack-plugin": "4.2.3",
     "text-table": "0.2.0",
