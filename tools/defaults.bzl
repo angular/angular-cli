@@ -82,6 +82,7 @@ GLOBALS = {
     "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",
     "express": "express",
     "fs": "fs",
+    "domino": "domino",
     "jsdom": "jsdom",
     "url": "url",
     "net": "net",
