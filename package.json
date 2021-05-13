@@ -195,7 +195,7 @@
     "postcss-import": "14.0.1",
     "postcss-loader": "5.2.0",
     "postcss-preset-env": "6.7.0",
-    "prettier": "^2.0.0",
+    "prettier": "^2.3.0",
     "protractor": "~7.0.0",
     "puppeteer": "9.0.0",
     "quicktype-core": "6.0.69",
