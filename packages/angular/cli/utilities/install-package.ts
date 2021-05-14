@@ -78,7 +78,7 @@ export async function installTempPackage(
   extraArgs?: string[],
 ): Promise<{
   status: 1 | 0;
-  tempPath: string;
+  tempNodeModules: string;
 }> {
   const tempPath = mkdtempSync(join(realpathSync(tmpdir()), 'angular-cli-packages-'));
 
@@ -121,7 +121,7 @@ export async function installTempPackage(
 
   return {
     status: await installPackage(packageName, packageManager, true, installArgs, tempPath),
-    tempPath,
+    tempNodeModules,
   };
 }
 
@@ -130,7 +130,7 @@ export async function runTempPackageBin(
   packageManager: PackageManager = PackageManager.Npm,
   args: string[] = [],
 ): Promise<number> {
-  const { status: code, tempPath } = await installTempPackage(packageName, packageManager);
+  const { status: code, tempNodeModules } = await installTempPackage(packageName, packageManager);
   if (code !== 0) {
     return code;
   }
@@ -138,7 +138,7 @@ export async function runTempPackageBin(
   // Remove version/tag etc... from package name
   // Ex: @angular/cli@latest -> @angular/cli
   const packageNameNoVersion = packageName.substring(0, packageName.lastIndexOf('@'));
-  const pkgLocation = join(tempPath, packageNameNoVersion);
+  const pkgLocation = join(tempNodeModules, packageNameNoVersion);
   const packageJsonPath = join(pkgLocation, 'package.json');
 
   // Get a binary location for this package
