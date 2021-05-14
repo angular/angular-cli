@@ -205,13 +205,13 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     if (savePackage === false) {
       // Temporary packages are located in a different directory
       // Hence we need to resolve them using the temp path
-      const { status, tempPath } = await installTempPackage(
+      const { status, tempNodeModules } = await installTempPackage(
         packageIdentifier.raw,
         packageManager,
         options.registry ? [`--registry="${options.registry}"`] : undefined,
       );
       const resolvedCollectionPath = require.resolve(join(collectionName, 'package.json'), {
-        paths: [tempPath],
+        paths: [tempNodeModules],
       });
 
       if (status !== 0) {
