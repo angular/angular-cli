@@ -17,7 +17,7 @@ import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { SchematicEngineHost } from '../models/schematic-engine-host';
 import { colors } from '../utilities/color';
-import { runTempPackageBin } from '../utilities/install-package';
+import { installAllPackages, runTempPackageBin } from '../utilities/install-package';
 import { writeErrorToLogFile } from '../utilities/log-file';
 import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
 import {
@@ -654,6 +654,26 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       packageManager: this.packageManager,
       packages: packagesToUpdate,
     });
+
+    if (success) {
+      try {
+        // Remove existing node modules directory to provide a stronger guarantee that packages
+        // will be hoisted into the correct locations.
+        await fs.promises.rmdir(path.join(this.context.root, 'node_modules'), {
+          recursive: true,
+          maxRetries: 3,
+        });
+      } catch {}
+
+      const result = await installAllPackages(
+        this.packageManager,
+        options.force ? ['--force'] : [],
+        this.context.root,
+      );
+      if (result !== 0) {
+        return result;
+      }
+    }
 
     if (success && options.createCommits) {
       const committed = this.commit(
