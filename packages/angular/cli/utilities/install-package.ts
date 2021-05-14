@@ -19,8 +19,53 @@ interface PackageManagerOptions {
   silent: string;
   saveDev: string;
   install: string;
+  installAll?: string;
   prefix: string;
   noLockfile: string;
+}
+
+export async function installAllPackages(
+  packageManager: PackageManager = PackageManager.Npm,
+  extraArgs: string[] = [],
+  cwd = process.cwd(),
+): Promise<1 | 0> {
+  const packageManagerArgs = getPackageManagerArguments(packageManager);
+
+  const installArgs: string[] = [];
+  if (packageManagerArgs.installAll) {
+    installArgs.push(packageManagerArgs.installAll);
+  }
+  installArgs.push(packageManagerArgs.silent);
+
+  const spinner = new Spinner();
+  spinner.start('Installing packages...');
+
+  const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
+
+  return new Promise((resolve, reject) => {
+    const childProcess = spawn(packageManager, [...installArgs, ...extraArgs], {
+      stdio: 'pipe',
+      shell: true,
+      cwd,
+    }).on('close', (code: number) => {
+      if (code === 0) {
+        spinner.succeed('Packages successfully installed.');
+        resolve(0);
+      } else {
+        spinner.stop();
+        bufferedOutput.forEach(({ stream, data }) => stream.write(data));
+        spinner.fail('Package install failed, see above.');
+        reject(1);
+      }
+    });
+
+    childProcess.stdout?.on('data', (data: Buffer) =>
+      bufferedOutput.push({ stream: process.stdout, data: data }),
+    );
+    childProcess.stderr?.on('data', (data: Buffer) =>
+      bufferedOutput.push({ stream: process.stderr, data: data }),
+    );
+  });
 }
 
 export async function installPackage(
@@ -193,6 +238,7 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
         silent: '--silent',
         saveDev: '--save-dev',
         install: 'add',
+        installAll: 'install',
         prefix: '--prefix',
         noLockfile: '--no-lockfile',
       };
@@ -201,6 +247,7 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
         silent: '--quiet',
         saveDev: '--save-dev',
         install: 'install',
+        installAll: 'install',
         prefix: '--prefix',
         noLockfile: '--no-package-lock',
       };

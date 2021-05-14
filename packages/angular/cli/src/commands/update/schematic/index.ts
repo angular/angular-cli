@@ -8,7 +8,6 @@
 
 import { logging, tags } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as npa from 'npm-package-arg';
 import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';
@@ -310,9 +309,7 @@ function _performUpdate(
   const newContent = JSON.stringify(packageJson, null, 2);
   if (packageJsonContent.toString() != newContent || migrateOnly) {
     if (!migrateOnly) {
-      // If something changed, also hook up the task.
       tree.overwrite('/package.json', JSON.stringify(packageJson, null, 2));
-      context.addTask(new NodePackageInstallTask());
     }
 
     const externalMigrations: {}[] = [];
