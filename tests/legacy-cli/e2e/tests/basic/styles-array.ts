@@ -3,7 +3,7 @@ import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
-export default async function() {
+export default async function () {
   await writeMultipleFiles({
     'src/string-style.css': '.string-style { color: red }',
     'src/input-style.css': '.input-style { color: red }',
@@ -12,7 +12,7 @@ export default async function() {
     'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }',
   });
 
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect.build.options.styles = [
       { input: 'src/string-style.css' },
@@ -27,7 +27,7 @@ export default async function() {
     ];
   });
 
-  await ng('build', '--extract-css', '--configuration=development');
+  const { stdout } = await ng('build', '--extract-css', '--configuration=development');
 
   await expectFileToMatch('dist/test-project/styles.css', '.string-style');
   await expectFileToMatch('dist/test-project/styles.css', '.input-style');
@@ -41,4 +41,9 @@ export default async function() {
       <link rel="stylesheet" href="renamed-style.css">
     `,
   );
+
+  // Non injected styles should be listed under lazy chunk files
+  if (!/Lazy Chunk Files.*\srenamed-lazy-style\.css/m.test(stdout)) {
+    throw new Error(`Expected "renamed-lazy-style.css" to be listed under "Lazy Chunk Files".`);
+  }
 }
