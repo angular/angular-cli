@@ -188,8 +188,8 @@ function _build(logger: logging.Logger) {
 }
 
 export default async function (
-  argv: { local?: boolean; snapshot?: boolean },
-  logger: logging.Logger,
+  argv: { local?: boolean; snapshot?: boolean } = {},
+  logger: logging.Logger = new logging.Logger('build-logger'),
 ) {
   _clean(logger);
 
@@ -407,6 +407,7 @@ export default async function (
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
   }
 
+  const output: { name: string; outputPath: string }[] = [];
   logger.info('Tarring all packages...');
   const tarLogger = logger.createChild('license');
   Object.keys(packages).forEach((pkgName) => {
@@ -414,8 +415,11 @@ export default async function (
     if (!pkg.private) {
       tarLogger.info(`${pkgName} => ${pkg.tar}`);
       _tar(pkg.tar, pkg.dist);
+      output.push({ name: pkgName, outputPath: pkg.tar });
     }
   });
 
   logger.info(`Done.`);
+
+  return output;
 }
