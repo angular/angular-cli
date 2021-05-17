@@ -61,6 +61,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
+  const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
 
   const targetInFileName = getEsVersionForFileName(
     tsConfig.options.target,
@@ -75,8 +76,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const differentialLoadingMode = buildOptions.differentialLoadingNeeded && !buildOptions.watch;
   if (platform !== 'server') {
     if (differentialLoadingMode || tsConfig.options.target === ScriptTarget.ES5) {
-      const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
-
       if (buildBrowserFeatures.isEs5SupportNeeded()) {
         const polyfillsChunkName = 'polyfills-es5';
         entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
@@ -391,11 +390,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     };
 
     const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
+
     extraMinimizers.push(
       new TerserPlugin({
-        sourceMap: scriptsSourceMap,
         parallel: maxWorkers,
-        cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
         exclude: globalScriptsNames,
         terserOptions,
@@ -403,9 +401,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       // Script bundles are fully optimized here in one step since they are never downleveled.
       // They are shared between ES2015 & ES5 outputs so must support ES5.
       new TerserPlugin({
-        sourceMap: scriptsSourceMap,
         parallel: maxWorkers,
-        cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
         include: globalScriptsNames,
         terserOptions: {
