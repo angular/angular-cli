@@ -37,7 +37,7 @@
     "jsonc-parser": "3.0.0",
     "npm-package-arg": "8.1.2",
     "npm-pick-manifest": "6.1.1",
-    "open": "8.0.8",
+    "open": "8.0.2",
     "ora": "5.4.0",
     "pacote": "11.3.3",
     "resolve": "1.20.0",

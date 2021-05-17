@@ -8210,10 +8210,10 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-open@8.0.8:
-  version "8.0.8"
-  resolved "https://registry.yarnpkg.com/open/-/open-8.0.8.tgz#0e286bb2df3c72e00cb2a0203d604abee002dbdc"
-  integrity sha512-3XmKIU8+H/TVr8wB8C4vj0z748+yBydSvtpzZVS6vQ1dKNHB6AiPbhaoG+89zb80717GPk9y/7OvK0R6FXkNmQ==
+open@8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/open/-/open-8.0.2.tgz#8c3e95cce93ba2fc8d99968ee8bfefecdb50b84f"
+  integrity sha512-NV5QmWJrTaNBLHABJyrb+nd5dXI5zfea/suWawBhkHzAbVhLLiJdrqMgxMypGK9Eznp2Ltoh7SAVkQ3XAucX7Q==
   dependencies:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
