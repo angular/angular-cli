@@ -114,19 +114,19 @@ The system operates on placeholders defined inside files or their paths as loade
 
 ## Path Templating
 
-| Placeholder           | Description                                                                                                                      |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| **variable**          | Replaced with the value of `variable`.                                                                                           |
-| **variable@function** | Replaced with the result of the call `function(variable)`. Can be chained to the left (`__variable@function1@function2__ ` etc). |
+| Placeholder             | Description                                                                                                                      |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `__variable__`          | Replaced with the value of `variable`.                                                                                           |
+| `__variable@function__` | Replaced with the result of the call `function(variable)`. Can be chained to the left (`__variable@function1@function2__ ` etc). |
 
 ## Content Templating
 
-| Placeholder       | Description                                                                                                                                 |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| <%= expression %> | Replaced with the result of the call of the given expression. This only supports direct expressions, no structural (for/if/...) JavaScript. |
-| <%- expression %> | Same as above, but the value of the result will be escaped for HTML when inserted (i.e. replacing '<' with '&lt;')                          |
-| <% inline code %> | Inserts the given code into the template structure, allowing to insert structural JavaScript.                                               |
-| <%# text %>       | A comment, which gets entirely dropped.                                                                                                     |
+| Placeholder         | Description                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<%= expression %>` | Replaced with the result of the call of the given expression. This only supports direct expressions, no structural (for/if/...) JavaScript. |
+| `<%- expression %>` | Same as above, but the value of the result will be escaped for HTML when inserted (i.e. replacing '<' with '&lt;')                          |
+| `<% inline code %>` | Inserts the given code into the template structure, allowing to insert structural JavaScript.                                               |
+| `<%# text %>`       | A comment, which gets entirely dropped.                                                                                                     |
 
 # Examples
 
