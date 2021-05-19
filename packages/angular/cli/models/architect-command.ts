@@ -23,7 +23,7 @@ export interface ArchitectCommandOptions extends BaseCommandOptions {
 }
 
 export abstract class ArchitectCommand<
-  T extends ArchitectCommandOptions = ArchitectCommandOptions
+  T extends ArchitectCommandOptions = ArchitectCommandOptions,
 > extends Command<T> {
   protected _architect!: Architect;
   protected _architectHost!: WorkspaceNodeModulesArchitectHost;
@@ -238,7 +238,7 @@ export abstract class ArchitectCommand<
     }
 
     await this.reportAnalytics([this.description.name], {
-      ...(((await this._architectHost.getOptionsForTarget(target)) as unknown) as T),
+      ...((await this._architectHost.getOptionsForTarget(target)) as unknown as T),
       ...overrides,
     });
 
@@ -344,11 +344,18 @@ export abstract class ArchitectCommand<
       project = commandOptions.project;
       target = this.target;
       if (commandOptions.prod) {
+        const defaultConfig =
+          project &&
+          target &&
+          this.workspace?.projects.get(project)?.targets.get(target)?.defaultConfiguration;
+
+        this.logger.warn(
+          defaultConfig === 'production'
+            ? 'Option "--prod" is deprecated: No need to use this option as this builder defaults to configuration "production".'
+            : 'Option "--prod" is deprecated: Use "--configuration production" instead.',
+        );
         // The --prod flag will always be the first configuration, available to be overwritten
         // by following configurations.
-        this.logger.warn(
-          'Option "--prod" is deprecated: Use "--configuration production" instead.',
-        );
         configuration = 'production';
       }
       if (commandOptions.configuration) {
