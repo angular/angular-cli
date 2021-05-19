@@ -328,7 +328,7 @@ workflows:
                 - master
       - e2e-cli:
           name: e2e-cli-node-12
-          nodeversion: '12.18'
+          nodeversion: '12.20'
           <<: *only_release_branches
           requires:
             - e2e-cli
