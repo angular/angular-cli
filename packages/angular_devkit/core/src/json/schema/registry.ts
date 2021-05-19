@@ -296,7 +296,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     let validator: ValidateFunction;
     try {
       this._currentCompilationSchemaInfo = schemaInfo;
-      validator = await this._ajv.compileAsync(schema);
+      validator = this._ajv.compile(schema);
     } finally {
       this._currentCompilationSchemaInfo = undefined;
     }
