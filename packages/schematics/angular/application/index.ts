@@ -97,7 +97,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
       'directive',
       'guard',
       'interceptor',
-      'module',
       'pipe',
       'service',
     ].forEach((type) => {
