@@ -115,6 +115,11 @@
       "factory": "./update-12/update-web-workers",
       "description": "Updates Web Worker consumer usage to use the new syntax supported directly by Webpack 5."
     },
+    "schematic-options-12": {
+      "version": "12.0.1",
+      "factory": "./update-12/schematic-options",
+      "description": "Remove invalid 'skipTests' option in '@schematics/angular:module' Angular schematic options."
+    },
     "production-by-default": {
       "version": "9999.0.0",
       "factory": "./update-12/production-default-config",
