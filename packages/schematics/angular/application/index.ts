@@ -91,21 +91,14 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
   }
 
   if (options.skipTests || options.minimal) {
-    [
-      'class',
-      'component',
-      'directive',
-      'guard',
-      'interceptor',
-      'module',
-      'pipe',
-      'service',
-    ].forEach((type) => {
-      if (!(`@schematics/angular:${type}` in schematics)) {
-        schematics[`@schematics/angular:${type}`] = {};
-      }
-      (schematics[`@schematics/angular:${type}`] as JsonObject).skipTests = true;
-    });
+    ['class', 'component', 'directive', 'guard', 'interceptor', 'pipe', 'service'].forEach(
+      (type) => {
+        if (!(`@schematics/angular:${type}` in schematics)) {
+          schematics[`@schematics/angular:${type}`] = {};
+        }
+        (schematics[`@schematics/angular:${type}`] as JsonObject).skipTests = true;
+      },
+    );
   }
 
   if (options.strict) {
