@@ -476,6 +476,14 @@ export class AngularWebpackPlugin {
         }
 
         affectedFiles.add(result.affected as ts.SourceFile);
+        diagnosticsReporter(result.result);
+      }
+    } else {
+      // Collect semantic diagnostics
+      for (const sourceFile of builder.getSourceFiles()) {
+        if (!ignoreForDiagnostics.has(sourceFile)) {
+          diagnosticsReporter(builder.getSemanticDiagnostics(sourceFile));
+        }
       }
     }
 
@@ -487,13 +495,6 @@ export class AngularWebpackPlugin {
       ...builder.getSyntacticDiagnostics(),
     ];
     diagnosticsReporter(diagnostics);
-
-    // Collect semantic diagnostics
-    for (const sourceFile of builder.getSourceFiles()) {
-      if (!ignoreForDiagnostics.has(sourceFile)) {
-        diagnosticsReporter(builder.getSemanticDiagnostics(sourceFile));
-      }
-    }
 
     const transformers = createAotTransformers(builder, this.pluginOptions);
 
