@@ -87,6 +87,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
         : 'web',
     output: {
       crossOriginLoading,
+      trustedTypes: 'angular#bundler',
     },
     optimization: {
       runtimeChunk: 'single',
