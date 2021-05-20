@@ -4,7 +4,7 @@ import { join } from 'path';
 import { format } from 'url';
 
 const PORT = 4200;
-const HOST = `http://localhost:${PORT}`;
+const HOST = `localhost:${PORT}`;
 const DIST = join(__dirname, '../browser');
 
 const app = express();
@@ -37,5 +37,5 @@ app.get('*', (req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Node Express server listening on ${HOST}`);
+  console.log(`Node Express server listening on http://${HOST}`);
 });
