@@ -29,7 +29,7 @@ if (version[0] % 2 === 1 && version[0] > 14) {
 } else if (
   version[0] < 12 ||
   version[0] === 13 ||
-  (version[0] === 12 && version[1] < 14) ||
+  (version[0] === 12 && version[1] < 20) ||
   (version[0] === 14 && version[1] < 15)
 ) {
   // Error and exit if less than 12.14 or 13.x or less than 14.15
