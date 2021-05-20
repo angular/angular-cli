@@ -16,6 +16,7 @@ import * as path from 'path';
 import { URL } from 'url';
 import { CustomResourceLoader } from './custom-resource-loader';
 import { InlineCriticalCssProcessor } from './inline-css-processor';
+import { augmentWindowWithStubs } from './stubs';
 
 export interface RenderOptions {
   headers?: Record<string, string | undefined | string[]>;
@@ -73,6 +74,7 @@ export class Engine {
         referrer: options.headers?.referrer as string | undefined,
         userAgent: options.headers?.['user-agent'] as string | undefined,
         beforeParse: (window) => {
+          augmentWindowWithStubs(window);
           window.ngRenderMode = true;
         },
       });
