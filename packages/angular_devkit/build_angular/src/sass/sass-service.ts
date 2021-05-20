@@ -40,6 +40,15 @@ interface RenderResponseMessage {
 }
 
 /**
+ * Workaround required for lack of new Worker transfer list support in Node.js prior to 12.17
+ */
+let transferListWorkaround = false;
+const version = process.versions.node.split('.').map((part) => Number(part));
+if (version[0] === 12 && version[1] < 17) {
+  transferListWorkaround = true;
+}
+
+/**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
  * with the `dart-sass` package.  The `dart-sass` synchronous render function is used within
@@ -126,9 +135,13 @@ export class SassWorkerImplementation {
 
     const workerPath = require.resolve('./worker');
     const worker = new Worker(workerPath, {
-      workerData: { workerImporterPort, importerSignal },
-      transferList: [workerImporterPort],
+      workerData: transferListWorkaround ? undefined : { workerImporterPort, importerSignal },
+      transferList: transferListWorkaround ? undefined : [workerImporterPort],
     });
+
+    if (transferListWorkaround) {
+      worker.postMessage({ init: true, workerImporterPort, importerSignal }, [workerImporterPort]);
+    }
 
     worker.on('message', (response: RenderResponseMessage) => {
       const request = this.requests.get(response.id);
