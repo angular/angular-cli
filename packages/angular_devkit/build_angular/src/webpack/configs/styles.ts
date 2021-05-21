@@ -13,6 +13,7 @@ import { ExtraEntryPoint } from '../../browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { BuildBrowserFeatures } from '../../utils/build-browser-features';
 import { WebpackConfigOptions } from '../../utils/build-options';
+import { maxWorkers } from '../../utils/environment-options';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -402,10 +403,53 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     });
   }
 
+  const extraMinimizers = [];
+  if (buildOptions.optimization.styles.minify) {
+    const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+    const minimizerOptions = {
+      preset: [
+        'default',
+        {
+          // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
+          svgo: false,
+          // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+          calc: false,
+          // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
+          cssDeclarationSorter: false,
+        },
+      ],
+    };
+
+    const globalBundlesRegExp = new RegExp(
+      `^(${Object.keys(entryPoints).join('|')})(\.[0-9a-f]{20})?.css$`,
+    );
+
+    extraMinimizers.push(
+      new CssMinimizerPlugin({
+        // Component styles retain their original file name
+        test: /\.(?:css|scss|sass|less|styl)$/,
+        parallel: false,
+        exclude: globalBundlesRegExp,
+        minify: [CssMinimizerPlugin.cssnanoMinify],
+        minimizerOptions,
+      }),
+      new CssMinimizerPlugin({
+        test: /\.css$/,
+        include: globalBundlesRegExp,
+        parallel: maxWorkers,
+        minify: [CssMinimizerPlugin.cssnanoMinify],
+        minimizerOptions,
+      }),
+    );
+  }
+
   return {
     entry: entryPoints,
     module: {
       rules: [...fileLanguageRules, ...inlineLanguageRules],
+    },
+    optimization: {
+      minimizer: extraMinimizers,
     },
     plugins: extraPlugins,
   };
