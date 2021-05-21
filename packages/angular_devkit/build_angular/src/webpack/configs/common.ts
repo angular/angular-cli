@@ -313,30 +313,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   const extraMinimizers = [];
-  if (stylesOptimization.minify) {
-    const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-    extraMinimizers.push(
-      new CssMinimizerPlugin({
-        // component styles retain their original file name
-        test: /\.(?:css|scss|sass|less|styl)$/,
-        parallel: maxWorkers,
-        minify: [CssMinimizerPlugin.cssnanoMinify],
-        minimizerOptions: {
-          preset: [
-            'default',
-            {
-              // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
-              svgo: false,
-              // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
-              calc: false,
-              // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
-              cssDeclarationSorter: false,
-            },
-          ],
-        },
-      }),
-    );
-  }
 
   if (scriptsOptimization) {
     const TerserPlugin = require('terser-webpack-plugin');
