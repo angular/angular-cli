@@ -46,7 +46,7 @@ class CliFilesystem implements Filesystem {
     for await (const entry of await fs.opendir(dir)) {
       if (entry.isFile()) {
         // Uses posix paths since the service worker expects URLs
-        items.push('/' + path.posix.relative(this.base, path.posix.join(dir, entry.name)));
+        items.push('/' + path.relative(this.base, path.join(dir, entry.name)).replace(/\\/g, '/'));
       } else if (entry.isDirectory()) {
         subdirectories.push(path.join(dir, entry.name));
       }
