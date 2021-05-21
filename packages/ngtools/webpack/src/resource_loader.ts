@@ -9,7 +9,7 @@
 import { createHash } from 'crypto';
 import * as path from 'path';
 import * as vm from 'vm';
-import { Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
+import { Asset, Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
 import { normalizePath } from './ivy/paths';
 
 interface CompilationOutput {
@@ -25,6 +25,8 @@ export class WebpackResourceLoader {
 
   private fileCache?: Map<string, CompilationOutput>;
   private inlineCache?: Map<string, CompilationOutput>;
+  private assetCache?: Map<string, Asset>;
+
   private modifiedResources = new Set<string>();
   private outputPathCounter = 1;
 
@@ -32,6 +34,7 @@ export class WebpackResourceLoader {
     if (shouldCache) {
       this.fileCache = new Map();
       this.inlineCache = new Map();
+      this.assetCache = new Map();
     }
   }
 
@@ -40,15 +43,34 @@ export class WebpackResourceLoader {
 
     // Update resource cache and modified resources
     this.modifiedResources.clear();
+
     if (changedFiles) {
       for (const changedFile of changedFiles) {
+        const changedFileNormalized = normalizePath(changedFile);
+        this.assetCache?.delete(changedFileNormalized);
+
         for (const affectedResource of this.getAffectedResources(changedFile)) {
-          this.fileCache?.delete(normalizePath(affectedResource));
+          const affectedResourceNormalized = normalizePath(affectedResource);
+          this.fileCache?.delete(affectedResourceNormalized);
           this.modifiedResources.add(affectedResource);
+
+          for (const effectedDependencies of this.getResourceDependencies(
+            affectedResourceNormalized,
+          )) {
+            this.assetCache?.delete(normalizePath(effectedDependencies));
+          }
         }
       }
     } else {
       this.fileCache?.clear();
+      this.assetCache?.clear();
+    }
+
+    // Re-emit all assets for un-effected files
+    if (this.assetCache) {
+      for (const [, { name, source, info }] of this.assetCache) {
+        this._parentCompilation.emitAsset(name, source, info);
+      }
     }
   }
 
@@ -200,6 +222,13 @@ export class WebpackResourceLoader {
 
           parent.warnings.push(...childCompilation.warnings);
           parent.errors.push(...childCompilation.errors);
+          for (const { info, name, source } of childCompilation.getAssets()) {
+            if (info.sourceFilename === undefined) {
+              throw new Error(`'${name}' asset info 'sourceFilename' is 'undefined'.`);
+            }
+
+            this.assetCache?.set(info.sourceFilename, { info, name, source });
+          }
         }
 
         // Save the dependencies for this resource.

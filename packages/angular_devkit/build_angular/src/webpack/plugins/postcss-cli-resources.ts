@@ -125,7 +125,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
 
         loader.addDependency(result);
         if (emitFile) {
-          loader.emitFile(outputPath, content, undefined);
+          loader.emitFile(outputPath, content, undefined, { sourceFilename: result });
         }
 
         let outputUrl = outputPath.replace(/\\/g, '/');
