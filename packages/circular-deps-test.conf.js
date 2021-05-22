@@ -32,7 +32,7 @@ const LOCAL_MAPPINGS = [
   ['@angular-devkit/build-webpack', 'angular_devkit/build_webpack'],
   ['@angular-devkit/core', 'angular_devkit/core'],
   ['@angular-devkit/schematics', 'angular_devkit/schematics'],
-  ['@angular-devkit/schematics_cli', 'angular_devkit/schematics_cli'],
+  ['@angular-devkit/schematics-cli', 'angular_devkit/schematics_cli'],
   ['@angular/cli', 'angular/cli'],
   ['@schematics/angular', 'schematics/angular'],
   ['@ngtools/webpack', 'ngtools/webpack'],
