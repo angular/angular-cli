@@ -139,7 +139,7 @@
     "common-tags": "^1.8.0",
     "conventional-changelog": "^3.0.0",
     "conventional-commits-parser": "^3.0.0",
-    "copy-webpack-plugin": "8.1.1",
+    "copy-webpack-plugin": "9.0.0",
     "core-js": "3.12.1",
     "critters": "0.0.10",
     "css-loader": "5.2.4",
