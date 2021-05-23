@@ -158,6 +158,11 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   }
 
   const { supportedBrowsers } = new BuildBrowserFeatures(wco.projectRoot);
+  const postcssPresetEnvPlugin = postcssPresetEnv({
+    browsers: supportedBrowsers,
+    autoprefixer: true,
+    stage: 3,
+  });
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean | undefined) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const optionGenerator = (loader: any) => ({
@@ -195,11 +200,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
           extracted,
         }),
         ...extraPostcssPlugins,
-        postcssPresetEnv({
-          browsers: supportedBrowsers,
-          autoprefixer: true,
-          stage: 3,
-        }),
+        postcssPresetEnvPlugin,
       ],
     });
     // postcss-loader fails when trying to determine configuration files for data URIs
