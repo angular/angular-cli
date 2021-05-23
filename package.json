@@ -80,7 +80,7 @@
     "jasmine": "^3.6.0",
     "jasmine-core": "^3.6.0",
     "jest-worker": "26.6.2",
-    "jsdom": "16.5.3",
+    "jsdom": "16.6.0",
     "minimatch": "^3.0.4",
     "node-fetch": "^2.6.1",
     "ora": "^5.1.0",
