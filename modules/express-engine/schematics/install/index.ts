@@ -117,11 +117,11 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
         },
         configurations: {
           production: {
-            browserTarget: `${options.project}:build:production`,
+            browserTarget: `${projectName}:build:production`,
             serverTarget: `${projectName}:server:production`,
           },
           development: {
-            browserTarget: `${options.project}:build:development`,
+            browserTarget: `${projectName}:build:development`,
             serverTarget: `${projectName}:server:development`,
           },
         },
