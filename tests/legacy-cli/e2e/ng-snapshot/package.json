@@ -16,6 +16,7 @@
     "@angular/platform-browser": "github:angular/platform-browser-builds#8a3b383485754ffe85453d972db8709484a56ab3",
     "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#b6d2d193af01f8ac5951a5e6e945712a0d948fe5",
     "@angular/platform-server": "github:angular/platform-server-builds#7553899212283c15a3bd08661417b8c0b06f51f9",
-    "@angular/router": "github:angular/router-builds#76cd3541b820ddac2416de5f1bb48c106b4973dc"
+    "@angular/router": "github:angular/router-builds#76cd3541b820ddac2416de5f1bb48c106b4973dc",
+    "@angular/service-worker": "github:angular/service-worker-builds#163cd9d311092d2358f33f2de0b3e8eb97a0f38e"
   }
 }
