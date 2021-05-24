@@ -19,7 +19,11 @@ import { normalizePath } from './paths';
 export function augmentHostWithResources(
   host: ts.CompilerHost,
   resourceLoader: WebpackResourceLoader,
-  options: { directTemplateLoading?: boolean; inlineStyleMimeType?: string } = {},
+  options: {
+    directTemplateLoading?: boolean;
+    inlineStyleMimeType?: string;
+    inlineStyleFileExtension?: string;
+  } = {},
 ) {
   const resourceHost = host as CompilerHost;
 
@@ -57,10 +61,11 @@ export function augmentHostWithResources(
       return null;
     }
 
-    if (options.inlineStyleMimeType) {
+    if (options.inlineStyleMimeType || options.inlineStyleFileExtension) {
       const content = await resourceLoader.process(
         data,
         options.inlineStyleMimeType,
+        options.inlineStyleFileExtension,
         context.type,
         context.containingFile,
       );

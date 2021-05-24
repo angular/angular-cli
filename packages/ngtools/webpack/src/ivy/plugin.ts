@@ -55,6 +55,7 @@ export interface AngularWebpackPluginOptions {
   emitNgModuleScope: boolean;
   jitMode: boolean;
   inlineStyleMimeType?: string;
+  inlineStyleFileExtension?: string;
 }
 
 // Add support for missing properties in Webpack types as well as the loader's file emitter
@@ -241,6 +242,7 @@ export class AngularWebpackPlugin {
       augmentHostWithResources(host, resourceLoader, {
         directTemplateLoading: this.pluginOptions.directTemplateLoading,
         inlineStyleMimeType: this.pluginOptions.inlineStyleMimeType,
+        inlineStyleFileExtension: this.pluginOptions.inlineStyleFileExtension,
       });
 
       // Setup source file adjustment options

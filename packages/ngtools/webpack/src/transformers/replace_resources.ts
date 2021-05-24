@@ -8,11 +8,14 @@
 
 import * as ts from 'typescript';
 
+const inlineDataLoaderPath = require.resolve('../inline-data-loader');
+
 export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
   getTypeChecker: () => ts.TypeChecker,
   directTemplateLoading = false,
   inlineStyleMimeType?: string,
+  inlineStyleFileExtension?: string,
 ): ts.TransformerFactory<ts.SourceFile> {
   if (inlineStyleMimeType && !/^text\/[-.\w]+$/.test(inlineStyleMimeType)) {
     throw new Error('Invalid inline style MIME type.');
@@ -36,6 +39,7 @@ export function replaceResources(
                 resourceImportDeclarations,
                 moduleKind,
                 inlineStyleMimeType,
+                inlineStyleFileExtension,
               )
             : node,
         );
@@ -87,6 +91,7 @@ function visitDecorator(
   resourceImportDeclarations: ts.ImportDeclaration[],
   moduleKind?: ts.ModuleKind,
   inlineStyleMimeType?: string,
+  inlineStyleFileExtension?: string,
 ): ts.Decorator {
   if (!isComponentDecorator(node, typeChecker)) {
     return node;
@@ -117,6 +122,7 @@ function visitDecorator(
           resourceImportDeclarations,
           moduleKind,
           inlineStyleMimeType,
+          inlineStyleFileExtension,
         )
       : node,
   );
@@ -150,6 +156,7 @@ function visitComponentMetadata(
   resourceImportDeclarations: ts.ImportDeclaration[],
   moduleKind?: ts.ModuleKind,
   inlineStyleMimeType?: string,
+  inlineStyleFileExtension?: string,
 ): ts.ObjectLiteralElementLike | undefined {
   if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
     return node;
@@ -198,6 +205,10 @@ function visitComponentMetadata(
           if (inlineStyleMimeType) {
             const data = Buffer.from(node.text).toString('base64');
             url = `data:${inlineStyleMimeType};charset=utf-8;base64,${data}`;
+          } else if (inlineStyleFileExtension) {
+            const data = Buffer.from(node.text).toString('base64');
+            const containingFile = node.getSourceFile().fileName;
+            url = `${containingFile}.${inlineStyleFileExtension}!=!${inlineDataLoaderPath}?data=${data}!${containingFile}`;
           } else {
             return nodeFactory.createStringLiteral(node.text);
           }

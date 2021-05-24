@@ -10,6 +10,10 @@ import { createHash } from 'crypto';
 import * as path from 'path';
 import * as vm from 'vm';
 import { Asset, Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
+import {
+  CompilationWithInlineAngularResource,
+  InlineAngularResourceSymbol,
+} from './inline-data-loader';
 import { normalizePath } from './ivy/paths';
 
 interface CompilationOutput {
@@ -29,6 +33,8 @@ export class WebpackResourceLoader {
 
   private modifiedResources = new Set<string>();
   private outputPathCounter = 1;
+
+  private readonly inlineDataLoaderPath = require.resolve('./inline-data-loader');
 
   constructor(shouldCache: boolean) {
     if (shouldCache) {
@@ -98,6 +104,7 @@ export class WebpackResourceLoader {
     filePath?: string,
     data?: string,
     mimeType?: string,
+    fileExtension?: string,
     resourceType?: 'style' | 'template',
     hash?: string,
     containingFile?: string,
@@ -107,7 +114,12 @@ export class WebpackResourceLoader {
     }
 
     // Create a special URL for reading the resource from memory
-    const entry = data ? `angular-resource:${resourceType},${hash}` : filePath;
+    const entry =
+      filePath ||
+      (resourceType
+        ? `${containingFile}-${this.outputPathCounter}.${fileExtension}!=!${this.inlineDataLoaderPath}!${containingFile}`
+        : `angular-resource:${resourceType},${hash}`);
+
     if (!entry) {
       throw new Error(`"filePath" or "data" must be specified.`);
     }
@@ -166,6 +178,8 @@ export class WebpackResourceLoader {
           NormalModule.getCompilationHooks(compilation)
             .readResourceForScheme.for('angular-resource')
             .tap('angular-compiler', () => data);
+
+          (compilation as CompilationWithInlineAngularResource)[InlineAngularResourceSymbol] = data;
         }
 
         compilation.hooks.additionalAssets.tap('angular-compiler', () => {
@@ -314,7 +328,8 @@ export class WebpackResourceLoader {
 
   async process(
     data: string,
-    mimeType: string,
+    mimeType: string | undefined,
+    fileExtension: string | undefined,
     resourceType: 'template' | 'style',
     containingFile?: string,
   ): Promise<string> {
@@ -330,6 +345,7 @@ export class WebpackResourceLoader {
         undefined,
         data,
         mimeType,
+        fileExtension,
         resourceType,
         cacheKey,
         containingFile,
