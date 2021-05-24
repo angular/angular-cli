@@ -36,7 +36,11 @@ export function createAotTransformers(
 
 export function createJitTransformers(
   builder: ts.BuilderProgram,
-  options: { directTemplateLoading?: boolean; inlineStyleMimeType?: string },
+  options: {
+    directTemplateLoading?: boolean;
+    inlineStyleMimeType?: string;
+    inlineStyleFileExtension?: string;
+  },
 ): ts.CustomTransformers {
   const getTypeChecker = () => builder.getProgram().getTypeChecker();
 
@@ -47,6 +51,7 @@ export function createJitTransformers(
         getTypeChecker,
         options.directTemplateLoading,
         options.inlineStyleMimeType,
+        options.inlineStyleFileExtension,
       ),
       constructorParametersDownlevelTransform(builder.getProgram()),
     ],
