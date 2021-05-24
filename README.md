@@ -24,7 +24,7 @@ The Angular Universal project is a community driven project to expand on the cor
 
 This repository will host the various tools like engines to integrate with various backends(NodeJS, ASP.NET etc.) and also extra modules and examples to help you started with server side rendering.
 
-The Universal project is driven by community contributions. Please send us your Pull Requests!
+The Universal project is driven by community contributions. Please check [our contributing guidelines](https://github.com/angular/universal/blob/master/CONTRIBUTING.md) and send us your Pull Requests!
 
 # Getting Started
 
