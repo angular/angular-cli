@@ -51,20 +51,20 @@ function createIvyPlugin(
     }
   }
 
-  let inlineStyleMimeType;
+  let inlineStyleFileExtension;
   switch (buildOptions.inlineStyleLanguage) {
     case 'less':
-      inlineStyleMimeType = 'text/x-less';
+      inlineStyleFileExtension = 'less';
       break;
     case 'sass':
-      inlineStyleMimeType = 'text/x-sass';
+      inlineStyleFileExtension = 'sass';
       break;
     case 'scss':
-      inlineStyleMimeType = 'text/x-scss';
+      inlineStyleFileExtension = 'scss';
       break;
     case 'css':
     default:
-      inlineStyleMimeType = 'text/css';
+      inlineStyleFileExtension = 'css';
       break;
   }
 
@@ -74,7 +74,7 @@ function createIvyPlugin(
     fileReplacements,
     jitMode: !aot,
     emitNgModuleScope: !optimize,
-    inlineStyleMimeType,
+    inlineStyleFileExtension,
   });
 }
 
