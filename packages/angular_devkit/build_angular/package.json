@@ -35,7 +35,7 @@
     "glob": "7.1.7",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.0.0",
-    "jest-worker": "26.6.2",
+    "jest-worker": "27.0.1",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.1",
     "less-loader": "9.0.0",
