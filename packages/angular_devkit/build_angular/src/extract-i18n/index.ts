@@ -24,6 +24,7 @@ import {
   getCommonConfig,
   getStatsConfig,
   getTypeScriptConfig,
+  getWorkerConfig,
 } from '../webpack/configs';
 import { createWebpackLoggingCallback } from '../webpack/utils/stats';
 import { Format, Schema } from './schema';
@@ -212,6 +213,7 @@ export async function execute(
         getCommonConfig(wco),
         getBrowserConfig(wco),
         getTypeScriptConfig(wco),
+        getWorkerConfig(wco),
         getStatsConfig(wco),
       ];
 
