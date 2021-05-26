@@ -269,7 +269,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
             const { stringifyStream } = await import('@discoveryjs/json-ext');
             const data = stats.toJson('verbose');
-            const statsOutputPath = path.join(root, buildOptions.outputPath, 'stats.json');
+            const statsOutputPath = path.resolve(root, buildOptions.outputPath, 'stats.json');
 
             try {
               await fsPromises.mkdir(path.dirname(statsOutputPath), { recursive: true });
