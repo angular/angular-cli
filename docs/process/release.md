@@ -55,14 +55,16 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 ## Before releasing
 
-Update `Angular` version in [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts).
+Update `Angular` version in
+[`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
+**and** [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json).
 
 ## Shepparding
 
 As commits are cherry-picked when PRs are merged, creating the release should be a matter of creating a tag.
 
 ```bash
-git add packages/schematics/angular/utility/latest-versions.ts
+git add packages/schematics/angular/utility/latest-versions.ts package.json
 git commit -m 'release: vXX'
 git tag -a 'vXX' -m 'release: tag vXX'
 ```
@@ -153,23 +155,11 @@ using the `--githubToken` flag. You just then have to confirm the draft.
 
 > **Tags containing `next` or `rc` should be marked as pre-release.**
 
-## Post-release Version Update
+## Post-release
 
-**For each released version**:
-
-Update `version` in root [`package.json`](/package.json#L3) to the _next_ release version.
-
-```sh
-git checkout -b release-bump-vXX
-git commit package.json packages/schematics/angular/utility/latest-versions.ts -m "build: bump version to vXX"
-git push -u origin release-bump-vXX
-```
-
-Then make a PR and assign it to the next primary caretaker.
-
-Don't forget to update the Slack [#tools](https://angular-team.slack.com/archives/C46U16D4Z) channel topic and also post
-links to all the version bump PRs. If anyone else on the team notices these links missing, they should ask the caretaker
-to make sure the post-release version bump is not forgotten.
+Don't forget to update the Slack [#tools](https://angular-team.slack.com/archives/C46U16D4Z) channel
+topic with the next caretaker shift from the
+[calendar](https://calendar.google.com/calendar/embed?src=angular.io_jf53juok1lhpm84hv6bo6fmgbc%40group.calendar.google.com&ctz=America%2FLos_Angeles).
 
 ## Publishing a Major Version
 
@@ -190,3 +180,13 @@ packages.
 ```bash
 yarn admin dist-tag --version 10.0.0 --tag latest
 ```
+
+## Changing shifts
+
+If you need to update the
+[caretaker calendar](https://calendar.google.com/calendar/embed?src=angular.io_jf53juok1lhpm84hv6bo6fmgbc%40group.calendar.google.com&ctz=America%2FLos_Angeles)
+to modify shifts, **make sure you are logged in as your @angular.io account** and
+click the "+ Google Calendar" button in the bottom right to add it to your Google
+Calendar account. You should then be able to find and modify events on
+calendar.google.com. The calendar is a part of the `angular.io` organization, so
+events can only be modified by users in the same organization.
