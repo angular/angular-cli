@@ -79,6 +79,8 @@ parentPort.on('message', (message: RenderRequestMessage | InitMessage) => {
 
     parentPort?.postMessage({ id, result });
   } catch (error) {
-    parentPort?.postMessage({ id, error });
+    // Needed because V8 will only serialize the message and stack properties of an Error instance.
+    const { formatted, file, line, column, message, stack } = error;
+    parentPort?.postMessage({ id, error: { formatted, file, line, column, message, stack } });
   }
 });
