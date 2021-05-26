@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../../utils/env';
 import { expectFileToExist, readFile, rimraf } from '../../../utils/fs';
-import { installPackage } from '../../../utils/packages';
+import { installWorkspacePackages } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
@@ -26,19 +26,20 @@ export default async function () {
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
-    const packagesToInstall = [];
+    let needInstall = false;
     await updateJsonFile('package.json', (packageJson) => {
       const dependencies = packageJson['dependencies'];
       // Iterate over all of the packages to update them to the snapshot version.
       for (const [name, version] of Object.entries(snapshots.dependencies)) {
         if (name in dependencies && dependencies[name] !== version) {
-          packagesToInstall.push(version);
+          dependencies[name] = version;
+          needInstall = true;
         }
       }
     });
 
-    for (const pkg of packagesToInstall) {
-      await installPackage(pkg);
+    if (needInstall) {
+      await installWorkspacePackages();
     }
   }
 
