@@ -73,11 +73,11 @@ async function updateWebdriver() {
 
   // run `webdriver-manager update --standalone false --gecko false --quiet`
   // if you change this, update the command comment in prev line
-  return webdriverUpdate.program.run(({
+  return webdriverUpdate.program.run({
     standalone: false,
     gecko: false,
     quiet: true,
-  } as unknown) as JSON);
+  } as unknown as JSON);
 }
 
 export { ProtractorBuilderOptions };
@@ -89,6 +89,10 @@ export async function execute(
   options: ProtractorBuilderOptions,
   context: BuilderContext,
 ): Promise<BuilderOutput> {
+  context.logger.warn(
+    'Protractor has been deprecated including its support in the Angular CLI. For additional information and alternatives, please see https://github.com/angular/protractor/issues/5502.',
+  );
+
   // ensure that only one of these options is used
   if (options.devServerTarget && options.baseUrl) {
     throw new Error(tags.stripIndents`
