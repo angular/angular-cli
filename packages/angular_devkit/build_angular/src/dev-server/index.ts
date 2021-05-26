@@ -226,6 +226,7 @@ export function serveWebpackBrowser(
     }
 
     if (
+      !options.disableHostCheck &&
       options.host &&
       !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
       options.host !== 'localhost'
