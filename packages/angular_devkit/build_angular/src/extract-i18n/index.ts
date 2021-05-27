@@ -232,14 +232,16 @@ export async function execute(
         },
       });
 
-      // Replace all stylesheets with an empty default export
+      // Replace all stylesheets with empty content
       partials.push({
-        plugins: [
-          new webpack.NormalModuleReplacementPlugin(
-            /\.(css|scss|sass|styl|less)$/,
-            path.join(__dirname, 'empty-export-default.js'),
-          ),
-        ],
+        module: {
+          rules: [
+            {
+              test: /\.(css|scss|sass|styl|less)$/,
+              loader: require.resolve('./empty-loader'),
+            },
+          ],
+        },
       });
 
       return partials;
