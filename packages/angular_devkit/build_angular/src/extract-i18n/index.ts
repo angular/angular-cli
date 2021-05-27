@@ -240,7 +240,7 @@ export async function execute(
             path.join(__dirname, 'empty-export-default.js'),
           ),
           new webpack.NormalModuleReplacementPlugin(
-            /^angular-resource:\/\//,
+            /^angular-resource:style,/,
             path.join(__dirname, 'empty-export-default.js'),
           ),
         ],
