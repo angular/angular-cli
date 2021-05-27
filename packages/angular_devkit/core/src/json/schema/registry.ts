@@ -63,16 +63,18 @@ export class SchemaValidationException extends BaseException {
 
     const messages = errors.map((err) => {
       let message = `Data path ${JSON.stringify(err.instancePath)} ${err.message}`;
-      switch (err.keyword) {
-        case 'additionalProperties':
-          message += `(${err.params.additionalProperty})`;
-          break;
+      if (err.params) {
+        switch (err.keyword) {
+          case 'additionalProperties':
+            message += `(${err.params.additionalProperty})`;
+            break;
 
-        case 'enum':
-          message += `. Allowed values are: ${(err.params.allowedValues as string[] | undefined)
-            ?.map((v) => `"${v}"`)
-            .join(', ')}`;
-          break;
+          case 'enum':
+            message += `. Allowed values are: ${(err.params.allowedValues as string[] | undefined)
+              ?.map((v) => `"${v}"`)
+              .join(', ')}`;
+            break;
+        }
       }
 
       return message + '.';
@@ -300,12 +302,17 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     };
 
     this._ajv.removeSchema(schema);
-
     let validator: ValidateFunction;
+
     try {
       this._currentCompilationSchemaInfo = schemaInfo;
       validator = this._ajv.compile(schema);
-    } catch {
+    } catch (e) {
+      // This should eventually be refactored so that we we handle race condition where the same schema is validated at the same time.
+      if (!(e instanceof Ajv.MissingRefError)) {
+        throw e;
+      }
+
       validator = await this._ajv.compileAsync(schema);
     } finally {
       this._currentCompilationSchemaInfo = undefined;
@@ -361,9 +368,18 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       // Validate using ajv
-      const success = await validator.call(validationContext, data);
-      if (!success) {
-        return { data, success, errors: validator.errors ?? [] };
+      try {
+        const success = await validator.call(validationContext, data);
+
+        if (!success) {
+          return { data, success, errors: validator.errors ?? [] };
+        }
+      } catch (error) {
+        if (error instanceof Ajv.ValidationError) {
+          return { data, success: false, errors: error.errors };
+        }
+
+        throw error;
       }
 
       // Apply post-validation transforms

@@ -281,7 +281,7 @@ export abstract class ArchitectCommand<
         const newErrors: schema.SchemaValidatorError[] = [];
         for (const schemaError of e.errors) {
           if (schemaError.keyword === 'additionalProperties') {
-            const unknownProperty = schemaError.params.additionalProperty;
+            const unknownProperty = schemaError.params?.additionalProperty;
             if (unknownProperty in options) {
               const dashes = unknownProperty.length === 1 ? '-' : '--';
               this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);

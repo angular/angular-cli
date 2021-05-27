@@ -19,7 +19,7 @@ export interface SchemaValidatorResult {
   errors?: SchemaValidatorError[];
 }
 
-export type SchemaValidatorError = ErrorObject;
+export type SchemaValidatorError = Partial<ErrorObject>;
 
 export interface SchemaValidatorOptions {
   applyPreTransforms?: boolean;
