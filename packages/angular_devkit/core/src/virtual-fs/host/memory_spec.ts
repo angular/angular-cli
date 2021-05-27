@@ -7,7 +7,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { fragment, normalize } from '@angular-devkit/core';
+import { fragment, normalize } from '../path';
 import { stringToFileBuffer } from './buffer';
 import { SimpleMemoryHost } from './memory';
 import { SyncDelegateHost } from './sync';
