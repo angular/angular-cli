@@ -180,9 +180,7 @@ describe('CoreSchemaRegistry', () => {
         mergeMap((validator) => validator(data)),
         map((result) => {
           expect(result.success).toBe(false);
-          expect(result.errors?.[0].message).toContain(
-            'must NOT have additional properties',
-          );
+          expect(result.errors?.[0].message).toContain('must NOT have additional properties');
           expect(result.errors?.[0].keyword).toBe('additionalProperties');
         }),
       )
@@ -279,7 +277,7 @@ describe('CoreSchemaRegistry', () => {
           expect(result.errors && (result.errors[0].params as any).format).toBe('is-hotdog');
         }),
       )
-      .toPromise()
+      .toPromise();
   });
 
   it('supports smart defaults', (done) => {

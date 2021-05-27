@@ -793,7 +793,7 @@ export interface SchemaValidator {
     (data: JsonValue, options?: SchemaValidatorOptions): Observable<SchemaValidatorResult>;
 }
 
-export declare type SchemaValidatorError = ErrorObject;
+export declare type SchemaValidatorError = Partial<ErrorObject>;
 
 export interface SchemaValidatorOptions {
     applyPostTransforms?: boolean;
