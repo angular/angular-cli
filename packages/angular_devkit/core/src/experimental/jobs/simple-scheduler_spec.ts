@@ -102,7 +102,7 @@ describe('SimpleScheduler', () => {
       // is released, otherwise this breaks because bazel downgrade to ES5 which does not support
       // extending Error.
       // expect(e instanceof JobInboundMessageSchemaValidationError).toBe(true);
-      expect(e.message).toMatch(/"\[0\]".*number/);
+      expect(e.message).toMatch(/"\/0" must be number/);
     }
   });
 
