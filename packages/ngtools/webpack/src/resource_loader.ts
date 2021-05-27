@@ -28,7 +28,6 @@ export class WebpackResourceLoader {
   private _reverseDependencies = new Map<string, Set<string>>();
 
   private fileCache?: Map<string, CompilationOutput>;
-  private inlineCache?: Map<string, CompilationOutput>;
   private assetCache?: Map<string, Asset>;
 
   private modifiedResources = new Set<string>();
@@ -39,7 +38,6 @@ export class WebpackResourceLoader {
   constructor(shouldCache: boolean) {
     if (shouldCache) {
       this.fileCache = new Map();
-      this.inlineCache = new Map();
       this.assetCache = new Map();
     }
   }
@@ -106,7 +104,6 @@ export class WebpackResourceLoader {
     mimeType?: string,
     fileExtension?: string,
     resourceType?: 'style' | 'template',
-    hash?: string,
     containingFile?: string,
   ): Promise<CompilationOutput> {
     if (!this._parentCompilation) {
@@ -118,7 +115,8 @@ export class WebpackResourceLoader {
       filePath ||
       (resourceType
         ? `${containingFile}-${this.outputPathCounter}.${fileExtension}!=!${this.inlineDataLoaderPath}!${containingFile}`
-        : `angular-resource:${resourceType},${hash}`);
+        : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          `angular-resource:${resourceType},${createHash('md5').update(data!).digest('hex')}`);
 
     if (!entry) {
       throw new Error(`"filePath" or "data" must be specified.`);
@@ -337,24 +335,14 @@ export class WebpackResourceLoader {
       return '';
     }
 
-    const cacheKey = createHash('md5').update(data).digest('hex');
-    let compilationResult = this.inlineCache?.get(cacheKey);
-
-    if (compilationResult === undefined) {
-      compilationResult = await this._compile(
-        undefined,
-        data,
-        mimeType,
-        fileExtension,
-        resourceType,
-        cacheKey,
-        containingFile,
-      );
-
-      if (this.inlineCache && compilationResult.success) {
-        this.inlineCache.set(cacheKey, compilationResult);
-      }
-    }
+    const compilationResult = await this._compile(
+      undefined,
+      data,
+      mimeType,
+      fileExtension,
+      resourceType,
+      containingFile,
+    );
 
     return compilationResult.content;
   }
