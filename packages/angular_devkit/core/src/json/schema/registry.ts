@@ -63,8 +63,16 @@ export class SchemaValidationException extends BaseException {
 
     const messages = errors.map((err) => {
       let message = `Data path ${JSON.stringify(err.instancePath)} ${err.message}`;
-      if (err.keyword === 'additionalProperties') {
-        message += `(${err.params.additionalProperty})`;
+      switch (err.keyword) {
+        case 'additionalProperties':
+          message += `(${err.params.additionalProperty})`;
+          break;
+
+        case 'enum':
+          message += `. Allowed values are: ${(err.params.allowedValues as string[] | undefined)
+            ?.map((v) => `"${v}"`)
+            .join(', ')}`;
+          break;
       }
 
       return message + '.';

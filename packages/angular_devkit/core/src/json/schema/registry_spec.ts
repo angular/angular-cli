@@ -9,7 +9,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { map, mergeMap } from 'rxjs/operators';
 import { SchemaFormat } from './interface';
-import { CoreSchemaRegistry } from './registry';
+import { CoreSchemaRegistry, SchemaValidationException } from './registry';
 import { addUndefinedDefaults } from './transforms';
 
 describe('CoreSchemaRegistry', () => {
@@ -131,6 +131,31 @@ describe('CoreSchemaRegistry', () => {
           expect(result.success).toBe(false);
           expect(result.errors && result.errors[0].message).toContain(
             'should NOT have additional properties',
+          );
+        }),
+      )
+      .toPromise()
+      .then(done, done.fail);
+  });
+
+  it('fails on invalid enum value', (done) => {
+    const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
+    const data = { packageManager: 'foo' };
+
+    registry
+      .compile({
+        properties: {
+          packageManager: { type: 'string', enum: ['npm', 'yarn', 'pnpm', 'cnpm'] },
+        },
+        additionalProperties: false,
+      })
+      .pipe(
+        mergeMap((validator) => validator(data)),
+        map((result) => {
+          expect(result.success).toBe(false);
+          expect(new SchemaValidationException(result.errors).message).toContain(
+            `Data path "/packageManager" must be equal to one of the allowed values. Allowed values are: "npm", "yarn", "pnpm", "cnpm".`,
           );
         }),
       )
