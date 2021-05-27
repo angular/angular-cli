@@ -24,7 +24,6 @@ export class WebpackResourceLoader {
   private _reverseDependencies = new Map<string, Set<string>>();
 
   private fileCache?: Map<string, CompilationOutput>;
-  private inlineCache?: Map<string, CompilationOutput>;
   private assetCache?: Map<string, Asset>;
 
   private modifiedResources = new Set<string>();
@@ -33,7 +32,6 @@ export class WebpackResourceLoader {
   constructor(shouldCache: boolean) {
     if (shouldCache) {
       this.fileCache = new Map();
-      this.inlineCache = new Map();
       this.assetCache = new Map();
     }
   }
@@ -99,7 +97,6 @@ export class WebpackResourceLoader {
     data?: string,
     mimeType?: string,
     resourceType?: 'style' | 'template',
-    hash?: string,
     containingFile?: string,
   ): Promise<CompilationOutput> {
     if (!this._parentCompilation) {
@@ -107,7 +104,9 @@ export class WebpackResourceLoader {
     }
 
     // Create a special URL for reading the resource from memory
-    const entry = data ? `angular-resource:${resourceType},${hash}` : filePath;
+    const entry = data
+      ? `angular-resource:${resourceType},${createHash('md5').update(data).digest('hex')}`
+      : filePath;
     if (!entry) {
       throw new Error(`"filePath" or "data" must be specified.`);
     }
@@ -322,23 +321,13 @@ export class WebpackResourceLoader {
       return '';
     }
 
-    const cacheKey = createHash('md5').update(data).digest('hex');
-    let compilationResult = this.inlineCache?.get(cacheKey);
-
-    if (compilationResult === undefined) {
-      compilationResult = await this._compile(
-        undefined,
-        data,
-        mimeType,
-        resourceType,
-        cacheKey,
-        containingFile,
-      );
-
-      if (this.inlineCache && compilationResult.success) {
-        this.inlineCache.set(cacheKey, compilationResult);
-      }
-    }
+    const compilationResult = await this._compile(
+      undefined,
+      data,
+      mimeType,
+      resourceType,
+      containingFile,
+    );
 
     return compilationResult.content;
   }
