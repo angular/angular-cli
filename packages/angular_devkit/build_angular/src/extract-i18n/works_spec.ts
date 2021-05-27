@@ -146,4 +146,17 @@ describe('Extract i18n Target', () => {
     const fullLog = logs.join();
     expect(fullLog).toContain('Duplicate messages with id');
   });
+
+  it('ignores inline styles', async () => {
+    host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
+    host.replaceInFile('src/app/app.component.ts', 'styleUrls', 'styles');
+    host.replaceInFile('src/app/app.component.ts', './app.component.css', 'h1 { color: green; }');
+
+    const run = await architect.scheduleTarget(extractI18nTargetSpec);
+
+    // This will fail if a style is processed since the style rules are not included during extraction
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+  });
 });
