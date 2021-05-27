@@ -65,6 +65,24 @@ const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'deployUrl',
 ];
 
+// Get dev-server only options.
+type DevServerOptions = Partial<
+  Omit<
+    Schema,
+    | 'watch'
+    | 'optimization'
+    | 'aot'
+    | 'sourceMap'
+    | 'vendorChunk'
+    | 'commonChunk'
+    | 'baseHref'
+    | 'progress'
+    | 'poll'
+    | 'verbose'
+    | 'deployUrl'
+  >
+>;
+
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
@@ -119,23 +137,6 @@ export function serveWebpackBrowser(
         {},
       );
 
-    // Get dev-server only options.
-    type DevServerOptions = Partial<
-      Omit<
-        Schema,
-        | 'watch'
-        | 'optimization'
-        | 'aot'
-        | 'sourceMap'
-        | 'vendorChunk'
-        | 'commonChunk'
-        | 'baseHref'
-        | 'progress'
-        | 'poll'
-        | 'verbose'
-        | 'deployUrl'
-      >
-    >;
     const devServerOptions: DevServerOptions = (Object.keys(options) as (keyof Schema)[])
       .filter((key) => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
       .reduce<DevServerOptions>(
@@ -156,6 +157,36 @@ export function serveWebpackBrowser(
       logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
     }
 
+    if (options.hmr) {
+      logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
+      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
+    }
+
+    if (
+      !options.disableHostCheck &&
+      options.host &&
+      !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
+      options.host !== 'localhost'
+    ) {
+      logger.warn(tags.stripIndent`
+        Warning: This is a simple server for use in testing or debugging Angular applications
+        locally. It hasn't been reviewed for security issues.
+
+        Binding this server to an open connection can result in compromising your application or
+        computer. Using a different host than the one passed to the "--host" flag might result in
+        websocket connection issues. You might need to use "--disableHostCheck" if that's the
+        case.
+      `);
+    }
+
+    if (options.disableHostCheck) {
+      logger.warn(tags.oneLine`
+        Warning: Running a server with --disable-host-check is a security risk.
+        See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
+        for more information.
+      `);
+    }
+
     // Webpack's live reload functionality adds the `strip-ansi` package which is commonJS
     rawBrowserOptions.allowedCommonJsDependencies ??= [];
     rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
@@ -165,6 +196,18 @@ export function serveWebpackBrowser(
       { ...rawBrowserOptions, ...overrides },
       browserName,
     )) as json.JsonObject & BrowserBuilderSchema;
+
+    const { styles, scripts } = normalizeOptimization(browserOptions.optimization);
+    if (scripts || styles.minify) {
+      logger.error(tags.stripIndents`
+        ****************************************************************************************
+        This is a simple server for use in testing or debugging Angular applications locally.
+        It hasn't been reviewed for security issues.
+
+        DON'T USE IT FOR PRODUCTION!
+        ****************************************************************************************
+      `);
+    }
 
     const { config, projectRoot, i18n } = await generateI18nBrowserWebpackConfigFromContext(
       browserOptions,
@@ -220,36 +263,6 @@ export function serveWebpackBrowser(
       }
     }
 
-    if (options.hmr) {
-      logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
-      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
-    }
-
-    if (
-      !options.disableHostCheck &&
-      options.host &&
-      !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
-      options.host !== 'localhost'
-    ) {
-      logger.warn(tags.stripIndent`
-        Warning: This is a simple server for use in testing or debugging Angular applications
-        locally. It hasn't been reviewed for security issues.
-
-        Binding this server to an open connection can result in compromising your application or
-        computer. Using a different host than the one passed to the "--host" flag might result in
-        websocket connection issues. You might need to use "--disableHostCheck" if that's the
-        case.
-      `);
-    }
-
-    if (options.disableHostCheck) {
-      logger.warn(tags.oneLine`
-        Warning: Running a server with --disable-host-check is a security risk.
-        See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
-        for more information.
-      `);
-    }
-
     let locale: string | undefined;
     if (i18n.shouldInline) {
       // Dev-server only supports one locale
@@ -290,8 +303,6 @@ export function serveWebpackBrowser(
 
   return from(setup()).pipe(
     switchMap(({ browserOptions, webpackConfig, projectRoot, locale }) => {
-      const normalizedOptimization = normalizeOptimization(browserOptions.optimization);
-
       if (browserOptions.index) {
         const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
         const { options: compilerOptions } = readTsconfig(tsConfig, workspaceRoot);
@@ -315,23 +326,12 @@ export function serveWebpackBrowser(
             deployUrl: browserOptions.deployUrl,
             sri: browserOptions.subresourceIntegrity,
             postTransform: transforms.indexHtml,
-            optimization: normalizedOptimization,
+            optimization: normalizeOptimization(browserOptions.optimization),
             WOFFSupportNeeded: !buildBrowserFeatures.isFeatureSupported('woff2'),
             crossOrigin: browserOptions.crossOrigin,
             lang: locale,
           }),
         );
-      }
-
-      if (normalizedOptimization.scripts || normalizedOptimization.styles.minify) {
-        logger.error(tags.stripIndents`
-          ****************************************************************************************
-          This is a simple server for use in testing or debugging Angular applications locally.
-          It hasn't been reviewed for security issues.
-
-          DON'T USE IT FOR PRODUCTION!
-          ****************************************************************************************
-        `);
       }
 
       return runWebpackDevServer(webpackConfig, context, {
