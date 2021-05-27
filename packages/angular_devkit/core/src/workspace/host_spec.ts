@@ -21,18 +21,16 @@ describe('createWorkspaceHost', () => {
     workspaceHost = createWorkspaceHost(testHost);
   });
 
-  it('supports isFile', async (done) => {
+  it('supports isFile', async () => {
     expect(await workspaceHost.isFile('abc.txt')).toBeTruthy();
     expect(await workspaceHost.isFile('foo/bar.json')).toBeTruthy();
     expect(await workspaceHost.isFile('foo\\bar.json')).toBeTruthy();
 
     expect(await workspaceHost.isFile('foo')).toBeFalsy();
     expect(await workspaceHost.isFile('not.there')).toBeFalsy();
-
-    done();
   });
 
-  it('supports isDirectory', async (done) => {
+  it('supports isDirectory', async () => {
     expect(await workspaceHost.isDirectory('foo')).toBeTruthy();
     expect(await workspaceHost.isDirectory('foo/')).toBeTruthy();
     expect(await workspaceHost.isDirectory('foo\\')).toBeTruthy();
@@ -40,22 +38,16 @@ describe('createWorkspaceHost', () => {
     expect(await workspaceHost.isDirectory('abc.txt')).toBeFalsy();
     expect(await workspaceHost.isDirectory('foo/bar.json')).toBeFalsy();
     expect(await workspaceHost.isDirectory('not.there')).toBeFalsy();
-
-    done();
   });
 
-  it('supports readFile', async (done) => {
+  it('supports readFile', async () => {
     expect(await workspaceHost.readFile('abc.txt')).toBe('abcdefg');
-
-    done();
   });
 
-  it('supports writeFile', async (done) => {
+  it('supports writeFile', async () => {
     await workspaceHost.writeFile('newfile', 'baz');
     expect(testHost.files.sort() as string[]).toEqual(['/abc.txt', '/foo/bar.json', '/newfile']);
 
     expect(testHost.$read('newfile')).toBe('baz');
-
-    done();
   });
 });
