@@ -31,7 +31,7 @@ describe('Browser Builder with differential loading', () => {
   it(
     'emits all the neccessary files for default configuration',
     async () => {
-      const { files } = await browserBuild(architect, host, target);
+      const { files } = await browserBuild(architect, host, target, { sourceMap: true });
 
       const expectedOutputs = [
         'favicon.ico',
@@ -71,8 +71,7 @@ describe('Browser Builder with differential loading', () => {
     async () => {
       host.replaceInFile('tsconfig.json', '"target": "es2017",', `"target": "esnext",`);
 
-      const { files } = await browserBuild(architect, host, target);
-
+      const { files } = await browserBuild(architect, host, target, { sourceMap: true });
       const expectedOutputs = [
         'favicon.ico',
         'index.html',
@@ -109,7 +108,10 @@ describe('Browser Builder with differential loading', () => {
   it(
     'deactivates differential loading for watch mode',
     async () => {
-      const { files } = await browserBuild(architect, host, target, { watch: true });
+      const { files } = await browserBuild(architect, host, target, {
+        watch: true,
+        sourceMap: true,
+      });
 
       const expectedOutputs = [
         'favicon.ico',
