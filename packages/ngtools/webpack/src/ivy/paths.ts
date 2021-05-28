@@ -12,7 +12,6 @@ const normalizationCache = new Map<string, string>();
 
 export function normalizePath(path: string): string {
   let result = normalizationCache.get(path);
-
   if (result === undefined) {
     result = nodePath.win32.normalize(path).replace(/\\/g, nodePath.posix.sep);
     normalizationCache.set(path, result);
@@ -28,8 +27,11 @@ function externalizeForWindows(path: string): string {
 
   if (result === undefined) {
     result = nodePath.win32.normalize(path);
+
     externalizationCache.set(path, result);
   }
+
+  console.log({ result });
 
   return result;
 }

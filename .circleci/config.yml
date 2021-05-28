@@ -269,9 +269,8 @@ jobs:
             yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
 
   # Windows jobs
-  e2e-cli-win:
+  build-win:
     executor: windows-executor
-    parallelism: 8
     steps:
       - custom_attach_workspace
       - setup_windows
@@ -286,12 +285,7 @@ jobs:
       # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
       - run:
           name: Execute E2E Tests
-          command: |
-            if (Test-Path env:CIRCLE_PULL_REQUEST) {
-              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
-            } else {
-              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
-            }
+          command: yarn admin create test-app
 
 workflows:
   version: 2
@@ -299,60 +293,6 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-      - lint:
+      - build-win:
           requires:
             - setup
-      - validate:
-          requires:
-            - setup
-      - build:
-          requires:
-            - setup
-      - e2e-cli:
-          name: e2e-cli
-          post-steps:
-            - store_artifacts:
-                path: /tmp/dist
-                destination: cli/new-production
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          snapshots: true
-          requires:
-            - e2e-cli
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - master
-      - e2e-cli:
-          name: e2e-cli-node-12
-          nodeversion: '12.20'
-          <<: *only_release_branches
-          requires:
-            - e2e-cli
-      - test-browsers:
-          requires:
-            - build
-
-      # Bazel jobs
-      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
-      # will catch any build errors before proceeding to the more lengthy and resource intensive
-      # Bazel jobs.
-      - test:
-          requires:
-            - build
-
-      # Windows jobs
-      - e2e-cli-win:
-          requires:
-            - test
-
-      # Publish jobs
-      - snapshot_publish:
-          <<: *only_release_branches
-          requires:
-            - build
-            - test
-            - e2e-cli
