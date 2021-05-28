@@ -301,7 +301,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   let buildOptimizerUseRule: RuleSetRule[] = [];
-  if (buildOptions.buildOptimizer) {
+  if (buildOptions.buildOptimizer && wco.scriptTarget < ScriptTarget.ES2015) {
     extraPlugins.push(new BuildOptimizerWebpackPlugin());
     buildOptimizerUseRule = [
       {
@@ -465,6 +465,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                 cacheDirectory: findCachePath('babel-webpack'),
                 scriptTarget: wco.scriptTarget,
                 aot: buildOptions.aot,
+                optimize: buildOptions.buildOptimizer && wco.scriptTarget >= ScriptTarget.ES2015,
               },
             },
             ...buildOptimizerUseRule,
