@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.37.0",
+    "**/@types/copy-webpack-plugin/webpack": "5.38.1",
     "ajv-formats/ajv": "8.4.0"
   },
   "devDependencies": {
@@ -230,7 +230,7 @@
     "typescript": "4.2.4",
     "verdaccio": "5.0.4",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.37.0",
+    "webpack": "5.38.1",
     "webpack-dev-middleware": "4.2.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.7.3",
