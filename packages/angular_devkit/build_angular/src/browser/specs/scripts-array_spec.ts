@@ -174,9 +174,9 @@ describe('Browser Builder scripts array', () => {
     );
 
     const joinedLogs = logs.join('\n');
-    expect(joinedLogs).toMatch(/lazy-script.+69 bytes/);
-    expect(joinedLogs).toMatch(/renamed-script.+78 bytes/);
-    expect(joinedLogs).toMatch(/renamed-lazy-script.+88 bytes/);
+    expect(joinedLogs).toMatch(/lazy-script.+\d+ bytes/);
+    expect(joinedLogs).toMatch(/renamed-script.+\d+ bytes/);
+    expect(joinedLogs).toMatch(/renamed-lazy-script.+\d+ bytes/);
     expect(joinedLogs).not.toContain('Lazy Chunks');
   });
 
