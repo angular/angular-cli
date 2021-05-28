@@ -146,4 +146,31 @@ describe('Server Builder', () => {
 
     await run.stop();
   });
+
+  it('should not try to resolve web-worker', async () => {
+    host.writeMultipleFiles({
+      'src/app/app.worker.ts': `
+        /// <reference lib="webworker" />
+  
+        const foo: string = 'hello world';
+        addEventListener('message', ({ data }) => {
+          postMessage(foo);
+        });
+      `,
+      'src/main.server.ts': `
+        if (typeof Worker !== 'undefined') {
+          const worker = new Worker(new URL('./app/app.worker', import.meta.url), { type: 'module' });
+          worker.onmessage = ({ data }) => {
+            console.log('page got message:', data);
+          };
+          worker.postMessage('hello');
+        }
+      `,
+    });
+
+    const run = await architect.scheduleTarget(target);
+    const output = (await run.result) as ServerBuilderOutput;
+    expect(output.success).toBe(true);
+    await run.stop();
+  });
 });
