@@ -109,16 +109,19 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
 
   protected async readIndex(path: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.compilation.inputFileSystem.readFile(path, (err?: Error, data?: string | Buffer) => {
-        if (err) {
-          reject(err);
+      this.compilation.inputFileSystem.readFile(
+        path,
+        (err?: Error | null, data?: string | Buffer) => {
+          if (err) {
+            reject(err);
 
-          return;
-        }
+            return;
+          }
 
-        this.compilation.fileDependencies.add(path);
-        resolve(data?.toString() ?? '');
-      });
+          this.compilation.fileDependencies.add(path);
+          resolve(data?.toString() ?? '');
+        },
+      );
     });
   }
 }
