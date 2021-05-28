@@ -113,7 +113,7 @@ export class ScriptsWebpackPlugin {
           return new Promise<webpackSources.Source>((resolve, reject) => {
             compilation.inputFileSystem.readFile(
               fullPath,
-              (err?: Error, data?: string | Buffer) => {
+              (err?: Error | null, data?: string | Buffer) => {
                 if (err) {
                   reject(err);
 
