@@ -22,6 +22,6 @@
     }
   },
   "devDependencies": {
-    "webpack": "5.37.0"
+    "webpack": "5.38.1"
   }
 }
