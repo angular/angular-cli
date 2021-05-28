@@ -120,4 +120,21 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
     expect(options.namedChunks).toBeTrue();
     expect(options.buildOptimizer).toBeFalse();
   });
+
+  it('migration should be idempotent', async () => {
+    const { options } = getBuildTarget(tree);
+    expect(options.aot).toBeTrue();
+
+    // First run
+    const newTree1 = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { options: options1 } = getBuildTarget(newTree1);
+    expect(options1.aot).toBeUndefined();
+
+    // Second run
+    const newTree2 = await schematicRunner
+      .runSchematicAsync(schematicName, {}, newTree1)
+      .toPromise();
+    const { options: options2 } = getBuildTarget(newTree2);
+    expect(options2.aot).toBeUndefined();
+  });
 });
