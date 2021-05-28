@@ -22,7 +22,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "progress": false,
-            "sourceMap": true,
+            "sourceMap": false,
             "aot": false,
             "vendorChunk": true,
             "buildOptimizer": false,
