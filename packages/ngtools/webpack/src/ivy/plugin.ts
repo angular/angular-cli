@@ -268,8 +268,9 @@ export class AngularWebpackPlugin {
           continue;
         }
 
-        // Ensure all program files are considered part of the compilation and will be watched
-        compilation.fileDependencies.add(sourceFile.fileName);
+        // Ensure all program files are considered part of the compilation and will be watched.
+        // Webpack does not normalize paths. Therefore, we need to normalize the path with FS seperators.
+        compilation.fileDependencies.add(externalizePath(sourceFile.fileName));
 
         // Add all non-declaration files to the initial set of unused files. The set will be
         // analyzed and pruned after all Webpack modules are finished building.
