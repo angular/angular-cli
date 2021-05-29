@@ -20,7 +20,10 @@ import { PokedexComponent } from './pokedex.component';
     // The HttpClientInMemoryWebApiModule module intercepts HTTP requests
     // and returns simulated server responses.
 
-    HttpClientInMemoryWebApiModule.forRoot(PokemonService, { dataEncapsulation: false }),
+    HttpClientInMemoryWebApiModule.forRoot(PokemonService, {
+      dataEncapsulation: false,
+      passThruUnknownUrl: true,
+    }),
 
     RendererModule.forRoot(),
     TransferHttpCacheModule,

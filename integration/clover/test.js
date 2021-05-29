@@ -21,4 +21,12 @@ for (const page of pages) {
   if (!content.includes('ng-clover')) {
     throw new Error(`Page ${page} didn't contain ng-clover marker.`);
   }
+
+  // Asserts embedded state transfer for local relative requests
+  if (page === 'index.html') {
+    const dataJson = require('./src/assets/data.json');
+    if (!content.includes(dataJson.message)) {
+      throw new Error(`Page ${page} didn't contain message from data.json.`);
+    }
+  }
 }

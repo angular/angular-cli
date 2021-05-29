@@ -16,10 +16,14 @@ import { BrowserBuilderOptions, BrowserBuilderOutput } from '@angular-devkit/bui
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
 import { normalize, resolve } from '@angular-devkit/core';
+import * as express from 'express';
+import * as http from 'http';
 import JestWorker from 'jest-worker';
 import * as ora from 'ora';
 import { cpus } from 'os';
 import * as path from 'path';
+import { promisify } from 'util';
+import { getAvailablePort } from '../ssr-dev-server/utils';
 import { Schema as PrerenderBuilderOptions } from './schema';
 import { getRoutes } from './utils';
 import { WorkerSetupArgs } from './worker';
@@ -34,9 +38,9 @@ export async function execute(
   context: BuilderContext,
 ): Promise<BuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const browserOptions = ((await context.getTargetOptions(
+  const browserOptions = (await context.getTargetOptions(
     browserTarget,
-  )) as unknown) as BrowserBuilderOptions;
+  )) as unknown as BrowserBuilderOptions;
   const routes = await getRoutes(options, browserOptions.tsConfig, context);
 
   if (!routes.length) {
@@ -57,12 +61,15 @@ export async function execute(
   try {
     for (const outputPath of outputPaths) {
       const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
+
+      const staticServer = await createStaticServer(outputPath);
       try {
         await Promise.all(
           routes.map((route) =>
             (worker as any).render({
               outputPath,
               route,
+              port: staticServer.port,
             }),
           ),
         );
@@ -79,6 +86,8 @@ export async function execute(
         spinner.fail(`Prerendering routes to ${outputPath} failed.`);
 
         return { success: false, error: error.message };
+      } finally {
+        await staticServer.close();
       }
     }
 
@@ -88,6 +97,22 @@ export async function execute(
     // tslint:disable-next-line: no-floating-promises
     const _ = worker.end();
   }
+}
+
+async function createStaticServer(browserOutputRoot: string): Promise<{
+  close: () => Promise<void>;
+  port: number;
+}> {
+  const app = express();
+  app.use(express.static(browserOutputRoot));
+  const port = await getAvailablePort();
+  const server = new http.Server(app);
+  await new Promise<void>((res) => server.listen(port, res));
+
+  return {
+    close: promisify(server.close.bind(server)),
+    port,
+  };
 }
 
 function createWorker(browserOptions: BrowserBuilderOptions): JestWorker {

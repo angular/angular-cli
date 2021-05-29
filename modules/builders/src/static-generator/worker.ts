@@ -22,12 +22,16 @@ export function setup(options: WorkerSetupArgs): void {
   sharedOptions = options;
 }
 
-export async function render(options: { outputPath: string; route: string }): Promise<void> {
-  const { outputPath, route } = options;
+export async function render(options: {
+  outputPath: string;
+  route: string;
+  port: number;
+}): Promise<void> {
+  const { outputPath, route, port } = options;
   const html = await engine.render({
     publicPath: outputPath,
     inlineCriticalCss: sharedOptions.inlineCriticalCss,
-    url: `http://localhost/${route}`,
+    url: `http://localhost:${port}/${route}`,
   });
 
   // This case happens when we are prerendering "/".
