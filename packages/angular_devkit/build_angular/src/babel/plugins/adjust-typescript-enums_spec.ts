@@ -12,11 +12,19 @@ import { default as adjustTypeScriptEnums } from './adjust-typescript-enums';
 // eslint-disable-next-line import/no-extraneous-dependencies
 const prettier = require('prettier');
 
-function testCase({ input, expected }: { input: string; expected: string }): void {
+function testCase({
+  input,
+  expected,
+  options,
+}: {
+  input: string;
+  expected: string;
+  options?: { loose?: boolean };
+}): void {
   const result = transform(input, {
     configFile: false,
     babelrc: false,
-    plugins: [adjustTypeScriptEnums],
+    plugins: [[adjustTypeScriptEnums, options]],
   });
   if (!result) {
     fail('Expected babel to return a transform result.');
@@ -210,5 +218,26 @@ describe('adjust-typescript-enums Babel plugin', () => {
 
       RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
     `);
+  });
+
+  it('wraps TypeScript enums in loose mode', () => {
+    testCase({
+      input: `
+        var ChangeDetectionStrategy;
+        (function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+            ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+      `,
+      expected: `
+        var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
+          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
+          return ChangeDetectionStrategy;
+        })();
+      `,
+      options: { loose: true },
+    });
   });
 });

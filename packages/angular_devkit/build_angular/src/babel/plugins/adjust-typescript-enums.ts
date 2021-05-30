@@ -76,6 +76,12 @@ export default function (): PluginObj {
           return;
         }
 
+        // Loose mode rewrites the enum to a shorter but less TypeScript-like form
+        let enumAssignments: types.ExpressionStatement[] | undefined;
+        if (loose) {
+          enumAssignments = [];
+        }
+
         // Check if all enum member values are pure.
         // If not, leave as-is due to potential side efects
         let hasElements = false;
@@ -93,6 +99,7 @@ export default function (): PluginObj {
           }
 
           hasElements = true;
+          enumAssignments?.push(enumStatement.node);
         }
 
         // If there are no enum elements then there is nothing to wrap
@@ -104,11 +111,33 @@ export default function (): PluginObj {
         const enumInitializer = nextExpression.node;
         nextExpression.remove();
 
+        // Create IIFE block contents
+        let blockContents;
+        if (enumAssignments) {
+          // Loose mode
+          blockContents = [
+            types.expressionStatement(
+              types.assignmentExpression(
+                '=',
+                types.cloneNode(declarationId),
+                types.logicalExpression(
+                  '||',
+                  types.cloneNode(declarationId),
+                  types.objectExpression([]),
+                ),
+              ),
+            ),
+            ...enumAssignments,
+          ];
+        } else {
+          blockContents = [types.expressionStatement(enumInitializer)];
+        }
+
         // Wrap existing enum initializer in a pure annotated IIFE
         const container = types.arrowFunctionExpression(
           [],
           types.blockStatement([
-            types.expressionStatement(enumInitializer),
+            ...blockContents,
             types.returnStatement(types.cloneNode(declarationId)),
           ]),
         );
