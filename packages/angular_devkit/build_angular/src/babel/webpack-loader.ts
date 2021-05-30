@@ -15,6 +15,7 @@ interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLi
   forceAsyncTransformation: boolean;
   forceES5: boolean;
   optimize?: {
+    looseEnums: boolean;
     pureTopLevel: boolean;
     wrapDecorators: boolean;
   };
@@ -85,10 +86,12 @@ export default custom<AngularCustomOptions>(() => {
       }
 
       if (optimize) {
+        const angularPackage = /[\\\/]node_modules[\\\/]@angular[\\\/]/.test(this.resourcePath);
         customOptions.optimize = {
           // Angular packages provide additional tested side effects guarantees and can use
           // otherwise unsafe optimizations.
-          pureTopLevel: /[\\\/]node_modules[\\\/]@angular[\\\/]/.test(this.resourcePath),
+          looseEnums: angularPackage,
+          pureTopLevel: angularPackage,
           // JavaScript modules that are marked as side effect free are considered to have
           // no decorators that contain non-local effects.
           wrapDecorators: !!this._module?.factoryMeta?.sideEffectFree,
@@ -126,7 +129,10 @@ export default custom<AngularCustomOptions>(() => {
 
         plugins.push(
           require('./plugins/elide-angular-metadata').default,
-          require('./plugins/adjust-typescript-enums').default,
+          [
+            require('./plugins/adjust-typescript-enums').default,
+            { loose: customOptions.optimize.looseEnums },
+          ],
           [
             require('./plugins/adjust-static-class-members').default,
             { wrapDecorators: customOptions.optimize.wrapDecorators },
