@@ -176,15 +176,13 @@
                     }
                   },
                   "additionalProperties": true,
-                  "required": [
-                    "input"
-                  ]
+                  "required": ["input"]
                 }
               ]
             },
             "additionalProperties": false
           },
-          "environmentSource":{
+          "environmentSource": {
             "description": "Source file for environment config.",
             "type": "string"
           },
@@ -260,9 +258,7 @@
             "default": []
           }
         },
-        "required": [
-          "project"
-        ],
+        "required": ["project"],
         "additionalProperties": false
       }
     },
@@ -511,19 +507,16 @@
               "description": "The host the application will be served on.",
               "type": "string",
               "default": "localhost"
-
             },
             "ssl": {
               "description": "Enables ssl for the application.",
               "type": "boolean",
               "default": false
-
             },
             "sslKey": {
               "description": "The ssl key used by the server.",
               "type": "string",
               "default": "ssl/server.key"
-
             },
             "sslCert": {
               "description": "The ssl certificate used by the server.",
@@ -558,7 +551,7 @@
     },
     "packageManager": {
       "description": "Specify which package manager tool to use.",
-      "enum": [ "npm", "cnpm", "yarn", "default" ],
+      "enum": ["npm", "cnpm", "yarn", "default"],
       "default": "default",
       "type": "string"
     },
