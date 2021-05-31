@@ -136,12 +136,13 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
   }
 
   exists(path: Path): Observable<boolean> {
-    return observableFrom(exists(path));
+    return observableFrom(exists(getSystemPath(path)));
   }
 
   isDirectory(path: Path): Observable<boolean> {
     return this.stat(path).pipe(map((stat) => stat.isDirectory()));
   }
+
   isFile(path: Path): Observable<boolean> {
     return this.stat(path).pipe(map((stat) => stat.isFile()));
   }
@@ -267,6 +268,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.stat(path)!.pipe(map((stat) => stat.isDirectory()));
   }
+
   isFile(path: Path): Observable<boolean> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.stat(path)!.pipe(map((stat) => stat.isFile()));
