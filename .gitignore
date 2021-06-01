@@ -41,6 +41,7 @@ npm-debug.log*
 yarn-error.log*
 .ng_pkg_build/
 .ng-dev.log
+.ng-dev.err*.log
 .ng-dev.user*
 .husky/_
 .bazelrc.user
