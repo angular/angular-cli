@@ -110,7 +110,7 @@ export default function (options: DirectiveOptions): Rule {
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project as string);
     if (!project) {
-      throw new SchematicsException(`Invalid project name (${options.project})`);
+      throw new SchematicsException(`Project "${options.project}" does not exist.`);
     }
 
     if (options.path === undefined) {

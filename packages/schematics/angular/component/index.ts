@@ -116,7 +116,11 @@ export default function (options: ComponentOptions): Rule {
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project as string);
 
-    if (options.path === undefined && project) {
+    if (!project) {
+      throw new SchematicsException(`Project "${options.project}" does not exist.`);
+    }
+
+    if (options.path === undefined) {
       options.path = buildDefaultPath(project);
     }
 
