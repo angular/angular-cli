@@ -238,3 +238,8 @@ for (const pkgName of Object.keys(packages)) {
   });
   pkg.dependencies.forEach((depName) => packages[depName].reverseDependencies.push(pkgName));
 }
+
+/** The set of packages which are built and released. */
+export const releasePackages = Object.fromEntries(
+  Object.entries(packages).filter(([_, pkg]) => !pkg.private),
+);

@@ -1,10 +1,10 @@
 import '../lib/bootstrap-local';
 
 import { ReleaseConfig } from '@angular/dev-infra-private/release/config';
-import { packages } from '../lib/packages';
+import { releasePackages } from '../lib/packages';
 import buildPackages from '../scripts/build';
 
-const npmPackages = Object.keys(packages);
+const npmPackages = Object.keys(releasePackages);
 
 /** Configuration for the `ng-dev release` command. */
 export const release: ReleaseConfig = {
