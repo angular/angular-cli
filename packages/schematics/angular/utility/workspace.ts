@@ -85,7 +85,7 @@ export async function createDefaultPath(tree: Tree, projectName: string): Promis
   const workspace = await getWorkspace(tree);
   const project = workspace.projects.get(projectName);
   if (!project) {
-    throw new Error('Specified project does not exist.');
+    throw new Error(`Project "${projectName}" does not exist.`);
   }
 
   return buildDefaultPath(project);
