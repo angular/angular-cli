@@ -15,16 +15,13 @@ const webpackOutputOptions = {
   timings: true, // required by custom stat output
   chunks: true, // required by custom stat output
   builtAt: true, // required by custom stat output
-  chunkModules: false,
-  children: false, // listing all children is very noisy in AOT and hides warnings/errors
-  modules: false,
-  reasons: false,
   warnings: true,
   errors: true,
   assets: true, // required by custom stat output
-  version: false,
-  errorDetails: false,
-  moduleTrace: false,
+
+  // Needed for markAsyncChunksNonInitial.
+  ids: true,
+  entrypoints: true,
 };
 
 const verboseWebpackOutputOptions: Record<string, boolean | string | number> = {
@@ -40,9 +37,8 @@ const verboseWebpackOutputOptions: Record<string, boolean | string | number> = {
   errorDetails: true,
   moduleTrace: true,
   logging: 'verbose',
+  modulesSpace: Infinity,
 };
-
-verboseWebpackOutputOptions['modulesSpace'] = Infinity;
 
 export function getWebpackStatsConfig(verbose = false) {
   return verbose
