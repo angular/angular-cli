@@ -18,7 +18,7 @@ import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/u
 import { normalize, resolve } from '@angular-devkit/core';
 import * as express from 'express';
 import * as http from 'http';
-import JestWorker from 'jest-worker';
+import { Worker as JestWorker } from 'jest-worker';
 import * as ora from 'ora';
 import { cpus } from 'os';
 import * as path from 'path';
