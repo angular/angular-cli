@@ -59,11 +59,6 @@ export function runWebpack(
     switchMap(
       (webpackCompiler) =>
         new Observable<BuildResult>((obs) => {
-          // Webpack 5 has a compiler level close function
-          const compilerClose = (webpackCompiler as {
-            close?(callback: () => void): void;
-          }).close?.bind(webpackCompiler);
-
           const callback = (err?: Error, stats?: webpack.Stats) => {
             if (err) {
               return obs.error(err);
@@ -76,19 +71,17 @@ export function runWebpack(
             // Log stats.
             log(stats, config);
 
-            obs.next(({
+            const statsOptions = typeof config.stats === 'boolean' ? undefined : config.stats;
+
+            obs.next({
               success: !stats.hasErrors(),
-              webpackStats: shouldProvideStats ? stats.toJson() : undefined,
+              webpackStats: shouldProvideStats ? stats.toJson(statsOptions) : undefined,
               emittedFiles: getEmittedFiles(stats.compilation),
               outputPath: stats.compilation.outputOptions.path,
-            } as unknown) as BuildResult);
+            } as unknown as BuildResult);
 
             if (!config.watch) {
-              if (compilerClose) {
-                compilerClose(() => obs.complete());
-              } else {
-                obs.complete();
-              }
+              webpackCompiler.close(() => obs.complete());
             }
           };
 
@@ -100,7 +93,7 @@ export function runWebpack(
               // Teardown logic. Close the watcher when unsubscribed from.
               return () => {
                 watching.close(() => {});
-                compilerClose?.(() => {});
+                webpackCompiler.close(() => {});
               };
             } else {
               webpackCompiler.run(callback);
