@@ -5,26 +5,18 @@ import { ng, noSilentNg } from '../../utils/process';
 import { isPrereleaseCli, useCIChrome, useCIDefaults } from '../../utils/project';
 
 export default async function () {
-  // We need to use the public registry because in the local NPM server we don't have
-  // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
-  try {
-    await createProjectFromAsset('8.0-project', true, true);
+  await createProjectFromAsset('8.0-project', true, true);
+  await installWorkspacePackages();
 
-    await setRegistry(false);
-    await installWorkspacePackages();
-
-    // Update Angular to 9
-    await installPackage('@angular/cli@8');
-    const { stdout } = await ng('update', '@angular/cli@9.x', '@angular/core@9.x');
-    if (!stdout.includes("Executing migrations of package '@angular/cli'")) {
-      throw new Error('Update did not execute migrations. OUTPUT: \n' + stdout);
-    }
-
-    // Update Angular to 10
-    await ng('update', '@angular/cli@10', '@angular/core@10');
-  } finally {
-    await setRegistry(true);
+  // Update Angular to 9
+  await installPackage('@angular/cli@8');
+  const { stdout } = await ng('update', '@angular/cli@9.x', '@angular/core@9.x');
+  if (!stdout.includes("Executing migrations of package '@angular/cli'")) {
+    throw new Error('Update did not execute migrations. OUTPUT: \n' + stdout);
   }
+
+  // Update Angular to 10
+  await ng('update', '@angular/cli@10', '@angular/core@10');
 
   // Update Angular current build
   const extraUpdateArgs = isPrereleaseCli() ? ['--next', '--force'] : ['--force'];
