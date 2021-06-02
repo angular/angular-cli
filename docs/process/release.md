@@ -35,12 +35,8 @@ git push upstream && git push upstream --tags
 
 # Release Changelog
 
-(TODO: Borrow the changelog from Angular CLI project. For now use these simple instructions)
-
-- Get commits between the two releases
-
 ```sh
-git log v9.0.0-next.12..v9.0.0-next.13 | xclip -selection clipboard
+npx conventional-changelog-cli -p angular -r 1 | sed 1,3d | xclip -selection clipboard
 ```
 
 - Go to the `Releases` tab in the repository
