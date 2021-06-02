@@ -53,13 +53,17 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 # Release
 
-## Before releasing
+For each version to be released, check out the associated branch and:
 
-Update `Angular` version in
-[`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
-**and** [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json).
-
-## Shepparding
+1. Increment the CLI version number in
+   [`package.json`](https://github.com/angular/angular-cli/blob/master/package.json).
+1. Update `Angular` version in
+   [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts)
+   to match the lastest framework patch version for the associated minor.
+   - This number _usually_ aligns with the CLI version **but not always**. Framework may have
+     required a hotfix release, which could desync the two version numbers. Check the latest version
+     with `yarn info @angular/core dist-tags` or look at the most recent FW release in the
+     [#news channel](https://angular-team.slack.com/archives/C0439GUGA).
 
 As commits are cherry-picked when PRs are merged, creating the release should be a matter of creating a tag.
 
@@ -84,7 +88,7 @@ Now push the commit and the tag to the upstream repository. **Make sure to use
 git push upstream --follow-tags
 ```
 
-### Authenticating
+## Authenticating
 
 **This can ONLY be done by a Google employee.**
 
@@ -101,7 +105,7 @@ After closing the tab, you have successfully logged in, it is time to publish.
 
 **NOTE: After publishing, remove the token added to your `~/.npmrc` file to logout.**
 
-### Publishing
+## Publishing
 
 **This can ONLY be done by a Google employee.**
 
@@ -134,7 +138,7 @@ rm -rf node_modules/ && yarn # Reload dependencies
 yarn admin publish --tag v8-lts
 ```
 
-### Release Notes
+## Release Notes
 
 `yarn run -s admin changelog` takes `from` and `to` arguments which are any valid git
 ref.
