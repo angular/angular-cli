@@ -173,7 +173,17 @@ export class SassWorkerImplementation {
 
     mainImporterPort.on(
       'message',
-      ({ id, url, prev }: { id: number; url: string; prev: string }) => {
+      ({
+        id,
+        url,
+        prev,
+        fromImport,
+      }: {
+        id: number;
+        url: string;
+        prev: string;
+        fromImport: boolean;
+      }) => {
         const request = this.requests.get(id);
         if (!request?.importers) {
           mainImporterPort.postMessage(null);
@@ -183,7 +193,7 @@ export class SassWorkerImplementation {
           return;
         }
 
-        this.processImporters(request.importers, url, prev)
+        this.processImporters(request.importers, url, prev, fromImport)
           .then((result) => {
             mainImporterPort.postMessage(result);
           })
@@ -207,12 +217,13 @@ export class SassWorkerImplementation {
     importers: Iterable<Importer>,
     url: string,
     prev: string,
+    fromImport: boolean,
   ): Promise<ImporterReturnType> {
     let result = null;
     for (const importer of importers) {
       result = await new Promise<ImporterReturnType>((resolve) => {
         // Importers can be both sync and async
-        const innerResult = importer(url, prev, resolve);
+        const innerResult = importer.call({ fromImport }, url, prev, resolve);
         if (innerResult !== undefined) {
           resolve(innerResult);
         }

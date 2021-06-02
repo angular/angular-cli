@@ -65,9 +65,11 @@ parentPort.on('message', (message: RenderRequestMessage | InitMessage) => {
       // This process must be synchronous from the perspective of dart-sass. The `Atomics`
       // functions combined with the shared memory `importSignal` and the Node.js
       // `receiveMessageOnPort` function are used to ensure synchronous behavior.
-      options.importer = (url, prev) => {
+      options.importer = function (url, prev) {
         Atomics.store(importerSignal, 0, 0);
-        workerImporterPort.postMessage({ id, url, prev });
+        // `this.fromImport` was added in dart-sass in 1.33.0, `@types/sass` doesn't include it yet.
+        const { fromImport } = this as { fromImport: boolean };
+        workerImporterPort.postMessage({ id, url, prev, fromImport });
         Atomics.wait(importerSignal, 0, 0);
 
         return receiveMessageOnPort(workerImporterPort)?.message as ImporterReturnType;
