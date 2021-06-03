@@ -72,33 +72,28 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     const spinner = new Spinner();
     spinner.start(`Generating ${platform} application bundles (phase: setup)...`);
 
-    let previousPercentage: number | undefined;
     extraPlugins.push(
       new ProgressPlugin({
         handler: (percentage: number, message: string) => {
-          if (previousPercentage === 1 && percentage !== 0) {
-            // In some scenarios in Webpack 5 percentage goes from 1 back to 0.99.
-            // Ex: 0.99 -> 1 -> 0.99 -> 1
-            // This causes the "complete" message to be displayed multiple times.
-
-            return;
-          }
+          const phase = message ? ` (phase: ${message})` : '';
+          spinner.text = `Generating ${platform} application bundles${phase}...`;
 
           switch (percentage) {
             case 1:
-              spinner.succeed(
-                `${platform.replace(/^\w/, (s) =>
-                  s.toUpperCase(),
-                )} application bundle generation complete.`,
-              );
+              if (spinner.isSpinning) {
+                spinner.succeed(
+                  `${platform.replace(/^\w/, (s) =>
+                    s.toUpperCase(),
+                  )} application bundle generation complete.`,
+                );
+              }
               break;
             case 0:
-            default:
-              spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
+              if (!spinner.isSpinning) {
+                spinner.start();
+              }
               break;
           }
-
-          previousPercentage = percentage;
         },
       }),
     );
