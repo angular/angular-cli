@@ -81,7 +81,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/npm-package-arg",
         "@npm//@types/resolve",
-        "@npm//@types/rimraf",
         "@npm//@types/semver",
         "@npm//@types/uuid",
         "@npm//ansi-colors",

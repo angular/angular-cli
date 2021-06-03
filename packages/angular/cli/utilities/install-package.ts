@@ -7,10 +7,9 @@
  */
 
 import { spawn, spawnSync } from 'child_process';
-import { existsSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'fs';
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmdirSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
-import * as rimraf from 'rimraf';
 import { PackageManager } from '../lib/config/workspace-schema';
 import { NgAddSaveDepedency } from '../utilities/package-metadata';
 import { Spinner } from './spinner';
@@ -130,7 +129,7 @@ export async function installTempPackage(
   // clean up temp directory on process exit
   process.on('exit', () => {
     try {
-      rimraf.sync(tempPath);
+      rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
     } catch {}
   });
 
