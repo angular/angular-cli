@@ -204,11 +204,8 @@ export async function runTempPackageBin(
     throw new Error(`Cannot locate bin for temporary package: ${packageNameNoVersion}.`);
   }
 
-  const argv = [`"${binPath}"`, ...args];
-
-  const { status, error } = spawnSync('node', argv, {
+  const { status, error } = spawnSync(process.execPath, [binPath, ...args], {
     stdio: 'inherit',
-    shell: true,
     env: {
       ...process.env,
       NG_DISABLE_VERSION_CHECK: 'true',
