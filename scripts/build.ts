@@ -11,7 +11,6 @@ import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
-import * as rimraf from 'rimraf';
 import { packages } from '../lib/packages';
 import buildSchema from './build-schema';
 
@@ -35,16 +34,6 @@ function _gitIgnoreMatch(p: string): boolean {
   }
 
   return gitIgnore.some((line) => minimatch(p, line));
-}
-
-function _mkdirp(p: string) {
-  // Create parent folder if necessary.
-  if (!fs.existsSync(path.dirname(p))) {
-    _mkdirp(path.dirname(p));
-  }
-  if (!fs.existsSync(p)) {
-    fs.mkdirSync(p);
-  }
 }
 
 function _recursiveFileList(p: string): string[] {
@@ -98,7 +87,7 @@ function _tar(out: string, dir: string) {
 function _copy(from: string, to: string) {
   // Create parent folder if necessary.
   if (!fs.existsSync(path.dirname(to))) {
-    _mkdirp(path.dirname(to));
+    fs.mkdirSync(path.dirname(to), { recursive: true });
   }
 
   // Error out if destination already exists.
@@ -135,7 +124,7 @@ function _rm(p: string) {
 function _clean(logger: logging.Logger) {
   logger.info('Cleaning...');
   logger.info('  Removing dist/...');
-  rimraf.sync(path.join(__dirname, '../dist'));
+  fs.rmdirSync(path.join(__dirname, '../dist'), { recursive: true, maxRetries: 3 });
 }
 
 function _sortPackages() {
@@ -203,7 +192,7 @@ export default async function (
     packageLogger.info(packageName);
     const pkg = packages[packageName];
     _recursiveCopy(pkg.build, pkg.dist, logger);
-    rimraf.sync(pkg.build);
+    fs.rmdirSync(pkg.build, { recursive: true, maxRetries: 3 });
   }
 
   logger.info('Merging bazel-bin/ with dist/');
@@ -215,7 +204,7 @@ export default async function (
     if (fs.existsSync(bazelBinPath)) {
       packageLogger.info(packageName);
       _recursiveCopy(bazelBinPath, pkg.dist, logger);
-      rimraf.sync(bazelBinPath);
+      fs.rmdirSync(bazelBinPath, { recursive: true, maxRetries: 3 });
     }
   }
 

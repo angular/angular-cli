@@ -11,24 +11,6 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
-function _mkdirp(p: string) {
-  // Create parent folder if necessary.
-  if (!fs.existsSync(path.dirname(p))) {
-    _mkdirp(path.dirname(p));
-  }
-  if (!fs.existsSync(p)) {
-    fs.mkdirSync(p);
-  }
-}
-
-function _rimraf(p: string) {
-  glob.sync(path.join(p, '**/*'), { dot: true, nodir: true }).forEach((p) => fs.unlinkSync(p));
-  glob
-    .sync(path.join(p, '**/*'), { dot: true })
-    .sort((a, b) => b.length - a.length)
-    .forEach((p) => fs.rmdirSync(p));
-}
-
 export default async function (argv: {}, logger: logging.Logger) {
   const allJsonFiles = glob.sync('packages/**/*.json', {
     ignore: ['**/node_modules/**', '**/files/**', '**/*-files/**', '**/package.json'],
@@ -37,7 +19,7 @@ export default async function (argv: {}, logger: logging.Logger) {
 
   const quicktypeRunner = require('../tools/quicktype_runner');
   logger.info('Removing dist-schema/...');
-  _rimraf(dist);
+  fs.rmdirSync(dist, { recursive: true, maxRetries: 3 });
 
   logger.info('Generating JSON Schema....');
 
@@ -65,7 +47,7 @@ export default async function (argv: {}, logger: logging.Logger) {
     const tsContent = await quicktypeRunner.generate(fileName);
     const tsPath = path.join(dist, fileName.replace(/\.json$/, '.ts'));
 
-    _mkdirp(path.dirname(tsPath));
+    fs.mkdirSync(path.dirname(tsPath), { recursive: true });
     fs.writeFileSync(tsPath, tsContent, 'utf-8');
   }
 
