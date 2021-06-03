@@ -23,10 +23,6 @@ export interface BuilderWatcherFactory {
 export interface WebpackWatcher {
   close(): void;
   pause(): void;
-  // Webpack 4
-  getFileTimestamps(): Map<string, number>;
-  getContextTimestamps(): Map<string, number>;
-  // Webpack 5
   getFileTimeInfoEntries(): Map<string, { safeTime: number; timestamp: number }>;
   getContextTimeInfoEntries(): Map<string, { safeTime: number; timestamp: number }>;
 }
@@ -126,10 +122,12 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
           }
         }
 
+        const timeInfoMap = new Map(timeInfo);
+
         callback(
           undefined,
-          new Map(timeInfo),
-          new Map(timeInfo),
+          timeInfoMap,
+          timeInfoMap,
           new Set([...fileChanges, ...directoryChanges, ...missingChanges]),
           removals,
         );
@@ -141,12 +139,6 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
         watcher.close();
       },
       pause() {},
-      getFileTimestamps() {
-        return timeInfo.toTimestamps();
-      },
-      getContextTimestamps() {
-        return timeInfo.toTimestamps();
-      },
       getFileTimeInfoEntries() {
         return new Map(timeInfo);
       },
