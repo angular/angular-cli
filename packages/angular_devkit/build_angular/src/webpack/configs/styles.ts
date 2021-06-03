@@ -108,7 +108,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     );
   }
 
-  let sassImplementation: {} | undefined;
+  let sassImplementation: SassWorkerImplementation | undefined;
   try {
     sassImplementation = require('node-sass');
     wco.logger.warn(
@@ -117,6 +117,13 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     );
   } catch {
     sassImplementation = new SassWorkerImplementation();
+    extraPlugins.push({
+      apply(compiler) {
+        compiler.hooks.shutdown.tap('sass-worker', () => {
+          sassImplementation?.close();
+        });
+      },
+    });
   }
 
   const assetNameTemplate = assetNameTemplateFactory(hashFormat);
