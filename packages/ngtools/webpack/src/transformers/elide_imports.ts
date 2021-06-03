@@ -7,7 +7,6 @@
  */
 
 import * as ts from 'typescript';
-import { RemoveNodeOperation, TransformOperation } from './interfaces';
 
 // Remove imports for which all identifiers have been removed.
 // Needs type checker, and works even if it's not the first transformer.
@@ -20,11 +19,11 @@ export function elideImports(
   removedNodes: ts.Node[],
   getTypeChecker: () => ts.TypeChecker,
   compilerOptions: ts.CompilerOptions,
-): TransformOperation[] {
-  const ops: TransformOperation[] = [];
+): Set<ts.Node> {
+  const importNodeRemovals = new Set<ts.Node>();
 
   if (removedNodes.length === 0) {
-    return [];
+    return importNodeRemovals;
   }
 
   const typeChecker = getTypeChecker();
@@ -117,7 +116,7 @@ export function elideImports(
   });
 
   if (imports.length === 0) {
-    return [];
+    return importNodeRemovals;
   }
 
   const isUnused = (node: ts.Identifier) => {
@@ -142,10 +141,10 @@ export function elideImports(
     if (namedBindings && ts.isNamespaceImport(namedBindings)) {
       // "import * as XYZ from 'abc';"
       if (isUnused(namedBindings.name)) {
-        ops.push(new RemoveNodeOperation(sourceFile, node));
+        importNodeRemovals.add(node);
       }
     } else {
-      const specifierOps = [];
+      const specifierNodeRemovals = [];
       let clausesCount = 0;
 
       // "import { XYZ, ... } from 'abc';"
@@ -160,7 +159,7 @@ export function elideImports(
             const nodeToRemove =
               clausesCount === removedClausesCount ? specifier.parent : specifier;
 
-            specifierOps.push(new RemoveNodeOperation(sourceFile, nodeToRemove));
+            specifierNodeRemovals.push(nodeToRemove);
           }
         }
       }
@@ -170,17 +169,19 @@ export function elideImports(
         clausesCount++;
 
         if (isUnused(node.importClause.name)) {
-          specifierOps.push(new RemoveNodeOperation(sourceFile, node.importClause.name));
+          specifierNodeRemovals.push(node.importClause.name);
         }
       }
 
-      if (specifierOps.length === clausesCount) {
-        ops.push(new RemoveNodeOperation(sourceFile, node));
+      if (specifierNodeRemovals.length === clausesCount) {
+        importNodeRemovals.add(node);
       } else {
-        ops.push(...specifierOps);
+        for (const specifierNodeRemoval of specifierNodeRemovals) {
+          importNodeRemovals.add(specifierNodeRemoval);
+        }
       }
     }
   }
 
-  return ops;
+  return importNodeRemovals;
 }

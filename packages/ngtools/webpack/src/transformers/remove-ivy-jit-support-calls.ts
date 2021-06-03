@@ -55,12 +55,12 @@ export function removeIvyJitSupportCalls(
           removedNodes,
           getTypeChecker,
           context.getCompilerOptions(),
-        ).map((op) => op.target);
-        if (importRemovals.length > 0) {
+        );
+        if (importRemovals.size > 0) {
           updatedSourceFile = ts.visitEachChild(
             updatedSourceFile,
             function visitForRemoval(node): ts.Node | undefined {
-              return importRemovals.includes(node)
+              return importRemovals.has(node)
                 ? undefined
                 : ts.visitEachChild(node, visitForRemoval, context);
             },
