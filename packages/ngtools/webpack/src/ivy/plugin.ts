@@ -161,8 +161,7 @@ export class AngularWebpackPlugin {
       }
       const emitRegistration = compilation[AngularPluginSymbol].register();
 
-      // Store watch mode; assume true if not present (webpack < 4.23.0)
-      this.watchMode = compiler.watchMode ?? true;
+      this.watchMode = compiler.watchMode;
 
       // Initialize the resource loader if not already setup
       if (!resourceLoader) {
