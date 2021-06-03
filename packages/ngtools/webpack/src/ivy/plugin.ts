@@ -48,6 +48,7 @@ const DIAGNOSTICS_AFFECTED_THRESHOLD = 1;
 export interface AngularWebpackPluginOptions {
   tsconfig: string;
   compilerOptions?: CompilerOptions;
+  customTransformers: ts.CustomTransformers;
   fileReplacements: Record<string, string>;
   substitutions: Record<string, string>;
   directTemplateLoading: boolean;
@@ -111,6 +112,7 @@ export class AngularWebpackPlugin {
       substitutions: {},
       directTemplateLoading: true,
       tsconfig: 'tsconfig.json',
+      customTransformers: {},
       ...options,
     };
   }
@@ -497,7 +499,10 @@ export class AngularWebpackPlugin {
       }
     }
 
-    const transformers = createAotTransformers(builder, this.pluginOptions);
+    const transformers = mergeTransformers(
+      createAotTransformers(builder, this.pluginOptions),
+      this.pluginOptions.customTransformers,
+    );
 
     const getDependencies = (sourceFile: ts.SourceFile) => {
       const dependencies = [];
@@ -613,7 +618,10 @@ export class AngularWebpackPlugin {
     ];
     diagnosticsReporter(diagnostics);
 
-    const transformers = createJitTransformers(builder, this.pluginOptions);
+    const transformers = mergeTransformers(
+      createJitTransformers(builder, this.pluginOptions),
+      this.pluginOptions.customTransformers,
+    );
 
     return {
       fileEmitter: this.createFileEmitter(builder, transformers, () => []),
