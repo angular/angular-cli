@@ -18,6 +18,7 @@ const webpackOutputOptions = {
   warnings: true,
   errors: true,
   assets: true, // required by custom stat output
+  cachedAssets: true, // required for bundle size calculators
 
   // Needed for markAsyncChunksNonInitial.
   ids: true,
