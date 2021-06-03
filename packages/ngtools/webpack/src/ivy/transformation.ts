@@ -132,11 +132,11 @@ export function replaceBootstrap(
           replacedNodes,
           getTypeChecker,
           context.getCompilerOptions(),
-        ).map((op) => op.target);
-        if (removals.length > 0) {
+        );
+        if (removals.size > 0) {
           updatedSourceFile = ts.visitEachChild(
             updatedSourceFile,
-            (node) => (removals.includes(node) ? undefined : node),
+            (node) => (removals.has(node) ? undefined : node),
             context,
           );
         }
