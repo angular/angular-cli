@@ -220,10 +220,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#ccf49db26d09093bdb3882282d99f3448cf68cba":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#881f9af1d66194d25a66043021f6b3bf2a678490":
   version "0.0.0"
-  uid ccf49db26d09093bdb3882282d99f3448cf68cba
-  resolved "https://github.com/angular/dev-infra-private-builds.git#ccf49db26d09093bdb3882282d99f3448cf68cba"
+  uid "881f9af1d66194d25a66043021f6b3bf2a678490"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#881f9af1d66194d25a66043021f6b3bf2a678490"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
