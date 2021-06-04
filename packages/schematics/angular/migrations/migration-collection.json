@@ -120,6 +120,11 @@
       "factory": "./update-12/schematic-options",
       "description": "Remove invalid 'skipTests' option in '@schematics/angular:module' Angular schematic options."
     },
+    "replace-deprecated-prod-flag": {
+      "version": "12.1.0",
+      "factory": "./update-12/replace-prod-flag",
+      "description": "Replace the deprecated '--prod' in package.json scripts."
+    },
     "production-by-default": {
       "version": "9999.0.0",
       "factory": "./update-12/production-default-config",
