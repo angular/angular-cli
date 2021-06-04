@@ -8,6 +8,7 @@
 
 import { join, normalize } from '@angular-devkit/core';
 import { Rule } from '../engine/interface';
+import { MergeStrategy } from '../tree/interface';
 import { noop } from './base';
 
 export function move(from: string, to?: string | string[]): Rule {
@@ -44,7 +45,7 @@ export function move(from: string, to?: string | string[]): Rule {
         });
       }
 
-      tree.merge(branch);
+      tree.merge(branch, MergeStrategy.Overwrite);
     });
 
     return tree;
