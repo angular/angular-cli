@@ -17,10 +17,10 @@
     "@angular/core" "^10.0.0-0 || ^11.0.0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@12.0.2":
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-12.0.2.tgz#a942fb5195138291558741a4bff3286a955a3f02"
-  integrity sha512-1JGayyUJmwaul5YSEgb780aWxk+MLVG5FakVaxz5NtbPZx19ZyOuZqytCh5js11LsBDipF5/kirYhJPBFlMbWQ==
+"@angular/cdk@12.0.3":
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-12.0.3.tgz#ed2ab6da003dd39559c732186cd5e64536bd60fa"
+  integrity sha512-E/3eAcDTsuSAaeOajwBwjPtBMVSzZu5BgtXBX+QfC66jWJ4FdX5FUxGDZCwlF/Bbtdkvn0Jq8+UW9RlrS2Hd9Q==
   dependencies:
     tslib "^2.1.0"
   optionalDependencies:
@@ -84,10 +84,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#ccf49db26d09093bdb3882282d99f3448cf68cba":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7308e71916da94b51a9b558693c49a04bfc98beb":
   version "0.0.0"
-  uid ccf49db26d09093bdb3882282d99f3448cf68cba
-  resolved "https://github.com/angular/dev-infra-private-builds.git#ccf49db26d09093bdb3882282d99f3448cf68cba"
+  uid "7308e71916da94b51a9b558693c49a04bfc98beb"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#7308e71916da94b51a9b558693c49a04bfc98beb"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -113,9 +113,9 @@
     semver "^7.3.5"
     shelljs "^0.8.4"
     ts-node "^10.0.0"
-    tslib "^2.1.0"
+    tslib "^2.2.0"
     typed-graphqlify "^3.1.1"
-    typescript "~4.2.4"
+    typescript "~4.3.2"
     yaml "^1.10.0"
     yargs "^17.0.0"
 
@@ -135,10 +135,10 @@
     glob "7.1.7"
     yargs "^16.2.0"
 
-"@angular/material@12.0.2":
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-12.0.2.tgz#1191d899a82e8ff336799779bf8c5f61d70e7d06"
-  integrity sha512-jTH53w4iVNk+3K5ciFyHeRhNNtV6TzeuNTSELeme4l3t5FP3VqFTdE56Q55MrV2RMIzDKLYEpiqSiQf+8ZuGSA==
+"@angular/material@12.0.3":
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-12.0.3.tgz#f0fe83061fdeb9330b0ea0b1683a5e4f49bef1d1"
+  integrity sha512-o21ogL6P38CPS0KpvbgEJ18G0YIFvG4wcyp7hTEoMv4YncpZWPQXDBi501Ys+OsUmv57R/vYa/mo+sz6uSYw2A==
   dependencies:
     tslib "^2.1.0"
 
@@ -11447,7 +11447,7 @@ tsconfig-paths@^3.9.0:
     minimist "^1.2.0"
     strip-bom "^3.0.0"
 
-tslib@2.2.0, tslib@^2.0.0, tslib@^2.1.0:
+tslib@2.2.0, tslib@^2.0.0, tslib@^2.1.0, tslib@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.2.0.tgz#fb2c475977e35e241311ede2693cee1ec6698f5c"
   integrity sha512-gS9GVHRU+RGn5KQM2rllAlR3dU6m7AcpJKdtH8gFvQiC4Otgk98XnmMU+nZenHt/+VhnBPWwgrJsyrdcw6i23w==
@@ -11591,10 +11591,15 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.2.4, typescript@~4.2.4:
+typescript@4.2.4:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
   integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
+
+typescript@~4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.2.tgz#399ab18aac45802d6f2498de5054fcbbe716a805"
+  integrity sha512-zZ4hShnmnoVnAHpVHWpTcxdv7dWP60S2FsydQLV8V5PbS3FifjWFFRiHSWpDJahly88PRyV5teTSLoq4eG7mKw==
 
 ua-parser-js@^0.7.23:
   version "0.7.28"
