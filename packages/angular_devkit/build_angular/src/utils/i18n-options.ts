@@ -11,7 +11,6 @@ import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import * as rimraf from 'rimraf';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { Schema as ServerBuilderSchema } from '../server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
@@ -268,7 +267,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     // Remove temporary directory used for i18n processing
     process.on('exit', () => {
       try {
-        rimraf.sync(tempPath);
+        fs.rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
       } catch {}
     });
   }
