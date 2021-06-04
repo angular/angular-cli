@@ -363,7 +363,7 @@ export declare enum MergeStrategy {
 
 export declare function mergeWith(source: Source, strategy?: MergeStrategy): Rule;
 
-export declare function move(from: string, to?: string): Rule;
+export declare function move(from: string, to?: string | string[]): Rule;
 
 export declare function noop(): Rule;
 

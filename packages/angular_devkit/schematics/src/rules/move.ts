@@ -25,7 +25,7 @@ export function move(from: string, to?: string | string[]): Rule {
     const arrayLength = (to as Array<string>).length;
 
     (to as Array<string>).forEach((toElement: string, index: number) => {
-      const requireToBranch = arrayLength !== ++index;
+      const requireToBranch = arrayLength !== (index += 1);
       const branchStrategy = requireToBranch ? tree.branch() : tree;
       const fromPath = normalize('/' + from);
       const toPath = normalize('/' + toElement);
