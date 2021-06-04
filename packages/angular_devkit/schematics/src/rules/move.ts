@@ -16,13 +16,13 @@ export function move(from: string, to?: string | string[]): Rule {
     from = '/';
   }
 
+  if (typeof from === 'string' && typeof to === 'string' && from === to) {
+    return noop;
+  }
+
   if (typeof to === 'string') {
     // For simplicity, we wrap to string into an array
     to = new Array(to);
-  }
-
-  if (typeof from === 'string' && typeof to === 'string' && from === to) {
-    return noop;
   }
 
   return (tree) => {
