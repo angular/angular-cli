@@ -105,6 +105,7 @@ function addSnippet(options: WebWorkerOptions): Rule {
 export default function (options: WebWorkerOptions): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
+
     if (!options.project) {
       throw new SchematicsException('Option "project" is required.');
     }
@@ -124,8 +125,7 @@ export default function (options: WebWorkerOptions): Rule {
     if (!projectTarget) {
       throw new Error(`Target is not defined for this project.`);
     }
-    const projectTargetOptions = ((projectTarget.options ||
-      {}) as unknown) as BrowserBuilderOptions;
+    const projectTargetOptions = (projectTarget.options || {}) as unknown as BrowserBuilderOptions;
 
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);
@@ -143,8 +143,8 @@ export default function (options: WebWorkerOptions): Rule {
 
     const projectTestTarget = project.targets.get('test');
     if (projectTestTarget) {
-      const projectTestTargetOptions = ((projectTestTarget.options ||
-      {}) as unknown) as BrowserBuilderOptions;
+      const projectTestTargetOptions = (projectTestTarget.options ||
+        {}) as unknown as BrowserBuilderOptions;
 
       const needWebWorkerConfig = !projectTestTargetOptions.webWorkerTsConfig;
       if (needWebWorkerConfig) {
