@@ -63,7 +63,7 @@
   },
   "resolutions": {
     "**/@types/copy-webpack-plugin/webpack": "5.38.1",
-    "ajv-formats/ajv": "8.5.0"
+    "ajv-formats/ajv": "8.6.0"
   },
   "devDependencies": {
     "@angular/animations": "12.0.3",
@@ -127,7 +127,7 @@
     "@typescript-eslint/eslint-plugin": "4.26.0",
     "@typescript-eslint/parser": "4.26.0",
     "@yarnpkg/lockfile": "1.1.0",
-    "ajv": "8.5.0",
+    "ajv": "8.6.0",
     "ajv-formats": "2.1.0",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
@@ -141,13 +141,13 @@
     "conventional-changelog": "^3.0.0",
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "9.0.0",
-    "core-js": "3.13.1",
+    "core-js": "3.14.0",
     "critters": "0.0.10",
     "css-loader": "5.2.6",
     "css-minimizer-webpack-plugin": "3.0.1",
     "debug": "^4.1.1",
     "enhanced-resolve": "5.8.2",
-    "eslint": "7.27.0",
+    "eslint": "7.28.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.22.1",
