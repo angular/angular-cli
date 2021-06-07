@@ -23,8 +23,6 @@
     "bazel:test": "bazel test //packages/... //goldens/public-api/... ",
     "build": "node ./bin/devkit-admin build",
     "build-tsc": "tsc -p tsconfig.json",
-    "debug:test": "node --inspect-brk ./bin/devkit-admin test",
-    "debug:test-large": "node --inspect-brk ./bin/devkit-admin test --large --spec-reporter",
     "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
     "templates": "node ./bin/devkit-admin templates",
     "validate": "node ./bin/devkit-admin validate",
