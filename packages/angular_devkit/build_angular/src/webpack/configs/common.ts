@@ -413,7 +413,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     context: root,
     entry: entryPoints,
     output: {
-      clean: buildOptions.deleteOutputPath,
+      clean: buildOptions.deleteOutputPath ?? true,
       path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl ?? '',
       filename: ({ chunk }) => {
