@@ -175,28 +175,29 @@ export async function execute(
   let useLegacyIds = true;
 
   const ivyMessages: LocalizeMessage[] = [];
-  const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
-    {
-      ...browserOptions,
-      optimization: false,
-      sourceMap: {
-        scripts: true,
-        styles: false,
-        vendor: true,
-      },
-      buildOptimizer: false,
-      aot: true,
-      progress: options.progress,
-      budgets: [],
-      assets: [],
-      scripts: [],
-      styles: [],
-      deleteOutputPath: false,
-      extractLicenses: false,
-      subresourceIntegrity: false,
-      outputHashing: OutputHashing.None,
-      namedChunks: true,
+  const builderOptions = {
+    ...browserOptions,
+    optimization: false,
+    sourceMap: {
+      scripts: true,
+      styles: false,
+      vendor: true,
     },
+    buildOptimizer: false,
+    aot: true,
+    progress: options.progress,
+    budgets: [],
+    assets: [],
+    scripts: [],
+    styles: [],
+    deleteOutputPath: false,
+    extractLicenses: false,
+    subresourceIntegrity: false,
+    outputHashing: OutputHashing.None,
+    namedChunks: true,
+  };
+  const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
+    builderOptions,
     context,
     (wco) => {
       if (wco.tsConfig.options.enableIvy === false) {
@@ -262,7 +263,7 @@ export async function execute(
     (await transforms?.webpackConfiguration?.(config)) || config,
     context,
     {
-      logging: createWebpackLoggingCallback(false, context.logger),
+      logging: createWebpackLoggingCallback(builderOptions, context.logger),
       webpackFactory: webpack,
     },
   ).toPromise();
