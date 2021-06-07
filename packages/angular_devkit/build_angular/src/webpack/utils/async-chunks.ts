@@ -27,7 +27,9 @@ export function markAsyncChunksNonInitial(
   // **cannot** be loaded in main bundle.
   const asyncChunkIds = extraEntryPoints
     .filter((entryPoint) => !entryPoint.inject)
-    .flatMap((entryPoint) => entryPoints[entryPoint.bundleName].chunks);
+    .flatMap((entryPoint) =>
+      entryPoints[entryPoint.bundleName].chunks?.filter((n) => n !== 'runtime'),
+    );
 
   // Find chunks for each ID.
   const asyncChunks = asyncChunkIds.map((chunkId) => {
@@ -41,8 +43,12 @@ export function markAsyncChunksNonInitial(
 
   // A chunk is considered `initial` only if Webpack already belives it to be initial
   // and the application developer did not mark it async via an extra entry point.
-  return chunks.map((chunk) => ({
-    ...chunk,
-    initial: chunk.initial && !asyncChunks.find((asyncChunk) => asyncChunk === chunk),
-  }));
+  return chunks.map((chunk) => {
+    return asyncChunks.find((asyncChunk) => asyncChunk === chunk)
+      ? {
+          ...chunk,
+          initial: false,
+        }
+      : chunk;
+  });
 }

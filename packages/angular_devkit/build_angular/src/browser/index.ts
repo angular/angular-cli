@@ -143,25 +143,21 @@ async function initialize(
   // Assets are processed directly by the builder except when watching
   const adjustedOptions = options.watch ? options : { ...options, assets: [] };
 
-  const {
-    config,
-    projectRoot,
-    projectSourceRoot,
-    i18n,
-  } = await generateI18nBrowserWebpackConfigFromContext(
-    adjustedOptions,
-    context,
-    (wco) => [
-      getCommonConfig(wco),
-      getBrowserConfig(wco),
-      getStylesConfig(wco),
-      getStatsConfig(wco),
-      getAnalyticsConfig(wco, context),
-      getCompilerConfig(wco),
-      wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
-    ],
-    { differentialLoadingNeeded },
-  );
+  const { config, projectRoot, projectSourceRoot, i18n } =
+    await generateI18nBrowserWebpackConfigFromContext(
+      adjustedOptions,
+      context,
+      (wco) => [
+        getCommonConfig(wco),
+        getBrowserConfig(wco),
+        getStylesConfig(wco),
+        getStatsConfig(wco),
+        getAnalyticsConfig(wco, context),
+        getCompilerConfig(wco),
+        wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
+      ],
+      { differentialLoadingNeeded },
+    );
 
   // Validate asset option values if processed directly
   if (options.assets?.length && !adjustedOptions.assets?.length) {
@@ -803,7 +799,6 @@ function generateBundleInfoStats(
     size: bundle.size,
     files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
     names: chunk?.names,
-    entry: !!chunk?.names?.includes('runtime'),
     initial: !!chunk?.initial,
     rendered: true,
     chunkType,
