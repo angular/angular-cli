@@ -335,7 +335,7 @@ export function serveWebpackBrowser(
       }
 
       return runWebpackDevServer(webpackConfig, context, {
-        logging: transforms.logging || createWebpackLoggingCallback(!!options.verbose, logger),
+        logging: transforms.logging || createWebpackLoggingCallback(browserOptions, logger),
         webpackFactory: require('webpack') as typeof webpack,
         webpackDevServerFactory: require('webpack-dev-server') as typeof webpackDevServer,
       }).pipe(
