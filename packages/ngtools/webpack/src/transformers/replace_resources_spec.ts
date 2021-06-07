@@ -16,7 +16,7 @@ function transform(
   shouldTransform = true,
   directTemplateLoading = true,
   importHelpers = true,
-  module: ts.ModuleKind = ts.ModuleKind.ESNext,
+  module: ts.ModuleKind = ts.ModuleKind.ES2020,
   inlineStyleMimeType?: string,
 ) {
   const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, {
