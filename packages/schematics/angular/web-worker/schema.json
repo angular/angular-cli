@@ -22,7 +22,8 @@
     "target": {
       "type": "string",
       "description": "The target to apply web worker to.",
-      "default": "build"
+      "default": "build",
+      "x-deprecated": "No longer has an effect."
     },
     "name": {
       "type": "string",
