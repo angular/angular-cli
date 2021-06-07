@@ -45,7 +45,6 @@ export function generateBundleStats(info: {
   size?: number;
   files?: string[];
   names?: string[];
-  entry?: boolean;
   initial?: boolean;
   rendered?: boolean;
   chunkType?: ChunkType;
@@ -57,7 +56,7 @@ export function generateBundleStats(info: {
       .map((f) => path.basename(f))
       .join(', ') ?? '';
   const names = info.names?.length ? info.names.join(', ') : '-';
-  const initial = !!(info.entry || info.initial);
+  const initial = !!info.initial;
   const chunkType = info.chunkType || 'unknown';
 
   return {
