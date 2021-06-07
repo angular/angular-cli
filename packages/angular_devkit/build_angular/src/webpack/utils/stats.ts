@@ -11,8 +11,11 @@ import { logging, tags } from '@angular-devkit/core';
 import * as path from 'path';
 import * as textTable from 'text-table';
 import { Configuration, StatsCompilation } from 'webpack';
+import { Schema as BrowserBuilderOptions } from '../../browser/schema';
 import { colors as ansiColors, removeColor } from '../../utils/color';
 import { getWebpackStatsConfig } from '../configs/stats';
+import { markAsyncChunksNonInitial } from './async-chunks';
+import { normalizeExtraEntryPoints } from './helpers';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -325,15 +328,27 @@ export function statsHasWarnings(json: StatsCompilation): boolean {
 }
 
 export function createWebpackLoggingCallback(
-  verbose: boolean,
+  options: BrowserBuilderOptions,
   logger: logging.LoggerApi,
 ): WebpackLoggingCallback {
+  const { verbose = false, scripts = [], styles = [] } = options;
+  const extraEntryPoints = [
+    ...normalizeExtraEntryPoints(styles, 'styles'),
+    ...normalizeExtraEntryPoints(scripts, 'scripts'),
+  ];
+
   return (stats, config) => {
     if (verbose) {
       logger.info(stats.toString(config.stats));
     }
 
-    webpackStatsLogger(logger, stats.toJson(getWebpackStatsConfig(false)), config);
+    const rawStats = stats.toJson(getWebpackStatsConfig(false));
+    const webpackStats = {
+      ...rawStats,
+      chunks: markAsyncChunksNonInitial(rawStats, extraEntryPoints),
+    };
+
+    webpackStatsLogger(logger, webpackStats, config);
   };
 }
 
