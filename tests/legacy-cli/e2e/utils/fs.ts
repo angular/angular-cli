@@ -1,195 +1,127 @@
-import * as fs from 'fs-extra';
-import {dirname} from 'path';
-import {stripIndents} from 'common-tags';
+import { promises as fs, constants } from 'fs';
+import { dirname, join } from 'path';
+import { stripIndents } from 'common-tags';
 
-
-export function readFile(fileName: string) {
-  return new Promise<string>((resolve, reject) => {
-    fs.readFile(fileName, 'utf-8', (err: any, data: string) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
+export function readFile(fileName: string): Promise<string> {
+  return fs.readFile(fileName, 'utf-8');
 }
 
-export function writeFile(fileName: string, content: string, options?: any) {
-  return new Promise<void>((resolve, reject) => {
-    fs.writeFile(fileName, content, options, (err: any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export function writeFile(fileName: string, content: string, options?: any): Promise<void> {
+  return fs.writeFile(fileName, content, options);
 }
 
-
-export function deleteFile(path: string) {
-  return new Promise<void>((resolve, reject) => {
-    fs.unlink(path, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export function deleteFile(path: string): Promise<void> {
+  return fs.unlink(path);
 }
 
-
-export function rimraf(path: string) {
-  return new Promise<void>((resolve, reject) => {
-    fs.remove(path, (err?: any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export function rimraf(path: string): Promise<void> {
+  return fs.rmdir(path, { recursive: true, maxRetries: 3 });
 }
 
-
-export function moveFile(from: string, to: string) {
-  return new Promise<void>((resolve, reject) => {
-    fs.rename(from, to, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export function moveFile(from: string, to: string): Promise<void> {
+  return fs.rename(from, to);
 }
 
-
-export function symlinkFile(from: string, to: string, type?: string) {
-  return new Promise<void>((resolve, reject) => {
-    fs.symlink(from, to, type, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export function symlinkFile(from: string, to: string, type?: string): Promise<void> {
+  return fs.symlink(from, to, type);
 }
 
-export function createDir(path: string) {
-  return _recursiveMkDir(path);
+export function createDir(path: string): Promise<void> {
+  return fs.mkdir(path, { recursive: true });
 }
 
+export async function copyFile(from: string, to: string): Promise<void> {
+  await createDir(dirname(to));
 
-function _recursiveMkDir(path: string): Promise<void> {
-  if (fs.existsSync(path)) {
-    return Promise.resolve();
-  } else {
-    return _recursiveMkDir(dirname(path))
-      .then(() => fs.mkdirSync(path));
+  return fs.copyFile(from, to, constants.COPYFILE_FICLONE);
+}
+
+export async function moveDirectory(from: string, to: string): Promise<void> {
+  await rimraf(to);
+  await createDir(to);
+
+  for (const entry of await fs.readdir(from)) {
+    const fromEntry = join(from, entry);
+    const toEntry = join(to, entry);
+    if ((await fs.stat(fromEntry)).isFile()) {
+      await copyFile(fromEntry, toEntry);
+    } else {
+      await moveDirectory(fromEntry, toEntry);
+    }
   }
 }
 
-export function copyFile(from: string, to: string) {
-  return _recursiveMkDir(dirname(to))
-    .then(() => new Promise((resolve, reject) => {
-      const rd = fs.createReadStream(from);
-      rd.on('error', (err: Error) => reject(err));
-
-      const wr = fs.createWriteStream(to);
-      wr.on('error', (err: Error) => reject(err));
-      wr.on('close', () => resolve());
-
-      rd.pipe(wr);
-    }));
-}
-
-export function moveDirectory(from: string, to: string) {
-  return fs.move(from, to, { overwrite: true });
-}
-
-
 export function writeMultipleFiles(fs: { [path: string]: string }) {
-  return Promise.all(Object.keys(fs).map(fileName => writeFile(fileName, fs[fileName])));
+  return Promise.all(Object.keys(fs).map((fileName) => writeFile(fileName, fs[fileName])));
 }
-
 
 export function replaceInFile(filePath: string, match: RegExp | string, replacement: string) {
-  return readFile(filePath)
-    .then((content: string) => writeFile(filePath, content.replace(match, replacement)));
+  return readFile(filePath).then((content: string) =>
+    writeFile(filePath, content.replace(match, replacement)),
+  );
 }
-
 
 export function appendToFile(filePath: string, text: string, options?: any) {
-  return readFile(filePath)
-    .then((content: string) => writeFile(filePath, content.concat(text), options));
+  return readFile(filePath).then((content: string) =>
+    writeFile(filePath, content.concat(text), options),
+  );
 }
-
 
 export function prependToFile(filePath: string, text: string, options?: any) {
-  return readFile(filePath)
-    .then((content: string) => writeFile(filePath, text.concat(content), options));
+  return readFile(filePath).then((content: string) =>
+    writeFile(filePath, text.concat(content), options),
+  );
 }
 
+export async function expectFileMatchToExist(dir: string, regex: RegExp): Promise<string> {
+  const files = await fs.readdir(dir);
+  const fileName = files.find((name) => regex.test(name));
 
-export function expectFileMatchToExist(dir: string, regex: RegExp) {
-  return new Promise((resolve, reject) => {
-    const [fileName] = fs.readdirSync(dir).filter(name => name.match(regex));
-    if (!fileName) {
-      reject(new Error(`File ${regex} was expected to exist but not found...`));
-    }
-    resolve(fileName);
-  });
+  if (!fileName) {
+    throw new Error(`File ${regex} was expected to exist but not found...`);
+  }
+
+  return fileName;
 }
 
-export function expectFileNotToExist(fileName: string) {
-  return new Promise((resolve, reject) => {
-    fs.exists(fileName, (exist) => {
-      if (exist) {
-        reject(new Error(`File ${fileName} was expected not to exist but found...`));
-      } else {
-        resolve();
-      }
-    });
-  });
+export async function expectFileNotToExist(fileName: string): Promise<void> {
+  try {
+    await fs.access(fileName, constants.F_OK);
+  } catch {
+    return;
+  }
+
+  throw new Error(`File ${fileName} was expected not to exist but found...`);
 }
 
-export function expectFileToExist(fileName: string) {
-  return new Promise((resolve, reject) => {
-    fs.exists(fileName, (exist) => {
-      if (exist) {
-        resolve();
-      } else {
-        reject(new Error(`File ${fileName} was expected to exist but not found...`));
-      }
-    });
-  });
+export async function expectFileToExist(fileName: string): Promise<void> {
+  try {
+    await fs.access(fileName, constants.F_OK);
+  } catch {
+    throw new Error(`File ${fileName} was expected to exist but not found...`);
+  }
 }
 
 export function expectFileToMatch(fileName: string, regEx: RegExp | string) {
-  return readFile(fileName)
-    .then(content => {
-      if (typeof regEx == 'string') {
-        if (content.indexOf(regEx) == -1) {
-          throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
+  return readFile(fileName).then((content) => {
+    if (typeof regEx == 'string') {
+      if (content.indexOf(regEx) == -1) {
+        throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
             Content:
             ${content}
             ------
           `);
-        }
-      } else {
-        if (!content.match(regEx)) {
-          throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
-            Content:
-            ${content}
-            ------
-          `);
-        }
       }
-    });
+    } else {
+      if (!content.match(regEx)) {
+        throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
+            Content:
+            ${content}
+            ------
+          `);
+      }
+    }
+  });
 }
 
 export async function getFileSize(fileName: string) {
@@ -202,6 +134,8 @@ export async function expectFileSizeToBeUnder(fileName: string, sizeInBytes: num
   const fileSize = await getFileSize(fileName);
 
   if (fileSize > sizeInBytes) {
-    throw new Error(`File "${fileName}" exceeded file size of "${sizeInBytes}". Size is ${fileSize}.`);
+    throw new Error(
+      `File "${fileName}" exceeded file size of "${sizeInBytes}". Size is ${fileSize}.`,
+    );
   }
 }
