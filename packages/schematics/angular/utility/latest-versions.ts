@@ -11,8 +11,8 @@ export const latestVersions = {
   Angular: '~12.1.0-next.4',
   RxJs: '~6.6.0',
   ZoneJs: '~0.11.4',
-  TypeScript: '~4.2.3',
-  TsLib: '^2.1.0',
+  TypeScript: '~4.3.2',
+  TsLib: '^2.2.0',
 
   // Since @angular-devkit/build-angular and @schematics/angular are always
   // published together from the same monorepo, and they are both
