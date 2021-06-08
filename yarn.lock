@@ -84,9 +84,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7308e71916da94b51a9b558693c49a04bfc98beb":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#b945d698497fe2d412f209641cf69fde54276f5d":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#ccf49db26d09093bdb3882282d99f3448cf68cba"
+  uid b945d698497fe2d412f209641cf69fde54276f5d
+  resolved "https://github.com/angular/dev-infra-private-builds.git#b945d698497fe2d412f209641cf69fde54276f5d"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -112,9 +113,9 @@
     semver "^7.3.5"
     shelljs "^0.8.4"
     ts-node "^10.0.0"
-    tslib "^2.1.0"
+    tslib "^2.2.0"
     typed-graphqlify "^3.1.1"
-    typescript "~4.2.4"
+    typescript "~4.3.2"
     yaml "^1.10.0"
     yargs "^17.0.0"
 
