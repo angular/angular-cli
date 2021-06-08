@@ -220,10 +220,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#881f9af1d66194d25a66043021f6b3bf2a678490":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#b945d698497fe2d412f209641cf69fde54276f5d":
   version "0.0.0"
-  uid "881f9af1d66194d25a66043021f6b3bf2a678490"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#881f9af1d66194d25a66043021f6b3bf2a678490"
+  uid b945d698497fe2d412f209641cf69fde54276f5d
+  resolved "https://github.com/angular/dev-infra-private-builds.git#b945d698497fe2d412f209641cf69fde54276f5d"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -249,9 +249,9 @@
     semver "^7.3.5"
     shelljs "^0.8.4"
     ts-node "^10.0.0"
-    tslib "^2.1.0"
+    tslib "^2.2.0"
     typed-graphqlify "^3.1.1"
-    typescript "~4.2.4"
+    typescript "~4.3.2"
     yaml "^1.10.0"
     yargs "^17.0.0"
 
@@ -9767,7 +9767,7 @@ tsickle@^0.38.0:
   resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.38.1.tgz#30762db759d40c435943093b6972c7f2efb384ef"
   integrity sha512-4xZfvC6+etRu6ivKCNqMOd1FqcY/m6JY3Y+yr5+Xw+i751ciwrWINi6x/3l1ekcODH9GZhlf0ny2LpzWxnjWYA==
 
-tslib@2.2.0, tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@~2.2.0:
+tslib@2.2.0, tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0, tslib@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.2.0.tgz#fb2c475977e35e241311ede2693cee1ec6698f5c"
   integrity sha512-gS9GVHRU+RGn5KQM2rllAlR3dU6m7AcpJKdtH8gFvQiC4Otgk98XnmMU+nZenHt/+VhnBPWwgrJsyrdcw6i23w==
@@ -9869,7 +9869,7 @@ typed-graphqlify@^3.1.1:
   resolved "https://registry.yarnpkg.com/typed-graphqlify/-/typed-graphqlify-3.1.2.tgz#4bd26c11082b130bebc811030f892e2b22902d66"
   integrity sha512-z0x63rRNswSKbIIjZyooKMzV4tHLt1OhWmsUkz1dohnv8+6T1J55DCRRb1CFaYWmkD8DkJ9miSP8VNB9N/1VPQ==
 
-typescript@4.2.4, typescript@~4.2.3, typescript@~4.2.4:
+typescript@4.2.4, typescript@~4.2.3:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
   integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
@@ -9878,6 +9878,11 @@ typescript@~3.7.2:
   version "3.7.7"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.7.tgz#c931733e2ec10dda56b855b379cc488a72a81199"
   integrity sha512-MmQdgo/XenfZPvVLtKZOq9jQQvzaUAUpcKW8Z43x9B2fOm4S5g//tPtMweZUIP+SoBqrVPEIm+dJeQ9dfO0QdA==
+
+typescript@~4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.2.tgz#399ab18aac45802d6f2498de5054fcbbe716a805"
+  integrity sha512-zZ4hShnmnoVnAHpVHWpTcxdv7dWP60S2FsydQLV8V5PbS3FifjWFFRiHSWpDJahly88PRyV5teTSLoq4eG7mKw==
 
 ua-parser-js@^0.7.18:
   version "0.7.28"
