@@ -18,37 +18,37 @@ export interface EmitFileResult {
 export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
 
 export class FileEmitterRegistration {
-  #fileEmitter?: FileEmitter;
+  private fileEmitter?: FileEmitter;
 
   update(emitter: FileEmitter): void {
-    this.#fileEmitter = emitter;
+    this.fileEmitter = emitter;
   }
 
   emit(file: string): Promise<EmitFileResult | undefined> {
-    if (!this.#fileEmitter) {
+    if (!this.fileEmitter) {
       throw new Error('Emit attempted before Angular Webpack plugin initialization.');
     }
 
-    return this.#fileEmitter(file);
+    return this.fileEmitter(file);
   }
 }
 
 export class FileEmitterCollection {
-  #registrations: FileEmitterRegistration[] = [];
+  private readonly registrations: FileEmitterRegistration[] = [];
 
   register(): FileEmitterRegistration {
     const registration = new FileEmitterRegistration();
-    this.#registrations.push(registration);
+    this.registrations.push(registration);
 
     return registration;
   }
 
   async emit(file: string): Promise<EmitFileResult | undefined> {
-    if (this.#registrations.length === 1) {
-      return this.#registrations[0].emit(file);
+    if (this.registrations.length === 1) {
+      return this.registrations[0].emit(file);
     }
 
-    for (const registration of this.#registrations) {
+    for (const registration of this.registrations) {
       const result = await registration.emit(file);
       if (result) {
         return result;
