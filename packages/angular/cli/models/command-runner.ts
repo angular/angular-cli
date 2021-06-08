@@ -37,6 +37,7 @@ const standardCommands = {
   'analytics': '../commands/analytics.json',
   'build': '../commands/build.json',
   'deploy': '../commands/deploy.json',
+  'completion': '../commands/completion.json',
   'config': '../commands/config.json',
   'doc': '../commands/doc.json',
   'e2e': '../commands/e2e.json',

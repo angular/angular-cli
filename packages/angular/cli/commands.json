@@ -2,6 +2,7 @@
   "add": "./commands/add.json",
   "analytics": "./commands/analytics.json",
   "build": "./commands/build.json",
+  "completion": "./commands/completion.json",
   "config": "./commands/config.json",
   "deploy": "./commands/deploy.json",
   "doc": "./commands/doc.json",

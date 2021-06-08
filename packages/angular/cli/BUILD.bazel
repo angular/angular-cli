@@ -34,6 +34,7 @@ ts_library(
         "//packages/angular/cli:commands/add.ts",
         "//packages/angular/cli:commands/build.ts",
         "//packages/angular/cli:commands/deploy.ts",
+        "//packages/angular/cli:commands/completion.ts",
         "//packages/angular/cli:commands/config.ts",
         "//packages/angular/cli:commands/doc.ts",
         "//packages/angular/cli:commands/e2e.ts",
@@ -263,6 +264,14 @@ ts_json_schema(
 ts_json_schema(
     name = "version_schema",
     src = "commands/version.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "completion_schema",
+    src = "commands/completion.json",
     data = [
         "commands/definitions.json",
     ],

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/completion.json",
+  "description": "Generate Shell completion for Angular CLI.",
+  "$longDescription": "./completion-long.md",
+
+  "$scope": "all",
+  "$aliases": [],
+  "$impl": "./completion-impl#CompletionCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "shell": {
+          "type": "string",
+          "description": "The Shell for which completions are to be generated",
+          "aliases": ["s"],
+          "enum": ["bash", "fish"]
+        }
+      },
+      "required": ["shell"]
+    },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}
