@@ -51,11 +51,6 @@ export interface AngularWebpackPluginOptions {
   inlineStyleFileExtension?: string;
 }
 
-// Add support for missing properties in Webpack types as well as the loader's file emitter
-interface WebpackCompilation extends Compilation {
-  [AngularPluginSymbol]: FileEmitterCollection;
-}
-
 function initializeNgccProcessor(
   compiler: Compiler,
   tsconfig: string,
@@ -89,6 +84,7 @@ function hashContent(content: string): Uint8Array {
 }
 
 const PLUGIN_NAME = 'angular-compiler';
+const compilationFileEmitters = new WeakMap<Compilation, FileEmitterCollection>();
 
 export class AngularWebpackPlugin {
   private readonly pluginOptions: AngularWebpackPluginOptions;
@@ -153,14 +149,9 @@ export class AngularWebpackPlugin {
     let ngccProcessor: NgccProcessor | undefined;
     let resourceLoader: WebpackResourceLoader | undefined;
     let previousUnused: Set<string> | undefined;
-    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (thisCompilation) => {
-      const compilation = thisCompilation as WebpackCompilation;
-
+    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
       // Register plugin to ensure deterministic emit order in multi-plugin usage
-      if (!compilation[AngularPluginSymbol]) {
-        compilation[AngularPluginSymbol] = new FileEmitterCollection();
-      }
-      const emitRegistration = compilation[AngularPluginSymbol].register();
+      const emitRegistration = this.registerWithCompilation(compilation);
 
       this.watchMode = compiler.watchMode;
 
@@ -184,7 +175,7 @@ export class AngularWebpackPlugin {
       }
 
       // Setup and read TypeScript and Angular compiler configuration
-      const { compilerOptions, rootNames, errors } = this.loadConfiguration(compilation);
+      const { compilerOptions, rootNames, errors } = this.loadConfiguration();
 
       // Create diagnostics reporter and report configuration file errors
       const diagnosticsReporter = createDiagnosticsReporter(compilation);
@@ -316,6 +307,23 @@ export class AngularWebpackPlugin {
     });
   }
 
+  private registerWithCompilation(compilation: Compilation) {
+    let fileEmitters = compilationFileEmitters.get(compilation);
+    if (!fileEmitters) {
+      fileEmitters = new FileEmitterCollection();
+      compilationFileEmitters.set(compilation, fileEmitters);
+      compilation.compiler.webpack.NormalModule.getCompilationHooks(compilation).loader.tap(
+        PLUGIN_NAME,
+        (loaderContext: { [AngularPluginSymbol]?: FileEmitterCollection }) => {
+          loaderContext[AngularPluginSymbol] = fileEmitters;
+        },
+      );
+    }
+    const emitRegistration = fileEmitters.register();
+
+    return emitRegistration;
+  }
+
   private markResourceUsed(normalizedResourcePath: string, currentUnused: Set<string>): void {
     if (!currentUnused.has(normalizedResourcePath)) {
       return;
@@ -333,7 +341,7 @@ export class AngularWebpackPlugin {
 
   private async rebuildRequiredFiles(
     modules: Iterable<Module>,
-    compilation: WebpackCompilation,
+    compilation: Compilation,
     fileEmitter: FileEmitter,
   ): Promise<void> {
     if (this.requiredFilesToEmit.size === 0) {
@@ -379,7 +387,7 @@ export class AngularWebpackPlugin {
     this.requiredFilesToEmitCache.clear();
   }
 
-  private loadConfiguration(compilation: WebpackCompilation) {
+  private loadConfiguration() {
     const {
       options: compilerOptions,
       rootNames,
