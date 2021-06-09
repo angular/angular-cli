@@ -72,6 +72,10 @@ function initializeNgccProcessor(
 
   const errors: string[] = [];
   const warnings: string[] = [];
+  const resolver = compiler.resolverFactory.get('normal', {
+    extensions: ['.json'],
+    useSyncFileSystemCalls: true,
+  });
   const processor = new NgccProcessor(
     mainFields,
     warnings,
@@ -79,7 +83,7 @@ function initializeNgccProcessor(
     compiler.context,
     tsconfig,
     inputFileSystem,
-    webpackOptions.resolve?.symlinks,
+    resolver,
   );
 
   return { processor, errors, warnings };
