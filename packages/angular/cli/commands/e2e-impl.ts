@@ -20,6 +20,7 @@ You should add a package that implements end-to-end testing capabilities.
 
 For example:
   Cypress: ng add @cypress/schematic
+  Nightwatch: ng add @nightwatch/schematics
   WebdriverIO: ng add @wdio/schematics
 
 More options will be added to the list as they become available.
