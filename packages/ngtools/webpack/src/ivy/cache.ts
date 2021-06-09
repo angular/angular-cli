@@ -7,7 +7,6 @@
  */
 
 import * as ts from 'typescript';
-import { normalizePath } from './paths';
 
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   private readonly angularDiagnostics = new Map<ts.SourceFile, ts.Diagnostic[]>();

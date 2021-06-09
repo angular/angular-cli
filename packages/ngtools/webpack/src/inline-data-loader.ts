@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Compilation, LoaderContext } from 'webpack';
+import type { Compilation, LoaderContext } from 'webpack';
 
 export const InlineAngularResourceSymbol = Symbol();
 
