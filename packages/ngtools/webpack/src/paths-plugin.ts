@@ -11,13 +11,6 @@ import { CompilerOptions, MapLike } from 'typescript';
 
 const getInnerRequest = require('enhanced-resolve/lib/getInnerRequest');
 
-interface NormalModuleFactoryRequest {
-  request: string;
-  context: { issuer: string };
-  contextInfo: { issuer: string };
-  typescriptPathMapped?: boolean;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {}
 
@@ -29,78 +22,94 @@ export class TypeScriptPathsPlugin {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  apply(resolver: any) {
+  apply(resolver: import('enhanced-resolve').Resolver) {
     const target = resolver.ensureHook('resolve');
-    const resolveAsync = (request: NormalModuleFactoryRequest, requestContext: {}) => {
-      return new Promise<NormalModuleFactoryRequest | undefined>((resolve, reject) => {
-        resolver.doResolve(
-          target,
-          request,
-          '',
-          requestContext,
-          (error: Error | null, result: NormalModuleFactoryRequest | undefined) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(result);
-            }
-          },
-        );
-      });
-    };
 
-    resolver
-      .getHook('described-resolve')
-      .tapPromise(
-        'TypeScriptPathsPlugin',
-        async (request: NormalModuleFactoryRequest, resolveContext: {}) => {
-          if (!this.options) {
-            throw new Error('TypeScriptPathsPlugin options were not provided.');
-          }
+    resolver.getHook('described-resolve').tapAsync(
+      'TypeScriptPathsPlugin',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (request: any, resolveContext, callback) => {
+        if (!this.options) {
+          callback();
 
-          if (!request || request.typescriptPathMapped) {
+          return;
+        }
+
+        if (!request || request.typescriptPathMapped) {
+          callback();
+
+          return;
+        }
+
+        const originalRequest = getInnerRequest(resolver, request);
+        if (!originalRequest) {
+          callback();
+
+          return;
+        }
+
+        // Only work on Javascript/TypeScript issuers.
+        if (!request.context.issuer || !request.context.issuer.match(/\.[jt]sx?$/)) {
+          callback();
+
+          return;
+        }
+
+        // Relative or absolute requests are not mapped
+        if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
+          callback();
+
+          return;
+        }
+
+        // Ignore all webpack special requests
+        if (originalRequest.startsWith('!!')) {
+          callback();
+
+          return;
+        }
+
+        const replacements = findReplacements(originalRequest, this.options.paths || {});
+
+        const tryResolve = () => {
+          const potential = replacements.shift();
+          if (!potential) {
+            callback();
+
             return;
           }
 
-          const originalRequest = getInnerRequest(resolver, request);
-          if (!originalRequest) {
-            return;
-          }
+          const potentialRequest = {
+            ...request,
+            request: path.resolve(this.options?.baseUrl || '', potential),
+            typescriptPathMapped: true,
+          };
 
-          // Only work on Javascript/TypeScript issuers.
-          if (!request.context.issuer || !request.context.issuer.match(/\.[jt]sx?$/)) {
-            return;
-          }
+          resolver.doResolve(
+            target,
+            potentialRequest,
+            '',
+            resolveContext,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (error: Error | null, result: any) => {
+              if (error) {
+                callback(error);
+              } else if (result) {
+                callback(undefined, result);
+              } else {
+                tryResolve();
+              }
+            },
+          );
+        };
 
-          // Relative or absolute requests are not mapped
-          if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
-            return;
-          }
-
-          // Ignore all webpack special requests
-          if (originalRequest.startsWith('!!')) {
-            return;
-          }
-
-          const replacements = findReplacements(originalRequest, this.options.paths || {});
-          for (const potential of replacements) {
-            const potentialRequest = {
-              ...request,
-              request: path.resolve(this.options.baseUrl || '', potential),
-              typescriptPathMapped: true,
-            };
-            const result = await resolveAsync(potentialRequest, resolveContext);
-
-            if (result) {
-              return result;
-            }
-          }
-        },
-      );
+        tryResolve();
+      },
+    );
   }
 }
 
-function findReplacements(originalRequest: string, paths: MapLike<string[]>): Iterable<string> {
+function findReplacements(originalRequest: string, paths: MapLike<string[]>): string[] {
   // check if any path mapping rules are relevant
   const pathMapOptions = [];
   for (const pattern in paths) {
