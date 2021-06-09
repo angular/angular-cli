@@ -141,8 +141,8 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         codeCoverage: true,
       });
 
-      const result = await harness.execute();
-      await result
+      await harness
+        .execute()
         .pipe(
           // In incremental mode, karma-coverage does not have the ability to mark a
           // run as failed if code coverage does not pass. This is because it does
