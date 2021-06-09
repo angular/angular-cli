@@ -301,7 +301,7 @@ function fallbackMiddleware() {
           `/${KARMA_APPLICATION_PATH}/polyfills.js`,
           `/${KARMA_APPLICATION_PATH}/polyfills-es5.js`,
           `/${KARMA_APPLICATION_PATH}/scripts.js`,
-          `/${KARMA_APPLICATION_PATH}/styles.js`,
+          `/${KARMA_APPLICATION_PATH}/styles.css`,
           `/${KARMA_APPLICATION_PATH}/vendor.js`,
         ];
         if (request.url && alwaysServe.includes(request.url)) {

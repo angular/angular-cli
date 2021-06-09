@@ -43,7 +43,7 @@ async function initialize(
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
     {
-      ...((options as unknown) as BrowserBuilderOptions),
+      ...(options as unknown as BrowserBuilderOptions),
       outputPath: '',
       budgets: undefined,
       optimization: false,
@@ -58,6 +58,7 @@ async function initialize(
       // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
       // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
       watch: true,
+      extractCss: true,
     },
     context,
     (wco) => [
