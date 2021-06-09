@@ -36,13 +36,22 @@ export class HostSink extends SimpleSinkBase {
   protected _validateFileExists(p: Path): Observable<boolean> {
     if (this._filesToCreate.has(p) || this._filesToUpdate.has(p)) {
       return observableOf(true);
-    } else if (this._filesToDelete.has(p)) {
-      return observableOf(false);
-    } else if ([...this._filesToRename.values()].some(([from]) => from == p)) {
-      return observableOf(false);
-    } else {
-      return this._host.exists(p);
     }
+
+    if (this._filesToDelete.has(p)) {
+      return observableOf(false);
+    }
+
+    for (const [from, to] of this._filesToRename.values()) {
+      switch (p) {
+        case from:
+          return observableOf(false);
+        case to:
+          return observableOf(true);
+      }
+    }
+
+    return this._host.exists(p);
   }
 
   protected _overwriteFile(path: Path, content: Buffer): Observable<void> {
@@ -82,12 +91,12 @@ export class HostSink extends SimpleSinkBase {
       ),
       observableFrom([...this._filesToCreate.entries()]).pipe(
         concatMap(([path, buffer]) => {
-          return this._host.write(path, (buffer.generate() as {}) as virtualFs.FileBuffer);
+          return this._host.write(path, buffer.generate() as {} as virtualFs.FileBuffer);
         }),
       ),
       observableFrom([...this._filesToUpdate.entries()]).pipe(
         concatMap(([path, buffer]) => {
-          return this._host.write(path, (buffer.generate() as {}) as virtualFs.FileBuffer);
+          return this._host.write(path, buffer.generate() as {} as virtualFs.FileBuffer);
         }),
       ),
     ).pipe(reduce(() => {}));

@@ -135,5 +135,22 @@ describe('FileSystemSink', () => {
         })
         .then(done, done.fail);
     });
+
+    it('can rename then modify the same file', async () => {
+      const host = new virtualFs.test.TestHost({
+        '/file0': 'world',
+      });
+      const tree = new HostTree(host);
+
+      tree.rename('/file0', '/file1');
+      expect(tree.exists('/file0')).toBeFalsy();
+      expect(tree.exists('/file1')).toBeTruthy();
+
+      tree.overwrite('/file1', 'hello');
+
+      const sink = new HostSink(host);
+      await sink.commit(tree).toPromise();
+      expect(virtualFs.fileBufferToString(host.sync.read(normalize('/file1')))).toBe('hello');
+    });
   });
 });
