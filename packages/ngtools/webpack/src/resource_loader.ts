@@ -9,7 +9,7 @@
 import { createHash } from 'crypto';
 import * as path from 'path';
 import * as vm from 'vm';
-import { Asset, Compilation, EntryPlugin, NormalModule, library, node, sources } from 'webpack';
+import type { Asset, Compilation } from 'webpack';
 import { normalizePath } from './ivy/paths';
 
 interface CompilationOutput {
@@ -131,7 +131,8 @@ export class WebpackResourceLoader {
       },
     };
 
-    const context = this._parentCompilation.compiler.context;
+    const { context, webpack } = this._parentCompilation.compiler;
+    const { EntryPlugin, NormalModule, library, node, sources } = webpack;
     const childCompiler = this._parentCompilation.createChildCompiler(
       'angular-compiler:resource',
       outputOptions,
@@ -191,7 +192,7 @@ export class WebpackResourceLoader {
     let finalMap: string | undefined;
     childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
       childCompilation.hooks.processAssets.tap(
-        { name: 'angular-compiler', stage: Compilation.PROCESS_ASSETS_STAGE_REPORT },
+        { name: 'angular-compiler', stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT },
         () => {
           finalContent = childCompilation.assets[outputFilePath]?.source().toString();
           finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
