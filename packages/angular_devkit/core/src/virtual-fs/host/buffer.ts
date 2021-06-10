@@ -34,7 +34,7 @@ export function stringToFileBuffer(str: string): FileBuffer {
     return ab;
   } else if (typeof TextEncoder !== 'undefined') {
     // Modern browsers implement TextEncode.
-    return new TextEncoder('utf-8').encode(str).buffer as ArrayBuffer;
+    return new TextEncoder('utf-8').encode(str).buffer;
   } else {
     // Slowest method but sure to be compatible with every platform.
     const buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char

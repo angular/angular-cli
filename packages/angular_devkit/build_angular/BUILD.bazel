@@ -110,6 +110,7 @@ ts_library(
         "@npm//@angular/service-worker",
         "@npm//@babel/core",
         "@npm//@babel/helper-annotate-as-pure",
+        "@npm//@babel/plugin-transform-async-to-generator",
         "@npm//@babel/plugin-transform-runtime",
         "@npm//@babel/preset-env",
         "@npm//@babel/runtime",
