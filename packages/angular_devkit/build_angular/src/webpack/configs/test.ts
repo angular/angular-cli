@@ -16,7 +16,7 @@ export function getTestConfig(
   wco: WebpackConfigOptions<WebpackTestOptions>,
 ): webpack.Configuration {
   const {
-    buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap },
+    buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap, webWorkerTsConfig },
     root,
     sourceRoot,
   } = wco;
@@ -60,6 +60,15 @@ export function getTestConfig(
     },
     module: {
       rules: extraRules,
+      parser:
+        webWorkerTsConfig === undefined
+          ? undefined
+          : {
+              javascript: {
+                worker: false,
+                url: false,
+              },
+            },
     },
     plugins: extraPlugins,
     optimization: {
