@@ -84,10 +84,15 @@ ts_library(
         "@npm//@types/rimraf",
         "@npm//@types/semver",
         "@npm//@types/uuid",
+        "@npm//@yarnpkg/lockfile",
         "@npm//ansi-colors",
+        "@npm//ini",
         "@npm//jsonc-parser",
+        "@npm//npm-package-arg",
         "@npm//open",
         "@npm//ora",
+        "@npm//pacote",
+        "@npm//semver",
     ],
 )
 

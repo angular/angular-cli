@@ -109,6 +109,7 @@ ts_library(
         "@npm//@angular/localize",
         "@npm//@angular/service-worker",
         "@npm//@babel/core",
+        "@npm//@babel/plugin-transform-async-to-generator",
         "@npm//@babel/plugin-transform-runtime",
         "@npm//@babel/preset-env",
         "@npm//@babel/runtime",

@@ -34,7 +34,7 @@ describe('angularMajorCompatGuarantee', () => {
 describe('@schematics/update', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/update',
-    require.resolve('../collection.json'),
+    require.resolve('./collection.json'),
   );
   let host: virtualFs.test.TestHost;
   let appTree: UnitTestTree = new UnitTestTree(new HostTree());
@@ -133,22 +133,6 @@ describe('@schematics/update', () => {
         map((tree) => {
           const packageJson = JSON.parse(tree.readContent('/package.json'));
           expect(packageJson['dependencies']['@angular/core'][0]).toBe('6');
-
-          // Check install task.
-          expect(schematicRunner.tasks).toEqual([
-            {
-              name: 'node-package',
-              options: jasmine.objectContaining({
-                command: 'install',
-              }),
-            },
-            {
-              name: 'run-schematic',
-              options: jasmine.objectContaining({
-                name: 'migrate',
-              }),
-            },
-          ]);
         }),
       )
       .toPromise()
@@ -190,22 +174,6 @@ describe('@schematics/update', () => {
           expect(packageJson['dependencies']['rxjs'][0]).toBe('6');
           expect(packageJson['dependencies']['typescript'][0]).toBe('2');
           expect(packageJson['dependencies']['typescript'][2]).not.toBe('4');
-
-          // Check install task.
-          expect(schematicRunner.tasks).toEqual([
-            {
-              name: 'node-package',
-              options: jasmine.objectContaining({
-                command: 'install',
-              }),
-            },
-            {
-              name: 'run-schematic',
-              options: jasmine.objectContaining({
-                name: 'migrate',
-              }),
-            },
-          ]);
         }),
       )
       .toPromise()
@@ -238,16 +206,6 @@ describe('@schematics/update', () => {
           const deps = packageJson['dependencies'];
           expect(deps['@angular-devkit-tests/update-package-group-1']).toBe('1.2.0');
           expect(deps['@angular-devkit-tests/update-package-group-2']).toBe('2.0.0');
-
-          // Check install task.
-          expect(schematicRunner.tasks).toEqual([
-            {
-              name: 'node-package',
-              options: jasmine.objectContaining({
-                command: 'install',
-              }),
-            },
-          ]);
         }),
       )
       .toPromise();
@@ -279,16 +237,6 @@ describe('@schematics/update', () => {
           expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe(
             '1.0.0',
           );
-
-          // Check install task.
-          expect(schematicRunner.tasks).toEqual([
-            {
-              name: 'run-schematic',
-              options: jasmine.objectContaining({
-                name: 'migrate',
-              }),
-            },
-          ]);
         }),
       )
       .toPromise()
@@ -321,20 +269,6 @@ describe('@schematics/update', () => {
           expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe(
             '1.6.0',
           );
-
-          // Check install task.
-          expect(schematicRunner.tasks).toEqual([
-            {
-              name: 'run-schematic',
-              options: jasmine.objectContaining({
-                name: 'migrate',
-                options: jasmine.objectContaining({
-                  from: '0.1.2',
-                  to: '1.6.0',
-                }),
-              }),
-            },
-          ]);
         }),
       )
       .toPromise()
@@ -367,20 +301,6 @@ describe('@schematics/update', () => {
           expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe(
             '1.6.0',
           );
-
-          // Check install task.
-          expect(schematicRunner.tasks).toEqual([
-            {
-              name: 'run-schematic',
-              options: jasmine.objectContaining({
-                name: 'migrate',
-                options: jasmine.objectContaining({
-                  from: '0.0.0',
-                  to: '1.6.0',
-                }),
-              }),
-            },
-          ]);
         }),
       )
       .toPromise()
