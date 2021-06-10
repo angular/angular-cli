@@ -89,7 +89,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
 
   write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
     return observableFrom(fsPromises.mkdir(getSystemPath(dirname(path)), { recursive: true })).pipe(
-      mergeMap(() => fsPromises.writeFile(getSystemPath(path), content)),
+      mergeMap(() => fsPromises.writeFile(getSystemPath(path), new Uint8Array(content))),
     );
   }
 
