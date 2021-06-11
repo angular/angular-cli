@@ -1,7 +1,14 @@
-import * as express from 'express';
+import express from 'express';
 import { resolve } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { appendToFile, copyFile, expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
+import {
+  appendToFile,
+  copyFile,
+  expectFileToExist,
+  expectFileToMatch,
+  replaceInFile,
+  writeFile,
+} from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -12,7 +19,8 @@ import { readNgVersion } from '../../utils/version';
 export const baseDir = 'dist/test-project';
 export const langTranslations = [
   {
-    lang: 'en-US', outputPath: `${baseDir}/en-US`,
+    lang: 'en-US',
+    outputPath: `${baseDir}/en-US`,
     translation: {
       helloPartial: 'Hello',
       hello: 'Hello i18n!',
@@ -21,7 +29,8 @@ export const langTranslations = [
     },
   },
   {
-    lang: 'fr', outputPath: `${baseDir}/fr`,
+    lang: 'fr',
+    outputPath: `${baseDir}/fr`,
     translation: {
       helloPartial: 'Bonjour',
       hello: 'Bonjour i18n!',
@@ -38,7 +47,8 @@ export const langTranslations = [
     ],
   },
   {
-    lang: 'de', outputPath: `${baseDir}/de`,
+    lang: 'de',
+    outputPath: `${baseDir}/de`,
     translation: {
       helloPartial: 'Hallo',
       hello: 'Hallo i18n!',
@@ -69,16 +79,12 @@ export const formats = {
   'xlf': {
     ext: 'xlf',
     sourceCheck: 'source-language="en-US"',
-    replacements: [
-      [/source/g, 'target'],
-    ],
+    replacements: [[/source/g, 'target']],
   },
   'xlf2': {
     ext: 'xlf',
     sourceCheck: 'srcLang="en-US"',
-    replacements: [
-      [/source/g, 'target'],
-    ],
+    replacements: [[/source/g, 'target']],
   },
   'xmb': {
     ext: 'xmb',
@@ -92,20 +98,20 @@ export const formats = {
   'json': {
     ext: 'json',
     sourceCheck: '"locale": "en-US"',
-    replacements: [
-    ],
+    replacements: [],
   },
   'arb': {
     ext: 'arb',
     sourceCheck: '"@@locale": "en-US"',
-    replacements: [
-    ],
+    replacements: [],
   },
 };
 
 export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
   // Add component with i18n content, both translations and localeData (plural, dates).
-  await writeFile('src/app/app.component.ts', `
+  await writeFile(
+    'src/app/app.component.ts',
+    `
     import { Component, Inject, LOCALE_ID } from '@angular/core';
     @Component({
       selector: 'app-root',
@@ -117,24 +123,33 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
       jan = new Date(2000, 0, 1);
       minutes = 3;
     }
-  `);
-  await writeFile(`src/app/app.component.html`, `
+  `,
+  );
+  await writeFile(
+    `src/app/app.component.html`,
+    `
     <p id="hello" i18n="An introduction header for this sample">Hello {{ title }}! </p>
     <p id="locale">{{ locale }}</p>
     <p id="date">{{ jan | date : 'LLLL' }}</p>
     <p id="plural" i18n>Updated {minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}</p>
-  `);
+  `,
+  );
 
   // Add a dynamic import to ensure syntax is supported
   // ng serve support: https://github.com/angular/angular-cli/issues/16248
   await writeFile('src/app/dynamic.ts', `export const abc = 5;`);
-  await appendToFile('src/app/app.component.ts', `
+  await appendToFile(
+    'src/app/app.component.ts',
+    `
     (async () => { await import('./dynamic'); })();
-  `);
+  `,
+  );
 
   // Add e2e specs for each lang.
   for (const { lang, translation } of langTranslations) {
-    await writeFile(`./e2e/src/app.${lang}.e2e-spec.ts`, `
+    await writeFile(
+      `./e2e/src/app.${lang}.e2e-spec.ts`,
+      `
       import { browser, logging, element, by } from 'protractor';
 
       describe('workspace-project App', () => {
@@ -160,11 +175,12 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
         it('should display pluralized message', async () =>
           expect(await getParagraph('plural')).toEqual('${translation.plural}'));
       });
-    `);
+    `,
+    );
   }
 
   // Update angular.json to build, serve, and test each locale.
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     const appArchitect = workspaceJson.projects['test-project'].architect;
     const buildConfigs = appArchitect['build'].configurations;
@@ -177,10 +193,12 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
     appArchitect['build'].options.optimization = true;
     appArchitect['build'].options.buildOptimizer = true;
     appArchitect['build'].options.aot = true;
-    appArchitect['build'].options.fileReplacements = [{
-      replace: 'src/environments/environment.ts',
-      with: 'src/environments/environment.prod.ts',
-    }];
+    appArchitect['build'].options.fileReplacements = [
+      {
+        replace: 'src/environments/environment.ts',
+        with: 'src/environments/environment.prod.ts',
+      },
+    ];
     appArchitect['build'].options.i18nMissingTranslation = 'error';
     appArchitect['build'].options.vendorChunk = true;
     appArchitect['build'].options.sourceMap = true;
@@ -209,7 +227,7 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
     }
   });
 
-// Install the localize package if using ivy
+  // Install the localize package if using ivy
   let localizeVersion = '@angular/localize@' + readNgVersion();
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
@@ -217,11 +235,7 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
   await installPackage(localizeVersion);
 
   // Extract the translation messages.
-  await ng(
-    'extract-i18n',
-    '--output-path=src/locale',
-    `--format=${format}`,
-  );
+  await ng('extract-i18n', '--output-path=src/locale', `--format=${format}`);
   const translationFile = `src/locale/messages.${formats[format].ext}`;
   await expectFileToExist(translationFile);
   await expectFileToMatch(translationFile, formats[format].sourceCheck);

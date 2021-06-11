@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as findCacheDirectory from 'find-cache-dir';
+import findCacheDirectory from 'find-cache-dir';
 import { tmpdir } from 'os';
 import { resolve } from 'path';
 import { cachingBasePath } from './environment-options';

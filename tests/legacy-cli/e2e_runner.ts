@@ -5,8 +5,8 @@ import { createConsoleLogger } from '@angular-devkit/core/node';
 import * as colors from 'ansi-colors';
 import { spawn } from 'child_process';
 import * as fs from 'fs';
-import * as glob from 'glob';
-import * as minimist from 'minimist';
+import glob from 'glob';
+import minimist from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
 import { setGlobalVariable } from './e2e/utils/env';
@@ -57,11 +57,11 @@ const argv = minimist(process.argv.slice(2), {
 process.exitCode = 255;
 
 const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr, {
-  info: s => s,
-  debug: s => s,
-  warn: s => colors.bold.yellow(s),
-  error: s => colors.bold.red(s),
-  fatal: s => colors.bold.red(s),
+  info: (s) => s,
+  debug: (s) => s,
+  warn: (s) => colors.bold.yellow(s),
+  error: (s) => colors.bold.red(s),
+  fatal: (s) => colors.bold.red(s),
 });
 
 const logStack = [logger];
@@ -75,25 +75,25 @@ let currentFileName = null;
 const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob
   .sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true })
-  .map(name => path.relative(e2eRoot, name))
+  .map((name) => path.relative(e2eRoot, name))
   .sort();
 const allTests = glob
   .sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
-  .map(name => path.relative(e2eRoot, name))
+  .map((name) => path.relative(e2eRoot, name))
   // Replace windows slashes.
-  .map(name => name.replace(/\\/g, '/'))
+  .map((name) => name.replace(/\\/g, '/'))
   .sort()
-  .filter(name => !name.endsWith('/setup.ts'));
+  .filter((name) => !name.endsWith('/setup.ts'));
 
 const shardId = 'shard' in argv ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;
-const tests = allTests.filter(name => {
+const tests = allTests.filter((name) => {
   // Check for naming tests on command line.
   if (argv._.length == 0) {
     return true;
   }
 
-  return argv._.some(argName => {
+  return argv._.some((argName) => {
     return (
       path.join(process.cwd(), argName) == path.join(__dirname, 'e2e', name) ||
       argName == name ||
@@ -128,12 +128,10 @@ setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 setGlobalVariable('package-registry', 'http://localhost:4873');
 
 // Setup local package registry
-const registryPath =
-  fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-e2e-registry-'));
-fs.copyFileSync(
-  path.join(__dirname, 'verdaccio.yaml'),
-  path.join(registryPath, 'verdaccio.yaml'),
+const registryPath = fs.mkdtempSync(
+  path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-e2e-registry-'),
 );
+fs.copyFileSync(path.join(__dirname, 'verdaccio.yaml'), path.join(registryPath, 'verdaccio.yaml'));
 const registryProcess = spawn(
   'node',
   [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'],
@@ -172,7 +170,7 @@ testsToRun
         .then(() => fn(() => (clean = false)))
         .then(
           () => logStack.pop(),
-          err => {
+          (err) => {
             logStack.pop();
             throw err;
           },
@@ -193,7 +191,7 @@ testsToRun
 
             return gitClean().then(
               () => logStack.pop(),
-              err => {
+              (err) => {
                 logStack.pop();
                 throw err;
               },
@@ -202,7 +200,7 @@ testsToRun
         })
         .then(
           () => printFooter(currentFileName, start),
-          err => {
+          (err) => {
             printFooter(currentFileName, start);
             console.error(err);
             throw err;
@@ -219,7 +217,7 @@ testsToRun
       console.log(colors.green('Done.'));
       process.exit(0);
     },
-    err => {
+    (err) => {
       console.log('\n');
       console.error(colors.red(`Test "${currentFileName}" failed...`));
       console.error(colors.red(err.message));
@@ -251,8 +249,12 @@ function printHeader(testName: string, testIndex: number) {
       : (testIndex - allSetups.length) * nbShards + shardId + allSetups.length) + 1;
   const length = tests.length + allSetups.length;
   const shard =
-    shardId === null ? '' : colors.yellow(` [${shardId}:${nbShards}]` + colors.bold(` (${fullIndex}/${length})`));
-  console.log(colors.green(`Running "${colors.bold.blue(testName)}" (${colors.bold.white(text)}${shard})...`));
+    shardId === null
+      ? ''
+      : colors.yellow(` [${shardId}:${nbShards}]` + colors.bold(` (${fullIndex}/${length})`));
+  console.log(
+    colors.green(`Running "${colors.bold.blue(testName)}" (${colors.bold.white(text)}${shard})...`),
+  );
 }
 
 function printFooter(testName: string, startTime: number) {

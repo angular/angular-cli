@@ -91,12 +91,12 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
             throw new Error(`Project "${project}" does not exist.`);
           }
 
-          return ({
+          return {
             root: projectDefinition.root,
             sourceRoot: projectDefinition.sourceRoot,
             prefix: projectDefinition.prefix,
             ...(clone(projectDefinition.extensions) as {}),
-          } as unknown) as json.JsonObject;
+          } as unknown as json.JsonObject;
         },
         async hasTarget(project, target) {
           return !!workspaceOrHost.projects.get(project)?.targets.has(target);
@@ -199,6 +199,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     const builder = (await import(info.import)).default;
     if (builder[BuilderSymbol]) {
       return builder;
+    }
+
+    // Default handling code is for old builders that incorrectly export `default` with non-ESM module
+    if (builder?.default[BuilderSymbol]) {
+      return builder.default;
     }
 
     throw new Error('Builder is not a builder');

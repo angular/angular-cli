@@ -18,8 +18,8 @@ import { Observable, from } from 'rxjs';
 import { concatMap, switchMap } from 'rxjs/operators';
 import * as ts from 'typescript';
 import * as url from 'url';
-import * as webpack from 'webpack';
-import * as webpackDevServer from 'webpack-dev-server';
+import webpack from 'webpack';
+import webpackDevServer from 'webpack-dev-server';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
@@ -362,7 +362,7 @@ export function serveWebpackBrowser(
             );
 
             if (options.open) {
-              const open = await import('open');
+              const open = (await import('open')).default;
               await open(serverAddress);
             }
           }

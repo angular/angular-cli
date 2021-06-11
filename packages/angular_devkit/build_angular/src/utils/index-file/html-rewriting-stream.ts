@@ -8,14 +8,12 @@
 
 import { Readable, Writable } from 'stream';
 
-export async function htmlRewritingStream(
-  content: string,
-): Promise<{
+export async function htmlRewritingStream(content: string): Promise<{
   rewriter: import('parse5-html-rewriting-stream');
   transformedContent: Promise<string>;
 }> {
   const chunks: Buffer[] = [];
-  const rewriter = new (await import('parse5-html-rewriting-stream'))();
+  const rewriter = new (await import('parse5-html-rewriting-stream')).default();
 
   return {
     rewriter,

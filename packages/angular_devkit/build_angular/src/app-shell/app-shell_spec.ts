@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
-import * as express from 'express'; // eslint-disable-line import/no-extraneous-dependencies
+import express from 'express'; // eslint-disable-line import/no-extraneous-dependencies
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { createArchitect, host } from '../test-utils';

@@ -7,7 +7,7 @@
  */
 
 import { SpawnOptions, spawn } from 'child_process';
-import * as pidusage from 'pidusage';
+import pidusage from 'pidusage';
 import { Observable, Subject, from, timer } from 'rxjs';
 import { concatMap, map, onErrorResumeNext, tap } from 'rxjs/operators';
 import { Command } from './command';

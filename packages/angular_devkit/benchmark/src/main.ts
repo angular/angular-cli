@@ -11,7 +11,7 @@ import { logging, tags } from '@angular-devkit/core';
 import { ProcessOutput } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
 import { appendFileSync, writeFileSync } from 'fs';
-import * as minimist from 'minimist';
+import minimist from 'minimist';
 import { filter, map, toArray } from 'rxjs/operators';
 import { Command } from '../src/command';
 import { defaultReporter } from '../src/default-reporter';
@@ -73,7 +73,7 @@ export async function main({
   }
 
   // Parse the command line.
-  const argv = (minimist(args, {
+  const argv = minimist(args, {
     boolean: ['help', 'verbose', 'overwrite-output-file'],
     string: ['watch-matcher', 'watch-script'],
     default: {
@@ -86,7 +86,7 @@ export async function main({
       'watch-timeout': 10000,
     },
     '--': true,
-  }) as {}) as BenchmarkCliArgv;
+  }) as {} as BenchmarkCliArgv;
 
   // Create the DevKit Logger used through the CLI.
   const logger = new logging.TransformLogger('benchmark-prefix-logger', (stream) =>

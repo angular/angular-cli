@@ -113,7 +113,7 @@ async function isES5SupportNeeded(projectRoot: Path): Promise<boolean | undefine
 
   try {
     // eslint-disable-next-line import/no-extraneous-dependencies
-    const browserslist = await import('browserslist');
+    const browserslist = (await import('browserslist')).default;
     const supportedBrowsers = browserslist(undefined, {
       path: getSystemPath(projectRoot),
     });

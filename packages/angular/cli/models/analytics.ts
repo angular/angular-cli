@@ -7,7 +7,7 @@
  */
 
 import { json, tags } from '@angular-devkit/core';
-import * as debug from 'debug';
+import debug from 'debug';
 import * as inquirer from 'inquirer';
 import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
@@ -298,9 +298,8 @@ export async function getWorkspaceAnalytics(): Promise<AnalyticsCollector | unde
   analyticsDebug('getWorkspaceAnalytics');
   try {
     const globalWorkspace = await getWorkspace('local');
-    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace?.getCli()[
-      'analytics'
-    ];
+    const analyticsConfig: string | undefined | null | { uid?: string } =
+      globalWorkspace?.getCli()['analytics'];
     analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
 
     if (analyticsConfig === false) {

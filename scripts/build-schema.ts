@@ -8,7 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
-import * as glob from 'glob';
+import glob from 'glob';
 import * as path from 'path';
 
 export default async function (argv: {}, logger: logging.Logger) {
