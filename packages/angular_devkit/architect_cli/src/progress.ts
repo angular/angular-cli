@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as ProgressBar from 'progress';
+import ProgressBar from 'progress';
 import * as readline from 'readline';
 
 export class MultiProgressBar<Key, T> {

@@ -1,5 +1,5 @@
 import { join } from 'path';
-import * as glob from 'glob';
+import glob from 'glob';
 import { getGlobalVariable } from './env';
 import { relative, resolve } from 'path';
 import { copyFile, writeFile } from './fs';

@@ -14,7 +14,7 @@ import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import {
   BuildBrowserFeatures,

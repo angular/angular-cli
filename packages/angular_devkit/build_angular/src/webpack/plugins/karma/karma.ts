@@ -11,7 +11,7 @@
 import * as http from 'http';
 import * as path from 'path';
 import * as glob from 'glob';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
 import { statsErrorsToString } from '../../utils/stats';

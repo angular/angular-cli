@@ -13,7 +13,7 @@ import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import type { Diagnostics } from '@angular/localize/src/tools/src/diagnostics';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';

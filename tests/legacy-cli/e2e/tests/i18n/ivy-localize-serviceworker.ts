@@ -1,4 +1,4 @@
-import * as express from 'express';
+import express from 'express';
 import { resolve } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import {
@@ -14,7 +14,7 @@ import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
-export default async function() {
+export default async function () {
   // TEMP: disable pending i18n updates
   // TODO: when re-enabling, use setupI18nConfig and helpers like other i18n tests.
   return;
@@ -33,7 +33,7 @@ export default async function() {
   }
   await installPackage(serviceWorkerVersion);
 
-  await updateJsonFile('tsconfig.json', config => {
+  await updateJsonFile('tsconfig.json', (config) => {
     config.compilerOptions.target = 'es2015';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};
@@ -49,7 +49,7 @@ export default async function() {
     { lang: 'fr', translation: 'Bonjour i18n!' },
   ];
 
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     const appArchitect = appProject.architect || appProject.targets;
     const serveConfigs = appArchitect['serve'].configurations;

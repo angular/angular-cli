@@ -9,7 +9,7 @@
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging, tags } from '@angular-devkit/core';
 import * as path from 'path';
-import * as textTable from 'text-table';
+import textTable from 'text-table';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../browser/schema';
 import { colors as ansiColors, removeColor } from '../../utils/color';

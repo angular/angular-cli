@@ -15,7 +15,7 @@ import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
 import * as inquirer from 'inquirer';
-import * as minimist from 'minimist';
+import minimist from 'minimist';
 
 /**
  * Parse the name of schematic passed in argument, and return a {collection, schematic} named

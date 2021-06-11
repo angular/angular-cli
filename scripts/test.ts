@@ -8,7 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import { execSync, spawnSync } from 'child_process';
-import * as glob from 'glob';
+import glob from 'glob';
 import { SpecReporter as JasmineSpecReporter, StacktraceOption } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, normalize, relative } from 'path';

@@ -9,7 +9,7 @@
 import * as cacache from 'cacache';
 import * as fs from 'fs';
 import * as https from 'https';
-import * as proxyAgent from 'https-proxy-agent';
+import proxyAgent from 'https-proxy-agent';
 import { URL } from 'url';
 import { findCachePath } from '../cache-path';
 import { cachingDisabled } from '../environment-options';

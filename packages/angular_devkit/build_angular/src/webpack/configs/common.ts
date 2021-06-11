@@ -15,7 +15,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   VERSION as NG_VERSION,
 } from '@angular/compiler-cli';
-import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { createHash } from 'crypto';
 import { createWriteStream, existsSync, promises as fsPromises } from 'fs';
 import * as path from 'path';

@@ -13,7 +13,7 @@ import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../utils';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';

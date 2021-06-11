@@ -9,7 +9,7 @@
 import { JsonObject, logging } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
-import * as glob from 'glob';
+import glob from 'glob';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 import buildSchema from './build-schema';

@@ -13,7 +13,7 @@ import { logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
-import * as minimist from 'minimist';
+import minimist from 'minimist';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
 import { MultiProgressBar } from '../src/progress';

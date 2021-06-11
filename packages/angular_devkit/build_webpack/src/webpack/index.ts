@@ -10,7 +10,7 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { EmittedFiles, getEmittedFiles } from '../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
 
@@ -115,6 +115,8 @@ export default createBuilder<WebpackBuilderSchema>((options, context) => {
   const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
   return from(import(configPath)).pipe(
-    switchMap((config: webpack.Configuration) => runWebpack(config, context)),
+    switchMap(({ default: config }: { default: webpack.Configuration }) =>
+      runWebpack(config, context),
+    ),
   );
 });

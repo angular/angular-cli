@@ -8,7 +8,7 @@
 
 import { analytics } from '@angular-devkit/core';
 import { execSync } from 'child_process';
-import * as debug from 'debug';
+import debug from 'debug';
 import * as https from 'https';
 import * as os from 'os';
 import * as querystring from 'querystring';

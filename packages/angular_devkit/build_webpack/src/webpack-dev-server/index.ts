@@ -11,8 +11,8 @@ import * as net from 'net';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import * as webpack from 'webpack';
-import * as WebpackDevServer from 'webpack-dev-server';
+import webpack from 'webpack';
+import WebpackDevServer from 'webpack-dev-server';
 import { getEmittedFiles } from '../utils';
 import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
@@ -85,12 +85,12 @@ export function runWebpackDevServer(
             // Log stats.
             log(stats, config);
 
-            obs.next(({
+            obs.next({
               ...result,
               emittedFiles: getEmittedFiles(stats.compilation),
               success: !stats.hasErrors(),
               outputPath: stats.compilation.outputOptions.path,
-            } as unknown) as DevServerBuildOutput);
+            } as unknown as DevServerBuildOutput);
           });
 
           server.listen(
@@ -132,7 +132,9 @@ export default createBuilder<WebpackDevServerBuilderSchema, DevServerBuildOutput
     const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
     return from(import(configPath)).pipe(
-      switchMap((config: webpack.Configuration) => runWebpackDevServer(config, context)),
+      switchMap(({ default: config }: { default: webpack.Configuration }) =>
+        runWebpackDevServer(config, context),
+      ),
     );
   },
 );

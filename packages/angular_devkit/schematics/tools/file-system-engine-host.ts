@@ -105,7 +105,8 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       try {
         const path = require.resolve(join(this._root, name));
 
-        return from(import(path).then((mod) => mod.default())).pipe(
+        // Default handling code is for old tasks that incorrectly export `default` with non-ESM module
+        return from(import(path).then((mod) => (mod.default?.default || mod.default)())).pipe(
           catchError(() => throwError(new UnregisteredTaskException(name))),
         );
       } catch {}

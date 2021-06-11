@@ -30,7 +30,7 @@ function updateIndexFile(path: string): Rule {
       throw new SchematicsException(`Could not read index file: ${path}`);
     }
 
-    const rewriter = new (await import('parse5-html-rewriting-stream'))();
+    const rewriter = new (await import('parse5-html-rewriting-stream')).default();
     let needsNoScript = true;
     rewriter.on('startTag', (startTag) => {
       if (startTag.tagName === 'noscript') {
