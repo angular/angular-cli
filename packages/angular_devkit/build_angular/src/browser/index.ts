@@ -25,7 +25,6 @@ import {
   urlJoin,
 } from '../utils';
 import { BundleActionExecutor } from '../utils/action-executor';
-import { WebpackConfigOptions } from '../utils/build-options';
 import { ThresholdSeverity, checkBudgets } from '../utils/bundle-calculator';
 import { findCachePath } from '../utils/cache-path';
 import { colors } from '../utils/color';
@@ -53,6 +52,7 @@ import {
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
 import {
+  getAnalyticsConfig,
   getBrowserConfig,
   getCommonConfig,
   getStatsConfig,
@@ -60,7 +60,6 @@ import {
   getTypeScriptConfig,
   getWorkerConfig,
 } from '../webpack/configs';
-import { NgBuildAnalyticsPlugin } from '../webpack/plugins/analytics';
 import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
 import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 import {
@@ -90,43 +89,6 @@ export type BrowserBuilderOutput = json.JsonObject &
     outputPath: string;
   };
 
-export function getAnalyticsConfig(
-  wco: WebpackConfigOptions,
-  context: BuilderContext,
-): webpack.Configuration {
-  if (context.analytics) {
-    // If there's analytics, add our plugin. Otherwise no need to slow down the build.
-    let category = 'build';
-    if (context.builder) {
-      // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
-      category =
-        context.builder.builderName.split(':')[1] || context.builder.builderName || 'build';
-    }
-
-    // The category is the builder name if it's an angular builder.
-    return {
-      plugins: [
-        new NgBuildAnalyticsPlugin(
-          wco.projectRoot,
-          context.analytics,
-          category,
-          !!wco.tsConfig.options.enableIvy,
-        ),
-      ],
-    };
-  }
-
-  return {};
-}
-
-export function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration {
-  if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-    return getTypeScriptConfig(wco);
-  }
-
-  return {};
-}
-
 async function initialize(
   options: BrowserBuilderSchema,
   context: BuilderContext,
@@ -153,7 +115,7 @@ async function initialize(
         getStylesConfig(wco),
         getStatsConfig(wco),
         getAnalyticsConfig(wco, context),
-        getCompilerConfig(wco),
+        getTypeScriptConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
       ],
       { differentialLoadingNeeded },

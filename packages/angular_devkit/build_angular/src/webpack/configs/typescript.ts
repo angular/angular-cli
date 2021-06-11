@@ -9,6 +9,7 @@
 import { getSystemPath } from '@angular-devkit/core';
 import { CompilerOptions } from '@angular/compiler-cli';
 import { AngularWebpackLoaderPath, AngularWebpackPlugin } from '@ngtools/webpack';
+import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
 
 function ensureIvy(wco: WebpackConfigOptions): void {
@@ -78,23 +79,29 @@ function createIvyPlugin(
   });
 }
 
-export function getTypeScriptConfig(wco: WebpackConfigOptions) {
-  const { buildOptions, tsConfigPath } = wco;
-  const aot = !!buildOptions.aot;
+export function getTypeScriptConfig(wco: WebpackConfigOptions): Configuration {
+  const {
+    buildOptions: { aot = false, main, polyfills },
+    tsConfigPath,
+  } = wco;
 
-  ensureIvy(wco);
+  if (main || polyfills) {
+    ensureIvy(wco);
 
-  return {
-    module: {
-      rules: [
-        {
-          test: /\.[jt]sx?$/,
-          loader: AngularWebpackLoaderPath,
-        },
-      ],
-    },
-    plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
-  };
+    return {
+      module: {
+        rules: [
+          {
+            test: /\.[jt]sx?$/,
+            loader: AngularWebpackLoaderPath,
+          },
+        ],
+      },
+      plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
+    };
+  }
+
+  return {};
 }
 
 export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {

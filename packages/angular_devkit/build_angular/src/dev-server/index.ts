@@ -20,7 +20,6 @@ import * as ts from 'typescript';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import * as webpackDevServer from 'webpack-dev-server';
-import { getAnalyticsConfig, getCompilerConfig } from '../browser';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
@@ -38,11 +37,13 @@ import {
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
 import {
+  getAnalyticsConfig,
   getBrowserConfig,
   getCommonConfig,
   getDevServerConfig,
   getStatsConfig,
   getStylesConfig,
+  getTypeScriptConfig,
   getWorkerConfig,
 } from '../webpack/configs';
 import { IndexHtmlWebpackPlugin } from '../webpack/plugins/index-html-webpack-plugin';
@@ -219,7 +220,7 @@ export function serveWebpackBrowser(
         getStylesConfig(wco),
         getStatsConfig(wco),
         getAnalyticsConfig(wco, context),
-        getCompilerConfig(wco),
+        getTypeScriptConfig(wco),
         browserOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
       ],
       devServerOptions,
