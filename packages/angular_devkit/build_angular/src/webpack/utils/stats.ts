@@ -240,14 +240,6 @@ function statsToString(
   }
 }
 
-export const IGNORE_WARNINGS = [
-  // Webpack 5+ has no facility to disable this warning.
-  // System.import is used in @angular/core for deprecated string-form lazy routes
-  /System.import\(\) is deprecated and will be removed soon/i,
-  // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
-  /Failed to parse source map from/,
-];
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function statsWarningsToString(json: StatsCompilation, statsConfig: any): string {
   const colors = statsConfig.colors;
