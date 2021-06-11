@@ -80,6 +80,13 @@ export const cachingBasePath = (() => {
   return cacheVariable;
 })();
 
+// Persistent build cache
+const persistentBuildCacheVariable = process.env['NG_PERSISTENT_BUILD_CACHE'];
+export const persistentBuildCacheEnabled =
+  !cachingDisabled &&
+  isPresent(persistentBuildCacheVariable) &&
+  isEnabled(persistentBuildCacheVariable);
+
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 export const profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);

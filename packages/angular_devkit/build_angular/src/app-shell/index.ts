@@ -75,9 +75,8 @@ async function _renderUniversal(
 
     const { AppServerModule, renderModule } = await import(serverBundlePath);
 
-    const renderModuleFn:
-      | ((module: unknown, options: {}) => Promise<string>)
-      | undefined = renderModule;
+    const renderModuleFn: ((module: unknown, options: {}) => Promise<string>) | undefined =
+      renderModule;
 
     if (!(renderModuleFn && AppServerModule)) {
       throw new Error(
@@ -172,7 +171,7 @@ async function _appShellBuilder(
   const browserTargetRun = await context.scheduleTarget(browserTarget, {
     watch: false,
     serviceWorker: false,
-    optimization: (optimization as unknown) as JsonObject,
+    optimization: optimization as unknown as JsonObject,
   });
   const serverTargetRun = await context.scheduleTarget(serverTarget, {
     watch: false,
@@ -181,9 +180,10 @@ async function _appShellBuilder(
   let spinner: Spinner | undefined;
 
   try {
+    // Using `.result` instead of `.output` causes Webpack FS cache not to be created.
     const [browserResult, serverResult] = await Promise.all([
-      (browserTargetRun.result as unknown) as BrowserBuilderOutput,
-      (serverTargetRun.result as unknown) as ServerBuilderOutput,
+      browserTargetRun.output.toPromise() as Promise<BrowserBuilderOutput>,
+      serverTargetRun.output.toPromise() as Promise<ServerBuilderOutput>,
     ]);
 
     if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
@@ -203,8 +203,8 @@ async function _appShellBuilder(
 
     return { success: false, error: err.message };
   } finally {
-    // Just be good citizens and stop those jobs.
-    await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
+    // workaround for [tsetse] All Promises in async functions must either be awaited or used in an expression.
+    const _ = Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
   }
 }
 

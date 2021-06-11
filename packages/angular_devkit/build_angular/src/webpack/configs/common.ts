@@ -10,7 +10,13 @@ import {
   BuildOptimizerWebpackPlugin,
   buildOptimizerLoaderPath,
 } from '@angular-devkit/build-optimizer';
+import {
+  GLOBAL_DEFS_FOR_TERSER,
+  GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+  VERSION as NG_VERSION,
+} from '@angular/compiler-cli';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import { createHash } from 'crypto';
 import { createWriteStream, existsSync, promises as fsPromises } from 'fs';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
@@ -20,6 +26,7 @@ import {
   ContextReplacementPlugin,
   ProgressPlugin,
   RuleSetRule,
+  WebpackOptionsNormalized,
   debug,
 } from 'webpack';
 import { AssetPatternClass } from '../../browser/schema';
@@ -31,6 +38,7 @@ import {
   allowMinify,
   cachingDisabled,
   maxWorkers,
+  persistentBuildCacheEnabled,
   profilingEnabled,
   shouldBeautify,
 } from '../../utils/environment-options';
@@ -310,11 +318,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   if (scriptsOptimization) {
     const TerserPlugin = require('terser-webpack-plugin');
-    const {
-      GLOBAL_DEFS_FOR_TERSER,
-      GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-    } = require('@angular/compiler-cli');
-
     const angularGlobalDefinitions = buildOptions.aot
       ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
       : GLOBAL_DEFS_FOR_TERSER;
@@ -473,11 +476,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       syncWebAssembly: true,
       asyncWebAssembly: true,
     },
-    cache: !!buildOptions.watch &&
-      !cachingDisabled && {
-        type: 'memory',
-        maxGenerations: 1,
-      },
+    cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers),
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: 'deterministic',
@@ -496,4 +495,39 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ...extraPlugins,
     ],
   };
+}
+
+function getCacheSettings(
+  wco: WebpackConfigOptions,
+  supportedBrowsers: string[],
+): WebpackOptionsNormalized['cache'] {
+  if (persistentBuildCacheEnabled) {
+    const packageVersion = require('../../../package.json').version;
+
+    return {
+      type: 'filesystem',
+      cacheDirectory: findCachePath('angular-webpack'),
+      maxMemoryGenerations: 1,
+      // We use the versions and build options as the cache name. The Webpack configurations are too
+      // dynamic and shared among different build types: test, build and serve.
+      // None of which are "named".
+      name: createHash('sha1')
+        .update(NG_VERSION.full)
+        .update(packageVersion)
+        .update(wco.projectRoot)
+        .update(JSON.stringify(wco.tsConfig))
+        .update(JSON.stringify(wco.buildOptions))
+        .update(supportedBrowsers.join(''))
+        .digest('base64'),
+    };
+  }
+
+  if (wco.buildOptions.watch && !cachingDisabled) {
+    return {
+      type: 'memory',
+      maxGenerations: 1,
+    };
+  }
+
+  return false;
 }
