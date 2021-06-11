@@ -8,6 +8,7 @@
 
 import * as glob from 'glob';
 import * as path from 'path';
+import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../../utils/build-options';
 import { getSourceMapDevTool, isPolyfillsEntry } from '../utils/helpers';
@@ -51,6 +52,7 @@ export function getTestConfig(
 
   return {
     mode: 'development',
+    target: wco.tsConfig.options.target === ScriptTarget.ES5 ? ['web', 'es5'] : 'web',
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
     },
