@@ -16,14 +16,14 @@ import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
 import { normalize, resolve as resolvePath } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { fork } from 'child_process';
 import * as fs from 'fs';
+import { Worker as JestWorker } from 'jest-worker';
 import * as ora from 'ora';
 import * as path from 'path';
 import { promisify } from 'util';
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
-import { getIndexOutputFile, getRoutes, shardArray } from './utils';
+import { getIndexOutputFile, getRoutes } from './utils';
+import { RenderResult, WorkerSetupArgs } from './worker';
 
 export const readFile = promisify(fs.readFile);
 
@@ -59,8 +59,8 @@ async function _scheduleBuilds(
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      (browserTargetRun.result as unknown) as BuildBuilderOutput,
-      (serverTargetRun.result as unknown) as BuildBuilderOutput,
+      browserTargetRun.result as unknown as BuildBuilderOutput,
+      serverTargetRun.result as unknown as BuildBuilderOutput,
     ]);
 
     const success =
@@ -87,7 +87,6 @@ async function _renderUniversal(
   browserOptions: BrowserBuilderOptions,
   numProcesses?: number,
 ): Promise<PrerenderBuilderOutput> {
-  const host = new NodeJsSyncHost();
   const projectName = context.target && context.target.project;
   if (!projectName) {
     throw new Error('The builder requires a target.');
@@ -103,93 +102,77 @@ async function _renderUniversal(
     browserOptions.optimization,
   );
 
-  // We need to render the routes for each locale from the browser output.
-  for (const outputPath of browserResult.outputPaths) {
-    const browserIndexInputPath = path.join(outputPath, indexFile);
-    let indexHtml = await readFile(browserIndexInputPath, 'utf8');
+  const { baseOutputPath = '' } = serverResult;
 
-    if (normalizedStylesOptimization.inlineCritical) {
-      // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-      indexHtml = indexHtml.replace(
-        / media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g,
-        '>',
-      );
-    }
+  const workerArgs: WorkerSetupArgs = {
+    indexFile,
+    deployUrl: browserOptions.deployUrl || '',
+    inlineCriticalCss: !!normalizedStylesOptimization.inlineCritical,
+    minifyCss: !!normalizedStylesOptimization.minify,
+  };
+  const worker = new JestWorker(path.join(__dirname, 'worker.js'), {
+    exposedMethods: ['render'],
+    enableWorkerThreads: true,
+    numWorkers: numProcesses,
+    setupArgs: [workerArgs],
+  });
+  try {
+    worker.getStdout().pipe(process.stdout);
+    worker.getStderr().pipe(process.stderr);
 
-    const { baseOutputPath = '' } = serverResult;
-    const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
-    const serverBundlePath = path.join(baseOutputPath, localeDirectory, 'main.js');
-    if (!fs.existsSync(serverBundlePath)) {
-      throw new Error(`Could not find the main bundle: ${serverBundlePath}`);
-    }
+    // We need to render the routes for each locale from the browser output.
+    for (const outputPath of browserResult.outputPaths) {
+      const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
+      const serverBundlePath = path.join(baseOutputPath, localeDirectory, 'main.js');
+      if (!fs.existsSync(serverBundlePath)) {
+        throw new Error(`Could not find the main bundle: ${serverBundlePath}`);
+      }
 
-    const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
-
-    try {
-      const workerFile = path.join(__dirname, 'render.js');
-      const childProcesses = shardArray(routes, numProcesses).map(
-        (routesShard) =>
-          new Promise((resolve, reject) => {
-            fork(workerFile, [
-              indexHtml.replace(
-                '</html>',
-                '<!-- This page was prerendered with Angular Universal -->\n</html>',
-              ),
-              indexFile,
-              serverBundlePath,
-              outputPath,
-              browserOptions.deployUrl || '',
-              normalizedStylesOptimization.inlineCritical ? 'true' : 'false',
-              normalizedStylesOptimization.minify ? 'true' : 'false',
-              ...routesShard,
-            ])
-              .on('message', (data) => {
-                if (data.success === false) {
-                  reject(
-                    new Error(`Unable to render ${data.outputIndexPath}.\nError: ${data.error}`),
-                  );
-
-                  return;
-                }
-
-                if (data.logLevel) {
-                  spinner.stop();
-                  context.logger.log(data.logLevel, data.message);
-                  spinner.start();
-                }
-              })
-              .on('exit', resolve)
-              .on('error', reject);
-          }),
-      );
-
-      await Promise.all(childProcesses);
-    } catch (error) {
-      spinner.fail(`Prerendering routes to ${outputPath} failed.`);
-
-      return { success: false, error: error.message };
-    }
-
-    spinner.succeed(`Prerendering routes to ${outputPath} complete.`);
-
-    if (browserOptions.serviceWorker) {
-      spinner.start('Generating service worker...');
+      const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
       try {
-        await augmentAppWithServiceWorker(
-          root,
-          projectRoot,
-          normalize(outputPath),
-          browserOptions.baseHref || '/',
-          browserOptions.ngswConfigPath,
-        );
+        const results = (await Promise.all(
+          routes.map((route) => (worker as any).render(outputPath, serverBundlePath, route)),
+        )) as RenderResult[];
+        let numErrors = 0;
+        for (const { errors, warnings } of results) {
+          spinner.stop();
+          errors?.forEach((e) => context.logger.error(e));
+          warnings?.forEach((e) => context.logger.warn(e));
+          spinner.start();
+          numErrors += errors?.length ?? 0;
+        }
+        if (numErrors > 0) {
+          throw Error(`Rendering failed with ${numErrors} worker errors.`);
+        }
       } catch (error) {
-        spinner.fail('Service worker generation failed.');
+        spinner.fail(`Prerendering routes to ${outputPath} failed.`);
 
         return { success: false, error: error.message };
       }
+      spinner.succeed(`Prerendering routes to ${outputPath} complete.`);
 
-      spinner.succeed('Service worker generation complete.');
+      if (browserOptions.serviceWorker) {
+        spinner.start('Generating service worker...');
+        try {
+          await augmentAppWithServiceWorker(
+            root,
+            projectRoot,
+            normalize(outputPath),
+            browserOptions.baseHref || '/',
+            browserOptions.ngswConfigPath,
+          );
+        } catch (error) {
+          spinner.fail('Service worker generation failed.');
+
+          return { success: false, error: error.message };
+        }
+        spinner.succeed('Service worker generation complete.');
+      }
     }
+  } finally {
+    // const _ = is a workaround to disable tsetse must use promises rule.
+    // tslint:disable-next-line: no-floating-promises
+    const _ = worker.end();
   }
 
   return browserResult;
@@ -205,9 +188,9 @@ export async function execute(
   context: BuilderContext,
 ): Promise<PrerenderBuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const browserOptions = ((await context.getTargetOptions(
+  const browserOptions = (await context.getTargetOptions(
     browserTarget,
-  )) as unknown) as BrowserBuilderOptions;
+  )) as unknown as BrowserBuilderOptions;
   const tsConfigPath =
     typeof browserOptions.tsConfig === 'string' ? browserOptions.tsConfig : undefined;
 
