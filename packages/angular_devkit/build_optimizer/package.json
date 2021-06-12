@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "source-map": "0.7.3",
-    "tslib": "2.2.0",
+    "tslib": "2.3.0",
     "typescript": "4.3.2"
   },
   "peerDependencies": {
