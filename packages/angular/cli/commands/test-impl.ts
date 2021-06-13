@@ -11,10 +11,10 @@ import { Arguments } from '../models/interface';
 import { Schema as TestCommandSchema } from './test';
 
 export class TestCommand extends ArchitectCommand<TestCommandSchema> {
-  public readonly target = 'test';
-  public readonly multiTarget = true;
+  public override readonly target = 'test';
+  public override readonly multiTarget = true;
 
-  public async run(options: ArchitectCommandOptions & Arguments) {
+  public override async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
   }
 }

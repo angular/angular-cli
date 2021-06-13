@@ -17,7 +17,7 @@ import { NodeJsSyncHost } from '../host';
  */
 export class TempScopedNodeJsSyncHost extends virtualFs.ScopedHost<fs.Stats> {
   protected _sync?: virtualFs.SyncDelegateHost<fs.Stats>;
-  protected _root: Path;
+  protected override _root: Path;
 
   constructor() {
     const root = normalize(path.join(os.tmpdir(), `devkit-host-${+Date.now()}-${process.pid}`));

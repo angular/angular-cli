@@ -56,10 +56,10 @@ export class UnknownCollectionError extends Error {
 }
 
 export abstract class SchematicCommand<
-  T extends BaseSchematicSchema & BaseCommandOptions
+  T extends BaseSchematicSchema & BaseCommandOptions,
 > extends Command<T> {
   protected readonly allowPrivateSchematics: boolean = false;
-  protected readonly useReportAnalytics = false;
+  protected override readonly useReportAnalytics = false;
   protected _workflow!: NodeWorkflow;
 
   protected defaultCollectionName = '@schematics/angular';
@@ -70,7 +70,7 @@ export abstract class SchematicCommand<
     super(context, description, logger);
   }
 
-  public async initialize(options: T & Arguments) {
+  public override async initialize(options: T & Arguments) {
     await this.createWorkflow(options);
 
     if (this.schematicName) {
@@ -94,7 +94,7 @@ export abstract class SchematicCommand<
     }
   }
 
-  public async printHelp() {
+  public override async printHelp() {
     await super.printHelp();
     this.logger.info('');
 
@@ -138,7 +138,7 @@ export abstract class SchematicCommand<
     return 0;
   }
 
-  async printHelpUsage() {
+  override async printHelpUsage() {
     const subCommandOption = this.description.options.filter((x) => x.subcommands)[0];
 
     if (!subCommandOption || !subCommandOption.subcommands) {

@@ -11,9 +11,9 @@ import { Arguments } from '../models/interface';
 import { Schema as BuildCommandSchema } from './build';
 
 export class BuildCommand extends ArchitectCommand<BuildCommandSchema> {
-  public readonly target = 'build';
+  public override readonly target = 'build';
 
-  public async run(options: ArchitectCommandOptions & Arguments) {
+  public override async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
   }
 }

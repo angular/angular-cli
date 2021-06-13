@@ -75,15 +75,15 @@ export class UpdateRecorderBom extends UpdateRecorderBase {
     super(entry);
   }
 
-  insertLeft(index: number, content: Buffer | string) {
+  override insertLeft(index: number, content: Buffer | string) {
     return super.insertLeft(index + this._delta, content);
   }
 
-  insertRight(index: number, content: Buffer | string) {
+  override insertRight(index: number, content: Buffer | string) {
     return super.insertRight(index + this._delta, content);
   }
 
-  remove(index: number, length: number) {
+  override remove(index: number, length: number) {
     return super.remove(index + this._delta, length);
   }
 }

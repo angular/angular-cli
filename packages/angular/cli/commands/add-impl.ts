@@ -31,9 +31,9 @@ import { Schema as AddCommandSchema } from './add';
 const npa = require('npm-package-arg');
 
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
-  readonly allowPrivateSchematics = true;
+  override readonly allowPrivateSchematics = true;
 
-  async initialize(options: AddCommandSchema & Arguments) {
+  override async initialize(options: AddCommandSchema & Arguments) {
     if (options.registry) {
       return super.initialize({ ...options, packageRegistry: options.registry });
     } else {
@@ -235,7 +235,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     return this.executeSchematic(collectionName, options['--']);
   }
 
-  async reportAnalytics(
+  override async reportAnalytics(
     paths: string[],
     options: AddCommandSchema & Arguments,
     dimensions: (boolean | number | string)[] = [],

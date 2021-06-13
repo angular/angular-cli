@@ -20,11 +20,11 @@ For example:
 `;
 
 export class LintCommand extends ArchitectCommand<LintCommandSchema> {
-  readonly target = 'lint';
-  readonly multiTarget = true;
-  readonly missingTargetError = MissingBuilder;
+  override readonly target = 'lint';
+  override readonly multiTarget = true;
+  override readonly missingTargetError = MissingBuilder;
 
-  async initialize(options: LintCommandSchema & Arguments): Promise<number | void> {
+  override async initialize(options: LintCommandSchema & Arguments): Promise<number | void> {
     if (!options.help) {
       return super.initialize(options);
     }

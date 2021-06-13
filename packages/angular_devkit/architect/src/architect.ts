@@ -215,7 +215,7 @@ class ArchitectBuilderJobRegistry implements BuilderRegistry {
  * A JobRegistry that resolves targets from the host.
  */
 class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
-  get<A extends json.JsonObject, I extends BuilderInput, O extends BuilderOutput>(
+  override get<A extends json.JsonObject, I extends BuilderInput, O extends BuilderOutput>(
     name: string,
   ): Observable<experimental.jobs.JobHandler<A, I, O> | null> {
     const m = name.match(/^{([^:]+):([^:]+)(?::([^:]*))?}$/i);

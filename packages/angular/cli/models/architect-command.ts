@@ -28,7 +28,7 @@ export abstract class ArchitectCommand<
   protected _architect!: Architect;
   protected _architectHost!: WorkspaceNodeModulesArchitectHost;
   protected _registry!: json.schema.SchemaRegistry;
-  protected readonly useReportAnalytics = false;
+  protected override readonly useReportAnalytics = false;
 
   // If this command supports running multiple targets.
   protected multiTarget = false;
@@ -36,7 +36,7 @@ export abstract class ArchitectCommand<
   target: string | undefined;
   missingTargetError: string | undefined;
 
-  public async initialize(options: T & Arguments): Promise<number | void> {
+  public override async initialize(options: T & Arguments): Promise<number | void> {
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
     this._registry.useXDeprecatedProvider((msg) => this.logger.warn(msg));

@@ -34,7 +34,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
     throw new Error('compilation is undefined.');
   }
 
-  constructor(readonly options: IndexHtmlWebpackPluginOptions) {
+  constructor(override readonly options: IndexHtmlWebpackPluginOptions) {
     super(options);
   }
 
@@ -101,13 +101,13 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
     };
   }
 
-  async readAsset(path: string): Promise<string> {
+  override async readAsset(path: string): Promise<string> {
     const data = this.compilation.assets[basename(path)].source();
 
     return typeof data === 'string' ? data : data.toString();
   }
 
-  protected async readIndex(path: string): Promise<string> {
+  protected override async readIndex(path: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       this.compilation.inputFileSystem.readFile(
         path,

@@ -29,7 +29,7 @@ export class HostSink extends SimpleSinkBase {
     super();
   }
 
-  protected _validateCreateAction(action: CreateFileAction): Observable<void> {
+  protected override _validateCreateAction(action: CreateFileAction): Observable<void> {
     return this._force ? EMPTY : super._validateCreateAction(action);
   }
 

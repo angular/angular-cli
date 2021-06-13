@@ -16,7 +16,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
   // Allows us to resolve aliases before reporting analytics
   longSchematicName: string | undefined;
 
-  async initialize(options: GenerateCommandSchema & Arguments) {
+  override async initialize(options: GenerateCommandSchema & Arguments) {
     // Fill up the schematics property of the command description.
     const [collectionName, schematicName] = await this.parseSchematicInfo(options);
     this.collectionName = collectionName;
@@ -75,7 +75,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     });
   }
 
-  async reportAnalytics(
+  override async reportAnalytics(
     paths: string[],
     options: GenerateCommandSchema & Arguments,
   ): Promise<void> {
@@ -104,7 +104,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     return [collectionName, schematicName];
   }
 
-  public async printHelp() {
+  public override async printHelp() {
     await super.printHelp();
 
     this.logger.info('');

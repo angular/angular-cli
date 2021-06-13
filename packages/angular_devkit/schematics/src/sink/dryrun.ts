@@ -65,14 +65,14 @@ export class DryRunSink extends HostSink {
     );
   }
 
-  protected _fileAlreadyExistException(path: string): void {
+  protected override _fileAlreadyExistException(path: string): void {
     this._fileAlreadyExistExceptionSet.add(path);
   }
-  protected _fileDoesNotExistException(path: string): void {
+  protected override _fileDoesNotExistException(path: string): void {
     this._fileDoesNotExistExceptionSet.add(path);
   }
 
-  _done() {
+  override _done() {
     this._fileAlreadyExistExceptionSet.forEach((path) => {
       this._subject.next({
         kind: 'error',

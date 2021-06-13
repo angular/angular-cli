@@ -51,7 +51,7 @@ function shouldWrapSchematic(schematicFile: string): boolean {
 }
 
 export class SchematicEngineHost extends NodeModulesEngineHost {
-  protected _resolveReferenceString(refString: string, parentPath: string) {
+  protected override _resolveReferenceString(refString: string, parentPath: string) {
     const [path, name] = refString.split('#', 2);
     // Mimic behavior of ExportStringRef class used in default behavior
     const fullPath = path[0] === '.' ? resolve(parentPath ?? process.cwd(), path) : path;

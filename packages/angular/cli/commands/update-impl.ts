@@ -63,11 +63,11 @@ const disableVersionCheck =
   disableVersionCheckEnv.toLowerCase() !== 'false';
 
 export class UpdateCommand extends Command<UpdateCommandSchema> {
-  public readonly allowMissingWorkspace = true;
+  public override readonly allowMissingWorkspace = true;
   private workflow!: NodeWorkflow;
   private packageManager = PackageManager.Npm;
 
-  async initialize(options: UpdateCommandSchema & Arguments) {
+  override async initialize(options: UpdateCommandSchema & Arguments) {
     this.packageManager = await getPackageManager(this.context.root);
     this.workflow = new NodeWorkflow(this.context.root, {
       packageManager: this.packageManager,

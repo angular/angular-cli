@@ -21,7 +21,7 @@ import {
 } from '../models/interface';
 
 export class CommandJsonPathException extends BaseException {
-  constructor(public readonly path: string, public readonly name: string) {
+  constructor(public readonly path: string, public override readonly name: string) {
     super(`File ${path} was not found while constructing the subcommand ${name}.`);
   }
 }
@@ -36,7 +36,7 @@ function _getEnumFromValue<E, T extends E[keyof E]>(
   }
 
   if (Object.values(enumeration).includes(value)) {
-    return (value as unknown) as T;
+    return value as unknown as T;
   }
 
   return defaultValue;

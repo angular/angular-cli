@@ -11,9 +11,9 @@ import { Arguments } from '../models/interface';
 import { Schema as ExtractI18nCommandSchema } from './extract-i18n';
 
 export class ExtractI18nCommand extends ArchitectCommand<ExtractI18nCommandSchema> {
-  public readonly target = 'extract-i18n';
+  public override readonly target = 'extract-i18n';
 
-  public async run(options: ExtractI18nCommandSchema & Arguments) {
+  public override async run(options: ExtractI18nCommandSchema & Arguments) {
     const version = process.version.substr(1).split('.');
     if (Number(version[0]) === 12 && Number(version[1]) === 0) {
       this.logger.error(

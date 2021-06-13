@@ -11,13 +11,13 @@ import { Arguments } from '../models/interface';
 import { Schema as ServeCommandSchema } from './serve';
 
 export class ServeCommand extends ArchitectCommand<ServeCommandSchema> {
-  public readonly target = 'serve';
+  public override readonly target = 'serve';
 
   public validate() {
     return true;
   }
 
-  public async run(options: ArchitectCommandOptions & Arguments) {
+  public override async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
   }
 }
