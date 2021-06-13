@@ -1,0 +1,394 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_json_schema(
+    name = "app_shell_schema",
+    src = "src/app-shell/schema.json",
+)
+
+ts_json_schema(
+    name = "browser_schema",
+    src = "src/browser/schema.json",
+)
+
+ts_json_schema(
+    name = "dev_server_schema",
+    src = "src/dev-server/schema.json",
+)
+
+ts_json_schema(
+    name = "extract_i18n_schema",
+    src = "src/extract-i18n/schema.json",
+)
+
+ts_json_schema(
+    name = "karma_schema",
+    src = "src/karma/schema.json",
+)
+
+ts_json_schema(
+    name = "protractor_schema",
+    src = "src/protractor/schema.json",
+)
+
+ts_json_schema(
+    name = "server_schema",
+    src = "src/server/schema.json",
+)
+
+ts_json_schema(
+    name = "tslint_schema",
+    src = "src/tslint/schema.json",
+)
+
+ts_json_schema(
+    name = "ng_packagr_schema",
+    src = "src/ng-packagr/schema.json",
+)
+
+ts_library(
+    name = "build_angular",
+    srcs = glob(
+        include = [
+            "src/**/*.ts",
+            "plugins/**/*.ts",
+        ],
+        exclude = [
+            "src/test-utils.ts",
+            "src/**/*_spec.ts",
+            "src/**/tests/**/*.ts",
+            "plugins/**/*_spec.ts",
+            "src/testing/**/*.ts",
+        ],
+    ) + [
+        "//packages/angular_devkit/build_angular:src/app-shell/schema.ts",
+        "//packages/angular_devkit/build_angular:src/browser/schema.ts",
+        "//packages/angular_devkit/build_angular:src/dev-server/schema.ts",
+        "//packages/angular_devkit/build_angular:src/extract-i18n/schema.ts",
+        "//packages/angular_devkit/build_angular:src/karma/schema.ts",
+        "//packages/angular_devkit/build_angular:src/protractor/schema.ts",
+        "//packages/angular_devkit/build_angular:src/server/schema.ts",
+        "//packages/angular_devkit/build_angular:src/tslint/schema.ts",
+        "//packages/angular_devkit/build_angular:src/ng-packagr/schema.ts",
+    ],
+    data = glob(
+        include = [
+            "package.json",
+            "builders.json",
+            "src/**/schema.json",
+            "src/**/*.js",
+            "src/**/*.html",
+        ],
+    ),
+    module_name = "@angular-devkit/build-angular",
+    module_root = "src/index.d.ts",
+    deps = [
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/build_optimizer",
+        "//packages/angular_devkit/build_webpack",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//packages/ngtools/webpack",
+        "@npm//@angular/compiler-cli",
+        "@npm//@angular/core",
+        "@npm//@angular/localize",
+        "@npm//@angular/service-worker",
+        "@npm//@babel/core",
+        "@npm//@babel/helper-annotate-as-pure",
+        "@npm//@babel/plugin-transform-async-to-generator",
+        "@npm//@babel/plugin-transform-runtime",
+        "@npm//@babel/preset-env",
+        "@npm//@babel/runtime",
+        "@npm//@babel/template",
+        "@npm//@discoveryjs/json-ext",
+        "@npm//@jsdevtools/coverage-istanbul-loader",
+        "@npm//@types/babel__core",
+        "@npm//@types/babel__template",
+        "@npm//@types/browserslist",
+        "@npm//@types/cacache",
+        "@npm//@types/caniuse-lite",
+        "@npm//@types/copy-webpack-plugin",
+        "@npm//@types/find-cache-dir",
+        "@npm//@types/glob",
+        "@npm//@types/inquirer",
+        "@npm//@types/karma",
+        "@npm//@types/loader-utils",
+        "@npm//@types/minimatch",
+        "@npm//@types/node",
+        "@npm//@types/parse5-html-rewriting-stream",
+        "@npm//@types/postcss-preset-env",
+        "@npm//@types/sass",
+        "@npm//@types/semver",
+        "@npm//@types/text-table",
+        "@npm//@types/webpack-dev-server",
+        "@npm//ajv",
+        "@npm//ansi-colors",
+        "@npm//babel-loader",
+        "@npm//browserslist",
+        "@npm//cacache",
+        "@npm//caniuse-lite",
+        "@npm//circular-dependency-plugin",
+        "@npm//copy-webpack-plugin",
+        "@npm//core-js",
+        "@npm//critters",
+        "@npm//css-loader",
+        "@npm//css-minimizer-webpack-plugin",
+        "@npm//find-cache-dir",
+        "@npm//glob",
+        "@npm//https-proxy-agent",
+        "@npm//inquirer",
+        "@npm//jest-worker",
+        "@npm//karma",
+        "@npm//karma-source-map-support",
+        "@npm//less",
+        "@npm//less-loader",
+        "@npm//license-webpack-plugin",
+        "@npm//loader-utils",
+        "@npm//mini-css-extract-plugin",
+        "@npm//minimatch",
+        "@npm//ng-packagr",
+        "@npm//open",
+        "@npm//ora",
+        "@npm//parse5-html-rewriting-stream",
+        "@npm//postcss",
+        "@npm//postcss-import",
+        "@npm//postcss-loader",
+        "@npm//postcss-preset-env",
+        "@npm//raw-loader",
+        "@npm//regenerator-runtime",
+        "@npm//resolve-url-loader",
+        "@npm//rxjs",
+        "@npm//sass",
+        "@npm//sass-loader",
+        "@npm//semver",
+        "@npm//source-map",
+        "@npm//source-map-loader",
+        "@npm//source-map-support",
+        "@npm//style-loader",
+        "@npm//stylus",
+        "@npm//stylus-loader",
+        "@npm//terser",
+        "@npm//terser-webpack-plugin",
+        "@npm//text-table",
+        "@npm//tree-kill",
+        "@npm//tslib",
+        "@npm//tslint",
+        "@npm//typescript",
+        "@npm//webpack",
+        "@npm//webpack-dev-middleware",
+        "@npm//webpack-dev-server",
+        "@npm//webpack-merge",
+        "@npm//webpack-subresource-integrity",
+    ],
+)
+
+ts_library(
+    name = "build_angular_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "plugins/**/*_spec.ts",
+            "src/utils/**/*_spec.ts",
+            "src/babel/**/*_spec.ts",
+            "src/angular-cli-files/**/*_spec.ts",
+        ],
+    ),
+    data = glob(["test/**/*"]),
+    # strict_checks = False,
+    deps = [
+        ":build_angular",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
+        "@npm//prettier",
+        "@npm//typescript",
+        "@npm//webpack",
+    ],
+)
+
+jasmine_node_test(
+    name = "build_angular_test",
+    srcs = [":build_angular_test_lib"],
+)
+
+# @external_begin
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":build_angular",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
+)
+# @external_end
+# Large build_angular specs
+
+ts_library(
+    name = "build_angular_test_utils",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/test-utils.ts",
+            "src/testing/**/*.ts",
+            "src/**/tests/*.ts",
+        ],
+    ),
+    data = glob(["test/**/*"]),
+    tsconfig = "//:tsconfig-test.json",
+    deps = [
+        ":build_angular",
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "@npm//@types/node-fetch",
+        "@npm//rxjs",
+    ],
+)
+
+LARGE_SPECS = {
+    "app-shell": {
+        "extra_deps": [
+            "@npm//@angular/animations",
+            "@npm//@angular/platform-server",
+            "@npm//@types/express",
+            "@npm//express",
+            "@npm//jasmine-spec-reporter",
+            "@npm//protractor",
+            "@npm//puppeteer",
+            "@npm//ts-node",
+        ],
+        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
+        "tags": ["no-remote-exec"],
+    },
+    "dev-server": {
+        "shards": 10,
+        "size": "large",
+        "extra_deps": [
+            "@npm//@types/node-fetch",
+            "@npm//node-fetch",
+            "@npm//@types/http-proxy",
+            "@npm//http-proxy",
+            "@npm//puppeteer",
+        ],
+    },
+    "extract-i18n": {},
+    "karma": {
+        "extra_deps": [
+            "@npm//karma",
+            "@npm//karma-chrome-launcher",
+            "@npm//karma-coverage",
+            "@npm//karma-jasmine",
+            "@npm//karma-jasmine-html-reporter",
+            "@npm//puppeteer",
+        ],
+    },
+    "protractor": {
+        "extra_deps": [
+            "@npm//jasmine-spec-reporter",
+            "@npm//protractor",
+            "@npm//puppeteer",
+            "@npm//ts-node",
+        ],
+        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
+        "tags": ["no-remote-exec"],
+        # NB: multiple shards will compete for port 4200 so limiting to 1
+        "shards": 1,
+    },
+    "tslint": {
+        "extra_deps": [
+            "@npm//codelyzer",
+            "@npm//tslint",
+        ],
+    },
+    "server": {
+        "extra_deps": [
+            "@npm//@angular/animations",
+            "@npm//@angular/platform-server",
+        ],
+    },
+    "ng-packagr": {},
+    "browser": {
+        "shards": 50,
+        "size": "large",
+        "flaky": True,
+        "extra_deps": [
+            "@npm//@angular/animations",
+            "@npm//@angular/material",
+            "@npm//bootstrap",
+            "@npm//font-awesome",
+            "@npm//jquery",
+            "@npm//popper.js",
+        ],
+    },
+}
+
+[
+    ts_library(
+        name = "build_angular_" + spec + "_test_lib",
+        testonly = True,
+        srcs = glob(["src/" + spec + "/**/*_spec.ts"]),
+        tsconfig = "//:tsconfig-test.json",
+        deps = [
+            # Dependencies needed to compile and run the specs themselves.
+            ":build_angular",
+            ":build_angular_test_utils",
+            "//packages/angular_devkit/architect",
+            "//packages/angular_devkit/architect/node",
+            "//packages/angular_devkit/architect/testing",
+            "//packages/angular_devkit/core",
+            "//packages/angular_devkit/core/node",
+
+            # Base dependencies for the application in hello-world-app.
+            # Some tests also require extra dependencies.
+            "@npm//@angular/common",
+            "@npm//@angular/compiler",
+            "@npm//@angular/compiler-cli",
+            "@npm//@angular/core",
+            "@npm//@angular/platform-browser",
+            "@npm//@angular/platform-browser-dynamic",
+            "@npm//@angular/router",
+            "@npm//rxjs",
+            "@npm//tslib",
+            "@npm//typescript",
+            "@npm//zone.js",
+        ] + LARGE_SPECS[spec].get("extra_deps", []),
+    )
+    for spec in LARGE_SPECS
+]
+
+[
+    jasmine_node_test(
+        name = "build_angular_" + spec + "_test",
+        size = LARGE_SPECS[spec].get("size", "medium"),
+        flaky = LARGE_SPECS[spec].get("flaky", False),
+        shard_count = LARGE_SPECS[spec].get("shards", 2),
+        # These tests are resource intensive and should not be over-parallized as they will
+        # compete for the resources of other parallel tests slowing everything down.
+        # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
+        tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
+        deps = [":build_angular_" + spec + "_test_lib"],
+    )
+    for spec in LARGE_SPECS
+]

@@ -1,0 +1,25 @@
+{
+  "$schema": "../src/builders-schema.json",
+  "builders": {
+    "true": {
+      "implementation": "./true",
+      "schema": "./noop-schema.json",
+      "description": "Always succeed."
+    },
+    "false": {
+      "implementation": "./false",
+      "schema": "./noop-schema.json",
+      "description": "Always fails."
+    },
+    "allOf": {
+      "implementation": "./all-of",
+      "schema": "./operator-schema.json",
+      "description": "A builder that executes many builders in parallel, and succeed if both succeeds."
+    },
+    "concat": {
+      "implementation": "./concat",
+      "schema": "./operator-schema.json",
+      "description": "A builder that executes many builders one after the other, and stops when one fail. It will succeed if all builders succeeds (and return the last output)"
+    }
+  }
+}

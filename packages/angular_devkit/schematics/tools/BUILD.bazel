@@ -1,0 +1,65 @@
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "tools",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            "**/*_benchmark.ts",
+            "test/**/*.ts",
+        ],
+    ),
+    module_name = "@angular-devkit/schematics/tools",
+    module_root = "index.d.ts",
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
+    deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tasks/node",
+        "@npm//@types/node",
+        "@npm//rxjs",
+    ],
+)
+
+ts_library(
+    name = "tools_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+            "test/**/*.ts",
+        ],
+    ),
+    deps = [
+        ":tools",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/testing",
+        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
+        "@npm//rxjs",
+    ],
+)
+
+jasmine_node_test(
+    name = "tools_test",
+    srcs = [":tools_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+    ],
+)

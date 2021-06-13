@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsLibrary",
+  "title": "Library Options Schema",
+  "type": "object",
+  "description": "Creates a new, generic library project in the current workspace.",
+  "long-description": "./library-long.md",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the library.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the library?"
+    },
+    "entryFile": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the library's public API file, relative to the workspace root.",
+      "default": "public-api"
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "A prefix to apply to generated selectors.",
+      "default": "lib",
+      "alias": "p"
+    },
+    "skipPackageJson": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not add dependencies to the \"package.json\" file. "
+    },
+    "skipInstall": {
+      "description": "Do not install dependency packages.",
+      "type": "boolean",
+      "default": false
+    },
+    "skipTsConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not update \"tsconfig.json\" to add a path mapping for the new library. The path mapping is needed to use the library in an app, but can be disabled here to simplify development."
+    },
+    "lintFix": {
+      "type": "boolean",
+      "description": "Apply lint fixes after generating the library.",
+      "x-user-analytics": 15,
+      "x-deprecated": "Use \"ng lint --fix\" directly instead."
+    }
+  },
+  "required": []
+}

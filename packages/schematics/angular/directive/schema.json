@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularDirective",
+  "title": "Angular Directive Options Schema",
+  "type": "object",
+  "description": "Creates a new, generic directive definition in the given or default project.",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the new directive.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the directive?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the interface that defines the directive, relative to the workspace root.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "prefix": {
+      "type": "string",
+      "description": "A prefix to apply to generated selectors.",
+      "alias": "p",
+      "oneOf": [
+        {
+          "maxLength": 0
+        },
+        {
+          "minLength": 1,
+          "format": "html-selector"
+        }
+      ]
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Do not create \"spec.ts\" test files for the new class.",
+      "default": false,
+      "x-user-analytics": 12
+    },
+    "skipImport": {
+      "type": "boolean",
+      "description": "Do not import this directive into the owning NgModule.",
+      "default": false,
+      "x-user-analytics": 18
+    },
+    "selector": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The HTML selector to use for this directive."
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "When true (the default), creates the new files at the top level of the current project.",
+      "default": true
+    },
+    "module": {
+      "type": "string",
+      "description": "The declaring NgModule.",
+      "alias": "m"
+    },
+    "export": {
+      "type": "boolean",
+      "default": false,
+      "description": "The declaring NgModule exports this directive.",
+      "x-user-analytics": 19
+    },
+    "lintFix": {
+      "type": "boolean",
+      "description": "Apply lint fixes after generating the directive.",
+      "x-user-analytics": 15,
+      "x-deprecated": "Use \"ng lint --fix\" directly instead."
+    }
+  },
+  "required": ["name"]
+}

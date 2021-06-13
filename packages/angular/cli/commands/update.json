@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/update.json",
+  "description": "Updates your application and its dependencies. See https://update.angular.io/",
+  "$longDescription": "./update-long.md",
+
+  "$scope": "all",
+  "$aliases": [],
+  "$type": "schematics",
+  "$impl": "./update-impl#UpdateCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "packages": {
+          "description": "The names of package(s) to update.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "$default": {
+            "$source": "argv"
+          }
+        },
+        "force": {
+          "description": "Ignore peer dependency version mismatches. Passes the `--force` flag to the package manager when installing packages.",
+          "default": false,
+          "type": "boolean"
+        },
+        "all": {
+          "description": "Whether to update all packages in package.json.",
+          "default": false,
+          "type": "boolean",
+          "x-deprecated": true
+        },
+        "next": {
+          "description": "Use the prerelease version, including beta and RCs.",
+          "default": false,
+          "type": "boolean"
+        },
+        "migrateOnly": {
+          "description": "Only perform a migration, do not update the installed version.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "description": "The name of the migration to run."
+            }
+          ]
+        },
+        "from": {
+          "description": "Version from which to migrate from. Only available with a single package being updated, and only on migration only.",
+          "type": "string"
+        },
+        "to": {
+          "description": "Version up to which to apply migrations. Only available with a single package being updated, and only on migrations only. Requires from to be specified. Default to the installed version detected.",
+          "type": "string"
+        },
+        "allowDirty": {
+          "description": "Whether to allow updating when the repository contains modified or untracked files.",
+          "type": "boolean"
+        },
+        "verbose": {
+          "description": "Display additional details about internal operations during execution.",
+          "type": "boolean",
+          "default": false
+        },
+        "createCommits": {
+          "description": "Create source control commits for updates and migrations.",
+          "type": "boolean",
+          "default": false,
+          "aliases": ["C"]
+        }
+      }
+    }
+  ]
+}

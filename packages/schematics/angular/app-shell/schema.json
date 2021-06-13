@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularAppShell",
+  "title": "Angular AppShell Options Schema",
+  "type": "object",
+  "description": "Generates an app shell for running a server-side version of an app.",
+  "additionalProperties": false,
+  "long-description": "./app-shell-long.md",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the related client app.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "route": {
+      "type": "string",
+      "description": "Route path used to produce the app shell.",
+      "default": "shell"
+    },
+    "appId": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The app ID to use in withServerTransition().",
+      "default": "serverApp"
+    },
+    "main": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the main entry-point file.",
+      "default": "main.server.ts"
+    },
+    "appDir": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the application directory.",
+      "default": "app"
+    },
+    "rootModuleFileName": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the root module file",
+      "default": "app.server.module.ts"
+    },
+    "rootModuleClassName": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The name of the root module class.",
+      "default": "AppServerModule"
+    }
+  },
+  "required": ["project"]
+}

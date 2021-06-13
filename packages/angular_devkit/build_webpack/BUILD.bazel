@@ -1,0 +1,122 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_json_schema(
+    name = "webpack_schema",
+    src = "src/webpack/schema.json",
+)
+
+ts_json_schema(
+    name = "webpack_dev_server_schema",
+    src = "src/webpack-dev-server/schema.json",
+)
+
+ts_library(
+    name = "build_webpack",
+    srcs = glob(
+        include = ["src/**/*.ts"],
+        exclude = [
+            "src/test-utils.ts",
+            "src/**/*_spec.ts",
+        ],
+    ) + [
+        "//packages/angular_devkit/build_webpack:src/webpack/schema.ts",
+        "//packages/angular_devkit/build_webpack:src/webpack-dev-server/schema.ts",
+    ],
+    data = [
+        "builders.json",
+        "package.json",
+        "src/webpack-dev-server/schema.json",
+        "src/webpack/schema.json",
+    ],
+    module_name = "@angular-devkit/build-webpack",
+    module_root = "src/index.d.ts",
+    deps = [
+        "//packages/angular_devkit/architect",
+        "@npm//@types/node",
+        "@npm//@types/webpack-dev-server",
+        "@npm//rxjs",
+        "@npm//webpack",
+        "@npm//webpack-dev-server",
+    ],
+)
+
+ts_library(
+    name = "build_webpack_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/test-utils.ts",
+            "src/**/*_spec.ts",
+        ],
+    ),
+    data = glob(
+        include = [
+            "test/**/*",
+        ],
+    ),
+    deps = [
+        ":build_webpack",
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//packages/ngtools/webpack",
+        "@npm//@angular/common",
+        "@npm//@angular/compiler",
+        "@npm//@angular/compiler-cli",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-browser-dynamic",
+        "@npm//@types/node-fetch",
+        "@npm//node-fetch",
+        "@npm//raw-loader",
+        "@npm//tslib",
+        "@npm//zone.js",
+    ],
+)
+
+jasmine_node_test(
+    name = "build_webpack_test",
+    srcs = [":build_webpack_test_lib"],
+    # Turns off nodejs require patches and turns on the linker, which sets up up node_modules
+    # so that standard node module resolution work.
+    templated_args = ["--nobazel_patch_module_resolver"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+    ],
+)
+
+# @external_begin
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":build_webpack",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
+)
+# @external_end

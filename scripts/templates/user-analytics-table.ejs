@@ -1,0 +1,9 @@
+<%
+%>| Id | Flag | Type |
+|:---:|:---|:---|
+<% for (const flag of flags) {
+  if (flag === undefined) {
+    continue;
+  }
+%>| <%= flag.userAnalytics %> | `<%= flag.name %>` | `<%= flag.type %>` |
+<%}%>

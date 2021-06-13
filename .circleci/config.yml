@@ -1,158 +1,358 @@
-version: 2
+# Configuration file for https://circleci.com/gh/angular/angular-cli
 
-# Settings common to each job.
-anchor_1: &defaults
-  working_directory: ~/angular-cli
-  environment:
-    BASH_ENV: ~/.profile
-  docker:
-    - image: angular/ngcontainer:0.1.1
+# Note: YAML anchors allow an object to be re-used, reducing duplication.
+# The ampersand declares an alias for an object, then later the `<<: *name`
+# syntax dereferences it.
+# See http://blog.daemonl.com/2016/02/yaml.html
+# To validate changes, use an online parser, eg.
+# http://yaml-online-parser.appspot.com/
 
-# Restore cache based on package-lock.json checksum for branch.
-anchor_2: &restore_cache_defaults
-    key: angular-cli-{{ checksum "package-lock.json" }}
+version: 2.1
 
-# Attach workspace that contains:
-# - dist/ : built cli
-# - angular-cli-e2e-default/ : initialized e2e test project
-anchor_3: &attach_workspace_defaults
-    at: /home/circleci/workspace
+orbs:
+  browser-tools: circleci/browser-tools@1.0.1
 
+# Variables
+
+## IMPORTANT
+# Windows needs its own cache key because binaries in node_modules are different.
+# See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
+var_1: &cache_key v1-angular_devkit-14.15-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v1-angular_devkit-win-12.22-{{ checksum "yarn.lock" }}
+var_3: &default_nodeversion '14.15'
+# Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
+# https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
+# https://circleci.com/blog/deep-diving-into-circleci-workspaces/
+var_4: &workspace_location .
+# Filter to only release branches on a given job.
+var_5: &only_release_branches
+  filters:
+    branches:
+      only:
+        - master
+        - /\d+\.\d+\.x/
+
+# Executor Definitions
+# https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
+executors:
+  action-executor:
+    parameters:
+      nodeversion:
+        type: string
+        default: *default_nodeversion
+    docker:
+      - image: cimg/node:<< parameters.nodeversion >>
+    working_directory: ~/ng
+    resource_class: small
+
+  test-executor:
+    parameters:
+      nodeversion:
+        type: string
+        default: *default_nodeversion
+    docker:
+      - image: cimg/node:<< parameters.nodeversion >>
+    working_directory: ~/ng
+    resource_class: large
+
+  windows-executor:
+    # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
+    working_directory: ~/ng
+    resource_class: windows.medium
+    shell: powershell.exe -ExecutionPolicy Bypass
+    machine:
+      # Contents of this image:
+      # https://circleci.com/docs/2.0/hello-world-windows/#software-pre-installed-in-the-windows-image
+      image: windows-server-2019-vs2019:stable
+
+# Command Definitions
+# https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
+commands:
+  custom_attach_workspace:
+    description: Attach workspace at a predefined location
+    steps:
+      - attach_workspace:
+          at: *workspace_location
+  setup_windows:
+    steps:
+      - run: nvm install 12.22.1
+      - run: nvm use 12.22.1
+      - run: npm install -g yarn@1.22.10
+      - run: node --version
+      - run: yarn --version
+
+  setup_bazel_rbe:
+    parameters:
+      key:
+        type: env_var_name
+        default: CIRCLE_PROJECT_REPONAME
+    steps:
+      - run:
+          name: 'Setup bazel RBE remote execution'
+          command: |
+            touch .bazelrc.user;
+            # We need ensure that the same default digest is used for encoding and decoding
+            # with openssl. Openssl versions might have different default digests which can
+            # cause decryption failures based on the openssl version. https://stackoverflow.com/a/39641378/4317734
+            openssl aes-256-cbc -d -in .circleci/gcp_token -md md5 -k "${<< parameters.key >>}" -out /home/circleci/.gcp_credentials;
+            sudo bash -c "echo -e 'build --google_credentials=/home/circleci/.gcp_credentials' >> .bazelrc.user";
+            # Upload/don't upload local results to cache based on environment
+            if [[ -n "{$CIRCLE_PULL_REQUEST}" ]]; then
+              sudo bash -c "echo -e 'build:remote --remote_upload_local_results=false\n' >> .bazelrc.user";
+              echo "Not uploading local build results to remote cache.";
+            else
+              sudo bash -c "echo -e 'build:remote --remote_upload_local_results=true\n' >> .bazelrc.user";
+              echo "Uploading local build results to remote cache.";
+            fi
+            # Enable remote builds
+            sudo bash -c "echo -e 'build --config=remote' >> .bazelrc.user";
+            echo "Reading from remote cache for bazel remote jobs.";
+
+  install_python:
+    steps:
+      - run:
+          name: 'Install Python 2'
+          command: |
+            sudo apt-get update > /dev/null 2>&1
+            sudo apt-get install -y python
+            python --version
+
+# Job definitions
 jobs:
-  build:
-    <<: *defaults
+  setup:
+    executor: action-executor
+    resource_class: medium
     steps:
       - checkout
+      - run:
+          name: Rebase PR on target branch
+          command: >
+            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+              # User is required for rebase.
+              git config user.name "angular-ci"
+              git config user.email "angular-ci"
+              # Rebase PR on top of target branch.
+              node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
+            else
+              echo "This build is not over a PR, nothing to do."
+            fi
       - restore_cache:
-          <<: *restore_cache_defaults
-      - run: node --version
-      - run: npm --version
-      - run: npm install --no-save
-      - run: npm run build
-      - save_cache:
-          key: angular-cli-{{ checksum "package-lock.json" }}
+          keys:
+            - *cache_key
+      - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - persist_to_workspace:
+          root: *workspace_location
           paths:
-            - "node_modules"
+            - ./*
+      - save_cache:
+          key: *cache_key
+          paths:
+            - ~/.cache/yarn
 
   lint:
-    <<: *defaults
+    executor: action-executor
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: npm run lint
+      - custom_attach_workspace
+      - run: yarn lint
+
+  validate:
+    executor: action-executor
+    steps:
+      - custom_attach_workspace
+      - run:
+          name: Validate Commit Messages
+          command: >
+            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+              yarn ng-dev commit-message validate-range <<pipeline.git.base_revision>> <<pipeline.git.revision>>
+            else
+              echo "This build is not over a PR, nothing to do."
+            fi
+      - run:
+          name: Validate Code Formatting
+          command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
+      - run:
+          name: Validate NgBot Configuration
+          command: yarn ng-dev ngbot verify
+      - run:
+          name: Validate Circular Dependencies
+          command: yarn ts-circular-deps:check
+      - run:
+          command: yarn -s admin validate
+
+  e2e-cli:
+    parameters:
+      nodeversion:
+        type: string
+        default: *default_nodeversion
+      snapshots:
+        type: boolean
+        default: false
+    executor:
+      name: test-executor
+      nodeversion: << parameters.nodeversion >>
+    parallelism: 6
+    steps:
+      - custom_attach_workspace
+      - browser-tools/install-chrome
+      - run:
+          name: Initialize Environment
+          command: ./.circleci/env.sh
+      - run:
+          name: Execute CLI E2E Tests
+          command: |
+            mkdir /mnt/ramdisk/e2e-main
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e-main
+      - run:
+          name: Execute CLI E2E Tests Subset with Yarn
+          command: |
+            mkdir /mnt/ramdisk/e2e-yarn
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+
+  test-browsers:
+    executor:
+      name: test-executor
+    environment:
+      E2E_BROWSERS: true
+    resource_class: medium
+    steps:
+      - custom_attach_workspace
+      - run:
+          name: Initialize Environment
+          command: ./.circleci/env.sh
+      - run:
+          name: Initialize Saucelabs
+          command: setSecretVar SAUCE_ACCESS_KEY $(echo $SAUCE_ACCESS_KEY | rev)
+      - run:
+          name: Start Saucelabs Tunnel
+          command: ./scripts/saucelabs/start-tunnel.sh
+          background: true
+        # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
+        # too early without Saucelabs not being ready.
+      - run: ./scripts/saucelabs/wait-for-tunnel.sh
+      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
+      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
+      - run: ./scripts/saucelabs/stop-tunnel.sh
+
+  build:
+    executor: action-executor
+    steps:
+      - custom_attach_workspace
+      - run: yarn build
 
   test:
-    <<: *defaults
+    executor: test-executor
+    resource_class: xlarge
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: npm run test
+      - custom_attach_workspace
+      - browser-tools/install-chrome
+      - setup_bazel_rbe
+      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
+      - run:
+          command: yarn bazel:test
+          no_output_timeout: 20m
 
-  # E2E test for current Angular.
-  e2e-setup:
-    <<: *defaults
+  snapshot_publish:
+    executor: action-executor
+    resource_class: medium
     steps:
-      - checkout
+      - custom_attach_workspace
+      - run:
+          name: Decrypt Credentials
+          # Note: when changing the image, you might have to re-encrypt the credentials with a
+          # matching version of openssl.
+          # See https://stackoverflow.com/a/43847627/2116927 for more info.
+          command: |
+            openssl aes-256-cbc -d -in .circleci/github_token -k "${KEY}" -out ~/github_token -md md5
+      - run:
+          name: Deployment to Snapshot
+          command: |
+            yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
+
+  # Windows jobs
+  e2e-cli-win:
+    executor: windows-executor
+    parallelism: 8
+    steps:
+      - custom_attach_workspace
+      - setup_windows
       - restore_cache:
-          <<: *restore_cache_defaults
-      - run: mkdir /home/circleci/workspace
-      - run: mkdir /home/circleci/workspace/angular-cli-e2e-default
-      # Ignore all tests, we just want the setup step to persist it to the workspace.
-      - run: node tests/run_e2e.js --tmpdir=/home/circleci/workspace/angular-cli-e2e-default --ignore=**/*
-      - run: mv dist /home/circleci/workspace/
-      - persist_to_workspace:
-          root: /home/circleci/workspace
+          keys:
+            - *cache_key_win
+      - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
+      - save_cache:
+          key: *cache_key_win
           paths:
-            - dist/
-            - angular-cli-e2e-default/
-
-  e2e-0:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-rc.2"
-
-  e2e-1:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-rc.2"
-
-  e2e-2:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-rc.2"
-
-  e2e-3:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-rc.2"
-
-  # Master only E2E.
-  nightly-e2e:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: xvfb-run -a node tests/run_e2e.js --nightly "--glob=tests/build/**"
+            - ~/.cache/yarn
+      # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
+      - run:
+          name: Execute E2E Tests
+          command: |
+            if (Test-Path env:CIRCLE_PULL_REQUEST) {
+              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+            } else {
+              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+            }
 
 workflows:
   version: 2
-  build_and_test:
+  default_workflow:
     jobs:
-      - build
+      # Linux jobs
+      - setup
       - lint:
           requires:
-            - build
-      - test:
+            - setup
+      - validate:
+          requires:
+            - setup
+      - build:
+          requires:
+            - setup
+      - e2e-cli:
+          name: e2e-cli
+          post-steps:
+            - store_artifacts:
+                path: /tmp/dist
+                destination: cli/new-production
           requires:
             - build
-      # E2E test for current Angular.
-      - e2e-setup:
+      - e2e-cli:
+          name: e2e-cli-ng-snapshots
+          snapshots: true
           requires:
-            - build
-      - e2e-0:
-          requires:
-            - e2e-setup
-      - e2e-1:
-          requires:
-            - e2e-setup
-      - e2e-2:
-          requires:
-            - e2e-setup
-      - e2e-3:
-          requires:
-            - e2e-setup
-      # Master only E2E.
-      - nightly-e2e:
-          requires:
-            - build
+            - e2e-cli
           filters:
             branches:
               only:
+                - renovate/angular
                 - master
+      - e2e-cli:
+          name: e2e-cli-node-12
+          nodeversion: '12.20'
+          <<: *only_release_branches
+          requires:
+            - e2e-cli
+      - test-browsers:
+          requires:
+            - build
+
+      # Bazel jobs
+      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
+      # will catch any build errors before proceeding to the more lengthy and resource intensive
+      # Bazel jobs.
+      - test:
+          requires:
+            - build
+
+      # Windows jobs
+      - e2e-cli-win:
+          requires:
+            - test
+
+      # Publish jobs
+      - snapshot_publish:
+          <<: *only_release_branches
+          requires:
+            - build
+            - test
+            - e2e-cli

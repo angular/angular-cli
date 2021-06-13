@@ -1,0 +1,5 @@
+{
+  "name": "empty-app",
+  "version": "0.0.1",
+  "schematics": "./collection.json"
+}

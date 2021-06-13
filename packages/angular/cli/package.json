@@ -1,0 +1,62 @@
+{
+  "name": "@angular/cli",
+  "version": "0.0.0",
+  "description": "CLI tool for Angular",
+  "main": "lib/cli/index.js",
+  "bin": {
+    "ng": "./bin/ng"
+  },
+  "keywords": [
+    "angular",
+    "angular-cli",
+    "Angular CLI"
+  ],
+  "scripts": {
+    "postinstall": "node ./bin/postinstall/script.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "dependencies": {
+    "@angular-devkit/architect": "0.0.0",
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0",
+    "@schematics/angular": "0.0.0",
+    "@yarnpkg/lockfile": "1.1.0",
+    "ansi-colors": "4.1.1",
+    "debug": "4.3.1",
+    "ini": "2.0.0",
+    "inquirer": "8.1.0",
+    "jsonc-parser": "3.0.0",
+    "npm-package-arg": "8.1.4",
+    "npm-pick-manifest": "6.1.1",
+    "open": "8.2.0",
+    "ora": "5.4.1",
+    "pacote": "11.3.4",
+    "resolve": "1.20.0",
+    "semver": "7.3.5",
+    "symbol-observable": "4.0.0",
+    "uuid": "8.3.2"
+  },
+  "devDependencies": {
+    "rxjs": "6.6.7"
+  },
+  "ng-update": {
+    "migrations": "@schematics/angular/migrations/migration-collection.json",
+    "packageGroup": {
+      "@angular/cli": "0.0.0",
+      "@angular-devkit/architect": "0.0.0",
+      "@angular-devkit/build-angular": "0.0.0",
+      "@angular-devkit/build-webpack": "0.0.0",
+      "@angular-devkit/core": "0.0.0",
+      "@angular-devkit/schematics": "0.0.0"
+    }
+  }
+}

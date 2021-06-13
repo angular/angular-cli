@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--
+This file is almost the same as context.html - loads all source files,
+but its purpose is to be loaded in the main frame (not within an iframe),
+just for immediate execution, without reporting to Karma server.
+-->
+<html>
+  <head>
+    %X_UA_COMPATIBLE%
+    <title>Karma DEBUG RUNNER</title>
+    <base href="/" />
+    <link href="favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="_karma_webpack_/styles.css" crossorigin="anonymous" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+  </head>
+
+  <body>
+    <!-- The scripts need to be at the end of body, so that some test running frameworks
+   (Angular Scenario, for example) need the body to be loaded so that it can insert its magic
+   into it. If it is before body, then it fails to find the body and crashes and burns in an epic
+   manner. -->
+    <script src="context.js"></script>
+    <script src="debug.js"></script>
+    <script type="text/javascript">
+      // Configure our Karma
+      %CLIENT_CONFIG%
+
+      // All served files with the latest timestamps
+      %MAPPINGS%
+    </script>
+    <script src="_karma_webpack_/runtime.js" crossorigin="anonymous"></script>
+    <script src="_karma_webpack_/polyfills-es5.js" crossorigin="anonymous" nomodule></script>
+    <script src="_karma_webpack_/polyfills.js" crossorigin="anonymous"></script>
+    <!-- Dynamically replaced with <script> tags -->
+    %SCRIPTS%
+    <script src="_karma_webpack_/scripts.js" crossorigin="anonymous"></script>
+    <script src="_karma_webpack_/vendor.js" crossorigin="anonymous"></script>
+    <script src="_karma_webpack_/main.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      window.__karma__.loaded();
+    </script>
+  </body>
+</html>

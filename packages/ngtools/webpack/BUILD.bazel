@@ -1,0 +1,88 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "webpack",
+    srcs = glob(
+        include = [
+            "src/**/*.ts",
+        ],
+        exclude = [
+            "src/**/*_spec.ts",
+            "src/**/*_spec_helpers.ts",
+        ],
+    ),
+    data = glob(
+        include = [
+            "src/type_checker_bootstrap.js",
+            "package.json",
+        ],
+    ),
+    module_name = "@ngtools/webpack",
+    module_root = "src/index.d.ts",
+    deps = [
+        "@npm//@angular/compiler-cli",
+        "@npm//@types/node",
+        "@npm//enhanced-resolve",
+        "@npm//typescript",
+        "@npm//webpack",
+    ],
+)
+
+ts_library(
+    name = "webpack_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/**/*_spec.ts",
+            "src/**/*_spec_helpers.ts",
+        ],
+    ),
+    deps = [
+        ":webpack",
+        "//packages/angular_devkit/core",
+        "@npm//@angular/compiler",
+        "@npm//jasmine",
+        "@npm//typescript",
+    ],
+)
+
+jasmine_node_test(
+    name = "webpack_test",
+    srcs = [":webpack_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+    ],
+)
+
+# @external_begin
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":webpack",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
+)
+# @external_end

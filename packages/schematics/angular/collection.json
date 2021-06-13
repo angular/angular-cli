@@ -1,0 +1,123 @@
+{
+  "schematics": {
+    "ng-new": {
+      "factory": "./ng-new",
+      "schema": "./ng-new/schema.json",
+      "description": "Create an Angular workspace.",
+      "hidden": true
+    },
+    "workspace": {
+      "factory": "./workspace",
+      "schema": "./workspace/schema.json",
+      "description": "Create an Angular workspace.",
+      "hidden": true
+    },
+    "service-worker": {
+      "aliases": ["serviceWorker"],
+      "factory": "./service-worker",
+      "description": "Initializes a service worker setup.",
+      "schema": "./service-worker/schema.json"
+    },
+    "application": {
+      "aliases": ["app"],
+      "factory": "./application",
+      "schema": "./application/schema.json",
+      "description": "Create an Angular application."
+    },
+    "e2e": {
+      "factory": "./e2e",
+      "schema": "./e2e/schema.json",
+      "description": "Create an Angular e2e application.",
+      "hidden": true
+    },
+    "class": {
+      "aliases": ["cl"],
+      "factory": "./class",
+      "description": "Create a class.",
+      "schema": "./class/schema.json"
+    },
+    "component": {
+      "aliases": ["c"],
+      "factory": "./component",
+      "description": "Create an Angular component.",
+      "schema": "./component/schema.json"
+    },
+    "directive": {
+      "aliases": ["d"],
+      "factory": "./directive",
+      "description": "Create an Angular directive.",
+      "schema": "./directive/schema.json"
+    },
+    "enum": {
+      "aliases": ["e"],
+      "factory": "./enum",
+      "description": "Create an enumeration.",
+      "schema": "./enum/schema.json"
+    },
+    "guard": {
+      "aliases": ["g"],
+      "factory": "./guard",
+      "description": "Create a guard.",
+      "schema": "./guard/schema.json"
+    },
+    "resolver": {
+      "aliases": ["r"],
+      "factory": "./resolver",
+      "description": "Create a resolver.",
+      "schema": "./resolver/schema.json"
+    },
+    "interceptor": {
+      "factory": "./interceptor",
+      "description": "Create an interceptor.",
+      "schema": "./interceptor/schema.json"
+    },
+    "interface": {
+      "aliases": ["i"],
+      "factory": "./interface",
+      "description": "Create an interface.",
+      "schema": "./interface/schema.json"
+    },
+    "module": {
+      "aliases": ["m"],
+      "factory": "./module",
+      "description": "Create an Angular module.",
+      "schema": "./module/schema.json"
+    },
+    "pipe": {
+      "aliases": ["p"],
+      "factory": "./pipe",
+      "description": "Create an Angular pipe.",
+      "schema": "./pipe/schema.json"
+    },
+    "service": {
+      "aliases": ["s"],
+      "factory": "./service",
+      "description": "Create an Angular service.",
+      "schema": "./service/schema.json"
+    },
+    "universal": {
+      "factory": "./universal",
+      "description": "Create an Angular universal app.",
+      "schema": "./universal/schema.json",
+      "hidden": true
+    },
+    "app-shell": {
+      "aliases": ["appShell"],
+      "factory": "./app-shell",
+      "description": "Create an app shell.",
+      "schema": "./app-shell/schema.json"
+    },
+    "library": {
+      "aliases": ["lib"],
+      "factory": "./library",
+      "schema": "./library/schema.json",
+      "description": "Generate a library project for Angular."
+    },
+    "web-worker": {
+      "aliases": ["webWorker"],
+      "factory": "./web-worker",
+      "schema": "./web-worker/schema.json",
+      "description": "Create a Web Worker."
+    }
+  }
+}

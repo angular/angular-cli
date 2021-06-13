@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/new.json",
+  "description": "Creates a new workspace and an initial Angular application.",
+  "$longDescription": "./new.md",
+
+  "$aliases": ["n"],
+  "$scope": "out",
+  "$type": "schematic",
+  "$impl": "./new-impl#NewCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "collection": {
+          "type": "string",
+          "aliases": ["c"],
+          "description": "A collection of schematics to use in generating the initial application."
+        },
+        "verbose": {
+          "type": "boolean",
+          "default": false,
+          "aliases": ["v"],
+          "description": "Add more details to output logging."
+        }
+      },
+      "required": []
+    },
+    { "$ref": "./definitions.json#/definitions/base" },
+    { "$ref": "./definitions.json#/definitions/schematic" },
+    { "$ref": "./definitions.json#/definitions/interactive" }
+  ]
+}

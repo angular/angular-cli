@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/run.json",
+  "description": "Runs an Architect target with an optional custom builder configuration defined in your project.",
+  "$longDescription": "./run-long.md",
+
+  "$aliases": [],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./run-impl#RunCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "The Architect target to run.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "One or more named builder configurations as a comma-separated list as specified in the \"configurations\" section of angular.json.\nThe builder uses the named configurations to run the given target.\nFor more information, see https://angular.io/guide/workspace-config#alternate-build-configurations.",
+          "type": "string",
+          "aliases": ["c"]
+        }
+      },
+      "required": []
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

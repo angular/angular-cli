@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/definitions.json",
+
+  "definitions": {
+    "architect": {
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "The name of the project to build. Can be an application or a library.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "One or more named builder configurations as a comma-separated list as specified in the \"configurations\" section of angular.json.\nThe builder uses the named configurations to run the given target.\nFor more information, see https://angular.io/guide/workspace-config#alternate-build-configurations.\nSetting this explicitly overrides the \"--prod\" flag.",
+          "type": "string",
+          "aliases": ["c"]
+        },
+        "prod": {
+          "description": "Shorthand for \"--configuration=production\".\nSet the build configuration to the production target.\nBy default, the production target is set up in the workspace configuration such that all builds make use of bundling, limited tree-shaking, and also limited dead code elimination.",
+          "type": "boolean",
+          "x-deprecated": "Use `--configuration production` instead."
+        }
+      }
+    },
+    "base": {
+      "type": "object",
+      "properties": {
+        "help": {
+          "enum": [true, false, "json", "JSON"],
+          "description": "Shows a help message for this command in the console.",
+          "default": false
+        }
+      }
+    },
+    "schematic": {
+      "type": "object",
+      "properties": {
+        "dryRun": {
+          "type": "boolean",
+          "default": false,
+          "aliases": ["d"],
+          "description": "Run through and reports activity without writing out results."
+        },
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "aliases": ["f"],
+          "description": "Force overwriting of existing files."
+        }
+      }
+    },
+    "interactive": {
+      "type": "object",
+      "properties": {
+        "interactive": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enable interactive input prompts."
+        },
+        "defaults": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Disable interactive input prompts for options with a default."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+licenses(["notice"])  # MIT License
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "node",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "testing/**/*.ts",
+            "**/*_spec.ts",
+            "**/*_benchmark.ts",
+        ],
+    ),
+    module_name = "@angular-devkit/core/node",
+    module_root = "index.d.ts",
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
+    deps = [
+        "//packages/angular_devkit/core",
+        "@npm//@types/node",
+        "@npm//rxjs",
+    ],
+)
+
+ts_library(
+    name = "node_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+        ],
+        exclude = [
+            "testing/**/*.ts",
+        ],
+    ),
+    deps = [
+        ":node",
+        "//packages/angular_devkit/core",
+        "//tests/angular_devkit/core/node/jobs:jobs_test_lib",
+        "@npm//rxjs",
+    ],
+)
+
+jasmine_node_test(
+    name = "node_test",
+    srcs = [":node_test_lib"],
+    deps = [
+        "@npm//chokidar",
+        "@npm//temp",
+        # @node_module: ajv
+        # @node_module: fast_json_stable_stringify
+        # @node_module: magic_string
+    ],
+)

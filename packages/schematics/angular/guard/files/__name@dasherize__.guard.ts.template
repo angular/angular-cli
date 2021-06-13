@@ -1,0 +1,31 @@
+import { Injectable } from '@angular/core';
+import { <%= implementationImports %> } from '@angular/router';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <%= classify(name) %>Guard implements <%= implementations %> {
+  <% if (implements.includes('CanActivate')) { %>canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanActivateChild')) { %>canActivateChild(
+    childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanDeactivate')) { %>canDeactivate(
+    component: unknown,
+    currentRoute: ActivatedRouteSnapshot,
+    currentState: RouterStateSnapshot,
+    nextState?: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanLoad')) { %>canLoad(
+    route: Route,
+    segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return true;
+  }<% } %>
+}

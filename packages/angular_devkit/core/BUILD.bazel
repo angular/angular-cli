@@ -1,0 +1,96 @@
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
+
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])  # MIT License
+
+# @angular-devkit/core
+
+ts_library(
+    name = "core",
+    srcs = glob(
+        include = ["src/**/*.ts"],
+        exclude = [
+            "src/**/*_spec.ts",
+            "src/**/*_benchmark.ts",
+        ],
+    ),
+    data = glob(
+        include = ["**/*.json"],
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        exclude = ["node_modules/**"],
+    ),
+    module_name = "@angular-devkit/core",
+    module_root = "src/index.d.ts",
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
+    deps = [
+        "@npm//@types/node",
+        "@npm//ajv",
+        "@npm//ajv-formats",
+        "@npm//fast-json-stable-stringify",
+        "@npm//magic-string",
+        "@npm//rxjs",
+        "@npm//source-map",  # @external
+        # @node_module: typescript:es2015.proxy
+        # @node_module: typescript:es2015.reflect
+        # @node_module: typescript:es2015.symbol.wellknown
+        # @typings: source_map
+    ],
+)
+
+ts_library(
+    name = "core_test_lib",
+    testonly = True,
+    srcs = glob(["src/**/*_spec.ts"]),
+    data = glob(["src/workspace/json/test/**/*.json"]),
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
+    deps = [
+        ":core",
+        "//packages/angular_devkit/core/node",
+        "@npm//rxjs",
+    ],
+)
+
+jasmine_node_test(
+    name = "core_test",
+    srcs = [":core_test_lib"],
+    # TODO: Audit tests to determine if tests can be run in RBE environments
+    local = True,
+    deps = [
+        # @node_module: ajv
+        # @node_module: fast_json_stable_stringify
+        # @node_module: magic_string
+        # @node_module: source_map
+    ],
+)
+
+# @external_begin
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":core",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/core/node/testing",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
+)
+# @external_end

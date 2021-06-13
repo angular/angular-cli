@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularGuard",
+  "title": "Angular Guard Options Schema",
+  "type": "object",
+  "description": "Generates a new, generic route guard definition in the given or default project.",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the new route guard.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the guard?"
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Do not create \"spec.ts\" test files for the new guard.",
+      "default": false,
+      "x-user-analytics": 12
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "When true (the default), creates the new files at the top level of the current project.",
+      "default": true
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the interface that defines the guard, relative to the current workspace.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "lintFix": {
+      "type": "boolean",
+      "description": "Apply lint fixes after generating the guard.",
+      "x-user-analytics": 15,
+      "x-deprecated": "Use \"ng lint --fix\" directly instead."
+    },
+    "implements": {
+      "type": "array",
+      "description": "Specifies which interfaces to implement.",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "enum": ["CanActivate", "CanActivateChild", "CanDeactivate", "CanLoad"],
+        "type": "string"
+      },
+      "default": ["CanActivate"],
+      "x-prompt": "Which interfaces would you like to implement?"
+    }
+  },
+  "required": ["name"]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "extends-deep",
+  "extends": "extends-basic",
+  "schematics": {}
+}

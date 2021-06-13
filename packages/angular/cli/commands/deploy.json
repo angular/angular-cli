@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/deploy.json",
+  "description": "Invokes the deploy builder for a specified project or for the default project in the workspace.",
+  "$longDescription": "./deploy-long.md",
+
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./deploy-impl#DeployCommand",
+
+  "allOf": [
+    {
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "The name of the project to deploy.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "One or more named builder configurations as a comma-separated list as specified in the \"configurations\" section of angular.json.\nThe builder uses the named configurations to run the given target.\nFor more information, see https://angular.io/guide/workspace-config#alternate-build-configurations.",
+          "type": "string",
+          "aliases": ["c"]
+        }
+      },
+      "required": []
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

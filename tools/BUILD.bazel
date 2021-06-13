@@ -1,0 +1,36 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+# @external_begin
+load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+nodejs_binary(
+    name = "ng_cli_schema",
+    data = [
+        "ng_cli_schema_generator.js",
+    ],
+    entry_point = "ng_cli_schema_generator.js",
+)
+
+nodejs_binary(
+    name = "quicktype_runner",
+    data = [
+        "quicktype_runner.js",
+        "@npm//quicktype-core",
+    ],
+    entry_point = "quicktype_runner.js",
+    templated_args = ["--bazel_patch_module_resolver"],
+)
+
+platform(
+    name = "rbe_platform_with_network_access",
+    exec_properties = {
+        "dockerNetwork": "standard",
+    },
+    parents = ["@npm//@angular/dev-infra-private/bazel/remote-execution:platform"],
+)
+
+# @external_end

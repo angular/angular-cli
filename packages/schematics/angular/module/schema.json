@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularModule",
+  "title": "Angular Module Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Creates a new, generic NgModule definition in the given or default project.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the NgModule.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the NgModule?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the NgModule, relative to the workspace root.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "Create a routing module.",
+      "default": false,
+      "x-user-analytics": 17
+    },
+    "routingScope": {
+      "enum": ["Child", "Root"],
+      "type": "string",
+      "description": "The scope for the new routing module.",
+      "default": "Child"
+    },
+    "route": {
+      "type": "string",
+      "description": "The route path for a lazy-loaded module. When supplied, creates a component in the new module, and adds the route to that component in the `Routes` array declared in the module provided in the `--module` option."
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "Create the new files at the top level of the current project root. ",
+      "default": false
+    },
+    "commonModule": {
+      "type": "boolean",
+      "description": "The new NgModule imports \"CommonModule\". ",
+      "default": true,
+      "visible": false
+    },
+    "module": {
+      "type": "string",
+      "description": "The declaring NgModule.",
+      "alias": "m"
+    },
+    "lintFix": {
+      "type": "boolean",
+      "description": "Apply lint fixes after generating the module.",
+      "x-user-analytics": 15,
+      "x-deprecated": "Use \"ng lint --fix\" directly instead."
+    }
+  },
+  "required": ["name"]
+}

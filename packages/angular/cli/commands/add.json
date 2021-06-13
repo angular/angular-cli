@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/add.json",
+  "description": "Adds support for an external library to your project.",
+  "$longDescription": "./add.md",
+
+  "$scope": "in",
+  "$impl": "./add-impl#AddCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "The package to be added.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "registry": {
+          "description": "The NPM registry to use.",
+          "type": "string",
+          "oneOf": [
+            {
+              "format": "uri"
+            },
+            {
+              "format": "hostname"
+            }
+          ]
+        },
+        "verbose": {
+          "description": "Display additional details about internal operations during execution.",
+          "type": "boolean",
+          "default": false
+        },
+        "skipConfirmation": {
+          "description": "Skip asking a confirmation prompt before installing and executing the package. Ensure package name is correct prior to using this option.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": []
+    },
+    {
+      "$ref": "./definitions.json#/definitions/interactive"
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

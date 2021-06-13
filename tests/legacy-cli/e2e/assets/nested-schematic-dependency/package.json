@@ -1,0 +1,5 @@
+{
+  "name": "empty-app-nested",
+  "version": "0.0.1",
+  "schematics": "./collection.json"
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "../../../../packages/angular_devkit/core/src/workspace/workspace-schema.json",
+  "version": 1,
+  "projects": {
+    "lib": {
+      "root": "projects/lib",
+      "projectType": "library",
+      "targets": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/lib/ng-package.json",
+            "tsConfig": "projects/lib/tsconfig.lib.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/lib/tsconfig.lib.prod.json"
+            }
+          }
+        }
+      }
+    }
+  }
+}

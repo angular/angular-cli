@@ -1,18 +1,51 @@
+# Outputs
+bazel-*
+test-project-host-*
 dist/
-node_modules/
-npm-debug.log*
-yarn-error.log*
+dist-schema/
 
 # IDEs
-.idea/
 jsconfig.json
+
+# Intellij IDEA/WebStorm
+# https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+.idea/inspectionProfiles/
+.idea/**/compiler.xml
+.idea/**/encodings.xml
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Also ignore code styles because .editorconfig is used instead.
+.idea/codeStyles/
+
+# VSCode
+# https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+**/*.code-workspace
 
 # Typings file.
 typings/
 
 # Misc
+coverage/
+node_modules/
 tmp/
+npm-debug.log*
+yarn-error.log*
+.ng_pkg_build/
+.ng-dev.log
+.ng-dev.err*.log
+.ng-dev.user*
+.husky/_
+.bazelrc.user
+.eslintcache
 
 # Mac OSX Finder files.
 **/.DS_Store

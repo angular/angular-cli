@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "All input types of builders that perform operations on one or multiple sub-builders.",
+  "type": "object",
+  "properties": {
+    "builders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "builder": {
+            "type": "string",
+            "pattern": ".*:.*"
+          },
+          "options": {
+            "type": "object"
+          }
+        },
+        "required": ["builder"]
+      },
+      "minItems": 1
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "pattern": ".*:.*"
+          },
+          "overrides": {
+            "type": "object"
+          }
+        },
+        "required": ["target"]
+      },
+      "minItems": 1
+    }
+  }
+}

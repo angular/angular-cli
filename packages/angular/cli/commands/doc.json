@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/doc.json",
+  "description": "Opens the official Angular documentation (angular.io) in a browser, and searches for a given keyword.",
+  "$longDescription": "",
+
+  "$aliases": ["d"],
+  "$type": "native",
+  "$impl": "./doc-impl#DocCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "keyword": {
+          "type": "string",
+          "description": "The keyword to search for, as provided in the search bar in angular.io.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "search": {
+          "aliases": ["s"],
+          "type": "boolean",
+          "default": false,
+          "description": "Search all of angular.io. Otherwise, searches only API reference documentation."
+        },
+        "version": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 4
+            },
+            {
+              "enum": [2, "next"]
+            }
+          ],
+          "description": "Contains the version of Angular to use for the documentation. If not provided, the command uses your current Angular core version."
+        }
+      },
+      "required": []
+    },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

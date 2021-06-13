@@ -1,0 +1,13 @@
+{
+  "name": "extends-circular-middle",
+  "extends": [
+    "extends-multiple",
+    "extends-circular-multiple"
+  ],
+  "schematics": {
+    "schematic2": {
+      "description": "2",
+      "factory": "../null-factory"
+    }
+  }
+}

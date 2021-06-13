@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularUniversalApp",
+  "title": "Angular Universal App Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Pass this schematic to the \"run\" command to set up server-side rendering for an app.",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "appId": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The app identifier to use for transition.",
+      "default": "serverApp"
+    },
+    "main": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the main entry-point file.",
+      "default": "main.server.ts"
+    },
+    "appDir": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the application folder.",
+      "default": "app"
+    },
+    "rootModuleFileName": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the root NgModule file.",
+      "default": "app.server.module.ts"
+    },
+    "rootModuleClassName": {
+      "type": "string",
+      "description": "The name of the root NgModule class.",
+      "default": "AppServerModule"
+    },
+    "skipInstall": {
+      "description": "Do not install packages for dependencies.",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["project"]
+}

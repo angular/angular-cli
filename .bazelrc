@@ -1,0 +1,143 @@
+# Disable NG CLI TTY mode
+test --action_env=NG_FORCE_TTY=false
+
+# Make TypeScript compilation fast, by keeping a few copies of the compiler
+# running as daemons, and cache SourceFile AST's to reduce parse time.
+build --strategy=TypeScriptCompile=worker
+
+# Enable debugging tests with --config=debug
+test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
+
+###############################
+# Filesystem interactions     #
+###############################
+
+# Create symlinks in the project:
+# - dist/bin for outputs
+# - dist/testlogs, dist/genfiles
+# - bazel-out
+# NB: bazel-out should be excluded from the editor configuration.
+# The checked-in /.vscode/settings.json does this for VSCode.
+# Other editors may require manual config to ignore this directory.
+# In the past, we saw a problem where VSCode traversed a massive tree, opening file handles and
+# eventually a surprising failure with auto-discovery of the C++ toolchain in
+# MacOS High Sierra.
+# See https://github.com/bazelbuild/bazel/issues/4603
+build --symlink_prefix=dist/
+
+# Disable watchfs as it causes tests to be flaky on Windows
+# https://github.com/angular/angular/issues/29541
+build --nowatchfs
+
+# Turn off legacy external runfiles
+run --nolegacy_external_runfiles
+test --nolegacy_external_runfiles
+
+# Turn on --incompatible_strict_action_env which was on by default
+# in Bazel 0.21.0 but turned off again in 0.22.0. Follow
+# https://github.com/bazelbuild/bazel/issues/7026 for more details.
+# This flag is needed to so that the bazel cache is not invalidated
+# when running bazel via `yarn bazel`.
+# See https://github.com/angular/angular/issues/27514.
+build --incompatible_strict_action_env
+run --incompatible_strict_action_env
+test --incompatible_strict_action_env
+
+###############################
+# Saucelabs support           #
+# Turn on these settings with #
+#  --config=saucelabs         #
+###############################
+
+# Expose SauceLabs environment to actions
+# These environment variables are needed by
+# web_test_karma to run on Saucelabs
+test:saucelabs --action_env=SAUCE_USERNAME
+test:saucelabs --action_env=SAUCE_ACCESS_KEY
+test:saucelabs --action_env=SAUCE_READY_FILE
+test:saucelabs --action_env=SAUCE_PID_FILE
+test:saucelabs --action_env=SAUCE_TUNNEL_IDENTIFIER
+test:saucelabs --define=KARMA_WEB_TEST_MODE=SL_REQUIRED
+
+###############################
+# Release support             #
+# Turn on these settings with #
+#  --config=release           #
+###############################
+
+# Releases should always be stamped with version control info
+# This command assumes node on the path and is a workaround for
+# https://github.com/bazelbuild/bazel/issues/4802
+build:release --workspace_status_command="yarn -s ng-dev release build-env-stamp"
+
+###############################
+# Output                      #
+###############################
+
+# A more useful default output mode for bazel query
+# Prints eg. "ng_module rule //foo:bar" rather than just "//foo:bar"
+query --output=label_kind
+
+# By default, failing tests don't print any output, it goes to the log file
+test --test_output=errors
+
+################################
+# Settings for CircleCI        #
+################################
+
+# Bazel flags for CircleCI are in /.circleci/bazel.rc
+
+################################
+# Remote Execution Setup       #
+################################
+
+# Use the Angular team internal GCP instance for remote execution.
+build:remote --remote_instance_name=projects/internal-200822/instances/default_instance
+build:remote --project_id=internal-200822
+
+# Starting with Bazel 0.27.0 strategies do not need to be explicitly
+# defined. See https://github.com/bazelbuild/bazel/issues/7480
+build:remote --define=EXECUTOR=remote
+
+# Setup the remote build execution servers.
+build:remote --remote_cache=remotebuildexecution.googleapis.com
+build:remote --remote_executor=remotebuildexecution.googleapis.com
+build:remote --remote_timeout=600
+build:remote --jobs=150
+
+# Setup the toolchain and platform for the remote build execution. The platform
+# is provided by the shared dev-infra package and targets k8 remote containers.
+build:remote --crosstool_top=@npm//@angular/dev-infra-private/bazel/remote-execution/cpp:cc_toolchain_suite
+build:remote --extra_toolchains=@npm//@angular/dev-infra-private/bazel/remote-execution/cpp:cc_toolchain
+build:remote --extra_execution_platforms=//tools:rbe_platform_with_network_access
+build:remote --host_platform=//tools:rbe_platform_with_network_access
+build:remote --platforms=//tools:rbe_platform_with_network_access
+
+# Set remote caching settings
+build:remote --remote_accept_cached=true
+
+# Force remote executions to consider the entire run as linux.
+# This is required for OSX cross-platform RBE.
+build:remote --cpu=k8
+build:remote --host_cpu=k8
+
+# Set up authentication mechanism for RBE
+build:remote --google_default_credentials
+
+###############################
+# NodeJS rules settings
+# These settings are required for rules_nodejs
+###############################
+
+####################################################
+# User bazel configuration
+# NOTE: This needs to be the *last* entry in the config.
+####################################################
+
+# Load any settings which are specific to the current user. Needs to be *last* statement
+# in this config, as the user configuration should be able to overwrite flags from this file.
+try-import .bazelrc.user
+
+# Enable runfiles even on Windows.
+# Architect resolves output files from data files, and this isn't possible without runfile support.
+test --enable_runfiles

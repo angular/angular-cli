@@ -1,0 +1,330 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
+load("//tools:defaults.bzl", "ts_library")
+
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "angular-cli",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + [
+        # @external_begin
+        # These files are generated from the JSON schema
+        "//packages/angular/cli:lib/config/workspace-schema.ts",
+        "//packages/angular/cli:commands/analytics.ts",
+        "//packages/angular/cli:commands/add.ts",
+        "//packages/angular/cli:commands/build.ts",
+        "//packages/angular/cli:commands/deploy.ts",
+        "//packages/angular/cli:commands/config.ts",
+        "//packages/angular/cli:commands/doc.ts",
+        "//packages/angular/cli:commands/e2e.ts",
+        "//packages/angular/cli:commands/easter-egg.ts",
+        "//packages/angular/cli:commands/generate.ts",
+        "//packages/angular/cli:commands/help.ts",
+        "//packages/angular/cli:commands/lint.ts",
+        "//packages/angular/cli:commands/new.ts",
+        "//packages/angular/cli:commands/serve.ts",
+        "//packages/angular/cli:commands/test.ts",
+        "//packages/angular/cli:commands/update.ts",
+        "//packages/angular/cli:commands/version.ts",
+        "//packages/angular/cli:commands/run.ts",
+        "//packages/angular/cli:commands/extract-i18n.ts",
+        "//packages/angular/cli:src/commands/update/schematic/schema.ts",
+        # @external_end
+    ],
+    data = glob(
+        include = [
+            "bin/**/*",
+            "**/*.json",
+            "**/*.md",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+            "cli/lib/config/workspace-schema.json",
+        ],
+    ) + [
+        "//packages/angular/cli:lib/config/schema.json",
+    ],
+    module_name = "@angular/cli",
+    # strict_checks = False,
+    deps = [
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tools",
+        "@npm//@angular/core",
+        "@npm//@types/debug",
+        "@npm//@types/inquirer",
+        "@npm//@types/node",
+        "@npm//@types/npm-package-arg",
+        "@npm//@types/resolve",
+        "@npm//@types/semver",
+        "@npm//@types/uuid",
+        "@npm//@yarnpkg/lockfile",
+        "@npm//ansi-colors",
+        "@npm//ini",
+        "@npm//jsonc-parser",
+        "@npm//npm-package-arg",
+        "@npm//open",
+        "@npm//ora",
+        "@npm//pacote",
+        "@npm//semver",
+    ],
+)
+
+CLI_SCHEMA_DATA = [
+    "//packages/angular_devkit/build_angular:src/app-shell/schema.json",
+    "//packages/angular_devkit/build_angular:src/browser/schema.json",
+    "//packages/angular_devkit/build_angular:src/dev-server/schema.json",
+    "//packages/angular_devkit/build_angular:src/extract-i18n/schema.json",
+    "//packages/angular_devkit/build_angular:src/karma/schema.json",
+    "//packages/angular_devkit/build_angular:src/ng-packagr/schema.json",
+    "//packages/angular_devkit/build_angular:src/protractor/schema.json",
+    "//packages/angular_devkit/build_angular:src/server/schema.json",
+    "//packages/angular_devkit/build_angular:src/tslint/schema.json",
+    "//packages/schematics/angular:app-shell/schema.json",
+    "//packages/schematics/angular:application/schema.json",
+    "//packages/schematics/angular:class/schema.json",
+    "//packages/schematics/angular:component/schema.json",
+    "//packages/schematics/angular:directive/schema.json",
+    "//packages/schematics/angular:enum/schema.json",
+    "//packages/schematics/angular:guard/schema.json",
+    "//packages/schematics/angular:interceptor/schema.json",
+    "//packages/schematics/angular:interface/schema.json",
+    "//packages/schematics/angular:library/schema.json",
+    "//packages/schematics/angular:module/schema.json",
+    "//packages/schematics/angular:ng-new/schema.json",
+    "//packages/schematics/angular:pipe/schema.json",
+    "//packages/schematics/angular:resolver/schema.json",
+    "//packages/schematics/angular:service/schema.json",
+    "//packages/schematics/angular:service-worker/schema.json",
+    "//packages/schematics/angular:web-worker/schema.json",
+]
+
+cli_json_schema(
+    name = "cli_config_schema",
+    src = "lib/config/workspace-schema.json",
+    out = "lib/config/schema.json",
+    data = CLI_SCHEMA_DATA,
+)
+
+ts_json_schema(
+    name = "cli_schema",
+    src = "lib/config/workspace-schema.json",
+    data = CLI_SCHEMA_DATA,
+)
+
+ts_json_schema(
+    name = "analytics_schema",
+    src = "commands/analytics.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "add_schema",
+    src = "commands/add.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "build_schema",
+    src = "commands/build.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "deploy_schema",
+    src = "commands/deploy.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "config_schema",
+    src = "commands/config.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "doc_schema",
+    src = "commands/doc.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "e2e_schema",
+    src = "commands/e2e.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "easter_egg_schema",
+    src = "commands/easter-egg.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "generate_schema",
+    src = "commands/generate.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "help_schema",
+    src = "commands/help.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "lint_schema",
+    src = "commands/lint.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "new_schema",
+    src = "commands/new.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "run_schema",
+    src = "commands/run.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "serve_schema",
+    src = "commands/serve.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "test_schema",
+    src = "commands/test.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "update_schema",
+    src = "commands/update.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "version_schema",
+    src = "commands/version.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "extract-i18n_schema",
+    src = "commands/extract-i18n.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "update_schematic_schema",
+    src = "src/commands/update/schematic/schema.json",
+)
+
+ts_library(
+    name = "angular-cli_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = ["**/*_spec.ts"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+    # strict_checks = False,
+    deps = [
+        ":angular-cli",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/testing",
+        "@npm//@types/semver",
+        "@npm//rxjs",
+    ],
+)
+
+jasmine_node_test(
+    name = "angular-cli_test",
+    srcs = [":angular-cli_test_lib"],
+)
+
+# @external_begin
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":angular-cli",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
+)
+# @external_end

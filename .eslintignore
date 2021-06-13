@@ -1,10 +1,11 @@
+/bazel-out/
+/dist-schema/
+/goldens/public-api
+/packages/angular_devkit/build_angular/test/
+/packages/angular_devkit/build_webpack/test/
+/packages/angular_devkit/schematics_cli/schematic/files/
+/tests/
+.yarn/
 dist/
-.git/
-tmp/
-typings/
-
-# Ignore all blueprint files. We e2e tests those later on.
-packages/@angular/cli/blueprints/*/files/
-
-# Ignore ember cli.
-packages/@angular/cli/ember-cli/
+node_modules/
+third_party/

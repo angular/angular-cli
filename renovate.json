@@ -1,0 +1,54 @@
+{
+  "pinVersions": false,
+  "semanticCommits": true,
+  "semanticPrefix": "build",
+  "separateMajorMinor": false,
+  "prHourlyLimit": 2,
+  "labels": ["target: minor", "action: merge"],
+  "timezone": "America/Tijuana",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "schedule": ["after 10pm every weekday", "before 4am every weekday", "every weekend"],
+  "baseBranches": ["master"],
+  "ignoreDeps": ["@types/node", "quicktype-core", "eslint-plugin-import"],
+  "packageFiles": [
+    "WORKSPACE",
+    "package.json",
+    "packages/**/package.json",
+    "tests/legacy-cli/e2e/ng-snapshot/package.json"
+  ],
+  "packageRules": [
+    {
+      "packagePatterns": ["^@angular/.*"],
+      "groupName": "angular",
+      "pinVersions": false
+    },
+    {
+      "packagePatterns": ["^@babel/.*"],
+      "groupName": "babel",
+      "pinVersions": false
+    },
+    {
+      "packagePatterns": ["^@bazel/.*", "^build_bazel.*"],
+      "groupName": "bazel",
+      "pinVersions": false
+    },
+    {
+      "packageNames": ["typescript"],
+      "separateMinorPatch": true
+    },
+    {
+      "packageNames": ["typescript"],
+      "updateTypes": ["minor", "major"],
+      "enabled": false
+    },
+    {
+      "excludePackagePatterns": ["^@angular/.*"],
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    }
+  ]
+}

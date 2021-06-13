@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ng-cli://commands/build.json",
+  "description": "Compiles an Angular app into an output directory named dist/ at the given output path. Must be executed from within a workspace directory.",
+  "$longDescription": "./build-long.md",
+
+  "$aliases": ["b"],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./build-impl#BuildCommand",
+
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

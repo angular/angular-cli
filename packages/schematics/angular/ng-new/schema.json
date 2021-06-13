@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularNgNew",
+  "title": "Angular Ng New Options Schema",
+  "type": "object",
+  "description": "Creates a new project by combining the workspace and application schematics.",
+  "additionalProperties": false,
+  "properties": {
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
+    },
+    "name": {
+      "description": "The name of the new workspace and initial project.",
+      "type": "string",
+      "format": "html-selector",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the new workspace and initial project?"
+    },
+    "skipInstall": {
+      "description": "Do not install dependency packages.",
+      "type": "boolean",
+      "default": false
+    },
+    "linkCli": {
+      "description": "Link the CLI to the global version (internal development only).",
+      "type": "boolean",
+      "default": false,
+      "visible": false
+    },
+    "skipGit": {
+      "description": "Do not initialize a git repository.",
+      "type": "boolean",
+      "default": false,
+      "alias": "g"
+    },
+    "commit": {
+      "description": "Initial git repository commit information.",
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": ["name", "email"]
+        }
+      ],
+      "default": true
+    },
+    "newProjectRoot": {
+      "description": "The path where new projects will be created, relative to the new workspace root.",
+      "type": "string",
+      "default": "projects"
+    },
+    "inlineStyle": {
+      "description": "Include styles inline in the component TS file. By default, an external styles file is created and referenced in the component TypeScript file.",
+      "type": "boolean",
+      "alias": "s",
+      "x-user-analytics": 9
+    },
+    "inlineTemplate": {
+      "description": "Include template inline in the component TS file. By default, an external template file is created and referenced in the component TypeScript file.",
+      "type": "boolean",
+      "alias": "t",
+      "x-user-analytics": 10
+    },
+    "viewEncapsulation": {
+      "description": "The view encapsulation strategy to use in the initial project.",
+      "enum": ["Emulated", "None", "ShadowDom"],
+      "type": "string",
+      "x-user-analytics": 11
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the Angular CLI to use.",
+      "visible": false,
+      "$default": {
+        "$source": "ng-cli-version"
+      }
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "Generate a routing module for the initial project.",
+      "x-user-analytics": 17
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The prefix to apply to generated selectors for the initial project.",
+      "minLength": 1,
+      "default": "app",
+      "alias": "p"
+    },
+    "style": {
+      "description": "The file extension or preprocessor to use for style files.",
+      "type": "string",
+      "enum": ["css", "scss", "sass", "less"],
+      "x-user-analytics": 5
+    },
+    "skipTests": {
+      "description": "Do not generate \"spec.ts\" test files for the new project.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S",
+      "x-user-analytics": 12
+    },
+    "createApplication": {
+      "description": "Create a new initial application project in the 'src' folder of the new workspace. When false, creates an empty workspace with no initial application. You can then use the generate application command so that all applications are created in the projects folder.",
+      "type": "boolean",
+      "default": true
+    },
+    "minimal": {
+      "description": "Create a workspace without any testing frameworks. (Use for learning purposes only.)",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": 14
+    },
+    "strict": {
+      "description": "Creates a workspace with stricter type checking and stricter bundle budgets settings. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.io/guide/strict-mode",
+      "type": "boolean",
+      "default": true,
+      "x-user-analytics": 7
+    },
+    "legacyBrowsers": {
+      "type": "boolean",
+      "description": "Add support for legacy browsers like Internet Explorer using differential loading.",
+      "default": false,
+      "x-deprecated": "Legacy browsers support is deprecated since version 12. For more information, see https://angular.io/guide/browser-support"
+    },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "cnpm"]
+    }
+  },
+  "required": ["name", "version"]
+}

@@ -1,0 +1,129 @@
+{
+  "schematics": {
+    "workspace-version-9": {
+      "version": "9.0.0-beta.0",
+      "factory": "./update-9",
+      "description": "Angular Workspace migration. Update an Angular CLI workspace to version 9."
+    },
+    "lazy-loading-syntax": {
+      "version": "9.0.0-next.6",
+      "factory": "./update-12/update-lazy-module-paths",
+      "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
+    },
+    "schematic-options-9": {
+      "version": "9.0.2",
+      "factory": "./update-9/schematic-options",
+      "description": "Replace deprecated 'styleext' and 'spec' Angular schematic options."
+    },
+    "tslint-version-6": {
+      "version": "10.0.0-beta.0",
+      "factory": "./update-10/update-tslint",
+      "description": "Update tslint to version 6 and adjust rules to maintain existing behavior."
+    },
+    "rename-browserslist-config": {
+      "version": "10.0.0-beta.0",
+      "factory": "./update-10/rename-browserslist-config",
+      "description": "Update Browserslist configuration file name to '.browserslistrc' from deprecated 'browserslist'."
+    },
+    "remove-es5-browser-support-option": {
+      "version": "10.0.0-beta.2",
+      "factory": "./update-10/remove-es5-browser-support",
+      "description": "Remove deprecated 'es5BrowserSupport' browser builder option. The inclusion for ES5 polyfills will be determined from the browsers listed in the browserslist configuration."
+    },
+    "schematic-options-10": {
+      "version": "10.0.0-beta.2",
+      "factory": "./update-9/schematic-options",
+      "description": "Replace deprecated and removed 'styleext' and 'spec' Angular schematic options with 'style' and 'skipTests', respectively."
+    },
+    "update-angular-config": {
+      "version": "10.0.0-beta.6",
+      "factory": "./update-10/update-angular-config",
+      "description": "Remove deprecated options from 'angular.json' that are no longer present in v10."
+    },
+    "tslint-add-deprecation-rule": {
+      "version": "10.0.0-beta.7",
+      "factory": "./update-10/add-deprecation-rule-tslint",
+      "description": "Add the tslint deprecation rule to tslint JSON configuration files."
+    },
+    "update-libraries-tslib": {
+      "version": "10.0.0-beta.7",
+      "factory": "./update-10/update-libraries-tslib",
+      "description": "Update library projects to use tslib version 2 as a direct dependency. Read more about this here: https://v10.angular.io/guide/migration-update-libraries-tslib"
+    },
+    "update-workspace-dependencies": {
+      "version": "10.0.0-rc.2",
+      "factory": "./update-10/update-dependencies",
+      "description": "Update workspace dependencies to match a new v10 project."
+    },
+    "update-module-and-target-compiler-options": {
+      "version": "10.0.1",
+      "factory": "./update-10/update-module-and-target-compiler-options",
+      "description": "Update 'module' and 'target' TypeScript compiler options. Read more about this here: https://v10.angular.io/guide/migration-update-module-and-target-compiler-options"
+    },
+    "remove-solution-style-tsconfig": {
+      "version": "10.1.0-next.5",
+      "factory": "./update-10/remove-solution-style-tsconfig",
+      "description": "Removing \"Solution Style\" TypeScript configuration file support."
+    },
+    "replace-ng-packagr-builder": {
+      "version": "11.0.0-next.0",
+      "factory": "./update-11/replace-ng-packagr-builder",
+      "description": "Replace deprecated library builder '@angular-devkit/build-ng-packagr'."
+    },
+    "add-declaration-map-compiler-option": {
+      "version": "11.0.0-next.2",
+      "factory": "./update-11/add-declaration-map-compiler-option",
+      "description": "Add 'declarationMap' compiler options for non production library builds."
+    },
+    "update-angular-config-v11": {
+      "version": "11.0.0-next.8",
+      "factory": "./update-11/update-angular-config",
+      "description": "Remove deprecated options from 'angular.json' that are no longer present in v11."
+    },
+    "update-workspace-dependencies-v11": {
+      "version": "11.0.0",
+      "factory": "./update-11/update-dependencies",
+      "description": "Update workspace dependencies to match a new v11 project."
+    },
+    "update-angular-config-v12": {
+      "version": "12.0.0-next.0",
+      "factory": "./update-12/update-angular-config",
+      "description": "Remove deprecated options from 'angular.json' that are no longer present in v12."
+    },
+    "update-zonejs": {
+      "version": "12.0.0-next.1",
+      "factory": "./update-12/update-zonejs",
+      "description": "Update 'zone.js' to version 0.11.x. Read more about this here: https://github.com/angular/angular/blob/master/packages/zone.js/CHANGELOG.md#breaking-changes-since-zonejs-v0111"
+    },
+    "remove-emit-decorator-metadata": {
+      "version": "12.0.0-next.2",
+      "factory": "./update-12/remove-emit-decorator-metadata",
+      "description": "Remove 'emitDecoratorMetadata' TypeScript compiler option. Decorator metadata is no longer needed by Angular. Read more about this here: https://www.typescriptlang.org/docs/handbook/decorators.html#metadata"
+    },
+    "lazy-loading-string-syntax": {
+      "version": "12.0.0-next.4",
+      "factory": "./update-12/update-lazy-module-paths",
+      "description": "Lazy loading syntax migration. Update lazy loading string syntax to use dynamic imports."
+    },
+    "remove-deprecated-i18n-options": {
+      "version": "12.0.0-next.7",
+      "factory": "./update-9/update-i18n#updateI18nConfig",
+      "description": "Remove deprecated ViewEngine-based i18n build and extract options. Options present in the configuration will be converted to use non-deprecated options."
+    },
+    "update-web-workers-webpack-5": {
+      "version": "12.0.0-next.7",
+      "factory": "./update-12/update-web-workers",
+      "description": "Updates Web Worker consumer usage to use the new syntax supported directly by Webpack 5."
+    },
+    "schematic-options-12": {
+      "version": "12.0.1",
+      "factory": "./update-12/schematic-options",
+      "description": "Remove invalid 'skipTests' option in '@schematics/angular:module' Angular schematic options."
+    },
+    "production-by-default": {
+      "version": "9999.0.0",
+      "factory": "./update-12/production-default-config",
+      "description": "Optional migration to update Angular CLI workspace configurations to 'production' mode by default."
+    }
+  }
+}

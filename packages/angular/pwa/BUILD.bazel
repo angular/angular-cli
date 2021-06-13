@@ -1,0 +1,68 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])  # MIT
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "pwa",
+    srcs = glob(
+        ["**/*.ts"],
+        # Currently, this library is used only with the rollup plugin.
+        # To make it simpler for downstream repositories to compile this, we
+        # neither provide compile-time deps as an `npm_install` rule, nor do we
+        # expect the downstream repository to install @types/webpack[-*]
+        # So we exclude files that depend on webpack typings.
+        exclude = [
+            "pwa/files/**/*",
+            "**/*_spec.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + [
+        "//packages/angular/pwa:pwa/schema.ts",
+    ],
+    data = glob(
+        include = [
+            "collection.json",
+            "package.json",
+            "pwa/schema.json",
+            "pwa/files/**/*",
+        ],
+    ),
+    deps = [
+        "//packages/angular_devkit/schematics",
+        "//packages/schematics/angular",
+        "@npm//@types/node",
+        "@npm//@types/parse5-html-rewriting-stream",
+    ],
+)
+
+ts_json_schema(
+    name = "pwa_schema",
+    src = "pwa/schema.json",
+)
+
+ts_library(
+    name = "pwa_test_lib",
+    testonly = True,
+    srcs = glob(["pwa/**/*_spec.ts"]),
+    # strict_checks = False,
+    deps = [
+        ":pwa",
+        "//packages/angular_devkit/schematics/testing",
+        "@npm//parse5-html-rewriting-stream",
+    ],
+)
+
+jasmine_node_test(
+    name = "pwa_test",
+    srcs = [":pwa_test_lib"],
+)

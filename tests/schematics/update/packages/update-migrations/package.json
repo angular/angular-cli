@@ -1,0 +1,8 @@
+{
+  "name": "@angular-devkit-tests/update-migrations",
+  "version": "1.6.0",
+  "description": "Tests",
+  "ng-update": {
+    "migrations": "./migrations.json"
+  }
+}
