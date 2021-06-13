@@ -70,7 +70,7 @@ export class CordHost extends SimpleMemoryHost {
   get backend(): ReadonlyHost {
     return this._back;
   }
-  get capabilities(): HostCapabilities {
+  override get capabilities(): HostCapabilities {
     // Our own host is always Synchronous, but the backend might not be.
     return {
       synchronous: this._back.capabilities.synchronous,
@@ -219,7 +219,7 @@ export class CordHost extends SimpleMemoryHost {
     );
   }
 
-  write(path: Path, content: FileBuffer): Observable<void> {
+  override write(path: Path, content: FileBuffer): Observable<void> {
     return this.exists(path).pipe(
       switchMap((exists) => {
         if (exists) {
@@ -236,7 +236,7 @@ export class CordHost extends SimpleMemoryHost {
     );
   }
 
-  read(path: Path): Observable<FileBuffer> {
+  override read(path: Path): Observable<FileBuffer> {
     if (this._exists(path)) {
       return super.read(path);
     }
@@ -244,7 +244,7 @@ export class CordHost extends SimpleMemoryHost {
     return this._back.read(path);
   }
 
-  delete(path: Path): Observable<void> {
+  override delete(path: Path): Observable<void> {
     if (this._exists(path)) {
       if (this._filesToCreate.has(path)) {
         this._filesToCreate.delete(path);
@@ -280,7 +280,7 @@ export class CordHost extends SimpleMemoryHost {
     }
   }
 
-  rename(from: Path, to: Path): Observable<void> {
+  override rename(from: Path, to: Path): Observable<void> {
     return concat(this.exists(to), this.exists(from)).pipe(
       toArray(),
       switchMap(([existTo, existFrom]) => {
@@ -347,7 +347,7 @@ export class CordHost extends SimpleMemoryHost {
     );
   }
 
-  list(path: Path): Observable<PathFragment[]> {
+  override list(path: Path): Observable<PathFragment[]> {
     return concat(super.list(path), this._back.list(path)).pipe(
       reduce((list: Set<PathFragment>, curr: PathFragment[]) => {
         curr.forEach((elem) => list.add(elem));
@@ -358,17 +358,17 @@ export class CordHost extends SimpleMemoryHost {
     );
   }
 
-  exists(path: Path): Observable<boolean> {
+  override exists(path: Path): Observable<boolean> {
     return this._exists(path)
       ? of(true)
       : this.willDelete(path) || this.willRename(path)
       ? of(false)
       : this._back.exists(path);
   }
-  isDirectory(path: Path): Observable<boolean> {
+  override isDirectory(path: Path): Observable<boolean> {
     return this._exists(path) ? super.isDirectory(path) : this._back.isDirectory(path);
   }
-  isFile(path: Path): Observable<boolean> {
+  override isFile(path: Path): Observable<boolean> {
     return this._exists(path)
       ? super.isFile(path)
       : this.willDelete(path) || this.willRename(path)
@@ -376,7 +376,7 @@ export class CordHost extends SimpleMemoryHost {
       : this._back.isFile(path);
   }
 
-  stat(path: Path): Observable<Stats | null> | null {
+  override stat(path: Path): Observable<Stats | null> | null {
     return this._exists(path)
       ? super.stat(path)
       : this.willDelete(path) || this.willRename(path)
@@ -384,7 +384,7 @@ export class CordHost extends SimpleMemoryHost {
       : this._back.stat(path);
   }
 
-  watch(path: Path, options?: HostWatchOptions) {
+  override watch(path: Path, options?: HostWatchOptions) {
     // Watching not supported.
     return null;
   }

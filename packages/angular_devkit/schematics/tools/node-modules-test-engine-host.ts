@@ -30,7 +30,7 @@ export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
     this._collections.set(name, path);
   }
 
-  transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
+  override transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
     const oldAddTask = context.addTask;
     context.addTask = (task: TaskConfigurationGenerator<{}>, dependencies?: Array<TaskId>) => {
       this._tasks.push(task.toConfiguration());
@@ -41,7 +41,7 @@ export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
     return context;
   }
 
-  protected _resolveCollectionPath(name: string, requester?: string): string {
+  protected override _resolveCollectionPath(name: string, requester?: string): string {
     const maybePath = this._collections.get(name);
     if (maybePath) {
       return maybePath;

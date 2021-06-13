@@ -15,7 +15,7 @@ export class NullLogger extends Logger {
     this._observable = EMPTY;
   }
 
-  asApi(): LoggerApi {
+  override asApi(): LoggerApi {
     return {
       createChild: () => new NullLogger(this),
       log() {},

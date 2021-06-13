@@ -85,7 +85,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     return desc as FileSystemSchematicDesc;
   }
 
-  hasTaskExecutor(name: string): boolean {
+  override hasTaskExecutor(name: string): boolean {
     if (super.hasTaskExecutor(name)) {
       return true;
     }
@@ -100,7 +100,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     return false;
   }
 
-  createTaskExecutor(name: string): Observable<TaskExecutor> {
+  override createTaskExecutor(name: string): Observable<TaskExecutor> {
     if (!super.hasTaskExecutor(name)) {
       try {
         const path = require.resolve(join(this._root, name));

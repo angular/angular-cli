@@ -101,7 +101,7 @@ export class ScopedTree implements Tree {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     const delegate = new (class extends DelegateTree {
-      get actions(): Action[] {
+      override get actions(): Action[] {
         return other.actions.map((action) => self._fullPathAction(action));
       }
     })(other);

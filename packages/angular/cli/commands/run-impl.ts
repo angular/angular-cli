@@ -11,7 +11,7 @@ import { Arguments } from '../models/interface';
 import { Schema as RunCommandSchema } from './run';
 
 export class RunCommand extends ArchitectCommand<RunCommandSchema> {
-  public async run(options: ArchitectCommandOptions & Arguments) {
+  public override async run(options: ArchitectCommandOptions & Arguments) {
     if (options.target) {
       return this.runArchitectTarget(options);
     } else {

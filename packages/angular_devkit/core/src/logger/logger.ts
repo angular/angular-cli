@@ -134,22 +134,22 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     return this.log('fatal', message, metadata);
   }
 
-  toString() {
+  override toString() {
     return `<Logger(${this.name})>`;
   }
 
-  lift<R>(operator: Operator<LogEntry, R>): Observable<R> {
+  override lift<R>(operator: Operator<LogEntry, R>): Observable<R> {
     return this._observable.lift(operator);
   }
 
-  subscribe(): Subscription;
-  subscribe(observer: PartialObserver<LogEntry>): Subscription;
-  subscribe(
+  override subscribe(): Subscription;
+  override subscribe(observer: PartialObserver<LogEntry>): Subscription;
+  override subscribe(
     next?: (value: LogEntry) => void,
     error?: (error: Error) => void,
     complete?: () => void,
   ): Subscription;
-  subscribe(
+  override subscribe(
     _observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
     _error?: (error: Error) => void,
     _complete?: () => void,
@@ -158,10 +158,10 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     return this._observable.subscribe.apply(
       this._observable,
       // eslint-disable-next-line prefer-rest-params
-      (arguments as unknown) as Parameters<Observable<LogEntry>['subscribe']>,
+      arguments as unknown as Parameters<Observable<LogEntry>['subscribe']>,
     );
   }
-  forEach(next: (value: LogEntry) => void, PromiseCtor?: typeof Promise): Promise<void> {
+  override forEach(next: (value: LogEntry) => void, PromiseCtor?: typeof Promise): Promise<void> {
     return this._observable.forEach(next, PromiseCtor);
   }
 }

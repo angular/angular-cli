@@ -12,10 +12,10 @@ import { VERSION } from '../models/version';
 import { Schema as NewCommandSchema } from './new';
 
 export class NewCommand extends SchematicCommand<NewCommandSchema> {
-  public readonly allowMissingWorkspace = true;
-  schematicName = 'ng-new';
+  public override readonly allowMissingWorkspace = true;
+  override schematicName = 'ng-new';
 
-  async initialize(options: NewCommandSchema & Arguments) {
+  override async initialize(options: NewCommandSchema & Arguments) {
     this.collectionName = options.collection || (await this.getDefaultSchematicCollection());
 
     return super.initialize(options);

@@ -84,10 +84,10 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     this._context = [];
   }
 
-  get engine(): FileSystemEngine {
+  override get engine(): FileSystemEngine {
     return this._engine as FileSystemEngine;
   }
-  get engineHost(): NodeModulesEngineHost {
+  override get engineHost(): NodeModulesEngineHost {
     return this._engineHost as NodeModulesEngineHost;
   }
 }

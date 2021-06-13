@@ -25,10 +25,12 @@ Find more packages on npm https://www.npmjs.com/search?q=ng%20deploy
 `;
 
 export class DeployCommand extends ArchitectCommand<DeployCommandSchema> {
-  public readonly target = 'deploy';
-  public readonly missingTargetError = BuilderMissing;
+  public override readonly target = 'deploy';
+  public override readonly missingTargetError = BuilderMissing;
 
-  public async initialize(options: DeployCommandSchema & Arguments): Promise<number | void> {
+  public override async initialize(
+    options: DeployCommandSchema & Arguments,
+  ): Promise<number | void> {
     if (!options.help) {
       return super.initialize(options);
     }

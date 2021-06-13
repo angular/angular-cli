@@ -190,7 +190,7 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
     return project;
   }
 
-  set(name: string, value: ProjectDefinition): this {
+  override set(name: string, value: ProjectDefinition): this {
     this._validateName(name);
 
     super.set(name, value);
@@ -235,7 +235,7 @@ export class TargetDefinitionCollection extends DefinitionCollection<TargetDefin
     return target;
   }
 
-  set(name: string, value: TargetDefinition): this {
+  override set(name: string, value: TargetDefinition): this {
     this._validateName(name);
 
     super.set(name, value);
