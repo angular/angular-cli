@@ -30,15 +30,15 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
         **kwargs
     )
 
-NG_VERSION = "^12.0.0-rc.1"
+NG_VERSION = "^12.1.0-next.5"
 RXJS_VERSION = "^6.5.5"
 HAPI_VERSION = "^18.4.0"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
-DEVKIT_CORE_VERSION = "^12.0.0-rc.1"
-DEVKIT_ARCHITECT_VERSION = "^0.1200.0-rc.1"
-DEVKIT_BUILD_ANGULAR_VERSION = "^12.0.0-rc.1"
-TSLIB_VERSION = "^2.1.0"
+DEVKIT_CORE_VERSION = "^12.1.0-next.5"
+DEVKIT_ARCHITECT_VERSION = "^0.1201.0-next.5"
+DEVKIT_BUILD_ANGULAR_VERSION = "^12.1.0-next.5"
+TSLIB_VERSION = "^2.3.0"
 
 NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
     "aspnetcore-engine",
