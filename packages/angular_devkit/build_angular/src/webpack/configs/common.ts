@@ -425,7 +425,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           return `[name]${targetInFileName}${hashFormat.chunk}.js`;
         }
       },
-      chunkFilename: `[id]${targetInFileName}${hashFormat.chunk}.js`,
+      chunkFilename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
     },
     watch: buildOptions.watch,
     watchOptions: getWatchOptions(buildOptions.poll),
