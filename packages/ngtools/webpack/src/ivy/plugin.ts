@@ -127,7 +127,7 @@ export class AngularWebpackPlugin {
 
     // Set resolver options
     const pathsPlugin = new TypeScriptPathsPlugin();
-    compiler.hooks.afterResolvers.tap('angular-compiler', (compiler) => {
+    compiler.hooks.afterResolvers.tap(PLUGIN_NAME, (compiler) => {
       // When Ivy is enabled we need to add the fields added by NGCC
       // to take precedence over the provided mainFields.
       // NGCC adds fields in package.json suffixed with '_ivy_ngcc'
@@ -149,7 +149,7 @@ export class AngularWebpackPlugin {
     let ngccProcessor: NgccProcessor | undefined;
     let resourceLoader: WebpackResourceLoader | undefined;
     let previousUnused: Set<string> | undefined;
-    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation, { normalModuleFactory }) => {
       // Register plugin to ensure deterministic emit order in multi-plugin usage
       const emitRegistration = this.registerWithCompilation(compilation);
 
@@ -158,6 +158,14 @@ export class AngularWebpackPlugin {
       // Initialize the resource loader if not already setup
       if (!resourceLoader) {
         resourceLoader = new WebpackResourceLoader(this.watchMode);
+      }
+
+      // Needed for resource loader
+      if (compilation.options.experiments.executeModule) {
+        compilation.dependencyFactories.set(
+          compilation.compiler.webpack.dependencies.ModuleDependency,
+          normalModuleFactory,
+        );
       }
 
       // Initialize and process eager ngcc if not already setup
@@ -275,7 +283,7 @@ export class AngularWebpackPlugin {
         await this.rebuildRequiredFiles(modules, compilation, fileEmitter);
 
         // Clear out the Webpack compilation to avoid an extra retaining reference
-        resourceLoader?.clearParentCompilation();
+        resourceLoader?.clean();
 
         // Analyze program for unused files
         if (compilation.errors.length > 0) {
