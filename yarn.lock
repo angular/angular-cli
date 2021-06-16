@@ -6135,7 +6135,27 @@ injection-js@^2.4.0:
   dependencies:
     tslib "^2.0.0"
 
-inquirer@8.1.0, inquirer@^8.0.0:
+inquirer@8.1.1:
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-8.1.1.tgz#7c53d94c6d03011c7bb2a947f0dca3b98246c26a"
+  integrity sha512-hUDjc3vBkh/uk1gPfMAD/7Z188Q8cvTGl0nxwaCdwSbzFh6ZKkZh+s2ozVxbE5G9ZNRyeY0+lgbAIOUFsFf98w==
+  dependencies:
+    ansi-escapes "^4.2.1"
+    chalk "^4.1.1"
+    cli-cursor "^3.1.0"
+    cli-width "^3.0.0"
+    external-editor "^3.0.3"
+    figures "^3.0.0"
+    lodash "^4.17.21"
+    mute-stream "0.0.8"
+    ora "^5.3.0"
+    run-async "^2.4.0"
+    rxjs "^6.6.6"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+    through "^2.3.6"
+
+inquirer@^8.0.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-8.1.0.tgz#68ce5ce5376cf0e89765c993d8b7c1e62e184d69"
   integrity sha512-1nKYPoalt1vMBfCMtpomsUc32wmOoWXAoq3kM/5iTfxyQ2f/BxjixQpC+mbZ7BI0JUXHED4/XPXekDVtJNpXYw==
@@ -8069,10 +8089,10 @@ npm-normalize-package-bin@^1.0.0, npm-normalize-package-bin@^1.0.1:
   resolved "https://registry.yarnpkg.com/npm-normalize-package-bin/-/npm-normalize-package-bin-1.0.1.tgz#6e79a41f23fd235c0623218228da7d9c23b8f6e2"
   integrity sha512-EPfafl6JL5/rU+ot6P3gRSCpPDW5VmIzX959Ob1+ySFUuuYHWHekXpwdUZcKP5C+DS4GEtdJluwBjnsNDl+fSA==
 
-npm-package-arg@8.1.4, npm-package-arg@^8.0.0, npm-package-arg@^8.0.1, npm-package-arg@^8.1.2:
-  version "8.1.4"
-  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.1.4.tgz#8001cdbc4363997b8ef6c6cf7aaf543c5805879d"
-  integrity sha512-xLokoCFqj/rPdr3LvcdDL6Kj6ipXGEDHD/QGpzwU6/pibYUOXmp5DBmg76yukFyx4ZDbrXNOTn+BPyd8TD4Jlw==
+npm-package-arg@8.1.5:
+  version "8.1.5"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.1.5.tgz#3369b2d5fe8fdc674baa7f1786514ddc15466e44"
+  integrity sha512-LhgZrg0n0VgvzVdSm1oiZworPbTxYHUJCgtsJW8mGvlDpxTM1vSJc3m5QZeUkhAHIzbz3VCHd/R4osi1L1Tg/Q==
   dependencies:
     hosted-git-info "^4.0.1"
     semver "^7.3.4"
@@ -8086,6 +8106,15 @@ npm-package-arg@8.1.4, npm-package-arg@^8.0.0, npm-package-arg@^8.0.1, npm-packa
     hosted-git-info "^2.7.1"
     osenv "^0.1.5"
     semver "^5.6.0"
+    validate-npm-package-name "^3.0.0"
+
+npm-package-arg@^8.0.0, npm-package-arg@^8.0.1, npm-package-arg@^8.1.2:
+  version "8.1.4"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.1.4.tgz#8001cdbc4363997b8ef6c6cf7aaf543c5805879d"
+  integrity sha512-xLokoCFqj/rPdr3LvcdDL6Kj6ipXGEDHD/QGpzwU6/pibYUOXmp5DBmg76yukFyx4ZDbrXNOTn+BPyd8TD4Jlw==
+  dependencies:
+    hosted-git-info "^4.0.1"
+    semver "^7.3.4"
     validate-npm-package-name "^3.0.0"
 
 npm-packlist@^2.1.4:
@@ -10248,10 +10277,10 @@ sass-loader@12.1.0:
     klona "^2.0.4"
     neo-async "^2.6.2"
 
-sass@1.35.0:
-  version "1.35.0"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.35.0.tgz#37c39e60eb3f82149488a9ca9ae48f888bf9324d"
-  integrity sha512-9joxNu7CoIEdZTDZFnH67NoWE/1VTofGPYiSIntWSE391SfmPu6Kd2Y0ZclDu9WQhVvvPwvo8LHeb/8wHIj95Q==
+sass@1.35.1:
+  version "1.35.1"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.35.1.tgz#90ecf774dfe68f07b6193077e3b42fb154b9e1cd"
+  integrity sha512-oCisuQJstxMcacOPmxLNiLlj4cUyN2+8xJnG7VanRoh2GOLr9RqkvI4AxA4a6LHVg/rsu+PmxXeGhrdSF9jCiQ==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
 
