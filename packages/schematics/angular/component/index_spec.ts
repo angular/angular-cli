@@ -7,7 +7,7 @@
  */
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { Schema as ApplicationOptions } from '../application/schema';
+import { Style as AppStyle, Schema as ApplicationOptions } from '../application/schema';
 import { createAppModule } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { ChangeDetection, Schema as ComponentOptions, Style } from './schema';
@@ -43,7 +43,7 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: Style.Css,
+    style: AppStyle.Css,
     skipTests: false,
     skipPackageJson: false,
   };
@@ -276,6 +276,15 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/styleUrls: \['.\/foo.component.sass/);
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.sass');
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
+  });
+
+  it('should respect the style=none option', async () => {
+    const options = { ...defaultOptions, style: Style.None };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).not.toMatch(/styleUrls: /);
+    expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
+    expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.none');
   });
 
   it('should respect the type option', async () => {

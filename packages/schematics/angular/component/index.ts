@@ -30,7 +30,7 @@ import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { validateHtmlSelector, validateName } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
-import { Schema as ComponentOptions } from './schema';
+import { Schema as ComponentOptions, Style } from './schema';
 
 function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
   const text = host.read(modulePath);
@@ -135,9 +135,10 @@ export default function (options: ComponentOptions): Rule {
     validateName(options.name);
     validateHtmlSelector(options.selector);
 
+    const skipStyleFile = options.inlineStyle || options.style === Style.None;
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
-      options.inlineStyle ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
+      skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
       options.inlineTemplate ? filter((path) => !path.endsWith('.html.template')) : noop(),
       applyTemplates({
         ...strings,
