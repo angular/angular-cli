@@ -10,9 +10,8 @@ import { logging, tags } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as npa from 'npm-package-arg';
 import * as semver from 'semver';
-import { getNpmPackageJson } from './npm';
-import { NpmRepositoryPackageJson } from './npm-package-json';
-import { Dependency, JsonSchemaForNpmPackageJsonFiles } from './package-json';
+import { Dependency, JsonSchemaForNpmPackageJsonFiles } from '../../../../utilities/package-json';
+import { NpmRepositoryPackageJson, getNpmPackageJson } from '../../../../utilities/package-metadata';
 import { Schema as UpdateSchema } from './schema';
 
 type VersionRange = string & { __VERSION_RANGE: void };
@@ -818,7 +817,7 @@ export default function (options: UpdateSchema): Rule {
     const allPackageMetadata = await Promise.all(
       Array.from(npmDeps.keys()).map((depName) =>
         getNpmPackageJson(depName, logger, {
-          registryUrl: options.registry,
+          registry: options.registry,
           usingYarn,
           verbose: options.verbose,
         }),

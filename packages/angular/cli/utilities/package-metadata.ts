@@ -10,13 +10,31 @@ import { logging } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import * as path from 'path';
+import { JsonSchemaForNpmPackageJsonFiles } from './package-json';
 
 const lockfile = require('@yarnpkg/lockfile');
 const ini = require('ini');
 const pacote = require('pacote');
 
-export interface PackageDependencies {
-  [dependency: string]: string;
+const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
+
+export interface NpmRepositoryPackageJson {
+  name: string;
+  requestedName: string;
+  description: string;
+
+  'dist-tags': {
+    [name: string]: string;
+  };
+  versions: {
+    [version: string]: JsonSchemaForNpmPackageJsonFiles;
+  };
+  time: {
+    modified: string;
+    created: string;
+
+    [version: string]: string;
+  };
 }
 
 export type NgAddSaveDepedency = 'dependencies' | 'devDependencies' | boolean;
@@ -37,17 +55,16 @@ export interface PackageManifest {
   license?: string;
   private?: boolean;
   deprecated?: boolean;
-
-  dependencies: PackageDependencies;
-  devDependencies: PackageDependencies;
-  peerDependencies: PackageDependencies;
-  optionalDependencies: PackageDependencies;
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
+  peerDependencies: Record<string, string>;
+  optionalDependencies: Record<string, string>;
   'ng-add'?: {
     save?: NgAddSaveDepedency;
   };
   'ng-update'?: {
     migrations: string;
-    packageGroup: { [name: string]: string };
+    packageGroup: Record<string, string>;
   };
 }
 
@@ -58,7 +75,9 @@ export interface PackageMetadata {
   'dist-tags'?: unknown;
 }
 
-type PackageManagerOptions = Record<string, unknown>;
+interface PackageManagerOptions extends Record<string, unknown> {
+  forceAuth?: Record<string, unknown>;
+}
 
 let npmrc: PackageManagerOptions;
 
@@ -122,47 +141,44 @@ function readOptions(
       // See: https://github.com/npm/npm-registry-fetch/blob/ebddbe78a5f67118c1f7af2e02c8a22bcaf9e850/index.js#L99-L126
       const rcConfig: PackageManagerOptions = yarn ? lockfile.parse(data) : ini.parse(data);
       for (const [key, value] of Object.entries(rcConfig)) {
+        let substitutedValue = value;
+
+        // Substitute any environment variable references.
+        if (typeof value === 'string') {
+          substitutedValue = value.replace(/\$\{([^\}]+)\}/, (_, name) => process.env[name] || '');
+        }
+
         switch (key) {
           case 'noproxy':
           case 'no-proxy':
-            options['noProxy'] = value;
+            options['noProxy'] = substitutedValue;
             break;
           case 'maxsockets':
-            options['maxSockets'] = value;
+            options['maxSockets'] = substitutedValue;
             break;
           case 'https-proxy':
           case 'proxy':
-            options['proxy'] = value;
+            options['proxy'] = substitutedValue;
             break;
           case 'strict-ssl':
-            options['strictSSL'] = value;
+            options['strictSSL'] = substitutedValue;
             break;
           case 'local-address':
-            options['localAddress'] = value;
+            options['localAddress'] = substitutedValue;
             break;
           case 'cafile':
-            if (typeof value === 'string') {
-              const cafile = path.resolve(path.dirname(location), value);
+            if (typeof substitutedValue === 'string') {
+              const cafile = path.resolve(path.dirname(location), substitutedValue);
               try {
                 options['ca'] = readFileSync(cafile, 'utf8').replace(/\r?\n/g, '\n');
               } catch {}
             }
             break;
           default:
-            options[key] = value;
+            options[key] = substitutedValue;
             break;
         }
       }
-    } else if (showPotentials) {
-      logger.info(`Trying '${location}'...not found.`);
-    }
-  }
-
-  // Substitute any environment variable references
-  for (const key in options) {
-    const value = options[key];
-    if (typeof value === 'string') {
-      options[key] = value.replace(/\$\{([^\}]+)\}/, (_, name) => process.env[name] || '');
     }
   }
 
@@ -238,18 +254,13 @@ export async function fetchPackageMetadata(
 export async function fetchPackageManifest(
   name: string,
   logger: logging.LoggerApi,
-  options?: {
+  options: {
     registry?: string;
     usingYarn?: boolean;
     verbose?: boolean;
-  },
+  } = {},
 ): Promise<PackageManifest> {
-  const { usingYarn, verbose, registry } = {
-    registry: undefined,
-    usingYarn: false,
-    verbose: false,
-    ...options,
-  };
+  const { usingYarn = false, verbose = false, registry } = options;
 
   ensureNpmrc(logger, usingYarn, verbose);
 
@@ -260,4 +271,50 @@ export async function fetchPackageManifest(
   });
 
   return normalizeManifest(response);
+}
+
+export function getNpmPackageJson(
+  packageName: string,
+  logger: logging.LoggerApi,
+  options: {
+    registry?: string;
+    usingYarn?: boolean;
+    verbose?: boolean;
+  } = {},
+): Promise<Partial<NpmRepositoryPackageJson>> {
+  const cachedResponse = npmPackageJsonCache.get(packageName);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  const { usingYarn = false, verbose = false, registry } = options;
+
+  if (!npmrc) {
+    try {
+      npmrc = readOptions(logger, false, verbose);
+    } catch {}
+
+    if (usingYarn) {
+      try {
+        npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
+      } catch {}
+    }
+  }
+
+  const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(packageName, {
+    fullMetadata: true,
+    ...npmrc,
+    ...(registry ? { registry } : {}),
+  });
+
+  // TODO: find some way to test this
+  const response = resultPromise.catch((err) => {
+    logger.warn(err.message || err);
+
+    return { requestedName: packageName };
+  });
+
+  npmPackageJsonCache.set(packageName, response);
+
+  return response;
 }
