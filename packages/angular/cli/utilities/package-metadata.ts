@@ -149,6 +149,19 @@ function readOptions(
         }
 
         switch (key) {
+          // Unless auth options are scope with the registry url it appears that npm-registry-fetch ignores them,
+          // even though they are documented.
+          // https://github.com/npm/npm-registry-fetch/blob/8954f61d8d703e5eb7f3d93c9b40488f8b1b62ac/README.md
+          // https://github.com/npm/npm-registry-fetch/blob/8954f61d8d703e5eb7f3d93c9b40488f8b1b62ac/auth.js#L45-L91
+          case '_authToken':
+          case 'token':
+          case 'username':
+          case 'password':
+          case '_auth':
+          case 'auth':
+            options['forceAuth'] ??= {};
+            options['forceAuth'][key] = substitutedValue;
+            break;
           case 'noproxy':
           case 'no-proxy':
             options['noProxy'] = substitutedValue;
