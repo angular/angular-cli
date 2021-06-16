@@ -120,9 +120,11 @@ function readOptions(
   ];
 
   const projectConfigLocations: string[] = [path.join(cwd, dotFilename)];
-  const root = path.parse(cwd).root;
-  for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
-    projectConfigLocations.unshift(path.join(curDir, dotFilename));
+  if (yarn) {
+    const root = path.parse(cwd).root;
+    for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
+      projectConfigLocations.unshift(path.join(curDir, dotFilename));
+    }
   }
 
   if (showPotentials) {
