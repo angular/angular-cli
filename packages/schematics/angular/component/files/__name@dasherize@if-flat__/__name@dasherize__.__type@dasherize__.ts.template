@@ -14,7 +14,7 @@ import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }
         display: block;
       }
     `<% } %>
-  ]<% } else { %>
+  ]<% } else if (style !== 'none') { %>
   styleUrls: ['./<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.<%= style %>']<% } %><% if(!!viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
