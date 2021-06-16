@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export const AngularPluginSymbol = Symbol.for('@angular-devkit/build-angular[angular-compiler]');
+export const AngularPluginSymbol = Symbol.for('@ngtools/webpack[angular-compiler]');
 
 export interface EmitFileResult {
   content?: string;

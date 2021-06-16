@@ -13,7 +13,7 @@ import { ExtraEntryPoint } from '../../browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { BuildBrowserFeatures } from '../../utils/build-browser-features';
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { maxWorkers } from '../../utils/environment-options';
+import { executeModulesDisabled, maxWorkers } from '../../utils/environment-options';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -229,7 +229,12 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
 
   if (buildOptions.extractCss) {
     // extract global css from js files into own css file.
-    extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
+    extraPlugins.push(
+      new MiniCssExtractPlugin({
+        filename: `[name]${hashFormat.extract}.css`,
+        experimentalUseImportModule: !executeModulesDisabled,
+      }),
+    );
 
     if (!buildOptions.hmr) {
       // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.

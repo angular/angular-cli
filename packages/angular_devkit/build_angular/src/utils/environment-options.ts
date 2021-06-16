@@ -102,3 +102,7 @@ export const profilingEnabled = isPresent(profilingVariable) && isEnabled(profil
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 export const maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
+
+/** Disable Webpack experimental executeModule */
+const executeModules = process.env['NG_EXECUTE_MODULES'];
+export const executeModulesDisabled = isPresent(executeModules) && isDisabled(executeModules);

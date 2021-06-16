@@ -37,6 +37,7 @@ import {
   allowMangle,
   allowMinify,
   cachingDisabled,
+  executeModulesDisabled,
   maxWorkers,
   persistentBuildCacheEnabled,
   profilingEnabled,
@@ -480,6 +481,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ],
     },
     experiments: {
+      executeModule: !executeModulesDisabled,
       syncWebAssembly: true,
       asyncWebAssembly: true,
     },

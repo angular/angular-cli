@@ -18,7 +18,6 @@ import { normalizePath } from './ivy/paths';
 
 interface CompilationOutput {
   content: string;
-  map?: string;
   success: boolean;
 }
 
@@ -27,6 +26,7 @@ export class WebpackResourceLoader {
   private _fileDependencies = new Map<string, Set<string>>();
   private _reverseDependencies = new Map<string, Set<string>>();
 
+  private readonly inlineAngularResources = new Map<string, string>();
   private fileCache?: Map<string, CompilationOutput>;
   private assetCache?: Map<string, Asset>;
 
@@ -34,6 +34,8 @@ export class WebpackResourceLoader {
   private outputPathCounter = 1;
 
   private readonly inlineDataLoaderPath = require.resolve('./inline-data-loader');
+
+  private executeModule = false;
 
   constructor(shouldCache: boolean) {
     if (shouldCache) {
@@ -44,7 +46,18 @@ export class WebpackResourceLoader {
 
   update(parentCompilation: Compilation, changedFiles?: Iterable<string>) {
     this._parentCompilation = parentCompilation;
+    this.executeModule = !!parentCompilation.compiler.options.experiments.executeModule;
 
+    if (this.executeModule) {
+      parentCompilation.compiler.webpack.NormalModule.getCompilationHooks(
+        parentCompilation,
+      ).loader.tap(
+        'angular_compiler',
+        (loaderContext: { [InlineAngularResourceSymbol]?: Map<string, string> }) => {
+          loaderContext[InlineAngularResourceSymbol] = this.inlineAngularResources;
+        },
+      );
+    }
     // Update resource cache and modified resources
     this.modifiedResources.clear();
 
@@ -78,8 +91,9 @@ export class WebpackResourceLoader {
     }
   }
 
-  clearParentCompilation() {
+  clean() {
     this._parentCompilation = undefined;
+    this.inlineAngularResources.clear();
   }
 
   getModifiedResourceFiles() {
@@ -314,7 +328,17 @@ export class WebpackResourceLoader {
 
     if (compilationResult === undefined) {
       // cache miss so compile resource
-      compilationResult = await this._compile(filePath);
+      if (this.executeModule) {
+        try {
+          compilationResult = await this.compileModule(filePath);
+        } catch (error) {
+          this._parentCompilation?.errors.push(error);
+
+          return '';
+        }
+      } else {
+        compilationResult = await this._compile(filePath);
+      }
 
       // Only cache if compilation was successful
       if (this.fileCache && compilationResult.success) {
@@ -323,6 +347,126 @@ export class WebpackResourceLoader {
     }
 
     return compilationResult.content;
+  }
+
+  private async compileModule(
+    filePath?: string,
+    data?: string,
+    fileExtension?: string,
+    containingFile?: string,
+  ): Promise<CompilationOutput> {
+    if (!this._parentCompilation) {
+      throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
+    }
+
+    const compilation = this._parentCompilation;
+
+    const { webpack, context } = this._parentCompilation.compiler;
+    // Create a special URL for reading the resource from memory
+    const entry =
+      filePath ||
+      `${containingFile}-${this.outputPathCounter}.${fileExtension}!=!${this.inlineDataLoaderPath}!${containingFile}`;
+    this.outputPathCounter++;
+
+    const dep = new webpack.dependencies.ModuleDependency(entry);
+    dep.weak = true;
+    dep.loc = {
+      name: entry,
+    };
+
+    if (data) {
+      this.inlineAngularResources.set(entry, data);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const factory = compilation.dependencyFactories.get(dep.constructor as any);
+    if (!factory) {
+      throw new Error(`No module factory available for dependency type: ${dep.constructor.name}`);
+    }
+
+    compilation.buildQueue.increaseParallelism();
+
+    return new Promise<CompilationOutput>((resolve, reject) => {
+      compilation.handleModuleCreation(
+        {
+          factory,
+          dependencies: [dep],
+          originModule: null,
+          context,
+          connectOrigin: false,
+        },
+        (err) => {
+          compilation.buildQueue.decreaseParallelism();
+          if (err) {
+            return reject(err);
+          }
+          const referencedModule = compilation.moduleGraph.getModule(dep);
+
+          if (!referencedModule) {
+            return reject(new Error(`Cannot load the module for ${entry}.`));
+          }
+
+          compilation.executeModule(referencedModule, {}, (err, result) => {
+            this.inlineAngularResources.delete(entry);
+
+            if (err) {
+              return reject(err);
+            }
+
+            if (!result) {
+              return reject(new Error(`No result for ${entry}.`));
+            }
+
+            for (const d of result.fileDependencies) {
+              compilation.fileDependencies.add(d);
+            }
+            for (const d of result.contextDependencies) {
+              compilation.contextDependencies.add(d);
+            }
+            for (const d of result.missingDependencies) {
+              compilation.missingDependencies.add(d);
+            }
+            for (const d of result.buildDependencies) {
+              compilation.buildDependencies.add(d);
+            }
+            for (const [name, { source, info }] of result.assets) {
+              if (info.sourceFilename === undefined) {
+                throw new Error(`'${name}' asset info 'sourceFilename' is 'undefined'.`);
+              }
+
+              this.assetCache?.set(info.sourceFilename, { info, name, source });
+            }
+
+            // Save the dependencies for this resource.
+            if (filePath) {
+              this._fileDependencies.set(filePath, new Set(result.fileDependencies));
+              for (const file of result.fileDependencies) {
+                const resolvedFile = normalizePath(file);
+
+                // Skip paths that do not appear to be files (have no extension).
+                // `fileDependencies` can contain directories and not just files which can
+                // cause incorrect cache invalidation on rebuilds.
+                if (!path.extname(resolvedFile)) {
+                  continue;
+                }
+
+                const entry = this._reverseDependencies.get(resolvedFile);
+                if (entry) {
+                  entry.add(filePath);
+                } else {
+                  this._reverseDependencies.set(resolvedFile, new Set([filePath]));
+                }
+              }
+            }
+
+            resolve({
+              success: typeof result.exports.default === 'string',
+              content: result.exports.default,
+            });
+          });
+        },
+      );
+    });
   }
 
   async process(
@@ -334,6 +478,23 @@ export class WebpackResourceLoader {
   ): Promise<string> {
     if (data.trim().length === 0) {
       return '';
+    }
+
+    if (this.executeModule) {
+      try {
+        const { content } = await this.compileModule(
+          undefined,
+          data,
+          fileExtension,
+          containingFile,
+        );
+
+        return content;
+      } catch (error) {
+        this._parentCompilation?.errors.push(error);
+
+        return '';
+      }
     }
 
     const compilationResult = await this._compile(
