@@ -99,4 +99,14 @@ describe('Class Schematic', () => {
     appTree = await schematicRunner.runSchematicAsync('class', defaultOptions, appTree).toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.ts');
   });
+
+  it('should respect the skipTests flag', async () => {
+    const options = {
+      ...defaultOptions,
+      skipTests: true,
+    };
+    const tree = await schematicRunner.runSchematicAsync('class', options, appTree).toPromise();
+    expect(tree.files).toContain('/projects/bar/src/app/foo.ts');
+    expect(tree.files).not.toContain('/projects/bar/src/app/foo.spec.ts');
+  });
 });

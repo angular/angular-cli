@@ -365,4 +365,19 @@ describe('Component Schematic', () => {
       .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.component.ts');
   });
+
+  it('should respect the skipTests option', async () => {
+    const options = { ...defaultOptions, skipTests: true };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const files = tree.files;
+
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/projects/bar/src/app/foo/foo.component.css',
+        '/projects/bar/src/app/foo/foo.component.html',
+        '/projects/bar/src/app/foo/foo.component.ts',
+      ]),
+    );
+    expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
+  });
 });

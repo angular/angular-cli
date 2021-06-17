@@ -138,4 +138,13 @@ describe('Pipe Schematic', () => {
     appTree = await schematicRunner.runSchematicAsync('pipe', defaultOptions, appTree).toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.pipe.ts');
   });
+
+  it('should respect the skipTests flag', async () => {
+    const options = { ...defaultOptions, skipTests: true };
+
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
+    const files = tree.files;
+    expect(files).not.toContain('/projects/bar/src/app/foo.pipe.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
+  });
 });
