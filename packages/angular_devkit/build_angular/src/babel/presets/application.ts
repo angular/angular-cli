@@ -20,6 +20,7 @@ export interface ApplicationPresetOptions {
   angularLinker?: {
     shouldLink: boolean;
     jitMode: boolean;
+    sourcemap: boolean;
   };
 
   forceES5?: boolean;
@@ -31,7 +32,8 @@ export interface ApplicationPresetOptions {
 type I18nDiagnostics = import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
 function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): I18nDiagnostics {
   // Babel currently is synchronous so import cannot be used
-  const diagnostics: I18nDiagnostics = new (require('@angular/localize/src/tools/src/diagnostics').Diagnostics)();
+  const diagnostics: I18nDiagnostics =
+    new (require('@angular/localize/src/tools/src/diagnostics').Diagnostics)();
 
   if (!reporter) {
     return diagnostics;
@@ -130,13 +132,13 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
 
   if (options.angularLinker?.shouldLink) {
     // Babel currently is synchronous so import cannot be used
-    const {
-      createEs2015LinkerPlugin,
-    } = require('@angular/compiler-cli/linker/babel') as typeof import('@angular/compiler-cli/linker/babel');
+    const { createEs2015LinkerPlugin } =
+      require('@angular/compiler-cli/linker/babel') as typeof import('@angular/compiler-cli/linker/babel');
 
     plugins.push(
       createEs2015LinkerPlugin({
         linkerJitMode: options.angularLinker.jitMode,
+        sourceMapping: options.angularLinker.sourcemap,
         logger: createNgtscLogger(options.diagnosticReporter),
         fileSystem: {
           resolve: path.resolve,
