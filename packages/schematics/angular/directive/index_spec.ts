@@ -174,4 +174,13 @@ describe('Directive Schematic', () => {
       .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.directive.ts');
   });
+
+  it('should respect skipTests flag', async () => {
+    const options = { ...defaultOptions, skipTests: true };
+
+    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo.directive.ts');
+    expect(files).not.toContain('/projects/bar/src/app/foo.directive.spec.ts');
+  });
 });
