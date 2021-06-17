@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2019",
-    "lib": ["es2019"],
+    "lib": ["es2020"],
     "baseUrl": "",
     "rootDirs": [".", "./dist-schema/", "./bazel-bin/"],
     "typeRoots": ["./node_modules/@types"],
