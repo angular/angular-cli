@@ -58,6 +58,7 @@ export default custom<AngularCustomOptions>(() => {
         customOptions.angularLinker = {
           shouldLink: true,
           jitMode: aot !== true,
+          sourcemap: false,
         };
         shouldProcess = true;
       }
@@ -138,6 +139,15 @@ export default custom<AngularCustomOptions>(() => {
             { wrapDecorators: customOptions.optimize.wrapDecorators },
           ],
         );
+      }
+
+      // Only enable linker template sourcemapping if linker is enabled and Webpack provides
+      // a sourcemap. This logic allows the linker sourcemap behavior to be controlled by the
+      // Webpack sourcemap configuration. For example, if a vendor file is being processed
+      // and vendor sourcemaps are disabled, the `inputSourceMap` property will be `undefined`
+      // which will effectively disable linker sourcemapping for vendor files.
+      if (customOptions.angularLinker && configuration.options.inputSourceMap) {
+        customOptions.angularLinker.sourcemap = true;
       }
 
       return {
