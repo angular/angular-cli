@@ -3,14 +3,12 @@
 import { logging } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import * as colors from 'ansi-colors';
-import { spawn } from 'child_process';
-import * as fs from 'fs';
 import glob from 'glob';
 import minimist from 'minimist';
-import * as os from 'os';
 import * as path from 'path';
 import { setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
+import { createNpmRegistry } from './e2e/utils/registry';
 
 Error.stackTraceLimit = Infinity;
 
@@ -127,16 +125,8 @@ setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.e
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 setGlobalVariable('package-registry', 'http://localhost:4873');
 
-// Setup local package registry
-const registryPath = fs.mkdtempSync(
-  path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-e2e-registry-'),
-);
-fs.copyFileSync(path.join(__dirname, 'verdaccio.yaml'), path.join(registryPath, 'verdaccio.yaml'));
-const registryProcess = spawn(
-  'node',
-  [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'],
-  { cwd: registryPath, stdio: 'inherit' },
-);
+const registryProcess = createNpmRegistry();
+const secureRegistryProcess = createNpmRegistry(true);
 
 testsToRun
   .reduce((previous, relativeName, testIndex) => {
@@ -210,9 +200,8 @@ testsToRun
   }, Promise.resolve())
   .then(
     () => {
-      if (registryProcess) {
-        registryProcess.kill();
-      }
+      registryProcess.kill();
+      secureRegistryProcess.kill();
 
       console.log(colors.green('Done.'));
       process.exit(0);
@@ -223,9 +212,8 @@ testsToRun
       console.error(colors.red(err.message));
       console.error(colors.red(err.stack));
 
-      if (registryProcess) {
-        registryProcess.kill();
-      }
+      registryProcess.kill();
+      secureRegistryProcess.kill();
 
       if (argv.debug) {
         console.log(`Current Directory: ${process.cwd()}`);
