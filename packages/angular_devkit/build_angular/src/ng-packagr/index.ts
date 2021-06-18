@@ -8,8 +8,8 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { resolve } from 'path';
-import { Observable, from } from 'rxjs';
-import { mapTo, switchMap } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { catchError, mapTo, switchMap } from 'rxjs/operators';
 import { Schema as NgPackagrBuilderOptions } from './schema';
 
 async function initialize(
@@ -37,6 +37,7 @@ export function execute(
   return from(initialize(options, context.workspaceRoot)).pipe(
     switchMap((packager) => (options.watch ? packager.watch() : packager.build())),
     mapTo({ success: true }),
+    catchError((err) => of({ success: false, error: err.message })),
   );
 }
 
