@@ -295,6 +295,7 @@ LARGE_SPECS = {
     },
     "extract-i18n": {},
     "karma": {
+        "size": "large",
         "extra_deps": [
             "@npm//karma",
             "@npm//karma-chrome-launcher",
