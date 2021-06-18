@@ -12,7 +12,7 @@ export default async function () {
   });
   // The environment variable has priority over the .npmrc
   const originalRegistryVariable = process.env['NPM_CONFIG_REGISTRY'];
-  process.env['NPM_CONFIG_REGISTRY'] = undefined;
+  delete process.env['NPM_CONFIG_REGISTRY'];
 
   try {
     await expectToFail(() => ng('add', '@angular/pwa', '--skip-confirmation'));

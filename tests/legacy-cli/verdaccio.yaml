@@ -3,7 +3,7 @@ storage: ./storage
 auth:
   auth-memory:
     users: {}
-
+listen: localhost:4873
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
@@ -20,7 +20,7 @@ packages:
   '@angular/{cli,pwa}':
     access: $all
     publish: $all
-    
+
   '@angular-devkit/*':
     access: $all
     publish: $all
@@ -42,7 +42,7 @@ packages:
     proxy: npmjs
 
 logs:
-  - {type: stdout, format: pretty, level: warn}
+  - { type: stdout, format: pretty, level: warn }
 
 # https://github.com/verdaccio/verdaccio/issues/301
 server:
