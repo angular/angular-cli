@@ -10,6 +10,7 @@ import { RuleFactory, SchematicsException, Tree } from '@angular-devkit/schemati
 import { NodeModulesEngineHost } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
 import { parse as parseJson } from 'jsonc-parser';
+import nodeModule from 'module';
 import { dirname, resolve } from 'path';
 import { Script } from 'vm';
 
@@ -120,8 +121,7 @@ function wrap(
   moduleCache: Map<string, unknown>,
   exportName?: string,
 ): () => unknown {
-  const { createRequire } = require('module');
-  const scopedRequire = createRequire(schematicFile);
+  const scopedRequire = nodeModule.createRequire(schematicFile);
 
   const customRequire = function (id: string) {
     if (legacyModules[id]) {
