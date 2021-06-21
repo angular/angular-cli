@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.39.1",
+    "**/@types/copy-webpack-plugin/webpack": "5.40.0",
     "ajv-formats/ajv": "8.6.0"
   },
   "devDependencies": {
@@ -85,7 +85,7 @@
     "@babel/generator": "7.14.5",
     "@babel/helper-annotate-as-pure": "7.14.5",
     "@babel/plugin-transform-runtime": "7.14.5",
-    "@babel/preset-env": "7.14.5",
+    "@babel/preset-env": "7.14.7",
     "@babel/runtime": "7.14.6",
     "@babel/template": "7.14.5",
     "@bazel/bazelisk": "1.9.0",
@@ -123,8 +123,8 @@
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
     "@types/webpack-dev-server": "^3.1.7",
-    "@typescript-eslint/eslint-plugin": "4.27.0",
-    "@typescript-eslint/parser": "4.27.0",
+    "@typescript-eslint/eslint-plugin": "4.28.0",
+    "@typescript-eslint/parser": "4.28.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.6.0",
     "ajv-formats": "2.1.0",
@@ -230,7 +230,7 @@
     "typescript": "4.3.4",
     "verdaccio": "5.1.1",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.39.1",
+    "webpack": "5.40.0",
     "webpack-dev-middleware": "5.0.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.8.0",
