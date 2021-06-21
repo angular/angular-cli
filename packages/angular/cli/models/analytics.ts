@@ -10,6 +10,7 @@ import { json, tags } from '@angular-devkit/core';
 import debug from 'debug';
 import * as inquirer from 'inquirer';
 import { v4 as uuidV4 } from 'uuid';
+import { VERSION } from '../models/version';
 import { colors } from '../utilities/color';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
@@ -27,7 +28,7 @@ export const AnalyticsProperties = {
       return _defaultAngularCliPropertyCache;
     }
 
-    const v = require('../package.json').version;
+    const v = VERSION.full;
 
     // The logic is if it's a full version then we should use the prod GA property.
     if (/^\d+\.\d+\.\d+$/.test(v) && v !== '0.0.0') {

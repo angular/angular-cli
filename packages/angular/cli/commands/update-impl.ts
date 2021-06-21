@@ -16,6 +16,7 @@ import { PackageManager } from '../lib/config/workspace-schema';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { SchematicEngineHost } from '../models/schematic-engine-host';
+import { VERSION } from '../models/version';
 import { colors } from '../utilities/color';
 import { installAllPackages, runTempPackageBin } from '../utilities/install-package';
 import { writeErrorToLogFile } from '../utilities/log-file';
@@ -860,7 +861,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
    * @returns `true` when the installed version is older.
    */
   private async checkCLILatestVersion(verbose = false, next = false): Promise<boolean> {
-    const { version: installedCLIVersion } = require('../package.json');
+    const installedCLIVersion = VERSION.full;
 
     const LatestCLIManifest = await fetchPackageManifest(
       `@angular/cli@${next ? 'next' : 'latest'}`,

@@ -11,6 +11,7 @@ import 'symbol-observable';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
+import { VERSION } from '../models/version';
 import { colors } from '../utilities/color';
 import { isWarningEnabled } from '../utilities/config';
 
@@ -80,14 +81,17 @@ if (process.env['NG_CLI_PROFILING']) {
     const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
     cli = await import(projectLocalCli);
 
-    const globalVersion = new SemVer(require('../package.json').version);
+    const globalVersion = new SemVer(VERSION.full);
 
     // Older versions might not have the VERSION export
     let localVersion = cli.VERSION?.full;
     if (!localVersion) {
       try {
-        localVersion = require(path.join(path.dirname(projectLocalCli), '../../package.json'))
-          .version;
+        const localPackageJson = await fs.promises.readFile(
+          path.join(path.dirname(projectLocalCli), '../../package.json'),
+          'utf-8',
+        );
+        localVersion = (JSON.parse(localPackageJson) as { version: string }).version;
       } catch (error) {
         // eslint-disable-next-line  no-console
         console.error('Version mismatch check skipped. Unable to retrieve local version: ' + error);
