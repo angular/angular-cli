@@ -8,48 +8,12 @@
 
 import 'symbol-observable';
 // symbol polyfill must go first
-import * as fs from 'fs';
+import { promises as fs } from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
 import { VERSION } from '../models/version';
 import { colors } from '../utilities/color';
 import { isWarningEnabled } from '../utilities/config';
-
-// Check if we need to profile this CLI run.
-if (process.env['NG_CLI_PROFILING']) {
-  let profiler: {
-    startProfiling: (name?: string, recsamples?: boolean) => void;
-    stopProfiling: (name?: string) => unknown;
-  };
-  try {
-    profiler = require('v8-profiler-node8'); // eslint-disable-line import/no-extraneous-dependencies
-  } catch (err) {
-    throw new Error(
-      `Could not require 'v8-profiler-node8'. You must install it separetely with ` +
-        `'npm install v8-profiler-node8 --no-save'.\n\nOriginal error:\n\n${err}`,
-    );
-  }
-
-  profiler.startProfiling();
-
-  const exitHandler = (options: { cleanup?: boolean; exit?: boolean }) => {
-    if (options.cleanup) {
-      const cpuProfile = profiler.stopProfiling();
-      fs.writeFileSync(
-        path.resolve(process.cwd(), process.env.NG_CLI_PROFILING || '') + '.cpuprofile',
-        JSON.stringify(cpuProfile),
-      );
-    }
-
-    if (options.exit) {
-      process.exit();
-    }
-  };
-
-  process.on('exit', () => exitHandler({ cleanup: true }));
-  process.on('SIGINT', () => exitHandler({ exit: true }));
-  process.on('uncaughtException', () => exitHandler({ exit: true }));
-}
 
 (async () => {
   /**
@@ -87,7 +51,7 @@ if (process.env['NG_CLI_PROFILING']) {
     let localVersion = cli.VERSION?.full;
     if (!localVersion) {
       try {
-        const localPackageJson = await fs.promises.readFile(
+        const localPackageJson = await fs.readFile(
           path.join(path.dirname(projectLocalCli), '../../package.json'),
           'utf-8',
         );
