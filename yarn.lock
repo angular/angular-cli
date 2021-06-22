@@ -86,8 +86,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a1442a839401cb9a09285fbf1cd925cf51390ca3":
   version "0.0.0"
-  uid a1442a839401cb9a09285fbf1cd925cf51390ca3
-  resolved "https://github.com/angular/dev-infra-private-builds.git#a1442a839401cb9a09285fbf1cd925cf51390ca3"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#6707d0f4cf98242af0b5635a0cf40cdeba300c9c"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -7863,10 +7862,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-packagr@~12.0.0-next.0:
-  version "12.0.6"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-12.0.6.tgz#f2e790a398d159ddce9199dd0acf35a78222857c"
-  integrity sha512-+EITs+See8qCDJQcX+HArC3gQvPzX5Y8/m9CWe8WdJz7kmM0LTZjw7UgKWn98+8tM5bsFRTH89qCs53XDEC6TQ==
+ng-packagr@~12.1.0-next.0:
+  version "12.1.0-next.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-12.1.0-next.0.tgz#4fa433106fbf1960fd94726998557a2d6d5f0232"
+  integrity sha512-LovKeGlk0mO69z35g388hjyrKqS2qGwRzRvaRYIJhHrvWmQerRQHYvoApfllD4U2/uUTAb1QbZY2J6Z77S44NA==
   dependencies:
     "@rollup/plugin-commonjs" "^19.0.0"
     "@rollup/plugin-json" "^4.1.0"
@@ -10206,7 +10205,6 @@ sass@1.35.1, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
@@ -11558,12 +11556,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.3.4:
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.4.tgz#3f85b986945bcf31071decdd96cf8bfa65f9dcbc"
-  integrity sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==
-
-typescript@~4.3.2:
+typescript@4.3.4, typescript@~4.3.2:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.4.tgz#3f85b986945bcf31071decdd96cf8bfa65f9dcbc"
   integrity sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==
