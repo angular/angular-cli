@@ -182,7 +182,7 @@
     "mini-css-extract-plugin": "1.6.0",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
-    "ng-packagr": "~12.0.0-next.0",
+    "ng-packagr": "~12.1.0-next.0",
     "node-fetch": "^2.2.0",
     "npm-registry-client": "8.6.0",
     "open": "8.2.1",
