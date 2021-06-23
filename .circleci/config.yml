@@ -427,3 +427,30 @@ workflows:
             - build
             - test
             - e2e-cli
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - 11.2.x
+    jobs:
+      # Linux jobs
+      - setup
+      - build:
+          requires:
+            - setup
+      - e2e-cli:
+          name: e2e-cli-nightly
+          requires:
+            - build
+      - e2e-cli:
+          name: e2e-cli-ve-nightly
+          ve: true
+          requires:
+            - build
+      - test-browsers:
+          requires:
+            - build
