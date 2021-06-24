@@ -14,9 +14,9 @@ version: 2.1
 ## IMPORTANT
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &cache_key angular_devkit-12.9-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win angular_devkit-win-12.9-{{ checksum "yarn.lock" }}
-var_3: &default_nodeversion "12.9"
+var_1: &cache_key angular_devkit-12.18-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win angular_devkit-win-12.18-{{ checksum "yarn.lock" }}
+var_3: &default_nodeversion "12.18"
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
