@@ -92,7 +92,7 @@ test --test_output=errors
 ################################
 
 # Use the Angular team internal GCP instance for remote execution.
-build:remote --remote_instance_name=projects/internal-200822/instances/default_instance
+build:remote --remote_instance_name=projects/internal-200822/instances/primary_instance
 build:remote --project_id=internal-200822
 
 # Starting with Bazel 0.27.0 strategies do not need to be explicitly
