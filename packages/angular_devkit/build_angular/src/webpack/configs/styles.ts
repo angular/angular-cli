@@ -238,12 +238,15 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     }
   }
 
+  const postCss = require('postcss');
+  const postCssLoaderPath = require.resolve('postcss-loader');
+
   const componentStyleLoaders: webpack.RuleSetUseItem[] = [
     { loader: require.resolve('raw-loader') },
     {
-      loader: require.resolve('postcss-loader'),
+      loader: postCssLoaderPath,
       options: {
-        implementation: require('postcss'),
+        implementation: postCss,
         postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
       },
     },
@@ -263,153 +266,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
       },
     },
     {
-      loader: require.resolve('postcss-loader'),
+      loader: postCssLoaderPath,
       options: {
-        implementation: require('postcss'),
+        implementation: postCss,
         postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
         sourceMap: !!cssSourceMap,
       },
     },
   ];
-
-  const styleLanguages: {
-    extensions: string[];
-    mimetype?: string;
-    use: webpack.RuleSetUseItem[];
-  }[] = [
-    {
-      extensions: ['css'],
-      mimetype: 'text/css',
-      use: [],
-    },
-    {
-      extensions: ['scss'],
-      mimetype: 'text/x-scss',
-      use: [
-        {
-          loader: require.resolve('resolve-url-loader'),
-          options: {
-            sourceMap: cssSourceMap,
-          },
-        },
-        {
-          loader: require.resolve('sass-loader'),
-          options: {
-            implementation: sassImplementation,
-            sourceMap: true,
-            sassOptions: {
-              // Prevent use of `fibers` package as it no longer works in newer Node.js versions
-              fiber: false,
-              // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
-              includePaths,
-              // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-              // Ex: /* autoprefixer grid: autoplace */
-              // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-              outputStyle: 'expanded',
-            },
-          },
-        },
-      ],
-    },
-    {
-      extensions: ['sass'],
-      mimetype: 'text/x-sass',
-      use: [
-        {
-          loader: require.resolve('resolve-url-loader'),
-          options: {
-            sourceMap: cssSourceMap,
-          },
-        },
-        {
-          loader: require.resolve('sass-loader'),
-          options: {
-            implementation: sassImplementation,
-            sourceMap: true,
-            sassOptions: {
-              indentedSyntax: true,
-              // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
-              includePaths,
-              // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-              // Ex: /* autoprefixer grid: autoplace */
-              // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-              outputStyle: 'expanded',
-            },
-          },
-        },
-      ],
-    },
-    {
-      extensions: ['less'],
-      mimetype: 'text/x-less',
-      use: [
-        {
-          loader: require.resolve('less-loader'),
-          options: {
-            implementation: require('less'),
-            sourceMap: cssSourceMap,
-            lessOptions: {
-              javascriptEnabled: true,
-              paths: includePaths,
-            },
-          },
-        },
-      ],
-    },
-    {
-      extensions: ['styl'],
-      mimetype: 'text/x-stylus',
-      use: [
-        {
-          loader: require.resolve('stylus-loader'),
-          options: {
-            sourceMap: cssSourceMap,
-            stylusOptions: {
-              compress: false,
-              sourceMap: { comment: false },
-              paths: includePaths,
-            },
-          },
-        },
-      ],
-    },
-  ];
-
-  const inlineLanguageRules: webpack.RuleSetRule[] = [];
-  const fileLanguageRules: webpack.RuleSetRule[] = [];
-  for (const language of styleLanguages) {
-    if (language.mimetype) {
-      // inline component styles use data URIs and processing is selected by mimetype
-      inlineLanguageRules.push({
-        mimetype: language.mimetype,
-        use: [...componentStyleLoaders, ...language.use],
-      });
-    }
-
-    fileLanguageRules.push({
-      test: new RegExp(`\\.(?:${language.extensions.join('|')})$`, 'i'),
-      rules: [
-        // Setup processing rules for global and component styles
-        {
-          oneOf: [
-            // Component styles are all styles except defined global styles
-            {
-              exclude: globalStylePaths,
-              use: componentStyleLoaders,
-            },
-            // Global styles are only defined global styles
-            {
-              include: globalStylePaths,
-              use: globalStyleLoaders,
-            },
-          ],
-        },
-        { use: language.use },
-      ],
-    });
-  }
 
   const extraMinimizers = [];
   if (buildOptions.optimization.styles.minify) {
@@ -451,10 +315,131 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     );
   }
 
+  const styleLanguages: {
+    extensions: string[];
+    use: webpack.RuleSetUseItem[];
+  }[] = [
+    {
+      extensions: ['css'],
+      use: [],
+    },
+    {
+      extensions: ['scss'],
+      use: [
+        {
+          loader: require.resolve('resolve-url-loader'),
+          options: {
+            sourceMap: cssSourceMap,
+          },
+        },
+        {
+          loader: require.resolve('sass-loader'),
+          options: {
+            implementation: sassImplementation,
+            sourceMap: true,
+            sassOptions: {
+              // Prevent use of `fibers` package as it no longer works in newer Node.js versions
+              fiber: false,
+              // bootstrap-sass requires a minimum precision of 8
+              precision: 8,
+              includePaths,
+              // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
+              // Ex: /* autoprefixer grid: autoplace */
+              // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
+              outputStyle: 'expanded',
+            },
+          },
+        },
+      ],
+    },
+    {
+      extensions: ['sass'],
+      use: [
+        {
+          loader: require.resolve('resolve-url-loader'),
+          options: {
+            sourceMap: cssSourceMap,
+          },
+        },
+        {
+          loader: require.resolve('sass-loader'),
+          options: {
+            implementation: sassImplementation,
+            sourceMap: true,
+            sassOptions: {
+              // Prevent use of `fibers` package as it no longer works in newer Node.js versions
+              fiber: false,
+              indentedSyntax: true,
+              // bootstrap-sass requires a minimum precision of 8
+              precision: 8,
+              includePaths,
+              // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
+              // Ex: /* autoprefixer grid: autoplace */
+              // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
+              outputStyle: 'expanded',
+            },
+          },
+        },
+      ],
+    },
+    {
+      extensions: ['less'],
+      use: [
+        {
+          loader: require.resolve('less-loader'),
+          options: {
+            implementation: require('less'),
+            sourceMap: cssSourceMap,
+            lessOptions: {
+              javascriptEnabled: true,
+              paths: includePaths,
+            },
+          },
+        },
+      ],
+    },
+    {
+      extensions: ['styl'],
+      use: [
+        {
+          loader: require.resolve('stylus-loader'),
+          options: {
+            sourceMap: cssSourceMap,
+            stylusOptions: {
+              compress: false,
+              sourceMap: { comment: false },
+              paths: includePaths,
+            },
+          },
+        },
+      ],
+    },
+  ];
+
   return {
     entry: entryPoints,
     module: {
-      rules: [...fileLanguageRules, ...inlineLanguageRules],
+      rules: styleLanguages.map(({ extensions, use }) => ({
+        test: new RegExp(`\\.(?:${extensions.join('|')})$`, 'i'),
+        rules: [
+          // Setup processing rules for global and component styles
+          {
+            oneOf: [
+              // Component styles are all styles except defined global styles
+              {
+                exclude: globalStylePaths,
+                use: componentStyleLoaders,
+              },
+              // Global styles are only defined global styles
+              {
+                include: globalStylePaths,
+                use: globalStyleLoaders,
+              },
+            ],
+          },
+          { use },
+        ],
+      })),
     },
     optimization: {
       minimizer: extraMinimizers,
