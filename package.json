@@ -151,7 +151,7 @@
     "eslint": "7.29.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-header": "3.1.1",
-    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-import": "2.23.4",
     "express": "4.17.1",
     "fast-json-stable-stringify": "2.1.0",
     "find-cache-dir": "3.3.1",
