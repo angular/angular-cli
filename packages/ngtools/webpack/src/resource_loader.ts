@@ -202,13 +202,11 @@ export class WebpackResourceLoader {
     );
 
     let finalContent: string | undefined;
-    let finalMap: string | undefined;
     childCompiler.hooks.compilation.tap('angular-compiler', (childCompilation) => {
       childCompilation.hooks.processAssets.tap(
         { name: 'angular-compiler', stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT },
         () => {
           finalContent = childCompilation.assets[outputFilePath]?.source().toString();
-          finalMap = childCompilation.assets[outputFilePath + '.map']?.source().toString();
 
           delete childCompilation.assets[outputFilePath];
           delete childCompilation.assets[outputFilePath + '.map'];

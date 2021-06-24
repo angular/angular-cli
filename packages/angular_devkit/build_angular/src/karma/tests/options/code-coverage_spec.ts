@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { first, last, tap } from 'rxjs/operators';
+import { last, tap } from 'rxjs/operators';
 import { promisify } from 'util';
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
