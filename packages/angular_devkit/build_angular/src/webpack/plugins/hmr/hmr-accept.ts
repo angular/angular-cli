@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   ApplicationRef,
   PlatformRef,
   Type,
   isDevMode,
   ɵresetCompiledComponents,
-  // eslint-disable-next-line import/no-extraneous-dependencies
 } from '@angular/core';
 import { filter, take } from 'rxjs/operators';
 
