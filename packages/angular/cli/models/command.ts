@@ -16,7 +16,6 @@ import {
   CommandDescriptionMap,
   CommandScope,
   Option,
-  SubCommandDescription,
 } from './interface';
 
 export interface BaseCommandOptions {
