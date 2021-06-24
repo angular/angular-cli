@@ -182,7 +182,16 @@ export class VersionCommand extends Command<VersionCommandSchema> {
   private async getPackageManager(): Promise<string> {
     try {
       const manager = await getPackageManager(this.context.root);
-      const version = execSync(`${manager} --version`, { encoding: 'utf8', stdio: 'pipe' }).trim();
+      const version = execSync(`${manager} --version`, {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        env: {
+          ...process.env,
+          //  NPM updater notifier will prevents the child process from closing until it timeout after 3 minutes.
+          NO_UPDATE_NOTIFIER: '1',
+          NPM_CONFIG_UPDATE_NOTIFIER: 'false',
+        },
+      }).trim();
 
       return `${manager} ${version}`;
     } catch {
