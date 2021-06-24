@@ -1,0 +1,8 @@
+####################################################################################################
+Command: ng-dev commit-message restore-commit-message-draft
+Ran at: Thu Jun 24 2021 13:15:43 GMT+0200 (Central European Summer Time)
+LOG:    Skipping commit message restoration attempt
+DEBUG:  A commit message was already provided via the command with a -m or -F flag
+####################################################################################################
+Command ran in 7ms
+Exit Code: 0
