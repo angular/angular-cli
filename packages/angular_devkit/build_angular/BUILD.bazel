@@ -295,6 +295,7 @@ LARGE_SPECS = {
     },
     "extract-i18n": {},
     "karma": {
+        "shards": 3,
         "size": "large",
         "extra_deps": [
             "@npm//karma",
