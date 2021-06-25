@@ -7,6 +7,8 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
+import MagicString from 'magic-string';
+import { updateBufferV2Enabled } from './environment-options';
 import { LinkedList } from './linked-list';
 
 export class IndexOutOfBoundException extends BaseException {
@@ -14,6 +16,7 @@ export class IndexOutOfBoundException extends BaseException {
     super(`Index ${index} outside of range [${min}, ${max}].`);
   }
 }
+/** @deprecated Since v13.0 */
 export class ContentCannotBeRemovedException extends BaseException {
   constructor() {
     super(`User tried to remove content that was marked essential.`);
@@ -26,6 +29,7 @@ export class ContentCannotBeRemovedException extends BaseException {
  * it means the content itself was deleted.
  *
  * @see UpdateBuffer
+ * @deprecated Since v13.0
  */
 export class Chunk {
   private _content: Buffer | null;
@@ -177,6 +181,37 @@ export class Chunk {
 }
 
 /**
+ * Base class for an update buffer implementation that allows buffers to be inserted to the _right
+ * or _left, or deleted, while keeping indices to the original buffer.
+ */
+export abstract class UpdateBufferBase {
+  constructor(protected _originalContent: Buffer) {}
+  abstract get length(): number;
+  abstract get original(): Buffer;
+  abstract toString(encoding?: string): string;
+  abstract generate(): Buffer;
+  abstract insertLeft(index: number, content: Buffer, assert?: boolean): void;
+  abstract insertRight(index: number, content: Buffer, assert?: boolean): void;
+  abstract remove(index: number, length: number): void;
+
+  /**
+   * Creates an UpdateBufferBase instance. Depending on the NG_UPDATE_BUFFER_V2
+   * environment variable, will either create an UpdateBuffer or an UpdateBuffer2
+   * instance.
+   *
+   * See: https://github.com/angular/angular-cli/issues/21110
+   *
+   * @param originalContent The original content of the update buffer instance.
+   * @returns An UpdateBufferBase instance.
+   */
+  static create(originalContent: Buffer): UpdateBufferBase {
+    return updateBufferV2Enabled
+      ? new UpdateBuffer2(originalContent)
+      : new UpdateBuffer(originalContent);
+  }
+}
+
+/**
  * An utility class that allows buffers to be inserted to the _right or _left, or deleted, while
  * keeping indices to the original buffer.
  *
@@ -185,12 +220,15 @@ export class Chunk {
  *
  * Since the Node Buffer structure is non-destructive when slicing, we try to use slicing to create
  * new chunks, and always keep chunks pointing to the original content.
+ *
+ * @deprecated Since v13.0
  */
-export class UpdateBuffer {
+export class UpdateBuffer extends UpdateBufferBase {
   protected _linkedList: LinkedList<Chunk>;
 
-  constructor(protected _originalContent: Buffer) {
-    this._linkedList = new LinkedList(new Chunk(0, _originalContent.length, _originalContent));
+  constructor(originalContent: Buffer) {
+    super(originalContent);
+    this._linkedList = new LinkedList(new Chunk(0, originalContent.length, originalContent));
   }
 
   protected _assertIndex(index: number) {
@@ -272,5 +310,49 @@ export class UpdateBuffer {
     if (curr) {
       curr.remove(true, false, false);
     }
+  }
+}
+
+/**
+ * An utility class that allows buffers to be inserted to the _right or _left, or deleted, while
+ * keeping indices to the original buffer.
+ */
+export class UpdateBuffer2 extends UpdateBufferBase {
+  protected _mutatableContent: MagicString = new MagicString(this._originalContent.toString());
+
+  protected _assertIndex(index: number) {
+    if (index < 0 || index > this._originalContent.length) {
+      throw new IndexOutOfBoundException(index, 0, this._originalContent.length);
+    }
+  }
+
+  get length(): number {
+    return this._mutatableContent.length();
+  }
+  get original(): Buffer {
+    return this._originalContent;
+  }
+
+  toString(): string {
+    return this._mutatableContent.toString();
+  }
+
+  generate(): Buffer {
+    return Buffer.from(this.toString());
+  }
+
+  insertLeft(index: number, content: Buffer): void {
+    this._assertIndex(index);
+    this._mutatableContent.appendLeft(index, content.toString());
+  }
+
+  insertRight(index: number, content: Buffer): void {
+    this._assertIndex(index);
+    this._mutatableContent.appendRight(index, content.toString());
+  }
+
+  remove(index: number, length: number) {
+    this._assertIndex(index);
+    this._mutatableContent.remove(index, index + length);
   }
 }

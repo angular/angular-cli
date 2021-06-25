@@ -7,6 +7,7 @@
  */
 
 import { normalize } from '@angular-devkit/core';
+import { UpdateBuffer2, UpdateBufferBase } from '../utility/update-buffer';
 import { SimpleFileEntry } from './entry';
 import { UpdateRecorderBase, UpdateRecorderBom } from './recorder';
 
@@ -29,6 +30,23 @@ describe('UpdateRecorderBase', () => {
     recorder.insertRight(5, ' beautiful');
     const result = recorder.apply(buffer);
     expect(result.toString()).toBe('Hello beautiful World');
+  });
+
+  it('works with multiple adjacent inserts', () => {
+    const buffer = Buffer.from('Hello beautiful World');
+    const entry = new SimpleFileEntry(normalize('/some/path'), buffer);
+
+    // TODO: Remove once UpdateBufferBase.create defaults to UpdateBuffer2
+    spyOn(UpdateBufferBase, 'create').and.callFake(
+      (originalContent) => new UpdateBuffer2(originalContent),
+    );
+
+    const recorder = new UpdateRecorderBase(entry);
+    recorder.remove(6, 9);
+    recorder.insertRight(6, 'amazing');
+    recorder.insertRight(15, ' and fantastic');
+    const result = recorder.apply(buffer);
+    expect(result.toString()).toBe('Hello amazing and fantastic World');
   });
 
   it('can create the proper recorder', () => {

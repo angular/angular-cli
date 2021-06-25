@@ -16,14 +16,14 @@ import {
 } from 'rxjs';
 import { concatMap, reduce } from 'rxjs/operators';
 import { CreateFileAction } from '../tree/action';
-import { UpdateBuffer } from '../utility/update-buffer';
+import { UpdateBufferBase } from '../utility/update-buffer';
 import { SimpleSinkBase } from './sink';
 
 export class HostSink extends SimpleSinkBase {
   protected _filesToDelete = new Set<Path>();
   protected _filesToRename = new Set<[Path, Path]>();
-  protected _filesToCreate = new Map<Path, UpdateBuffer>();
-  protected _filesToUpdate = new Map<Path, UpdateBuffer>();
+  protected _filesToCreate = new Map<Path, UpdateBufferBase>();
+  protected _filesToUpdate = new Map<Path, UpdateBufferBase>();
 
   constructor(protected _host: virtualFs.Host, protected _force = false) {
     super();
@@ -55,12 +55,12 @@ export class HostSink extends SimpleSinkBase {
   }
 
   protected _overwriteFile(path: Path, content: Buffer): Observable<void> {
-    this._filesToUpdate.set(path, new UpdateBuffer(content));
+    this._filesToUpdate.set(path, UpdateBufferBase.create(content));
 
     return EMPTY;
   }
   protected _createFile(path: Path, content: Buffer): Observable<void> {
-    this._filesToCreate.set(path, new UpdateBuffer(content));
+    this._filesToCreate.set(path, UpdateBufferBase.create(content));
 
     return EMPTY;
   }
