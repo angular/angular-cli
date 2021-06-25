@@ -23,14 +23,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
-import { sources } from 'webpack';
 import { workerData } from 'worker_threads';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 
-const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = sources;
-
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
+
+// Lazy loaded webpack-sources object
+// Webpack is only imported if needed during the processing
+let webpackSources: typeof import('webpack').sources | undefined;
 
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
@@ -215,9 +216,14 @@ async function mergeSourceMaps(
     return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
   }
 
+  // Load Webpack only when needed
+  if (webpackSources === undefined) {
+    webpackSources = (await import('webpack')).sources;
+  }
+
   // SourceMapSource produces high-quality sourcemaps
   // Final sourcemap will always be available when providing the input sourcemaps
-  const finalSourceMap = new SourceMapSource(
+  const finalSourceMap = new webpackSources.SourceMapSource(
     resultCode,
     filename,
     resultSourceMap,
@@ -726,6 +732,12 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
     delete inputMap.sourceRoot;
   }
 
+  // Load Webpack only when needed
+  if (webpackSources === undefined) {
+    webpackSources = (await import('webpack')).sources;
+  }
+  const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpackSources;
+
   for (const locale of i18n.inlineLocales) {
     const content = new ReplaceSource(
       inputMap
@@ -752,12 +764,12 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
       content.replace(position.start, position.end - 1, code);
     }
 
-    let outputSource: sources.Source = content;
+    let outputSource: import('webpack').sources.Source = content;
     if (options.setLocale) {
       const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});\n`;
 
       // If locale data is provided, load it and prepend to file
-      let localeDataSource: sources.Source | null = null;
+      let localeDataSource;
       const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
       if (localeDataPath) {
         const localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);
