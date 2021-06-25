@@ -23,8 +23,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
-import * as v8 from 'v8';
 import { sources } from 'webpack';
+import { workerData } from 'worker_threads';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 
@@ -78,16 +78,7 @@ export const enum CacheKey {
   DownlevelMap = 3,
 }
 
-let cachePath: string | undefined;
-let i18n: I18nOptions | undefined;
-
-export function setup(data: number[] | { cachePath: string; i18n: I18nOptions }): void {
-  const options = Array.isArray(data)
-    ? (v8.deserialize(Buffer.from(data)) as { cachePath: string; i18n: I18nOptions })
-    : data;
-  cachePath = options.cachePath;
-  i18n = options.i18n;
-}
+const { cachePath, i18n } = (workerData || {}) as { cachePath?: string; i18n?: I18nOptions };
 
 async function cachePut(
   content: string,
@@ -413,7 +404,7 @@ async function terserMangle(
       code,
       options.map,
       outputCode,
-      (minifyOutput.map as unknown) as RawSourceMap,
+      minifyOutput.map as unknown as RawSourceMap,
       options.filename || '0',
       code.length > FAST_SOURCEMAP_THRESHOLD,
     );
