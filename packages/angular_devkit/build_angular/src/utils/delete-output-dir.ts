@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { rmdirSync } from 'fs';
+import { existsSync, rmdirSync } from 'fs';
 import { resolve } from 'path';
 
 /**
@@ -18,5 +18,11 @@ export function deleteOutputDir(root: string, outputPath: string): void {
     throw new Error('Output path MUST not be project root directory!');
   }
 
-  rmdirSync(resolvedOutputPath, { recursive: true, maxRetries: 3 });
+  // NOTE: `recursive: true` does not silence errors about existence on node
+  //       v16. `rmdirSync` recursive is deprecated and when node v14.14.0 is
+  //       the default `rmSync` should be used with `force: true` in addition
+  //       to the existing options.
+  if (existsSync(resolvedOutputPath)) {
+    rmdirSync(resolvedOutputPath, { recursive: true, maxRetries: 3 });
+  }
 }
