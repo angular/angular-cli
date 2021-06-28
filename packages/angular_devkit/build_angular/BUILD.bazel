@@ -178,7 +178,6 @@ ts_library(
         "@npm//sass",
         "@npm//sass-loader",
         "@npm//semver",
-        "@npm//source-map",
         "@npm//source-map-loader",
         "@npm//source-map-support",
         "@npm//style-loader",
