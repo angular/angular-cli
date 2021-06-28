@@ -143,6 +143,12 @@ export class JavaScriptOptimizerPlugin {
           const workerPool = new Piscina({
             filename: workerPath,
             maxThreads: MAX_OPTIMIZE_WORKERS,
+            env: {
+              ...process.env,
+              // Workaround for `TypeError [Error]: Cannot read property 'workerPort' of undefined`
+              // See: https://github.com/evanw/esbuild/commit/aa8b9ce8d462378f0f06ac52e83f6c32332dde38
+              ESBUILD_WORKER_THREADS: '0',
+            },
           });
 
           // Enqueue script optimization tasks and update compilation assets as the tasks complete
