@@ -61,7 +61,6 @@
     "sass": "1.35.1",
     "sass-loader": "12.1.0",
     "semver": "7.3.5",
-    "source-map": "0.7.3",
     "source-map-loader": "3.0.0",
     "source-map-support": "0.5.19",
     "style-loader": "3.0.0",

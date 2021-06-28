@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import remapping from '@ampproject/remapping';
 import {
   NodePath,
   ParseResult,
@@ -21,13 +22,15 @@ import * as cacache from 'cacache';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import { workerData } from 'worker_threads';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
+
+// Extract Sourcemap input type from the remapping function since it is not currently exported
+type SourceMapInput = Exclude<Parameters<typeof remapping>[0], unknown[]>;
 
 // Lazy loaded webpack-sources object
 // Webpack is only imported if needed during the processing
@@ -114,10 +117,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   const downlevelFilename = filename.replace(/\-(es20\d{2}|esnext)/, '-es5');
   const downlevel = !options.optimizeOnly;
   const sourceCode = options.code;
-  const sourceMap = options.map ? JSON.parse(options.map) : undefined;
 
-  let downlevelCode;
-  let downlevelMap;
   if (downlevel) {
     const { supportedBrowsers: targets = [] } = options;
 
@@ -158,36 +158,17 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
       ],
       minified: allowMinify && !!options.optimize,
       compact: !shouldBeautify && !!options.optimize,
-      sourceMaps: !!sourceMap,
+      sourceMaps: !!options.map,
     });
 
     if (!transformResult || !transformResult.code) {
       throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
     }
-    downlevelCode = transformResult.code;
 
-    if (sourceMap && transformResult.map) {
-      // String length is used as an estimate for byte length
-      const fastSourceMaps = sourceCode.length > FAST_SOURCEMAP_THRESHOLD;
-
-      downlevelMap = await mergeSourceMaps(
-        sourceCode,
-        sourceMap,
-        downlevelCode,
-        transformResult.map,
-        filename,
-        // When not optimizing, the sourcemaps are significantly less complex
-        // and can use the higher fidelity merge
-        !!options.optimize && fastSourceMaps,
-      );
-    }
-  }
-
-  if (downlevelCode) {
     result.downlevel = await processBundle({
       ...options,
-      code: downlevelCode,
-      map: downlevelMap,
+      code: transformResult.code,
+      downlevelMap: (transformResult.map as SourceMapInput) ?? undefined,
       filename: path.join(basePath, downlevelFilename),
       isOriginal: false,
     });
@@ -203,156 +184,59 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   return result;
 }
 
-async function mergeSourceMaps(
-  inputCode: string,
-  inputSourceMap: RawSourceMap,
-  resultCode: string,
-  resultSourceMap: RawSourceMap,
-  filename: string,
-  fast = false,
-): Promise<RawSourceMap> {
-  // Webpack 5 terser sourcemaps currently fail merging with the high-quality method
-  if (fast) {
-    return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
-  }
-
-  // Load Webpack only when needed
-  if (webpackSources === undefined) {
-    webpackSources = (await import('webpack')).sources;
-  }
-
-  // SourceMapSource produces high-quality sourcemaps
-  // Final sourcemap will always be available when providing the input sourcemaps
-  const finalSourceMap = new webpackSources.SourceMapSource(
-    resultCode,
-    filename,
-    resultSourceMap,
-    inputCode,
-    inputSourceMap,
-    true,
-  ).map();
-
-  return finalSourceMap as RawSourceMap;
-}
-
-async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
-  const sourceRoot = first.sourceRoot;
-  const generator = new SourceMapGenerator();
-
-  // sourcemap package adds the sourceRoot to all position source paths if not removed
-  delete first.sourceRoot;
-
-  await SourceMapConsumer.with(first, null, (originalConsumer) => {
-    return SourceMapConsumer.with(second, null, (newConsumer) => {
-      newConsumer.eachMapping((mapping) => {
-        if (mapping.originalLine === null) {
-          return;
-        }
-        const originalPosition = originalConsumer.originalPositionFor({
-          line: mapping.originalLine,
-          column: mapping.originalColumn,
-        });
-        if (
-          originalPosition.line === null ||
-          originalPosition.column === null ||
-          originalPosition.source === null
-        ) {
-          return;
-        }
-        generator.addMapping({
-          generated: {
-            line: mapping.generatedLine,
-            column: mapping.generatedColumn,
-          },
-          name: originalPosition.name || undefined,
-          original: {
-            line: originalPosition.line,
-            column: originalPosition.column,
-          },
-          source: originalPosition.source,
-        });
-      });
-    });
-  });
-
-  const map = generator.toJSON();
-  map.file = second.file;
-  map.sourceRoot = sourceRoot;
-
-  // Add source content if present
-  if (first.sourcesContent) {
-    // Source content array is based on index of sources
-    const sourceContentMap = new Map<string, number>();
-    for (let i = 0; i < first.sources.length; i++) {
-      // make paths "absolute" so they can be compared (`./a.js` and `a.js` are equivalent)
-      sourceContentMap.set(path.resolve('/', first.sources[i]), i);
-    }
-    map.sourcesContent = [];
-    for (let i = 0; i < map.sources.length; i++) {
-      const contentIndex = sourceContentMap.get(path.resolve('/', map.sources[i]));
-      if (contentIndex === undefined) {
-        map.sourcesContent.push('');
-      } else {
-        map.sourcesContent.push(first.sourcesContent[contentIndex]);
-      }
-    }
-  }
-
-  // Put the sourceRoot back
-  if (sourceRoot) {
-    first.sourceRoot = sourceRoot;
-  }
-
-  return map;
-}
-
 async function processBundle(
-  options: Omit<ProcessBundleOptions, 'map'> & { isOriginal: boolean; map?: string | RawSourceMap },
+  options: ProcessBundleOptions & {
+    isOriginal: boolean;
+    downlevelMap?: SourceMapInput;
+  },
 ): Promise<ProcessBundleFile> {
   const {
     optimize,
     isOriginal,
     code,
     map,
+    downlevelMap,
     filename: filepath,
     hiddenSourceMaps,
     cacheKeys = [],
     integrityAlgorithm,
   } = options;
 
-  const rawMap = typeof map === 'string' ? (JSON.parse(map) as RawSourceMap) : map;
   const filename = path.basename(filepath);
+  let resultCode = code;
 
-  let result: {
-    code: string;
-    map: RawSourceMap | undefined;
-  };
-
-  if (rawMap) {
-    rawMap.file = filename;
-  }
-
+  let optimizeResult;
   if (optimize) {
-    result = await terserMangle(code, {
+    optimizeResult = await terserMangle(code, {
       filename,
-      map: rawMap,
+      sourcemap: !!map,
       compress: !isOriginal, // We only compress bundles which are downlevelled.
       ecma: isOriginal ? 2015 : 5,
     });
-  } else {
-    result = {
-      map: rawMap,
-      code,
-    };
+    resultCode = optimizeResult.code;
   }
 
   let mapContent: string | undefined;
-  if (result.map) {
+  if (map) {
     if (!hiddenSourceMaps) {
-      result.code += `\n//# sourceMappingURL=${filename}.map`;
+      resultCode += `\n//# sourceMappingURL=${filename}.map`;
     }
 
-    mapContent = JSON.stringify(result.map);
+    const partialSourcemaps: SourceMapInput[] = [];
+    if (optimizeResult && optimizeResult.map) {
+      partialSourcemaps.push(optimizeResult.map);
+    }
+    if (downlevelMap) {
+      partialSourcemaps.push(downlevelMap);
+    }
+
+    if (partialSourcemaps.length > 0) {
+      partialSourcemaps.push(map);
+      const fullSourcemap = remapping(partialSourcemaps, () => null);
+      mapContent = JSON.stringify(fullSourcemap);
+    } else {
+      mapContent = map;
+    }
 
     await cachePut(
       mapContent,
@@ -361,21 +245,21 @@ async function processBundle(
     fs.writeFileSync(filepath + '.map', mapContent);
   }
 
-  const fileResult = createFileEntry(filepath, result.code, mapContent, integrityAlgorithm);
+  const fileResult = createFileEntry(filepath, resultCode, mapContent, integrityAlgorithm);
 
   await cachePut(
-    result.code,
+    resultCode,
     cacheKeys[isOriginal ? CacheKey.OriginalCode : CacheKey.DownlevelCode],
     fileResult.integrity,
   );
-  fs.writeFileSync(filepath, result.code);
+  fs.writeFileSync(filepath, resultCode);
 
   return fileResult;
 }
 
 async function terserMangle(
   code: string,
-  options: { filename?: string; map?: RawSourceMap; compress?: boolean; ecma?: 5 | 2015 } = {},
+  options: { filename?: string; sourcemap?: boolean; compress?: boolean; ecma?: 5 | 2015 } = {},
 ) {
   // Note: Investigate converting the AST instead of re-parsing
   // estree -> terser is already supported; need babel -> estree/terser
@@ -393,7 +277,7 @@ async function terserMangle(
       wrap_func_args: false,
     },
     sourceMap:
-      !!options.map &&
+      !!options.sourcemap &&
       ({
         asObject: true,
         // typings don't include asObject option
@@ -402,21 +286,7 @@ async function terserMangle(
   });
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const outputCode = minifyOutput.code!;
-
-  let outputMap;
-  if (options.map && minifyOutput.map) {
-    outputMap = await mergeSourceMaps(
-      code,
-      options.map,
-      outputCode,
-      minifyOutput.map as unknown as RawSourceMap,
-      options.filename || '0',
-      code.length > FAST_SOURCEMAP_THRESHOLD,
-    );
-  }
-
-  return { code: outputCode, map: outputMap };
+  return { code: minifyOutput.code!, map: minifyOutput.map as SourceMapInput | undefined };
 }
 
 function createFileEntry(
@@ -644,7 +514,6 @@ export async function inlineLocales(options: InlineOptions) {
   }
 
   const diagnostics = [];
-  const inputMap = options.map && (JSON.parse(options.map) as RawSourceMap);
   for (const locale of i18n.inlineLocales) {
     const isSourceLocale = locale === i18n.sourceLocale;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -675,7 +544,7 @@ export async function inlineLocales(options: InlineOptions) {
       configFile: false,
       plugins,
       compact: !shouldBeautify,
-      sourceMaps: !!inputMap,
+      sourceMaps: !!options.map,
     });
 
     diagnostics.push(...localeDiagnostics.messages);
@@ -691,15 +560,8 @@ export async function inlineLocales(options: InlineOptions) {
     );
     fs.writeFileSync(outputPath, transformResult.code);
 
-    if (inputMap && transformResult.map) {
-      const outputMap = await mergeSourceMaps(
-        options.code,
-        inputMap,
-        transformResult.code,
-        transformResult.map,
-        options.filename,
-        options.code.length > FAST_SOURCEMAP_THRESHOLD,
-      );
+    if (options.map && transformResult.map) {
+      const outputMap = remapping([transformResult.map as SourceMapInput, options.map], () => null);
 
       fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
     }
@@ -725,7 +587,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
     return inlineCopyOnly(options);
   }
 
-  const inputMap = options.map && (JSON.parse(options.map) as RawSourceMap);
+  const inputMap = !!options.map && (JSON.parse(options.map) as { sourceRoot?: string });
   // Cleanup source root otherwise it will be added to each source entry
   const mapSourceRoot = inputMap && inputMap.sourceRoot;
   if (inputMap) {
@@ -741,8 +603,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   for (const locale of i18n.inlineLocales) {
     const content = new ReplaceSource(
       inputMap
-        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          new SourceMapSource(options.code, options.filename, inputMap as any)
+        ? new SourceMapSource(options.code, options.filename, inputMap)
         : new OriginalSource(options.code, options.filename),
     );
 
@@ -784,7 +645,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
 
     const { source: outputCode, map: outputMap } = outputSource.sourceAndMap() as {
       source: string;
-      map: RawSourceMap;
+      map: { file: string; sourceRoot?: string };
     };
     const outputPath = path.join(
       options.outputPath,
