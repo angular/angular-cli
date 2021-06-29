@@ -208,7 +208,9 @@ function visitComponentMetadata(
           } else if (inlineStyleFileExtension) {
             const data = Buffer.from(node.text).toString('base64');
             const containingFile = node.getSourceFile().fileName;
-            url = `${containingFile}.${inlineStyleFileExtension}!=!${inlineDataLoaderPath}?data=${data}!${containingFile}`;
+            url = `${containingFile}.${inlineStyleFileExtension}!=!${inlineDataLoaderPath}?data=${encodeURIComponent(
+              data,
+            )}!${containingFile}`;
           } else {
             return nodeFactory.createStringLiteral(node.text);
           }
