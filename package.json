@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.40.0",
+    "**/@types/copy-webpack-plugin/webpack": "5.41.0",
     "ajv-formats/ajv": "8.6.0"
   },
   "devDependencies": {
@@ -124,8 +124,8 @@
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
     "@types/webpack-dev-server": "^3.1.7",
-    "@typescript-eslint/eslint-plugin": "4.28.0",
-    "@typescript-eslint/parser": "4.28.0",
+    "@typescript-eslint/eslint-plugin": "4.28.1",
+    "@typescript-eslint/parser": "4.28.1",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.6.0",
     "ajv-formats": "2.1.0",
@@ -147,7 +147,7 @@
     "css-minimizer-webpack-plugin": "3.0.2",
     "debug": "^4.1.1",
     "enhanced-resolve": "5.8.2",
-    "esbuild": "0.12.11",
+    "esbuild": "0.12.12",
     "eslint": "7.29.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-header": "3.1.1",
@@ -180,7 +180,7 @@
     "license-webpack-plugin": "2.3.19",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
-    "mini-css-extract-plugin": "1.6.1",
+    "mini-css-extract-plugin": "1.6.2",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
     "ng-packagr": "~12.1.0-next.0",
@@ -232,7 +232,7 @@
     "typescript": "4.3.4",
     "verdaccio": "5.1.1",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.40.0",
+    "webpack": "5.41.0",
     "webpack-dev-middleware": "5.0.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.8.0",
