@@ -181,7 +181,10 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
 
   if (options.forceAsyncTransformation) {
     // Always transform async/await to support Zone.js
-    plugins.push(require('@babel/plugin-transform-async-to-generator').default);
+    plugins.push(
+      require('@babel/plugin-transform-async-to-generator').default,
+      require('@babel/plugin-proposal-async-generator-functions').default,
+    );
     needRuntimeTransform = true;
   }
 
