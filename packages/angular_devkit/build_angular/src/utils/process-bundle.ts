@@ -413,7 +413,7 @@ async function terserMangle(
       code,
       options.map,
       outputCode,
-      (minifyOutput.map as unknown) as RawSourceMap,
+      minifyOutput.map as unknown as RawSourceMap,
       options.filename || '0',
       code.length > FAST_SOURCEMAP_THRESHOLD,
     );
