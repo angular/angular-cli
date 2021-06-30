@@ -81,10 +81,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
     },
-    target:
-      wco.tsConfig.options.target === ScriptTarget.ES5 || buildBrowserFeatures.isEs5SupportNeeded()
-        ? ['web', 'es5']
-        : 'web',
     output: {
       crossOriginLoading,
       trustedTypes: 'angular#bundler',
