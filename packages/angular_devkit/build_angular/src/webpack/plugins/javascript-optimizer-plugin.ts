@@ -8,6 +8,7 @@
 
 import Piscina from 'piscina';
 import { ScriptTarget } from 'typescript';
+import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../utils/environment-options';
 
 /**
@@ -74,7 +75,7 @@ export interface JavaScriptOptimizerOptions {
 export class JavaScriptOptimizerPlugin {
   constructor(public options: Partial<JavaScriptOptimizerOptions> = {}) {}
 
-  apply(compiler: import('webpack').Compiler) {
+  apply(compiler: Compiler) {
     const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
 
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
@@ -85,19 +86,43 @@ export class JavaScriptOptimizerPlugin {
         },
         async (compilationAssets) => {
           const scriptsToOptimize = [];
+          const cache =
+            compilation.options.cache && compilation.getCache('JavaScriptOptimizerPlugin');
 
           // Analyze the compilation assets for scripts that require optimization
           for (const assetName of Object.keys(compilationAssets)) {
-            if (assetName.endsWith('.js')) {
-              const scriptAsset = compilation.getAsset(assetName);
-              if (scriptAsset && !scriptAsset.info.minimized) {
-                const { source, map } = scriptAsset.source.sourceAndMap();
-                scriptsToOptimize.push({
-                  name: scriptAsset.name,
-                  code: typeof source === 'string' ? source : source.toString(),
-                  map,
-                });
+            if (!assetName.endsWith('.js')) {
+              continue;
+            }
+
+            const scriptAsset = compilation.getAsset(assetName);
+
+            if (scriptAsset && !scriptAsset.info.minimized) {
+              const { source: scriptAssetSource, name } = scriptAsset;
+              let cacheItem;
+
+              if (cache) {
+                const eTag = cache.getLazyHashedEtag(scriptAssetSource);
+                cacheItem = cache.getItemCache(name, eTag);
+                const cachedOutput = await cacheItem.getPromise<
+                  { source: sources.Source } | undefined
+                >();
+
+                if (cachedOutput) {
+                  compilation.updateAsset(name, cachedOutput.source, {
+                    minimized: true,
+                  });
+                  continue;
+                }
               }
+
+              const { source, map } = scriptAssetSource.sourceAndMap();
+              scriptsToOptimize.push({
+                name: scriptAsset.name,
+                code: typeof source === 'string' ? source : source.toString(),
+                map,
+                cacheItem,
+              });
             }
           }
 
@@ -148,7 +173,7 @@ export class JavaScriptOptimizerPlugin {
           // Enqueue script optimization tasks and update compilation assets as the tasks complete
           try {
             const tasks = [];
-            for (const { name, code, map } of scriptsToOptimize) {
+            for (const { name, code, map, cacheItem } of scriptsToOptimize) {
               tasks.push(
                 workerPool
                   .run({
@@ -161,13 +186,14 @@ export class JavaScriptOptimizerPlugin {
                   })
                   .then(
                     ({ code, name, map }) => {
-                      let optimizedAsset;
-                      if (map) {
-                        optimizedAsset = new SourceMapSource(code, name, map);
-                      } else {
-                        optimizedAsset = new OriginalSource(code, name);
-                      }
+                      const optimizedAsset = map
+                        ? new SourceMapSource(code, name, map)
+                        : new OriginalSource(code, name);
                       compilation.updateAsset(name, optimizedAsset, { minimized: true });
+
+                      return cacheItem?.storePromise({
+                        source: optimizedAsset,
+                      });
                     },
                     (error) => {
                       const optimizationError = new compiler.webpack.WebpackError(
