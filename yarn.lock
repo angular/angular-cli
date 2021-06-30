@@ -86,7 +86,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a1442a839401cb9a09285fbf1cd925cf51390ca3":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#6707d0f4cf98242af0b5635a0cf40cdeba300c9c"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#5879ecd963467fef55d090c45ebaddc80088107c"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
@@ -114,7 +114,7 @@
     ts-node "^10.0.0"
     tslib "^2.2.0"
     typed-graphqlify "^3.1.1"
-    typescript "~4.3.2"
+    typescript "~4.3.4"
     yaml "^1.10.0"
     yargs "^17.0.0"
 
@@ -474,7 +474,7 @@
     "@babel/helper-skip-transparent-expression-wrappers" "^7.14.5"
     "@babel/plugin-proposal-optional-chaining" "^7.14.5"
 
-"@babel/plugin-proposal-async-generator-functions@^7.14.7":
+"@babel/plugin-proposal-async-generator-functions@7.14.7", "@babel/plugin-proposal-async-generator-functions@^7.14.7":
   version "7.14.7"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-async-generator-functions/-/plugin-proposal-async-generator-functions-7.14.7.tgz#784a48c3d8ed073f65adcf30b57bcbf6c8119ace"
   integrity sha512-RK8Wj7lXLY3bqei69/cc25gwS5puEc3dknoFPFbqfy3XxYQBQFvu4ioWpafMBAB+L9NyptQK4nMOa5Xz16og8Q==

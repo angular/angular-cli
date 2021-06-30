@@ -43,15 +43,9 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         vendorChunk: true,
       });
 
-      const { result, logs } = await harness.executeOnce();
+      const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Zone.js does not support native async/await in ES2017+'),
-        }),
-      );
-
       harness.expectFile('dist/main.js').content.not.toMatch(/\sasync\s/);
       harness.expectFile('dist/main.js').content.toContain('"from-async-app-function"');
       harness.expectFile('dist/main.js').content.toContain('"from-async-js-function"');
@@ -125,17 +119,46 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         vendorChunk: true,
       });
 
-      const { result, logs } = await harness.executeOnce();
+      const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Zone.js does not support native async/await in ES2017+'),
-        }),
-      );
-
       harness.expectFile('dist/main.js').content.not.toMatch(/\sasync\s/);
       harness.expectFile('dist/main.js').content.toContain('"from-async-function"');
+    });
+
+    it('downlevels "for await...of" when targetting ES2018+', async () => {
+      await harness.modifyFile('src/tsconfig.app.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        if (!tsconfig.compilerOptions) {
+          tsconfig.compilerOptions = {};
+        }
+        tsconfig.compilerOptions.target = 'es2020';
+
+        return JSON.stringify(tsconfig);
+      });
+
+      // Add an async function to the project
+      await harness.writeFile(
+        'src/main.ts',
+        `
+        (async () => {
+          for await (const o of [1, 2, 3]) {
+            console.log("for await...of");
+          }
+        })();
+        `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        vendorChunk: true,
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+      harness.expectFile('dist/main.js').content.not.toMatch(/\sawait\s/);
+      harness.expectFile('dist/main.js').content.toContain('"for await...of"');
     });
   });
 });
