@@ -35,7 +35,6 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
     resolve: {
       mainFields: ['es2015', 'main', 'module'],
     },
-    target: 'node',
     output: {
       libraryTarget: 'commonjs',
     },
