@@ -40,6 +40,7 @@ import {
   maxWorkers,
   persistentBuildCacheEnabled,
   profilingEnabled,
+  shouldBeautify,
 } from '../../utils/environment-options';
 import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
