@@ -181,7 +181,7 @@
     "license-webpack-plugin": "2.3.19",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
-    "mini-css-extract-plugin": "1.6.2",
+    "mini-css-extract-plugin": "2.0.0",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
     "ng-packagr": "~12.1.0-next.0",
