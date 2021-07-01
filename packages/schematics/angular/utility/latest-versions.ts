@@ -8,7 +8,7 @@
 
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
-  Angular: '~12.2.0-next.0',
+  Angular: '~12.2.0-next.1',
   RxJs: '~6.6.0',
   ZoneJs: '~0.11.4',
   TypeScript: '~4.3.2',
