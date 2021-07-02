@@ -7,7 +7,6 @@
  */
 
 import { logging, tags } from '@angular-devkit/core';
-import { getOptions } from 'loader-utils';
 import { extname } from 'path';
 
 export interface SingleTestTransformLoaderOptions {
@@ -32,8 +31,11 @@ export const SingleTestTransformLoader = __filename;
  * array to import them directly, and thus run the tests there.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function loader(this: any, source: string): string {
-  const { files = [], logger = console } = getOptions(this) as SingleTestTransformLoaderOptions;
+export default function loader(
+  this: import('webpack').LoaderContext<SingleTestTransformLoaderOptions>,
+  source: string,
+): string {
+  const { files = [], logger = console } = this.getOptions();
   // signal the user that expected content is not present.
   if (!source.includes('require.context(')) {
     logger.error(tags.stripIndent`The 'include' option requires that the 'main' file for tests includes the below line:

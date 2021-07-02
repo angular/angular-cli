@@ -7,26 +7,23 @@
  */
 
 import { MessageExtractor } from '@angular/localize/src/tools/src/extract/extraction';
-import { getOptions } from 'loader-utils';
 import * as nodePath from 'path';
+
+// Extract loader source map parameter type since it is not exported directly
+type LoaderSourceMap = Parameters<import('webpack').LoaderDefinitionFunction>[1];
 
 interface LocalizeExtractLoaderOptions {
   messageHandler: (messages: import('@angular/localize').ɵParsedMessage[]) => void;
 }
 
 export default function localizeExtractLoader(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  this: any,
+  this: import('webpack').LoaderContext<LocalizeExtractLoaderOptions>,
   content: string,
-  // Source map types are broken in the webpack type definitions
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  map: any,
+  map: LoaderSourceMap,
 ) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const loaderContext = this;
-
-  // Casts are needed to workaround the loader-utils typings limited support for option values
-  const options = (getOptions(this) as unknown) as LocalizeExtractLoaderOptions | undefined;
+  const options = this.getOptions();
 
   // Setup a Webpack-based logger instance
   const logger = {
@@ -37,20 +34,22 @@ export default function localizeExtractLoader(
       console.debug(...args);
     },
     info(...args: string[]): void {
-      loaderContext.emitWarning(args.join(''));
+      loaderContext.emitWarning(new Error(args.join('')));
     },
     warn(...args: string[]): void {
-      loaderContext.emitWarning(args.join(''));
+      loaderContext.emitWarning(new Error(args.join('')));
     },
     error(...args: string[]): void {
-      loaderContext.emitError(args.join(''));
+      loaderContext.emitError(new Error(args.join('')));
     },
   };
 
   let filename = loaderContext.resourcePath;
-  if (map?.file) {
+  const mapObject =
+    typeof map === 'string' ? (JSON.parse(map) as Exclude<LoaderSourceMap, string>) : map;
+  if (mapObject?.file) {
     // The extractor's internal sourcemap handling expects the filenames to match
-    filename = nodePath.join(loaderContext.context, map.file);
+    filename = nodePath.join(loaderContext.context, mapObject.file);
   }
 
   // Setup a virtual file system instance for the extractor

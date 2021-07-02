@@ -32,8 +32,7 @@ export interface PostcssCliResourcesOptions {
   /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
   extracted?: boolean;
   filename: (resourcePath: string) => string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  loader: any;
+  loader: import('webpack').LoaderContext<unknown>;
   emitFile: boolean;
 }
 
@@ -94,20 +93,20 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));
     const resolver = (file: string, base: string) =>
       new Promise<string>((resolve, reject) => {
-        loader.resolve(base, decodeURI(file), (err: Error, result: string) => {
+        loader.resolve(base, decodeURI(file), (err, result) => {
           if (err) {
             reject(err);
 
             return;
           }
-          resolve(result);
+          resolve(result as string);
         });
       });
 
     const result = await resolve(pathname as string, context, resolver);
 
     return new Promise<string>((resolve, reject) => {
-      loader.fs.readFile(result, (err: Error, content: Buffer) => {
+      loader.fs.readFile(result, (err, content) => {
         if (err) {
           reject(err);
 
@@ -125,7 +124,8 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
 
         loader.addDependency(result);
         if (emitFile) {
-          loader.emitFile(outputPath, content, undefined, { sourceFilename: result });
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          loader.emitFile(outputPath, content!, undefined, { sourceFilename: result });
         }
 
         let outputUrl = outputPath.replace(/\\/g, '/');
@@ -172,7 +172,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
         try {
           processedUrl = await process(originalUrl, context, resourceCache);
         } catch (err) {
-          loader.emitError(decl.error(err.message, { word: originalUrl }).toString());
+          loader.emitError(decl.error(err.message, { word: originalUrl }));
           continue;
         }
 
