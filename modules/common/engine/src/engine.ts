@@ -28,7 +28,7 @@ export interface RenderOptions {
   documentFilePath?: string;
   /**
    * Reduce render blocking requests by inlining critical CSS.
-   * Defaults to false.
+   * Defaults to true.
    */
   inlineCriticalCss?: boolean;
   /**
