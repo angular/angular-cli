@@ -20,7 +20,6 @@ export interface ApplicationPresetOptions {
   angularLinker?: {
     shouldLink: boolean;
     jitMode: boolean;
-    sourcemap: boolean;
   };
 
   forceES5?: boolean;
@@ -138,7 +137,6 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     plugins.push(
       createEs2015LinkerPlugin({
         linkerJitMode: options.angularLinker.jitMode,
-        sourceMapping: options.angularLinker.sourcemap,
         logger: createNgtscLogger(options.diagnosticReporter),
         fileSystem: {
           resolve: path.resolve,
