@@ -107,7 +107,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         harness
           .expectFile('dist/styles.css')
           .content.toMatch(
-            /\.test-c {color: blue}\s+\.test-d {color: yellow}\s+\.test-b {color: green}\s+\.test-a {color: red}/,
+            /\.test-c {color: blue}[\s|\S]+\.test-d {color: yellow}[\s|\S]+\.test-b {color: green}[\s|\S]+\.test-a {color: red}/m,
           );
       });
 
@@ -300,7 +300,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         harness
           .expectFile('dist/styles.css')
           .content.toMatch(
-            /\.test-c {color: blue}\s+\.test-d {color: yellow}\s+\.test-b {color: green}\s+\.test-a {color: red}/,
+            /\.test-c {color: blue}[\s|\S]+\.test-d {color: yellow}[\s|\S]+\.test-b {color: green}[\s|\S]+\.test-a {color: red}/,
           );
       });
 
@@ -328,10 +328,10 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
         harness
           .expectFile('dist/other.css')
-          .content.toMatch(/\.test-c {color: blue}\s+\.test-a {color: red}/);
+          .content.toMatch(/\.test-c {color: blue}[\s|\S]+\.test-a {color: red}/);
         harness
           .expectFile('dist/extra.css')
-          .content.toMatch(/\.test-d {color: yellow}\s+\.test-b {color: green}/);
+          .content.toMatch(/\.test-d {color: yellow}[\s|\S]+\.test-b {color: green}/);
         harness
           .expectFile('dist/index.html')
           .content.toMatch(
