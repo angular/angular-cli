@@ -7,8 +7,7 @@
  */
 
 import * as ts from 'typescript';
-
-const inlineDataLoaderPath = require.resolve('../inline-data-loader');
+import { InlineAngularResourceLoaderPath } from '../loaders/inline-resource';
 
 export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
@@ -208,7 +207,7 @@ function visitComponentMetadata(
           } else if (inlineStyleFileExtension) {
             const data = Buffer.from(node.text).toString('base64');
             const containingFile = node.getSourceFile().fileName;
-            url = `${containingFile}.${inlineStyleFileExtension}!=!${inlineDataLoaderPath}?data=${encodeURIComponent(
+            url = `${containingFile}.${inlineStyleFileExtension}!=!${InlineAngularResourceLoaderPath}?data=${encodeURIComponent(
               data,
             )}!${containingFile}`;
           } else {

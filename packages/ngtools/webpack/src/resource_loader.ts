@@ -10,11 +10,12 @@ import { createHash } from 'crypto';
 import * as path from 'path';
 import * as vm from 'vm';
 import type { Asset, Compilation } from 'webpack';
+import { normalizePath } from './ivy/paths';
 import {
   CompilationWithInlineAngularResource,
+  InlineAngularResourceLoaderPath,
   InlineAngularResourceSymbol,
-} from './inline-data-loader';
-import { normalizePath } from './ivy/paths';
+} from './loaders/inline-resource';
 
 interface CompilationOutput {
   content: string;
@@ -33,7 +34,7 @@ export class WebpackResourceLoader {
   private modifiedResources = new Set<string>();
   private outputPathCounter = 1;
 
-  private readonly inlineDataLoaderPath = require.resolve('./inline-data-loader');
+  private readonly inlineDataLoaderPath = InlineAngularResourceLoaderPath;
 
   constructor(shouldCache: boolean) {
     if (shouldCache) {
