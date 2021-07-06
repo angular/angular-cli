@@ -14,9 +14,13 @@ import type { Compilation, Compiler, Module, NormalModule } from 'webpack';
 import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
-import { addError, addWarning } from '../webpack-diagnostics';
 import { SourceFileCache } from './cache';
-import { DiagnosticsReporter, createDiagnosticsReporter } from './diagnostics';
+import {
+  DiagnosticsReporter,
+  addError,
+  addWarning,
+  createDiagnosticsReporter,
+} from './diagnostics';
 import {
   augmentHostWithCaching,
   augmentHostWithDependencyCollection,
