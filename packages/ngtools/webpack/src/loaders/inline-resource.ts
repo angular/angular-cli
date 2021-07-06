@@ -8,6 +8,8 @@
 
 import type { Compilation, LoaderContext } from 'webpack';
 
+export const InlineAngularResourceLoaderPath = __filename;
+
 export const InlineAngularResourceSymbol = Symbol('@ngtools/webpack[angular-resource]');
 
 export interface CompilationWithInlineAngularResource extends Compilation {
