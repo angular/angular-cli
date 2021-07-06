@@ -7,6 +7,7 @@
  */
 
 import * as ts from 'typescript';
+import { DirectAngularResourceLoaderPath } from '../loaders/direct-resource';
 import { InlineAngularResourceLoaderPath } from '../loaders/inline-resource';
 
 export function replaceResources(
@@ -167,7 +168,10 @@ function visitComponentMetadata(
       return undefined;
 
     case 'templateUrl':
-      const url = getResourceUrl(node.initializer, directTemplateLoading ? '!raw-loader!' : '');
+      const url = getResourceUrl(
+        node.initializer,
+        directTemplateLoading ? `!${DirectAngularResourceLoaderPath}!` : '',
+      );
       if (!url) {
         return node;
       }
