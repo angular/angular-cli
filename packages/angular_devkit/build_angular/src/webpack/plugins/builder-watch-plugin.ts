@@ -20,13 +20,6 @@ export interface BuilderWatcherFactory {
   ): { close(): void };
 }
 
-export interface WebpackWatcher {
-  close(): void;
-  pause(): void;
-  getFileTimeInfoEntries(): Map<string, { safeTime: number; timestamp: number }>;
-  getContextTimeInfoEntries(): Map<string, { safeTime: number; timestamp: number }>;
-}
-
 class TimeInfoMap extends Map<string, { safeTime: number; timestamp: number }> {
   update(path: string, timestamp: number): void {
     this.set(path, Object.freeze({ safeTime: timestamp, timestamp }));
@@ -42,30 +35,15 @@ class TimeInfoMap extends Map<string, { safeTime: number; timestamp: number }> {
   }
 }
 
-type WatchCallback = (
-  error: Error | undefined,
-  files: Map<string, { safeTime: number; timestamp: number }>,
-  contexts: Map<string, { safeTime: number; timestamp: number }>,
-  changes: Set<string>,
-  removals: Set<string>,
-) => void;
-
-export interface WebpackWatchFileSystem {
-  watch(
-    files: Iterable<string>,
-    directories: Iterable<string>,
-    missing: Iterable<string>,
-    startTime: number,
-    options: {},
-    callback: WatchCallback,
-    callbackUndelayed: (file: string, time: number) => void,
-  ): WebpackWatcher;
-}
+// Extract watch related types from the Webpack compiler type since they are not directly exported
+type WebpackWatchFileSystem = Compiler['watchFileSystem'];
+type WatchOptions = Parameters<WebpackWatchFileSystem['watch']>[4];
+type WatchCallback = Parameters<WebpackWatchFileSystem['watch']>[5];
 
 class BuilderWatchFileSystem implements WebpackWatchFileSystem {
   constructor(
     private readonly watcherFactory: BuilderWatcherFactory,
-    private readonly inputFileSystem: { purge?(path?: string): void },
+    private readonly inputFileSystem: Compiler['inputFileSystem'],
   ) {}
 
   watch(
@@ -73,10 +51,10 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
     directories: Iterable<string>,
     missing: Iterable<string>,
     startTime: number,
-    _options: {},
+    _options: WatchOptions,
     callback: WatchCallback,
     callbackUndelayed?: (file: string, time: number) => void,
-  ): WebpackWatcher {
+  ): ReturnType<WebpackWatchFileSystem['watch']> {
     const watchedFiles = new Set(files);
     const watchedDirectories = new Set(directories);
     const watchedMissing = new Set(missing);
@@ -152,7 +130,7 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
 export class BuilderWatchPlugin {
   constructor(private readonly watcherFactory: BuilderWatcherFactory) {}
 
-  apply(compiler: Compiler & { watchFileSystem: unknown }): void {
+  apply(compiler: Compiler): void {
     compiler.hooks.environment.tap('BuilderWatchPlugin', () => {
       compiler.watchFileSystem = new BuilderWatchFileSystem(
         this.watcherFactory,
