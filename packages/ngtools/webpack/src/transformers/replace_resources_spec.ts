@@ -8,6 +8,7 @@
 
 import { tags } from '@angular-devkit/core';
 import * as ts from 'typescript';
+import { DirectAngularResourceLoaderPath } from '../loaders/direct-resource';
 import { replaceResources } from './replace_resources';
 import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
@@ -52,7 +53,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "./app.component.css";
         import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
         import { Component } from '@angular/core';
@@ -102,7 +103,7 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
           core_1.Component({
             selector: 'app-root',
-            template: require("!raw-loader!./app.component.html").default,
+            template: require("!${DirectAngularResourceLoaderPath}!./app.component.html").default,
             styles: [require("./app.component.css").default, require("./app.component.2.css").default] }) ], AppComponent);
         exports.AppComponent = AppComponent;
       `;
@@ -166,7 +167,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.svg";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.svg";
         import { Component } from '@angular/core';
         let AppComponent = class AppComponent {
             constructor() {
@@ -202,7 +203,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "./app.component.css";
         import { Component } from '@angular/core';
 
@@ -240,7 +241,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "data:text/css;charset=utf-8;base64,YSB7IGNvbG9yOiByZWQgfQ==";
         import { Component } from '@angular/core';
 
@@ -284,7 +285,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = `
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "./app.component.css";
         import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
 
@@ -323,7 +324,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "./app.component.css";
         import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
         import { Component as NgComponent } from '@angular/core';
@@ -366,7 +367,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "./app.component.css";
         import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
 
@@ -411,7 +412,7 @@ describe('@ngtools/webpack transformers', () => {
 
       const output = tags.stripIndent`
         import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
         import __NG_CLI_RESOURCE__1 from "./app.component.css";
 
         import { Component } from '@angular/core';
