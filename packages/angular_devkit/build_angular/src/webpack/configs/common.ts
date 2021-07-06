@@ -494,7 +494,7 @@ function getCacheSettings(
         .update(JSON.stringify(wco.tsConfig))
         .update(JSON.stringify(wco.buildOptions))
         .update(supportedBrowsers.join(''))
-        .digest('base64'),
+        .digest('hex'),
     };
   }
 
