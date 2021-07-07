@@ -86,7 +86,6 @@ ts_library(
         "@npm//@angular/platform-browser-dynamic",
         "@npm//@types/node-fetch",
         "@npm//node-fetch",
-        "@npm//raw-loader",
         "@npm//tslib",
         "@npm//zone.js",
     ],

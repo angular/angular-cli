@@ -242,7 +242,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   const postCssLoaderPath = require.resolve('postcss-loader');
 
   const componentStyleLoaders: webpack.RuleSetUseItem[] = [
-    { loader: require.resolve('raw-loader') },
     {
       loader: postCssLoaderPath,
       options: {
@@ -435,6 +434,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
               {
                 exclude: globalStylePaths,
                 use: componentStyleLoaders,
+                type: 'asset/source',
               },
               // Global styles are only defined global styles
               {
