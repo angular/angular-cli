@@ -3,25 +3,23 @@ const path = require('path');
 
 module.exports = {
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
   },
   entry: './app/main.ts',
   output: {
     path: path.resolve('./dist'),
     publicPath: 'dist/',
-    filename: 'app.main.js'
+    filename: 'app.main.js',
   },
-  plugins: [
-    new ngToolsWebpack.ivy.AngularWebpackPlugin(),
-  ],
+  plugins: [new ngToolsWebpack.AngularWebpackPlugin()],
   module: {
     rules: [
-      { test: /\.scss$/, use: ['raw-loader', 'sass-loader'] },
-      { test: /\.html$/, loader: 'raw-loader' },
-      { test: /\.ts$/, loader: ngToolsWebpack.ivy.AngularWebpackLoaderPath }
-    ]
+      { test: /\.scss$/, use: ['sass-loader'], type: 'asset/source' },
+      { test: /\.html$/, type: 'asset/source' },
+      { test: /\.ts$/, loader: ngToolsWebpack.AngularWebpackLoaderPath },
+    ],
   },
   devServer: {
-    historyApiFallback: true
-  }
+    historyApiFallback: true,
+  },
 };

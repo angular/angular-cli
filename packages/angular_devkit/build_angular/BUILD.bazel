@@ -171,7 +171,6 @@ ts_library(
         "@npm//postcss-import",
         "@npm//postcss-loader",
         "@npm//postcss-preset-env",
-        "@npm//raw-loader",
         "@npm//regenerator-runtime",
         "@npm//resolve-url-loader",
         "@npm//rxjs",
