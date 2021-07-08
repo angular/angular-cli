@@ -287,6 +287,9 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
           calc: false,
           // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
           cssDeclarationSorter: false,
+          // Workaround for Critters as it doesn't work when `@media all {}` is minified to `@media {}`.
+          // TODO: Remove once they move to postcss.
+          minifyParams: !buildOptions.optimization.styles.inlineCritical,
         },
       ],
     };
