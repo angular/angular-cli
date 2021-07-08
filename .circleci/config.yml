@@ -68,6 +68,14 @@ executors:
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
 commands:
+  fail_fast:
+    steps:
+      - run:
+          name: 'Cancel workflow on fail'
+          when: on_fail
+          command: |
+            curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
+
   custom_attach_workspace:
     description: Attach workspace at a predefined location
     steps:
@@ -148,12 +156,14 @@ jobs:
           key: *cache_key
           paths:
             - ~/.cache/yarn
+      - fail_fast
 
   lint:
     executor: action-executor
     steps:
       - custom_attach_workspace
       - run: yarn lint
+      - fail_fast
 
   validate:
     executor: action-executor
@@ -178,6 +188,7 @@ jobs:
           command: yarn ts-circular-deps:check
       - run:
           command: yarn -s admin validate
+      - fail_fast
 
   e2e-cli:
     parameters:
@@ -207,6 +218,7 @@ jobs:
           command: |
             mkdir /mnt/ramdisk/e2e-yarn
             node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+      - fail_fast
 
   test-browsers:
     executor:
@@ -232,12 +244,14 @@ jobs:
       - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
       - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
       - run: ./scripts/saucelabs/stop-tunnel.sh
+      - fail_fast
 
   build:
     executor: action-executor
     steps:
       - custom_attach_workspace
       - run: yarn build
+      - fail_fast
 
   test:
     executor: test-executor
@@ -250,6 +264,7 @@ jobs:
       - run:
           command: yarn bazel:test
           no_output_timeout: 20m
+      - fail_fast
 
   snapshot_publish:
     executor: action-executor
@@ -267,6 +282,7 @@ jobs:
           name: Deployment to Snapshot
           command: |
             yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
+      - fail_fast
 
   # Windows jobs
   e2e-cli-win:
@@ -292,6 +308,7 @@ jobs:
             } else {
               node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
             }
+      - fail_fast
 
 workflows:
   version: 2
@@ -320,7 +337,7 @@ workflows:
           name: e2e-cli-ng-snapshots
           snapshots: true
           requires:
-            - e2e-cli
+            - build
           filters:
             branches:
               only:
@@ -331,7 +348,7 @@ workflows:
           nodeversion: '12.20'
           <<: *only_release_branches
           requires:
-            - e2e-cli
+            - build
       - test-browsers:
           requires:
             - build
@@ -347,7 +364,7 @@ workflows:
       # Windows jobs
       - e2e-cli-win:
           requires:
-            - test
+            - build
 
       # Publish jobs
       - snapshot_publish:
