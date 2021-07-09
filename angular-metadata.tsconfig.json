@@ -8,6 +8,7 @@
     "types": [],
     "skipLibCheck": true,
     "module": "amd",
+    "downlevelIteration": true,
     "moduleResolution": "node"
   },
   "angularCompilerOptions": {
