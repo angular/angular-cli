@@ -277,7 +277,9 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   const extraMinimizers = [];
   if (buildOptions.optimization.styles.minify) {
     const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-    const minimizerOptions = {
+    const esbuild = require('esbuild') as typeof import('esbuild');
+
+    const cssnanoOptions = {
       preset: [
         'default',
         {
@@ -299,20 +301,40 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     );
 
     extraMinimizers.push(
+      // Component styles use esbuild which is faster and generates smaller files on average.
+      // esbuild does not yet support style sourcemaps but component style sourcemaps are not
+      // supported by the CLI when style minify is enabled.
       new CssMinimizerPlugin({
         // Component styles retain their original file name
         test: /\.(?:css|scss|sass|less|styl)$/,
-        parallel: false,
         exclude: globalBundlesRegExp,
-        minify: [CssMinimizerPlugin.cssnanoMinify],
-        minimizerOptions,
+        parallel: false,
+        minify: async (data: string) => {
+          const [[sourcefile, input]] = Object.entries(data);
+          const { code, warnings } = await esbuild.transform(input, {
+            loader: 'css',
+            minify: true,
+            sourcefile,
+          });
+
+          return {
+            code,
+            warnings:
+              warnings.length > 0
+                ? await esbuild.formatMessages(warnings, { kind: 'warning' })
+                : [],
+          };
+        },
       }),
+      // Global styles use cssnano since sourcemap support is required even when minify
+      // is enabled. Once esbuild supports style sourcemaps this can be changed.
+      // esbuild stylesheet source map support issue: https://github.com/evanw/esbuild/issues/519
       new CssMinimizerPlugin({
         test: /\.css$/,
         include: globalBundlesRegExp,
         parallel: maxWorkers,
         minify: [CssMinimizerPlugin.cssnanoMinify],
-        minimizerOptions,
+        minimizerOptions: cssnanoOptions,
       }),
     );
   }
