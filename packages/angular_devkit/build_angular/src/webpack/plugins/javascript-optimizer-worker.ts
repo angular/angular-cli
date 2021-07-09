@@ -93,7 +93,7 @@ async function optimizeWithTerser(
     { [name]: code },
     {
       compress: {
-        passes: advanced ? 3 : 1,
+        passes: advanced ? 2 : 1,
         pure_getters: advanced,
       },
       ecma: target,
