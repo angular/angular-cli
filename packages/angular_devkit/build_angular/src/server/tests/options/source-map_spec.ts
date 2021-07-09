@@ -133,7 +133,7 @@ describeBuilder(execute, SERVER_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/main.js').content.not.toContain('sourceMappingURL=main.js.map');
     });
 
-    it(`should not generate scripts sourceMaps when "scripts" option is true`, async () => {
+    it(`should generate scripts sourceMaps when "scripts" option is true`, async () => {
       harness.useTarget('server', {
         ...BASE_OPTIONS,
         sourceMap: {
