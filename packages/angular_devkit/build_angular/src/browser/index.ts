@@ -648,6 +648,7 @@ export function buildWebpackBrowser(
                     postTransform: transforms.indexHtml,
                   });
 
+                  let hasErrors = false;
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
                       const { content, warnings, errors } = await indexHtmlGenerator.process({
@@ -663,7 +664,10 @@ export function buildWebpackBrowser(
                       if (warnings.length || errors.length) {
                         spinner.stop();
                         warnings.forEach((m) => context.logger.warn(m));
-                        errors.forEach((m) => context.logger.error(m));
+                        errors.forEach((m) => {
+                          context.logger.error(m);
+                          hasErrors = true;
+                        });
                         spinner.start();
                       }
 
@@ -677,7 +681,13 @@ export function buildWebpackBrowser(
                     }
                   }
 
-                  spinner.succeed('Index html generation complete.');
+                  if (hasErrors) {
+                    spinner.fail('Index html generation failed.');
+
+                    return { success: false };
+                  } else {
+                    spinner.succeed('Index html generation complete.');
+                  }
                 }
 
                 if (options.serviceWorker) {
