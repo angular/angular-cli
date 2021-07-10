@@ -221,14 +221,14 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#e82c2626c8918a762465a94bcaeee8ba00bfcce7":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a45aaca7ddb9cd204a7bc46920dc218423106840":
   version "0.0.0"
-  uid e82c2626c8918a762465a94bcaeee8ba00bfcce7
-  resolved "https://github.com/angular/dev-infra-private-builds.git#e82c2626c8918a762465a94bcaeee8ba00bfcce7"
+  uid a45aaca7ddb9cd204a7bc46920dc218423106840
+  resolved "https://github.com/angular/dev-infra-private-builds.git#a45aaca7ddb9cd204a7bc46920dc218423106840"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
-    "@bazel/runfiles" "3.7.0"
+    "@bazel/runfiles" "4.0.0-beta.0"
     "@microsoft/api-extractor" "7.18.1"
     "@octokit/graphql" "^4.6.1"
     "@octokit/rest" "^18.6.2"
@@ -1196,10 +1196,10 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
-"@bazel/runfiles@3.7.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-3.7.0.tgz#c00eeee9b7e7c3993f95cab5ad3cced17949869a"
-  integrity sha512-lAj01NxpnHvvyHY1TquaQADFex5hfqmDH5KR7US63rpEuDazaGCk1WxEE/3PzZPUq4kyT6PNPLhuNB+OW1lupQ==
+"@bazel/runfiles@4.0.0-beta.0":
+  version "4.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-4.0.0-beta.0.tgz#e62679d80cf9fcd84996e5f3ae4bedc33ed1a993"
+  integrity sha512-pFdanyvI0wf2WtdQXUmcTZw7OJ83uj2bxF3rOskx45wewBRAlQZkm2q2A6WEffSfdf2WaBlk5u/x2kqK2nyG7w==
 
 "@bazel/typescript@3.7.0":
   version "3.7.0"
