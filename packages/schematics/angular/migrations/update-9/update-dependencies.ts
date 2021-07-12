@@ -12,7 +12,6 @@ import {
   getPackageJsonDependency,
   removePackageJsonDependency,
 } from '../../utility/dependencies';
-import { latestVersions } from '../../utility/latest-versions';
 
 export function updateDependencies(): Rule {
   return (host, context) => {
