@@ -3,8 +3,13 @@ import { ng } from '../../utils/process';
 
 export default async function () {
   // Development build
-  await ng('build', '--configuration=development');
+  const { stdout: stdoutDev } = await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/index.html', 'main.js');
+  if (stdoutDev.includes('Estimated Transfer Size')) {
+    throw new Error(
+      `Expected stdout not to contain 'Estimated Transfer Size' but it did.\n${stdoutDev}`,
+    );
+  }
 
   // Named Development build
   await ng('build', 'test-project', '--configuration=development');
@@ -17,6 +22,12 @@ export default async function () {
 
   if (!stdout.includes('Initial Total')) {
     throw new Error(`Expected stdout to contain 'Initial Total' but it did not.\n${stdout}`);
+  }
+
+  if (!stdout.includes('Estimated Transfer Size')) {
+    throw new Error(
+      `Expected stdout to contain 'Estimated Transfer Size' but it did not.\n${stdout}`,
+    );
   }
 
   const logs: string[] = [
