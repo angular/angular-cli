@@ -147,7 +147,7 @@ export async function execute(
   },
 ): Promise<BuildResult> {
   // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+  assertCompatibleAngularVersion(context.workspaceRoot);
 
   const browserTarget = targetFromTargetString(options.browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderOptions>(
