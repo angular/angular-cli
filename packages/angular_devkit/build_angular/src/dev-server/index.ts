@@ -112,7 +112,7 @@ export function serveWebpackBrowser(
 ): Observable<DevServerBuilderOutput> {
   // Check Angular version.
   const { logger, workspaceRoot } = context;
-  assertCompatibleAngularVersion(workspaceRoot, logger);
+  assertCompatibleAngularVersion(workspaceRoot);
 
   const browserTarget = targetFromTargetString(options.browserTarget);
 

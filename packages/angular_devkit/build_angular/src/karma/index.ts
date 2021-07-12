@@ -91,7 +91,7 @@ export function execute(
   } = {},
 ): Observable<BuilderOutput> {
   // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+  assertCompatibleAngularVersion(context.workspaceRoot);
 
   let singleRun: boolean | undefined;
   if (options.watch !== undefined) {

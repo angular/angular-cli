@@ -171,7 +171,7 @@ export function buildWebpackBrowser(
   let outputPaths: undefined | Map<string, string>;
 
   // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+  assertCompatibleAngularVersion(context.workspaceRoot);
 
   return from(context.getProjectMetadata(projectName)).pipe(
     switchMap(async (projectMetadata) => {

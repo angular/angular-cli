@@ -60,7 +60,7 @@ export function execute(
   const root = context.workspaceRoot;
 
   // Check Angular version.
-  assertCompatibleAngularVersion(root, context.logger);
+  assertCompatibleAngularVersion(root);
 
   const tsConfig = readTsconfig(options.tsConfig, root);
   const target = tsConfig.options.target || ScriptTarget.ES5;
