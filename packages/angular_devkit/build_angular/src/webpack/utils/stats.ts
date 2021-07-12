@@ -30,20 +30,28 @@ export function formatSize(size: number): string {
   return `${roundedSize.toFixed(fractionDigits)} ${abbreviations[index]}`;
 }
 
-export type BundleStatsData = [files: string, names: string, size: number | string];
+export type BundleStatsData = [
+  files: string,
+  names: string,
+  rawSize: number | string,
+  estimatedTransferSize: number | string,
+];
 export interface BundleStats {
   initial: boolean;
   stats: BundleStatsData;
 }
 
 export function generateBundleStats(info: {
-  size?: number;
+  rawSize?: number;
+  estimatedTransferSize?: number;
   files?: string[];
   names?: string[];
   initial?: boolean;
   rendered?: boolean;
 }): BundleStats {
-  const size = typeof info.size === 'number' ? info.size : '-';
+  const rawSize = typeof info.rawSize === 'number' ? info.rawSize : '-';
+  const estimatedTransferSize =
+    typeof info.estimatedTransferSize === 'number' ? info.estimatedTransferSize : '-';
   const files =
     info.files
       ?.filter((f) => !f.endsWith('.map'))
@@ -54,7 +62,7 @@ export function generateBundleStats(info: {
 
   return {
     initial,
-    stats: [files, names, size],
+    stats: [files, names, rawSize, estimatedTransferSize],
   };
 }
 
@@ -62,6 +70,7 @@ function generateBuildStatsTable(
   data: BundleStats[],
   colors: boolean,
   showTotalSize: boolean,
+  showEstimatedTransferSize: boolean,
 ): string {
   const g = (x: string) => (colors ? ansiColors.greenBright(x) : x);
   const c = (x: string) => (colors ? ansiColors.cyanBright(x) : x);
@@ -71,21 +80,39 @@ function generateBuildStatsTable(
   const changedEntryChunksStats: BundleStatsData[] = [];
   const changedLazyChunksStats: BundleStatsData[] = [];
 
-  let initialTotalSize = 0;
+  let initialTotalRawSize = 0;
+  let initialTotalEstimatedTransferSize;
 
   for (const { initial, stats } of data) {
-    const [files, names, size] = stats;
+    const [files, names, rawSize, estimatedTransferSize] = stats;
 
-    const data: BundleStatsData = [
-      g(files),
-      names,
-      c(typeof size === 'number' ? formatSize(size) : size),
-    ];
+    let data: BundleStatsData;
+
+    if (showEstimatedTransferSize) {
+      data = [
+        g(files),
+        names,
+        c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
+        c(
+          typeof estimatedTransferSize === 'number'
+            ? formatSize(estimatedTransferSize)
+            : estimatedTransferSize,
+        ),
+      ];
+    } else {
+      data = [g(files), names, c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize), ''];
+    }
 
     if (initial) {
       changedEntryChunksStats.push(data);
-      if (typeof size === 'number') {
-        initialTotalSize += size;
+      if (typeof rawSize === 'number') {
+        initialTotalRawSize += rawSize;
+      }
+      if (showEstimatedTransferSize && typeof estimatedTransferSize === 'number') {
+        if (initialTotalEstimatedTransferSize === undefined) {
+          initialTotalEstimatedTransferSize = 0;
+        }
+        initialTotalEstimatedTransferSize += estimatedTransferSize;
       }
     } else {
       changedLazyChunksStats.push(data);
@@ -93,14 +120,30 @@ function generateBuildStatsTable(
   }
 
   const bundleInfo: (string | number)[][] = [];
+  const baseTitles = ['Names', 'Raw Size'];
+  const tableAlign: ('l' | 'r')[] = ['l', 'l', 'r'];
+
+  if (showEstimatedTransferSize) {
+    baseTitles.push('Estimated Transfer Size');
+    tableAlign.push('r');
+  }
 
   // Entry chunks
   if (changedEntryChunksStats.length) {
-    bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
+    bundleInfo.push(['Initial Chunk Files', ...baseTitles].map(bold), ...changedEntryChunksStats);
 
     if (showTotalSize) {
       bundleInfo.push([]);
-      bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
+
+      const totalSizeElements = [' ', 'Initial Total', formatSize(initialTotalRawSize)];
+      if (showEstimatedTransferSize) {
+        totalSizeElements.push(
+          typeof initialTotalEstimatedTransferSize === 'number'
+            ? formatSize(initialTotalEstimatedTransferSize)
+            : '-',
+        );
+      }
+      bundleInfo.push(totalSizeElements.map(bold));
     }
   }
 
@@ -111,13 +154,13 @@ function generateBuildStatsTable(
 
   // Lazy chunks
   if (changedLazyChunksStats.length) {
-    bundleInfo.push(['Lazy Chunk Files', 'Names', 'Size'].map(bold), ...changedLazyChunksStats);
+    bundleInfo.push(['Lazy Chunk Files', ...baseTitles].map(bold), ...changedLazyChunksStats);
   }
 
   return textTable(bundleInfo, {
     hsep: dim(' | '),
     stringLength: (s) => removeColor(s).length,
-    align: ['l', 'l', 'r'],
+    align: tableAlign,
   });
 }
 
@@ -148,6 +191,7 @@ function statsToString(
 
   const changedChunksStats: BundleStats[] = bundleState ?? [];
   let unchangedChunkNumber = 0;
+  let hasEstimatedTransferSizes = false;
   if (!bundleState?.length) {
     const isFirstRun = !runsCache.has(json.outputPath || '');
 
@@ -159,10 +203,26 @@ function statsToString(
       }
 
       const assets = json.assets?.filter((asset) => chunk.files?.includes(asset.name));
-      const summedSize = assets
-        ?.filter((asset) => !asset.name.endsWith('.map'))
-        .reduce((total, asset) => total + asset.size, 0);
-      changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }));
+      let rawSize = 0;
+      let estimatedTransferSize;
+      if (assets) {
+        for (const asset of assets) {
+          if (asset.name.endsWith('.map')) {
+            continue;
+          }
+
+          rawSize += asset.size;
+
+          if (typeof asset.info.estimatedTransferSize === 'number') {
+            if (estimatedTransferSize === undefined) {
+              estimatedTransferSize = 0;
+              hasEstimatedTransferSizes = true;
+            }
+            estimatedTransferSize += asset.info.estimatedTransferSize;
+          }
+        }
+      }
+      changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
     }
     unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
 
@@ -186,6 +246,7 @@ function statsToString(
     changedChunksStats,
     colors,
     unchangedChunkNumber === 0,
+    hasEstimatedTransferSizes,
   );
 
   // In some cases we do things outside of webpack context
