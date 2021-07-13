@@ -81,7 +81,19 @@ export default custom<AngularCustomOptions>(() => {
         !/[\\\/]@angular[\\\/](?:compiler|localize)/.test(this.resourcePath) &&
         source.includes('$localize')
       ) {
-        customOptions.i18n = i18n as ApplicationPresetOptions['i18n'];
+        const { translationFiles, ...i18nOptions } = i18n as ApplicationPresetOptions['i18n'] & {
+          translationFiles?: string[];
+        };
+        customOptions.i18n = i18nOptions;
+
+        // Add translation files as dependencies of the file to support rebuilds
+        // Except for `@angular/core` which needs locale injection but has no translations
+        if (translationFiles && !/[\\\/]@angular[\\\/]core/.test(this.resourcePath)) {
+          for (const file of translationFiles) {
+            this.addDependency(file);
+          }
+        }
+
         shouldProcess = true;
       }
 

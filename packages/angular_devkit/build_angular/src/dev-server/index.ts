@@ -286,7 +286,7 @@ export function serveWebpackBrowser(
           );
         }
 
-        await setupLocalize(locale, i18n, browserOptions, webpackConfig);
+        await setupLocalize(locale, i18n, browserOptions, webpackConfig, context);
       }
     }
 
@@ -383,6 +383,7 @@ async function setupLocalize(
   i18n: I18nOptions,
   browserOptions: BrowserBuilderSchema,
   webpackConfig: webpack.Configuration,
+  context: BuilderContext,
 ) {
   const localeDescription = i18n.locales[locale];
 
@@ -405,8 +406,10 @@ async function setupLocalize(
 
   let missingTranslationBehavior = browserOptions.i18nMissingTranslation || 'ignore';
   let translation = localeDescription?.translation || {};
+  const sourceLocale = i18n.sourceLocale;
+  const shouldInline = i18n.shouldInline;
 
-  if (locale === i18n.sourceLocale) {
+  if (locale === sourceLocale) {
     missingTranslationBehavior = 'ignore';
     translation = {};
   }
@@ -414,7 +417,10 @@ async function setupLocalize(
   const i18nLoaderOptions = {
     locale,
     missingTranslationBehavior,
-    translation: i18n.shouldInline ? translation : undefined,
+    translation: shouldInline ? translation : undefined,
+    translationFiles: localeDescription?.files.map((file) =>
+      path.resolve(context.workspaceRoot, file.path),
+    ),
   };
 
   const i18nRule: webpack.RuleSetRule = {
@@ -444,6 +450,25 @@ async function setupLocalize(
   }
 
   rules.push(i18nRule);
+
+  // Add a plugin to reload translation files on rebuilds
+  // tslint:disable-next-line: no-non-null-assertion
+  webpackConfig.plugins!.push({
+    apply: (compiler: webpack.Compiler) => {
+      compiler.hooks.thisCompilation.tap('build-angular', compilation => {
+        if (shouldInline && i18nLoaderOptions.translation === undefined) {
+          // Reload translation
+          // NOTE: This could be further optimized by checking if any translation file actually changed
+
+        }
+
+        compilation.hooks.finishModules.tap('build-angular', () => {
+          // After loaders are finished, clear out the now unneeded translations
+          i18nLoaderOptions.translation = undefined;
+        });
+      });
+    },
+  });
 }
 
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);
