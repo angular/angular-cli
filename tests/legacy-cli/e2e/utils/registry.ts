@@ -2,6 +2,7 @@ import { ChildProcess, spawn } from 'child_process';
 import { copyFileSync, mkdtempSync, realpathSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { getGlobalVariable } from './env';
 import { writeFile } from './fs';
 
 export function createNpmRegistry(withAuthentication = false): ChildProcess {
@@ -18,6 +19,9 @@ export function createNpmRegistry(withAuthentication = false): ChildProcess {
     stdio: 'inherit',
   });
 }
+
+// Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
+const validToken = `dGVzdGluZzpzM2NyZXQ=`;
 
 export function createNpmConfigForAuthentication(
   /**
@@ -37,8 +41,7 @@ export function createNpmConfigForAuthentication(
   /** When true, an incorrect token is used. Use this to validate authentication failures. */
   invalidToken = false,
 ): Promise<void> {
-  // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
-  const token = invalidToken ? `invalid=` : `dGVzdGluZzpzM2NyZXQ=`;
+  const token = invalidToken ? `invalid=` : validToken;
   const registry = `//localhost:4876/`;
 
   return writeFile(
@@ -53,4 +56,20 @@ export function createNpmConfigForAuthentication(
         registry=http:${registry}
       `,
   );
+}
+
+export function setNpmEnvVarsForAuthentication(
+  /** When true, an incorrect token is used. Use this to validate authentication failures. */
+  invalidToken = false,
+): void {
+  const token = invalidToken ? `invalid=` : validToken;
+  const registry = `http://localhost:4876/`;
+
+  process.env['NPM_CONFIG_REGISTRY'] = registry;
+  process.env['NPM_CONFIG__AUTH'] = token;
+}
+
+export function resetNpmEnvVars() {
+  process.env['NPM_CONFIG_REGISTRY'] = getGlobalVariable('package-registry');
+  delete process.env['NPM_CONFIG__AUTH'];
 }
