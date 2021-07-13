@@ -41,7 +41,7 @@
     "karma-source-map-support": "1.4.0",
     "less": "4.1.1",
     "less-loader": "10.0.0",
-    "license-webpack-plugin": "2.3.19",
+    "license-webpack-plugin": "2.3.20",
     "loader-utils": "2.0.0",
     "mini-css-extract-plugin": "1.6.2",
     "minimatch": "3.0.4",
