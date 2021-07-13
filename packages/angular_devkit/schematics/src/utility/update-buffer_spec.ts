@@ -135,10 +135,10 @@ describe('UpdateBuffer', () => {
       mb.remove(3, 4);
       expect(mb.toString()).toBe('01B27890');
       mb.insertRight(4, Buffer.from('C'));
-      expect(mb.toString()).toBe('01B27890');
+      expect(mb.toString()).toBe('01B2C7890');
 
       mb.remove(2, 6);
-      expect(mb.toString()).toBe('01B890');
+      expect(mb.toString()).toBe('01890');
     });
 
     it('works for _left/_right inserts', () => {
@@ -152,23 +152,9 @@ describe('UpdateBuffer', () => {
       mb.insertRight(10, Buffer.from('C'));
       expect(mb.toString()).toBe('01234AB56789C');
       mb.remove(5, 5);
-      expect(mb.toString()).toBe('01234AB');
+      expect(mb.toString()).toBe('01234AC');
       mb.remove(0, 5);
-      expect(mb.toString()).toBe('');
-    });
-
-    it('supports essential', () => {
-      const mb = new UpdateBuffer(Buffer.from('0123456789'));
-
-      mb.insertLeft(5, Buffer.from('A'), true);
-      expect(mb.toString()).toBe('01234A56789');
-      mb.remove(5, 5);
-      expect(mb.toString()).toBe('01234A');
-      expect(() => mb.remove(0, 5)).toThrow();
-      expect(mb.toString()).toBe('01234A');
-
-      expect(() => mb.insertRight(6, Buffer.from('B'), true)).toThrow();
-      expect(mb.toString()).toBe('01234A');
+      expect(mb.toString()).toBe('C');
     });
 
     it('works for content at start/end of buffer', () => {
@@ -176,7 +162,7 @@ describe('UpdateBuffer', () => {
       buffer.insertLeft(0, Buffer.from('ABC'));
       buffer.insertRight(6, Buffer.from('DEF'));
       buffer.remove(0, 6);
-      expect(buffer.toString()).toBe('ABC');
+      expect(buffer.toString()).toBe('ABCDEF');
     });
   });
 

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseException } from '@angular-devkit/core';
+import { BaseException, MagicString } from '@angular-devkit/core';
 import { LinkedList } from './linked-list';
 
 export class IndexOutOfBoundException extends BaseException {
@@ -14,6 +14,7 @@ export class IndexOutOfBoundException extends BaseException {
     super(`Index ${index} outside of range [${min}, ${max}].`);
   }
 }
+/** @deprecated Since v12.2, unused by the Angular tooling */
 export class ContentCannotBeRemovedException extends BaseException {
   constructor() {
     super(`User tried to remove content that was marked essential.`);
@@ -26,6 +27,7 @@ export class ContentCannotBeRemovedException extends BaseException {
  * it means the content itself was deleted.
  *
  * @see UpdateBuffer
+ * @deprecated Since v12.2, unused by the Angular tooling (replaced by magic-string)
  */
 export class Chunk {
   private _content: Buffer | null;
@@ -187,10 +189,13 @@ export class Chunk {
  * new chunks, and always keep chunks pointing to the original content.
  */
 export class UpdateBuffer {
+  /** @deprecated Since v12.2, unused by the Angular tooling (replaced by magic-string) */
   protected _linkedList: LinkedList<Chunk>;
+  protected _mutatableContent: MagicString;
 
   constructor(protected _originalContent: Buffer) {
     this._linkedList = new LinkedList(new Chunk(0, _originalContent.length, _originalContent));
+    this._mutatableContent = new MagicString(this._originalContent.toString());
   }
 
   protected _assertIndex(index: number) {
@@ -199,6 +204,7 @@ export class UpdateBuffer {
     }
   }
 
+  /** @deprecated Since v12.2, unused by the Angular tooling */
   protected _slice(start: number): [Chunk, Chunk] {
     // If start is longer than the content, use start, otherwise determine exact position in string.
     const index = start >= this._originalContent.length ? start : this._getTextPosition(start);
@@ -222,55 +228,47 @@ export class UpdateBuffer {
    * Gets the position in the content based on the position in the string.
    * Some characters might be wider than one byte, thus we have to determine the position using
    * string functions.
+   *
+   * @deprecated Since v12.2, unused by the Angular tooling
    */
   protected _getTextPosition(index: number): number {
     return Buffer.from(this._originalContent.toString().substring(0, index)).length;
   }
 
   get length(): number {
-    return this._linkedList.reduce((acc, chunk) => acc + chunk.length, 0);
+    return this._mutatableContent.length();
   }
   get original(): Buffer {
     return this._originalContent;
   }
 
-  toString(encoding = 'utf-8'): string {
-    return this._linkedList.reduce((acc, chunk) => acc + chunk.toString(encoding), '');
+  toString(): string;
+  /** @deprecated Since v12.2, encoding no longer has any effect */
+  toString(encoding: string): string;
+  toString(_encoding = 'utf-8'): string {
+    return this._mutatableContent.toString();
   }
   generate(): Buffer {
-    const result = Buffer.allocUnsafe(this.length);
-    let i = 0;
-    this._linkedList.forEach((chunk) => {
-      chunk.copy(result, i);
-      i += chunk.length;
-    });
-
-    return result;
+    return Buffer.from(this.toString());
   }
 
-  insertLeft(index: number, content: Buffer, assert = false) {
-    this._slice(index)[0].append(content, assert);
+  insertLeft(index: number, content: Buffer): void;
+  /** @deprecated Since v12.2, assert no longer has any effect */
+  insertLeft(index: number, content: Buffer, assert: boolean): void;
+  insertLeft(index: number, content: Buffer, _assert = false) {
+    this._assertIndex(index);
+    this._mutatableContent.appendLeft(index, content.toString());
   }
-  insertRight(index: number, content: Buffer, assert = false) {
-    this._slice(index)[1].prepend(content, assert);
+  insertRight(index: number, content: Buffer): void;
+  /** @deprecated Since v12.2, assert no longer has any effect */
+  insertRight(index: number, content: Buffer, assert: boolean): void;
+  insertRight(index: number, content: Buffer, _assert = false) {
+    this._assertIndex(index);
+    this._mutatableContent.appendRight(index, content.toString());
   }
 
   remove(index: number, length: number) {
-    const end = index + length;
-
-    const first = this._slice(index)[1];
-    const last = this._slice(end)[1];
-
-    let curr: Chunk | null;
-    for (curr = first; curr && curr !== last; curr = curr.next) {
-      curr.assert(curr !== first, curr !== last, curr === first);
-    }
-    for (curr = first; curr && curr !== last; curr = curr.next) {
-      curr.remove(curr !== first, curr !== last, curr === first);
-    }
-
-    if (curr) {
-      curr.remove(true, false, false);
-    }
+    this._assertIndex(index);
+    this._mutatableContent.remove(index, index + length);
   }
 }
