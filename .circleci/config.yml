@@ -156,14 +156,12 @@ jobs:
           key: *cache_key
           paths:
             - ~/.cache/yarn
-      - fail_fast
 
   lint:
     executor: action-executor
     steps:
       - custom_attach_workspace
       - run: yarn lint
-      - fail_fast
 
   validate:
     executor: action-executor
@@ -188,7 +186,6 @@ jobs:
           command: yarn ts-circular-deps:check
       - run:
           command: yarn -s admin validate
-      - fail_fast
 
   e2e-cli:
     parameters:
@@ -251,7 +248,6 @@ jobs:
     steps:
       - custom_attach_workspace
       - run: yarn build
-      - fail_fast
 
   test:
     executor: test-executor
