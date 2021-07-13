@@ -92,14 +92,15 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#876f2094018d2f0f32853784ffccab74ed1f344e":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#0057daca63205a10c26256b6733b02af835497c0":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#876f2094018d2f0f32853784ffccab74ed1f344e"
+  uid "0057daca63205a10c26256b6733b02af835497c0"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#0057daca63205a10c26256b6733b02af835497c0"
   dependencies:
     "@angular/benchpress" "0.2.1"
     "@bazel/buildifier" "^4.0.1"
-    "@bazel/runfiles" "3.6.0"
-    "@microsoft/api-extractor" "7.17.1"
+    "@bazel/runfiles" "4.0.0-beta.0"
+    "@microsoft/api-extractor" "7.18.1"
     "@octokit/graphql" "^4.6.1"
     "@octokit/rest" "^18.6.2"
     "@octokit/types" "^6.16.6"
@@ -1117,10 +1118,10 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
-"@bazel/runfiles@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-3.6.0.tgz#154d1d663db3e129de1954d56c1fede5a2ca0e11"
-  integrity sha512-b0Wq4agrfVY8kmtTHCmUsSTd5/5YurvBjzfJA1AAxO9uL+VzNmDyYaE+K5PDvYkGn/ZskYA4tipmjvDd6E0WbA==
+"@bazel/runfiles@4.0.0-beta.0":
+  version "4.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-4.0.0-beta.0.tgz#e62679d80cf9fcd84996e5f3ae4bedc33ed1a993"
+  integrity sha512-pFdanyvI0wf2WtdQXUmcTZw7OJ83uj2bxF3rOskx45wewBRAlQZkm2q2A6WEffSfdf2WaBlk5u/x2kqK2nyG7w==
 
 "@bazel/typescript@3.7.0":
   version "3.7.0"
@@ -1214,10 +1215,10 @@
     "@microsoft/tsdoc-config" "~0.15.2"
     "@rushstack/node-core-library" "3.39.0"
 
-"@microsoft/api-extractor@7.17.1":
-  version "7.17.1"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.17.1.tgz#df6b7aa7cadcb35e2483048ebe5dbaf7af932446"
-  integrity sha512-NqdN627QoDdDtvfqEoX+Z6WbF2yid5URUZVYefC9KuisgwrsfvbSj5QwzOZlMYcufoafTq9jfeVyFAXr4PqGig==
+"@microsoft/api-extractor@7.18.1":
+  version "7.18.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.1.tgz#61b39f972b646261dd49f2de9f5d448aa6497e7a"
+  integrity sha512-qljUF2Q0zAx1vJrjKkJVGN7OVbsXki+Pji99jywyl6L/FK3YZ7PpstUJYE6uBcLPy6rhNPWPAsHNTMpG/kHIsg==
   dependencies:
     "@microsoft/api-extractor-model" "7.13.3"
     "@microsoft/tsdoc" "0.13.2"
