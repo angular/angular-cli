@@ -22,7 +22,7 @@ export default function (): Rule {
       'karma-jasmine': '~4.0.0',
       'karma-jasmine-html-reporter': '^1.5.0',
       'protractor': '~7.0.0',
-      'ng-packagr': latestVersions.ngPackagr,
+      'ng-packagr': latestVersions['ng-packagr'],
       'tslib': '^2.0.0',
     };
 
