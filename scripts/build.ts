@@ -404,7 +404,7 @@ export default async function (
     if (!pkg.private) {
       tarLogger.info(`${pkgName} => ${pkg.tar}`);
       _tar(pkg.tar, pkg.dist);
-      output.push({ name: pkgName, outputPath: pkg.tar });
+      output.push({ name: pkgName, outputPath: pkg.dist });
     }
   });
 
