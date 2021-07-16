@@ -7,21 +7,18 @@
  */
 
 import * as path from 'path';
+import type { LoaderContext } from 'webpack';
 import { AngularPluginSymbol, FileEmitterCollection } from './symbol';
 
-export function angularWebpackLoader(
-  this: import('webpack').LoaderContext<unknown> & {
-    [AngularPluginSymbol]?: FileEmitterCollection;
-  },
-  content: string,
-  map: string,
-) {
+export function angularWebpackLoader(this: LoaderContext<unknown>, content: string, map: string) {
   const callback = this.async();
   if (!callback) {
     throw new Error('Invalid webpack version');
   }
 
-  const fileEmitter = this[AngularPluginSymbol];
+  const fileEmitter = (
+    this as LoaderContext<unknown> & { [AngularPluginSymbol]?: FileEmitterCollection }
+  )[AngularPluginSymbol];
   if (!fileEmitter || typeof fileEmitter !== 'object') {
     if (this.resourcePath.endsWith('.js')) {
       // Passthrough for JS files when no plugin is used
