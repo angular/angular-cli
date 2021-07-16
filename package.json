@@ -63,7 +63,7 @@
   },
   "resolutions": {
     "**/@types/copy-webpack-plugin/webpack": "5.44.0",
-    "ajv-formats/ajv": "8.6.1"
+    "ajv-formats/ajv": "8.6.2"
   },
   "devDependencies": {
     "@ampproject/remapping": "1.0.1",
@@ -128,7 +128,7 @@
     "@typescript-eslint/eslint-plugin": "4.28.3",
     "@typescript-eslint/parser": "4.28.3",
     "@yarnpkg/lockfile": "1.1.0",
-    "ajv": "8.6.1",
+    "ajv": "8.6.2",
     "ajv-formats": "2.1.0",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
