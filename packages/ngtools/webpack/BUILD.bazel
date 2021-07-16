@@ -9,6 +9,7 @@ load("//tools:defaults.bzl", "ts_library")
 # @external_begin
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("@npm//@angular/dev-infra-private/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 # @external_end
 
 licenses(["notice"])  # MIT
@@ -85,5 +86,15 @@ pkg_tar(
     extension = "tar.gz",
     strip_prefix = "./npm_package",
     tags = ["manual"],
+)
+
+api_golden_test_npm_package(
+    name = "ngtools_webpack_api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "angular_cli/goldens/public-api/ngtools/webpack",
+    npm_package = "angular_cli/packages/ngtools/webpack/npm_package",
 )
 # @external_end
