@@ -55,7 +55,7 @@
     "@angular/platform-server": "12.1.2",
     "@angular/router": "12.1.2",
     "@angular/service-worker": "12.1.2",
-    "@bazel/bazelisk": "1.10.0",
+    "@bazel/bazelisk": "1.10.1",
     "@bazel/buildifier": "4.0.1",
     "@bazel/ibazel": "0.15.10",
     "@bazel/jasmine": "3.7.0",
