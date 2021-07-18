@@ -175,7 +175,7 @@ export function serveWebpackBrowser(
 
         Binding this server to an open connection can result in compromising your application or
         computer. Using a different host than the one passed to the "--host" flag might result in
-        websocket connection issues. You might need to use "--disableHostCheck" if that's the
+        websocket connection issues. You might need to use "--disable-host-check" if that's the
         case.
       `);
     }
