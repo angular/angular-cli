@@ -20,6 +20,7 @@ ts_library(
             "**/*_benchmark.ts",
         ],
     ),
+    data = ["package.json"],
     module_name = "@angular-devkit/core/node",
     module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking

@@ -19,6 +19,7 @@ ts_library(
             "test/**/*.ts",
         ],
     ),
+    data = ["package.json"],
     module_name = "@angular-devkit/schematics/tools",
     module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
