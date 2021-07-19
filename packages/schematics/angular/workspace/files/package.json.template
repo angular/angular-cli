@@ -18,21 +18,21 @@
     "@angular/platform-browser": "<%= latestVersions.Angular %>",
     "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
     "@angular/router": "<%= latestVersions.Angular %>",
-    "rxjs": "<%= latestVersions.RxJs %>",
-    "tslib": "<%= latestVersions.TsLib %>",
-    "zone.js": "<%= latestVersions.ZoneJs %>"
+    "rxjs": "<%= latestVersions['rxjs'] %>",
+    "tslib": "<%= latestVersions['tslib'] %>",
+    "zone.js": "<%= latestVersions['zone.js'] %>"
   },
   "devDependencies": {
     "@angular/cli": "<%= '~' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
-    "@types/jasmine": "~3.8.0",<% } %>
-    "@types/node": "^12.11.1",<% if (!minimal) { %>
-    "jasmine-core": "~3.8.0",
-    "karma": "~6.3.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.0.3",
-    "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "~1.7.0",<% } %>
-    "typescript": "<%= latestVersions.TypeScript %>"
+    "@types/jasmine": "<%= latestVersions['@types/jasmine'] %>",<% } %>
+    "@types/node": "<%= latestVersions['@types/node'] %>",<% if (!minimal) { %>
+    "jasmine-core": "<%= latestVersions['jasmine-core'] %>",
+    "karma": "<%= latestVersions['karma'] %>",
+    "karma-chrome-launcher": "<%= latestVersions['karma-chrome-launcher'] %>",
+    "karma-coverage": "<%= latestVersions['karma-coverage'] %>",
+    "karma-jasmine": "<%= latestVersions['karma-jasmine'] %>",
+    "karma-jasmine-html-reporter": "<%= latestVersions['karma-jasmine-html-reporter'] %>",<% } %>
+    "typescript": "<%= latestVersions['typescript'] %>"
   }
 }

@@ -44,7 +44,15 @@
       "enabled": false
     },
     {
-      "excludePackagePatterns": ["^@angular/.*"],
+      "matchPaths": ["packages/schematics/angular/utility/latest-versions/package.json"],
+      "matchPackagePatterns": ["*"],
+      "groupName": "schematics dependencies",
+      "groupSlug": "all-schematics-ependencies"
+    },
+    {
+      "excludePackagePatterns": [
+        "!packages/schematics/angular/utility/latest-versions/package.json"
+      ],
       "matchPackagePatterns": ["*"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies",
