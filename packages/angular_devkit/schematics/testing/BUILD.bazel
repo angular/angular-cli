@@ -13,6 +13,7 @@ ts_library(
     srcs = glob(
         include = ["**/*.ts"],
     ),
+    data = ["package.json"],
     module_name = "@angular-devkit/schematics/testing",
     module_root = "index.d.ts",
     deps = [

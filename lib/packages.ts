@@ -100,23 +100,32 @@ function loadPackageJson(p: string) {
   return pkg;
 }
 
-function _findAllPackageJson(dir: string, exclude: RegExp): string[] {
-  const result: string[] = [];
-  fs.readdirSync(dir).forEach((fileName) => {
-    const p = path.join(dir, fileName);
+function* _findPrimaryPackageJsonFiles(dir: string, exclude: RegExp): Iterable<string> {
+  const subdirectories = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, entry.name);
 
     if (exclude.test(p)) {
-      return;
-    } else if (/[\/\\]node_modules[\/\\]/.test(p)) {
-      return;
-    } else if (fileName == 'package.json') {
-      result.push(p);
-    } else if (fs.statSync(p).isDirectory() && fileName != 'node_modules') {
-      result.push(..._findAllPackageJson(p, exclude));
+      continue;
     }
-  });
 
-  return result;
+    if (entry.isDirectory() && entry.name !== 'node_modules') {
+      subdirectories.push(p);
+      continue;
+    }
+
+    if (entry.name === 'package.json') {
+      yield p;
+
+      // First package.json found will be the package's root package.json
+      // Secondary entrypoint package.json files should not be found here
+      return;
+    }
+  }
+
+  for (const directory of subdirectories) {
+    yield* _findPrimaryPackageJsonFiles(directory, exclude);
+  }
 }
 
 const tsConfigPath = path.join(__dirname, '../tsconfig.json');
@@ -139,9 +148,9 @@ const pattern =
 const excludeRe = new RegExp(pattern);
 
 // Find all the package.json that aren't excluded from tsconfig.
-const packageJsonPaths = _findAllPackageJson(path.join(__dirname, '..'), excludeRe)
-  // Remove the root package.json.
-  .filter((p) => p != path.join(__dirname, '../package.json'));
+const packageJsonPaths = [
+  ..._findPrimaryPackageJsonFiles(path.join(__dirname, '..', 'packages'), excludeRe),
+];
 
 function _exec(cmd: string) {
   return execSync(cmd).toString().trim();
