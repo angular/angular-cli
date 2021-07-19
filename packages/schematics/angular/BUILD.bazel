@@ -64,6 +64,7 @@ ts_library(
         include = [
             "collection.json",
             "package.json",
+            "utility/latest-versions/package.json",
             "migrations/migration-collection.json",
             "*/schema.json",
             "*/files/**/*",

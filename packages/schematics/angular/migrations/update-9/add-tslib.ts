@@ -25,7 +25,7 @@ export function addTsLib(): Rule {
 
     addPackageJsonDependency(host, {
       name: 'tslib',
-      version: latestVersions.TsLib,
+      version: latestVersions['tslib'],
       type: NodeDependencyType.Default,
       overwrite: true,
     });

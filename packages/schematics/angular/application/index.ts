@@ -50,7 +50,7 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
       {
         type: NodeDependencyType.Dev,
         name: 'typescript',
-        version: latestVersions.TypeScript,
+        version: latestVersions['typescript'],
       },
     ].forEach((dependency) => addPackageJsonDependency(host, dependency));
 

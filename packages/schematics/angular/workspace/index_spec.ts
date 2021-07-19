@@ -54,9 +54,9 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
-    expect(pkg.dependencies['rxjs']).toEqual(latestVersions.RxJs);
-    expect(pkg.dependencies['zone.js']).toEqual(latestVersions.ZoneJs);
-    expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
+    expect(pkg.dependencies['rxjs']).toEqual(latestVersions['rxjs']);
+    expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
+    expect(pkg.devDependencies['typescript']).toEqual(latestVersions['typescript']);
   });
 
   it('should create correct files when using minimal', async () => {

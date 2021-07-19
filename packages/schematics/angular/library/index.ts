@@ -61,17 +61,17 @@ function addDependenciesToPackageJson() {
       {
         type: NodeDependencyType.Dev,
         name: 'ng-packagr',
-        version: latestVersions.ngPackagr,
+        version: latestVersions['ng-packagr'],
       },
       {
         type: NodeDependencyType.Default,
         name: 'tslib',
-        version: latestVersions.TsLib,
+        version: latestVersions['tslib'],
       },
       {
         type: NodeDependencyType.Dev,
         name: 'typescript',
-        version: latestVersions.TypeScript,
+        version: latestVersions['typescript'],
       },
     ].forEach((dependency) => addPackageJsonDependency(host, dependency));
 
@@ -162,8 +162,8 @@ export default function (options: LibraryOptions): Rule {
         distRoot,
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(projectRoot),
         prefix,
-        angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
-        tsLibLatestVersion: latestVersions.TsLib.replace('~', '').replace('^', ''),
+        angularLatestVersion: latestVersions.Angular.replace(/\~|\^/, ''),
+        tsLibLatestVersion: latestVersions['tslib'].replace(/\~|\^/, ''),
         folderName,
       }),
       move(projectRoot),

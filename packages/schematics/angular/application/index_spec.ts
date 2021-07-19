@@ -341,7 +341,7 @@ describe('Application Schematic', () => {
         .toPromise();
       const pkg = JSON.parse(tree.readContent('/package.json'));
       expect(pkg.devDependencies['@angular/compiler-cli']).toEqual(latestVersions.Angular);
-      expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
+      expect(pkg.devDependencies['typescript']).toEqual(latestVersions['typescript']);
     });
 
     it(`should not override existing users dependencies`, async () => {
@@ -349,7 +349,7 @@ describe('Application Schematic', () => {
       workspaceTree.overwrite(
         'package.json',
         oldPackageJson.replace(
-          `"typescript": "${latestVersions.TypeScript}"`,
+          `"typescript": "${latestVersions['typescript']}"`,
           `"typescript": "~2.5.2"`,
         ),
       );

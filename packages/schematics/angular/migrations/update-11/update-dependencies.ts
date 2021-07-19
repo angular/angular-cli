@@ -9,7 +9,6 @@
 import { Rule } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
-import { latestVersions } from '../../utility/latest-versions';
 
 export default function (): Rule {
   return (host, context) => {
