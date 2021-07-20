@@ -4,6 +4,9 @@
 /goldens/public-api
 /packages/angular_devkit/build_angular/test/
 /packages/angular_devkit/core/src/workspace/json/test/
+/packages/angular_devkit/schematics_cli/blank/project-files/
+/packages/angular_devkit/schematics_cli/blank/schematic-files/
+/packages/angular_devkit/schematics_cli/schematic/files/
 /README.md
 /CONTRIBUTING.md
 .yarn/
