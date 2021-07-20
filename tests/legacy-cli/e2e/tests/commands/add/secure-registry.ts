@@ -5,8 +5,11 @@ import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
   // The environment variable has priority over the .npmrc
-  const originalRegistryVariable = process.env['NPM_CONFIG_REGISTRY'];
-  delete process.env['NPM_CONFIG_REGISTRY'];
+  let originalRegistryVariable;
+  if (process.env['NPM_CONFIG_REGISTRY']) {
+    originalRegistryVariable = process.env['NPM_CONFIG_REGISTRY'];
+    delete process.env['NPM_CONFIG_REGISTRY'];
+  }
 
   try {
     const command = ['add', '@angular/pwa', '--skip-confirmation'];
@@ -32,6 +35,8 @@ export default async function () {
     await createNpmConfigForAuthentication(true, true);
     await expectToFail(() => ng(...command));
   } finally {
-    process.env['NPM_CONFIG_REGISTRY'] = originalRegistryVariable;
+    if (originalRegistryVariable) {
+      process.env['NPM_CONFIG_REGISTRY'] = originalRegistryVariable;
+    }
   }
 }

@@ -19,6 +19,10 @@ export function createNpmRegistry(withAuthentication = false): ChildProcess {
   });
 }
 
+// Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
+const VALID_TOKEN = `dGVzdGluZzpzM2NyZXQ=`;
+const SECURE_REGISTRY = `//localhost:4876/`;
+
 export function createNpmConfigForAuthentication(
   /**
    * When true, the authentication token will be scoped to the registry URL.
@@ -37,9 +41,8 @@ export function createNpmConfigForAuthentication(
   /** When true, an incorrect token is used. Use this to validate authentication failures. */
   invalidToken = false,
 ): Promise<void> {
-  // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
-  const token = invalidToken ? `invalid=` : `dGVzdGluZzpzM2NyZXQ=`;
-  const registry = `//localhost:4876/`;
+  const token = invalidToken ? `invalid=` : VALID_TOKEN;
+  const registry = SECURE_REGISTRY;
 
   return writeFile(
     '.npmrc',
@@ -53,4 +56,15 @@ export function createNpmConfigForAuthentication(
         registry=http:${registry}
       `,
   );
+}
+
+export function setNpmEnvVarsForAuthentication(
+  /** When true, an incorrect token is used. Use this to validate authentication failures. */
+  invalidToken = false,
+): void {
+  const token = invalidToken ? `invalid=` : VALID_TOKEN;
+  const registry = SECURE_REGISTRY;
+
+  process.env['NPM_CONFIG_REGISTRY'] = `http:${registry}`;
+  process.env['NPM_CONFIG__AUTH'] = token;
 }
