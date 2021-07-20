@@ -42,7 +42,7 @@
     "import/newline-after-import": "error",
     "import/no-absolute-path": "error",
     "import/no-duplicates": "error",
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": false }],
+    "import/no-extraneous-dependencies": ["off", { "devDependencies": false }],
     "import/no-unassigned-import": ["error", { "allow": ["symbol-observable"] }],
     "import/order": [
       "error",
