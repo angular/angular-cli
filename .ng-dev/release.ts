@@ -9,8 +9,15 @@ const npmPackages = Object.keys(releasePackages);
 /** Configuration for the `ng-dev release` command. */
 export const release: ReleaseConfig = {
   npmPackages,
-  buildPackages,
-  releaseNotes: {},
+  buildPackages: () => buildPackages(),
+  releaseNotes: {
+    groupOrder: [
+      '@angular/cli',
+      '@schematics/angular',
+      '@angular-devkit/architect-cli',
+      '@angular-devkit/schematics-cli',
+    ],
+  },
   publishRegistry: 'https://wombat-dressing-room.appspot.com',
   releasePrLabels: ['action: merge'],
 };
