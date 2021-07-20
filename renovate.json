@@ -21,8 +21,14 @@
   "packageRules": [
     {
       "packagePatterns": ["^@angular/.*"],
+      "excludePackageNames": ["@angular/dev-infra-private"],
       "groupName": "angular",
       "pinVersions": false
+    },
+    {
+      "matchPackageNames": ["@angular/dev-infra-private"],
+      "groupName": "dev-infra",
+      "labels": ["action: merge", "target: patch"]
     },
     {
       "packagePatterns": ["^@babel/.*"],
