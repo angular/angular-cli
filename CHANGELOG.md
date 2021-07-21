@@ -1,3 +1,25 @@
+<a name="12.1.3"></a>
+
+# 12.1.3 (2021-07-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Description                                                                             |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [eaa2378b6](https://github.com/angular/angular-cli/commit/eaa2378b6bc69a2485cce742ef95b0b94ae994c6) | fix(@angular/cli): handle `YARN_` environment variables during `ng update` and `ng add` |
+| [4b9a41bde](https://github.com/angular/angular-cli/commit/4b9a41bdedcdc4e115e8956d31126c5bf6f442ca) | fix(@angular/cli): handle NPM_CONFIG environment variables during ng update and ng add  |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [04e9ffe4f](https://github.com/angular/angular-cli/commit/04e9ffe4f6b262ce5ef630310bed318e1466d238) | fix(@angular-devkit/build-angular): allow classes with pure annotated static properties to be optimized |
+| [6ae17e265](https://github.com/angular/angular-cli/commit/6ae17e26547a0174f7a8910c514016db60fe4c7a) | fix(@angular-devkit/build-angular): dasherize disable-host-check suggestion                             |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
+
 <a name="v12.2.0-next.2"></a>
 
 # v12.2.0-next.2 (2021-07-14)
