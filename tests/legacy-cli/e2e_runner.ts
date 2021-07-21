@@ -173,16 +173,19 @@ testsToRun
         .then(() => {
           // If we're not in a setup, change the directory back to where it was before the test.
           // This allows tests to chdir without worrying about keeping the original directory.
-          if (allSetups.indexOf(relativeName) == -1 && previousDir) {
+          if (!allSetups.includes(relativeName) && previousDir) {
             process.chdir(previousDir);
+
+            // Restore env variables before each test.
+            console.log('  Restoring original environment variables...');
+            process.env = originalEnvVariables;
           }
         })
         .then(() => {
           // Only clean after a real test, not a setup step. Also skip cleaning if the test
           // requested an exception.
-          if (allSetups.indexOf(relativeName) == -1 && clean) {
+          if (!allSetups.includes(relativeName) && clean) {
             logStack.push(new logging.NullLogger());
-
             return gitClean().then(
               () => logStack.pop(),
               (err) => {
@@ -191,11 +194,6 @@ testsToRun
               },
             );
           }
-        })
-        .finally(() => {
-          // Restore env variables after each test.
-          console.log('  Restoring original environment variables...');
-          process.env = originalEnvVariables;
         })
         .then(
           () => printFooter(currentFileName, start),

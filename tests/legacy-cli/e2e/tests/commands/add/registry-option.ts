@@ -10,21 +10,12 @@ export default async function () {
   await writeMultipleFiles({
     '.npmrc': 'registry=http://127.0.0.1:9999',
   });
+
   // The environment variable has priority over the .npmrc
-  let originalRegistryVariable;
-  if (process.env['NPM_CONFIG_REGISTRY']) {
-    originalRegistryVariable = process.env['NPM_CONFIG_REGISTRY'];
-    delete process.env['NPM_CONFIG_REGISTRY'];
-  }
+  delete process.env['NPM_CONFIG_REGISTRY'];
 
-  try {
-    await expectToFail(() => ng('add', '@angular/pwa', '--skip-confirmation'));
+  await expectToFail(() => ng('add', '@angular/pwa', '--skip-confirmation'));
 
-    await ng('add', `--registry=${testRegistry}`, '@angular/pwa', '--skip-confirmation');
-    await expectFileToExist('src/manifest.webmanifest');
-  } finally {
-    if (originalRegistryVariable) {
-      process.env['NPM_CONFIG_REGISTRY'] = originalRegistryVariable;
-    }
-  }
+  await ng('add', `--registry=${testRegistry}`, '@angular/pwa', '--skip-confirmation');
+  await expectFileToExist('src/manifest.webmanifest');
 }

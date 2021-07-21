@@ -53,8 +53,7 @@ export async function setRegistry(useTestRegistry: boolean): Promise<void> {
     // Safe to set a user configuration on CI
     await npm('config', 'set', 'registry', url);
   } else {
-    // Yarn does not use the environment variable so an .npmrc file is also required
-    await writeFile('.npmrc', `registry=${url}`);
+    // Yarn supports both `NPM_CONFIG_REGISTRY` and `YARN_REGISTRY`.
     process.env['NPM_CONFIG_REGISTRY'] = url;
   }
 }
