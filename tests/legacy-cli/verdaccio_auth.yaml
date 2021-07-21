@@ -17,12 +17,17 @@ uplinks:
       keepAlive: true
       maxSockets: 32
       maxFreeSockets: 8
+
 packages:
   '**':
     access: $authenticated
     proxy: local
+
 logs:
-  - { type: stdout, format: pretty, level: http }
+  type: stdout
+  format: pretty
+  level: warn
+
 # https://github.com/verdaccio/verdaccio/issues/301
 server:
   keepAliveTimeout: 0

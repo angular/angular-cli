@@ -42,7 +42,9 @@ packages:
     proxy: npmjs
 
 logs:
-  - { type: stdout, format: pretty, level: warn }
+  type: stdout
+  format: pretty
+  level: warn
 
 # https://github.com/verdaccio/verdaccio/issues/301
 server:
