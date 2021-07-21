@@ -141,6 +141,10 @@ testsToRun
       const start = +new Date();
 
       const module = require(absoluteName);
+      const originalEnvVariables = {
+        ...process.env,
+      };
+
       const fn: (skipClean?: () => void) => Promise<void> | void =
         typeof module == 'function'
           ? module
@@ -187,6 +191,11 @@ testsToRun
               },
             );
           }
+        })
+        .finally(() => {
+          // Restore env variables after each test.
+          console.log('  Restoring original environment variables...');
+          process.env = originalEnvVariables;
         })
         .then(
           () => printFooter(currentFileName, start),
