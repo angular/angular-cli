@@ -182,7 +182,7 @@ describe('adjust-static-class-members Babel plugin', () => {
     `);
   });
 
-  it('does wrap not class with only side effect fields', () => {
+  it('does wrap not default exported class with only side effect fields', () => {
     testCaseNoChange(`
       export default class CustomComponentEffects {
         constructor(_actions) {
@@ -192,6 +192,75 @@ describe('adjust-static-class-members Babel plugin', () => {
       }
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
     `);
+  });
+
+  it('does wrap not class with only side effect fields', () => {
+    testCaseNoChange(`
+      class CustomComponentEffects {
+        constructor(_actions) {
+          this._actions = _actions;
+          this.doThis = this._actions;
+        }
+      }
+
+      CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
+    `);
+  });
+
+  it('wraps class with pure annotated side effect fields', () => {
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        CustomComponentEffects.someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
+      `,
+      expected: `
+        let CustomComponentEffects = /*#__PURE__*/ (() => {
+          class CustomComponentEffects {
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+          }
+
+          CustomComponentEffects.someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
+          return CustomComponentEffects;
+        })();
+      `,
+    });
+  });
+
+  it('wraps class with closure pure annotated side effect fields', () => {
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        CustomComponentEffects.someFieldWithSideEffects = /* @pureOrBreakMyCode */ console.log('foo');
+      `,
+      expected: `
+        let CustomComponentEffects = /*#__PURE__*/ (() => {
+          class CustomComponentEffects {
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+          }
+
+          CustomComponentEffects.someFieldWithSideEffects =
+            /* @pureOrBreakMyCode */
+            console.log('foo');
+          return CustomComponentEffects;
+        })();
+      `,
+    });
   });
 
   it('wraps exported class with a pure static field', () => {

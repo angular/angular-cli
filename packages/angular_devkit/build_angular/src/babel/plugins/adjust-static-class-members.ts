@@ -57,6 +57,33 @@ export function getKeywords(): Iterable<string> {
 }
 
 /**
+ * Determines whether a property and its initializer value can be safely wrapped in a pure
+ * annotated IIFE. Values that may cause side effects are not considered safe to wrap.
+ * Wrapping such values may cause runtime errors and/or incorrect runtime behavior.
+ *
+ * @param propertyName The name of the property to analyze.
+ * @param assignmentValue The initializer value that will be assigned to the property.
+ * @returns If the property can be safely wrapped, then true; otherwise, false.
+ */
+function canWrapProperty(propertyName: string, assignmentValue: NodePath): boolean {
+  if (angularStaticsToWrap.has(propertyName)) {
+    return true;
+  }
+
+  const { leadingComments } = assignmentValue.node as { leadingComments?: { value: string }[] };
+  if (
+    leadingComments?.some(
+      // `@pureOrBreakMyCode` is used by closure and is present in Angular code
+      ({ value }) => value.includes('#__PURE__') || value.includes('@pureOrBreakMyCode'),
+    )
+  ) {
+    return true;
+  }
+
+  return assignmentValue.isPure();
+}
+
+/**
  * Analyze the sibling nodes of a class to determine if any downlevel elements should be
  * wrapped in a pure annotated IIFE. Also determines if any elements have potential side
  * effects.
@@ -140,7 +167,7 @@ function analyzeClassSiblings(
     if (angularStaticsToElide[propertyName]?.(assignmentValue)) {
       nextStatement.remove();
       --i;
-    } else if (angularStaticsToWrap.has(propertyName) || assignmentValue.isPure()) {
+    } else if (canWrapProperty(propertyName, assignmentValue)) {
       wrapStatementPaths.push(nextStatement);
     } else {
       // Statement cannot be safely wrapped which makes wrapping the class unneeded.
