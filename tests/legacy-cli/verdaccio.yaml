@@ -7,7 +7,6 @@ listen: localhost:4873
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
-    cache: false
     maxage: 20m
     max_fails: 32
     timeout: 60s

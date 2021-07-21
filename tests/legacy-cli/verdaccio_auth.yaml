@@ -9,7 +9,6 @@ listen: localhost:4876
 uplinks:
   local:
     url: http://localhost:4873
-    cache: false
     maxage: 20m
     max_fails: 32
     timeout: 60s
