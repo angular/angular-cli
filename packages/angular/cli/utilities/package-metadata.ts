@@ -131,7 +131,7 @@ function readOptions(
     logger.info(`Locating potential ${baseFilename} files:`);
   }
 
-  let options: PackageManagerOptions = {};
+  let rcOptions: PackageManagerOptions = {};
   for (const location of [...defaultConfigLocations, ...projectConfigLocations]) {
     if (existsSync(location)) {
       if (showPotentials) {
@@ -143,25 +143,33 @@ function readOptions(
       // See: https://github.com/npm/npm-registry-fetch/blob/ebddbe78a5f67118c1f7af2e02c8a22bcaf9e850/index.js#L99-L126
       const rcConfig: PackageManagerOptions = yarn ? lockfile.parse(data) : ini.parse(data);
 
-      options = normalizeOptions(rcConfig, location);
+      rcOptions = normalizeOptions(rcConfig, location);
     }
   }
 
+  const envVariablesOptions: PackageManagerOptions = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (!value || !key.toLowerCase().startsWith('npm_config_')) {
+    if (!value) {
       continue;
     }
 
-    const normalizedName = key
-      .substr(11)
-      .replace(/(?!^)_/g, '-') // don't replace _ at the start of the key
-      .toLowerCase();
-    options[normalizedName] = value;
+    let normalizedName = key.toLowerCase();
+    if (normalizedName.startsWith('npm_config_')) {
+      normalizedName = normalizedName.substring(11);
+    } else if (yarn && normalizedName.startsWith('yarn_')) {
+      normalizedName = normalizedName.substring(5);
+    } else {
+      continue;
+    }
+
+    normalizedName = normalizedName.replace(/(?!^)_/g, '-'); // don't replace _ at the start of the key.s
+    envVariablesOptions[normalizedName] = value;
   }
 
-  options = normalizeOptions(options);
-
-  return options;
+  return {
+    ...rcOptions,
+    ...normalizeOptions(envVariablesOptions),
+  };
 }
 
 function normalizeOptions(
@@ -302,7 +310,6 @@ export async function fetchPackageManifest(
   } = {},
 ): Promise<PackageManifest> {
   const { usingYarn = false, verbose = false, registry } = options;
-
   ensureNpmrc(logger, usingYarn, verbose);
 
   const response = await pacote.manifest(name, {
@@ -329,18 +336,7 @@ export function getNpmPackageJson(
   }
 
   const { usingYarn = false, verbose = false, registry } = options;
-
-  if (!npmrc) {
-    try {
-      npmrc = readOptions(logger, false, verbose);
-    } catch {}
-
-    if (usingYarn) {
-      try {
-        npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
-      } catch {}
-    }
-  }
+  ensureNpmrc(logger, usingYarn, verbose);
 
   const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(packageName, {
     fullMetadata: true,

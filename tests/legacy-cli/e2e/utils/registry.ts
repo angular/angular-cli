@@ -61,10 +61,18 @@ export function createNpmConfigForAuthentication(
 export function setNpmEnvVarsForAuthentication(
   /** When true, an incorrect token is used. Use this to validate authentication failures. */
   invalidToken = false,
+  /** When true, `YARN_REGISTRY` is used instead of `NPM_CONFIG_REGISTRY`. */
+  useYarnEnvVariable = false,
 ): void {
-  const token = invalidToken ? `invalid=` : VALID_TOKEN;
-  const registry = SECURE_REGISTRY;
+  delete process.env['YARN_REGISTRY'];
+  delete process.env['NPM_CONFIG_REGISTRY'];
 
-  process.env['NPM_CONFIG_REGISTRY'] = `http:${registry}`;
-  process.env['NPM_CONFIG__AUTH'] = token;
+  const registryKey = useYarnEnvVariable ? 'YARN_REGISTRY' : 'NPM_CONFIG_REGISTRY';
+  process.env[registryKey] = `http:${SECURE_REGISTRY}`;
+
+  process.env['NPM_CONFIG__AUTH'] = invalidToken ? `invalid=` : VALID_TOKEN;
+
+  // Needed for verdaccio when used with yarn
+  // https://verdaccio.org/docs/en/cli-registry#yarn
+  process.env['NPM_CONFIG_ALWAYS_AUTH'] = 'true';
 }
