@@ -65,6 +65,7 @@
         "!packages/angular_devkit/schematics_cli/schematic/files/package.json",
         "!packages/schematics/angular/utility/latest-versions/package.json"
       ],
+      "excludePackagePatterns": ["^@angular/.*"],
       "matchPackagePatterns": ["*"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies",
