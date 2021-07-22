@@ -7,15 +7,15 @@
  */
 
 /** Retrieve the minor version for the provided version string. */
-function getEarliestMinorVersion(version: string) {
-  const versionMatching = version.match(/^(\d+)\.(\d+)\.*/);
+function getAngularEarliestMinorVersion(version: string): string {
+  const versionMatching = version.match(/^(\d+)\.(\d+)\.\d+(-\w+)?/);
 
   if (versionMatching === null) {
     throw Error('Unable to determine the minor version for the provided version');
   }
-  const [_, major, minor] = versionMatching;
+  const [_, major, minor, prerelease = ''] = versionMatching;
 
-  return `${major}.${minor}.0`;
+  return `~${major}.${minor}.0${prerelease}`;
 }
 
 export const latestVersions: Record<string, string> & {
@@ -27,9 +27,7 @@ export const latestVersions: Record<string, string> & {
   ...require('./latest-versions/package.json')['dependencies'],
 
   // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-  // Angular CLI minor version with earliest prerelease (appended with `-`) will match the latest
-  // Angular Framework minor.
-  Angular: `~${getEarliestMinorVersion(require('../package.json')['version'])}-`,
+  Angular: getAngularEarliestMinorVersion(require('../package.json')['version']),
 
   // Since @angular-devkit/build-angular and @schematics/angular are always
   // published together from the same monorepo, and they are both
