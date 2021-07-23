@@ -143,7 +143,7 @@ function readOptions(
       // See: https://github.com/npm/npm-registry-fetch/blob/ebddbe78a5f67118c1f7af2e02c8a22bcaf9e850/index.js#L99-L126
       const rcConfig: PackageManagerOptions = yarn ? lockfile.parse(data) : ini.parse(data);
 
-      rcOptions = normalizeOptions(rcConfig, location);
+      rcOptions = normalizeOptions(rcConfig, location, rcOptions);
     }
   }
 
@@ -166,17 +166,15 @@ function readOptions(
     envVariablesOptions[normalizedName] = value;
   }
 
-  return {
-    ...rcOptions,
-    ...normalizeOptions(envVariablesOptions),
-  };
+  return normalizeOptions(envVariablesOptions, undefined, rcOptions);
 }
 
 function normalizeOptions(
   rawOptions: PackageManagerOptions,
   location = process.cwd(),
+  existingNormalizedOptions: PackageManagerOptions = {},
 ): PackageManagerOptions {
-  const options: PackageManagerOptions = {};
+  const options = { ...existingNormalizedOptions };
 
   for (const [key, value] of Object.entries(rawOptions)) {
     let substitutedValue = value;
