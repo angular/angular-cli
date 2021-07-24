@@ -49,7 +49,7 @@
     "@angular/compiler": "12.1.3",
     "@angular/compiler-cli": "12.1.3",
     "@angular/core": "12.1.3",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#6df6965081c403bab4ab9a38831936c3ecae2589",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#5fa832317b3d2ca4f743079c7b3ae747c375db31",
     "@angular/platform-browser": "12.1.3",
     "@angular/platform-browser-dynamic": "12.1.3",
     "@angular/platform-server": "12.1.3",
