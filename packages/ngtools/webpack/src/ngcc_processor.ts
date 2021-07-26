@@ -9,12 +9,15 @@
 import { LogLevel, Logger, process as mainNgcc } from '@angular/compiler-cli/ngcc';
 import { spawnSync } from 'child_process';
 import { createHash } from 'crypto';
-import { Resolver } from 'enhanced-resolve';
 import { accessSync, constants, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
+import type { Compiler } from 'webpack';
 import { time, timeEnd } from './benchmark';
 import { InputFileSystem } from './ivy/system';
+
+// Extract Resolver type from Webpack types since it is not directly exported
+type ResolverWithOptions = ReturnType<Compiler['resolverFactory']['get']>;
 
 // We cannot create a plugin for this, because NGTSC requires addition type
 // information which ngcc creates when processing a package which was compiled with NGC.
@@ -38,7 +41,7 @@ export class NgccProcessor {
     private readonly basePath: string,
     private readonly tsConfigPath: string,
     private readonly inputFileSystem: InputFileSystem,
-    private readonly resolver: Resolver,
+    private readonly resolver: ResolverWithOptions,
   ) {
     this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
     this._nodeModulesDirectory = this.findNodeModulesDirectory(this.basePath);
