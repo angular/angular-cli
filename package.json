@@ -148,7 +148,6 @@
     "css-loader": "6.2.0",
     "css-minimizer-webpack-plugin": "3.0.2",
     "debug": "^4.1.1",
-    "enhanced-resolve": "5.8.2",
     "esbuild": "0.12.16",
     "eslint": "7.31.0",
     "eslint-config-prettier": "8.3.0",

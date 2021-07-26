@@ -8,11 +8,13 @@
 
 import * as path from 'path';
 import { CompilerOptions, MapLike } from 'typescript';
-
-const getInnerRequest = require('enhanced-resolve/lib/getInnerRequest');
+import type { Configuration } from 'webpack';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {}
+
+// Extract Resolver type from Webpack types since it is not directly exported
+type Resolver = Exclude<Exclude<Configuration['resolve'], undefined>['resolver'], undefined>;
 
 export class TypeScriptPathsPlugin {
   constructor(private options?: TypeScriptPathsPluginOptions) {}
@@ -21,8 +23,7 @@ export class TypeScriptPathsPlugin {
     this.options = options;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  apply(resolver: import('enhanced-resolve').Resolver) {
+  apply(resolver: Resolver): void {
     const target = resolver.ensureHook('resolve');
 
     resolver.getHook('described-resolve').tapAsync(
@@ -41,7 +42,7 @@ export class TypeScriptPathsPlugin {
           return;
         }
 
-        const originalRequest = getInnerRequest(resolver, request);
+        const originalRequest = request.request || request.path;
         if (!originalRequest) {
           callback();
 
