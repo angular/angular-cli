@@ -72,16 +72,20 @@ export function runWebpack(
             log(stats, config);
 
             const statsOptions = typeof config.stats === 'boolean' ? undefined : config.stats;
-
-            obs.next({
+            const result = {
               success: !stats.hasErrors(),
               webpackStats: shouldProvideStats ? stats.toJson(statsOptions) : undefined,
               emittedFiles: getEmittedFiles(stats.compilation),
               outputPath: stats.compilation.outputOptions.path,
-            } as unknown as BuildResult);
+            } as unknown as BuildResult;
 
-            if (!config.watch) {
-              webpackCompiler.close(() => obs.complete());
+            if (config.watch) {
+              obs.next(result);
+            } else {
+              webpackCompiler.close(() => {
+                obs.next(result);
+                obs.complete();
+              });
             }
           };
 
