@@ -26,9 +26,8 @@ export const latestVersions = {
   TsLib: '^2.2.0',
 
   // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-  // Angular CLI minor version with earliest prerelease (appended with `-`) will match the latest
-  // Angular Framework minor.
-  Angular: `~${getEarliestMinorVersion(require('../package.json')['version'])}-`,
+  // Angular CLI minor version will match the latest Angular Framework minor.
+  Angular: `~${getEarliestMinorVersion(require('../package.json')['version'])}`,
 
   // Since @angular-devkit/build-angular and @schematics/angular are always
   // published together from the same monorepo, and they are both
