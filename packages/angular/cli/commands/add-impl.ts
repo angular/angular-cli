@@ -8,6 +8,7 @@
 
 import { analytics, tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
+import npa from 'npm-package-arg';
 import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
 import { PackageManager } from '../lib/config/workspace-schema';
@@ -27,8 +28,6 @@ import { askConfirmation } from '../utilities/prompt';
 import { Spinner } from '../utilities/spinner';
 import { isTTY } from '../utilities/tty';
 import { Schema as AddCommandSchema } from './add';
-
-const npa = require('npm-package-arg');
 
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
   override readonly allowPrivateSchematics = true;
@@ -62,21 +61,12 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       return 1;
     }
 
-    if (packageIdentifier.registry && this.isPackageInstalled(packageIdentifier.name)) {
-      let validVersion = false;
-      const installedVersion = await this.findProjectVersion(packageIdentifier.name);
-      if (installedVersion) {
-        if (packageIdentifier.type === 'range') {
-          validVersion = satisfies(installedVersion, packageIdentifier.fetchSpec);
-        } else if (packageIdentifier.type === 'version') {
-          const v1 = valid(packageIdentifier.fetchSpec);
-          const v2 = valid(installedVersion);
-          validVersion = v1 !== null && v1 === v2;
-        } else if (!packageIdentifier.rawSpec) {
-          validVersion = true;
-        }
-      }
-
+    if (
+      packageIdentifier.name &&
+      packageIdentifier.registry &&
+      this.isPackageInstalled(packageIdentifier.name)
+    ) {
+      const validVersion = await this.isProjectVersionValid(packageIdentifier);
       if (validVersion) {
         // Already installed so just run schematic
         this.logger.info('Skipping installation: Package already installed');
@@ -92,7 +82,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     const usingYarn = packageManager === PackageManager.Yarn;
     spinner.info(`Using package manager: ${colors.grey(packageManager)}`);
 
-    if (packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
+    if (packageIdentifier.name && packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
       // only package name provided; search for viable version
       // plus special cases for packages that did not have peer deps setup
       spinner.start('Searching for compatible package version...');
@@ -126,7 +116,9 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         } else {
           packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
         }
-        spinner.succeed(`Found compatible package version: ${colors.grey(packageIdentifier)}.`);
+        spinner.succeed(
+          `Found compatible package version: ${colors.grey(packageIdentifier.toString())}.`,
+        );
       } else if (!latestManifest || (await this.hasMismatchedPeer(latestManifest))) {
         // 'latest' is invalid so search for most recent matching package
         const versionManifests = Object.values(packageMetadata.versions).filter(
@@ -147,11 +139,15 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           spinner.warn("Unable to find compatible package.  Using 'latest'.");
         } else {
           packageIdentifier = newIdentifier;
-          spinner.succeed(`Found compatible package version: ${colors.grey(packageIdentifier)}.`);
+          spinner.succeed(
+            `Found compatible package version: ${colors.grey(packageIdentifier.toString())}.`,
+          );
         }
       } else {
         packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
-        spinner.succeed(`Found compatible package version: ${colors.grey(packageIdentifier)}.`);
+        spinner.succeed(
+          `Found compatible package version: ${colors.grey(packageIdentifier.toString())}.`,
+        );
       }
     }
 
@@ -160,7 +156,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
 
     try {
       spinner.start('Loading package information from registry...');
-      const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
+      const manifest = await fetchPackageManifest(packageIdentifier.toString(), this.logger, {
         registry: options.registry,
         verbose: options.verbose,
         usingYarn,
@@ -233,6 +229,28 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     }
 
     return this.executeSchematic(collectionName, options['--']);
+  }
+
+  private async isProjectVersionValid(packageIdentifier: npa.Result): Promise<boolean> {
+    if (!packageIdentifier.name) {
+      return false;
+    }
+
+    let validVersion = false;
+    const installedVersion = await this.findProjectVersion(packageIdentifier.name);
+    if (installedVersion) {
+      if (packageIdentifier.type === 'range' && packageIdentifier.fetchSpec) {
+        validVersion = satisfies(installedVersion, packageIdentifier.fetchSpec);
+      } else if (packageIdentifier.type === 'version') {
+        const v1 = valid(packageIdentifier.fetchSpec);
+        const v2 = valid(installedVersion);
+        validVersion = v1 !== null && v1 === v2;
+      } else if (!packageIdentifier.rawSpec) {
+        validVersion = true;
+      }
+    }
+
+    return validVersion;
   }
 
   override async reportAnalytics(
