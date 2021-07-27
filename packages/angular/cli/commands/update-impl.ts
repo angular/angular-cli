@@ -10,6 +10,7 @@ import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
+import npa from 'npm-package-arg';
 import * as path from 'path';
 import * as semver from 'semver';
 import { PackageManager } from '../lib/config/workspace-schema';
@@ -36,7 +37,6 @@ import {
 } from '../utilities/package-tree';
 import { Schema as UpdateCommandSchema } from './update';
 
-const npa = require('npm-package-arg') as (selector: string) => PackageIdentifier;
 const pickManifest = require('npm-pick-manifest') as (
   metadata: PackageMetadata,
   selector: string,
@@ -340,7 +340,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           packageIdentifier.fetchSpec = 'next';
         }
 
-        packages.push(packageIdentifier);
+        packages.push(packageIdentifier as PackageIdentifier);
       } catch (e) {
         this.logger.error(e.message);
 
