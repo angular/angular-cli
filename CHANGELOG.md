@@ -1,3 +1,21 @@
+<a name="12.2.0-rc.0"></a>
+# 12.2.0-rc.0 (2021-07-28)
+### @angular/cli
+| Commit | Description |
+| -- | -- |
+| [259e26979](https://github.com/angular/angular-cli/commit/259e26979ebc712ee08fd36fb68a9576c1e02447) | fix(@angular/cli): merge npmrc files values |
+### @angular-devkit/build-angular
+| Commit | Description |
+| -- | -- |
+| [d750c686f](https://github.com/angular/angular-cli/commit/d750c686fd26f3ccfccb039027bd816a91279497) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns |
+### @angular-devkit/build-webpack
+| Commit | Description |
+| -- | -- |
+| [615353022](https://github.com/angular/angular-cli/commit/61535302204a2a767f85053b7efaa6ac5ac64098) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
+## Special Thanks:
+Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
+
+
 <a name="12.1.4"></a>
 # 12.1.4 (2021-07-28)
 ### @angular/cli
