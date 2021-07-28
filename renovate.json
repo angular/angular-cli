@@ -35,12 +35,17 @@
       "pinVersions": false
     },
     {
-      "packageNames": ["typescript"],
+      "packageNames": ["typescript", "rxjs", "tslib"],
       "separateMinorPatch": true
     },
     {
+      "packageNames": ["typescript", "rxjs", "tslib"],
+      "updateTypes": ["major"],
+      "enabled": false
+    },
+    {
       "packageNames": ["typescript"],
-      "updateTypes": ["minor", "major"],
+      "updateTypes": ["minor"],
       "enabled": false
     },
     {
