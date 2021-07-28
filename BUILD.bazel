@@ -10,5 +10,5 @@ exports_files([
     "LICENSE",
     "tsconfig.json",  # @external
     "tsconfig-test.json",  # @external
-    "tslint.base.json",  # @external
+    "tsconfig-build.json",  # @external
 ])
