@@ -9,7 +9,7 @@
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { workspaces } from '@angular-devkit/core';
 import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
-import { createArchitect, host } from '../test-utils';
+import { createArchitect, host } from '../testing/test-utils';
 
 describe('Dev Server Builder index', () => {
   const targetSpec = { project: 'app', target: 'serve' };

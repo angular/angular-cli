@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, extractI18nTargetSpec, host } from '../test-utils';
+import { createArchitect, extractI18nTargetSpec, host } from '../testing/test-utils';
 
 describe('Extract i18n Target', () => {
   const extractionFile = join(normalize('src'), 'messages.xlf');

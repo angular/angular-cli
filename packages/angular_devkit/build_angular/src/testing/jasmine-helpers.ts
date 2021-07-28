@@ -9,8 +9,8 @@
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
-import { host } from '../test-utils';
 import { BuilderHarness } from './builder-harness';
+import { host } from './test-utils';
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
 

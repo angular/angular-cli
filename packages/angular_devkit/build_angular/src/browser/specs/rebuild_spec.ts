@@ -15,7 +15,7 @@ import {
   lazyModuleFiles,
   lazyModuleFnImport,
   outputPath,
-} from '../../test-utils';
+} from '../../testing/test-utils';
 
 describe('Browser Builder rebuilds', () => {
   const target = { project: 'app', target: 'build' };

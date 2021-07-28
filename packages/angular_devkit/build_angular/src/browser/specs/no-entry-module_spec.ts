@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder no entry module', () => {
   const target = { project: 'app', target: 'build' };

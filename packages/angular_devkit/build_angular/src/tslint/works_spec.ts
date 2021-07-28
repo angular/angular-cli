@@ -11,7 +11,7 @@ import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/nod
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { logging, normalize, schema, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { workspaceRoot } from '../test-utils';
+import { workspaceRoot } from '../testing/test-utils';
 
 const lintTarget: Target = { project: 'app', target: 'lint' };
 

@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder styles resources output path', () => {
   const imgSvg = `

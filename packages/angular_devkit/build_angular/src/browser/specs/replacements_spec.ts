@@ -10,7 +10,7 @@ import { Architect } from '@angular-devkit/architect';
 import { logging, normalize, virtualFs } from '@angular-devkit/core';
 import { of, race } from 'rxjs';
 import { delay, filter, map, take, takeUntil, takeWhile, tap, timeout } from 'rxjs/operators';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder file replacements', () => {
   const target = { project: 'app', target: 'build' };

@@ -10,7 +10,7 @@ import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { logging } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { createArchitect, host } from '../../test-utils';
+import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder unused files warnings', () => {
   const warningMessageSuffix = `is part of the TypeScript compilation but it's unused`;

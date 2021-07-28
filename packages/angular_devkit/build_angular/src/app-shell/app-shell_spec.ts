@@ -11,7 +11,7 @@ import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core'
 import express from 'express'; // eslint-disable-line import/no-extraneous-dependencies
 import * as http from 'http';
 import { AddressInfo } from 'net';
-import { createArchitect, host } from '../test-utils';
+import { createArchitect, host } from '../testing/test-utils';
 
 describe('AppShell Builder', () => {
   const target = { project: 'app', target: 'app-shell' };

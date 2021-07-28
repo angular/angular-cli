@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, host, outputPath } from '../../test-utils';
+import { createArchitect, host, outputPath } from '../../testing/test-utils';
 
 describe('Browser Builder allow svg', () => {
   const target = { project: 'app', target: 'build' };
