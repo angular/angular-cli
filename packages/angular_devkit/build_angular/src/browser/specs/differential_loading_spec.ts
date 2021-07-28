@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { PathFragment } from '@angular-devkit/core';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 const TEST_TIMEOUT = 8 * 60 * 1000;
 

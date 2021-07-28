@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { createArchitect, host } from '../../test-utils';
+import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder bundle budgets', () => {
   const cssExtensions = ['css', 'scss', 'less', 'styl'];

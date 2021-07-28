@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { createArchitect, host } from '../../test-utils';
+import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder service worker', () => {
   const manifest = {

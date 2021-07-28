@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, host } from '../../test-utils';
+import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder AOT', () => {
   const targetSpec = { project: 'app', target: 'build' };

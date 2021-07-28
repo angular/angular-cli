@@ -11,7 +11,7 @@ import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
-import { createArchitect, host } from '../../test-utils';
+import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder allow js', () => {
   const targetSpec = { project: 'app', target: 'build' };

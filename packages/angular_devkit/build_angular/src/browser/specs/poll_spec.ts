@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { createArchitect, host } from '../../test-utils';
+import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder poll', () => {
   const target = { project: 'app', target: 'build' };

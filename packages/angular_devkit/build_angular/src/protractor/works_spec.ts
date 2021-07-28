@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { JsonObject, normalize } from '@angular-devkit/core';
-import { createArchitect, host, protractorTargetSpec } from '../test-utils';
+import { createArchitect, host, protractorTargetSpec } from '../testing/test-utils';
 
 describe('Protractor Builder', () => {
   let architect: Architect;
@@ -29,7 +29,7 @@ describe('Protractor Builder', () => {
   });
 
   it('fails with no devServerTarget and no standalone server', async () => {
-    const overrides = ({ devServerTarget: undefined } as unknown) as JsonObject;
+    const overrides = { devServerTarget: undefined } as unknown as JsonObject;
     const run = await architect.scheduleTarget(protractorTargetSpec, overrides);
 
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));

@@ -11,7 +11,7 @@ import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { tags } from '@angular-devkit/core';
 import * as https from 'https';
 import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
-import { createArchitect, host } from '../test-utils';
+import { createArchitect, host } from '../testing/test-utils';
 
 describe('Dev Server Builder ssl', () => {
   const target = { project: 'app', target: 'serve' };

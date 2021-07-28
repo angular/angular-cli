@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder output path', () => {
   const target = { project: 'app', target: 'build' };

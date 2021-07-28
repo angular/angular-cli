@@ -16,7 +16,7 @@ import {
   host,
   lazyModuleFiles,
   lazyModuleFnImport,
-} from '../../test-utils';
+} from '../../testing/test-utils';
 
 describe('Browser Builder lazy modules', () => {
   const target = { project: 'app', target: 'build' };

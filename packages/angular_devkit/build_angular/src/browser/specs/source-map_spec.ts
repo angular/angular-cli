@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { OutputHashing } from '@angular-devkit/build-angular';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder source map', () => {
   const target = { project: 'app', target: 'build' };

@@ -10,7 +10,7 @@ import { Architect } from '@angular-devkit/architect';
 import { join, logging, virtualFs } from '@angular-devkit/core';
 import { timer } from 'rxjs';
 import { debounceTime, map, switchMap, takeWhile, tap } from 'rxjs/operators';
-import { browserBuild, createArchitect, host, outputPath } from '../../test-utils';
+import { browserBuild, createArchitect, host, outputPath } from '../../testing/test-utils';
 
 describe('Browser Builder Web Worker support', () => {
   const target = { project: 'app', target: 'build' };

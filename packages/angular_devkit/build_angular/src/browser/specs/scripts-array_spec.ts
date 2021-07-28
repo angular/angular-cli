@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { browserBuild, createArchitect, host } from '../../test-utils';
+import { browserBuild, createArchitect, host } from '../../testing/test-utils';
 
 describe('Browser Builder scripts array', () => {
   const scripts: { [path: string]: string } = {
