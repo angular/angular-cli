@@ -173,7 +173,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
 
 function _build(logger: logging.Logger) {
   logger.info('Building...');
-  _exec('node', [require.resolve('typescript/bin/tsc'), '-p', 'tsconfig.json'], {}, logger);
+  _exec('node', [require.resolve('typescript/bin/tsc'), '-p', 'tsconfig-build.json'], {}, logger);
 }
 
 export default async function (
@@ -214,70 +214,74 @@ export default async function (
     resourceLogger.info(packageName);
     const pkg = packages[packageName];
     const pkgJson = pkg.packageJson;
-    const files = glob.sync(path.join(pkg.root, '**/*'), { dot: true, nodir: true });
+    const files = glob.sync('**/*', {
+      cwd: pkg.root,
+      dot: true,
+      nodir: true,
+      ignore: ['test/**/*', '**/tests/*', 'src/testing/*'],
+    });
     const subSubLogger = resourceLogger.createChild(packageName);
     subSubLogger.info(`${files.length} files total...`);
-    const resources = files
-      .map((fileName) => path.relative(pkg.root, fileName))
-      .filter((fileName) => {
-        if (/(?:^|[\/\\])node_modules[\/\\]/.test(fileName)) {
-          return false;
-        }
+    const resources = files.filter((fileName) => {
+      if (/(?:^|[\/\\])node_modules[\/\\]/.test(fileName)) {
+        return false;
+      }
 
-        // Schematics template files.
-        if (
-          pkgJson['schematics'] &&
-          (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)\w+-files(\/|\\)/))
-        ) {
-          return true;
-        }
-
-        if (fileName.endsWith('package.json')) {
-          return true;
-        }
-
-        // Ignore in package test files.
-        if (fileName.startsWith('test/') || fileName.startsWith('test\\')) {
-          return false;
-        }
-        if (pkg.name === '@angular-devkit/core' && fileName.startsWith('src/workspace/json/test')) {
-          return false;
-        }
-
-        // This schema is built and copied later on as schema.json.
-        if (pkg.name === '@angular/cli' && fileName.endsWith('workspace-schema.json')) {
-          return false;
-        }
-
-        // Remove Bazel files from NPM.
-        if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
-          return false;
-        }
-
-        // Skip sources.
-        if (fileName.endsWith('.ts') && !fileName.endsWith('.d.ts')) {
-          // Verify that it was actually built.
-          if (!fs.existsSync(path.join(pkg.dist, fileName).replace(/ts$/, 'js'))) {
-            subSubLogger.error(`\nSource found but compiled file not found: "${fileName}".`);
-            process.exit(2);
-          }
-
-          // Skip all sources.
-          return false;
-        }
-
-        // Skip tsconfig only.
-        if (fileName.endsWith('tsconfig.json')) {
-          return false;
-        }
-
-        // Skip files from gitignore.
-        if (_gitIgnoreMatch(fileName)) {
-          return false;
-        }
-
+      // Schematics template files.
+      if (
+        pkgJson['schematics'] &&
+        (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)\w+-files(\/|\\)/))
+      ) {
         return true;
-      });
+      }
+
+      // Skip test files
+      if (fileName.endsWith('_spec.ts')) {
+        return false;
+      }
+
+      if (fileName.endsWith('package.json')) {
+        return true;
+      }
+
+      if (pkg.name === '@angular-devkit/core' && fileName.startsWith('src/workspace/json/test')) {
+        return false;
+      }
+
+      // This schema is built and copied later on as schema.json.
+      if (pkg.name === '@angular/cli' && fileName.endsWith('workspace-schema.json')) {
+        return false;
+      }
+
+      // Remove Bazel files from NPM.
+      if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
+        return false;
+      }
+
+      // Skip sources.
+      if (fileName.endsWith('.ts') && !fileName.endsWith('.d.ts')) {
+        // Verify that it was actually built.
+        if (!fs.existsSync(path.join(pkg.dist, fileName).replace(/ts$/, 'js'))) {
+          subSubLogger.error(`\nSource found but compiled file not found: "${fileName}".`);
+          process.exit(2);
+        }
+
+        // Skip all sources.
+        return false;
+      }
+
+      // Skip tsconfig only.
+      if (fileName.endsWith('tsconfig.json')) {
+        return false;
+      }
+
+      // Skip files from gitignore.
+      if (_gitIgnoreMatch(fileName)) {
+        return false;
+      }
+
+      return true;
+    });
 
     subSubLogger.info(`${resources.length} resources...`);
     resources.forEach((fileName) => {

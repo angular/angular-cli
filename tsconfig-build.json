@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "exclude": [
+    "packages/angular_devkit/build_angular/src/bazel-babel.d.ts",
+    "bazel-out/**/*",
+    "dist/**/*",
+    "dist-schema/**",
+    "goldens/**/*",
+    "**/node_modules/**/*",
+    "**/third_party/**/*",
+    "packages/angular_devkit/schematics_cli/blank/*-files/**/*",
+    "packages/angular_devkit/schematics_cli/schematic/files/**/*",
+    "packages/angular_devkit/build_angular/src/*/tests/**/*",
+    "packages/angular_devkit/build_angular/src/testing/**/*",
+    "packages/angular_devkit/*/test/**/*",
+    "packages/schematics/*/*/*files/**/*",
+    "tests/**/*",
+    "tools/**/*",
+    ".ng-dev/**/*",
+    "**/*_spec.ts"
+  ]
+}
