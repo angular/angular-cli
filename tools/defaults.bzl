@@ -2,6 +2,7 @@
 
 load("@npm//@bazel/typescript:index.bzl", _ts_library = "ts_library")
 
+_DEFAULT_TSCONFIG = "//:tsconfig-build.json"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
 
 def ts_library(
@@ -17,8 +18,11 @@ def ts_library(
         # Match the types[] in //packages:tsconfig-test.json
         deps.append("@npm//@types/jasmine")
         deps.append("@npm//@types/node")
-    if not tsconfig and testonly:
-        tsconfig = _DEFAULT_TSCONFIG_TEST
+    if not tsconfig:
+        if testonly:
+            tsconfig = _DEFAULT_TSCONFIG_TEST
+        else:
+            tsconfig = _DEFAULT_TSCONFIG
 
     if not devmode_module:
         devmode_module = "commonjs"

@@ -18,7 +18,7 @@
     "baseUrl": "",
     "rootDirs": [".", "./dist-schema/", "./bazel-bin/"],
     "typeRoots": ["./node_modules/@types"],
-    "types": ["node"],
+    "types": ["node", "jasmine"],
     "paths": {
       "@angular-devkit/core": ["./packages/angular_devkit/core/src/index"],
       "@angular-devkit/core/node": ["./packages/angular_devkit/core/node/index"],
@@ -63,7 +63,6 @@
     "packages/schematics/*/*/*files/**/*",
     "tests/**/*",
     "tools/**/*",
-    "integration/**/*",
     ".ng-dev/**/*"
   ]
 }
