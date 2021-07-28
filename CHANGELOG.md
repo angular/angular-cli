@@ -1,3 +1,25 @@
+<a name="12.1.4"></a>
+# 12.1.4 (2021-07-28)
+### @angular/cli
+| Commit | Description |
+| -- | -- |
+| [e02c97dd0](https://github.com/angular/angular-cli/commit/e02c97dd09399443438b32cf1ad47fa0f7011df3) | fix(@angular/cli): merge npmrc files values |
+### @schematics/angular
+| Commit | Description |
+| -- | -- |
+| [cfc267426](https://github.com/angular/angular-cli/commit/cfc267426716e9ecf0c9833720cb35298284f699) | fix(@schematics/angular): ensure valid SemVer range for new project Angular packages |
+### @angular-devkit/build-angular
+| Commit | Description |
+| -- | -- |
+| [55c0bddc8](https://github.com/angular/angular-cli/commit/55c0bddc8b2425309f00733eca96c06f60f867d5) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns |
+### @angular-devkit/build-webpack
+| Commit | Description |
+| -- | -- |
+| [b3736a3c0](https://github.com/angular/angular-cli/commit/b3736a3c09f39f5ee5dc12d98535fe4b6803ea3b) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
+## Special Thanks:
+Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
+
+
 <a name="12.1.3"></a>
 
 # 12.1.3 (2021-07-21)
