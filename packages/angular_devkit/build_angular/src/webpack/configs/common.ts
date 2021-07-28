@@ -15,7 +15,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   VERSION as NG_VERSION,
 } from '@angular/compiler-cli';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
+import CopyWebpackPlugin, { ObjectPattern } from 'copy-webpack-plugin';
 import { createHash } from 'crypto';
 import { createWriteStream, existsSync, promises as fsPromises } from 'fs';
 import * as path from 'path';
@@ -212,40 +212,43 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   // process asset entries
   if (buildOptions.assets.length) {
-    const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternClass) => {
-      // Resolve input paths relative to workspace root and add slash at the end.
-      // eslint-disable-next-line prefer-const
-      let { input, output, ignore = [], glob } = asset;
-      input = path.resolve(root, input).replace(/\\/g, '/');
-      input = input.endsWith('/') ? input : input + '/';
-      output = output.endsWith('/') ? output : output + '/';
+    const copyWebpackPluginPatterns = buildOptions.assets.map(
+      (asset: AssetPatternClass, index: number): ObjectPattern => {
+        // Resolve input paths relative to workspace root and add slash at the end.
+        // eslint-disable-next-line prefer-const
+        let { input, output, ignore = [], glob } = asset;
+        input = path.resolve(root, input).replace(/\\/g, '/');
+        input = input.endsWith('/') ? input : input + '/';
+        output = output.endsWith('/') ? output : output + '/';
 
-      if (output.startsWith('..')) {
-        throw new Error('An asset cannot be written to a location outside of the output path.');
-      }
+        if (output.startsWith('..')) {
+          throw new Error('An asset cannot be written to a location outside of the output path.');
+        }
 
-      return {
-        context: input,
-        // Now we remove starting slash to make Webpack place it from the output root.
-        to: output.replace(/^\//, ''),
-        from: glob,
-        noErrorOnMissing: true,
-        force: true,
-        globOptions: {
-          dot: true,
-          followSymbolicLinks: !!asset.followSymlinks,
-          ignore: [
-            '.gitkeep',
-            '**/.DS_Store',
-            '**/Thumbs.db',
-            // Negate patterns needs to be absolute because copy-webpack-plugin uses absolute globs which
-            // causes negate patterns not to match.
-            // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
-            ...ignore,
-          ].map((i) => path.posix.join(input, i)),
-        },
-      };
-    });
+        return {
+          context: input,
+          // Now we remove starting slash to make Webpack place it from the output root.
+          to: output.replace(/^\//, ''),
+          from: glob,
+          noErrorOnMissing: true,
+          force: true,
+          globOptions: {
+            dot: true,
+            followSymbolicLinks: !!asset.followSymlinks,
+            ignore: [
+              '.gitkeep',
+              '**/.DS_Store',
+              '**/Thumbs.db',
+              // Negate patterns needs to be absolute because copy-webpack-plugin uses absolute globs which
+              // causes negate patterns not to match.
+              // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
+              ...ignore,
+            ].map((i) => path.posix.join(input, i)),
+          },
+          priority: index,
+        };
+      },
+    );
 
     extraPlugins.push(
       new CopyWebpackPlugin({
