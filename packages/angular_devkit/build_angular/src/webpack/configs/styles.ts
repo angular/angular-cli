@@ -108,23 +108,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     );
   }
 
-  let sassImplementation: SassWorkerImplementation | undefined;
-  try {
-    sassImplementation = require('node-sass');
-    wco.logger.warn(
-      `'node-sass' usage is deprecated and will be removed in a future major version. ` +
-        `To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`,
-    );
-  } catch {
-    sassImplementation = new SassWorkerImplementation();
-    extraPlugins.push({
-      apply(compiler) {
-        compiler.hooks.shutdown.tap('sass-worker', () => {
-          sassImplementation?.close();
-        });
-      },
-    });
-  }
+  const sassImplementation = new SassWorkerImplementation();
+  extraPlugins.push({
+    apply(compiler) {
+      compiler.hooks.shutdown.tap('sass-worker', () => {
+        sassImplementation?.close();
+      });
+    },
+  });
 
   const assetNameTemplate = assetNameTemplateFactory(hashFormat);
 
