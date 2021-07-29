@@ -1,7 +1,7 @@
 import express from 'express';
 import * as path from 'path';
 import { copyProjectAsset } from '../../utils/assets';
-import { replaceInFile } from '../../utils/fs';
+import { appendToFile, replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
@@ -14,7 +14,7 @@ export default async function () {
     throw new Error('SauceLabs is not configured.');
   }
 
-  await replaceInFile('.browserslistrc', 'not IE 11', 'IE 11');
+  await appendToFile('.browserslistrc', 'IE 11');
 
   // Workaround for https://github.com/angular/angular/issues/32192
   await replaceInFile('src/app/app.component.html', /class="material-icons"/g, '');

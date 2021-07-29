@@ -1,23 +1,19 @@
 import { oneLineTrim } from 'common-tags';
-import { appendToFile, expectFileToMatch, replaceInFile, writeMultipleFiles } from '../../utils/fs';
+import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
   // Enable Differential loading to run both size checks
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await appendToFile('.browserslistrc', 'IE 11');
 
   await writeMultipleFiles({
     'src/string-script.js': "console.log('string-script'); var number = 1+1;",
     'src/pre-rename-script.js': "console.log('pre-rename-script');",
   });
 
-  await updateJsonFile('angular.json', configJson => {
+  await updateJsonFile('angular.json', (configJson) => {
     const appArchitect = configJson.projects['test-project'].architect;
     appArchitect.build.options.scripts = [
       { input: 'src/string-script.js' },
@@ -25,7 +21,13 @@ export default async function () {
     ];
   });
 
-  await ng('build', '--extract-css', '--vendor-chunk', '--optimization', '--configuration=development');
+  await ng(
+    'build',
+    '--extract-css',
+    '--vendor-chunk',
+    '--optimization',
+    '--configuration=development',
+  );
 
   // index.html lists the right bundles
   await expectFileToMatch(
@@ -45,5 +47,7 @@ export default async function () {
   );
 
   await expectFileToMatch('dist/test-project/vendor-es2017.js', /class \w{constructor\(/);
-  await expectToFail(() => expectFileToMatch('dist/test-project/vendor-es5.js', /class \w{constructor\(/));
+  await expectToFail(() =>
+    expectFileToMatch('dist/test-project/vendor-es5.js', /class \w{constructor\(/),
+  );
 }

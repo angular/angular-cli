@@ -1,4 +1,4 @@
-import { expectFileToMatch, replaceInFile, writeMultipleFiles } from '../../../utils/fs';
+import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 
 export default async function () {
@@ -9,11 +9,7 @@ export default async function () {
   });
 
   // Enable IE 11 support
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await appendToFile('.browserslistrc', 'IE 11');
 
   await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/styles.css', 'z-index: auto');

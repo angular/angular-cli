@@ -1,10 +1,10 @@
-import { appendToFile, expectFileToMatch, replaceInFile } from '../../utils/fs';
+import { appendToFile, expectFileToMatch } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { baseDir, externalServer, langTranslations, setupI18nConfig } from './setup';
 
-export default async function() {
+export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig('xlf2');
 
@@ -14,13 +14,9 @@ export default async function() {
 
 export async function executeTest() {
   // Ensure a DL build is used.
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await appendToFile('.browserslistrc', 'IE 11');
 
-  await updateJsonFile('tsconfig.json', config => {
+  await updateJsonFile('tsconfig.json', (config) => {
     config.compilerOptions.target = 'es2017';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};
@@ -56,10 +52,16 @@ export async function executeTest() {
 
     // Verify locale data comments are removed in production
     await expectToFail(() =>
-      expectFileToMatch(`${outputPath}/vendor-es5.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
+      expectFileToMatch(
+        `${outputPath}/vendor-es5.js`,
+        '// See angular/tools/gulp-tasks/cldr/extract.js',
+      ),
     );
     await expectToFail(() =>
-      expectFileToMatch(`${outputPath}/vendor-es2017.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
+      expectFileToMatch(
+        `${outputPath}/vendor-es2017.js`,
+        '// See angular/tools/gulp-tasks/cldr/extract.js',
+      ),
     );
 
     // Execute Application E2E tests with dev server

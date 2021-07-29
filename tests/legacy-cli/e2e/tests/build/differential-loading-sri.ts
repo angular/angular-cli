@@ -11,7 +11,7 @@ import { ng } from '../../utils/process';
 
 export default async function () {
   // Enable Differential loading
-  await replaceInFile('.browserslistrc', 'not IE 11', 'IE 11');
+  await appendToFile('.browserslistrc', 'IE 11');
 
   const appRoutingModulePath = 'src/app/app-routing.module.ts';
 
