@@ -19,13 +19,11 @@ import {
   noop,
   url,
 } from '@angular-devkit/schematics';
-import { applyLintFix } from './lint-fix';
 import { parseName } from './parse-name';
 import { createDefaultPath } from './workspace';
 
 export interface GenerateFromFilesOptions {
   flat?: boolean;
-  lintFix?: boolean;
   name: string;
   path?: string;
   prefix?: string;
@@ -56,9 +54,6 @@ export function generateFromFiles(
       move(parsedPath.path + (options.flat ? '' : '/' + strings.dasherize(options.name))),
     ]);
 
-    return chain([
-      mergeWith(templateSource),
-      options.lintFix ? applyLintFix(options.path) : noop(),
-    ]);
+    return chain([mergeWith(templateSource)]);
   };
 }

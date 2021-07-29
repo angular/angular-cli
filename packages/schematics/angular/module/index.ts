@@ -31,7 +31,6 @@ import {
   buildRelativePath,
   findModuleFromOptions,
 } from '../utility/find-module';
-import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as ModuleOptions, RoutingScope } from './schema';
@@ -190,7 +189,6 @@ export default function (options: ModuleOptions): Rule {
       addRouteDeclarationToNgModule(options, routingModulePath),
       mergeWith(templateSource),
       isLazyLoadedModuleGen ? schematic('component', componentOptions) : noop(),
-      options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
 }

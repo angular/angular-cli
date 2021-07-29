@@ -19,7 +19,6 @@ describe('Service Worker Schematic', () => {
   const defaultOptions: ServiceWorkerOptions = {
     project: 'bar',
     target: 'build',
-    configuration: '',
   };
 
   let appTree: UnitTestTree;

@@ -18,7 +18,6 @@ describe('PWA Schematic', () => {
   const defaultOptions: PwaOptions = {
     project: 'bar',
     target: 'build',
-    configuration: 'production',
     title: 'Fake Title',
   };
 

@@ -525,25 +525,6 @@ describe('Application Schematic', () => {
     });
   });
 
-  it(`should add support for IE 11 in '.browserslistrc' when 'legacyBrowsers' is true`, async () => {
-    const options: ApplicationOptions = { ...defaultOptions, legacyBrowsers: true };
-    const tree = await schematicRunner
-      .runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    const content = tree.readContent('/projects/foo/.browserslistrc');
-    expect(content).not.toContain('not IE 11');
-    expect(content).toContain('IE 11');
-  });
-
-  it(`should not add support for IE 11 in '.browserslistrc' when 'legacyBrowsers' is false`, async () => {
-    const options: ApplicationOptions = { ...defaultOptions, legacyBrowsers: false };
-    const tree = await schematicRunner
-      .runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    const content = tree.readContent('/projects/foo/.browserslistrc');
-    expect(content).toContain('not IE 11');
-  });
-
   it(`should create kebab-case project folder names with camelCase project name`, async () => {
     const options: ApplicationOptions = { ...defaultOptions, name: 'myCool' };
     const tree = await schematicRunner

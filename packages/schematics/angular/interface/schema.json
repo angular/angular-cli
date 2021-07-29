@@ -40,12 +40,6 @@
         "$source": "argv",
         "index": 1
       }
-    },
-    "lintFix": {
-      "type": "boolean",
-      "description": "Apply lint fixes after generating the interface.",
-      "x-user-analytics": 15,
-      "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
   },
   "required": ["name"]

@@ -19,12 +19,6 @@
         "$source": "projectName"
       }
     },
-    "target": {
-      "type": "string",
-      "description": "The target to apply web worker to.",
-      "default": "build",
-      "x-deprecated": "No longer has an effect."
-    },
     "name": {
       "type": "string",
       "description": "The name of the worker.",

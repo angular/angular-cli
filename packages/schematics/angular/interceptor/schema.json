@@ -38,12 +38,6 @@
       "description": "Do not create \"spec.ts\" test files for the new interceptor.",
       "default": false,
       "x-user-analytics": 12
-    },
-    "lintFix": {
-      "type": "boolean",
-      "description": "Apply lint fixes after generating the interceptor.",
-      "x-user-analytics": 15,
-      "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
   },
   "required": ["name"]

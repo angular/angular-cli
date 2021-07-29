@@ -13,6 +13,4 @@ last 1 Firefox version
 last 2 Edge major versions
 last 2 Safari major versions
 last 2 iOS major versions
-Firefox ESR<% if (legacyBrowsers) { %>
-IE 11<% } else { %>
-not IE 11 # Angular supports IE 11 only as an opt-in. To opt-in, remove the 'not' prefix on this line.<% } %>
+Firefox ESR
