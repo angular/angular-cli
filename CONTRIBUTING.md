@@ -281,36 +281,14 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [stackoverflow]: http://stackoverflow.com/questions/tagged/angular-devkit
 
 ## <a name="public-api"></a> Updating the Public API
-Our Public API is protected with TS API Guardian. This is a tool that keeps track of public API surface of our packages.
+Our Public API surface is tracked using golden files.
 
-To test if your change effect the public API you need to run the API guardian on that particular package.
-
-For example in case `@angular-devkit/core` package was modified you need to run:
-
+You check all golden files by running:
 ```bash
-yarn bazel test //goldens/public-api:angular_devkit_core_api
-```
-
-You can also test all packages by running:
-```bash
-yarn bazel test //goldens/public-api ...
+yarn public-api:check
 ```
 
 If you modified the public API, the test will fail. To update the golden files you need to run:
-
 ```bash
-yarn bazel run //goldens/public-api:angular_devkit_core_api.accept
+yarn public-api:update
 ```
-
-**Note**: In some cases we use aliased symbols to create namespaces.
-
-Example:
-```javascript
-import * as foo from './foo';
-
-export { foo };
-```
-There are currently not supported by the API guardian.
-To overcome this limitation we created `_golden-api.ts` in certain packages.
-
-When adding a new API, it might be the case that you need to add it to `_golden-api.ts`.
