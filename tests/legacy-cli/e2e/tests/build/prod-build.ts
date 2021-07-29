@@ -1,13 +1,12 @@
 import { statSync } from 'fs';
 import { join } from 'path';
-import { expectFileToExist, expectFileToMatch, readFile, replaceInFile } from '../../utils/fs';
+import { appendToFile, expectFileToExist, expectFileToMatch, readFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
-
 function verifySize(bundle: string, baselineBytes: number) {
   const size = statSync(`dist/test-project/${bundle}`).size;
-  const percentageBaseline = baselineBytes * 10 / 100;
+  const percentageBaseline = (baselineBytes * 10) / 100;
   const maxSize = baselineBytes + percentageBaseline;
   const minSize = baselineBytes - percentageBaseline;
 
@@ -32,11 +31,7 @@ export default async function () {
   const bootstrapRegExp = /bootstrapModule\(.?[a-zA-Z]+\)\./;
 
   // Enable Differential loading to run both size checks
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await appendToFile('.browserslistrc', 'IE 11');
 
   await ng('build');
   await expectFileToExist(join(process.cwd(), 'dist'));

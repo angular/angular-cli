@@ -1,8 +1,7 @@
-import { expectFileToMatch, replaceInFile } from '../../utils/fs';
+import { appendToFile, expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
-
-export default async function() {
+export default async function () {
   // Development build
   await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/index.html', 'main.js');
@@ -13,11 +12,7 @@ export default async function() {
   await ng('build', '--configuration=development', '--no-progress', 'test-project');
 
   // Enable Differential loading to run both size checks
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await appendToFile('.browserslistrc', 'IE 11');
   // Production build
   const { stderr: stderrProgress, stdout } = await ng('build', '--progress');
   await expectFileToMatch('dist/test-project/index.html', /main-es5\.[a-zA-Z0-9]{20}\.js/);

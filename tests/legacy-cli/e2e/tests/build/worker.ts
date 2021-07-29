@@ -7,7 +7,13 @@
  */
 
 import { join } from 'path';
-import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
+import {
+  appendToFile,
+  expectFileToExist,
+  expectFileToMatch,
+  replaceInFile,
+  writeFile,
+} from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
@@ -17,7 +23,7 @@ export default async function () {
   const workerTsConfig = 'tsconfig.worker.json';
 
   // Enable Differential loading to run both size checks
-  await replaceInFile('.browserslistrc', 'not IE 11', 'IE 11');
+  await appendToFile('.browserslistrc', 'IE 11');
 
   await ng('generate', 'web-worker', 'app');
   await expectFileToExist(workerPath);

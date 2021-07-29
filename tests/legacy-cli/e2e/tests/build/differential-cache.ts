@@ -1,17 +1,14 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { rimraf, replaceInFile } from '../../utils/fs';
+import { rimraf, appendToFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 function generateFileHashMap(): Map<string, string> {
   const hashes = new Map<string, string>();
 
-  fs.readdirSync('./dist/test-project').forEach(name => {
+  fs.readdirSync('./dist/test-project').forEach((name) => {
     const data = fs.readFileSync('./dist/test-project/' + name);
-    const hash = crypto
-      .createHash('sha1')
-      .update(data)
-      .digest('hex');
+    const hash = crypto.createHash('sha1').update(data).digest('hex');
 
     hashes.set(name, hash);
   });
@@ -35,7 +32,7 @@ function validateHashes(
   });
 }
 
-export default async function() {
+export default async function () {
   // Skip on CI due to large variability of performance
   if (process.env['CI']) {
     return;
@@ -45,11 +42,7 @@ export default async function() {
   let newHashes: Map<string, string>;
 
   // Enable Differential loading to run both size checks
-  await replaceInFile(
-    '.browserslistrc',
-    'not IE 11',
-    'IE 11',
-  );
+  await appendToFile('.browserslistrc', 'IE 11');
 
   // Remove the cache so that an initial build and build with cache can be tested
   await rimraf('./node_modules/.cache');
@@ -66,7 +59,7 @@ export default async function() {
 
   validateHashes(oldHashes, newHashes, []);
 
-  if (cached > initial * 0.70) {
+  if (cached > initial * 0.7) {
     throw new Error(
       `Cached build time [${cached}] should not be greater than 70% of initial build time [${initial}].`,
     );
@@ -85,7 +78,7 @@ export default async function() {
   cached = Date.now() - start;
   newHashes = generateFileHashMap();
 
-  if (cached > initial * 0.70) {
+  if (cached > initial * 0.7) {
     throw new Error(
       `Cached build time [${cached}] should not be greater than 70% of initial build time [${initial}].`,
     );
