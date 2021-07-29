@@ -12,19 +12,13 @@ import { WebpackConfigOptions } from '../../utils/build-options';
 import { getTypescriptWorkerPlugin } from './typescript';
 
 export function getWorkerConfig(wco: WebpackConfigOptions): Configuration {
-  const { buildOptions } = wco;
+  const { webWorkerTsConfig } = wco.buildOptions;
 
-  if (!buildOptions.webWorkerTsConfig) {
+  if (!webWorkerTsConfig) {
     return {};
   }
 
-  if (typeof buildOptions.webWorkerTsConfig != 'string') {
-    throw new Error('The `webWorkerTsConfig` must be a string.');
-  }
-
-  const workerTsConfigPath = resolve(wco.root, buildOptions.webWorkerTsConfig);
-
   return {
-    plugins: [getTypescriptWorkerPlugin(wco, workerTsConfigPath)],
+    plugins: [getTypescriptWorkerPlugin(wco, resolve(wco.root, webWorkerTsConfig))],
   };
 }
