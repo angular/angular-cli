@@ -10,4 +10,3 @@ export { NodePackageInstallTask } from './package-manager/install-task';
 export { NodePackageLinkTask } from './package-manager/link-task';
 export { RepositoryInitializerTask } from './repo-init/init-task';
 export { RunSchematicTask } from './run-schematic/task';
-export { TslintFixTask } from './tslint-fix/task';
