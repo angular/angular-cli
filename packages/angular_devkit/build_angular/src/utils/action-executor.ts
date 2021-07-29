@@ -7,25 +7,16 @@
  */
 
 import Piscina from 'piscina';
-import { BundleActionCache } from './action-cache';
 import { maxWorkers } from './environment-options';
 import { I18nOptions } from './i18n-options';
-import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
+import { InlineOptions } from './process-bundle';
 
 const workerFile = require.resolve('./process-bundle');
 
 export class BundleActionExecutor {
   private workerPool?: Piscina;
-  private cache?: BundleActionCache;
 
-  constructor(
-    private workerOptions: { cachePath?: string; i18n: I18nOptions },
-    integrityAlgorithm?: string,
-  ) {
-    if (workerOptions.cachePath) {
-      this.cache = new BundleActionCache(workerOptions.cachePath, integrityAlgorithm);
-    }
-  }
+  constructor(private workerOptions: { i18n: I18nOptions }) {}
 
   private ensureWorkerPool(): Piscina {
     if (this.workerPool) {
@@ -34,33 +25,12 @@ export class BundleActionExecutor {
 
     this.workerPool = new Piscina({
       filename: workerFile,
-      name: 'process',
+      name: 'inlineLocales',
       workerData: this.workerOptions,
       maxThreads: maxWorkers,
     });
 
     return this.workerPool;
-  }
-
-  async process(action: ProcessBundleOptions): Promise<ProcessBundleResult> {
-    if (this.cache) {
-      const cacheKeys = this.cache.generateCacheKeys(action);
-      action.cacheKeys = cacheKeys;
-
-      // Try to get cached data, if it fails fallback to processing
-      try {
-        const cachedResult = await this.cache.getCachedBundleResult(action);
-        if (cachedResult) {
-          return cachedResult;
-        }
-      } catch {}
-    }
-
-    return this.ensureWorkerPool().run(action, { name: 'process' });
-  }
-
-  processAll(actions: Iterable<ProcessBundleOptions>): AsyncIterable<ProcessBundleResult> {
-    return BundleActionExecutor.executeAll(actions, (action) => this.process(action));
   }
 
   async inline(

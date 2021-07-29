@@ -48,8 +48,7 @@ export default async function () {
   await ng('e2e');
   await ng('e2e', '--prod');
 
-  // Verify project now creates bundles for differential loading.
+  // Verify project now creates bundles
   await noSilentNg('build', '--prod');
-  await expectFileMatchToExist('dist/eight-project/', /main-es5\.[0-9a-f]{20}\.js/);
-  await expectFileMatchToExist('dist/eight-project/', /main-es2015\.[0-9a-f]{20}\.js/);
+  await expectFileMatchToExist('dist/eight-project/', /main\.[0-9a-f]{20}\.js/);
 }

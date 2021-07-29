@@ -16,13 +16,12 @@ import { json, tags } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, switchMap } from 'rxjs/operators';
-import * as ts from 'typescript';
 import * as url from 'url';
 import webpack from 'webpack';
 import webpackDevServer from 'webpack-dev-server';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
-import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
+import { normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
 import { checkPort } from '../utils/check-port';
 import { colors } from '../utils/color';
@@ -303,17 +302,10 @@ export function serveWebpackBrowser(
   }
 
   return from(setup()).pipe(
-    switchMap(({ browserOptions, webpackConfig, projectRoot, locale }) => {
+    switchMap(({ browserOptions, webpackConfig, locale }) => {
       if (browserOptions.index) {
-        const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
-        const { options: compilerOptions } = readTsconfig(tsConfig, workspaceRoot);
-        const target = compilerOptions.target || ts.ScriptTarget.ES5;
-        const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
-
+        const { scripts = [], styles = [], baseHref } = browserOptions;
         const entrypoints = generateEntryPoints({ scripts, styles });
-        const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded(target)
-          ? generateEntryPoints({ scripts: [], styles })
-          : [];
 
         webpackConfig.plugins = [...(webpackConfig.plugins || [])];
         webpackConfig.plugins.push(
@@ -322,7 +314,7 @@ export function serveWebpackBrowser(
             outputPath: getIndexOutputFile(browserOptions.index),
             baseHref,
             entrypoints,
-            moduleEntrypoints,
+            moduleEntrypoints: [],
             noModuleEntrypoints: ['polyfills-es5'],
             deployUrl: browserOptions.deployUrl,
             sri: browserOptions.subresourceIntegrity,

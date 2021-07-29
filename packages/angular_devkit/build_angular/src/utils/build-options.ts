@@ -70,8 +70,6 @@ export interface BuildOptions {
   inlineStyleLanguage?: InlineStyleLanguage;
 
   allowedCommonJsDependencies?: string[];
-
-  differentialLoadingNeeded?: boolean;
 }
 
 export interface WebpackTestOptions extends BuildOptions {

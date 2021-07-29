@@ -40,12 +40,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
 
   if (scriptsSourceMap || stylesSourceMap) {
     extraPlugins.push(
-      getSourceMapDevTool(
-        scriptsSourceMap,
-        stylesSourceMap,
-        buildOptions.differentialLoadingNeeded && !buildOptions.watch ? true : hiddenSourceMap,
-        false,
-      ),
+      getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap, false),
     );
   }
 

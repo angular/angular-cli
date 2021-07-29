@@ -1,15 +1,15 @@
-import { expectFileNotToExist, expectFileToMatch, readFile } from '../../utils/fs';
+import { expectFileToMatch, readFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { externalServer, langTranslations, setupI18nConfig } from './setup';
 
-export default async function() {
+export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
   // Ensure a es5 build is used.
-  await updateJsonFile('tsconfig.json', config => {
+  await updateJsonFile('tsconfig.json', (config) => {
     config.compilerOptions.target = 'es5';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};
@@ -22,7 +22,6 @@ export default async function() {
   for (const { lang, outputPath, translation } of langTranslations) {
     await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
-    await expectFileNotToExist(`${outputPath}/main-es2017.js`);
 
     // Ensure sourcemap for modified file contains content
     const mainSourceMap = JSON.parse(await readFile(`${outputPath}/main.js.map`));

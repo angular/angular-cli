@@ -75,40 +75,6 @@ describe('Browser Builder scripts array', () => {
     }
   });
 
-  it('works in watch mode with differential loading', async () => {
-    const matches: Record<string, string> = {
-      'scripts.js': 'input-script',
-      'lazy-script.js': 'lazy-script',
-      'renamed-script.js': 'pre-rename-script',
-      'renamed-lazy-script.js': 'pre-rename-lazy-script',
-      'main-es2017.js': 'input-script',
-      'index.html':
-        '<script src="runtime-es2017.js" type="module"></script>' +
-        '<script src="polyfills-es2017.js" type="module"></script>' +
-        '<script src="scripts.js" defer></script>' +
-        '<script src="renamed-script.js" defer></script>' +
-        '<script src="vendor-es2017.js" type="module"></script>' +
-        '<script src="main-es2017.js" type="module"></script>',
-    };
-
-    host.writeMultipleFiles(scripts);
-    host.appendToFile('src/main.ts', "\nimport './input-script.js';");
-
-    // Enable differential loading
-    host.appendToFile('.browserslistrc', '\nIE 11');
-
-    // Remove styles so we don't have to account for them in the index.html order check.
-    const { files } = await browserBuild(architect, host, target, {
-      styles: [],
-      scripts: getScriptsOption(),
-      watch: true,
-    } as {});
-
-    for (const [fileName, content] of Object.entries(matches)) {
-      expect(await files[fileName]).toMatch(content);
-    }
-  });
-
   it('uglifies, uses sourcemaps, and adds hashes', async () => {
     host.writeMultipleFiles(scripts);
 
