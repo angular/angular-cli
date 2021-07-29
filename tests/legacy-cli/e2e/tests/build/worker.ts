@@ -22,9 +22,6 @@ export default async function () {
   const projectTsConfig = 'tsconfig.json';
   const workerTsConfig = 'tsconfig.worker.json';
 
-  // Enable Differential loading to run both size checks
-  await appendToFile('.browserslistrc', 'IE 11');
-
   await ng('generate', 'web-worker', 'app');
   await expectFileToExist(workerPath);
   await expectFileToExist(projectTsConfig);
@@ -32,17 +29,13 @@ export default async function () {
   await expectFileToMatch(snippetPath, `new Worker(new URL('./app.worker', import.meta.url)`);
 
   await ng('build', '--configuration=development');
-  await expectFileToExist('dist/test-project/src_app_app_worker_ts-es5.js');
-  await expectFileToMatch('dist/test-project/main-es5.js', 'src_app_app_worker_ts');
-  await expectFileToExist('dist/test-project/src_app_app_worker_ts-es2017.js');
-  await expectFileToMatch('dist/test-project/main-es2017.js', 'src_app_app_worker_ts');
+  await expectFileToExist('dist/test-project/src_app_app_worker_ts.js');
+  await expectFileToMatch('dist/test-project/main.js', 'src_app_app_worker_ts');
 
   await ng('build', '--output-hashing=none');
   const chunkId = '151';
-  await expectFileToExist(`dist/test-project/${chunkId}-es5.js`);
-  await expectFileToMatch('dist/test-project/main-es5.js', chunkId);
-  await expectFileToExist(`dist/test-project/${chunkId}-es2017.js`);
-  await expectFileToMatch('dist/test-project/main-es2017.js', chunkId);
+  await expectFileToExist(`dist/test-project/${chunkId}.js`);
+  await expectFileToMatch('dist/test-project/main.js', chunkId);
 
   // console.warn has to be used because chrome only captures warnings and errors by default
   // https://github.com/angular/protractor/issues/2207

@@ -21,27 +21,17 @@ import {
   deleteOutputDir,
   normalizeAssetPatterns,
   normalizeOptimization,
-  normalizeSourceMaps,
   urlJoin,
 } from '../utils';
-import { BundleActionExecutor } from '../utils/action-executor';
 import { ThresholdSeverity, checkBudgets } from '../utils/bundle-calculator';
-import { findCachePath } from '../utils/cache-path';
 import { colors } from '../utils/color';
 import { copyAssets } from '../utils/copy-assets';
-import { cachingDisabled } from '../utils/environment-options';
 import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
 import { I18nOptions } from '../utils/i18n-options';
 import { FileInfo } from '../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator, IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { ensureOutputPaths } from '../utils/output-paths';
 import { generateEntryPoints } from '../utils/package-chunk-sort';
-import {
-  InlineOptions,
-  ProcessBundleFile,
-  ProcessBundleOptions,
-  ProcessBundleResult,
-} from '../utils/process-bundle';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../utils/service-worker';
 import { Spinner } from '../utils/spinner';
@@ -63,9 +53,6 @@ import {
 import { markAsyncChunksNonInitial } from '../webpack/utils/async-chunks';
 import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 import {
-  BundleStats,
-  ChunkType,
-  generateBundleStats,
   statsErrorsToString,
   statsHasErrors,
   statsHasWarnings,
@@ -73,8 +60,6 @@ import {
   webpackStatsLogger,
 } from '../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema } from './schema';
-
-const cacheDownlevelPath = cachingDisabled ? undefined : findCachePath('angular-build-dl');
 
 /**
  * @experimental Direct usage of this type is considered experimental.
@@ -92,7 +77,6 @@ export type BrowserBuilderOutput = json.JsonObject &
 async function initialize(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  differentialLoadingNeeded: boolean,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
 ): Promise<{
   config: webpack.Configuration;
@@ -106,20 +90,15 @@ async function initialize(
   const adjustedOptions = options.watch ? options : { ...options, assets: [] };
 
   const { config, projectRoot, projectSourceRoot, i18n } =
-    await generateI18nBrowserWebpackConfigFromContext(
-      adjustedOptions,
-      context,
-      (wco) => [
-        getCommonConfig(wco),
-        getBrowserConfig(wco),
-        getStylesConfig(wco),
-        getStatsConfig(wco),
-        getAnalyticsConfig(wco, context),
-        getTypeScriptConfig(wco),
-        wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
-      ],
-      { differentialLoadingNeeded },
-    );
+    await generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
+      getCommonConfig(wco),
+      getBrowserConfig(wco),
+      getStylesConfig(wco),
+      getStatsConfig(wco),
+      getAnalyticsConfig(wco, context),
+      getTypeScriptConfig(wco),
+      wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
+    ]);
 
   // Validate asset option values if processed directly
   if (options.assets?.length && !adjustedOptions.assets?.length) {
@@ -185,33 +164,18 @@ export function buildWebpackBrowser(
       const { options: compilerOptions } = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = compilerOptions.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
-      const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
 
       checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
 
       return {
-        ...(await initialize(
-          options,
-          context,
-          isDifferentialLoadingNeeded,
-          transforms.webpackConfiguration,
-        )),
+        ...(await initialize(options, context, transforms.webpackConfiguration)),
         buildBrowserFeatures,
-        isDifferentialLoadingNeeded,
         target,
       };
     }),
     switchMap(
       // eslint-disable-next-line max-lines-per-function
-      ({
-        config,
-        projectRoot,
-        projectSourceRoot,
-        i18n,
-        buildBrowserFeatures,
-        isDifferentialLoadingNeeded,
-        target,
-      }) => {
+      ({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, target }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
 
         return runWebpack(config, context, {
@@ -258,338 +222,38 @@ export function buildWebpackBrowser(
 
               return { success };
             } else {
-              const processResults: ProcessBundleResult[] = [];
-              const bundleInfoStats: BundleStats[] = [];
               outputPaths = ensureOutputPaths(baseOutputPath, i18n);
 
-              let noModuleFiles: EmittedFiles[] | undefined;
               let moduleFiles: EmittedFiles[] | undefined;
-              let files: EmittedFiles[] | undefined;
 
               const scriptsEntryPointName = normalizeExtraEntryPoints(
                 options.scripts || [],
                 'scripts',
               ).map((x) => x.bundleName);
 
-              if (isDifferentialLoadingNeeded && options.watch) {
-                moduleFiles = emittedFiles;
-                files = moduleFiles.filter(
-                  (x) =>
-                    x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)),
+              const files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
+              const noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
+              if (i18n.shouldInline) {
+                const success = await i18nInlineEmittedFiles(
+                  context,
+                  emittedFiles,
+                  i18n,
+                  baseOutputPath,
+                  Array.from(outputPaths.values()),
+                  scriptsEntryPointName,
+                  webpackOutputPath,
+                  target <= ScriptTarget.ES5,
+                  options.i18nMissingTranslation,
                 );
-                if (i18n.shouldInline) {
-                  const success = await i18nInlineEmittedFiles(
-                    context,
-                    emittedFiles,
-                    i18n,
-                    baseOutputPath,
-                    Array.from(outputPaths.values()),
-                    scriptsEntryPointName,
-                    webpackOutputPath,
-                    target <= ScriptTarget.ES5,
-                    options.i18nMissingTranslation,
-                  );
-                  if (!success) {
-                    return { success: false };
-                  }
-                }
-              } else if (isDifferentialLoadingNeeded) {
-                moduleFiles = [];
-                noModuleFiles = [];
-
-                // Common options for all bundle process actions
-                const sourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
-                const actionOptions: Partial<ProcessBundleOptions> = {
-                  optimize: normalizedOptimization.scripts,
-                  sourceMaps: sourceMapOptions.scripts,
-                  hiddenSourceMaps: sourceMapOptions.hidden,
-                  vendorSourceMaps: sourceMapOptions.vendor,
-                  integrityAlgorithm: options.subresourceIntegrity ? 'sha384' : undefined,
-                };
-
-                let mainChunkId;
-                const actions: ProcessBundleOptions[] = [];
-                let workerReplacements: [string, string][] | undefined;
-                const seen = new Set<string>();
-                for (const file of emittedFiles) {
-                  // Assets are not processed nor injected into the index
-                  if (file.asset) {
-                    // WorkerPlugin adds worker files to assets
-                    if (file.file.endsWith('.worker.js')) {
-                      if (!workerReplacements) {
-                        workerReplacements = [];
-                      }
-                      workerReplacements.push([
-                        file.file,
-                        file.file.replace(/\-(es20\d{2}|esnext)/, '-es5'),
-                      ]);
-                    } else {
-                      continue;
-                    }
-                  }
-
-                  // Scripts and non-javascript files are not processed
-                  if (
-                    file.extension !== '.js' ||
-                    (file.name && scriptsEntryPointName.includes(file.name))
-                  ) {
-                    if (files === undefined) {
-                      files = [];
-                    }
-                    files.push(file);
-                    continue;
-                  }
-
-                  // Ignore already processed files; emittedFiles can contain duplicates
-                  if (seen.has(file.file)) {
-                    continue;
-                  }
-                  seen.add(file.file);
-
-                  if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    mainChunkId = file.id!.toString();
-                  }
-
-                  // All files at this point except ES5 polyfills are module scripts
-                  const es5Polyfills = file.file.startsWith('polyfills-es5');
-                  if (!es5Polyfills) {
-                    moduleFiles.push(file);
-                  }
-
-                  // Retrieve the content/map for the file
-                  // NOTE: Additional future optimizations will read directly from memory
-                  let filename = path.join(webpackOutputPath, file.file);
-                  const code = fs.readFileSync(filename, 'utf8');
-                  let map;
-                  if (actionOptions.sourceMaps) {
-                    try {
-                      map = fs.readFileSync(filename + '.map', 'utf8');
-                      if (es5Polyfills) {
-                        fs.unlinkSync(filename + '.map');
-                      }
-                    } catch {}
-                  }
-
-                  if (es5Polyfills) {
-                    fs.unlinkSync(filename);
-                    filename = filename.replace(/\-es20\d{2}/, '');
-                  }
-
-                  const es2015Polyfills = file.file.startsWith('polyfills-es20');
-
-                  // Record the bundle processing action
-                  // The runtime chunk gets special processing for lazy loaded files
-                  actions.push({
-                    ...actionOptions,
-                    filename,
-                    code,
-                    map,
-                    // id is always present for non-assets
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    name: file.id!,
-                    runtime: file.file.startsWith('runtime'),
-                    ignoreOriginal: es5Polyfills,
-                    optimizeOnly: es2015Polyfills,
-                  });
-
-                  // ES2015 polyfills are only optimized; optimization check was performed above
-                  if (es2015Polyfills) {
-                    continue;
-                  }
-
-                  // Add the newly created ES5 bundles to the index as nomodule scripts
-                  const newFilename = es5Polyfills
-                    ? file.file.replace(/\-es20\d{2}/, '')
-                    : file.file.replace(/\-(es20\d{2}|esnext)/, '-es5');
-                  noModuleFiles.push({ ...file, file: newFilename });
-                }
-
-                const processActions: typeof actions = [];
-                let processRuntimeAction: ProcessBundleOptions | undefined;
-                for (const action of actions) {
-                  // If SRI is enabled always process the runtime bundle
-                  // Lazy route integrity values are stored in the runtime bundle
-                  if (action.integrityAlgorithm && action.runtime) {
-                    processRuntimeAction = action;
-                  } else {
-                    processActions.push({ replacements: workerReplacements, ...action });
-                  }
-                }
-
-                const executor = new BundleActionExecutor(
-                  { cachePath: cacheDownlevelPath, i18n },
-                  options.subresourceIntegrity ? 'sha384' : undefined,
-                );
-
-                // Execute the bundle processing actions
-                try {
-                  spinner.start('Generating ES5 bundles for differential loading...');
-                  for await (const result of executor.processAll(processActions)) {
-                    processResults.push(result);
-                  }
-
-                  // Runtime must be processed after all other files
-                  if (processRuntimeAction) {
-                    const runtimeOptions = {
-                      ...processRuntimeAction,
-                      runtimeData: processResults,
-                      supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
-                    };
-                    processResults.push(
-                      await import('../utils/process-bundle').then((m) =>
-                        m.process(runtimeOptions),
-                      ),
-                    );
-                  }
-
-                  spinner.succeed('ES5 bundle generation complete.');
-
-                  if (i18n.shouldInline) {
-                    spinner.start('Generating localized bundles...');
-                    const inlineActions: InlineOptions[] = [];
-                    const processedFiles = new Set<string>();
-                    for (const result of processResults) {
-                      if (result.original) {
-                        inlineActions.push({
-                          filename: path.basename(result.original.filename),
-                          code: fs.readFileSync(result.original.filename, 'utf8'),
-                          map:
-                            result.original.map &&
-                            fs.readFileSync(result.original.map.filename, 'utf8'),
-                          outputPath: baseOutputPath,
-                          es5: false,
-                          missingTranslation: options.i18nMissingTranslation,
-                          setLocale: result.name === mainChunkId,
-                        });
-                        processedFiles.add(result.original.filename);
-                        if (result.original.map) {
-                          processedFiles.add(result.original.map.filename);
-                        }
-                      }
-                      if (result.downlevel) {
-                        inlineActions.push({
-                          filename: path.basename(result.downlevel.filename),
-                          code: fs.readFileSync(result.downlevel.filename, 'utf8'),
-                          map:
-                            result.downlevel.map &&
-                            fs.readFileSync(result.downlevel.map.filename, 'utf8'),
-                          outputPath: baseOutputPath,
-                          es5: true,
-                          missingTranslation: options.i18nMissingTranslation,
-                          setLocale: result.name === mainChunkId,
-                        });
-                        processedFiles.add(result.downlevel.filename);
-                        if (result.downlevel.map) {
-                          processedFiles.add(result.downlevel.map.filename);
-                        }
-                      }
-                    }
-
-                    let hasErrors = false;
-                    try {
-                      for await (const result of executor.inlineAll(inlineActions)) {
-                        if (options.verbose) {
-                          context.logger.info(
-                            `Localized "${result.file}" [${result.count} translation(s)].`,
-                          );
-                        }
-                        for (const diagnostic of result.diagnostics) {
-                          spinner.stop();
-                          if (diagnostic.type === 'error') {
-                            hasErrors = true;
-                            context.logger.error(diagnostic.message);
-                          } else {
-                            context.logger.warn(diagnostic.message);
-                          }
-                          spinner.start();
-                        }
-                      }
-
-                      // Copy any non-processed files into the output locations
-                      await copyAssets(
-                        [
-                          {
-                            glob: '**/*',
-                            input: webpackOutputPath,
-                            output: '',
-                            ignore: [...processedFiles].map((f) =>
-                              path.relative(webpackOutputPath, f),
-                            ),
-                          },
-                        ],
-                        Array.from(outputPaths.values()),
-                        '',
-                      );
-                    } catch (err) {
-                      spinner.fail('Localized bundle generation failed.');
-
-                      return { success: false, error: mapErrorToMessage(err) };
-                    }
-
-                    if (hasErrors) {
-                      spinner.fail('Localized bundle generation failed.');
-                    } else {
-                      spinner.succeed('Localized bundle generation complete.');
-                    }
-
-                    if (hasErrors) {
-                      return { success: false };
-                    }
-                  }
-                } finally {
-                  executor.stop();
-                }
-                for (const result of processResults) {
-                  const chunk = webpackStats.chunks?.find(
-                    (chunk) => chunk.id?.toString() === result.name,
-                  );
-
-                  if (result.original) {
-                    bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
-                  }
-
-                  if (result.downlevel) {
-                    bundleInfoStats.push(
-                      generateBundleInfoStats(result.downlevel, chunk, 'legacy'),
-                    );
-                  }
-                }
-
-                const unprocessedChunks =
-                  webpackStats.chunks?.filter(
-                    (chunk) =>
-                      !processResults.find((result) => chunk.id?.toString() === result.name),
-                  ) || [];
-                for (const chunk of unprocessedChunks) {
-                  const asset = webpackStats.assets?.find((a) => a.name === chunk.files?.[0]);
-                  bundleInfoStats.push(generateBundleStats({ ...chunk, size: asset?.size }));
-                }
-              } else {
-                files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
-                noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
-                if (i18n.shouldInline) {
-                  const success = await i18nInlineEmittedFiles(
-                    context,
-                    emittedFiles,
-                    i18n,
-                    baseOutputPath,
-                    Array.from(outputPaths.values()),
-                    scriptsEntryPointName,
-                    webpackOutputPath,
-                    target <= ScriptTarget.ES5,
-                    options.i18nMissingTranslation,
-                  );
-                  if (!success) {
-                    return { success: false };
-                  }
+                if (!success) {
+                  return { success: false };
                 }
               }
 
               // Check for budget errors and display them to the user.
               const budgets = options.budgets;
               if (budgets?.length) {
-                const budgetFailures = checkBudgets(budgets, webpackStats, processResults);
+                const budgetFailures = checkBudgets(budgets, webpackStats);
                 for (const { severity, message } of budgetFailures) {
                   switch (severity) {
                     case ThresholdSeverity.Warning:
@@ -710,7 +374,7 @@ export function buildWebpackBrowser(
                 }
               }
 
-              webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
+              webpackStatsLogger(context.logger, webpackStats, config);
 
               return { success: buildSuccess };
             }
@@ -758,21 +422,6 @@ function assertNever(input: never): never {
       4 /* tabSize */,
     )}`,
   );
-}
-
-function generateBundleInfoStats(
-  bundle: ProcessBundleFile,
-  chunk: webpack.StatsChunk | undefined,
-  chunkType: ChunkType,
-): BundleStats {
-  return generateBundleStats({
-    size: bundle.size,
-    files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
-    names: chunk?.names,
-    initial: !!chunk?.initial,
-    rendered: true,
-    chunkType,
-  });
 }
 
 function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
