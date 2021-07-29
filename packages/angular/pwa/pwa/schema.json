@@ -16,11 +16,6 @@
       "description": "The target to apply service worker to.",
       "default": "build"
     },
-    "configuration": {
-      "type": "string",
-      "description": "The configuration to apply service worker to.",
-      "default": "production"
-    },
     "title": {
       "type": "string",
       "description": "The title of the application."

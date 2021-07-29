@@ -129,6 +129,11 @@
       "version": "9999.0.0",
       "factory": "./update-12/production-default-config",
       "description": "Optional migration to update Angular CLI workspace configurations to 'production' mode by default."
+    },
+    "schematic-options-13": {
+      "version": "13.0.0",
+      "factory": "./update-13/schematic-options",
+      "description": "Remove no longer valid Angular schematic options from `angular.json`."
     }
   }
 }

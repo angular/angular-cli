@@ -101,23 +101,11 @@
       "type": "boolean",
       "default": false
     },
-    "lintFix": {
-      "type": "boolean",
-      "description": "Apply lint fixes after generating the application.",
-      "x-user-analytics": 15,
-      "x-deprecated": "Use \"ng lint --fix\" directly instead."
-    },
     "strict": {
       "description": "Creates an application with stricter bundle budgets settings.",
       "type": "boolean",
       "default": true,
       "x-user-analytics": 7
-    },
-    "legacyBrowsers": {
-      "type": "boolean",
-      "description": "Add support for legacy browsers like Internet Explorer using differential loading.",
-      "default": false,
-      "x-deprecated": "Legacy browsers support is deprecated since version 12. For more information, see https://angular.io/guide/browser-support"
     }
   },
   "required": ["name"]

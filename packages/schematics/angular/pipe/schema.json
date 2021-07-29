@@ -55,13 +55,6 @@
       "default": false,
       "description": "The declaring NgModule exports this pipe.",
       "x-user-analytics": 19
-    },
-    "lintFix": {
-      "type": "boolean",
-      "default": false,
-      "description": "Apply lint fixes after generating the pipe.",
-      "x-user-analytics": 15,
-      "x-deprecated": "Use \"ng lint --fix\" directly instead."
     }
   },
   "required": ["name"]

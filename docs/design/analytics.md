@@ -58,7 +58,6 @@ Note: There's a limit of 20 custom dimensions.
 | 12 | `Flag: --skip-tests` | `boolean` |
 | 13 | `Flag: --aot` | `boolean` |
 | 14 | `Flag: --minimal` | `boolean` |
-| 15 | `Flag: --lint-fix` | `boolean` |
 | 16 | `Flag: --optimization` | `boolean` |
 | 17 | `Flag: --routing` | `boolean` |
 | 18 | `Flag: --skip-import` | `boolean` |

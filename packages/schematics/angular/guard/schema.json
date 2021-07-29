@@ -39,12 +39,6 @@
         "$source": "projectName"
       }
     },
-    "lintFix": {
-      "type": "boolean",
-      "description": "Apply lint fixes after generating the guard.",
-      "x-user-analytics": 15,
-      "x-deprecated": "Use \"ng lint --fix\" directly instead."
-    },
     "implements": {
       "type": "array",
       "description": "Specifies which interfaces to implement.",

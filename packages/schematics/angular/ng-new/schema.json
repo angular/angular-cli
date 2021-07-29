@@ -134,12 +134,6 @@
       "default": true,
       "x-user-analytics": 7
     },
-    "legacyBrowsers": {
-      "type": "boolean",
-      "description": "Add support for legacy browsers like Internet Explorer using differential loading.",
-      "default": false,
-      "x-deprecated": "Legacy browsers support is deprecated since version 12. For more information, see https://angular.io/guide/browser-support"
-    },
     "packageManager": {
       "description": "The package manager used to install dependencies.",
       "type": "string",

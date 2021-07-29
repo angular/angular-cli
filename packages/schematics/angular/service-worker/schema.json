@@ -17,11 +17,6 @@
       "type": "string",
       "description": "The target to apply service worker to.",
       "default": "build"
-    },
-    "configuration": {
-      "type": "string",
-      "description": "The configuration to apply service worker to.",
-      "x-deprecated": "No longer has an effect."
     }
   },
   "required": ["project"]

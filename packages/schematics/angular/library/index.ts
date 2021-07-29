@@ -25,7 +25,6 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
-import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
@@ -197,7 +196,6 @@ export default function (options: LibraryOptions): Rule {
         path: sourceDir,
         project: projectName,
       }),
-      options.lintFix ? applyLintFix(sourceDir) : noop(),
       (_tree: Tree, context: SchematicContext) => {
         if (!options.skipPackageJson && !options.skipInstall) {
           context.addTask(new NodePackageInstallTask());

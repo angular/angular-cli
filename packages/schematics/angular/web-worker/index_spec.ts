@@ -19,7 +19,6 @@ describe('Web Worker Schematic', () => {
   );
   const defaultOptions: WebWorkerOptions = {
     project: 'bar',
-    target: 'build',
     name: 'app',
     snippet: true,
   };

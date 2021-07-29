@@ -63,7 +63,6 @@ export default function (options: NgNewOptions): Rule {
     skipInstall: true,
     strict: options.strict,
     minimal: options.minimal,
-    legacyBrowsers: options.legacyBrowsers || undefined,
   };
 
   return chain([
