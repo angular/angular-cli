@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
-import { BuildBrowserFeatures } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { CommonJsUsageWarnPlugin } from '../plugins';
 import { getSourceMapDevTool } from '../utils/helpers';
@@ -18,7 +16,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   const {
     crossOrigin = 'none',
     subresourceIntegrity,
-    extractLicenses,
     vendorChunk,
     commonChunk,
     allowedCommonJsDependencies,
@@ -58,8 +55,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   } else if (crossOrigin !== 'none') {
     crossOriginLoading = crossOrigin;
   }
-
-  const buildBrowserFeatures = new BuildBrowserFeatures(wco.projectRoot);
 
   return {
     devtool: false,
