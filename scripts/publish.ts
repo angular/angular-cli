@@ -10,7 +10,6 @@ import { logging, tags } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import * as semver from 'semver';
 import { packages } from '../lib/packages';
-import { wombat } from '../lib/registries';
 import build from './build';
 
 export interface PublishArgs {
@@ -128,7 +127,7 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
   }
 
   // If no registry is provided, the wombat proxy should be used.
-  const registry = args.registry ?? wombat;
+  const registry = args.registry ?? 'http://localhost:4873/';
 
   logger.info('Building...');
   await build({}, logger.createChild('build'));
