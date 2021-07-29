@@ -58,11 +58,9 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     return;
   }
 
+  const supportedAngularSemver =
+    require('../../package.json')['peerDependencies']['@angular/compiler-cli'];
   const angularVersion = new SemVer(angularPkgJson['version']);
-  const cliMajor = new SemVer(angularCliPkgJson['version']).major;
-  // e.g. CLI 8.0 supports '>=8.0.0 <9.0.0', including pre-releases (next, rcs, snapshots)
-  // of both 8 and 9.
-  const supportedAngularSemver = `^${cliMajor}.0.0-next || >=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
 
   if (!satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
     console.error(
