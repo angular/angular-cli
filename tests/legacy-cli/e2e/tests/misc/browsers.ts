@@ -14,8 +14,6 @@ export default async function () {
     throw new Error('SauceLabs is not configured.');
   }
 
-  await appendToFile('.browserslistrc', 'IE 11');
-
   // Workaround for https://github.com/angular/angular/issues/32192
   await replaceInFile('src/app/app.component.html', /class="material-icons"/g, '');
 
