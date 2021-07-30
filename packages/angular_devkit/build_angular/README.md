@@ -14,7 +14,6 @@ This package contains [Architect builders](/packages/angular_devkit/architect/RE
 | ng-packagr   | Build and package an Angular library in [Angular Package Format (APF)](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview) format using [ng-packagr](https://github.com/ng-packagr/ng-packagr). |
 | server       | Build an Angular application targeting a [Node.js](https://nodejs.org) environment.                                                                                                                                                  |
 | protractor   | **Deprecated** - Run end-to-end tests using [Protractor](https://www.protractortest.org/) framework.                                                                                                                                 |
-| tslint       | **Deprecated** - Statically analyze [TypeScript](https://www.typescriptlang.org/) files using [TSLint](https://palantir.github.io/tslint/).                                                                                          |
 
 ## Disclaimer
 

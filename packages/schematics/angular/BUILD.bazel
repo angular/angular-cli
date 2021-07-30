@@ -86,7 +86,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//jsonc-parser",
         "@npm//rxjs",
-        "@npm//tslint",
     ],
 )
 
@@ -124,7 +123,6 @@ ts_library(
         "@npm//@types/caniuse-lite",
         "@npm//jsonc-parser",
         "@npm//rxjs",
-        "@npm//tslint",
     ],
     # @external_end
 )

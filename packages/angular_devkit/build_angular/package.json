@@ -84,7 +84,6 @@
     "ng-packagr": "^12.0.0 || ^12.1.0-next",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0",
-    "tslint": "^6.1.0",
     "typescript": "~4.2.3 || ~4.3.2"
   },
   "peerDependenciesMeta": {
@@ -104,9 +103,6 @@
       "optional": true
     },
     "tailwindcss": {
-      "optional": true
-    },
-    "tslint": {
       "optional": true
     }
   }

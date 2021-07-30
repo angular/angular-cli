@@ -53,11 +53,6 @@ ts_json_schema(
 )
 
 ts_json_schema(
-    name = "tslint_schema",
-    src = "src/tslint/schema.json",
-)
-
-ts_json_schema(
     name = "ng_packagr_schema",
     src = "src/ng-packagr/schema.json",
 )
@@ -84,7 +79,6 @@ ts_library(
         "//packages/angular_devkit/build_angular:src/karma/schema.ts",
         "//packages/angular_devkit/build_angular:src/protractor/schema.ts",
         "//packages/angular_devkit/build_angular:src/server/schema.ts",
-        "//packages/angular_devkit/build_angular:src/tslint/schema.ts",
         "//packages/angular_devkit/build_angular:src/ng-packagr/schema.ts",
     ],
     data = glob(
@@ -187,7 +181,6 @@ ts_library(
         "@npm//text-table",
         "@npm//tree-kill",
         "@npm//tslib",
-        "@npm//tslint",
         "@npm//typescript",
         "@npm//webpack",
         "@npm//webpack-dev-middleware",
@@ -327,12 +320,6 @@ LARGE_SPECS = {
         "tags": ["no-remote-exec"],
         # NB: multiple shards will compete for port 4200 so limiting to 1
         "shards": 1,
-    },
-    "tslint": {
-        "extra_deps": [
-            "@npm//codelyzer",
-            "@npm//tslint",
-        ],
     },
     "server": {
         "extra_deps": [
