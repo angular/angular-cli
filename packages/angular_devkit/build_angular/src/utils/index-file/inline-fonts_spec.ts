@@ -20,7 +20,6 @@ describe('InlineFontsProcessor', () => {
 
     it('works with // protocol', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: false,
         minify: false,
       });
 
@@ -31,7 +30,6 @@ describe('InlineFontsProcessor', () => {
     it('should inline supported fonts and icons in HTML', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
         minify: false,
-        WOFFSupportNeeded: false,
       });
 
       const html = await inlineFontsProcessor.process(`
@@ -56,7 +54,6 @@ describe('InlineFontsProcessor', () => {
     it('should inline multiple fonts from a single request with minification enabled', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
         minify: true,
-        WOFFSupportNeeded: false,
       });
 
       const html = await inlineFontsProcessor.process(`
@@ -76,7 +73,6 @@ describe('InlineFontsProcessor', () => {
 
     it('works with http protocol', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: false,
         minify: false,
       });
 
@@ -84,20 +80,8 @@ describe('InlineFontsProcessor', () => {
       expect(html).toContain(`format('woff2');`);
     });
 
-    it('should include WOFF1 definitions when `WOFF1SupportNeeded` is true', async () => {
-      const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: true,
-        minify: false,
-      });
-
-      const html = await inlineFontsProcessor.process(content);
-      expect(html).toContain(`format('woff2');`);
-      expect(html).toContain(`format('woff');`);
-    });
-
     it('should remove comments and line breaks when `minifyInlinedCSS` is true', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: false,
         minify: true,
       });
 
@@ -108,7 +92,6 @@ describe('InlineFontsProcessor', () => {
 
     it('should add preconnect hint', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: true,
         minify: false,
       });
 
@@ -128,21 +111,8 @@ describe('InlineFontsProcessor', () => {
     <body></body>
   </html>`;
 
-    it('should include WOFF1 definitions when `WOFF1SupportNeeded` is true', async () => {
-      const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: true,
-        minify: false,
-      });
-
-      const html = await inlineFontsProcessor.process(content);
-      expect(html).not.toContain('href="https://use.typekit.net/plm1izr.css"');
-      expect(html).toContain(`format("woff2")`);
-      expect(html).toContain(`format("woff")`);
-    });
-
     it('should add preconnect hint', async () => {
       const inlineFontsProcessor = new InlineFontsProcessor({
-        WOFFSupportNeeded: true,
         minify: false,
       });
 

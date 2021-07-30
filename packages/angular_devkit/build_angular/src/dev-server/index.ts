@@ -328,7 +328,6 @@ export function serveWebpackBrowser(
             sri: browserOptions.subresourceIntegrity,
             postTransform: transforms.indexHtml,
             optimization: normalizeOptimization(browserOptions.optimization),
-            WOFFSupportNeeded: !buildBrowserFeatures.isFeatureSupported('woff2'),
             crossOrigin: browserOptions.crossOrigin,
             lang: locale,
           }),

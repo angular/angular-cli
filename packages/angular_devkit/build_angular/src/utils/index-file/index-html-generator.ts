@@ -36,7 +36,6 @@ export interface IndexHtmlGeneratorOptions {
   postTransform?: IndexHtmlTransform;
   crossOrigin?: CrossOriginValue;
   optimization?: NormalizedOptimizationOptions;
-  WOFFSupportNeeded: boolean;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
@@ -126,7 +125,6 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
 function inlineFontsPlugin({ options }: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
   const inlineFontsProcessor = new InlineFontsProcessor({
     minify: options.optimization?.styles.minify,
-    WOFFSupportNeeded: options.WOFFSupportNeeded,
   });
 
   return async (html) => inlineFontsProcessor.process(html);

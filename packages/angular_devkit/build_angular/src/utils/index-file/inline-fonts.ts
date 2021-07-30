@@ -20,28 +20,19 @@ const cacheFontsPath: string | undefined = cachingDisabled
   : findCachePath('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
 
-const enum UserAgent {
-  Chrome = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
-  IE = 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11. 0) like Gecko',
-}
-
 interface FontProviderDetails {
   preconnectUrl: string;
-  seperateRequestForWOFF: boolean;
 }
 
 export interface InlineFontsOptions {
   minify?: boolean;
-  WOFFSupportNeeded: boolean;
 }
 
 const SUPPORTED_PROVIDERS: Record<string, FontProviderDetails> = {
   'fonts.googleapis.com': {
-    seperateRequestForWOFF: true,
     preconnectUrl: 'https://fonts.gstatic.com',
   },
   'use.typekit.net': {
-    seperateRequestForWOFF: false,
     preconnectUrl: 'https://use.typekit.net',
   },
 };
@@ -160,8 +151,8 @@ export class InlineFontsProcessor {
     return transformedContent;
   }
 
-  private async getResponse(url: URL, userAgent: UserAgent): Promise<string> {
-    const key = `${packageVersion}|${url}|${userAgent}`;
+  private async getResponse(url: URL): Promise<string> {
+    const key = `${packageVersion}|${url}`;
 
     if (cacheFontsPath) {
       const entry = await cacache.get.info(cacheFontsPath, key);
@@ -186,7 +177,8 @@ export class InlineFontsProcessor {
             agent,
             rejectUnauthorized: false,
             headers: {
-              'user-agent': userAgent,
+              'user-agent':
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
             },
           },
           (res) => {
@@ -226,13 +218,7 @@ export class InlineFontsProcessor {
       return undefined;
     }
 
-    // The order IE -> Chrome is important as otherwise Chrome will load woff1.
-    let cssContent = '';
-    if (this.options.WOFFSupportNeeded && provider.seperateRequestForWOFF) {
-      cssContent += await this.getResponse(url, UserAgent.IE);
-    }
-
-    cssContent += await this.getResponse(url, UserAgent.Chrome);
+    let cssContent = await this.getResponse(url);
 
     if (this.options.minify) {
       cssContent = cssContent
