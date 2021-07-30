@@ -4,8 +4,6 @@
 
 ```ts
 
-import { JsonObject } from '@angular-devkit/core';
-
 // @public (undocumented)
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
     constructor(workingDirectory?: string);
@@ -60,19 +58,6 @@ export class RunSchematicTask<T> implements TaskConfigurationGenerator<RunSchema
     protected _schematic: string;
     // (undocumented)
     toConfiguration(): TaskConfiguration<RunSchematicTaskOptions<T>>;
-}
-
-// @public @deprecated (undocumented)
-export class TslintFixTask implements TaskConfigurationGenerator<TslintFixTaskOptions> {
-    constructor(config: JsonObject, options: TslintFixTaskOptionsBase);
-    constructor(options: TslintFixTaskOptionsBase);
-    constructor(path: string, options: TslintFixTaskOptionsBase);
-    // (undocumented)
-    protected _configOrPath: null | string | JsonObject;
-    // (undocumented)
-    protected _options: TslintFixTaskOptionsBase;
-    // (undocumented)
-    toConfiguration(): TaskConfiguration<TslintFixTaskOptions>;
 }
 
 // (No @packageDocumentation comment for this package)
