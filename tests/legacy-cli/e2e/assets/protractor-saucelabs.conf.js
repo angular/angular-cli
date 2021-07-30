@@ -48,15 +48,9 @@ exports.config = {
       tunnelIdentifier,
     },
     {
-      browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: "MicrosoftEdge",
+      browserName: 'MicrosoftEdge',
       platform: 'Windows 10',
-      version: "88.0",
+      version: '88.0',
       tunnelIdentifier,
     },
   ],
@@ -70,7 +64,7 @@ exports.config = {
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 30000,
-    print: function() {},
+    print: function () {},
   },
 
   onPrepare() {
@@ -80,10 +74,12 @@ exports.config = {
     require('ts-node').register({
       project: require('path').join(__dirname, './tsconfig.json'),
     });
-    jasmine.getEnv().addReporter(new SpecReporter({
-      spec: {
-        displayStacktrace: StacktraceOption.PRETTY
-      }
-    }));
+    jasmine.getEnv().addReporter(
+      new SpecReporter({
+        spec: {
+          displayStacktrace: StacktraceOption.PRETTY,
+        },
+      }),
+    );
   },
 };
