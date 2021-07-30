@@ -14,6 +14,7 @@ export const merge: DevInfraMergeConfig['merge'] = async (api) => {
       labels: [{ pattern: 'squash commits', method: 'squash' }],
     },
     claSignedLabel: 'cla: yes',
+    breakingChangeLabel: 'flag: breaking change',
     mergeReadyLabel: /^action: merge(-assistance)?/,
     caretakerNoteLabel: /(action: merge-assistance)/,
     commitMessageFixupLabel: 'commit message fixup',
