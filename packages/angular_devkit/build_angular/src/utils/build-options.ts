@@ -38,8 +38,6 @@ export interface BuildOptions {
   progress?: boolean;
   localize?: Localize;
   i18nMissingTranslation?: I18NMissingTranslation;
-  /** @deprecated since version 11.0. No longer required to disable CSS extraction for HMR.*/
-  extractCss?: boolean;
   bundleDependencies?: boolean;
   externalDependencies?: string[];
   watch?: boolean;

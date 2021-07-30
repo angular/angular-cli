@@ -41,7 +41,6 @@ describe('Browser Builder optimization level', () => {
         scripts: false,
       },
       aot: true,
-      extractCss: true,
       styles: ['src/styles.css'],
     };
 
@@ -64,7 +63,6 @@ describe('Browser Builder optimization level', () => {
         scripts: true,
       },
       aot: true,
-      extractCss: true,
       styles: ['src/styles.css'],
     };
 

@@ -46,22 +46,6 @@ describe('Browser Builder styles', () => {
         '<link rel="stylesheet" href="styles.css">' +
         '<link rel="stylesheet" href="renamed-style.css">',
     };
-    const jsMatches: { [path: string]: string } = {
-      'styles.js': '.input-style',
-      'lazy-style.js': '.lazy-style',
-      'renamed-style.js': '.pre-rename-style',
-      'renamed-lazy-style.js': '.pre-rename-lazy-style',
-    };
-    const jsIndexMatches: { [path: string]: string } = {
-      'index.html':
-        '<script src="runtime.js" defer></script>' +
-        '<script src="polyfills.js" defer></script>' +
-        '<script src="styles.js" defer></script>' +
-        '<script src="renamed-style.js" defer></script>' +
-        '<script src="vendor.js" defer></script>' +
-        '<script src="main.js" defer></script>',
-    };
-
     host.writeMultipleFiles({
       'src/string-style.css': '.string-style { color: red }',
       'src/input-style.css': '.input-style { color: red }',
@@ -70,37 +54,15 @@ describe('Browser Builder styles', () => {
       'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }',
     });
 
-    let { files } = await browserBuild(architect, host, target, { extractCss: true, styles });
+    const { files } = await browserBuild(architect, host, target, { styles });
     // Check css files were created.
     for (const cssFileName of Object.keys(cssMatches)) {
       expect(await files[cssFileName]).toMatch(cssMatches[cssFileName]);
-    }
-    // Check no js files are created.
-    for (const jsFileName of Object.keys(jsMatches)) {
-      expect(jsFileName in files).toBe(false);
     }
 
     // Check check index has styles in the right order.
     for (const cssIndexFileName of Object.keys(cssIndexMatches)) {
       expect(await files[cssIndexFileName]).toMatch(cssIndexMatches[cssIndexFileName]);
-    }
-
-    // Also test with extractCss false.
-    files = (await browserBuild(architect, host, target, { extractCss: false, styles })).files;
-
-    // Check js files were created.
-    for (const jsFileName of Object.keys(jsMatches)) {
-      expect(await files[jsFileName]).toMatch(jsMatches[jsFileName]);
-    }
-
-    // Check no css files are created.
-    for (const cssFileName of Object.keys(cssMatches)) {
-      expect(cssFileName in files).toBe(false);
-    }
-
-    // Check check index has styles in the right order.
-    for (const jsIndexFileName of Object.keys(jsIndexMatches)) {
-      expect(await files[jsIndexFileName]).toMatch(jsIndexMatches[jsIndexFileName]);
     }
   });
 
@@ -120,7 +82,7 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    await browserBuild(architect, host, target, { extractCss: true });
+    await browserBuild(architect, host, target);
   });
 
   it('supports autoprefixer with inline component styles in JIT mode', async () => {
@@ -203,7 +165,6 @@ describe('Browser Builder styles', () => {
       };
 
       const overrides = {
-        extractCss: true,
         sourceMap: true,
         styles: [`src/styles.${ext}`],
       };
@@ -240,7 +201,6 @@ describe('Browser Builder styles', () => {
       );
 
       const overrides = {
-        extractCss: true,
         styles: [{ input: `src/styles.${ext}` }],
       };
       await browserBuild(architect, host, target, overrides);
@@ -286,7 +246,6 @@ describe('Browser Builder styles', () => {
       );
 
       const overrides = {
-        extractCss: true,
         styles: [`src/styles.${ext}`],
         stylePreprocessorOptions: {
           includePaths: ['src/style-paths'],
@@ -307,7 +266,7 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    const overrides = { extractCss: true, styles: [`src/styles.scss`] };
+    const overrides = { styles: [`src/styles.scss`] };
     await browserBuild(architect, host, target, overrides);
   });
 
@@ -319,18 +278,7 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    const overrides = { extractCss: true, styles: [`src/styles.scss`] };
-    await browserBuild(architect, host, target, overrides);
-  });
-
-  it(`supports font-awesome imports without extractCss`, async () => {
-    host.writeMultipleFiles({
-      'src/styles.scss': `
-        @import "~font-awesome/css/font-awesome.css";
-      `,
-    });
-
-    const overrides = { extractCss: false, styles: [`src/styles.scss`] };
+    const overrides = { styles: [`src/styles.scss`] };
     await browserBuild(architect, host, target, overrides);
   });
 
@@ -348,7 +296,7 @@ describe('Browser Builder styles', () => {
       '.browserslistrc': 'IE 10',
     });
 
-    const overrides = { extractCss: true, optimization: false };
+    const overrides = { optimization: false };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain(tags.stripIndents`
       /* normal-comment */
@@ -367,7 +315,7 @@ describe('Browser Builder styles', () => {
         div { flex: 1 }`,
     });
 
-    const overrides = { extractCss: true, optimization: true };
+    const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain('/*! important-comment */div{flex:1}');
   });
@@ -385,7 +333,7 @@ describe('Browser Builder styles', () => {
       '.browserslistrc': 'IE 10',
     });
 
-    const overrides = { extractCss: true, optimization: true, styles: ['src/styles.scss'] };
+    const overrides = { optimization: true, styles: ['src/styles.scss'] };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain('-ms-grid-columns:100px;');
   });
@@ -410,7 +358,7 @@ describe('Browser Builder styles', () => {
         'src/assets/component-img-absolute.svg': imgSvg,
       });
 
-      let { files } = await browserBuild(architect, host, target, { aot: true, extractCss: true });
+      let { files } = await browserBuild(architect, host, target, { aot: true });
 
       // Check base paths are correctly generated.
       let styles = await files['styles.css'];
@@ -431,7 +379,6 @@ describe('Browser Builder styles', () => {
       // Check urls with deploy-url scheme are used as is.
       files = (
         await browserBuild(architect, host, target, {
-          extractCss: true,
           baseHref: '/base/',
           deployUrl: 'http://deploy.url/',
         })
@@ -445,7 +392,6 @@ describe('Browser Builder styles', () => {
       // Check urls with base-href scheme are used as is (with deploy-url).
       files = (
         await browserBuild(architect, host, target, {
-          extractCss: true,
           baseHref: 'http://base.url/',
           deployUrl: 'deploy/',
         })
@@ -458,7 +404,6 @@ describe('Browser Builder styles', () => {
       // Check urls with deploy-url and base-href scheme only use deploy-url.
       files = (
         await browserBuild(architect, host, target, {
-          extractCss: true,
           baseHref: 'http://base.url/',
           deployUrl: 'http://deploy.url/',
         })
@@ -471,7 +416,6 @@ describe('Browser Builder styles', () => {
       // Check with schemeless base-href and deploy-url flags.
       files = (
         await browserBuild(architect, host, target, {
-          extractCss: true,
           baseHref: '/base/',
           deployUrl: 'deploy/',
         })
@@ -484,7 +428,6 @@ describe('Browser Builder styles', () => {
       // Check with identical base-href and deploy-url flags.
       files = (
         await browserBuild(architect, host, target, {
-          extractCss: true,
           baseHref: '/base/',
           deployUrl: '/base/',
         })
@@ -498,7 +441,6 @@ describe('Browser Builder styles', () => {
       // Check with only base-href flag.
       files = (
         await browserBuild(architect, host, target, {
-          extractCss: true,
           baseHref: '/base/',
         })
       ).files;
@@ -516,7 +458,6 @@ describe('Browser Builder styles', () => {
     const bootstrapPath = dirname(require.resolve('bootstrap/package.json'));
 
     const overrides = {
-      extractCss: true,
       styles: [bootstrapPath + '/dist/css/bootstrap.css'],
       scripts: [bootstrapPath + '/dist/js/bootstrap.js'],
     };
@@ -526,7 +467,6 @@ describe('Browser Builder styles', () => {
 
   it(`supports bootstrap@4 with package reference`, async () => {
     const overrides = {
-      extractCss: true,
       styles: ['bootstrap/dist/css/bootstrap.css'],
       scripts: ['bootstrap/dist/js/bootstrap.js'],
     };
@@ -559,7 +499,7 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    const overrides = { extractCss: true, optimization: true };
+    const overrides = { optimization: true };
     const run = await architect.scheduleTarget(target, overrides);
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
 
@@ -584,7 +524,7 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    const overrides = { extractCss: true, optimization: true };
+    const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain('background-image:url(//cdn.com/classic-bg.jpg)');
   });
@@ -604,13 +544,12 @@ describe('Browser Builder styles', () => {
       'src/assets/fa solid-900.woff2': '',
     });
 
-    const overrides = { extractCss: true };
-    const { output } = await browserBuild(architect, host, target, overrides);
+    const { output } = await browserBuild(architect, host, target);
     expect(output.success).toBe(true);
   });
 
   extensionsWithImportSupport.forEach((ext) => {
-    it(`retains declarations order in ${ext} files with extractCss when using @import`, async () => {
+    it(`retains declarations order in ${ext} files when using @import`, async () => {
       host.writeMultipleFiles({
         [`src/styles-one.${ext}`]: tags.stripIndents`
             .one {
@@ -635,7 +574,6 @@ describe('Browser Builder styles', () => {
       });
 
       const overrides = {
-        extractCss: true,
         styles: [`src/styles-one.${ext}`, `src/styles-two.${ext}`, `src/styles-three.${ext}`],
       };
       const { files } = await browserBuild(architect, host, target, overrides);
@@ -659,7 +597,6 @@ describe('Browser Builder styles', () => {
 
       const overrides = {
         sourceMap: false,
-        extractCss: true,
         styles: [`src/styles-one.${ext}`],
       };
       const { files } = await browserBuild(architect, host, target, overrides);

@@ -161,7 +161,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     autoprefixer: true,
     stage: 3,
   });
-  const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean | undefined) => {
+  const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const optionGenerator = (loader: any) => ({
       map: inlineSourcemaps
@@ -218,15 +218,13 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     !buildOptions.sourceMap.hidden
   );
 
-  if (buildOptions.extractCss) {
-    // extract global css from js files into own css file.
-    extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
+  // extract global css from js files into own css file.
+  extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
 
-    if (!buildOptions.hmr) {
-      // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
-      // suppress empty .js files in css only entry points.
-      extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
-    }
+  if (!buildOptions.hmr) {
+    // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
+    // suppress empty .js files in css only entry points.
+    extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
 
   const postCss = require('postcss');
@@ -243,11 +241,9 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   ];
 
   const globalStyleLoaders: webpack.RuleSetUseItem[] = [
-    buildOptions.extractCss
-      ? {
-          loader: MiniCssExtractPlugin.loader,
-        }
-      : require.resolve('style-loader'),
+    {
+      loader: MiniCssExtractPlugin.loader,
+    },
     {
       loader: require.resolve('css-loader'),
       options: {
@@ -259,7 +255,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
       loader: postCssLoaderPath,
       options: {
         implementation: postCss,
-        postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
+        postcssOptions: postcssOptionsCreator(false, true),
         sourceMap: !!cssSourceMap,
       },
     },

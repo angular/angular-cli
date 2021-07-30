@@ -49,7 +49,6 @@ describe('Browser Builder styles resources output path', () => {
     // Check base paths are correctly generated.
     const overrides = {
       aot: true,
-      extractCss: true,
       resourcesOutputPath: 'out-assets',
     };
 
@@ -78,7 +77,7 @@ describe('Browser Builder styles resources output path', () => {
     writeFiles();
 
     // Check base paths are correctly generated.
-    const overrides = { aot: true, extractCss: true };
+    const overrides = { aot: true };
     const { files } = await browserBuild(architect, host, target, overrides);
     const styles = await files['styles.css'];
     const main = await files['main.js'];

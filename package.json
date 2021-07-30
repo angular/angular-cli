@@ -211,7 +211,6 @@
     "source-map-loader": "3.0.0",
     "source-map-support": "0.5.19",
     "spdx-satisfies": "^5.0.0",
-    "style-loader": "3.2.1",
     "stylus": "0.54.8",
     "stylus-loader": "6.1.0",
     "symbol-observable": "4.0.0",

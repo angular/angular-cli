@@ -2,7 +2,7 @@ import {
   writeMultipleFiles,
   deleteFile,
   expectFileToMatch,
-  replaceInFile
+  replaceInFile,
 } from '../../../utils/fs';
 import { expectToFail } from '../../../utils/utils';
 import { ng } from '../../../utils/process';
@@ -26,21 +26,29 @@ export default function () {
             background: #fff;
           }
         }
-      `})
+      `,
+  })
     .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
-      appArchitect.build.options.styles = [
-        { input: 'src/styles.styl' },
-      ];
-    }))
-    .then(() => replaceInFile('src/app/app.component.ts',
-      './app.component.css', './app.component.styl'))
-    .then(() => ng('build', '--extract-css', '--source-map', '--configuration=development'))
-    .then(() => expectFileToMatch('dist/test-project/styles.css',
-      /body\s*{\s*background-color: #00f;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/styles.css',
-      /p\s*{\s*background-color: #f00;\s*}/))
-    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""')))
-    .then(() => expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
+    .then(() =>
+      updateJsonFile('angular.json', (workspaceJson) => {
+        const appArchitect = workspaceJson.projects['test-project'].architect;
+        appArchitect.build.options.styles = [{ input: 'src/styles.styl' }];
+      }),
+    )
+    .then(() =>
+      replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.styl'),
+    )
+    .then(() => ng('build', '--source-map', '--configuration=development'))
+    .then(() =>
+      expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: #00f;\s*}/),
+    )
+    .then(() =>
+      expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: #f00;\s*}/),
+    )
+    .then(() =>
+      expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""')),
+    )
+    .then(() =>
+      expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/),
+    );
 }
