@@ -23,7 +23,6 @@ describe('Browser Builder source map', () => {
   it('works', async () => {
     const overrides = {
       sourceMap: true,
-      extractCss: true,
       styles: ['src/styles.css'],
     };
 
@@ -77,7 +76,6 @@ describe('Browser Builder source map', () => {
         styles: true,
         scripts: true,
       },
-      extractCss: true,
       styles: ['src/styles.scss'],
     };
 
@@ -98,7 +96,6 @@ describe('Browser Builder source map', () => {
         styles: true,
         scripts: false,
       },
-      extractCss: true,
       styles: ['src/styles.scss'],
     };
 
@@ -119,7 +116,6 @@ describe('Browser Builder source map', () => {
         styles: false,
         scripts: true,
       },
-      extractCss: true,
       styles: ['src/styles.scss'],
     };
 
@@ -141,7 +137,6 @@ describe('Browser Builder source map', () => {
         styles: true,
         scripts: true,
       },
-      extractCss: true,
       styles: ['src/styles.scss'],
     };
 
@@ -162,7 +157,6 @@ describe('Browser Builder source map', () => {
   it('should resolve sources to partial SCSS files', async () => {
     const overrides = {
       sourceMap: true,
-      extractCss: true,
       styles: ['src/styles.scss'],
     };
 

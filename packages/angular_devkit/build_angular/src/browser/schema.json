@@ -237,12 +237,6 @@
         }
       ]
     },
-    "extractCss": {
-      "type": "boolean",
-      "description": "Extract CSS from global styles into '.css' files instead of '.js'.",
-      "default": true,
-      "x-deprecated": "Deprecated since version 11.0. No longer required to disable CSS extraction for HMR."
-    },
     "watch": {
       "type": "boolean",
       "description": "Run build when files change.",

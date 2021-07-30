@@ -40,8 +40,6 @@ export interface BrowserBuilderOptions {
     crossOrigin?: CrossOrigin;
     deleteOutputPath?: boolean;
     deployUrl?: string;
-    // @deprecated
-    extractCss?: boolean;
     extractLicenses?: boolean;
     fileReplacements?: FileReplacement[];
     i18nMissingTranslation?: I18NMissingTranslation;

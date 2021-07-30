@@ -20,7 +20,7 @@ export default async function () {
 
   await appendToFile('src/main.ts', "import './string-script.js';");
 
-  await updateJsonFile('angular.json', configJson => {
+  await updateJsonFile('angular.json', (configJson) => {
     const appArchitect = configJson.projects['test-project'].architect;
     appArchitect.build.options.scripts = [
       { input: 'src/string-script.js' },
@@ -41,7 +41,7 @@ export default async function () {
     ];
   });
 
-  await ng('build', '--extract-css', '--configuration=development');
+  await ng('build', '--configuration=development');
 
   // files were created successfully
   await expectFileToMatch('dist/test-project/scripts.js', 'string-script');
