@@ -69,7 +69,6 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       rootDirectory: root && getSystemPath(root),
     });
     engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
-    engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
 
     if (options.optionTransforms) {
       for (const transform of options.optionTransforms) {

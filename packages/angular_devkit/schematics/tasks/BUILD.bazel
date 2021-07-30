@@ -1,4 +1,3 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -17,7 +16,6 @@ ts_library(
             "node/**/*.ts",
             "**/*_spec.ts",
             "**/*_benchmark.ts",
-            "tslint-fix/test/**/*",
         ],
     ),
     data = ["package.json"],
@@ -32,45 +30,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//ora",
         "@npm//rxjs",
-        "@npm//tslint",
         "@npm//typescript",
-    ],
-)
-
-ts_library(
-    name = "tasks_test_lib",
-    testonly = True,
-    srcs = glob(
-        include = [
-            "**/*_spec.ts",
-            "tslint-fix/test/**/*.ts",
-        ],
-        exclude = [
-            "node/**/*.ts",
-        ],
-    ),
-    data = [
-        "tslint-fix/test/collection.json",
-        "tslint-fix/test/rules/customRuleRule.js",
-    ],
-    # The attribute below is needed in g3 to turn off strict typechecking
-    # strict_checks = False,
-    deps = [
-        ":tasks",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/core/node/testing",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/testing",
-        "@npm//rxjs",
-    ],
-)
-
-jasmine_node_test(
-    name = "tasks_test",
-    srcs = [":tasks_test_lib"],
-    deps = [
-        "@npm//jasmine",
-        "@npm//source-map",
     ],
 )
