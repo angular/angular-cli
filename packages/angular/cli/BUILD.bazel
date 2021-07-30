@@ -104,7 +104,6 @@ CLI_SCHEMA_DATA = [
     "//packages/angular_devkit/build_angular:src/ng-packagr/schema.json",
     "//packages/angular_devkit/build_angular:src/protractor/schema.json",
     "//packages/angular_devkit/build_angular:src/server/schema.json",
-    "//packages/angular_devkit/build_angular:src/tslint/schema.json",
     "//packages/schematics/angular:app-shell/schema.json",
     "//packages/schematics/angular:application/schema.json",
     "//packages/schematics/angular:class/schema.json",

@@ -45,7 +45,6 @@ export default async function () {
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
-  await ng('lint');
   await ng('e2e');
   await ng('e2e', '--prod');
 

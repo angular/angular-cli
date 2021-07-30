@@ -304,7 +304,6 @@
                       "@angular-devkit/build-angular:karma",
                       "@angular-devkit/build-angular:protractor",
                       "@angular-devkit/build-angular:server",
-                      "@angular-devkit/build-angular:tslint",
                       "@angular-devkit/build-angular:ng-packagr"
                     ]
                   }
@@ -477,28 +476,6 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/server/schema.json"
-                  }
-                }
-              }
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "builder": {
-                  "const": "@angular-devkit/build-angular:tslint"
-                },
-                "defaultConfiguration": {
-                  "type": "string",
-                  "description": "A default named configuration to use when a target configuration is not provided."
-                },
-                "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/tslint/schema.json"
-                },
-                "configurations": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/tslint/schema.json"
                   }
                 }
               }
