@@ -631,7 +631,6 @@ export function buildWebpackBrowser(
                 if (options.index) {
                   spinner.start('Generating index html...');
 
-                  const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
                   const entrypoints = generateEntryPoints({
                     scripts: options.scripts ?? [],
                     styles: options.styles ?? [],
@@ -642,7 +641,6 @@ export function buildWebpackBrowser(
                     entrypoints,
                     deployUrl: options.deployUrl,
                     sri: options.subresourceIntegrity,
-                    WOFFSupportNeeded,
                     optimization: normalizedOptimization,
                     crossOrigin: options.crossOrigin,
                     postTransform: transforms.indexHtml,
