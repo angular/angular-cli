@@ -8,20 +8,12 @@
 
 import browserslist from 'browserslist';
 import { feature, features } from 'caniuse-lite';
-import * as ts from 'typescript';
 
 export class BuildBrowserFeatures {
   readonly supportedBrowsers: string[];
 
   constructor(private projectRoot: string) {
     this.supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
-  }
-
-  /**
-   * True, when one or more browsers requires ES5 support
-   */
-  isEs5SupportNeeded(): boolean {
-    return !this.isFeatureSupported('es6-module');
   }
 
   /**
