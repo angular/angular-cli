@@ -46,12 +46,7 @@ import { Spinner } from '../../utils/spinner';
 import { addError } from '../../utils/webpack-diagnostics';
 import { DedupeModuleResolvePlugin, ScriptsWebpackPlugin } from '../plugins';
 import { JavaScriptOptimizerPlugin } from '../plugins/javascript-optimizer-plugin';
-import {
-  getEsVersionForFileName,
-  getOutputHashFormat,
-  getWatchOptions,
-  normalizeExtraEntryPoints,
-} from '../utils/helpers';
+import { getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
 
 // eslint-disable-next-line max-lines-per-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
@@ -107,19 +102,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (platform !== 'server') {
-    if (buildBrowserFeatures.isEs5SupportNeeded()) {
-      const polyfillsChunkName = 'polyfills-es5';
-      entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
-
-      if (!buildOptions.aot) {
-        entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
-      }
-
-      if (buildOptions.polyfills) {
-        entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
-      }
-    }
-
     if (buildOptions.polyfills) {
       const projectPolyfills = path.resolve(root, buildOptions.polyfills);
       if (entryPoints['polyfills']) {
@@ -130,7 +112,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
 
     if (!buildOptions.aot) {
-      const jitPolyfills = path.join(__dirname, '..', 'jit-polyfills.js');
+      const jitPolyfills = 'core-js/proposals/reflect-metadata';
       if (entryPoints['polyfills']) {
         entryPoints['polyfills'].push(jitPolyfills);
       } else {
@@ -366,10 +348,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     devtool: false,
     target: [
       platform === 'server' ? 'node' : 'web',
-      tsConfig.options.target === ScriptTarget.ES5 ||
-      (platform !== 'server' && buildBrowserFeatures.isEs5SupportNeeded())
-        ? 'es5'
-        : 'es2015',
+      tsConfig.options.target === ScriptTarget.ES5 ? 'es5' : 'es2015',
     ],
     profile: buildOptions.statsJson,
     resolve: {
@@ -394,13 +373,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       clean: buildOptions.deleteOutputPath ?? true,
       path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl ?? '',
-      filename: ({ chunk }) => {
-        if (chunk?.name === 'polyfills-es5') {
-          return `polyfills-es5${hashFormat.chunk}.js`;
-        } else {
-          return `[name]${hashFormat.chunk}.js`;
-        }
-      },
+      filename: `[name]${hashFormat.chunk}.js`,
       chunkFilename: `[name]${hashFormat.chunk}.js`,
     },
     watch: buildOptions.watch,

@@ -231,8 +231,6 @@ export function buildWebpackBrowser(
                 'scripts',
               ).map((x) => x.bundleName);
 
-              const files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
-              const noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
               if (i18n.shouldInline) {
                 const success = await i18nInlineEmittedFiles(
                   context,
@@ -318,8 +316,8 @@ export function buildWebpackBrowser(
                         // i18nLocale is used when Ivy is disabled
                         lang: locale || undefined,
                         outputPath,
-                        files: mapEmittedFilesToFileInfo(files),
-                        noModuleFiles: mapEmittedFilesToFileInfo(noModuleFiles),
+                        files: mapEmittedFilesToFileInfo(emittedFiles),
+                        noModuleFiles: [],
                         moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                       });
 

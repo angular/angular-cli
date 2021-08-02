@@ -299,7 +299,6 @@ function fallbackMiddleware() {
         const alwaysServe = [
           `/${KARMA_APPLICATION_PATH}/runtime.js`,
           `/${KARMA_APPLICATION_PATH}/polyfills.js`,
-          `/${KARMA_APPLICATION_PATH}/polyfills-es5.js`,
           `/${KARMA_APPLICATION_PATH}/scripts.js`,
           `/${KARMA_APPLICATION_PATH}/styles.css`,
           `/${KARMA_APPLICATION_PATH}/vendor.js`,

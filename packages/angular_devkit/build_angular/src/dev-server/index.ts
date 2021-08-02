@@ -315,7 +315,7 @@ export function serveWebpackBrowser(
             baseHref,
             entrypoints,
             moduleEntrypoints: [],
-            noModuleEntrypoints: ['polyfills-es5'],
+            noModuleEntrypoints: [],
             deployUrl: browserOptions.deployUrl,
             sri: browserOptions.subresourceIntegrity,
             postTransform: transforms.indexHtml,

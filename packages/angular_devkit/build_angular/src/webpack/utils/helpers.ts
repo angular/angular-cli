@@ -113,7 +113,7 @@ export function getEsVersionForFileName(
 }
 
 export function isPolyfillsEntry(name: string): boolean {
-  return name === 'polyfills' || name === 'polyfills-es5';
+  return name === 'polyfills';
 }
 
 export function getWatchOptions(poll: number | undefined): Configuration['watchOptions'] {
