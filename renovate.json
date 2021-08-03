@@ -56,7 +56,8 @@
       ],
       "matchPackagePatterns": ["*"],
       "groupName": "schematics dependencies",
-      "groupSlug": "all-schematics-dependencies"
+      "groupSlug": "all-schematics-dependencies",
+      "lockFileMaintenance": { "enabled": false }
     },
     {
       "matchPaths": [
