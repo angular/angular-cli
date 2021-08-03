@@ -18,7 +18,7 @@ import {
   resolve,
 } from '@angular-devkit/core';
 import { statSync } from 'fs';
-import { AssetPattern, AssetPatternClass } from '../browser/schema';
+import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 
 export class MissingAssetSourceRootException extends BaseException {
   constructor(path: String) {

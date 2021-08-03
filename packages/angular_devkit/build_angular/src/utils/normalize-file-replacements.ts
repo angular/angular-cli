@@ -8,7 +8,7 @@
 
 import { BaseException, Path, getSystemPath, join, normalize } from '@angular-devkit/core';
 import { existsSync } from 'fs';
-import { FileReplacement } from '../browser/schema';
+import { FileReplacement } from '../builders/browser/schema';
 
 export class MissingFileReplacementException extends BaseException {
   constructor(path: String) {

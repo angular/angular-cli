@@ -14,6 +14,7 @@
     "packages/angular_devkit/schematics_cli/blank/*-files/**/*",
     "packages/angular_devkit/schematics_cli/schematic/files/**/*",
     "packages/angular_devkit/build_angular/src/*/tests/**/*",
+    "packages/angular_devkit/build_angular/src/builders/*/tests/**/*",
     "packages/angular_devkit/build_angular/src/testing/**/*",
     "packages/angular_devkit/*/test/**/*",
     "packages/schematics/*/*/*files/**/*",
