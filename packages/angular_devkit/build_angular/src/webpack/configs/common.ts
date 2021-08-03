@@ -41,7 +41,6 @@ import {
   persistentBuildCacheEnabled,
   profilingEnabled,
 } from '../../utils/environment-options';
-import { findAllNodeModules } from '../../utils/find-up';
 import { Spinner } from '../../utils/spinner';
 import { addError } from '../../utils/webpack-diagnostics';
 import { DedupeModuleResolvePlugin, ScriptsWebpackPlugin } from '../plugins';
@@ -359,13 +358,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
-      modules: [
-        // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
-        // This is important in case loaders do not get hoisted.
-        // If this file moves to another location, alter potentialNodeModules as well.
-        'node_modules',
-        ...findAllNodeModules(__dirname, projectRoot),
-      ],
     },
     context: root,
     entry: entryPoints,
