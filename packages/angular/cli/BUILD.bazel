@@ -96,14 +96,14 @@ ts_library(
 )
 
 CLI_SCHEMA_DATA = [
-    "//packages/angular_devkit/build_angular:src/app-shell/schema.json",
-    "//packages/angular_devkit/build_angular:src/browser/schema.json",
-    "//packages/angular_devkit/build_angular:src/dev-server/schema.json",
-    "//packages/angular_devkit/build_angular:src/extract-i18n/schema.json",
-    "//packages/angular_devkit/build_angular:src/karma/schema.json",
-    "//packages/angular_devkit/build_angular:src/ng-packagr/schema.json",
-    "//packages/angular_devkit/build_angular:src/protractor/schema.json",
-    "//packages/angular_devkit/build_angular:src/server/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/browser/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/extract-i18n/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/karma/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/ng-packagr/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/protractor/schema.json",
+    "//packages/angular_devkit/build_angular:src/builders/server/schema.json",
     "//packages/schematics/angular:app-shell/schema.json",
     "//packages/schematics/angular:application/schema.json",
     "//packages/schematics/angular:class/schema.json",

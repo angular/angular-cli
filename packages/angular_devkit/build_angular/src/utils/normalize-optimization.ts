@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { FontsClass, OptimizationClass, OptimizationUnion, StylesClass } from '../browser/schema';
+import {
+  FontsClass,
+  OptimizationClass,
+  OptimizationUnion,
+  StylesClass,
+} from '../builders/browser/schema';
 
 export type NormalizedOptimizationOptions = Required<
   Omit<OptimizationClass, 'fonts' | 'styles'>

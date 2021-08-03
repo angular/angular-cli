@@ -19,42 +19,42 @@ package(default_visibility = ["//visibility:public"])
 
 ts_json_schema(
     name = "app_shell_schema",
-    src = "src/app-shell/schema.json",
+    src = "src/builders/app-shell/schema.json",
 )
 
 ts_json_schema(
     name = "browser_schema",
-    src = "src/browser/schema.json",
+    src = "src/builders/browser/schema.json",
 )
 
 ts_json_schema(
     name = "dev_server_schema",
-    src = "src/dev-server/schema.json",
+    src = "src/builders/dev-server/schema.json",
 )
 
 ts_json_schema(
     name = "extract_i18n_schema",
-    src = "src/extract-i18n/schema.json",
+    src = "src/builders/extract-i18n/schema.json",
 )
 
 ts_json_schema(
     name = "karma_schema",
-    src = "src/karma/schema.json",
+    src = "src/builders/karma/schema.json",
 )
 
 ts_json_schema(
     name = "protractor_schema",
-    src = "src/protractor/schema.json",
+    src = "src/builders/protractor/schema.json",
 )
 
 ts_json_schema(
     name = "server_schema",
-    src = "src/server/schema.json",
+    src = "src/builders/server/schema.json",
 )
 
 ts_json_schema(
     name = "ng_packagr_schema",
-    src = "src/ng-packagr/schema.json",
+    src = "src/builders/ng-packagr/schema.json",
 )
 
 ts_library(
@@ -72,14 +72,14 @@ ts_library(
             "src/testing/**/*.ts",
         ],
     ) + [
-        "//packages/angular_devkit/build_angular:src/app-shell/schema.ts",
-        "//packages/angular_devkit/build_angular:src/browser/schema.ts",
-        "//packages/angular_devkit/build_angular:src/dev-server/schema.ts",
-        "//packages/angular_devkit/build_angular:src/extract-i18n/schema.ts",
-        "//packages/angular_devkit/build_angular:src/karma/schema.ts",
-        "//packages/angular_devkit/build_angular:src/protractor/schema.ts",
-        "//packages/angular_devkit/build_angular:src/server/schema.ts",
-        "//packages/angular_devkit/build_angular:src/ng-packagr/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/browser/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/extract-i18n/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/karma/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/protractor/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/server/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/ng-packagr/schema.ts",
     ],
     data = glob(
         include = [

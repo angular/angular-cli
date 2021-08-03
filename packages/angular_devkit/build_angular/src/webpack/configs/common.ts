@@ -29,7 +29,7 @@ import {
   WebpackOptionsNormalized,
   debug,
 } from 'webpack';
-import { AssetPatternClass } from '../../browser/schema';
+import { AssetPatternClass } from '../../builders/browser/schema';
 import { BuildBrowserFeatures } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { findCachePath } from '../../utils/cache-path';

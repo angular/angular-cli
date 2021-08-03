@@ -11,8 +11,8 @@ import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { Schema as ServerBuilderSchema } from '../server/schema';
+import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
+import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { createTranslationLoader } from './load-translations';
 

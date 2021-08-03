@@ -18,8 +18,8 @@ import {
   InlineStyleLanguage,
   Localize,
   SourceMapClass,
-} from '../browser/schema';
-import { Schema as DevServerSchema } from '../dev-server/schema';
+} from '../builders/browser/schema';
+import { Schema as DevServerSchema } from '../builders/dev-server/schema';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
 import { NormalizedOptimizationOptions } from './normalize-optimization';
 

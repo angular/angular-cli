@@ -7,7 +7,7 @@
  */
 
 import { StatsCompilation } from 'webpack';
-import { Budget, Type } from '../browser/schema';
+import { Budget, Type } from '../builders/browser/schema';
 import { ThresholdSeverity, checkBudgets } from './bundle-calculator';
 
 const KB = 1024;

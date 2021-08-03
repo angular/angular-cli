@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as webpack from 'webpack';
-import { ExtraEntryPoint } from '../../browser/schema';
+import { ExtraEntryPoint } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { BuildBrowserFeatures } from '../../utils/build-browser-features';
 import { WebpackConfigOptions } from '../../utils/build-options';

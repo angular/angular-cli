@@ -8,7 +8,7 @@
 
 import * as path from 'path';
 import { Compilation, Compiler } from 'webpack';
-import { Budget, Type } from '../../browser/schema';
+import { Budget, Type } from '../../builders/browser/schema';
 import {
   ThresholdSeverity,
   calculateThresholds,

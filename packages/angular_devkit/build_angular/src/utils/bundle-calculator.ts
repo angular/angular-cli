@@ -7,7 +7,7 @@
  */
 
 import { StatsAsset, StatsChunk, StatsCompilation } from 'webpack';
-import { Budget, Type } from '../browser/schema';
+import { Budget, Type } from '../builders/browser/schema';
 import { formatSize } from '../webpack/utils/stats';
 
 interface Size {

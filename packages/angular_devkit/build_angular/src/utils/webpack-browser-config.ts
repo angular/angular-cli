@@ -11,7 +11,7 @@ import { getSystemPath, logging, normalize, resolve } from '@angular-devkit/core
 import * as path from 'path';
 import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
-import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { readTsconfig } from '../utils/read-tsconfig';

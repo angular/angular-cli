@@ -11,7 +11,7 @@ import {
   AssetPatternClass,
   Schema as BrowserBuilderSchema,
   SourceMapClass,
-} from '../browser/schema';
+} from '../builders/browser/schema';
 import { BuildOptions } from './build-options';
 import { normalizeAssetPatterns } from './normalize-asset-patterns';
 import {

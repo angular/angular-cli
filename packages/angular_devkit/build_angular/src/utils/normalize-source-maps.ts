@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { SourceMapClass, SourceMapUnion } from '../browser/schema';
+import { SourceMapClass, SourceMapUnion } from '../builders/browser/schema';
 
 export function normalizeSourceMaps(sourceMap: SourceMapUnion): SourceMapClass {
   const scripts = typeof sourceMap === 'object' ? sourceMap.scripts : sourceMap;

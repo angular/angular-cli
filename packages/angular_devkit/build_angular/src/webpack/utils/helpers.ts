@@ -10,7 +10,7 @@ import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import { Configuration, SourceMapDevToolPlugin } from 'webpack';
-import { ExtraEntryPoint, ExtraEntryPointClass } from '../../browser/schema';
+import { ExtraEntryPoint, ExtraEntryPointClass } from '../../builders/browser/schema';
 
 export interface HashFormat {
   chunk: string;
