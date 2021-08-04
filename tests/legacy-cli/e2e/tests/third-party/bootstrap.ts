@@ -36,7 +36,6 @@ export default function () {
         'build',
         '--configuration=development',
         '--optimization',
-
         '--output-hashing=none',
         '--vendor-chunk=false',
       ),

@@ -39,10 +39,10 @@ describe('Browser Builder crossOrigin', () => {
     expect(content).toBe(
       `<html><head><base href="/"><link rel="stylesheet" href="styles.css" crossorigin="use-credentials"></head>` +
         `<body><app-root></app-root>` +
-        `<script src="runtime.js" crossorigin="use-credentials" defer></script>` +
-        `<script src="polyfills.js" crossorigin="use-credentials" defer></script>` +
-        `<script src="vendor.js" crossorigin="use-credentials" defer></script>` +
-        `<script src="main.js" crossorigin="use-credentials" defer></script></body></html>`,
+        `<script src="runtime.js" type="module" crossorigin="use-credentials"></script>` +
+        `<script src="polyfills.js" type="module" crossorigin="use-credentials"></script>` +
+        `<script src="vendor.js" type="module" crossorigin="use-credentials"></script>` +
+        `<script src="main.js" type="module" crossorigin="use-credentials"></script></body></html>`,
     );
     await run.stop();
   });
@@ -58,10 +58,10 @@ describe('Browser Builder crossOrigin', () => {
       `<html><head><base href="/">` +
         `<link rel="stylesheet" href="styles.css" crossorigin="anonymous"></head>` +
         `<body><app-root></app-root>` +
-        `<script src="runtime.js" crossorigin="anonymous" defer></script>` +
-        `<script src="polyfills.js" crossorigin="anonymous" defer></script>` +
-        `<script src="vendor.js" crossorigin="anonymous" defer></script>` +
-        `<script src="main.js" crossorigin="anonymous" defer></script></body></html>`,
+        `<script src="runtime.js" type="module" crossorigin="anonymous"></script>` +
+        `<script src="polyfills.js" type="module" crossorigin="anonymous"></script>` +
+        `<script src="vendor.js" type="module" crossorigin="anonymous"></script>` +
+        `<script src="main.js" type="module" crossorigin="anonymous"></script></body></html>`,
     );
     await run.stop();
   });
@@ -77,10 +77,10 @@ describe('Browser Builder crossOrigin', () => {
       `<html><head><base href="/">` +
         `<link rel="stylesheet" href="styles.css"></head>` +
         `<body><app-root></app-root>` +
-        `<script src="runtime.js" defer></script>` +
-        `<script src="polyfills.js" defer></script>` +
-        `<script src="vendor.js" defer></script>` +
-        `<script src="main.js" defer></script></body></html>`,
+        `<script src="runtime.js" type="module"></script>` +
+        `<script src="polyfills.js" type="module"></script>` +
+        `<script src="vendor.js" type="module"></script>` +
+        `<script src="main.js" type="module"></script></body></html>`,
     );
     await run.stop();
   });
