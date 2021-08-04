@@ -1,58 +1,155 @@
-<a name="12.2.0-rc.0"></a>
-# 12.2.0-rc.0 (2021-07-28)
-### @angular/cli
-| Commit | Description |
-| -- | -- |
-| [259e26979](https://github.com/angular/angular-cli/commit/259e26979ebc712ee08fd36fb68a9576c1e02447) | fix(@angular/cli): merge npmrc files values |
-### @angular-devkit/build-angular
-| Commit | Description |
-| -- | -- |
-| [d750c686f](https://github.com/angular/angular-cli/commit/d750c686fd26f3ccfccb039027bd816a91279497) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns |
-### @angular-devkit/build-webpack
-| Commit | Description |
-| -- | -- |
-| [615353022](https://github.com/angular/angular-cli/commit/61535302204a2a767f85053b7efaa6ac5ac64098) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
-## Special Thanks:
-Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
+<a name="12.2.0"></a>
 
+# 12.2.0 (2021-08-04)
+
+### @angular/cli
+
+| Commit                                                                                              | Description                                                                                            |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [259e26979](https://github.com/angular/angular-cli/commit/259e26979ebc712ee08fd36fb68a9576c1e02447) | fix(@angular/cli): merge npmrc files values                                                            |
+| [c1eddbdc9](https://github.com/angular/angular-cli/commit/c1eddbdc98631fdfff287ce566d79ed43b601e0f) | fix(@angular/cli): handle `YARN_` environment variables during `ng update` and `ng add`                |
+| [6b00d1270](https://github.com/angular/angular-cli/commit/6b00d1270acaf33f32ee68c4254ce06951ddcb8c) | fix(@angular/cli): handle NPM_CONFIG environment variables during ng update and ng add                 |
+| [88ee85c41](https://github.com/angular/angular-cli/commit/88ee85c4178e37b72001e8946b70a46ba739a0b7) | fix(@angular/cli): disable update notifier when retrieving package manager version during `ng version` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                                                    |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| [d750c686f](https://github.com/angular/angular-cli/commit/d750c686fd26f3ccfccb039027bd816a91279497) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns                                               |
+| [4bcd1dc9e](https://github.com/angular/angular-cli/commit/4bcd1dc9ee744343a465d73d51d4a062964a3714) | fix(@angular-devkit/build-angular): allow classes with pure annotated static properties to be optimized                        |
+| [ceade0c27](https://github.com/angular/angular-cli/commit/ceade0c27e4b8b0e731e6ca5128fd86cf071d029) | fix(@angular-devkit/build-angular): dasherize disable-host-check suggestion                                                    |
+| [8383c6b42](https://github.com/angular/angular-cli/commit/8383c6b421f7005a25a3bff0826048f3a24f3030) | fix(@angular-devkit/build-angular): silence Sass compiler warnings from 3rd party stylesheets                                  |
+| [07763702f](https://github.com/angular/angular-cli/commit/07763702fd244ba44aebb714a295dbf5ba72b91d) | fix(@angular-devkit/build-angular): force linker `sourceMapping` option to false.                                              |
+| [a5c69722f](https://github.com/angular/angular-cli/commit/a5c69722ffeceb72dcd46901c2bb983e5dc8bf32) | fix(@angular-devkit/build-angular): ensure `NG_PERSISTENT_BUILD_CACHE` always creates a cache in the specified cache directory |
+| [c65b04999](https://github.com/angular/angular-cli/commit/c65b049996a8de9d9fcc66631872424cbe5f13f9) | fix(@angular-devkit/build-angular): fail browser build when index generation fails                                             |
+| [3d71c63b3](https://github.com/angular/angular-cli/commit/3d71c63b3a11946ebfca3f0d97d4fbf8dca16255) | fix(@angular-devkit/build-angular): fix issue were `@media all` causing critical CSS inling to fail                            |
+| [9a04975a2](https://github.com/angular/angular-cli/commit/9a04975a2170c3ecc2c09c32bd15a89c613e198f) | fix(@angular-devkit/build-angular): `extractLicenses` didn't have an effect when using server builder                          |
+| [2ac8e9c0e](https://github.com/angular/angular-cli/commit/2ac8e9c0e131bf7fcb2c6e92500eeaa112efcefb) | fix(@angular-devkit/build-angular): display incompatibility errors                                                             |
+| [2c2b49919](https://github.com/angular/angular-cli/commit/2c2b499193fb319e1c9cb92318610353b7720e2b) | fix(@angular-devkit/build-angular): limit advanced terser passes to two                                                        |
+| [1be3b0783](https://github.com/angular/angular-cli/commit/1be3b07836659487e4aa9b8c71c673635e268a60) | fix(@angular-devkit/build-angular): exclude `outputPath` from persistent build cache key                                       |
+| [fefd6d042](https://github.com/angular/angular-cli/commit/fefd6d04213e61d3f48c0484d8c6a8dcff1ecd34) | perf(@angular-devkit/build-angular): use `esbuild` as a CSS optimizer for component styles                                     |
+| [18cfa0431](https://github.com/angular/angular-cli/commit/18cfa04317230f934ccba798c080543bb389725f) | feat(@angular-devkit/build-angular): add support to inline Adobe Fonts                                                         |
+| [9a751f0f8](https://github.com/angular/angular-cli/commit/9a751f0f81919d67f5eeeaecbe807d5c216f6a7a) | fix(@angular-devkit/build-angular): handle `ENOENT` and `ENOTDIR` errors when deleting outputs                                 |
+| [41e645792](https://github.com/angular/angular-cli/commit/41e64579213b9d4a7c976ea45daa6b32d980df10) | fix(@angular-devkit/build-angular): downlevel `for await...of` when targetting ES2018+                                         |
+| [070a13364](https://github.com/angular/angular-cli/commit/070a1336478d721bbbb474622f50fab455cda26c) | fix(@angular-devkit/build-angular): configure webpack target in common configuration                                           |
+| [da32daa75](https://github.com/angular/angular-cli/commit/da32daa75d08d4be177af5fa16088398d7fb427b) | perf(@angular-devkit/build-angular): use combination of `esbuild` and `terser` as a JavaScript optimizer                       |
+| [6a2b11906](https://github.com/angular/angular-cli/commit/6a2b11906e4173562a82b3654ff662dd05513049) | perf(@angular-devkit/build-angular): cache JavaScriptOptimizerPlugin results                                                   |
+| [ab17b1721](https://github.com/angular/angular-cli/commit/ab17b1721c05366e592cf805ad6d25e672b314bf) | fix(@angular-devkit/build-angular): handle ng-packagr errors more gracefully.                                                  |
+| [d4c5f8518](https://github.com/angular/angular-cli/commit/d4c5f8518d4801b9fd76de289a015dcbb8d8f69b) | fix(@angular-devkit/build-angular): control linker template sourcemapping via builder sourcemap options                        |
+| [06181c2fb](https://github.com/angular/angular-cli/commit/06181c2fbf5a20396b2d0e2b3925ceb1276947fb) | fix(@angular-devkit/build-angular): parse web-workers in tests when webWorkerTsConfig is defined                               |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [615353022](https://github.com/angular/angular-cli/commit/61535302204a2a767f85053b7efaa6ac5ac64098) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [dbbcf5c8c](https://github.com/angular/angular-cli/commit/dbbcf5c8c4ec4427609942f4ef7053c1b51773c9) | fix(@ngtools/webpack): only track file dependencies                                  |
+| [7536338e0](https://github.com/angular/angular-cli/commit/7536338e0becc7f9cde62becbde58e18a270cb31) | fix(@ngtools/webpack): allow generated assets of Angular component resources         |
+| [720feee34](https://github.com/angular/angular-cli/commit/720feee34f910fc11c40e2f68d919d61b7d6cbec) | fix(@ngtools/webpack): avoid non-actionable template type-checker syntax diagnostics |
+| [6a7bcf330](https://github.com/angular/angular-cli/commit/6a7bcf3300b459aef80fcf98f2475c977f6244dc) | fix(@ngtools/webpack): encode component style data                                   |
+| [12c14b565](https://github.com/angular/angular-cli/commit/12c14b56537d65d6986e245ab1ae4dd9aa8dd378) | fix(@ngtools/webpack): remove no longer needed component styles workaround           |
+
+### @schematics/angular
+
+| Commit                                                                                              | Description                                                                                         |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [20fd33f6d](https://github.com/angular/angular-cli/commit/20fd33f6d4ce6cef1feb508a0221222e83a85630) | feat(@schematics/angular): destroy test module after every test                                     |
+| [5b10d4f54](https://github.com/angular/angular-cli/commit/5b10d4f549ebc12645ad08cba8ab7b91eaa87d28) | fix(@schematics/angular): remove unsafe any usage in application spec file                          |
+| [1b5e18e7b](https://github.com/angular/angular-cli/commit/1b5e18e7b401efb7ec73d99c4d77d9b29e956724) | fix(@schematics/angular): replace interactive `div` with `button` in application component template |
+| [0907b6941](https://github.com/angular/angular-cli/commit/0907b694174d6d684d965baf6cd37b87f49742e8) | fix(@schematics/angular): use stricter semver for `karma-jasmine-html-reporter`                     |
+| [8ad1539c5](https://github.com/angular/angular-cli/commit/8ad1539c5e73bad30eb6eb340379d64db208098c) | fix(@schematics/angular): add 'none' value for the 'style' option of the component schematic        |
+| [e5ba29c7d](https://github.com/angular/angular-cli/commit/e5ba29c7d54cbd83057cf23a21119ea5a3146993) | fix(@schematics/angular): display warning during migrations when using third-party builders         |
+| [a44dc02fe](https://github.com/angular/angular-cli/commit/a44dc02feecaf8735f2dc6128a5b6cc5666b4434) | fix(@schematics/angular): add devtools to ng new                                                    |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, David Scourfield, Doug Parker, hien-pham, Joey Perrott, LeonEck, Mike
+Jancar, twerske, Vaibhav Singh and originalfrostig
+
+<a name="12.2.0-rc.0"></a>
+
+# 12.2.0-rc.0 (2021-07-28)
+
+### @angular/cli
+
+| Commit                                                                                              | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [259e26979](https://github.com/angular/angular-cli/commit/259e26979ebc712ee08fd36fb68a9576c1e02447) | fix(@angular/cli): merge npmrc files values |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [d750c686f](https://github.com/angular/angular-cli/commit/d750c686fd26f3ccfccb039027bd816a91279497) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [615353022](https://github.com/angular/angular-cli/commit/61535302204a2a767f85053b7efaa6ac5ac64098) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
 
 <a name="12.1.4"></a>
+
 # 12.1.4 (2021-07-28)
+
 ### @angular/cli
-| Commit | Description |
-| -- | -- |
+
+| Commit                                                                                              | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | [e02c97dd0](https://github.com/angular/angular-cli/commit/e02c97dd09399443438b32cf1ad47fa0f7011df3) | fix(@angular/cli): merge npmrc files values |
+
 ### @schematics/angular
-| Commit | Description |
-| -- | -- |
+
+| Commit                                                                                              | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | [cfc267426](https://github.com/angular/angular-cli/commit/cfc267426716e9ecf0c9833720cb35298284f699) | fix(@schematics/angular): ensure valid SemVer range for new project Angular packages |
+
 ### @angular-devkit/build-angular
-| Commit | Description |
-| -- | -- |
+
+| Commit                                                                                              | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | [55c0bddc8](https://github.com/angular/angular-cli/commit/55c0bddc8b2425309f00733eca96c06f60f867d5) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns |
+
 ### @angular-devkit/build-webpack
-| Commit | Description |
-| -- | -- |
+
+| Commit                                                                                              | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | [b3736a3c0](https://github.com/angular/angular-cli/commit/b3736a3c09f39f5ee5dc12d98535fe4b6803ea3b) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
+
 ## Special Thanks:
+
 Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
 
-
 <a name="12.2.0-next.3"></a>
-# 12.2.0-next.3 (2021-07-21)
-### @angular/cli
-| Commit | Description |
-| -- | -- |
-| [c1eddbdc9](https://github.com/angular/angular-cli/commit/c1eddbdc98631fdfff287ce566d79ed43b601e0f) | fix(@angular/cli): handle `YARN_` environment variables during `ng update` and `ng add` |
-| [6b00d1270](https://github.com/angular/angular-cli/commit/6b00d1270acaf33f32ee68c4254ce06951ddcb8c) | fix(@angular/cli): handle NPM_CONFIG environment variables during ng update and ng add |
-### @angular-devkit/build-angular
-| Commit | Description |
-| -- | -- |
-| [4bcd1dc9e](https://github.com/angular/angular-cli/commit/4bcd1dc9ee744343a465d73d51d4a062964a3714) | fix(@angular-devkit/build-angular): allow classes with pure annotated static properties to be optimized |
-| [ceade0c27](https://github.com/angular/angular-cli/commit/ceade0c27e4b8b0e731e6ca5128fd86cf071d029) | fix(@angular-devkit/build-angular): dasherize disable-host-check suggestion |
-## Special Thanks:
-Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
+# 12.2.0-next.3 (2021-07-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Description                                                                             |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [c1eddbdc9](https://github.com/angular/angular-cli/commit/c1eddbdc98631fdfff287ce566d79ed43b601e0f) | fix(@angular/cli): handle `YARN_` environment variables during `ng update` and `ng add` |
+| [6b00d1270](https://github.com/angular/angular-cli/commit/6b00d1270acaf33f32ee68c4254ce06951ddcb8c) | fix(@angular/cli): handle NPM_CONFIG environment variables during ng update and ng add  |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [4bcd1dc9e](https://github.com/angular/angular-cli/commit/4bcd1dc9ee744343a465d73d51d4a062964a3714) | fix(@angular-devkit/build-angular): allow classes with pure annotated static properties to be optimized |
+| [ceade0c27](https://github.com/angular/angular-cli/commit/ceade0c27e4b8b0e731e6ca5128fd86cf071d029) | fix(@angular-devkit/build-angular): dasherize disable-host-check suggestion                             |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
 <a name="12.1.3"></a>
 
