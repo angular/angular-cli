@@ -27,7 +27,7 @@ export default async function () {
 
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  const bootstrapRegExp = /bootstrapModule\(.?[a-zA-Z]+\)\./;
+  const bootstrapRegExp = /bootstrapModule\([a-zA-Z]+[0-9]*\)\./;
 
   await ng('build');
   await expectFileToExist(join(process.cwd(), 'dist'));
