@@ -14,7 +14,10 @@ export default async function () {
   // files were created successfully
   await expectFileToMatch('dist/test-project/polyfills.js', 'core-js/proposals/reflect-metadata');
   await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
-  await expectFileToMatch('dist/test-project/index.html', '<script src="polyfills.js" defer>');
+  await expectFileToMatch(
+    'dist/test-project/index.html',
+    '<script src="polyfills.js" type="module">',
+  );
   const jitPolyfillSize = await getFileSize('dist/test-project/polyfills.js');
 
   await ng('build', '--aot=true', '--configuration=development');
@@ -26,5 +29,8 @@ export default async function () {
     expectFileToMatch('dist/test-project/polyfills.js', 'core-js/proposals/reflect-metadata'),
   );
   await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
-  await expectFileToMatch('dist/test-project/index.html', '<script src="polyfills.js" defer>');
+  await expectFileToMatch(
+    'dist/test-project/index.html',
+    '<script src="polyfills.js" type="module">',
+  );
 }

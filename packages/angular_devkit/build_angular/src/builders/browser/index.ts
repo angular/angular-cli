@@ -172,13 +172,12 @@ export function buildWebpackBrowser(
 
       return {
         ...(await initialize(options, context, transforms.webpackConfiguration)),
-        buildBrowserFeatures,
         target,
       };
     }),
     switchMap(
       // eslint-disable-next-line max-lines-per-function
-      ({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, target }) => {
+      ({ config, projectRoot, projectSourceRoot, i18n, target }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
 
         return runWebpack(config, context, {
@@ -191,7 +190,6 @@ export function buildWebpackBrowser(
               }
             }),
         }).pipe(
-          // eslint-disable-next-line max-lines-per-function
           concatMap(async (buildEvent) => {
             const spinner = new Spinner();
             spinner.enabled = options.progress !== false;
@@ -226,8 +224,6 @@ export function buildWebpackBrowser(
               return { success };
             } else {
               outputPaths = ensureOutputPaths(baseOutputPath, i18n);
-
-              let moduleFiles: EmittedFiles[] | undefined;
 
               const scriptsEntryPointName = normalizeExtraEntryPoints(
                 options.scripts || [],
@@ -320,8 +316,6 @@ export function buildWebpackBrowser(
                         lang: locale || undefined,
                         outputPath,
                         files: mapEmittedFilesToFileInfo(emittedFiles),
-                        noModuleFiles: [],
-                        moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                       });
 
                       if (warnings.length || errors.length) {

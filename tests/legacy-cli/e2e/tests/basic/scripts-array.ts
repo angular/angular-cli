@@ -54,12 +54,12 @@ export default async function () {
   await expectFileToMatch(
     'dist/test-project/index.html',
     oneLineTrim`
-    <script src="runtime.js" defer></script>
-    <script src="polyfills.js" defer></script>
+    <script src="runtime.js" type="module"></script>
+    <script src="polyfills.js" type="module"></script>
     <script src="scripts.js" defer></script>
     <script src="renamed-script.js" defer></script>
-    <script src="vendor.js" defer></script>
-    <script src="main.js" defer></script>
+    <script src="vendor.js" type="module"></script>
+    <script src="main.js" type="module"></script>
   `,
   );
 }

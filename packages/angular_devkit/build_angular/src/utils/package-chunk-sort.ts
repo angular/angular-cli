@@ -9,36 +9,35 @@
 import { ExtraEntryPoint } from '../builders/browser/schema';
 import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 
-export function generateEntryPoints(appConfig: {
+export type EntryPointsType = [name: string, isModule: boolean];
+
+export function generateEntryPoints(options: {
   styles: ExtraEntryPoint[];
   scripts: ExtraEntryPoint[];
-}) {
+  isHMREnabled?: boolean;
+}): EntryPointsType[] {
   // Add all styles/scripts, except lazy-loaded ones.
-  const extraEntryPoints = (
-    extraEntryPoints: ExtraEntryPoint[],
-    defaultBundleName: string,
-  ): string[] => {
+  const extraEntryPoints = (extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string) => {
     const entryPoints = normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
       .filter((entry) => entry.inject)
       .map((entry) => entry.bundleName);
 
     // remove duplicates
-    return [...new Set(entryPoints)];
+    return [...new Set(entryPoints)].map<EntryPointsType>((f) => [f, false]);
   };
 
-  const entryPoints = [
-    'runtime',
-    'polyfills',
-    'sw-register',
-    ...extraEntryPoints(appConfig.styles, 'styles'),
-    ...extraEntryPoints(appConfig.scripts, 'scripts'),
-    'vendor',
-    'main',
+  const entryPoints: EntryPointsType[] = [
+    ['runtime', !options.isHMREnabled],
+    ['polyfills', true],
+    ...extraEntryPoints(options.styles, 'styles'),
+    ...extraEntryPoints(options.scripts, 'scripts'),
+    ['vendor', true],
+    ['main', true],
   ];
 
-  const duplicates = [
-    ...new Set(entryPoints.filter((x) => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x))),
-  ];
+  const duplicates = entryPoints.filter(
+    ([name]) => entryPoints[0].indexOf(name) !== entryPoints[0].lastIndexOf(name),
+  );
 
   if (duplicates.length > 0) {
     throw new Error(`Multiple bundles have been named the same: '${duplicates.join(`', '`)}'.`);

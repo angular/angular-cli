@@ -18,10 +18,7 @@ import { addError, addWarning } from '../../utils/webpack-diagnostics';
 
 export interface IndexHtmlWebpackPluginOptions
   extends IndexHtmlGeneratorOptions,
-    Omit<IndexHtmlGeneratorProcessOptions, 'files' | 'noModuleFiles' | 'moduleFiles'> {
-  noModuleEntrypoints: string[];
-  moduleEntrypoints: string[];
-}
+    Omit<IndexHtmlGeneratorProcessOptions, 'files'> {}
 
 const PLUGIN_NAME = 'index-html-webpack-plugin';
 export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
@@ -51,41 +48,25 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
     });
 
     const callback = async (assets: Record<string, unknown>) => {
-      // Get all files for selected entrypoints
       const files: FileInfo[] = [];
-      const noModuleFiles: FileInfo[] = [];
-      const moduleFiles: FileInfo[] = [];
 
       try {
-        for (const [entryName, entrypoint] of this.compilation.entrypoints) {
-          const entryFiles: FileInfo[] = entrypoint
-            ?.getFiles()
-            ?.filter((f) => !f.endsWith('.hot-update.js'))
-            .map(
-              (f: string): FileInfo => ({
-                name: entryName,
-                file: f,
-                extension: extname(f),
-              }),
-            );
+        for (const chunk of this.compilation.chunks) {
+          for (const file of chunk.files) {
+            if (file.endsWith('.hot-update.js')) {
+              continue;
+            }
 
-          if (!entryFiles) {
-            continue;
-          }
-
-          if (this.options.noModuleEntrypoints.includes(entryName)) {
-            noModuleFiles.push(...entryFiles);
-          } else if (this.options.moduleEntrypoints.includes(entryName)) {
-            moduleFiles.push(...entryFiles);
-          } else {
-            files.push(...entryFiles);
+            files.push({
+              name: chunk.name,
+              file,
+              extension: extname(file),
+            });
           }
         }
 
         const { content, warnings, errors } = await this.process({
           files,
-          noModuleFiles,
-          moduleFiles,
           outputPath: dirname(this.options.outputPath),
           baseHref: this.options.baseHref,
           lang: this.options.lang,
