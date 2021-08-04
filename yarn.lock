@@ -10818,10 +10818,10 @@ tar-stream@^2.0.0:
     inherits "^2.0.3"
     readable-stream "^3.1.1"
 
-tar@^6.0.0, tar@^6.0.2, tar@^6.1.0:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.1.tgz#4d7da4b132b334bb8c175ed1de466fe9157ea0eb"
-  integrity sha512-GG0R7yt/CQkvG4fueXDi52Zskqxe2AyRJ+Wm54yqarnBgcX3qRIWh10qLVAAN+mlPFGTfP5UxvD3Fbi11UOTUQ==
+tar@^6.0.2, tar@^6.1.0, tar@^6.1.5:
+  version "6.1.5"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.5.tgz#6e25bee1cfda94317aedc3f5d49290ae68361d73"
+  integrity sha512-FiK6MQyyaqd5vHuUjbg/NpO8BuEGeSXcmlH7Pt/JkugWS8s0w8nKybWjHDJiwzCAIKZ66uof4ghm4tBADjcqRA==
   dependencies:
     chownr "^2.0.0"
     fs-minipass "^2.0.0"
