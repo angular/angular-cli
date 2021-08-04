@@ -107,6 +107,7 @@ function _createPromptProvider(): schema.PromptProvider {
   };
 }
 
+// eslint-disable-next-line max-lines-per-function
 export async function main({
   args,
   stdout = process.stdout,
@@ -141,8 +142,10 @@ export async function main({
   const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
   /** Gather the arguments for later use. */
-  const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
-  const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
+  const debugPresent = argv['debug'] !== null;
+  const debug = debugPresent ? !!argv['debug'] : isLocalCollection;
+  const dryRunPresent = argv['dry-run'] !== null;
+  const dryRun = dryRunPresent ? !!argv['dry-run'] : debug;
   const force = argv['force'];
   const allowPrivate = argv['allow-private'];
 
@@ -163,6 +166,12 @@ export async function main({
     logger.info(getUsage());
 
     return 1;
+  }
+
+  if (debug) {
+    logger.info(
+      `Debug mode enabled${isLocalCollection ? ' by default for local collections' : ''}.`,
+    );
   }
 
   // Indicate to the user when nothing has been done. This is automatically set to off when there's
@@ -285,6 +294,12 @@ export async function main({
 
     if (nothingDone) {
       logger.info('Nothing to be done.');
+    } else if (dryRun) {
+      logger.info(
+        `Dry run enabled${
+          dryRunPresent ? '' : ' by default in debug mode'
+        }. No files written to disk.`,
+      );
     }
 
     return 0;
