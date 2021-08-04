@@ -1,3 +1,9 @@
+<a name="12.1.5"></a>
+# 12.1.5 (2021-08-04)
+## Special Thanks:
+Alan Agius
+
+
 <a name="12.1.4"></a>
 # 12.1.4 (2021-07-28)
 ### @angular/cli
