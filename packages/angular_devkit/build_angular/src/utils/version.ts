@@ -14,26 +14,23 @@ import { SemVer, satisfies } from 'semver';
 export function assertCompatibleAngularVersion(projectRoot: string): void | never {
   let angularCliPkgJson;
   let angularPkgJson;
-  let rxjsPkgJson;
   const resolveOptions = { paths: [projectRoot] };
 
   try {
     const angularPackagePath = require.resolve('@angular/core/package.json', resolveOptions);
-    const rxjsPackagePath = require.resolve('rxjs/package.json', resolveOptions);
 
     angularPkgJson = require(angularPackagePath);
-    rxjsPkgJson = require(rxjsPackagePath);
   } catch {
     console.error(tags.stripIndents`
-      You seem to not be depending on "@angular/core" and/or "rxjs". This is an error.
+      You seem to not be depending on "@angular/core". This is an error.
     `);
 
     process.exit(2);
   }
 
-  if (!(angularPkgJson && angularPkgJson['version'] && rxjsPkgJson && rxjsPkgJson['version'])) {
+  if (!(angularPkgJson && angularPkgJson['version'])) {
     console.error(tags.stripIndents`
-      Cannot determine versions of "@angular/core" and/or "rxjs".
+      Cannot determine versions of "@angular/core".
       This likely means your local installation is broken. Please reinstall your packages.
     `);
 
