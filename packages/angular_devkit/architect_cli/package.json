@@ -23,6 +23,6 @@
     "symbol-observable": "4.0.0"
   },
   "devDependencies": {
-    "@types/progress": "2.0.4"
+    "@types/progress": "2.0.5"
   }
 }
