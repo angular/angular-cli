@@ -96,34 +96,36 @@ export class JavaScriptOptimizerPlugin {
             }
 
             const scriptAsset = compilation.getAsset(assetName);
-
-            if (scriptAsset && !scriptAsset.info.minimized) {
-              const { source: scriptAssetSource, name } = scriptAsset;
-              let cacheItem;
-
-              if (cache) {
-                const eTag = cache.getLazyHashedEtag(scriptAssetSource);
-                cacheItem = cache.getItemCache(name, eTag);
-                const cachedOutput = await cacheItem.getPromise<
-                  { source: sources.Source } | undefined
-                >();
-
-                if (cachedOutput) {
-                  compilation.updateAsset(name, cachedOutput.source, {
-                    minimized: true,
-                  });
-                  continue;
-                }
-              }
-
-              const { source, map } = scriptAssetSource.sourceAndMap();
-              scriptsToOptimize.push({
-                name: scriptAsset.name,
-                code: typeof source === 'string' ? source : source.toString(),
-                map,
-                cacheItem,
-              });
+            // Skip assets that have already been optimized or are verbatim copies (project assets)
+            if (!scriptAsset || scriptAsset.info.minimized || scriptAsset.info.copied) {
+              continue;
             }
+
+            const { source: scriptAssetSource, name } = scriptAsset;
+            let cacheItem;
+
+            if (cache) {
+              const eTag = cache.getLazyHashedEtag(scriptAssetSource);
+              cacheItem = cache.getItemCache(name, eTag);
+              const cachedOutput = await cacheItem.getPromise<
+                { source: sources.Source } | undefined
+              >();
+
+              if (cachedOutput) {
+                compilation.updateAsset(name, cachedOutput.source, {
+                  minimized: true,
+                });
+                continue;
+              }
+            }
+
+            const { source, map } = scriptAssetSource.sourceAndMap();
+            scriptsToOptimize.push({
+              name: scriptAsset.name,
+              code: typeof source === 'string' ? source : source.toString(),
+              map,
+              cacheItem,
+            });
           }
 
           if (scriptsToOptimize.length === 0) {
