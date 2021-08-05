@@ -23,7 +23,7 @@ import { debounceTime, map, take, tap } from 'rxjs/operators';
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
 
 describe('NgPackagr Builder', () => {
-  const workspaceRoot = join(normalize(__dirname), `../../test/hello-world-lib/`);
+  const workspaceRoot = join(normalize(__dirname), `../../../test/hello-world-lib/`);
   const host = new TestProjectHost(workspaceRoot);
   let architect: Architect;
 

@@ -346,7 +346,7 @@ LARGE_SPECS = {
     ts_library(
         name = "build_angular_" + spec + "_test_lib",
         testonly = True,
-        srcs = glob(["src/" + spec + "/**/*_spec.ts"]),
+        srcs = glob(["src/builders/" + spec + "/**/*_spec.ts"]),
         tsconfig = "//:tsconfig-test.json",
         deps = [
             # Dependencies needed to compile and run the specs themselves.
