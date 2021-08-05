@@ -185,7 +185,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       );
 
       if (!confirmationResponse) {
-        if (!isTTY) {
+        if (!isTTY()) {
           this.logger.error(
             'No terminal detected. ' +
               `'--skip-confirmation' can be used to bypass installation confirmation. ` +
