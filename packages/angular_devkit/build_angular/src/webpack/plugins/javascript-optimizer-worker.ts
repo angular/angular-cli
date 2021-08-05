@@ -74,7 +74,9 @@ export default async function ({ asset, options }: OptimizeRequest) {
       partialSourcemaps.unshift(terserResult.map);
     }
 
-    partialSourcemaps.push(asset.map);
+    if (asset.map) {
+      partialSourcemaps.push(asset.map);
+    }
 
     fullSourcemap = remapping(partialSourcemaps, () => null);
   }
