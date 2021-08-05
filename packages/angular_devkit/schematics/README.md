@@ -74,10 +74,10 @@ It is impossible to create files using a `FileOperator`.
 
 The Schematics library provides multiple `Operator` factories by default that cover basic use cases:
 
-| FileOperator                     | Description                                         |
-| -------------------------------- | --------------------------------------------------- |
-| `contentTemplate<T>(options: T)` | Apply a content template (see the Template section) |
-| `pathTemplate<T>(options: T)`    | Apply a path template (see the Template section)    |
+| FileOperator                     | Description                                                          |
+| -------------------------------- | -------------------------------------------------------------------- |
+| `contentTemplate<T>(options: T)` | Apply a content template (see the [Templating](#templating) section) |
+| `pathTemplate<T>(options: T)`    | Apply a path template (see the [Templating](#templating) section)    |
 
 ## Provided Sources
 
