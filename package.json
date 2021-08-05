@@ -217,7 +217,7 @@
     "stylus": "0.54.8",
     "stylus-loader": "6.1.0",
     "symbol-observable": "4.0.0",
-    "tar": "^6.0.0",
+    "tar": "^6.1.6",
     "temp": "^0.9.0",
     "terser": "5.7.1",
     "terser-webpack-plugin": "5.1.4",
