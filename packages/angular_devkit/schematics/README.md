@@ -202,11 +202,3 @@ Additional things from this example:
 1. The files are on-disk in the same root directory as the `index.ts` and loaded into a `Tree`.
 1. Then the `template` `Rule` fills in the specified templating placeholders. For this, it only knows about the variables and functions passed to it via the options-object.
 1. Finally, the resulting `Tree`, containing the new file, is merged with the existing files of the project which the Schematic is run on.
-
-# Future Work
-
-Schematics is not done yet. Here's a list of things we are considering:
-
-- Smart defaults for Options. Having a JavaScript function for default values based on other default values.
-- Prompt for input options. This should only be prompted for the original schematics, dependencies to other schematics should not trigger another prompting.
-- Tasks for running tooling-specific jobs before and after a schematics has been scaffolded. Such tasks can involve initialize git, or npm install. A specific list of tasks should be provided by the tool, with unsupported tasks generating an error.
