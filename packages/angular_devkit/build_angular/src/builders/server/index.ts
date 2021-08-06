@@ -19,7 +19,6 @@ import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../../utils';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
 import { I18nOptions } from '../../utils/i18n-options';
 import { ensureOutputPaths } from '../../utils/output-paths';
-import { readTsconfig } from '../../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateI18nBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
 import {
@@ -62,8 +61,6 @@ export function execute(
   // Check Angular version.
   assertCompatibleAngularVersion(root);
 
-  const tsConfig = readTsconfig(options.tsConfig, root);
-  const target = tsConfig.options.target || ScriptTarget.ES5;
   const baseOutputPath = path.resolve(root, options.outputPath);
   let outputPaths: undefined | Map<string, string>;
 
@@ -91,7 +88,7 @@ export function execute(
   }
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
-    concatMap(({ config, i18n }) => {
+    concatMap(({ config, i18n, target }) => {
       return runWebpack(config, context, {
         webpackFactory: require('webpack') as typeof webpack,
         logging: (stats, config) => {
@@ -153,9 +150,10 @@ async function initialize(
 ): Promise<{
   config: webpack.Configuration;
   i18n: I18nOptions;
+  target: ScriptTarget;
 }> {
   const originalOutputPath = options.outputPath;
-  const { config, i18n } = await generateI18nBrowserWebpackConfigFromContext(
+  const { config, i18n, target } = await generateI18nBrowserWebpackConfigFromContext(
     {
       ...options,
       buildOptimizer: false,
@@ -181,5 +179,5 @@ async function initialize(
     deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
-  return { config: transformedConfig || config, i18n };
+  return { config: transformedConfig || config, i18n, target };
 }
