@@ -74,7 +74,10 @@ function canWrapProperty(propertyName: string, assignmentValue: NodePath): boole
   if (
     leadingComments?.some(
       // `@pureOrBreakMyCode` is used by closure and is present in Angular code
-      ({ value }) => value.includes('#__PURE__') || value.includes('@pureOrBreakMyCode'),
+      ({ value }) =>
+        value.includes('@__PURE__') ||
+        value.includes('#__PURE__') ||
+        value.includes('@pureOrBreakMyCode'),
     )
   ) {
     return true;
