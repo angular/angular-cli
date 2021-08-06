@@ -74,7 +74,7 @@ export function execute(
     );
   }
 
-  if (!options.bundleDependencies && tsConfig.options.enableIvy) {
+  if (!options.bundleDependencies) {
     // eslint-disable-next-line import/no-extraneous-dependencies
     const { __processed_by_ivy_ngcc__, main = '' } = require('@angular/core/package.json');
     if (
