@@ -94,7 +94,6 @@ ts_library(
     module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/build_optimizer",
         "//packages/angular_devkit/build_webpack",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",

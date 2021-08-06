@@ -7,10 +7,6 @@
  */
 
 import {
-  BuildOptimizerWebpackPlugin,
-  buildOptimizerLoaderPath,
-} from '@angular-devkit/build-optimizer';
-import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   VERSION as NG_VERSION,
@@ -301,17 +297,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     });
   }
 
-  let buildOptimizerUseRule: RuleSetRule[] = [];
-  if (buildOptions.buildOptimizer && wco.scriptTarget < ScriptTarget.ES2015) {
-    extraPlugins.push(new BuildOptimizerWebpackPlugin());
-    buildOptimizerUseRule = [
-      {
-        loader: buildOptimizerLoaderPath,
-        options: { sourceMap: scriptsSourceMap },
-      },
-    ];
-  }
-
   const extraMinimizers = [];
 
   if (scriptsOptimization) {
@@ -422,10 +407,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                 cacheDirectory: findCachePath('babel-webpack'),
                 scriptTarget: wco.scriptTarget,
                 aot: buildOptions.aot,
-                optimize: buildOptions.buildOptimizer && wco.scriptTarget >= ScriptTarget.ES2015,
+                optimize: buildOptions.buildOptimizer,
               },
             },
-            ...buildOptimizerUseRule,
           ],
         },
         ...extraRules,

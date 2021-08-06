@@ -66,8 +66,7 @@ export default custom<AngularCustomOptions>(() => {
       const esTarget = scriptTarget as ScriptTarget | undefined;
       if (esTarget !== undefined) {
         if (esTarget < ScriptTarget.ES2015) {
-          // TypeScript files will have already been downlevelled
-          customOptions.forceES5 = !/\.tsx?$/.test(this.resourcePath);
+          customOptions.forceES5 = true;
         } else if (esTarget >= ScriptTarget.ES2017) {
           customOptions.forceAsyncTransformation =
             !/[\\\/][_f]?esm2015[\\\/]/.test(this.resourcePath) && source.includes('async');
