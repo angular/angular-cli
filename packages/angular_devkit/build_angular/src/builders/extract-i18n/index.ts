@@ -200,12 +200,6 @@ export async function execute(
     builderOptions,
     context,
     (wco) => {
-      if (wco.tsConfig.options.enableIvy === false) {
-        context.logger.warn(
-          'Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.',
-        );
-      }
-
       // Default value for legacy message ids is currently true
       useLegacyIds = wco.tsConfig.options.enableI18nLegacyMessageIdFormat ?? true;
 

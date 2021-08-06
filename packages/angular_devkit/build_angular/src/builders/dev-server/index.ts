@@ -27,7 +27,6 @@ import { colors } from '../../utils/color';
 import { I18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
-import { readTsconfig } from '../../utils/read-tsconfig';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   generateI18nBrowserWebpackConfigFromContext,
@@ -276,17 +275,13 @@ export function serveWebpackBrowser(
 
     // If a locale is defined, setup localization
     if (locale) {
-      // Only supported with Ivy
-      const tsConfig = readTsconfig(browserOptions.tsConfig, workspaceRoot);
-      if (tsConfig.options.enableIvy !== false) {
-        if (i18n.inlineLocales.size > 1) {
-          throw new Error(
-            'The development server only supports localizing a single locale per build.',
-          );
-        }
-
-        await setupLocalize(locale, i18n, browserOptions, webpackConfig);
+      if (i18n.inlineLocales.size > 1) {
+        throw new Error(
+          'The development server only supports localizing a single locale per build.',
+        );
       }
+
+      await setupLocalize(locale, i18n, browserOptions, webpackConfig);
     }
 
     if (transforms.webpackConfiguration) {
