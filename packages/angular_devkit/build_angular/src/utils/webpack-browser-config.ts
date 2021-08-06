@@ -9,6 +9,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { getSystemPath, logging, normalize, resolve } from '@angular-devkit/core';
 import * as path from 'path';
+import { ScriptTarget } from 'typescript';
 import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
@@ -69,12 +70,18 @@ export async function generateI18nBrowserWebpackConfigFromContext(
   projectRoot: string;
   projectSourceRoot?: string;
   i18n: I18nOptions;
+  target: ScriptTarget;
 }> {
   const { buildOptions, i18n } = await configureI18nBuild(context, options);
+  let target = ScriptTarget.ES5;
   const result = await generateBrowserWebpackConfigFromContext(
     buildOptions,
     context,
-    webpackPartialGenerator,
+    (wco) => {
+      target = wco.scriptTarget;
+
+      return webpackPartialGenerator(wco);
+    },
     extraBuildOptions,
   );
   const config = result.config;
@@ -119,7 +126,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
     });
   }
 
-  return { ...result, i18n };
+  return { ...result, i18n, target };
 }
 export async function generateBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,

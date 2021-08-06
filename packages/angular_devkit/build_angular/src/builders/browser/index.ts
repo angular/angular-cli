@@ -35,7 +35,6 @@ import {
 } from '../../utils/index-file/index-html-generator';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
-import { readTsconfig } from '../../utils/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
 import { assertCompatibleAngularVersion } from '../../utils/version';
@@ -86,13 +85,14 @@ async function initialize(
   projectRoot: string;
   projectSourceRoot?: string;
   i18n: I18nOptions;
+  target: ScriptTarget;
 }> {
   const originalOutputPath = options.outputPath;
 
   // Assets are processed directly by the builder except when watching
   const adjustedOptions = options.watch ? options : { ...options, assets: [] };
 
-  const { config, projectRoot, projectSourceRoot, i18n } =
+  const { config, projectRoot, projectSourceRoot, i18n, target } =
     await generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
       getCommonConfig(wco),
       getBrowserConfig(wco),
@@ -126,7 +126,7 @@ async function initialize(
     deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
-  return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
+  return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n, target };
 }
 
 /**
@@ -164,16 +164,11 @@ export function buildWebpackBrowser(
         ),
       );
 
-      const { options: compilerOptions } = readTsconfig(options.tsConfig, context.workspaceRoot);
-      const target = compilerOptions.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
 
       checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
 
-      return {
-        ...(await initialize(options, context, transforms.webpackConfiguration)),
-        target,
-      };
+      return initialize(options, context, transforms.webpackConfiguration);
     }),
     switchMap(
       // eslint-disable-next-line max-lines-per-function
