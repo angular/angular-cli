@@ -207,7 +207,7 @@ describe('adjust-static-class-members Babel plugin', () => {
     `);
   });
 
-  it('wraps class with pure annotated side effect fields', () => {
+  it('wraps class with pure annotated side effect fields (#__PURE__)', () => {
     testCase({
       input: `
         class CustomComponentEffects {
@@ -228,6 +228,62 @@ describe('adjust-static-class-members Babel plugin', () => {
           }
 
           CustomComponentEffects.someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
+          return CustomComponentEffects;
+        })();
+      `,
+    });
+  });
+
+  it('wraps class with pure annotated side effect fields (@__PURE__)', () => {
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        CustomComponentEffects.someFieldWithSideEffects = /*@__PURE__*/ console.log('foo');
+      `,
+      expected: `
+        let CustomComponentEffects = /*#__PURE__*/ (() => {
+          class CustomComponentEffects {
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+          }
+
+          CustomComponentEffects.someFieldWithSideEffects = /*@__PURE__*/ console.log('foo');
+          return CustomComponentEffects;
+        })();
+      `,
+    });
+  });
+
+  it('wraps class with pure annotated side effect fields (@pureOrBreakMyCode)', () => {
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        CustomComponentEffects.someFieldWithSideEffects = /**@pureOrBreakMyCode*/ console.log('foo');
+      `,
+      expected: `
+        let CustomComponentEffects = /*#__PURE__*/ (() => {
+          class CustomComponentEffects {
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+          }
+
+          CustomComponentEffects.someFieldWithSideEffects =
+            /**@pureOrBreakMyCode*/
+            console.log('foo');
           return CustomComponentEffects;
         })();
       `,
