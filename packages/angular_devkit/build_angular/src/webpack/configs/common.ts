@@ -314,9 +314,20 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   if (scriptsSourceMap || stylesSourceMap) {
     extraRules.push({
       test: /\.m?js$/,
-      exclude: vendorSourceMap ? undefined : /[\\\/]node_modules[\\\/]/,
       enforce: 'pre',
       loader: require.resolve('source-map-loader'),
+      options: {
+        filterSourceMappingUrl: (_mapUri: string, resourcePath: string) => {
+          if (vendorSourceMap) {
+            // Consume all sourcemaps when vendor option is enabled.
+            return true;
+          }
+
+          // Don't consume sourcemaps in node_modules when vendor is disabled.
+          // But, do consume local libraries sourcemaps.
+          return !resourcePath.includes('node_modules');
+        },
+      },
     });
   }
 
