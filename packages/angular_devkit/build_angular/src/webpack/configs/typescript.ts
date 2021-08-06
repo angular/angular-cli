@@ -9,6 +9,7 @@
 import { getSystemPath } from '@angular-devkit/core';
 import { CompilerOptions } from '@angular/compiler-cli';
 import { AngularWebpackLoaderPath, AngularWebpackPlugin } from '@ngtools/webpack';
+import { ScriptTarget } from 'typescript';
 import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
 
@@ -43,6 +44,13 @@ function createIvyPlugin(
 
   if (buildOptions.preserveSymlinks !== undefined) {
     compilerOptions.preserveSymlinks = buildOptions.preserveSymlinks;
+  }
+
+  // Outputting ES2015 from TypeScript is the required minimum for the build optimizer passes.
+  // Downleveling to ES5 will occur after the build optimizer passes via babel which is the same
+  // as for third-party libraries. This greatly reduces the complexity of static analysis.
+  if (wco.scriptTarget < ScriptTarget.ES2015) {
+    compilerOptions.target = ScriptTarget.ES2015;
   }
 
   const fileReplacements: Record<string, string> = {};
