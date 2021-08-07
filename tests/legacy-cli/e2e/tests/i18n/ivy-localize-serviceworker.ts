@@ -105,7 +105,7 @@ export default async function () {
         installMode: 'lazy',
         updateMode: 'prefetch',
         resources: {
-          files: ['/assets/**', '/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)'],
+          files: ['/assets/**', '/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)'],
         },
       },
     ],
