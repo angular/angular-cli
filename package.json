@@ -96,7 +96,7 @@
     "source-map-support": "^0.5.9",
     "terser": "^5.0.0",
     "tree-kill": "^1.2.1",
-    "ts-node": "10.1.0",
+    "ts-node": "10.2.0",
     "tslib": "~2.3.0",
     "tslint": "^6.0.0",
     "tsutils": "^3.0.0",
