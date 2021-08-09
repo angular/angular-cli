@@ -1,15 +1,15 @@
-/modules/aspnetcore-engine/*                           @MarkPieszak @kyliau
+/modules/aspnetcore-engine/*                           @MarkPieszak @dgp1130
 /modules/builders                                      @alan-agius4
-/modules/common/*                                      @kyliau @CaerusKaru
-/modules/express-engine/*                              @kyliau @FrozenPandaz
-/modules/hapi-engine/*                                 @kyliau @CaerusKaru
+/modules/common/*                                      @dgp1130 @CaerusKaru
+/modules/express-engine/*                              @dgp1130 @FrozenPandaz
+/modules/hapi-engine/*                                 @dgp1130 @CaerusKaru
 
 # Tooling
-/scripts/**                                        @CaerusKaru @kyliau
-/integration/**                                    @CaerusKaru @kyliau
-/tools/**                                          @CaerusKaru @kyliau
+/scripts/**                                        @CaerusKaru @dgp1130
+/integration/**                                    @CaerusKaru @dgp1130
+/tools/**                                          @CaerusKaru @dgp1130
 
 # Misc
-/*                                                 @kyliau
-/.github/**                                        @kyliau
-/modules/*                                         @kyliau
+/*                                                 @dgp1130
+/.github/**                                        @dgp1130
+/modules/*                                         @dgp1130
