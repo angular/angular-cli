@@ -22,7 +22,7 @@
       "resources": {
         "files": [
           "/assets/**",
-          "<%= resourcesOutputPath %>/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
+          "<%= resourcesOutputPath %>/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
         ]
       }
     }
