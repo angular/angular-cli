@@ -63,7 +63,7 @@ We believe that using the word "universal" is correct when referring to a JavaSc
   - [Angular for the rest of us](https://medium.com/google-developer-experts/angular-universal-for-the-rest-of-us-922ca8bac84)
   - [Angular outside the browser](http://slides.com/wassimchegham/angular2-universal#/)
 - [Jeff Cross](https://twitter.com/jeffbcross) - Evangelist and performance consultant
-- [Keen Yee Liau](https://twitter.com/liauky) and [Alex Rickabaugh](https://github.com/alxhub) - Angular Core API
+- [Douglas Parker](https://github.com/dgp1130) and [Alex Rickabaugh](https://github.com/alxhub) - Angular Core API
 
 # License
 
