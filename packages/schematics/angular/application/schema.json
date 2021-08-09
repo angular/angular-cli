@@ -33,7 +33,7 @@
       "x-user-analytics": 10
     },
     "viewEncapsulation": {
-      "description": "The view encapsulation strategy to use in the new app.",
+      "description": "The view encapsulation strategy to use in the new application.",
       "enum": ["Emulated", "None", "ShadowDom"],
       "type": "string",
       "x-user-analytics": 11
