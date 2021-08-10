@@ -7,7 +7,6 @@
  */
 
 import * as path from 'path';
-import { ScriptTarget } from 'typescript';
 import { Configuration, SourceMapDevToolPlugin } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../builders/browser/schema';
 
@@ -91,24 +90,6 @@ export function getSourceMapDevTool(
     moduleFilenameTemplate: '[resource-path]',
     append: hiddenSourceMap ? false : undefined,
   });
-}
-
-/**
- * Returns an ES version file suffix to differentiate between various builds.
- */
-export function getEsVersionForFileName(
-  scriptTarget: ScriptTarget | undefined,
-  esVersionInFileName = false,
-): string {
-  if (!esVersionInFileName || scriptTarget === undefined) {
-    return '';
-  }
-
-  if (scriptTarget === ScriptTarget.ESNext) {
-    return '-esnext';
-  }
-
-  return '-' + ScriptTarget[scriptTarget].toLowerCase();
 }
 
 export function isPolyfillsEntry(name: string): boolean {
