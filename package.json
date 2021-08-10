@@ -143,7 +143,6 @@
     "core-js": "3.16.1",
     "critters": "0.0.10",
     "css-loader": "6.2.0",
-    "css-minimizer-webpack-plugin": "3.0.2",
     "debug": "^4.1.1",
     "esbuild": "0.12.19",
     "eslint": "7.32.0",
