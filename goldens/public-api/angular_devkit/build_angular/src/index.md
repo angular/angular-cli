@@ -39,6 +39,7 @@ export interface BrowserBuilderOptions {
     commonChunk?: boolean;
     crossOrigin?: CrossOrigin;
     deleteOutputPath?: boolean;
+    // @deprecated
     deployUrl?: string;
     extractLicenses?: boolean;
     fileReplacements?: FileReplacement[];
@@ -253,6 +254,7 @@ export interface ProtractorBuilderOptions {
 export interface ServerBuilderOptions {
     bundleDependencies?: BundleDependenciesUnion;
     deleteOutputPath?: boolean;
+    // @deprecated
     deployUrl?: string;
     externalDependencies?: string[];
     extractLicenses?: boolean;
