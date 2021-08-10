@@ -12,7 +12,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { JsonObject, tags } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import * as url from 'url';
 import { runModuleAsObservableFork } from '../../utils';
@@ -171,4 +171,4 @@ export async function execute(
   }
 }
 
-export default createBuilder<JsonObject & ProtractorBuilderOptions>(execute);
+export default createBuilder<ProtractorBuilderOptions>(execute);

@@ -154,7 +154,7 @@ async function _getServerModuleBundlePath(
 }
 
 async function _appShellBuilder(
-  options: JsonObject & BuildWebpackAppShellSchema,
+  options: BuildWebpackAppShellSchema,
   context: BuilderContext,
 ): Promise<BuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
