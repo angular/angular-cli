@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import { Configuration, SourceMapDevToolPlugin } from 'webpack';
@@ -57,7 +56,7 @@ export function normalizeExtraEntryPoints(
       bundleName = entry.bundleName;
     } else if (!inject) {
       // Lazy entry points use the file name as bundle name.
-      bundleName = basename(normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')));
+      bundleName = path.parse(entry.input).name;
     } else {
       bundleName = defaultBundleName;
     }
