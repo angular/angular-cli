@@ -160,5 +160,43 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/main.js').content.not.toMatch(/\sawait\s/);
       harness.expectFile('dist/main.js').content.toContain('"for await...of"');
     });
+
+    it('allows optimizing global scripts with ES2015+ syntax when targetting ES5', async () => {
+      await harness.modifyFile('src/tsconfig.app.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        if (!tsconfig.compilerOptions) {
+          tsconfig.compilerOptions = {};
+        }
+        tsconfig.compilerOptions.target = 'es5';
+
+        return JSON.stringify(tsconfig);
+      });
+
+      // Add global script with ES2015+ syntax to the project
+      await harness.writeFile(
+        'src/es2015-syntax.js',
+        `
+          class foo {
+            bar() {
+              console.log('baz');
+            }
+          }
+
+          (new foo()).bar();
+        `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: {
+          scripts: true,
+        },
+        scripts: ['src/es2015-syntax.js'],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+    });
   });
 });

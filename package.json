@@ -216,7 +216,6 @@
     "tar": "^6.1.6",
     "temp": "^0.9.0",
     "terser": "5.7.1",
-    "terser-webpack-plugin": "5.1.4",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "ts-node": "^10.0.0",

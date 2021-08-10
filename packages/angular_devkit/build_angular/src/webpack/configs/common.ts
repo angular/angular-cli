@@ -31,9 +31,7 @@ import { WebpackConfigOptions } from '../../utils/build-options';
 import { findCachePath } from '../../utils/cache-path';
 import {
   allowMangle,
-  allowMinify,
   cachingDisabled,
-  maxWorkers,
   persistentBuildCacheEnabled,
   profilingEnabled,
 } from '../../utils/environment-options';
@@ -298,34 +296,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   const extraMinimizers = [];
-
   if (scriptsOptimization) {
-    const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
-
-    if (globalScriptsNames.length > 0) {
-      // Script bundles are fully optimized here in one step since they are never downleveled.
-      // They are shared between ES2015 & ES5 outputs so must support ES5.
-      // The `terser-webpack-plugin` will add the minified flag to the asset which will prevent
-      // additional optimizations by the next plugin.
-      const TerserPlugin = require('terser-webpack-plugin');
-      extraMinimizers.push(
-        new TerserPlugin({
-          parallel: maxWorkers,
-          extractComments: false,
-          include: globalScriptsNames,
-          terserOptions: {
-            ecma: 5,
-            compress: allowMinify,
-            output: {
-              ascii_only: true,
-              wrap_func_args: false,
-            },
-            mangle: allowMangle && platform !== 'server',
-          },
-        }),
-      );
-    }
-
     extraMinimizers.push(
       new JavaScriptOptimizerPlugin({
         define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
