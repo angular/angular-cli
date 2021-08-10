@@ -174,7 +174,6 @@ ts_library(
         "@npm//stylus",
         "@npm//stylus-loader",
         "@npm//terser",
-        "@npm//terser-webpack-plugin",
         "@npm//text-table",
         "@npm//tree-kill",
         "@npm//tslib",
