@@ -588,9 +588,6 @@ export class InvalidUpdateRecordException extends BaseException {
     constructor();
 }
 
-// @public @deprecated (undocumented)
-export function isAction(action: any): action is Action;
-
 // @public (undocumented)
 export function isContentAction(action: Action): action is CreateFileAction | OverwriteFileAction;
 

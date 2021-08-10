@@ -158,21 +158,6 @@ export function isContentAction(action: Action): action is CreateFileAction | Ov
   return action.kind == 'c' || action.kind == 'o';
 }
 
-/**
- * @deprecated since version 11.0. not used anymore can be removed in future version.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isAction(action: any): action is Action {
-  const kind = action && action.kind;
-
-  return (
-    action !== null &&
-    typeof action.id == 'number' &&
-    typeof action.path == 'string' &&
-    (kind == 'c' || kind == 'o' || kind == 'r' || kind == 'd')
-  );
-}
-
 // Create a file. If the file already exists then this is an error.
 export interface CreateFileAction extends ActionBase {
   readonly kind: 'c';
