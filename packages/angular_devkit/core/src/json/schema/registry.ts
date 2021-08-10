@@ -235,7 +235,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   }
 
   private async _flatten(schema: JsonObject): Promise<JsonObject> {
-    this._replaceDeprecatedSchemaIdKeyword(schema);
     this._ajv.removeSchema(schema);
 
     this._currentCompilationSchemaInfo = undefined;
@@ -293,8 +292,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     if (typeof schema === 'boolean') {
       return async (data) => ({ success: schema, data });
     }
-
-    this._replaceDeprecatedSchemaIdKeyword(schema);
 
     const schemaInfo: SchemaInfo = {
       smartDefaultRecord: new Map<string, JsonObject>(),
@@ -678,22 +675,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       },
       errors: false,
     });
-  }
-
-  /**
-   * Workaround to avoid a breaking change in downstream schematics.
-   * @deprecated will be removed in version 13.
-   */
-  private _replaceDeprecatedSchemaIdKeyword(schema: JsonObject): void {
-    if (typeof schema.id === 'string') {
-      schema.$id = schema.id;
-      delete schema.id;
-
-      // eslint-disable-next-line no-console
-      console.warn(
-        `"${schema.$id}" schema is using the keyword "id" which its support is deprecated. Use "$id" for schema ID.`,
-      );
-    }
   }
 
   private normalizeDataPathArr(it: SchemaObjCxt): (number | string)[] {
