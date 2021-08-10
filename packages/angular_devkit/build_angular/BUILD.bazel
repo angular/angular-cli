@@ -141,7 +141,6 @@ ts_library(
         "@npm//core-js",
         "@npm//critters",
         "@npm//css-loader",
-        "@npm//css-minimizer-webpack-plugin",
         "@npm//esbuild",
         "@npm//find-cache-dir",
         "@npm//glob",

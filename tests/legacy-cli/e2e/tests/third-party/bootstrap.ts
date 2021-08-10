@@ -41,7 +41,7 @@ export default function () {
       ),
     )
     .then(() => expectFileToMatch('dist/test-project/scripts.js', 'jQuery'))
-    .then(() => expectFileToMatch('dist/test-project/styles.css', '* Bootstrap'))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', ':root'))
     .then(() =>
       expectFileToMatch(
         'dist/test-project/index.html',
