@@ -317,4 +317,4 @@ export async function execute(
   return webpackResult;
 }
 
-export default createBuilder<JsonObject & ExtractI18nBuilderOptions>(execute);
+export default createBuilder<ExtractI18nBuilderOptions>(execute);

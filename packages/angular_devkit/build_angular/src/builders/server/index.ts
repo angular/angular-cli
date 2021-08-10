@@ -141,7 +141,7 @@ export function execute(
   );
 }
 
-export default createBuilder<json.JsonObject & ServerBuilderOptions, ServerBuilderOutput>(execute);
+export default createBuilder<ServerBuilderOptions, ServerBuilderOutput>(execute);
 
 async function initialize(
   options: ServerBuilderOptions,
