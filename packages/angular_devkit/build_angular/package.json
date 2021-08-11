@@ -17,7 +17,7 @@
     "@babel/plugin-transform-async-to-generator": "7.14.5",
     "@babel/plugin-transform-runtime": "7.15.0",
     "@babel/preset-env": "7.15.0",
-    "@babel/runtime": "7.14.8",
+    "@babel/runtime": "7.15.3",
     "@babel/template": "7.14.5",
     "@discoveryjs/json-ext": "0.5.3",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
