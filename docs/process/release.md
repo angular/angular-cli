@@ -26,7 +26,7 @@ for the release. Primary-secondary pairs are as follows:
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
-be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22PR+action%3A+merge%22+-is%3Adraft).
+be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22action%3A+merge%22+-is%3Adraft).
 This list should be checked daily and any ready PRs should be merged. For each PR, check the
 `target` label to understand where it should be merged to. You can find which branches a specific
 PR will be merged into with the `yarn ng-dev pr check-target-branches <pr>` command.
