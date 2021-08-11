@@ -88,7 +88,7 @@
     "@babel/plugin-proposal-async-generator-functions": "7.14.9",
     "@babel/plugin-transform-runtime": "7.15.0",
     "@babel/preset-env": "7.15.0",
-    "@babel/runtime": "7.14.8",
+    "@babel/runtime": "7.15.3",
     "@babel/template": "7.14.5",
     "@bazel/bazelisk": "1.10.1",
     "@bazel/buildifier": "4.0.1",
