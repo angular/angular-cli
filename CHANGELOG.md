@@ -1,3 +1,33 @@
+<a name="12.2.1"></a>
+
+# 12.2.1 (2021-08-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Description                                                                                                     |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [8dc3c895a](https://github.com/angular/angular-cli/commit/8dc3c895a6531316e672031c8d0815781f0c089a) | fix(@angular/cli): show error when using non-TTY terminal without passing `--skip-confirmation` during `ng add` |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [eded01270](https://github.com/angular/angular-cli/commit/eded01270f9aa70f6ba4806a068de8d1c0a52454) | fix(@angular-devkit/schematics-cli): log when in debug and/or dry run modes |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                              |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [22e0208a9](https://github.com/angular/angular-cli/commit/22e0208a9ee6257213b3bf93ac61a2c3d4ac9504) | fix(@angular-devkit/build-angular): ensure native async is downlevelled in third-party libraries         |
+| [9b4b86fb0](https://github.com/angular/angular-cli/commit/9b4b86fb0d9c88a3c714f5eabf925859bb7b71bb) | fix(@angular-devkit/build-angular): support both pure annotation forms for static properties             |
+| [cea028090](https://github.com/angular/angular-cli/commit/cea0280908db39308ac5fa37374b138ceb79ecea) | fix(@angular-devkit/build-angular): do not consume inline sourcemaps when vendor sourcemaps is disabled. |
+| [e7ec0346e](https://github.com/angular/angular-cli/commit/e7ec0346e69c090ded7d9ec6d3574deb79926db0) | fix(@angular-devkit/build-angular): avoid attempting to optimize copied JavaScript assets                |
+| [4f757c2bc](https://github.com/angular/angular-cli/commit/4f757c2bcf1356d33eaa86bc3b715c0a6b7c2ed8) | fix(@angular-devkit/build-angular): handle null maps in JavaScript optimizer worker                      |
+
+## Special Thanks:
+
+Alan Agius and Charles Lyding
+
 <a name="12.2.0"></a>
 
 # 12.2.0 (2021-08-04)
