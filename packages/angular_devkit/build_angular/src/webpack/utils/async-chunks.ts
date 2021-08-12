@@ -26,7 +26,7 @@ export function markAsyncChunksNonInitial(
   // depended upon in Webpack, thus any extra entry point with `inject: false`,
   // **cannot** be loaded in main bundle.
   const asyncChunkIds = extraEntryPoints
-    .filter((entryPoint) => !entryPoint.inject)
+    .filter((entryPoint) => !entryPoint.inject && entryPoints[entryPoint.bundleName])
     .flatMap((entryPoint) =>
       entryPoints[entryPoint.bundleName].chunks?.filter((n) => n !== 'runtime'),
     );
