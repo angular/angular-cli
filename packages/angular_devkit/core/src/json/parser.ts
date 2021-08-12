@@ -9,7 +9,6 @@
 /* eslint-disable no-constant-condition */
 import { BaseException } from '../exception';
 import {
-  JsonArray,
   JsonAstArray,
   JsonAstComment,
   JsonAstConstantFalse,
@@ -22,16 +21,16 @@ import {
   JsonAstNumber,
   JsonAstObject,
   JsonAstString,
-  JsonObject,
-  JsonValue,
   Position,
-} from './interface';
+} from './parser_ast';
+import { JsonArray, JsonObject, JsonValue } from './utils';
 
 export class JsonException extends BaseException {}
 
 /**
  * A character was invalid in this context.
- * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
+ * @deprecated
+ * @private
  */
 export class InvalidJsonCharacterException extends JsonException {
   invalidChar: string;
@@ -53,7 +52,8 @@ export class InvalidJsonCharacterException extends JsonException {
 
 /**
  * More input was expected, but we reached the end of the stream.
- * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
+ * @deprecated
+ * @private
  */
 export class UnexpectedEndOfInputException extends JsonException {
   constructor(_context: JsonParserContext) {

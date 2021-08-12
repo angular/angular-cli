@@ -7,7 +7,7 @@
  */
 
 import { Observable, Operator, PartialObserver, Subject, Subscription, empty } from 'rxjs';
-import { JsonObject } from '../json/interface';
+import { JsonObject } from '../json/utils';
 
 export interface LoggerMetadata extends JsonObject {
   name: string;

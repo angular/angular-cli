@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { Observer } from 'rxjs';
 import { Operator } from 'rxjs';
 import { PartialObserver } from 'rxjs';
-import { Position as Position_2 } from 'source-map';
+import { Position } from 'source-map';
 import { Subject } from 'rxjs';
 import { SubscribableOrPromise } from 'rxjs';
 import { Subscription } from 'rxjs';
@@ -530,19 +530,6 @@ class IndentLogger extends Logger {
     constructor(name: string, parent?: Logger | null, indentation?: string);
 }
 
-// @public @deprecated
-export class InvalidJsonCharacterException extends JsonException {
-    constructor(context: JsonParserContext);
-    // (undocumented)
-    character: number;
-    // (undocumented)
-    invalidChar: string;
-    // (undocumented)
-    line: number;
-    // (undocumented)
-    offset: number;
-}
-
 // @public (undocumented)
 export class InvalidPathException extends BaseException {
     constructor(path: string);
@@ -855,199 +842,21 @@ declare namespace json {
         schema,
         isJsonObject,
         isJsonArray,
-        Position,
-        JsonAstNode,
-        JsonAstNodeBase,
-        JsonAstNumber,
-        JsonAstString,
-        JsonAstIdentifier,
         JsonArray,
-        JsonAstArray,
         JsonObject,
-        JsonAstKeyValue,
-        JsonAstObject,
-        JsonAstConstantFalse,
-        JsonAstConstantNull,
-        JsonAstConstantTrue,
-        JsonAstMultilineComment,
-        JsonAstComment,
-        JsonValue,
-        parseJsonAst,
-        parseJson,
-        JsonException,
-        InvalidJsonCharacterException,
-        UnexpectedEndOfInputException,
-        PathSpecificJsonException,
-        JsonParserContext,
-        JsonParseMode,
-        ParseJsonOptions
+        JsonValue
     }
 }
 export { json }
 
-// @public (undocumented)
+// @public
 export interface JsonArray extends Array<JsonValue> {
-}
-
-// @public (undocumented)
-export interface JsonAstArray extends JsonAstNodeBase {
-    // (undocumented)
-    readonly elements: JsonAstNode[];
-    // (undocumented)
-    readonly kind: 'array';
-    // (undocumented)
-    readonly value: JsonArray;
-}
-
-// @public (undocumented)
-export interface JsonAstComment extends JsonAstNodeBase {
-    // (undocumented)
-    readonly content: string;
-    // (undocumented)
-    readonly kind: 'comment';
-}
-
-// @public (undocumented)
-export interface JsonAstConstantFalse extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'false';
-    // (undocumented)
-    readonly value: false;
-}
-
-// @public (undocumented)
-export interface JsonAstConstantNull extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'null';
-    // (undocumented)
-    readonly value: null;
-}
-
-// @public (undocumented)
-export interface JsonAstConstantTrue extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'true';
-    // (undocumented)
-    readonly value: true;
-}
-
-// @public (undocumented)
-export interface JsonAstIdentifier extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'identifier';
-    // (undocumented)
-    readonly value: string;
-}
-
-// @public (undocumented)
-export interface JsonAstKeyValue extends JsonAstNodeBase {
-    // (undocumented)
-    readonly key: JsonAstString | JsonAstIdentifier;
-    // (undocumented)
-    readonly kind: 'keyvalue';
-    // (undocumented)
-    readonly value: JsonAstNode;
-}
-
-// @public (undocumented)
-export interface JsonAstMultilineComment extends JsonAstNodeBase {
-    // (undocumented)
-    readonly content: string;
-    // (undocumented)
-    readonly kind: 'multicomment';
-}
-
-// @public (undocumented)
-export type JsonAstNode = JsonAstNumber | JsonAstString | JsonAstIdentifier | JsonAstArray | JsonAstObject | JsonAstConstantFalse | JsonAstConstantNull | JsonAstConstantTrue;
-
-// @public (undocumented)
-export interface JsonAstNodeBase {
-    // (undocumented)
-    readonly comments?: (JsonAstComment | JsonAstMultilineComment)[];
-    // (undocumented)
-    readonly end: Position;
-    // (undocumented)
-    readonly start: Position;
-    // (undocumented)
-    readonly text: string;
-}
-
-// @public (undocumented)
-export interface JsonAstNumber extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'number';
-    // (undocumented)
-    readonly value: number;
-}
-
-// @public (undocumented)
-export interface JsonAstObject extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'object';
-    // (undocumented)
-    readonly properties: JsonAstKeyValue[];
-    // (undocumented)
-    readonly value: JsonObject;
-}
-
-// @public (undocumented)
-export interface JsonAstString extends JsonAstNodeBase {
-    // (undocumented)
-    readonly kind: 'string';
-    // (undocumented)
-    readonly value: string;
-}
-
-// @public (undocumented)
-export class JsonException extends BaseException {
 }
 
 // @public (undocumented)
 export interface JsonObject {
     // (undocumented)
     [prop: string]: JsonValue;
-}
-
-// @public
-export enum JsonParseMode {
-    // (undocumented)
-    CommentsAllowed = 1,
-    // (undocumented)
-    Default = 0,
-    // (undocumented)
-    HexadecimalNumberAllowed = 16,
-    // (undocumented)
-    IdentifierKeyNamesAllowed = 4,
-    // (undocumented)
-    Json = 0,
-    // (undocumented)
-    Json5 = 255,
-    // (undocumented)
-    LaxNumberParsingAllowed = 64,
-    // (undocumented)
-    Loose = 255,
-    // (undocumented)
-    MultiLineStringAllowed = 32,
-    // (undocumented)
-    NumberConstantsAllowed = 128,
-    // (undocumented)
-    SingleQuotesAllowed = 2,
-    // (undocumented)
-    Strict = 0,
-    // (undocumented)
-    TrailingCommasAllowed = 8
-}
-
-// @public @deprecated
-export interface JsonParserContext {
-    // (undocumented)
-    readonly mode: JsonParseMode;
-    // (undocumented)
-    readonly original: string;
-    // (undocumented)
-    position: Position;
-    // (undocumented)
-    previous: Position;
 }
 
 // @public (undocumented)
@@ -1065,7 +874,7 @@ interface JsonSchemaVisitor {
 }
 
 // @public (undocumented)
-export type JsonValue = JsonAstNode['value'];
+export type JsonValue = boolean | string | number | JsonArray | JsonObject | null;
 
 // @public (undocumented)
 interface JsonVisitor {
@@ -1368,17 +1177,6 @@ interface PageviewOptions extends CustomDimensionsAndMetricsOptions {
     title?: string;
 }
 
-// @public @deprecated
-export function parseJson(input: string, mode?: JsonParseMode, options?: ParseJsonOptions): JsonValue;
-
-// @public @deprecated
-export function parseJsonAst(input: string, mode?: JsonParseMode): JsonAstNode;
-
-// @public @deprecated
-export interface ParseJsonOptions {
-    path?: string;
-}
-
 // @public (undocumented)
 function parseJsonPointer(pointer: JsonPointer): string[];
 
@@ -1440,15 +1238,6 @@ export class PathMustBeAbsoluteException extends BaseException {
     constructor(path: string);
 }
 
-// @public @deprecated
-export class PathSpecificJsonException extends JsonException {
-    constructor(path: string, exception: JsonException);
-    // (undocumented)
-    exception: JsonException;
-    // (undocumented)
-    path: string;
-}
-
 // @public (undocumented)
 class PatternMatchingHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
     // (undocumented)
@@ -1457,16 +1246,6 @@ class PatternMatchingHost<StatsT extends object = {}> extends ResolverHost<Stats
     protected _patterns: Map<RegExp, ReplacementFunction>;
     // (undocumented)
     protected _resolve(path: Path): Path;
-}
-
-// @public
-export interface Position {
-    // (undocumented)
-    readonly character: number;
-    // (undocumented)
-    readonly line: number;
-    // (undocumented)
-    readonly offset: number;
 }
 
 // @public (undocumented)
@@ -2083,9 +1862,9 @@ export interface TemplateAst {
 // @public
 export interface TemplateAstBase {
     // (undocumented)
-    end: Position_2;
+    end: Position;
     // (undocumented)
-    start: Position_2;
+    start: Position;
 }
 
 // @public
@@ -2243,11 +2022,6 @@ function trimNewlines(strings: TemplateStringsArray, ...values: any[]): string;
 
 // @public
 function underscore(str: string): string;
-
-// @public @deprecated
-export class UnexpectedEndOfInputException extends JsonException {
-    constructor(_context: JsonParserContext);
-}
 
 // @public (undocumented)
 export class UnimplementedException extends BaseException {

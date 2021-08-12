@@ -15,7 +15,7 @@ import { map } from 'rxjs/operators';
 import * as Url from 'url';
 import { BaseException } from '../../exception/exception';
 import { PartiallyOrderedSet, deepCopy } from '../../utils';
-import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../interface';
+import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../utils';
 import {
   JsonPointer,
   JsonVisitor,

@@ -6,14 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  JsonAstKeyValue,
-  JsonAstNode,
-  JsonAstObject,
-  JsonParseMode,
-  JsonValue,
-  parseJsonAst,
-} from '../../json';
+import { JsonParseMode, parseJsonAst } from '../../json/parser';
+import { JsonAstKeyValue, JsonAstNode, JsonAstObject } from '../../json/parser_ast';
+import { JsonValue } from '../../json/utils';
 import {
   DefinitionCollectionListener,
   ProjectDefinition,
@@ -306,7 +301,7 @@ function parseTargetsObject(
         },
       });
     } else {
-      targets[name] = (value.value as unknown) as TargetDefinition;
+      targets[name] = value.value as unknown as TargetDefinition;
     }
   }
 
