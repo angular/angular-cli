@@ -14,6 +14,7 @@
   ],
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
+    "jsonc-parser": "3.0.0",
     "ora": "5.4.1",
     "rxjs": "6.6.7"
   }

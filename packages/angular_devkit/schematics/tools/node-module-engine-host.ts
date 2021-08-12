@@ -6,11 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  BaseException,
-  InvalidJsonCharacterException,
-  UnexpectedEndOfInputException,
-} from '@angular-devkit/core';
+import { BaseException } from '@angular-devkit/core';
 import { dirname, join, resolve } from 'path';
 import { RuleFactory } from '../src';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
@@ -19,7 +15,6 @@ import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
   FileSystemEngineHostBase,
-  InvalidCollectionJsonException,
   SchematicMissingFieldsException,
 } from './file-system-engine-host-base';
 import { readJsonFile } from './file-system-utility';
@@ -98,21 +93,9 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
 
   protected _resolveCollectionPath(name: string, requester?: string): string {
     const collectionPath = this.resolve(name, requester);
+    readJsonFile(collectionPath);
 
-    try {
-      readJsonFile(collectionPath);
-
-      return collectionPath;
-    } catch (e) {
-      if (
-        e instanceof InvalidJsonCharacterException ||
-        e instanceof UnexpectedEndOfInputException
-      ) {
-        throw new InvalidCollectionJsonException(name, collectionPath, e);
-      } else {
-        throw e;
-      }
-    }
+    return collectionPath;
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {

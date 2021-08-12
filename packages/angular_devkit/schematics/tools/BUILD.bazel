@@ -31,6 +31,7 @@ ts_library(
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tasks/node",
         "@npm//@types/node",
+        "@npm//jsonc-parser",
         "@npm//rxjs",
     ],
 )
