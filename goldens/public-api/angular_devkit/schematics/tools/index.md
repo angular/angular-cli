@@ -8,14 +8,12 @@
 
 import { analytics } from '@angular-devkit/core';
 import { BaseException } from '@angular-devkit/core';
-import { InvalidJsonCharacterException } from '@angular-devkit/core';
 import { JsonObject } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Path } from '@angular-devkit/core';
 import { PathFragment } from '@angular-devkit/core';
 import { schema } from '@angular-devkit/core';
-import { UnexpectedEndOfInputException } from '@angular-devkit/core';
 import { Url } from 'url';
 import { virtualFs } from '@angular-devkit/core';
 import { workflow } from '@angular-devkit/schematics';
@@ -177,7 +175,7 @@ export interface FileSystemSchematicJsonDescription {
 
 // @public (undocumented)
 export class InvalidCollectionJsonException extends BaseException {
-    constructor(_name: string, path: string, jsonException?: UnexpectedEndOfInputException | InvalidJsonCharacterException);
+    constructor(_name: string, path: string, jsonException?: Error);
 }
 
 // @public

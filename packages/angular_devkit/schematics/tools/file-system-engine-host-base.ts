@@ -6,14 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  BaseException,
-  InvalidJsonCharacterException,
-  JsonObject,
-  UnexpectedEndOfInputException,
-  normalize,
-  virtualFs,
-} from '@angular-devkit/core';
+import { BaseException, JsonObject, normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, statSync } from 'fs';
 import { dirname, isAbsolute, join, resolve } from 'path';
@@ -51,11 +44,7 @@ export class CollectionCannotBeResolvedException extends BaseException {
   }
 }
 export class InvalidCollectionJsonException extends BaseException {
-  constructor(
-    _name: string,
-    path: string,
-    jsonException?: UnexpectedEndOfInputException | InvalidJsonCharacterException,
-  ) {
+  constructor(_name: string, path: string, jsonException?: Error) {
     let msg = `Collection JSON at path ${JSON.stringify(path)} is invalid.`;
 
     if (jsonException) {
@@ -320,7 +309,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
       return transformedOptions;
     };
 
-    return (observableFrom(transform()) as unknown) as Observable<ResultT>;
+    return observableFrom(transform()) as unknown as Observable<ResultT>;
   }
 
   transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
