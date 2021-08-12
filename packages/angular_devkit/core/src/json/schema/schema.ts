@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonObject, JsonValue, isJsonObject } from '../interface';
+import { JsonObject, JsonValue, isJsonObject } from '../utils';
 
 /**
  * A specialized interface for JsonSchema (to come). JsonSchemas are also JsonObject.

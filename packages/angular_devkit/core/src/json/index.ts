@@ -8,6 +8,5 @@
 
 import * as schema from './schema/index';
 
-export * from './interface';
-export * from './parser';
+export * from './utils';
 export { schema };

@@ -6,14 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  JsonAstArray,
-  JsonAstKeyValue,
-  JsonAstNode,
-  JsonAstObject,
-  JsonObject,
-  JsonValue,
-} from '../../json';
+import { JsonObject, JsonValue } from '../../json';
+import { JsonAstArray, JsonAstKeyValue, JsonAstNode, JsonAstObject } from '../../json/parser_ast';
 
 const stableStringify = require('fast-json-stable-stringify');
 

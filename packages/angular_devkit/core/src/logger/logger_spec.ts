@@ -8,7 +8,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { toArray } from 'rxjs/operators';
-import { JsonValue } from '../json/interface';
+import { JsonValue } from '../json/utils';
 import { Logger } from './logger';
 
 describe('Logger', () => {
@@ -19,8 +19,8 @@ describe('Logger', () => {
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
-          jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'test' }) as any,
-          jasmine.objectContaining({ message: 'world', level: 'info', name: 'test' }) as any,
+          jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'test' }),
+          jasmine.objectContaining({ message: 'world', level: 'info', name: 'test' }),
         ]);
       })
       .then(

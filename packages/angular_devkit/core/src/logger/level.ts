@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonObject } from '../json/interface';
+import { JsonObject } from '../json/utils';
 import { LogLevel, Logger } from './logger';
 
 export class LevelTransformLogger extends Logger {

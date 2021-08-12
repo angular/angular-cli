@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonObject, isJsonArray, isJsonObject } from '../interface';
+import { JsonObject, isJsonArray, isJsonObject } from '../utils';
 import { JsonSchema } from './schema';
 
 const allTypes = ['string', 'integer', 'number', 'object', 'array', 'boolean', 'null'];

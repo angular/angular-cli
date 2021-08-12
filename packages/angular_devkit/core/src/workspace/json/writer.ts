@@ -7,7 +7,8 @@
  */
 
 import MagicString from 'magic-string';
-import { JsonAstKeyValue, JsonAstNode, JsonObject, JsonValue } from '../../json';
+import { JsonObject, JsonValue } from '../../json';
+import { JsonAstKeyValue, JsonAstNode } from '../../json/parser_ast';
 import { ProjectDefinition, TargetDefinition, WorkspaceDefinition } from '../definitions';
 import { WorkspaceHost } from '../host';
 import {
