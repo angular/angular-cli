@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "critters": "0.0.10",
-    "jsdom": "16.7.0",
+    "jsdom": "17.0.0",
     "tslib": "TSLIB_VERSION"
   },
   "peerDependencies": {
