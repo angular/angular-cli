@@ -16,7 +16,8 @@
     "WORKSPACE",
     "package.json",
     "modules/**/package.json",
-    "integration/**/package.json"
+    "integration/**/package.json",
+    ".github/workflows/**/*.yml"
   ],
   "ignorePaths": ["modules/builders/testing/**"],
   "packageRules": [
