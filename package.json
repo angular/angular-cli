@@ -129,7 +129,7 @@
     "@typescript-eslint/parser": "4.29.1",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.6.2",
-    "ajv-formats": "2.1.0",
+    "ajv-formats": "2.1.1",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
     "bootstrap": "^4.0.0",
