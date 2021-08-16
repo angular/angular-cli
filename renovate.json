@@ -22,7 +22,7 @@
   "ignorePaths": ["modules/builders/testing/**"],
   "packageRules": [
     {
-      "packagePatterns": ["^@angular/.*", "^@angular-devkit/.*", "^@schematics/.*"],
+      "packagePatterns": ["^@angular/.*", "^@angular-devkit/.*", "^@schematics/.*", "angular/dev-infra"],
       "groupName": "angular",
       "pinVersions": false
     },
