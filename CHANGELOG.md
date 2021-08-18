@@ -1,3 +1,24 @@
+<a name="13.0.0-next.1"></a>
+
+# 13.0.0-next.1 (2021-08-18)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [aba54ae78](https://github.com/angular/angular-cli/commit/aba54ae783816502122ec63530a7274229c31762) | fix(@angular-devkit/build-angular): provide supported browsers to esbuild                  |
+| [9eb599da2](https://github.com/angular/angular-cli/commit/9eb599da2b71f067e607f86266cecdb008b6a867) | fix(@angular-devkit/build-angular): handle undefined entrypoints when marking async chunks |
+
+## Breaking Changes
+
+### @angular-devkit/core
+
+The deprecated JSON parser has been removed from public API. [jsonc-parser](https://www.npmjs.com/package/jsonc-parser) should be used instead.
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Douglas Parker, Joey Perrott and Simon Primetzhofer
+
 <a name="12.2.2"></a>
 
 # 12.2.2 (2021-08-18)
