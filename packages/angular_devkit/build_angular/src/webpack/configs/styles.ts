@@ -395,7 +395,13 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
       })),
     },
     optimization: {
-      minimizer: buildOptions.optimization.styles.minify ? [new CssOptimizerPlugin()] : undefined,
+      minimizer: buildOptions.optimization.styles.minify
+        ? [
+            new CssOptimizerPlugin({
+              supportedBrowsers,
+            }),
+          ]
+        : undefined,
     },
     plugins: extraPlugins,
   };
