@@ -1,3 +1,25 @@
+<a name="12.2.2"></a>
+
+# 12.2.2 (2021-08-18)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [a55118a75](https://github.com/angular/angular-cli/commit/a55118a753555c0082cfd434379559df7e3eb7f9) | fix: provide supported browsers to esbuild                  |
+| [81baa4f95](https://github.com/angular/angular-cli/commit/81baa4f956443fcc718f9021fd23ab7064d04607) | fix: update Angular peer dependencies to 12.2 stable        |
+| [297410ae8](https://github.com/angular/angular-cli/commit/297410ae860860d71905639cf38b49ff05813845) | fix: handle undefined entrypoints when marking async chunks |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [b7199f366](https://github.com/angular/angular-cli/commit/b7199f366841d976b502ad5f1923e24ea2f6b302) | fix: update Angular peer dependencies to 12.2 stable |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Joey Perrott and Simon Primetzhofer
+
 <a name="12.2.1"></a>
 
 # 12.2.1 (2021-08-11)
