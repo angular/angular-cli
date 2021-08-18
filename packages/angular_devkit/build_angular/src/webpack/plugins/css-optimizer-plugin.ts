@@ -14,6 +14,10 @@ import { addWarning } from '../../utils/webpack-diagnostics';
  */
 const PLUGIN_NAME = 'angular-css-optimizer';
 
+export interface CssOptimizerPluginOptions {
+  supportedBrowsers?: string[];
+}
+
 /**
  * A Webpack plugin that provides CSS optimization capabilities.
  *
@@ -21,7 +25,13 @@ const PLUGIN_NAME = 'angular-css-optimizer';
  * code output.
  */
 export class CssOptimizerPlugin {
-  constructor() {}
+  private targets: string[] | undefined;
+
+  constructor(options?: CssOptimizerPluginOptions) {
+    if (options?.supportedBrowsers) {
+      this.targets = this.transformSupportedBrowsersToTargets(options.supportedBrowsers);
+    }
+  }
 
   apply(compiler: Compiler) {
     const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
@@ -83,6 +93,7 @@ export class CssOptimizerPlugin {
                 minify: true,
                 sourcemap: !!inputMap && 'external',
                 sourcefile: asset.name,
+                target: this.targets,
               },
             );
 
@@ -109,5 +120,21 @@ export class CssOptimizerPlugin {
         addWarning(compilation, warning);
       }
     }
+  }
+
+  private transformSupportedBrowsersToTargets(supportedBrowsers: string[]): string[] | undefined {
+    const transformed: string[] = [];
+
+    // https://esbuild.github.io/api/#target
+    const esBuildSupportedBrowsers = new Set(['safari', 'firefox', 'edge', 'chrome', 'ios']);
+
+    for (const browser of supportedBrowsers) {
+      const [browserName, version] = browser.split(' ');
+      if (esBuildSupportedBrowsers.has(browserName)) {
+        transformed.push(browserName + version);
+      }
+    }
+
+    return transformed.length ? transformed : undefined;
   }
 }
