@@ -300,6 +300,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
       `^(${Object.keys(entryPoints).join('|')})(\.[0-9a-f]{20})?.css$`,
     );
 
+    const target = transformSupportedBrowsersToTargets(supportedBrowsers);
     extraMinimizers.push(
       // Component styles use esbuild which is faster and generates smaller files on average.
       // esbuild does not yet support style sourcemaps but component style sourcemaps are not
@@ -315,6 +316,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
             loader: 'css',
             minify: true,
             sourcefile,
+            target,
           });
 
           return {
@@ -477,4 +479,20 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     },
     plugins: extraPlugins,
   };
+}
+
+function transformSupportedBrowsersToTargets(supportedBrowsers: string[]): string[] | undefined {
+  const transformed: string[] = [];
+
+  // https://esbuild.github.io/api/#target
+  const esBuildSupportedBrowsers = new Set(['safari', 'firefox', 'edge', 'chrome', 'ios']);
+
+  for (const browser of supportedBrowsers) {
+    const [browserName, version] = browser.split(' ');
+    if (esBuildSupportedBrowsers.has(browserName)) {
+      transformed.push(browserName + version);
+    }
+  }
+
+  return transformed.length ? transformed : undefined;
 }
