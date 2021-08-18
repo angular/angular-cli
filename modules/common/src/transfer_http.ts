@@ -6,21 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  HTTP_INTERCEPTORS,
   HttpEvent,
   HttpHandler,
   HttpHeaders,
   HttpInterceptor,
   HttpParams,
   HttpRequest,
-  HttpResponse,
+  HttpResponse, HTTP_INTERCEPTORS
 } from '@angular/common/http';
 import { ApplicationRef, Injectable, NgModule } from '@angular/core';
 import {
-  BrowserTransferStateModule,
-  StateKey,
-  TransferState,
-  makeStateKey,
+  BrowserTransferStateModule, makeStateKey, StateKey,
+  TransferState
 } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { filter, take, tap } from 'rxjs/operators';
@@ -71,15 +68,12 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     // Stop using the cache if the application has stabilized, indicating initial rendering is
     // complete.
     // tslint:disable-next-line: no-floating-promises
-    appRef.isStable
-      .pipe(
-        filter((isStable: boolean) => isStable),
-        take(1),
-      )
-      .toPromise()
-      .then(() => {
-        this.isCacheActive = false;
-      });
+    appRef.isStable.pipe(
+      filter((isStable: boolean) => isStable),
+      take(1),
+    ).subscribe(() => {
+      this.isCacheActive = false;
+    });
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -141,4 +135,4 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     { provide: HTTP_INTERCEPTORS, useExisting: TransferHttpCacheInterceptor, multi: true },
   ],
 })
-export class TransferHttpCacheModule {}
+export class TransferHttpCacheModule { }
