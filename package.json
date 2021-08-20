@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.50.0",
+    "**/@types/copy-webpack-plugin/webpack": "5.51.1",
     "ajv-formats/ajv": "8.6.2"
   },
   "devDependencies": {
@@ -144,11 +144,11 @@
     "critters": "0.0.10",
     "css-loader": "6.2.0",
     "debug": "^4.1.1",
-    "esbuild": "0.12.20",
+    "esbuild": "0.12.21",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-header": "3.1.1",
-    "eslint-plugin-import": "2.24.0",
+    "eslint-plugin-import": "2.24.1",
     "express": "4.17.1",
     "fast-json-stable-stringify": "2.1.0",
     "find-cache-dir": "3.3.1",
@@ -221,9 +221,9 @@
     "ts-node": "^10.0.0",
     "tslib": "2.3.1",
     "typescript": "4.3.5",
-    "verdaccio": "5.1.2",
+    "verdaccio": "5.1.3",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.50.0",
+    "webpack": "5.51.1",
     "webpack-dev-middleware": "5.0.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.8.0",
