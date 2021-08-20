@@ -32,13 +32,9 @@ export function formatSize(size: number): string {
 }
 
 export type BundleStatsData = [files: string, names: string, size: number | string];
-
-export type ChunkType = 'modern' | 'legacy' | 'unknown';
-
 export interface BundleStats {
   initial: boolean;
   stats: BundleStatsData;
-  chunkType: ChunkType;
 }
 
 export function generateBundleStats(info: {
@@ -47,7 +43,6 @@ export function generateBundleStats(info: {
   names?: string[];
   initial?: boolean;
   rendered?: boolean;
-  chunkType?: ChunkType;
 }): BundleStats {
   const size = typeof info.size === 'number' ? info.size : '-';
   const files =
@@ -57,10 +52,8 @@ export function generateBundleStats(info: {
       .join(', ') ?? '';
   const names = info.names?.length ? info.names.join(', ') : '-';
   const initial = !!info.initial;
-  const chunkType = info.chunkType || 'unknown';
 
   return {
-    chunkType,
     initial,
     stats: [files, names, size],
   };
@@ -79,11 +72,9 @@ function generateBuildStatsTable(
   const changedEntryChunksStats: BundleStatsData[] = [];
   const changedLazyChunksStats: BundleStatsData[] = [];
 
-  let initialModernTotalSize = 0;
-  let initialLegacyTotalSize = 0;
-  let modernFileSuffix: string | undefined;
+  let initialTotalSize = 0;
 
-  for (const { initial, stats, chunkType } of data) {
+  for (const { initial, stats } of data) {
     const [files, names, size] = stats;
 
     const data: BundleStatsData = [
@@ -94,24 +85,8 @@ function generateBuildStatsTable(
 
     if (initial) {
       changedEntryChunksStats.push(data);
-
       if (typeof size === 'number') {
-        switch (chunkType) {
-          case 'modern':
-            initialModernTotalSize += size;
-            if (!modernFileSuffix) {
-              const match = files.match(/-(es20\d{2}|esnext)/);
-              modernFileSuffix = match?.[1].toString().toUpperCase();
-            }
-            break;
-          case 'legacy':
-            initialLegacyTotalSize += size;
-            break;
-          default:
-            initialModernTotalSize += size;
-            initialLegacyTotalSize += size;
-            break;
-        }
+        initialTotalSize += size;
       }
     } else {
       changedLazyChunksStats.push(data);
@@ -126,14 +101,7 @@ function generateBuildStatsTable(
 
     if (showTotalSize) {
       bundleInfo.push([]);
-      if (initialModernTotalSize === initialLegacyTotalSize) {
-        bundleInfo.push([' ', 'Initial Total', formatSize(initialModernTotalSize)].map(bold));
-      } else {
-        bundleInfo.push(
-          [' ', 'Initial ES5 Total', formatSize(initialLegacyTotalSize)].map(bold),
-          [' ', `Initial ${modernFileSuffix} Total`, formatSize(initialModernTotalSize)].map(bold),
-        );
-      }
+      bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
     }
   }
 
