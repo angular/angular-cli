@@ -147,9 +147,7 @@ function wrap(
 
       // Do not wrap vendored third-party packages or JSON files
       if (
-        !/[\/\\]node_modules[\/\\]@schematics[\/\\]angular[\/\\]third_party[\/\\]/.test(
-          modulePath,
-        ) &&
+        !/[/\\]node_modules[/\\]@schematics[/\\]angular[/\\]third_party[/\\]/.test(modulePath) &&
         !modulePath.endsWith('.json')
       ) {
         // Wrap module and save in cache

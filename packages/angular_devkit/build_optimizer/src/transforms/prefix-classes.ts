@@ -24,7 +24,7 @@ export function testPrefixClasses(content: string) {
       /\s*function \(\) {/,
       newLine,
       multiLineComment,
-      /function (?:\S+)\([^\)]*\) \{/,
+      /function (?:\S+)\([^)]*\) \{/,
       newLine,
     ],
     [

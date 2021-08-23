@@ -124,7 +124,7 @@ describe('Application Schematic', () => {
       .toPromise();
     const path = '/projects/foo/src/app/app.module.ts';
     const content = tree.readContent(path);
-    expect(content).toMatch(/import { BrowserModule } from \'@angular\/platform-browser\';/);
+    expect(content).toMatch(/import { BrowserModule } from '@angular\/platform-browser';/);
   });
 
   it('should declare app component in the app module', async () => {
@@ -133,7 +133,7 @@ describe('Application Schematic', () => {
       .toPromise();
     const path = '/projects/foo/src/app/app.module.ts';
     const content = tree.readContent(path);
-    expect(content).toMatch(/import { AppComponent } from \'\.\/app\.component\';/);
+    expect(content).toMatch(/import { AppComponent } from '\.\/app\.component';/);
   });
 
   it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, async () => {

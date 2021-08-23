@@ -119,7 +119,7 @@ function getBootstrapComponentPath(host: Tree, mainPath: string): string {
 
 function validateProject(mainPath: string): Rule {
   return (host: Tree, context: SchematicContext) => {
-    const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
+    const routerOutletCheckRegex = /<router-outlet.*?>([\s\S]*?)<\/router-outlet>/;
 
     const componentPath = getBootstrapComponentPath(host, mainPath);
     const tmpl = getComponentTemplateInfo(host, componentPath);
@@ -247,7 +247,7 @@ function addServerRoutes(options: AppShellOptions): Rule {
     if (!clientServerTarget) {
       throw new Error('Universal schematic did not add server target to client project.');
     }
-    const clientServerOptions = (clientServerTarget.options as unknown) as ServerBuilderOptions;
+    const clientServerOptions = clientServerTarget.options as unknown as ServerBuilderOptions;
     if (!clientServerOptions) {
       throw new SchematicsException('Server target does not contain options.');
     }
@@ -326,8 +326,8 @@ export default function (options: AppShellOptions): Rule {
     if (!clientBuildTarget) {
       throw targetBuildNotFoundError();
     }
-    const clientBuildOptions = ((clientBuildTarget.options ||
-      {}) as unknown) as BrowserBuilderOptions;
+    const clientBuildOptions = (clientBuildTarget.options ||
+      {}) as unknown as BrowserBuilderOptions;
 
     return chain([
       validateProject(clientBuildOptions.main),

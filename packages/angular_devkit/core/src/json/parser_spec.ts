@@ -350,7 +350,7 @@ describe('parseJson and parseJsonAst', () => {
           /* MULTIPLE
              LINE
              COMMENT
-             \o/ */
+             \\o/ */
           "b" /* COMMENT */: /* YOU GUESSED IT */ 1 // COMMENT
           , /* STILL VALID */
           "c": 2

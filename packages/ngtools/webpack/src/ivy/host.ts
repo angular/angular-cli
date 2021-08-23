@@ -268,7 +268,7 @@ export function augmentHostWithReplacements(
     if (replacement) {
       return {
         resolvedFileName: replacement,
-        isExternalLibraryImport: /[\/\\]node_modules[\/\\]/.test(replacement),
+        isExternalLibraryImport: /[/\\]node_modules[/\\]/.test(replacement),
       };
     } else {
       return resolvedModule;

@@ -232,12 +232,12 @@ export function noCacheNormalize(path: string): Path {
 
   // Match absolute windows path.
   const original = path;
-  if (path.match(/^[A-Z]:[\/\\]/i)) {
+  if (path.match(/^[A-Z]:[/\\]/i)) {
     path = '\\' + path[0] + '\\' + path.substr(3);
   }
 
   // We convert Windows paths as well here.
-  const p = path.split(/[\/\\]/g);
+  const p = path.split(/[/\\]/g);
   let relative = false;
   let i = 1;
 
@@ -301,7 +301,7 @@ export function asWindowsPath(path: Path): WindowsPath {
 }
 
 export function asPosixPath(path: Path): PosixPath {
-  return (path as string) as PosixPath;
+  return path as string as PosixPath;
 }
 
 export function getSystemPath(path: Path): string {

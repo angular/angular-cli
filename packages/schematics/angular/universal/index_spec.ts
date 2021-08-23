@@ -138,7 +138,7 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"@angular\/platform-server\": \"/);
+    expect(contents).toMatch(/"@angular\/platform-server": "/);
   });
 
   it('should update workspace with a server target', async () => {

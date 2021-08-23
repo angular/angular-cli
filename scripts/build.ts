@@ -198,7 +198,7 @@ export default async function (
   logger.info('Merging bazel-bin/ with dist/');
   for (const packageName of sortedPackages) {
     const pkg = packages[packageName];
-    const bazelBinPath = pkg.build.replace(/([\\\/]dist[\\\/])(packages)/, (_, dist, packages) => {
+    const bazelBinPath = pkg.build.replace(/([\\/]dist[\\/])(packages)/, (_, dist, packages) => {
       return path.join(dist, 'dist-schema', packages);
     });
     if (fs.existsSync(bazelBinPath)) {
@@ -223,7 +223,7 @@ export default async function (
     const subSubLogger = resourceLogger.createChild(packageName);
     subSubLogger.info(`${files.length} files total...`);
     const resources = files.filter((fileName) => {
-      if (/(?:^|[\/\\])node_modules[\/\\]/.test(fileName)) {
+      if (/(?:^|[/\\])node_modules[/\\]/.test(fileName)) {
         return false;
       }
 
