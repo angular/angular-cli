@@ -1,4 +1,4 @@
-import { ReleaseConfig } from '@angular/dev-infra-private/release/config';
+import { ReleaseConfig } from '@angular/dev-infra-private/ng-dev/release/config';
 
 /** Configuration for the `ng-dev release` command. */
 export const release: ReleaseConfig = {
