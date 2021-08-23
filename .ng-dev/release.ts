@@ -10,8 +10,11 @@ export const release: ReleaseConfig = {
     '@nguniversal/hapi-engine',
     '@nguniversal/socket-engine',
   ],
+  releaseNotes: {
+    groupOrder: ['@nguniversal/common', '@nguniversal/builders', '@nguniversal/express-engine'],
+  },
+  publishRegistry: 'https://wombat-dressing-room.appspot.com',
+  releasePrLabels: ['action: merge'],
   // TODO: Set up package building.
   buildPackages: async () => [],
-  // TODO: Set up generating changelogs
-  generateReleaseNotesForHead: async () => {},
 };

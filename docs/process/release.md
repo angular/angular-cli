@@ -36,7 +36,8 @@ git push upstream && git push upstream --tags
 # Release Changelog
 
 ```sh
-npx conventional-changelog-cli -p angular -r 1 | sed 1,3d | xclip -selection clipboard
+yarn ng-dev release notes --from=<The git tag or ref to start the changelog entry from>
+yarn ng-dev release notes --mode=github-release --from=<The git tag or ref to start the changelog entry from>
 ```
 
 - Go to the `Releases` tab in the repository
