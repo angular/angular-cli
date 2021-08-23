@@ -24,13 +24,22 @@
       "description": "Include styles inline in the root component.ts file. Only CSS styles can be included inline. Default is false, meaning that an external styles file is created and referenced in the root component.ts file.",
       "type": "boolean",
       "alias": "s",
+      "x-prompt": "Would you like to have Inline Styles?",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
       "description": "Include template inline in the root component.ts file. Default is false, meaning that an external template file is created and referenced in the root component.ts file. ",
       "type": "boolean",
       "alias": "t",
+      "x-prompt": "Would you like to have Inline Template?",
       "x-user-analytics": 10
+    },
+    "changeDetection": {
+      "description": "Default setting for changeDetectionStrategy",
+      "enum": ["OnPush", "Default"],
+      "type":"string",
+      "default": "OnPush",
+      "x-prompt": "Which Change Detection Strategy would you like to use?"
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the new application.",
@@ -50,7 +59,8 @@
       "format": "html-selector",
       "description": "A prefix to apply to generated selectors.",
       "default": "app",
-      "alias": "p"
+      "alias": "p",
+      "x-prompt": "Prefix for selectors"
     },
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
