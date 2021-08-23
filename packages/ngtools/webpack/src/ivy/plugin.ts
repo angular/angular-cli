@@ -655,6 +655,7 @@ export class AngularWebpackPlugin {
 
       let content: string | undefined;
       let map: string | undefined;
+      let declaration: string | undefined;
       program.emit(
         sourceFile,
         (filename, data) => {
@@ -662,6 +663,8 @@ export class AngularWebpackPlugin {
             map = data;
           } else if (filename.endsWith('.js')) {
             content = data;
+          } else if (filename.endsWith('.d.ts')) {
+            declaration = data;
           }
         },
         undefined,
@@ -683,7 +686,7 @@ export class AngularWebpackPlugin {
         ...getExtraDependencies(sourceFile),
       ].map(externalizePath);
 
-      return { content, map, dependencies, hash };
+      return { content, map, declaration, dependencies, hash };
     };
   }
 }

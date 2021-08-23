@@ -11,6 +11,7 @@ export const AngularPluginSymbol = Symbol.for('@ngtools/webpack[angular-compiler
 export interface EmitFileResult {
   content?: string;
   map?: string;
+  declaration?: string;
   dependencies: readonly string[];
   hash?: Uint8Array;
 }
