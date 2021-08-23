@@ -82,7 +82,7 @@ describe('App Shell Schematic', () => {
       .toPromise();
     const filePath = '/projects/bar/src/app/app.module.ts';
     const content = tree.readContent(filePath);
-    expect(content).toMatch(/import { RouterModule } from \'@angular\/router\';/);
+    expect(content).toMatch(/import { RouterModule } from '@angular\/router';/);
   });
 
   it('should not fail when AppModule have imported RouterModule already', async () => {
@@ -95,7 +95,7 @@ describe('App Shell Schematic', () => {
       .toPromise();
     const filePath = '/projects/bar/src/app/app.module.ts';
     const content = tree.readContent(filePath);
-    expect(content).toMatch(/import { RouterModule } from \'@angular\/router\';/);
+    expect(content).toMatch(/import { RouterModule } from '@angular\/router';/);
   });
 
   describe('Add router-outlet', () => {
@@ -138,7 +138,7 @@ describe('App Shell Schematic', () => {
         .toPromise();
 
       const content = tree.readContent(htmlPath);
-      const matches = content.match(/<router\-outlet><\/router\-outlet>/g);
+      const matches = content.match(/<router-outlet><\/router-outlet>/g);
       const numMatches = matches ? matches.length : 0;
       expect(numMatches).toEqual(1);
     });
@@ -149,7 +149,7 @@ describe('App Shell Schematic', () => {
         .runSchematicAsync('appShell', defaultOptions, appTree)
         .toPromise();
       const content = tree.readContent('/projects/bar/src/app/app.component.ts');
-      const matches = content.match(/<router\-outlet><\/router\-outlet>/g);
+      const matches = content.match(/<router-outlet><\/router-outlet>/g);
       const numMatches = matches ? matches.length : 0;
       expect(numMatches).toEqual(1);
     });
@@ -161,7 +161,7 @@ describe('App Shell Schematic', () => {
       .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     const content = tree.readContent(filePath);
-    expect(content).toMatch(/import { Routes, RouterModule } from \'@angular\/router\';/);
+    expect(content).toMatch(/import { Routes, RouterModule } from '@angular\/router';/);
   });
 
   it('should work after adding nguniversal', async () => {
@@ -177,7 +177,7 @@ describe('App Shell Schematic', () => {
     tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, tree).toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     const content = tree.readContent(filePath);
-    expect(content).toMatch(/import { Routes, RouterModule } from \'@angular\/router\';/);
+    expect(content).toMatch(/import { Routes, RouterModule } from '@angular\/router';/);
   });
 
   it('should define a server route', async () => {
@@ -207,6 +207,6 @@ describe('App Shell Schematic', () => {
       .toPromise();
     expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
     const content = tree.readContent('/projects/bar/src/app/app.server.module.ts');
-    expect(content).toMatch(/app\-shell\.component/);
+    expect(content).toMatch(/app-shell\.component/);
   });
 });

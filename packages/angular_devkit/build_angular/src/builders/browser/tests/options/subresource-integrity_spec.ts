@@ -44,7 +44,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toMatch(/integrity="\w+-[A-Za-z0-9\/\+=]+"/);
+      harness.expectFile('dist/index.html').content.toMatch(/integrity="\w+-[A-Za-z0-9/+=]+"/);
     });
 
     it(`does not issue a warning when 'true' and 'scripts' is set.`, async () => {
@@ -59,7 +59,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toMatch(/integrity="\w+-[A-Za-z0-9\/\+=]+"/);
+      harness.expectFile('dist/index.html').content.toMatch(/integrity="\w+-[A-Za-z0-9/+=]+"/);
       expect(logs).not.toContain(
         jasmine.objectContaining<logging.LogEntry>({
           message: jasmine.stringMatching(/subresource-integrity/),

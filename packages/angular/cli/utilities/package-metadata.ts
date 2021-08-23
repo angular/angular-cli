@@ -181,7 +181,7 @@ function normalizeOptions(
 
     // Substitute any environment variable references.
     if (typeof value === 'string') {
-      substitutedValue = value.replace(/\$\{([^\}]+)\}/, (_, name) => process.env[name] || '');
+      substitutedValue = value.replace(/\$\{([^}]+)\}/, (_, name) => process.env[name] || '');
     }
 
     switch (key) {

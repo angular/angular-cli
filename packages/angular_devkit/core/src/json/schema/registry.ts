@@ -680,6 +680,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   private normalizeDataPathArr(it: SchemaObjCxt): (number | string)[] {
     return it.dataPathArr
       .slice(1, it.dataLevel + 1)
-      .map((p) => (typeof p === 'number' ? p : p.str.replace(/\"/g, '')));
+      .map((p) => (typeof p === 'number' ? p : p.str.replace(/"/g, '')));
   }
 }

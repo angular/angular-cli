@@ -99,7 +99,7 @@ describe('Browser Builder bundle budgets', () => {
       const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
       const output = await run.result;
       expect(output.success).toBe(true);
-      expect(logs.join()).toMatch(`Warning.+app\.component\.${ext}`);
+      expect(logs.join()).toMatch(`Warning.+app\\.component\\.${ext}`);
       await run.stop();
     });
   });
@@ -138,7 +138,7 @@ describe('Browser Builder bundle budgets', () => {
       const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
       const output = await run.result;
       expect(output.success).toBe(false);
-      expect(logs.join()).toMatch(`Error.+app\.component\.${ext}`);
+      expect(logs.join()).toMatch(`Error.+app\\.component\\.${ext}`);
       await run.stop();
     });
   });

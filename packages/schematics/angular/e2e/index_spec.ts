@@ -67,7 +67,7 @@ describe('Application Schematic', () => {
       .runSchematicAsync('e2e', defaultOptions, applicationTree)
       .toPromise();
     const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
-    expect(content).toMatch(/app\-root/);
+    expect(content).toMatch(/app-root/);
   });
 
   it('should set the rootSelector in the app.po.ts from the option', async () => {
@@ -76,7 +76,7 @@ describe('Application Schematic', () => {
       .runSchematicAsync('e2e', options, applicationTree)
       .toPromise();
     const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
-    expect(content).toMatch(/t\-a\-c\-o/);
+    expect(content).toMatch(/t-a-c-o/);
   });
 
   it('should set the rootSelector in the app.po.ts from the option with emoji', async () => {

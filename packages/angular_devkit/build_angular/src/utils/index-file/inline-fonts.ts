@@ -227,7 +227,7 @@ export class InlineFontsProcessor {
         // New lines.
         .replace(/\n/g, '')
         // Safe spaces.
-        .replace(/\s?[\{\:\;]\s+/g, (s) => s.trim());
+        .replace(/\s?[{:;]\s+/g, (s) => s.trim());
     }
 
     return cssContent;

@@ -25,7 +25,7 @@ describe('augment-index-html', () => {
   };
 
   const oneLineHtml = (html: TemplateStringsArray) =>
-    tags.stripIndents`${html}`.replace(/(\>\s+)/g, '>');
+    tags.stripIndents`${html}`.replace(/(>\s+)/g, '>');
 
   it('can generate index.html', async () => {
     const source = augmentIndexHtml({

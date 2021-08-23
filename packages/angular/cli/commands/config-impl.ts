@@ -45,7 +45,7 @@ function parseJsonPath(path: string): (string | number)[] {
       break;
     }
 
-    const match = fragment.match(/([^\[]+)((\[.*\])*)/);
+    const match = fragment.match(/([^[]+)((\[.*\])*)/);
     if (!match) {
       throw new Error('Invalid JSON path.');
     }
@@ -55,7 +55,7 @@ function parseJsonPath(path: string): (string | number)[] {
       const indices = match[2]
         .slice(1, -1)
         .split('][')
-        .map((x) => (/^\d$/.test(x) ? +x : x.replace(/\"|\'/g, '')));
+        .map((x) => (/^\d$/.test(x) ? +x : x.replace(/"|'/g, '')));
       result.push(...indices);
     }
   }

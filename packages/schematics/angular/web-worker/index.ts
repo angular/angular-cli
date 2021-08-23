@@ -33,7 +33,7 @@ function addSnippet(options: WebWorkerOptions): Rule {
       return;
     }
 
-    const fileRegExp = new RegExp(`^${options.name}.*\.ts`);
+    const fileRegExp = new RegExp(`^${options.name}.*\\.ts`);
     const siblingModules = host
       .getDir(options.path)
       .subfiles // Find all files that start with the same name, are ts files,

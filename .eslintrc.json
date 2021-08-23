@@ -86,7 +86,6 @@
     "no-case-declarations": "off",
     "no-fallthrough": "off",
     "no-underscore-dangle": "off",
-    "no-useless-escape": "off",
     "@typescript-eslint/await-thenable": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-empty-function": "off",

@@ -25,10 +25,10 @@ export class PatternMatchingHost<StatsT extends object = {}> extends ResolverHos
           (ex) =>
             '(' +
             ex
-              .split(/[\/\\]/g)
+              .split(/[/\\]/g)
               .map((f) =>
                 f
-                  .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
+                  .replace(/[-[\]{}()+?.^$|]/g, '\\$&')
                   .replace(/^\*\*/g, '(.+?)?')
                   .replace(/\*/g, '[^/\\\\]*'),
               )
