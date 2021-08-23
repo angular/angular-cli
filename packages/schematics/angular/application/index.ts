@@ -31,7 +31,7 @@ import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
-import { Schema as ApplicationOptions, Style } from './schema';
+import { Schema as ApplicationOptions, ChangeDetection, Style } from './schema';
 
 function addDependenciesToPackageJson(options: ApplicationOptions) {
   return (host: Tree, context: SchematicContext) => {
@@ -81,6 +81,11 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     }
     if (options.inlineStyle ?? options.minimal) {
       componentSchematicsOptions.inlineStyle = true;
+    }
+    if (options.changeDetection ?? options.minimal) {
+      componentSchematicsOptions.changeDetection = options.changeDetection
+        ? ChangeDetection[options.changeDetection]
+        : ChangeDetection.Default;
     }
     if (options.style && options.style !== Style.Css) {
       componentSchematicsOptions.style = options.style;
@@ -252,6 +257,7 @@ export default function (options: ApplicationOptions): Rule {
           skipTests: options.skipTests,
           style: options.style,
           viewEncapsulation: options.viewEncapsulation,
+          changeDetection: options.changeDetection,
         }
       : {
           inlineStyle: options.inlineStyle ?? true,
@@ -259,6 +265,7 @@ export default function (options: ApplicationOptions): Rule {
           skipTests: true,
           style: options.style,
           viewEncapsulation: options.viewEncapsulation,
+          changeDetection: options.changeDetection,
         };
 
     const workspace = await getWorkspace(host);

@@ -37,7 +37,7 @@
     "changeDetection": {
       "description": "Default setting for changeDetectionStrategy",
       "enum": ["OnPush", "Default"],
-      "type":"string",
+      "type": "string",
       "default": "OnPush",
       "x-prompt": "Which Change Detection Strategy would you like to use?"
     },

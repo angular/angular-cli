@@ -66,16 +66,27 @@
       "default": "projects"
     },
     "inlineStyle": {
-      "description": "Include styles inline in the component TS file. By default, an external styles file is created and referenced in the component TypeScript file.",
+      "description": "Include styles inline in the root component.ts file. Only CSS styles can be included inline. Default is false, meaning that an external styles file is created and referenced in the root component.ts file.",
       "type": "boolean",
       "alias": "s",
+      "default": false,
+      "x-prompt": "Would you like to have Inline Styles?",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
-      "description": "Include template inline in the component TS file. By default, an external template file is created and referenced in the component TypeScript file.",
+      "description": "Include template inline in the root component.ts file. Default is false, meaning that an external template file is created and referenced in the root component.ts file. ",
       "type": "boolean",
       "alias": "t",
+      "default": false,
+      "x-prompt": "Would you like to have Inline Template?",
       "x-user-analytics": 10
+    },
+    "changeDetection": {
+      "description": "Default setting for changeDetectionStrategy",
+      "enum": ["OnPush", "Default"],
+      "type": "string",
+      "default": "OnPush",
+      "x-prompt": "Which Change Detection Strategy would you like to use?"
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the initial project.",
@@ -102,7 +113,8 @@
       "description": "The prefix to apply to generated selectors for the initial project.",
       "minLength": 1,
       "default": "app",
-      "alias": "p"
+      "alias": "p",
+      "x-prompt": "Prefix for selectors"
     },
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
