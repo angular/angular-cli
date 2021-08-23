@@ -4621,10 +4621,10 @@ es6-weak-map@^2.0.3:
     es6-iterator "^2.0.3"
     es6-symbol "^3.1.1"
 
-esbuild@0.12.21:
-  version "0.12.21"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.12.21.tgz#7ff32a9ac73ce4310f9cb61ea4c3da9756570d46"
-  integrity sha512-7hyXbU3g94aREufI/5nls7Xcc+RGQeZWZApm6hoBaFvt2BPtpT4TjFMQ9Tb1jU8XyBGz00ShmiyflCogphMHFQ==
+esbuild@0.12.22:
+  version "0.12.22"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.12.22.tgz#6031a1257b8d0307d306bed673b79c3668607f51"
+  integrity sha512-yWCr9RoFehpqoe/+MwZXJpYOEIt7KOEvNnjIeMZpMSyQt+KCBASM3y7yViiN5dJRphf1wGdUz1+M4rTtWd/ulA==
 
 esbuild@^0.12.15:
   version "0.12.20"
@@ -6531,6 +6531,11 @@ jasmine-core@~2.8.0:
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.8.0.tgz#bcc979ae1f9fd05701e45e52e65d3a5d63f1a24e"
   integrity sha1-vMl5rh+f0FcB5F5S5l06XWPxok4=
 
+jasmine-core@~3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.9.0.tgz#09a3c8169fe98ec69440476d04a0e4cb4d59e452"
+  integrity sha512-Tv3kVbPCGVrjsnHBZ38NsPU3sDOtNa0XmbG2baiyJqdb5/SPpDO6GVwJYtUryl6KB4q1Ssckwg612ES9Z0dreQ==
+
 jasmine-reporters@~2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/jasmine-reporters/-/jasmine-reporters-2.4.0.tgz#708c17ae70ba6671e3a930bb1b202aab80a31409"
@@ -6964,10 +6969,10 @@ license-checker@^25.0.0:
     spdx-satisfies "^4.0.0"
     treeify "^1.1.0"
 
-license-webpack-plugin@2.3.20:
-  version "2.3.20"
-  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.3.20.tgz#f51fb674ca31519dbedbe1c7aabc036e5a7f2858"
-  integrity sha512-AHVueg9clOKACSHkhmEI+PCC9x8+qsQVuKECZD3ETxETK5h/PCv5/MUzyG1gm8OMcip/s1tcNxqo9Qb7WhjGsg==
+license-webpack-plugin@2.3.21:
+  version "2.3.21"
+  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.3.21.tgz#152f5e82d5f51f8bab78905731f2b8042aa5691b"
+  integrity sha512-rVaYU9TddZN3ao8M/0PrRSCdTp2EW6VQymlgsuScld1vef0Ou7fALx3ePe83KLP3xAEDcPK5fkqUVqGBnbz1zQ==
   dependencies:
     "@types/webpack-sources" "^0.1.5"
     webpack-sources "^1.2.0"
