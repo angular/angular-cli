@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
 // Same structure as used in framework packages
 export class Version {
   public readonly major: string;
@@ -19,4 +22,9 @@ export class Version {
   }
 }
 
-export const VERSION = new Version(require('../package.json').version);
+// TODO: Convert this to use build-time version stamping once implemented in the build system
+export const VERSION = new Version(
+  (
+    JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf-8')) as { version: string }
+  ).version,
+);
