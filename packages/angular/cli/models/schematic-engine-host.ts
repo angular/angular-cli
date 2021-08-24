@@ -121,7 +121,8 @@ function wrap(
   moduleCache: Map<string, unknown>,
   exportName?: string,
 ): () => unknown {
-  const scopedRequire = nodeModule.createRequire(schematicFile);
+  const hostRequire = nodeModule.createRequire(__filename);
+  const schematicRequire = nodeModule.createRequire(schematicFile);
 
   const customRequire = function (id: string) {
     if (legacyModules[id]) {
@@ -131,13 +132,13 @@ function wrap(
       // Resolve from inside the `@angular/cli` project
       const packagePath = require.resolve(id);
 
-      return require(packagePath);
+      return hostRequire(packagePath);
     } else if (id.startsWith('.') || id.startsWith('@angular/cdk')) {
       // Wrap relative files inside the schematic collection
       // Also wrap `@angular/cdk`, it contains helper utilities that import core schematic packages
 
       // Resolve from the original file
-      const modulePath = scopedRequire.resolve(id);
+      const modulePath = schematicRequire.resolve(id);
 
       // Use cached module if available
       const cachedModule = moduleCache.get(modulePath);
@@ -159,7 +160,7 @@ function wrap(
     }
 
     // All others are required directly from the original file
-    return scopedRequire(id);
+    return schematicRequire(id);
   };
 
   // Setup a wrapper function to capture the module's exports
