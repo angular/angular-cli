@@ -6,6 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+declare module '@yarnpkg/lockfile' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function parse(data: string): Record<string, any>;
+}
+
+declare module 'ini' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function parse(data: string): Record<string, any>;
+}
+
 declare module 'npm-pick-manifest' {
   function pickManifest(
     metadata: import('../utilities/package-metadata').PackageMetadata,
