@@ -23,3 +23,15 @@ declare module 'npm-pick-manifest' {
   ): import('../utilities/package-metadata').PackageManifest;
   export = pickManifest;
 }
+
+declare module 'pacote' {
+  export function manifest(
+    specifier: string,
+    options: Record<string, unknown>,
+  ): Promise<{ name: string; version: string }>;
+
+  export function packument(
+    specifier: string,
+    options: Record<string, unknown>,
+  ): Promise<import('../utilities/package-metadata').NpmRepositoryPackageJson>;
+}

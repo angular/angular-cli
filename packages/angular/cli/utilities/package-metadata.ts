@@ -11,10 +11,9 @@ import * as lockfile from '@yarnpkg/lockfile';
 import { existsSync, readFileSync } from 'fs';
 import * as ini from 'ini';
 import { homedir } from 'os';
+import * as pacote from 'pacote';
 import * as path from 'path';
 import { JsonSchemaForNpmPackageJsonFiles } from './package-json';
-
-const pacote = require('pacote');
 
 const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
 
