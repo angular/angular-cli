@@ -183,7 +183,7 @@
     "ng-packagr": "~12.2.0",
     "node-fetch": "^2.2.0",
     "open": "8.2.1",
-    "ora": "5.4.1",
+    "ora": "6.0.0",
     "pacote": "11.3.5",
     "parse5-html-rewriting-stream": "6.0.1",
     "pidtree": "^0.5.0",

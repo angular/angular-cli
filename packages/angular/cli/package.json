@@ -38,7 +38,7 @@
     "npm-package-arg": "8.1.5",
     "npm-pick-manifest": "6.1.1",
     "open": "8.2.1",
-    "ora": "5.4.1",
+    "ora": "6.0.0",
     "pacote": "11.3.5",
     "resolve": "1.20.0",
     "semver": "7.3.5",
