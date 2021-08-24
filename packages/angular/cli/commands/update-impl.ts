@@ -11,6 +11,7 @@ import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import npa from 'npm-package-arg';
+import pickManifest from 'npm-pick-manifest';
 import * as path from 'path';
 import * as semver from 'semver';
 import { PackageManager } from '../lib/config/workspace-schema';
@@ -25,7 +26,6 @@ import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-man
 import {
   PackageIdentifier,
   PackageManifest,
-  PackageMetadata,
   fetchPackageManifest,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
@@ -36,11 +36,6 @@ import {
   readPackageJson,
 } from '../utilities/package-tree';
 import { Schema as UpdateCommandSchema } from './update';
-
-const pickManifest = require('npm-pick-manifest') as (
-  metadata: PackageMetadata,
-  selector: string,
-) => PackageManifest;
 
 const NG_VERSION_9_POST_MSG = colors.cyan(
   '\nYour project has been updated to Angular version 9!\n' +
