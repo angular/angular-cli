@@ -55,7 +55,7 @@
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "4.0.0",
     "rxjs": "6.6.7",
-    "sass": "1.38.0",
+    "sass": "1.38.1",
     "sass-loader": "12.1.0",
     "semver": "7.3.5",
     "source-map-loader": "3.0.0",
