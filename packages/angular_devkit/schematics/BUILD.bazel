@@ -19,6 +19,7 @@ licenses(["notice"])
 
 ts_library(
     name = "schematics",
+    package_name = "@angular-devkit/schematics",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [

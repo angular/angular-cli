@@ -39,6 +39,7 @@ ts_json_schema(
 
 ts_library(
     name = "architect",
+    package_name = "@angular-devkit/architect",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = ["**/*_spec.ts"],

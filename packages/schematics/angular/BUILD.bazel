@@ -42,6 +42,7 @@ ALL_SCHEMA_TARGETS = [
 
 ts_library(
     name = "angular",
+    package_name = "@schematics/angular",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [

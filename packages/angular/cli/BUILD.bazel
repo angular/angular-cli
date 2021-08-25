@@ -19,6 +19,7 @@ package(default_visibility = ["//visibility:public"])
 
 ts_library(
     name = "angular-cli",
+    package_name = "@angular/cli",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [

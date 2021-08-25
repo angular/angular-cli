@@ -17,6 +17,7 @@ package(default_visibility = ["//visibility:public"])
 
 ts_library(
     name = "benchmark",
+    package_name = "@angular-devkit/benchmark",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [

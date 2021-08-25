@@ -59,6 +59,7 @@ ts_json_schema(
 
 ts_library(
     name = "build_angular",
+    package_name = "@angular-devkit/build-angular",
     srcs = glob(
         include = [
             "src/**/*.ts",

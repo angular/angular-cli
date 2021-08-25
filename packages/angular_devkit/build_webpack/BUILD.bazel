@@ -29,6 +29,7 @@ ts_json_schema(
 
 ts_library(
     name = "build_webpack",
+    package_name = "@angular-devkit/build-webpack",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [

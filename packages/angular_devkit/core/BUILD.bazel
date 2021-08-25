@@ -19,6 +19,7 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "core",
+    package_name = "@angular-devkit/core",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [
