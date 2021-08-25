@@ -1,5 +1,13 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 'use strict';
-// This file is ES6 because it needs to be executed as is.
+// This file is ES5 because it needs to be executed as is.
 
 if ('NG_CLI_ANALYTICS' in process.env) {
   return;
