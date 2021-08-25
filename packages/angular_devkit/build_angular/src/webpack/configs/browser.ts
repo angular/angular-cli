@@ -7,6 +7,7 @@
  */
 
 import * as webpack from 'webpack';
+import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { CommonJsUsageWarnPlugin } from '../plugins';
 import { getSourceMapDevTool } from '../utils/helpers';
@@ -30,7 +31,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   } = buildOptions.sourceMap;
 
   if (subresourceIntegrity) {
-    const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
     extraPlugins.push(
       new SubresourceIntegrityPlugin({
         hashFuncNames: ['sha384'],
