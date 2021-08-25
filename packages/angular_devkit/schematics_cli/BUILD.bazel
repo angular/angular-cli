@@ -13,6 +13,7 @@ package(default_visibility = ["//visibility:public"])
 # @angular-devkit/schematics-cli
 ts_library(
     name = "schematics_cli",
+    package_name = "@angular-devkit/schematics-cli",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [

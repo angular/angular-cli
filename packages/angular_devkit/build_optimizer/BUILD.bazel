@@ -18,6 +18,7 @@ package(default_visibility = ["//visibility:public"])
 
 ts_library(
     name = "build_optimizer",
+    package_name = "@angular-devkit/build-optimizer",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [
