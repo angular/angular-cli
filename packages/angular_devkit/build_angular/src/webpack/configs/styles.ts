@@ -489,7 +489,10 @@ function transformSupportedBrowsersToTargets(supportedBrowsers: string[]): strin
 
   for (const browser of supportedBrowsers) {
     const [browserName, version] = browser.split(' ');
-    if (esBuildSupportedBrowsers.has(browserName)) {
+
+    if (browserName === 'ie') {
+      transformed.push('edge12');
+    } else if (esBuildSupportedBrowsers.has(browserName)) {
       transformed.push(browserName + version);
     }
   }

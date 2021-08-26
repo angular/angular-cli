@@ -700,5 +700,36 @@ describe('Browser Builder styles', () => {
       };
       await browserBuild(architect, host, target, overrides);
     });
+
+    it('should minify colors based on browser support', async () => {
+      host.writeMultipleFiles({
+        'src/app/app.component.css': `
+          div { box-shadow: 0 3px 10px, rgba(0, 0, 0, 0.15); }
+        `,
+      });
+      host.replaceInFile('tsconfig.json', 'es2017', 'es5');
+
+      let result = await browserBuild(architect, host, target, { optimization: true, aot: true });
+      expect(await result.files['main.js']).toContain('#00000026');
+
+      await host.restore().toPromise();
+      await host.initialize().toPromise();
+      architect = (await createArchitect(host.root())).architect;
+
+      // IE 11 doesn't support #rrggbbaa colors
+      // https://github.com/angular/angular-cli/issues/21594#:~:text=%23rrggbbaa%20hex%20color%20notation
+      // While this browser is un-supported, this is used as a base case to test that the underlying
+      // logic to pass the list of supported browsers to the css optimizer works.
+      host.writeMultipleFiles({
+        'src/app/app.component.css': `
+          div { box-shadow: 0 3px 10px, rgba(0, 0, 0, 0.15); }
+        `,
+        '.browserslistrc': 'ie 11',
+      });
+      host.replaceInFile('tsconfig.json', 'es2017', 'es5');
+
+      result = await browserBuild(architect, host, target, { optimization: true, aot: true });
+      expect(await result.files['main.js']).toContain('rgba(0,0,0,.149)');
+    });
   });
 });
