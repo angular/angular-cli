@@ -1,3 +1,17 @@
+<a name="12.2.3"></a>
+
+# 12.2.3 (2021-08-26)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [3e3321857](https://github.com/angular/angular-cli/commit/3e33218578007f93a131dc8be569e9985179098f) | fix  | RGBA converted to hex notation in component styles breaks IE11 |
+
+## Special Thanks:
+
+Alan Agius and Trevor Karjanis
+
 <a name="12.2.2"></a>
 
 # 12.2.2 (2021-08-18)
