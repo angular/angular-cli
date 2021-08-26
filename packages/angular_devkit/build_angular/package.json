@@ -25,7 +25,7 @@
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
     "browserslist": "^4.9.1",
-    "cacache": "15.2.0",
+    "cacache": "15.3.0",
     "caniuse-lite": "^1.0.30001032",
     "circular-dependency-plugin": "5.2.2",
     "copy-webpack-plugin": "9.0.1",
