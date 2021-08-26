@@ -20,6 +20,7 @@ ng_module(
 
 ng_package(
     name = "npm_package",
+    package_name = "@nguniversal/common",
     srcs = [":package.json"],
     entry_point = ":index.ts",
     nested_packages = [

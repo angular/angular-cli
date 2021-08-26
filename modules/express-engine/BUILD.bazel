@@ -21,6 +21,7 @@ ng_module(
 
 ng_package(
     name = "npm_package",
+    package_name = "@nguniversal/express-engine",
     srcs = [
         ":package.json",
     ],

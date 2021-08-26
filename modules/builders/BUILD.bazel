@@ -42,6 +42,7 @@ ts_library(
 
 pkg_npm(
     name = "npm_package",
+    package_name = "@nguniversal/builders",
     srcs = [":builders_assets"],
     tags = ["release"],
     deps = [":builders"],
