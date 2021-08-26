@@ -1,3 +1,29 @@
+<a name="13.0.0-next.2"></a>
+
+# 13.0.0-next.2 (2021-08-26)
+
+### @schematics/angular
+
+| Commit                                                                                              | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [4f91816b2](https://github.com/angular/angular-cli/commit/4f91816b2951c0e2b0109ad1938eb0ae632c0c76) | feat(@schematics/angular): migrate libraries to be published from ViewEngine to Ivy Partial compilation |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [0565ed62e](https://github.com/angular/angular-cli/commit/0565ed62eb08c1e82cffb2533e6afde216c37eb7) | feat(@angular-devkit/schematics): add UpdateBuffer2 based on magic-string |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [7928b18ed](https://github.com/angular/angular-cli/commit/7928b18edf34243a404b5a4f40a5d6e40247d797) | perf(@ngtools/webpack): reduce repeat path mapping analysis during resolution |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Doug Parker, Lukas Spirig and Trevor Karjanis
+
 <a name="12.2.3"></a>
 
 # 12.2.3 (2021-08-26)
