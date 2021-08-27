@@ -51,8 +51,6 @@ export interface AngularWebpackPluginOptions {
   emitClassMetadata: boolean;
   emitNgModuleScope: boolean;
   jitMode: boolean;
-  /** @deprecated use `inlineStyleFileExtension` instead. */
-  inlineStyleMimeType?: string;
   inlineStyleFileExtension?: string;
 }
 
@@ -237,7 +235,6 @@ export class AngularWebpackPlugin {
       resourceLoader.update(compilation, changedFiles);
       augmentHostWithResources(host, resourceLoader, {
         directTemplateLoading: this.pluginOptions.directTemplateLoading,
-        inlineStyleMimeType: this.pluginOptions.inlineStyleMimeType,
         inlineStyleFileExtension: this.pluginOptions.inlineStyleFileExtension,
       });
 

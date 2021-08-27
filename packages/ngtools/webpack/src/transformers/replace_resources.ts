@@ -14,13 +14,8 @@ export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
   getTypeChecker: () => ts.TypeChecker,
   directTemplateLoading = false,
-  inlineStyleMimeType?: string,
   inlineStyleFileExtension?: string,
 ): ts.TransformerFactory<ts.SourceFile> {
-  if (inlineStyleMimeType && !/^text\/[-.\w]+$/.test(inlineStyleMimeType)) {
-    throw new Error('Invalid inline style MIME type.');
-  }
-
   return (context: ts.TransformationContext) => {
     const typeChecker = getTypeChecker();
     const resourceImportDeclarations: ts.ImportDeclaration[] = [];
@@ -38,7 +33,6 @@ export function replaceResources(
                 directTemplateLoading,
                 resourceImportDeclarations,
                 moduleKind,
-                inlineStyleMimeType,
                 inlineStyleFileExtension,
               )
             : node,
@@ -90,7 +84,6 @@ function visitDecorator(
   directTemplateLoading: boolean,
   resourceImportDeclarations: ts.ImportDeclaration[],
   moduleKind?: ts.ModuleKind,
-  inlineStyleMimeType?: string,
   inlineStyleFileExtension?: string,
 ): ts.Decorator {
   if (!isComponentDecorator(node, typeChecker)) {
@@ -121,7 +114,6 @@ function visitDecorator(
           directTemplateLoading,
           resourceImportDeclarations,
           moduleKind,
-          inlineStyleMimeType,
           inlineStyleFileExtension,
         )
       : node,
@@ -155,7 +147,6 @@ function visitComponentMetadata(
   directTemplateLoading: boolean,
   resourceImportDeclarations: ts.ImportDeclaration[],
   moduleKind?: ts.ModuleKind,
-  inlineStyleMimeType?: string,
   inlineStyleFileExtension?: string,
 ): ts.ObjectLiteralElementLike | undefined {
   if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
@@ -205,10 +196,7 @@ function visitComponentMetadata(
 
         let url;
         if (isInlineStyle) {
-          if (inlineStyleMimeType) {
-            const data = Buffer.from(node.text).toString('base64');
-            url = `data:${inlineStyleMimeType};charset=utf-8;base64,${data}`;
-          } else if (inlineStyleFileExtension) {
+          if (inlineStyleFileExtension) {
             const data = Buffer.from(node.text).toString('base64');
             const containingFile = node.getSourceFile().fileName;
             url = `${containingFile}.${inlineStyleFileExtension}!=!${InlineAngularResourceLoaderPath}?data=${encodeURIComponent(

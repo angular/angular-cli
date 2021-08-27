@@ -18,7 +18,6 @@ function transform(
   directTemplateLoading = true,
   importHelpers = true,
   module: ts.ModuleKind = ts.ModuleKind.ES2020,
-  inlineStyleMimeType?: string,
 ) {
   const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, {
     importHelpers,
@@ -29,7 +28,6 @@ function transform(
     () => shouldTransform,
     getTypeChecker,
     directTemplateLoading,
-    inlineStyleMimeType,
   );
 
   return transformTypescript(input, [transformer], program, compilerHost);
@@ -224,50 +222,6 @@ describe('@ngtools/webpack transformers', () => {
 
       const result = transform(input);
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
-
-    it('should create data URIs for inline styles when inlineStyleMimeType is set', () => {
-      const input = tags.stripIndent`
-        import { Component } from '@angular/core';
-
-        @Component({
-          selector: 'app-root',
-          templateUrl: './app.component.html',
-          styles: ['a { color: red }'],
-        })
-        export class AppComponent {
-          title = 'app';
-        }
-      `;
-      const output = tags.stripIndent`
-        import { __decorate } from "tslib";
-        import __NG_CLI_RESOURCE__0 from "!${DirectAngularResourceLoaderPath}!./app.component.html";
-        import __NG_CLI_RESOURCE__1 from "data:text/css;charset=utf-8;base64,YSB7IGNvbG9yOiByZWQgfQ==";
-        import { Component } from '@angular/core';
-
-        let AppComponent = class AppComponent {
-            constructor() {
-                this.title = 'app';
-            }
-        };
-        AppComponent = __decorate([
-            Component({
-                selector: 'app-root',
-                template: __NG_CLI_RESOURCE__0,
-                styles: [__NG_CLI_RESOURCE__1]
-            })
-        ], AppComponent);
-        export { AppComponent };
-      `;
-
-      const result = transform(input, true, true, true, ts.ModuleKind.ESNext, 'text/css');
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
-
-    it('should throw error if inlineStyleMimeType value has invalid format', () => {
-      expect(() =>
-        transform('', true, true, true, ts.ModuleKind.ESNext, 'asdfsd;sdfsd//sdfsdf'),
-      ).toThrowError('Invalid inline style MIME type.');
     });
 
     it('should replace resources with backticks', () => {
