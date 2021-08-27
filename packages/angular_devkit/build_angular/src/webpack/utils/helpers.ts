@@ -96,7 +96,9 @@ export function isPolyfillsEntry(name: string): boolean {
   return name === 'polyfills';
 }
 
-export function getWatchOptions(poll: number | undefined): Configuration['watchOptions'] {
+export function getWatchOptions(
+  poll: number | undefined,
+): NonNullable<Configuration['watchOptions']> {
   return {
     poll,
     ignored: poll === undefined ? '**/$_lazy_route_resources' : 'node_modules/**',

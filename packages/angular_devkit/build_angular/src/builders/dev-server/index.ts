@@ -228,40 +228,6 @@ export function serveWebpackBrowser(
       throw new Error('Webpack Dev Server configuration was not set.');
     }
 
-    if (options.liveReload && !options.hmr) {
-      // This is needed because we cannot use the inline option directly in the config
-      // because of the SuppressExtractedTextChunksWebpackPlugin
-      // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-      webpackDevServer.addDevServerEntrypoints(config, {
-        ...config.devServer,
-        inline: true,
-      });
-
-      // Remove live-reload code from all entrypoints but not main.
-      // Otherwise this will break SuppressExtractedTextChunksWebpackPlugin because
-      // 'addDevServerEntrypoints' adds addional entry-points to all entries.
-      if (
-        config.entry &&
-        typeof config.entry === 'object' &&
-        !Array.isArray(config.entry) &&
-        config.entry.main
-      ) {
-        for (const [key, value] of Object.entries(config.entry)) {
-          if (key === 'main' || !Array.isArray(value)) {
-            continue;
-          }
-
-          const webpackClientScriptIndex = value.findIndex((x) =>
-            x.includes('webpack-dev-server/client/index.js'),
-          );
-          if (webpackClientScriptIndex >= 0) {
-            // Remove the webpack-dev-server/client script from array.
-            value.splice(webpackClientScriptIndex, 1);
-          }
-        }
-      }
-    }
-
     let locale: string | undefined;
     if (i18n.shouldInline) {
       // Dev-server only supports one locale
@@ -306,7 +272,7 @@ export function serveWebpackBrowser(
           // The below is needed as otherwise HMR for CSS will break.
           // styles.js and runtime.js needs to be loaded as a non-module scripts as otherwise `document.currentScript` will be null.
           // https://github.com/webpack-contrib/mini-css-extract-plugin/blob/90445dd1d81da0c10b9b0e8a17b417d0651816b8/src/hmr/hotModuleReplacement.js#L39
-          isHMREnabled: webpackConfig.devServer?.hot,
+          isHMREnabled: !!webpackConfig.devServer?.hot,
         });
 
         webpackConfig.plugins ??= [];
@@ -336,8 +302,8 @@ export function serveWebpackBrowser(
           const serverAddress = url.format({
             protocol: options.ssl ? 'https' : 'http',
             hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
-            pathname: webpackConfig.devServer?.publicPath,
             port: buildEvent.port,
+            pathname: webpackConfig.devServer?.devMiddleware?.publicPath,
           });
 
           if (index === 0) {

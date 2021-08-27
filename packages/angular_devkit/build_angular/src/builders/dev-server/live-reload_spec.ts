@@ -10,7 +10,6 @@
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
 import { createProxyServer } from 'http-proxy';
-import { HTTPResponse } from 'puppeteer/lib/cjs/puppeteer/api-docs-entry';
 import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser';
 import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page';
 import puppeteer from 'puppeteer/lib/cjs/puppeteer/node';
@@ -96,15 +95,33 @@ function createProxy(target: string, secure: boolean, ws = true): ProxyInstance 
   };
 }
 
-async function goToPageAndWaitForSockJs(page: Page, url: string): Promise<void> {
-  const socksRequest = `${url.endsWith('/') ? url : url + '/'}sockjs-node/info?t=`;
+async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
+  const baseUrl = url.replace(/^http/, 'ws');
+  const socksRequest = baseUrl[baseUrl.length - 1] === '/' ? `${baseUrl}ws` : `${baseUrl}/ws`;
+  // Create a Chrome dev tools session so that we can capturing websocket request.
+  // https://github.com/puppeteer/puppeteer/issues/2974
+
+  // We do this, to ensure that we make the right request with the expected host, port etc...
+  const client = await page.target().createCDPSession();
+  await client.send('Network.enable');
+  await client.send('Page.enable');
 
   await Promise.all([
-    page.waitForResponse(
-      (r: HTTPResponse) => r.url().startsWith(socksRequest) && r.status() === 200,
-    ),
+    new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error(`A Websocket connected to ${socksRequest} was not established.`)),
+        2000,
+      );
+      client.on('Network.webSocketCreated', ({ url }) => {
+        if (url.startsWith(socksRequest)) {
+          clearTimeout(timeout);
+          resolve();
+        }
+      });
+    }),
     page.goto(url),
   ]);
+  await client.detach();
 }
 
 describe('Dev Server Builder live-reload', () => {
@@ -169,7 +186,7 @@ describe('Dev Server Builder live-reload', () => {
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
             case 0:
-              await goToPageAndWaitForSockJs(page, url);
+              await goToPageAndWaitForWS(page, url);
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
               break;
             case 1:
@@ -200,7 +217,7 @@ describe('Dev Server Builder live-reload', () => {
           switch (buildCount) {
             case 0:
               proxy = createProxy(url, false);
-              await goToPageAndWaitForSockJs(page, proxy.url);
+              await goToPageAndWaitForWS(page, proxy.url);
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
               break;
             case 1:
@@ -231,43 +248,7 @@ describe('Dev Server Builder live-reload', () => {
           switch (buildCount) {
             case 0:
               proxy = createProxy(url, true);
-              await goToPageAndWaitForSockJs(page, proxy.url);
-              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
-              break;
-            case 1:
-              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-              expect(innerText).toBe('app-live-reload');
-              break;
-          }
-
-          buildCount++;
-        }),
-        take(2),
-      )
-      .toPromise();
-  });
-
-  it('works without https -> http proxy without websockets (dotnet emulation)', async () => {
-    const run = await architect.scheduleTarget(target, overrides);
-    runs.push(run);
-
-    let proxy: ProxyInstance | undefined;
-    let buildCount = 0;
-
-    await run.output
-      .pipe(
-        debounceTime(1000),
-        switchMap(async (buildEvent) => {
-          expect(buildEvent.success).toBe(true);
-          const url = buildEvent.baseUrl as string;
-          switch (buildCount) {
-            case 0:
-              proxy = createProxy(url, true, false);
-              await goToPageAndWaitForSockJs(page, proxy.url);
-              await page.waitForResponse(
-                (response: HTTPResponse) =>
-                  response.url().includes('xhr_streaming') && response.status() === 200,
-              );
+              await goToPageAndWaitForWS(page, proxy.url);
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
               break;
             case 1:

@@ -68,7 +68,7 @@
     "tslib": "2.3.1",
     "webpack": "5.51.1",
     "webpack-dev-middleware": "5.0.0",
-    "webpack-dev-server": "3.11.2",
+    "webpack-dev-server": "4.0.0",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0"
   },
