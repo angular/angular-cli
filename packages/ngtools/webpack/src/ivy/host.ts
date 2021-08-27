@@ -20,7 +20,6 @@ export function augmentHostWithResources(
   resourceLoader: WebpackResourceLoader,
   options: {
     directTemplateLoading?: boolean;
-    inlineStyleMimeType?: string;
     inlineStyleFileExtension?: string;
   } = {},
 ) {
@@ -60,10 +59,9 @@ export function augmentHostWithResources(
       return null;
     }
 
-    if (options.inlineStyleMimeType || options.inlineStyleFileExtension) {
+    if (options.inlineStyleFileExtension) {
       const content = await resourceLoader.process(
         data,
-        options.inlineStyleMimeType,
         options.inlineStyleFileExtension,
         context.type,
         context.containingFile,

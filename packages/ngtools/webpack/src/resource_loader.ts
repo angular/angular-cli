@@ -102,7 +102,6 @@ export class WebpackResourceLoader {
   private async _compile(
     filePath?: string,
     data?: string,
-    mimeType?: string,
     fileExtension?: string,
     resourceType?: 'style' | 'template',
     containingFile?: string,
@@ -167,10 +166,6 @@ export class WebpackResourceLoader {
               if (filePath) {
                 resourceData.path = filePath;
                 resourceData.resource = filePath;
-              }
-
-              if (mimeType) {
-                resourceData.data.mimetype = mimeType;
               }
 
               return true;
@@ -334,7 +329,6 @@ export class WebpackResourceLoader {
 
   async process(
     data: string,
-    mimeType: string | undefined,
     fileExtension: string | undefined,
     resourceType: 'template' | 'style',
     containingFile?: string,
@@ -346,7 +340,6 @@ export class WebpackResourceLoader {
     const compilationResult = await this._compile(
       undefined,
       data,
-      mimeType,
       fileExtension,
       resourceType,
       containingFile,

@@ -38,7 +38,6 @@ export function createJitTransformers(
   builder: ts.BuilderProgram,
   options: {
     directTemplateLoading?: boolean;
-    inlineStyleMimeType?: string;
     inlineStyleFileExtension?: string;
   },
 ): ts.CustomTransformers {
@@ -50,7 +49,6 @@ export function createJitTransformers(
         () => true,
         getTypeChecker,
         options.directTemplateLoading,
-        options.inlineStyleMimeType,
         options.inlineStyleFileExtension,
       ),
       constructorParametersDownlevelTransform(builder.getProgram()),

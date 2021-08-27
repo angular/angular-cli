@@ -38,8 +38,6 @@ export interface AngularWebpackPluginOptions {
     fileReplacements: Record<string, string>;
     // (undocumented)
     inlineStyleFileExtension?: string;
-    // @deprecated (undocumented)
-    inlineStyleMimeType?: string;
     // (undocumented)
     jitMode: boolean;
     // (undocumented)
