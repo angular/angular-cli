@@ -13,6 +13,20 @@ export class BuildBrowserFeatures {
   readonly supportedBrowsers: string[];
 
   constructor(private projectRoot: string) {
+    // By default, browserslist defaults are too inclusive
+    // https://github.com/browserslist/browserslist/blob/83764ea81ffaa39111c204b02c371afa44a4ff07/index.js#L516-L522
+
+    // We change the default query to browsers that Angular support.
+    // https://angular.io/guide/browser-support
+    browserslist.defaults = [
+      'last 1 Chrome version',
+      'last 1 Firefox version',
+      'last 2 Edge major versions',
+      'last 2 Safari major versions',
+      'last 2 iOS major versions',
+      'Firefox ESR',
+    ];
+
     this.supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
   }
 
