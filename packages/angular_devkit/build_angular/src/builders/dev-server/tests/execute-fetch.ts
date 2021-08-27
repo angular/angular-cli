@@ -27,7 +27,9 @@ export async function executeOnceAndFetch<T>(
       mergeMap(async (executionResult) => {
         let response = undefined;
         if (executionResult.result?.success) {
-          const resolvedUrl = new URL(url, `${executionResult.result.baseUrl}/`);
+          let baseUrl = `${executionResult.result.baseUrl}`;
+          baseUrl = baseUrl[baseUrl.length - 1] === '/' ? baseUrl : `${baseUrl}/`;
+          const resolvedUrl = new URL(url, baseUrl);
           response = await fetch(resolvedUrl, options?.request);
         }
 

@@ -390,6 +390,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       syncWebAssembly: true,
       asyncWebAssembly: true,
     },
+    infrastructureLogging: {
+      level: buildOptions.verbose ? 'verbose' : 'error',
+    },
     cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers),
     optimization: {
       minimizer: extraMinimizers,
