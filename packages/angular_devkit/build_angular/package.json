@@ -32,7 +32,7 @@
     "core-js": "3.16.3",
     "critters": "0.0.10",
     "css-loader": "6.2.0",
-    "esbuild": "0.12.23",
+    "esbuild": "0.12.24",
     "find-cache-dir": "3.3.1",
     "glob": "7.1.7",
     "https-proxy-agent": "5.0.0",
