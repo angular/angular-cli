@@ -177,7 +177,7 @@
     "license-webpack-plugin": "2.3.21",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
-    "mini-css-extract-plugin": "2.2.0",
+    "mini-css-extract-plugin": "2.2.1",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
     "ng-packagr": "~12.2.0",
@@ -225,7 +225,7 @@
     "verdaccio-auth-memory": "^10.0.0",
     "webpack": "5.51.1",
     "webpack-dev-middleware": "5.0.0",
-    "webpack-dev-server": "4.0.0",
+    "webpack-dev-server": "4.1.0",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0",
     "zone.js": "^0.11.3"
