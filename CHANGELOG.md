@@ -1,3 +1,18 @@
+<a name="12.2.4"></a>
+
+# 12.2.4 (2021-09-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [aaadef026](https://github.com/angular/angular-cli/commit/aaadef02698ba729ca04ccd4159bda5b6582babb) | fix  | update `esbuild` to `0.12.24`               |
+| [f8a9f4a01](https://github.com/angular/angular-cli/commit/f8a9f4a0100286b7cf656ffbe486c3424cad5172) | fix  | update `mini-css-extract-plugin` to `2.2.1` |
+
+## Special Thanks
+
+Alan Agius
+
 <a name="12.2.3"></a>
 
 # 12.2.3 (2021-08-26)
