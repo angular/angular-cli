@@ -1,3 +1,52 @@
+<a name="13.0.0-next.3"></a>
+
+# 13.0.0-next.3 (2021-09-01)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- The dev-server now uses WebSockets to communicate changes to the browser during HMR and live-reloaded. If during your development you are using a proxy you will need to enable proxying of WebSockets.
+
+### @angular-devkit/build-webpack
+
+- Support for `webpack-dev-server` version 3 has been removed. For more information about the migration please see: https://github.com/webpack/webpack-dev-server/blob/master/migration-v4.md
+
+Note: this change only affects users depending on `@angular-devkit/build-webpack` directly.
+
+### @ngtools/webpack
+
+- Deprecated `inlineStyleMimeType` option has been removed from `AngularWebpackPluginOptions`. Use `inlineStyleFileExtension` instead.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [732ef7985](https://github.com/angular/angular-cli/commit/732ef798523f74994ed3d482a65b191058674d19) | fix  | add browserslist configuration in library projects |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [32dbf659a](https://github.com/angular/angular-cli/commit/32dbf659acb632fac1d76d99d8191ea9c5e6350b) | feat | update `webpack-dev-server` to version 4 |
+| [76d6d8826](https://github.com/angular/angular-cli/commit/76d6d8826f9968f84edf219f67b84673d70bbe95) | fix  | set browserslist defaults                |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [a0b5897d5](https://github.com/angular/angular-cli/commit/a0b5897d50a00ee4668029c2cbc47cacd2ab925f) | feat | update `webpack-dev-server` to version 4 |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type     | Description                                    |
+| --------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
+| [8ce8e4edc](https://github.com/angular/angular-cli/commit/8ce8e4edc5ca2984d6a36fe4c7d308fa7f089102) | refactor | remove deprecated `inlineStyleMimeType` option |
+
+## Special Thanks
+
+Alan Agius and Joey Perrott
+
 <a name="12.2.4"></a>
 
 # 12.2.4 (2021-09-01)
