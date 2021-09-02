@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.51.1",
+    "**/@types/copy-webpack-plugin/webpack": "5.51.2",
     "ajv-formats/ajv": "8.6.2"
   },
   "devDependencies": {
@@ -140,7 +140,7 @@
     "common-tags": "^1.8.0",
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "9.0.1",
-    "core-js": "3.16.4",
+    "core-js": "3.17.1",
     "critters": "0.0.10",
     "css-loader": "6.2.0",
     "debug": "^4.1.1",
@@ -177,7 +177,7 @@
     "license-webpack-plugin": "2.3.21",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
-    "mini-css-extract-plugin": "2.2.1",
+    "mini-css-extract-plugin": "2.2.2",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
     "ng-packagr": "13.0.0-next.1",
@@ -201,7 +201,7 @@
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "4.0.0",
     "rxjs": "6.6.7",
-    "sass": "1.38.2",
+    "sass": "1.39.0",
     "sass-loader": "12.1.0",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz",
     "semver": "7.3.5",
@@ -223,7 +223,7 @@
     "typescript": "4.3.5",
     "verdaccio": "5.1.3",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.51.1",
+    "webpack": "5.51.2",
     "webpack-dev-middleware": "5.0.0",
     "webpack-dev-server": "4.1.0",
     "webpack-merge": "5.8.0",
