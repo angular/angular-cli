@@ -82,7 +82,7 @@
     "@angular/platform-server": "12.2.3",
     "@angular/router": "12.2.3",
     "@angular/service-worker": "12.2.3",
-    "@babel/core": "7.15.4",
+    "@babel/core": "7.15.5",
     "@babel/generator": "7.15.4",
     "@babel/helper-annotate-as-pure": "7.15.4",
     "@babel/plugin-proposal-async-generator-functions": "7.15.4",
