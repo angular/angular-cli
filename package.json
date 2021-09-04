@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.51.2",
+    "**/@types/copy-webpack-plugin/webpack": "5.52.0",
     "ajv-formats/ajv": "8.6.2"
   },
   "devDependencies": {
@@ -210,7 +210,7 @@
     "source-map-loader": "3.0.0",
     "source-map-support": "0.5.19",
     "spdx-satisfies": "^5.0.0",
-    "stylus": "0.54.8",
+    "stylus": "0.55.0",
     "stylus-loader": "6.1.0",
     "symbol-observable": "4.0.0",
     "tar": "^6.1.6",
@@ -223,7 +223,7 @@
     "typescript": "4.3.5",
     "verdaccio": "5.1.3",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.51.2",
+    "webpack": "5.52.0",
     "webpack-dev-middleware": "5.0.0",
     "webpack-dev-server": "4.1.0",
     "webpack-merge": "5.8.0",
