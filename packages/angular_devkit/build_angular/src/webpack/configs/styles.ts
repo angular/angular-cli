@@ -488,11 +488,25 @@ function transformSupportedBrowsersToTargets(supportedBrowsers: string[]): strin
   const esBuildSupportedBrowsers = new Set(['safari', 'firefox', 'edge', 'chrome', 'ios']);
 
   for (const browser of supportedBrowsers) {
-    const [browserName, version] = browser.split(' ');
+    let [browserName, version] = browser.split(' ');
+
+    // browserslist uses the name `ios_saf` for iOS Safari whereas esbuild uses `ios`
+    if (browserName === 'ios_saf') {
+      browserName = 'ios';
+      // browserslist also uses ranges for iOS Safari versions but only the lowest is required
+      // to perform minimum supported feature checks. esbuild also expects a single version.
+      [version] = version.split('-');
+    }
 
     if (browserName === 'ie') {
       transformed.push('edge12');
     } else if (esBuildSupportedBrowsers.has(browserName)) {
+      if (browserName === 'safari' && version === 'TP') {
+        // esbuild only supports numeric versions so `TP` is converted to a high number (999) since
+        // a Technology Preview (TP) of Safari is assumed to support all currently known features.
+        version = '999';
+      }
+
       transformed.push(browserName + version);
     }
   }
