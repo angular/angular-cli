@@ -1,3 +1,17 @@
+<a name="13.0.0-next.4"></a>
+
+# 13.0.0-next.4 (2021-09-08)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [decb1d14b](https://github.com/angular/angular-cli/commit/decb1d14b038c142213ded334a79570a09e9b31f) | fix  | improve Safari browserslist to esbuild target conversion |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
 <a name="12.2.5"></a>
 
 # 12.2.5 (2021-09-08)
