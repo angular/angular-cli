@@ -43,9 +43,8 @@ export function getDevServerConfig(
   } = wco;
 
   const servePath = buildServePath(wco.buildOptions, logger);
-  const { styles: stylesOptimization, scripts: scriptsOptimization } = normalizeOptimization(
-    optimization,
-  );
+  const { styles: stylesOptimization, scripts: scriptsOptimization } =
+    normalizeOptimization(optimization);
 
   const extraPlugins = [];
 
@@ -109,7 +108,7 @@ export function getDevServerConfig(
       },
       sockPath: posix.join(servePath, 'sockjs-node'),
       stats: false,
-      compress: stylesOptimization.minify || scriptsOptimization,
+      compress: false,
       watchOptions: getWatchOptions(poll),
       https: getSslConfig(root, wco.buildOptions),
       overlay: {
