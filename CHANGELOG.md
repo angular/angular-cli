@@ -1,3 +1,18 @@
+<a name="12.2.5"></a>
+
+# 12.2.5 (2021-09-08)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [0498768c5](https://github.com/angular/angular-cli/commit/0498768c54de225a40c28fdf27bb1fc43959ba20) | fix  | disable dev-server response compression                  |
+| [367fce2e9](https://github.com/angular/angular-cli/commit/367fce2e9f9389c41f2ed5361ef6749198c49785) | fix  | improve Safari browserslist to esbuild target conversion |
+
+## Special Thanks:
+
+Alan Agius and Charles Lyding
+
 <a name="13.0.0-next.3"></a>
 
 # 13.0.0-next.3 (2021-09-01)
