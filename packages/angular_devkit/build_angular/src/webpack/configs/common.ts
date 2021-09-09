@@ -370,7 +370,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           test: /\.[cm]?js$|\.tsx?$/,
           // The below is needed due to a bug in `@babel/runtime`. See: https://github.com/babel/babel/issues/12824
           resolve: { fullySpecified: false },
-          exclude: [/[/\\](?:core-js|@babel|tslib|web-animations-js)[/\\]/],
+          exclude: [/[/\\](?:core-js|@babel|tslib|web-animations-js|web-streams-polyfill)[/\\]/],
           use: [
             {
               loader: require.resolve('../../babel/webpack-loader'),
