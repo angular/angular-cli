@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext, createBuilder } from '@angular-devkit/architect';
+import { createServer } from 'net';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -62,12 +63,35 @@ export function runWebpackDevServer(
     options.logging || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
   return createWebpack({ ...config, watch: false }).pipe(
-    switchMap(
-      (webpackCompiler) =>
-        new Observable<DevServerBuildOutput>((obs) => {
-          const devServerConfig = options.devServerConfig || config.devServer || {};
-          devServerConfig.host ??= 'localhost';
+    switchMap(async (webpackCompiler) => {
+      const devServerConfig = options.devServerConfig || config.devServer || {};
+      devServerConfig.host ??= 'localhost';
 
+      // Webpack-dev-server doesnt' handle concurrency very well.
+      // When using port 0, and 2 processes start at the same time, they end up being given the same port.
+      // The below is a workaround until the issue is resolved upstream.
+      // The main reason for the issue is that it find a free port, put only uses at a later stage
+      // and the `WEBPACK_DEV_SERVER_BASE_PORT` is always set the same.
+      if (devServerConfig.port === 'auto' || devServerConfig.port === 0) {
+        try {
+          const port = await getFreePort();
+          if (port) {
+            // We set `WEBPACK_DEV_SERVER_BASE_PORT` instead of the `port` option to still use the retry mechanism
+            // in case the port get assigned in the meantime.
+            // https://github.com/webpack/webpack-dev-server/blob/2b1208dadfbe70246a36b74954e3f2fd2c3ba220/lib/Server.js#L76-L94
+            process.env.WEBPACK_DEV_SERVER_BASE_PORT = `${port}`;
+          }
+        } catch {}
+      }
+
+      return [webpackCompiler, devServerConfig] as [
+        webpack.Compiler,
+        WebpackDevServer.Configuration,
+      ];
+    }),
+    switchMap(
+      ([webpackCompiler, devServerConfig]) =>
+        new Observable<DevServerBuildOutput>((obs) => {
           let result: Partial<DevServerBuildOutput>;
 
           webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
@@ -119,3 +143,17 @@ export default createBuilder<WebpackDevServerBuilderSchema, DevServerBuildOutput
     );
   },
 );
+
+function getFreePort(): Promise<number | undefined> {
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    server
+      .unref()
+      .once('error', reject)
+      .listen(0, () => {
+        const address = server.address();
+        resolve(address && typeof address !== 'string' ? address.port : undefined);
+        server.close();
+      });
+  });
+}
