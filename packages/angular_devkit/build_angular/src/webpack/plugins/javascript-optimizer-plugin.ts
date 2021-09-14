@@ -10,6 +10,7 @@ import Piscina from 'piscina';
 import { ScriptTarget } from 'typescript';
 import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../utils/environment-options';
+import { EsbuildExecutor } from './esbuild-executor';
 
 /**
  * The maximum number of Workers that will be created to execute optimize tasks.
@@ -160,6 +161,10 @@ export class JavaScriptOptimizerPlugin {
             target,
             removeLicenses: this.options.removeLicenses,
             advanced: this.options.advanced,
+            // Perform a single native esbuild support check.
+            // This removes the need for each worker to perform the check which would
+            // otherwise require spawning a separate process per worker.
+            alwaysUseWasm: !EsbuildExecutor.hasNativeSupport(),
           };
 
           // Sort scripts so larger scripts start first - worker pool uses a FIFO queue
