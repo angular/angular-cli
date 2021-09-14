@@ -20,6 +20,7 @@ import {
   RemoveHashPlugin,
   SuppressExtractedTextChunksWebpackPlugin,
 } from '../plugins';
+import { EsbuildExecutor } from '../plugins/esbuild-executor';
 import {
   assetNameTemplateFactory,
   getOutputHashFormat,
@@ -277,7 +278,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   const extraMinimizers = [];
   if (buildOptions.optimization.styles.minify) {
     const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-    const esbuild = require('esbuild') as typeof import('esbuild');
+    const esbuild = new EsbuildExecutor();
 
     const cssnanoOptions = {
       preset: [

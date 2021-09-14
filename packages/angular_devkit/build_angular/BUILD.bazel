@@ -91,6 +91,7 @@ ts_library(
         include = [
             "package.json",
             "builders.json",
+            "esbuild-check.js",
             "src/**/schema.json",
             "src/**/*.js",
             "src/**/*.html",
@@ -150,6 +151,7 @@ ts_library(
         "@npm//css-loader",
         "@npm//css-minimizer-webpack-plugin",
         "@npm//esbuild",
+        "@npm//esbuild-wasm",
         "@npm//find-cache-dir",
         "@npm//glob",
         "@npm//https-proxy-agent",
