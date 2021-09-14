@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Message, formatMessages, transform } from 'esbuild';
+import type { Message, TransformResult } from 'esbuild';
 import type { Compilation, Compiler, sources } from 'webpack';
 import { addWarning } from '../../utils/webpack-diagnostics';
+import { EsbuildExecutor } from './esbuild-executor';
+
 /**
  * The name of the plugin provided to Webpack when tapping Webpack compiler hooks.
  */
@@ -26,6 +28,7 @@ export interface CssOptimizerPluginOptions {
  */
 export class CssOptimizerPlugin {
   private targets: string[] | undefined;
+  private esbuild = new EsbuildExecutor();
 
   constructor(options?: CssOptimizerPluginOptions) {
     if (options?.supportedBrowsers) {
@@ -76,25 +79,13 @@ export class CssOptimizerPlugin {
             }
 
             const { source, map: inputMap } = styleAssetSource.sourceAndMap();
-            let sourceMapLine;
-            if (inputMap) {
-              // esbuild will automatically remap the sourcemap if provided
-              sourceMapLine = `\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
-                JSON.stringify(inputMap),
-              ).toString('base64')} */`;
-            }
-
             const input = typeof source === 'string' ? source : source.toString();
-            const { code, warnings, map } = await transform(
-              sourceMapLine ? input + sourceMapLine : input,
-              {
-                loader: 'css',
-                legalComments: 'inline',
-                minify: true,
-                sourcemap: !!inputMap && 'external',
-                sourcefile: asset.name,
-                target: this.targets,
-              },
+
+            const { code, warnings, map } = await this.optimize(
+              input,
+              asset.name,
+              inputMap,
+              this.targets,
             );
 
             await this.addWarnings(compilation, warnings);
@@ -114,9 +105,43 @@ export class CssOptimizerPlugin {
     });
   }
 
+  /**
+   * Optimizes a CSS asset using esbuild.
+   *
+   * @param input The CSS asset source content to optimize.
+   * @param name The name of the CSS asset. Used to generate source maps.
+   * @param inputMap Optionally specifies the CSS asset's original source map that will
+   * be merged with the intermediate optimized source map.
+   * @param target Optionally specifies the target browsers for the output code.
+   * @returns A promise resolving to the optimized CSS, source map, and any warnings.
+   */
+  private optimize(
+    input: string,
+    name: string,
+    inputMap: object,
+    target: string[] | undefined,
+  ): Promise<TransformResult> {
+    let sourceMapLine;
+    if (inputMap) {
+      // esbuild will automatically remap the sourcemap if provided
+      sourceMapLine = `\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
+        JSON.stringify(inputMap),
+      ).toString('base64')} */`;
+    }
+
+    return this.esbuild.transform(sourceMapLine ? input + sourceMapLine : input, {
+      loader: 'css',
+      legalComments: 'inline',
+      minify: true,
+      sourcemap: !!inputMap && 'external',
+      sourcefile: name,
+      target,
+    });
+  }
+
   private async addWarnings(compilation: Compilation, warnings: Message[]) {
     if (warnings.length > 0) {
-      for (const warning of await formatMessages(warnings, { kind: 'warning' })) {
+      for (const warning of await this.esbuild.formatMessages(warnings, { kind: 'warning' })) {
         addWarning(compilation, warning);
       }
     }
