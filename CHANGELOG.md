@@ -1,3 +1,24 @@
+<a name="13.0.0-next.5"></a>
+
+# 13.0.0-next.5 (2021-09-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [d3fa202e9](https://github.com/angular/angular-cli/commit/d3fa202e9a26926f0660b1e1f156012ea41b1711) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [590c15664](https://github.com/angular/angular-cli/commit/590c15664282e6d80bb655191272ab2be1f2e399) | fix  | add web-streams-polyfill to downlevel exclusion list              |
+| [df8f909d8](https://github.com/angular/angular-cli/commit/df8f909d80ca787e24cb040f9ee2517bf050c20b) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Joey Perrott
+
 <a name="12.2.6"></a>
 
 # 12.2.6 (2021-09-15)
