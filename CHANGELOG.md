@@ -1,46 +1,16 @@
-<a name="12.2.6"></a>
+<a name="13.0.0-next.4"></a>
 
-# 12.2.6 (2021-09-15)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [8b21effad](https://github.com/angular/angular-cli/commit/8b21effad673877cf1a82ef7d0601393a65517fb) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
+# 13.0.0-next.4 (2021-09-08)
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [ea60f0f52](https://github.com/angular/angular-cli/commit/ea60f0f527f2ab8fc5acc967138c4ae993946923) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [decb1d14b](https://github.com/angular/angular-cli/commit/decb1d14b038c142213ded334a79570a09e9b31f) | fix  | improve Safari browserslist to esbuild target conversion |
 
 ## Special Thanks
 
-Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="12.2.6"></a>
-
-# 12.2.6 (2021-09-15)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [8b21effad](https://github.com/angular/angular-cli/commit/8b21effad673877cf1a82ef7d0601393a65517fb) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [ea60f0f52](https://github.com/angular/angular-cli/commit/ea60f0f527f2ab8fc5acc967138c4ae993946923) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
-
-## Special Thanks
-
-Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
+Alan Agius, Charles Lyding and Doug Parker
 
 <a name="12.2.5"></a>
 
@@ -57,6 +27,55 @@ Alan Agius
 
 Alan Agius and Charles Lyding
 
+<a name="13.0.0-next.3"></a>
+
+# 13.0.0-next.3 (2021-09-01)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- The dev-server now uses WebSockets to communicate changes to the browser during HMR and live-reloaded. If during your development you are using a proxy you will need to enable proxying of WebSockets.
+
+### @angular-devkit/build-webpack
+
+- Support for `webpack-dev-server` version 3 has been removed. For more information about the migration please see: https://github.com/webpack/webpack-dev-server/blob/master/migration-v4.md
+
+Note: this change only affects users depending on `@angular-devkit/build-webpack` directly.
+
+### @ngtools/webpack
+
+- Deprecated `inlineStyleMimeType` option has been removed from `AngularWebpackPluginOptions`. Use `inlineStyleFileExtension` instead.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [732ef7985](https://github.com/angular/angular-cli/commit/732ef798523f74994ed3d482a65b191058674d19) | fix  | add browserslist configuration in library projects |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [32dbf659a](https://github.com/angular/angular-cli/commit/32dbf659acb632fac1d76d99d8191ea9c5e6350b) | feat | update `webpack-dev-server` to version 4 |
+| [76d6d8826](https://github.com/angular/angular-cli/commit/76d6d8826f9968f84edf219f67b84673d70bbe95) | fix  | set browserslist defaults                |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [a0b5897d5](https://github.com/angular/angular-cli/commit/a0b5897d50a00ee4668029c2cbc47cacd2ab925f) | feat | update `webpack-dev-server` to version 4 |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type     | Description                                    |
+| --------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
+| [8ce8e4edc](https://github.com/angular/angular-cli/commit/8ce8e4edc5ca2984d6a36fe4c7d308fa7f089102) | refactor | remove deprecated `inlineStyleMimeType` option |
+
+## Special Thanks
+
+Alan Agius and Joey Perrott
+
 <a name="12.2.4"></a>
 
 # 12.2.4 (2021-09-01)
@@ -72,6 +91,32 @@ Alan Agius and Charles Lyding
 
 Alan Agius
 
+<a name="13.0.0-next.2"></a>
+
+# 13.0.0-next.2 (2021-08-26)
+
+### @schematics/angular
+
+| Commit                                                                                              | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [4f91816b2](https://github.com/angular/angular-cli/commit/4f91816b2951c0e2b0109ad1938eb0ae632c0c76) | feat(@schematics/angular): migrate libraries to be published from ViewEngine to Ivy Partial compilation |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [0565ed62e](https://github.com/angular/angular-cli/commit/0565ed62eb08c1e82cffb2533e6afde216c37eb7) | feat(@angular-devkit/schematics): add UpdateBuffer2 based on magic-string |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [7928b18ed](https://github.com/angular/angular-cli/commit/7928b18edf34243a404b5a4f40a5d6e40247d797) | perf(@ngtools/webpack): reduce repeat path mapping analysis during resolution |
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Doug Parker, Lukas Spirig and Trevor Karjanis
+
 <a name="12.2.3"></a>
 
 # 12.2.3 (2021-08-26)
@@ -85,6 +130,27 @@ Alan Agius
 ## Special Thanks:
 
 Alan Agius and Trevor Karjanis
+
+<a name="13.0.0-next.1"></a>
+
+# 13.0.0-next.1 (2021-08-18)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [aba54ae78](https://github.com/angular/angular-cli/commit/aba54ae783816502122ec63530a7274229c31762) | fix(@angular-devkit/build-angular): provide supported browsers to esbuild                  |
+| [9eb599da2](https://github.com/angular/angular-cli/commit/9eb599da2b71f067e607f86266cecdb008b6a867) | fix(@angular-devkit/build-angular): handle undefined entrypoints when marking async chunks |
+
+## Breaking Changes
+
+### @angular-devkit/core
+
+The deprecated JSON parser has been removed from public API. [jsonc-parser](https://www.npmjs.com/package/jsonc-parser) should be used instead.
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Douglas Parker, Joey Perrott and Simon Primetzhofer
 
 <a name="12.2.2"></a>
 
@@ -107,6 +173,137 @@ Alan Agius and Trevor Karjanis
 ## Special Thanks:
 
 Alan Agius, Charles Lyding, Joey Perrott and Simon Primetzhofer
+
+<a name="13.0.0-next.0"></a>
+
+# 13.0.0-next.0 (2021-08-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Description                                                                                                     |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [77fe6c4e6](https://github.com/angular/angular-cli/commit/77fe6c4e67147ff42fa6350edaf4ef7dc184a3a6) | fix(@angular/cli): update `engines` to require `node` `12.20.0`                                                 |
+| [c0f1b5ea5](https://github.com/angular/angular-cli/commit/c0f1b5ea5200e6ecc05fb40f875fd7ba45803809) | fix(@angular/cli): show error when using non-TTY terminal without passing `--skip-confirmation` during `ng add` |
+| [259e26979](https://github.com/angular/angular-cli/commit/259e26979ebc712ee08fd36fb68a9576c1e02447) | fix(@angular/cli): merge npmrc files values                                                                     |
+
+### @schematics/angular
+
+| Commit                                                                                              | Description                                                                                                        |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| [3ba13f467](https://github.com/angular/angular-cli/commit/3ba13f467c12f4ad0c314cc92a2d94fb63f640ec) | feat(@schematics/angular): add `noImplicitOverride` and `noPropertyAccessFromIndexSignature` to workspace tsconfig |
+| [a7b2e6f51](https://github.com/angular/angular-cli/commit/a7b2e6f512d2a1124f0d2c68caacfe6552a10cd5) | feat(@schematics/angular): update ngsw-config resources extensions                                                 |
+| [f227e145d](https://github.com/angular/angular-cli/commit/f227e145dfbec2954cb96c92ab3c4cb97cbe0f32) | fix(@schematics/angular): updated Angular new project version to v13.0 prerelease                                  |
+| [268a03b63](https://github.com/angular/angular-cli/commit/268a03b63094d9c680401bc0977edafb22826ce3) | feat(@schematics/angular): add migration to update the workspace config                                            |
+| [5986befcd](https://github.com/angular/angular-cli/commit/5986befcdc953c0e8c90c756ac1c89b8c4b66614) | feat(@schematics/angular): remove deprecated options                                                               |
+| [9fbd16655](https://github.com/angular/angular-cli/commit/9fbd16655e86ec6fc598a47436e3e80a48beb649) | feat(@schematics/angular): remove IE 11 specific polyfills                                                         |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [b9e7f8958](https://github.com/angular/angular-cli/commit/b9e7f89589626f1443216a584c539491cec19a4d) | fix(@angular-devkit/schematics-cli): log when in debug and/or dry run modes |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Description                                                                                              |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [d67e7ad2f](https://github.com/angular/angular-cli/commit/d67e7ad2fc335a7e8476c6049c2d372a0ed45c0c) | fix(@angular-devkit/build-angular): ensure native async is downlevelled in third-party libraries         |
+| [8e82263c5](https://github.com/angular/angular-cli/commit/8e82263c5e7da6ca25bdd4e2ce9ad2c775d623b7) | perf(@angular-devkit/build-angular): use esbuild/terser combination to optimize global scripts           |
+| [e95ecb8ab](https://github.com/angular/angular-cli/commit/e95ecb8ab0382eb803741619c446d6cc7b215ba0) | feat(@angular-devkit/build-angular): deprecate deployUrl                                                 |
+| [cb7d156c2](https://github.com/angular/angular-cli/commit/cb7d156c23a7ef2f1c2f338db1487b85f8b98690) | perf(@angular-devkit/build-angular): use esbuild as a CSS optimizer for global styles                    |
+| [cdfaeee08](https://github.com/angular/angular-cli/commit/cdfaeee089f3458b1924eb516a2b4275e662b079) | fix(@angular-devkit/build-angular): support both pure annotation forms for static properties             |
+| [2aa6f579d](https://github.com/angular/angular-cli/commit/2aa6f579d7b5af13eeb5bbf35f78d5411738b98a) | fix(@angular-devkit/build-angular): do not consume inline sourcemaps when vendor sourcemaps is disabled. |
+| [167eed465](https://github.com/angular/angular-cli/commit/167eed4654be4480c45d7fdfe7a0b9f160170289) | fix(@angular-devkit/build-angular): update Angular peer dependencies to v13.0 prerelease                 |
+| [7dcfffaff](https://github.com/angular/angular-cli/commit/7dcfffafff6f3d29bbe679a90cdf77b1292fec0b) | feat(@angular-devkit/build-angular): drop support for `karma-coverage-instanbul-reporter`                |
+| [f5d019f9d](https://github.com/angular/angular-cli/commit/f5d019f9d6ad6d8fdea37836564d9ee190deb23c) | fix(@angular-devkit/build-angular): avoid attempting to optimize copied JavaScript assets                |
+| [8758e4415](https://github.com/angular/angular-cli/commit/8758e4415d7ef6301c4441db0014e24f1cc8d146) | fix(@angular-devkit/build-angular): handle null maps in JavaScript optimizer worker                      |
+| [f53bf9dc2](https://github.com/angular/angular-cli/commit/f53bf9dc21ee9aa8a682b8a82ee8a9870fa859e1) | feat(@angular-devkit/build-angular): add `type=module` to all scripts tags                               |
+| [20e48a33c](https://github.com/angular/angular-cli/commit/20e48a33c14a1b0b959ba0a45018df53a3e129c8) | feat(@angular-devkit/build-angular): remove deprecated options                                           |
+| [7576136b2](https://github.com/angular/angular-cli/commit/7576136b2fc8a9173b0a92e2ab14c9bc2559081e) | feat(@angular-devkit/build-angular): remove automatic inclusion of ES5 browser polyfills                 |
+| [701214d17](https://github.com/angular/angular-cli/commit/701214d174586fe7373b6155024c9b6e97b26377) | feat(@angular-devkit/build-angular): remove differential loading support                                 |
+| [e78f6ab5d](https://github.com/angular/angular-cli/commit/e78f6ab5d8f00338d826c8407ce5c8fca40cf097) | feat(@angular-devkit/build-angular): remove deprecated tslint builder                                    |
+| [ac3fc2752](https://github.com/angular/angular-cli/commit/ac3fc2752f28761e1cd42157b59dcf2364ae5567) | feat(@angular-devkit/build-angular): drop support for `node-sass`                                        |
+| [c1efaa17f](https://github.com/angular/angular-cli/commit/c1efaa17feb1d2911dcdea12688d75086d410bf1) | fix(@angular-devkit/build-angular): calculate valid Angular versions from peerDependencies               |
+| [d750c686f](https://github.com/angular/angular-cli/commit/d750c686fd26f3ccfccb039027bd816a91279497) | fix(@angular-devkit/build-angular): add priority to copy-webpack-plugin patterns                         |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [615353022](https://github.com/angular/angular-cli/commit/61535302204a2a767f85053b7efaa6ac5ac64098) | fix(@angular-devkit/build-webpack): emit result when webpack is closed |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [0c92ea5ca](https://github.com/angular/angular-cli/commit/0c92ea5ca34d82849862d55c4210cf62c819d514) | feat(@angular-devkit/core): remove deprecated schema id handling |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [8954d1152](https://github.com/angular/angular-cli/commit/8954d1152b6c1a33dd7d4b63d2fa430d91e7b370) | feat(@angular-devkit/schematics): remove deprecated `isAction`  |
+| [053b7d66c](https://github.com/angular/angular-cli/commit/053b7d66c269423804891e4d43d61f8605838e24) | feat(@angular-devkit/schematics): remove deprecated tslint APIs |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [d2a97f919](https://github.com/angular/angular-cli/commit/d2a97f9193fcf7e454fe8eb48c0ed732d3b2f24f) | fix(@ngtools/webpack): update Angular peer dependencies to v13.0 prerelease |
+
+## Breaking Changes
+
+### @schematics/angular
+
+We removed several deprecated `@schematics/angular` deprecated options.
+
+- `lintFix` have been removed from all schematics. `ng lint --fix` should be used instead.
+- `legacyBrowsers` have been removed from the `application` schematics since IE 11 is no longer supported.
+- `configuration` has been removed from the `web-worker` as it was unused.
+- `target` has been removed from the `service-worker` as it was unused.
+
+### @angular/cli
+
+We drop support for Node.js versions prior to `12.20`.
+
+### @angular-devkit/build-angular
+
+Support for `karma-coverage-instanbul-reporter` has been dropped in favor of the official karma coverage plugin `karma-coverage`.
+With this change we removed several deprecated builder options
+
+- `extractCss` has been removed from the browser builder. CSS is now always extracted.
+- `servePathDefaultWarning` and `hmrWarning` have been removed from the dev-server builder. These options had no effect.
+
+The automatic inclusion of Angular-required ES2015 polyfills to support ES5 browsers has been removed. Previously when targetting ES5 within the application's TypeScript configuration or listing an ES5 requiring browser in the browserslist file, Angular-required polyfills were included in the built application. However, with Angular no longer supporting IE11, there are now no browsers officially supported by Angular that would require these polyfills. As a result, the automatic inclusion of these ES2015 polyfills has been removed. Any polyfills manually added to an application's code are not affected by this change.
+
+Differential loading support has been removed. With Angular no longer supporting IE11, there are now no browsers officially supported by Angular that require ES5 code. As a result, differential loading's functionality for creating and conditionally loading ES5 and ES2015+ variants of an application is no longer required.
+
+Deprecated `@angular-devkit/build-angular:tslint` builder has been removed. Use https://github.com/angular-eslint/angular-eslint instead.
+
+We remove inlining of Google fonts in WOFF format since IE 11 is no longer supported. Other supported browsers use WOFF2.
+
+Support for `node-sass` has been removed. `sass` will be used by default to compile SASS and SCSS files.
+
+### @angular-devkit/core
+
+With this change we drop support for the deprecated behaviour to transform `id` in schemas. Use `$id` instead.
+
+Note: this only effects schematics and builders authors.
+
+### @angular-devkit/schematics
+
+`isAction` has been removed without replacement as it was unused.
+
+With this change we remove the following deprecated APIs
+
+- `TslintFixTask`
+- `TslintFixTaskOptions`
+
+**Note:** this only effects schematics developers.
+
+## Special Thanks:
+
+Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and originalfrostig
 
 <a name="12.2.1"></a>
 
