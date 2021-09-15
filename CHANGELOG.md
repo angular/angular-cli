@@ -1,3 +1,23 @@
+<a name="12.2.6"></a>
+
+# 12.2.6 (2021-09-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [8b21effad](https://github.com/angular/angular-cli/commit/8b21effad673877cf1a82ef7d0601393a65517fb) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [ea60f0f52](https://github.com/angular/angular-cli/commit/ea60f0f527f2ab8fc5acc967138c4ae993946923) | fix  | handle `FORCE_COLOR` when stdout is not instance of `WriteStream` |
+
+## Special Thanks
+
+Alan Agius
+
 <a name="13.0.0-next.4"></a>
 
 # 13.0.0-next.4 (2021-09-08)
