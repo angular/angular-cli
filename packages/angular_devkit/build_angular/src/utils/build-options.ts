@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { ParsedConfiguration } from '@angular/compiler-cli';
+import type { ParsedConfiguration } from '@angular/compiler-cli';
 import {
   AssetPatternClass,
   Budget,
