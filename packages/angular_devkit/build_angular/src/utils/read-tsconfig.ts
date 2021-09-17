@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ParsedConfiguration } from '@angular/compiler-cli';
+import type { ParsedConfiguration } from '@angular/compiler-cli';
 import * as path from 'path';
 
 /**

@@ -7,7 +7,7 @@
  */
 
 import { getSystemPath } from '@angular-devkit/core';
-import { CompilerOptions } from '@angular/compiler-cli';
+import type { CompilerOptions } from '@angular/compiler-cli';
 import { AngularWebpackLoaderPath, AngularWebpackPlugin } from '@ngtools/webpack';
 import { ScriptTarget } from 'typescript';
 import { Configuration } from 'webpack';
