@@ -9,6 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: angular/dev-infra/github-actions/breaking-changes-label@7bdd46591b6300ca636f3c78fd1b427d7f3fdf38
+      - uses: angular/dev-infra/github-actions/breaking-changes-label@7e2c5b8998b41a8ffcf51b2055375f299e22cdb4
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
