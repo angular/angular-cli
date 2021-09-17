@@ -16,16 +16,28 @@ import * as path from 'path';
  * @param workspaceRoot - workspaceRoot root location when provided
  * it will resolve 'tsconfigPath' from this path.
  */
-export function readTsconfig(tsconfigPath: string, workspaceRoot?: string): ParsedConfiguration {
+export async function readTsconfig(
+  tsconfigPath: string,
+  workspaceRoot?: string,
+): Promise<ParsedConfiguration> {
   const tsConfigFullPath = workspaceRoot ? path.resolve(workspaceRoot, tsconfigPath) : tsconfigPath;
 
-  // We use 'ng' instead of 'ts' here because 'ts' is not aware of 'angularCompilerOptions'
-  // and will not merged them if they are at un upper level tsconfig file when using `extends`.
-  const ng: typeof import('@angular/compiler-cli') = require('@angular/compiler-cli');
+  // This uses a dynamic import to load `@angular/compiler-cli` which may be ESM.
+  // CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
+  // will currently, unconditionally downlevel dynamic import into a require call.
+  // require calls cannot load ESM code and will result in a runtime error. To workaround
+  // this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
+  // Once TypeScript provides support for keeping the dynamic import this workaround can
+  // be dropped.
+  const compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
+  // If it is not ESM then the functions needed will be stored in the `default` property.
+  const { formatDiagnostics, readConfiguration } = (
+    compilerCliModule.readConfiguration ? compilerCliModule : compilerCliModule.default
+  ) as typeof import('@angular/compiler-cli');
 
-  const configResult = ng.readConfiguration(tsConfigFullPath);
+  const configResult = readConfiguration(tsConfigFullPath);
   if (configResult.errors && configResult.errors.length) {
-    throw new Error(ng.formatDiagnostics(configResult.errors));
+    throw new Error(formatDiagnostics(configResult.errors));
   }
 
   return configResult;
