@@ -40,7 +40,7 @@ export async function generateWebpackConfig(
   }
 
   const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
-  const tsConfig = readTsconfig(tsConfigPath);
+  const tsConfig = await readTsconfig(tsConfigPath);
 
   const ts = await import('typescript');
   const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;

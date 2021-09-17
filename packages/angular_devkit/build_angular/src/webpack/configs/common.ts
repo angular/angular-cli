@@ -6,11 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  GLOBAL_DEFS_FOR_TERSER,
-  GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  VERSION as NG_VERSION,
-} from '@angular/compiler-cli';
 import CopyWebpackPlugin, { ObjectPattern } from 'copy-webpack-plugin';
 import { createHash } from 'crypto';
 import { createWriteStream, existsSync, promises as fsPromises } from 'fs';
@@ -42,7 +37,7 @@ import { JavaScriptOptimizerPlugin } from '../plugins/javascript-optimizer-plugi
 import { getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
 
 // eslint-disable-next-line max-lines-per-function
-export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
+export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration> {
   const { root, projectRoot, buildOptions, tsConfig } = wco;
   const {
     platform = 'browser',
@@ -53,6 +48,23 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const extraPlugins: { apply(compiler: Compiler): void }[] = [];
   const extraRules: RuleSetRule[] = [];
   const entryPoints: { [key: string]: [string, ...string[]] } = {};
+
+  // This uses a dynamic import to load `@angular/compiler-cli` which may be ESM.
+  // CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
+  // will currently, unconditionally downlevel dynamic import into a require call.
+  // require calls cannot load ESM code and will result in a runtime error. To workaround
+  // this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
+  // Once TypeScript provides support for keeping the dynamic import this workaround can
+  // be dropped.
+  const compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
+  // If it is not ESM then the values needed will be stored in the `default` property.
+  const {
+    GLOBAL_DEFS_FOR_TERSER,
+    GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+    VERSION: NG_VERSION,
+  } = (
+    compilerCliModule.GLOBAL_DEFS_FOR_TERSER ? compilerCliModule : compilerCliModule.default
+  ) as typeof import('@angular/compiler-cli');
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
@@ -393,7 +405,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     infrastructureLogging: {
       level: buildOptions.verbose ? 'verbose' : 'error',
     },
-    cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers),
+    cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: 'deterministic',
@@ -417,6 +429,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 function getCacheSettings(
   wco: WebpackConfigOptions,
   supportedBrowsers: string[],
+  angularVersion: string,
 ): WebpackOptionsNormalized['cache'] {
   if (persistentBuildCacheEnabled) {
     const packageVersion = require('../../../package.json').version;
@@ -429,7 +442,7 @@ function getCacheSettings(
       // dynamic and shared among different build types: test, build and serve.
       // None of which are "named".
       name: createHash('sha1')
-        .update(NG_VERSION.full)
+        .update(angularVersion)
         .update(packageVersion)
         .update(wco.projectRoot)
         .update(JSON.stringify(wco.tsConfig))
