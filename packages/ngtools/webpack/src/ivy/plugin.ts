@@ -6,8 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { CompilerHost, CompilerOptions, readConfiguration } from '@angular/compiler-cli';
-import { NgtscProgram } from '@angular/compiler-cli/src/ngtsc/program';
+import {
+  CompilerHost,
+  CompilerOptions,
+  NgtscProgram,
+  readConfiguration,
+} from '@angular/compiler-cli';
 import { createHash } from 'crypto';
 import * as ts from 'typescript';
 import type { Compilation, Compiler, Module, NormalModule } from 'webpack';
