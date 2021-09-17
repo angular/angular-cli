@@ -21,12 +21,16 @@ import { I18nOptions, configureI18nBuild } from './i18n-options';
 
 export type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 
+export type WebpackPartialGenerator = (
+  configurationOptions: BrowserWebpackConfigOptions,
+) => (Promise<Configuration> | Configuration)[];
+
 export async function generateWebpackConfig(
   workspaceRoot: string,
   projectRoot: string,
   sourceRoot: string | undefined,
   options: NormalizedBrowserBuilderSchema,
-  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
+  webpackPartialGenerator: WebpackPartialGenerator,
   logger: logging.LoggerApi,
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>,
 ): Promise<Configuration> {
@@ -55,7 +59,8 @@ export async function generateWebpackConfig(
 
   wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
 
-  const webpackConfig = webpackMerge(webpackPartialGenerator(wco));
+  const partials = await Promise.all(webpackPartialGenerator(wco));
+  const webpackConfig = webpackMerge(partials);
 
   return webpackConfig;
 }
@@ -63,7 +68,7 @@ export async function generateWebpackConfig(
 export async function generateI18nBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
+  webpackPartialGenerator: WebpackPartialGenerator,
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
 ): Promise<{
   config: Configuration;
@@ -131,7 +136,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
 export async function generateBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => Configuration[],
+  webpackPartialGenerator: WebpackPartialGenerator,
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema> = {},
 ): Promise<{ config: Configuration; projectRoot: string; projectSourceRoot?: string }> {
   const projectName = context.target && context.target.project;
