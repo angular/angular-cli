@@ -1163,6 +1163,14 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
+"@bazel/jasmine@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.2.0.tgz#1150e6fd8cbaf0805253bcd7a38562b11f728f56"
+  integrity sha512-XpGt96Ydl2tMlqLY3xv3oHUTKUL+mSoFQG+u9hqsqqHL8MY2LJjp3zodo9KtsM8zfu8/MYrUyYh8i9kjsk43sw==
+  dependencies:
+    c8 "~7.5.0"
+    jasmine-reporters "~2.4.0"
+
 "@bazel/protractor@4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-4.1.0.tgz#db2602654d584d2e458cd90e8df2ddc213365ad7"
@@ -1184,10 +1192,28 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
+"@bazel/typescript@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-4.2.0.tgz#41543c2808c4c475f33f5b1d9e071101a2385503"
+  integrity sha512-M0jqTrwt1Dqc7wFCvs0J5XU+aQ0DfVjkkcruIFBuEPOTTA5aaVs6XKr1xVPV9WL5QsbJFD7rYc55zr0jDlX22Q==
+  dependencies:
+    "@bazel/worker" "4.2.0"
+    protobufjs "6.8.8"
+    semver "5.6.0"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
+
 "@bazel/worker@4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.1.0.tgz#f63a5c821ce01731a4bc1b38f7dff16332fe331c"
   integrity sha512-xO8dMC2GR+MwZrRa+FTG9yr5yzUCFvs7MiVYEJ25L708XhOqs34at6BFH1Xa3/ZYQt7iDBFpwY6QzbhhIIQrXA==
+  dependencies:
+    google-protobuf "^3.6.1"
+
+"@bazel/worker@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.2.0.tgz#96d4f4f7807c8e3a583e3e9e78d81385882c8013"
+  integrity sha512-FQ88yaWtCAveauBXxZ9uuQvmAGAaHZUqu2ptTIf6R6Q8yblPB7w6VTKfkLoT162gqLzDclzhoidJ4YH93bidtA==
   dependencies:
     google-protobuf "^3.6.1"
 
@@ -2401,10 +2427,10 @@
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-10.0.0.tgz#8b06e1d6f06e906ebda0f1d4089cdb651a533541"
   integrity sha512-PqxxY11HhweN6z1lwfn9ydLCdnOkCPpthMZs+SGCDz8Rt6gOyrjJVslV7o4uobDipjD9+hUPpJHDeO33Qt24uw==
 
-"@verdaccio/ui-theme@3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-3.1.0.tgz#21108f3c1b97e6db5901509d935e1f4ce475950a"
-  integrity sha512-NmJOcv25/OtF84YrmYxi31beFde7rt+/y2qlnq0wYR4ZCFRE5TsuqisTVTe1OyJ8D8JwwPMyMSMSMtlMwUfqIQ==
+"@verdaccio/ui-theme@3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-3.2.1.tgz#041a5b436847f73ebddeb693758b0f30819a98b0"
+  integrity sha512-xaN1nVxGWSIO4Qmnm3xZwvUf2jOUIt43nAp2IbSiPdozQztCcfU1LHEHiMW2mP036LoUWcHbb3Z6Tj1GHyuQNg==
 
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
@@ -3754,10 +3780,10 @@ css-has-pseudo@^0.10.0:
     postcss "^7.0.6"
     postcss-selector-parser "^5.0.0-rc.4"
 
-css-loader@6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.2.0.tgz#9663d9443841de957a3cb9bcea2eda65b3377071"
-  integrity sha512-/rvHfYRjIpymZblf49w8jYcRo2y9gj6rV8UroHGmBxKrIyGLokpycyKzp9OkitvqT29ZSpzJ0Ic7SpnJX3sC8g==
+css-loader@6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.3.0.tgz#334d3500ff0a0c14cfbd4b0670088dbb5b5c1530"
+  integrity sha512-9NGvHOR+L6ps13Ilw/b216++Q8q+5RpJcVufCdW9S/9iCzs4KBDNa8qnA/n3FK/sSfWmH35PAIK/cfPi7LOSUg==
   dependencies:
     icss-utils "^5.1.0"
     postcss "^8.2.15"
@@ -10388,16 +10414,16 @@ verdaccio-htpasswd@10.0.0:
     http-errors "1.8.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.1.4:
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.1.4.tgz#7b69b4a26689a6460ef5c0e604cfea96ecc3e9ad"
-  integrity sha512-+30BtZL+YH5UDRIXHIp+6MzyGfGbVZCiSxgLPy79rjfNK0gQzr50+J5vkyxW/DA4/9m/pOpdpq3MsL8aRBY1/g==
+verdaccio@5.1.5:
+  version "5.1.5"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.1.5.tgz#129501a37041556d0a2d4e375e9a60e51b4cc49d"
+  integrity sha512-hbcIYb7DqWhoOenE5hZMGRu0DnC6rX7cDikLcT67JGorZ/8uhGINxT0F03BkiY6Ahv8chKWNKb5fpTVumF+YjQ==
   dependencies:
     "@verdaccio/commons-api" "10.0.0"
     "@verdaccio/local-storage" "10.0.6"
     "@verdaccio/readme" "10.0.0"
     "@verdaccio/streams" "10.0.0"
-    "@verdaccio/ui-theme" "3.1.0"
+    "@verdaccio/ui-theme" "3.2.1"
     JSONStream "1.3.5"
     async "3.2.1"
     body-parser "1.19.0"

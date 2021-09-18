@@ -31,7 +31,7 @@
     "copy-webpack-plugin": "9.0.1",
     "core-js": "3.17.3",
     "critters": "0.0.10",
-    "css-loader": "6.2.0",
+    "css-loader": "6.3.0",
     "esbuild": "0.12.28",
     "find-cache-dir": "3.3.2",
     "glob": "7.1.7",
