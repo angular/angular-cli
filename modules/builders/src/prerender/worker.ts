@@ -50,7 +50,10 @@ export async function render(
 
   const { renderModule, AppServerModule } = await import(serverBundlePath);
 
-  const browserIndexInputPath = path.join(outputPath, workerArgs.indexFile);
+  const indexBaseName = fs.existsSync(path.join(outputPath, 'index.original.html'))
+    ? 'index.original.html'
+    : workerArgs.indexFile;
+  const browserIndexInputPath = path.join(outputPath, indexBaseName);
   let indexHtml = await fs.promises.readFile(browserIndexInputPath, 'utf8');
   indexHtml = indexHtml.replace(
     '</html>',
