@@ -6,16 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Diagnostics, formatDiagnostics } from '@angular/compiler-cli';
+import type { Diagnostics } from '@angular/compiler-cli';
 import { DiagnosticCategory } from 'typescript';
 import type { Compilation } from 'webpack';
 
 export type DiagnosticsReporter = (diagnostics: Diagnostics) => void;
 
-export function createDiagnosticsReporter(compilation: Compilation): DiagnosticsReporter {
+export function createDiagnosticsReporter(
+  compilation: Compilation,
+  formatter: (diagnostic: Diagnostics[number]) => string,
+): DiagnosticsReporter {
   return (diagnostics) => {
     for (const diagnostic of diagnostics) {
-      const text = formatDiagnostics([diagnostic]);
+      const text = formatter(diagnostic);
       if (diagnostic.category === DiagnosticCategory.Error) {
         addError(compilation, text);
       } else {

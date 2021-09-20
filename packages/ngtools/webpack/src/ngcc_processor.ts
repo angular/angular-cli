@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { LogLevel, Logger, process as mainNgcc } from '@angular/compiler-cli/ngcc';
+import type { LogLevel, Logger } from '@angular/compiler-cli/ngcc';
 import { spawnSync } from 'child_process';
 import { createHash } from 'crypto';
 import { accessSync, constants, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
@@ -35,6 +35,7 @@ export class NgccProcessor {
   private _nodeModulesDirectory: string;
 
   constructor(
+    private readonly compilerNgcc: typeof import('@angular/compiler-cli/ngcc'),
     private readonly propertiesToConsider: string[],
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
@@ -43,7 +44,11 @@ export class NgccProcessor {
     private readonly inputFileSystem: InputFileSystem,
     private readonly resolver: ResolverWithOptions,
   ) {
-    this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
+    this._logger = new NgccLogger(
+      this.compilationWarnings,
+      this.compilationErrors,
+      compilerNgcc.LogLevel.info,
+    );
     this._nodeModulesDirectory = this.findNodeModulesDirectory(this.basePath);
   }
 
@@ -115,6 +120,14 @@ export class NgccProcessor {
     const timeLabel = 'NgccProcessor.process';
     time(timeLabel);
 
+    // Temporary workaround during transition to ESM-only @angular/compiler-cli
+    // TODO_ESM: This workaround should be removed prior to the final release of v13
+    //       and replaced with only `this.compilerNgcc.ngccMainFilePath`.
+    const ngccExecutablePath =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (this.compilerNgcc as any).ngccMainFilePath ??
+      require.resolve('@angular/compiler-cli/ngcc/main-ngcc.js');
+
     // We spawn instead of using the API because:
     // - NGCC Async uses clustering which is problematic when used via the API which means
     // that we cannot setup multiple cluster masters with different options.
@@ -123,7 +136,7 @@ export class NgccProcessor {
     const { status, error } = spawnSync(
       process.execPath,
       [
-        require.resolve('@angular/compiler-cli/ngcc/main-ngcc.js'),
+        ngccExecutablePath,
         '--source' /** basePath */,
         this._nodeModulesDirectory,
         '--properties' /** propertiesToConsider */,
@@ -187,7 +200,7 @@ export class NgccProcessor {
 
     const timeLabel = `NgccProcessor.processModule.ngcc.process+${moduleName}`;
     time(timeLabel);
-    mainNgcc({
+    this.compilerNgcc.process({
       basePath: this._nodeModulesDirectory,
       targetEntryPointPath: path.dirname(packageJsonPath),
       propertiesToConsider: this.propertiesToConsider,
@@ -246,11 +259,10 @@ export class NgccProcessor {
 }
 
 class NgccLogger implements Logger {
-  level = LogLevel.info;
-
   constructor(
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
+    public level: LogLevel,
   ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

@@ -5,7 +5,7 @@
 ```ts
 
 import type { Compiler } from 'webpack';
-import { CompilerOptions } from '@angular/compiler-cli';
+import type { CompilerOptions } from '@angular/compiler-cli';
 import type { LoaderContext } from 'webpack';
 
 // @public (undocumented)
