@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { constructorParametersDownlevelTransform } from '@angular/compiler-cli';
 import * as ts from 'typescript';
 import { elideImports } from '../transformers/elide_imports';
 import { removeIvyJitSupportCalls } from '../transformers/remove-ivy-jit-support-calls';
@@ -36,6 +35,7 @@ export function createAotTransformers(
 
 export function createJitTransformers(
   builder: ts.BuilderProgram,
+  compilerCli: typeof import('@angular/compiler-cli'),
   options: {
     directTemplateLoading?: boolean;
     inlineStyleFileExtension?: string;
@@ -51,7 +51,7 @@ export function createJitTransformers(
         options.directTemplateLoading,
         options.inlineStyleFileExtension,
       ),
-      constructorParametersDownlevelTransform(builder.getProgram()),
+      compilerCli.constructorParametersDownlevelTransform(builder.getProgram()),
     ],
   };
 }

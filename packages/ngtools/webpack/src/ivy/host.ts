@@ -7,7 +7,7 @@
  */
 
 /* eslint-disable @typescript-eslint/unbound-method */
-import { CompilerHost } from '@angular/compiler-cli';
+import type { CompilerHost } from '@angular/compiler-cli';
 import { createHash } from 'crypto';
 import * as path from 'path';
 import * as ts from 'typescript';
