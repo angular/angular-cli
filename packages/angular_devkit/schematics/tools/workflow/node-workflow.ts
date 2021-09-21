@@ -24,7 +24,7 @@ export interface NodeWorkflowOptions {
   registry?: schema.CoreSchemaRegistry;
   resolvePaths?: string[];
   schemaValidation?: boolean;
-  optionTransforms?: OptionTransform<object, object>[];
+  optionTransforms?: OptionTransform<Record<string, unknown> | null, object>[];
   engineHostCreator?: (options: NodeWorkflowOptions) => NodeModulesEngineHost;
 }
 
