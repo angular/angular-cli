@@ -117,7 +117,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost_2
     // (undocumented)
     registerContextTransform(t: ContextTransform): void;
     // (undocumented)
-    registerOptionsTransform<T extends object, R extends object>(t: OptionTransform<T, R>): void;
+    registerOptionsTransform<T extends object | null, R extends object>(t: OptionTransform<T, R>): void;
     // (undocumented)
     registerTaskExecutor<T>(factory: TaskExecutorFactory<T>, options?: T): void;
     // (undocumented)
@@ -235,7 +235,7 @@ export interface NodeWorkflowOptions {
     // (undocumented)
     force?: boolean;
     // (undocumented)
-    optionTransforms?: OptionTransform<object, object>[];
+    optionTransforms?: OptionTransform<Record<string, unknown> | null, object>[];
     // (undocumented)
     packageManager?: string;
     // (undocumented)
@@ -251,7 +251,7 @@ export interface NodeWorkflowOptions {
 }
 
 // @public (undocumented)
-export type OptionTransform<T extends object, R extends object> = (schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext) => Observable<R> | PromiseLike<R> | R;
+export type OptionTransform<T extends object | null, R extends object> = (schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext) => Observable<R> | PromiseLike<R> | R;
 
 // @public (undocumented)
 export class SchematicMissingDescriptionException extends BaseException {
@@ -274,7 +274,7 @@ export class SchematicNameCollisionException extends BaseException {
 }
 
 // @public (undocumented)
-export function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {}>(schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext | undefined) => Observable<T>;
+export function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {} | null>(schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext | undefined) => Observable<T>;
 
 // (No @packageDocumentation comment for this package)
 

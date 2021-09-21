@@ -29,7 +29,7 @@ import {
 } from './description';
 import { readJsonFile } from './file-system-utility';
 
-export declare type OptionTransform<T extends object, R extends object> = (
+export declare type OptionTransform<T extends object | null, R extends object> = (
   schematic: FileSystemSchematicDescription,
   options: T,
   context?: FileSystemSchematicContext,
@@ -140,7 +140,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     return schematics;
   }
 
-  registerOptionsTransform<T extends object, R extends object>(t: OptionTransform<T, R>) {
+  registerOptionsTransform<T extends object | null, R extends object>(t: OptionTransform<T, R>) {
     this._transforms.push(t);
   }
 

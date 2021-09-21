@@ -22,7 +22,7 @@ export class InvalidInputOptions<T = {}> extends schema.SchemaValidationExceptio
 
 // This can only be used in NodeJS.
 export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
-  return <T extends {}>(
+  return <T extends {} | null>(
     schematic: FileSystemSchematicDescription,
     options: T,
     context?: FileSystemSchematicContext,
