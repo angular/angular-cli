@@ -58,6 +58,13 @@ export function runWebpackDevServer(
     return new WebpackDevServer(config, webpack);
   };
 
+  // Force `WEBPACK_DEV_SERVER_BASE_PORT` to use port 0 as base port.
+  // This is needed to handle better concurrent dev-servers. Otherwise if two or more processes starts at the same time
+  // they will end up being assigned the same port due to a race condition between the time you get the port number and
+  // you actually start using it.
+  // https://github.com/webpack/webpack-dev-server/blob/2b1208dadfbe70246a36b74954e3f2fd2c3ba220/lib/Server.js#L76-L94
+  process.env.WEBPACK_DEV_SERVER_BASE_PORT = '0';
+
   const log: WebpackLoggingCallback =
     options.logging || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
