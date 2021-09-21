@@ -18,7 +18,7 @@ import { latestVersions } from '../../utility/latest-versions';
 import { allTargetOptions, allWorkspaceTargets, updateWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
 
-export function updateI18nConfig(): Rule {
+export default function (): Rule {
   return (tree, { logger }) =>
     updateWorkspace((workspace) => {
       // Process extraction targets first since they use browser option values

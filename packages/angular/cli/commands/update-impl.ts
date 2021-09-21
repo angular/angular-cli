@@ -611,12 +611,13 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         // Migrations for non LTS versions of Angular CLI are no longer included in @schematics/angular v12.
         const toBeInstalledMajorVersion = +manifest.version.split('.')[0];
         const currentMajorVersion = +node.package.version.split('.')[0];
-        if (currentMajorVersion < 9 && toBeInstalledMajorVersion >= 12) {
+        if (currentMajorVersion < 10 && toBeInstalledMajorVersion >= 12) {
           const updateVersions: Record<number, number> = {
             1: 6,
             6: 7,
             7: 8,
             8: 9,
+            9: 10,
           };
 
           const updateTo = updateVersions[currentMajorVersion];

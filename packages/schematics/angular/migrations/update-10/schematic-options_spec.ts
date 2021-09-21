@@ -11,7 +11,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 
 const workspacePath = '/angular.json';
 
-describe('Migration to version 9', () => {
+describe('Migration to version 10', () => {
   describe('Migrate workspace config', () => {
     const schematicRunner = new SchematicTestRunner(
       'migrations',
@@ -47,7 +47,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const { schematics } = JSON.parse(tree2.readContent(workspacePath));
         expect(schematics['@schematics/angular:component'].styleext).toBeUndefined();
@@ -64,7 +64,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const { schematics } = JSON.parse(tree2.readContent(workspacePath));
         expect(schematics['@schematics/some-other:component'].styleext).toBe('scss');
@@ -81,7 +81,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const { schematics } = JSON.parse(tree2.readContent(workspacePath));
         expect(schematics['@schematics/angular:component'].spec).toBeUndefined();
@@ -98,7 +98,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const { schematics } = JSON.parse(tree2.readContent(workspacePath));
         expect(schematics['@schematics/angular:component'].spec).toBeUndefined();
@@ -127,7 +127,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const { schematics } = JSON.parse(tree2.readContent(workspacePath));
         for (const key of Object.keys(workspace.schematics)) {
@@ -147,7 +147,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const { schematics } = JSON.parse(tree2.readContent(workspacePath));
         expect(schematics['@schematics/angular:component'].styleext).toBeUndefined();
@@ -167,7 +167,7 @@ describe('Migration to version 9', () => {
         tree.overwrite(workspacePath, JSON.stringify(workspace, undefined, 2));
 
         const tree2 = await schematicRunner
-          .runSchematicAsync('schematic-options-9', {}, tree.branch())
+          .runSchematicAsync('schematic-options-10', {}, tree.branch())
           .toPromise();
         const {
           projects: {
