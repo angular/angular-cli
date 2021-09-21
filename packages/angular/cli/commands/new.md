@@ -11,6 +11,6 @@ All prompts can safely be allowed to default.
 
 - Subsequent applications that you generate in the workspace reside in the `projects/` subfolder.
 
-If you plan to have multiple applications in the workspace, you can create an empty workspace by setting the `--createApplication` option to false.
+If you plan to have multiple applications in the workspace, you can create an empty workspace by setting the `--create-application` option to false.
 You can then use `ng generate application` to create an initial application.
 This allows a workspace name different from the initial app name, and ensures that all applications reside in the `/projects` subfolder, matching the structure of the configuration file.
