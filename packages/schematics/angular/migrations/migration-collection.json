@@ -1,19 +1,9 @@
 {
   "schematics": {
-    "workspace-version-9": {
-      "version": "9.0.0-beta.0",
-      "factory": "./update-9",
-      "description": "Angular Workspace migration. Update an Angular CLI workspace to version 9."
-    },
     "lazy-loading-syntax": {
       "version": "9.0.0-next.6",
       "factory": "./update-12/update-lazy-module-paths",
       "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
-    },
-    "schematic-options-9": {
-      "version": "9.0.2",
-      "factory": "./update-9/schematic-options",
-      "description": "Replace deprecated 'styleext' and 'spec' Angular schematic options."
     },
     "tslint-version-6": {
       "version": "10.0.0-beta.0",
@@ -32,7 +22,7 @@
     },
     "schematic-options-10": {
       "version": "10.0.0-beta.2",
-      "factory": "./update-9/schematic-options",
+      "factory": "./update-10/schematic-options",
       "description": "Replace deprecated and removed 'styleext' and 'spec' Angular schematic options with 'style' and 'skipTests', respectively."
     },
     "update-angular-config": {
@@ -107,7 +97,7 @@
     },
     "remove-deprecated-i18n-options": {
       "version": "12.0.0-next.7",
-      "factory": "./update-9/update-i18n#updateI18nConfig",
+      "factory": "./update-12/update-i18n",
       "description": "Remove deprecated ViewEngine-based i18n build and extract options. Options present in the configuration will be converted to use non-deprecated options."
     },
     "update-web-workers-webpack-5": {

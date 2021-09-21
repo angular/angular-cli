@@ -24,7 +24,7 @@ function updateWorkspaceTargets(tree: UnitTestTree, workspaceTargets: WorkspaceT
 
 const workspacePath = '/angular.json';
 
-describe('Migration to version 9', () => {
+describe('Migration to version 12', () => {
   describe('Migrate workspace config', () => {
     const schematicRunner = new SchematicTestRunner(
       'migrations',
@@ -72,7 +72,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const { dependencies } = JSON.parse(tree2.readContent('/package.json'));
           expect(dependencies['@angular/localize']).toBe(latestVersions.Angular);
@@ -86,7 +86,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.options.localize).toEqual(['fr']);
@@ -101,7 +101,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.options.i18nFormat).toBeUndefined();
@@ -119,7 +119,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.configurations.fr.baseHref).toBeUndefined();
@@ -134,7 +134,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.configurations.fr.outputPath).toBe('dist');
@@ -149,7 +149,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.configurations.fr.outputPath).toBe('dist/abc');
@@ -170,7 +170,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.configurations.staging.baseHref).toBe('/de/');
@@ -183,7 +183,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.options.baseHref).toBe('/my-app/');
@@ -197,7 +197,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           config = getWorkspaceTargets(tree2)['extract-i18n'];
           expect(config.options.i18nFormat).toBeUndefined();
@@ -214,7 +214,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects[
             'migration-test'
@@ -230,7 +230,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects[
             'migration-test'
@@ -249,7 +249,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects[
             'migration-test'
@@ -269,7 +269,7 @@ describe('Migration to version 9', () => {
           updateWorkspaceTargets(tree, config);
 
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects[
             'migration-test'
@@ -285,7 +285,7 @@ describe('Migration to version 9', () => {
       describe('when i18n builder options are not set', () => {
         it(`should not add 'localize' option`, async () => {
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const config = getWorkspaceTargets(tree2).build;
           expect(config.options.localize).toBeUndefined();
@@ -294,7 +294,7 @@ describe('Migration to version 9', () => {
 
         it('should not add i18n project config', async () => {
           const tree2 = await schematicRunner
-            .runSchematicAsync('workspace-version-9', {}, tree.branch())
+            .runSchematicAsync('remove-deprecated-i18n-options', {}, tree.branch())
             .toPromise();
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects[
             'migration-test'
