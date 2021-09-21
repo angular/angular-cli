@@ -120,9 +120,7 @@ export abstract class SchematicsCommandModule
         // Add configuration file defaults
         async (schematic, current) => {
           const projectName =
-            typeof (current as Record<string, unknown>).project === 'string'
-              ? ((current as Record<string, unknown>).project as string)
-              : this.getProjectName();
+            typeof current?.project === 'string' ? current.project : this.getProjectName();
 
           return {
             ...(await getSchematicDefaults(schematic.collection.name, schematic.name, projectName)),
