@@ -94,7 +94,6 @@ export async function execute(
     return { success: true };
   } finally {
     // const _ = is a workaround to disable tsetse must use promises rule.
-    // tslint:disable-next-line: no-floating-promises
     const _ = worker.end();
   }
 }

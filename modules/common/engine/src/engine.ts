@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { ResourceLoader } from '@angular/compiler';
 import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import {
@@ -101,7 +102,7 @@ export class CommonEngine {
           document: inlineCriticalCss
             ? // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
               doc.replace(
-                / media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g,
+                / media="print" onload="this\.media='all'"><noscript><link .+?><\/noscript>/g,
                 '>',
               )
             : doc,
@@ -123,9 +124,9 @@ export class CommonEngine {
         opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : undefined),
     });
 
-    // tslint:disable-next-line: no-console
+    // eslint-disable-next-line no-console
     warnings?.forEach((m) => console.warn(m));
-    // tslint:disable-next-line: no-console
+    // eslint-disable-next-line no-console
     errors?.forEach((m) => console.error(m));
 
     return content;

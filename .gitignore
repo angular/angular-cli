@@ -19,6 +19,7 @@ dist
 node_modules
 ngfactory
 web_modules
+.eslintcache
 
 /compiled
 *.metadata.json

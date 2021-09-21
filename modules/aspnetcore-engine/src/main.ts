@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { StaticProvider } from '@angular/core';
 
 import { ORIGIN_URL, REQUEST } from '@nguniversal/aspnetcore-engine/tokens';
@@ -22,9 +23,8 @@ function _getUniversalData(content: string, appSelector: string): IEngineRenderR
   const meta: string[] = [];
   const links: string[] = [];
 
-  // tslint:disable: no-non-null-assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const elements = [...Array.from(doc.head!.children), ...Array.from(doc.body!.children)];
-  // tslint:enable: no-non-null-assertion
 
   for (const element of elements) {
     switch (element.tagName.toUpperCase()) {
@@ -47,7 +47,7 @@ function _getUniversalData(content: string, appSelector: string): IEngineRenderR
 
   return {
     completeHTML: content,
-    // tslint:disable-next-line: no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     html: doc.querySelector(appSelector)!.outerHTML,
     globals: {
       title: doc.title,

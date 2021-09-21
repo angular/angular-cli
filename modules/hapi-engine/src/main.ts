@@ -5,9 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Request, ResponseToolkit } from '@hapi/hapi';
 
 import { StaticProvider } from '@angular/core';
+import { Request, ResponseToolkit } from '@hapi/hapi';
+
 import { CommonEngine, RenderOptions as CommonRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
 

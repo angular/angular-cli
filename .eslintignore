@@ -1,0 +1,8 @@
+.yarn/
+dist/
+node_modules/
+third_party/
+/bazel-out/
+integration/
+modules/builders/testing/
+modules/**/schematics/**/files/

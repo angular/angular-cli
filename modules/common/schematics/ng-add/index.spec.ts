@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -40,7 +40,7 @@ describe('ng-add schematic (clover)', () => {
       .toPromise();
   });
 
-  describe('when "ssr" is set to "true"', async () => {
+  describe('when "ssr" is set to "true"', () => {
     let tree: UnitTestTree;
     beforeEach(async () => {
       tree = await schematicRunner
@@ -91,7 +91,7 @@ describe('ng-add schematic (clover)', () => {
     });
   });
 
-  describe('when "prerender" is set to "true"', async () => {
+  describe('when "prerender" is set to "true"', () => {
     let tree: UnitTestTree;
     beforeEach(async () => {
       tree = await schematicRunner

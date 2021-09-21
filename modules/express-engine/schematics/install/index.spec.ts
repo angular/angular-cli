@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -33,7 +33,7 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"@nguniversal\/express-engine\": \"/);
+    expect(contents).toMatch(/"@nguniversal\/express-engine": "/);
   });
 
   it('should add dependency: express', async () => {
@@ -42,7 +42,7 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"express\": \"/);
+    expect(contents).toMatch(/"express": "/);
   });
 
   it('should install npm dependencies', async () => {

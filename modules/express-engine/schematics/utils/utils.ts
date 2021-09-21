@@ -137,7 +137,7 @@ export function addInitialNavigation(node: ts.CallExpression): ts.CallExpression
   const enabledLiteral = ts.createStringLiteral('enabled');
   // TypeScript will emit the Node with double quotes.
   // In schematics we usually write code with a single quotes
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (enabledLiteral as any).singleQuote = true;
 
   const initialNavigationProperty = ts.createPropertyAssignment(

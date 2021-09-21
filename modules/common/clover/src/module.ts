@@ -18,9 +18,9 @@ import {
 } from '@angular/core';
 import {
   BrowserModule,
-  TransferState,
   ɵDomSharedStylesHost as DomSharedStylesHost,
   ɵSharedStylesHost as SharedStylesHost,
+  TransferState,
   ɵescapeHtml as escapeHtml,
 } from '@angular/platform-browser';
 import { filter, mapTo, take } from 'rxjs/operators';

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -28,10 +28,10 @@ describe('Prerender Builder Utils', () => {
     ];
 
     const TSCONFIG_PATH = 'tsconfig.app.json';
-    const CONTEXT = ({
+    const CONTEXT = {
       workspaceRoot: '/path/to/angular/json',
       logger: new logging.NullLogger(),
-    } as unknown) as BuilderContext;
+    } as unknown as BuilderContext;
 
     let parseAngularRoutesSpy: jasmine.Spy;
     let loggerErrorSpy: jasmine.Spy;
@@ -44,6 +44,7 @@ describe('Prerender Builder Utils', () => {
       loggerErrorSpy = spyOn(CONTEXT.logger, 'error');
     });
 
+    // eslint-disable-next-line max-len
     it('Should return the union of the routes from routes, routesFile, and the extracted routes without any parameterized routes', async () => {
       const options = {
         routes: ROUTES,

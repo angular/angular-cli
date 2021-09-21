@@ -1,17 +1,25 @@
-import 'zone.js';
-import { SOME_TOKEN } from '../testing/mock.server.module';
-import {
-  ErrorServerModuleNgFactory,
-  MockServerModuleNgFactory,
-  TokenServerModuleNgFactory,
-} from '../testing/mock.server.module.ngfactory';
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 
+/* eslint-disable */
+import 'zone.js';
 import {
   SocketEngineRenderOptions,
   SocketEngineResponse,
   startSocketEngine,
 } from '@nguniversal/socket-engine';
 import * as net from 'net';
+import { SOME_TOKEN } from '../testing/mock.server.module';
+import {
+  ErrorServerModuleNgFactory,
+  MockServerModuleNgFactory,
+  TokenServerModuleNgFactory,
+} from '../testing/mock.server.module.ngfactory';
 
 async function sendAndRecieve(renderOptions: SocketEngineRenderOptions) {
   return new Promise<SocketEngineResponse>(async (resolve, _reject) => {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -42,7 +42,6 @@ describe('Serve SSR Builder', () => {
 
   // todo: alan-agius4: Investigate why this tests passed locally but fails in CI.
   // this is currenty disabled but still useful locally
-  // tslint:disable-next-line: ban
   xit('works', async () => {
     host.writeMultipleFiles({
       'src/app/app.component.ts': `
@@ -109,7 +108,6 @@ describe('Serve SSR Builder', () => {
 
   // todo: alan-agius4: Investigate why this tests passed locally but fails in CI.
   // this is currenty disabled but still useful locally
-  // tslint:disable-next-line: ban
   xit('works with rebuilds with fetch', async () => {
     const run = await architect.scheduleTarget(target, { port: 7001 });
     runs.push(run);

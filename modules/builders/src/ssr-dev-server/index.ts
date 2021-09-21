@@ -14,7 +14,6 @@ import {
 } from '@angular-devkit/architect';
 import { json, logging, tags } from '@angular-devkit/core';
 import * as browserSync from 'browser-sync';
-import { existsSync } from 'fs';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { join, resolve as pathResolve } from 'path';
 import { EMPTY, Observable, combineLatest, from, of, zip } from 'rxjs';
@@ -267,6 +266,7 @@ async function initBrowserSync(
     // ex: http://testinghost.com/ssr -> http://localhost:4200 which will result in a 404.
     if (hasPathname) {
       // Remove leading slash
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       (bsOptions.scriptPath = (p) => p.substring(1)),
         (bsOptions.middleware = [
           createProxyMiddleware(defaultSocketIoPath, {

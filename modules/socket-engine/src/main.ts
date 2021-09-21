@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { CommonEngine, RenderOptions } from '@nguniversal/common/engine';
 import * as net from 'net';
@@ -44,6 +45,7 @@ export function startSocketEngine(
     const engine = new CommonEngine(moduleOrFactory, providers);
 
     const server = net.createServer((socket) => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       socket.on('data', async (buff) => {
         const message = buff.toString();
         const renderOptions = JSON.parse(message) as SocketEngineRenderOptions;

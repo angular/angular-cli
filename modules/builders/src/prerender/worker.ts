@@ -62,7 +62,7 @@ export async function render(
   if (workerArgs.inlineCriticalCss) {
     // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
     indexHtml = indexHtml.replace(
-      / media=\"print\" onload=\"this\.media='all'"><noscript><link .+?><\/noscript>/g,
+      / media="print" onload="this\.media='all'"><noscript><link .+?><\/noscript>/g,
       '>',
     );
   }

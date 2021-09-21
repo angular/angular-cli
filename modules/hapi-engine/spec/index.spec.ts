@@ -1,6 +1,15 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 import { destroyPlatform, getPlatform } from '@angular/core';
 import { Request, Server, ServerInjectResponse } from '@hapi/hapi';
 import { ngHapiEngine } from '@nguniversal/hapi-engine';
+// eslint-disable-next-line import/no-unassigned-import
 import 'zone.js';
 import { ExampleModuleNgFactory } from '../testing/example.ngfactory';
 

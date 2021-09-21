@@ -1,0 +1,115 @@
+{
+  "root": true,
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": ["eslint-plugin-import", "header", "@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/consistent-type-assertions": "error",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/no-unnecessary-qualifier": "error",
+    "@typescript-eslint/no-unused-expressions": "error",
+    "curly": "error",
+    "header/header": [
+      "error",
+      "block",
+      [
+        "*",
+        " * @license",
+        " * Copyright Google LLC All Rights Reserved.",
+        " *",
+        " * Use of this source code is governed by an MIT-style license that can be",
+        " * found in the LICENSE file at https://angular.io/license",
+        " "
+      ],
+      2
+    ],
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-absolute-path": "error",
+    "import/no-duplicates": "error",
+    "import/no-extraneous-dependencies": ["off", { "devDependencies": false }],
+    "import/no-unassigned-import": ["error", { "allow": ["symbol-observable"] }],
+    "import/order": [
+      "error",
+      {
+        "alphabetize": { "order": "asc" },
+        "groups": [["builtin", "external"], "parent", "sibling", "index"]
+      }
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 140,
+        "ignoreUrls": true
+      }
+    ],
+    "max-lines-per-function": ["error", { "max": 200 }],
+    "no-caller": "error",
+    "no-console": "error",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-eval": "error",
+    "no-multiple-empty-lines": ["error"],
+    "no-throw-literal": "error",
+    "padding-line-between-statements": [
+      "error",
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": "return"
+      }
+    ],
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "markers": ["/"]
+      }
+    ],
+
+    /* TODO: evaluate usage of these rules and fix issues as needed */
+    "no-case-declarations": "off",
+    "no-fallthrough": "off",
+    "no-underscore-dangle": "off",
+    "@typescript-eslint/await-thenable": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-implied-eval": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-unnecessary-type-assertion": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-unsafe-return": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/prefer-regexp-exec": "off",
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/restrict-plus-operands": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
+    "@typescript-eslint/unbound-method": "off"
+  },
+  "overrides": [
+    {
+      "files": ["!modules/**", "**/*.spec.ts"],
+      "rules": {
+        "max-lines-per-function": "off"
+      }
+    }
+  ]
+}

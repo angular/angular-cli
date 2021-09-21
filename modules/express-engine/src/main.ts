@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Request, Response } from 'express';
 
 import { StaticProvider } from '@angular/core';
 import { CommonEngine, RenderOptions as CommonRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
+import { Request, Response } from 'express';
 
 /**
  * These are the allowed options for the engine
@@ -51,6 +51,7 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
         renderOptions.url || `${req.protocol}://${req.get('host') || ''}${req.originalUrl}`;
       renderOptions.documentFilePath = renderOptions.documentFilePath || filePath;
       renderOptions.providers = [...(renderOptions.providers || []), getReqResProviders(req, res)];
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       (renderOptions.publicPath =
         renderOptions.publicPath ?? setupOptions.publicPath ?? (options as any).settings?.views),
         (renderOptions.inlineCriticalCss =
