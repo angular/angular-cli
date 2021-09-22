@@ -1,3 +1,35 @@
+<a name="13.0.0-next.6"></a>
+
+# 13.0.0-next.6 (2021-09-22)
+
+## Breaking Changes
+
+### @ngtools/webpack
+
+- Applications directly using the `webpack-cli` and not the Angular CLI to build must set the environment variable `DISABLE_V8_COMPILE_CACHE=1`. The `@ngtools/webpack` package now uses dynamic imports to provide support for the ESM `@angular/compiler-cli` package. The `v8-compile-cache` package used by the `webpack-cli` does not currently support dynamic import expressions and will cause builds to fail if the environment variable is not specified. Applications using the Angular CLI are not affected by this limitation.
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [0d76bf04b](https://github.com/angular/angular-cli/commit/0d76bf04bca6e083865972b5398a32bbe9396e14) | fix  | support WASM-based esbuild optimizer fallback |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [9efcb32e3](https://github.com/angular/angular-cli/commit/9efcb32e378442714eae4caec43281123c5e30f6) | fix  | better handle concurrent dev-servers |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type     | Description                                         |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------- |
+| [7d98ab3df](https://github.com/angular/angular-cli/commit/7d98ab3df9f7c15612c69cedca5a01a535301508) | refactor | support an ESM-only `@angular/compiler-cli` package |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
 <a name="13.0.0-next.5"></a>
 
 # 13.0.0-next.5 (2021-09-15)
