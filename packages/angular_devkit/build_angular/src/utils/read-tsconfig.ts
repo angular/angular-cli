@@ -8,6 +8,7 @@
 
 import type { ParsedConfiguration } from '@angular/compiler-cli';
 import * as path from 'path';
+import { loadEsmModule } from './load-esm';
 
 /**
  * Reads and parses a given TsConfig file.
@@ -22,15 +23,14 @@ export async function readTsconfig(
 ): Promise<ParsedConfiguration> {
   const tsConfigFullPath = workspaceRoot ? path.resolve(workspaceRoot, tsconfigPath) : tsconfigPath;
 
-  // This uses a dynamic import to load `@angular/compiler-cli` which may be ESM.
-  // CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
-  // will currently, unconditionally downlevel dynamic import into a require call.
-  // require calls cannot load ESM code and will result in a runtime error. To workaround
-  // this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
-  // Once TypeScript provides support for keeping the dynamic import this workaround can
-  // be dropped.
-  const compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
+  // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
+  // Once TypeScript provides support for keeping the dynamic import this workaround can be
+  // changed to a direct dynamic import.
+  const compilerCliModule = await loadEsmModule<{ readConfiguration: unknown; default: unknown }>(
+    '@angular/compiler-cli',
+  );
   // If it is not ESM then the functions needed will be stored in the `default` property.
+  // TODO_ESM: This can be removed once `@angular/compiler-cli` is ESM only.
   const { formatDiagnostics, readConfiguration } = (
     compilerCliModule.readConfiguration ? compilerCliModule : compilerCliModule.default
   ) as typeof import('@angular/compiler-cli');
