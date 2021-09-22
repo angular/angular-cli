@@ -13,12 +13,13 @@ import * as url from 'url';
 import * as webpack from 'webpack';
 import { Configuration } from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
+import { loadEsmModule } from '../../utils/load-esm';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { HmrLoader } from '../plugins/hmr/hmr-loader';
 
-export function getDevServerConfig(
+export async function getDevServerConfig(
   wco: WebpackConfigOptions<WebpackDevServerOptions>,
-): webpack.Configuration {
+): Promise<webpack.Configuration> {
   const {
     buildOptions: { host, port, index, headers, watch, hmr, main, liveReload, proxyConfig },
     logger,
@@ -90,7 +91,7 @@ export function getDevServerConfig(
       },
       liveReload,
       hot: hmr && !liveReload ? 'only' : hmr,
-      proxy: addProxyConfig(root, proxyConfig),
+      proxy: await addProxyConfig(root, proxyConfig),
       client: {
         logging: 'info',
         webSocketURL: getPublicHostOptions(wco.buildOptions, webSocketPath),
@@ -154,14 +155,25 @@ function getSslConfig(root: string, options: WebpackDevServerOptions): Configura
  * Private method to enhance a webpack config with Proxy configuration.
  * @private
  */
-function addProxyConfig(root: string, proxyConfig: string | undefined) {
+async function addProxyConfig(root: string, proxyConfig: string | undefined) {
   if (!proxyConfig) {
     return undefined;
   }
 
   const proxyPath = resolve(root, proxyConfig);
   if (existsSync(proxyPath)) {
-    return require(proxyPath);
+    try {
+      return require(proxyPath);
+    } catch (e) {
+      if (e.code === 'ERR_REQUIRE_ESM') {
+        // Load the ESM configuration file using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        return (await loadEsmModule<{ default: unknown }>(url.pathToFileURL(proxyPath))).default;
+      }
+
+      throw e;
+    }
   }
 
   throw new Error('Proxy config file ' + proxyPath + ' does not exist.');
