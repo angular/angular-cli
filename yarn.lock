@@ -2384,7 +2384,15 @@
     "@typescript-eslint/types" "4.31.2"
     eslint-visitor-keys "^2.0.0"
 
-"@verdaccio/commons-api@10.0.0", "@verdaccio/commons-api@^10.0.0":
+"@verdaccio/commons-api@10.0.1":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@verdaccio/commons-api/-/commons-api-10.0.1.tgz#7217a167e428a7603ff46685c4cc40bb1526e463"
+  integrity sha512-dO/3ocK2Cpx5GZ/HST7YWRMVXAZu5zkDglfcoxEnUh2V9D4detGn0sIDV9nCJJJiO70ZmhuOoA5oeUmrA1lELA==
+  dependencies:
+    http-errors "1.8.0"
+    http-status-codes "1.4.0"
+
+"@verdaccio/commons-api@^10.0.0":
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/@verdaccio/commons-api/-/commons-api-10.0.0.tgz#2d7de8722f94181f1a71891fe91198a7c14e6dea"
   integrity sha512-UC8wrRI9FvqjfDeB1RijF7aVI0JJhCOI8RkEDibCT/JD8zVngphrNmgSWcjo8Es3lRiu7NugWXDSuggCCeCfUg==
@@ -2399,12 +2407,12 @@
   dependencies:
     lockfile "1.0.4"
 
-"@verdaccio/local-storage@10.0.6":
-  version "10.0.6"
-  resolved "https://registry.yarnpkg.com/@verdaccio/local-storage/-/local-storage-10.0.6.tgz#be485a8107ad84206cf80702d325ca47b7f22f68"
-  integrity sha512-YEImOMUL56lziS/N3o1YzoOcVGZXpyZclGSonw7XQ1lKQEvEhU06V2+tIdjPgtqIOuH9ZKdPeBsBuN7ILa2qzQ==
+"@verdaccio/local-storage@10.0.7":
+  version "10.0.7"
+  resolved "https://registry.yarnpkg.com/@verdaccio/local-storage/-/local-storage-10.0.7.tgz#c90114cc474c564b6aecc5513a95fe474ca8b797"
+  integrity sha512-DpR4RFDQXVFI9ILEU0xXIqGP7m59u4n5RJ9AYEbc6i/6Iv0Ba2K2Q4l/J22ZLURjqCKZY4ZPUJkhUwXSmzRFMQ==
   dependencies:
-    "@verdaccio/commons-api" "10.0.0"
+    "@verdaccio/commons-api" "10.0.1"
     "@verdaccio/file-locking" "10.0.0"
     "@verdaccio/streams" "10.0.0"
     async "3.2.0"
@@ -4400,7 +4408,12 @@ es6-weak-map@^2.0.3:
     es6-iterator "^2.0.3"
     es6-symbol "^3.1.1"
 
-esbuild@0.12.28, esbuild@^0.12.15:
+esbuild@0.12.29:
+  version "0.12.29"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.12.29.tgz#be602db7c4dc78944a9dbde0d1ea19d36c1f882d"
+  integrity sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==
+
+esbuild@^0.12.15:
   version "0.12.28"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.12.28.tgz#84da0d2a0d0dee181281545271e0d65cf6fab1ef"
   integrity sha512-pZ0FrWZXlvQOATlp14lRSk1N9GkeJ3vLIwOcUoo3ICQn9WNR4rWoNi81pbn6sC1iYUy7QPqNzI3+AEzokwyVcA==
@@ -7061,7 +7074,12 @@ mv@2.1.1:
     ncp "~2.0.0"
     rimraf "~2.4.0"
 
-nanoid@^3.1.23:
+nanocolors@^0.1.5:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/nanocolors/-/nanocolors-0.1.6.tgz#bc2350d3edfdbfadd7ac018c855ae7c13905a6ad"
+  integrity sha512-2pvTw6vYRaBLGir2xR7MxaJtyWkrn+C53EpW8yPotG+pdAwBvt0Xwk4VJ6VHLY0aLthVZPvDfm9TdZvrvAm5UQ==
+
+nanoid@^3.1.23, nanoid@^3.1.25:
   version "3.1.25"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.25.tgz#09ca32747c0e543f0e1814b7d3793477f9c8e152"
   integrity sha512-rdwtIXaXCLFAQbnfqDRnI6jaRHp9fTcYBjtFKE8eezcZ7LuLjhUaQGNeMXf1HmRoCH32CLz6XwX0TtxEOS/A3Q==
@@ -7159,11 +7177,6 @@ node-addon-api@^3.0.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
   integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
-
-node-fetch@2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
-  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 node-fetch@2.6.1:
   version "2.6.1"
@@ -8256,7 +8269,16 @@ postcss@7.x.x, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2, postcss@^7.0.32
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@8.3.6, postcss@^8.2.15, postcss@^8.2.4:
+postcss@8.3.7:
+  version "8.3.7"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.7.tgz#ec88563588c8da8e58e7226f7633b51ae221eeda"
+  integrity sha512-9SaY7nnyQ63/WittqZYAvkkYPyKxchMKH71UDzeTmWuLSvxTRpeEeABZAzlCi55cuGcoFyoV/amX2BdsafQidQ==
+  dependencies:
+    nanocolors "^0.1.5"
+    nanoid "^3.1.25"
+    source-map-js "^0.6.2"
+
+postcss@^8.2.15, postcss@^8.2.4:
   version "8.3.6"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.6.tgz#2730dd76a97969f37f53b9a6096197be311cc4ea"
   integrity sha512-wG1cc/JhRgdqB6WHEuyLTedf3KIRuD0hG6ldkFEZNCjRxiC+3i6kkWUUbiJQayP28iwG35cEmAbe98585BYV0A==
@@ -8421,10 +8443,10 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer@10.2.0:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-10.2.0.tgz#7d8d7fda91e19a7cfd56986e0275448e6351849e"
-  integrity sha512-OR2CCHRashF+f30+LBOtAjK6sNtz2HEyTr5FqAvhf8lR/qB3uBRoIZOwQKgwoyZnMBsxX7ZdazlyBgGjpnkiMw==
+puppeteer@10.4.0:
+  version "10.4.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-10.4.0.tgz#a6465ff97fda0576c4ac29601406f67e6fea3dc7"
+  integrity sha512-2cP8mBoqnu5gzAVpbZ0fRaobBWZM8GEUF4I1F6WbgHrKV/rz7SX8PG2wMymZgD0wo0UBlg2FBPNxlF/xlqW6+w==
   dependencies:
     debug "4.3.1"
     devtools-protocol "0.0.901419"
@@ -9000,10 +9022,10 @@ sass-loader@12.1.0:
     klona "^2.0.4"
     neo-async "^2.6.2"
 
-sass@1.42.0:
-  version "1.42.0"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.42.0.tgz#dc485e5cf7890a22fd6ccc6856c64f297239d595"
-  integrity sha512-kcjxsemgaOnfl43oZgO/IePLvXQI0ZKzo0/xbCt6uyrg3FY/FF8hVK9YoO8GiZBcEG2Ebl79EKnUc+aiE4f2Vw==
+sass@1.42.1:
+  version "1.42.1"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.42.1.tgz#5ab17bebc1cb1881ad2e0c9a932c66ad64e441e2"
+  integrity sha512-/zvGoN8B7dspKc5mC6HlaygyCBRvnyzzgD5khiaCfglWztY99cYoiTUksVx11NlnemrcfH5CEaCpsUKoW0cQqg==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
 
@@ -9820,7 +9842,16 @@ terser-webpack-plugin@^5.1.3:
     source-map "^0.6.1"
     terser "^5.7.2"
 
-terser@5.8.0, terser@^5.7.2:
+terser@5.9.0:
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.9.0.tgz#47d6e629a522963240f2b55fcaa3c99083d2c351"
+  integrity sha512-h5hxa23sCdpzcye/7b8YqbE5OwKca/ni0RQz1uRX3tGh8haaGHqcuSqbGRybuAKNdntZ0mDgFNXPJ48xQ2RXKQ==
+  dependencies:
+    commander "^2.20.0"
+    source-map "~0.7.2"
+    source-map-support "~0.5.20"
+
+terser@^5.7.2:
   version "5.8.0"
   resolved "https://registry.yarnpkg.com/terser/-/terser-5.8.0.tgz#c6d352f91aed85cc6171ccb5e84655b77521d947"
   integrity sha512-f0JH+6yMpneYcRJN314lZrSwu9eKkUFEHLN/kNy8ceh8gaRiLgFPJqrB9HsXjhEGdv4e/ekjTOFxIlL6xlma8A==
@@ -10371,15 +10402,15 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-verdaccio-audit@10.0.1:
-  version "10.0.1"
-  resolved "https://registry.yarnpkg.com/verdaccio-audit/-/verdaccio-audit-10.0.1.tgz#dc5b28c6a5315d874552b982d047c7e5bb3644e5"
-  integrity sha512-OxY5REold4AjecbhydgB4DN/9mr0+mR+okxYl5BPugXKNuyfFO/CeXluEKnYBqIcbsEghu/zPrOJbJgrShJdGQ==
+verdaccio-audit@10.0.2:
+  version "10.0.2"
+  resolved "https://registry.yarnpkg.com/verdaccio-audit/-/verdaccio-audit-10.0.2.tgz#736e1d0dd96039a9de32830ea5a295bb9773f7a2"
+  integrity sha512-pcud2xwztYETO15r+a11cFkpvweLmnsuJJ0FLCifL3+z4IzYFgD5KgPwUD9sdMPHFz5efOrHeO71cu8hb8oEWg==
   dependencies:
     body-parser "1.19.0"
     express "4.17.1"
     https-proxy-agent "5.0.0"
-    node-fetch "2.6.0"
+    node-fetch "2.6.1"
 
 verdaccio-auth-memory@^10.0.0:
   version "10.0.0"
@@ -10399,13 +10430,13 @@ verdaccio-htpasswd@10.0.0:
     http-errors "1.8.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.1.5:
-  version "5.1.5"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.1.5.tgz#129501a37041556d0a2d4e375e9a60e51b4cc49d"
-  integrity sha512-hbcIYb7DqWhoOenE5hZMGRu0DnC6rX7cDikLcT67JGorZ/8uhGINxT0F03BkiY6Ahv8chKWNKb5fpTVumF+YjQ==
+verdaccio@5.1.6:
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.1.6.tgz#309f4a5c2b3cd4679109d8339cdcfa87a9c9e2da"
+  integrity sha512-/DlhWtgtlfqKKxV6puZigRS6eicqVSXBZoZuG1HL8h+pft7F2bwu0KI1u4XT2fzGw9hp69FFET8OlPLNfYEvwQ==
   dependencies:
-    "@verdaccio/commons-api" "10.0.0"
-    "@verdaccio/local-storage" "10.0.6"
+    "@verdaccio/commons-api" "10.0.1"
+    "@verdaccio/local-storage" "10.0.7"
     "@verdaccio/readme" "10.0.0"
     "@verdaccio/streams" "10.0.0"
     "@verdaccio/ui-theme" "3.2.1"
@@ -10443,7 +10474,7 @@ verdaccio@5.1.5:
     request "2.88.0"
     semver "7.3.5"
     validator "13.6.0"
-    verdaccio-audit "10.0.1"
+    verdaccio-audit "10.0.2"
     verdaccio-htpasswd "10.0.0"
 
 verror@1.10.0:
