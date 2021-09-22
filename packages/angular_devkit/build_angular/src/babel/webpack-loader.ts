@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { needsLinking } from '@angular/compiler-cli/linker';
 import { custom } from 'babel-loader';
 import { ScriptTarget } from 'typescript';
+import { loadEsmModule } from '../utils/load-esm';
 import { ApplicationPresetOptions } from './presets/application';
 
 interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLinker' | 'i18n'> {
@@ -21,11 +21,33 @@ interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLi
   };
 }
 
-function requiresLinking(path: string, source: string): boolean {
+/**
+ * Cached instance of the compiler-cli linker's needsLinking function.
+ */
+let needsLinking: typeof import('@angular/compiler-cli/linker').needsLinking | undefined;
+
+/**
+ * Cached instance of the compiler-cli linker's Babel plugin factory function.
+ */
+let linkerPluginCreator:
+  | typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin
+  | undefined;
+
+async function requiresLinking(path: string, source: string): Promise<boolean> {
   // @angular/core and @angular/compiler will cause false positives
   // Also, TypeScript files do not require linking
   if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {
     return false;
+  }
+
+  if (!needsLinking) {
+    // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+    // changed to a direct dynamic import.
+    const linkerModule = await loadEsmModule<typeof import('@angular/compiler-cli/linker')>(
+      '@angular/compiler-cli/linker',
+    );
+    needsLinking = linkerModule.needsLinking;
   }
 
   return needsLinking(path, source);
@@ -55,9 +77,20 @@ export default custom<AngularCustomOptions>(() => {
 
       // Analyze file for linking
       if (await requiresLinking(this.resourcePath, source)) {
+        if (!linkerPluginCreator) {
+          // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
+          // Once TypeScript provides support for keeping the dynamic import this workaround can be
+          // changed to a direct dynamic import.
+          const linkerBabelModule = await loadEsmModule<
+            typeof import('@angular/compiler-cli/linker/babel')
+          >('@angular/compiler-cli/linker/babel');
+          linkerPluginCreator = linkerBabelModule.createEs2015LinkerPlugin;
+        }
+
         customOptions.angularLinker = {
           shouldLink: true,
           jitMode: aot !== true,
+          linkerPluginCreator,
         };
         shouldProcess = true;
       }

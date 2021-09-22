@@ -20,6 +20,7 @@ export interface ApplicationPresetOptions {
   angularLinker?: {
     shouldLink: boolean;
     jitMode: boolean;
+    linkerPluginCreator: typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin;
   };
 
   forceES5?: boolean;
@@ -27,6 +28,11 @@ export interface ApplicationPresetOptions {
 
   diagnosticReporter?: DiagnosticReporter;
 }
+
+// Extract Logger type from the linker function to avoid deep importing to access the type
+type NgtscLogger = Parameters<
+  typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin
+>[0]['logger'];
 
 type I18nDiagnostics = import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
 function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): I18nDiagnostics {
@@ -106,9 +112,7 @@ function createI18nPlugins(
   return plugins;
 }
 
-function createNgtscLogger(
-  reporter: DiagnosticReporter | undefined,
-): import('@angular/compiler-cli/src/ngtsc/logging').Logger {
+function createNgtscLogger(reporter: DiagnosticReporter | undefined): NgtscLogger {
   return {
     level: 1, // Info level
     debug(...args: string[]) {},
@@ -130,12 +134,8 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   let needRuntimeTransform = false;
 
   if (options.angularLinker?.shouldLink) {
-    // Babel currently is synchronous so import cannot be used
-    const { createEs2015LinkerPlugin } =
-      require('@angular/compiler-cli/linker/babel') as typeof import('@angular/compiler-cli/linker/babel');
-
     plugins.push(
-      createEs2015LinkerPlugin({
+      options.angularLinker.linkerPluginCreator({
         linkerJitMode: options.angularLinker.jitMode,
         // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
         sourceMapping: false,
