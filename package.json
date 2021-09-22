@@ -93,7 +93,7 @@
     "prettier": "^2.2.1",
     "protractor": "7.0.0",
     "puppeteer": "10.4.0",
-    "rollup": "~2.56.0",
+    "rollup": "~2.57.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.6.0",
