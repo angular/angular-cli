@@ -285,7 +285,19 @@ jobs:
     executor: windows-executor
     parallelism: 8
     steps:
-      - custom_attach_workspace
+      - checkout
+      - run:
+          name: Rebase PR on target branch
+          command: |
+            if (Test-Path env:CIRCLE_PR_NUMBER) {
+              # User is required for rebase.
+              git config user.name "angular-ci"
+              git config user.email "angular-ci"
+              # Rebase PR on top of target branch.
+              node tools/rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER
+            } else {
+              echo "This build is not over a PR, nothing to do."
+            }
       - setup_windows
       - restore_cache:
           keys:
