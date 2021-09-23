@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 
@@ -57,9 +56,13 @@ describe('Universal Schematic', () => {
       .runSchematicAsync('ng-add', defaultOptions, appTree)
       .toPromise();
 
-    const { files } = parseJson(
-      tree.readContent('/projects/test-app/tsconfig.server.json'),
-      JsonParseMode.Loose,
+    const { files } = JSON.parse(
+      tree
+        .readContent('/projects/test-app/tsconfig.server.json')
+        .replace(
+          '/* To learn more about this file see: https://angular.io/config/tsconfig. */',
+          '',
+        ),
     ) as any;
 
     expect(files).toEqual(['src/main.server.ts', 'server.ts']);

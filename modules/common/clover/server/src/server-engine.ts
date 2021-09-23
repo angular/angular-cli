@@ -66,6 +66,10 @@ export class Engine {
       );
     }
 
+    // JSDOM doesn't support type=module
+    // https://github.com/jsdom/jsdom/issues/2475
+    htmlContent = htmlContent.replace(/ type="module"/g, '');
+
     try {
       dom = new JSDOM(htmlContent, {
         runScripts: 'dangerously',
