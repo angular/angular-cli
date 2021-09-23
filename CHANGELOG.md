@@ -30,6 +30,22 @@
 
 Alan Agius and Charles Lyding
 
+<a name="12.2.7"></a>
+
+# 12.2.7 (2021-09-22)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [d856b4d23](https://github.com/angular/angular-cli/commit/d856b4d2369bea76ce65fc5f6d1585145ad41618) | fix  | support WASM-based esbuild optimizer fallback |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-next.5"></a>
 
 # 13.0.0-next.5 (2021-09-15)
