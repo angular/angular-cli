@@ -12,6 +12,7 @@ import * as crypto from 'crypto';
 import { createReadStream, promises as fs, constants as fsConstants } from 'fs';
 import * as path from 'path';
 import { pipeline } from 'stream';
+import { pathToFileURL } from 'url';
 import { loadEsmModule } from './load-esm';
 
 class CliFilesystem implements Filesystem {
@@ -75,9 +76,13 @@ export async function augmentAppWithServiceWorker(
   const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js', {
     paths: [systemProjectRoot],
   });
-  const swConfigPath = require.resolve('@angular/service-worker/config', {
-    paths: [systemProjectRoot],
-  });
+  // Absolute paths on Windows must be `file://` URLs when using ESM. Otherwise,
+  // `c:` would be interpreted as a protocol instead of a drive letter.
+  const swConfigPath = pathToFileURL(
+    require.resolve('@angular/service-worker/config', {
+      paths: [systemProjectRoot],
+    }),
+  );
 
   // Determine the configuration file path
   let configPath;

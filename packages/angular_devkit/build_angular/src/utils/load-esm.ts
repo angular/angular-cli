@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { URL } from 'url';
+
 /**
  * This uses a dynamic import to load a module which may be ESM.
  * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
@@ -18,7 +20,7 @@
  * @param modulePath The path of the module to load.
  * @returns A Promise that resolves to the dynamically imported module.
  */
-export async function loadEsmModule<T>(modulePath: string): Promise<T> {
+export async function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
   try {
     return (await new Function('modulePath', `return import(modulePath);`)(modulePath)) as T;
   } catch (e) {
