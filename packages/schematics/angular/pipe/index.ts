@@ -25,7 +25,7 @@ import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils'
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
-import { createDefaultPath } from '../utility/workspace';
+import { createDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as PipeOptions } from './schema';
 
 function addDeclarationToNgModule(options: PipeOptions): Rule {
@@ -92,6 +92,9 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 
 export default function (options: PipeOptions): Rule {
   return async (host: Tree) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(options.project as string);
+
     if (options.path === undefined) {
       options.path = await createDefaultPath(host, options.project as string);
     }
@@ -108,10 +111,22 @@ export default function (options: PipeOptions): Rule {
         ...strings,
         'if-flat': (s: string) => (options.flat ? '' : s),
         ...options,
+        selector: buildSelector(options, (project && project.prefix) || ''),
       }),
       move(parsedPath.path),
     ]);
 
     return chain([addDeclarationToNgModule(options), mergeWith(templateSource)]);
   };
+}
+
+function buildSelector(options: PipeOptions, projectPrefix: string) {
+  let selector = options.name;
+  if (options.prefix) {
+    selector = `${options.prefix}-${selector}`;
+  } else if (options.prefix === undefined && projectPrefix) {
+    selector = `${projectPrefix}-${selector}`;
+  }
+
+  return strings.camelize(selector);
 }

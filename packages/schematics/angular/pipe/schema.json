@@ -21,6 +21,20 @@
       "description": "The path at which to create the pipe, relative to the workspace root.",
       "visible": false
     },
+    "prefix": {
+      "type": "string",
+      "description": "The prefix to apply to the generated pipe name.",
+      "alias": "p",
+      "oneOf": [
+        {
+          "maxLength": 0
+        },
+        {
+          "minLength": 1,
+          "format": "html-selector"
+        }
+      ]
+    },
     "project": {
       "type": "string",
       "description": "The name of the project.",

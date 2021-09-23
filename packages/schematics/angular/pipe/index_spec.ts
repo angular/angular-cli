@@ -147,4 +147,28 @@ describe('Pipe Schematic', () => {
     expect(files).not.toContain('/projects/bar/src/app/foo.pipe.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
   });
+
+  it('should use the prefix', async () => {
+    const options = { ...defaultOptions, prefix: 'pre' };
+
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+    expect(content).toMatch(/name: 'preFoo'/);
+  });
+
+  it('should use the default project prefix if none is passed', async () => {
+    const options = { ...defaultOptions, prefix: undefined };
+
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+    expect(content).toMatch(/name: 'appFoo'/);
+  });
+
+  it('should use the supplied prefix if it is ""', async () => {
+    const options = { ...defaultOptions, prefix: '' };
+
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+    expect(content).toMatch(/name: 'foo'/);
+  });
 });

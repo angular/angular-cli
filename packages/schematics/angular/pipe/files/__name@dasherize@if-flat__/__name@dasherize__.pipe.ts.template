@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: '<%= camelize(name) %>'
+  name: '<%= selector %>'
 })
 export class <%= classify(name) %>Pipe implements PipeTransform {
 
