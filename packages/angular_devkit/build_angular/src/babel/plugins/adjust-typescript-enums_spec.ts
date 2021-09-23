@@ -240,4 +240,31 @@ describe('adjust-typescript-enums Babel plugin', () => {
       options: { loose: true },
     });
   });
+
+  it(
+    'should not wrap TypeScript enums in loose mode if the declaration identifier has been ' +
+      'renamed to avoid collisions',
+    () => {
+      testCase({
+        input: `
+        var ChangeDetectionStrategy$1;
+        (function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+            ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy$1 || (ChangeDetectionStrategy$1 = {}));
+      `,
+        expected: `
+        var ChangeDetectionStrategy$1 = /*#__PURE__*/ (() => {
+          (function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
+            ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
+          })(ChangeDetectionStrategy$1 || (ChangeDetectionStrategy$1 = {}));
+
+          return ChangeDetectionStrategy$1;
+        })();
+      `,
+        options: { loose: true },
+      });
+    },
+  );
 });
