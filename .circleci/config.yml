@@ -147,7 +147,7 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key
-      - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run: yarn install --cache-folder ~/.cache/yarn
       - persist_to_workspace:
           root: *workspace_location
           paths:
@@ -290,7 +290,7 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key_win
-      - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
+      - run: yarn install --cache-folder ../.cache/yarn
       - save_cache:
           key: *cache_key_win
           paths:
