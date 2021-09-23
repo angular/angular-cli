@@ -76,9 +76,17 @@ export default function (): PluginObj {
           return;
         }
 
+        const enumCalleeParam = enumCallee.node.params[0];
+        const isEnumCalleeMatching =
+          types.isIdentifier(enumCalleeParam) && enumCalleeParam.name === declarationId.name;
+
         // Loose mode rewrites the enum to a shorter but less TypeScript-like form
+        // Note: We only can apply the `loose` mode transformation if the callee parameter matches
+        // with the declaration identifier name. This is necessary in case the the declaration id has
+        // been renamed to avoid collisions, as the loose transform would then break the enum assignments
+        // which rely on the differently-named callee identifier name.
         let enumAssignments: types.ExpressionStatement[] | undefined;
-        if (loose) {
+        if (loose && isEnumCalleeMatching) {
           enumAssignments = [];
         }
 
