@@ -22,6 +22,7 @@ import * as path from 'path';
 import { workerData } from 'worker_threads';
 import { allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
+import { loadEsmModule } from './load-esm';
 
 type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
 
@@ -34,7 +35,62 @@ let webpackSources: typeof import('webpack').sources | undefined;
 
 const { i18n } = (workerData || {}) as { i18n?: I18nOptions };
 
+/**
+ * Internal flag to enable the direct usage of the `@angular/localize` translation plugins.
+ * Their usage is currently several times slower than the string manipulation method.
+ * Future work to optimize the plugins should enable plugin usage as the default.
+ */
 const USE_LOCALIZE_PLUGINS = false;
+
+/**
+ * The extracted `@angular/localize` utilities module type used by the manually constructed
+ * `LocalizeToolsModule` type.
+ *
+ * TODO_ESM: Remove once the `tools` entry point exists in a published package version
+ */
+type LocalizeUtilityModule = typeof import('@angular/localize/src/tools/src/source_file_utils');
+
+/**
+ * The manually constructed type for the `@angular/localize/tools` module.
+ * This type only contains the exports that are need for this file.
+ *
+ * TODO_ESM: Remove once the `tools` entry point exists in a published package version
+ */
+interface LocalizeToolsModule extends LocalizeUtilityModule {
+  /* eslint-disable max-len */
+  Diagnostics: typeof import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
+  makeEs2015TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin').makeEs2015TranslatePlugin;
+  makeEs5TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin').makeEs5TranslatePlugin;
+  makeLocalePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/locale_plugin').makeLocalePlugin;
+  /* eslint-enable max-len */
+}
+
+/**
+ * Cached instance of the `@angular/localize/tools` module.
+ * This is used to remove the need to repeatedly import the module per file translation.
+ */
+let localizeToolsModule: LocalizeToolsModule | undefined;
+
+/**
+ * Attempts to load the `@angular/localize/tools` module containing the functionality to
+ * perform the file translations.
+ * This module must be dynamically loaded as it is an ESM module and this file is CommonJS.
+ */
+async function loadLocalizeTools(): Promise<void> {
+  if (localizeToolsModule !== undefined) {
+    return;
+  }
+
+  // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
+  // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
+  // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+  try {
+    // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+    // changed to a direct dynamic import.
+    localizeToolsModule = await loadEsmModule<LocalizeToolsModule>('@angular/localize/tools');
+  } catch {}
+}
 
 export async function createI18nPlugins(
   locale: string,
@@ -44,14 +100,17 @@ export async function createI18nPlugins(
   localeDataContent?: string,
 ) {
   const plugins = [];
-  const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
+  const localizeDiag =
+    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/diagnostics'));
 
   const diagnostics = new localizeDiag.Diagnostics();
 
   if (shouldInline) {
-    const es2015 = await import(
-      '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
-    );
+    const es2015 =
+      localizeToolsModule ??
+      (await import(
+        '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
+      ));
     plugins.push(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
@@ -59,9 +118,9 @@ export async function createI18nPlugins(
       }),
     );
 
-    const es5 = await import(
-      '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
-    );
+    const es5 =
+      localizeToolsModule ??
+      (await import('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
     plugins.push(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
@@ -70,9 +129,9 @@ export async function createI18nPlugins(
     );
   }
 
-  const inlineLocale = await import(
-    '@angular/localize/src/tools/src/translate/source_files/locale_plugin'
-  );
+  const inlineLocale =
+    localizeToolsModule ??
+    (await import('@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
   plugins.push(inlineLocale.makeLocalePlugin(locale));
 
   if (localeDataContent) {
@@ -119,6 +178,8 @@ export async function inlineLocales(options: InlineOptions) {
   if (!hasLocalizeName && !options.setLocale) {
     return inlineCopyOnly(options);
   }
+
+  await loadLocalizeTools();
 
   let ast: ParseResult | undefined | null;
   try {
@@ -211,8 +272,10 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
 
   const { default: generate } = await import('@babel/generator');
 
-  const utils = await import('@angular/localize/src/tools/src/source_file_utils');
-  const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
+  const utils =
+    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/source_file_utils'));
+  const localizeDiag =
+    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/diagnostics'));
 
   const diagnostics = new localizeDiag.Diagnostics();
 

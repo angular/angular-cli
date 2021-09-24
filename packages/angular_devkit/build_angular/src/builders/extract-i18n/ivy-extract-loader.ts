@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { MessageExtractor } from '@angular/localize/src/tools/src/extract/extraction';
 import * as nodePath from 'path';
+import { loadEsmModule } from '../../utils/load-esm';
 
 // Extract loader source map parameter type since it is not exported directly
 type LoaderSourceMap = Parameters<import('webpack').LoaderDefinitionFunction>[1];
@@ -21,9 +21,49 @@ export default function localizeExtractLoader(
   content: string,
   map: LoaderSourceMap,
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const loaderContext = this;
   const options = this.getOptions();
+  const callback = this.async();
+
+  extract(this, content, map, options).then(
+    () => {
+      // Pass through the original content now that messages have been extracted
+      callback(undefined, content, map);
+    },
+    (error) => {
+      callback(error);
+    },
+  );
+}
+
+async function extract(
+  loaderContext: import('webpack').LoaderContext<LocalizeExtractLoaderOptions>,
+  content: string,
+  map: string | LoaderSourceMap | undefined,
+  options: LocalizeExtractLoaderOptions,
+) {
+  // Try to load the `@angular/localize` message extractor.
+  // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
+  // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
+  // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+  let MessageExtractor;
+  try {
+    try {
+      // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+      // Once TypeScript provides support for keeping the dynamic import this workaround can be
+      // changed to a direct dynamic import.
+      const localizeToolsModule = await loadEsmModule<
+        typeof import('@angular/localize/src/tools/src/extract/extraction')
+      >('@angular/localize/tools');
+      MessageExtractor = localizeToolsModule.MessageExtractor;
+    } catch {
+      MessageExtractor = (await import('@angular/localize/src/tools/src/extract/extraction'))
+        .MessageExtractor;
+    }
+  } catch {
+    throw new Error(
+      `Unable to load message extractor. Please ensure '@angular/localize' is installed.`,
+    );
+  }
 
   // Setup a Webpack-based logger instance
   const logger = {
@@ -82,7 +122,7 @@ export default function localizeExtractLoader(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const extractor = new MessageExtractor(filesystem as any, logger, {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    basePath: this.rootContext as any,
+    basePath: loaderContext.rootContext as any,
     useSourceMaps: !!map,
   });
 
@@ -90,7 +130,4 @@ export default function localizeExtractLoader(
   if (messages.length > 0) {
     options?.messageHandler(messages);
   }
-
-  // Pass through the original content now that messages have been extracted
-  this.callback(undefined, content, map);
 }
