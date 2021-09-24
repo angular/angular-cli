@@ -139,7 +139,10 @@
       "type": "object",
       "properties": {
         "cli": {
-          "$ref": "#/definitions/cliOptions"
+          "defaultCollection": {
+            "description": "The default schematics collection to use.",
+            "type": "string"
+          }
         },
         "schematics": {
           "$ref": "#/definitions/schematicOptions"
