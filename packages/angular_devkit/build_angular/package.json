@@ -32,7 +32,7 @@
     "core-js": "3.18.0",
     "critters": "0.0.10",
     "css-loader": "6.3.0",
-    "esbuild-wasm": "0.13.1",
+    "esbuild-wasm": "0.13.2",
     "find-cache-dir": "3.3.2",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
@@ -73,7 +73,7 @@
     "webpack-subresource-integrity": "5.0.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.13.1"
+    "esbuild": "0.13.2"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^13.0.0 || ^13.0.0-next",
