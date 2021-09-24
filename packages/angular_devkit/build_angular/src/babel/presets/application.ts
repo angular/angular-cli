@@ -10,11 +10,28 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
+
+/**
+ * An interface representing the factory functions for the `@angular/localize` translation Babel plugins.
+ * This must be provided for the ESM imports since dynamic imports are required to be asynchronous and
+ * Babel presets currently can only be synchronous.
+ *
+ * TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+ */
+export interface I18nPluginCreators {
+  /* eslint-disable max-len */
+  makeEs2015TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin').makeEs2015TranslatePlugin;
+  makeEs5TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin').makeEs5TranslatePlugin;
+  makeLocalePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/locale_plugin').makeLocalePlugin;
+  /* eslint-enable max-len */
+}
+
 export interface ApplicationPresetOptions {
   i18n?: {
     locale: string;
     missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
     translation?: unknown;
+    pluginCreators?: I18nPluginCreators;
   };
 
   angularLinker?: {
@@ -80,6 +97,8 @@ function createI18nPlugins(
   translation: unknown | undefined,
   missingTranslationBehavior: 'error' | 'warning' | 'ignore',
   diagnosticReporter: DiagnosticReporter | undefined,
+  // TODO_ESM: Make `pluginCreators` required once `@angular/localize` is published with the `tools` entry point
+  pluginCreators: I18nPluginCreators | undefined,
 ) {
   const diagnostics = createI18nDiagnostics(diagnosticReporter);
   const plugins = [];
@@ -87,7 +106,10 @@ function createI18nPlugins(
   if (translation) {
     const {
       makeEs2015TranslatePlugin,
-    } = require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
+      // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+    } =
+      pluginCreators ??
+      require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
     plugins.push(
       makeEs2015TranslatePlugin(diagnostics, translation, {
         missingTranslation: missingTranslationBehavior,
@@ -96,7 +118,10 @@ function createI18nPlugins(
 
     const {
       makeEs5TranslatePlugin,
-    } = require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
+      // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+    } =
+      pluginCreators ??
+      require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
     plugins.push(
       makeEs5TranslatePlugin(diagnostics, translation, {
         missingTranslation: missingTranslationBehavior,
@@ -106,7 +131,10 @@ function createI18nPlugins(
 
   const {
     makeLocalePlugin,
-  } = require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
+    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+  } =
+    pluginCreators ??
+    require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
   plugins.push(makeLocalePlugin(locale));
 
   return plugins;
@@ -168,12 +196,13 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   }
 
   if (options.i18n) {
-    const { locale, missingTranslationBehavior, translation } = options.i18n;
+    const { locale, missingTranslationBehavior, pluginCreators, translation } = options.i18n;
     const i18nPlugins = createI18nPlugins(
       locale,
       translation,
       missingTranslationBehavior || 'ignore',
       options.diagnosticReporter,
+      pluginCreators,
     );
 
     plugins.push(...i18nPlugins);
