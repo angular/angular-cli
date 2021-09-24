@@ -8,23 +8,23 @@ export default async function () {
   // We need to use the public registry because in the local NPM server we don't have
   // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
   try {
-    await createProjectFromAsset('8.0-project', true, true);
+    await createProjectFromAsset('9.0-project', true, true);
 
     await setRegistry(false);
     await installWorkspacePackages();
 
-    // Update Angular to 9
-    await installPackage('@angular/cli@8');
-    const { stdout } = await ng('update', '@angular/cli@9.x', '@angular/core@9.x');
+    // Update Angular to 10
+    await installPackage('@angular/cli@9');
+    const { stdout } = await ng('update', '@angular/cli@10.x', '@angular/core@10.x');
     if (!stdout.includes("Executing migrations of package '@angular/cli'")) {
       throw new Error('Update did not execute migrations. OUTPUT: \n' + stdout);
     }
 
-    // Update Angular to 10
-    await ng('update', '@angular/cli@10', '@angular/core@10');
-
     // Update Angular to 11
     await ng('update', '@angular/cli@11', '@angular/core@11');
+
+    // Update Angular to 12
+    await ng('update', '@angular/cli@12', '@angular/core@12');
   } finally {
     await setRegistry(true);
   }
@@ -40,7 +40,7 @@ export default async function () {
   // Setup testing to use CI Chrome.
   await useCIChrome('./');
   await useCIChrome('./e2e/');
-  await useCIDefaults('eight-project');
+  await useCIDefaults('nine-project');
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
@@ -50,5 +50,5 @@ export default async function () {
 
   // Verify project now creates bundles
   await noSilentNg('build', '--prod');
-  await expectFileMatchToExist('dist/eight-project/', /main\.[0-9a-f]{20}\.js/);
+  await expectFileMatchToExist('dist/nine-project/', /main\.[0-9a-f]{20}\.js/);
 }
