@@ -62,7 +62,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.53.0",
+    "**/@types/copy-webpack-plugin/webpack": "5.54.0",
     "ajv-formats/ajv": "8.6.3"
   },
   "devDependencies": {
@@ -140,7 +140,7 @@
     "common-tags": "^1.8.0",
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "9.0.1",
-    "core-js": "3.18.0",
+    "core-js": "3.18.1",
     "critters": "0.0.10",
     "css-loader": "6.3.0",
     "debug": "^4.1.1",
@@ -191,7 +191,7 @@
     "pidusage": "^2.0.17",
     "piscina": "3.1.0",
     "popper.js": "^1.14.1",
-    "postcss": "8.3.7",
+    "postcss": "8.3.8",
     "postcss-import": "14.0.2",
     "postcss-loader": "6.1.1",
     "postcss-preset-env": "6.7.0",
@@ -224,9 +224,9 @@
     "typescript": "4.3.5",
     "verdaccio": "5.1.6",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.53.0",
-    "webpack-dev-middleware": "5.1.0",
-    "webpack-dev-server": "4.2.1",
+    "webpack": "5.54.0",
+    "webpack-dev-middleware": "5.2.1",
+    "webpack-dev-server": "4.3.0",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0",
     "zone.js": "^0.11.3"
