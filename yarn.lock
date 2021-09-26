@@ -251,10 +251,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#66f3d762e79e729464ec26685d8ab784d4876e94":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#cab3f97335cdd980b8f8c1a4d49bf47c43e03c57":
   version "0.0.0"
-  uid "66f3d762e79e729464ec26685d8ab784d4876e94"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#66f3d762e79e729464ec26685d8ab784d4876e94"
+  uid cab3f97335cdd980b8f8c1a4d49bf47c43e03c57
+  resolved "https://github.com/angular/dev-infra-private-builds.git#cab3f97335cdd980b8f8c1a4d49bf47c43e03c57"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -267,7 +267,7 @@
     "@bazel/protractor" "4.2.0"
     "@bazel/runfiles" "4.2.0"
     "@bazel/typescript" "4.2.0"
-    "@microsoft/api-extractor" "7.18.10"
+    "@microsoft/api-extractor" "7.18.11"
     "@octokit/auth-app" "^3.6.0"
     "@octokit/core" "^3.5.1"
     "@octokit/graphql" "^4.8.0"
@@ -1729,24 +1729,24 @@
     "@microsoft/tsdoc-config" "~0.15.2"
     "@rushstack/node-core-library" "3.40.0"
 
-"@microsoft/api-extractor-model@7.13.8":
-  version "7.13.8"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.13.8.tgz#a76a0be5cd019cab14e0be2b05a97115739d3938"
-  integrity sha512-tC/Mbc7vOEkinVmhXyGS4RvPD3cesE0UvE0RmgazDfLHOpefLwoakdoocZqUp+mL5hMUep/ymIW7IbfZlwWxnQ==
+"@microsoft/api-extractor-model@7.13.9":
+  version "7.13.9"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.13.9.tgz#018fb37ac0147595832e13db17509f6adafbad9c"
+  integrity sha512-t/XKTr8MlHRWgDr1fkyCzTQRR5XICf/WzIFs8yw1JLU8Olw99M3by4/dtpOZNskfqoW+J8NwOxovduU2csi4Ww==
   dependencies:
     "@microsoft/tsdoc" "0.13.2"
     "@microsoft/tsdoc-config" "~0.15.2"
-    "@rushstack/node-core-library" "3.40.3"
+    "@rushstack/node-core-library" "3.41.0"
 
-"@microsoft/api-extractor@7.18.10":
-  version "7.18.10"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.10.tgz#2b6fc8ada9988c5d0d1f108773a4afd95163182f"
-  integrity sha512-FrXFniXYVG8YS55uwJ+lxHsHuy7SFmne0yClF0k8up2+CXw1zqOGuWJE66QzH4JITirTfny7E8x3i/3WlK53xg==
+"@microsoft/api-extractor@7.18.11":
+  version "7.18.11"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.11.tgz#24910c2432362b09900b493a0713919b662cdb0f"
+  integrity sha512-WfN5MZry4TrF60OOcGadFDsGECF9JNKNT+8P/8crYAumAYQRitI2cUiQRlCWrgmFgCWNezsNZeI/2BggdnUqcg==
   dependencies:
-    "@microsoft/api-extractor-model" "7.13.8"
+    "@microsoft/api-extractor-model" "7.13.9"
     "@microsoft/tsdoc" "0.13.2"
     "@microsoft/tsdoc-config" "~0.15.2"
-    "@rushstack/node-core-library" "3.40.3"
+    "@rushstack/node-core-library" "3.41.0"
     "@rushstack/rig-package" "0.3.1"
     "@rushstack/ts-command-line" "4.9.1"
     colors "~1.2.1"
@@ -2145,10 +2145,10 @@
     timsort "~0.3.0"
     z-schema "~3.18.3"
 
-"@rushstack/node-core-library@3.40.3":
-  version "3.40.3"
-  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.40.3.tgz#7dbeb6c5153e491b7c2002d53dec117a18161900"
-  integrity sha512-yWM84xgLVy1p3pQJw8EQYui5IgAFzB0MUpdGXCVKl3/qt25ucsqKA/I50DSPhvLf/Gpsvc8bGv+kx5PKgAseZg==
+"@rushstack/node-core-library@3.41.0":
+  version "3.41.0"
+  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.41.0.tgz#36f79ecf1a3c9b417690d95bbfcdf40390bf5f51"
+  integrity sha512-JxdmqR+SHU04jTDaZhltMZL3/XTz2ZZM47DTN+FSPUGUVp6WmxLlvJnT5FoHrOZWUjL/FoIlZUdUPTSXjTjIcg==
   dependencies:
     "@types/node" "12.20.24"
     colors "~1.2.1"
