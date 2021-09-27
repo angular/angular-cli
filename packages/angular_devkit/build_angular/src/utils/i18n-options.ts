@@ -8,13 +8,19 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import fs from 'fs';
+import module from 'module';
+import os from 'os';
+import path from 'path';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { createTranslationLoader } from './load-translations';
+
+/**
+ * The base module location used to search for locale specific data.
+ */
+const LOCALE_DATA_BASE_MODULE = '@angular/common/locales/global';
 
 export interface I18nOptions {
   inlineLocales: Set<string>;
@@ -171,12 +177,10 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   }
 
   const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
-  const localeDataBasePath = findLocaleDataBasePath(projectRoot);
-  if (!localeDataBasePath) {
-    throw new Error(
-      `Unable to find locale data within '@angular/common'. Please ensure '@angular/common' is installed.`,
-    );
-  }
+  // The trailing slash is required to signal that the path is a directory and not a file.
+  const projectRequire = module.createRequire(projectRoot + '/');
+  const localeResolver = (locale: string) =>
+    projectRequire.resolve(path.join(LOCALE_DATA_BASE_MODULE, locale));
 
   // Load locale data and translations (if present)
   let loader;
@@ -186,11 +190,11 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
       continue;
     }
 
-    let localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
+    let localeDataPath = findLocaleDataPath(locale, localeResolver);
     if (!localeDataPath) {
       const [first] = locale.split('-');
       if (first) {
-        localeDataPath = findLocaleDataPath(first.toLowerCase(), localeDataBasePath);
+        localeDataPath = findLocaleDataPath(first.toLowerCase(), localeResolver);
         if (localeDataPath) {
           context.logger.warn(
             `Locale data for '${locale}' cannot be found.  Using locale data for '${first}'.`,
@@ -275,37 +279,18 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   return { buildOptions, i18n };
 }
 
-function findLocaleDataBasePath(projectRoot: string): string | null {
-  try {
-    const commonPath = path.dirname(
-      require.resolve('@angular/common/package.json', { paths: [projectRoot] }),
-    );
-    const localesPath = path.join(commonPath, 'locales/global');
-
-    if (!fs.existsSync(localesPath)) {
-      return null;
-    }
-
-    return localesPath;
-  } catch {
-    return null;
-  }
-}
-
-function findLocaleDataPath(locale: string, basePath: string): string | null {
+function findLocaleDataPath(locale: string, resolver: (locale: string) => string): string | null {
   // Remove private use subtags
   const scrubbedLocale = locale.replace(/-x(-[a-zA-Z0-9]{1,8})+$/, '');
 
-  const localeDataPath = path.join(basePath, scrubbedLocale + '.js');
-
-  if (!fs.existsSync(localeDataPath)) {
+  try {
+    return resolver(scrubbedLocale);
+  } catch {
     if (scrubbedLocale === 'en-US') {
       // fallback to known existing en-US locale data as of 9.0
-      return findLocaleDataPath('en-US-POSIX', basePath);
+      return findLocaleDataPath('en-US-POSIX', resolver);
     }
 
     return null;
   }
-
-  return localeDataPath;
 }
