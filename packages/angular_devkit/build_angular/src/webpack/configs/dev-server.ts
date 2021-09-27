@@ -7,7 +7,7 @@
  */
 
 import { logging, tags } from '@angular-devkit/core';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { posix, resolve } from 'path';
 import * as url from 'url';
 import * as webpack from 'webpack';
@@ -143,8 +143,8 @@ function getSslConfig(root: string, options: WebpackDevServerOptions): Configura
   const { ssl, sslCert, sslKey } = options;
   if (ssl && sslCert && sslKey) {
     return {
-      key: readFileSync(resolve(root, sslKey), 'utf-8'),
-      cert: readFileSync(resolve(root, sslCert), 'utf-8'),
+      key: resolve(root, sslKey),
+      cert: resolve(root, sslCert),
     };
   }
 
