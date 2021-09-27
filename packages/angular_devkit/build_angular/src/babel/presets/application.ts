@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { strict as assert } from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -52,42 +53,43 @@ type NgtscLogger = Parameters<
 >[0]['logger'];
 
 type I18nDiagnostics = import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
+type I18nDiagnosticsHandlingStrategy =
+  import('@angular/localize/src/tools/src/diagnostics').DiagnosticHandlingStrategy;
 function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): I18nDiagnostics {
-  // Babel currently is synchronous so import cannot be used
-  const diagnostics: I18nDiagnostics =
-    new (require('@angular/localize/src/tools/src/diagnostics').Diagnostics)();
+  const diagnostics: I18nDiagnostics = new (class {
+    readonly messages: I18nDiagnostics['messages'] = [];
+    hasErrors = false;
 
-  if (!reporter) {
-    return diagnostics;
-  }
+    add(type: I18nDiagnosticsHandlingStrategy, message: string): void {
+      if (type === 'ignore') {
+        return;
+      }
 
-  const baseAdd = diagnostics.add;
-  diagnostics.add = function (type, message, ...args) {
-    if (type !== 'ignore') {
-      baseAdd.call(diagnostics, type, message, ...args);
-      reporter(type, message);
+      this.messages.push({ type, message });
+      this.hasErrors ||= type === 'error';
+      reporter?.(type, message);
     }
-  };
 
-  const baseError = diagnostics.error;
-  diagnostics.error = function (message, ...args) {
-    baseError.call(diagnostics, message, ...args);
-    reporter('error', message);
-  };
-
-  const baseWarn = diagnostics.warn;
-  diagnostics.warn = function (message, ...args) {
-    baseWarn.call(diagnostics, message, ...args);
-    reporter('warning', message);
-  };
-
-  const baseMerge = diagnostics.merge;
-  diagnostics.merge = function (other, ...args) {
-    baseMerge.call(diagnostics, other, ...args);
-    for (const diagnostic of other.messages) {
-      reporter(diagnostic.type, diagnostic.message);
+    error(message: string): void {
+      this.add('error', message);
     }
-  };
+
+    warn(message: string): void {
+      this.add('warning', message);
+    }
+
+    merge(other: I18nDiagnostics): void {
+      for (const diagnostic of other.messages) {
+        this.add(diagnostic.type, diagnostic.message);
+      }
+    }
+
+    formatDiagnostics(): never {
+      assert.fail(
+        '@angular/localize Diagnostics formatDiagnostics should not be called from within babel.',
+      );
+    }
+  })();
 
   return diagnostics;
 }
