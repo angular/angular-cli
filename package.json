@@ -72,7 +72,7 @@
     "@types/node": "12.12.37",
     "@types/shelljs": "^0.8.6",
     "@typescript-eslint/eslint-plugin": "4.32.0",
-    "@typescript-eslint/parser": "4.31.2",
+    "@typescript-eslint/parser": "4.32.0",
     "browser-sync": "^2.26.7",
     "critters": "0.0.10",
     "domino": "^2.1.2",
