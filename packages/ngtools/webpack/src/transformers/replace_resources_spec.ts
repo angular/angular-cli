@@ -88,6 +88,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
+
       const output = tags.stripIndent`
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
@@ -98,8 +99,8 @@ describe('@ngtools/webpack transformers', () => {
         let AppComponent = class AppComponent {
           constructor() { this.title = 'app'; }
         };
-        AppComponent = tslib_1.__decorate([
-          core_1.Component({
+        AppComponent = (0, tslib_1.__decorate)([
+          (0, core_1.Component)({
             selector: 'app-root',
             template: require("!${DirectAngularResourceLoaderPath}!./app.component.html").default,
             styles: [require("./app.component.css").default, require("./app.component.2.css").default] }) ], AppComponent);
