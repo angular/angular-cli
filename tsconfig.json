@@ -10,7 +10,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
-    "emitDecoratorMetadata": true,
+    "useUnknownInCatchVariables": false,
     "experimentalDecorators": true,
     "sourceMap": true,
     "typeRoots": ["node_modules/@types"],

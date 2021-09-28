@@ -253,7 +253,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#e674228281ff6ac4d21779070b090e8a8bde9e69":
   version "0.0.0"
-  uid e674228281ff6ac4d21779070b090e8a8bde9e69
   resolved "https://github.com/angular/dev-infra-private-builds.git#e674228281ff6ac4d21779070b090e8a8bde9e69"
   dependencies:
     "@actions/core" "^1.4.0"
@@ -10361,12 +10360,12 @@ typed-graphqlify@^3.1.1:
   resolved "https://registry.yarnpkg.com/typed-graphqlify/-/typed-graphqlify-3.1.4.tgz#f5e494cd78bb87a4284df8c34b8f29617596aaec"
   integrity sha512-/LnB/b5TXXL9zY5I5hE6/SwAaxZZsvQPxjZGIHtMa/Y0pcnw52uwVA5UnLNesgWtgFkfPYw2NAx31vGbnaqh+A==
 
-typescript@4.3.5, typescript@~4.3.2, typescript@~4.3.5:
+typescript@4.3.5, typescript@~4.3.5:
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.5.tgz#4d1c37cc16e893973c45a06886b7113234f119f4"
   integrity sha512-DqQgihaQ9cUrskJo9kIyW/+g0Vxsk8cDtZ52a3NGh0YNTfpUSArXSohyUGnvbPazEPLu398C0UxmKSOrPumUzA==
 
-typescript@~4.4.0, typescript@~4.4.2:
+typescript@~4.4.0, typescript@~4.4.2, typescript@~4.4.3:
   version "4.4.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.3.tgz#bdc5407caa2b109efd4f82fe130656f977a29324"
   integrity sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==
