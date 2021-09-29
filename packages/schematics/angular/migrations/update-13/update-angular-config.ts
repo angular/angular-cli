@@ -16,18 +16,24 @@ export default function (): Rule {
         // Delete removed tslint builder
         if (target.builder === '@angular-devkit/build-angular:tslint') {
           project.targets.delete(name);
-          continue;
-        }
-
-        if (!target.builder.startsWith('@angular-devkit/build-angular')) {
-          continue;
-        }
-
-        // Only interested in Angular Devkit builders
-        for (const [, options] of allTargetOptions(target)) {
-          delete options.extractCss;
-          delete options.servePathDefaultWarning;
-          delete options.hmrWarning;
+        } else if (target.builder === '@angular-devkit/build-angular:dev-server') {
+          for (const [, options] of allTargetOptions(target)) {
+            delete options.optimization;
+            delete options.aot;
+            delete options.progress;
+            delete options.deployUrl;
+            delete options.sourceMap;
+            delete options.vendorChunk;
+            delete options.commonChunk;
+            delete options.baseHref;
+            delete options.servePathDefaultWarning;
+            delete options.hmrWarning;
+          }
+        } else if (target.builder.startsWith('@angular-devkit/build-angular')) {
+          // Only interested in Angular Devkit builders
+          for (const [, options] of allTargetOptions(target)) {
+            delete options.extractCss;
+          }
         }
       }
     }
