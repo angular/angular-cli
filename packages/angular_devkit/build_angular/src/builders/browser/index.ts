@@ -429,24 +429,10 @@ function checkInternetExplorerSupport(
   supportedBrowsers: string[],
   logger: logging.LoggerApi,
 ): void {
-  const hasIE9 = supportedBrowsers.includes('ie 9');
-  const hasIE10 = supportedBrowsers.includes('ie 10');
-  const hasIE11 = supportedBrowsers.includes('ie 11');
-
-  if (hasIE9 || hasIE10) {
-    const browsers = (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
+  if (supportedBrowsers.some((b) => b === 'ie 9' || b === 'ie 10' || b === 'ie 11')) {
     logger.warn(
-      `Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
-        (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
-        ' no longer officially supported with Angular v11 and higher.' +
-        '\nFor more information, see https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile',
-    );
-  }
-
-  if (hasIE11) {
-    logger.warn(
-      `Warning: Support was requested for IE 11 in the project's browserslist configuration. ` +
-        'IE 11 support is deprecated since Angular v12.' +
+      `Warning: Support was requested for Internet Explorer in the project's browserslist configuration. ` +
+        'Internet Explorer is no longer officially supported.' +
         '\nFor more information, see https://angular.io/guide/browser-support',
     );
   }
