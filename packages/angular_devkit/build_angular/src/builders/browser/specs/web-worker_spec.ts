@@ -120,7 +120,7 @@ describe('Browser Builder Web Worker support', () => {
     // Worker bundle should have hash and minified code.
     const workerBundle = host.fileMatchExists(
       outputPath,
-      /src_app_app_worker_ts\.[0-9a-f]{20}\.js/,
+      /src_app_app_worker_ts\.[0-9a-f]{16}\.js/,
     ) as string;
     expect(workerBundle).toBeTruthy('workerBundle should exist');
     const workerContent = virtualFs.fileBufferToString(
@@ -131,7 +131,7 @@ describe('Browser Builder Web Worker support', () => {
     expect(workerContent).toContain('"hello"===e&&postMessage');
 
     // Main bundle should reference hashed worker bundle.
-    const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{20}\.js/) as string;
+    const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{16}\.js/) as string;
     expect(mainBundle).toBeTruthy('mainBundle should exist');
     const mainContent = virtualFs.fileBufferToString(
       host.scopedSync().read(join(outputPath, mainBundle)),

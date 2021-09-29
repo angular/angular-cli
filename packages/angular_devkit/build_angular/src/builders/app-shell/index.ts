@@ -143,7 +143,7 @@ async function _getServerModuleBundlePath(
     throw new Error(`Could not find server output directory: ${outputPath}.`);
   }
 
-  const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?js$/;
+  const re = /^main\.(?:[a-zA-Z0-9]{16}\.)?js$/;
   const maybeMain = fs.readdirSync(outputPath).find((x) => re.test(x));
 
   if (!maybeMain) {

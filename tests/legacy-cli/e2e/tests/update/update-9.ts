@@ -50,5 +50,5 @@ export default async function () {
 
   // Verify project now creates bundles
   await noSilentNg('build', '--prod');
-  await expectFileMatchToExist('dist/nine-project/', /main\.[0-9a-f]{20}\.js/);
+  await expectFileMatchToExist('dist/nine-project/', /main\.[0-9a-f]{16}\.js/);
 }
