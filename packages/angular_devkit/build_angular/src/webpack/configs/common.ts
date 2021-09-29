@@ -342,6 +342,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     context: root,
     entry: entryPoints,
     output: {
+      hashFunction: 'xxhash64', // todo: remove in webpack 6. This is part of `futureDefaults`.
       clean: buildOptions.deleteOutputPath ?? true,
       path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl ?? '',

@@ -32,8 +32,8 @@ export default async function () {
   await ng('build');
   await expectFileToExist(join(process.cwd(), 'dist'));
   // Check for cache busting hash script src
-  await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.css/);
+  await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{16}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{16}\.css/);
   await expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/);
 
   const indexContent = await readFile('dist/test-project/index.html');
