@@ -20,7 +20,7 @@ describe('Browser Builder browser support', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
-  it('warns when IE9 is present in browserslist', async () => {
+  it('warns when IE is present in browserslist', async () => {
     host.appendToFile('.browserslistrc', '\nIE 9');
 
     const logger = new logging.Logger('');
@@ -31,52 +31,9 @@ describe('Browser Builder browser support', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
 
-    const fullLog = logs.join();
-    expect(fullLog).toContain(
-      "Warning: Support was requested for IE 9 in the project's browserslist configuration.",
+    expect(logs.join()).toContain(
+      "Warning: Support was requested for Internet Explorer in the project's browserslist configuration",
     );
-    expect(fullLog).toContain('This browser is ');
-
-    await run.stop();
-  });
-
-  it('warns when IE10 is present in browserslist', async () => {
-    host.appendToFile('.browserslistrc', '\nIE 10');
-
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe((e) => logs.push(e.message));
-
-    const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
-    const output = await run.result;
-    expect(output.success).toBe(true);
-
-    const fullLog = logs.join();
-    expect(fullLog).toContain(
-      "Warning: Support was requested for IE 10 in the project's browserslist configuration.",
-    );
-    expect(fullLog).toContain('This browser is ');
-
-    await run.stop();
-  });
-
-  it('warns when both IE9 & IE10 are present in browserslist', async () => {
-    host.appendToFile('.browserslistrc', '\nIE 9-10');
-
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe((e) => logs.push(e.message));
-
-    const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
-    const output = await run.result;
-    expect(output.success).toBe(true);
-
-    const fullLog = logs.join();
-    expect(fullLog).toContain(
-      "Warning: Support was requested for IE 9 & IE 10 in the project's browserslist configuration.",
-    );
-    expect(fullLog).toContain('These browsers are ');
-
     await run.stop();
   });
 });
