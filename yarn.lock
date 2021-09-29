@@ -1262,6 +1262,14 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
+"@bazel/jasmine@4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.3.0.tgz#d2dd29deb56cffae2b3bd7be706fb1b3dd532fc7"
+  integrity sha512-lROo6iAdyqmqVNe8M5or6Vkzcn5wyBSI4MJBqqLJVjejhlhU6Mg27j1xC+VJPlnQkiEyeHLV5WNndp50ROivSw==
+  dependencies:
+    c8 "~7.5.0"
+    jasmine-reporters "~2.4.0"
+
 "@bazel/protractor@4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-4.2.0.tgz#9f5bf46054c6f1f8eacc69acf28a483772f3f9cb"
@@ -1283,10 +1291,28 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
+"@bazel/typescript@4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-4.3.0.tgz#c4131ba7980f8e72885f5ec19c265ad9431e1a71"
+  integrity sha512-ddPw0Xetl+a5UeZVHzpWsyMrUcAyhpGXknmfymx8vrWL+Y3yyquC7ZcYoYbkoCwIMBz7xhadm8NKIUYCrsEgaA==
+  dependencies:
+    "@bazel/worker" "4.3.0"
+    protobufjs "6.8.8"
+    semver "5.6.0"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
+
 "@bazel/worker@4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.2.0.tgz#96d4f4f7807c8e3a583e3e9e78d81385882c8013"
   integrity sha512-FQ88yaWtCAveauBXxZ9uuQvmAGAaHZUqu2ptTIf6R6Q8yblPB7w6VTKfkLoT162gqLzDclzhoidJ4YH93bidtA==
+  dependencies:
+    google-protobuf "^3.6.1"
+
+"@bazel/worker@4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.3.0.tgz#5ba7da1efa772f5dade5dfd4b662dcaa60ed7c1c"
+  integrity sha512-K34/g/4aUAX8TOQ1MgBaZ+YeZkiIlwETwA50gheCAsasz0SWjvgcpIbwNkaL9fmXOVhDj2o55J20khsl5ItBIw==
   dependencies:
     google-protobuf "^3.6.1"
 
