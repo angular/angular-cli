@@ -50,38 +50,6 @@ import { Schema } from './schema';
 
 export type DevServerBuilderOptions = Schema & json.JsonObject;
 
-const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
-  'watch',
-  'optimization',
-  'aot',
-  'sourceMap',
-  'vendorChunk',
-  'commonChunk',
-  'baseHref',
-  'progress',
-  'poll',
-  'verbose',
-  'deployUrl',
-];
-
-// Get dev-server only options.
-type DevServerOptions = Partial<
-  Omit<
-    Schema,
-    | 'watch'
-    | 'optimization'
-    | 'aot'
-    | 'sourceMap'
-    | 'vendorChunk'
-    | 'commonChunk'
-    | 'baseHref'
-    | 'progress'
-    | 'poll'
-    | 'verbose'
-    | 'deployUrl'
-  >
->;
-
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
@@ -120,41 +88,7 @@ export function serveWebpackBrowser(
     projectRoot: string;
     locale: string | undefined;
   }> {
-    // Get the browser configuration from the target name.
-    const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as json.JsonObject &
-      BrowserBuilderSchema;
     options.port = await checkPort(options.port ?? 4200, options.host || 'localhost');
-
-    // Override options we need to override, if defined.
-    const overrides = (Object.keys(options) as (keyof DevServerBuilderOptions)[])
-      .filter((key) => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
-      .reduce<json.JsonObject & Partial<BrowserBuilderSchema>>(
-        (previous, key) => ({
-          ...previous,
-          [key]: options[key],
-        }),
-        {},
-      );
-
-    const devServerOptions: DevServerOptions = (Object.keys(options) as (keyof Schema)[])
-      .filter((key) => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
-      .reduce<DevServerOptions>(
-        (previous, key) => ({
-          ...previous,
-          [key]: options[key],
-        }),
-        {},
-      );
-
-    // In dev server we should not have budgets because of extra libs such as socks-js
-    overrides.budgets = undefined;
-
-    if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== OutputHashing.None) {
-      // Disable output hashing for dev build as this can cause memory leaks
-      // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
-      overrides.outputHashing = OutputHashing.None;
-      logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
-    }
 
     if (options.hmr) {
       logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
@@ -185,14 +119,26 @@ export function serveWebpackBrowser(
         for more information.
       `);
     }
+    // Get the browser configuration from the target name.
+    const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as json.JsonObject &
+      BrowserBuilderSchema;
 
-    // Webpack's live reload functionality adds the `strip-ansi` package which is commonJS
-    rawBrowserOptions.allowedCommonJsDependencies ??= [];
-    rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
+    if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== OutputHashing.None) {
+      // Disable output hashing for dev build as this can cause memory leaks
+      // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
+      rawBrowserOptions.outputHashing = OutputHashing.None;
+      logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
+    }
 
     const browserName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = (await context.validateOptions(
-      { ...rawBrowserOptions, ...overrides },
+      {
+        ...rawBrowserOptions,
+        watch: options.watch,
+        verbose: options.verbose,
+        // In dev server we should not have budgets because of extra libs such as socks-js
+        budgets: undefined,
+      } as json.JsonObject & BrowserBuilderSchema,
       browserName,
     )) as json.JsonObject & BrowserBuilderSchema;
 
@@ -221,7 +167,7 @@ export function serveWebpackBrowser(
         getTypeScriptConfig(wco),
         browserOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
       ],
-      devServerOptions,
+      options,
     );
 
     if (!config.devServer) {

@@ -193,7 +193,7 @@ export interface KarmaBuilderOptions {
     progress?: boolean;
     reporters?: string[];
     scripts?: ExtraEntryPoint_2[];
-    sourceMap?: SourceMapUnion_3;
+    sourceMap?: SourceMapUnion_2;
     stylePreprocessorOptions?: StylePreprocessorOptions_2;
     styles?: ExtraEntryPoint_2[];
     tsConfig: string;
@@ -264,7 +264,7 @@ export interface ServerBuilderOptions {
     localize?: Localize_2;
     main: string;
     namedChunks?: boolean;
-    optimization?: OptimizationUnion_3;
+    optimization?: OptimizationUnion_2;
     outputHashing?: OutputHashing_2;
     outputPath: string;
     poll?: number;
@@ -273,7 +273,7 @@ export interface ServerBuilderOptions {
     resourcesOutputPath?: string;
     // @deprecated
     showCircularDependencies?: boolean;
-    sourceMap?: SourceMapUnion_4;
+    sourceMap?: SourceMapUnion_3;
     statsJson?: boolean;
     stylePreprocessorOptions?: StylePreprocessorOptions_3;
     tsConfig: string;
