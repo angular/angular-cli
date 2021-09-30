@@ -1,3 +1,43 @@
+<a name="13.0.0-next.7"></a>
+
+# 13.0.0-next.7 (2021-09-30)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- TypeScript versions prior to 4.4 are no longer supported.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [7bdcd7da1](https://github.com/angular/angular-cli/commit/7bdcd7da1ff3a31f4958d90d856beb297e99b187) | feat | create new projects with rxjs 7 |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [c3acf3cc2](https://github.com/angular/angular-cli/commit/c3acf3cc26b9e37a3b8f4c369f42731f46b522ee) | fix  | remove unused cli project options. |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [fb1ad7c5b](https://github.com/angular/angular-cli/commit/fb1ad7c5b3fa3df85f1d3dff3850e1ad0003ef9d) | feat | support ESM proxy configuration files for the dev server                      |
+| [505438cc4](https://github.com/angular/angular-cli/commit/505438cc4146b1950038531ce30e1f62f7c41d00) | feat | support TypeScript 4.4                                                        |
+| [0e7277c63](https://github.com/angular/angular-cli/commit/0e7277c63a5fb76d9686289b779561c84c040ba0) | fix  | babel adjust enum plugin incorrectly transforming loose enums                 |
+| [f383f3201](https://github.com/angular/angular-cli/commit/f383f3201b69d28f8755c0bd63134619f9da408d) | fix  | ESM-interop loaded plugin creators of `@angular/localize/tools` not respected |
+| [884111ac0](https://github.com/angular/angular-cli/commit/884111ac0b8a73dca06d844b2ed795a3e3ed3289) | fix  | update IE unsupported and deprecation messages                                |
+| [13cceab8e](https://github.com/angular/angular-cli/commit/13cceab8e737a12d0809f184f852ceb5620d81fb) | fix  | use URLs for absolute import paths with ESM                                   |
+| [4e0743c8a](https://github.com/angular/angular-cli/commit/4e0743c8ad5879f212f2ea232ac9492848a8df2c) | perf | change webpack hashing function to `xxhash64`                                 |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-next.6"></a>
 
 # 13.0.0-next.6 (2021-09-22)
