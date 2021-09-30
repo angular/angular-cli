@@ -138,9 +138,9 @@ export default custom<AngularCustomOptions>(() => {
         }
 
         customOptions.i18n = {
-          ...(i18n as ApplicationPresetOptions['i18n']),
-          i18nPluginCreators,
-        } as ApplicationPresetOptions['i18n'];
+          ...(i18n as NonNullable<ApplicationPresetOptions['i18n']>),
+          pluginCreators: i18nPluginCreators,
+        };
         shouldProcess = true;
       }
 

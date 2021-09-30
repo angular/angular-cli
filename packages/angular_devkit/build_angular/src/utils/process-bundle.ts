@@ -24,8 +24,6 @@ import { allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 import { loadEsmModule } from './load-esm';
 
-type LocalizeUtilities = typeof import('@angular/localize/src/tools/src/source_file_utils');
-
 // Extract Sourcemap input type from the remapping function since it is not currently exported
 type SourceMapInput = Exclude<Parameters<typeof remapping>[0], unknown[]>;
 
@@ -386,7 +384,7 @@ function inlineCopyOnly(options: InlineOptions) {
 function findLocalizePositions(
   ast: ParseResult,
   options: InlineOptions,
-  utils: LocalizeUtilities,
+  utils: LocalizeUtilityModule,
 ): LocalizePosition[] {
   const positions: LocalizePosition[] = [];
 
@@ -438,7 +436,7 @@ function findLocalizePositions(
 
 function unwrapTemplateLiteral(
   path: NodePath<types.TaggedTemplateExpression>,
-  utils: LocalizeUtilities,
+  utils: LocalizeUtilityModule,
 ): [TemplateStringsArray, types.Expression[]] {
   const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(
     path.get('quasi').get('quasis'),
@@ -450,7 +448,7 @@ function unwrapTemplateLiteral(
 
 function unwrapLocalizeCall(
   path: NodePath<types.CallExpression>,
-  utils: LocalizeUtilities,
+  utils: LocalizeUtilityModule,
 ): [TemplateStringsArray, types.Expression[]] {
   const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
   const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
