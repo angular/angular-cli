@@ -19,7 +19,25 @@ export default async function (argv: {}, logger: logging.Logger) {
 
   const quicktypeRunner = require('../tools/quicktype_runner');
   logger.info('Removing dist-schema/...');
-  fs.rmdirSync(dist, { recursive: true, maxRetries: 3 });
+
+  // The below should be removed and replace with just `rmSync` when support for Node.Js 12 is removed.
+  const { rmSync, rmdirSync } = fs as typeof fs & {
+    rmSync?: (
+      path: fs.PathLike,
+      options?: {
+        force?: boolean;
+        maxRetries?: number;
+        recursive?: boolean;
+        retryDelay?: number;
+      },
+    ) => void;
+  };
+
+  if (rmSync) {
+    rmSync(dist, { force: true, recursive: true, maxRetries: 3 });
+  } else {
+    rmdirSync(dist, { recursive: true, maxRetries: 3 });
+  }
 
   logger.info('Generating JSON Schema....');
 

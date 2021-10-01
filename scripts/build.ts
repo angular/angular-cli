@@ -121,10 +121,31 @@ function _rm(p: string) {
   fs.unlinkSync(p);
 }
 
+function rimraf(location: string) {
+  // The below should be removed and replace with just `rmSync` when support for Node.Js 12 is removed.
+  const { rmSync, rmdirSync } = fs as typeof fs & {
+    rmSync?: (
+      path: fs.PathLike,
+      options?: {
+        force?: boolean;
+        maxRetries?: number;
+        recursive?: boolean;
+        retryDelay?: number;
+      },
+    ) => void;
+  };
+
+  if (rmSync) {
+    rmSync(location, { force: true, recursive: true, maxRetries: 3 });
+  } else {
+    rmdirSync(location, { recursive: true, maxRetries: 3 });
+  }
+}
+
 function _clean(logger: logging.Logger) {
   logger.info('Cleaning...');
   logger.info('  Removing dist/...');
-  fs.rmdirSync(path.join(__dirname, '../dist'), { recursive: true, maxRetries: 3 });
+  rimraf(path.join(__dirname, '../dist'));
 }
 
 function _sortPackages() {
@@ -192,7 +213,7 @@ export default async function (
     packageLogger.info(packageName);
     const pkg = packages[packageName];
     _recursiveCopy(pkg.build, pkg.dist, logger);
-    fs.rmdirSync(pkg.build, { recursive: true, maxRetries: 3 });
+    rimraf(pkg.build);
   }
 
   logger.info('Merging bazel-bin/ with dist/');
@@ -204,7 +225,7 @@ export default async function (
     if (fs.existsSync(bazelBinPath)) {
       packageLogger.info(packageName);
       _recursiveCopy(bazelBinPath, pkg.dist, logger);
-      fs.rmdirSync(bazelBinPath, { recursive: true, maxRetries: 3 });
+      rimraf(bazelBinPath);
     }
   }
 
