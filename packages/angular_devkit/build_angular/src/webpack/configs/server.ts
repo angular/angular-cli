@@ -31,9 +31,9 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  const config: Configuration = {
+  return {
     resolve: {
-      mainFields: ['es2015', 'main', 'module'],
+      mainFields: ['es2020', 'es2015', 'main', 'module'],
     },
     output: {
       libraryTarget: 'commonjs',
@@ -55,8 +55,6 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
     node: false,
     externals,
   };
-
-  return config;
 }
 
 function externalizePackages(
