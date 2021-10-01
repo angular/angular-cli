@@ -10,14 +10,11 @@ import * as cacache from 'cacache';
 import * as fs from 'fs';
 import * as https from 'https';
 import proxyAgent from 'https-proxy-agent';
+import { join } from 'path';
 import { URL } from 'url';
-import { findCachePath } from '../cache-path';
-import { cachingDisabled } from '../environment-options';
+import { NormalizedCachedOptions } from '../normalize-cache';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
-const cacheFontsPath: string | undefined = cachingDisabled
-  ? undefined
-  : findCachePath('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
 
 interface FontProviderDetails {
@@ -26,6 +23,7 @@ interface FontProviderDetails {
 
 export interface InlineFontsOptions {
   minify?: boolean;
+  cache?: NormalizedCachedOptions;
 }
 
 const SUPPORTED_PROVIDERS: Record<string, FontProviderDetails> = {
@@ -38,7 +36,13 @@ const SUPPORTED_PROVIDERS: Record<string, FontProviderDetails> = {
 };
 
 export class InlineFontsProcessor {
-  constructor(private options: InlineFontsOptions) {}
+  private readonly cachePath: string | undefined;
+  constructor(private options: InlineFontsOptions) {
+    const { path: cacheDirectory, enabled } = this.options.cache || {};
+    if (cacheDirectory && enabled) {
+      this.cachePath = join(cacheDirectory, 'angular-build-fonts');
+    }
+  }
 
   async process(content: string): Promise<string> {
     const hrefList: string[] = [];
@@ -154,8 +158,8 @@ export class InlineFontsProcessor {
   private async getResponse(url: URL): Promise<string> {
     const key = `${packageVersion}|${url}`;
 
-    if (cacheFontsPath) {
-      const entry = await cacache.get.info(cacheFontsPath, key);
+    if (this.cachePath) {
+      const entry = await cacache.get.info(this.cachePath, key);
       if (entry) {
         return fs.promises.readFile(entry.path, 'utf8');
       }
@@ -205,8 +209,8 @@ export class InlineFontsProcessor {
         );
     });
 
-    if (cacheFontsPath) {
-      await cacache.put(cacheFontsPath, key, data);
+    if (this.cachePath) {
+      await cacache.put(this.cachePath, key, data);
     }
 
     return data;

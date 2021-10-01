@@ -20,6 +20,7 @@ import {
   SourceMapClass,
 } from '../builders/browser/schema';
 import { Schema as DevServerSchema } from '../builders/dev-server/schema';
+import { NormalizedCachedOptions } from './normalize-cache';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
 import { NormalizedOptimizationOptions } from './normalize-optimization';
 
@@ -66,8 +67,8 @@ export interface BuildOptions {
   platform?: 'browser' | 'server';
   fileReplacements: NormalizedFileReplacement[];
   inlineStyleLanguage?: InlineStyleLanguage;
-
   allowedCommonJsDependencies?: string[];
+  cache: NormalizedCachedOptions;
 }
 
 export interface WebpackTestOptions extends BuildOptions {

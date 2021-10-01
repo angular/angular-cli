@@ -21,10 +21,14 @@ const validCliPaths = new Map<
   ['cli.warnings.versionMismatch', undefined],
   ['cli.defaultCollection', undefined],
   ['cli.packageManager', undefined],
-
   ['cli.analytics', undefined],
+
   ['cli.analyticsSharing.tracking', undefined],
   ['cli.analyticsSharing.uuid', (v) => (v ? `${v}` : uuidV4())],
+
+  ['cli.cache.enabled', undefined],
+  ['cli.cache.environment', undefined],
+  ['cli.cache.path', undefined],
 ]);
 
 /**

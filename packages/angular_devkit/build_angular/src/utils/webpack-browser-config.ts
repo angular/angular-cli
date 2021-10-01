@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { getSystemPath, logging, normalize, resolve } from '@angular-devkit/core';
+import { getSystemPath, json, logging, normalize, resolve } from '@angular-devkit/core';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import { Configuration, javascript } from 'webpack';
@@ -152,7 +152,13 @@ export async function generateBrowserWebpackConfigFromContext(
     ? resolve(workspaceRoot, normalize(projectSourceRoot))
     : undefined;
 
-  const normalizedOptions = normalizeBrowserSchema(workspaceRoot, projectRoot, sourceRoot, options);
+  const normalizedOptions = normalizeBrowserSchema(
+    workspaceRoot,
+    projectRoot,
+    sourceRoot,
+    options,
+    projectMetadata,
+  );
 
   const config = await generateWebpackConfig(
     getSystemPath(workspaceRoot),

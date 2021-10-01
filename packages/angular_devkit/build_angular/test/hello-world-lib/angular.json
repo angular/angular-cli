@@ -1,6 +1,9 @@
 {
   "$schema": "../../../../packages/angular_devkit/core/src/workspace/workspace-schema.json",
   "version": 1,
+  "cli": {
+    "enabled": false
+  },
   "projects": {
     "lib": {
       "root": "projects/lib",

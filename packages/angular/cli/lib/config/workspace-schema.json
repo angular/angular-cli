@@ -76,6 +76,25 @@
               "type": "string"
             }
           }
+        },
+        "cache": {
+          "description": "Control disk cache.",
+          "type": "object",
+          "properties": {
+            "environment": {
+              "description": "Configure in which environment disk cache is enabled.",
+              "type": "string",
+              "enum": ["local", "ci", "all"]
+            },
+            "enabled": {
+              "description": "Configure whether disk caching is enabled.",
+              "type": "boolean"
+            },
+            "path": {
+              "description": "Cache base path.",
+              "type": "string"
+            }
+          }
         }
       },
       "additionalProperties": false

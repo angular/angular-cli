@@ -33,6 +33,7 @@ import {
   IndexHtmlGenerator,
   IndexHtmlTransform,
 } from '../../utils/index-file/index-html-generator';
+import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
@@ -168,11 +169,14 @@ export function buildWebpackBrowser(
 
       checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
 
-      return initialize(options, context, transforms.webpackConfiguration);
+      return {
+        ...(await initialize(options, context, transforms.webpackConfiguration)),
+        cacheOptions: normalizeCacheOptions(projectMetadata, context.workspaceRoot),
+      };
     }),
     switchMap(
       // eslint-disable-next-line max-lines-per-function
-      ({ config, projectRoot, projectSourceRoot, i18n, target }) => {
+      ({ config, projectRoot, projectSourceRoot, i18n, target, cacheOptions }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
 
         return runWebpack(config, context, {
@@ -293,6 +297,7 @@ export function buildWebpackBrowser(
                   });
 
                   const indexHtmlGenerator = new IndexHtmlGenerator({
+                    cache: cacheOptions,
                     indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
                     entrypoints,
                     deployUrl: options.deployUrl,
