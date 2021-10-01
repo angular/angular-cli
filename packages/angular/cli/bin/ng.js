@@ -24,8 +24,8 @@ try {
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
 var version = process.versions.node.split('.').map((part) => Number(part));
-if (version[0] % 2 === 1 && version[0] > 14) {
-  // Allow new odd numbered releases with a warning (currently v15+)
+if (version[0] % 2 === 1 && version[0] > 16) {
+  // Allow new odd numbered releases with a warning (currently v17+)
   console.warn(
     'Node.js version ' +
       process.version +
@@ -38,15 +38,17 @@ if (version[0] % 2 === 1 && version[0] > 14) {
 } else if (
   version[0] < 12 ||
   version[0] === 13 ||
+  version[0] === 15 ||
   (version[0] === 12 && version[1] < 20) ||
-  (version[0] === 14 && version[1] < 15)
+  (version[0] === 14 && version[1] < 15) ||
+  (version[0] === 16 && version[1] < 10)
 ) {
-  // Error and exit if less than 12.20 or 13.x or less than 14.15
+  // Error and exit if less than 12.20 or 13.x or less than 14.15 or 15.x or less than 16.10
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of either v12.20 or v14.15.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of either v12.20, v14.15, or v16.10.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
