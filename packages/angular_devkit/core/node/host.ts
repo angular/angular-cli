@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
+import fs, {
   PathLike,
   Stats,
   constants,
@@ -16,7 +16,6 @@ import {
   readFileSync,
   readdirSync,
   renameSync,
-  rmdirSync,
   statSync,
   unlinkSync,
   writeFileSync,
@@ -103,21 +102,24 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
     return this.isDirectory(path).pipe(
       mergeMap(async (isDirectory) => {
         if (isDirectory) {
-          const recursiveDelete = async (dirPath: string) => {
-            for (const fragment of await fsPromises.readdir(dirPath)) {
-              const sysPath = pathJoin(dirPath, fragment);
-              const stats = await fsPromises.stat(sysPath);
-
-              if (stats.isDirectory()) {
-                await recursiveDelete(sysPath);
-                await fsPromises.rmdir(sysPath);
-              } else {
-                await fsPromises.unlink(sysPath);
-              }
-            }
+          // The below should be removed and replaced with just `rm` when support for Node.Js 12 is removed.
+          const { rm, rmdir } = fsPromises as typeof fsPromises & {
+            rm?: (
+              path: fs.PathLike,
+              options?: {
+                force?: boolean;
+                maxRetries?: number;
+                recursive?: boolean;
+                retryDelay?: number;
+              },
+            ) => Promise<void>;
           };
 
-          await recursiveDelete(getSystemPath(path));
+          if (rm) {
+            await rm(getSystemPath(path), { force: true, recursive: true, maxRetries: 3 });
+          } else {
+            await rmdir(getSystemPath(path), { recursive: true, maxRetries: 3 });
+          }
         } else {
           await fsPromises.unlink(getSystemPath(path));
         }
@@ -221,7 +223,25 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
         if (isDir) {
           const dirPaths = readdirSync(getSystemPath(path));
           const rmDirComplete = new Observable<void>((obs) => {
-            rmdirSync(getSystemPath(path));
+            // The below should be removed and replaced with just `rmSync` when support for Node.Js 12 is removed.
+            const { rmSync, rmdirSync } = fs as typeof fs & {
+              rmSync?: (
+                path: fs.PathLike,
+                options?: {
+                  force?: boolean;
+                  maxRetries?: number;
+                  recursive?: boolean;
+                  retryDelay?: number;
+                },
+              ) => void;
+            };
+
+            if (rmSync) {
+              rmSync(getSystemPath(path), { force: true, recursive: true, maxRetries: 3 });
+            } else {
+              rmdirSync(getSystemPath(path), { recursive: true, maxRetries: 3 });
+            }
+
             obs.complete();
           });
 
