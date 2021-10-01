@@ -8,6 +8,7 @@
 
 import * as fs from 'fs';
 import { join } from 'path';
+import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
 import { stripBom } from '../strip-bom';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
@@ -34,6 +35,7 @@ export interface IndexHtmlGeneratorOptions {
   postTransform?: IndexHtmlTransform;
   crossOrigin?: CrossOriginValue;
   optimization?: NormalizedOptimizationOptions;
+  cache?: NormalizedCachedOptions;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;

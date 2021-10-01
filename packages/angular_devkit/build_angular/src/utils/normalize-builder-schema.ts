@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Path } from '@angular-devkit/core';
+import { Path, getSystemPath, json } from '@angular-devkit/core';
 import {
   AssetPatternClass,
   Schema as BrowserBuilderSchema,
@@ -14,6 +14,7 @@ import {
 } from '../builders/browser/schema';
 import { BuildOptions } from './build-options';
 import { normalizeAssetPatterns } from './normalize-asset-patterns';
+import { normalizeCacheOptions } from './normalize-cache';
 import {
   NormalizedFileReplacement,
   normalizeFileReplacements,
@@ -37,11 +38,13 @@ export function normalizeBrowserSchema(
   projectRoot: Path,
   sourceRoot: Path | undefined,
   options: BrowserBuilderSchema,
+  metadata: json.JsonObject,
 ): NormalizedBrowserBuilderSchema {
   const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
 
   return {
     ...options,
+    cache: normalizeCacheOptions(metadata, getSystemPath(root)),
     assets: normalizeAssetPatterns(options.assets || [], root, projectRoot, sourceRoot),
     fileReplacements: normalizeFileReplacements(options.fileReplacements || [], root),
     optimization: normalizeOptimization(options.optimization),

@@ -7,25 +7,11 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { Observable, from, of } from 'rxjs';
 import { catchError, mapTo, switchMap } from 'rxjs/operators';
+import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { Schema as NgPackagrBuilderOptions } from './schema';
-
-async function initialize(
-  options: NgPackagrBuilderOptions,
-  root: string,
-): Promise<import('ng-packagr').NgPackagr> {
-  const packager = (await import('ng-packagr')).ngPackagr();
-
-  packager.forProject(resolve(root, options.project));
-
-  if (options.tsConfig) {
-    packager.withTsConfig(resolve(root, options.tsConfig));
-  }
-
-  return packager;
-}
 
 /**
  * @experimental Direct usage of this function is considered experimental.
@@ -34,8 +20,39 @@ export function execute(
   options: NgPackagrBuilderOptions,
   context: BuilderContext,
 ): Observable<BuilderOutput> {
-  return from(initialize(options, context.workspaceRoot)).pipe(
-    switchMap((packager) => (options.watch ? packager.watch() : packager.build())),
+  return from(
+    (async () => {
+      const root = context.workspaceRoot;
+      const packager = (await import('ng-packagr')).ngPackagr();
+
+      packager.forProject(resolve(root, options.project));
+
+      if (options.tsConfig) {
+        packager.withTsConfig(resolve(root, options.tsConfig));
+      }
+
+      const projectName = context.target?.project;
+      if (!projectName) {
+        throw new Error('The builder requires a target.');
+      }
+
+      const metadata = await context.getProjectMetadata(projectName);
+      const { enabled: cacheEnabled, path: cacheDirectory } = normalizeCacheOptions(
+        metadata,
+        context.workspaceRoot,
+      );
+
+      const ngPackagrOptions = {
+        cacheEnabled,
+        cacheDirectory: join(cacheDirectory, 'ng-packagr'),
+      };
+
+      return { packager, ngPackagrOptions };
+    })(),
+  ).pipe(
+    switchMap(({ packager, ngPackagrOptions }) =>
+      options.watch ? packager.watch(ngPackagrOptions) : packager.build(ngPackagrOptions),
+    ),
     mapTo({ success: true }),
     catchError((err) => of({ success: false, error: err.message })),
   );
