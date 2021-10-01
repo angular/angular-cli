@@ -1,3 +1,19 @@
+<a name="12.2.8"></a>
+
+# 12.2.8 (2021-10-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [821a1b5a9](https://github.com/angular/angular-cli/commit/821a1b5a949d53f2e82f734062b711a166d42e24) | fix  | babel adjust enum plugin incorrectly transforming loose enums |
+
+## Special Thanks
+
+Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-next.7"></a>
 
 # 13.0.0-next.7 (2021-09-30)
