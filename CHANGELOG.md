@@ -1,3 +1,17 @@
+<a name="12.1.1"></a>
+
+# 12.1.1 (2021-09-30)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                  |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
+| [00cc596f](https://github.com/angular/universal/commit/00cc596fe83fb4f4206b00e6a21975862dfd60e5) | fix  | index.original.html should be used if exists |
+
+## Special Thanks
+
+Doug Parker, Javier Infante and ikeq
+
 <a name="12.1.0"></a>
 
 # 12.1.0 (2021-06-26)
