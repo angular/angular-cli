@@ -33,7 +33,7 @@ export default async function () {
   await expectFileToMatch('dist/test-project/main.js', 'src_app_app_worker_ts');
 
   await ng('build', '--output-hashing=none');
-  const chunkId = '151';
+  const chunkId = '310';
   await expectFileToExist(`dist/test-project/${chunkId}.js`);
   await expectFileToMatch('dist/test-project/main.js', chunkId);
 
