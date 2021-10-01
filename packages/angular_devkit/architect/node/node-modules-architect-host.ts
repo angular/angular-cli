@@ -95,6 +95,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
             root: projectDefinition.root,
             sourceRoot: projectDefinition.sourceRoot,
             prefix: projectDefinition.prefix,
+            ...(clone(workspaceOrHost.extensions) as {}),
             ...(clone(projectDefinition.extensions) as {}),
           } as unknown as json.JsonObject;
         },
