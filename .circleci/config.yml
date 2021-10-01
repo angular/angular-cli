@@ -204,7 +204,10 @@ jobs:
       - browser-tools/install-chrome
       - run:
           name: Initialize Environment
-          command: ./.circleci/env.sh
+          # npm 7 currently does not properly publish the packages locally
+          command: |
+            ./.circleci/env.sh
+            sudo npm install --global npm@6
       - run:
           name: Execute CLI E2E Tests
           command: |
@@ -354,6 +357,12 @@ workflows:
       - e2e-cli:
           name: e2e-cli-node-12
           nodeversion: '12.20'
+          <<: *only_release_branches
+          requires:
+            - build
+      - e2e-cli:
+          name: e2e-cli-node-16
+          nodeversion: '16.10'
           <<: *only_release_branches
           requires:
             - build
