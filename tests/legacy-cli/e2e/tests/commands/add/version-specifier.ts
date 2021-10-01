@@ -22,7 +22,8 @@ export default async function () {
     throw new Error('Installation should not have been skipped');
   }
 
-  const output3 = await ng('add', '@angular/localize@12.0.0', '--skip-confirmation');
+  // v12.2.0 has a package.json engine field that supports Node.js v16+
+  const output3 = await ng('add', '@angular/localize@12.2.0', '--skip-confirmation');
   if (output3.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation should not have been skipped');
   }

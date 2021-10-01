@@ -16,7 +16,7 @@ import { Schema as VersionCommandSchema } from './version';
 /**
  * Major versions of Node.js that are officially supported by Angular.
  */
-const SUPPORTED_NODE_MAJORS = [12, 14];
+const SUPPORTED_NODE_MAJORS = [12, 14, 16];
 
 interface PartialPackageInfo {
   name: string;
