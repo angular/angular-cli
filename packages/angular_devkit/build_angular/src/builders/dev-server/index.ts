@@ -321,7 +321,7 @@ async function setupLocalize(
   };
 
   const i18nRule: webpack.RuleSetRule = {
-    test: /\.(?:[cm]?js|ts)$/,
+    test: /\.[cm]?[tj]sx?$/,
     enforce: 'post',
     use: [
       {

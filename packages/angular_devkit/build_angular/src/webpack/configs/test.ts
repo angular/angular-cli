@@ -37,7 +37,7 @@ export function getTestConfig(
     }
 
     extraRules.push({
-      test: /\.(jsx?|tsx?)$/,
+      test: /\.[cm]?[tj]sx?$/,
       loader: require.resolve('@jsdevtools/coverage-istanbul-loader'),
       options: { esModules: true },
       enforce: 'post',
