@@ -325,13 +325,9 @@ function _performUpdate(
         return;
       }
 
-      const collection =
-        (target.updateMetadata.migrations.match(/^[./]/) ? name + '/' : '') +
-        target.updateMetadata.migrations;
-
       externalMigrations.push({
         package: name,
-        collection,
+        collection: target.updateMetadata.migrations,
         from: installed.version,
         to: target.version,
       });
