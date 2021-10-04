@@ -14,6 +14,10 @@ module.exports = {
   plugins: [new ngToolsWebpack.AngularWebpackPlugin()],
   module: {
     rules: [
+      // rxjs 6 requires directory imports which are not support in ES modules.
+      // Disabling `fullySpecified` allows Webpack to ignore this but this is
+      // not ideal because it currently disables ESM behavior import for all JS files.
+      { test: /\.[m]?js$/, resolve: { fullySpecified: false } },
       { test: /\.scss$/, use: ['sass-loader'], type: 'asset/source' },
       { test: /\.html$/, type: 'asset/source' },
       { test: /\.ts$/, loader: ngToolsWebpack.AngularWebpackLoaderPath },
