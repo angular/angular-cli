@@ -249,7 +249,7 @@ export async function execute(
         module: {
           rules: [
             {
-              test: /\.[t|j]s$/,
+              test: /\.[cm]?[tj]sx?$/,
               loader: require.resolve('./ivy-extract-loader'),
               options: {
                 messageHandler: (messages: LocalizeMessage[]) => ivyMessages.push(...messages),
