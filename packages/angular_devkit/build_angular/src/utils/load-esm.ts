@@ -20,19 +20,6 @@ import { URL } from 'url';
  * @param modulePath The path of the module to load.
  * @returns A Promise that resolves to the dynamically imported module.
  */
-export async function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
-  try {
-    return (await new Function('modulePath', `return import(modulePath);`)(modulePath)) as T;
-  } catch (e) {
-    // Temporary workaround to handle directory imports for current packages. ESM does not support
-    // directory imports.
-    // TODO_ESM: Remove once FW packages are fully ESM with defined `exports` package.json fields
-    if (e.code !== 'ERR_UNSUPPORTED_DIR_IMPORT') {
-      throw e;
-    }
-
-    return (await new Function('modulePath', `return import(modulePath);`)(
-      modulePath + '/index.js',
-    )) as T;
-  }
+export function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
+  return new Function('modulePath', `return import(modulePath);`)(modulePath) as Promise<T>;
 }

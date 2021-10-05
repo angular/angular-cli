@@ -40,54 +40,28 @@ const { i18n } = (workerData || {}) as { i18n?: I18nOptions };
  */
 const USE_LOCALIZE_PLUGINS = false;
 
-/**
- * The extracted `@angular/localize` utilities module type used by the manually constructed
- * `LocalizeToolsModule` type.
- *
- * TODO_ESM: Remove once the `tools` entry point exists in a published package version
- */
-type LocalizeUtilityModule = typeof import('@angular/localize/src/tools/src/source_file_utils');
-
-/**
- * The manually constructed type for the `@angular/localize/tools` module.
- * This type only contains the exports that are need for this file.
- *
- * TODO_ESM: Remove once the `tools` entry point exists in a published package version
- */
-interface LocalizeToolsModule extends LocalizeUtilityModule {
-  /* eslint-disable max-len */
-  Diagnostics: typeof import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
-  makeEs2015TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin').makeEs2015TranslatePlugin;
-  makeEs5TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin').makeEs5TranslatePlugin;
-  makeLocalePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/locale_plugin').makeLocalePlugin;
-  /* eslint-enable max-len */
-}
+type LocalizeUtilityModule = typeof import('@angular/localize/tools');
 
 /**
  * Cached instance of the `@angular/localize/tools` module.
  * This is used to remove the need to repeatedly import the module per file translation.
  */
-let localizeToolsModule: LocalizeToolsModule | undefined;
+let localizeToolsModule: LocalizeUtilityModule | undefined;
 
 /**
  * Attempts to load the `@angular/localize/tools` module containing the functionality to
  * perform the file translations.
  * This module must be dynamically loaded as it is an ESM module and this file is CommonJS.
  */
-async function loadLocalizeTools(): Promise<void> {
+async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
   if (localizeToolsModule !== undefined) {
-    return;
+    return localizeToolsModule;
   }
 
-  // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
-  // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
-  // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-  try {
-    // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    localizeToolsModule = await loadEsmModule<LocalizeToolsModule>('@angular/localize/tools');
-  } catch {}
+  // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+  // Once TypeScript provides support for keeping the dynamic import this workaround can be
+  // changed to a direct dynamic import.
+  return loadEsmModule('@angular/localize/tools');
 }
 
 export async function createI18nPlugins(
@@ -97,40 +71,29 @@ export async function createI18nPlugins(
   shouldInline: boolean,
   localeDataContent?: string,
 ) {
-  const plugins = [];
-  const localizeDiag =
-    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/diagnostics'));
+  const { Diagnostics, makeEs2015TranslatePlugin, makeEs5TranslatePlugin, makeLocalePlugin } =
+    await loadLocalizeTools();
 
-  const diagnostics = new localizeDiag.Diagnostics();
+  const plugins = [];
+  const diagnostics = new Diagnostics();
 
   if (shouldInline) {
-    const es2015 =
-      localizeToolsModule ??
-      (await import(
-        '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
-      ));
     plugins.push(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
+      makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
       }),
     );
 
-    const es5 =
-      localizeToolsModule ??
-      (await import('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
     plugins.push(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
+      makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
       }),
     );
   }
 
-  const inlineLocale =
-    localizeToolsModule ??
-    (await import('@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
-  plugins.push(inlineLocale.makeLocalePlugin(locale));
+  plugins.push(makeLocalePlugin(locale));
 
   if (localeDataContent) {
     plugins.push({
@@ -269,15 +232,10 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   }
 
   const { default: generate } = await import('@babel/generator');
-
-  const utils =
-    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/source_file_utils'));
-  const localizeDiag =
-    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/diagnostics'));
-
+  const localizeDiag = await loadLocalizeTools();
   const diagnostics = new localizeDiag.Diagnostics();
 
-  const positions = findLocalizePositions(ast, options, utils);
+  const positions = findLocalizePositions(ast, options, localizeDiag);
   if (positions.length === 0 && !options.setLocale) {
     return inlineCopyOnly(options);
   }
@@ -306,7 +264,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const translations: any = isSourceLocale ? {} : i18n.locales[locale].translation || {};
     for (const position of positions) {
-      const translated = utils.translate(
+      const translated = localizeDiag.translate(
         diagnostics,
         translations,
         position.messageParts,
@@ -314,7 +272,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
         isSourceLocale ? 'ignore' : options.missingTranslation || 'warning',
       );
 
-      const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
+      const expression = localizeDiag.buildLocalizeReplacement(translated[0], translated[1]);
       const { code } = generate(expression);
 
       content.replace(position.start, position.end - 1, code);

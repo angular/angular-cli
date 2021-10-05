@@ -6,6 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type {
+  DiagnosticHandlingStrategy,
+  Diagnostics,
+  makeEs2015TranslatePlugin,
+  makeEs5TranslatePlugin,
+  makeLocalePlugin,
+} from '@angular/localize/tools';
 import { strict as assert } from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -17,14 +24,11 @@ export type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: s
  * This must be provided for the ESM imports since dynamic imports are required to be asynchronous and
  * Babel presets currently can only be synchronous.
  *
- * TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
  */
 export interface I18nPluginCreators {
-  /* eslint-disable max-len */
-  makeEs2015TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin').makeEs2015TranslatePlugin;
-  makeEs5TranslatePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin').makeEs5TranslatePlugin;
-  makeLocalePlugin: typeof import('@angular/localize/src/tools/src/translate/source_files/locale_plugin').makeLocalePlugin;
-  /* eslint-enable max-len */
+  makeEs2015TranslatePlugin: typeof makeEs2015TranslatePlugin;
+  makeEs5TranslatePlugin: typeof makeEs5TranslatePlugin;
+  makeLocalePlugin: typeof makeLocalePlugin;
 }
 
 export interface ApplicationPresetOptions {
@@ -52,15 +56,12 @@ type NgtscLogger = Parameters<
   typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin
 >[0]['logger'];
 
-type I18nDiagnostics = import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
-type I18nDiagnosticsHandlingStrategy =
-  import('@angular/localize/src/tools/src/diagnostics').DiagnosticHandlingStrategy;
-function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): I18nDiagnostics {
-  const diagnostics: I18nDiagnostics = new (class {
-    readonly messages: I18nDiagnostics['messages'] = [];
+function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): Diagnostics {
+  const diagnostics: Diagnostics = new (class {
+    readonly messages: Diagnostics['messages'] = [];
     hasErrors = false;
 
-    add(type: I18nDiagnosticsHandlingStrategy, message: string): void {
+    add(type: DiagnosticHandlingStrategy, message: string): void {
       if (type === 'ignore') {
         return;
       }
@@ -78,7 +79,7 @@ function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): I18nDi
       this.add('warning', message);
     }
 
-    merge(other: I18nDiagnostics): void {
+    merge(other: Diagnostics): void {
       for (const diagnostic of other.messages) {
         this.add(diagnostic.type, diagnostic.message);
       }

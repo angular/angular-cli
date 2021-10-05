@@ -10,7 +10,7 @@ import { BuilderContext, createBuilder, targetFromTargetString } from '@angular-
 import { BuildResult, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
-import type { Diagnostics } from '@angular/localize/src/tools/src/diagnostics';
+import type { Diagnostics } from '@angular/localize/tools';
 import * as fs from 'fs';
 import * as path from 'path';
 import webpack from 'webpack';
@@ -31,24 +31,6 @@ import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schem
 import { Format, Schema } from './schema';
 
 export type ExtractI18nBuilderOptions = Schema & JsonObject;
-
-/**
- * The manually constructed type for the `@angular/localize/tools` module.
- * This type only contains the exports that are need for this file.
- *
- * TODO_ESM: Remove once the `tools` entry point exists in a published package version
- */
-interface LocalizeToolsModule {
-  /* eslint-disable max-len */
-  checkDuplicateMessages: typeof import('@angular/localize/src/tools/src/extract/duplicates').checkDuplicateMessages;
-  XmbTranslationSerializer: typeof import('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer').XmbTranslationSerializer;
-  SimpleJsonTranslationSerializer: typeof import('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer').SimpleJsonTranslationSerializer;
-  Xliff1TranslationSerializer: typeof import('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer').Xliff1TranslationSerializer;
-  Xliff2TranslationSerializer: typeof import('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer').Xliff2TranslationSerializer;
-  ArbTranslationSerializer: typeof import('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer').ArbTranslationSerializer;
-  LegacyMessageIdMigrationSerializer: typeof import('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer').LegacyMessageIdMigrationSerializer;
-  /* eslint-enable max-len */
-}
 
 function getI18nOutfile(format: string | undefined) {
   switch (format) {
@@ -71,67 +53,40 @@ function getI18nOutfile(format: string | undefined) {
 }
 
 async function getSerializer(
-  localizeToolsModule: LocalizeToolsModule | undefined,
+  localizeToolsModule: typeof import('@angular/localize/tools'),
   format: Format,
   sourceLocale: string,
   basePath: string,
   useLegacyIds: boolean,
   diagnostics: Diagnostics,
 ) {
+  const {
+    XmbTranslationSerializer,
+    LegacyMessageIdMigrationSerializer,
+    ArbTranslationSerializer,
+    Xliff1TranslationSerializer,
+    Xliff2TranslationSerializer,
+    SimpleJsonTranslationSerializer,
+  } = localizeToolsModule;
+
   switch (format) {
     case Format.Xmb:
-      const { XmbTranslationSerializer } =
-        localizeToolsModule ??
-        (await import(
-          '@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'
-        ));
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new XmbTranslationSerializer(basePath as any, useLegacyIds);
     case Format.Xlf:
     case Format.Xlif:
     case Format.Xliff:
-      const { Xliff1TranslationSerializer } =
-        localizeToolsModule ??
-        (await import(
-          '@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'
-        ));
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new Xliff1TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
     case Format.Xlf2:
     case Format.Xliff2:
-      const { Xliff2TranslationSerializer } =
-        localizeToolsModule ??
-        (await import(
-          '@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'
-        ));
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new Xliff2TranslationSerializer(sourceLocale, basePath as any, useLegacyIds, {});
     case Format.Json:
-      const { SimpleJsonTranslationSerializer } =
-        localizeToolsModule ??
-        (await import(
-          '@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'
-        ));
-
       return new SimpleJsonTranslationSerializer(sourceLocale);
     case Format.LegacyMigrate:
-      const { LegacyMessageIdMigrationSerializer } =
-        localizeToolsModule ??
-        (await import(
-          '@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'
-        ));
-
       return new LegacyMessageIdMigrationSerializer(diagnostics);
     case Format.Arb:
-      const { ArbTranslationSerializer } =
-        localizeToolsModule ??
-        (await import(
-          '@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'
-        ));
-
       const fileSystem = {
         relative(from: string, to: string): string {
           return path.relative(from, to);
@@ -287,15 +242,9 @@ export async function execute(
 
   // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
   // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
-  // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-  let localizeToolsModule;
-  try {
-    // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    localizeToolsModule = await loadEsmModule<LocalizeToolsModule>('@angular/localize/tools');
-  } catch {}
-
+  const localizeToolsModule = await loadEsmModule<typeof import('@angular/localize/tools')>(
+    '@angular/localize/tools',
+  );
   const webpackResult = await runWebpack(
     (await transforms?.webpackConfiguration?.(config)) || config,
     context,
@@ -315,8 +264,7 @@ export async function execute(
 
   const basePath = config.context || projectRoot;
 
-  const { checkDuplicateMessages } =
-    localizeToolsModule ?? (await import('@angular/localize/src/tools/src/extract/duplicates'));
+  const { checkDuplicateMessages } = localizeToolsModule;
 
   // The filesystem is used to create a relative path for each file
   // from the basePath.  This relative path is then used in the error message.
