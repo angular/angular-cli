@@ -1,3 +1,44 @@
+<a name="13.0.0-next.8"></a>
+
+# 13.0.0-next.8 (2021-10-05)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- With this change a number of deprecated dev-server builder options which proxied to the browser builder have been removed. These options should be configured in the browser builder instead.
+
+The removed options are:
+
+- `aot`
+- `sourceMap`
+- `deployUrl`
+- `baseHref`
+- `vendorChunk`
+- `commonChunk`
+- `optimization`
+- `progress`
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [e1b954d70](https://github.com/angular/angular-cli/commit/e1b954d707f90622d8a75fc45840cefeb224c286) | fix  | keep relative migration paths during update analysis |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [22cd9edfa](https://github.com/angular/angular-cli/commit/22cd9edfafd357bb9d62a93dd56f033b3f34bbe8) | feat | favor es2020 main fields                        |
+| [000b0e51c](https://github.com/angular/angular-cli/commit/000b0e51c166ecd26b6f24d6a133ea5076df9849) | feat | remove deprecated dev-server options            |
+| [4be6537dd](https://github.com/angular/angular-cli/commit/4be6537ddf4b32e8d204dbaa75f1a53712fe9d44) | fix  | update TS/JS regexp checks to latest extensions |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.8"></a>
 
 # 12.2.8 (2021-10-01)
