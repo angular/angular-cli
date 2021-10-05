@@ -172,7 +172,7 @@
     "less": "4.1.1",
     "less-loader": "10.0.1",
     "license-checker": "^25.0.0",
-    "license-webpack-plugin": "2.3.21",
+    "license-webpack-plugin": "3.0.0",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
     "mini-css-extract-plugin": "2.3.0",
