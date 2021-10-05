@@ -1,4 +1,4 @@
-import { promises as fs, constants } from 'fs';
+import { PathLike, promises as fs, constants } from 'fs';
 import { dirname, join } from 'path';
 import { stripIndents } from 'common-tags';
 
@@ -15,7 +15,31 @@ export function deleteFile(path: string): Promise<void> {
 }
 
 export function rimraf(path: string): Promise<void> {
-  return fs.rmdir(path, { recursive: true, maxRetries: 3 });
+  // The below should be removed and replaced with just `rm` when support for Node.Js 12 is removed.
+  const { rm, rmdir } = fs as typeof fs & {
+    rm?: (
+      path: PathLike,
+      options?: {
+        force?: boolean;
+        maxRetries?: number;
+        recursive?: boolean;
+        retryDelay?: number;
+      },
+    ) => Promise<void>;
+  };
+
+  if (rm) {
+    return rm(path, {
+      force: true,
+      recursive: true,
+      maxRetries: 3,
+    });
+  } else {
+    return rmdir(path, {
+      recursive: true,
+      maxRetries: 3,
+    });
+  }
 }
 
 export function moveFile(from: string, to: string): Promise<void> {
