@@ -114,7 +114,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#d008ca5d1aeebd192c7dca25d6eb09b9e69140c6":
   version "0.0.0"
-  uid d008ca5d1aeebd192c7dca25d6eb09b9e69140c6
   resolved "https://github.com/angular/dev-infra-private-builds.git#d008ca5d1aeebd192c7dca25d6eb09b9e69140c6"
   dependencies:
     "@actions/core" "^1.4.0"
@@ -1628,6 +1627,19 @@
   version "20.0.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-20.0.0.tgz#3246872dcbcb18a54aaa6277a8c7d7f1b155b745"
   integrity sha512-5K0g5W2Ol8hAcTHqcTBHiA7M58tfmYi1o9KxeJuuRNpGaTa5iLjcyemBitCBcKXaHamOBBEH2dGom6v6Unmqjg==
+  dependencies:
+    "@rollup/pluginutils" "^3.1.0"
+    commondir "^1.0.1"
+    estree-walker "^2.0.1"
+    glob "^7.1.6"
+    is-reference "^1.2.1"
+    magic-string "^0.25.7"
+    resolve "^1.17.0"
+
+"@rollup/plugin-commonjs@^21.0.0":
+  version "21.0.0"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-21.0.0.tgz#b9e4342855ea20b5528f4587b9a90f642196a502"
+  integrity sha512-XDQimjHl0kNotAV5lLo34XoygaI0teqiKGJ100B3iCU8+15YscJPeqk2KqkqD3NIe1H8ZTUo5lYjUFZyEgASTw==
   dependencies:
     "@rollup/pluginutils" "^3.1.0"
     commondir "^1.0.1"
@@ -7193,12 +7205,12 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-packagr@13.0.0-next.5:
-  version "13.0.0-next.5"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.0-next.5.tgz#1214b418c79b82eb52997a04fbef5328ab557478"
-  integrity sha512-7hZ20WWMc6McpmxomTl7TdlYxqVoRqxO3VTm6eG9K0ixgWZ6CHJM5wP2JYkoemMGwRl8VveTNN89rwn709Dhew==
+ng-packagr@13.0.0-next.6:
+  version "13.0.0-next.6"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.0-next.6.tgz#5e318fb38b63a6d7bced93fbbd87cdd5933d5234"
+  integrity sha512-wqxAloy5xV6sHKlOpZtSr0YniscZpi2gnqYN1iZQjpURqi6oosfi7fF3TyNzn/WGlMgYseXspzBypSqzbqnI8g==
   dependencies:
-    "@rollup/plugin-commonjs" "^20.0.0"
+    "@rollup/plugin-commonjs" "^21.0.0"
     "@rollup/plugin-json" "^4.1.0"
     "@rollup/plugin-node-resolve" "^13.0.0"
     ajv "^8.0.0"
