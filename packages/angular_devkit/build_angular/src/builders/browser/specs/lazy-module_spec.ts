@@ -152,9 +152,7 @@ describe('Browser Builder lazy modules', () => {
     const { files } = await browserBuild(architect, host, target);
     expect(files['src_one_ts.js']).not.toBeUndefined();
     expect(files['src_two_ts.js']).not.toBeUndefined();
-    expect(
-      files['default-node_modules_angular_common___ivy_ngcc___fesm2015_http_js.js'],
-    ).toBeDefined();
+    expect(files['default-node_modules_angular_common_fesm2020_http_mjs.js']).toBeDefined();
   });
 
   it(`supports disabling the common bundle`, async () => {
