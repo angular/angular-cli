@@ -2,6 +2,11 @@
 
 Angular Build Optimizer contains Angular optimizations applicable to JavaScript code as a TypeScript transform pipeline.
 
+This package is **deprecated** and should not be used. It has always been experimental (never hit
+`1.0.0`) and was an internal package for the Angular CLI. All the relevant functionality has been
+moved into
+[`@angular-devkit/build-angular`](https://npmjs.com/package/@angular-devkit/build-angular).
+
 ## Available optimizations
 
 Transformations applied depend on file content:
