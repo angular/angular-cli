@@ -38,6 +38,5 @@ node_repositories(
 yarn_install(
     name = "npm",
     package_json = "//:package.json",
-    strict_visibility = False,  # Needed for ts-api-guardian. More info about this can be found https://github.com/bazelbuild/rules_nodejs/wiki#strict_visibility-on-yarn_install-and-npm_install-now-defaults-true-2199
     yarn_lock = "//:yarn.lock",
 )
