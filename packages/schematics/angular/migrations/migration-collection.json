@@ -139,6 +139,11 @@
       "version": "13.0.0",
       "factory": "./update-13/drop-ie-polyfills",
       "description": "Remove polyfills required only for Internet Explorer which is no longer supported."
+    },
+    "update-gitignore": {
+      "version": "13.0.0",
+      "factory": "./update-13/update-gitignore",
+      "description": "Updating '.gitignore' to include '.angular/cache'."
     }
   }
 }
