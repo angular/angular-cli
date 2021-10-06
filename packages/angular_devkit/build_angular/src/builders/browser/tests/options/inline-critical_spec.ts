@@ -40,7 +40,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/index.html').content.toContain(`body{color:#000;}`);
     });
 
-    it(`should extract critical css when 'optimization' is unset`, async () => {
+    it(`should not extract critical css when 'optimization' is unset`, async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
@@ -50,15 +50,10 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness
-        .expectFile('dist/index.html')
-        .content.toContain(
-          `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
-        );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000;}`);
+      harness.expectFile('dist/index.html').content.not.toContain(`<style`);
     });
 
-    it(`should extract critical css when 'optimization' is true`, async () => {
+    it(`should not extract critical css when 'optimization' is true`, async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
@@ -68,12 +63,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness
-        .expectFile('dist/index.html')
-        .content.toContain(
-          `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
-        );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000;}`);
+      harness.expectFile('dist/index.html').content.not.toContain(`<style`);
     });
 
     it(`should not extract critical css when 'optimization' is false`, async () => {

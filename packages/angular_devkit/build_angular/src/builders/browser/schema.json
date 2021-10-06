@@ -89,7 +89,7 @@
                     "inlineCritical": {
                       "type": "boolean",
                       "description": "Extract and inline critical CSS definitions to improve first paint time.",
-                      "default": true
+                      "default": false
                     }
                   },
                   "additionalProperties": false
