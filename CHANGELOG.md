@@ -1,3 +1,20 @@
+<a name="12.2.9"></a>
+
+# 12.2.9 (2021-10-06)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [9d45b7752](https://github.com/angular/angular-cli/commit/9d45b77522a9693c4876fdfd741e8869e89e0268) | fix  | add web-streams-polyfill to downlevel exclusion list |
+| [ccedf53a8](https://github.com/angular/angular-cli/commit/ccedf53a820a748b56c84528294b36c7af30dbaf) | fix  | update `esbuild` to `0.13.4`                         |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.8"></a>
 
 # 12.2.8 (2021-10-01)
