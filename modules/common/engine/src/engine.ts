@@ -29,7 +29,7 @@ export interface RenderOptions {
   documentFilePath?: string;
   /**
    * Reduce render blocking requests by inlining critical CSS.
-   * Defaults to true.
+   * Defaults to false.
    */
   inlineCriticalCss?: boolean;
   /**
@@ -64,7 +64,7 @@ export class CommonEngine {
    * render options
    */
   async render(opts: RenderOptions): Promise<string> {
-    const { inlineCriticalCss = true } = opts;
+    const { inlineCriticalCss = false } = opts;
 
     if (opts.publicPath && opts.documentFilePath && opts.url !== undefined) {
       const url = new URL(opts.url);
