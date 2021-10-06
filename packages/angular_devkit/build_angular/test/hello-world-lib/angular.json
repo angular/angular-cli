@@ -2,7 +2,9 @@
   "$schema": "../../../../packages/angular_devkit/core/src/workspace/workspace-schema.json",
   "version": 1,
   "cli": {
-    "enabled": false
+    "cache": {
+      "enabled": false
+    }
   },
   "projects": {
     "lib": {
