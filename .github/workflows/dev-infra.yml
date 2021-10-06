@@ -1,0 +1,14 @@
+name: DevInfra
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  breaking-changes-label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: angular/dev-infra/github-actions/breaking-changes-label@792204aa7a4e88dab92636d34f5efb3546d69a9e
+        with:
+          angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
