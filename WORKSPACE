@@ -13,6 +13,9 @@ http_archive(
 
 # Check the bazel version and download npm dependencies
 load("@build_bazel_rules_nodejs//:index.bzl", "check_bazel_version", "check_rules_nodejs_version", "node_repositories", "yarn_install")
+load("@build_bazel_rules_nodejs//toolchains/esbuild:esbuild_repositories.bzl", "esbuild_repositories")
+
+esbuild_repositories()
 
 # Bazel version must be at least the following version because:
 #   - 0.26.0 managed_directories feature added which is required for nodejs rules 0.30.0
@@ -40,10 +43,6 @@ node_repositories(
 
 yarn_install(
     name = "npm",
-    # Ensure that the script is available when running `postinstall` in the Bazel sandbox.
-    data = [
-        "//:angular-metadata.tsconfig.json",
-    ],
     package_json = "//:package.json",
     yarn_lock = "//:yarn.lock",
 )

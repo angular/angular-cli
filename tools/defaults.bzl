@@ -3,6 +3,7 @@
 load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
 load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
 load("@npm//@bazel/jasmine:index.bzl", _jasmine_node_test = "jasmine_node_test")
+load("@npm//@bazel/esbuild:index.bzl", "esbuild")
 load(
     "@npm//@bazel/typescript:index.bzl",
     _ts_library = "ts_library",
@@ -10,7 +11,6 @@ load(
 
 DEFAULT_TSCONFIG_BUILD = "//modules:bazel-tsconfig-build.json"
 DEFAULT_TSCONFIG_TEST = "//modules:bazel-tsconfig-test"
-DEFAULT_TS_TYPINGS = "@npm//typescript:typescript__typings"
 
 def _getDefaultTsConfig(testonly):
     if testonly:
@@ -18,15 +18,31 @@ def _getDefaultTsConfig(testonly):
     else:
         return DEFAULT_TSCONFIG_BUILD
 
-def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
-    local_deps = ["@npm//tslib", "@npm//@types/node", DEFAULT_TS_TYPINGS] + deps
+def ts_library(
+        tsconfig = None,
+        testonly = False,
+        deps = [],
+        devmode_module = None,
+        devmode_target = None,
+        **kwargs):
+    deps = deps + ["@npm//tslib", "@npm//@types/node"]
+    if testonly:
+        deps.append("@npm//@types/jasmine")
+
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
+
+    if not devmode_module:
+        devmode_module = "commonjs"
+    if not devmode_target:
+        devmode_target = "es2019"
 
     _ts_library(
         tsconfig = tsconfig,
         testonly = testonly,
-        deps = local_deps,
+        devmode_module = devmode_module,
+        devmode_target = devmode_target,
+        deps = deps,
         **kwargs
     )
 
@@ -63,42 +79,19 @@ PKG_GROUP_REPLACEMENTS = {
     "TSLIB_VERSION": TSLIB_VERSION,
 }
 
-GLOBALS = {
-    "@angular/animations": "ng.animations",
-    "@angular/common": "ng.common",
-    "@angular/common/http": "ng.common.http",
-    "@angular/compiler": "ng.compiler",
-    "@angular/core": "ng.core",
-    "@angular/http": "ng.http",
-    "@angular/platform-browser": "ng.platformBrowser",
-    "@angular/platform-browser-dynamic": "ng.platformBrowserDynamic",
-    "@angular/platform-server": "ng.platformServer",
-    "@nguniversal/common": "nguniversal.common",
-    "@nguniversal/common/engine": "nguniversal.common.engine",
-    "@nguniversal/common/clover": "nguniversal.common.domRenderer",
-    "@nguniversal/common/clover/server": "nguniversal.common.domRenderer.server",
-    "@nguniversal/aspnetcore-engine/tokens": "nguniversal.aspnetcoreEngine.tokens",
-    "@nguniversal/express-engine/tokens": "nguniversal.expressEngine.tokens",
-    "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",
-    "express": "express",
-    "fs": "fs",
-    "domino": "domino",
-    "source-map-resolve": "sourcemapResolve",
-    "supports-color": "supportsColor",
-    "jsdom": "jsdom",
-    "url": "url",
-    "net": "net",
-    "@hapi/hapi": "hapi.hapi",
-    "rxjs": "rxjs",
-    "rxjs/operators": "rxjs.operators",
-}
+def ng_module(name, package_name, module_name = None, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
+    deps = deps + ["@npm//tslib", "@npm//@types/node"]
 
-def ng_module(name, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
-    deps = deps + ["@npm//tslib", "@npm//@types/node", DEFAULT_TS_TYPINGS]
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
+
+    if not module_name:
+        module_name = package_name
+
     _ng_module(
         name = name,
+        module_name = package_name,
+        package_name = package_name,
         flat_module_out_file = name,
         bundle_dts = bundle_dts,
         tsconfig = tsconfig,
@@ -119,30 +112,48 @@ def jasmine_node_test(deps = [], **kwargs):
         **kwargs
     )
 
-def ng_test_library(deps = [], tsconfig = None, **kwargs):
+def ng_test_library(name, entry_point = None, deps = [], tsconfig = None, **kwargs):
     local_deps = [
         # We declare "@angular/core" as default dependencies because
         # all Angular component unit tests use the `TestBed` and `Component` exports.
         "@npm//@angular/core",
-        "@npm//@types/jasmine",
     ] + deps
 
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(1)
 
+    ts_library_name = name + "_ts_library"
     ts_library(
+        name = ts_library_name,
         testonly = 1,
         tsconfig = tsconfig,
         deps = local_deps,
         **kwargs
     )
 
-def ng_package(globals = {}, deps = [], **kwargs):
-    globals = dict(globals, **GLOBALS)
-    deps = deps + [
-        "@npm//tslib",
-    ]
+    esbuild(
+        name,
+        testonly = 1,
+        args = {
+            "keepNames": True,
+            # ensure that esbuild prefers .mjs to .js if both are available
+            # since ts_library produces both
+            "resolveExtensions": [
+                ".mjs",
+                ".js",
+            ],
+        },
+        output = name + "_spec.js",
+        entry_point = entry_point,
+        format = "iife",
+        # We cannot use `ES2017` or higher as that would result in `async/await` not being downleveled.
+        # ZoneJS needs to be able to intercept these as otherwise change detection would not work properly.
+        target = "es2016",
+        platform = "node",
+        deps = [":" + ts_library_name],
+    )
 
+def ng_package(deps = [], **kwargs):
     common_substitutions = dict(kwargs.pop("substitutions", {}), **PKG_GROUP_REPLACEMENTS)
     substitutions = dict(common_substitutions, **{
         "0.0.0-PLACEHOLDER": "0.0.0",
@@ -152,8 +163,16 @@ def ng_package(globals = {}, deps = [], **kwargs):
     })
 
     _ng_package(
-        globals = globals,
         deps = deps,
+        externals = [
+            "domino",
+            "xhr2",
+            "jsdom",
+            "critters",
+            "express-engine",
+            "express",
+            "@hapi/hapi",
+        ],
         substitutions = select({
             "//:stamp": stamped_substitutions,
             "//conditions:default": substitutions,

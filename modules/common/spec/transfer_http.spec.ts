@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+// eslint-disable-next-line import/no-unassigned-import
+import '@angular/compiler';
 import { HttpParams } from '@angular/common/http';
 import { ɵTransferHttpCacheInterceptor as TransferHttpCacheInterceptor } from '@nguniversal/common';
 import { of } from 'rxjs';

@@ -41,7 +41,7 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
     try {
       const renderOptions = { ...options } as RenderOptions;
       if (!setupOptions.bootstrap && !renderOptions.bootstrap) {
-        throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
+        throw new Error('You must pass in a NgModule to be bootstrapped');
       }
 
       const req = renderOptions.req;

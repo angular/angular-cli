@@ -8,22 +8,23 @@
 
 /* eslint-disable */
 import 'zone.js';
+import '@angular/compiler';
 import {
   SocketEngineRenderOptions,
   SocketEngineResponse,
   startSocketEngine,
 } from '@nguniversal/socket-engine';
 import * as net from 'net';
-import { SOME_TOKEN } from '../testing/mock.server.module';
 import {
-  ErrorServerModuleNgFactory,
-  MockServerModuleNgFactory,
-  TokenServerModuleNgFactory,
-} from '../testing/mock.server.module.ngfactory';
+  ErrorServerModule,
+  MockServerModule,
+  SOME_TOKEN,
+  TokenServerModule,
+} from './mock.server.module';
 
 async function sendAndRecieve(renderOptions: SocketEngineRenderOptions) {
   return new Promise<SocketEngineResponse>(async (resolve, _reject) => {
-    const server = await startSocketEngine(MockServerModuleNgFactory);
+    const server = await startSocketEngine(MockServerModule);
 
     const client = net.createConnection(9090, 'localhost', () => {
       client.write(JSON.stringify(renderOptions));
@@ -60,7 +61,7 @@ describe('test runner', () => {
   });
 
   it('should return an error if it cant render', async (done) => {
-    const server = await startSocketEngine(ErrorServerModuleNgFactory);
+    const server = await startSocketEngine(ErrorServerModule);
 
     const client = net.createConnection(9090, 'localhost', () => {
       const renderOptions = {
@@ -91,7 +92,7 @@ describe('test runner', () => {
 
   it('should be able to inject some token', async (done) => {
     const someValue = { message: 'value' + new Date() };
-    const server = await startSocketEngine(TokenServerModuleNgFactory, [
+    const server = await startSocketEngine(TokenServerModule, [
       { provide: SOME_TOKEN, useValue: someValue },
     ]);
 

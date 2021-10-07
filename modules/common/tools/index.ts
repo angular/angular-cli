@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export { CommonEngine, RenderOptions } from './src/engine';
+export * from './public_api';

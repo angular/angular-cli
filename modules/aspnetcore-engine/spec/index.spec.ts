@@ -8,9 +8,10 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import 'zone.js';
-
+// eslint-disable-next-line import/no-unassigned-import
+import '@angular/compiler';
 import { ngAspnetCoreEngine } from '@nguniversal/aspnetcore-engine';
-import { MockServerModule } from '../testing/mock.server.module';
+import { MockServerModule } from './mock.server.module';
 
 describe('ASPNETCore Engine', () => {
   it('should render a basic template', async () => {

@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "hapi-engine",
+    package_name = "@nguniversal/hapi-engine",
     srcs = glob([
         "*.ts",
         "src/**/*.ts",
     ]),
-    module_name = "@nguniversal/hapi-engine",
     deps = [
         "//modules/common/engine",
         "//modules/hapi-engine/tokens",
@@ -23,7 +23,6 @@ ng_package(
     srcs = [
         ":package.json",
     ],
-    entry_point = ":index.ts",
     readme_md = ":README.md",
     tags = ["release"],
     deps = [
@@ -32,27 +31,15 @@ ng_package(
     ],
 )
 
-# NgModule used only for tests.
-ng_module(
-    name = "testing",
-    srcs = glob([
-        "testing/**/*.ts",
-    ]),
-    module_name = "@nguniversal/hapi-engine/testing",
-    deps = [
-        "@npm//@angular/platform-browser",
-        "@npm//@angular/platform-server",
-    ],
-)
-
 ng_test_library(
     name = "unit_test_lib",
     srcs = glob([
-        "spec/**/*.spec.ts",
+        "spec/**/*.ts",
     ]),
+    entry_point = ":spec/index.spec.ts",
     deps = [
         ":hapi-engine",
-        ":testing",
+        "@npm//@angular/compiler",
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
         "@npm//@hapi/hapi",

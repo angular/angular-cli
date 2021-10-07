@@ -1,7 +1,0 @@
-{
-  "extends": "../../bazel-tsconfig-build.json",
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "lib": ["dom", "es2018"]
-  }
-}

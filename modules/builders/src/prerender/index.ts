@@ -18,7 +18,7 @@ import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/u
 import { normalize, resolve as resolvePath } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Worker as JestWorker } from 'jest-worker';
-import * as ora from 'ora';
+import ora from 'ora';
 import * as path from 'path';
 import { promisify } from 'util';
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';

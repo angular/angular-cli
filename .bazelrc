@@ -15,9 +15,6 @@ test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test
 # `bazel info output_base` to find out where the outputs went.
 build --symlink_prefix=dist/
 
-# Performance: avoid stat'ing input files
-build --watchfs
-
 # Turn off legacy external runfiles
 build --nolegacy_external_runfiles
 run --nolegacy_external_runfiles
@@ -63,9 +60,7 @@ build --strategy=AngularTemplateCompile=worker
 # Temporary Settings for Ivy   #
 ################################
 
-# Use the legacy AOT compiler strategy. We don't want to compile with Ivy nor with "ngtsc" which
-# does not generate factory files which are needed for AOT.
-build --define=compile=legacy
+build --define=angular_ivy_enabled=True
 
 ###############################
 # NodeJS rules settings

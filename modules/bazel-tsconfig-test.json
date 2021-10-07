@@ -1,7 +1,7 @@
 {
   "extends": "./bazel-tsconfig-build.json",
   "compilerOptions": {
-    "importHelpers": false,
+    "module": "commonjs",
     "types": ["jasmine", "node"]
   }
 }

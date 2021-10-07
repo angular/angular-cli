@@ -137,7 +137,7 @@
           }
         },
         "serve-ssr": {
-          "builder": "nguniversal/modules/builders/npm_package:ssr-dev-server",
+          "builder": "@nguniversal/builders:ssr-dev-server",
           "options": {
             "browserTarget": "app:build",
             "serverTarget": "app:server"
@@ -150,7 +150,7 @@
           }
         },
         "prerender": {
-          "builder": "nguniversal/modules/builders/npm_package:prerender",
+          "builder": "@nguniversal/builders:prerender",
           "options": {
             "browserTarget": "app:build",
             "serverTarget": "app:server"

@@ -4,10 +4,10 @@ package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "tokens",
+    package_name = "@nguniversal/hapi-engine/tokens",
     srcs = glob([
         "*.ts",
     ]),
-    module_name = "@nguniversal/hapi-engine/tokens",
     deps = [
         "@npm//@angular/core",
         "@npm//@hapi/hapi",

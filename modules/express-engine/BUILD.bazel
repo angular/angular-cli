@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "express-engine",
+    package_name = "@nguniversal/express-engine",
     srcs = glob([
         "*.ts",
         "src/**/*.ts",
     ]),
-    module_name = "@nguniversal/express-engine",
     deps = [
         "//modules/common/engine",
         "//modules/express-engine/tokens",
@@ -25,7 +25,6 @@ ng_package(
     srcs = [
         ":package.json",
     ],
-    entry_point = ":index.ts",
     nested_packages = ["//modules/express-engine/schematics:npm_package"],
     readme_md = ":README.md",
     tags = ["release"],
@@ -35,28 +34,14 @@ ng_package(
     ],
 )
 
-# NgModule used only for tests.
-ng_module(
-    name = "testing",
-    srcs = glob([
-        "testing/**/*.ts",
-    ]),
-    module_name = "@nguniversal/express-engine/testing",
-    deps = [
-        ":express-engine",
-        "@npm//@angular/platform-browser",
-        "@npm//@angular/platform-server",
-    ],
-)
-
 ng_test_library(
     name = "unit_test_lib",
     srcs = glob([
-        "spec/**/*.spec.ts",
+        "spec/**/*.ts",
     ]),
+    entry_point = ":spec/index.spec.ts",
     deps = [
         ":express-engine",
-        ":testing",
         "//modules/express-engine/tokens",
         "@npm//@angular/compiler",
         "@npm//@angular/platform-browser",

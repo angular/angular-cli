@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "aspnetcore-engine",
+    package_name = "@nguniversal/aspnetcore-engine",
     srcs = glob([
         "*.ts",
         "src/**/*.ts",
     ]),
-    module_name = "@nguniversal/aspnetcore-engine",
     deps = [
         "//modules/aspnetcore-engine/tokens",
         "//modules/common/engine",
@@ -26,7 +26,6 @@ ng_package(
     srcs = [
         ":package.json",
     ],
-    entry_point = ":index.ts",
     readme_md = ":README.md",
     tags = ["release"],
     deps = [
@@ -35,28 +34,14 @@ ng_package(
     ],
 )
 
-# NgModule used only for tests.
-ng_module(
-    name = "testing",
-    srcs = glob([
-        "testing/**/*.ts",
-    ]),
-    module_name = "@nguniversal/aspnetcore-engine/testing",
-    deps = [
-        ":aspnetcore-engine",
-        "@npm//@angular/platform-browser",
-        "@npm//@angular/platform-server",
-    ],
-)
-
 ng_test_library(
     name = "unit_test_lib",
     srcs = glob([
-        "spec/**/*.spec.ts",
+        "spec/**/*.ts",
     ]),
+    entry_point = ":spec/index.spec.ts",
     deps = [
         ":aspnetcore-engine",
-        ":testing",
         "@npm//@angular/compiler",
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",

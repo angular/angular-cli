@@ -9,7 +9,7 @@ This is an Express Engine for running Angular Apps on the server for server side
 To use it, set the engine and then route requests to it
 
 ```ts
-import * as express from 'express';
+import express from 'express';
 import { ngExpressEngine } from '@nguniversal/express-engine';
 
 const app = express();

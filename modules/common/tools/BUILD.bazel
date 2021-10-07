@@ -3,16 +3,15 @@ load("//tools:defaults.bzl", "ng_module")
 package(default_visibility = ["//visibility:public"])
 
 ng_module(
-    name = "clover",
-    package_name = "@nguniversal/common/clover",
+    name = "tools",
+    package_name = "@nguniversal/common/tools",
     srcs = glob([
-        "src/**/*.ts",
+        "src/*.ts",
         "*.ts",
     ]),
     deps = [
-        "@npm//@angular/common",
         "@npm//@angular/core",
-        "@npm//@angular/platform-browser",
-        "@npm//rxjs",
+        "@npm//@angular/platform-server",
+        "@npm//critters",
     ],
 )

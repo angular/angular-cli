@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ɵInlineCriticalCssProcessor as InlineCriticalCssProcessor } from '@nguniversal/common/engine';
 import * as fs from 'fs';
 import * as path from 'path';
+import { loadEsmModule } from '../utils/utils';
 
 export interface WorkerSetupArgs {
   indexFile: string;
@@ -23,16 +23,9 @@ export interface RenderResult {
 }
 
 let workerArgs: WorkerSetupArgs;
-let inlineCriticalCssProcessor: InlineCriticalCssProcessor | undefined;
 
 export function setup(options: WorkerSetupArgs): void {
   workerArgs = options;
-  if (workerArgs.inlineCriticalCss) {
-    inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-      deployUrl: workerArgs.deployUrl,
-      minify: workerArgs.minifyCss,
-    });
-  }
 }
 
 /**
@@ -72,7 +65,16 @@ export async function render(
     url: route,
   });
 
-  if (inlineCriticalCssProcessor) {
+  if (workerArgs.inlineCriticalCss) {
+    const { ɵInlineCriticalCssProcessor: InlineCriticalCssProcessor } = await loadEsmModule<
+      typeof import('@nguniversal/common/tools')
+    >('@nguniversal/common/tools');
+
+    const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
+      deployUrl: workerArgs.deployUrl,
+      minify: workerArgs.minifyCss,
+    });
+
     const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
       outputPath,
     });

@@ -16,10 +16,10 @@ import { BrowserBuilderOptions, BrowserBuilderOutput } from '@angular-devkit/bui
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
 import { normalize, resolve } from '@angular-devkit/core';
-import * as express from 'express';
+import express from 'express';
 import * as http from 'http';
 import { Worker as JestWorker } from 'jest-worker';
-import * as ora from 'ora';
+import ora from 'ora';
 import { cpus } from 'os';
 import * as path from 'path';
 import { promisify } from 'util';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
+import type { StaticProvider, Type } from '@angular/core';
 import { CommonEngine, RenderOptions } from '@nguniversal/common/engine';
 import * as net from 'net';
 
@@ -36,7 +36,7 @@ export interface SocketEngineResponse {
  * @deprecated use `@nguniversal/common` instead.
  */
 export function startSocketEngine(
-  moduleOrFactory: Type<{}> | NgModuleFactory<{}>,
+  moduleOrFactory: Type<{}>,
   providers: StaticProvider[] = [],
   host = 'localhost',
   port = 9090,

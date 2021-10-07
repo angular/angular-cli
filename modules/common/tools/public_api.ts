@@ -6,8 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-describe('test runner', () => {
-  it('can run a test', () => {
-    expect(true).toBe(true);
-  });
-});
+export { InlineCriticalCssProcessor as ɵInlineCriticalCssProcessor } from './src/inline-css-processor';

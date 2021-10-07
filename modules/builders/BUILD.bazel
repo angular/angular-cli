@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 
 filegroup(
     name = "builders_assets",
@@ -30,7 +30,6 @@ ts_library(
         "@npm//@angular-devkit/core",
         "@npm//@types/browser-sync",
         "@npm//@types/express",
-        "@npm//browser-sync",
         "@npm//guess-parser",
         "@npm//http-proxy-middleware",
         "@npm//jest-worker",
@@ -48,38 +47,10 @@ pkg_npm(
     deps = [":builders"],
 )
 
-### Testing rules
-jasmine_node_test(
-    name = "unit_tests",
-    srcs = [":unit_test_lib"],
-    data = [
-        "@npm//@angular/cli",
-        "@npm//@angular-devkit/build-angular",
-        "@npm//@angular/core",
-        "@npm//@angular/router",
-        "@npm//@angular/common",
-        "@npm//@angular/compiler-cli",
-        "@npm//@angular/compiler",
-        "@npm//@angular/platform-browser",
-        "@npm//@angular/platform-browser-dynamic",
-        "@npm//@angular/service-worker",
-        "@npm//@types/node",
-        "@npm//browser-sync",
-        "@npm//express",
-        "@npm//rxjs",
-        "@npm//shelljs",
-        "@npm//node-fetch",
-        "@npm//zone.js",
-        "//modules/common:npm_package",
-        "//modules/express-engine:npm_package",
-        ":npm_package",
-    ] + glob([
-        "testing/hello-world-app/**/*",
-    ]),
-)
-
-ng_test_library(
+## Testing rules
+ts_library(
     name = "unit_test_lib",
+    testonly = True,
     srcs = glob(
         [
             "testing/*.ts",
@@ -92,9 +63,34 @@ ng_test_library(
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/build-angular",
         "@npm//@angular-devkit/core",
+        "@npm//@angular/cli",
+        "@npm//@angular/common",
+        "@npm//@angular/compiler",
+        "@npm//@angular/compiler-cli",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-browser-dynamic",
+        "@npm//@angular/router",
+        "@npm//@angular/service-worker",
         "@npm//@types/browser-sync",
-        "@npm//@types/shelljs",
+        "@npm//browser-sync",
+        "@npm//express",
         "@npm//guess-parser",
+        "@npm//node-fetch",
         "@npm//rxjs",
     ],
 )
+
+# TODO investigate and enable after we land APF version 13
+# The main reason for this is due to https://github.com/angular/angular/blob/e1c2fbd2aff5c4dce29d1153cea4ce117b7d83f5/packages/bazel/src/ng_package/ng_package.bzl#L542-L549
+# jasmine_node_test(
+#     name = "unit_test",
+#     srcs = [":unit_test_lib"],
+#     data = glob([
+#         "testing/hello-world-app/**/*",
+#     ]),
+#     deps = [
+#         "//modules/express-engine",
+#         "//modules/common",
+#         ":npm_package",
+#     ]
+# )

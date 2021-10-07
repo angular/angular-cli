@@ -10,7 +10,7 @@ import { SpawnOptions, spawn } from 'child_process';
 import { AddressInfo, createConnection, createServer } from 'net';
 import { Observable, throwError, timer } from 'rxjs';
 import { mergeMap, retryWhen } from 'rxjs/operators';
-import * as treeKill from 'tree-kill';
+import treeKill from 'tree-kill';
 
 export function getAvailablePort(): Promise<number> {
   return new Promise((resolve, reject) => {

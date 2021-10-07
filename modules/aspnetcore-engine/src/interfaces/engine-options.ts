@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
+import { StaticProvider, Type } from '@angular/core';
 import { RenderOptions } from '@nguniversal/common/engine';
 import { IRequestParams } from './request-params';
 
@@ -16,6 +16,6 @@ export interface IEngineOptions extends Pick<RenderOptions, 'publicPath' | 'inli
   request: IRequestParams; // e.g., params
   url?: string; // e.g., http://testhost.com
   document?: string; // e.g., <html>...</html>
-  ngModule: Type<{}> | NgModuleFactory<{}>; // e.g., AppModule
+  ngModule: Type<{}>; // e.g., AppModule
   providers?: StaticProvider[]; // StaticProvider[]
 }

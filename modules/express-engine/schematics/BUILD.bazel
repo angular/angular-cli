@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "jasmine_node_test", "pkg_npm", "ts_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,6 +14,7 @@ filegroup(
 
 ts_library(
     name = "schematics",
+    package_name = "@nguniversal/express-engine/schematics",
     srcs = glob(
         ["**/*.ts"],
         exclude = [
@@ -22,7 +23,6 @@ ts_library(
             "**/files/**/*",
         ],
     ),
-    module_name = "@nguniversal/express-engine/schematics",
     tsconfig = ":tsconfig.json",
     deps = [
         "@npm//@angular-devkit/core",
@@ -50,8 +50,9 @@ jasmine_node_test(
     ],
 )
 
-ng_test_library(
+ts_library(
     name = "schematics_test_sources",
+    testonly = True,
     srcs = glob(
         [
             "testing/*.ts",
@@ -59,7 +60,6 @@ ng_test_library(
         ],
         exclude = ["**/files/**/*"],
     ),
-    tsconfig = ":tsconfig.json",
     deps = [
         ":schematics",
         "@npm//@angular-devkit/core",

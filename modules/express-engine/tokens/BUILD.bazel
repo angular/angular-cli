@@ -6,10 +6,10 @@ exports_files(["package.json"])
 
 ng_module(
     name = "tokens",
+    package_name = "@nguniversal/express-engine/tokens",
     srcs = glob([
         "*.ts",
     ]),
-    module_name = "@nguniversal/express-engine/tokens",
     deps = [
         "@npm//@angular/core",
         "@npm//@types/express",

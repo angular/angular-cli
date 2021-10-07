@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "target": "es2015",
-    "module": "commonjs",
+    "module": "es2020",
     "moduleResolution": "node",
     "declaration": true,
     "noImplicitReturns": true,
@@ -10,6 +10,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
+    "esModuleInterop": true,
     "useUnknownInCatchVariables": false,
     "experimentalDecorators": true,
     "sourceMap": true,

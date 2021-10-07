@@ -6,12 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+// eslint-disable-next-line import/no-unassigned-import
+import 'zone.js';
+// eslint-disable-next-line import/no-unassigned-import
+import '@angular/compiler';
 import { destroyPlatform, getPlatform } from '@angular/core';
 import { Request, Server, ServerInjectResponse } from '@hapi/hapi';
 import { ngHapiEngine } from '@nguniversal/hapi-engine';
-// eslint-disable-next-line import/no-unassigned-import
-import 'zone.js';
-import { ExampleModuleNgFactory } from '../testing/example.ngfactory';
+import { ExampleModule } from './mock.server.module';
 
 describe('test runner', () => {
   const server = new Server({ debug: false });
@@ -21,7 +23,7 @@ describe('test runner', () => {
       path: '/',
       handler: (req: Request) =>
         ngHapiEngine({
-          bootstrap: ExampleModuleNgFactory,
+          bootstrap: ExampleModule,
           req,
           document: '<html><body><app></app></body></html>',
         }),
@@ -33,7 +35,7 @@ describe('test runner', () => {
     },
   ]);
 
-  beforeEach(async () => {
+  beforeEach(() => {
     if (getPlatform()) {
       destroyPlatform();
     }

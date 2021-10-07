@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "common",
+    package_name = "@nguniversal/common",
     srcs = glob([
         "*.ts",
         "src/**/*.ts",
     ]),
-    module_name = "@nguniversal/common",
     deps = [
         "//modules/common/engine",
         "@npm//@angular/common",
@@ -22,18 +22,17 @@ ng_package(
     name = "npm_package",
     package_name = "@nguniversal/common",
     srcs = [":package.json"],
-    entry_point = ":index.ts",
     nested_packages = [
         "//modules/common/schematics:npm_package",
-        "//modules/common/clover/server:npm_package",
     ],
     readme_md = ":README.md",
     tags = ["release"],
     deps = [
         ":common",
         "//modules/common/clover",
+        "//modules/common/clover/server",
         "//modules/common/engine",
-        "@npm//critters",
+        "//modules/common/tools",
     ],
 )
 
@@ -42,14 +41,18 @@ ng_test_library(
     srcs = glob([
         "spec/**/*.spec.ts",
     ]),
+    entry_point = ":spec/transfer_http.spec.ts",
     deps = [
         ":common",
         "@npm//@angular/common",
+        "@npm//@angular/compiler",
         "@npm//rxjs",
     ],
 )
 
 jasmine_node_test(
     name = "unit_test",
-    srcs = [":unit_test_lib"],
+    srcs = [
+        ":unit_test_lib",
+    ],
 )

@@ -1,5 +1,5 @@
 import { Engine } from '@nguniversal/common/clover/server';
-import * as express from 'express';
+import express from 'express';
 import { join } from 'path';
 import { format } from 'url';
 
