@@ -71,7 +71,6 @@
     "@types/jasmine": "^3.4.4",
     "@types/jsdom": "^16.2.10",
     "@types/node": "12.12.37",
-    "@types/shelljs": "^0.8.6",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "browser-sync": "^2.26.7",

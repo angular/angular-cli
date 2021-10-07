@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "jasmine_node_test", "pkg_npm", "ts_library")
 
 filegroup(
     name = "builders_assets",
@@ -70,7 +70,6 @@ ts_library(
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-browser-dynamic",
         "@npm//@angular/router",
-        "@npm//@angular/service-worker",
         "@npm//@types/browser-sync",
         "@npm//browser-sync",
         "@npm//express",
@@ -80,17 +79,21 @@ ts_library(
     ],
 )
 
-# TODO investigate and enable after we land APF version 13
-# The main reason for this is due to https://github.com/angular/angular/blob/e1c2fbd2aff5c4dce29d1153cea4ce117b7d83f5/packages/bazel/src/ng_package/ng_package.bzl#L542-L549
-# jasmine_node_test(
-#     name = "unit_test",
-#     srcs = [":unit_test_lib"],
-#     data = glob([
-#         "testing/hello-world-app/**/*",
-#     ]),
-#     deps = [
-#         "//modules/express-engine",
-#         "//modules/common",
-#         ":npm_package",
-#     ]
-# )
+jasmine_node_test(
+    name = "unit_test",
+    srcs = [":unit_test_lib"],
+    data = glob([
+        "testing/hello-world-app/**/*",
+    ]),
+    deps = [
+        ":common_npm_package_workaround",
+        ":npm_package",
+    ],
+)
+
+# Workaround for https://github.com/angular/angular/blob/e1c2fbd2aff5c4dce29d1153cea4ce117b7d83f5/packages/bazel/src/ng_package/ng_package.bzl#L542-L549
+pkg_npm(
+    name = "common_npm_package_workaround",
+    package_name = "@nguniversal/common",
+    srcs = ["//modules/common:npm_package"],
+)

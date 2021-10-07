@@ -26,8 +26,7 @@
   "peerDependencies": {
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
-    "@nguniversal/common": "0.0.0-PLACEHOLDER",
-    "rxjs": "RXJS_VERSION"
+    "@nguniversal/common": "0.0.0-PLACEHOLDER"
   },
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP",

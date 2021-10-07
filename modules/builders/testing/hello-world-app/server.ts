@@ -1,24 +1,16 @@
 import 'zone.js/dist/zone-node';
 
-import { ngExpressEngine } from '@nguniversal/express-engine';
+import { renderModule } from '@angular/platform-server';
 import * as express from 'express';
 import { join } from 'path';
 
 import { AppServerModule } from './src/main.server';
-import { APP_BASE_HREF } from '@angular/common';
+import { readFileSync } from 'fs';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app() {
   const server = express();
   const distFolder = join(__dirname, '../browser');
-
-  // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-  server.engine(
-    'html',
-    ngExpressEngine({
-      bootstrap: AppServerModule,
-    }),
-  );
 
   server.set('view engine', 'html');
   server.set('views', distFolder);
@@ -35,7 +27,10 @@ export function app() {
 
   // All regular routes use the Universal engine
   server.get('*', (req, res) => {
-    res.render('index', { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
+    renderModule(AppServerModule, {
+      document: readFileSync(join(distFolder, 'index.html')).toString(),
+      url: '/',
+    }).then((d) => res.send(d));
   });
 
   return server;
