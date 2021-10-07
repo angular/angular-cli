@@ -114,7 +114,6 @@ async function _renderUniversal(
 
     if (browserOptions.serviceWorker) {
       await augmentAppWithServiceWorker(
-        normalize(root),
         projectRoot,
         normalize(outputPath),
         browserOptions.baseHref || '/',

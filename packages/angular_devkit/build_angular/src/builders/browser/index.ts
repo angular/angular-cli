@@ -352,7 +352,6 @@ export function buildWebpackBrowser(
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
                       await augmentAppWithServiceWorker(
-                        root,
                         normalize(projectRoot),
                         normalize(outputPath),
                         getLocaleBaseHref(i18n, locale) || options.baseHref || '/',
