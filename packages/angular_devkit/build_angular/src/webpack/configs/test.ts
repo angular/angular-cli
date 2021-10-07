@@ -55,6 +55,7 @@ export function getTestConfig(
     target: wco.tsConfig.options.target === ScriptTarget.ES5 ? ['web', 'es5'] : 'web',
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
+      conditionNames: ['es2015', '...'],
     },
     devtool: false,
     entry: {
