@@ -1,3 +1,107 @@
+<a name="13.0.0-next.9"></a>
+
+# 13.0.0-next.9 (2021-10-06)
+
+## Breaking Changes
+
+### @schematics/angular
+
+- `classlist.js` and `web-animations-js` are removed from application polyfills and uninstalled from the package. These were only needed for compatibility with Internet Explorer, which is no longer needed now that Angular only supports evergreen browsers. See: https://angular.io/guide/browser-support.
+
+Add the following to the polyfills file for an app to re-add these packages:
+
+```typescript
+import 'classlist.js';
+import 'web-animations-js';
+```
+
+And then run:
+
+```sh
+npm install classlist.js web-animations-js --save
+```
+
+### @angular-devkit/build-angular
+
+- Inlining of critical CSS is no longer enable by default. Users already on Angular CLI version 12 and have not opted-out from using this feature are encouraged to opt-in using the browser builder `inlineCritical` option.
+
+- `NG_PERSISTENT_BUILD_CACHE` environment variable option no longer have effect. Configure `cli.cache` in the workspace configuration instead.
+
+```json
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "cache": {
+      "enabled": true,
+      "path": ".custom-cache-path",
+      "environment": "all"
+    }
+  }
+  ...
+}
+```
+
+## Deprecations
+
+###
+
+- `@angular-devkit/build-optimizer`
+
+It's functionality has been included in `@angular-devkit/build-angular` so this package is no longer needed by the CLI and we will stop publishing the package soon. It has been an experimental (never hit `1.0.0`) and internal (only used by Angular itself) package and should be not be used directly by others.
+
+### @angular-devkit/build-angular
+
+- `NG_BUILD_CACHE` environment variable option will be removed in the next major version. Configure `cli.cache` in the workspace configuration instead.
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [9fe55752d](https://github.com/angular/angular-cli/commit/9fe55752db8bb50cad5a1ddfe670dce06528e23e) | feat | officially support Node.js v16                         |
+| [d8c9f6eaf](https://github.com/angular/angular-cli/commit/d8c9f6eaf4513639741d20c6af97a751b33b968e) | fix  | update the update command to fully support Node.js v16 |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------- |
+| [7ff8c5350](https://github.com/angular/angular-cli/commit/7ff8c5350ea2e49574dd659adae02215957d2685) | feat | add `/.angular/cache` to `.gitignore`                                                       |
+| [eac18aed7](https://github.com/angular/angular-cli/commit/eac18aed78da55efb840a3ef6f5e90718946504c) | feat | drop polyfills required only for Internet Explorer now that support has been dropped for it |
+| [585adacd0](https://github.com/angular/angular-cli/commit/585adacd0624ddf32c5c69a755d8e542f3463861) | fix  | don't add `destroyAfterEach` in newly generated spec files                                  |
+
+###
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [5e435ff37](https://github.com/angular/angular-cli/commit/5e435ff37703f9ffea7fa92fbd5cd42d9a3db07e) | docs | mark `@angular-devkit/build-optimizer` as deprecated. |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [09e039500](https://github.com/angular/angular-cli/commit/09e039500f34b0d6a16e62128409ac5821e8b9c2) | feat | include workspace extensions in project metadata |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [bf0709b14](https://github.com/angular/angular-cli/commit/bf0709b14c1f0d47af77a64e586a5d4564b75766) | feat | disable critical CSS inlining by default                      |
+| [5904afd1d](https://github.com/angular/angular-cli/commit/5904afd1de3ffa0bb6cd1757795ba9abfce9e523) | feat | enable disk cache by default and provide configurable options |
+| [d7af4a7b5](https://github.com/angular/angular-cli/commit/d7af4a7b536a7c43704f808ea208bc9f230d2403) | fix  | enable custom `es2020` and `es2015` conditional exports       |
+| [f10a82833](https://github.com/angular/angular-cli/commit/f10a8283367390031767eb67fcbea3ebbd5a3955) | fix  | improve fidelity and performance of babel loader sourcemaps   |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------- |
+| [a54e5e065](https://github.com/angular/angular-cli/commit/a54e5e06551c828eb5cf08695674e04fd8a78bf3) | fix  | support Node.js v16 with `NodeJsSyncHost`/`NodeJsAsyncHost` delete operation |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.9"></a>
 
 # 12.2.9 (2021-10-06)
