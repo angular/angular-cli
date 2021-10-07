@@ -206,6 +206,7 @@
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "4.0.0",
     "rxjs": "6.6.7",
+    "rxjs-7": "npm:rxjs@7.4.0",
     "sass": "1.36.0",
     "sass-loader": "12.1.0",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz",

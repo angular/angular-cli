@@ -354,6 +354,7 @@ LARGE_SPECS = {
             "@npm//font-awesome",
             "@npm//jquery",
             "@npm//popper.js",
+            "@npm//rxjs-7",
         ],
     },
 }
