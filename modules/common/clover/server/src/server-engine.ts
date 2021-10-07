@@ -48,7 +48,7 @@ export class Engine {
       pathname,
       options.htmlFilename,
     );
-    const inlineCriticalCss = options.inlineCriticalCss === true;
+    const inlineCriticalCss = options.inlineCriticalCss !== false;
 
     const customResourceLoader = new CustomResourceLoader(
       origin,
