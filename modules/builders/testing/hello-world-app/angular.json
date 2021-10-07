@@ -2,6 +2,11 @@
   "$schema": "../../../../node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "newProjectRoot": "projects",
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
+  },
   "projects": {
     "app": {
       "projectType": "application",
