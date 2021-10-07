@@ -12,7 +12,6 @@ import * as crypto from 'crypto';
 import { createReadStream, promises as fs, constants as fsConstants } from 'fs';
 import * as path from 'path';
 import { pipeline } from 'stream';
-import { pathToFileURL } from 'url';
 import { loadEsmModule } from './load-esm';
 
 class CliFilesystem implements Filesystem {
@@ -63,34 +62,17 @@ class CliFilesystem implements Filesystem {
 }
 
 export async function augmentAppWithServiceWorker(
-  projectRoot: Path,
   appRoot: Path,
   outputPath: Path,
   baseHref: string,
   ngswConfigPath?: string,
 ): Promise<void> {
   const distPath = getSystemPath(normalize(outputPath));
-  const systemProjectRoot = getSystemPath(projectRoot);
-
-  // Find the service worker package
-  const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js', {
-    paths: [systemProjectRoot],
-  });
-  // Absolute paths on Windows must be `file://` URLs when using ESM. Otherwise,
-  // `c:` would be interpreted as a protocol instead of a drive letter.
-  const swConfigPath = pathToFileURL(
-    require.resolve('@angular/service-worker/config', {
-      paths: [systemProjectRoot],
-    }),
-  );
 
   // Determine the configuration file path
-  let configPath;
-  if (ngswConfigPath) {
-    configPath = getSystemPath(normalize(ngswConfigPath));
-  } else {
-    configPath = path.join(getSystemPath(appRoot), 'ngsw-config.json');
-  }
+  const configPath = ngswConfigPath
+    ? getSystemPath(normalize(ngswConfigPath))
+    : path.join(getSystemPath(appRoot), 'ngsw-config.json');
 
   // Read the configuration file
   let config: Config | undefined;
@@ -113,7 +95,9 @@ export async function augmentAppWithServiceWorker(
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
   const GeneratorConstructor = (
-    await loadEsmModule<typeof import('@angular/service-worker/config')>(swConfigPath)
+    await loadEsmModule<typeof import('@angular/service-worker/config')>(
+      '@angular/service-worker/config',
+    )
   ).Generator;
 
   // Generate the manifest
@@ -123,6 +107,9 @@ export async function augmentAppWithServiceWorker(
   // Write the manifest
   const manifest = JSON.stringify(output, null, 2);
   await fs.writeFile(path.join(distPath, 'ngsw.json'), manifest);
+
+  // Find the service worker package
+  const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js');
 
   // Write the worker code
   await fs.copyFile(
