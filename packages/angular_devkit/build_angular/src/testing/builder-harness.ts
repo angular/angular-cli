@@ -39,11 +39,27 @@ export interface BuilderHarnessExecutionOptions {
   useNativeFileWatching: boolean;
 }
 
+/**
+ * The default set of fields provided to all builders executed via the BuilderHarness.
+ * `root` and `sourceRoot` are required for most Angular builders to function.
+ * `cli.cache.enabled` set to false provides improved test isolation guarantees by disabling
+ * the Webpack caching.
+ */
+const DEFAULT_PROJECT_METADATA = {
+  root: '.',
+  sourceRoot: 'src',
+  cli: {
+    cache: {
+      enabled: false,
+    },
+  },
+};
+
 export class BuilderHarness<T> {
   private readonly builderInfo: BuilderInfo;
   private schemaRegistry = new json.schema.CoreSchemaRegistry();
   private projectName = 'test';
-  private projectMetadata: Record<string, unknown> = { root: '.', sourceRoot: 'src' };
+  private projectMetadata: Record<string, unknown> = DEFAULT_PROJECT_METADATA;
   private targetName?: string;
   private options = new Map<string | null, T>();
   private builderTargets = new Map<
@@ -365,7 +381,7 @@ class HarnessBuilderContext implements BuilderContext {
 
   get analytics(): analytics.Analytics {
     // Can be undefined even though interface does not allow it
-    return (undefined as unknown) as analytics.Analytics;
+    return undefined as unknown as analytics.Analytics;
   }
 
   addTeardown(teardown: () => Promise<void> | void): void {
@@ -447,7 +463,7 @@ class HarnessBuilderContext implements BuilderContext {
     options: json.JsonObject,
     builderName: string,
   ): Promise<T> {
-    return (this.contextHost.validate(options, builderName) as unknown) as T;
+    return this.contextHost.validate(options, builderName) as unknown as T;
   }
 
   // Unused report methods
