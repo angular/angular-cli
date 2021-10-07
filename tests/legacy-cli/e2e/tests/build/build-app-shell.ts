@@ -6,17 +6,18 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 
-export default function() {
+export default function () {
   let platformServerVersion = readNgVersion();
 
   if (getGlobalVariable('argv')['ng-snapshots']) {
-    platformServerVersion = require('../../ng-snapshot/package.json')
-      .dependencies['@angular/platform-server'];
+    platformServerVersion = require('../../ng-snapshot/package.json').dependencies[
+      '@angular/platform-server'
+    ];
   }
 
   return Promise.resolve()
     .then(() =>
-      updateJsonFile('angular.json', workspaceJson => {
+      updateJsonFile('angular.json', (workspaceJson) => {
         const appArchitect = workspaceJson.projects['test-project'].architect;
         appArchitect['server'] = {
           builder: '@angular-devkit/build-angular:server',
@@ -74,7 +75,7 @@ export default function() {
       }
 
       export { AppServerModule } from './app/app.server.module';
-      export { renderModule, renderModuleFactory } from '@angular/platform-server';
+      export { renderModule } from '@angular/platform-server';
     `,
       ),
     )
@@ -157,7 +158,7 @@ export default function() {
       ),
     )
     .then(() =>
-      updateJsonFile('package.json', packageJson => {
+      updateJsonFile('package.json', (packageJson) => {
         const dependencies = packageJson['dependencies'];
         dependencies['@angular/platform-server'] = platformServerVersion;
       }).then(() => installWorkspacePackages()),
