@@ -4,6 +4,8 @@
 
 ```ts
 
+/// <reference types="node" />
+
 import { ErrorObject } from 'ajv';
 import { Format } from 'ajv';
 import { Observable } from 'rxjs';

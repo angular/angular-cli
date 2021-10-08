@@ -4,6 +4,8 @@
 
 ```ts
 
+/// <reference types="node" />
+
 // @public (undocumented)
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
     constructor(workingDirectory?: string);

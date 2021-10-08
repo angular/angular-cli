@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { FSWatcher as ChokidarWatcher } from 'chokidar';
 import fs, {
   PathLike,
   Stats,
@@ -20,7 +21,7 @@ import fs, {
   unlinkSync,
   writeFileSync,
 } from 'fs';
-import { dirname as pathDirname, join as pathJoin } from 'path';
+import { dirname as pathDirname } from 'path';
 import { Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
 import { concatMap, map, mergeMap, publish, refCount } from 'rxjs/operators';
 import {
@@ -33,18 +34,6 @@ import {
   normalize,
   virtualFs,
 } from '../src';
-
-interface ChokidarWatcher {
-  // eslint-disable-next-line @typescript-eslint/no-misused-new
-  new (options: {}): ChokidarWatcher;
-
-  add(path: string): ChokidarWatcher;
-  on(type: 'change', cb: (path: string) => void): ChokidarWatcher;
-  on(type: 'add', cb: (path: string) => void): ChokidarWatcher;
-  on(type: 'unlink', cb: (path: string) => void): ChokidarWatcher;
-
-  close(): void;
-}
 
 async function exists(path: PathLike): Promise<boolean> {
   try {
@@ -59,7 +48,7 @@ async function exists(path: PathLike): Promise<boolean> {
 // This will only be initialized if the watch() method is called.
 // Otherwise chokidar appears only in type positions, and shouldn't be referenced
 // in the JavaScript output.
-let FSWatcher: ChokidarWatcher;
+let FSWatcher: typeof ChokidarWatcher;
 function loadFSWatcher() {
   if (!FSWatcher) {
     try {
@@ -161,7 +150,8 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>((obs) => {
       loadFSWatcher();
-      const watcher = new FSWatcher({ persistent: true }).add(getSystemPath(path));
+      const watcher = new FSWatcher({ persistent: true });
+      watcher.add(getSystemPath(path));
 
       watcher
         .on('change', (path) => {
@@ -308,9 +298,9 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
     _options?: virtualFs.HostWatchOptions,
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>((obs) => {
-      const opts = { persistent: false };
       loadFSWatcher();
-      const watcher = new FSWatcher(opts).add(getSystemPath(path));
+      const watcher = new FSWatcher({ persistent: false });
+      watcher.add(getSystemPath(path));
 
       watcher
         .on('change', (path) => {
