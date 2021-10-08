@@ -59,7 +59,7 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.57.1",
+    "**/@types/copy-webpack-plugin/webpack": "5.58.0",
     "ajv-formats/ajv": "8.6.3"
   },
   "devDependencies": {
@@ -88,7 +88,7 @@
     "@babel/runtime": "7.15.4",
     "@babel/template": "7.15.4",
     "@bazel/bazelisk": "1.10.1",
-    "@bazel/buildifier": "4.2.1",
+    "@bazel/buildifier": "4.2.2",
     "@bazel/jasmine": "4.3.0",
     "@bazel/typescript": "4.3.0",
     "@discoveryjs/json-ext": "0.5.5",
@@ -173,12 +173,12 @@
     "license-webpack-plugin": "3.0.0",
     "loader-utils": "2.0.0",
     "magic-string": "0.25.7",
-    "mini-css-extract-plugin": "2.4.1",
+    "mini-css-extract-plugin": "2.4.2",
     "minimatch": "3.0.4",
     "minimist": "^1.2.0",
-    "ng-packagr": "13.0.0-next.6",
+    "ng-packagr": "13.0.0-next.8",
     "node-fetch": "^2.2.0",
-    "open": "8.2.1",
+    "open": "8.3.0",
     "ora": "5.4.1",
     "pacote": "12.0.0",
     "parse5-html-rewriting-stream": "6.0.1",
@@ -219,7 +219,7 @@
     "typescript": "4.4.3",
     "verdaccio": "5.1.6",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.57.1",
+    "webpack": "5.58.0",
     "webpack-dev-middleware": "5.2.1",
     "webpack-dev-server": "4.3.1",
     "webpack-merge": "5.8.0",
