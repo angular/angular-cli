@@ -1236,7 +1236,12 @@
   resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.10.1.tgz#46236a43ad58e310c55247f866da0dc6083c3d8b"
   integrity sha512-IHszNzBO2UrUy6YtsSAsZtnU6I6qpzXGkWdEvGoMxLgJnDsEnsIYniDCUjvjU1KAP+A03eepmCHlyFcRHMSxRA==
 
-"@bazel/buildifier@4.2.1", "@bazel/buildifier@^4.0.1":
+"@bazel/buildifier@4.2.2":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.2.2.tgz#cdc0b560dc68368bc5d1e82377cf0abc7ba66a85"
+  integrity sha512-BGgd3vv+JiAAIPKzMp0avB0v3HwqokFN6sd60F19spaK0XstLP7IZrUcPGaRS+oKcYzYSQ6MGKVNqkP3161ipg==
+
+"@bazel/buildifier@^4.0.1":
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.2.1.tgz#2ea4c0d5015a1f36174a139e8953c4eec509564e"
   integrity sha512-eMBw//leW3xIbDrylsFKC7ejOMKAja2Z3BmQ5Zan/h7s/C+F2cMz3UFJhSVZRl4AaN3bXVvTNMz385abaTK/tA==
