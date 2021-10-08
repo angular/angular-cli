@@ -15,6 +15,14 @@
     "rxjs": "6.6.7",
     "source-map": "0.7.3"
   },
+  "peerDependencies": {
+    "chokidar": "^3.5.2"
+  },
+  "peerDependenciesMeta": {
+    "chokidar": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "seedrandom": "^3.0.0"
   }
