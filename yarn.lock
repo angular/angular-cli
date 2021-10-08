@@ -114,7 +114,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#cd75435cf69814d7a44c4b22ee24361a8513a730":
   version "0.0.0"
-  uid cd75435cf69814d7a44c4b22ee24361a8513a730
   resolved "https://github.com/angular/dev-infra-private-builds.git#cd75435cf69814d7a44c4b22ee24361a8513a730"
   dependencies:
     "@actions/core" "^1.4.0"
@@ -3389,7 +3388,7 @@ chardet@^0.7.0:
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.7.0.tgz#90094849f0937f2eedc2425d0d28a9e5f0cbad9e"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
-"chokidar@>=3.0.0 <4.0.0", chokidar@^3.0.0, chokidar@^3.5.1:
+"chokidar@>=3.0.0 <4.0.0", chokidar@^3.0.0, chokidar@^3.5.1, chokidar@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.2.tgz#dba3976fcadb016f66fd365021d91600d01c1e75"
   integrity sha512-ekGhOnNVPgT77r4K/U3GDhu+FQ2S8TnK/s2KbIGXi0SZWuwkZ2QNyfWdZW+TVfn84DpEP7rLeCt2UI6bJ8GwbQ==
