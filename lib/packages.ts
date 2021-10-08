@@ -86,7 +86,7 @@ function loadPackageJson(p: string) {
       case 'engines':
         pkg['engines'] = {
           'node': '^12.14.1 || >=14.0.0',
-          'npm': '^6.11.0 || ^7.5.6',
+          'npm': '^6.11.0 || ^7.5.6 || >=8.0.0',
           'yarn': '>= 1.13.0',
         };
         break;
