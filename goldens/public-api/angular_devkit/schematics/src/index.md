@@ -4,6 +4,8 @@
 
 ```ts
 
+/// <reference types="node" />
+
 import { analytics } from '@angular-devkit/core';
 import { BaseException } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
