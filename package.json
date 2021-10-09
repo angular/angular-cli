@@ -47,7 +47,7 @@
     "@angular/compiler": "13.0.0-next.15",
     "@angular/compiler-cli": "13.0.0-next.15",
     "@angular/core": "13.0.0-next.15",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#cd75435cf69814d7a44c4b22ee24361a8513a730",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#a9c20b73ffe183e4be891660b0a6b4f551296d41",
     "@angular/platform-browser": "13.0.0-next.15",
     "@angular/platform-browser-dynamic": "13.0.0-next.15",
     "@angular/platform-server": "13.0.0-next.15",
