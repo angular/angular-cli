@@ -238,8 +238,15 @@ export class UpdateBuffer extends UpdateBufferBase {
   }
 
   protected _slice(start: number): [Chunk, Chunk] {
-    // If start is longer than the content, use start, otherwise determine exact position in string.
-    const index = start >= this._originalContent.length ? start : this._getTextPosition(start);
+    let index: number;
+
+    if (start >= this._originalContent.length) {
+      index = start;
+    } else if (start < 0) {
+      index = this._originalContent.length + start;
+    } else {
+      index = this._getTextPosition(start);
+    }
 
     this._assertIndex(index);
 
@@ -294,8 +301,11 @@ export class UpdateBuffer extends UpdateBufferBase {
   }
 
   remove(index: number, length: number) {
-    const end = index + length;
+    if (length === 0) {
+      return;
+    }
 
+    const end = index + length;
     const first = this._slice(index)[1];
     const last = this._slice(end)[1];
 
