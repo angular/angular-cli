@@ -178,6 +178,26 @@ describe('UpdateBuffer', () => {
       buffer.remove(0, 6);
       expect(buffer.toString()).toBe('ABC');
     });
+
+    it('is able to insert after a zero-length removal', () => {
+      const mb = new UpdateBuffer(Buffer.from('123'));
+
+      mb.remove(0, 0);
+      expect(mb.toString()).toBe('123');
+
+      mb.insertRight(0, Buffer.from('0'));
+      expect(mb.toString()).toBe('0123');
+    });
+
+    it('is able to insert after a negative-length removal', () => {
+      const mb = new UpdateBuffer(Buffer.from('123'));
+
+      mb.remove(0, -1);
+      expect(mb.toString()).toBe('3');
+
+      mb.insertRight(0, Buffer.from('0'));
+      expect(mb.toString()).toBe('03');
+    });
   });
 
   describe('generate', () => {
@@ -354,6 +374,26 @@ describe('UpdateBuffer2', () => {
       buffer.insertRight(6, Buffer.from('DEF'));
       buffer.remove(0, 6);
       expect(buffer.toString()).toBe('ABCDEF');
+    });
+
+    it('is able to insert after a zero-length removal', () => {
+      const mb = new UpdateBuffer2(Buffer.from('123'));
+
+      mb.remove(0, 0);
+      expect(mb.toString()).toBe('123');
+
+      mb.insertRight(0, Buffer.from('0'));
+      expect(mb.toString()).toBe('0123');
+    });
+
+    it('is able to insert after a negative-length removal', () => {
+      const mb = new UpdateBuffer2(Buffer.from('123'));
+
+      mb.remove(0, -1);
+      expect(mb.toString()).toBe('3');
+
+      mb.insertRight(0, Buffer.from('0'));
+      expect(mb.toString()).toBe('03');
     });
   });
 
