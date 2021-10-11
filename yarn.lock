@@ -58,12 +58,12 @@
     "@angular/core" "^10.0.0-0 || ^11.0.0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@13.0.0-next.7":
-  version "13.0.0-next.7"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-13.0.0-next.7.tgz#50b25922dc0bb2c821602d5d5ccd894fe6af6e29"
-  integrity sha512-FTpGwe/s+Q4T4NouWuZ0uoPjzBra2y3yzuetBiRWdgr7ireNjDn1qDKaGVs0hduaNkb1WAhXroJomUmITM4yNQ==
+"@angular/cdk@13.0.0-next.8":
+  version "13.0.0-next.8"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-13.0.0-next.8.tgz#22db245e75c20bc3cf051447b288ea73934cb034"
+  integrity sha512-uizcCH5sabZjAyhnKNEEL5TeBEQfGp4cjsC1kQtYKG89RKMtzAMlIWmkuwhIxfl+d52Izd+3jpq14J5QdguErw==
   dependencies:
-    tslib "^2.2.0"
+    tslib "^2.3.0"
   optionalDependencies:
     parse5 "^5.0.0"
 
@@ -112,9 +112,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#cd75435cf69814d7a44c4b22ee24361a8513a730":
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a9c20b73ffe183e4be891660b0a6b4f551296d41":
   version "0.0.0"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#cd75435cf69814d7a44c4b22ee24361a8513a730"
+  uid a9c20b73ffe183e4be891660b0a6b4f551296d41
+  resolved "https://github.com/angular/dev-infra-private-builds.git#a9c20b73ffe183e4be891660b0a6b4f551296d41"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -183,12 +184,12 @@
     glob "7.2.0"
     yargs "^17.2.1"
 
-"@angular/material@13.0.0-next.7":
-  version "13.0.0-next.7"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-13.0.0-next.7.tgz#2a787449f9bc118f595094490cd9511e818aa0c3"
-  integrity sha512-dhZAVZ2xoJqrMU0YyRj+j7yZdTY1Y0PYacwFhHoSDT4POHwlkv8wws/CV3ta1fiY7F+Ljj8UV1htOMO2mnnIHw==
+"@angular/material@13.0.0-next.8":
+  version "13.0.0-next.8"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-13.0.0-next.8.tgz#fbf48aae4684d41555368f5a7b5a54819217b93c"
+  integrity sha512-rP9n2zw3bpQhvCLvf5M6ziW/1d06zDsFDhQDn40pH8r6PoTm5DevrrKdQ05L3eTog28ADEVv9BrhyeaEiTUJtw==
   dependencies:
-    tslib "^2.2.0"
+    tslib "^2.3.0"
 
 "@angular/platform-browser-dynamic@13.0.0-next.15":
   version "13.0.0-next.15"
@@ -10169,7 +10170,7 @@ tslib@2.3.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.0.tgz#803b8cdab3e12ba581a4ca41c8839bbb0dacb09e"
   integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
 
-tslib@2.3.1, tslib@^2.0.0, tslib@^2.2.0, tslib@^2.3.0:
+tslib@2.3.1, tslib@^2.0.0, tslib@^2.3.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
