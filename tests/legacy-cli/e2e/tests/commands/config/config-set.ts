@@ -15,13 +15,25 @@ export default async function () {
     throw new Error(`Expected "yarn", received "${JSON.stringify(stdout2)}".`);
   }
 
+  // Set config as object literal
   await ng('config', 'schematics', '{"@schematics/angular:component":{"style": "scss"}}');
   const { stdout: stdout3 } = await ng('config', 'schematics.@schematics/angular:component.style');
   if (!stdout3.includes('scss')) {
     throw new Error(`Expected "scss", received "${JSON.stringify(stdout3)}".`);
   }
 
+  // Remove config when setting value to undefined.
   await ng('config', 'schematics');
   await ng('config', 'schematics', 'undefined');
   await expectToFail(() => ng('config', 'schematics'));
+
+  // Remove config when setting value to empty string.
+  await ng('config', 'cli.analyticsSharing.uuid', 'foo-bar');
+  const { stdout: stdout4 } = await ng('config', 'cli.analyticsSharing.uuid');
+  if (!stdout4.includes('foo-bar')) {
+    throw new Error(`Expected "foo-bar", received "${JSON.stringify(stdout3)}".`);
+  }
+
+  await ng('config', 'cli.analyticsSharing.uuid', '');
+  await expectToFail(() => ng('config', 'cli.analyticsSharing.uuid'));
 }

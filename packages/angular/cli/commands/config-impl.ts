@@ -24,7 +24,7 @@ const validCliPaths = new Map<
   ['cli.analytics', undefined],
 
   ['cli.analyticsSharing.tracking', undefined],
-  ['cli.analyticsSharing.uuid', (v) => (v ? `${v}` : uuidV4())],
+  ['cli.analyticsSharing.uuid', (v) => (v == undefined ? uuidV4() : `${v}`)],
 
   ['cli.cache.enabled', undefined],
   ['cli.cache.environment', undefined],
@@ -77,6 +77,7 @@ function normalizeValue(value: string | undefined | boolean | number): JsonValue
     case 'null':
       return null;
     case 'undefined':
+    case '':
       return undefined;
   }
 
