@@ -69,7 +69,7 @@
             "tracking": {
               "description": "Analytics sharing info tracking ID.",
               "type": "string",
-              "pattern": "^GA-\\d+-\\d+$"
+              "pattern": "^(GA|UA)?-\\d+-\\d+$"
             },
             "uuid": {
               "description": "Analytics sharing info universally unique identifier.",
