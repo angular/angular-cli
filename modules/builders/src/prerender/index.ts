@@ -17,13 +17,13 @@ import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/n
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
 import { normalize, resolve as resolvePath } from '@angular-devkit/core';
 import * as fs from 'fs';
-import { Worker as JestWorker } from 'jest-worker';
 import ora from 'ora';
 import * as path from 'path';
+import Piscina from 'piscina';
 import { promisify } from 'util';
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getIndexOutputFile, getRoutes } from './utils';
-import { RenderResult, WorkerSetupArgs } from './worker';
+import { RenderOptions, RenderResult } from './worker';
 
 export const readFile = promisify(fs.readFile);
 
@@ -103,23 +103,13 @@ async function _renderUniversal(
   );
 
   const { baseOutputPath = '' } = serverResult;
-
-  const workerArgs: WorkerSetupArgs = {
-    indexFile,
-    deployUrl: browserOptions.deployUrl || '',
-    inlineCriticalCss: !!normalizedStylesOptimization.inlineCritical,
-    minifyCss: !!normalizedStylesOptimization.minify,
-  };
-  const worker = new JestWorker(path.join(__dirname, 'worker.js'), {
-    exposedMethods: ['render'],
-    enableWorkerThreads: true,
-    numWorkers: numProcesses,
-    setupArgs: [workerArgs],
+  const worker = new Piscina({
+    filename: path.join(__dirname, 'worker.js'),
+    name: 'render',
+    maxThreads: numProcesses,
   });
-  try {
-    worker.getStdout().pipe(process.stdout);
-    worker.getStderr().pipe(process.stderr);
 
+  try {
     // We need to render the routes for each locale from the browser output.
     for (const outputPath of browserResult.outputPaths) {
       const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
@@ -129,9 +119,22 @@ async function _renderUniversal(
       }
 
       const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
+
       try {
         const results = (await Promise.all(
-          routes.map((route) => (worker as any).render(outputPath, serverBundlePath, route)),
+          routes.map((route) => {
+            const options: RenderOptions = {
+              indexFile,
+              deployUrl: browserOptions.deployUrl || '',
+              inlineCriticalCss: !!normalizedStylesOptimization.inlineCritical,
+              minifyCss: !!normalizedStylesOptimization.minify,
+              outputPath,
+              route,
+              serverBundlePath,
+            };
+
+            return worker.run(options, { name: 'render' });
+          }),
         )) as RenderResult[];
         let numErrors = 0;
         for (const { errors, warnings } of results) {
@@ -170,9 +173,7 @@ async function _renderUniversal(
       }
     }
   } finally {
-    // const _ = is a workaround to disable tsetse must use promises rule.
-    // tslint:disable-next-line: no-floating-promises
-    const _ = worker.end();
+    void worker.destroy();
   }
 
   return browserResult;

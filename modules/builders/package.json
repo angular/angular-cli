@@ -35,8 +35,8 @@
     "express": "^4.17.1",
     "guess-parser": "^0.4.12",
     "http-proxy-middleware": "^2.0.0",
-    "jest-worker": "27.2.4",
     "ora": "^5.1.0",
+    "piscina": "~3.1.0",
     "rxjs": "RXJS_VERSION",
     "tree-kill": "^1.2.2"
   }

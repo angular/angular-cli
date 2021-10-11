@@ -10,34 +10,34 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { loadEsmModule } from '../utils/utils';
 
-export interface WorkerSetupArgs {
+export interface RenderOptions {
   indexFile: string;
   deployUrl: string;
   inlineCriticalCss: boolean;
   minifyCss: boolean;
+  outputPath: string;
+  serverBundlePath: string;
+  route: string;
 }
-
 export interface RenderResult {
   errors?: string[];
   warnings?: string[];
 }
 
-let workerArgs: WorkerSetupArgs;
-
-export function setup(options: WorkerSetupArgs): void {
-  workerArgs = options;
-}
-
 /**
  * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
  */
-export async function render(
-  outputPath: string,
-  serverBundlePath: string,
-  route: string,
-): Promise<RenderResult> {
+export async function render({
+  indexFile,
+  deployUrl,
+  minifyCss,
+  outputPath,
+  serverBundlePath,
+  route,
+  inlineCriticalCss,
+}: RenderOptions): Promise<RenderResult> {
   const result = {} as RenderResult;
-  const browserIndexOutputPath = path.join(outputPath, workerArgs.indexFile);
+  const browserIndexOutputPath = path.join(outputPath, indexFile);
   const outputFolderPath = path.join(outputPath, route);
   const outputIndexPath = path.join(outputFolderPath, 'index.html');
 
@@ -45,14 +45,14 @@ export async function render(
 
   const indexBaseName = fs.existsSync(path.join(outputPath, 'index.original.html'))
     ? 'index.original.html'
-    : workerArgs.indexFile;
+    : indexFile;
   const browserIndexInputPath = path.join(outputPath, indexBaseName);
   let indexHtml = await fs.promises.readFile(browserIndexInputPath, 'utf8');
   indexHtml = indexHtml.replace(
     '</html>',
     '<!-- This page was prerendered with Angular Universal -->\n</html>',
   );
-  if (workerArgs.inlineCriticalCss) {
+  if (inlineCriticalCss) {
     // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
     indexHtml = indexHtml.replace(
       / media="print" onload="this\.media='all'"><noscript><link .+?><\/noscript>/g,
@@ -65,14 +65,14 @@ export async function render(
     url: route,
   });
 
-  if (workerArgs.inlineCriticalCss) {
+  if (inlineCriticalCss) {
     const { ɵInlineCriticalCssProcessor: InlineCriticalCssProcessor } = await loadEsmModule<
       typeof import('@nguniversal/common/tools')
     >('@nguniversal/common/tools');
 
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-      deployUrl: workerArgs.deployUrl,
-      minify: workerArgs.minifyCss,
+      deployUrl: deployUrl,
+      minify: minifyCss,
     });
 
     const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {

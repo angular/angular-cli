@@ -10,30 +10,26 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { loadEsmModule } from '../utils/utils';
 
-export interface WorkerSetupArgs {
+export interface RenderOptions {
   inlineCriticalCss?: boolean;
-}
-
-let sharedOptions: WorkerSetupArgs;
-
-export function setup(options: WorkerSetupArgs): void {
-  sharedOptions = options;
-}
-
-export async function render(options: {
   outputPath: string;
   route: string;
   port: number;
-}): Promise<void> {
-  const { outputPath, route, port } = options;
+}
 
+export async function render({
+  inlineCriticalCss,
+  outputPath,
+  route,
+  port,
+}: RenderOptions): Promise<void> {
   const { Engine } = await loadEsmModule<typeof import('@nguniversal/common/clover/server')>(
     '@nguniversal/common/clover/server',
   );
 
   const html = await new Engine().render({
     publicPath: outputPath,
-    inlineCriticalCss: sharedOptions.inlineCriticalCss,
+    inlineCriticalCss: inlineCriticalCss,
     url: `http://localhost:${port}/${route}`,
   });
 
