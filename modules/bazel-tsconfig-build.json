@@ -20,7 +20,14 @@
     "lib": ["es2018", "dom"],
     "skipLibCheck": true,
     "types": ["tslib", "node"],
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "plugins": [
+      {
+        "name": "@bazel/tsetse",
+        // must-use-promises is handled by the eslint @typescript-eslint/no-floating-promises rule
+        "disabledRules": ["must-use-promises"]
+      }
+    ]
   },
   "bazelOptions": {
     "suppressTsconfigOverrideWarnings": true
