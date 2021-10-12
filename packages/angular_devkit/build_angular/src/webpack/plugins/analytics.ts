@@ -81,7 +81,7 @@ export class NgBuildAnalyticsPlugin {
     protected _projectRoot: string,
     protected _analytics: analytics.Analytics,
     protected _category: string,
-    private _isIvy: boolean,
+    private aotEnabled: boolean,
   ) {}
 
   protected _reset() {
@@ -115,7 +115,7 @@ export class NgBuildAnalyticsPlugin {
       dimensions[analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
     }
 
-    dimensions[analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._isIvy;
+    dimensions[analytics.NgCliAnalyticsDimensions.AotEnabled] = this.aotEnabled;
 
     return dimensions;
   }

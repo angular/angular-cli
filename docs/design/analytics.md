@@ -51,7 +51,7 @@ Note: There's a limit of 20 custom dimensions.
 | 5 | `Flag: --style` | `string` |
 | 6 | `--collection` | `string` |
 | 7 | `Flag: --strict` | `boolean` |
-| 8 | `Ivy Enabled` | `boolean` |
+| 8 | `AOT Enabled` | `boolean` |
 | 9 | `Flag: --inline-style` | `boolean` |
 | 10 | `Flag: --inline-template` | `boolean` |
 | 11 | `Flag: --view-encapsulation` | `string` |
