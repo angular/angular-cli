@@ -24,7 +24,7 @@ const validCliPaths = new Map<
   ['cli.analytics', undefined],
 
   ['cli.analyticsSharing.tracking', undefined],
-  ['cli.analyticsSharing.uuid', (v) => (v ? `${v}` : uuidV4())],
+  ['cli.analyticsSharing.uuid', (v) => (v === '' ? uuidV4() : `${v}`)],
 
   ['cli.cache.enabled', undefined],
   ['cli.cache.environment', undefined],
@@ -84,7 +84,15 @@ function normalizeValue(value: string | undefined | boolean | number): JsonValue
     return +valueString;
   }
 
-  return parseJson(valueString) ?? value ?? undefined;
+  try {
+    // We use `JSON.parse` instead of `parseJson` because the latter will parse UUIDs
+    // and convert them into a numberic entities.
+    // Example: 73b61974-182c-48e4-b4c6-30ddf08c5c98 -> 73.
+    // These values should never contain comments, therefore using `JSON.parse` is safe.
+    return JSON.parse(valueString);
+  } catch {
+    return value;
+  }
 }
 
 export class ConfigCommand extends Command<ConfigCommandSchema> {
