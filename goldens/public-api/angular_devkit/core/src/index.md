@@ -1074,6 +1074,8 @@ class MultiAnalytics implements Analytics {
 // @public
 enum NgCliAnalyticsDimensions {
     // (undocumented)
+    AotEnabled = 8,
+    // (undocumented)
     BuildErrors = 20,
     // (undocumented)
     CpuCount = 1,
@@ -1081,8 +1083,6 @@ enum NgCliAnalyticsDimensions {
     CpuSpeed = 2,
     // (undocumented)
     NgAddCollection = 6,
-    // (undocumented)
-    NgIvyEnabled = 8,
     // (undocumented)
     NodeVersion = 4,
     // (undocumented)
