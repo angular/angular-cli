@@ -24,4 +24,17 @@ export default async function () {
   await ng('config', 'schematics');
   await ng('config', 'schematics', 'undefined');
   await expectToFail(() => ng('config', 'schematics'));
+
+  /**
+   * `ng config cli.analyticsSharing.uuid ""` should generate new random user ID.
+   * @see: https://angular.io/cli/usage-analytics-gathering#per-user-tracking
+   */
+  await ng('config', 'cli.analyticsSharing.uuid', '');
+  const { stdout: stdout4 } = await ng('config', 'cli.analyticsSharing.uuid');
+  console.log(stdout4);
+  if (!/(?:urn:uuid:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/i.test(stdout4)) {
+    throw new Error(
+      `Expected "cli.analyticsSharing.uuid" to be a UUID, received "${JSON.stringify(stdout4)}".`,
+    );
+  }
 }
