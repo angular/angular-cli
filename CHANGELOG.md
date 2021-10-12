@@ -12,6 +12,8 @@
 
 Doug Parker, Javier Infante and ikeq
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.1.0"></a>
 
 # 12.1.0 (2021-06-26)
