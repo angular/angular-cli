@@ -14,8 +14,8 @@
 # **NOTE 1**: Pin to exact images using an ID (SHA). See https://circleci.com/docs/2.0/circleci-images/#using-a-docker-image-id-to-pin-an-image-to-a-fixed-version.
 #             (Using the tag in not necessary when pinning by ID, but include it anyway for documentation purposes.)
 # **NOTE 2**: If you change the version of the docker images, also change the `cache_key` suffix.
-var_1: &docker_image cimg/node:14.15.0
-var_2: &cache_key angular_universal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-14.15.0
+var_1: &docker_image cimg/node:14.17
+var_2: &cache_key angular_universal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-14.17
 
 # Workspace initially persisted by the `setup` job.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
