@@ -86,7 +86,6 @@
     "http-proxy-middleware": "^2.0.0",
     "jasmine": "^3.6.0",
     "jasmine-core": "^3.6.0",
-    "jest-worker": "27.2.4",
     "jsdom": "18.0.0",
     "minimatch": "^3.0.4",
     "node-fetch": "^2.6.1",
