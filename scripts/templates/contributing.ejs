@@ -246,12 +246,32 @@ Just as in the **subject**, use the imperative, present tense: "change" not "cha
 The body should include the motivation for the change and contrast this with previous behavior.
 
 ### Footer
-The footer should contain any information about **Breaking Changes** and is also the place to
-reference GitHub issues that this commit **Closes**.
+The footer can contain information about breaking changes and deprecations. It is also the place to reference GitHub issues, Jira tickets, and other PRs that are related to this commit or that this commit will close.
+For example:
 
-**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
+```
+BREAKING CHANGE: <breaking change summary>
+<BLANK LINE>
+<breaking change description + migration instructions>
+<BLANK LINE>
+<BLANK LINE>
+Fixes #<issue number>
+```
 
-A detailed explanation can be found in this [document][commit-message-format].
+or
+
+```
+DEPRECATED: <what is deprecated>
+<BLANK LINE>
+<deprecation description + recommended update path>
+<BLANK LINE>
+<BLANK LINE>
+Closes #<pr number>
+```
+
+Breaking Change section should start with the phrase "BREAKING CHANGE: " followed by a summary of the breaking change, a blank line, and a detailed description of the breaking change that also includes migration instructions.
+
+Similarly, a Deprecation section should start with "DEPRECATED: " followed by a short description of what is deprecated, a blank line, and a detailed description of the deprecation that also mentions the recommended update path.
 
 ## <a name="cla"></a> Signing the CLA
 
