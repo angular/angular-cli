@@ -248,6 +248,8 @@ Alan Agius, Charles Lyding, Doug Parker and Paul Gschwendtner
 
 Alan Agius and Charles Lyding
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.7"></a>
 
 # 12.2.7 (2021-09-22)
@@ -285,6 +287,8 @@ Alan Agius and Charles Lyding
 
 Alan Agius, Charles Lyding and Joey Perrott
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.6"></a>
 
 # 12.2.6 (2021-09-15)
@@ -305,6 +309,8 @@ Alan Agius, Charles Lyding and Joey Perrott
 
 Alan Agius
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-next.4"></a>
 
 # 13.0.0-next.4 (2021-09-08)
@@ -318,6 +324,8 @@ Alan Agius
 ## Special Thanks
 
 Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="12.2.5"></a>
 
@@ -333,6 +341,8 @@ Alan Agius, Charles Lyding and Doug Parker
 ## Special Thanks:
 
 Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="13.0.0-next.3"></a>
 
@@ -383,6 +393,8 @@ Note: this change only affects users depending on `@angular-devkit/build-webpack
 
 Alan Agius and Joey Perrott
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.4"></a>
 
 # 12.2.4 (2021-09-01)
@@ -397,6 +409,8 @@ Alan Agius and Joey Perrott
 ## Special Thanks
 
 Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="13.0.0-next.2"></a>
 
@@ -424,6 +438,8 @@ Alan Agius
 
 Alan Agius, Charles Lyding, Doug Parker, Lukas Spirig and Trevor Karjanis
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.3"></a>
 
 # 12.2.3 (2021-08-26)
@@ -437,6 +453,8 @@ Alan Agius, Charles Lyding, Doug Parker, Lukas Spirig and Trevor Karjanis
 ## Special Thanks:
 
 Alan Agius and Trevor Karjanis
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="13.0.0-next.1"></a>
 
@@ -459,6 +477,8 @@ The deprecated JSON parser has been removed from public API. [jsonc-parser](http
 
 Alan Agius, Charles Lyding, Douglas Parker, Joey Perrott and Simon Primetzhofer
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.2"></a>
 
 # 12.2.2 (2021-08-18)
@@ -480,6 +500,8 @@ Alan Agius, Charles Lyding, Douglas Parker, Joey Perrott and Simon Primetzhofer
 ## Special Thanks:
 
 Alan Agius, Charles Lyding, Joey Perrott and Simon Primetzhofer
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="13.0.0-next.0"></a>
 
@@ -612,6 +634,8 @@ With this change we remove the following deprecated APIs
 
 Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and originalfrostig
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.1"></a>
 
 # 12.2.1 (2021-08-11)
@@ -641,6 +665,8 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and originalfrostig
 ## Special Thanks:
 
 Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="12.2.0"></a>
 
@@ -715,6 +741,8 @@ Alan Agius and Charles Lyding
 Alan Agius, Charles Lyding, David Scourfield, Doug Parker, hien-pham, Joey Perrott, LeonEck, Mike
 Jancar, twerske, Vaibhav Singh and originalfrostig
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.0-rc.0"></a>
 
 # 12.2.0-rc.0 (2021-07-28)
@@ -740,6 +768,8 @@ Jancar, twerske, Vaibhav Singh and originalfrostig
 ## Special Thanks:
 
 Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="12.1.4"></a>
 
@@ -773,6 +803,8 @@ Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
 
 Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.0-next.3"></a>
 
 # 12.2.0-next.3 (2021-07-21)
@@ -795,6 +827,8 @@ Alan Agius, Charles Lyding, Joey Perrott and originalfrostig
 
 Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.1.3"></a>
 
 # 12.1.3 (2021-07-21)
@@ -816,6 +850,8 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 ## Special Thanks:
 
 Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="v12.2.0-next.2"></a>
 
@@ -1143,6 +1179,8 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
 Alan Agius, Charles Lyding, Joey Perrott
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.2"></a>
 
 # v12.1.2 (2021-07-14)
@@ -1422,6 +1460,8 @@ Alan Agius, Charles Lyding, Joey Perrott
 
 Alan Agius, Charles Lyding, Joey Perrott, Terence D. Honles
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.1"></a>
 
 # v12.1.1 (2021-07-01)
@@ -1591,6 +1631,9 @@ Alan Agius, Charles Lyding, Joey Perrott, Terence D. Honles
 # Special Thanks
 
 Alan Agius, Charles Lyding, Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.2.0-next.1"></a>
 
 # v12.2.0-next.1 (2021-07-01)
@@ -1777,6 +1820,9 @@ Alan Agius, Charles Lyding, Doug Parker
 # Special Thanks
 
 Alan Agius, Charles Lyding, Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.2.0-next.0"></a>
 
 # v12.2.0-next.0 (2021-06-24)
@@ -1928,6 +1974,9 @@ Alan Agius, Charles Lyding, Doug Parker
 # Special Thanks
 
 Alan Agius, Charles Lyding, Doug Parker, Vaibhav Singh, Joey Perrott, twerske, David Scourfield, hien-pham
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.0"></a>
 
 # v12.1.0 (2021-06-24)
@@ -2355,6 +2404,9 @@ Alan Agius, Charles Lyding, Doug Parker, Vaibhav Singh, Joey Perrott, twerske, D
 # Special Thanks
 
 Alan Agius, Charles Lyding, Doug Parker, Joey Perrott, Bjarki, Vaibhav Singh, twerske, David Scourfield, hien-pham, Alberto Calvo, Paul Gschwendtner, Keen Yee Liau
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.0-next.6"></a>
 
 # v12.1.0-next.6 (2021-06-17)
@@ -2514,6 +2566,9 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott, Bjarki, Vaibhav Singh, tw
 # Special Thanks
 
 Alan Agius, Joey Perrott, Alberto Calvo, Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.5"></a>
 
 # v12.0.5 (2021-06-17)
@@ -2602,6 +2657,8 @@ Alan Agius, Joey Perrott, Alberto Calvo, Charles Lyding
 # Special Thanks
 
 Alan Agius, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
 
 <a name="v12.1.0-next.5"></a>
 
@@ -2946,6 +3003,9 @@ Alan Agius, Joey Perrott
 # Special Thanks
 
 Charles Lyding, Alan Agius, Doug Parker, Santosh Mahto, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.4"></a>
 
 # v12.0.4 (2021-06-09)
@@ -3229,6 +3289,9 @@ Charles Lyding, Alan Agius, Doug Parker, Santosh Mahto, Joey Perrott
 # Special Thanks
 
 Alan Agius, Charles Lyding, Santosh Mahto, Joey Perrott, Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.3"></a>
 
 # v12.0.3 (2021-06-02)
@@ -3528,6 +3591,9 @@ Alan Agius, Charles Lyding, Santosh Mahto, Joey Perrott, Doug Parker
 # Special Thanks
 
 Alan Agius, Doug Parker, Charles Lyding, why520crazy
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.0-next.4"></a>
 
 # v12.1.0-next.4 (2021-06-02)
@@ -3810,6 +3876,9 @@ Alan Agius, Doug Parker, Charles Lyding, why520crazy
 # Special Thanks
 
 Alan Agius, Doug Parker, Charles Lyding, why520crazy
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.0-next.3"></a>
 
 # v12.1.0-next.3 (2021-05-26)
@@ -4107,6 +4176,9 @@ Alan Agius, Doug Parker, Charles Lyding, why520crazy
 # Special Thanks
 
 Alan Agius, Charles Lyding, Doug Parker, Bjarki, Hassan Sani, JoostK, George Kalpakas, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.2"></a>
 
 # v12.0.2 (2021-05-26)
@@ -4374,6 +4446,9 @@ Alan Agius, Charles Lyding, Doug Parker, Bjarki, Hassan Sani, JoostK, George Kal
 # Special Thanks
 
 Alan Agius, Charles Lyding, Doug Parker, Hassan Sani, JoostK, George Kalpakas, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.1"></a>
 
 # v12.0.1 (2021-05-19)
@@ -4745,6 +4820,8 @@ Alan Agius, Charles Lyding, Doug Parker, Hassan Sani, JoostK, George Kalpakas, J
 
 Alan Agius, Charles Lyding, Joey Perrott, Keen Yee Liau, Luca Vazzano, Pankaj Patil, Ryan Lester, Terence D. Honles, Alan Cohen
 
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.1.0-next.2"></a>
 
 # v12.1.0-next.2 (2021-05-19)
@@ -5102,6 +5179,9 @@ Alan Agius, Charles Lyding, Joey Perrott, Keen Yee Liau, Luca Vazzano, Pankaj Pa
 # Special Thanks
 
 Alan Agius, Charles Lyding, Joey Perrott, Keen Yee Liau, Luca Vazzano, Pankaj Patil, Ryan Lester, Alan Cohen, Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0"></a>
 
 # v12.0.0 (2021-05-12)
@@ -7126,6 +7206,9 @@ After
 # Special Thanks
 
 Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, Doug Parker, Cédric Exbrayat, Douglas Parker, George Kalpakas, Sam Bulatov, Joshua Chapman, Santosh Yadav, David Shevitz, Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-rc.3"></a>
 
 # v12.0.0-rc.3 (2021-05-10)
@@ -7210,6 +7293,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, Doug Parker, Cédric Ex
 # Special Thanks
 
 Alan Agius, Charles Lyding, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-rc.2"></a>
 
 # v12.0.0-rc.2 (2021-05-05)
@@ -7406,6 +7492,9 @@ Alan Agius, Charles Lyding, Joey Perrott
 # Special Thanks
 
 Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-rc.1"></a>
 
 # v12.0.0-rc.1 (2021-04-28)
@@ -7669,6 +7758,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 # Special Thanks
 
 Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua Chapman, Billy Lando, Santosh Yadav, mzocateli
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-rc.0"></a>
 
 # v12.0.0-rc.0 (2021-04-21)
@@ -8006,6 +8098,9 @@ A number of browser and server builder options have had their default values cha
 # Special Thanks
 
 Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, David Shevitz
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.9"></a>
 
 # v12.0.0-next.9 (2021-04-14)
@@ -8368,6 +8463,9 @@ new Worker(new URL('./app.worker', import.meta.url), ...)
 # Special Thanks
 
 Alan Agius, Charles Lyding, Keen Yee Liau, Doug Parker, Douglas Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.8"></a>
 
 # v12.0.0-next.8 (2021-04-07)
@@ -8484,6 +8582,9 @@ The deprecated `i18nFormat` option has been removed and the `format` option shou
 # Special Thanks
 
 Charles Lyding, Renovate Bot, Alan Agius, Doug Parker, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.7"></a>
 
 # v12.0.0-next.7 (2021-04-02)
@@ -8718,6 +8819,9 @@ the application may need to be updated to become Ivy compatible.
 # Special Thanks
 
 Charles Lyding, Alan Agius, Renovate Bot, George Kalpakas, Joey Perrott, Keen Yee Liau
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.6"></a>
 
 # v12.0.0-next.6 (2021-03-24)
@@ -8815,6 +8919,9 @@ Charles Lyding, Alan Agius, Renovate Bot, George Kalpakas, Joey Perrott, Keen Ye
 # Special Thanks
 
 Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.5"></a>
 
 # v12.0.0-next.5 (2021-03-18)
@@ -9258,6 +9365,9 @@ A `--skip-confirmation` option has been added to skip the prompt and directly in
 # Special Thanks
 
 Alan Agius, Charles Lyding, Renovate Bot, Doug Parker, Cédric Exbrayat, Kristiyan Kostadinov, Mouad Ennaciri, Omar Hasan
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.4"></a>
 
 # v12.0.0-next.4 (2021-03-10)
@@ -9549,6 +9659,9 @@ The following options which were used to support the above syntax were removed w
 # Special Thanks
 
 Alan Agius, Charles Lyding, Renovate Bot, Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.3"></a>
 
 # v12.0.0-next.3 (2021-03-03)
@@ -9651,6 +9764,9 @@ See: https://angular.io/guide/workspace-config#optimization-configuration
 # Special Thanks
 
 Renovate Bot, Charles Lyding, Alan Agius, Keen Yee Liau, Douglas Parker, twerske
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.2"></a>
 
 # v12.0.0-next.2 (2021-02-24)
@@ -9793,6 +9909,9 @@ Renovate Bot, Charles Lyding, Alan Agius, Keen Yee Liau, Douglas Parker, twerske
 # Special Thanks
 
 Renovate Bot, Charles Lyding, Alan Agius, Doug Parker, Joey Perrott, Jefiozie, George Kalpakas, Keen Yee Liau
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.1"></a>
 
 # v12.0.0-next.1 (2021-02-17)
@@ -10016,6 +10135,9 @@ Minimum supported `karma` version is `6.0.0`
 # Special Thanks
 
 Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau, Aravind V Nair
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="v12.0.0-next.0"></a>
 
 # v12.0.0-next.0 (2021-02-11)
