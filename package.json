@@ -122,7 +122,7 @@
     "@types/uuid": "^8.0.0",
     "@types/webpack-dev-server": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "4.33.0",
-    "@typescript-eslint/parser": "4.33.0",
+    "@typescript-eslint/parser": "5.0.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.6.3",
     "ajv-formats": "2.1.1",
