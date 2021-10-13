@@ -1,3 +1,47 @@
+<a name="13.0.0-rc.0"></a>
+
+# 13.0.0-rc.0 (2021-10-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [ded510594](https://github.com/angular/angular-cli/commit/ded51059423f3e2710baee344d337563fdbe396b) | fix  | accept `UA-00000-0` format in analytics `tracking` id           |
+| [d2a992274](https://github.com/angular/angular-cli/commit/d2a99227427c9a9a9384740f1676019aed179630) | fix  | add engine field support for npm 8 and higher                   |
+| [cf03daf9e](https://github.com/angular/angular-cli/commit/cf03daf9ef89e982550f0822004f664af4872e01) | fix  | generate new random user ID when passing empty string to `uuid` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [e58226ee9](https://github.com/angular/angular-cli/commit/e58226ee948ea88f27a81d50d71945b5c9c39ee3) | fix  | don't export `renderModuleFactory` from server file    |
+| [0ec0ad8a4](https://github.com/angular/angular-cli/commit/0ec0ad8a4dba4a778b368c5cd76ef13fb370b310) | fix  | remove `target` and `lib` options for library tsconfig |
+| [16e58a58c](https://github.com/angular/angular-cli/commit/16e58a58c05f5d661d46bfd53d5074e5775c48c6) | fix  | wrap bootstrapping code in an HMR compatible manner    |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [427a9ee97](https://github.com/angular/angular-cli/commit/427a9ee9738c0911caeaba5fb4b59d183ffe6244) | fix  | update workspace tsconfig lib es2020 |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [9874aff71](https://github.com/angular/angular-cli/commit/9874aff71ecb5f3baf6c1dcc489581d1dcb58491) | fix  | add missing option peer dependency on `chokidar` |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [bdd89ae84](https://github.com/angular/angular-cli/commit/bdd89ae84ad6919b670dde862de72f562c86d0c5) | fix  | handle zero or negative length removals in update buffer |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Joey Perrott and Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-next.9"></a>
 
 # 13.0.0-next.9 (2021-10-06)
