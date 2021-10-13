@@ -72,7 +72,7 @@
     "@types/jsdom": "^16.2.10",
     "@types/node": "12.12.37",
     "@typescript-eslint/eslint-plugin": "4.33.0",
-    "@typescript-eslint/parser": "4.33.0",
+    "@typescript-eslint/parser": "5.0.0",
     "browser-sync": "^2.26.7",
     "critters": "0.0.10",
     "domino": "^2.1.2",
