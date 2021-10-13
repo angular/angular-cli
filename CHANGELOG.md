@@ -1,3 +1,33 @@
+<a name="12.2.10"></a>
+
+# 12.2.10 (2021-10-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [73a47af80](https://github.com/angular/angular-cli/commit/73a47af80e15a4b9d5b97956458bacafb43138bd) | fix  | accept `UA-00000-0` format in analytics `tracking` id           |
+| [d2e24d396](https://github.com/angular/angular-cli/commit/d2e24d396551ff89d6178c8bdb56db30531e1bb0) | fix  | generate new random user ID when passing empty string to `uuid` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [f6ed31fdf](https://github.com/angular/angular-cli/commit/f6ed31fdf2fe0f2a73f09c39e82e4b6bd6ccc6a6) | fix  | wrap bootstrapping code in an HMR compatible manner |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [7b01a0004](https://github.com/angular/angular-cli/commit/7b01a000432810f09c7871a95c9d2e6e5f35af85) | fix  | enable custom `es2015` conditional exports                  |
+| [892567487](https://github.com/angular/angular-cli/commit/8925674870973ce58e4f5b911fd3768811248916) | fix  | improve fidelity and performance of babel loader sourcemaps |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.9"></a>
 
 # 12.2.9 (2021-10-06)
