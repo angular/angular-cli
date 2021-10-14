@@ -1,3 +1,33 @@
+<a name="13.0.0-rc.0"></a>
+
+# 13.0.0-rc.0 (2021-10-14)
+
+## Breaking Changes
+
+### @nguniversal/common
+
+- Inlining of critical CSS is no longer enable by default. Users already on Angular version 12 and have not opted-out from using this feature are encouraged to opt-in using the `inlineCriticalCss` option.
+
+The motivation behind this change is that the package used to parse the CSS has a number of defects which can lead to unactionable error messages when updating to Angular 13 from versions priors to 12. Such errors can be seen in the following issue https://github.com/angular/angular-cli/issues/20760.
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                  |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
+| [6ba411cd](https://github.com/angular/universal/commit/6ba411cd8c8c18d2f334d7182fee65402a118d42) | fix  | index.original.html should be used if exists |
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                              |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------------------- |
+| [357411dd](https://github.com/angular/universal/commit/357411ddb344c030455937f9b0c8ba62c4eafae4) | feat | disable critical CSS inlining by default                 |
+| [838e478e](https://github.com/angular/universal/commit/838e478e5421b918cd51f7bfbb7ba51be1cb7604) | feat | officially support Node.js v16                           |
+| [b94bcd11](https://github.com/angular/universal/commit/b94bcd118eb489abf9822ed49c1a725e8b1c8fb8) | fix  | inlineCriticalCssProcessor `outputPath` fallback to `''` |
+
+## Special Thanks
+
+Alan Agius, Doug Parker, Douglas Parker, Javier Infante and ikeq
+
 <a name="12.1.1"></a>
 
 # 12.1.1 (2021-09-30)
