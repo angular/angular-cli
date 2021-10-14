@@ -60,6 +60,7 @@
   },
   "resolutions": {
     "**/@types/copy-webpack-plugin/webpack": "5.58.2",
+    "**/@types/webpack-dev-server/webpack": "5.58.2",
     "ajv-formats/ajv": "8.6.3"
   },
   "devDependencies": {
