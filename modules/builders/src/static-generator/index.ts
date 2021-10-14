@@ -150,7 +150,6 @@ async function generateServiceWorker(
     const projectRoot = resolve(root, normalize((projectMetadata.root as string) ?? ''));
 
     await augmentAppWithServiceWorker(
-      root,
       projectRoot,
       normalize(outputPath),
       browserOptions.baseHref || '/',

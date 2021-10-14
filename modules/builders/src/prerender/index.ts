@@ -158,7 +158,6 @@ async function _renderUniversal(
         spinner.start('Generating service worker...');
         try {
           await augmentAppWithServiceWorker(
-            root,
             projectRoot,
             normalize(outputPath),
             browserOptions.baseHref || '/',
