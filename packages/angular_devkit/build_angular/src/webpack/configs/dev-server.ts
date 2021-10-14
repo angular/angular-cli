@@ -10,8 +10,8 @@ import { logging, tags } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import { posix, resolve } from 'path';
 import * as url from 'url';
-import * as webpack from 'webpack';
-import { Configuration } from 'webpack-dev-server';
+import { Configuration, RuleSetRule } from 'webpack';
+import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
@@ -19,7 +19,7 @@ import { HmrLoader } from '../plugins/hmr/hmr-loader';
 
 export async function getDevServerConfig(
   wco: WebpackConfigOptions<WebpackDevServerOptions>,
-): Promise<webpack.Configuration> {
+): Promise<Configuration> {
   const {
     buildOptions: { host, port, index, headers, watch, hmr, main, liveReload, proxyConfig },
     logger,
@@ -28,7 +28,7 @@ export async function getDevServerConfig(
 
   const servePath = buildServePath(wco.buildOptions, logger);
 
-  const extraRules: webpack.RuleSetRule[] = [];
+  const extraRules: RuleSetRule[] = [];
   if (hmr) {
     extraRules.push({
       loader: HmrLoader,
@@ -139,7 +139,10 @@ export function buildServePath(
  * Private method to enhance a webpack config with SSL configuration.
  * @private
  */
-function getSslConfig(root: string, options: WebpackDevServerOptions): Configuration['https'] {
+function getSslConfig(
+  root: string,
+  options: WebpackDevServerOptions,
+): DevServerConfiguration['https'] {
   const { ssl, sslCert, sslKey } = options;
   if (ssl && sslCert && sslKey) {
     return {
@@ -217,7 +220,9 @@ function findDefaultServePath(baseHref?: string, deployUrl?: string): string | n
   return `${normalizedBaseHref}${deployUrl || ''}`;
 }
 
-function getAllowedHostsConfig(options: WebpackDevServerOptions): Configuration['allowedHosts'] {
+function getAllowedHostsConfig(
+  options: WebpackDevServerOptions,
+): DevServerConfiguration['allowedHosts'] {
   if (options.disableHostCheck) {
     return 'all';
   } else if (options.allowedHosts?.length) {

@@ -8,7 +8,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as webpack from 'webpack';
+import { Configuration, RuleSetUseItem } from 'webpack';
 import { ExtraEntryPoint } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { BuildBrowserFeatures } from '../../utils/build-browser-features';
@@ -71,13 +71,13 @@ function resolveGlobalStyles(
 }
 
 // eslint-disable-next-line max-lines-per-function
-export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuration {
+export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   const MiniCssExtractPlugin = require('mini-css-extract-plugin');
   const postcssImports = require('postcss-import');
   const postcssPresetEnv: typeof import('postcss-preset-env') = require('postcss-preset-env');
 
   const { root, buildOptions } = wco;
-  const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
+  const extraPlugins: Configuration['plugins'] = [];
 
   extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
 
@@ -230,7 +230,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
   const postCss = require('postcss');
   const postCssLoaderPath = require.resolve('postcss-loader');
 
-  const componentStyleLoaders: webpack.RuleSetUseItem[] = [
+  const componentStyleLoaders: RuleSetUseItem[] = [
     {
       loader: postCssLoaderPath,
       options: {
@@ -240,7 +240,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
     },
   ];
 
-  const globalStyleLoaders: webpack.RuleSetUseItem[] = [
+  const globalStyleLoaders: RuleSetUseItem[] = [
     {
       loader: MiniCssExtractPlugin.loader,
     },
@@ -263,7 +263,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): webpack.Configuratio
 
   const styleLanguages: {
     extensions: string[];
-    use: webpack.RuleSetUseItem[];
+    use: RuleSetUseItem[];
   }[] = [
     {
       extensions: ['css'],

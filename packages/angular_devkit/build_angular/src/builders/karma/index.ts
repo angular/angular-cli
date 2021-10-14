@@ -12,7 +12,7 @@ import { Config, ConfigOptions } from 'karma';
 import { dirname, resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
-import * as webpack from 'webpack';
+import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
@@ -36,8 +36,8 @@ export type KarmaConfigOptions = ConfigOptions & {
 async function initialize(
   options: KarmaBuilderOptions,
   context: BuilderContext,
-  webpackConfigurationTransformer?: ExecutionTransformer<webpack.Configuration>,
-): Promise<[typeof import('karma'), webpack.Configuration]> {
+  webpackConfigurationTransformer?: ExecutionTransformer<Configuration>,
+): Promise<[typeof import('karma'), Configuration]> {
   const { config } = await generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
@@ -84,7 +84,7 @@ export function execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   transforms: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+    webpackConfiguration?: ExecutionTransformer<Configuration>;
     // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
