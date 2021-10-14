@@ -9,21 +9,19 @@
 import * as glob from 'glob';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
-import * as webpack from 'webpack';
+import { Configuration, RuleSetRule } from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../../utils/build-options';
 import { getSourceMapDevTool, isPolyfillsEntry } from '../utils/helpers';
 
-export function getTestConfig(
-  wco: WebpackConfigOptions<WebpackTestOptions>,
-): webpack.Configuration {
+export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>): Configuration {
   const {
     buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap, webWorkerTsConfig },
     root,
     sourceRoot,
   } = wco;
 
-  const extraRules: webpack.RuleSetRule[] = [];
-  const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
+  const extraRules: RuleSetRule[] = [];
+  const extraPlugins: Configuration['plugins'] = [];
 
   if (codeCoverage) {
     const exclude: (string | RegExp)[] = [/\.(e2e|spec)\.tsx?$/, /node_modules/];

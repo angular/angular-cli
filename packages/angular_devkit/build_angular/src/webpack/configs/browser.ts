@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as webpack from 'webpack';
+import { Configuration } from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { CommonJsUsageWarnPlugin } from '../plugins';
 import { getSourceMapDevTool } from '../utils/helpers';
 
-export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
+export function getBrowserConfig(wco: WebpackConfigOptions): Configuration {
   const { buildOptions } = wco;
   const {
     crossOrigin = 'none',

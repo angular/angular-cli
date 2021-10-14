@@ -8,12 +8,12 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import { BuildResult } from '@angular-devkit/build-webpack';
 import { ConfigOptions } from 'karma';
+import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
 import { json } from '@angular-devkit/core';
 import { JsonObject } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
-import * as webpack_2 from 'webpack';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 
 // @public (undocumented)
@@ -133,7 +133,7 @@ export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, co
 
 // @public
 export function executeKarmaBuilder(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
-    webpackConfiguration?: ExecutionTransformer<webpack_2.Configuration>;
+    webpackConfiguration?: ExecutionTransformer<Configuration>;
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
 }): Observable<BuilderOutput>;
 
