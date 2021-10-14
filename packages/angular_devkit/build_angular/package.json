@@ -32,7 +32,7 @@
     "core-js": "3.18.3",
     "critters": "0.0.10",
     "css-loader": "6.4.0",
-    "esbuild-wasm": "0.13.5",
+    "esbuild-wasm": "0.13.6",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -49,12 +49,12 @@
     "piscina": "3.1.0",
     "postcss": "8.3.9",
     "postcss-import": "14.0.2",
-    "postcss-loader": "6.1.1",
+    "postcss-loader": "6.2.0",
     "postcss-preset-env": "6.7.0",
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "4.0.0",
     "rxjs": "6.6.7",
-    "sass": "1.42.1",
+    "sass": "1.43.2",
     "sass-loader": "12.2.0",
     "semver": "7.3.5",
     "source-map-loader": "3.0.0",
@@ -65,14 +65,14 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
-    "webpack": "5.58.1",
+    "webpack": "5.58.2",
     "webpack-dev-middleware": "5.2.1",
     "webpack-dev-server": "4.3.1",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.13.5"
+    "esbuild": "0.13.6"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^13.0.0 || ^13.0.0-next",
