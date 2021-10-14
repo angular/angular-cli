@@ -49,7 +49,7 @@
     "@nguniversal/builders": "file:../../dist/modules-dist/builders",
     "codelyzer": "6.0.2",
     "concurrently": "6.3.0",
-    "jasmine-core": "3.9.0",
+    "jasmine-core": "3.10.0",
     "jasmine-spec-reporter": "7.0.0",
     "karma": "6.3.4",
     "karma-chrome-launcher": "3.1.0",
