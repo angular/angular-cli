@@ -36,12 +36,30 @@ git push upstream && git push upstream --tags
 
 # Release Changelog
 
+Release changelog needs to be included in two places, the GitHub release and in
+the
+[`CHANGELOG.md`](https://github.com/angular/universal/blob/master/CHANGELOG.md)
+file. These use different formats, so start with GitHub by running:
+
 ```sh
-yarn ng-dev release notes --from=<The git tag or ref to start the changelog entry from>
-yarn ng-dev release notes --mode=github-release --from=<The git tag or ref to start the changelog entry from>
+yarn -s ng-dev release notes --type=github-release --from=<The git tag or ref to start the changelog entry from>
 ```
 
-- Go to the `Releases` tab in the repository
-- Click on the newly created tag (9.0.0-next.13 in this case)
-- Paste the contents of clipboard to the contents
-- Choose `This is a prerelase` checkbox for pre-release versions
+- Go to the [`Releases` tab](https://github.com/angular/universal/releases) in
+  the repository.
+- Click on the newly created tag.
+- Copy paste the output of the above command into the contents of the release.
+- Choose `This is a prerelase` checkbox for pre-release versions.
+
+After creating a GitHub release, update the
+[`CHANGELOG.md`](https://github.com/angular/universal/blob/master/CHANGELOG.md)
+file by prepending it with changelog-formatted release notes (note
+`--type=changelog` which is _different_ from the GitHub release):
+
+```sh
+cat <(yarn -s ng-dev release notes --type=changelog --from=<The git tag or ref to start the changelog entry from>) \
+    CHANGELOG.md > CHANGELOG.md
+```
+
+Then make a PR with the update targeting `master`, get a team member to review
+it, and merge when ready.
