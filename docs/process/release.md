@@ -12,7 +12,7 @@ git commit -a -m "release: v9.0.0-next.13"  # (Update to version just put in pac
 - Create a tag
 
 ```sh
-git tag -v v9.0.0-next.13
+git tag v9.0.0-next.13
 ```
 
 - Push commit and tag
@@ -21,6 +21,7 @@ git tag -v v9.0.0-next.13
 git push upstream && git push upstream --tags
 ```
 
+- Wait for CI to be green at https://github.com/angular/universal/commits/${branch}.
 - Publish
 
 ```sh
