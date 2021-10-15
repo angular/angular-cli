@@ -7311,10 +7311,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-packagr@13.0.0-next.8:
-  version "13.0.0-next.8"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.0-next.8.tgz#ebb4592101dcc09f713991228c28204dde6c5b54"
-  integrity sha512-2C+2fudb6Eftv9CdLkOdF2SongDWHNy4tit39y0Xi3Qzl7Asvek9kgpADHV4lSeIHIYdRFdvskGANPO18fHyow==
+ng-packagr@13.0.0-rc.0:
+  version "13.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.0-rc.0.tgz#b9040fb08366a945645cb0cbca66aca478191d10"
+  integrity sha512-wAAUNYtath7RoKoMzIKSS54VSZjJhPpFAyylJAyb3G6bgMx3w5teZ6jNRo49Ky4RYojeWTerttdHK3V4Dw5Y4Q==
   dependencies:
     "@rollup/plugin-commonjs" "^21.0.0"
     "@rollup/plugin-json" "^4.1.0"
@@ -10755,10 +10755,10 @@ webpack-subresource-integrity@5.0.0:
   dependencies:
     typed-assert "^1.0.8"
 
-webpack@*, webpack@^5.38.1:
-  version "5.58.1"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.58.1.tgz#df8aad72b617a9d0db8c89d4f410784ee93320d7"
-  integrity sha512-4Z/dmbTU+VmkCb2XNgW7wkE5TfEcSooclprn/UEuVeAkwHhn07OcgUsyaKHGtCY/VobjnsYBlyhKeMLiSoOqPg==
+webpack@*, webpack@5.58.2, webpack@^5.1.0:
+  version "5.58.2"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.58.2.tgz#6b4af12fc9bd5cbedc00dc0a2fc2b9592db16b44"
+  integrity sha512-3S6e9Vo1W2ijk4F4PPWRIu6D/uGgqaPmqw+av3W3jLDujuNkdxX5h5c+RQ6GkjVR+WwIPOfgY8av+j5j4tMqJw==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.50"
@@ -10785,10 +10785,10 @@ webpack@*, webpack@^5.38.1:
     watchpack "^2.2.0"
     webpack-sources "^3.2.0"
 
-webpack@5.58.2, webpack@^5.1.0:
-  version "5.58.2"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.58.2.tgz#6b4af12fc9bd5cbedc00dc0a2fc2b9592db16b44"
-  integrity sha512-3S6e9Vo1W2ijk4F4PPWRIu6D/uGgqaPmqw+av3W3jLDujuNkdxX5h5c+RQ6GkjVR+WwIPOfgY8av+j5j4tMqJw==
+webpack@^5.38.1:
+  version "5.58.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.58.1.tgz#df8aad72b617a9d0db8c89d4f410784ee93320d7"
+  integrity sha512-4Z/dmbTU+VmkCb2XNgW7wkE5TfEcSooclprn/UEuVeAkwHhn07OcgUsyaKHGtCY/VobjnsYBlyhKeMLiSoOqPg==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.50"
