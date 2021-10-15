@@ -23,6 +23,7 @@ function emittedFilesToInlineOptions(
   outputPath: string,
   es5: boolean,
   missingTranslation: 'error' | 'warning' | 'ignore' | undefined,
+  context: BuilderContext,
 ): { options: InlineOptions[]; originalFiles: string[] } {
   const options: InlineOptions[] = [];
   const originalFiles: string[] = [];
@@ -46,15 +47,35 @@ function emittedFilesToInlineOptions(
     };
     originalFiles.push(originalPath);
 
+    // Remove temporary original file as the content has now been read
+    try {
+      fs.unlinkSync(originalPath);
+    } catch (e) {
+      context.logger.debug(
+        `Unable to delete i18n temporary file [${originalPath}]: ${e.toString()}`,
+      );
+    }
+
     try {
       const originalMapPath = originalPath + '.map';
       action.map = fs.readFileSync(originalMapPath, 'utf8');
       originalFiles.push(originalMapPath);
+
+      // Remove temporary original map file as the content has now been read
+      try {
+        fs.unlinkSync(originalMapPath);
+      } catch (e) {
+        context.logger.debug(
+          `Unable to delete i18n temporary file [${originalMapPath}]: ${e.toString()}`,
+        );
+      }
     } catch (err) {
       if (err.code !== 'ENOENT') {
         throw err;
       }
     }
+
+    context.logger.debug(`i18n file queued for processing: ${action.filename}`);
 
     options.push(action);
   }
@@ -86,9 +107,12 @@ export async function i18nInlineEmittedFiles(
       baseOutputPath,
       es5,
       missingTranslation,
+      context,
     );
 
     for await (const result of executor.inlineAll(options)) {
+      context.logger.debug(`i18n file processed: ${result.file}`);
+
       for (const diagnostic of result.diagnostics) {
         spinner.stop();
         if (diagnostic.type === 'error') {
