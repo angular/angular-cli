@@ -417,7 +417,7 @@ export function buildWebpackBrowser(
                   }
                 }
 
-                const executor = new BundleActionExecutor(
+                const differentialLoadingExecutor = new BundleActionExecutor(
                   { cachePath: cacheDownlevelPath, i18n },
                   options.subresourceIntegrity ? 'sha384' : undefined,
                 );
@@ -425,121 +425,128 @@ export function buildWebpackBrowser(
                 // Execute the bundle processing actions
                 try {
                   spinner.start('Generating ES5 bundles for differential loading...');
-                  for await (const result of executor.processAll(processActions)) {
+                  for await (const result of differentialLoadingExecutor.processAll(
+                    processActions,
+                  )) {
                     processResults.push(result);
                   }
-
-                  // Runtime must be processed after all other files
-                  if (processRuntimeAction) {
-                    const runtimeOptions = {
-                      ...processRuntimeAction,
-                      runtimeData: processResults,
-                      supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
-                    };
-                    processResults.push(
-                      await import('../utils/process-bundle').then((m) =>
-                        m.process(runtimeOptions),
-                      ),
-                    );
-                  }
-
-                  spinner.succeed('ES5 bundle generation complete.');
-
-                  if (i18n.shouldInline) {
-                    spinner.start('Generating localized bundles...');
-                    const inlineActions: InlineOptions[] = [];
-                    const processedFiles = new Set<string>();
-                    for (const result of processResults) {
-                      if (result.original) {
-                        inlineActions.push({
-                          filename: path.basename(result.original.filename),
-                          code: fs.readFileSync(result.original.filename, 'utf8'),
-                          map:
-                            result.original.map &&
-                            fs.readFileSync(result.original.map.filename, 'utf8'),
-                          outputPath: baseOutputPath,
-                          es5: false,
-                          missingTranslation: options.i18nMissingTranslation,
-                          setLocale: result.name === mainChunkId,
-                        });
-                        processedFiles.add(result.original.filename);
-                        if (result.original.map) {
-                          processedFiles.add(result.original.map.filename);
-                        }
-                      }
-                      if (result.downlevel) {
-                        inlineActions.push({
-                          filename: path.basename(result.downlevel.filename),
-                          code: fs.readFileSync(result.downlevel.filename, 'utf8'),
-                          map:
-                            result.downlevel.map &&
-                            fs.readFileSync(result.downlevel.map.filename, 'utf8'),
-                          outputPath: baseOutputPath,
-                          es5: true,
-                          missingTranslation: options.i18nMissingTranslation,
-                          setLocale: result.name === mainChunkId,
-                        });
-                        processedFiles.add(result.downlevel.filename);
-                        if (result.downlevel.map) {
-                          processedFiles.add(result.downlevel.map.filename);
-                        }
-                      }
-                    }
-
-                    let hasErrors = false;
-                    try {
-                      for await (const result of executor.inlineAll(inlineActions)) {
-                        if (options.verbose) {
-                          context.logger.info(
-                            `Localized "${result.file}" [${result.count} translation(s)].`,
-                          );
-                        }
-                        for (const diagnostic of result.diagnostics) {
-                          spinner.stop();
-                          if (diagnostic.type === 'error') {
-                            hasErrors = true;
-                            context.logger.error(diagnostic.message);
-                          } else {
-                            context.logger.warn(diagnostic.message);
-                          }
-                          spinner.start();
-                        }
-                      }
-
-                      // Copy any non-processed files into the output locations
-                      await copyAssets(
-                        [
-                          {
-                            glob: '**/*',
-                            input: webpackOutputPath,
-                            output: '',
-                            ignore: [...processedFiles].map((f) =>
-                              path.relative(webpackOutputPath, f),
-                            ),
-                          },
-                        ],
-                        Array.from(outputPaths.values()),
-                        '',
-                      );
-                    } catch (err) {
-                      spinner.fail('Localized bundle generation failed.');
-
-                      return { success: false, error: mapErrorToMessage(err) };
-                    }
-
-                    if (hasErrors) {
-                      spinner.fail('Localized bundle generation failed.');
-                    } else {
-                      spinner.succeed('Localized bundle generation complete.');
-                    }
-
-                    if (hasErrors) {
-                      return { success: false };
-                    }
-                  }
                 } finally {
-                  executor.stop();
+                  differentialLoadingExecutor.stop();
                 }
+
+                // Runtime must be processed after all other files
+                if (processRuntimeAction) {
+                  const runtimeOptions = {
+                    ...processRuntimeAction,
+                    runtimeData: processResults,
+                    supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
+                  };
+                  processResults.push(
+                    await import('../utils/process-bundle').then((m) => m.process(runtimeOptions)),
+                  );
+                }
+
+                spinner.succeed('ES5 bundle generation complete.');
+
+                if (i18n.shouldInline) {
+                  spinner.start('Generating localized bundles...');
+                  const inlineActions: InlineOptions[] = [];
+                  const processedFiles = new Set<string>();
+                  for (const result of processResults) {
+                    if (result.original) {
+                      inlineActions.push({
+                        filename: path.basename(result.original.filename),
+                        code: fs.readFileSync(result.original.filename, 'utf8'),
+                        map:
+                          result.original.map &&
+                          fs.readFileSync(result.original.map.filename, 'utf8'),
+                        outputPath: baseOutputPath,
+                        es5: false,
+                        missingTranslation: options.i18nMissingTranslation,
+                        setLocale: result.name === mainChunkId,
+                      });
+                      processedFiles.add(result.original.filename);
+                      if (result.original.map) {
+                        processedFiles.add(result.original.map.filename);
+                      }
+                    }
+                    if (result.downlevel) {
+                      inlineActions.push({
+                        filename: path.basename(result.downlevel.filename),
+                        code: fs.readFileSync(result.downlevel.filename, 'utf8'),
+                        map:
+                          result.downlevel.map &&
+                          fs.readFileSync(result.downlevel.map.filename, 'utf8'),
+                        outputPath: baseOutputPath,
+                        es5: true,
+                        missingTranslation: options.i18nMissingTranslation,
+                        setLocale: result.name === mainChunkId,
+                      });
+                      processedFiles.add(result.downlevel.filename);
+                      if (result.downlevel.map) {
+                        processedFiles.add(result.downlevel.map.filename);
+                      }
+                    }
+                  }
+
+                  let hasErrors = false;
+                  const i18nExecutor = new BundleActionExecutor(
+                    { i18n },
+                    options.subresourceIntegrity ? 'sha384' : undefined,
+                  );
+                  try {
+                    for await (const result of i18nExecutor.inlineAll(inlineActions)) {
+                      if (options.verbose) {
+                        context.logger.info(
+                          `Localized "${result.file}" [${result.count} translation(s)].`,
+                        );
+                      }
+                      for (const diagnostic of result.diagnostics) {
+                        spinner.stop();
+                        if (diagnostic.type === 'error') {
+                          hasErrors = true;
+                          context.logger.error(diagnostic.message);
+                        } else {
+                          context.logger.warn(diagnostic.message);
+                        }
+                        spinner.start();
+                      }
+                    }
+
+                    // Copy any non-processed files into the output locations
+                    await copyAssets(
+                      [
+                        {
+                          glob: '**/*',
+                          input: webpackOutputPath,
+                          output: '',
+                          ignore: [...processedFiles].map((f) =>
+                            path.relative(webpackOutputPath, f),
+                          ),
+                        },
+                      ],
+                      Array.from(outputPaths.values()),
+                      '',
+                    );
+                  } catch (err) {
+                    spinner.fail('Localized bundle generation failed.');
+
+                    return { success: false, error: mapErrorToMessage(err) };
+                  } finally {
+                    i18nExecutor.stop();
+                  }
+
+                  if (hasErrors) {
+                    spinner.fail('Localized bundle generation failed.');
+                  } else {
+                    spinner.succeed('Localized bundle generation complete.');
+                  }
+
+                  if (hasErrors) {
+                    return { success: false };
+                  }
+                }
+
                 for (const result of processResults) {
                   const chunk = webpackStats.chunks?.find(
                     (chunk) => chunk.id?.toString() === result.name,
