@@ -174,7 +174,7 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
     if (answers.analytics) {
       console.log('');
       console.log(tags.stripIndent`
-        Thank you for sharing anonymous usage data. Would you change your mind, the following
+        Thank you for sharing anonymous usage data. Should you change your mind, the following
         command will disable this feature entirely:
 
             ${colors.yellow('ng analytics project off')}
