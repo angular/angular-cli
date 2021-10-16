@@ -3,7 +3,7 @@
   "comment": "This file is needed so that depedencies are synced by Renovate.",
   "private": true,
   "dependencies": {
-    "@types/jasmine": "~3.9.0",
+    "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "jasmine-core": "~3.10.0",
     "karma-chrome-launcher": "~3.1.0",
