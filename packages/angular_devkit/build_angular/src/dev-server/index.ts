@@ -369,6 +369,8 @@ export function serveWebpackBrowser(
 
           if (buildEvent.success) {
             logger.info(`\n${colors.greenBright(colors.symbols.check)} Compiled successfully.`);
+          } else {
+            logger.info(`\n${colors.redBright(colors.symbols.cross)} Failed to compile.`);
           }
 
           return { ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput;
