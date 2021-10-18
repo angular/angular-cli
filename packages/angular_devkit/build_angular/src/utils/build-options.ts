@@ -89,4 +89,5 @@ export interface WebpackConfigOptions<T = BuildOptions> {
   tsConfig: ParsedConfiguration;
   tsConfigPath: string;
   scriptTarget: import('typescript').ScriptTarget;
+  projectName: string;
 }

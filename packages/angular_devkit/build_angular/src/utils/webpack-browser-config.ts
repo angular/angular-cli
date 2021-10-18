@@ -29,6 +29,7 @@ export async function generateWebpackConfig(
   workspaceRoot: string,
   projectRoot: string,
   sourceRoot: string | undefined,
+  projectName: string,
   options: NormalizedBrowserBuilderSchema,
   webpackPartialGenerator: WebpackPartialGenerator,
   logger: logging.LoggerApi,
@@ -54,6 +55,7 @@ export async function generateWebpackConfig(
     buildOptions,
     tsConfig,
     tsConfigPath,
+    projectName,
     scriptTarget,
   };
 
@@ -164,6 +166,7 @@ export async function generateBrowserWebpackConfigFromContext(
     getSystemPath(workspaceRoot),
     getSystemPath(projectRoot),
     sourceRoot && getSystemPath(sourceRoot),
+    projectName,
     normalizedOptions,
     webpackPartialGenerator,
     context.logger,
