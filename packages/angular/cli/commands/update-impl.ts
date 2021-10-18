@@ -199,7 +199,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   ): Promise<boolean> {
     const collection = this.workflow.engine.createCollection(collectionPath);
     const migrationRange = new semver.Range(
-      '>' + (semver.prerelease(from) ? from.split('-')[0] + '-0' : from) + ' <=' + to,
+      '>' + (semver.prerelease(from) ? from.split('-')[0] + '-0' : from) + ' <=' + to.split('-')[0],
     );
     const migrations = [];
 
