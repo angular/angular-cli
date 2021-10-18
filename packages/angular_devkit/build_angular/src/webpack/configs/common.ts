@@ -33,7 +33,7 @@ import { getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from 
 
 // eslint-disable-next-line max-lines-per-function
 export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration> {
-  const { root, projectRoot, buildOptions, tsConfig } = wco;
+  const { root, projectRoot, buildOptions, tsConfig, projectName } = wco;
   const {
     cache,
     platform = 'browser',
@@ -337,6 +337,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     context: root,
     entry: entryPoints,
     output: {
+      uniqueName: projectName,
       hashFunction: 'xxhash64', // todo: remove in webpack 6. This is part of `futureDefaults`.
       clean: buildOptions.deleteOutputPath ?? true,
       path: path.resolve(root, buildOptions.outputPath),
