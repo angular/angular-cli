@@ -729,7 +729,7 @@ describe('Browser Builder styles', () => {
       host.replaceInFile('tsconfig.json', 'es2017', 'es5');
 
       result = await browserBuild(architect, host, target, { optimization: true, aot: true });
-      expect(await result.files['main.js']).toContain('rgba(0,0,0,.149)');
+      expect(await result.files['main.js']).toContain('rgba(0,0,0,.15)');
     });
   });
 });
