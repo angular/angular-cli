@@ -653,6 +653,6 @@ describe('Browser Builder styles', () => {
     });
 
     result = await browserBuild(architect, host, target, { optimization: true });
-    expect(await result.files['styles.css']).toContain('rgba(0,0,0,.149)');
+    expect(await result.files['styles.css']).toContain('rgba(0,0,0,.15)');
   });
 });
