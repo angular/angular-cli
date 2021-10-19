@@ -109,52 +109,5 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
       await setTimeoutPromise(1000);
       harness.expectFile(coveragePath).content.not.toContain('my-lib');
     });
-
-    it('should exit with non-zero code when coverage is below threshold', async () => {
-      await harness.modifyFile('karma.conf.js', (content) =>
-        content.replace(
-          'coverageReporter: {',
-          `coverageReporter: {
-            check: {
-              global: {
-                statements: 100,
-                lines: 100,
-                branches: 100,
-                functions: 100
-              }
-            },
-           `,
-        ),
-      );
-
-      await harness.appendToFile(
-        'src/app/app.component.ts',
-        `
-          export function nonCovered(): boolean {
-            return true;
-          }
-        `,
-      );
-
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        codeCoverage: true,
-      });
-
-      await harness
-        .execute()
-        .pipe(
-          // In incremental mode, karma-coverage does not have the ability to mark a
-          // run as failed if code coverage does not pass. This is because it does
-          // the coverage asynchoronously and Karma does not await the promise
-          // returned by the plugin.
-
-          // However the program must exit with non-zero exit code.
-          // This is a more common use case of coverage testing and must be supported.
-          last(),
-          tap((buildEvent) => expect(buildEvent.result?.success).toBeFalse()),
-        )
-        .toPromise();
-    });
   });
 });
