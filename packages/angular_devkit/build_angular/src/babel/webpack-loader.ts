@@ -185,10 +185,16 @@ export default custom<AngularCustomOptions>(() => {
         // `@ampproject/remapping` source map objects but both are compatible with Webpack.
         // This method for merging is used because it provides more accurate output
         // and is faster while using less memory.
-        result.map = remapping(
-          [result.map as SourceMapInput, inputSourceMap as SourceMapInput],
-          () => null,
-        ) as typeof result.map;
+        result.map = {
+          // Convert the SourceMap back to simple plain object.
+          // This is needed because otherwise code-coverage will fail with `don't know how to turn this value into a node`
+          // Which is throw by Babel when it is invoked again from `istanbul-lib-instrument`.
+          // https://github.com/babel/babel/blob/780aa48d2a34dc55f556843074b6aed45e7eabeb/packages/babel-types/src/converters/valueToNode.ts#L115-L130
+          ...(remapping(
+            [result.map as SourceMapInput, inputSourceMap as SourceMapInput],
+            () => null,
+          ) as typeof result.map),
+        };
       }
 
       return result;
