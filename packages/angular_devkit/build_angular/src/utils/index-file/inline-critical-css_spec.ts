@@ -58,14 +58,10 @@ describe('InlineCriticalCssProcessor', () => {
     );
     expect(content).not.toContain('color: blue');
     expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
-    <style>body {
-      margin: 0;
-      }
-
-      html {
-      color: white;
-      }</style>
-      `);
+    <style>
+    body { margin: 0; }
+    html { color: white; }
+    </style>`);
   });
 
   it('should inline critical css when using deployUrl', async () => {
@@ -85,14 +81,10 @@ describe('InlineCriticalCssProcessor', () => {
       `<link href="http://cdn.com/theme.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
-    <style>body {
-      margin: 0;
-      }
-
-      html {
-      color: white;
-      }</style>
-      `);
+    <style>
+    body { margin: 0; }
+    html { color: white; }
+    </style>`);
   });
 
   it('should compress inline critical css when minify is enabled', async () => {
@@ -111,6 +103,6 @@ describe('InlineCriticalCssProcessor', () => {
     expect(content).toContain(
       `<link href="theme.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
-    expect(content).toContain('<style>body{margin:0;}html{color:white;}</style>');
+    expect(content).toContain('<style>body{margin:0}html{color:white}</style>');
   });
 });
