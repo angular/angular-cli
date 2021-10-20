@@ -44,7 +44,7 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
       const { result, response } = await executeOnceAndFetch(harness, '/');
 
       expect(result?.success).toBeTrue();
-      expect(await response?.text()).toContain('body{color:#000;}');
+      expect(await response?.text()).toContain('body{color:#000}');
     });
   });
 });
