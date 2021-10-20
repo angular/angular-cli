@@ -37,7 +37,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         .content.toContain(
           `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000;}`);
+      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
     });
 
     it(`should not extract critical css when 'optimization' is unset`, async () => {
@@ -121,7 +121,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         .content.toContain(
           `<link rel="stylesheet" href="http://cdn.com/styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000;}`);
+      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
     });
 
     it(`should extract critical css when using '@media all {}' and 'minify' is set to true`, async () => {
@@ -147,7 +147,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         .content.toContain(
           `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000;}`);
+      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
     });
   });
 });
