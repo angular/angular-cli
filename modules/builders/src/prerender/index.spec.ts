@@ -210,7 +210,7 @@ describe('Prerender Builder', () => {
     );
 
     expect(content).toMatch(
-      /<style>p{color:red;}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this.media='all'">/,
+      /<style>p{color:red}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this.media='all'">/,
     );
     await run.stop();
   });
