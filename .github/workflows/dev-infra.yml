@@ -5,10 +5,10 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  breaking-changes-label:
+  commit_message_based_labels:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: angular/dev-infra/github-actions/breaking-changes-label@6fb5d7162863b67cd1e006b2262db7da78608c88
+      - uses: angular/dev-infra/github-actions/commit-message-based-labels@6fb5d7162863b67cd1e006b2262db7da78608c88
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
