@@ -1,0 +1,102 @@
+name: Bug report
+description: Report a bug in Angular CLI
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Oh hi there!
+
+        To expedite issue processing please search open and closed issues before submitting a new one.
+        Existing issues often contain information about workarounds, resolution, or progress updates.
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      description: Can you pin-point the command or commands that are effected by this bug?
+      options:
+        - add
+        - build
+        - config
+        - doc
+        - e2e
+        - extract-i18n
+        - generate
+        - help
+        - lint
+        - new
+        - other
+        - run
+        - serve
+        - test
+        - update
+        - version
+      multiple: true
+    validations:
+      required: true
+  - type: checkboxes
+    id: is-regression
+    attributes:
+      label: Is this a regression?
+      description: Did this behavior use to work in the previous version?
+      options:
+        - label: Yes, this behavior used to work in the previous version
+  - type: input
+    id: version-bug-was-not-present
+    attributes:
+      label: The previous version in which this bug was not present was
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: minimal-reproduction
+    attributes:
+      label: Minimal Reproduction
+      description: |
+        Simple steps to reproduce this bug.
+
+        **Please include:**
+        * commands run (including args)
+        * packages added
+        * related code changes
+
+
+        If reproduction steps are not enough for reproduction of your issue, please create a minimal GitHub repository with the reproduction of the issue.
+        A good way to make a minimal reproduction is to create a new app via `ng new repro-app` and add the minimum possible code to show the problem.
+        Share the link to the repo below along with step-by-step instructions to reproduce the problem, as well as expected and actual behavior.
+
+        Issues that don't have enough info and can't be reproduced will be closed.
+
+        You can read more about issue submission guidelines [here](https://github.com/angular/angular-cli/blob/main/CONTRIBUTING.md#-submitting-an-issue).
+    validations:
+      required: true
+  - type: textarea
+    id: exception-or-error
+    attributes:
+      label: Exception or Error
+      description: If the issue is accompanied by an exception or an error, please share it below.
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Your Environment
+      description: Run `ng version` and paste output below.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Anything else relevant?
+      description: |
+        Is this a browser specific issue? If so, please specify the browser and version.
+        Do any of these matter: operating system, IDE, package manager, HTTP server, ...? If so, please mention it below.
+    validations:
+      required: false
