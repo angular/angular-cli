@@ -56,6 +56,7 @@ export interface ProcessBundleOptions {
   runtimeData?: ProcessBundleResult[];
   replacements?: [string, string][];
   supportedBrowsers?: string[] | Record<string, string>;
+  memoryMode?: boolean;
 }
 
 export interface ProcessBundleResult {
@@ -69,9 +70,11 @@ export interface ProcessBundleFile {
   filename: string;
   size: number;
   integrity?: string;
+  content?: string;
   map?: {
     filename: string;
     size: number;
+    content?: string;
   };
 }
 
@@ -200,6 +203,7 @@ async function processBundle(
     hiddenSourceMaps,
     cacheKeys = [],
     integrityAlgorithm,
+    memoryMode,
   } = options;
 
   const filename = path.basename(filepath);
@@ -242,17 +246,27 @@ async function processBundle(
       mapContent,
       cacheKeys[isOriginal ? CacheKey.OriginalMap : CacheKey.DownlevelMap],
     );
-    fs.writeFileSync(filepath + '.map', mapContent);
+    if (!memoryMode) {
+      fs.writeFileSync(filepath + '.map', mapContent);
+    }
   }
 
-  const fileResult = createFileEntry(filepath, resultCode, mapContent, integrityAlgorithm);
+  const fileResult = createFileEntry(
+    filepath,
+    resultCode,
+    mapContent,
+    memoryMode,
+    integrityAlgorithm,
+  );
 
   await cachePut(
     resultCode,
     cacheKeys[isOriginal ? CacheKey.OriginalCode : CacheKey.DownlevelCode],
     fileResult.integrity,
   );
-  fs.writeFileSync(filepath, resultCode);
+  if (!memoryMode) {
+    fs.writeFileSync(filepath, resultCode);
+  }
 
   return fileResult;
 }
@@ -293,17 +307,20 @@ function createFileEntry(
   filename: string,
   code: string,
   map: string | undefined,
+  memoryMode?: boolean,
   integrityAlgorithm?: string,
 ): ProcessBundleFile {
   return {
     filename: filename,
     size: Buffer.byteLength(code),
     integrity: integrityAlgorithm && generateIntegrityValue(integrityAlgorithm, code),
+    content: memoryMode ? code : undefined,
     map: !map
       ? undefined
       : {
           filename: filename + '.map',
           size: Buffer.byteLength(map),
+          content: memoryMode ? map : undefined,
         },
   };
 }
