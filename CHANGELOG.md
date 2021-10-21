@@ -1,3 +1,28 @@
+<a name="13.0.0-rc.1"></a>
+
+# 13.0.0-rc.1 (2021-10-20)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [1b98a52f4](https://github.com/angular/angular-cli/commit/1b98a52f4d88d4fa7c3d0bb86fe61e3e9d54b5e8) | fix  | correct grammar error in Analytics consent prompt        |
+| [1e2efbc98](https://github.com/angular/angular-cli/commit/1e2efbc987f0c1b8084d58f9d81e9a213feb7920) | fix  | run stable migrations when package version is prerelease |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [448c020be](https://github.com/angular/angular-cli/commit/448c020be8178dc9a5687a311d61554f6112d388) | fix  | add "Failed to compile" message                  |
+| [7934becb5](https://github.com/angular/angular-cli/commit/7934becb581d07c8e1f74898ddd4c20f050be659) | fix  | generate unique webpack runtimes                 |
+| [ff486861d](https://github.com/angular/angular-cli/commit/ff486861dc9af1e54f72f544d4f2f1de788671ec) | fix  | transform remapped sourcemap into a plain object |
+
+## Special Thanks
+
+Alan Agius, Extacy and Sushrit_Lawliet
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.11"></a>
 
 # 12.2.11 (2021-10-20)
