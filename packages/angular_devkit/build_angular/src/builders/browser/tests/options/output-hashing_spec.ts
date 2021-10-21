@@ -35,7 +35,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9a-f]{16}\.js$/)).toBeTrue();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9a-f]{16}\.js$/)).toBeTrue();
       expect(harness.hasFileMatch('dist', /styles\.[0-9a-f]{16}\.css$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9a-f]{20}\.png$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist', /spectrum\.[0-9a-f]{16}\.png$/)).toBeTrue();
     });
 
     it(`doesn't hash any filenames when not set`, async () => {
@@ -94,7 +94,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9a-f]{16}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9a-f]{16}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /styles\.[0-9a-f]{16}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9a-f]{20}\.png$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist', /spectrum\.[0-9a-f]{16}\.png$/)).toBeTrue();
     });
 
     it(`hashes bundles filenames only when set to "bundles"`, async () => {
