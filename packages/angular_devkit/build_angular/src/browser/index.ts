@@ -365,7 +365,7 @@ export function buildWebpackBrowser(
                   if (actionOptions.sourceMaps) {
                     try {
                       map = fs.readFileSync(filename + '.map', 'utf8');
-                      if (es5Polyfills) {
+                      if (es5Polyfills || i18n.shouldInline) {
                         fs.unlinkSync(filename + '.map');
                       }
                     } catch {}
@@ -374,6 +374,10 @@ export function buildWebpackBrowser(
                   if (es5Polyfills) {
                     fs.unlinkSync(filename);
                     filename = filename.replace(/\-es20\d{2}/, '');
+                  } else if (i18n.shouldInline) {
+                    // Original files must be deleted with i18n to avoid the original files from
+                    // being copied over the translated files when copying the project assets.
+                    fs.unlinkSync(filename);
                   }
 
                   const es2015Polyfills = file.file.startsWith('polyfills-es20');
@@ -391,6 +395,8 @@ export function buildWebpackBrowser(
                     runtime: file.file.startsWith('runtime'),
                     ignoreOriginal: es5Polyfills,
                     optimizeOnly: es2015Polyfills,
+                    // When using i18n, file results are kept in memory for further processing
+                    memoryMode: i18n.shouldInline,
                   });
 
                   // ES2015 polyfills are only optimized; optimization check was performed above
@@ -451,41 +457,32 @@ export function buildWebpackBrowser(
                 if (i18n.shouldInline) {
                   spinner.start('Generating localized bundles...');
                   const inlineActions: InlineOptions[] = [];
-                  const processedFiles = new Set<string>();
                   for (const result of processResults) {
                     if (result.original) {
                       inlineActions.push({
                         filename: path.basename(result.original.filename),
-                        code: fs.readFileSync(result.original.filename, 'utf8'),
-                        map:
-                          result.original.map &&
-                          fs.readFileSync(result.original.map.filename, 'utf8'),
+                        // Memory mode is always enabled for i18n
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        code: result.original.content!,
+                        map: result.original.map?.content,
                         outputPath: baseOutputPath,
                         es5: false,
                         missingTranslation: options.i18nMissingTranslation,
                         setLocale: result.name === mainChunkId,
                       });
-                      processedFiles.add(result.original.filename);
-                      if (result.original.map) {
-                        processedFiles.add(result.original.map.filename);
-                      }
                     }
                     if (result.downlevel) {
                       inlineActions.push({
                         filename: path.basename(result.downlevel.filename),
-                        code: fs.readFileSync(result.downlevel.filename, 'utf8'),
-                        map:
-                          result.downlevel.map &&
-                          fs.readFileSync(result.downlevel.map.filename, 'utf8'),
+                        // Memory mode is always enabled for i18n
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        code: result.downlevel.content!,
+                        map: result.downlevel.map?.content,
                         outputPath: baseOutputPath,
                         es5: true,
                         missingTranslation: options.i18nMissingTranslation,
                         setLocale: result.name === mainChunkId,
                       });
-                      processedFiles.add(result.downlevel.filename);
-                      if (result.downlevel.map) {
-                        processedFiles.add(result.downlevel.map.filename);
-                      }
                     }
                   }
 
@@ -520,9 +517,6 @@ export function buildWebpackBrowser(
                           glob: '**/*',
                           input: webpackOutputPath,
                           output: '',
-                          ignore: [...processedFiles].map((f) =>
-                            path.relative(webpackOutputPath, f),
-                          ),
                         },
                       ],
                       Array.from(outputPaths.values()),
