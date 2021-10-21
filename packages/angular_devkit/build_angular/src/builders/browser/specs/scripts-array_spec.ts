@@ -86,14 +86,14 @@ describe('Browser Builder scripts array', () => {
     } as {});
 
     const fileNames = Object.keys(files);
-    const scriptsBundle = fileNames.find((n) => /scripts\.[0-9a-f]{20}\.js/.test(n));
+    const scriptsBundle = fileNames.find((n) => /scripts\.[0-9a-f]{16}\.js/.test(n));
     expect(scriptsBundle).toBeTruthy();
     expect(await files[scriptsBundle || '']).toMatch('var number=2;');
 
-    expect(fileNames.some((n) => /scripts\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
-    expect(fileNames.some((n) => /renamed-script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
-    expect(fileNames.some((n) => /renamed-script\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
-    expect(fileNames.some((n) => /script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /scripts\.[0-9a-f]{16}\.js\.map/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /renamed-script\.[0-9a-f]{16}\.js/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /renamed-script\.[0-9a-f]{16}\.js\.map/.test(n))).toBeTruthy();
+    expect(fileNames.some((n) => /script\.[0-9a-f]{16}\.js/.test(n))).toBeTruthy();
     expect(await files['lazy-script.js']).not.toBeUndefined();
     expect(await files['lazy-script.js.map']).not.toBeUndefined();
     expect(await files['renamed-lazy-script.js']).not.toBeUndefined();
