@@ -77,21 +77,19 @@ export class BundleActionExecutor {
     actions: Iterable<I>,
     executor: (action: I) => Promise<O>,
   ): AsyncIterable<O> {
-    const executions = new Map<Promise<O>, Promise<O>>();
+    const executions = new Map<Promise<O>, Promise<[Promise<O>, O]>>();
     for (const action of actions) {
       const execution = executor(action);
       executions.set(
         execution,
-        execution.then((result) => {
-          executions.delete(execution);
-
-          return result;
-        }),
+        execution.then((result) => [execution, result]),
       );
     }
 
     while (executions.size > 0) {
-      yield Promise.race(executions.values());
+      const [execution, result] = await Promise.race(executions.values());
+      executions.delete(execution);
+      yield result;
     }
   }
 
