@@ -47,7 +47,7 @@ class CrittersExtended extends Critters {
     });
   }
 
-  protected readFile(path: string): Promise<string> {
+  public override readFile(path: string): Promise<string> {
     const readAsset = this.optionsExtended.readAsset;
 
     return readAsset ? readAsset(path) : fs.promises.readFile(path, 'utf-8');
