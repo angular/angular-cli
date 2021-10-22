@@ -23,13 +23,16 @@ class CrittersExtended extends Critters {
   readonly warnings: string[] = [];
   readonly errors: string[] = [];
 
-  constructor(private readonly optionsExtended: InlineCriticalCssProcessorOptions & InlineCriticalCssProcessOptions) {
+  constructor(
+    private readonly optionsExtended: InlineCriticalCssProcessorOptions &
+      InlineCriticalCssProcessOptions,
+  ) {
     super({
       logger: {
         warn: (s: string) => this.warnings.push(s),
         error: (s: string) => this.errors.push(s),
-        log: () => { },
-        info: () => { },
+        log: () => {},
+        info: () => {},
       },
       path: optionsExtended.outputPath,
       publicPath: optionsExtended.deployUrl,
@@ -44,7 +47,7 @@ class CrittersExtended extends Critters {
     } as any);
   }
 
-  protected readFile(path: string): Promise<string> {
+  public readFile(path: string): Promise<string> {
     const readAsset = this.optionsExtended.readAsset;
 
     return readAsset ? readAsset(path) : readFile(path, 'utf-8');
@@ -52,10 +55,12 @@ class CrittersExtended extends Critters {
 }
 
 export class InlineCriticalCssProcessor {
-  constructor(protected readonly options: InlineCriticalCssProcessorOptions) { }
+  constructor(protected readonly options: InlineCriticalCssProcessorOptions) {}
 
-  async process(html: string, options: InlineCriticalCssProcessOptions)
-    : Promise<{ content: string, warnings: string[], errors: string[] }> {
+  async process(
+    html: string,
+    options: InlineCriticalCssProcessOptions,
+  ): Promise<{ content: string; warnings: string[]; errors: string[] }> {
     const critters = new CrittersExtended({ ...this.options, ...options });
     const content = await critters.process(html);
 

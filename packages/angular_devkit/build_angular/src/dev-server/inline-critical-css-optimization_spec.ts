@@ -43,7 +43,7 @@ describe('Dev Server Builder inline critical CSS optimization', () => {
       mergeMap(async output => {
         expect(output.success).toBe(true);
         const response = await fetch(`${output.baseUrl}/index.html`);
-        expect(await response.text()).toContain(`body{color:#000;}`);
+        expect(await response.text()).toContain(`body{color:#000}`);
       }),
     ).toPromise();
 
