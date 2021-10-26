@@ -44,7 +44,7 @@ export class Spinner {
   }
 
   warn(text?: string): void {
-    this.spinner.fail(text && colors.yellowBright(text));
+    this.spinner.warn(text && colors.yellowBright(text));
   }
 
   stop(): void {
