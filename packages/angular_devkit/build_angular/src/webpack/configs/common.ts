@@ -14,28 +14,37 @@ import { ScriptTarget } from 'typescript';
 import {
   Compiler,
   Configuration,
-  ContextReplacementPlugin,
   ProgressPlugin,
   RuleSetRule,
   WebpackOptionsNormalized,
   debug,
 } from 'webpack';
+import { AngularBabelLoaderOptions } from '../../babel/webpack-loader';
 import { AssetPatternClass } from '../../builders/browser/schema';
 import { BuildBrowserFeatures } from '../../utils';
-import { WebpackConfigOptions } from '../../utils/build-options';
+import { WebpackConfigOptions, WebpackTestOptions } from '../../utils/build-options';
 import { allowMangle, profilingEnabled } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { Spinner } from '../../utils/spinner';
 import { addError } from '../../utils/webpack-diagnostics';
 import { DedupeModuleResolvePlugin, ScriptsWebpackPlugin } from '../plugins';
 import { JavaScriptOptimizerPlugin } from '../plugins/javascript-optimizer-plugin';
-import { getOutputHashFormat, getWatchOptions, normalizeExtraEntryPoints } from '../utils/helpers';
+import {
+  getInstrumentationExcludedPaths,
+  getOutputHashFormat,
+  getWatchOptions,
+  normalizeExtraEntryPoints,
+} from '../utils/helpers';
 
 // eslint-disable-next-line max-lines-per-function
-export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration> {
-  const { root, projectRoot, buildOptions, tsConfig, projectName } = wco;
+export async function getCommonConfig(
+  wco: WebpackConfigOptions<WebpackTestOptions>,
+): Promise<Configuration> {
+  const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot } = wco;
   const {
     cache,
+    codeCoverage,
+    codeCoverageExclude = [],
     platform = 'browser',
     sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap },
     optimization: { styles: stylesOptimization, scripts: scriptsOptimization },
@@ -380,7 +389,13 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
                 scriptTarget: wco.scriptTarget,
                 aot: buildOptions.aot,
                 optimize: buildOptions.buildOptimizer,
-              },
+                instrumentCode: codeCoverage
+                  ? {
+                      includedBasePath: sourceRoot,
+                      excludedPaths: getInstrumentationExcludedPaths(root, codeCoverageExclude),
+                    }
+                  : undefined,
+              } as AngularBabelLoaderOptions,
             },
           ],
         },
