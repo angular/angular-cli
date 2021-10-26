@@ -52,6 +52,20 @@
     {
       "matchCurrentVersion": "/_VERSION$/",
       "enabled": false
+    },
+    {
+      "excludePackagePatterns": [
+        "^@angular/.*",
+        "^@angular-devkit/.*",
+        "^@schematics/.*",
+        "angular/dev-infra"
+      ],
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": ">=1",
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "schedule": ["after 1am on Thursday"]
     }
   ]
 }
