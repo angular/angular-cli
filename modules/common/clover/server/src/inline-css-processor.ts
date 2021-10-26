@@ -52,7 +52,7 @@ class CrittersExtended extends Critters {
     });
   }
 
-  protected async readFile(path: string): Promise<string> {
+  public override async readFile(path: string): Promise<string> {
     let resourceContent = this.resourceCache.get(path);
     if (resourceContent === undefined) {
       resourceContent = await promises.readFile(path);
