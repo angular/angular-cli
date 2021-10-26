@@ -85,7 +85,7 @@ if (require.main === module) {
     generate(inPath, outPath);
   } catch (error) {
     console.error('An error happened:');
-    console.error(err);
+    console.error(error);
     process.exit(127);
   }
 }
