@@ -47,6 +47,14 @@ export interface ApplicationPresetOptions {
 
   forceES5?: boolean;
   forceAsyncTransformation?: boolean;
+  instrumentCode?: {
+    includedBasePath: string;
+  };
+  optimize?: {
+    looseEnums: boolean;
+    pureTopLevel: boolean;
+    wrapDecorators: boolean;
+  };
 
   diagnosticReporter?: DiagnosticReporter;
 }
@@ -218,6 +226,31 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
       require('@babel/plugin-proposal-async-generator-functions').default,
     );
     needRuntimeTransform = true;
+  }
+
+  if (options.optimize) {
+    if (options.optimize.pureTopLevel) {
+      plugins.push(require('../plugins/pure-toplevel-functions').default);
+    }
+
+    plugins.push(
+      require('../plugins/elide-angular-metadata').default,
+      [
+        require('../plugins/adjust-typescript-enums').default,
+        { loose: options.optimize.looseEnums },
+      ],
+      [
+        require('../plugins/adjust-static-class-members').default,
+        { wrapDecorators: options.optimize.wrapDecorators },
+      ],
+    );
+  }
+
+  if (options.instrumentCode) {
+    plugins.push([
+      require('babel-plugin-istanbul').default,
+      { inputSourceMap: false, cwd: options.instrumentCode.includedBasePath },
+    ]);
   }
 
   if (needRuntimeTransform) {
