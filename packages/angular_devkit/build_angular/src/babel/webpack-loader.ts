@@ -12,15 +12,15 @@ import { ScriptTarget } from 'typescript';
 import { loadEsmModule } from '../utils/load-esm';
 import { ApplicationPresetOptions, I18nPluginCreators } from './presets/application';
 
-interface AngularCustomOptions extends Pick<ApplicationPresetOptions, 'angularLinker' | 'i18n'> {
-  forceAsyncTransformation: boolean;
-  forceES5: boolean;
-  optimize?: {
-    looseEnums: boolean;
-    pureTopLevel: boolean;
-    wrapDecorators: boolean;
+interface AngularCustomOptions extends Omit<ApplicationPresetOptions, 'instrumentCode'> {
+  instrumentCode?: {
+    /** node_modules and test files are always excluded. */
+    excludedPaths: Set<String>;
+    includedBasePath: string;
   };
 }
+
+export type AngularBabelLoaderOptions = AngularCustomOptions & Record<string, unknown>;
 
 // Extract Sourcemap input type from the remapping function since it is not currently exported
 type SourceMapInput = Exclude<Parameters<typeof remapping>[0], unknown[]>;
@@ -62,7 +62,7 @@ async function requiresLinking(path: string, source: string): Promise<boolean> {
   return needsLinking(path, source);
 }
 
-export default custom<AngularCustomOptions>(() => {
+export default custom<ApplicationPresetOptions>(() => {
   const baseOptions = Object.freeze({
     babelrc: false,
     configFile: false,
@@ -73,15 +73,19 @@ export default custom<AngularCustomOptions>(() => {
   });
 
   return {
-    async customOptions({ i18n, scriptTarget, aot, optimize, ...rawOptions }, { source }) {
+    async customOptions(options, { source }) {
+      const { i18n, scriptTarget, aot, optimize, instrumentCode, ...rawOptions } =
+        options as AngularBabelLoaderOptions;
+
       // Must process file if plugins are added
       let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
 
-      const customOptions: AngularCustomOptions = {
+      const customOptions: ApplicationPresetOptions = {
         forceAsyncTransformation: false,
         forceES5: false,
         angularLinker: undefined,
         i18n: undefined,
+        instrumentCode: undefined,
       };
 
       // Analyze file for linking
@@ -117,7 +121,7 @@ export default custom<AngularCustomOptions>(() => {
           customOptions.forceAsyncTransformation =
             !/[\\/][_f]?esm2015[\\/]/.test(this.resourcePath) && source.includes('async');
         }
-        shouldProcess ||= customOptions.forceAsyncTransformation || customOptions.forceES5;
+        shouldProcess ||= customOptions.forceAsyncTransformation || customOptions.forceES5 || false;
       }
 
       // Analyze for i18n inlining
@@ -163,6 +167,20 @@ export default custom<AngularCustomOptions>(() => {
         shouldProcess = true;
       }
 
+      if (
+        instrumentCode &&
+        !instrumentCode.excludedPaths.has(this.resourcePath) &&
+        !/\.(e2e|spec)\.tsx?$|[\\/]node_modules[\\/]/.test(this.resourcePath) &&
+        this.resourcePath.startsWith(instrumentCode.includedBasePath)
+      ) {
+        // `babel-plugin-istanbul` has it's own includes but we do the below so that we avoid running the the loader.
+        customOptions.instrumentCode = {
+          includedBasePath: instrumentCode.includedBasePath,
+        };
+
+        shouldProcess = true;
+      }
+
       // Add provided loader options to default base options
       const loaderOptions: Record<string, unknown> = {
         ...baseOptions,
@@ -184,32 +202,12 @@ export default custom<AngularCustomOptions>(() => {
       return { custom: customOptions, loader: loaderOptions };
     },
     config(configuration, { customOptions }) {
-      const plugins = configuration.options.plugins ?? [];
-      if (customOptions.optimize) {
-        if (customOptions.optimize.pureTopLevel) {
-          plugins.push(require('./plugins/pure-toplevel-functions').default);
-        }
-
-        plugins.push(
-          require('./plugins/elide-angular-metadata').default,
-          [
-            require('./plugins/adjust-typescript-enums').default,
-            { loose: customOptions.optimize.looseEnums },
-          ],
-          [
-            require('./plugins/adjust-static-class-members').default,
-            { wrapDecorators: customOptions.optimize.wrapDecorators },
-          ],
-        );
-      }
-
       return {
         ...configuration.options,
         // Using `false` disables babel from attempting to locate sourcemaps or process any inline maps.
         // The babel types do not include the false option even though it is valid
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         inputSourceMap: false as any,
-        plugins,
         presets: [
           ...(configuration.options.presets || []),
           [
@@ -240,16 +238,10 @@ export default custom<AngularCustomOptions>(() => {
         // `@ampproject/remapping` source map objects but both are compatible with Webpack.
         // This method for merging is used because it provides more accurate output
         // and is faster while using less memory.
-        result.map = {
-          // Convert the SourceMap back to simple plain object.
-          // This is needed because otherwise code-coverage will fail with `don't know how to turn this value into a node`
-          // Which is throw by Babel when it is invoked again from `istanbul-lib-instrument`.
-          // https://github.com/babel/babel/blob/780aa48d2a34dc55f556843074b6aed45e7eabeb/packages/babel-types/src/converters/valueToNode.ts#L115-L130
-          ...(remapping(
-            [result.map as SourceMapInput, inputSourceMap as SourceMapInput],
-            () => null,
-          ) as typeof result.map),
-        };
+        result.map = remapping(
+          [result.map as SourceMapInput, inputSourceMap as SourceMapInput],
+          () => null,
+        ) as typeof result.map;
       }
 
       return result;

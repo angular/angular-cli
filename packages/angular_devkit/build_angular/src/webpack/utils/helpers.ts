@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import glob from 'glob';
 import * as path from 'path';
 import { Configuration, SourceMapDevToolPlugin } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../builders/browser/schema';
@@ -130,4 +131,19 @@ export function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath:
     // File has the same name but it's in a different location.
     return '[path][name].[ext]';
   };
+}
+
+export function getInstrumentationExcludedPaths(
+  sourceRoot: string,
+  excludedPaths: string[],
+): Set<string> {
+  const excluded = new Set<string>();
+
+  for (const excludeGlob of excludedPaths) {
+    glob
+      .sync(path.join(sourceRoot, excludeGlob), { nodir: true })
+      .forEach((p) => excluded.add(path.normalize(p)));
+  }
+
+  return excluded;
 }
