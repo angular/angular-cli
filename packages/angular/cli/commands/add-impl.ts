@@ -29,6 +29,16 @@ import { Spinner } from '../utilities/spinner';
 import { isTTY } from '../utilities/tty';
 import { Schema as AddCommandSchema } from './add';
 
+/**
+ * The set of packages that should have certain versions excluded from consideration
+ * when attempting to find a compatible version for a package.
+ * The key is a package name and the value is a SemVer range of versions to exclude.
+ */
+const packageVersionExclusions: Record<string, string | undefined> = {
+  // @angular/localize@9.x versions do not have peer dependencies setup
+  '@angular/localize': '9.x',
+};
+
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
   override readonly allowPrivateSchematics = true;
 
@@ -40,6 +50,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     }
   }
 
+  // eslint-disable-next-line max-lines-per-function
   async run(options: AddCommandSchema & Arguments) {
     await ensureCompatibleNpm(this.context.root);
 
@@ -100,7 +111,13 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         return 1;
       }
 
+      // Start with the version tagged as `latest` if it exists
       const latestManifest = packageMetadata.tags['latest'];
+      if (latestManifest) {
+        packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
+      }
+
+      // Adjust the version based on name and peer dependencies
       if (latestManifest && Object.keys(latestManifest.peerDependencies).length === 0) {
         if (latestManifest.name === '@angular/pwa') {
           const version = await this.findProjectVersion('@angular/cli');
@@ -113,16 +130,31 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           ) {
             packageIdentifier = npa.resolve('@angular/pwa', '0.12');
           }
-        } else {
-          packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
         }
+
         spinner.succeed(
           `Found compatible package version: ${colors.grey(packageIdentifier.toString())}.`,
         );
       } else if (!latestManifest || (await this.hasMismatchedPeer(latestManifest))) {
         // 'latest' is invalid so search for most recent matching package
+        const versionExclusions = packageVersionExclusions[packageMetadata.name];
         const versionManifests = Object.values(packageMetadata.versions).filter(
-          (value: PackageManifest) => !prerelease(value.version) && !value.deprecated,
+          (value: PackageManifest) => {
+            // Prerelease versions are not stable and should not be considered by default
+            if (prerelease(value.version)) {
+              return false;
+            }
+            // Deprecated versions should not be used or considered
+            if (value.deprecated) {
+              return false;
+            }
+            // Excluded package versions should not be considered
+            if (versionExclusions && satisfies(value.version, versionExclusions)) {
+              return false;
+            }
+
+            return true;
+          },
         );
 
         versionManifests.sort((a, b) => rcompare(a.version, b.version, true));
@@ -130,13 +162,13 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         let newIdentifier;
         for (const versionManifest of versionManifests) {
           if (!(await this.hasMismatchedPeer(versionManifest))) {
-            newIdentifier = npa.resolve(packageIdentifier.name, versionManifest.version);
+            newIdentifier = npa.resolve(versionManifest.name, versionManifest.version);
             break;
           }
         }
 
         if (!newIdentifier) {
-          spinner.warn("Unable to find compatible package.  Using 'latest'.");
+          spinner.warn("Unable to find compatible package.  Using 'latest' tag.");
         } else {
           packageIdentifier = newIdentifier;
           spinner.succeed(
@@ -144,7 +176,6 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           );
         }
       } else {
-        packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
         spinner.succeed(
           `Found compatible package version: ${colors.grey(packageIdentifier.toString())}.`,
         );
