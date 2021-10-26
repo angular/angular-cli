@@ -133,6 +133,23 @@ export function capitalize(str: string): string {
 }
 
 /**
+ Returns the Titlecase form of a string
+
+ ```javascript
+ 'innerHTML'.titlecase()         // 'Inner HTML'
+ 'action_name'.titlecase()       // 'Action Name'
+ 'css-class-name'.titlecase()    // 'Css Class Name'
+ 'my favorite items'.titlecase() // 'My Favorite Items'
+ ```
+ */
+export function titlecase(str: string): string {
+  return dasherize(str)
+    .split('-')
+    .map((part) => capitalize(part))
+    .join(' ');
+}
+
+/**
  * Calculate the levenshtein distance of two strings.
  * See https://en.wikipedia.org/wiki/Levenshtein_distance.
  * Based off https://gist.github.com/andrei-m/982927 (for using the faster dynamic programming
