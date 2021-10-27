@@ -348,19 +348,26 @@ function getProxyConfig(root: string, proxyConfig: string): browserSync.Middlewa
   }
 
   const proxies = Array.isArray(proxySettings) ? proxySettings : [proxySettings];
+  const createdProxies = [];
 
-  return proxies.map((proxy) => {
-    const keys = Object.keys(proxy);
-    const context = keys[0];
-
-    if (keys.length === 1 || typeof context === 'string') {
-      const normalizedContext = context.replace(/^\*$/, '**').replace(/\/\*$/, '');
-
-      return createProxyMiddleware(normalizedContext, proxy[context]) as any;
+  for (const proxy of proxies) {
+    for (const [key, context] of Object.entries(proxy)) {
+      if (typeof key === 'string') {
+        createdProxies.push(
+          createProxyMiddleware(
+            key.replace(/^\*$/, '**').replace(/\/\*$/, ''),
+            context as any,
+          ) as browserSync.MiddlewareHandler,
+        );
+      } else {
+        createdProxies.push(
+          createProxyMiddleware(key, context as any) as browserSync.MiddlewareHandler,
+        );
+      }
     }
+  }
 
-    return createProxyMiddleware(proxy) as any;
-  });
+  return createdProxies;
 }
 
 export default createBuilder<SSRDevServerBuilderOptions, BuilderOutput>(execute);
