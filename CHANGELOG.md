@@ -1,3 +1,21 @@
+<a name="12.2.12"></a>
+
+# 12.2.12 (2021-10-27)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [2decc2d26](https://github.com/angular/angular-cli/commit/2decc2d265ad32df3a7834337f82f00d723eaa74) | fix  | avoid extra filesystem access with i18n and differential loading |
+| [802b1b037](https://github.com/angular/angular-cli/commit/802b1b0378c1816dbfd8f4320b5d69e82f0c7aa6) | fix  | remove potential race condition in i18n worker execution         |
+| [cce88c2e1](https://github.com/angular/angular-cli/commit/cce88c2e1cb673434dcd495dea1df751ca9d3592) | fix  | update `critters` to version `0.0.12`                            |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Mikhail Vasiliev
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.11"></a>
 
 # 12.2.11 (2021-10-20)
