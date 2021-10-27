@@ -1,3 +1,27 @@
+<a name="13.0.0-rc.2"></a>
+
+# 13.0.0-rc.2 (2021-10-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [5ad145722](https://github.com/angular/angular-cli/commit/5ad145722f66af526a36983b259c6d625c93f307) | fix  | error when updating Angular packages across multi-major migrations  |
+| [e4bc35e33](https://github.com/angular/angular-cli/commit/e4bc35e332e378f8d238f4069dc56f422fe205d6) | fix  | exclude packages from ng add that contain invalid peer dependencies |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [b14e0a547](https://github.com/angular/angular-cli/commit/b14e0a54727352a6939c7a0ff13dffe2deaa67d2) | fix  | improve sourcemaps fidelity when code coverage is enabled |
+| [5f012e1c6](https://github.com/angular/angular-cli/commit/5f012e1c6b2e8e175a38cb4978cc35bebbb64234) | fix  | update `critters` to version `0.0.12`                     |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Joey Perrott and Mikhail Vasiliev
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-rc.1"></a>
 
 # 13.0.0-rc.1 (2021-10-20)
