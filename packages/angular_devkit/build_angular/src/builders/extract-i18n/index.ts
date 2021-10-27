@@ -156,6 +156,16 @@ export async function execute(
     throw new Error('The builder requires a target.');
   }
 
+  try {
+    require.resolve('@angular/localize');
+  } catch {
+    return {
+      success: false,
+      error: `i18n extraction requires the '@angular/localize' package.`,
+      outputPath: outFile,
+    };
+  }
+
   const metadata = await context.getProjectMetadata(context.target);
   const i18n = createI18nOptions(metadata);
 
@@ -229,16 +239,6 @@ export async function execute(
       return partials;
     },
   );
-
-  try {
-    require.resolve('@angular/localize');
-  } catch {
-    return {
-      success: false,
-      error: `Ivy extraction requires the '@angular/localize' package.`,
-      outputPath: outFile,
-    };
-  }
 
   // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
   // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
