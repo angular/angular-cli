@@ -418,13 +418,39 @@ function _usageMessage(
   const packageGroups = new Map<string, string>();
   const packagesToUpdate = [...infoMap.entries()]
     .map(([name, info]) => {
-      const tag = options.next
+      let tag = options.next
         ? info.npmPackageJson['dist-tags']['next']
           ? 'next'
           : 'latest'
         : 'latest';
-      const version = info.npmPackageJson['dist-tags'][tag];
-      const target = info.npmPackageJson.versions[version];
+      let version = info.npmPackageJson['dist-tags'][tag];
+      let target = info.npmPackageJson.versions[version];
+
+      const versionDiff = semver.diff(info.installed.version, version);
+      if (
+        versionDiff !== 'patch' &&
+        versionDiff !== 'minor' &&
+        /^@(?:angular|nguniversal)\//.test(name)
+      ) {
+        const installedMajorVersion = semver.parse(info.installed.version)?.major;
+        const toInstallMajorVersion = semver.parse(version)?.major;
+        if (
+          installedMajorVersion !== undefined &&
+          toInstallMajorVersion !== undefined &&
+          installedMajorVersion < toInstallMajorVersion - 1
+        ) {
+          const nextMajorVersion = `${installedMajorVersion + 1}.`;
+          const nextMajorVersions = Object.keys(info.npmPackageJson.versions)
+            .filter((v) => v.startsWith(nextMajorVersion))
+            .sort((a, b) => (a > b ? -1 : 1));
+
+          if (nextMajorVersions.length) {
+            version = nextMajorVersions[0];
+            target = info.npmPackageJson.versions[version];
+            tag = '';
+          }
+        }
+      }
 
       return {
         name,
@@ -442,10 +468,9 @@ function _usageMessage(
     })
     .map(({ name, info, version, tag, target }) => {
       // Look for packageGroup.
-      if (target['ng-update'] && target['ng-update']['packageGroup']) {
-        const packageGroup = target['ng-update']['packageGroup'];
-        const packageGroupName =
-          target['ng-update']['packageGroupName'] || target['ng-update']['packageGroup'][0];
+      const packageGroup = target['ng-update']?.['packageGroup'];
+      if (packageGroup) {
+        const packageGroupName = packageGroup?.[0];
         if (packageGroupName) {
           if (packageGroups.has(name)) {
             return null;
@@ -458,7 +483,9 @@ function _usageMessage(
       }
 
       let command = `ng update ${name}`;
-      if (tag == 'next') {
+      if (!tag) {
+        command += `@${semver.parse(version)?.major || version}`;
+      } else if (tag == 'next') {
         command += ' --next';
       }
 
