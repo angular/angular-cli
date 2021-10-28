@@ -55,7 +55,7 @@
     "resolve-url-loader": "4.0.0",
     "rxjs": "6.6.7",
     "sass": "1.43.4",
-    "sass-loader": "12.2.0",
+    "sass-loader": "12.3.0",
     "semver": "7.3.5",
     "source-map-loader": "3.0.0",
     "source-map-support": "0.5.20",
@@ -67,7 +67,7 @@
     "tslib": "2.3.1",
     "webpack": "5.60.0",
     "webpack-dev-middleware": "5.2.1",
-    "webpack-dev-server": "4.3.1",
+    "webpack-dev-server": "4.4.0",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0"
   },
