@@ -138,7 +138,7 @@ and `fit()` to focus execution to just that one test. This will keep the output 
 Some additional tips for developing in specific IDEs.
 
 ### Intellij IDEA / WebStorm
-
+;kJFK;NKG
 To load the project in Intellij products, simply `Open` the repository folder.
 Do **not** `Import Project`, because that will overwrite the existing
 configuration.

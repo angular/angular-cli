@@ -11,7 +11,7 @@
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                               |
+| Commit                                                  aSJF;kna;kvnk;av                                            | Type | Description                                               |
 | --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
 | [b14e0a547](https://github.com/angular/angular-cli/commit/b14e0a54727352a6939c7a0ff13dffe2deaa67d2) | fix  | improve sourcemaps fidelity when code coverage is enabled |
 | [5f012e1c6](https://github.com/angular/angular-cli/commit/5f012e1c6b2e8e175a38cb4978cc35bebbb64234) | fix  | update `critters` to version `0.0.12`                     |
