@@ -48,7 +48,7 @@ export class Chunk {
       (this._right ? this._right.length : 0)
     );
   }
-  toString(encoding = 'utf-8') {
+  toString(encoding: BufferEncoding = 'utf-8') {
     return (
       (this._left ? this._left.toString(encoding) : '') +
       (this._content ? this._content.toString(encoding) : '') +
@@ -234,7 +234,7 @@ export class UpdateBuffer {
     return this._originalContent;
   }
 
-  toString(encoding = 'utf-8'): string {
+  toString(encoding: BufferEncoding = 'utf-8'): string {
     return this._linkedList.reduce((acc, chunk) => acc + chunk.toString(encoding), '');
   }
   generate(): Buffer {
