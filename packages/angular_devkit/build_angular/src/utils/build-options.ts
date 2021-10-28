@@ -69,9 +69,6 @@ export interface BuildOptions {
   inlineStyleLanguage?: InlineStyleLanguage;
   allowedCommonJsDependencies?: string[];
   cache: NormalizedCachedOptions;
-}
-
-export interface WebpackTestOptions extends BuildOptions {
   codeCoverage?: boolean;
   codeCoverageExclude?: string[];
 }

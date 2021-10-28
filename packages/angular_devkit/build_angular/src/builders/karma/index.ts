@@ -19,7 +19,6 @@ import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-bro
 import {
   getCommonConfig,
   getStylesConfig,
-  getTestConfig,
   getTypeScriptConfig,
   getWorkerConfig,
 } from '../../webpack/configs';
@@ -64,7 +63,6 @@ async function initialize(
       getCommonConfig(wco),
       getStylesConfig(wco),
       getTypeScriptConfig(wco),
-      getTestConfig(wco),
       getWorkerConfig(wco),
     ],
   );

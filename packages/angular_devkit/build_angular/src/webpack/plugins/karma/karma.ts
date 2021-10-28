@@ -17,7 +17,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 import { statsErrorsToString } from '../../utils/stats';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
-import { WebpackTestOptions } from '../../../utils/build-options';
+import { BuildOptions } from '../../../utils/build-options';
 import { normalizeSourceMaps } from '../../../utils/index';
 
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
@@ -58,7 +58,7 @@ const init: any = (config: any, emitter: any) => {
         ` be used from within Angular CLI and will not work correctly outside of it.`,
     );
   }
-  const options = config.buildWebpack.options as WebpackTestOptions;
+  const options = config.buildWebpack.options as BuildOptions;
   const logger: logging.Logger = config.buildWebpack.logger || createConsoleLogger();
   successCb = config.buildWebpack.successCb;
   failureCb = config.buildWebpack.failureCb;

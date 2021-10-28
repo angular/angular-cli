@@ -6,50 +6,69 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import CopyWebpackPlugin, { ObjectPattern } from 'copy-webpack-plugin';
-import { createHash } from 'crypto';
-import { createWriteStream, existsSync, promises as fsPromises } from 'fs';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import {
   Compiler,
   Configuration,
-  ProgressPlugin,
+  ContextReplacementPlugin,
   RuleSetRule,
-  WebpackOptionsNormalized,
+  SourceMapDevToolPlugin,
   debug,
 } from 'webpack';
+import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { AngularBabelLoaderOptions } from '../../babel/webpack-loader';
-import { AssetPatternClass } from '../../builders/browser/schema';
 import { BuildBrowserFeatures } from '../../utils';
-import { WebpackConfigOptions, WebpackTestOptions } from '../../utils/build-options';
+import { WebpackConfigOptions } from '../../utils/build-options';
 import { allowMangle, profilingEnabled } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
-import { Spinner } from '../../utils/spinner';
-import { addError } from '../../utils/webpack-diagnostics';
-import { DedupeModuleResolvePlugin, ScriptsWebpackPlugin } from '../plugins';
-import { JavaScriptOptimizerPlugin } from '../plugins/javascript-optimizer-plugin';
 import {
+  CommonJsUsageWarnPlugin,
+  DedupeModuleResolvePlugin,
+  JavaScriptOptimizerPlugin,
+  JsonStatsPlugin,
+  ScriptsWebpackPlugin,
+} from '../plugins';
+import { ProgressPlugin } from '../plugins/progress-plugin';
+import {
+  assetPatterns,
+  externalizePackages,
+  getCacheSettings,
   getInstrumentationExcludedPaths,
   getOutputHashFormat,
-  getWatchOptions,
-  normalizeExtraEntryPoints,
+  getStatsOptions,
+  globalScriptsByBundleName,
 } from '../utils/helpers';
 
 // eslint-disable-next-line max-lines-per-function
-export async function getCommonConfig(
-  wco: WebpackConfigOptions<WebpackTestOptions>,
-): Promise<Configuration> {
+export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration> {
   const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot } = wco;
   const {
     cache,
     codeCoverage,
-    codeCoverageExclude = [],
+    crossOrigin = 'none',
     platform = 'browser',
-    sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap },
+    codeCoverageExclude = [],
+    sourceMap: {
+      styles: stylesSourceMap,
+      scripts: scriptsSourceMap,
+      vendor: vendorSourceMap,
+      hidden: hiddenSourceMap,
+    },
     optimization: { styles: stylesOptimization, scripts: scriptsOptimization },
+    commonChunk,
+    vendorChunk,
+    subresourceIntegrity,
+    verbose,
+    poll,
+    webWorkerTsConfig,
+    externalDependencies = [],
+    allowedCommonJsDependencies,
+    bundleDependencies,
   } = buildOptions;
 
+  const isPlatformServer = buildOptions.platform === 'server';
   const extraPlugins: { apply(compiler: Compiler): void }[] = [];
   const extraRules: RuleSetRule[] = [];
   const entryPoints: { [key: string]: [string, ...string[]] } = {};
@@ -76,34 +95,7 @@ export async function getCommonConfig(
   const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
 
   if (buildOptions.progress) {
-    const spinner = new Spinner();
-    spinner.start(`Generating ${platform} application bundles (phase: setup)...`);
-
-    extraPlugins.push(
-      new ProgressPlugin({
-        handler: (percentage: number, message: string) => {
-          const phase = message ? ` (phase: ${message})` : '';
-          spinner.text = `Generating ${platform} application bundles${phase}...`;
-
-          switch (percentage) {
-            case 1:
-              if (spinner.isSpinning) {
-                spinner.succeed(
-                  `${platform.replace(/^\w/, (s) =>
-                    s.toUpperCase(),
-                  )} application bundle generation complete.`,
-                );
-              }
-              break;
-            case 0:
-              if (!spinner.isSpinning) {
-                spinner.start();
-              }
-              break;
-          }
-        },
-      }),
-    );
+    extraPlugins.push(new ProgressPlugin(platform));
   }
 
   if (buildOptions.main) {
@@ -111,7 +103,12 @@ export async function getCommonConfig(
     entryPoints['main'] = [mainPath];
   }
 
-  if (platform !== 'server') {
+  if (isPlatformServer) {
+    // Fixes Critical dependency: the request of a dependency is an expression
+    extraPlugins.push(new ContextReplacementPlugin(/@?hapi|express[\\/]/));
+  }
+
+  if (!isPlatformServer) {
     if (buildOptions.polyfills) {
       const projectPolyfills = path.resolve(root, buildOptions.polyfills);
       if (entryPoints['polyfills']) {
@@ -139,53 +136,31 @@ export async function getCommonConfig(
     );
   }
 
+  if (allowedCommonJsDependencies) {
+    // When this is not defined it means the builder doesn't support showing common js usages.
+    // When it does it will be an array.
+    extraPlugins.push(
+      new CommonJsUsageWarnPlugin({
+        allowedDependencies: allowedCommonJsDependencies,
+      }),
+    );
+  }
+
   // process global scripts
-  const globalScriptsByBundleName = normalizeExtraEntryPoints(
-    buildOptions.scripts,
-    'scripts',
-  ).reduce((prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {
-    const { bundleName, inject, input } = curr;
-    let resolvedPath = path.resolve(root, input);
-
-    if (!existsSync(resolvedPath)) {
-      try {
-        resolvedPath = require.resolve(input, { paths: [root] });
-      } catch {
-        throw new Error(`Script file ${input} does not exist.`);
-      }
-    }
-
-    const existingEntry = prev.find((el) => el.bundleName === bundleName);
-    if (existingEntry) {
-      if (existingEntry.inject && !inject) {
-        // All entries have to be lazy for the bundle to be lazy.
-        throw new Error(`The ${bundleName} bundle is mixing injected and non-injected scripts.`);
-      }
-
-      existingEntry.paths.push(resolvedPath);
-    } else {
-      prev.push({
-        bundleName,
-        inject,
-        paths: [resolvedPath],
-      });
-    }
-
-    return prev;
-  }, []);
-
   // Add a new asset for each entry.
-  for (const script of globalScriptsByBundleName) {
+  for (const { bundleName, inject, paths } of globalScriptsByBundleName(
+    root,
+    buildOptions.scripts,
+  )) {
     // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
-    const hash = script.inject ? hashFormat.script : '';
-    const bundleName = script.bundleName;
+    const hash = inject ? hashFormat.script : '';
 
     extraPlugins.push(
       new ScriptsWebpackPlugin({
         name: bundleName,
         sourceMap: scriptsSourceMap,
+        scripts: paths,
         filename: `${path.basename(bundleName)}${hash}.js`,
-        scripts: script.paths,
         basePath: projectRoot,
       }),
     );
@@ -193,47 +168,9 @@ export async function getCommonConfig(
 
   // process asset entries
   if (buildOptions.assets.length) {
-    const copyWebpackPluginPatterns = buildOptions.assets.map(
-      (asset: AssetPatternClass, index: number): ObjectPattern => {
-        // Resolve input paths relative to workspace root and add slash at the end.
-        // eslint-disable-next-line prefer-const
-        let { input, output, ignore = [], glob } = asset;
-        input = path.resolve(root, input).replace(/\\/g, '/');
-        input = input.endsWith('/') ? input : input + '/';
-        output = output.endsWith('/') ? output : output + '/';
-
-        if (output.startsWith('..')) {
-          throw new Error('An asset cannot be written to a location outside of the output path.');
-        }
-
-        return {
-          context: input,
-          // Now we remove starting slash to make Webpack place it from the output root.
-          to: output.replace(/^\//, ''),
-          from: glob,
-          noErrorOnMissing: true,
-          force: true,
-          globOptions: {
-            dot: true,
-            followSymbolicLinks: !!asset.followSymlinks,
-            ignore: [
-              '.gitkeep',
-              '**/.DS_Store',
-              '**/Thumbs.db',
-              // Negate patterns needs to be absolute because copy-webpack-plugin uses absolute globs which
-              // causes negate patterns not to match.
-              // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
-              ...ignore,
-            ].map((i) => path.posix.join(input, i)),
-          },
-          priority: index,
-        };
-      },
-    );
-
     extraPlugins.push(
       new CopyWebpackPlugin({
-        patterns: copyWebpackPluginPatterns,
+        patterns: assetPatterns(root, buildOptions.assets),
       }),
     );
   }
@@ -262,33 +199,42 @@ export async function getCommonConfig(
     );
   }
 
+  if (scriptsSourceMap || stylesSourceMap) {
+    const include = [];
+    if (scriptsSourceMap) {
+      include.push(/js$/);
+    }
+
+    if (stylesSourceMap) {
+      include.push(/css$/);
+    }
+
+    extraPlugins.push(
+      new SourceMapDevToolPlugin({
+        filename: '[file].map',
+        include,
+        // We want to set sourceRoot to  `webpack:///` for non
+        // inline sourcemaps as otherwise paths to sourcemaps will be broken in browser
+        // `webpack:///` is needed for Visual Studio breakpoints to work properly as currently
+        // there is no way to set the 'webRoot'
+        sourceRoot: 'webpack:///',
+        moduleFilenameTemplate: '[resource-path]',
+        append: hiddenSourceMap ? false : undefined,
+      }),
+    );
+  }
+
   if (buildOptions.statsJson) {
     extraPlugins.push(
-      new (class {
-        apply(compiler: Compiler) {
-          compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
-            const { stringifyStream } = await import('@discoveryjs/json-ext');
-            const data = stats.toJson('verbose');
-            const statsOutputPath = path.resolve(root, buildOptions.outputPath, 'stats.json');
+      new JsonStatsPlugin(path.resolve(root, buildOptions.outputPath, 'stats.json')),
+    );
+  }
 
-            try {
-              await fsPromises.mkdir(path.dirname(statsOutputPath), { recursive: true });
-
-              await new Promise<void>((resolve, reject) =>
-                stringifyStream(data)
-                  .pipe(createWriteStream(statsOutputPath))
-                  .on('close', resolve)
-                  .on('error', reject),
-              );
-            } catch (error) {
-              addError(
-                stats.compilation,
-                `Unable to write stats file: ${error.message || 'unknown error'}`,
-              );
-            }
-          });
-        }
-      })(),
+  if (subresourceIntegrity) {
+    extraPlugins.push(
+      new SubresourceIntegrityPlugin({
+        hashFuncNames: ['sha384'],
+      }),
     );
   }
 
@@ -319,18 +265,32 @@ export async function getCommonConfig(
         define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
         sourcemap: scriptsSourceMap,
         target: wco.scriptTarget,
-        keepNames: !allowMangle || platform === 'server',
+        keepNames: !allowMangle || isPlatformServer,
         removeLicenses: buildOptions.extractLicenses,
         advanced: buildOptions.buildOptimizer,
       }),
     );
   }
 
+  const externals: Configuration['externals'] = [...externalDependencies];
+  if (isPlatformServer && !bundleDependencies) {
+    externals.push(({ context, request }, callback) =>
+      externalizePackages(context ?? wco.projectRoot, request, callback),
+    );
+  }
+
+  let crossOriginLoading: NonNullable<Configuration['output']>['crossOriginLoading'] = false;
+  if (subresourceIntegrity && crossOrigin === 'none') {
+    crossOriginLoading = 'anonymous';
+  } else if (crossOrigin !== 'none') {
+    crossOriginLoading = crossOrigin;
+  }
+
   return {
     mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
     devtool: false,
     target: [
-      platform === 'server' ? 'node' : 'web',
+      isPlatformServer ? 'node' : 'web',
       tsConfig.options.target === ScriptTarget.ES5 ? 'es5' : 'es2015',
     ],
     profile: buildOptions.statsJson,
@@ -339,12 +299,17 @@ export async function getCommonConfig(
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
+      mainFields: isPlatformServer
+        ? ['es2020', 'es2015', 'module', 'main']
+        : ['es2020', 'es2015', 'browser', 'module', 'main'],
+      conditionNames: ['es2020', 'es2015', '...'],
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
     },
     context: root,
     entry: entryPoints,
+    externals,
     output: {
       uniqueName: projectName,
       hashFunction: 'xxhash64', // todo: remove in webpack 6. This is part of `futureDefaults`.
@@ -353,9 +318,16 @@ export async function getCommonConfig(
       publicPath: buildOptions.deployUrl ?? '',
       filename: `[name]${hashFormat.chunk}.js`,
       chunkFilename: `[name]${hashFormat.chunk}.js`,
+      libraryTarget: isPlatformServer ? 'commonjs' : undefined,
+      crossOriginLoading,
+      trustedTypes: 'angular#bundler',
+      scriptType: 'module',
     },
     watch: buildOptions.watch,
-    watchOptions: getWatchOptions(buildOptions.poll),
+    watchOptions: {
+      poll,
+      ignored: poll === undefined ? undefined : 'node_modules/**',
+    },
     performance: {
       hints: false,
     },
@@ -368,6 +340,17 @@ export async function getCommonConfig(
     module: {
       // Show an error for missing exports instead of a warning.
       strictExportPresence: true,
+
+      parser:
+        webWorkerTsConfig === undefined
+          ? {
+              javascript: {
+                worker: false,
+                url: false,
+              },
+            }
+          : undefined,
+
       rules: [
         {
           // Mark files inside `rxjs/add` as containing side effects.
@@ -407,59 +390,42 @@ export async function getCommonConfig(
       asyncWebAssembly: true,
     },
     infrastructureLogging: {
-      level: buildOptions.verbose ? 'verbose' : 'error',
+      level: verbose ? 'verbose' : 'error',
     },
+    stats: getStatsOptions(verbose),
     cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: 'deterministic',
       chunkIds: buildOptions.namedChunks ? 'named' : 'deterministic',
       emitOnErrors: false,
+      runtimeChunk: isPlatformServer ? false : 'single',
+      splitChunks: {
+        maxAsyncRequests: Infinity,
+        cacheGroups: {
+          default: !!commonChunk && {
+            chunks: 'async',
+            minChunks: 2,
+            priority: 10,
+          },
+          common: !!commonChunk && {
+            name: 'common',
+            chunks: 'async',
+            minChunks: 2,
+            enforce: true,
+            priority: 5,
+          },
+          vendors: false,
+          defaultVendors: !!vendorChunk && {
+            name: 'vendor',
+            chunks: (chunk) => chunk.name === 'main',
+            enforce: true,
+            test: /[\\/]node_modules[\\/]/,
+          },
+        },
+      },
     },
-    plugins: [new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }), ...extraPlugins],
+    plugins: [new DedupeModuleResolvePlugin({ verbose }), ...extraPlugins],
+    node: false,
   };
-}
-
-function getCacheSettings(
-  wco: WebpackConfigOptions,
-  supportedBrowsers: string[],
-  angularVersion: string,
-): WebpackOptionsNormalized['cache'] {
-  const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
-  if (enabled) {
-    const packageVersion = require('../../../package.json').version;
-
-    return {
-      type: 'filesystem',
-      cacheDirectory: path.join(cacheDirectory, 'angular-webpack'),
-      maxMemoryGenerations: 1,
-      // We use the versions and build options as the cache name. The Webpack configurations are too
-      // dynamic and shared among different build types: test, build and serve.
-      // None of which are "named".
-      name: createHash('sha1')
-        .update(angularVersion)
-        .update(packageVersion)
-        .update(wco.projectRoot)
-        .update(JSON.stringify(wco.tsConfig))
-        .update(
-          JSON.stringify({
-            ...wco.buildOptions,
-            // Needed because outputPath changes on every build when using i18n extraction
-            // https://github.com/angular/angular-cli/blob/736a5f89deaca85f487b78aec9ff66d4118ceb6a/packages/angular_devkit/build_angular/src/utils/i18n-options.ts#L264-L265
-            outputPath: undefined,
-          }),
-        )
-        .update(supportedBrowsers.join(''))
-        .digest('hex'),
-    };
-  }
-
-  if (wco.buildOptions.watch) {
-    return {
-      type: 'memory',
-      maxGenerations: 1,
-    };
-  }
-
-  return false;
 }

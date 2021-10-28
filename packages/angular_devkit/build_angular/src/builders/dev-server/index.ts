@@ -35,10 +35,8 @@ import {
 } from '../../utils/webpack-browser-config';
 import {
   getAnalyticsConfig,
-  getBrowserConfig,
   getCommonConfig,
   getDevServerConfig,
-  getStatsConfig,
   getStylesConfig,
   getTypeScriptConfig,
   getWorkerConfig,
@@ -167,9 +165,7 @@ export function serveWebpackBrowser(
       (wco) => [
         getDevServerConfig(wco),
         getCommonConfig(wco),
-        getBrowserConfig(wco),
         getStylesConfig(wco),
-        getStatsConfig(wco),
         getAnalyticsConfig(wco, context),
         getTypeScriptConfig(wco),
         browserOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
