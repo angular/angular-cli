@@ -13,9 +13,8 @@ import textTable from 'text-table';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
 import { colors as ansiColors, removeColor } from '../../utils/color';
-import { getWebpackStatsConfig } from '../configs/stats';
 import { markAsyncChunksNonInitial } from './async-chunks';
-import { normalizeExtraEntryPoints } from './helpers';
+import { getStatsOptions, normalizeExtraEntryPoints } from './helpers';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -313,7 +312,7 @@ export function createWebpackLoggingCallback(
       logger.info(stats.toString(config.stats));
     }
 
-    const rawStats = stats.toJson(getWebpackStatsConfig(false));
+    const rawStats = stats.toJson(getStatsOptions(false));
     const webpackStats = {
       ...rawStats,
       chunks: markAsyncChunksNonInitial(rawStats, extraEntryPoints),

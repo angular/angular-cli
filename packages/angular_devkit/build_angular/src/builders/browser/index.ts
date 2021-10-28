@@ -46,9 +46,7 @@ import {
 } from '../../utils/webpack-browser-config';
 import {
   getAnalyticsConfig,
-  getBrowserConfig,
   getCommonConfig,
-  getStatsConfig,
   getStylesConfig,
   getTypeScriptConfig,
   getWorkerConfig,
@@ -96,9 +94,7 @@ async function initialize(
   const { config, projectRoot, projectSourceRoot, i18n, target } =
     await generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
       getCommonConfig(wco),
-      getBrowserConfig(wco),
       getStylesConfig(wco),
-      getStatsConfig(wco),
       getAnalyticsConfig(wco, context),
       getTypeScriptConfig(wco),
       wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},

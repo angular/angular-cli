@@ -19,13 +19,7 @@ import { createI18nOptions } from '../../utils/i18n-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
-import {
-  getBrowserConfig,
-  getCommonConfig,
-  getStatsConfig,
-  getTypeScriptConfig,
-  getWorkerConfig,
-} from '../../webpack/configs';
+import { getCommonConfig, getTypeScriptConfig, getWorkerConfig } from '../../webpack/configs';
 import { createWebpackLoggingCallback } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { Format, Schema } from './schema';
@@ -182,6 +176,7 @@ export async function execute(
     subresourceIntegrity: false,
     outputHashing: OutputHashing.None,
     namedChunks: true,
+    allowedCommonJsDependencies: undefined,
   };
   const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
     builderOptions,
@@ -193,10 +188,8 @@ export async function execute(
       const partials = [
         { plugins: [new NoEmitPlugin()] },
         getCommonConfig(wco),
-        getBrowserConfig(wco),
         getTypeScriptConfig(wco),
         getWorkerConfig(wco),
-        getStatsConfig(wco),
       ];
 
       // Add Ivy application file extractor support

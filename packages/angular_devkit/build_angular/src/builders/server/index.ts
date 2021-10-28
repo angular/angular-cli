@@ -21,13 +21,7 @@ import { I18nOptions } from '../../utils/i18n-options';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateI18nBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
-import {
-  getCommonConfig,
-  getServerConfig,
-  getStatsConfig,
-  getStylesConfig,
-  getTypeScriptConfig,
-} from '../../webpack/configs';
+import { getCommonConfig, getStylesConfig, getTypeScriptConfig } from '../../webpack/configs';
 import { webpackStatsLogger } from '../../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
@@ -161,13 +155,7 @@ async function initialize(
       platform: 'server',
     } as NormalizedBrowserBuilderSchema,
     context,
-    (wco) => [
-      getCommonConfig(wco),
-      getServerConfig(wco),
-      getStylesConfig(wco),
-      getStatsConfig(wco),
-      getTypeScriptConfig(wco),
-    ],
+    (wco) => [getCommonConfig(wco), getStylesConfig(wco), getTypeScriptConfig(wco)],
   );
 
   let transformedConfig;
