@@ -48,8 +48,7 @@ parentPort.on('message', ({ id, hasImporter, options }: RenderRequestMessage) =>
       // `receiveMessageOnPort` function are used to ensure synchronous behavior.
       options.importer = function (url, prev) {
         Atomics.store(importerSignal, 0, 0);
-        // `this.fromImport` was added in dart-sass in 1.33.0, `@types/sass` doesn't include it yet.
-        const { fromImport } = this as { fromImport: boolean };
+        const { fromImport } = this;
         workerImporterPort.postMessage({ id, url, prev, fromImport });
         Atomics.wait(importerSignal, 0, 0);
 
