@@ -114,8 +114,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#047a95f394e81d4a120a21a5802000d0c2e62030":
   version "0.0.0"
-  uid "047a95f394e81d4a120a21a5802000d0c2e62030"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#047a95f394e81d4a120a21a5802000d0c2e62030"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#eed375cd53f702e9d496ffcc9adfae1085e13ce7"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -128,7 +127,7 @@
     "@bazel/protractor" "4.4.0"
     "@bazel/runfiles" "4.4.0"
     "@bazel/typescript" "4.4.0"
-    "@microsoft/api-extractor" "7.18.17"
+    "@microsoft/api-extractor" "7.18.16"
     "@octokit/auth-app" "^3.6.0"
     "@octokit/core" "^3.5.1"
     "@octokit/graphql" "^4.8.0"
@@ -156,7 +155,7 @@
     node-fetch "^2.6.1"
     prettier "^2.3.2"
     protractor "^7.0.0"
-    rollup "2.58.3"
+    rollup "2.58.0"
     rollup-plugin-sourcemaps "^0.6.3"
     selenium-webdriver "3.5.0"
     semver "^7.3.5"
@@ -1372,26 +1371,26 @@
     brfs "^1.4.0"
     unicode-trie "^0.3.0"
 
-"@microsoft/api-extractor-model@7.13.14":
-  version "7.13.14"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.13.14.tgz#071bf881942814c7786a20c6805bc5cde4019bc5"
-  integrity sha512-mKc917+QhOuOZebSnE77i8Tavj/G5ydIFoJqDIY9LpmAfJjsVHgL2pc7vkvW58QTxH2wadIDK1tLzcteOMEt4w==
+"@microsoft/api-extractor-model@7.13.13":
+  version "7.13.13"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.13.13.tgz#5c1ac0fff0410b8f23478b15560b24096b8869c6"
+  integrity sha512-4Hz2TOL4TljsAfMQe7a8tm+Am8+AkrcgkbnH62S9YuaIC3Cw6jE4H2qP8WC2JJInWJP4pg/ZrUlHrtmtgrqn9Q==
   dependencies:
     "@microsoft/tsdoc" "0.13.2"
     "@microsoft/tsdoc-config" "~0.15.2"
-    "@rushstack/node-core-library" "3.43.0"
+    "@rushstack/node-core-library" "3.42.3"
 
-"@microsoft/api-extractor@7.18.17":
-  version "7.18.17"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.17.tgz#3139f803fcaef919c7ff68e02bd6759bc637a64b"
-  integrity sha512-gZuJ//FAyfrOqWssY0cyU2bEo8FOIaIYVs+pU5IDyfImkye6YkT2Qnm5PAFhyYSkfUjV5SjvyuP4+VsDfS3jww==
+"@microsoft/api-extractor@7.18.16":
+  version "7.18.16"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.16.tgz#c5e077e417938da7e7026124c51d34a90868e7bd"
+  integrity sha512-f0EcjGgS8IToUHxfQIr4vxGpBhUdaDOhGyddZpZ5K9e/GcGkImfkGeHpYbK043f2bZV3aagTx6NcIawwE72BKA==
   dependencies:
-    "@microsoft/api-extractor-model" "7.13.14"
+    "@microsoft/api-extractor-model" "7.13.13"
     "@microsoft/tsdoc" "0.13.2"
     "@microsoft/tsdoc-config" "~0.15.2"
-    "@rushstack/node-core-library" "3.43.0"
-    "@rushstack/rig-package" "0.3.4"
-    "@rushstack/ts-command-line" "4.10.3"
+    "@rushstack/node-core-library" "3.42.3"
+    "@rushstack/rig-package" "0.3.3"
+    "@rushstack/ts-command-line" "4.10.2"
     colors "~1.2.1"
     lodash "~4.17.15"
     resolve "~1.17.0"
@@ -1757,10 +1756,10 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rushstack/node-core-library@3.43.0":
-  version "3.43.0"
-  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.43.0.tgz#aace43bf49bc907445fa306f8c2e6010a8353cda"
-  integrity sha512-MFLW+6X83k6o8m8KnWkDhL/8NCJYHbFnnDokPSX1UHC3JwiEvVhHmEnxZv2YEzwnXeFYoKViub2G2t2liHbHLA==
+"@rushstack/node-core-library@3.42.3":
+  version "3.42.3"
+  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.42.3.tgz#e9bc8aee4ba047d1858afcb7822b5aaf973b4fd8"
+  integrity sha512-xtiJsHtO4Sf/hVKyf/8d58p3zQh2JAZNs1mmDNCyIlgSRYGdqUkpadvvn5mz7EwF6lwn+xTTaTV5/a32xKjbdw==
   dependencies:
     "@types/node" "12.20.24"
     colors "~1.2.1"
@@ -1772,18 +1771,18 @@
     timsort "~0.3.0"
     z-schema "~3.18.3"
 
-"@rushstack/rig-package@0.3.4":
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/@rushstack/rig-package/-/rig-package-0.3.4.tgz#13987cea8eef2f350e2e7538e028fa839f8c4f3c"
-  integrity sha512-NsCzPxPQ8cu7lnqa/4xBQXuCJwaBrb5vEbOC8Q/bMQK7GDOxeVUN3/f+NCYjgQSl39toAm8jQJ7TJe+RYYX3yQ==
+"@rushstack/rig-package@0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@rushstack/rig-package/-/rig-package-0.3.3.tgz#6e291d181b2b9b114dd8e806e8389d999142d137"
+  integrity sha512-ElPnChxIkUzcU3ywI0Cl7E1aM+2w6vFpAwM6X+oWk7Cyjf2ofItThje9e5qUBtKqvI9sc5jVsHY1bRC8rVwOqQ==
   dependencies:
     resolve "~1.17.0"
     strip-json-comments "~3.1.1"
 
-"@rushstack/ts-command-line@4.10.3":
-  version "4.10.3"
-  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.10.3.tgz#2b8610473f2aa9e22450273f662abb02a3979a11"
-  integrity sha512-DdDfwr8CO6CP/kBZlQrrwKyA6UxOteujaIBrmoHa+J+dyLZC19YA/LK0fAHjr2qHLAJHHXVpZwPH8BpqN84oVg==
+"@rushstack/ts-command-line@4.10.2":
+  version "4.10.2"
+  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.10.2.tgz#019d43d8428e243031c66aeac1f088687f6730f3"
+  integrity sha512-Weq8B7oJeCQ4ITsaVLhOQombipyg+idpkdkhA6UqLtKvuzq8zTtPpAfhP5ff5L+RCmo1CFCVOBE3i+MvzUR5vA==
   dependencies:
     "@types/argparse" "1.0.38"
     argparse "~1.0.9"
@@ -2248,7 +2247,7 @@
   resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.1.tgz#d8f1c0d0dc23afad6dc16a9e993a0865774b4065"
   integrity sha512-xoDlM2S4ortawSWORYqsdU+2rxdh4LRW9ytc3zmT37RIKQh6IHyKwwtKhKis9ah8ol07DCkZxPt8BBvPjC6v4g==
 
-"@types/sass@^1.16.0":
+"@types/sass@^1.43.0":
   version "1.43.0"
   resolved "https://registry.yarnpkg.com/@types/sass/-/sass-1.43.0.tgz#b4cebe057d887ed66dc6813fd6cbef22043057bb"
   integrity sha512-DPSXNJ1rYLo88GyF9tuB4bsYGfpKI1a4+wOQmc+LI1SUoocm9QLRSpz0GxxuyjmJsYFIQo/dDlRSSpIXngff+w==
@@ -9262,10 +9261,10 @@ rollup-plugin-sourcemaps@^0.6.3:
     "@rollup/pluginutils" "^3.0.9"
     source-map-resolve "^0.6.0"
 
-rollup@2.58.3:
-  version "2.58.3"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.58.3.tgz#71a08138d9515fb65043b6a18618b2ed9ac8d239"
-  integrity sha512-ei27MSw1KhRur4p87Q0/Va2NAYqMXOX++FNEumMBcdreIRLURKy+cE2wcDJKBn0nfmhP2ZGrJkP1XPO+G8FJQw==
+rollup@2.58.0:
+  version "2.58.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.58.0.tgz#a643983365e7bf7f5b7c62a8331b983b7c4c67fb"
+  integrity sha512-NOXpusKnaRpbS7ZVSzcEXqxcLDOagN6iFS8p45RkoiMqPHDLwJm758UF05KlMoCRbLBTZsPOIa887gZJ1AiXvw==
   optionalDependencies:
     fsevents "~2.3.2"
 
@@ -9334,7 +9333,6 @@ sass@1.43.4, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:

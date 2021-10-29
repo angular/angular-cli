@@ -76,9 +76,7 @@ export class SassWorkerImplementation {
   render(options: Options, callback: RenderCallback): void {
     // The `functions`, `logger` and `importer` options are JavaScript functions that cannot be transferred.
     // If any additional function options are added in the future, they must be excluded as well.
-    const { functions, importer, logger, ...serializableOptions } = options as Options & {
-      logger?: unknown;
-    };
+    const { functions, importer, logger, ...serializableOptions } = options;
 
     // The CLI's configuration does not use or expose the ability to defined custom Sass functions
     if (functions && Object.keys(functions).length > 0) {
