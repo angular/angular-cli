@@ -317,7 +317,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);
-    expect(await files['styles.css']).not.toContain('/*! important-comment */');
+    expect(await files['styles.css']).toContain('/*! important-comment */');
   });
 
   it('supports autoprefixer grid comments in SCSS with optimization true', async () => {

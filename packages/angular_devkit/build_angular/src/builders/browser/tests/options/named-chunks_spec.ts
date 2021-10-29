@@ -11,7 +11,7 @@ import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 const MAIN_OUTPUT = 'dist/main.js';
 const NAMED_LAZY_OUTPUT = 'dist/src_lazy-module_ts.js';
-const UNNAMED_LAZY_OUTPUT = 'dist/629.js';
+const UNNAMED_LAZY_OUTPUT = 'dist/8.js';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "namedChunks"', () => {
