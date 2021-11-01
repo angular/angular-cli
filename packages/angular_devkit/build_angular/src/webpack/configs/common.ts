@@ -300,9 +300,9 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       symlinks: !buildOptions.preserveSymlinks,
       modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
       mainFields: isPlatformServer
-        ? ['es2020', 'es2015', 'module', 'main']
+        ? ['es2015', 'module', 'main']
         : ['es2020', 'es2015', 'browser', 'module', 'main'],
-      conditionNames: ['es2020', 'es2015', '...'],
+      conditionNames: isPlatformServer ? ['es2015', '...'] : ['es2020', 'es2015', '...'],
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
