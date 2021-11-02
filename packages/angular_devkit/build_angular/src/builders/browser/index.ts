@@ -44,13 +44,7 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../../utils/webpack-browser-config';
-import {
-  getAnalyticsConfig,
-  getCommonConfig,
-  getStylesConfig,
-  getTypeScriptConfig,
-  getWorkerConfig,
-} from '../../webpack/configs';
+import { getAnalyticsConfig, getCommonConfig, getStylesConfig } from '../../webpack/configs';
 import { markAsyncChunksNonInitial } from '../../webpack/utils/async-chunks';
 import { normalizeExtraEntryPoints } from '../../webpack/utils/helpers';
 import {
@@ -96,8 +90,6 @@ async function initialize(
       getCommonConfig(wco),
       getStylesConfig(wco),
       getAnalyticsConfig(wco, context),
-      getTypeScriptConfig(wco),
-      wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
     ]);
 
   // Validate asset option values if processed directly
