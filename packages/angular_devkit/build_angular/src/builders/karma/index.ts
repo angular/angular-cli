@@ -16,12 +16,7 @@ import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
-import {
-  getCommonConfig,
-  getStylesConfig,
-  getTypeScriptConfig,
-  getWorkerConfig,
-} from '../../webpack/configs';
+import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
 import { SingleTestTransformLoader } from '../../webpack/plugins/single-test-transform';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { findTests } from './find-tests';
@@ -59,12 +54,7 @@ async function initialize(
       watch: true,
     },
     context,
-    (wco) => [
-      getCommonConfig(wco),
-      getStylesConfig(wco),
-      getTypeScriptConfig(wco),
-      getWorkerConfig(wco),
-    ],
+    (wco) => [getCommonConfig(wco), getStylesConfig(wco)],
   );
 
   const karma = await import('karma');

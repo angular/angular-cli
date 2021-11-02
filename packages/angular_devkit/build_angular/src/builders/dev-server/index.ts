@@ -38,8 +38,6 @@ import {
   getCommonConfig,
   getDevServerConfig,
   getStylesConfig,
-  getTypeScriptConfig,
-  getWorkerConfig,
 } from '../../webpack/configs';
 import { IndexHtmlWebpackPlugin } from '../../webpack/plugins/index-html-webpack-plugin';
 import { createWebpackLoggingCallback } from '../../webpack/utils/stats';
@@ -167,8 +165,6 @@ export function serveWebpackBrowser(
         getCommonConfig(wco),
         getStylesConfig(wco),
         getAnalyticsConfig(wco, context),
-        getTypeScriptConfig(wco),
-        browserOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
       ],
       options,
     );

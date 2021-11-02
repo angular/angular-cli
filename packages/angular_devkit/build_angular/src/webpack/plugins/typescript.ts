@@ -8,9 +8,8 @@
 
 import { getSystemPath } from '@angular-devkit/core';
 import type { CompilerOptions } from '@angular/compiler-cli';
-import { AngularWebpackLoaderPath, AngularWebpackPlugin } from '@ngtools/webpack';
+import { AngularWebpackPlugin } from '@ngtools/webpack';
 import { ScriptTarget } from 'typescript';
-import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
 
 function ensureIvy(wco: WebpackConfigOptions): void {
@@ -28,11 +27,15 @@ function ensureIvy(wco: WebpackConfigOptions): void {
   wco.tsConfig.options.enableIvy = true;
 }
 
-function createIvyPlugin(
+export function createIvyPlugin(
   wco: WebpackConfigOptions,
   aot: boolean,
   tsconfig: string,
 ): AngularWebpackPlugin {
+  if (aot) {
+    ensureIvy(wco);
+  }
+
   const { buildOptions } = wco;
   const optimize = buildOptions.optimization.scripts;
 
@@ -85,33 +88,4 @@ function createIvyPlugin(
     emitNgModuleScope: !optimize,
     inlineStyleFileExtension,
   });
-}
-
-export function getTypeScriptConfig(wco: WebpackConfigOptions): Configuration {
-  const {
-    buildOptions: { aot = false, main, polyfills },
-    tsConfigPath,
-  } = wco;
-
-  if (main || polyfills) {
-    ensureIvy(wco);
-
-    return {
-      module: {
-        rules: [
-          {
-            test: /\.[jt]sx?$/,
-            loader: AngularWebpackLoaderPath,
-          },
-        ],
-      },
-      plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
-    };
-  }
-
-  return {};
-}
-
-export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {
-  return createIvyPlugin(wco, false, workerTsConfigPath);
 }
