@@ -10,6 +10,8 @@ import * as path from 'path';
 import type { LoaderContext } from 'webpack';
 import { AngularPluginSymbol, FileEmitterCollection } from './symbol';
 
+const JS_FILE_REGEXP = /\.[cm]?js$/;
+
 export function angularWebpackLoader(this: LoaderContext<unknown>, content: string, map: string) {
   const callback = this.async();
   if (!callback) {
@@ -20,7 +22,7 @@ export function angularWebpackLoader(this: LoaderContext<unknown>, content: stri
     this as LoaderContext<unknown> & { [AngularPluginSymbol]?: FileEmitterCollection }
   )[AngularPluginSymbol];
   if (!fileEmitter || typeof fileEmitter !== 'object') {
-    if (this.resourcePath.endsWith('.js')) {
+    if (JS_FILE_REGEXP.test(this.resourcePath)) {
       // Passthrough for JS files when no plugin is used
       this.callback(undefined, content, map);
 
@@ -36,7 +38,7 @@ export function angularWebpackLoader(this: LoaderContext<unknown>, content: stri
     .emit(this.resourcePath)
     .then((result) => {
       if (!result) {
-        if (this.resourcePath.endsWith('.js')) {
+        if (JS_FILE_REGEXP.test(this.resourcePath)) {
           // Return original content for JS files if not compiled by TypeScript ("allowJs")
           this.callback(undefined, content, map);
         } else {
