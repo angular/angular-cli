@@ -1,3 +1,28 @@
+<a name="13.0.0-rc.3"></a>
+
+# 13.0.0-rc.3 (2021-11-02)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [8795536a3](https://github.com/angular/angular-cli/commit/8795536a31efbed6373787188cb21c5d1e0accbd) | fix  | update `ng update` output for Angular packages |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [e19287453](https://github.com/angular/angular-cli/commit/e19287453c10740ea21b31a6c8a3cd5f3714955d) | fix  | move `@angular/localize` detection prior to webpack initialization |
+| [416844194](https://github.com/angular/angular-cli/commit/416844194be414ed574d74e5efbe670e587cc883) | fix  | remove potential race condition in i18n worker execution           |
+| [1d8cdf853](https://github.com/angular/angular-cli/commit/1d8cdf853dc8fdea78b067a715b3342ed9427caa) | fix  | update esbuild to 0.13.12                                          |
+| [ea926db25](https://github.com/angular/angular-cli/commit/ea926db257ad3b042af86178e472b5763a695146) | fix  | use es2015 when generating server bundles                          |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0-rc.2"></a>
 
 # 13.0.0-rc.2 (2021-10-27)
