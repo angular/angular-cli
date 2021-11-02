@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import stableStringify from 'safe-stable-stringify';
 import { JsonObject, JsonValue } from '../../json';
 import { JsonAstArray, JsonAstKeyValue, JsonAstNode, JsonAstObject } from '../../json/parser_ast';
-
-const stableStringify = require('fast-json-stable-stringify');
 
 interface CacheEntry {
   value?: JsonValue;

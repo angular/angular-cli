@@ -8,6 +8,7 @@
 
 import { Observable, Subject, concat, of } from 'rxjs';
 import { finalize, ignoreElements, share, shareReplay, tap } from 'rxjs/operators';
+import stableStringify from 'safe-stable-stringify';
 import { JsonValue } from '../../json';
 import {
   JobDescription,
@@ -18,14 +19,12 @@ import {
   JobOutboundMessageKind,
 } from './api';
 
-const stableStringify = require('fast-json-stable-stringify');
-
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace strategy {
   export type JobStrategy<
     A extends JsonValue = JsonValue,
     I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue
+    O extends JsonValue = JsonValue,
   > = (
     handler: JobHandler<A, I, O>,
     options?: Partial<Readonly<JobDescription>>,
@@ -37,7 +36,7 @@ export namespace strategy {
   export function serialize<
     A extends JsonValue = JsonValue,
     I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue
+    O extends JsonValue = JsonValue,
   >(): JobStrategy<A, I, O> {
     let latest: Observable<JobOutboundMessage<O>> = of();
 
@@ -66,7 +65,7 @@ export namespace strategy {
   export function reuse<
     A extends JsonValue = JsonValue,
     I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue
+    O extends JsonValue = JsonValue,
   >(replayMessages = false): JobStrategy<A, I, O> {
     let inboundBus = new Subject<JobInboundMessage<I>>();
     let run: Observable<JobOutboundMessage<O>> | null = null;
@@ -121,7 +120,7 @@ export namespace strategy {
   export function memoize<
     A extends JsonValue = JsonValue,
     I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue
+    O extends JsonValue = JsonValue,
   >(replayMessages = false): JobStrategy<A, I, O> {
     const runs = new Map<string, Observable<JobOutboundMessage<O>>>();
 

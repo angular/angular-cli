@@ -40,9 +40,9 @@ ts_library(
         "@npm//@types/node",
         "@npm//ajv",
         "@npm//ajv-formats",
-        "@npm//fast-json-stable-stringify",
         "@npm//magic-string",
         "@npm//rxjs",
+        "@npm//safe-stable-stringify",
         "@npm//source-map",  # @external
         # @node_module: typescript:es2015.proxy
         # @node_module: typescript:es2015.reflect
