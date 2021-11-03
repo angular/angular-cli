@@ -138,7 +138,7 @@
     "common-tags": "^1.8.0",
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "9.0.1",
-    "core-js": "3.19.0",
+    "core-js": "3.19.1",
     "critters": "0.0.14",
     "css-loader": "6.5.0",
     "debug": "^4.1.1",
