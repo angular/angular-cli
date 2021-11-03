@@ -1,3 +1,19 @@
+<a name="13.1.0-next.0"></a>
+
+# 13.1.0-next.0 (2021-11-03)
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [5402f99f8](https://github.com/angular/angular-cli/commit/5402f99f8ad20e0a57456a416a992415fc6332bd) | fix  | add `cjs` and `mjs` to passthrough files |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Ruslan Lekhman
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.13"></a>
 
 # 12.2.13 (2021-11-03)
