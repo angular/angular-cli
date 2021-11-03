@@ -22,7 +22,7 @@
   "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/webpack",
   "dependencies": {},
   "peerDependencies": {
-    "@angular/compiler-cli": "^13.0.0 || ^13.0.0-next",
+    "@angular/compiler-cli": "^13.0.0 || ^13.1.0-next",
     "typescript": "~4.4.3",
     "webpack": "^5.30.0"
   },
