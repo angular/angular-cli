@@ -1,3 +1,19 @@
+<a name="12.2.13"></a>
+
+# 12.2.13 (2021-11-03)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [a2bd940e4](https://github.com/angular/angular-cli/commit/a2bd940e4ab44db57b0fc69d5346d2862a19c879) | fix  | add verbose logging for differential loading and i18n |
+
+## Special Thanks
+
+Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.0"></a>
 
 # 13.0.0 (2021-11-03)
