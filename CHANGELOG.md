@@ -1,32 +1,53 @@
-<a name="13.0.0-rc.0"></a>
+<a name="13.0.0"></a>
 
-# 13.0.0-rc.0 (2021-10-14)
-
-## Breaking Changes
-
-### @nguniversal/common
-
-- Inlining of critical CSS is no longer enable by default. Users already on Angular version 12 and have not opted-out from using this feature are encouraged to opt-in using the `inlineCriticalCss` option.
-
-The motivation behind this change is that the package used to parse the CSS has a number of defects which can lead to unactionable error messages when updating to Angular 13 from versions priors to 12. Such errors can be seen in the following issue https://github.com/angular/angular-cli/issues/20760.
-
-### @nguniversal/builders
-
-| Commit                                                                                           | Type | Description                                  |
-| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
-| [6ba411cd](https://github.com/angular/universal/commit/6ba411cd8c8c18d2f334d7182fee65402a118d42) | fix  | index.original.html should be used if exists |
+# 13.0.0 (2021-11-03)
 
 ### @nguniversal/common
 
 | Commit                                                                                           | Type | Description                                              |
 | ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------------------- |
-| [357411dd](https://github.com/angular/universal/commit/357411ddb344c030455937f9b0c8ba62c4eafae4) | feat | disable critical CSS inlining by default                 |
 | [838e478e](https://github.com/angular/universal/commit/838e478e5421b918cd51f7bfbb7ba51be1cb7604) | feat | officially support Node.js v16                           |
 | [b94bcd11](https://github.com/angular/universal/commit/b94bcd118eb489abf9822ed49c1a725e8b1c8fb8) | fix  | inlineCriticalCssProcessor `outputPath` fallback to `''` |
 
 ## Special Thanks
 
-Alan Agius, Doug Parker, Douglas Parker, Javier Infante and ikeq
+Alan Agius, Doug Parker, Douglas Parker, HyperLifelll9, Keen Yee Liau and ikeq
+
+<a name="12.1.3"></a>
+
+# 12.1.3 (2021-10-27)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                           |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------- |
+| [6819d0c3](https://github.com/angular/universal/commit/6819d0c32f755db80a1d34d15473cf47daf32bcf) | fix  | update `critters` to version `0.0.12` |
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                       |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------- |
+| [7adc8f9a](https://github.com/angular/universal/commit/7adc8f9a96e02eda415c3205012e06c0728b7651) | fix  | correctly handle multiple proxies |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                                                           |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------------------------- |
+| [cfe47ff0](https://github.com/angular/universal/commit/cfe47ff02e702a1758ea0d9ff170f815db929e1b) | fix  | update schematic to be `noPropertyAccessFromIndexSignature` compliant |
+
+## Special Thanks
+
+Alan Agius and Doug Parker
+
+<a name="12.1.2"></a>
+
+# 12.1.2 (2021-10-21)
+
+Update critters to version 0.0.11
+
+## Special Thanks
+
+Alan Agius and Doug Parker
 
 <a name="12.1.1"></a>
 
