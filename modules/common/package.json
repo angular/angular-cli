@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "critters": "0.0.14",
-    "jsdom": "18.0.0",
+    "jsdom": "18.0.1",
     "tslib": "TSLIB_VERSION"
   },
   "peerDependencies": {
