@@ -129,10 +129,21 @@ function wrap(
       // Provide compatibility modules for older versions of @angular/cdk
       return legacyModules[id];
     } else if (id.startsWith('@angular-devkit/') || id.startsWith('@schematics/')) {
-      // Resolve from inside the `@angular/cli` project
-      const packagePath = require.resolve(id);
+      // Files should not redirect `@angular/core` and instead use the direct
+      // dependency if available. This allows old major version migrations to continue to function
+      // even though the latest major version may have breaking changes in `@angular/core`.
+      if (id.startsWith('@angular-devkit/core')) {
+        try {
+          return schematicRequire(id);
+        } catch (e) {
+          if (e.code !== 'MODULE_NOT_FOUND') {
+            throw e;
+          }
+        }
+      }
 
-      return hostRequire(packagePath);
+      // Resolve from inside the `@angular/cli` project
+      return hostRequire(id);
     } else if (id.startsWith('.') || id.startsWith('@angular/cdk')) {
       // Wrap relative files inside the schematic collection
       // Also wrap `@angular/cdk`, it contains helper utilities that import core schematic packages
