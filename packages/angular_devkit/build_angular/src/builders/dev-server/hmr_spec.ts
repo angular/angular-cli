@@ -58,7 +58,9 @@ describe('Dev Server Builder HMR', () => {
         <p>{{title}}</p>
 
         <input class="visible" type="text">
+        <input type="file">
         <input type="hidden">
+
         <select>
           <option>one</option>
           <option>two</option>
