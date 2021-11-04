@@ -3760,10 +3760,10 @@ css-has-pseudo@^0.10.0:
     postcss "^7.0.6"
     postcss-selector-parser "^5.0.0-rc.4"
 
-css-loader@6.5.0:
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.5.0.tgz#9d1cf7766a9a8f0b3c6e1638309b964dbdab46d3"
-  integrity sha512-VmuSdQa3K+wJsl39i7X3qGBM5+ZHmtTnv65fqMGI+fzmHoYmszTVvTqC1XN8JwWDViCB1a8wgNim5SV4fb37xg==
+css-loader@6.5.1:
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.5.1.tgz#0c43d4fbe0d97f699c91e9818cb585759091d1b1"
+  integrity sha512-gEy2w9AnJNnD9Kuo4XAP9VflW/ujKoS9c/syO+uWMlm5igc7LysKzPXaDoR2vroROkSwsTS2tGr1yGGEbZOYZQ==
   dependencies:
     icss-utils "^5.1.0"
     postcss "^8.2.15"
@@ -6657,10 +6657,10 @@ loader-runner@^4.2.0:
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-4.2.0.tgz#d7022380d66d14c5fb1d496b89864ebcfd478384"
   integrity sha512-92+huvxMvYlMzMt0iIOukcwYBFpkYJdpl2xsZ7LrlayO7E8SOv+JJUEK17B/dJIHAOLMfh2dZZ/Y18WgmGtYNw==
 
-loader-utils@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-3.1.0.tgz#5d6583148713e4c022b3dac9daac0efd9b6bca42"
-  integrity sha512-7YF6k8Q9xXFHkQhVaX76PyJVAIcPAKNk+7zJs5w2k/wVqkb8uq8O6MIWuY50BkuinY2WD5Ugmpu0oVipDexFkQ==
+loader-utils@3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-3.1.3.tgz#bd56dd5f8cc7b94c4f3cb0512be58126219253e8"
+  integrity sha512-iQeN+4aRVLiJU1J2BNTRg2cjhuFXWUX9DmvTDDtuwAm+ye6cMpUTLaPZmCFlZOrcDg93C9a17e/Hr+nQ9lquYw==
   dependencies:
     big.js "^6.1.1"
 
@@ -7038,10 +7038,10 @@ min-indent@^1.0.0:
   resolved "https://registry.yarnpkg.com/min-indent/-/min-indent-1.0.1.tgz#a63f681673b30571fbe8bc25686ae746eefa9869"
   integrity sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==
 
-mini-css-extract-plugin@2.4.3:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-2.4.3.tgz#be742943c192b028645d4389084ef187615fff82"
-  integrity sha512-zekavl9mZuGyk7COjsfFY/f655AX61EKE0AthXPrmDk+oZyjZ9WzO4WPjXnnO9xl8obK2kmM6rAQrBEmk+WK1g==
+mini-css-extract-plugin@2.4.4:
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-2.4.4.tgz#c7e5d2d931dcf100ae50ae949ba757c506b54b0f"
+  integrity sha512-UJ+aNuFQaQaECu7AamlWOBLj2cJ6XSGU4zNiqXeZ7lZLe5VD0DoSPWFbWArXueo+6FZVbgHzpX9lUIaBIDLuYg==
   dependencies:
     schema-utils "^3.1.0"
 
@@ -7252,10 +7252,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-packagr@13.0.0-rc.3:
-  version "13.0.0-rc.3"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.0-rc.3.tgz#f604e4d0d3ac50bd8d4624ecad03d46ae8abdb16"
-  integrity sha512-p+gRs/dtaag/4vO3HaXZnd+IqJyuKvMEOsWsPZsRT/pF4C6P+IhEvsmlV+jVf1J/dz8CFnN19A3AQpTAVUCnUw==
+ng-packagr@13.0.2:
+  version "13.0.2"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.2.tgz#b0055bd65aa727a0aab04a8980578db9d4040629"
+  integrity sha512-Li48Hs7CEIedXNJmhwnVgg6mJkTAdG+6DxX0BpR4veKYg8Ms2b1nSVC3S4yR9MfOW2ADrJZHBZ26of4K3+Csbw==
   dependencies:
     "@rollup/plugin-json" "^4.1.0"
     "@rollup/plugin-node-resolve" "^13.0.0"
