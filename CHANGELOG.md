@@ -1,3 +1,19 @@
+<a name="13.0.1"></a>
+
+# 13.0.1 (2021-11-03)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [40f599241](https://github.com/angular/angular-cli/commit/40f599241e278478c694580c9dec4f5cc34db011) | fix  | updated Angular new project version to v13.0.0 |
+
+## Special Thanks
+
+Charles Lyding and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.0-next.0"></a>
 
 # 13.1.0-next.0 (2021-11-03)
