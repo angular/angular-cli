@@ -364,6 +364,9 @@ export async function getCommonConfig(
       /Failed to parse source map from/,
       // https://github.com/webpack-contrib/postcss-loader/blob/bd261875fdf9c596af4ffb3a1a73fe3c549befda/src/index.js#L153-L158
       /Add postcss as project dependency/,
+      // esbuild will issue a warning, while still hoists the @charset at the very top.
+      // This is caused by a bug in css-loader https://github.com/webpack-contrib/css-loader/issues/1212
+      /"@charset" must be the first rule in the file/,
     ],
     module: {
       // Show an error for missing exports instead of a warning.
