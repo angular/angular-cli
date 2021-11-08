@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join } from '@angular-devkit/core';
+import { join, tags } from '@angular-devkit/core';
 import { DirEntry, Rule } from '@angular-devkit/schematics';
 import { JSONFile } from '../../utility/json-file';
 import { allTargetOptions, getWorkspace } from '../../utility/workspace';
@@ -36,7 +36,7 @@ export default function (): Rule {
     ['lib', 'umdId'],
   ];
 
-  return async (tree) => {
+  return async (tree, context) => {
     const workspace = await getWorkspace(tree);
     const librariesTsConfig = new Set<string>();
     const ngPackagrConfig = new Set<string>();
@@ -53,7 +53,14 @@ export default function (): Rule {
           }
 
           if (typeof options.project === 'string') {
-            ngPackagrConfig.add(options.project);
+            if (options.project.endsWith('.json')) {
+              ngPackagrConfig.add(options.project);
+            } else {
+              context.logger
+                .warn(tags.stripIndent`Expected a JSON configuration file but found "${options.project}".
+                  You may need to adjust the configuration file to remove invalid options.
+                  For more information, see the breaking changes section within the release notes: https://github.com/ng-packagr/ng-packagr/releases/tag/v13.0.0/.`);
+            }
           }
         }
       }
