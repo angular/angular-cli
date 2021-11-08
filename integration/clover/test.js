@@ -11,7 +11,7 @@ console.log({
   pages,
 });
 
-const expectedNumberOfPages = 5;
+const expectedNumberOfPages = 6;
 if (pages.length !== expectedNumberOfPages) {
   throw new Error(`Expected to have ${expectedNumberOfPages} index pages, but got ${pages.length}`);
 }

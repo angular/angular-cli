@@ -33,8 +33,14 @@ export class CustomResourceLoader extends ResourceLoader {
       return filePromise;
     }
 
-    const promise = promises.readFile(path).then((content) => {
-      this.fileCache.set(path, content);
+    const promise = promises.readFile(path, 'utf-8').then((content) => {
+      if (path.includes('runtime.')) {
+        // JSDOM doesn't support type=module, which will be added to lazy loaded scripts.
+        // https://github.com/jsdom/jsdom/issues/2475
+        content = content.replace(/\.type\s?=\s?['"]module["']/, '');
+      }
+
+      this.fileCache.set(path, Buffer.from(content));
 
       return content;
     }) as AbortablePromise<Buffer>;

@@ -5,6 +5,7 @@ import { HomepageComponent } from './homepage.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
+  { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then((m) => m.LazyModule) },
   { path: '**', component: PokedexComponent },
 ];
 
