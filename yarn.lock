@@ -114,8 +114,7 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a90cdda88674f02dc5e30269868b531b5793295c":
   version "0.0.0"
-  uid a90cdda88674f02dc5e30269868b531b5793295c
-  resolved "https://github.com/angular/dev-infra-private-builds.git#a90cdda88674f02dc5e30269868b531b5793295c"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#e87c1a61a10bc630a316ed971139f572626ebe8b"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -128,7 +127,7 @@
     "@bazel/protractor" "4.4.2"
     "@bazel/runfiles" "4.4.2"
     "@bazel/typescript" "4.4.2"
-    "@microsoft/api-extractor" "7.18.19"
+    "@microsoft/api-extractor" "7.18.17"
     "@octokit/auth-app" "^3.6.0"
     "@octokit/core" "^3.5.1"
     "@octokit/graphql" "^4.8.0"
@@ -1828,11 +1827,6 @@
     "@types/node" "*"
     "@types/responselike" "*"
 
-"@types/caniuse-lite@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/caniuse-lite/-/caniuse-lite-1.0.1.tgz#368292d5d28268cb7917b9178fcdd500df22d64a"
-  integrity sha512-enW8d/vdojHAhr1C/0BqsNkhz/0ik2WCuAJIp9EClP+mHkR8xXBJ2OGeXHZ6cPqDjVKvWBRe9tY/Nr9r4yQSuA==
-
 "@types/component-emitter@^1.2.10":
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/@types/component-emitter/-/component-emitter-1.2.11.tgz#50d47d42b347253817a39709fef03ce66a108506"
@@ -3299,7 +3293,12 @@ camelcase@^5.0.0, camelcase@^5.3.1:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
-caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001032, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001274:
+caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109:
+  version "1.0.30001274"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001274.tgz#26ca36204d15b17601ba6fc35dbdad950a647cc7"
+  integrity sha512-+Nkvv0fHyhISkiMIjnyjmf5YJcQ1IQHZN6U9TLUMroWR38FNwpsC51Gb68yueafX1V6ifOisInSgP9WJFS13ew==
+
+caniuse-lite@^1.0.30001274:
   version "1.0.30001278"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001278.tgz#51cafc858df77d966b17f59b5839250b24417fff"
   integrity sha512-mpF9KeH8u5cMoEmIic/cr7PNS+F5LWBk0t2ekGT60lFf0Wq+n9LspAj0g3P+o7DQhD3sUdlMln4YFAWhFYn9jg==
@@ -9131,7 +9130,6 @@ sass@1.43.4, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:

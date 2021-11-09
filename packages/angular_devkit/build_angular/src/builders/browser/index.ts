@@ -17,7 +17,6 @@ import { ScriptTarget } from 'typescript';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import {
-  BuildBrowserFeatures,
   deleteOutputDir,
   normalizeAssetPatterns,
   normalizeOptimization,
@@ -38,6 +37,7 @@ import { ensureOutputPaths } from '../../utils/output-paths';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
+import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   generateI18nBrowserWebpackConfigFromContext,
@@ -153,9 +153,7 @@ export function buildWebpackBrowser(
         ),
       );
 
-      const buildBrowserFeatures = new BuildBrowserFeatures(sysProjectRoot);
-
-      checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
+      checkInternetExplorerSupport(sysProjectRoot, context.logger);
 
       return {
         ...(await initialize(options, context, transforms.webpackConfiguration)),
@@ -417,10 +415,8 @@ function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
   return filteredFiles;
 }
 
-function checkInternetExplorerSupport(
-  supportedBrowsers: string[],
-  logger: logging.LoggerApi,
-): void {
+function checkInternetExplorerSupport(projectRoot: string, logger: logging.LoggerApi): void {
+  const supportedBrowsers = getSupportedBrowsers(projectRoot);
   if (supportedBrowsers.some((b) => b === 'ie 9' || b === 'ie 10' || b === 'ie 11')) {
     logger.warn(
       `Warning: Support was requested for Internet Explorer in the project's browserslist configuration. ` +

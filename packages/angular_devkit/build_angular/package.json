@@ -26,7 +26,6 @@
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "^4.9.1",
     "cacache": "15.3.0",
-    "caniuse-lite": "^1.0.30001032",
     "circular-dependency-plugin": "5.2.2",
     "copy-webpack-plugin": "9.0.1",
     "core-js": "3.19.1",

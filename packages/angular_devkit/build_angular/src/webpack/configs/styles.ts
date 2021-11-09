@@ -11,7 +11,6 @@ import * as path from 'path';
 import { Configuration, RuleSetUseItem } from 'webpack';
 import { ExtraEntryPoint } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
-import { BuildBrowserFeatures } from '../../utils/build-browser-features';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import {
   AnyComponentStyleBudgetChecker,
@@ -155,9 +154,8 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     }
   }
 
-  const { supportedBrowsers } = new BuildBrowserFeatures(wco.projectRoot);
   const postcssPresetEnvPlugin = postcssPresetEnv({
-    browsers: supportedBrowsers,
+    browsers: buildOptions.supportedBrowsers,
     autoprefixer: true,
     stage: 3,
   });
@@ -398,7 +396,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
       minimizer: buildOptions.optimization.styles.minify
         ? [
             new CssOptimizerPlugin({
-              supportedBrowsers,
+              supportedBrowsers: buildOptions.supportedBrowsers,
             }),
           ]
         : undefined,

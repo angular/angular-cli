@@ -21,6 +21,7 @@ import {
 } from './normalize-file-replacements';
 import { NormalizedOptimizationOptions, normalizeOptimization } from './normalize-optimization';
 import { normalizeSourceMaps } from './normalize-source-maps';
+import { getSupportedBrowsers } from './supported-browsers';
 
 /**
  * A normalized browser builder schema.
@@ -65,5 +66,6 @@ export function normalizeBrowserSchema(
     // A value of 0 is falsy and will disable polling rather then enable
     // 500 ms is a sensible default in this case
     poll: options.poll === 0 ? 500 : options.poll,
+    supportedBrowsers: getSupportedBrowsers(getSystemPath(projectRoot)),
   };
 }
