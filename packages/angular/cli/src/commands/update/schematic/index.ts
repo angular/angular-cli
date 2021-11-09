@@ -460,17 +460,15 @@ function _usageMessage(
         target,
       };
     })
-    .filter(({ info, version, target }) => {
-      return target && semver.compare(info.installed.version, version) < 0;
-    })
-    .filter(({ target }) => {
-      return target['ng-update'];
-    })
+    .filter(
+      ({ info, version, target }) =>
+        target?.['ng-update'] && semver.compare(info.installed.version, version) < 0,
+    )
     .map(({ name, info, version, tag, target }) => {
       // Look for packageGroup.
-      const packageGroup = target['ng-update']?.['packageGroup'];
+      const packageGroup = target['ng-update']['packageGroup'];
       if (packageGroup) {
-        const packageGroupName = packageGroup?.[0];
+        const packageGroupName = target['ng-update']['packageGroupName'] || packageGroup[0];
         if (packageGroupName) {
           if (packageGroups.has(name)) {
             return null;
