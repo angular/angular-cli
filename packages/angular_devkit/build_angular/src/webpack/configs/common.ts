@@ -20,7 +20,6 @@ import {
 } from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { AngularBabelLoaderOptions } from '../../babel/webpack-loader';
-import { BuildBrowserFeatures } from '../../utils';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { allowMangle, profilingEnabled } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
@@ -97,7 +96,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
-  const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot);
 
   if (buildOptions.progress) {
     extraPlugins.push(new ProgressPlugin(platform));
@@ -412,7 +410,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       level: verbose ? 'verbose' : 'error',
     },
     stats: getStatsOptions(verbose),
-    cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
+    cache: getCacheSettings(wco, NG_VERSION.full),
     optimization: {
       minimizer: extraMinimizers,
       moduleIds: 'deterministic',

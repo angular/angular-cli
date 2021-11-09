@@ -71,6 +71,7 @@ export interface BuildOptions {
   cache: NormalizedCachedOptions;
   codeCoverage?: boolean;
   codeCoverageExclude?: string[];
+  supportedBrowsers: string[];
 }
 
 export interface WebpackDevServerOptions

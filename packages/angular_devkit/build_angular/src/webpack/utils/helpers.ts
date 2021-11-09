@@ -117,7 +117,6 @@ export function getInstrumentationExcludedPaths(
 
 export function getCacheSettings(
   wco: WebpackConfigOptions,
-  supportedBrowsers: string[],
   angularVersion: string,
 ): WebpackOptionsNormalized['cache'] {
   const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
@@ -144,7 +143,6 @@ export function getCacheSettings(
             outputPath: undefined,
           }),
         )
-        .update(supportedBrowsers.join(''))
         .digest('hex'),
     };
   }
