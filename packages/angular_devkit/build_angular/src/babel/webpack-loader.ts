@@ -73,7 +73,7 @@ export default custom<ApplicationPresetOptions>(() => {
   });
 
   return {
-    async customOptions(options, { source }) {
+    async customOptions(options, { source, map }) {
       const { i18n, scriptTarget, aot, optimize, instrumentCode, ...rawOptions } =
         options as AngularBabelLoaderOptions;
 
@@ -176,6 +176,7 @@ export default custom<ApplicationPresetOptions>(() => {
         // `babel-plugin-istanbul` has it's own includes but we do the below so that we avoid running the the loader.
         customOptions.instrumentCode = {
           includedBasePath: instrumentCode.includedBasePath,
+          inputSourceMap: map,
         };
 
         shouldProcess = true;
