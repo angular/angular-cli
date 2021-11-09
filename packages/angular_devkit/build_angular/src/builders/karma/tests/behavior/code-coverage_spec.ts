@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { tags } from '@angular-devkit/core';
 import { last, tap } from 'rxjs/operators';
 import { promisify } from 'util';
 import { execute } from '../../index';
@@ -84,6 +85,37 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
           tap((buildEvent) => expect(buildEvent.result?.success).toBeFalse()),
         )
         .toPromise();
+    });
+
+    it('should remapped instrumented code back to the original source', async () => {
+      await harness.modifyFile('src/app/app.component.ts', (content) => {
+        return content.replace(
+          `title = 'app'`,
+          tags.stripIndents`
+          title = 'app';
+  
+          async foo() {
+            return 'foo';
+          }
+        `,
+        );
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        codeCoverage: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      await setTimeoutPromise(1000);
+
+      harness
+        .expectFile('coverage/app.component.ts.html')
+        .content.toContain(
+          '<span class="fstat-no" title="function not covered" >async </span>foo()',
+        );
     });
   });
 });
