@@ -49,6 +49,7 @@ export interface ApplicationPresetOptions {
   forceAsyncTransformation?: boolean;
   instrumentCode?: {
     includedBasePath: string;
+    inputSourceMap: unknown;
   };
   optimize?: {
     looseEnums: boolean;
@@ -249,7 +250,10 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   if (options.instrumentCode) {
     plugins.push([
       require('babel-plugin-istanbul').default,
-      { inputSourceMap: false, cwd: options.instrumentCode.includedBasePath },
+      {
+        inputSourceMap: options.instrumentCode.inputSourceMap ?? false,
+        cwd: options.instrumentCode.includedBasePath,
+      },
     ]);
   }
 
