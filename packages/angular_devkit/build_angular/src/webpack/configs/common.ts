@@ -403,6 +403,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       ],
     },
     experiments: {
+      backCompat: false,
       syncWebAssembly: true,
       asyncWebAssembly: true,
     },
