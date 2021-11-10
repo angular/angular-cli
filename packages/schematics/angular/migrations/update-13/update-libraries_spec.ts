@@ -69,6 +69,25 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
       2,
     ),
   );
+
+  tree.create(
+    '/package.json',
+    JSON.stringify(
+      {
+        dependencies: { tslib: '^2.0.0' },
+        ngPackage: {
+          lib: {
+            entryFile: 'src/public-api.ts',
+            amdId: 'foo',
+            umdId: 'foo',
+            umdModuleIds: ['foo'],
+          },
+        },
+      },
+      undefined,
+      2,
+    ),
+  );
 }
 
 const schematicName = 'update-libraries-v13';
@@ -133,6 +152,21 @@ describe(`Migration to update library projects. ${schematicName}`, () => {
       expect(lib.amdId).toBeUndefined();
       expect(lib.umdId).toBeUndefined();
       expect(lib.umdModuleIds).toBeUndefined();
+    });
+  });
+
+  describe('Ng-packagr properties in package.json', () => {
+    it(`should remove UMD related options from package.json`, async () => {
+      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const pkg = readJsonFile(newTree, 'package.json');
+      expect(pkg).toEqual({
+        dependencies: { tslib: '^2.0.0' },
+        ngPackage: {
+          lib: {
+            entryFile: 'src/public-api.ts',
+          },
+        },
+      });
     });
   });
 });
