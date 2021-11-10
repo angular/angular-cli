@@ -81,7 +81,6 @@ export class NgBuildAnalyticsPlugin {
     protected _projectRoot: string,
     protected _analytics: analytics.Analytics,
     protected _category: string,
-    private aotEnabled: boolean,
   ) {}
 
   protected _reset() {
@@ -114,8 +113,6 @@ export class NgBuildAnalyticsPlugin {
       // Adding commas before and after so the regex are easier to define filters.
       dimensions[analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
     }
-
-    dimensions[analytics.NgCliAnalyticsDimensions.AotEnabled] = this.aotEnabled;
 
     return dimensions;
   }
