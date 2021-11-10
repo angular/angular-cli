@@ -13,9 +13,16 @@ import { allTargetOptions, getWorkspace } from '../../utility/workspace';
 
 function* visit(directory: DirEntry): IterableIterator<string> {
   for (const path of directory.subfiles) {
-    if (path === 'ng-package.json') {
-      yield join(directory.path, path);
+    if (path === 'package.json') {
+      const entry = directory.file(path);
+      if (entry?.content.toString().includes('ngPackage') !== true) {
+        continue;
+      }
+    } else if (path !== 'ng-package.json') {
+      continue;
     }
+
+    yield join(directory.path, path);
   }
 
   for (const path of directory.subdirs) {
@@ -34,6 +41,9 @@ export default function (): Rule {
     ['lib', 'umdModuleIds'],
     ['lib', 'amdId'],
     ['lib', 'umdId'],
+    ['ngPackage', 'lib', 'umdModuleIds'],
+    ['ngPackage', 'lib', 'amdId'],
+    ['ngPackage', 'lib', 'umdId'],
   ];
 
   return async (tree, context) => {
