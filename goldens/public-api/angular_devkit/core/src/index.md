@@ -1064,7 +1064,7 @@ class MultiAnalytics implements Analytics {
 // @public
 enum NgCliAnalyticsDimensions {
     // (undocumented)
-    AotEnabled = 8,
+    AngularCLIMajorVersion = 8,
     // (undocumented)
     BuildErrors = 20,
     // (undocumented)

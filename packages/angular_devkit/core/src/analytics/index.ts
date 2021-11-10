@@ -27,7 +27,7 @@ export enum NgCliAnalyticsDimensions {
   RamInGigabytes = 3,
   NodeVersion = 4,
   NgAddCollection = 6,
-  AotEnabled = 8,
+  AngularCLIMajorVersion = 8,
   BuildErrors = 20,
 }
 
@@ -57,7 +57,7 @@ export const NgCliAnalyticsDimensionsFlagInfo: { [name: string]: [string, string
   RamInGigabytes: ['RAM (In GB)', 'number'],
   NodeVersion: ['Node Version', 'number'],
   NgAddCollection: ['--collection', 'string'],
-  AotEnabled: ['AOT Enabled', 'boolean'],
+  AngularCLIMajorVersion: ['Angular CLI Major Version', 'string'],
   BuildErrors: ['Build Errors (comma separated)', 'string'],
 };
 
