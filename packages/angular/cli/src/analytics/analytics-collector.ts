@@ -117,6 +117,9 @@ export class AnalyticsCollector implements analytics.Analytics {
       os.totalmem() / (1024 * 1024 * 1024),
     );
     this.parameters['cd' + analytics.NgCliAnalyticsDimensions.NodeVersion] = nodeVersion;
+
+    this.parameters['cd' + analytics.NgCliAnalyticsDimensions.AngularCLIMajorVersion] =
+      VERSION.major;
   }
 
   event(ec: string, ea: string, options: analytics.EventOptions = {}): void {
