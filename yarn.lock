@@ -1250,6 +1250,11 @@
   resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-4.4.2.tgz#e1f35922cc9b63e96cc8c263a77b8e1b2938a445"
   integrity sha512-P3cXIje01zsg3TMhTwwbA0sKldYa1J2EGVwahmOPfXlxewd+6cwjhQBQV8SSoxZeFLmCuoMu8eA++mnXgHzm2g==
 
+"@bazel/esbuild@4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-4.4.5.tgz#17331868ac42f2d2c03afc776847dea2d0e650d4"
+  integrity sha512-CImfEr+1ecouGFVGgfCV6Zvx0I3Lw0abxkI8R3BmMleyQcLj8FejCGSFhxIJLKLuxGh/OJXjxoE+PAMTON4O9Q==
+
 "@bazel/ibazel@0.15.10":
   version "0.15.10"
   resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.15.10.tgz#cf0cff1aec6d8e7bb23e1fc618d09fbd39b7a13f"
@@ -1259,6 +1264,14 @@
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.4.2.tgz#04fc413856984456525d3e2e3ebf7f308e915c54"
   integrity sha512-r0ZUB//pRZnpXiy5keSt2vDQfV/3a9x/kar865CgMJRV+mVQsHMF4l72rQD8LPhGzx4QgX+yOWI2gpAq5E5/zQ==
+  dependencies:
+    c8 "~7.5.0"
+    jasmine-reporters "~2.4.0"
+
+"@bazel/jasmine@4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.4.5.tgz#e9540f0bffe286f23ce47ab59e6e015cc14c21af"
+  integrity sha512-BDWKtDmfux89TtWOhSMSuA01cdaNmdU9/8zrMNQopkTGDBmaDyPYvaxyhBAvQQLMiloOUBcS2eMO/fcSKRyg/A==
   dependencies:
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
@@ -1284,10 +1297,28 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
+"@bazel/typescript@4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-4.4.5.tgz#0b323a292910dbfdc5f90312377e9282c73035f0"
+  integrity sha512-Cgq7ZXGkFPAAOn2t9C9JWIDkSjDKB7AkwNgXEwrPwpchKgdoCcD1uMieiErfwBB0FWgJF1xvwwLGOnWA6E/G0A==
+  dependencies:
+    "@bazel/worker" "4.4.5"
+    protobufjs "6.8.8"
+    semver "5.6.0"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
+
 "@bazel/worker@4.4.2":
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.4.2.tgz#01dcfa873786d4ad0b7150b8f9d03a23aa0c19e4"
   integrity sha512-EkxgsV2o6nPd/+ujnyCuKU3C57sjYDdtQVPLdBBIiOmx37RPBw+tRMrp6XYgU3PkhqgMqNQPpS/9Exbj0XSihQ==
+  dependencies:
+    google-protobuf "^3.6.1"
+
+"@bazel/worker@4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.4.5.tgz#1f9292c31615dff8a7297960f7f520bf9febf428"
+  integrity sha512-PoBMiN0SGSb1Qn/SabiM9HWC5nqwyWn0yTJgz6Vq2GMHo1UG7olVHuIfDb2ScFx9jY+mJ3wSyxQ4htlTGldedA==
   dependencies:
     google-protobuf "^3.6.1"
 
