@@ -1,3 +1,37 @@
+<a name="13.0.2"></a>
+
+# 13.0.2 (2021-11-10)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [34047b1ad](https://github.com/angular/angular-cli/commit/34047b1adccd7eb852c1900c872e9ca71c8d4cd9) | fix  | avoid redirecting @angular/core in Angular migrations  |
+| [ff4538e98](https://github.com/angular/angular-cli/commit/ff4538e981cfff49b6e8433ffcb5ac2d2ea5d07e) | fix  | favor ng-update `packageGroupName` in ng update output |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [1bc00b6fe](https://github.com/angular/angular-cli/commit/1bc00b6feb9033fd611dec965c82f03e4135a9f4) | fix  | migrate ng-packagr configurations in package.json        |
+| [9ea74a13d](https://github.com/angular/angular-cli/commit/9ea74a13d07208373490c7cdb3ff7c452c698322) | fix  | show warning when migrating ng-packagr JS configurations |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [35164bf92](https://github.com/angular/angular-cli/commit/35164bf92b986a67215580622aaddc4148a7c822) | fix  | don't restore `input` of type `file` during HMR                         |
+| [facb5d8ff](https://github.com/angular/angular-cli/commit/facb5d8ffd4f6a81d3132515b8bae64278cf8316) | fix  | don't show `[NG HMR] Unknown input type` when restoring file type input |
+| [ef8815d04](https://github.com/angular/angular-cli/commit/ef8815d0434836f2d8119e91a7bc09742ff77d37) | fix  | improve sourcemap fidelity during code-coverage                         |
+| [966a1334a](https://github.com/angular/angular-cli/commit/966a1334a6502f5d4a18710ae22e739e62770101) | fix  | suppress "@charset" must be the first rule in the file warning          |
+| [1cdc24da0](https://github.com/angular/angular-cli/commit/1cdc24da0105fad75221e3c145de12dafc601059) | fix  | update Angular peer dependencies to 13.0 stable                         |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Joey Perrott and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.1"></a>
 
 # 13.0.1 (2021-11-03)
