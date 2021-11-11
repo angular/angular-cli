@@ -1,3 +1,23 @@
+<a name="13.0.1"></a>
+
+# 13.0.1 (2021-11-11)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                   |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------- |
+| [71516ece](https://github.com/angular/universal/commit/71516ece7163ec88eedb58767093d50a76aa9f57) | fix  | correctly handle lazy loaded routes in Clover |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                                   |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------- |
+| [fee929e2](https://github.com/angular/universal/commit/fee929e2a2e499404f4a5abc1b78ef0a6112a0da) | fix  | initialNavigation should be 'enabledBlocking' |
+
+## Special Thanks
+
+Alan Agius, Doug Parker and Mike Huang
+
 <a name="13.1.0-next.0"></a>
 
 # 13.1.0-next-0 (2021-11-03)
