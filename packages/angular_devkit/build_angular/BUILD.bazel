@@ -147,6 +147,7 @@ ts_library(
         "@npm//glob",
         "@npm//https-proxy-agent",
         "@npm//inquirer",
+        "@npm//jsonc-parser",
         "@npm//karma",
         "@npm//karma-source-map-support",
         "@npm//less",
