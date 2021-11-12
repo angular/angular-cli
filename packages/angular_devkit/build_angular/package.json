@@ -35,6 +35,7 @@
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
+    "jsonc-parser": "3.0.0",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.2",
     "less-loader": "10.2.0",
