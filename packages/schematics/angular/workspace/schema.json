@@ -9,7 +9,6 @@
     "name": {
       "description": "The name of the workspace.",
       "type": "string",
-      "format": "html-selector",
       "$default": {
         "$source": "argv",
         "index": 0

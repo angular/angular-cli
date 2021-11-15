@@ -14,6 +14,7 @@
     "name": {
       "description": "The name of the new app.",
       "type": "string",
+      "pattern": "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*/)?[a-zA-Z0-9-~][a-zA-Z0-9-._~]*$",
       "$default": {
         "$source": "argv",
         "index": 0
