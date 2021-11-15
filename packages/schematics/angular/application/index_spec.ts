@@ -534,6 +534,15 @@ describe('Application Schematic', () => {
     expect(exists).toBeTrue();
   });
 
+  it(`should create scoped kebab-case project folder names with camelCase project name`, async () => {
+    const options: ApplicationOptions = { ...defaultOptions, name: '@foo/myCool' };
+    const tree = await schematicRunner
+      .runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const exists = tree.exists('/projects/foo/my-cool/.browserslistrc');
+    expect(exists).toBeTrue();
+  });
+
   it(`should create kebab-case project folder names with PascalCase project name`, async () => {
     const options: ApplicationOptions = { ...defaultOptions, name: 'MyCool' };
     const tree = await schematicRunner
@@ -541,5 +550,40 @@ describe('Application Schematic', () => {
       .toPromise();
     const exists = tree.exists('/projects/my-cool/.browserslistrc');
     expect(exists).toBeTrue();
+  });
+
+  it(`should create scoped kebab-case project folder names with PascalCase project name`, async () => {
+    const options: ApplicationOptions = { ...defaultOptions, name: '@foo/MyCool' };
+    const tree = await schematicRunner
+      .runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const exists = tree.exists('/projects/foo/my-cool/.browserslistrc');
+    expect(exists).toBeTrue();
+  });
+
+  it('should support creating applications with `_` and `.` in name', async () => {
+    const options = { ...defaultOptions, name: 'foo.bar_buz' };
+    const tree = await schematicRunner
+      .runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+
+    const exists = tree.exists('/projects/foo.bar_buz/.browserslistrc');
+    expect(exists).toBeTrue();
+  });
+
+  it('should support creating scoped application', async () => {
+    const scopedName = '@myscope/myapp';
+    const options = { ...defaultOptions, name: scopedName };
+    const tree = await schematicRunner
+      .runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+
+    const cfg = JSON.parse(tree.readContent('/angular.json'));
+    expect(cfg.projects['@myscope/myapp']).toBeDefined();
+
+    const karmaConf = getFileContent(tree, '/projects/myscope/myapp/karma.conf.js');
+    expect(karmaConf).toContain(
+      `dir: require('path').join(__dirname, '../../../coverage/myscope/myapp')`,
+    );
   });
 });

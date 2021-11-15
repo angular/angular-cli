@@ -207,6 +207,14 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/selector: 'pre-foo'/);
   });
 
+  it('should error when name starts with a digit', async () => {
+    const options = { ...defaultOptions, name: '1-one' };
+
+    await expectAsync(
+      schematicRunner.runSchematicAsync('component', options, appTree).toPromise(),
+    ).toBeRejectedWithError('Selector (app-1-one) is invalid.');
+  });
+
   it('should use the default project prefix if none is passed', async () => {
     const options = { ...defaultOptions, prefix: undefined };
 

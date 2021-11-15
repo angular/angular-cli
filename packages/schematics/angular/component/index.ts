@@ -27,7 +27,7 @@ import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils'
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
-import { validateHtmlSelector, validateName } from '../utility/validation';
+import { validateHtmlSelector } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as ComponentOptions, Style } from './schema';
 
@@ -131,7 +131,6 @@ export default function (options: ComponentOptions): Rule {
     options.selector =
       options.selector || buildSelector(options, (project && project.prefix) || '');
 
-    validateName(options.name);
     validateHtmlSelector(options.selector);
 
     const skipStyleFile = options.inlineStyle || options.style === Style.None;
