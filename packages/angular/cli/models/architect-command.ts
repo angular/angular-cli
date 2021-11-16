@@ -9,7 +9,10 @@
 import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { json, schema, tags } from '@angular-devkit/core';
+import { existsSync } from 'fs';
+import * as path from 'path';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { getPackageManager } from '../utilities/package-manager';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, Option } from './interface';
@@ -115,7 +118,19 @@ export abstract class ArchitectCommand<
           builderNames.add(builderName);
         }
 
-        const builderDesc = await this._architectHost.resolveBuilder(builderName);
+        let builderDesc;
+        try {
+          builderDesc = await this._architectHost.resolveBuilder(builderName);
+        } catch (e) {
+          if (e.code === 'MODULE_NOT_FOUND') {
+            await this.warnOnMissingNodeModules(this.workspace.basePath);
+            this.logger.fatal(`Could not find the '${builderName}' builder's node package.`);
+
+            return 1;
+          }
+          throw e;
+        }
+
         const optionDefs = await parseJsonSchemaToOptions(
           this._registry,
           builderDesc.optionSchema as json.JsonObject,
@@ -193,7 +208,19 @@ export abstract class ArchitectCommand<
       project: projectName || (targetProjectNames.length > 0 ? targetProjectNames[0] : ''),
       target: this.target,
     });
-    const builderDesc = await this._architectHost.resolveBuilder(builderConf);
+
+    let builderDesc;
+    try {
+      builderDesc = await this._architectHost.resolveBuilder(builderConf);
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        await this.warnOnMissingNodeModules(this.workspace.basePath);
+        this.logger.fatal(`Could not find the '${builderConf}' builder's node package.`);
+
+        return 1;
+      }
+      throw e;
+    }
 
     this.description.options.push(
       ...(await parseJsonSchemaToOptions(
@@ -210,6 +237,38 @@ export abstract class ArchitectCommand<
     }
   }
 
+  private async warnOnMissingNodeModules(basePath: string): Promise<void> {
+    // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
+    if (existsSync(path.resolve(basePath, 'node_modules'))) {
+      return;
+    }
+
+    // Check for yarn PnP files
+    if (
+      existsSync(path.resolve(basePath, '.pnp.js')) ||
+      existsSync(path.resolve(basePath, '.pnp.cjs')) ||
+      existsSync(path.resolve(basePath, '.pnp.mjs'))
+    ) {
+      return;
+    }
+
+    const packageManager = await getPackageManager(basePath);
+    let installSuggestion = 'Try installing with ';
+    switch (packageManager) {
+      case 'npm':
+        installSuggestion += `'npm install'`;
+        break;
+      case 'yarn':
+        installSuggestion += `'yarn'`;
+        break;
+      default:
+        installSuggestion += `the project's package manager`;
+        break;
+    }
+
+    this.logger.warn(`Node packages may not be installed. ${installSuggestion}.`);
+  }
+
   async run(options: ArchitectCommandOptions & Arguments) {
     return await this.runArchitectTarget(options);
   }
@@ -219,7 +278,19 @@ export abstract class ArchitectCommand<
     // overrides separately (getting the configuration builds the whole project, including
     // overrides).
     const builderConf = await this._architectHost.getBuilderNameForTarget(target);
-    const builderDesc = await this._architectHost.resolveBuilder(builderConf);
+    let builderDesc;
+    try {
+      builderDesc = await this._architectHost.resolveBuilder(builderConf);
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this.warnOnMissingNodeModules(this.workspace!.basePath);
+        this.logger.fatal(`Could not find the '${builderConf}' builder's node package.`);
+
+        return 1;
+      }
+      throw e;
+    }
     const targetOptionArray = await parseJsonSchemaToOptions(
       this._registry,
       builderDesc.optionSchema as json.JsonObject,
