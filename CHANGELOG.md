@@ -104,6 +104,14 @@ npm install classlist.js web-animations-js --save
 }
 ```
 
+- Calling `BuilderContext.scheduleBuilder()` with a builder from `@angular-devkit/build-angular` now requires passing the `target` property in the 3rd argument, like in the following example:
+
+  ```typescript
+  context.scheduleBuilder('@angular-devkit/build-angular:ng-packagr', options, {
+    target: context.target,
+  });
+  ```
+
 - The automatic inclusion of Angular-required ES2015 polyfills to support ES5 browsers has been removed. Previously when targetting ES5 within the application's TypeScript configuration or listing an ES5 requiring browser in the browserslist file, Angular-required polyfills were included in the built application. However, with Angular no longer supporting IE11, there are now no browsers officially supported by Angular that would require these polyfills. As a result, the automatic inclusion of these ES2015 polyfills has been removed. Any polyfills manually added to an application's code are not affected by this change.
 
 - With this change a number of deprecated dev-server builder options which proxied to the browser builder have been removed. These options should be configured in the browser builder instead.
