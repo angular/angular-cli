@@ -1,3 +1,13 @@
+<a name="13.0.3"></a>
+
+# 13.0.3 (2021-11-17)
+
+## Special Thanks
+
+Alan Agius, Joey Perrott and Krzysztof Platis
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.2"></a>
 
 # 13.0.2 (2021-11-10)
