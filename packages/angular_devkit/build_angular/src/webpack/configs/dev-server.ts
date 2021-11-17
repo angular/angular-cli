@@ -83,7 +83,7 @@ export async function getDevServerConfig(
       },
       compress: false,
       static: false,
-      https: getSslConfig(root, wco.buildOptions),
+      server: getServerConfig(root, wco.buildOptions),
       allowedHosts: getAllowedHostsConfig(wco.buildOptions),
       devMiddleware: {
         publicPath: servePath,
@@ -139,19 +139,25 @@ export function buildServePath(
  * Private method to enhance a webpack config with SSL configuration.
  * @private
  */
-function getSslConfig(
+function getServerConfig(
   root: string,
   options: WebpackDevServerOptions,
-): DevServerConfiguration['https'] {
+): DevServerConfiguration['server'] {
   const { ssl, sslCert, sslKey } = options;
-  if (ssl && sslCert && sslKey) {
-    return {
-      key: resolve(root, sslKey),
-      cert: resolve(root, sslCert),
-    };
+  if (!ssl) {
+    return 'http';
   }
 
-  return ssl;
+  return {
+    type: 'https',
+    options:
+      sslCert && sslKey
+        ? {
+            key: resolve(root, sslKey),
+            cert: resolve(root, sslCert),
+          }
+        : undefined,
+  };
 }
 
 /**

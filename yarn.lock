@@ -114,7 +114,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#6cdeb28b4c4adfa8c7e3a84f5ca5cb11bab21760":
   version "0.0.0-2357f952775070b44dbc09363c4593d033b982b3"
-  uid "6cdeb28b4c4adfa8c7e3a84f5ca5cb11bab21760"
   resolved "https://github.com/angular/dev-infra-private-builds.git#6cdeb28b4c4adfa8c7e3a84f5ca5cb11bab21760"
   dependencies:
     "@actions/core" "^1.4.0"
@@ -2274,10 +2273,10 @@
     tapable "^2.1.1"
     webpack "^5.38.1"
 
-"@types/webpack-dev-server@^4.0.3":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@types/webpack-dev-server/-/webpack-dev-server-4.3.1.tgz#e6174f753aabdd3b2de8e4bc98df024365067011"
-  integrity sha512-sFAFnvz1Ah17Kt4pFjATbPtuAmFS9s2dUUKhpz0kkB+X7vpJF2tbO7JoHP42od0SKijtrB7CHbsa3/lnztjpvw==
+"@types/webpack-dev-server@^4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@types/webpack-dev-server/-/webpack-dev-server-4.5.0.tgz#52a983de97db81a38b7309a8cf8a730c3e02f28e"
+  integrity sha512-HMb6pZPANObue3LwbdpQLWzQyF9O0wntiPyXj4vGutlAbNKTXH4hDCHaZyfvfZDmFn+5HprrWHm1TGt3awNr/A==
   dependencies:
     "@types/bonjour" "*"
     "@types/connect-history-api-fallback" "*"

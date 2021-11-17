@@ -119,7 +119,7 @@
     "@types/semver": "^7.0.0",
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
-    "@types/webpack-dev-server": "^4.0.3",
+    "@types/webpack-dev-server": "^4.5.0",
     "@typescript-eslint/eslint-plugin": "5.4.0",
     "@typescript-eslint/parser": "5.4.0",
     "@yarnpkg/lockfile": "1.1.0",
