@@ -49,7 +49,6 @@ merge:
       - 'ci/circleci: e2e-cli'
       - 'ci/circleci: test-browsers'
       - 'ci/angular: size'
-      - 'cla/google'
 
   # the comment that will be added when the merge label is added despite failing checks, leave empty or set to false to disable
   # {{MERGE_LABEL}} will be replaced by the value of the mergeLabel option
