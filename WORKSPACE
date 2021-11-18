@@ -31,7 +31,7 @@ check_rules_nodejs_version(minimum_version_string = "2.0.0")
 
 # Setup the Node.js toolchain
 node_repositories(
-    node_version = "14.17.1",
+    node_version = "16.10.0",
     package_json = ["//:package.json"],
 )
 
