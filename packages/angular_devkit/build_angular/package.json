@@ -41,7 +41,7 @@
     "less-loader": "10.2.0",
     "license-webpack-plugin": "4.0.0",
     "loader-utils": "3.2.0",
-    "mini-css-extract-plugin": "2.4.4",
+    "mini-css-extract-plugin": "2.4.5",
     "minimatch": "3.0.4",
     "open": "8.4.0",
     "ora": "5.4.1",
@@ -66,7 +66,7 @@
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
     "webpack": "5.64.1",
-    "webpack-dev-middleware": "5.2.1",
+    "webpack-dev-middleware": "5.2.2",
     "webpack-dev-server": "4.5.0",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0"
