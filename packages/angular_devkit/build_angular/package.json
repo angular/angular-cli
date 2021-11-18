@@ -27,7 +27,7 @@
     "browserslist": "^4.9.1",
     "cacache": "15.3.0",
     "circular-dependency-plugin": "5.2.2",
-    "copy-webpack-plugin": "9.1.0",
+    "copy-webpack-plugin": "10.0.0",
     "core-js": "3.19.1",
     "critters": "0.0.14",
     "css-loader": "6.5.1",

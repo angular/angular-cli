@@ -135,7 +135,7 @@
     "circular-dependency-plugin": "5.2.2",
     "common-tags": "^1.8.0",
     "conventional-commits-parser": "^3.0.0",
-    "copy-webpack-plugin": "9.1.0",
+    "copy-webpack-plugin": "10.0.0",
     "core-js": "3.19.1",
     "critters": "0.0.14",
     "css-loader": "6.5.1",
