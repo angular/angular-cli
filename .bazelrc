@@ -42,10 +42,11 @@ test
 # Run with "--config=release"   #
 #################################
 
-# Configures script to do version stamping.
-# See https://docs.bazel.build/versions/master/user-manual.html#flag--workspace_status_command
-build:release --workspace_status_command="node ./tools/bazel-stamp-vars.js" --stamp
-run:release --workspace_status_command="node ./tools/bazel-stamp-vars.js" --stamp
+# Releases should always be stamped with version control info
+# This command assumes node on the path and is a workaround for
+# https://github.com/bazelbuild/bazel/issues/4802
+build:release --workspace_status_command="yarn -s ng-dev release build-env-stamp --mode=release"
+build:release --stamp
 
 ###############################
 # Typescript / Angular / Sass #
