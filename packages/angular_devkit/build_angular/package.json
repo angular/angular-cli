@@ -58,7 +58,7 @@
     "sass-loader": "12.3.0",
     "semver": "7.3.5",
     "source-map-loader": "3.0.0",
-    "source-map-support": "0.5.20",
+    "source-map-support": "0.5.21",
     "stylus": "0.55.0",
     "stylus-loader": "6.2.0",
     "terser": "5.10.0",

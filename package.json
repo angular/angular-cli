@@ -206,7 +206,7 @@
     "shelljs": "^0.8.4",
     "source-map": "0.7.3",
     "source-map-loader": "3.0.0",
-    "source-map-support": "0.5.20",
+    "source-map-support": "0.5.21",
     "spdx-satisfies": "^5.0.0",
     "stylus": "0.55.0",
     "stylus-loader": "6.2.0",
