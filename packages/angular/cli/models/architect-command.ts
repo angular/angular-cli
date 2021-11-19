@@ -39,6 +39,23 @@ export abstract class ArchitectCommand<
   target: string | undefined;
   missingTargetError: string | undefined;
 
+  protected async onMissingTarget(projectName?: string): Promise<void | number> {
+    if (this.missingTargetError) {
+      this.logger.fatal(this.missingTargetError);
+
+      return 1;
+    }
+
+    if (projectName) {
+      this.logger.fatal(`Project '${projectName}' does not support the '${this.target}' target.`);
+    } else {
+      this.logger.fatal(`No projects support the '${this.target}' target.`);
+    }
+
+    return 1;
+  }
+
+  // eslint-disable-next-line max-lines-per-function
   public override async initialize(options: T & Arguments): Promise<number | void> {
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
@@ -87,21 +104,12 @@ export abstract class ArchitectCommand<
       }
     }
 
-    if (targetProjectNames.length === 0) {
-      this.logger.fatal(
-        this.missingTargetError || `No projects support the '${this.target}' target.`,
-      );
-
-      return 1;
+    if (projectName && !targetProjectNames.includes(projectName)) {
+      return await this.onMissingTarget(projectName);
     }
 
-    if (projectName && !targetProjectNames.includes(projectName)) {
-      this.logger.fatal(
-        this.missingTargetError ||
-          `Project '${projectName}' does not support the '${this.target}' target.`,
-      );
-
-      return 1;
+    if (targetProjectNames.length === 0) {
+      return await this.onMissingTarget();
     }
 
     if (!projectName && commandLeftovers && commandLeftovers.length > 0) {
