@@ -31,7 +31,7 @@
     "core-js": "3.19.1",
     "critters": "0.0.14",
     "css-loader": "6.5.1",
-    "esbuild-wasm": "0.13.14",
+    "esbuild-wasm": "0.13.15",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -65,14 +65,14 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
-    "webpack": "5.64.1",
+    "webpack": "5.64.2",
     "webpack-dev-middleware": "5.2.2",
     "webpack-dev-server": "4.5.0",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.13.14"
+    "esbuild": "0.13.15"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^13.0.0 || ^13.1.0-next",
