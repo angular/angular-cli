@@ -58,9 +58,9 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.64.1",
-    "**/@types/webpack-dev-server/webpack": "5.64.1",
-    "ajv-formats/ajv": "8.8.1"
+    "**/@types/copy-webpack-plugin/webpack": "5.64.2",
+    "**/@types/webpack-dev-server/webpack": "5.64.2",
+    "ajv-formats/ajv": "8.8.2"
   },
   "devDependencies": {
     "@ampproject/remapping": "1.0.1",
@@ -123,7 +123,7 @@
     "@typescript-eslint/eslint-plugin": "5.4.0",
     "@typescript-eslint/parser": "5.4.0",
     "@yarnpkg/lockfile": "1.1.0",
-    "ajv": "8.8.1",
+    "ajv": "8.8.2",
     "ajv-formats": "2.1.1",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
@@ -140,9 +140,9 @@
     "critters": "0.0.14",
     "css-loader": "6.5.1",
     "debug": "^4.1.1",
-    "esbuild": "0.13.14",
-    "esbuild-wasm": "0.13.14",
-    "eslint": "8.2.0",
+    "esbuild": "0.13.15",
+    "esbuild-wasm": "0.13.15",
+    "eslint": "8.3.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.25.3",
@@ -221,7 +221,7 @@
     "typescript": "4.4.4",
     "verdaccio": "5.2.2",
     "verdaccio-auth-memory": "^10.0.0",
-    "webpack": "5.64.1",
+    "webpack": "5.64.2",
     "webpack-dev-middleware": "5.2.2",
     "webpack-dev-server": "4.5.0",
     "webpack-merge": "5.8.0",
