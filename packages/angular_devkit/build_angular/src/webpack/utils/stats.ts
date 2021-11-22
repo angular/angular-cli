@@ -12,6 +12,7 @@ import * as path from 'path';
 import textTable from 'text-table';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
+import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { colors as ansiColors, removeColor } from '../../utils/color';
 import { markAsyncChunksNonInitial } from './async-chunks';
 import { getStatsOptions, normalizeExtraEntryPoints } from './helpers';
@@ -71,11 +72,26 @@ function generateBuildStatsTable(
   colors: boolean,
   showTotalSize: boolean,
   showEstimatedTransferSize: boolean,
+  budgetFailures?: BudgetCalculatorResult[],
 ): string {
   const g = (x: string) => (colors ? ansiColors.greenBright(x) : x);
   const c = (x: string) => (colors ? ansiColors.cyanBright(x) : x);
+  const r = (x: string) => (colors ? ansiColors.redBright(x) : x);
+  const y = (x: string) => (colors ? ansiColors.yellowBright(x) : x);
   const bold = (x: string) => (colors ? ansiColors.bold(x) : x);
   const dim = (x: string) => (colors ? ansiColors.dim(x) : x);
+
+  const getSizeColor = (name: string, file?: string, defaultColor = c) => {
+    const severity = budgets.get(name) || (file && budgets.get(file));
+    switch (severity) {
+      case 'warning':
+        return y;
+      case 'error':
+        return r;
+      default:
+        return defaultColor;
+    }
+  };
 
   const changedEntryChunksStats: BundleStatsData[] = [];
   const changedLazyChunksStats: BundleStatsData[] = [];
@@ -83,16 +99,27 @@ function generateBuildStatsTable(
   let initialTotalRawSize = 0;
   let initialTotalEstimatedTransferSize;
 
+  const budgets = new Map<string, string>();
+  if (budgetFailures) {
+    for (const { label, severity } of budgetFailures) {
+      // In some cases a file can have multiple budget failures.
+      // Favor error.
+      if (label && (!budgets.has(label) || budgets.get(label) === 'warning')) {
+        budgets.set(label, severity);
+      }
+    }
+  }
+
   for (const { initial, stats } of data) {
     const [files, names, rawSize, estimatedTransferSize] = stats;
-
+    const getRawSizeColor = getSizeColor(names, files);
     let data: BundleStatsData;
 
     if (showEstimatedTransferSize) {
       data = [
         g(files),
         names,
-        c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
+        getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
         c(
           typeof estimatedTransferSize === 'number'
             ? formatSize(estimatedTransferSize)
@@ -100,7 +127,12 @@ function generateBuildStatsTable(
         ),
       ];
     } else {
-      data = [g(files), names, c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize), ''];
+      data = [
+        g(files),
+        names,
+        getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
+        '',
+      ];
     }
 
     if (initial) {
@@ -135,7 +167,12 @@ function generateBuildStatsTable(
     if (showTotalSize) {
       bundleInfo.push([]);
 
-      const totalSizeElements = [' ', 'Initial Total', formatSize(initialTotalRawSize)];
+      const initialSizeTotalColor = getSizeColor('bundle initial', undefined, (x) => x);
+      const totalSizeElements = [
+        ' ',
+        'Initial Total',
+        initialSizeTotalColor(formatSize(initialTotalRawSize)),
+      ];
       if (showEstimatedTransferSize) {
         totalSizeElements.push(
           typeof initialTotalEstimatedTransferSize === 'number'
@@ -180,7 +217,7 @@ function statsToString(
   json: StatsCompilation,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   statsConfig: any,
-  bundleState?: BundleStats[],
+  budgetFailures?: BudgetCalculatorResult[],
 ): string {
   if (!json.chunks?.length) {
     return '';
@@ -189,45 +226,44 @@ function statsToString(
   const colors = statsConfig.colors;
   const rs = (x: string) => (colors ? ansiColors.reset(x) : x);
 
-  const changedChunksStats: BundleStats[] = bundleState ?? [];
+  const changedChunksStats: BundleStats[] = [];
   let unchangedChunkNumber = 0;
   let hasEstimatedTransferSizes = false;
-  if (!bundleState?.length) {
-    const isFirstRun = !runsCache.has(json.outputPath || '');
 
-    for (const chunk of json.chunks) {
-      // During first build we want to display unchanged chunks
-      // but unchanged cached chunks are always marked as not rendered.
-      if (!isFirstRun && !chunk.rendered) {
-        continue;
-      }
+  const isFirstRun = !runsCache.has(json.outputPath || '');
 
-      const assets = json.assets?.filter((asset) => chunk.files?.includes(asset.name));
-      let rawSize = 0;
-      let estimatedTransferSize;
-      if (assets) {
-        for (const asset of assets) {
-          if (asset.name.endsWith('.map')) {
-            continue;
+  for (const chunk of json.chunks) {
+    // During first build we want to display unchanged chunks
+    // but unchanged cached chunks are always marked as not rendered.
+    if (!isFirstRun && !chunk.rendered) {
+      continue;
+    }
+
+    const assets = json.assets?.filter((asset) => chunk.files?.includes(asset.name));
+    let rawSize = 0;
+    let estimatedTransferSize;
+    if (assets) {
+      for (const asset of assets) {
+        if (asset.name.endsWith('.map')) {
+          continue;
+        }
+
+        rawSize += asset.size;
+
+        if (typeof asset.info.estimatedTransferSize === 'number') {
+          if (estimatedTransferSize === undefined) {
+            estimatedTransferSize = 0;
+            hasEstimatedTransferSizes = true;
           }
-
-          rawSize += asset.size;
-
-          if (typeof asset.info.estimatedTransferSize === 'number') {
-            if (estimatedTransferSize === undefined) {
-              estimatedTransferSize = 0;
-              hasEstimatedTransferSizes = true;
-            }
-            estimatedTransferSize += asset.info.estimatedTransferSize;
-          }
+          estimatedTransferSize += asset.info.estimatedTransferSize;
         }
       }
-      changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
     }
-    unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
-
-    runsCache.add(json.outputPath || '');
+    changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
   }
+  unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+
+  runsCache.add(json.outputPath || '');
 
   // Sort chunks by size in descending order
   changedChunksStats.sort((a, b) => {
@@ -247,6 +283,7 @@ function statsToString(
     colors,
     unchangedChunkNumber === 0,
     hasEstimatedTransferSizes,
+    budgetFailures,
   );
 
   // In some cases we do things outside of webpack context
@@ -387,9 +424,9 @@ export function webpackStatsLogger(
   logger: logging.LoggerApi,
   json: StatsCompilation,
   config: Configuration,
-  bundleStats?: BundleStats[],
+  budgetFailures?: BudgetCalculatorResult[],
 ): void {
-  logger.info(statsToString(json, config.stats, bundleStats));
+  logger.info(statsToString(json, config.stats, budgetFailures));
 
   if (statsHasWarnings(json)) {
     logger.warn(statsWarningsToString(json, config.stats));
