@@ -73,7 +73,11 @@ import { isWarningEnabled } from '../utilities/config';
     if (isGlobalGreater) {
       // If using the update command and the global version is greater, use the newer update command
       // This allows improvements in update to be used in older versions that do not have bootstrapping
-      if (process.argv[2] === 'update') {
+      if (
+        process.argv[2] === 'update' &&
+        cli.VERSION &&
+        cli.VERSION.major - globalVersion.major <= 1
+      ) {
         cli = await import('./cli');
       } else if (await isWarningEnabled('versionMismatch')) {
         // Otherwise, use local version and warn if global is newer than local
