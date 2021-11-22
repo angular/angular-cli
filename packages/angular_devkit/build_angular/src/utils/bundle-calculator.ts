@@ -31,6 +31,12 @@ export enum ThresholdSeverity {
   Error = 'error',
 }
 
+export interface BudgetCalculatorResult {
+  severity: ThresholdSeverity;
+  message: string;
+  label?: string;
+}
+
 export function* calculateThresholds(budget: Budget): IterableIterator<Threshold> {
   if (budget.maximumWarning) {
     yield {
@@ -181,7 +187,7 @@ class BundleCalculator extends Calculator {
       .map((chunk) => this.calculateChunkSize(chunk))
       .reduce((l, r) => l + r, 0);
 
-    return [{ size, label: `bundle ${this.budget.name}` }];
+    return [{ size, label: this.budget.name }];
   }
 }
 
@@ -295,7 +301,7 @@ function calculateBytes(input: string, baseline?: string, factor: 1 | -1 = 1): n
 export function* checkBudgets(
   budgets: Budget[],
   webpackStats: StatsCompilation,
-): IterableIterator<{ severity: ThresholdSeverity; message: string }> {
+): IterableIterator<BudgetCalculatorResult> {
   // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker`.
   const computableBudgets = budgets.filter((budget) => budget.type !== Type.AnyComponentStyle);
 
@@ -311,7 +317,7 @@ export function* checkThresholds(
   thresholds: IterableIterator<Threshold>,
   size: number,
   label?: string,
-): IterableIterator<{ severity: ThresholdSeverity; message: string }> {
+): IterableIterator<BudgetCalculatorResult> {
   for (const threshold of thresholds) {
     switch (threshold.type) {
       case ThresholdType.Max: {
@@ -322,6 +328,7 @@ export function* checkThresholds(
         const sizeDifference = formatSize(size - threshold.limit);
         yield {
           severity: threshold.severity,
+          label,
           message: `${label} exceeded maximum budget. Budget ${formatSize(
             threshold.limit,
           )} was not met by ${sizeDifference} with a total of ${formatSize(size)}.`,
@@ -336,6 +343,7 @@ export function* checkThresholds(
         const sizeDifference = formatSize(threshold.limit - size);
         yield {
           severity: threshold.severity,
+          label,
           message: `${label} failed to meet minimum budget. Budget ${formatSize(
             threshold.limit,
           )} was not met by ${sizeDifference} with a total of ${formatSize(size)}.`,

@@ -22,7 +22,11 @@ import {
   normalizeOptimization,
   urlJoin,
 } from '../../utils';
-import { ThresholdSeverity, checkBudgets } from '../../utils/bundle-calculator';
+import {
+  BudgetCalculatorResult,
+  ThresholdSeverity,
+  checkBudgets,
+} from '../../utils/bundle-calculator';
 import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
@@ -234,8 +238,9 @@ export function buildWebpackBrowser(
 
               // Check for budget errors and display them to the user.
               const budgets = options.budgets;
+              let budgetFailures: BudgetCalculatorResult[] | undefined;
               if (budgets?.length) {
-                const budgetFailures = checkBudgets(budgets, webpackStats);
+                budgetFailures = [...checkBudgets(budgets, webpackStats)];
                 for (const { severity, message } of budgetFailures) {
                   switch (severity) {
                     case ThresholdSeverity.Warning:
@@ -354,7 +359,7 @@ export function buildWebpackBrowser(
                 }
               }
 
-              webpackStatsLogger(context.logger, webpackStats, config);
+              webpackStatsLogger(context.logger, webpackStats, config, budgetFailures);
 
               return { success: buildSuccess };
             }

@@ -40,6 +40,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'foo.js',
         message: jasmine.stringMatching('foo.js exceeded maximum budget.'),
       });
     });
@@ -70,6 +71,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'bar.js',
         message: jasmine.stringMatching('bar.js failed to meet minimum budget.'),
       });
     });
@@ -107,6 +109,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'foo',
         message: jasmine.stringMatching('foo exceeded maximum budget.'),
       });
     });
@@ -144,6 +147,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'bundle initial',
         message: jasmine.stringMatching('initial exceeded maximum budget.'),
       });
     });
@@ -185,6 +189,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'total scripts',
         message: jasmine.stringMatching('total scripts exceeded maximum budget.'),
       });
     });
@@ -222,6 +227,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'total',
         message: jasmine.stringMatching('total exceeded maximum budget.'),
       });
     });
@@ -292,6 +298,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'foo.js',
         message: jasmine.stringMatching('foo.js exceeded maximum budget.'),
       });
     });
@@ -329,6 +336,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(1);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
+        label: 'foo.ext',
         message: jasmine.stringMatching('foo.ext exceeded maximum budget.'),
       });
     });
