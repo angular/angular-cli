@@ -101,6 +101,7 @@ ts_library(
         "//packages/angular_devkit/core/node",
         "//packages/ngtools/webpack",
         "@npm//@ampproject/remapping",
+        "@npm//@angular/common",
         "@npm//@angular/compiler-cli",
         "@npm//@angular/core",
         "@npm//@angular/localize",
