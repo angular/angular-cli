@@ -7,6 +7,7 @@
  */
 
 import { createHash } from 'crypto';
+import { loadEsmModule } from '../load-esm';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
 export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
@@ -50,8 +51,13 @@ export interface FileInfo {
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
-export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
+export async function augmentIndexHtml(
+  params: AugmentIndexHtmlOptions,
+): Promise<{ content: string; warnings: string[]; errors: string[] }> {
   const { loadOutputFile, files, entrypoints, sri, deployUrl = '', lang, baseHref, html } = params;
+
+  const warnings: string[] = [];
+  const errors: string[] = [];
 
   let { crossOrigin = 'none' } = params;
   if (sri && crossOrigin === 'none') {
@@ -119,6 +125,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     linkTags.push(`<link ${attrs.join(' ')}>`);
   }
 
+  const dir = lang ? await getLanguageDirection(lang, warnings) : undefined;
   const { rewriter, transformedContent } = await htmlRewritingStream(html);
   const baseTagExists = html.includes('<base');
 
@@ -129,6 +136,10 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
           // Adjust document locale if specified
           if (isString(lang)) {
             updateAttribute(tag, 'lang', lang);
+          }
+
+          if (dir) {
+            updateAttribute(tag, 'dir', dir);
           }
           break;
         case 'head':
@@ -174,12 +185,15 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
 
   const content = await transformedContent;
 
-  if (linkTags.length || scriptTags.length) {
-    // In case no body/head tags are not present (dotnet partial templates)
-    return linkTags.join('') + scriptTags.join('') + content;
-  }
-
-  return content;
+  return {
+    content:
+      linkTags.length || scriptTags.length
+        ? // In case no body/head tags are not present (dotnet partial templates)
+          linkTags.join('') + scriptTags.join('') + content
+        : content,
+    warnings,
+    errors,
+  };
 }
 
 function generateSriAttributes(content: string): string {
@@ -206,4 +220,22 @@ function updateAttribute(
 
 function isString(value: unknown): value is string {
   return typeof value === 'string';
+}
+
+async function getLanguageDirection(lang: string, warnings: string[]): Promise<string | undefined> {
+  try {
+    const localeData = (
+      await loadEsmModule<typeof import('@angular/common/locales/en')>(
+        `@angular/common/locales/${lang}`,
+      )
+    ).default;
+
+    const dir = localeData[localeData.length - 2];
+
+    return isString(dir) ? dir : undefined;
+  } catch {
+    warnings.push(
+      `Locale data for '${lang}' cannot be found. 'dir' attribute will not be set for this locale.`,
+    );
+  }
 }

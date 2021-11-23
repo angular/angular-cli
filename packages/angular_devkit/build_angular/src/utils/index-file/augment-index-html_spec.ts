@@ -28,7 +28,7 @@ describe('augment-index-html', () => {
     tags.stripIndents`${html}`.replace(/(>\s+)/g, '>');
 
   it('can generate index.html', async () => {
-    const source = augmentIndexHtml({
+    const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
       files: [
         { file: 'styles.css', extension: '.css', name: 'styles' },
@@ -39,8 +39,7 @@ describe('augment-index-html', () => {
       ],
     });
 
-    const html = await source;
-    expect(html).toEqual(oneLineHtml`
+    expect(content).toEqual(oneLineHtml`
       <html>
         <head><base href="/">
           <link rel="stylesheet" href="styles.css">
@@ -55,14 +54,13 @@ describe('augment-index-html', () => {
   });
 
   it('should replace base href value', async () => {
-    const source = augmentIndexHtml({
+    const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
       html: '<html><head><base href="/"></head><body></body></html>',
       baseHref: '/Apps/',
     });
 
-    const html = await source;
-    expect(html).toEqual(oneLineHtml`
+    expect(content).toEqual(oneLineHtml`
       <html>
         <head><base href="/Apps/">
       </head>
@@ -72,15 +70,51 @@ describe('augment-index-html', () => {
     `);
   });
 
-  it('should add lang attribute', async () => {
-    const source = augmentIndexHtml({
+  it('should add lang and dir LTR attribute for French (fr)', async () => {
+    const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
       lang: 'fr',
     });
 
-    const html = await source;
-    expect(html).toEqual(oneLineHtml`
-        <html lang="fr">
+    expect(content).toEqual(oneLineHtml`
+        <html lang="fr" dir="ltr">
+          <head>
+            <base href="/">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it('should add lang and dir RTL attribute for Pashto (ps)', async () => {
+    const { content } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      lang: 'ps',
+    });
+
+    expect(content).toEqual(oneLineHtml`
+        <html lang="ps" dir="rtl">
+          <head>
+            <base href="/">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should work when lang (locale) is not provided by '@angular/common'`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      lang: 'xx-XX',
+    });
+
+    expect(warnings).toEqual([
+      `Locale data for 'xx-XX' cannot be found. 'dir' attribute will not be set for this locale.`,
+    ]);
+    expect(content).toEqual(oneLineHtml`
+        <html lang="xx-XX">
           <head>
             <base href="/">
           </head>
@@ -91,7 +125,7 @@ describe('augment-index-html', () => {
   });
 
   it(`should add script and link tags even when body and head element doesn't exist`, async () => {
-    const source = augmentIndexHtml({
+    const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
       html: `<app-root></app-root>`,
       files: [
@@ -103,8 +137,7 @@ describe('augment-index-html', () => {
       ],
     });
 
-    const html = await source;
-    expect(html).toEqual(oneLineHtml`
+    expect(content).toEqual(oneLineHtml`
       <link rel="stylesheet" href="styles.css">
       <script src="runtime.js" type="module"></script>
       <script src="polyfills.js" type="module"></script>
