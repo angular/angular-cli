@@ -27,7 +27,7 @@ export default async function () {
 
     await silentNpm('install');
   } else {
-    await silentNpm('install', '@angular/material-moment-adapter');
+    await silentNpm('install', '@angular/material-moment-adapter@10');
   }
 
   await silentNpm('install', 'moment');
