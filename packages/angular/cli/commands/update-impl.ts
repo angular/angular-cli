@@ -507,15 +507,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         }
       }
 
+      let result: boolean;
       if (typeof options.migrateOnly == 'string') {
-        await this.executeMigration(
+        result = await this.executeMigration(
           packageName,
           migrations,
           options.migrateOnly,
           options.createCommits,
         );
-
-        return 0;
       } else {
         const from = coerceVersionNumber(options.from);
         if (!from) {
@@ -528,15 +527,15 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           '>' + from + ' <=' + (options.to || packageNode.package.version),
         );
 
-        await this.executeMigrations(
+        result = await this.executeMigrations(
           packageName,
           migrations,
           migrationRange,
           options.createCommits,
         );
-
-        return 0;
       }
+
+      return result ? 0 : 1;
     }
 
     const requests: {
