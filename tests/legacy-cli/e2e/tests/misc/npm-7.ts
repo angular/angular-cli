@@ -1,11 +1,12 @@
-import { rimraf, writeFile } from '../../utils/fs';
+import { rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, npm } from '../../utils/process';
+import { isPrereleaseCli } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 const warningText = 'npm version 7.5.6 or higher is recommended';
 
-export default async function() {
+export default async function () {
   // Only relevant with npm as a package manager
   if (getActivePackageManager() !== 'npm') {
     return;
@@ -17,12 +18,18 @@ export default async function() {
   }
 
   const currentDirectory = process.cwd();
+
+  const extraArgs = [];
+  if (isPrereleaseCli()) {
+    extraArgs.push('--next');
+  }
+
   try {
     // Install version >=7.5.6
     await npm('install', '--global', 'npm@>=7.5.6');
 
     // Ensure `ng update` does not show npm warning
-    const { stderr: stderrUpdate1 } = await ng('update');
+    const { stderr: stderrUpdate1 } = await ng('update', ...extraArgs);
     if (stderrUpdate1.includes(warningText)) {
       throw new Error('ng update expected to not show npm version warning.');
     }
@@ -37,7 +44,7 @@ export default async function() {
     }
 
     // Ensure `ng update` shows npm warning
-    const { stderr: stderrUpdate2 } = await ng('update');
+    const { stderr: stderrUpdate2 } = await ng('update', ...extraArgs);
     if (!stderrUpdate2.includes(warningText)) {
       throw new Error('ng update expected to show npm version warning.');
     }
@@ -85,5 +92,4 @@ export default async function() {
     // Reset version back to 6.x
     await npm('install', '--global', 'npm@6');
   }
-
 }
