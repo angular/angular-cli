@@ -5,38 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
 import 'symbol-observable';
 // symbol polyfill must go first
 // tslint:disable-next-line:ordered-imports import-groups
-import { tags } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
-import { Duplex } from 'stream';
 import { colors } from '../utilities/color';
 import { isWarningEnabled } from '../utilities/config';
-
-const packageJson = require('../package.json');
-
-function _fromPackageJson(cwd = process.cwd()): SemVer | null {
-  do {
-    const packageJsonPath = path.join(cwd, 'node_modules/@angular/cli/package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      const content = fs.readFileSync(packageJsonPath, 'utf-8');
-      if (content) {
-        const { version } = JSON.parse(content);
-        if (version) {
-          return new SemVer(version);
-        }
-      }
-    }
-
-    // Check the parent.
-    cwd = path.dirname(cwd);
-  } while (cwd != path.dirname(cwd));
-
-  return null;
-}
+import { VERSION } from './cli';
 
 // Check if we need to profile this CLI run.
 if (process.env['NG_CLI_PROFILING']) {
@@ -99,43 +77,56 @@ if (process.env['NG_CLI_PROFILING']) {
 
   let cli;
   try {
+    // No error implies a projectLocalCli, which will load whatever
+    // version of ng-cli you have installed in a local package.json
     const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
+    cli = await import(projectLocalCli);
 
-    // This was run from a global, check local version.
-    const globalVersion = new SemVer(packageJson['version']);
-    let localVersion;
-    let shouldWarn = false;
+    const globalVersion = new SemVer(VERSION.full);
 
-    try {
-      localVersion = _fromPackageJson();
-      shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
-    } catch (e) {
-      // tslint:disable-next-line no-console
-      console.error(e);
-      shouldWarn = true;
-    }
-
-    if (shouldWarn && await isWarningEnabled('versionMismatch')) {
-      const warning = colors.yellow(tags.stripIndents`
-      Your global Angular CLI version (${globalVersion}) is greater than your local
-      version (${localVersion}). The local Angular CLI version is used.
-
-      To disable this warning use "ng config -g cli.warnings.versionMismatch false".
-      `);
-      // Don't show warning colorised on `ng completion`
-      if (process.argv[2] !== 'completion') {
-        // tslint:disable-next-line no-console
-        console.error(warning);
-      } else {
-        // tslint:disable-next-line no-console
-        console.error(warning);
-        process.exit(1);
+    // Older versions might not have the VERSION export
+    let localVersion = cli.VERSION?.full;
+    if (!localVersion) {
+      try {
+        const localPackageJson = fs.readFileSync(
+          path.join(path.dirname(projectLocalCli), '../../package.json'),
+          'utf-8',
+        );
+        localVersion = (JSON.parse(localPackageJson) as { version: string }).version;
+      } catch (error) {
+        // tslint:disable-next-line:no-console
+        console.error('Version mismatch check skipped. Unable to retrieve local version: ' + error);
       }
     }
 
-    // No error implies a projectLocalCli, which will load whatever
-    // version of ng-cli you have installed in a local package.json
-    cli = await import(projectLocalCli);
+    let isGlobalGreater = false;
+    try {
+      isGlobalGreater = !!localVersion && globalVersion.compare(localVersion) > 0;
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error('Version mismatch check skipped. Unable to compare local version: ' + error);
+    }
+
+    if (isGlobalGreater) {
+      // If using the update command and the global version is greater, use the newer update command
+      // This allows improvements in update to be used in older versions that do not have bootstrapping
+      if (
+        process.argv[2] === 'update' &&
+        cli.VERSION &&
+        cli.VERSION.major - globalVersion.major <= 1
+      ) {
+        cli = await import('./cli');
+      } else if (await isWarningEnabled('versionMismatch')) {
+        // Otherwise, use local version and warn if global is newer than local
+        const warning =
+          `Your global Angular CLI version (${globalVersion}) is greater than your local ` +
+          `version (${localVersion}). The local Angular CLI version is used.\n\n` +
+          'To disable this warning use "ng config -g cli.warnings.versionMismatch false".';
+
+        // tslint:disable-next-line:no-console
+        console.error(colors.yellow(warning));
+      }
+    }
   } catch {
     // If there is an error, resolve could not find the ng-cli
     // library from a package.json. Instead, include it from a relative
@@ -149,26 +140,19 @@ if (process.env['NG_CLI_PROFILING']) {
   }
 
   return cli;
-})().then(cli => {
-  // This is required to support 1.x local versions with a 6+ global
-  let standardInput;
-  try {
-    standardInput = process.stdin;
-  } catch (e) {
-    process.stdin = new Duplex();
-    standardInput = process.stdin;
-  }
-
-  return cli({
-    cliArgs: process.argv.slice(2),
-    inputStream: standardInput,
-    outputStream: process.stdout,
+})()
+  .then((cli) => {
+    return cli({
+      cliArgs: process.argv.slice(2),
+      inputStream: process.stdin,
+      outputStream: process.stdout,
+    });
+  })
+  .then((exitCode: number) => {
+    process.exit(exitCode);
+  })
+  .catch((err: Error) => {
+    // tslint:disable-next-line:no-console
+    console.error('Unknown error: ' + err.toString());
+    process.exit(127);
   });
-}).then((exitCode: number) => {
-  process.exit(exitCode);
-})
-.catch((err: Error) => {
-  // tslint:disable-next-line no-console
-  console.error('Unknown error: ' + err.toString());
-  process.exit(127);
-});

@@ -13,6 +13,8 @@ import { getWorkspaceRaw } from '../../utilities/config';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import { getWorkspaceDetails } from '../../utilities/project';
 
+export { VERSION, Version } from '../../models/version';
+
 const debugEnv = process.env['NG_DEBUG'];
 const isDebug =
   debugEnv !== undefined &&
