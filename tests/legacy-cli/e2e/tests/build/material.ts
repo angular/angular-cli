@@ -28,7 +28,7 @@ export default async function () {
 
     await installWorkspacePackages();
   } else {
-    await installPackage('@angular/material-moment-adapter');
+    await installPackage('@angular/material-moment-adapter@11');
   }
 
   await installPackage('moment');

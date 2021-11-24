@@ -18,11 +18,6 @@ export default async function () {
     throw new Error('Installation was not skipped');
   }
 
-  const output2 = await ng('add', '@angular/localize@latest');
-  if (output2.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation should not have been skipped');
-  }
-
   const output3 = await ng('add', '@angular/localize@10.0.0');
   if (output3.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation should not have been skipped');
