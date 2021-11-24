@@ -482,8 +482,9 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         }
       }
 
+      let result: boolean;
       if (typeof options.migrateOnly == 'string') {
-        await this.executeMigration(
+        result = await this.executeMigration(
           packageName,
           migrations,
           options.migrateOnly,
@@ -497,7 +498,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           return 1;
         }
 
-        await this.executeMigrations(
+        result = await this.executeMigrations(
           packageName,
           migrations,
           from,
@@ -506,7 +507,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         );
       }
 
-      return 1;
+      return result ? 0 : 1;
     }
 
     const requests: {
