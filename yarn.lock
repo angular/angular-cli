@@ -1168,6 +1168,14 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
+"@bazel/jasmine@4.4.6":
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.4.6.tgz#12d72d55c65b34bffeb1108f8081deaa9ef42ec2"
+  integrity sha512-9/oBxEIFImRa+j2YxTfgjsLB+4iz/3M2a7MUE1iKN07QwOVBmMoaP74WtJlNbw69SIxzyG8IdidXNL1sgtPPSA==
+  dependencies:
+    c8 "~7.5.0"
+    jasmine-reporters "~2.4.0"
+
 "@bazel/protractor@4.4.5":
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-4.4.5.tgz#b406e85c3d59015e0895c00700396ddd0d58d755"
@@ -1189,10 +1197,28 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
+"@bazel/typescript@4.4.6":
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-4.4.6.tgz#fbaac22460b3aa4a0961c6c657d239af8f895778"
+  integrity sha512-J205En8MjmnWSPnz4CqJm1x4mzcdWM+HvAsOzzVb0DHx86O+mjPFwqleeAtPGLTE9aWskel81XICJfEuTlNtiw==
+  dependencies:
+    "@bazel/worker" "4.4.6"
+    protobufjs "6.8.8"
+    semver "5.6.0"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
+
 "@bazel/worker@4.4.5":
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.4.5.tgz#1f9292c31615dff8a7297960f7f520bf9febf428"
   integrity sha512-PoBMiN0SGSb1Qn/SabiM9HWC5nqwyWn0yTJgz6Vq2GMHo1UG7olVHuIfDb2ScFx9jY+mJ3wSyxQ4htlTGldedA==
+  dependencies:
+    google-protobuf "^3.6.1"
+
+"@bazel/worker@4.4.6":
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.4.6.tgz#c9122c8ec765f62dc723203270a3c913caf8826a"
+  integrity sha512-1Sk0FGIc1m9rFwXhCnm46XDRng88vAnY1FBb7OQPonha/kuxjZTpPDP7q2ndSkqDNyCFKp94cPUFUT58Fgqvfw==
   dependencies:
     google-protobuf "^3.6.1"
 
@@ -7262,10 +7288,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-packagr@13.0.6:
-  version "13.0.6"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.6.tgz#879b6a053ea76bd5c2b8892a4ce7ff5f753cfb58"
-  integrity sha512-VKrgsV7MfBoqG+knx3tH9GzFrWhWardUskwvCjcjsFhhPRb1ekbOId/sHdPtuU82vgd6ura2WIjBzJil9MNLUA==
+ng-packagr@13.0.7:
+  version "13.0.7"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-13.0.7.tgz#ad6f8138d2ba7855a6862c2aaa5568d170599daf"
+  integrity sha512-AzKNRZO0RIkpCFY9uYFYwlmlyEonhy99VW93Z9Dt0dDJNja7Wmy1aqd6voblK5Oa6lzvWIZcAmxBM3je/8lIeg==
   dependencies:
     "@rollup/plugin-json" "^4.1.0"
     "@rollup/plugin-node-resolve" "^13.0.0"
@@ -10681,7 +10707,37 @@ webpack-subresource-integrity@5.0.0:
   dependencies:
     typed-assert "^1.0.8"
 
-webpack@*, webpack@5.64.2, webpack@^5.1.0, webpack@^5.38.1:
+webpack@*, webpack@5.64.3, webpack@^5.1.0:
+  version "5.64.3"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.64.3.tgz#f4792cc3f8528db2c18375fa2cd269f69e0bf69f"
+  integrity sha512-XF6/IL9Bw2PPQioiR1UYA8Bs4tX3QXJtSelezKECdLFeSFzWoe44zqTzPW5N+xI3fACaRl2/G3sNA4WYHD7Iww==
+  dependencies:
+    "@types/eslint-scope" "^3.7.0"
+    "@types/estree" "^0.0.50"
+    "@webassemblyjs/ast" "1.11.1"
+    "@webassemblyjs/wasm-edit" "1.11.1"
+    "@webassemblyjs/wasm-parser" "1.11.1"
+    acorn "^8.4.1"
+    acorn-import-assertions "^1.7.6"
+    browserslist "^4.14.5"
+    chrome-trace-event "^1.0.2"
+    enhanced-resolve "^5.8.3"
+    es-module-lexer "^0.9.0"
+    eslint-scope "5.1.1"
+    events "^3.2.0"
+    glob-to-regexp "^0.4.1"
+    graceful-fs "^4.2.4"
+    json-parse-better-errors "^1.0.2"
+    loader-runner "^4.2.0"
+    mime-types "^2.1.27"
+    neo-async "^2.6.2"
+    schema-utils "^3.1.0"
+    tapable "^2.1.1"
+    terser-webpack-plugin "^5.1.3"
+    watchpack "^2.2.0"
+    webpack-sources "^3.2.2"
+
+webpack@^5.38.1:
   version "5.64.2"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.64.2.tgz#152e28d4712a6223b06c06cba0d3e622a61611a0"
   integrity sha512-4KGc0+Ozi0aS3EaLNRvEppfZUer+CaORKqL6OBjDLZOPf9YfN8leagFzwe6/PoBdHFxc/utKArl8LMC0Ivtmdg==
