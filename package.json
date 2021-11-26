@@ -74,7 +74,7 @@
     "@typescript-eslint/eslint-plugin": "5.4.0",
     "@typescript-eslint/parser": "5.4.0",
     "browser-sync": "^2.26.7",
-    "critters": "0.0.14",
+    "critters": "0.0.15",
     "domino": "^2.1.2",
     "esbuild": "^0.13.3",
     "eslint": "8.3.0",
