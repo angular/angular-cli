@@ -7,6 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
+import { lazyModuleFiles, lazyModuleFnImport } from '../../../../testing/test-utils';
 import { buildWebpackBrowser } from '../../index';
 import { Type } from '../../schema';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
@@ -63,6 +64,26 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         jasmine.objectContaining<logging.LogEntry>({
           level: 'warn',
           message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
+        }),
+      );
+    });
+
+    it(`should warn when lazy bundle is above 'maximumWarning' threshold`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: true,
+        budgets: [{ type: Type.Bundle, name: 'lazy-lazy-module', maximumWarning: '100b' }],
+      });
+
+      await harness.writeFiles(lazyModuleFiles);
+      await harness.writeFiles(lazyModuleFnImport);
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+      expect(logs).toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          level: 'warn',
+          message: jasmine.stringMatching('lazy-lazy-module exceeded maximum budget'),
         }),
       );
     });
