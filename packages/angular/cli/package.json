@@ -31,7 +31,7 @@
     "@schematics/angular": "0.0.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ansi-colors": "4.1.1",
-    "debug": "4.3.2",
+    "debug": "4.3.3",
     "ini": "2.0.0",
     "inquirer": "8.2.0",
     "jsonc-parser": "3.0.0",
