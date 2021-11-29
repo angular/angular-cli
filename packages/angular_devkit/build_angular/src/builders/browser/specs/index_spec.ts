@@ -44,7 +44,7 @@ describe('Browser Builder index HTML processing', () => {
   });
 
   // todo: enable when utf16 is supported
-  xit('works with UTF16 LE BOM', async () => {
+  it('works with UTF16 LE BOM', async () => {
     host.writeMultipleFiles({
       'src/index.html': Buffer.from(
         '\ufeff<html><head><base href="/"></head><body><app-root></app-root></body></html>',
