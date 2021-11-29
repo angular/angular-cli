@@ -6,8 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { LoaderContext } from 'webpack';
+
 export const DirectAngularResourceLoaderPath = __filename;
 
-export default function (content: string) {
-  return `export default ${JSON.stringify(content)};`;
+export default function (this: LoaderContext<{ esModule?: 'true' | 'false' }>, content: string) {
+  const { esModule } = this.getOptions();
+
+  return `${esModule === 'false' ? 'module.exports =' : 'export default'} ${JSON.stringify(
+    content,
+  )};`;
 }
