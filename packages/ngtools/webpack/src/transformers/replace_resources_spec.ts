@@ -102,8 +102,8 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = (0, tslib_1.__decorate)([
           (0, core_1.Component)({
             selector: 'app-root',
-            template: require("!${DirectAngularResourceLoaderPath}!./app.component.html").default,
-            styles: [require("./app.component.css").default, require("./app.component.2.css").default] }) ], AppComponent);
+            template: require("!${DirectAngularResourceLoaderPath}?esModule=false!./app.component.html"),
+            styles: [require("./app.component.css"), require("./app.component.2.css")] }) ], AppComponent);
         exports.AppComponent = AppComponent;
       `;
 

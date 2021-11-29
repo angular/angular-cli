@@ -146,7 +146,7 @@ function visitComponentMetadata(
   styleReplacements: ts.Expression[],
   directTemplateLoading: boolean,
   resourceImportDeclarations: ts.ImportDeclaration[],
-  moduleKind?: ts.ModuleKind,
+  moduleKind: ts.ModuleKind = ts.ModuleKind.ES2015,
   inlineStyleFileExtension?: string,
 ): ts.ObjectLiteralElementLike | undefined {
   if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
@@ -159,9 +159,10 @@ function visitComponentMetadata(
       return undefined;
 
     case 'templateUrl':
+      const loaderOptions = moduleKind < ts.ModuleKind.ES2015 ? '?esModule=false' : '';
       const url = getResourceUrl(
         node.initializer,
-        directTemplateLoading ? `!${DirectAngularResourceLoaderPath}!` : '',
+        directTemplateLoading ? `!${DirectAngularResourceLoaderPath}${loaderOptions}!` : '',
       );
       if (!url) {
         return node;
@@ -255,14 +256,15 @@ function createResourceImport(
   nodeFactory: ts.NodeFactory,
   url: string,
   resourceImportDeclarations: ts.ImportDeclaration[],
-  moduleKind = ts.ModuleKind.ES2015,
+  moduleKind: ts.ModuleKind,
 ): ts.Identifier | ts.Expression {
   const urlLiteral = nodeFactory.createStringLiteral(url);
 
   if (moduleKind < ts.ModuleKind.ES2015) {
-    return nodeFactory.createPropertyAccessExpression(
-      nodeFactory.createCallExpression(nodeFactory.createIdentifier('require'), [], [urlLiteral]),
-      'default',
+    return nodeFactory.createCallExpression(
+      nodeFactory.createIdentifier('require'),
+      [],
+      [urlLiteral],
     );
   } else {
     const importName = nodeFactory.createIdentifier(
