@@ -6,6 +6,8 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 licenses(["notice"])  # MIT
 
@@ -66,4 +68,19 @@ ts_library(
 jasmine_node_test(
     name = "pwa_test",
     srcs = [":pwa_test_lib"],
+)
+
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":pwa",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
 )
