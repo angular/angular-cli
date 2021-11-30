@@ -1,4 +1,6 @@
 load("//tools:defaults.bzl", "ts_library")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -26,4 +28,19 @@ ts_library(
         "@npm//ansi-colors",
         "@npm//rxjs",
     ],
+)
+
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":architect_cli",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
 )

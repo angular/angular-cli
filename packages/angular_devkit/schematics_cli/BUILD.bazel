@@ -1,6 +1,8 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -87,4 +89,19 @@ ts_json_schema(
 ts_json_schema(
     name = "schematic_schema",
     src = "schematic/schema.json",
+)
+
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":schematics_cli",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
 )
