@@ -361,6 +361,12 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
 
       rules: [
         {
+          test: /\.?(svg|html)$/,
+          // Only process HTML and SVG which are known Angular component resources.
+          resourceQuery: /\?ngResource/,
+          type: 'asset/source',
+        },
+        {
           // Mark files inside `rxjs/add` as containing side effects.
           // If this is fixed upstream and the fixed version becomes the minimum
           // supported version, this can be removed.
