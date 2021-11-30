@@ -102,7 +102,7 @@ export function getWatchOptions(
 ): NonNullable<Configuration['watchOptions']> {
   return {
     poll,
-    ignored: poll === undefined ? '**/$_lazy_route_resources' : 'node_modules/**',
+    ignored: poll === undefined ? '**/$_lazy_route_resources' : '**/node_modules/**',
   };
 }
 
