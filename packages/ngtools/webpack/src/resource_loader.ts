@@ -16,6 +16,7 @@ import {
   InlineAngularResourceLoaderPath,
   InlineAngularResourceSymbol,
 } from './loaders/inline-resource';
+import { NG_COMPONENT_RESOURCE_QUERY } from './transformers/replace_resources';
 
 interface CompilationOutput {
   content: string;
@@ -110,17 +111,24 @@ export class WebpackResourceLoader {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
     }
 
-    // Create a special URL for reading the resource from memory
-    const entry =
-      filePath ||
-      (resourceType
-        ? `${containingFile}-${this.outputPathCounter}.${fileExtension}!=!${this.inlineDataLoaderPath}!${containingFile}`
-        : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          `angular-resource:${resourceType},${createHash('md5').update(data!).digest('hex')}`);
+    const getEntry = (): string => {
+      if (filePath) {
+        return `${filePath}?${NG_COMPONENT_RESOURCE_QUERY}`;
+      } else if (resourceType) {
+        return (
+          // app.component.ts-2.css?ngResource!=!@ngtools/webpack/src/loaders/inline-resource.js!app.component.ts
+          `${containingFile}-${this.outputPathCounter}.${fileExtension}` +
+          `?${NG_COMPONENT_RESOURCE_QUERY}!=!${this.inlineDataLoaderPath}!${containingFile}`
+        );
+      } else if (data) {
+        // Create a special URL for reading the resource from memory
+        return `angular-resource:${resourceType},${createHash('md5').update(data).digest('hex')}`;
+      }
 
-    if (!entry) {
-      throw new Error(`"filePath" or "data" must be specified.`);
-    }
+      throw new Error(`"filePath", "resourceType" or "data" must be specified.`);
+    };
+
+    const entry = getEntry();
 
     // Simple sanity check.
     if (filePath?.match(/\.[jt]s$/)) {

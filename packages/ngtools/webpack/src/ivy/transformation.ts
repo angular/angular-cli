@@ -37,7 +37,6 @@ export function createJitTransformers(
   builder: ts.BuilderProgram,
   compilerCli: typeof import('@angular/compiler-cli'),
   options: {
-    directTemplateLoading?: boolean;
     inlineStyleFileExtension?: string;
   },
 ): ts.CustomTransformers {
@@ -45,12 +44,7 @@ export function createJitTransformers(
 
   return {
     before: [
-      replaceResources(
-        () => true,
-        getTypeChecker,
-        options.directTemplateLoading,
-        options.inlineStyleFileExtension,
-      ),
+      replaceResources(() => true, getTypeChecker, options.inlineStyleFileExtension),
       compilerCli.constructorParametersDownlevelTransform(builder.getProgram()),
     ],
   };
