@@ -347,7 +347,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     watch: buildOptions.watch,
     watchOptions: {
       poll,
-      ignored: poll === undefined ? undefined : 'node_modules/**',
+      ignored: poll === undefined ? undefined : '**/node_modules/**',
     },
     performance: {
       hints: false,
