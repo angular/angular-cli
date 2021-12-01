@@ -63,7 +63,7 @@
     "ajv-formats/ajv": "8.8.2"
   },
   "devDependencies": {
-    "@ampproject/remapping": "1.0.1",
+    "@ampproject/remapping": "1.0.2",
     "@angular/animations": "13.0.2",
     "@angular/cdk": "13.0.2",
     "@angular/common": "13.0.2",
@@ -92,7 +92,7 @@
     "@bazel/buildifier": "4.2.3",
     "@bazel/jasmine": "4.4.6",
     "@bazel/typescript": "4.4.6",
-    "@discoveryjs/json-ext": "0.5.5",
+    "@discoveryjs/json-ext": "0.5.6",
     "@types/babel__core": "7.1.16",
     "@types/babel__template": "7.4.1",
     "@types/cacache": "^15.0.0",
