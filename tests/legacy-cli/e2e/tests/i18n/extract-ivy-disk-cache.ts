@@ -1,37 +1,36 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, writeFile } from '../../utils/fs';
+import { expectFileToMatch, rimraf, writeFile } from '../../utils/fs';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
 export default async function () {
+  // Enable disk cache
+  updateJsonFile('angular.json', (config) => {
+    config.cli ??= {};
+    config.cli.cache = { environment: 'all' };
+  });
+
   // Setup an i18n enabled component
   await ng('generate', 'component', 'i18n-test');
   await writeFile(join('src/app/i18n-test', 'i18n-test.component.html'), '<p i18n>Hello world</p>');
-
-  // Should fail if `@angular/localize` is missing
-  const { message: message1 } = await expectToFail(() => ng('extract-i18n'));
-  if (!message1.includes(`i18n extraction requires the '@angular/localize' package.`)) {
-    throw new Error('Expected localize package error message when missing');
-  }
 
   // Install correct version
   let localizeVersion = '@angular/localize@' + readNgVersion();
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
+
   await installPackage(localizeVersion);
 
-  // Should not show any warnings when extracting
-  const { stderr: message5 } = await ng('extract-i18n');
-  if (message5.includes('WARNING')) {
-    throw new Error('Expected no warnings to be shown');
+  for (let i = 0; i < 2; i++) {
+    // Run the extraction twice and make sure the second time round works with cache.
+    await rimraf('messages.xlf');
+    await ng('extract-i18n');
+    await expectFileToMatch('messages.xlf', 'Hello world');
   }
-
-  expectFileToMatch('messages.xlf', 'Hello world');
 
   await uninstallPackage('@angular/localize');
 }
