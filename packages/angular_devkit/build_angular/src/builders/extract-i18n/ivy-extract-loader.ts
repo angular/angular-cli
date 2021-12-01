@@ -21,6 +21,11 @@ export default function localizeExtractLoader(
   content: string,
   map: LoaderSourceMap,
 ) {
+  // This loader is not cacheable due to message extraction works.
+  // Extracted messages are not part of webpack pipeline and hence they cannot be retrieved from cache.
+  // TODO: We should investigate in the future on making this deterministic and more cacheable.
+  this.cacheable(false);
+
   const options = this.getOptions();
   const callback = this.async();
 
