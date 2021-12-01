@@ -26,7 +26,7 @@
     "@angular/platform-server": "file:../../node_modules/@angular/platform-server",
     "@angular/router": "file:../../node_modules/@angular/router",
     "@nguniversal/common": "file:../../dist/modules-dist/common",
-    "angular-in-memory-web-api": "^0.11.0",
+    "angular-in-memory-web-api": "^0.13.0",
     "rxjs": "file:../../node_modules/rxjs",
     "zone.js": "file:../../node_modules/zone.js"
   },
