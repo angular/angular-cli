@@ -58,10 +58,10 @@
     "@angular/core" "^10.0.0-0 || ^11.0.0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@13.0.2":
-  version "13.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-13.0.2.tgz#48b9c00d24c9e764c0a718873acf8c6779241a35"
-  integrity sha512-m7RHIAXpFpgsrydhWXX1hAXRmQpQ+m9eRCYAoz8QiDCchYyVvTaxkZ8J7XGS8RtJ2EiocXSp4TlwQQrpXe+4lg==
+"@angular/cdk@13.0.3":
+  version "13.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-13.0.3.tgz#a92f0d44f1c80f8939af10cf2916f77a9ccba1a8"
+  integrity sha512-nPlnpdLk+Lady3l5eHh+csbHPOiTvfVpMrluUEnb1RAby07QQucUo7cYOKgFiVmSmaMwDBv2aGj1fAoXKzzc5g==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -112,10 +112,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#a47e6f039303d1b2f9a7602dd0c8bd419a0efa02":
-  version "0.0.0-886dc665ae52127bace968fb4ef95eb6022de753"
-  uid a47e6f039303d1b2f9a7602dd0c8bd419a0efa02
-  resolved "https://github.com/angular/dev-infra-private-builds.git#a47e6f039303d1b2f9a7602dd0c8bd419a0efa02"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#e4a13cfd135ec766dc9148ba4fe4d3ac76d94137":
+  version "0.0.0-486b6e2b6388e2bebf19e6daf0b4b997df62693c"
+  uid e4a13cfd135ec766dc9148ba4fe4d3ac76d94137
+  resolved "https://github.com/angular/dev-infra-private-builds.git#e4a13cfd135ec766dc9148ba4fe4d3ac76d94137"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -124,11 +124,11 @@
     "@babel/core" "^7.16.0"
     "@bazel/bazelisk" "^1.10.1"
     "@bazel/buildifier" "^4.0.1"
-    "@bazel/esbuild" "4.4.5"
-    "@bazel/jasmine" "4.4.5"
-    "@bazel/protractor" "4.4.5"
-    "@bazel/runfiles" "4.4.5"
-    "@bazel/typescript" "4.4.5"
+    "@bazel/esbuild" "4.4.6"
+    "@bazel/jasmine" "4.4.6"
+    "@bazel/protractor" "4.4.6"
+    "@bazel/runfiles" "4.4.6"
+    "@bazel/typescript" "4.4.6"
     "@microsoft/api-extractor" "7.18.19"
     "@octokit/auth-app" "^3.6.0"
     "@octokit/core" "^3.5.1"
@@ -158,7 +158,7 @@
     node-fetch "^2.6.1"
     prettier "^2.3.2"
     protractor "^7.0.0"
-    rollup "2.60.0"
+    rollup "2.60.1"
     rollup-plugin-sourcemaps "^0.6.3"
     selenium-webdriver "3.5.0"
     semver "^7.3.5"
@@ -168,7 +168,7 @@
     tslib "^2.3.0"
     tslint "^6.1.3"
     typed-graphqlify "^3.1.1"
-    typescript "~4.4.0"
+    typescript "~4.5.0"
     uuid "^8.3.2"
     yaml "^1.10.0"
     yargs "^17.0.0"
@@ -189,10 +189,10 @@
     glob "7.2.0"
     yargs "^17.2.1"
 
-"@angular/material@13.0.2":
-  version "13.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-13.0.2.tgz#bbab63f69c9227110b7e22d694fe984528b3d5c2"
-  integrity sha512-DbbkQFpZ73oxOuR9LkkpeUPWP31DNIG3Z94sOrtdBhX3HfbLLOCaAJAIwMl8+bEuzDgtWBmx3taUR8l4WKCO8g==
+"@angular/material@13.0.3":
+  version "13.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-13.0.3.tgz#c51e86c481dd839c1afa130c0802396df2c270c5"
+  integrity sha512-6lEofw8wWl1huNLEgngYfIDA7dY4oSq0sB7F16foDfenC+TokRxfIN950GKNYmvGVYqODUuQdrQ1n2bXE2GQGg==
   dependencies:
     tslib "^2.3.0"
 
@@ -1155,18 +1155,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.2.3.tgz#2c6e54faa12e31b75051834cf1cfa68c71678262"
   integrity sha512-19GqPhxlyh376mJT6kvvNAJbRCjDj4WFjqy+sT2LAMt5THMGSES8+lwde5J1jwpud/mqrNUIRjEzVZR5A/6+BA==
 
-"@bazel/esbuild@4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-4.4.5.tgz#17331868ac42f2d2c03afc776847dea2d0e650d4"
-  integrity sha512-CImfEr+1ecouGFVGgfCV6Zvx0I3Lw0abxkI8R3BmMleyQcLj8FejCGSFhxIJLKLuxGh/OJXjxoE+PAMTON4O9Q==
-
-"@bazel/jasmine@4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.4.5.tgz#e9540f0bffe286f23ce47ab59e6e015cc14c21af"
-  integrity sha512-BDWKtDmfux89TtWOhSMSuA01cdaNmdU9/8zrMNQopkTGDBmaDyPYvaxyhBAvQQLMiloOUBcS2eMO/fcSKRyg/A==
-  dependencies:
-    c8 "~7.5.0"
-    jasmine-reporters "~2.4.0"
+"@bazel/esbuild@4.4.6":
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-4.4.6.tgz#20ae2b2b77ecf40e4a18f7e9627f3ca51e95784d"
+  integrity sha512-iI4GlfhZEzSWg1mqoYl6WfeDJ/xSkEb7V8XbVOtXrZ1NG35yU5eYDRlIODEhdVRu/QyAMdcCePDJfgHwAsYXLg==
 
 "@bazel/jasmine@4.4.6":
   version "4.4.6"
@@ -1176,26 +1168,15 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.4.0"
 
-"@bazel/protractor@4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-4.4.5.tgz#b406e85c3d59015e0895c00700396ddd0d58d755"
-  integrity sha512-pW4hwkpLpBYHGFp7CO+vHfUXkOoFJBh11+2zFUjEXPaCYAol78Zt2SUzWRYD14CVEDWhxJlI6kCRg7IxW7/S2w==
+"@bazel/protractor@4.4.6":
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-4.4.6.tgz#2ed9c3780caf741bbe6e6947bcb84635fe0aa2a1"
+  integrity sha512-jLg2FDf7pCx87P56+HFEdXmcACpHJiGvePnVhKohLs0QOj+SEi1hDz4YgUsTBmcxZOEftI/v0zmXwgi9FFZ8QA==
 
-"@bazel/runfiles@4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-4.4.5.tgz#bbf112e882ea37d88f02009bb7cb661ac8908742"
-  integrity sha512-tFua24Ra/AI/K2di3sD03gzqG1uf9ziL+gSyc9dwjx9De1z4Fgafnqul9zXf1gqjEdWdJhZYXbntYmyj76BZNw==
-
-"@bazel/typescript@4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-4.4.5.tgz#0b323a292910dbfdc5f90312377e9282c73035f0"
-  integrity sha512-Cgq7ZXGkFPAAOn2t9C9JWIDkSjDKB7AkwNgXEwrPwpchKgdoCcD1uMieiErfwBB0FWgJF1xvwwLGOnWA6E/G0A==
-  dependencies:
-    "@bazel/worker" "4.4.5"
-    protobufjs "6.8.8"
-    semver "5.6.0"
-    source-map-support "0.5.9"
-    tsutils "3.21.0"
+"@bazel/runfiles@4.4.6":
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-4.4.6.tgz#a96d8f655d9aa8e3f3b7ad94f2f28562d480b977"
+  integrity sha512-bVZ+nZQqpprt8BOcfz0P8Nljr0gEsSiw8HrA6E8bSc/nRK7s+PWk1uRxOvoHfTiyJeOW2uvh+pJ9uDYd0d71Ow==
 
 "@bazel/typescript@4.4.6":
   version "4.4.6"
@@ -1207,13 +1188,6 @@
     semver "5.6.0"
     source-map-support "0.5.9"
     tsutils "3.21.0"
-
-"@bazel/worker@4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.4.5.tgz#1f9292c31615dff8a7297960f7f520bf9febf428"
-  integrity sha512-PoBMiN0SGSb1Qn/SabiM9HWC5nqwyWn0yTJgz6Vq2GMHo1UG7olVHuIfDb2ScFx9jY+mJ3wSyxQ4htlTGldedA==
-  dependencies:
-    google-protobuf "^3.6.1"
 
 "@bazel/worker@4.4.6":
   version "4.4.6"
@@ -9226,14 +9200,7 @@ rollup-plugin-sourcemaps@^0.6.3:
     "@rollup/pluginutils" "^3.0.9"
     source-map-resolve "^0.6.0"
 
-rollup@2.60.0:
-  version "2.60.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.60.0.tgz#4ee60ab7bdd0356763f87d7099f413e5460fc193"
-  integrity sha512-cHdv9GWd58v58rdseC8e8XIaPUo8a9cgZpnCMMDGZFDZKEODOiPPEQFXLriWr/TjXzhPPmG5bkAztPsOARIcGQ==
-  optionalDependencies:
-    fsevents "~2.3.2"
-
-rollup@^2.45.1:
+rollup@2.60.1, rollup@^2.45.1:
   version "2.60.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.60.1.tgz#4b34cd247f09b421f10a3c9286eda2ecf9972079"
   integrity sha512-akwfnpjY0rXEDSn1UTVfKXJhPsEBu+imi1gqBA1ZkHGydUnkV/fWCC90P7rDaLEW8KTwBcS1G3N4893Ndz+jwg==
@@ -10425,10 +10392,15 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.4.4, typescript@~4.4.0, typescript@~4.4.2:
+typescript@4.4.4, typescript@~4.4.2:
   version "4.4.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.4.tgz#2cd01a1a1f160704d3101fd5a58ff0f9fcb8030c"
   integrity sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==
+
+typescript@~4.5.0:
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.2.tgz#8ac1fba9f52256fdb06fb89e4122fa6a346c2998"
+  integrity sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==
 
 ua-parser-js@^0.7.30:
   version "0.7.31"
