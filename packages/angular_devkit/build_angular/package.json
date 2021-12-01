@@ -6,7 +6,7 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@ampproject/remapping": "1.0.1",
+    "@ampproject/remapping": "1.0.2",
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/build-webpack": "0.0.0",
     "@angular-devkit/core": "0.0.0",
@@ -19,7 +19,7 @@
     "@babel/preset-env": "7.16.4",
     "@babel/runtime": "7.16.3",
     "@babel/template": "7.16.0",
-    "@discoveryjs/json-ext": "0.5.5",
+    "@discoveryjs/json-ext": "0.5.6",
     "@ngtools/webpack": "0.0.0",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
