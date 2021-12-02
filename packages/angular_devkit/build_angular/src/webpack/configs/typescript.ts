@@ -90,6 +90,7 @@ function createIvyPlugin(
 export function getTypeScriptConfig(wco: WebpackConfigOptions): Configuration {
   const {
     buildOptions: { aot = false, main, polyfills },
+    tsConfig,
     tsConfigPath,
   } = wco;
 
@@ -100,8 +101,12 @@ export function getTypeScriptConfig(wco: WebpackConfigOptions): Configuration {
       module: {
         rules: [
           {
-            test: /\.[jt]sx?$/,
+            test: tsConfig.options.allowJs ? /\.[tj]sx?$/ : /\.tsx?$/,
             loader: AngularWebpackLoaderPath,
+            // The below are known paths that are not part of the TypeScript compilation even when allowJs is enabled.
+            exclude: [
+              /[/\\](?:css-loader|mini-css-extract-plugin|webpack-dev-server|webpack)[/\\]/,
+            ],
           },
         ],
       },
