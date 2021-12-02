@@ -63,7 +63,7 @@
     "ajv-formats/ajv": "8.6.3"
   },
   "devDependencies": {
-    "@ampproject/remapping": "1.0.1",
+    "@ampproject/remapping": "1.0.2",
     "@angular/animations": "13.0.0",
     "@angular/cdk": "13.0.0",
     "@angular/common": "13.0.0",
