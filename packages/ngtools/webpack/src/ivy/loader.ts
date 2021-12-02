@@ -67,7 +67,9 @@ export function angularWebpackLoader(this: LoaderContext<unknown>, content: stri
       callback(undefined, resultContent, resultMap);
     })
     .catch((err) => {
-      callback(err);
+      // The below is needed to hide stacktraces from users.
+      const message = err instanceof Error ? err.message : err;
+      callback(new Error(message));
     });
 }
 
