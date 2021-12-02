@@ -553,74 +553,77 @@ export class AngularWebpackPlugin {
 
     // Required to support asynchronous resource loading
     // Must be done before creating transformers or getting template diagnostics
-    const pendingAnalysis = angularCompiler.analyzeAsync().then(() => {
-      this.requiredFilesToEmit.clear();
+    const pendingAnalysis = angularCompiler
+      .analyzeAsync()
+      .then(() => {
+        this.requiredFilesToEmit.clear();
 
-      for (const sourceFile of builder.getSourceFiles()) {
-        if (sourceFile.isDeclarationFile) {
-          continue;
+        for (const sourceFile of builder.getSourceFiles()) {
+          if (sourceFile.isDeclarationFile) {
+            continue;
+          }
+
+          // Collect sources that are required to be emitted
+          if (
+            !ignoreForEmit.has(sourceFile) &&
+            !angularCompiler.incrementalDriver.safeToSkipEmit(sourceFile)
+          ) {
+            this.requiredFilesToEmit.add(normalizePath(sourceFile.fileName));
+
+            // If required to emit, diagnostics may have also changed
+            if (!ignoreForDiagnostics.has(sourceFile)) {
+              affectedFiles.add(sourceFile);
+            }
+          } else if (
+            this.sourceFileCache &&
+            !affectedFiles.has(sourceFile) &&
+            !ignoreForDiagnostics.has(sourceFile)
+          ) {
+            // Use cached Angular diagnostics for unchanged and unaffected files
+            const angularDiagnostics = this.sourceFileCache.getAngularDiagnostics(sourceFile);
+            if (angularDiagnostics) {
+              diagnosticsReporter(angularDiagnostics);
+            }
+          }
         }
 
-        // Collect sources that are required to be emitted
-        if (
-          !ignoreForEmit.has(sourceFile) &&
-          !angularCompiler.incrementalDriver.safeToSkipEmit(sourceFile)
-        ) {
-          this.requiredFilesToEmit.add(normalizePath(sourceFile.fileName));
-
-          // If required to emit, diagnostics may have also changed
-          if (!ignoreForDiagnostics.has(sourceFile)) {
-            affectedFiles.add(sourceFile);
-          }
-        } else if (
-          this.sourceFileCache &&
-          !affectedFiles.has(sourceFile) &&
-          !ignoreForDiagnostics.has(sourceFile)
-        ) {
-          // Use cached Angular diagnostics for unchanged and unaffected files
-          const angularDiagnostics = this.sourceFileCache.getAngularDiagnostics(sourceFile);
-          if (angularDiagnostics) {
-            diagnosticsReporter(angularDiagnostics);
-          }
+        // Collect new Angular diagnostics for files affected by changes
+        const OptimizeFor = this.compilerCli.OptimizeFor;
+        const optimizeDiagnosticsFor =
+          affectedFiles.size <= DIAGNOSTICS_AFFECTED_THRESHOLD
+            ? OptimizeFor.SingleFile
+            : OptimizeFor.WholeProgram;
+        for (const affectedFile of affectedFiles) {
+          const angularDiagnostics = angularCompiler.getDiagnosticsForFile(
+            affectedFile,
+            optimizeDiagnosticsFor,
+          );
+          diagnosticsReporter(angularDiagnostics);
+          this.sourceFileCache?.updateAngularDiagnostics(affectedFile, angularDiagnostics);
         }
-      }
 
-      // Temporary workaround during transition to ESM-only @angular/compiler-cli
-      // TODO_ESM: This workaround should be removed prior to the final release of v13
-      //       and replaced with only `this.compilerCli.OptimizeFor`.
-      const OptimizeFor =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.compilerCli as any).OptimizeFor ??
-        require('@angular/compiler-cli/src/ngtsc/typecheck/api').OptimizeFor;
+        return {
+          emitter: this.createFileEmitter(
+            builder,
+            mergeTransformers(angularCompiler.prepareEmit().transformers, transformers),
+            getDependencies,
+            (sourceFile) => {
+              this.requiredFilesToEmit.delete(normalizePath(sourceFile.fileName));
+              angularCompiler.incrementalDriver.recordSuccessfulEmit(sourceFile);
+            },
+          ),
+        };
+      })
+      .catch((err) => ({ errorMessage: err instanceof Error ? err.message : `${err}` }));
 
-      // Collect new Angular diagnostics for files affected by changes
-      const optimizeDiagnosticsFor =
-        affectedFiles.size <= DIAGNOSTICS_AFFECTED_THRESHOLD
-          ? OptimizeFor.SingleFile
-          : OptimizeFor.WholeProgram;
-      for (const affectedFile of affectedFiles) {
-        const angularDiagnostics = angularCompiler.getDiagnosticsForFile(
-          affectedFile,
-          optimizeDiagnosticsFor,
-        );
-        diagnosticsReporter(angularDiagnostics);
-        this.sourceFileCache?.updateAngularDiagnostics(affectedFile, angularDiagnostics);
-      }
-
-      return this.createFileEmitter(
-        builder,
-        mergeTransformers(angularCompiler.prepareEmit().transformers, transformers),
-        getDependencies,
-        (sourceFile) => {
-          this.requiredFilesToEmit.delete(normalizePath(sourceFile.fileName));
-          angularCompiler.incrementalDriver.recordSuccessfulEmit(sourceFile);
-        },
-      );
-    });
     const analyzingFileEmitter: FileEmitter = async (file) => {
-      const innerFileEmitter = await pendingAnalysis;
+      const analysis = await pendingAnalysis;
 
-      return innerFileEmitter(file);
+      if ('errorMessage' in analysis) {
+        throw new Error(analysis.errorMessage);
+      }
+
+      return analysis.emitter(file);
     };
 
     return {
