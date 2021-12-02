@@ -40,17 +40,13 @@ export class DocCommand extends Command<DocCommandSchema> {
         /* eslint-disable-next-line import/no-extraneous-dependencies */
         const currentNgVersion = (await import('@angular/core')).VERSION.major;
         domain = `v${currentNgVersion}.angular.io`;
-      } catch (e) {}
+      } catch {}
     }
 
-    let searchUrl = `https://${domain}/api?query=${options.keyword}`;
-
-    if (options.search) {
-      searchUrl = `https://${domain}/docs?search=${options.keyword}`;
-    }
-
-    await open(searchUrl, {
-      wait: false,
-    });
+    await open(
+      options.search
+        ? `https://${domain}/api?query=${options.keyword}`
+        : `https://${domain}/docs?search=${options.keyword}`,
+    );
   }
 }
