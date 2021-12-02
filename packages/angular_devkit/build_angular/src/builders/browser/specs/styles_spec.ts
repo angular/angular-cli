@@ -655,4 +655,26 @@ describe('Browser Builder styles', () => {
     result = await browserBuild(architect, host, target, { optimization: true });
     expect(await result.files['styles.css']).toContain('rgba(0,0,0,.15)');
   });
+
+  it('works when using the same css file in `styles` and `stylesUrl`', async () => {
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        div { color: red }
+      `,
+      './src/app/app.component.ts': `
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['../styles.css']
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `,
+    });
+
+    await browserBuild(architect, host, target, { styles: ['src/styles.css'] });
+  });
 });
