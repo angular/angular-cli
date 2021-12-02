@@ -19,7 +19,6 @@ favorite platform.
 For example:
   ng add @angular/fire
   ng add @azure/ng-deploy
-  ng add @zeit/ng-deploy
 
 Find more packages on npm https://www.npmjs.com/search?q=ng%20deploy
 `;
