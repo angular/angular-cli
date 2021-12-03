@@ -222,11 +222,26 @@ function isString(value: unknown): value is string {
   return typeof value === 'string';
 }
 
-async function getLanguageDirection(lang: string, warnings: string[]): Promise<string | undefined> {
+async function getLanguageDirection(
+  locale: string,
+  warnings: string[],
+): Promise<string | undefined> {
+  const dir = await getLanguageDirectionFromLocales(locale);
+
+  if (!dir) {
+    warnings.push(
+      `Locale data for '${locale}' cannot be found. 'dir' attribute will not be set for this locale.`,
+    );
+  }
+
+  return dir;
+}
+
+async function getLanguageDirectionFromLocales(locale: string): Promise<string | undefined> {
   try {
     const localeData = (
       await loadEsmModule<typeof import('@angular/common/locales/en')>(
-        `@angular/common/locales/${lang}`,
+        `@angular/common/locales/${locale}`,
       )
     ).default;
 
@@ -234,8 +249,13 @@ async function getLanguageDirection(lang: string, warnings: string[]): Promise<s
 
     return isString(dir) ? dir : undefined;
   } catch {
-    warnings.push(
-      `Locale data for '${lang}' cannot be found. 'dir' attribute will not be set for this locale.`,
-    );
+    // In some cases certain locales might map to files which are named only with language id.
+    // Example: `en-US` -> `en`.
+    const [languageId] = locale.split('-', 1);
+    if (languageId !== locale) {
+      return getLanguageDirectionFromLocales(languageId);
+    }
   }
+
+  return undefined;
 }

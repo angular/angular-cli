@@ -104,6 +104,24 @@ describe('augment-index-html', () => {
       `);
   });
 
+  it(`should fallback to use language ID to set the dir attribute (en-US)`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      lang: 'en-US',
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html lang="en-US" dir="ltr">
+          <head>
+            <base href="/">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
   it(`should work when lang (locale) is not provided by '@angular/common'`, async () => {
     const { content, warnings } = await augmentIndexHtml({
       ...indexGeneratorOptions,
