@@ -120,14 +120,6 @@ export class NgccProcessor {
     const timeLabel = 'NgccProcessor.process';
     time(timeLabel);
 
-    // Temporary workaround during transition to ESM-only @angular/compiler-cli
-    // TODO_ESM: This workaround should be removed prior to the final release of v13
-    //       and replaced with only `this.compilerNgcc.ngccMainFilePath`.
-    const ngccExecutablePath =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this.compilerNgcc as any).ngccMainFilePath ??
-      require.resolve('@angular/compiler-cli/ngcc/main-ngcc.js');
-
     // We spawn instead of using the API because:
     // - NGCC Async uses clustering which is problematic when used via the API which means
     // that we cannot setup multiple cluster masters with different options.
@@ -136,7 +128,7 @@ export class NgccProcessor {
     const { status, error } = spawnSync(
       process.execPath,
       [
-        ngccExecutablePath,
+        this.compilerNgcc.ngccMainFilePath,
         '--source' /** basePath */,
         this._nodeModulesDirectory,
         '--properties' /** propertiesToConsider */,
