@@ -734,24 +734,7 @@ export class AngularWebpackPlugin {
     // this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
     // Once TypeScript provides support for keeping the dynamic import this workaround can
     // be dropped.
-    const compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
-    let compilerNgccModule;
-    try {
-      compilerNgccModule = await new Function(`return import('@angular/compiler-cli/ngcc');`)();
-    } catch {
-      // If the `exports` field entry is not present then try the file directly.
-      // TODO_ESM: This try/catch can be removed once the `exports` field is present in `@angular/compiler-cli`
-      compilerNgccModule = await new Function(
-        `return import('@angular/compiler-cli/ngcc/index.js');`,
-      )();
-    }
-    // If it is not ESM then the functions needed will be stored in the `default` property.
-    // TODO_ESM: This conditional can be removed when `@angular/compiler-cli` is ESM only.
-    this.compilerCliModule = compilerCliModule.readConfiguration
-      ? compilerCliModule
-      : compilerCliModule.default;
-    this.compilerNgccModule = compilerNgccModule.process
-      ? compilerNgccModule
-      : compilerNgccModule.default;
+    this.compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
+    this.compilerNgccModule = await new Function(`return import('@angular/compiler-cli/ngcc');`)();
   }
 }
