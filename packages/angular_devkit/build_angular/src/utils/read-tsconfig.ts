@@ -26,14 +26,9 @@ export async function readTsconfig(
   // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
-  const compilerCliModule = await loadEsmModule<{ readConfiguration: unknown; default: unknown }>(
-    '@angular/compiler-cli',
-  );
-  // If it is not ESM then the functions needed will be stored in the `default` property.
-  // TODO_ESM: This can be removed once `@angular/compiler-cli` is ESM only.
-  const { formatDiagnostics, readConfiguration } = (
-    compilerCliModule.readConfiguration ? compilerCliModule : compilerCliModule.default
-  ) as typeof import('@angular/compiler-cli');
+  const { formatDiagnostics, readConfiguration } = await loadEsmModule<
+    typeof import('@angular/compiler-cli')
+  >('@angular/compiler-cli');
 
   const configResult = readConfiguration(tsConfigFullPath);
   if (configResult.errors && configResult.errors.length) {

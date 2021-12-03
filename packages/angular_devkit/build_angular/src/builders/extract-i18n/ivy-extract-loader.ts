@@ -49,7 +49,6 @@ async function extract(
   // Try to load the `@angular/localize` message extractor.
   // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
   // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
-  // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
   let MessageExtractor;
   try {
     // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.

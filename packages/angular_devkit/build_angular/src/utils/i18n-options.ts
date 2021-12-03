@@ -217,9 +217,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
       continue;
     }
 
-    if (!loader) {
-      loader = await createTranslationLoader();
-    }
+    loader ??= await createTranslationLoader();
 
     loadTranslations(
       locale,

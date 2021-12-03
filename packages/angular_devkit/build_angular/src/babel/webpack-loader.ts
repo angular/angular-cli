@@ -91,15 +91,14 @@ export default custom<ApplicationPresetOptions>(() => {
 
       // Analyze file for linking
       if (await requiresLinking(this.resourcePath, source)) {
-        if (!linkerPluginCreator) {
-          // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
-          // Once TypeScript provides support for keeping the dynamic import this workaround can be
-          // changed to a direct dynamic import.
-          const linkerBabelModule = await loadEsmModule<
-            typeof import('@angular/compiler-cli/linker/babel')
-          >('@angular/compiler-cli/linker/babel');
-          linkerPluginCreator = linkerBabelModule.createEs2015LinkerPlugin;
-        }
+        // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        linkerPluginCreator ??= (
+          await loadEsmModule<typeof import('@angular/compiler-cli/linker/babel')>(
+            '@angular/compiler-cli/linker/babel',
+          )
+        ).createEs2015LinkerPlugin;
 
         customOptions.angularLinker = {
           shouldLink: true,
@@ -136,14 +135,11 @@ export default custom<ApplicationPresetOptions>(() => {
         // During the transition, this will always attempt to load the entry point for each file.
         // This will only occur during prerelease and will be automatically corrected once the new
         // entry point exists.
-        // TODO_ESM: Make import failure an error once the `tools` entry point exists.
         if (i18nPluginCreators === undefined) {
           // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          try {
-            i18nPluginCreators = await loadEsmModule<I18nPluginCreators>('@angular/localize/tools');
-          } catch {}
+          i18nPluginCreators = await loadEsmModule<I18nPluginCreators>('@angular/localize/tools');
         }
 
         customOptions.i18n = {
