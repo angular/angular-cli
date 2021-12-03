@@ -204,8 +204,11 @@ export class WebpackResourceLoader {
         () => {
           finalContent = childCompilation.assets[outputFilePath]?.source().toString();
 
-          delete childCompilation.assets[outputFilePath];
-          delete childCompilation.assets[outputFilePath + '.map'];
+          for (const { files } of childCompilation.chunks) {
+            for (const file of files) {
+              childCompilation.deleteAsset(file);
+            }
+          }
         },
       );
     });
