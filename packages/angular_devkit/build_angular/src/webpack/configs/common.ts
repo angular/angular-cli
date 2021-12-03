@@ -16,12 +16,11 @@ import {
   ContextReplacementPlugin,
   RuleSetRule,
   SourceMapDevToolPlugin,
-  debug,
 } from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { AngularBabelLoaderOptions } from '../../babel/webpack-loader';
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { allowMangle, profilingEnabled } from '../../utils/environment-options';
+import { allowMangle } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import {
   CommonJsUsageWarnPlugin,
@@ -131,14 +130,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         entryPoints['polyfills'] = [jitPolyfills];
       }
     }
-  }
-
-  if (profilingEnabled) {
-    extraPlugins.push(
-      new debug.ProfilingPlugin({
-        outputPath: path.resolve(root, 'chrome-profiler-events.json'),
-      }),
-    );
   }
 
   if (allowedCommonJsDependencies) {

@@ -66,10 +66,6 @@ export const allowMangle = isPresent(mangleVariable)
 export const shouldBeautify = debugOptimize.beautify;
 export const allowMinify = debugOptimize.minify;
 
-// Build profiling
-const profilingVariable = process.env['NG_BUILD_PROFILING'];
-export const profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
-
 /**
  * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
  * This cause `Error: Call retries were exceeded` errors when trying to use them.
