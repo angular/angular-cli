@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { ɵParsedTranslation } from '@angular/localize/private';
 import type {
   DiagnosticHandlingStrategy,
   Diagnostics,
@@ -35,9 +36,9 @@ export interface ApplicationPresetOptions {
   i18n?: {
     locale: string;
     missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
-    translation?: unknown;
+    translation?: Record<string, ɵParsedTranslation>;
     translationFiles?: string[];
-    pluginCreators?: I18nPluginCreators;
+    pluginCreators: I18nPluginCreators;
   };
 
   angularLinker?: {
@@ -107,34 +108,23 @@ function createI18nDiagnostics(reporter: DiagnosticReporter | undefined): Diagno
 
 function createI18nPlugins(
   locale: string,
-  translation: unknown | undefined,
+  translation: Record<string, ɵParsedTranslation> | undefined,
   missingTranslationBehavior: 'error' | 'warning' | 'ignore',
   diagnosticReporter: DiagnosticReporter | undefined,
-  // TODO_ESM: Make `pluginCreators` required once `@angular/localize` is published with the `tools` entry point
-  pluginCreators: I18nPluginCreators | undefined,
+  pluginCreators: I18nPluginCreators,
 ) {
   const diagnostics = createI18nDiagnostics(diagnosticReporter);
   const plugins = [];
 
+  const { makeEs5TranslatePlugin, makeEs2015TranslatePlugin, makeLocalePlugin } = pluginCreators;
+
   if (translation) {
-    const {
-      makeEs2015TranslatePlugin,
-      // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-    } =
-      pluginCreators ??
-      require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
     plugins.push(
       makeEs2015TranslatePlugin(diagnostics, translation, {
         missingTranslation: missingTranslationBehavior,
       }),
     );
 
-    const {
-      makeEs5TranslatePlugin,
-      // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-    } =
-      pluginCreators ??
-      require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
     plugins.push(
       makeEs5TranslatePlugin(diagnostics, translation, {
         missingTranslation: missingTranslationBehavior,
@@ -142,12 +132,6 @@ function createI18nPlugins(
     );
   }
 
-  const {
-    makeLocalePlugin,
-    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-  } =
-    pluginCreators ??
-    require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
   plugins.push(makeLocalePlugin(locale));
 
   return plugins;
