@@ -249,10 +249,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#e4a13cfd135ec766dc9148ba4fe4d3ac76d94137":
-  version "0.0.0-486b6e2b6388e2bebf19e6daf0b4b997df62693c"
-  uid e4a13cfd135ec766dc9148ba4fe4d3ac76d94137
-  resolved "https://github.com/angular/dev-infra-private-builds.git#e4a13cfd135ec766dc9148ba4fe4d3ac76d94137"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#16817a2043e77118a8d90d67248b0432c47d429a":
+  version "0.0.0-1a6a036f16eba72eb32f30a5bb8cc64e2968a07e"
+  uid "16817a2043e77118a8d90d67248b0432c47d429a"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#16817a2043e77118a8d90d67248b0432c47d429a"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -266,7 +266,7 @@
     "@bazel/protractor" "4.4.6"
     "@bazel/runfiles" "4.4.6"
     "@bazel/typescript" "4.4.6"
-    "@microsoft/api-extractor" "7.18.19"
+    "@microsoft/api-extractor" "7.18.20"
     "@octokit/auth-app" "^3.6.0"
     "@octokit/core" "^3.5.1"
     "@octokit/graphql" "^4.8.0"
@@ -295,7 +295,7 @@
     node-fetch "^2.6.1"
     prettier "^2.3.2"
     protractor "^7.0.0"
-    rollup "2.60.1"
+    rollup "2.60.2"
     rollup-plugin-sourcemaps "^0.6.3"
     selenium-webdriver "3.5.0"
     semver "^7.3.5"
@@ -1738,6 +1738,15 @@
     "@microsoft/tsdoc-config" "~0.15.2"
     "@rushstack/node-core-library" "3.43.2"
 
+"@microsoft/api-extractor-model@7.13.17":
+  version "7.13.17"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.13.17.tgz#ea77c206984f62ee1d538ef2164e21c0e70a006e"
+  integrity sha512-XKP2NsUm2asriB6DshODfSRxYXwSBnA2VA51dVgxJnUE0OnBSZTc2rwzN6mDUJT72JGN081QG99eWA2SutOjIg==
+  dependencies:
+    "@microsoft/tsdoc" "0.13.2"
+    "@microsoft/tsdoc-config" "~0.15.2"
+    "@rushstack/node-core-library" "3.44.0"
+
 "@microsoft/api-extractor@7.18.19":
   version "7.18.19"
   resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.19.tgz#f09afc1c210aa67e2f3f34b0a68281a12f144541"
@@ -1747,6 +1756,24 @@
     "@microsoft/tsdoc" "0.13.2"
     "@microsoft/tsdoc-config" "~0.15.2"
     "@rushstack/node-core-library" "3.43.2"
+    "@rushstack/rig-package" "0.3.5"
+    "@rushstack/ts-command-line" "4.10.4"
+    colors "~1.2.1"
+    lodash "~4.17.15"
+    resolve "~1.17.0"
+    semver "~7.3.0"
+    source-map "~0.6.1"
+    typescript "~4.4.2"
+
+"@microsoft/api-extractor@7.18.20":
+  version "7.18.20"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.18.20.tgz#ab65df94ed5bc6aab53612fc0a6a93cbdeef1610"
+  integrity sha512-JBstlWs5/MC1IiXSMAwOUnX1hV/IcCl75xF6OUhR2LB7ckZWcsKIbhLecjHC+TZRQsRqVGA3u+DJgB7BIWWYcA==
+  dependencies:
+    "@microsoft/api-extractor-model" "7.13.17"
+    "@microsoft/tsdoc" "0.13.2"
+    "@microsoft/tsdoc-config" "~0.15.2"
+    "@rushstack/node-core-library" "3.44.0"
     "@rushstack/rig-package" "0.3.5"
     "@rushstack/ts-command-line" "4.10.4"
     colors "~1.2.1"
@@ -2116,6 +2143,21 @@
   version "3.43.2"
   resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.43.2.tgz#f067371a94fd92ed8f9d9aa8201c5e9e17a19f0f"
   integrity sha512-b7AEhSf6CvZgvuDcWMFDeKx2mQSn9AVnMQVyxNxFeHCtLz3gJicqCOlw2GOXM8HKh6PInLdil/NVCDcstwSrIw==
+  dependencies:
+    "@types/node" "12.20.24"
+    colors "~1.2.1"
+    fs-extra "~7.0.1"
+    import-lazy "~4.0.0"
+    jju "~1.4.0"
+    resolve "~1.17.0"
+    semver "~7.3.0"
+    timsort "~0.3.0"
+    z-schema "~3.18.3"
+
+"@rushstack/node-core-library@3.44.0":
+  version "3.44.0"
+  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.44.0.tgz#481c30a5b5fbaf6eb06f95334b704fe6e1b35b44"
+  integrity sha512-J+w5efSJjitZoxgtBfU4al0FUx2VIcxpPFUxjIvk7Os2hlGV0VxXLUQWIWdiSL6OGxMSksDlHC9/SHcvBARuvg==
   dependencies:
     "@types/node" "12.20.24"
     colors "~1.2.1"
@@ -8671,7 +8713,14 @@ rollup-plugin-sourcemaps@^0.6.0, rollup-plugin-sourcemaps@^0.6.3:
     "@rollup/pluginutils" "^3.0.9"
     source-map-resolve "^0.6.0"
 
-rollup@2.60.1, rollup@~2.60.0:
+rollup@2.60.2:
+  version "2.60.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.60.2.tgz#3f45ace36a9b10b4297181831ea0719922513463"
+  integrity sha512-1Bgjpq61sPjgoZzuiDSGvbI1tD91giZABgjCQBKM5aYLnzjq52GoDuWVwT/cm/MCxCMPU8gqQvkj8doQ5C8Oqw==
+  optionalDependencies:
+    fsevents "~2.3.2"
+
+rollup@~2.60.0:
   version "2.60.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.60.1.tgz#4b34cd247f09b421f10a3c9286eda2ecf9972079"
   integrity sha512-akwfnpjY0rXEDSn1UTVfKXJhPsEBu+imi1gqBA1ZkHGydUnkV/fWCC90P7rDaLEW8KTwBcS1G3N4893Ndz+jwg==
