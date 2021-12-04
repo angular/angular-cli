@@ -107,14 +107,16 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  const sassImplementation = new SassWorkerImplementation();
-  extraPlugins.push({
-    apply(compiler) {
-      compiler.hooks.shutdown.tap('sass-worker', () => {
-        sassImplementation?.close();
-      });
-    },
-  });
+  const sassImplementation = getSassImplementation();
+  if (sassImplementation instanceof SassWorkerImplementation) {
+    extraPlugins.push({
+      apply(compiler) {
+        compiler.hooks.shutdown.tap('sass-worker', () => {
+          sassImplementation?.close();
+        });
+      },
+    });
+  }
 
   const assetNameTemplate = assetNameTemplateFactory(hashFormat);
 
@@ -403,4 +405,15 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     },
     plugins: extraPlugins,
   };
+}
+
+function getSassImplementation(): SassWorkerImplementation | typeof import('sass') {
+  const { webcontainer } = process.versions as unknown as Record<string, unknown>;
+
+  // When `webcontainer` is a truthy it means that we are running in a StackBlitz webcontainer.
+  // `SassWorkerImplementation` uses `receiveMessageOnPort` Node.js `worker_thread` API to ensure sync behavior which is ~2x faster.
+  // However, it is non trivial to support this in a webcontainer and while slower we choose to use `dart-sass`
+  // which in Webpack uses the slower async path.
+  // We should periodically check with StackBlitz folks (Mark Whitfeld / Dominic Elm) to determine if this workaround is still needed.
+  return webcontainer ? require('sass') : new SassWorkerImplementation();
 }
