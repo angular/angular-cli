@@ -11,6 +11,7 @@ import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import glob from 'glob';
 import * as path from 'path';
+import { ScriptTarget } from 'typescript';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
 import {
   AssetPatternClass,
@@ -297,4 +298,24 @@ export function getStatsOptions(verbose = false): WebpackStatsOptions {
   return verbose
     ? { ...webpackOutputOptions, ...verboseWebpackOutputOptions }
     : webpackOutputOptions;
+}
+
+export function getMainFieldsAndConditionNames(
+  target: ScriptTarget,
+  platformServer: boolean,
+): Pick<WebpackOptionsNormalized['resolve'], 'mainFields' | 'conditionNames'> {
+  const mainFields = platformServer
+    ? ['es2015', 'module', 'main']
+    : ['es2015', 'browser', 'module', 'main'];
+  const conditionNames = ['es2015', '...'];
+
+  if (target >= ScriptTarget.ES2020) {
+    mainFields.unshift('es2020');
+    conditionNames.unshift('es2020');
+  }
+
+  return {
+    mainFields,
+    conditionNames,
+  };
 }
