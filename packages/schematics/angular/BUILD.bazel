@@ -4,13 +4,8 @@
 # found in the LICENSE file at https://angular.io/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
-
-# @external_begin
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
-# @external_end
 
 licenses(["notice"])  # MIT
 
@@ -136,19 +131,25 @@ jasmine_node_test(
     ],
 )
 
-# @external_begin
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":angular",
-    ],
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
+pkg_npm(
+    name = "npm_package",
+    srcs = [":package.json"],
+    deps = [
+        "library/library-long.md",
+        ":README.md",
+        ":angular",
+        ":app-shell/app-shell-long.md",
+        ":e2e/e2e-long.md",
+        ":license",
+        ":migrations/migration-collection.json",
+        ":utility/latest-versions/package.json",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:LICENSE",
+    ],
 )
-# @external_end

@@ -6,12 +6,7 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
-load("//tools:defaults.bzl", "ts_library")
-
-# @external_begin
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
-# @external_end
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 
 licenses(["notice"])  # MIT
 
@@ -61,7 +56,7 @@ ts_library(
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
-            "cli/lib/config/workspace-schema.json",
+            "lib/config/workspace-schema.json",
         ],
     ) + [
         "//packages/angular/cli:lib/config/schema.json",
@@ -312,19 +307,22 @@ jasmine_node_test(
     srcs = [":angular-cli_test_lib"],
 )
 
-# @external_begin
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":angular-cli",
-    ],
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
+pkg_npm(
+    name = "npm_package",
+    srcs = [":package.json"],
+    deps = [
+        ":README.md",
+        ":angular-cli",
+        ":license",
+        ":src/commands/update/schematic/collection.json",
+        ":src/commands/update/schematic/schema.json",
+        ":utilities/INITIAL_COMMIT_MESSAGE.txt",
+    ],
 )
-# @external_end

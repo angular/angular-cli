@@ -1,11 +1,6 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
-
-# @external_begin
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("@npm//@angular/dev-infra-private/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-# @external_end
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -30,7 +25,10 @@ ts_library(
     data = glob(
         include = ["**/*.json"],
         # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-        exclude = ["node_modules/**"],
+        exclude = [
+            "node_modules/**",
+            "src/workspace/json/test/**",
+        ],
     ),
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
@@ -78,22 +76,26 @@ jasmine_node_test(
     ],
 )
 
-# @external_begin
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/core/node/testing",
-    ],
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
+pkg_npm(
+    name = "npm_package",
+    srcs = [":package.json"],
+    deps = [
+        ":README.md",
+        ":core",
+        ":license",
+        ":src/experimental/jobs/README.md",
+        ":src/experimental/jobs/architecture.md",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/core/node:package.json",
+        "//packages/angular_devkit/core/node/testing",
+    ],
 )
 
 api_golden_test_npm_package(
@@ -106,4 +108,3 @@ api_golden_test_npm_package(
     npm_package = "angular_cli/packages/angular_devkit/core/npm_package",
     types = ["@npm//@types/node"],
 )
-# @external_end
