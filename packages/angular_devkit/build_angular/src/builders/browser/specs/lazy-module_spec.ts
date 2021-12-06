@@ -152,7 +152,7 @@ describe('Browser Builder lazy modules', () => {
     const { files } = await browserBuild(architect, host, target);
     expect(files['src_one_ts.js']).not.toBeUndefined();
     expect(files['src_two_ts.js']).not.toBeUndefined();
-    expect(files['default-node_modules_angular_common_fesm2020_http_mjs.js']).toBeDefined();
+    expect(files['default-node_modules_angular_common_fesm2015_http_mjs.js']).toBeDefined();
   });
 
   it(`supports disabling the common bundle`, async () => {
@@ -165,6 +165,6 @@ describe('Browser Builder lazy modules', () => {
     const { files } = await browserBuild(architect, host, target, { commonChunk: false });
     expect(files['src_one_ts.js']).not.toBeUndefined();
     expect(files['src_two_ts.js']).not.toBeUndefined();
-    expect(files['default-node_modules_angular_common_fesm2020_http_mjs.js']).toBeUndefined();
+    expect(files['default-node_modules_angular_common_fesm2015_http_mjs.js']).toBeUndefined();
   });
 });

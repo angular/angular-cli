@@ -8,7 +8,8 @@
 
 import glob from 'glob';
 import * as path from 'path';
-import { Configuration, SourceMapDevToolPlugin } from 'webpack';
+import { ScriptTarget } from 'typescript';
+import { Configuration, SourceMapDevToolPlugin, WebpackOptionsNormalized } from 'webpack';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../builders/browser/schema';
 
 export interface HashFormat {
@@ -146,4 +147,24 @@ export function getInstrumentationExcludedPaths(
   }
 
   return excluded;
+}
+
+export function getMainFieldsAndConditionNames(
+  target: ScriptTarget,
+  platformServer: boolean,
+): Pick<WebpackOptionsNormalized['resolve'], 'mainFields' | 'conditionNames'> {
+  const mainFields = platformServer
+    ? ['es2015', 'module', 'main']
+    : ['es2015', 'browser', 'module', 'main'];
+  const conditionNames = ['es2015', '...'];
+
+  if (target >= ScriptTarget.ES2020) {
+    mainFields.unshift('es2020');
+    conditionNames.unshift('es2020');
+  }
+
+  return {
+    mainFields,
+    conditionNames,
+  };
 }
