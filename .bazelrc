@@ -68,7 +68,11 @@ test:saucelabs --define=KARMA_WEB_TEST_MODE=SL_REQUIRED
 # Releases should always be stamped with version control info
 # This command assumes node on the path and is a workaround for
 # https://github.com/bazelbuild/bazel/issues/4802
-build:release --workspace_status_command="yarn -s ng-dev release build-env-stamp"
+build:release --workspace_status_command="yarn -s ng-dev release build-env-stamp --mode=release"
+build:release --stamp
+
+build:snapshot --workspace_status_command="yarn -s ng-dev release build-env-stamp --mode=snapshot"
+build:snapshot --stamp
 
 ###############################
 # Output                      #

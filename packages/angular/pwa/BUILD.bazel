@@ -4,10 +4,8 @@
 # found in the LICENSE file at https://angular.io/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 licenses(["notice"])  # MIT
 
@@ -35,7 +33,6 @@ ts_library(
     data = glob(
         include = [
             "collection.json",
-            "package.json",
             "pwa/schema.json",
             "pwa/files/**/*",
         ],
@@ -70,17 +67,19 @@ jasmine_node_test(
     srcs = [":pwa_test_lib"],
 )
 
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":pwa",
-    ],
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
+pkg_npm(
+    name = "npm_package",
+    srcs = [":package.json"],
+    deps = [
+        ":README.md",
+        ":license",
+        ":pwa",
+    ],
 )

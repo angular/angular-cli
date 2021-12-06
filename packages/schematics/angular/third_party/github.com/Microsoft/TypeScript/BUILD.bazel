@@ -4,6 +4,10 @@ load("//tools:defaults.bzl", "ts_library")
 # https://github.com/microsoft/TypeScript/releases/tag/v4.4.3
 licenses(["notice"])  # Apache 2.0
 
+exports_files([
+    "LICENSE",
+])
+
 ts_library(
     name = "TypeScript",
     srcs = ["lib/typescript.d.ts"],
