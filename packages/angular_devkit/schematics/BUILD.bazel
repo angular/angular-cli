@@ -1,11 +1,6 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
-
-# @external_begin
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("@npm//@angular/dev-infra-private/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-# @external_end
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -69,23 +64,27 @@ jasmine_node_test(
     ],
 )
 
-# @external_begin
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/testing",
-        "//packages/angular_devkit/schematics/tools",
-    ],
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
+pkg_npm(
+    name = "npm_package",
+    srcs = [":package.json"],
+    deps = [
+        ":README.md",
+        ":collection-schema.json",
+        ":license",
+        ":schematics",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tasks:package.json",
+        "//packages/angular_devkit/schematics/testing",
+        "//packages/angular_devkit/schematics/testing:package.json",
+        "//packages/angular_devkit/schematics/tools:package.json",
+    ],
 )
 
 api_golden_test_npm_package(
@@ -98,4 +97,3 @@ api_golden_test_npm_package(
     npm_package = "angular_cli/packages/angular_devkit/schematics/npm_package",
     types = ["@npm//@types/node"],
 )
-# @external_end

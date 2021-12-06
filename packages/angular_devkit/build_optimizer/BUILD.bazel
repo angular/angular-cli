@@ -4,13 +4,8 @@
 # found in the LICENSE file at https://angular.io/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
-
-# @external_begin
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("@npm//@angular/dev-infra-private/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-# @external_end
 
 licenses(["notice"])  # MIT
 
@@ -22,9 +17,6 @@ ts_library(
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [
-            # TODO(@filipesilva): shouldn't need to exclude the cli files but can't exclude them
-            # from jasmine_node_test.
-            "src/**/cli.ts",
             "src/**/*_spec.ts",
             "src/**/*_benchmark.ts",
         ],
@@ -67,20 +59,22 @@ jasmine_node_test(
     ],
 )
 
-# @external_begin
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":build_optimizer",
-    ],
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
+pkg_npm(
+    name = "npm_package",
+    srcs = [":package.json"],
+    deps = [
+        ":README.md",
+        ":build_optimizer",
+        ":license",
+        ":webpack-loader/package.json",
+    ],
 )
 
 api_golden_test_npm_package(
@@ -92,4 +86,3 @@ api_golden_test_npm_package(
     golden_dir = "angular_cli/goldens/public-api/angular_devkit/build_optimizer",
     npm_package = "angular_cli/packages/angular_devkit/build_optimizer/npm_package",
 )
-# @external_end
