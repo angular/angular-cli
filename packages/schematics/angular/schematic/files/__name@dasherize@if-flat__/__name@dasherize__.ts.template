@@ -1,0 +1,11 @@
+import { noop, Tree } from "@angular-devkit/schematics";
+
+export interface <%= classify(name) %>Options {
+  name: string;
+}
+
+export function <%= camelize(name) %>(options: <%= classify(name) %>Options) {
+  return async (host: Tree) => {
+    return noop();
+  };
+}

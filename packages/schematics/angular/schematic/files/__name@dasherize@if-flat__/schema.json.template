@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "",
+      "visible": false
+    }
+  },
+  "required": ["name"]
+}

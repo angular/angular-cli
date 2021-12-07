@@ -118,6 +118,11 @@
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",
       "description": "Create a Web Worker."
+    },
+    "schematic": {
+      "factory": "./schematic",
+      "schema": "./schematic/schema.json",
+      "description": "Create a schematic"
     }
   }
 }
