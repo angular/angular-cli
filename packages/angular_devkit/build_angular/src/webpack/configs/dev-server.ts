@@ -9,7 +9,7 @@
 import { logging, tags } from '@angular-devkit/core';
 import { existsSync, promises as fsPromises } from 'fs';
 import { extname, posix, resolve } from 'path';
-import * as url from 'url';
+import { URL, pathToFileURL } from 'url';
 import { Configuration, RuleSetRule } from 'webpack';
 import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
@@ -72,7 +72,7 @@ export async function getDevServerConfig(
         rewrites: [
           {
             from: new RegExp(`^(?!${servePath})/.*`),
-            to: (context) => url.format(context.parsedUrl),
+            to: (context) => context.parsedUrl.href,
           },
         ],
       },
@@ -198,7 +198,7 @@ async function addProxyConfig(root: string, proxyConfig: string | undefined) {
       // Load the ESM configuration file using the TypeScript dynamic import workaround.
       // Once TypeScript provides support for keeping the dynamic import this workaround can be
       // changed to a direct dynamic import.
-      return (await loadEsmModule<{ default: unknown }>(url.pathToFileURL(proxyPath))).default;
+      return (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath))).default;
     case '.cjs':
       return require(proxyPath);
     default:
@@ -211,7 +211,7 @@ async function addProxyConfig(root: string, proxyConfig: string | undefined) {
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          return (await loadEsmModule<{ default: unknown }>(url.pathToFileURL(proxyPath))).default;
+          return (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath))).default;
         }
 
         throw e;
@@ -300,11 +300,8 @@ function getAllowedHostsConfig(
 function getPublicHostOptions(options: WebpackDevServerOptions, webSocketPath: string): string {
   let publicHost: string | null | undefined = options.publicHost;
   if (publicHost) {
-    if (!/^\w+:\/\//.test(publicHost)) {
-      publicHost = `https://${publicHost}`;
-    }
-
-    publicHost = url.parse(publicHost).host;
+    const hostWithProtocol = !/^\w+:\/\//.test(publicHost) ? `https://${publicHost}` : publicHost;
+    publicHost = new URL(hostWithProtocol).host;
   }
 
   return `auto://${publicHost || '0.0.0.0:0'}${webSocketPath}`;
