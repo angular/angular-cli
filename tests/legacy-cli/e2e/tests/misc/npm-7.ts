@@ -17,6 +17,11 @@ export default async function () {
     return;
   }
 
+  // NPM 7 doesn't support Node v10.
+  if (process.version.startsWith('v10')) {
+    return;
+  }
+
   const currentDirectory = process.cwd();
 
   const extraArgs = [];
