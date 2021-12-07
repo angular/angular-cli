@@ -1,3 +1,22 @@
+<a name="12.2.14"></a>
+
+# 12.2.14 (2021-12-07)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------- |
+| [30295b33e](https://github.com/angular/angular-cli/commit/30295b33ed74667f31e9d3a4a0017910a85fd734) | fix  | error when updating Angular packages across multi-major migrations                        |
+| [e07bd059e](https://github.com/angular/angular-cli/commit/e07bd059e3d6bc6b40191c036c467595ed119da7) | fix  | logic which determines which temp version of the CLI is to be download during `ng update` |
+| [ce1ec0420](https://github.com/angular/angular-cli/commit/ce1ec0420770a8e28c1c1301df9e5eb4548d4c53) | fix  | update `ng update` output for Angular packages                                            |
+| [dd9f8df52](https://github.com/angular/angular-cli/commit/dd9f8df5204d639272f183795ebd48d7994df427) | fix  | update `pacote` to `12.0.2`                                                               |
+
+## Special Thanks
+
+Alan Agius and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.0-next.3"></a>
 
 # 13.1.0-next.3 (2021-12-01)
