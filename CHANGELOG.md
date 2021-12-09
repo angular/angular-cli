@@ -1,3 +1,46 @@
+<a name="13.1.0-rc.0"></a>
+
+# 13.1.0-rc.0 (2021-12-09)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [0b6071af3](https://github.com/angular/angular-cli/commit/0b6071af3a51e7d3f38a661bd4e0a3c3e81aff2f) | fix  | `ng doc` does open browser on Windows |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [f95cc8281](https://github.com/angular/angular-cli/commit/f95cc8281a64bd9ac19e0fa5d92cb0a6ee8c32ec) | feat | generate new projects using TypeScript 4.5 |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [339bab06c](https://github.com/angular/angular-cli/commit/339bab06cc25863571acb09cb3e877fed14ca2f9) | feat | generate new projects using TypeScript 4.5 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [9bacba342](https://github.com/angular/angular-cli/commit/9bacba3420cda7897091522415a8d55cf1b75106) | fix  | differentiate components and global styles using file query instead of filename |
+| [d55fc62ef](https://github.com/angular/angular-cli/commit/d55fc62ef2f8bc7a6f1190f56f8e8b64c9195263) | fix  | fallback to use language ID to set the `dir` attribute                          |
+| [562dc6a89](https://github.com/angular/angular-cli/commit/562dc6a8924826509d9012b2c0fe61c089077399) | fix  | prefer ES2015 entrypoints when application targets ES2019 or lower              |
+| [ac66e400c](https://github.com/angular/angular-cli/commit/ac66e400cddc81bde46949d1abe4560185dfbedb) | fix  | Sass compilation in StackBlitz webcontainers                                    |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [10d4ede2d](https://github.com/angular/angular-cli/commit/10d4ede2de42dfc302dcb4c5790274290170568d) | fix  | handle promise rejection during Angular program analyzes |
+
+## Special Thanks
+
+Alan Agius, Doug Parker and Ferdinand Malcher
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.14"></a>
 
 # 12.2.14 (2021-12-07)
