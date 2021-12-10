@@ -6,15 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { Diagnostics } from '@angular/compiler-cli';
-import { DiagnosticCategory } from 'typescript';
+import { Diagnostic, DiagnosticCategory } from 'typescript';
 import type { Compilation } from 'webpack';
 
-export type DiagnosticsReporter = (diagnostics: Diagnostics) => void;
+export type DiagnosticsReporter = (diagnostics: readonly Diagnostic[]) => void;
 
 export function createDiagnosticsReporter(
   compilation: Compilation,
-  formatter: (diagnostic: Diagnostics[number]) => string,
+  formatter: (diagnostic: Diagnostic) => string,
 ): DiagnosticsReporter {
   return (diagnostics) => {
     for (const diagnostic of diagnostics) {
