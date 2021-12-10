@@ -22,6 +22,7 @@
     "admin": "node ./bin/devkit-admin",
     "bazel:test": "bazel test //packages/...",
     "build": "node ./bin/devkit-admin build",
+    "build:bazel": "node ./bin/devkit-admin build-bazel",
     "build-tsc": "tsc -p tsconfig.json",
     "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
     "templates": "node ./bin/devkit-admin templates",
