@@ -4,13 +4,8 @@ import { ng, silentExec } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
-  // Tailwind is not supported in Node.js 10
-  if (process.version.startsWith('v10')) {
-    return;
-  }
-
   // Install Tailwind
-  await installPackage('tailwindcss');
+  await installPackage('tailwindcss@3');
 
   // Create configuration file
   await silentExec('npx', 'tailwindcss', 'init');
