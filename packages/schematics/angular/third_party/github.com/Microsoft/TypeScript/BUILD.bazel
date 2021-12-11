@@ -1,7 +1,7 @@
 load("//tools:defaults.bzl", "ts_library")
 
-# files fetched on 2021-09-28 from
-# https://github.com/microsoft/TypeScript/releases/tag/v4.4.3
+# files fetched on 2021-12-10 from
+# https://github.com/microsoft/TypeScript/releases/tag/v4.5.2
 licenses(["notice"])  # Apache 2.0
 
 ts_library(
