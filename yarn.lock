@@ -211,10 +211,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#d206b030f3dc60a85777604a8f3d1bc8156454f2":
-  version "0.0.0-a480a99a0d757e3b6fe9dec8ce6d3a60149efc13"
-  uid d206b030f3dc60a85777604a8f3d1bc8156454f2
-  resolved "https://github.com/angular/dev-infra-private-builds.git#d206b030f3dc60a85777604a8f3d1bc8156454f2"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7b237d7ec8d4ae7060e58b7aa226850462b4ba1b":
+  version "0.0.0-8e4fab15a1ec0130edd15a4aec632c62a353c478"
+  uid "7b237d7ec8d4ae7060e58b7aa226850462b4ba1b"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#7b237d7ec8d4ae7060e58b7aa226850462b4ba1b"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -267,6 +267,7 @@
     typed-graphqlify "^3.1.1"
     typescript "~4.5.0"
     uuid "^8.3.2"
+    which "^2.0.2"
     yaml "^1.10.0"
     yargs "^17.0.0"
 
@@ -10798,12 +10799,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.5.3:
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.3.tgz#afaa858e68c7103317d89eb90c5d8906268d353c"
-  integrity sha512-eVYaEHALSt+s9LbvgEv4Ef+Tdq7hBiIZgii12xXJnukryt3pMgJf6aKhoCZ3FWQsu6sydEnkg11fYXLzhLBjeQ==
-
-typescript@~4.5.2:
+typescript@4.5.3, typescript@~4.5.2:
   version "4.5.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.3.tgz#afaa858e68c7103317d89eb90c5d8906268d353c"
   integrity sha512-eVYaEHALSt+s9LbvgEv4Ef+Tdq7hBiIZgii12xXJnukryt3pMgJf6aKhoCZ3FWQsu6sydEnkg11fYXLzhLBjeQ==
