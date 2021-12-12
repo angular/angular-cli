@@ -173,22 +173,26 @@ export default function (options: LibraryOptions): Rule {
         path: sourceDir,
         project: packageName,
       }),
-      options.skipComponent ? noop() : schematic('component', {
-        name: options.name,
-        selector: `${prefix}-${options.name}`,
-        inlineStyle: true,
-        inlineTemplate: true,
-        flat: true,
-        path: sourceDir,
-        export: true,
-        project: packageName,
-      }),
-      options.skipService ? noop() : schematic('service', {
-        name: options.name,
-        flat: true,
-        path: sourceDir,
-        project: packageName,
-      }),
+      options.skipComponent
+        ? noop()
+        : schematic('component', {
+            name: options.name,
+            selector: `${prefix}-${options.name}`,
+            inlineStyle: true,
+            inlineTemplate: true,
+            flat: true,
+            path: sourceDir,
+            export: true,
+            project: packageName,
+          }),
+      options.skipService
+        ? noop()
+        : schematic('service', {
+            name: options.name,
+            flat: true,
+            path: sourceDir,
+            project: packageName,
+          }),
       (_tree: Tree, context: SchematicContext) => {
         if (!options.skipPackageJson && !options.skipInstall) {
           context.addTask(new NodePackageInstallTask());

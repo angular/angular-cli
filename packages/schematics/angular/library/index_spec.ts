@@ -409,13 +409,13 @@ describe('Library Schematic', () => {
         workspaceTree,
       )
       .toPromise();
-      const files = tree.files;
-      expect(files).not.toEqual(
-        jasmine.arrayContaining([
-          '/projects/foo/src/lib/foo.component.spec.ts',
-          '/projects/foo/src/lib/foo.component.ts'
-        ]),
-      );
+    const files = tree.files;
+    expect(files).not.toEqual(
+      jasmine.arrayContaining([
+        '/projects/foo/src/lib/foo.component.spec.ts',
+        '/projects/foo/src/lib/foo.component.ts',
+      ]),
+    );
   });
 
   it(`should not create service when --skipService`, async () => {
@@ -429,12 +429,12 @@ describe('Library Schematic', () => {
         workspaceTree,
       )
       .toPromise();
-      const files = tree.files;
-      expect(files).not.toEqual(
-        jasmine.arrayContaining([
-          '/projects/foo/src/lib/foo.service.spec.ts',
-          '/projects/foo/src/lib/foo.service.ts',
-        ]),
-      );
+    const files = tree.files;
+    expect(files).not.toEqual(
+      jasmine.arrayContaining([
+        '/projects/foo/src/lib/foo.service.spec.ts',
+        '/projects/foo/src/lib/foo.service.ts',
+      ]),
+    );
   });
 });
