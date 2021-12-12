@@ -12,7 +12,7 @@ import fs from 'fs';
 import module from 'module';
 import os from 'os';
 import path from 'path';
-import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
+import { Schema as BrowserBuilderSchema, I18NTranslation } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
 import { TranslationLoader, createTranslationLoader } from './load-translations';
@@ -233,6 +233,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
         },
       },
       usedFormats,
+      buildOptions.i18nDuplicateTranslation,
     );
 
     if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
@@ -282,6 +283,7 @@ export function loadTranslations(
   loader: TranslationLoader,
   logger: { warn: (message: string) => void; error: (message: string) => void },
   usedFormats?: Set<string>,
+  duplicateTranslation?: I18NTranslation,
 ) {
   for (const file of desc.files) {
     const loadResult = loader(path.join(workspaceRoot, file.path));
@@ -308,9 +310,18 @@ export function loadTranslations(
       // Merge translations
       for (const [id, message] of Object.entries(loadResult.translations)) {
         if (desc.translation[id] !== undefined) {
-          logger.warn(
-            `WARNING [${file.path}]: Duplicate translations for message '${id}' when merging`,
-          );
+          const duplicateTranslationMessage = `[${file.path}]: Duplicate translations for message '${id}' when merging.`;
+          switch (duplicateTranslation) {
+            case I18NTranslation.Ignore:
+              break;
+            case I18NTranslation.Error:
+              logger.error(`ERROR ${duplicateTranslationMessage}`);
+              break;
+            case I18NTranslation.Warning:
+            default:
+              logger.warn(`WARNING ${duplicateTranslationMessage}`);
+              break;
+          }
         }
         desc.translation[id] = message;
       }
