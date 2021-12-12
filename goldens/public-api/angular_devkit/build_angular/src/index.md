@@ -43,7 +43,8 @@ export interface BrowserBuilderOptions {
     deployUrl?: string;
     extractLicenses?: boolean;
     fileReplacements?: FileReplacement[];
-    i18nMissingTranslation?: I18NMissingTranslation;
+    i18nDuplicateTranslation?: I18NTranslation;
+    i18nMissingTranslation?: I18NTranslation;
     index: IndexUnion;
     inlineStyleLanguage?: InlineStyleLanguage;
     localize?: Localize;
@@ -259,7 +260,8 @@ export interface ServerBuilderOptions {
     externalDependencies?: string[];
     extractLicenses?: boolean;
     fileReplacements?: FileReplacement_3[];
-    i18nMissingTranslation?: I18NMissingTranslation_2;
+    i18nDuplicateTranslation?: I18NTranslation_2;
+    i18nMissingTranslation?: I18NTranslation_2;
     inlineStyleLanguage?: InlineStyleLanguage_3;
     localize?: Localize_2;
     main: string;

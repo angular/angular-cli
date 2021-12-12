@@ -13,7 +13,7 @@ import {
   Budget,
   CrossOrigin,
   ExtraEntryPoint,
-  I18NMissingTranslation,
+  I18NTranslation,
   IndexUnion,
   InlineStyleLanguage,
   Localize,
@@ -38,7 +38,7 @@ export interface BuildOptions {
   verbose?: boolean;
   progress?: boolean;
   localize?: Localize;
-  i18nMissingTranslation?: I18NMissingTranslation;
+  i18nMissingTranslation?: I18NTranslation;
   bundleDependencies?: boolean;
   externalDependencies?: string[];
   watch?: boolean;
