@@ -44,6 +44,16 @@
       "type": "boolean",
       "default": false,
       "description": "Do not update \"tsconfig.json\" to add a path mapping for the new library. The path mapping is needed to use the library in an app, but can be disabled here to simplify development."
+    },
+    "skipComponent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not create default component for the new library."
+    },
+    "skipService": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not create default service for the new library."
     }
   },
   "required": ["name"]

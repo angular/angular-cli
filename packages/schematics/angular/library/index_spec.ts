@@ -397,4 +397,44 @@ describe('Library Schematic', () => {
       '@angular-devkit/build-angular:ng-packagr',
     );
   });
+
+  it(`should not create component when --skipComponent`, async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync(
+        'library',
+        {
+          name: 'foo',
+          skipComponent: true,
+        },
+        workspaceTree,
+      )
+      .toPromise();
+      const files = tree.files;
+      expect(files).not.toEqual(
+        jasmine.arrayContaining([
+          '/projects/foo/src/lib/foo.component.spec.ts',
+          '/projects/foo/src/lib/foo.component.ts'
+        ]),
+      );
+  });
+
+  it(`should not create service when --skipService`, async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync(
+        'library',
+        {
+          name: 'foo',
+          skipService: true,
+        },
+        workspaceTree,
+      )
+      .toPromise();
+      const files = tree.files;
+      expect(files).not.toEqual(
+        jasmine.arrayContaining([
+          '/projects/foo/src/lib/foo.service.spec.ts',
+          '/projects/foo/src/lib/foo.service.ts',
+        ]),
+      );
+  });
 });

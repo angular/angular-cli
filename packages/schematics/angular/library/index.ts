@@ -173,7 +173,7 @@ export default function (options: LibraryOptions): Rule {
         path: sourceDir,
         project: packageName,
       }),
-      schematic('component', {
+      options.skipComponent ? noop() : schematic('component', {
         name: options.name,
         selector: `${prefix}-${options.name}`,
         inlineStyle: true,
@@ -183,7 +183,7 @@ export default function (options: LibraryOptions): Rule {
         export: true,
         project: packageName,
       }),
-      schematic('service', {
+      options.skipService ? noop() : schematic('service', {
         name: options.name,
         flat: true,
         path: sourceDir,
