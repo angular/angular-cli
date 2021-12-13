@@ -2402,14 +2402,14 @@
     eslint-scope "^5.1.1"
     eslint-utils "^3.0.0"
 
-"@typescript-eslint/parser@5.6.0":
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.6.0.tgz#11677324659641400d653253c03dcfbed468d199"
-  integrity sha512-YVK49NgdUPQ8SpCZaOpiq1kLkYRPMv9U5gcMrywzI8brtwZjr/tG3sZpuHyODt76W/A0SufNjYt9ZOgrC4tLIQ==
+"@typescript-eslint/parser@5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.7.0.tgz#4dca6de463d86f02d252e681136a67888ea3b181"
+  integrity sha512-m/gWCCcS4jXw6vkrPQ1BjZ1vomP01PArgzvauBqzsoZ3urLbsRChexB8/YV8z9HwE3qlJM35FxfKZ1nfP/4x8g==
   dependencies:
-    "@typescript-eslint/scope-manager" "5.6.0"
-    "@typescript-eslint/types" "5.6.0"
-    "@typescript-eslint/typescript-estree" "5.6.0"
+    "@typescript-eslint/scope-manager" "5.7.0"
+    "@typescript-eslint/types" "5.7.0"
+    "@typescript-eslint/typescript-estree" "5.7.0"
     debug "^4.3.2"
 
 "@typescript-eslint/scope-manager@5.6.0":
@@ -2420,10 +2420,23 @@
     "@typescript-eslint/types" "5.6.0"
     "@typescript-eslint/visitor-keys" "5.6.0"
 
+"@typescript-eslint/scope-manager@5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/scope-manager/-/scope-manager-5.7.0.tgz#70adf960e5a58994ad50438ba60d98ecadd79452"
+  integrity sha512-7mxR520DGq5F7sSSgM0HSSMJ+TFUymOeFRMfUfGFAVBv8BR+Jv1vHgAouYUvWRZeszVBJlLcc9fDdktxb5kmxA==
+  dependencies:
+    "@typescript-eslint/types" "5.7.0"
+    "@typescript-eslint/visitor-keys" "5.7.0"
+
 "@typescript-eslint/types@5.6.0":
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-5.6.0.tgz#745cb1b59daadcc1f32f7be95f0f68accf38afdd"
   integrity sha512-OIZffked7mXv4mXzWU5MgAEbCf9ecNJBKi+Si6/I9PpTaj+cf2x58h2oHW5/P/yTnPkKaayfjhLvx+crnl5ubA==
+
+"@typescript-eslint/types@5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-5.7.0.tgz#2d4cae0105ba7d08bffa69698197a762483ebcbe"
+  integrity sha512-5AeYIF5p2kAneIpnLFve8g50VyAjq7udM7ApZZ9JYjdPjkz0LvODfuSHIDUVnIuUoxafoWzpFyU7Sqbxgi79mA==
 
 "@typescript-eslint/typescript-estree@5.6.0":
   version "5.6.0"
@@ -2438,12 +2451,33 @@
     semver "^7.3.5"
     tsutils "^3.21.0"
 
+"@typescript-eslint/typescript-estree@5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-5.7.0.tgz#968fad899050ccce4f08a40cd5fabc0798525006"
+  integrity sha512-aO1Ql+izMrTnPj5aFFlEJkpD4jRqC4Gwhygu2oHK2wfVQpmOPbyDSveJ+r/NQo+PWV43M6uEAeLVbTi09dFLhg==
+  dependencies:
+    "@typescript-eslint/types" "5.7.0"
+    "@typescript-eslint/visitor-keys" "5.7.0"
+    debug "^4.3.2"
+    globby "^11.0.4"
+    is-glob "^4.0.3"
+    semver "^7.3.5"
+    tsutils "^3.21.0"
+
 "@typescript-eslint/visitor-keys@5.6.0":
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/visitor-keys/-/visitor-keys-5.6.0.tgz#3e36509e103fe9713d8f035ac977235fd63cb6e6"
   integrity sha512-1p7hDp5cpRFUyE3+lvA74egs+RWSgumrBpzBCDzfTFv0aQ7lIeay80yU0hIxgAhwQ6PcasW35kaOCyDOv6O/Ng==
   dependencies:
     "@typescript-eslint/types" "5.6.0"
+    eslint-visitor-keys "^3.0.0"
+
+"@typescript-eslint/visitor-keys@5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/visitor-keys/-/visitor-keys-5.7.0.tgz#e05164239eb7cb8aa9fa06c516ede480ce260178"
+  integrity sha512-hdohahZ4lTFcglZSJ3DGdzxQHBSxsLVqHzkiOmKi7xVAWC4y2c1bIMKmPJSrA4aOEoRUPOKQ87Y/taC7yVHpFg==
+  dependencies:
+    "@typescript-eslint/types" "5.7.0"
     eslint-visitor-keys "^3.0.0"
 
 "@verdaccio/commons-api@10.0.2":
@@ -2462,40 +2496,40 @@
     http-errors "1.8.1"
     http-status-codes "1.4.0"
 
-"@verdaccio/file-locking@10.0.1":
-  version "10.0.1"
-  resolved "https://registry.yarnpkg.com/@verdaccio/file-locking/-/file-locking-10.0.1.tgz#0a1040a2ce90485607b8dfcf2ca7820ef9ae9e11"
-  integrity sha512-yUi3wo17jhY2LZMNAv8/+oVfHJfqx0MdpKgUeQjoXHFfrEmpMck23ZfBQmXSM8xiC7RmdmOqlyGkJMbAkMb6nQ==
+"@verdaccio/file-locking@10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@verdaccio/file-locking/-/file-locking-10.1.0.tgz#e47935d197d186f619363f465d67b52d8841a355"
+  integrity sha512-PULcFqfj8S8shY/Ry+v+q6aYhhJBG517Pfzf9DYgJW5AcAHk6SpLB+0XyjfBtJ66ic0jlVnx/Y0FanQXrJDkig==
   dependencies:
     lockfile "1.0.4"
 
-"@verdaccio/local-storage@10.0.8":
-  version "10.0.8"
-  resolved "https://registry.yarnpkg.com/@verdaccio/local-storage/-/local-storage-10.0.8.tgz#7157755762f0228ba0cb94429586b039cfad8bca"
-  integrity sha512-PA/I3xQKujDZ1gX/r+/KnNaE2lzb6GDZiorUo6WHuMck1wGK2mPOtLMS1CIC1ZRbpKSmjot798a1Jy9I4cWRdw==
+"@verdaccio/local-storage@10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@verdaccio/local-storage/-/local-storage-10.1.0.tgz#ff294227c600a779aeccb41b0d1a1e6e33eec0fa"
+  integrity sha512-NSW7uLOCLaqTpvPsHkMyir0G0EgaywsUyLHpEs4CeEVR5QIKBklQPx1zATL+KqsPH8yQSlMQFbDYkNylxSCB3A==
   dependencies:
-    "@verdaccio/commons-api" "10.0.2"
-    "@verdaccio/file-locking" "10.0.1"
-    "@verdaccio/streams" "10.0.1"
+    "@verdaccio/commons-api" "10.1.0"
+    "@verdaccio/file-locking" "10.1.0"
+    "@verdaccio/streams" "10.1.0"
     async "3.2.2"
     debug "4.3.3"
     lodash "4.17.21"
     lowdb "1.0.0"
     mkdirp "1.0.4"
 
-"@verdaccio/readme@10.1.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/@verdaccio/readme/-/readme-10.1.0.tgz#6e47d62df8bf36001e403d41106cdbc09e5d512d"
-  integrity sha512-h8TWL5qVoJfNxeiFPrUE1Fev/dymV6c2iYTkTO08PM7iXHW7PTse2CfvvBGsj7mbVO/hkiOJ2BAtCEFh4SRF/A==
+"@verdaccio/readme@10.2.0":
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/@verdaccio/readme/-/readme-10.2.0.tgz#934bcb183c6ef3010cd575f660f1d3a8ae42a9ca"
+  integrity sha512-M+yXLGSazt9lPJKhZwCL/UsY0+/wGjyYsYZBmAPTbxuBtcjjcRHpGxkN/eRtr6HMIgBiuP/V7+8OInAtgb+ZiA==
   dependencies:
     dompurify "^2.2.6"
     jsdom "15.2.1"
     marked "^2.0.1"
 
-"@verdaccio/streams@10.0.1":
-  version "10.0.1"
-  resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-10.0.1.tgz#b0cce2772f164fca872f51931b9c65de152c133f"
-  integrity sha512-nZ0TzyHFEiR8I25XW/+rxQfXeDwyue4Swi4mFiegXwXkwo9U7dRRECbA/dep2D2NSsyieRJ/BMQXzLjlPyByaA==
+"@verdaccio/streams@10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-10.1.0.tgz#574fa404bec59fd34324a1b7ffca6510f7f19aff"
+  integrity sha512-19FebNvwNiJkk68fFEq/kNOcPNKYX/NoPFqOlZH6mGUGUo3htHh4tD5k2WepAZpBeK9SC868UiPbMizdIXquSg==
 
 "@verdaccio/ui-theme@3.2.1":
   version "3.2.1"
@@ -3801,6 +3835,18 @@ copy-webpack-plugin@10.0.0:
     schema-utils "^4.0.0"
     serialize-javascript "^6.0.0"
 
+copy-webpack-plugin@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/copy-webpack-plugin/-/copy-webpack-plugin-10.1.0.tgz#d27cf1cbe1c9b4ac57f1f96312e6f7da00108d23"
+  integrity sha512-dPGo+zoW77wiF5LlwkQcZTY7FsrSm7dmovhLDHsjYyciiJ+ZhLFt2EQbw9LRUHJ586JXN0K1A70Kbudclvt00Q==
+  dependencies:
+    fast-glob "^3.2.7"
+    glob-parent "^6.0.1"
+    globby "^12.0.2"
+    normalize-path "^3.0.0"
+    schema-utils "^4.0.0"
+    serialize-javascript "^6.0.0"
+
 core-js-compat@^3.18.0, core-js-compat@^3.19.1:
   version "3.19.3"
   resolved "https://registry.yarnpkg.com/core-js-compat/-/core-js-compat-3.19.3.tgz#de75e5821c5ce924a0a1e7b7d5c2cb973ff388aa"
@@ -3808,11 +3854,6 @@ core-js-compat@^3.18.0, core-js-compat@^3.19.1:
   dependencies:
     browserslist "^4.18.1"
     semver "7.0.0"
-
-core-js@3.19.1:
-  version "3.19.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.19.1.tgz#f6f173cae23e73a7d88fa23b6e9da329276c6641"
-  integrity sha512-Tnc7E9iKd/b/ff7GFbhwPVzJzPztGrChB8X8GLqoYGdEOG8IpLnK1xPyo3ZoO3HsK6TodJS58VGPOxA+hLHQMg==
 
 core-js@3.19.3:
   version "3.19.3"
@@ -4710,7 +4751,7 @@ esbuild-wasm@0.14.2:
   resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.14.2.tgz#49c59c610a0be48becec87a7d9019d143468f2f9"
   integrity sha512-Rs8NjWoo1UdsVjhxT2o6kLCX9Sh65pyd3/h4XeJ3jjQNM6NgL+/CSowuJgvOIjDAXMLXpc6fdGnyZQDil9IUJA==
 
-esbuild-wasm@^0.14.0:
+esbuild-wasm@0.14.3, esbuild-wasm@^0.14.0:
   version "0.14.3"
   resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.14.3.tgz#440853a272fb0985a7cd08b5b7a8771955735080"
   integrity sha512-TVfjQWqFhvEDcP/lB4r6PL/LU1zUXVV5b9s3SWTmXdmJi2NeeCazltvA36/cRbrfx+2xKgafqTpAlqB002FuLA==
@@ -4768,7 +4809,7 @@ esbuild@0.14.2:
     esbuild-windows-64 "0.14.2"
     esbuild-windows-arm64 "0.14.2"
 
-esbuild@^0.14.0:
+esbuild@0.14.3, esbuild@^0.14.0:
   version "0.14.3"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.14.3.tgz#38db1d26aaeccc43f478225974538e2c4de9d6b1"
   integrity sha512-zyEC5hkguW2oieXRXp8VJzQdcO/1FxCS5GjzqOHItRlojXnx/cTavsrkxdWvBH9li2lUq0bN+LeeVEmyCwiR/Q==
@@ -8205,6 +8246,17 @@ piscina@3.1.0:
   optionalDependencies:
     nice-napi "^1.0.2"
 
+piscina@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/piscina/-/piscina-3.2.0.tgz#f5a1dde0c05567775690cccefe59d9223924d154"
+  integrity sha512-yn/jMdHRw+q2ZJhFhyqsmANcbF6V2QwmD84c6xRau+QpQOmtrBCoRGdvTfeuFDYXB5W2m6MfLkjkvQa9lUSmIA==
+  dependencies:
+    eventemitter-asyncresource "^1.0.0"
+    hdr-histogram-js "^2.0.1"
+    hdr-histogram-percentiles-obj "^3.0.0"
+  optionalDependencies:
+    nice-napi "^1.0.2"
+
 pkg-dir@4.2.0, pkg-dir@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/pkg-dir/-/pkg-dir-4.2.0.tgz#f099133df7ede422e81d1d8448270eeb3e4261f3"
@@ -8618,7 +8670,7 @@ postcss@8.4.4:
     picocolors "^1.0.0"
     source-map-js "^1.0.1"
 
-postcss@^8.2.15, postcss@^8.2.4, postcss@^8.3.7:
+postcss@8.4.5, postcss@^8.2.15, postcss@^8.2.4, postcss@^8.3.7:
   version "8.4.5"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.5.tgz#bae665764dfd4c6fcc24dc0fdf7e7aa00cc77f95"
   integrity sha512-jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==
@@ -9368,7 +9420,7 @@ sass@1.44.0:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
 
-sass@^1.32.8:
+sass@1.45.0, sass@^1.32.8:
   version "1.45.0"
   resolved "https://registry.yarnpkg.com/sass/-/sass-1.45.0.tgz#192ede1908324bb293a3e403d1841dbcaafdd323"
   integrity sha512-ONy5bjppoohtNkFJRqdz1gscXamMzN3wQy1YH9qO2FiNpgjLhpz/IPRGg0PpCjyz/pWfCOaNEaiEGCcjOFAjqw==
@@ -10698,10 +10750,10 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-verdaccio-audit@10.0.3:
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/verdaccio-audit/-/verdaccio-audit-10.0.3.tgz#52f3ce89b8bd7660b75db7149f5df9919c301945"
-  integrity sha512-Jt3J5DXK1sHqhkoxMHedGDeHfLUv92sEZe43Dqav+N6TsCCG+iIpcef5FMfosnXgEds1LVndbJr+GL2ZW5qSYg==
+verdaccio-audit@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/verdaccio-audit/-/verdaccio-audit-10.1.0.tgz#b01a137b893807bd73c48ac5ef72e5a5b402c239"
+  integrity sha512-lu2rpicM7PeVQ+7dlupP92Ddp7v+Rqae4gFfzd9GTxgzS7wWm7USM88GalEPTJtcn4zDh4nC3nbjE7eEQTVFKg==
   dependencies:
     body-parser "1.19.0"
     express "4.17.1"
@@ -10715,26 +10767,26 @@ verdaccio-auth-memory@^10.0.0:
   dependencies:
     "@verdaccio/commons-api" "10.1.0"
 
-verdaccio-htpasswd@10.0.1:
-  version "10.0.1"
-  resolved "https://registry.yarnpkg.com/verdaccio-htpasswd/-/verdaccio-htpasswd-10.0.1.tgz#ee7c9aa26247f466a3cd89ca63829266052d4658"
-  integrity sha512-H5gMDHpa/xLEDwSsLc+9P+2cDot801YCbuR5KOlsD6GqOv33UjtU+p4bHkZCFbAoQYvIraucAoJrxzRiRSWQMA==
+verdaccio-htpasswd@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/verdaccio-htpasswd/-/verdaccio-htpasswd-10.1.0.tgz#a3509461344e29d8a2244cde0896e5d69265ca60"
+  integrity sha512-HPpAJ62Y3FRA19Vp47VSeeeur5mqPUU4E/W4N914vUFw63iZqDBqhMQI5g99SqnlB97HplYsS5CpXj6cRv4hmw==
   dependencies:
-    "@verdaccio/file-locking" "10.0.1"
+    "@verdaccio/file-locking" "10.1.0"
     apache-md5 "1.1.7"
     bcryptjs "2.4.3"
     http-errors "1.8.1"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.3.0.tgz#924265a21c2e95dd88ed21c835fb325bdd252570"
-  integrity sha512-yly7U/xIRMngqR1TXHY+JreIos+9///nVfWEhhhm/6Ksc3dWPu+qFfnw0NHRi3dFKW6ugsZX0mFgmZWTuSMLDA==
+verdaccio@5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.3.1.tgz#b35aa906867fa5201fccb730db7a0230fdf27756"
+  integrity sha512-IA+UxL6/73G5SgQ01ZZPPOFCpRge0DdXLrgaRpzi5SdGQDQkKsWnk90SI8q1qH1VuvgzVn0UEeq3SQTvx6ZXDg==
   dependencies:
     "@verdaccio/commons-api" "10.0.2"
-    "@verdaccio/local-storage" "10.0.8"
-    "@verdaccio/readme" "10.1.0"
-    "@verdaccio/streams" "10.0.1"
+    "@verdaccio/local-storage" "10.1.0"
+    "@verdaccio/readme" "10.2.0"
+    "@verdaccio/streams" "10.1.0"
     "@verdaccio/ui-theme" "3.2.1"
     JSONStream "1.3.5"
     async "3.2.2"
@@ -10742,7 +10794,6 @@ verdaccio@5.3.0:
     clipanion "3.1.0"
     compression "1.7.4"
     cookies "0.8.0"
-    core-js "3.19.1"
     cors "2.8.5"
     dayjs "1.10.7"
     debug "^4.3.2"
@@ -10771,8 +10822,8 @@ verdaccio@5.3.0:
     request "2.88.0"
     semver "7.3.5"
     validator "13.7.0"
-    verdaccio-audit "10.0.3"
-    verdaccio-htpasswd "10.0.1"
+    verdaccio-audit "10.1.0"
+    verdaccio-htpasswd "10.1.0"
 
 verror@1.10.0:
   version "1.10.0"
