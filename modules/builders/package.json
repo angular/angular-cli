@@ -36,7 +36,7 @@
     "guess-parser": "^0.4.12",
     "http-proxy-middleware": "^2.0.0",
     "ora": "^5.1.0",
-    "piscina": "~3.1.0",
+    "piscina": "~3.2.0",
     "rxjs": "RXJS_VERSION",
     "tree-kill": "^1.2.2"
   }
