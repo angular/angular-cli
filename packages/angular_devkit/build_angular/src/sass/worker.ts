@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ImporterReturnType, Options, renderSync } from 'sass';
+import { ImporterResult, LegacyOptions as Options, renderSync } from 'sass';
 import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'worker_threads';
 
 /**
@@ -21,7 +21,7 @@ interface RenderRequestMessage {
   /**
    * The Sass options to provide to the `dart-sass` render function.
    */
-  options: Options;
+  options: Options<'sync'>;
   /**
    * Indicates the request has a custom importer function on the main thread.
    */
@@ -52,7 +52,7 @@ parentPort.on('message', ({ id, hasImporter, options }: RenderRequestMessage) =>
         workerImporterPort.postMessage({ id, url, prev, fromImport });
         Atomics.wait(importerSignal, 0, 0);
 
-        return receiveMessageOnPort(workerImporterPort)?.message as ImporterReturnType;
+        return receiveMessageOnPort(workerImporterPort)?.message as ImporterResult;
       };
     }
 

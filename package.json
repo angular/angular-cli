@@ -58,7 +58,6 @@
     ]
   },
   "resolutions": {
-    "**/@types/copy-webpack-plugin/webpack": "5.65.0",
     "**/@types/webpack-dev-server/webpack": "5.65.0",
     "ajv-formats/ajv": "8.8.2"
   },
@@ -96,7 +95,6 @@
     "@types/babel__core": "7.1.17",
     "@types/babel__template": "7.4.1",
     "@types/cacache": "^15.0.0",
-    "@types/copy-webpack-plugin": "^8.0.0",
     "@types/debug": "^4.1.2",
     "@types/express": "^4.16.0",
     "@types/glob": "^7.1.1",
@@ -115,7 +113,6 @@
     "@types/postcss-preset-env": "^6.7.1",
     "@types/progress": "^2.0.3",
     "@types/resolve": "^1.17.1",
-    "@types/sass": "^1.43.0",
     "@types/semver": "^7.0.0",
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
