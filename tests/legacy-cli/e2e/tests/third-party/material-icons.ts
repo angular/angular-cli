@@ -5,7 +5,7 @@ import { updateJsonFile } from '../../utils/project';
 
 export default async function() {
   // Install material design icons
-  await installPackage('material-design-icons@3.0.1', '--registry=https://registry.npmjs.org/');
+  await installPackage('material-design-icons@3.0.1', 'https://registry.npmjs.org/');
 
   // Add icon stylesheet to application
   await updateJsonFile('angular.json', workspaceJson => {
