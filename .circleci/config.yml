@@ -19,7 +19,7 @@ orbs:
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-12.18-{{ checksum "yarn.lock" }}
 var_1_win: &cache_key_win v1-angular_devkit-win-12.18-{{ checksum "yarn.lock" }}
-var_3: &default_nodeversion "12.18"
+var_3: &default_nodeversion '12.18'
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
@@ -90,7 +90,7 @@ commands:
         default: CIRCLE_PROJECT_REPONAME
     steps:
       - run:
-          name: "Setup bazel RBE remote execution"
+          name: 'Setup bazel RBE remote execution'
           command: |
             touch .bazelrc.user;
             # We need ensure that the same default digest is used for encoding and decoding
@@ -113,7 +113,7 @@ commands:
   install_python:
     steps:
       - run:
-          name: "Install Python 2"
+          name: 'Install Python 2'
           command: |
             sudo apt-get update > /dev/null 2>&1
             sudo apt-get install -y python
@@ -157,10 +157,10 @@ jobs:
       - custom_attach_workspace
       - run: yarn lint
       - run: 'yarn bazel:format -mode=check ||
-              (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
+          (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
       # Run the skylark linter to check our Bazel rules
       - run: 'yarn bazel:lint ||
-              (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+          (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
 
   validate:
     executor: action-executor
@@ -186,7 +186,7 @@ jobs:
         type: boolean
         default: false
     executor: test-executor
-    parallelism: 6
+    parallelism: 1
     steps:
       - custom_attach_workspace
       - browser-tools/install-chrome
@@ -197,18 +197,13 @@ jobs:
           name: Execute CLI E2E Tests
           command: |
             mkdir /mnt/ramdisk/e2e-main
-            PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e-main
-      - run:
-          name: Execute CLI E2E Tests Subset with Yarn
-          command: |
-            mkdir /mnt/ramdisk/e2e-yarn
-            PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+            PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e tests/third-party/material-icons --tmpdir=/mnt/ramdisk/e2e-main
 
   e2e-cli-node-10:
     executor:
       name: test-executor
-      nodeversion: "10.20"
-    parallelism: 4
+      nodeversion: '10.20'
+    parallelism: 1
     steps:
       - custom_attach_workspace
       - browser-tools/install-chrome
@@ -218,12 +213,12 @@ jobs:
             ./.circleci/env.sh
             # Ensure latest v6 npm version to support local package repository
             PATH=~/.npm-global/bin:$PATH npm install --global npm@6
-      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e tests/third-party/material-icons
 
   e2e-cli-node-14:
     executor:
       name: test-executor
-      nodeversion: "14.15"
+      nodeversion: '14.15'
     parallelism: 6
     steps:
       - custom_attach_workspace
@@ -339,118 +334,10 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-      - lint:
-          requires:
-            - setup
-      - validate:
-          requires:
-            - setup
-      - build:
-          requires:
-            - setup
-      - e2e-cli:
+      - e2e-cli-node-10:
           post-steps:
             - store_artifacts:
                 path: /tmp/dist
                 destination: cli/new-production
           requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ve
-          ve: true
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          snapshots: true
-          requires:
-            - e2e-cli
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - master
-      - e2e-cli:
-          name: e2e-cli-ng-ve-snapshots
-          snapshots: true
-          ve: true
-          requires:
-            - e2e-cli
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - master
-      - e2e-cli-node-10:
-          <<: *only_release_branches
-          requires:
-            - e2e-cli
-      - e2e-cli-node-14:
-          <<: *only_release_branches
-          requires:
-            - e2e-cli
-      - test-browsers:
-          requires:
-            - build
-
-      # Bazel jobs
-      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
-      # will catch any build errors before proceeding to the more lengthy and resource intensive
-      # Bazel jobs.
-      - test:
-          requires:
-            - build
-
-      # Windows jobs
-      # These jobs only run after their non-windows counterparts finish successfully.
-      # This isn't strictly necessary as there is no artifact dependency, but helps economize
-      # CI resources by not attempting to build when we know it should fail.
-      - setup-and-build-win:
-          requires:
-            # The Linux setup job also does checkout and rebase, which we get via the workspace.
             - setup
-            - build
-      - test-win:
-          requires:
-            - test
-            - setup-and-build-win
-      - e2e-cli-win:
-          <<: *only_release_branches
-          requires:
-            - setup-and-build-win
-            - e2e-cli
-
-      # Publish jobs
-      - snapshot_publish:
-          <<: *only_release_branches
-          requires:
-            - build
-            - test
-            - e2e-cli
-
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - 11.2.x
-    jobs:
-      # Linux jobs
-      - setup
-      - build:
-          requires:
-            - setup
-      - e2e-cli:
-          name: e2e-cli-nightly
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ve-nightly
-          ve: true
-          requires:
-            - build
-      - test-browsers:
-          requires:
-            - build

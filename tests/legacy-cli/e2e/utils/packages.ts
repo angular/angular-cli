@@ -26,7 +26,7 @@ export async function installPackage(specifier: string, registry?: string): Prom
   const registryOption = registry ? [`--registry=${registry}`] : [];
   switch (getActivePackageManager()) {
     case 'npm':
-      return silentNpm('install', specifier, ...registryOption);
+      return npm('install', specifier, ...registryOption);
     case 'yarn':
       return silentYarn('add', specifier, ...registryOption);
   }
