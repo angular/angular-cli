@@ -4,6 +4,11 @@ import { killAllProcesses, ng, silentYarn } from '../../utils/process';
 import { ngServe, updateJsonFile } from '../../utils/project';
 
 export default async function() {
+  // Webpack 5 has a transitive dependency on `@npmcli/fs@1.1.0`, which doesn't support Node v10.
+  if (process.version.startsWith('v10')) {
+    return;
+  }
+
   // Setup project for yarn usage
   await rimraf('node_modules');
   await updateJsonFile('package.json', (json) => {
