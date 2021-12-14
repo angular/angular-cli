@@ -55,6 +55,15 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 Releasing is performed using Angular's unified release tooling. Each week, two releases are expected, `latest` and `next` on npm.
 
+**For a minor OR major release:**
+
+After FW releases `-rc.0` for an upcoming minor/major version, update the corresponding version in
+[`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18) to match. This
+ensures that CLI `-rc.0` depends on FW `-rc.0`. The same needs to be done for a `-next.0` release,
+and needs to be done for both minor _and_ major releases.
+
+**For a major release:**
+
 When a release is transitioning from a prerelease to a stable release, the semver ranges for Angular dependencies within the packages' `package.json` files will need to be updated to remove the prerelease version segment.
 For example, `"@angular/compiler-cli": "^13.0.0 || ^13.0.0-next"` in a prerelease should become `"@angular/compiler-cli": "^13.0.0"` in the stable release.
 The current packages that require adjustment are:
@@ -62,7 +71,10 @@ The current packages that require adjustment are:
 - `@angular-devkit/build-angular`: packages/angular_devkit/build_angular/package.json
 - `@ngtools/webpack`: packages/ngtools/webpack/package.json
 
-To perform a release run the following and navigate the prompts:
+## Releasing the CLI
+
+After confirming that the above steps have been done or are not necessary, run the following and
+navigate the prompts:
 
 ```sh
 yarn ng-dev release publish
