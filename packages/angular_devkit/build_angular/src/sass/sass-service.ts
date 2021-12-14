@@ -6,7 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Importer, ImporterReturnType, Options, Result, SassException } from 'sass';
+import {
+  LegacyAsyncImporter as AsyncImporter,
+  LegacyResult as CompileResult,
+  LegacyException as Exception,
+  LegacyImporterResult as ImporterResult,
+  LegacyImporterThis as ImporterThis,
+  LegacyOptions as Options,
+  LegacySyncImporter as SyncImporter,
+} from 'sass';
 import { MessageChannel, Worker } from 'worker_threads';
 import { maxWorkers } from '../utils/environment-options';
 
@@ -18,7 +26,7 @@ const MAX_RENDER_WORKERS = maxWorkers;
 /**
  * The callback type for the `dart-sass` asynchronous render function.
  */
-type RenderCallback = (error?: SassException, result?: Result) => void;
+type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 
 /**
  * An object containing the contextual information for a specific render request.
@@ -27,7 +35,7 @@ interface RenderRequest {
   id: number;
   workerIndex: number;
   callback: RenderCallback;
-  importers?: Importer[];
+  importers?: (SyncImporter | AsyncImporter)[];
 }
 
 /**
@@ -35,8 +43,8 @@ interface RenderRequest {
  */
 interface RenderResponseMessage {
   id: number;
-  error?: SassException;
-  result?: Result;
+  error?: Exception;
+  result?: CompileResult;
 }
 
 /**
@@ -73,7 +81,7 @@ export class SassWorkerImplementation {
    * @param options The `dart-sass` options to use when rendering the stylesheet.
    * @param callback The function to execute when the rendering is complete.
    */
-  render(options: Options, callback: RenderCallback): void {
+  render(options: Options<'async'>, callback: RenderCallback): void {
     // The `functions`, `logger` and `importer` options are JavaScript functions that cannot be transferred.
     // If any additional function options are added in the future, they must be excluded as well.
     const { functions, importer, logger, ...serializableOptions } = options;
@@ -142,7 +150,7 @@ export class SassWorkerImplementation {
         // The results are expected to be Node.js `Buffer` objects but will each be transferred as
         // a Uint8Array that does not have the expected `toString` behavior of a `Buffer`.
         const { css, map, stats } = response.result;
-        const result: Result = {
+        const result: CompileResult = {
           // This `Buffer.from` override will use the memory directly and avoid making a copy
           css: Buffer.from(css.buffer, css.byteOffset, css.byteLength),
           stats,
@@ -199,16 +207,21 @@ export class SassWorkerImplementation {
   }
 
   private async processImporters(
-    importers: Iterable<Importer>,
+    importers: Iterable<SyncImporter | AsyncImporter>,
     url: string,
     prev: string,
     fromImport: boolean,
-  ): Promise<ImporterReturnType> {
+  ): Promise<ImporterResult> {
     let result = null;
     for (const importer of importers) {
-      result = await new Promise<ImporterReturnType>((resolve) => {
+      result = await new Promise<ImporterResult>((resolve) => {
         // Importers can be both sync and async
-        const innerResult = importer.call({ fromImport }, url, prev, resolve);
+        const innerResult = (importer as AsyncImporter).call(
+          { fromImport } as ImporterThis,
+          url,
+          prev,
+          resolve,
+        );
         if (innerResult !== undefined) {
           resolve(innerResult);
         }
@@ -225,7 +238,7 @@ export class SassWorkerImplementation {
   private createRequest(
     workerIndex: number,
     callback: RenderCallback,
-    importer: Importer | Importer[] | undefined,
+    importer: SyncImporter | AsyncImporter | (SyncImporter | AsyncImporter)[] | undefined,
   ): RenderRequest {
     return {
       id: this.idCounter++,

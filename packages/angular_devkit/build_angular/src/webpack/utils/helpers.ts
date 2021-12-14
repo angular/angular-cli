@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { ObjectPattern } from 'copy-webpack-plugin';
+import type { ObjectPattern } from 'copy-webpack-plugin/types/index'; // Types are not exported properly. Hence the deep-import.
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import glob from 'glob';
