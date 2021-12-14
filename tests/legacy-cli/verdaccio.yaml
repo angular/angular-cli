@@ -10,7 +10,7 @@ uplinks:
     cache: false
     maxage: 20m
     max_fails: 32
-    timeout: 60s
+    timeout: 160s
     agent_options:
       keepAlive: true
       maxSockets: 32
