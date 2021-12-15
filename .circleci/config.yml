@@ -184,8 +184,8 @@ jobs:
       - run:
           name: Validate Circular Dependencies
           command: yarn ts-circular-deps:check
-      - run:
-          command: yarn -s admin validate
+      - run: yarn -s admin validate
+      - run: yarn -s check-tooling-setup
 
   e2e-cli:
     parameters:
