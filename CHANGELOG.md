@@ -1,3 +1,33 @@
+<a name="13.2.0-next.1"></a>
+
+# 13.2.0-next.1 (2021-12-15)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [41a828e20](https://github.com/angular/angular-cli/commit/41a828e2068b881f744846c3f0edbff8c62cb9ce) | fix  | updated Angular new project version to v13.2.0-next.0 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [0323a35b4](https://github.com/angular/angular-cli/commit/0323a35b47a4a2fd3870b09d46e3655714e50abd) | fix  | add `tailwindcss` support for version 3                       |
+| [471930007](https://github.com/angular/angular-cli/commit/471930007cb9cd26264eab483fdfd1f5b4db6641) | fix  | display FS cache information when `verbose` option is used    |
+| [f1d2873ca](https://github.com/angular/angular-cli/commit/f1d2873ca7ee337748366d04878514c2c27a72a2) | fix  | only extract CSS styles when are specified in `styles` option |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [b03b9eefe](https://github.com/angular/angular-cli/commit/b03b9eefeac77b93931803de208118e3a6c5a928) | perf | reduce redudant module rebuilds when cache is restored |
+
+## Special Thanks
+
+Alan Agius, Cédric Exbrayat, Derek Cormier and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.2"></a>
 
 # 13.1.2 (2021-12-15)
