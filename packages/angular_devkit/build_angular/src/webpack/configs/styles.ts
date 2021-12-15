@@ -377,16 +377,16 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           // Setup processing rules for global and component styles
           {
             oneOf: [
-              // Component styles are all styles except defined global styles
-              {
-                use: componentStyleLoaders,
-                resourceQuery: /\?ngResource/,
-                type: 'asset/source',
-              },
               // Global styles are only defined global styles
               {
                 use: globalStyleLoaders,
+                include: globalStylePaths,
                 resourceQuery: { not: [/\?ngResource/] },
+              },
+              // Component styles are all styles except defined global styles
+              {
+                use: componentStyleLoaders,
+                type: 'asset/source',
               },
             ],
           },
