@@ -10,14 +10,14 @@
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/build-webpack": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "@babel/core": "7.16.0",
-    "@babel/generator": "7.16.0",
+    "@babel/core": "7.16.5",
+    "@babel/generator": "7.16.5",
     "@babel/helper-annotate-as-pure": "7.16.0",
-    "@babel/plugin-proposal-async-generator-functions": "7.16.4",
-    "@babel/plugin-transform-async-to-generator": "7.16.0",
-    "@babel/plugin-transform-runtime": "7.16.4",
-    "@babel/preset-env": "7.16.4",
-    "@babel/runtime": "7.16.3",
+    "@babel/plugin-proposal-async-generator-functions": "7.16.5",
+    "@babel/plugin-transform-async-to-generator": "7.16.5",
+    "@babel/plugin-transform-runtime": "7.16.5",
+    "@babel/preset-env": "7.16.5",
+    "@babel/runtime": "7.16.5",
     "@babel/template": "7.16.0",
     "@discoveryjs/json-ext": "0.5.6",
     "@ngtools/webpack": "0.0.0",
@@ -31,7 +31,7 @@
     "core-js": "3.19.3",
     "critters": "0.0.15",
     "css-loader": "6.5.1",
-    "esbuild-wasm": "0.14.3",
+    "esbuild-wasm": "0.14.5",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -72,7 +72,7 @@
     "webpack-subresource-integrity": "5.0.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.3"
+    "esbuild": "0.14.5"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^13.0.0 || ^13.1.0-next",
