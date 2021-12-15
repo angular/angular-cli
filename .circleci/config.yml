@@ -104,6 +104,7 @@ jobs:
       - run:
           name: Validate Code Formatting
           command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
+      - run: yarn -s check-tooling-setup
       - run: yarn lint
 
   # We run the integration tests outside of Bazel for now.

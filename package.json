@@ -28,7 +28,8 @@
     "bazel:build": "bazel build //modules/...",
     "test": "bazel test //modules/...",
     "build:watch": "ibazel build //modules/...",
-    "test:watch": "ibazel test //modules/..."
+    "test:watch": "ibazel test //modules/...",
+    "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json"
   },
   "resolutions": {
     "@types/hapi__boom": "7.4.1",
