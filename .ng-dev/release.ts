@@ -3,13 +3,14 @@ import { join } from 'path';
 
 /** Configuration for the `ng-dev release` command. */
 export const release: ReleaseConfig = {
+  representativeNpmPackage: '@nguniversal/common',
   npmPackages: [
-    '@nguniversal/aspnetcore-engine',
-    '@nguniversal/builders',
-    '@nguniversal/common',
-    '@nguniversal/express-engine',
-    '@nguniversal/hapi-engine',
-    '@nguniversal/socket-engine',
+    { name: '@nguniversal/aspnetcore-engine' },
+    { name: '@nguniversal/builders' },
+    { name: '@nguniversal/common' },
+    { name: '@nguniversal/express-engine' },
+    { name: '@nguniversal/hapi-engine' },
+    { name: '@nguniversal/socket-engine' },
   ],
   releaseNotes: {
     groupOrder: ['@nguniversal/common', '@nguniversal/builders', '@nguniversal/express-engine'],

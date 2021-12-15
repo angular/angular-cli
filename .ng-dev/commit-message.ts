@@ -8,5 +8,5 @@ export const commitMessage: CommitMessageConfig = {
   maxLineLength: Infinity,
   minBodyLength: 0,
   minBodyLengthTypeExcludes: ['docs'],
-  scopes: release.npmPackages,
+  scopes: release.npmPackages.map(({ name }) => name),
 };
