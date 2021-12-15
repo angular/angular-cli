@@ -32,7 +32,8 @@
     "public-api:check": "node goldens/public-api/manage.js test",
     "public-api:update": "node goldens/public-api/manage.js accept",
     "ts-circular-deps:check": "ng-dev ts-circular-deps check --config ./packages/circular-deps-test.conf.js",
-    "ts-circular-deps:approve": "ng-dev ts-circular-deps approve --config ./packages/circular-deps-test.conf.js"
+    "ts-circular-deps:approve": "ng-dev ts-circular-deps approve --config ./packages/circular-deps-test.conf.js",
+    "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json"
   },
   "repository": {
     "type": "git",
