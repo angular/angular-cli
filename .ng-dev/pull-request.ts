@@ -9,7 +9,6 @@ export const pullRequest: PullRequestConfig = {
     default: 'rebase',
     labels: [{ pattern: 'squash commits', method: 'squash' }],
   },
-  claSignedLabel: 'cla: yes',
   mergeReadyLabel: /^action: merge(-assistance)?/,
   caretakerNoteLabel: /(action: merge-assistance)/,
   commitMessageFixupLabel: 'commit message fixup',

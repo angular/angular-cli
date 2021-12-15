@@ -203,10 +203,9 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7b237d7ec8d4ae7060e58b7aa226850462b4ba1b":
-  version "0.0.0-8e4fab15a1ec0130edd15a4aec632c62a353c478"
-  uid "7b237d7ec8d4ae7060e58b7aa226850462b4ba1b"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#7b237d7ec8d4ae7060e58b7aa226850462b4ba1b"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#2156ef860d69f7001c01e1fcb2c7087f8cbf8e5d":
+  version "0.0.0-0b4cae4acd9d42f33af92951947a30d6aa165070"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#2156ef860d69f7001c01e1fcb2c7087f8cbf8e5d"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -10114,7 +10113,6 @@ sass@1.45.0, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
