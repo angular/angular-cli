@@ -71,7 +71,7 @@
     "@angular/compiler": "13.1.0",
     "@angular/compiler-cli": "13.1.0",
     "@angular/core": "13.1.0",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#d206b030f3dc60a85777604a8f3d1bc8156454f2",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#2156ef860d69f7001c01e1fcb2c7087f8cbf8e5d",
     "@angular/forms": "13.1.0",
     "@angular/localize": "13.1.0",
     "@angular/material": "13.1.0",
