@@ -1,3 +1,27 @@
+<a name="13.1.2"></a>
+
+# 13.1.2 (2021-12-15)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [1ddbd75ae](https://github.com/angular/angular-cli/commit/1ddbd75ae200c14b5f33556bd6d5ae6b7722d14e) | fix  | add `tailwindcss` support for version 3                       |
+| [adf925c07](https://github.com/angular/angular-cli/commit/adf925c0755b6e78a57932becdb7b7a764afb9e6) | fix  | display FS cache information when `verbose` option is used    |
+| [09c3826c9](https://github.com/angular/angular-cli/commit/09c3826c9d9128a6b520d0fe8da3cb466d18cddc) | fix  | only extract CSS styles when are specified in `styles` option |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [f31d7f79d](https://github.com/angular/angular-cli/commit/f31d7f79dfa8f997fecdcfec1ebc6cfbe657f3fb) | perf | reduce redudant module rebuilds when cache is restored |
+
+## Special Thanks
+
+Alan Agius, Derek Cormier and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.1"></a>
 
 # 13.1.1 (2021-12-10)
