@@ -52,6 +52,22 @@ Alan Agius, Derek Cormier and Doug Parker
 
 <!-- CHANGELOG SPLIT MARKER -->
 
+<a name="11.2.17"></a>
+
+# 11.2.17 (2021-12-16)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [1efff8f82](https://github.com/angular/angular-cli/commit/1efff8f82df38b7485f8a8dcdd5bfea5a457c6a1) | fix  | exclude deprecated packages with removal migration from update |
+
+## Special Thanks
+
+Alan Agius and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="11.2.16"></a>
 
 # 11.2.16 (2021-12-15)
@@ -70,9 +86,9 @@ Alan Agius and Doug Parker
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="0.0.0"></a>
+<a name="10.2.4"></a>
 
-# 0.0.0 (2021-12-15)
+# 10.2.4 (2021-12-15)
 
 ### @angular/cli
 
