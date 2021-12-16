@@ -168,7 +168,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         }
 
         if (!newIdentifier) {
-          spinner.warn("Unable to find compatible package.  Using 'latest' tag.");
+          spinner.warn("Unable to find compatible package. Using 'latest' tag.");
         } else {
           packageIdentifier = newIdentifier;
           spinner.succeed(
