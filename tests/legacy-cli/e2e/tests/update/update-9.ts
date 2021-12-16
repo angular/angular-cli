@@ -21,7 +21,7 @@ export default async function () {
     }
 
     // Update Angular to 11
-    await ng('update', '@angular/cli@11', '@angular/core@11');
+    await ng('update', '@angular/cli@11', '@angular/core@11', '--force');
 
     // Update Angular to 12
     await ng('update', '@angular/cli@12', '@angular/core@12');
