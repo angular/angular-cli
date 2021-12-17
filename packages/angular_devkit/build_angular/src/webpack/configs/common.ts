@@ -357,16 +357,14 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     module: {
       // Show an error for missing exports instead of a warning.
       strictExportPresence: true,
-      parser:
-        webWorkerTsConfig === undefined
-          ? {
-              javascript: {
-                worker: false,
-                url: false,
-              },
-            }
-          : undefined,
-
+      parser: {
+        javascript: {
+          // Disable auto URL asset module creation. This doesn't effect `new Worker(new URL(...))`
+          // https://webpack.js.org/guides/asset-modules/#url-assets
+          url: false,
+          worker: !!webWorkerTsConfig,
+        },
+      },
       rules: [
         {
           test: /\.?(svg|html)$/,
