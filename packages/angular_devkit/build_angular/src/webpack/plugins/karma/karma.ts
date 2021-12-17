@@ -12,7 +12,7 @@ import * as http from 'http';
 import * as path from 'path';
 import * as glob from 'glob';
 import webpack from 'webpack';
-const webpackDevMiddleware = require('webpack-dev-middleware');
+import webpackDevMiddleware from 'webpack-dev-middleware';
 
 import { statsErrorsToString } from '../../utils/stats';
 import { createConsoleLogger } from '@angular-devkit/core/node';
