@@ -11,6 +11,7 @@ exports_files([
     "tsconfig.json",  # @external
     "tsconfig-test.json",  # @external
     "tsconfig-build.json",  # @external
+    "package.json",
 ])
 
 # Detect if the build is running under --stamp

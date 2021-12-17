@@ -50,3 +50,17 @@ yarn_install(
     package_json = "//:package.json",
     yarn_lock = "//:yarn.lock",
 )
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "a28dbee79b1382a170d4b93ba676a9e31cea48f1985dbdd4ee500211d2a005e9",
+    strip_prefix = "bazel-lib-0.4.0",
+    url = "https://github.com/aspect-build/bazel-lib/archive/v0.4.0.tar.gz",
+)
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_jq_toolchains")
+
+aspect_bazel_lib_dependencies()
+register_jq_toolchains(version = "1.6")

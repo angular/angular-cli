@@ -46,8 +46,6 @@ ts_library(
             # Also exclude templated files.
             "*/files/**/*.ts",
             "*/other-files/**/*.ts",
-            # Exclude test helpers.
-            "utility/test/**/*.ts",
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
         ],
@@ -76,6 +74,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/testing",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
         "@npm//@types/browserslist",
         "@npm//@types/node",

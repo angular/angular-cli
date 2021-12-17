@@ -4,6 +4,8 @@ load("@npm//@bazel/typescript:index.bzl", _ts_library = "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@npm//@angular/dev-infra-private/bazel:extract_js_module_output.bzl", "extract_js_module_output")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 
 _DEFAULT_TSCONFIG = "//:tsconfig-build.json"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
@@ -79,6 +81,46 @@ def pkg_npm(name, use_prodmode_output = False, **kwargs):
         deps = deps,
     )
 
+    # Merge package.json with root package.json and perform various substitutions. Output into
+    # a new directory to avoid conflicts with the source package.json.
+    jq(
+        name = "substituted_pkg_json",
+        srcs = ["//:package.json"] + kwargs.pop("srcs"),
+        filter = """
+            # Root package.json
+            .[0] as $root
+            # Project package.json
+            | .[1] as $proj
+            # Get the fields from root package.json that should override the project package.json
+            | ($root
+                | del(.bin, .description, .dependencies, .name, .main, .peerDependencies, .optionalDependencies, .typings, .version, .private, .workspaces, .resolutions, .scripts, .[\"ng-update\"])
+            ) as $root_overrides
+            # Use the project package.json as a base and override other fields from root
+            | $proj + $root_overrides
+            # Combine keywords from both
+            | .keywords = ($root.keywords + $proj.keywords | unique)
+            # Remove devDependencies
+            | del(.devDependencies)
+            # Add engines
+            + {\"engines\": {\"node\": \"^12.20.0 || ^14.15.0 || >=16.10.0\", \"npm\": \"^6.11.0 || ^7.5.6 || >=8.0.0\", \"yarn\": \">= 1.13.0\"}}""",
+        args = ["--slurp"],
+        out = "substituted/package.json",
+    )
+
+    # Move the generated package.json along with other deps into a directory for pkg_npm
+    # to package up because pkg_npm requires that all inputs be in the same directory.
+    copy_to_directory(
+        name = "package",
+        srcs = [":%s_js_module_output" % name, "substituted/package.json"] + deps,
+        replace_prefixes = {
+            "substituted/": "",
+        },
+        exclude_prefixes = [
+            "node_modules",
+            "packages",
+        ],
+    )
+
     _pkg_npm(
         name = name,
         # We never set a `package_name` for NPM packages, neither do we enable validation.
@@ -101,7 +143,7 @@ def pkg_npm(name, use_prodmode_output = False, **kwargs):
             "//conditions:default": substitutions,
         }),
         visibility = visibility,
-        deps = [":%s_js_module_output" % name],
+        nested_packages = ["package"],
         tgz = None,
         **kwargs
     )
