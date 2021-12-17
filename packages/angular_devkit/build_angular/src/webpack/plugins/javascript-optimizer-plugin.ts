@@ -11,6 +11,7 @@ import { ScriptTarget } from 'typescript';
 import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../utils/environment-options';
 import { EsbuildExecutor } from './esbuild-executor';
+import type { OptimizeRequestOptions } from './javascript-optimizer-worker';
 
 /**
  * The maximum number of Workers that will be created to execute optimize tasks.
@@ -28,10 +29,10 @@ const PLUGIN_NAME = 'angular-javascript-optimizer';
 export interface JavaScriptOptimizerOptions {
   /**
    * Enables advanced optimizations in the underlying JavaScript optimizers.
-   * This currently increases the `terser` passes to 3 and enables the `pure_getters`
+   * This currently increases the `terser` passes to 2 and enables the `pure_getters`
    * option for `terser`.
    */
-  advanced: boolean;
+  advanced?: boolean;
 
   /**
    * An object record of string keys that will be replaced with their respective values when found
@@ -44,7 +45,7 @@ export interface JavaScriptOptimizerOptions {
    * The output sourcemap will be a full sourcemap containing the merge of the input sourcemap and
    * all intermediate sourcemaps.
    */
-  sourcemap: boolean;
+  sourcemap?: boolean;
 
   /**
    * The ECMAScript version that should be used when generating output code.
@@ -56,13 +57,22 @@ export interface JavaScriptOptimizerOptions {
   /**
    * Enables the retention of identifier names and ensures that function and class names are
    * present in the output code.
+   *
+   * **Note**: in some cases symbols are still renamed to avoid collisions.
+   */
+  keepIdentifierNames: boolean;
+
+  /**
+   * Enables the retention of original name of classes and functions.
+   *
+   * **Note**: this causes increase of bundle size as it causes dead-code elimination to not work fully.
    */
   keepNames: boolean;
 
   /**
    * Enables the removal of all license comments from the output code.
    */
-  removeLicenses: boolean;
+  removeLicenses?: boolean;
 }
 
 /**
@@ -74,7 +84,7 @@ export interface JavaScriptOptimizerOptions {
  * optimizations not yet implemented by `esbuild`.
  */
 export class JavaScriptOptimizerPlugin {
-  constructor(public options: Partial<JavaScriptOptimizerOptions> = {}) {}
+  constructor(public options: JavaScriptOptimizerOptions) {}
 
   apply(compiler: Compiler) {
     const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
@@ -142,22 +152,25 @@ export class JavaScriptOptimizerPlugin {
             }
           }
 
-          let target = 2017;
+          let target: OptimizeRequestOptions['target'] = 2017;
           if (this.options.target) {
             if (this.options.target <= ScriptTarget.ES5) {
               target = 5;
             } else if (this.options.target < ScriptTarget.ESNext) {
-              target = Number(ScriptTarget[this.options.target].slice(2));
+              target = Number(
+                ScriptTarget[this.options.target].slice(2),
+              ) as OptimizeRequestOptions['target'];
             } else {
               target = 2020;
             }
           }
 
           // Setup the options used by all worker tasks
-          const optimizeOptions = {
+          const optimizeOptions: OptimizeRequestOptions = {
             sourcemap: this.options.sourcemap,
             define,
             keepNames: this.options.keepNames,
+            keepIdentifierNames: this.options.keepIdentifierNames,
             target,
             removeLicenses: this.options.removeLicenses,
             advanced: this.options.advanced,

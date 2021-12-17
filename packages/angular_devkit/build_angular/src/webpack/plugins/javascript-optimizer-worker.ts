@@ -12,49 +12,59 @@ import { minify } from 'terser';
 import { EsbuildExecutor } from './esbuild-executor';
 
 /**
+ * The options to use when optimizing.
+ */
+export interface OptimizeRequestOptions {
+  /**
+   * Controls advanced optimizations.
+   * Currently these are only terser related:
+   * * terser compress passes are set to 2
+   * * terser pure_getters option is enabled
+   */
+  advanced?: boolean;
+  /**
+   * Specifies the string tokens that should be replaced with a defined value.
+   */
+  define?: Record<string, string>;
+  /**
+   * Controls whether class, function, and variable names should be left intact
+   * throughout the output code.
+   */
+  keepIdentifierNames: boolean;
+
+  /**
+   * Controls whether to retain the original name of classes and functions.
+   */
+  keepNames: boolean;
+  /**
+   * Controls whether license text is removed from the output code.
+   * Within the CLI, this option is linked to the license extraction functionality.
+   */
+  removeLicenses?: boolean;
+  /**
+   * Controls whether source maps should be generated.
+   */
+  sourcemap?: boolean;
+  /**
+   * Specifies the target ECMAScript version for the output code.
+   */
+  target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
+  /**
+   * Controls whether esbuild should only use the WASM-variant instead of trying to
+   * use the native variant. Some platforms may not support the native-variant and
+   * this option allows one support test to be conducted prior to all the workers starting.
+   */
+  alwaysUseWasm: boolean;
+}
+
+/**
  * A request to optimize JavaScript using the supplied options.
  */
 interface OptimizeRequest {
   /**
    * The options to use when optimizing.
    */
-  options: {
-    /**
-     * Controls advanced optimizations.
-     * Currently these are only terser related:
-     * * terser compress passes are set to 2
-     * * terser pure_getters option is enabled
-     */
-    advanced: boolean;
-    /**
-     * Specifies the string tokens that should be replaced with a defined value.
-     */
-    define?: Record<string, string>;
-    /**
-     * Controls whether class, function, and variable names should be left intact
-     * throughout the output code.
-     */
-    keepNames: boolean;
-    /**
-     * Controls whether license text is removed from the output code.
-     * Within the CLI, this option is linked to the license extraction functionality.
-     */
-    removeLicenses: boolean;
-    /**
-     * Controls whether source maps should be generated.
-     */
-    sourcemap: boolean;
-    /**
-     * Specifies the target ECMAScript version for the output code.
-     */
-    target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
-    /**
-     * Controls whether esbuild should only use the WASM-variant instead of trying to
-     * use the native variant. Some platforms may not support the native-variant and
-     * this option allows one support test to be conducted prior to all the workers starting.
-     */
-    alwaysUseWasm: boolean;
-  };
+  options: OptimizeRequestOptions;
 
   /**
    * The JavaScript asset to optimize.
@@ -142,7 +152,7 @@ async function optimizeWithEsbuild(
   let result: TransformResult;
   try {
     result = await esbuild.transform(content, {
-      minifyIdentifiers: !options.keepNames,
+      minifyIdentifiers: !options.keepIdentifierNames,
       minifySyntax: true,
       // NOTE: Disabling whitespace ensures unused pure annotations are kept
       minifyWhitespace: false,
@@ -151,6 +161,10 @@ async function optimizeWithEsbuild(
       sourcefile: name,
       sourcemap: options.sourcemap && 'external',
       define: options.define,
+      // This option should always be disabled for browser builds as we don't rely on `.name`
+      // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
+      // We enable `keepNames` only for server builds as Domino relies on `.name`.
+      // Once we no longer rely on Domino for SSR we should be able to remove this.
       keepNames: options.keepNames,
       target: `es${options.target}`,
     });
@@ -193,9 +207,9 @@ async function optimizeWithEsbuild(
 async function optimizeWithTerser(
   name: string,
   code: string,
-  sourcemaps: boolean,
+  sourcemaps: boolean | undefined,
   target: OptimizeRequest['options']['target'],
-  advanced: boolean,
+  advanced: boolean | undefined,
 ): Promise<{ code: string; map?: object }> {
   const result = await minify(
     { [name]: code },
@@ -207,6 +221,8 @@ async function optimizeWithTerser(
       ecma: target,
       // esbuild in the first pass is used to minify identifiers instead of mangle here
       mangle: false,
+      // esbuild in the first pass is used to minify function names
+      keep_fnames: true,
       format: {
         // ASCII output is enabled here as well to prevent terser from converting back to UTF-8
         ascii_only: true,
