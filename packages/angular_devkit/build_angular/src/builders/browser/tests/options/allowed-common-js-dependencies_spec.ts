@@ -14,26 +14,6 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "allowedCommonJsDependencies"', () => {
     describe('given option is not set', () => {
       for (const aot of [true, false]) {
-        it(`should not show warning for styles import in ${aot ? 'AOT' : 'JIT'} Mode`, async () => {
-          await harness.writeFile('./test.css', `body { color: red; };`);
-          await harness.appendToFile('src/app/app.component.ts', `import '../../test.css';`);
-
-          harness.useTarget('build', {
-            ...BASE_OPTIONS,
-            allowedCommonJsDependencies: [],
-            aot,
-          });
-
-          const { result, logs } = await harness.executeOnce();
-
-          expect(result?.success).toBe(true);
-          expect(logs).not.toContain(
-            jasmine.objectContaining<logging.LogEntry>({
-              message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-            }),
-          );
-        });
-
         it(`should show warning when depending on a Common JS bundle in ${
           aot ? 'AOT' : 'JIT'
         } Mode`, async () => {

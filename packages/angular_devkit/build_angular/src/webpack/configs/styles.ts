@@ -384,6 +384,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
               {
                 use: componentStyleLoaders,
                 type: 'asset/source',
+                resourceQuery: /\?ngResource/,
               },
             ],
           },
