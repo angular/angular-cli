@@ -2,6 +2,8 @@
 #
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -11,10 +13,24 @@ exports_files([
     "tsconfig.json",  # @external
     "tsconfig-test.json",  # @external
     "tsconfig-build.json",  # @external
+    "package.json",
 ])
 
 # Detect if the build is running under --stamp
 config_setting(
     name = "stamp",
     values = {"stamp": "true"},
+)
+
+# If set will replace dependency versions with tarballs for packages in this repo
+bool_flag(
+    name = "enable_package_json_tar_deps",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "package_json_use_tar_deps",
+    flag_values = {
+        ":enable_package_json_tar_deps": "true",
+    },
 )

@@ -98,7 +98,10 @@ genrule(
 
 pkg_npm(
     name = "npm_package",
-    srcs = [":package.json"],
+    pkg_deps = [
+        "//packages/angular_devkit/schematics:package.json",
+        "//packages/angular_devkit/core:package.json",
+    ],
     deps = [
         ":README.md",
         ":license",

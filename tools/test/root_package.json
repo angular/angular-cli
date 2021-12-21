@@ -1,0 +1,37 @@
+{
+  "name": "root",
+  "version": "1.0.0-next.1",
+  "private": true,
+  "description": "Root package.json",
+  "bin": {
+    "root-foo": "./bin/root-foo.js",
+    "root-bar": "./bin/root-bar.js"
+  },
+  "keywords": [
+    "a",
+    "b"
+  ],
+  "scripts": {
+    "build": "node root-build-script"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "workspaces": {
+    "packages": ["packages/root/foo/*", "packages/root/bar/*"]
+  },
+  "resolutions": {
+    "root/foo/bar": "1.0.0"
+  },
+  "devDependencies": {
+    "@root/foo": "1.0.0",
+    "@root/bar": "2.0.0"
+  }
+}

@@ -109,7 +109,9 @@ genrule(
 
 pkg_npm(
     name = "npm_package",
-    srcs = [":package.json"],
+    pkg_deps = [
+        "//packages/angular_devkit/architect:package.json",
+    ],
     deps = [
         ":README.md",
         ":build_webpack",
