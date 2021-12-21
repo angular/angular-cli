@@ -68,7 +68,6 @@ genrule(
 
 pkg_npm(
     name = "npm_package",
-    srcs = [":package.json"],
     deps = [
         ":README.md",
         ":build_optimizer",

@@ -1,9 +1,13 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
 load("@npm//@bazel/typescript:index.bzl", _ts_library = "ts_library")
-load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _pkg_npm = "pkg_npm")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@npm//@angular/dev-infra-private/bazel:extract_js_module_output.bzl", "extract_js_module_output")
+load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
 
 _DEFAULT_TSCONFIG = "//:tsconfig-build.json"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
@@ -44,8 +48,20 @@ def ts_library(
         **kwargs
     )
 
-def pkg_npm(name, use_prodmode_output = False, **kwargs):
-    """Default values for pkg_npm"""
+def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
+    """Override of pkg_npm to produce package outputs and version substitutions conventional to the angular-cli project.
+
+    Produces a package and a tar of that package. Expects a package.json file
+    in the same folder to exist.
+
+    Args:
+        name: Name of the pkg_npm rule. '_archive.tar.gz' is appended to create the tarball.
+        pkg_deps: package.json files of dependent packages. These are used for local path substitutions when --config=local is set.
+        use_prodmode_output: False to ship ES5 devmode output, True to ship ESM output. Defaults to False.
+        **kwargs: Additional arguments passed to the real pkg_npm.
+    """
+    pkg_json = ":package.json"
+
     visibility = kwargs.pop("visibility", None)
 
     common_substitutions = dict(kwargs.pop("substitutions", {}))
@@ -79,6 +95,57 @@ def pkg_npm(name, use_prodmode_output = False, **kwargs):
         deps = deps,
     )
 
+    # Merge package.json with root package.json and perform various substitutions to
+    # prepare it for release. For jq docs, see https://stedolan.github.io/jq/manual/.
+    jq(
+        name = "basic_substitutions",
+        # Note: this jq filter relies on the order of the inputs
+        # buildifier: do not sort
+        srcs = ["//:package.json", pkg_json],
+        filter_file = "//tools:package_json_release_filter.jq",
+        args = ["--slurp"],
+        out = "substituted/package.json",
+    )
+
+    # Copy package.json files to bazel-out so we can use their bazel-out paths to determine
+    # the corresponding package npm package tar.gz path for substitutions.
+    copy_to_bin(
+        name = "package_json_copy",
+        srcs = [pkg_json],
+    )
+    pkg_deps_copies = []
+    for pkg_dep in pkg_deps:
+        pkg_label = to_label(pkg_dep)
+        if pkg_label.name != "package.json":
+            fail("ERROR: only package.json files allowed in pkg_deps of pkg_npm macro")
+        pkg_deps_copies.append("@%s//%s:package_json_copy" % (pkg_label.workspace_name, pkg_label.package))
+
+    # Substitute dependencies on other packages in this repo with tarballs.
+    link_package_json_to_tarballs(
+        name = "tar_substitutions",
+        src = "substituted/package.json",
+        pkg_deps = [":package_json_copy"] + pkg_deps_copies,
+        out = "substituted_with_tars/package.json",
+    )
+
+    # Move the generated package.json along with other deps into a directory for pkg_npm
+    # to package up because pkg_npm requires that all inputs be in the same directory.
+    copy_to_directory(
+        name = "package",
+        srcs = select({
+            # Do tar substitution if config_setting 'package_json_use_tar_deps' is true (local builds)
+            "//:package_json_use_tar_deps": [":%s_js_module_output" % name, "substituted_with_tars/package.json"],
+            "//conditions:default": [":%s_js_module_output" % name, "substituted/package.json"],
+        }),
+        replace_prefixes = {
+            "substituted_with_tars/": "",
+            "substituted/": "",
+        },
+        exclude_prefixes = [
+            "packages",  # Exclude compiled outputs of dependent packages
+        ],
+    )
+
     _pkg_npm(
         name = name,
         # We never set a `package_name` for NPM packages, neither do we enable validation.
@@ -101,7 +168,7 @@ def pkg_npm(name, use_prodmode_output = False, **kwargs):
             "//conditions:default": substitutions,
         }),
         visibility = visibility,
-        deps = [":%s_js_module_output" % name],
+        nested_packages = ["package"],
         tgz = None,
         **kwargs
     )

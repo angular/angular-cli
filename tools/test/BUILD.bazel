@@ -1,0 +1,32 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+
+jq(
+    name = "final_package_json",
+    # This jq filter relies on the order of the inputs
+    # buildifier: do not sort
+    srcs = [
+        "root_package.json",
+        "project_package.json",
+    ],
+    args = [
+        "--slurp",
+    ],
+    filter_file = "//tools:package_json_release_filter.jq",
+)
+
+# jq outputs CR on windows https://github.com/stedolan/jq/issues/92
+# strip the CRs to do a correct comparison on all platforms
+genrule(
+    name = "final_package_json_cr_stripped",
+    srcs = [":final_package_json"],
+    outs = ["final_package_json_cr_stripped.json"],
+    cmd = "cat $(execpath :final_package_json) | sed \"s#\\r##\" > $@",
+)
+
+# Test correctness of the filter that prepares each project's package.json file for release
+diff_test(
+    name = "package_json_filter_test",
+    file1 = "expected_package.json",
+    file2 = ":final_package_json_cr_stripped",
+)

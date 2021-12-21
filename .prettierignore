@@ -13,3 +13,4 @@
 dist/
 third_party/
 /tests/legacy-cli/e2e/assets/9.0-project/
+/tools/test/*.json

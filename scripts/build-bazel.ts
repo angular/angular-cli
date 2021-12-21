@@ -113,13 +113,6 @@ async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]
   const queryTargetsCmd = `${bazelCmd} query --output=label "attr(name, npm_package_archive, //packages/...)"`;
   const targets = (await _exec(queryTargetsCmd, true, queryLogger)).split(/\r?\n/);
 
-  let configArg = '';
-  if (mode === 'snapshot') {
-    configArg = '--config=snapshot';
-  } else if (mode === 'release') {
-    configArg = '--config=release';
-  }
-
   const buildLogger = logger.createChild('build');
 
   // If we are in release mode, run `bazel clean` to ensure the execroot and action cache
@@ -132,7 +125,7 @@ async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]
     await _exec(`${bazelCmd} clean`, false, buildLogger);
   }
 
-  await _exec(`${bazelCmd} build ${configArg} ${targets.join(' ')}`, false, buildLogger);
+  await _exec(`${bazelCmd} build --config=${mode} ${targets.join(' ')}`, false, buildLogger);
 
   return targets;
 }
