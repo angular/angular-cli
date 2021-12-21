@@ -1,0 +1,42 @@
+{
+  "name": "project",
+  "version": "0.0.0-SNAPSHOT",
+  "description": "Project package.json",
+  "main": "project/index.js",
+  "bin": {
+    "projectfoo": "./bin/project-foo.js"
+  },
+  "keywords": [
+    "a",
+    "b",
+    "c"
+  ],
+  "scripts": {
+    "build": "node project-build-script"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "dependencies": {
+    "@project/foo": "1.0.0",
+    "@project/bar": "2.0.0"
+  },
+  "ng-update": {
+    "migrations": "@project/migration-collection.json",
+    "packageGroup": {
+      "@project/abc": "0.0.0"
+    }
+  },
+  "engines": {
+    "node": "^12.20.0 || ^14.15.0 || >=16.10.0",
+    "npm": "^6.11.0 || ^7.5.6 || >=8.0.0",
+    "yarn": ">= 1.13.0"
+  }
+}

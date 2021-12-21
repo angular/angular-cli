@@ -74,6 +74,8 @@ build:release --stamp
 build:snapshot --workspace_status_command="yarn -s ng-dev release build-env-stamp --mode=snapshot"
 build:snapshot --stamp
 
+build:local --//:enable_package_json_tar_deps
+
 ###############################
 # Output                      #
 ###############################
