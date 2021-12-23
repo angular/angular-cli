@@ -110,7 +110,7 @@ async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]
   logger.info(`Building (mode=${mode})...`);
 
   const queryLogger = logger.createChild('query');
-  const queryTargetsCmd = `${bazelCmd} query --output=label "attr(name, npm_package_archive, //packages/...)"`;
+  const queryTargetsCmd = `${bazelCmd} query --output=label "kind(pkg_npm, //packages/...)"`;
   const targets = (await _exec(queryTargetsCmd, true, queryLogger)).split(/\r?\n/);
 
   let configArg = '';
@@ -161,9 +161,9 @@ export default async function (
   const packageLogger = logger.createChild('packages');
 
   for (const target of targets) {
-    const packageDir = target.replace(/\/\/packages\/(.*):npm_package_archive/, '$1');
+    const packageDir = target.replace(/\/\/packages\/(.*):npm_package/, '$1');
     const bazelOutDir = join(bazelBin, 'packages', packageDir, 'npm_package');
-    const tarPath = `${bazelBin}/packages/${packageDir}/npm_package_archive.tar.gz`;
+    const tarPath = `${bazelBin}/packages/${packageDir}/npm_package_archive.tgz`;
     const packageJsonPath = `${bazelOutDir}/package.json`;
     const packageName = require(packageJsonPath).name;
     const destDir = `${distRoot}/${packageName}`;

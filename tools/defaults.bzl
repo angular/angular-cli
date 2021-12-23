@@ -2,7 +2,6 @@
 
 load("@npm//@bazel/typescript:index.bzl", _ts_library = "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
-load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@npm//@angular/dev-infra-private/bazel:extract_js_module_output.bzl", "extract_js_module_output")
 
 _DEFAULT_TSCONFIG = "//:tsconfig-build.json"
@@ -102,14 +101,6 @@ def pkg_npm(name, use_prodmode_output = False, **kwargs):
         }),
         visibility = visibility,
         deps = [":%s_js_module_output" % name],
-        tgz = None,
+        tgz = name + "_archive.tgz",
         **kwargs
-    )
-
-    pkg_tar(
-        name = name + "_archive",
-        srcs = [":%s" % name],
-        extension = "tar.gz",
-        strip_prefix = "./%s" % name,
-        visibility = visibility,
     )
