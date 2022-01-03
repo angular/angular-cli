@@ -179,6 +179,24 @@ describe('Application Schematic', () => {
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 
+  it('should set the skipTests flag for other schematics when using --skipTests=true', async () => {
+    const options: ApplicationOptions = { ...defaultOptions, skipTests: true };
+    const tree = await schematicRunner
+      .runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const config = JSON.parse(tree.readContent('/angular.json'));
+    const schematics = config.projects.foo.schematics;
+
+    expect(schematics['@schematics/angular:class']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:component']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:directive']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:guard']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:interceptor']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:pipe']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:resolver']).toEqual({ skipTests: true });
+    expect(schematics['@schematics/angular:service']).toEqual({ skipTests: true });
+  });
+
   it('minimal=true should not create e2e and test targets', async () => {
     const options = { ...defaultOptions, minimal: true };
     const tree = await schematicRunner
