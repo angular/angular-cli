@@ -29,7 +29,7 @@
     "circular-dependency-plugin": "5.2.2",
     "copy-webpack-plugin": "10.0.0",
     "core-js": "3.19.3",
-    "critters": "0.0.15",
+    "critters": "0.0.16",
     "css-loader": "6.5.1",
     "esbuild-wasm": "0.14.2",
     "glob": "7.2.0",

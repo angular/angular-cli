@@ -139,7 +139,7 @@
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "10.0.0",
     "core-js": "3.19.3",
-    "critters": "0.0.15",
+    "critters": "0.0.16",
     "css-loader": "6.5.1",
     "debug": "^4.1.1",
     "esbuild": "0.14.2",
