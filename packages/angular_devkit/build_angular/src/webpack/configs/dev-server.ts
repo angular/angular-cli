@@ -51,8 +51,6 @@ export async function getDevServerConfig(
     });
   }
 
-  const webSocketPath = posix.join(servePath, 'ws');
-
   return {
     plugins: extraPlugins,
     module: {
@@ -76,11 +74,6 @@ export async function getDevServerConfig(
           },
         ],
       },
-      webSocketServer: {
-        options: {
-          path: webSocketPath,
-        },
-      },
       compress: false,
       static: false,
       server: getServerConfig(root, wco.buildOptions),
@@ -92,14 +85,7 @@ export async function getDevServerConfig(
       liveReload,
       hot: hmr && !liveReload ? 'only' : hmr,
       proxy: await addProxyConfig(root, proxyConfig),
-      client: {
-        logging: 'info',
-        webSocketURL: getPublicHostOptions(wco.buildOptions, webSocketPath),
-        overlay: {
-          errors: true,
-          warnings: false,
-        },
-      },
+      ...getWebSocketSettings(wco.buildOptions, servePath),
     },
   };
 }
@@ -295,6 +281,40 @@ function getAllowedHostsConfig(
   }
 
   return undefined;
+}
+
+function getWebSocketSettings(
+  options: WebpackDevServerOptions,
+  servePath: string,
+): {
+  webSocketServer?: DevServerConfiguration['webSocketServer'];
+  client?: DevServerConfiguration['client'];
+} {
+  const { hmr, liveReload } = options;
+  if (!hmr && !liveReload) {
+    return {
+      webSocketServer: false,
+      client: undefined,
+    };
+  }
+
+  const webSocketPath = posix.join(servePath, 'ws');
+
+  return {
+    webSocketServer: {
+      options: {
+        path: webSocketPath,
+      },
+    },
+    client: {
+      logging: 'info',
+      webSocketURL: getPublicHostOptions(options, webSocketPath),
+      overlay: {
+        errors: true,
+        warnings: false,
+      },
+    },
+  };
 }
 
 function getPublicHostOptions(options: WebpackDevServerOptions, webSocketPath: string): string {
