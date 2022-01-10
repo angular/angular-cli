@@ -310,6 +310,7 @@ export function loadTranslations(
   usedFormats?: Set<string>,
   duplicateTranslation?: I18NTranslation,
 ) {
+  let translations: Record<string, unknown> | undefined = undefined;
   for (const file of desc.files) {
     const loadResult = loader(path.join(workspaceRoot, file.path));
 
@@ -331,10 +332,10 @@ export function loadTranslations(
     file.format = loadResult.format;
     file.integrity = loadResult.integrity;
 
-    if (desc.translation) {
+    if (translations) {
       // Merge translations
       for (const [id, message] of Object.entries(loadResult.translations)) {
-        if (desc.translation[id] !== undefined) {
+        if (translations[id] !== undefined) {
           const duplicateTranslationMessage = `[${file.path}]: Duplicate translations for message '${id}' when merging.`;
           switch (duplicateTranslation) {
             case I18NTranslation.Ignore:
@@ -348,11 +349,12 @@ export function loadTranslations(
               break;
           }
         }
-        desc.translation[id] = message;
+        translations[id] = message;
       }
     } else {
       // First or only translation file
-      desc.translation = loadResult.translations;
+      translations = loadResult.translations;
     }
   }
+  desc.translation = translations;
 }
