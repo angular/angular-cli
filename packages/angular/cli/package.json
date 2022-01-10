@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "0.0.0",
+  "version": "0.0.0-PLACEHOLDER",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "bin": {
@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "@angular-devkit/architect": "0.0.0",
-    "@angular-devkit/core": "0.0.0",
-    "@angular-devkit/schematics": "0.0.0",
-    "@schematics/angular": "0.0.0",
+    "@angular-devkit/architect": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
+    "@schematics/angular": "0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
     "ansi-colors": "4.1.1",
     "debug": "4.3.3",
@@ -51,12 +51,12 @@
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
     "packageGroup": {
-      "@angular/cli": "0.0.0",
-      "@angular-devkit/architect": "0.0.0",
-      "@angular-devkit/build-angular": "0.0.0",
-      "@angular-devkit/build-webpack": "0.0.0",
-      "@angular-devkit/core": "0.0.0",
-      "@angular-devkit/schematics": "0.0.0"
+      "@angular/cli": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/architect": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/build-angular": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/build-webpack": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/schematics": "0.0.0-PLACEHOLDER"
     }
   }
 }

@@ -66,13 +66,10 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
 
     common_substitutions = dict(kwargs.pop("substitutions", {}))
     substitutions = dict(common_substitutions, **{
-        # TODO: Current build script relies on 0.0.0 in package.json; uncomment after replacing build script.
-        #"0.0.0-PLACEHOLDER": "0.0.0",
+        "0.0.0-PLACEHOLDER": "0.0.0",
     })
     stamped_substitutions = dict(common_substitutions, **{
-        # TODO: Current build script relies on 0.0.0 in package.json; uncomment after replacing build script.
-        #"0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
-        "0.0.0": "{BUILD_SCM_VERSION}",
+        "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
     })
 
     deps = kwargs.pop("deps", [])

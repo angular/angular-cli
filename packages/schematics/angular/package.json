@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "0.0.0",
+  "version": "0.0.0-PLACEHOLDER",
   "description": "Schematics specific to Angular",
   "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
@@ -10,8 +10,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "0.0.0",
-    "@angular-devkit/schematics": "0.0.0",
+    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
     "jsonc-parser": "3.0.0"
   }
 }
