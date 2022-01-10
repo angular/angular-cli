@@ -60,7 +60,6 @@
     ]
   },
   "resolutions": {
-    "**/@types/webpack-dev-server/webpack": "5.65.0",
     "ajv-formats/ajv": "8.8.2"
   },
   "devDependencies": {
@@ -118,7 +117,6 @@
     "@types/semver": "^7.0.0",
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
-    "@types/webpack-dev-server": "^4.5.0",
     "@typescript-eslint/eslint-plugin": "5.9.0",
     "@typescript-eslint/parser": "5.9.0",
     "@yarnpkg/lockfile": "1.1.0",
