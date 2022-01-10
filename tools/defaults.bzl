@@ -8,6 +8,7 @@ load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
+load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 
 _DEFAULT_TSCONFIG = "//:tsconfig-build.json"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
@@ -64,12 +65,16 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
 
     visibility = kwargs.pop("visibility", None)
 
-    common_substitutions = dict(kwargs.pop("substitutions", {}))
-    substitutions = dict(common_substitutions, **{
-        "0.0.0-PLACEHOLDER": "0.0.0",
-    })
-    stamped_substitutions = dict(common_substitutions, **{
+    NPM_PACKAGE_SUBSTITUTIONS = {
+        # Version of the local package being built, generated via the `--workspace_status_command` flag.
         "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
+        "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
+        "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
+        "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
+    }
+
+    NO_STAMP_PACKAGE_SUBSTITUTIONS = dict(NPM_PACKAGE_SUBSTITUTIONS, **{
+        "0.0.0-PLACEHOLDER": "0.0.0",
     })
 
     deps = kwargs.pop("deps", [])
@@ -161,8 +166,8 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         package_name = None,
         validate = False,
         substitutions = select({
-            "//:stamp": stamped_substitutions,
-            "//conditions:default": substitutions,
+            "//:stamp": NPM_PACKAGE_SUBSTITUTIONS,
+            "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,
         }),
         visibility = visibility,
         nested_packages = ["package"],
