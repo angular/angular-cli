@@ -124,7 +124,6 @@ ts_library(
         "@npm//@types/postcss-preset-env",
         "@npm//@types/semver",
         "@npm//@types/text-table",
-        "@npm//@types/webpack-dev-server",
         "@npm//ajv",
         "@npm//ansi-colors",
         "@npm//babel-loader",

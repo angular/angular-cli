@@ -246,11 +246,13 @@ export function serveWebpackBrowser(
       }).pipe(
         concatMap(async (buildEvent, index) => {
           // Resolve serve address.
+          const publicPath = webpackConfig.devServer?.devMiddleware?.publicPath;
+
           const serverAddress = url.format({
             protocol: options.ssl ? 'https' : 'http',
             hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
             port: buildEvent.port,
-            pathname: webpackConfig.devServer?.devMiddleware?.publicPath,
+            pathname: typeof publicPath === 'string' ? publicPath : undefined,
           });
 
           if (index === 0) {
