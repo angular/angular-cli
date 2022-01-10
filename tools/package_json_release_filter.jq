@@ -28,5 +28,5 @@
 # Remove devDependencies
 | del(.devDependencies)
 
-# Add engines
-+ {"engines": {"node": "^12.20.0 || ^14.15.0 || >=16.10.0", "npm": "^6.11.0 || ^7.5.6 || >=8.0.0", "yarn": ">= 1.13.0"}}
+# Add engines; versions substituted via pkg_npm
++ {"engines": {"node": "0.0.0-ENGINES-NODE", "npm": "0.0.0-ENGINES-NPM", "yarn": "0.0.0-ENGINES-YARN"}}
