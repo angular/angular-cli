@@ -411,8 +411,8 @@ export default async function (
             } else {
               obj[depName] = `github:${pkg.snapshotRepo}#${pkg.snapshotHash}`;
             }
-          } else if ((obj[depName] as string).match(/\b0\.0\.0\b/)) {
-            obj[depName] = (obj[depName] as string).replace(/\b0\.0\.0\b/, v);
+          } else if ((obj[depName] as string).match(/\b0\.0\.0-PLACEHOLDER\b/)) {
+            obj[depName] = (obj[depName] as string).replace(/\b0\.0\.0-PLACEHOLDER\b/, v);
           }
         }
       }
