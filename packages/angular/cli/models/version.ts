@@ -22,7 +22,8 @@ export class Version {
   }
 }
 
-// TODO: Convert this to use build-time version stamping once implemented in the build system
+// TODO: Convert this to use build-time version stamping after flipping the build script to use bazel
+// export const VERSION = new Version('0.0.0-PLACEHOLDER');
 export const VERSION = new Version(
   (
     JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf-8')) as { version: string }

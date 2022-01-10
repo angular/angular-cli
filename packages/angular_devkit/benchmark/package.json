@@ -1,6 +1,6 @@
 {
   "name": "@angular-devkit/benchmark",
-  "version": "0.0.0",
+  "version": "0.0.0-PLACEHOLDER",
   "private": true,
   "description": "Angular Benchmark",
   "bin": {
@@ -10,7 +10,7 @@
     "benchmark"
   ],
   "dependencies": {
-    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "ansi-colors": "4.1.1",
     "minimist": "1.2.5",
     "pidusage": "3.0.0",
