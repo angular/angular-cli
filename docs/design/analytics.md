@@ -98,9 +98,6 @@ Node version is our App ID, but a dimension is also used to get the numeric MAJO
 
 # Debugging
 
-Using `DEBUG=universal-analytics` will report all calls to the universal-analytics library,
-including queuing events and sending them to the server.
-
 Using `DEBUG=ng:analytics` will report additional information regarding initialization and
 decisions made during the usage analytics process, e.g. if the user has analytics disabled.
 
