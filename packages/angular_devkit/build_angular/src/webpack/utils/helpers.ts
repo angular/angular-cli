@@ -32,13 +32,13 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
     none: { chunk: '', extract: '', file: '', script: '' },
     media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
     bundles: {
-      chunk: `.[chunkhash:${length}]`,
+      chunk: `.[contenthash:${length}]`,
       extract: `.[contenthash:${length}]`,
       file: '',
       script: `.[hash:${length}]`,
     },
     all: {
-      chunk: `.[chunkhash:${length}]`,
+      chunk: `.[contenthash:${length}]`,
       extract: `.[contenthash:${length}]`,
       file: `.[hash:${length}]`,
       script: `.[hash:${length}]`,
