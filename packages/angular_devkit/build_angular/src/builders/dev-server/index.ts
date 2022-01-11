@@ -378,7 +378,7 @@ async function setupLocalize(
               addError(compilation, message);
             },
           });
-          i18nLoaderOptions.translation = localeDescription.translation;
+          i18nLoaderOptions.translation = localeDescription.translation ?? {};
         }
 
         compilation.hooks.finishModules.tap('build-angular', () => {
