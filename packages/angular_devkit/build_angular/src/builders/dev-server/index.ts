@@ -388,7 +388,8 @@ async function setupLocalize(
             undefined,
             browserOptions.i18nDuplicateTranslation,
           );
-          i18nLoaderOptions.translation = localeDescription.translation;
+
+          i18nLoaderOptions.translation = localeDescription.translation ?? {};
         }
 
         compilation.hooks.finishModules.tap('build-angular', () => {
