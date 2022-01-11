@@ -73,6 +73,9 @@ The current packages that require adjustment are:
 
 ## Releasing the CLI
 
+Typical patch and next releases do not require FW to release in advance, as CLI does not pin the FW
+dependency.
+
 After confirming that the above steps have been done or are not necessary, run the following and
 navigate the prompts:
 
