@@ -8,7 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import { concatMap, count, take, timeout } from 'rxjs/operators';
-import { buildWebpackBrowser } from '../../index';
+import { BUILD_TIMEOUT, buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
@@ -70,7 +70,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const buildCount = await harness
         .execute({ outputLogsOnFailure: false })
         .pipe(
-          timeout(60000),
+          timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
             switch (index) {
               case 0:
@@ -219,7 +219,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const buildCount = await harness
         .execute({ outputLogsOnFailure: false })
         .pipe(
-          timeout(60000),
+          timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
             switch (index) {
               case 0:
@@ -307,7 +307,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const buildCount = await harness
         .execute({ outputLogsOnFailure: false })
         .pipe(
-          timeout(30000),
+          timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
             switch (index) {
               case 0:

@@ -74,6 +74,12 @@ export type BrowserBuilderOutput = json.JsonObject &
     outputPath: string;
   };
 
+/**
+ * Maximum time in milliseconds for single build/rebuild
+ * This accounts for CI variability.
+ */
+export const BUILD_TIMEOUT = 30_000;
+
 async function initialize(
   options: BrowserBuilderSchema,
   context: BuilderContext,

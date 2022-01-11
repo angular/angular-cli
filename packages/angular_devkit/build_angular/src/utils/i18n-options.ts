@@ -248,11 +248,12 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     const tempPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-i18n-'));
     buildOptions.outputPath = tempPath;
 
-    // Remove temporary directory used for i18n processing
-    process.on('exit', () => {
-      try {
-        fs.rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
-      } catch {}
+    process.on('exit', () => deleteTempDirectory(tempPath));
+    process.once('SIGINT', () => {
+      deleteTempDirectory(tempPath);
+
+      // Needed due to `ora` as otherwise process will not terminate.
+      process.kill(process.pid, 'SIGINT');
     });
   }
 
@@ -273,6 +274,30 @@ function findLocaleDataPath(locale: string, resolver: (locale: string) => string
 
     return null;
   }
+}
+
+/** Remove temporary directory used for i18n processing. */
+function deleteTempDirectory(tempPath: string): void {
+  // The below should be removed and replaced with just `rmSync` when support for Node.Js 12 is removed.
+  const { rmSync, rmdirSync } = fs as typeof fs & {
+    rmSync?: (
+      path: fs.PathLike,
+      options?: {
+        force?: boolean;
+        maxRetries?: number;
+        recursive?: boolean;
+        retryDelay?: number;
+      },
+    ) => void;
+  };
+
+  try {
+    if (rmSync) {
+      rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
+    } else {
+      rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
+    }
+  } catch {}
 }
 
 export function loadTranslations(
