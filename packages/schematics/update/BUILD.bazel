@@ -102,6 +102,7 @@ jasmine_node_test(
 pkg_npm(
     name = "npm_package",
     deps = [
+        "README.md",
         ":update",
     ],
 )
