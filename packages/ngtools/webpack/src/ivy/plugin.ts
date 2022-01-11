@@ -184,7 +184,7 @@ export class AngularWebpackPlugin {
 
       // Initialize webpack cache
       if (!this.webpackCache && compilation.options.cache) {
-        this.webpackCache = compilation.getCache(PLUGIN_NAME);
+        this.webpackCache = compilation.getCache(`${PLUGIN_NAME}__${this.pluginOptions.tsconfig}`);
       }
 
       // Initialize the resource loader if not already setup
