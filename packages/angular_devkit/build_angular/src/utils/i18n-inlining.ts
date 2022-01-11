@@ -47,28 +47,10 @@ function emittedFilesToInlineOptions(
     };
     originalFiles.push(originalPath);
 
-    // Remove temporary original file as the content has now been read
-    try {
-      fs.unlinkSync(originalPath);
-    } catch (e) {
-      context.logger.debug(
-        `Unable to delete i18n temporary file [${originalPath}]: ${e.toString()}`,
-      );
-    }
-
     try {
       const originalMapPath = originalPath + '.map';
       action.map = fs.readFileSync(originalMapPath, 'utf8');
       originalFiles.push(originalMapPath);
-
-      // Remove temporary original map file as the content has now been read
-      try {
-        fs.unlinkSync(originalMapPath);
-      } catch (e) {
-        context.logger.debug(
-          `Unable to delete i18n temporary file [${originalMapPath}]: ${e.toString()}`,
-        );
-      }
     } catch (err) {
       if (err.code !== 'ENOENT') {
         throw err;
