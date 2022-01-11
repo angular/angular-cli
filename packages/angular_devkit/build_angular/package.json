@@ -44,7 +44,7 @@
     "mini-css-extract-plugin": "2.4.6",
     "minimatch": "3.0.4",
     "open": "8.4.0",
-    "ora": "5.4.1",
+    "ora": "6.0.1",
     "parse5-html-rewriting-stream": "6.0.1",
     "piscina": "3.2.0",
     "postcss": "8.4.5",

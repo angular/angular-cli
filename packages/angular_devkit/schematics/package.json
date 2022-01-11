@@ -16,7 +16,7 @@
     "@angular-devkit/core": "0.0.0",
     "jsonc-parser": "3.0.0",
     "magic-string": "0.25.7",
-    "ora": "5.4.1",
+    "ora": "6.0.1",
     "rxjs": "6.6.7"
   }
 }
