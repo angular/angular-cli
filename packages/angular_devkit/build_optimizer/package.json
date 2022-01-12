@@ -1,6 +1,6 @@
 {
   "name": "@angular-devkit/build-optimizer",
-  "version": "0.0.0-PLACEHOLDER",
+  "version": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
   "description": "Angular Build Optimizer",
   "experimental": true,
   "main": "src/index.js",

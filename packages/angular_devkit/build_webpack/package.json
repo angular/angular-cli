@@ -1,13 +1,13 @@
 {
   "name": "@angular-devkit/build-webpack",
-  "version": "0.0.0-PLACEHOLDER",
+  "version": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
   "description": "Webpack Builder for Architect",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "rxjs": "6.6.7"
   },
   "devDependencies": {
