@@ -205,7 +205,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#4b4d90418c4fe024676e102f714a20a65610c724":
   version "0.0.0-47168baf0b140436ad30c923ba8de24cad0aefc2"
-  uid "4b4d90418c4fe024676e102f714a20a65610c724"
   resolved "https://github.com/angular/dev-infra-private-builds.git#4b4d90418c4fe024676e102f714a20a65610c724"
   dependencies:
     "@actions/core" "^1.4.0"
@@ -9987,7 +9986,6 @@ sass@1.47.0, sass@^1.32.8:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
@@ -10235,7 +10233,7 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shelljs@^0.8.4:
+shelljs@^0.8.5:
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.5.tgz#de055408d8361bed66c669d2f000538ced8ee20c"
   integrity sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==
