@@ -81,7 +81,10 @@ const ignoredPackages = [
 
 // Ignore own packages (all MIT)
 for (const packageName of Object.keys(packages)) {
-  ignoredPackages.push(`${packageName}@0.0.0-PLACEHOLDER`);
+  const version = packages[packageName].experimental
+    ? '0.0.0-EXPERIMENTAL-PLACEHOLDER'
+    : '0.0.0-PLACEHOLDER';
+  ignoredPackages.push(`${packageName}@${version}`);
 }
 
 // Find all folders directly under a `node_modules` that have a package.json.
