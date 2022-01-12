@@ -28,6 +28,7 @@ import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator'
 import { createTranslationLoader } from '../../utils/load-translations';
 import { NormalizedCachedOptions, normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
+import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   generateI18nBrowserWebpackConfigFromContext,
@@ -89,6 +90,9 @@ export function serveWebpackBrowser(
     if (!projectName) {
       throw new Error('The builder requires a target.');
     }
+
+    // Purge old build disk cache.
+    await purgeStaleBuildCache(context);
 
     options.port = await checkPort(options.port ?? 4200, options.host || 'localhost');
 

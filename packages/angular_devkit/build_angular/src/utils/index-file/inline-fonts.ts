@@ -13,9 +13,8 @@ import proxyAgent from 'https-proxy-agent';
 import { join } from 'path';
 import { URL } from 'url';
 import { NormalizedCachedOptions } from '../normalize-cache';
+import { VERSION } from '../package-version';
 import { htmlRewritingStream } from './html-rewriting-stream';
-
-const packageVersion = require('../../../package.json').version;
 
 interface FontProviderDetails {
   preconnectUrl: string;
@@ -156,7 +155,7 @@ export class InlineFontsProcessor {
   }
 
   private async getResponse(url: URL): Promise<string> {
-    const key = `${packageVersion}|${url}`;
+    const key = `${VERSION}|${url}`;
 
     if (this.cachePath) {
       const entry = await cacache.get.info(this.cachePath, key);
