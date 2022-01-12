@@ -1,3 +1,19 @@
+<a name="12.2.15"></a>
+
+# 12.2.15 (2022-01-12)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [526115fdb](https://github.com/angular/angular-cli/commit/526115fdb7d35ff01f5dbdb6027d9f5e925e4056) | fix  | updated webpack-dev-server to latest security patch |
+
+## Special Thanks
+
+iRealNirmal
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.14"></a>
 
 # 12.2.14 (2021-12-07)
