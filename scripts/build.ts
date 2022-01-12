@@ -413,6 +413,11 @@ export default async function (
             }
           } else if ((obj[depName] as string).match(/\b0\.0\.0-PLACEHOLDER\b/)) {
             obj[depName] = (obj[depName] as string).replace(/\b0\.0\.0-PLACEHOLDER\b/, v);
+          } else if ((obj[depName] as string).match(/\b0\.0\.0-EXPERIMENTAL-PLACEHOLDER\b/)) {
+            obj[depName] = (obj[depName] as string).replace(
+              /\b0\.0\.0-EXPERIMENTAL-PLACEHOLDER\b/,
+              v,
+            );
           }
         }
       }

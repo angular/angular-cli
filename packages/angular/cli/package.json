@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "@angular-devkit/architect": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
     "@schematics/angular": "0.0.0-PLACEHOLDER",
@@ -52,9 +52,9 @@
     "migrations": "@schematics/angular/migrations/migration-collection.json",
     "packageGroup": {
       "@angular/cli": "0.0.0-PLACEHOLDER",
-      "@angular-devkit/architect": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
       "@angular-devkit/build-angular": "0.0.0-PLACEHOLDER",
-      "@angular-devkit/build-webpack": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
       "@angular-devkit/core": "0.0.0-PLACEHOLDER",
       "@angular-devkit/schematics": "0.0.0-PLACEHOLDER"
     }

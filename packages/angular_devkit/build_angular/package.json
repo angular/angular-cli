@@ -7,8 +7,8 @@
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "1.0.2",
-    "@angular-devkit/architect": "0.0.0-PLACEHOLDER",
-    "@angular-devkit/build-webpack": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@babel/core": "7.16.0",
     "@babel/generator": "7.16.0",

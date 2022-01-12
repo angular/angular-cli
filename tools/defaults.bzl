@@ -68,6 +68,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
     NPM_PACKAGE_SUBSTITUTIONS = {
         # Version of the local package being built, generated via the `--workspace_status_command` flag.
         "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
+        "0.0.0-EXPERIMENTAL-PLACEHOLDER": "{BUILD_SCM_EXPERIMENTAL_VERSION}",
         "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
         "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
         "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
@@ -75,6 +76,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
 
     NO_STAMP_PACKAGE_SUBSTITUTIONS = dict(NPM_PACKAGE_SUBSTITUTIONS, **{
         "0.0.0-PLACEHOLDER": "0.0.0",
+        "0.0.0-EXPERIMENTAL-PLACEHOLDER": "0.0.0",
     })
 
     deps = kwargs.pop("deps", [])
