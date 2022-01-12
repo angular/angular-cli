@@ -10,6 +10,7 @@ import remapping from '@ampproject/remapping';
 import { custom } from 'babel-loader';
 import { ScriptTarget } from 'typescript';
 import { loadEsmModule } from '../utils/load-esm';
+import { VERSION } from '../utils/package-version';
 import { ApplicationPresetOptions, I18nPluginCreators } from './presets/application';
 
 interface AngularCustomOptions extends Omit<ApplicationPresetOptions, 'instrumentCode'> {
@@ -196,7 +197,7 @@ export default custom<ApplicationPresetOptions>(() => {
         ...baseOptions,
         ...rawOptions,
         cacheIdentifier: JSON.stringify({
-          buildAngular: require('../../package.json').version,
+          buildAngular: VERSION,
           customOptions,
           baseOptions,
           rawOptions,

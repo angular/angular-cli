@@ -7,12 +7,17 @@
  */
 
 import { json } from '@angular-devkit/core';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { cachingDisabled } from './environment-options';
+import { VERSION } from './package-version';
 
 export interface NormalizedCachedOptions {
+  /** Whether disk cache is enabled. */
   enabled: boolean;
+  /** Disk cache path. Example: `/.angular/cache/v12.0.0`. */
   path: string;
+  /** Disk cache base path. Example: `/.angular/cache`. */
+  basePath: string;
 }
 
 interface CacheMetadata {
@@ -49,8 +54,11 @@ export function normalizeCacheOptions(
     }
   }
 
+  const cacheBasePath = resolve(worspaceRoot, path);
+
   return {
     enabled: cacheEnabled,
-    path: resolve(worspaceRoot, path),
+    basePath: cacheBasePath,
+    path: join(cacheBasePath, VERSION),
   };
 }

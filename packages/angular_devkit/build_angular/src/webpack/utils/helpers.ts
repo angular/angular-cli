@@ -19,6 +19,7 @@ import {
   ExtraEntryPointClass,
 } from '../../builders/browser/schema';
 import { WebpackConfigOptions } from '../../utils/build-options';
+import { VERSION } from '../../utils/package-version';
 
 export interface HashFormat {
   chunk: string;
@@ -122,8 +123,6 @@ export function getCacheSettings(
 ): WebpackOptionsNormalized['cache'] {
   const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
   if (enabled) {
-    const packageVersion = require('../../../package.json').version;
-
     return {
       type: 'filesystem',
       profile: wco.buildOptions.verbose,
@@ -134,7 +133,7 @@ export function getCacheSettings(
       // None of which are "named".
       name: createHash('sha1')
         .update(angularVersion)
-        .update(packageVersion)
+        .update(VERSION)
         .update(wco.projectRoot)
         .update(JSON.stringify(wco.tsConfig))
         .update(

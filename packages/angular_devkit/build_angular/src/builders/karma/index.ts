@@ -14,6 +14,7 @@ import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
+import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
 import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
@@ -32,6 +33,9 @@ async function initialize(
   context: BuilderContext,
   webpackConfigurationTransformer?: ExecutionTransformer<Configuration>,
 ): Promise<[typeof import('karma'), Configuration]> {
+  // Purge old build disk cache.
+  await purgeStaleBuildCache(context);
+
   const { config } = await generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests

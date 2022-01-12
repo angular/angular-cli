@@ -17,6 +17,7 @@ import webpack, { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { createI18nOptions } from '../../utils/i18n-options';
 import { loadEsmModule } from '../../utils/load-esm';
+import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
 import { getCommonConfig } from '../../webpack/configs';
@@ -129,6 +130,9 @@ export async function execute(
 ): Promise<BuildResult> {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
+
+  // Purge old build disk cache.
+  await purgeStaleBuildCache(context);
 
   const browserTarget = targetFromTargetString(options.browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderOptions>(
