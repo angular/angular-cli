@@ -70,6 +70,20 @@ Alan Agius, Derek Cormier, Doug Parker, Elio Goettelmann, Joey Perrott, Jordan P
 
 <!-- CHANGELOG SPLIT MARKER -->
 
+<a name="12.2.15"></a>
+
+# 12.2.15 (2022-01-12)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [526115fdb](https://github.com/angular/angular-cli/commit/526115fdb7d35ff01f5dbdb6027d9f5e925e4056) | fix  | updated webpack-dev-server to latest security patch |
+
+## Special Thanks
+
+Doug Parker and iRealNirmal
+
 <a name="13.2.0-next.1"></a>
 
 # 13.2.0-next.1 (2021-12-15)
