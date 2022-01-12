@@ -34,3 +34,16 @@ config_setting(
         ":enable_package_json_tar_deps": "true",
     },
 )
+
+# If set will replace dependency versions with snapshot repos for packages in this repo
+bool_flag(
+    name = "enable_snapshot_repo_deps",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "package_json_use_snapshot_repo_deps",
+    flag_values = {
+        ":enable_snapshot_repo_deps": "true",
+    },
+)
