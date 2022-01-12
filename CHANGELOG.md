@@ -1,3 +1,39 @@
+<a name="13.2.0-next.2"></a>
+
+# 13.2.0-next.2 (2022-01-12)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [b7e292374](https://github.com/angular/angular-cli/commit/b7e29237437dcfaa9a745824a15360812f1ade3c) | fix  | remove extra space in `Unable to find compatible package` during `ng add` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [aadfc7915](https://github.com/angular/angular-cli/commit/aadfc791524ff2bf6d040f288e7a2cca8f49b9cc) | fix  | set `skipTest` flag for resolvers when using ng new --skip-tests |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [cbe028e37](https://github.com/angular/angular-cli/commit/cbe028e37c8af6f2e17cbbeddc968c9410151bbb) | feat | expose i18nDuplicateTranslation option of browser and server builders |
+| [6d2087b8f](https://github.com/angular/angular-cli/commit/6d2087b8f8332d742bc1140b7c4e490f5cc57d08) | fix  | automatically purge stale build cache entries                         |
+| [a5e375ca9](https://github.com/angular/angular-cli/commit/a5e375ca93a93dd887d7fde34686ec9019619981) | fix  | correctly resolve `core-js/proposals/reflect-metadata`                |
+| [509322b62](https://github.com/angular/angular-cli/commit/509322b6214b3425bd209087ac99ee9b14edeaba) | fix  | Don't use TAILWIND_MODE=watch                                         |
+| [9a9af2040](https://github.com/angular/angular-cli/commit/9a9af20400a4be53f6c62187401cc9bf2fadc57e) | fix  | enable `:where` CSS pseudo-class                                      |
+| [426ddb68d](https://github.com/angular/angular-cli/commit/426ddb68d9a21b036d6151e6cdee625e58ca1194) | fix  | ensure `$localize` calls are replaced in watch mode                   |
+| [0d68ed547](https://github.com/angular/angular-cli/commit/0d68ed547362e6bad0a9c5ca5209b65ed125bbd8) | fix  | localized bundle generation fails in watch mode                       |
+| [11f817ada](https://github.com/angular/angular-cli/commit/11f817adae4f06d8b80a9d74534468f6e3c2d2c5) | fix  | use `contenthash` instead of `chunkhash` for chunks                   |
+| [50167a36b](https://github.com/angular/angular-cli/commit/50167a36b0f9803ebcedafa9abbd9ecc5bc19a40) | fix  | websocket client only injected if required                            |
+
+## Special Thanks
+
+Alan Agius, Derek Cormier, Doug Parker, Elio Goettelmann, Joey Perrott, Jordan Pittman, Kasper Christensen, Lukas Spirig, Zoltan Lehoczky and minijus
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.0-next.1"></a>
 
 # 13.2.0-next.1 (2021-12-15)
