@@ -8,6 +8,7 @@ load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
+load("//tools:snapshot_repo_filter.bzl", "SNAPSHOT_REPO_JQ_FILTER")
 load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 
 _DEFAULT_TSCONFIG = "//:tsconfig-build.json"
@@ -69,6 +70,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         # Version of the local package being built, generated via the `--workspace_status_command` flag.
         "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
         "0.0.0-EXPERIMENTAL-PLACEHOLDER": "{BUILD_SCM_EXPERIMENTAL_VERSION}",
+        "BUILD_SCM_HASH-PLACEHOLDER": "{BUILD_SCM_COMMIT_SHA}",
         "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
         "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
         "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
@@ -132,6 +134,14 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         out = "substituted_with_tars/package.json",
     )
 
+    # Substitute dependencies on other packages in this repo with snapshot repos.
+    jq(
+        name = "snapshot_repo_substitutions",
+        srcs = ["substituted/package.json"],
+        filter = SNAPSHOT_REPO_JQ_FILTER,
+        out = "substituted_with_snapshot_repos/package.json",
+    )
+
     # Move the generated package.json along with other deps into a directory for pkg_npm
     # to package up because pkg_npm requires that all inputs be in the same directory.
     copy_to_directory(
@@ -139,10 +149,12 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         srcs = select({
             # Do tar substitution if config_setting 'package_json_use_tar_deps' is true (local builds)
             "//:package_json_use_tar_deps": [":%s_js_module_output" % name, "substituted_with_tars/package.json"],
+            "//:package_json_use_snapshot_repo_deps": [":%s_js_module_output" % name, "substituted_with_snapshot_repos/package.json"],
             "//conditions:default": [":%s_js_module_output" % name, "substituted/package.json"],
         }),
         replace_prefixes = {
             "substituted_with_tars/": "",
+            "substituted_with_snapshot_repos/": "",
             "substituted/": "",
         },
         exclude_prefixes = [
