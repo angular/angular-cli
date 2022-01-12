@@ -19,6 +19,7 @@ import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../../utils';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
 import { I18nOptions } from '../../utils/i18n-options';
 import { ensureOutputPaths } from '../../utils/output-paths';
+import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateI18nBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
 import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
@@ -146,6 +147,9 @@ async function initialize(
   i18n: I18nOptions;
   target: ScriptTarget;
 }> {
+  // Purge old build disk cache.
+  await purgeStaleBuildCache(context);
+
   const originalOutputPath = options.outputPath;
   const { config, i18n, target } = await generateI18nBrowserWebpackConfigFromContext(
     {
