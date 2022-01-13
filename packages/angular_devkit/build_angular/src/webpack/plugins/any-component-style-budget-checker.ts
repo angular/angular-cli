@@ -37,6 +37,11 @@ export class AnyComponentStyleBudgetChecker {
           stage: Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
         },
         () => {
+          // No budgets.
+          if (this.budgets.length === 0) {
+            return;
+          }
+
           // In AOT compilations component styles get processed in child compilations.
           if (!compilation.compiler.parentCompilation) {
             return;
