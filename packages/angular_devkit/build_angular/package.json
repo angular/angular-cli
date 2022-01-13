@@ -50,7 +50,7 @@
     "postcss": "8.4.4",
     "postcss-import": "14.0.2",
     "postcss-loader": "6.2.1",
-    "postcss-preset-env": "6.7.0",
+    "postcss-preset-env": "7.2.3",
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "4.0.0",
     "rxjs": "6.6.7",
