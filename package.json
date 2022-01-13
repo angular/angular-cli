@@ -193,7 +193,7 @@
     "postcss": "8.4.4",
     "postcss-import": "14.0.2",
     "postcss-loader": "6.2.1",
-    "postcss-preset-env": "6.7.0",
+    "postcss-preset-env": "7.2.3",
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "13.0.0",
