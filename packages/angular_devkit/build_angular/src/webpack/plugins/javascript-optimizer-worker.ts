@@ -48,7 +48,7 @@ export interface OptimizeRequestOptions {
   /**
    * Specifies the target ECMAScript version for the output code.
    */
-  target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
+  target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 'next';
   /**
    * Controls whether esbuild should only use the WASM-variant instead of trying to
    * use the native variant. Some platforms may not support the native-variant and
@@ -105,7 +105,8 @@ export default async function ({ asset, options }: OptimizeRequest) {
     asset.name,
     esbuildResult.code,
     options.sourcemap,
-    options.target,
+    // Terser only supports up to ES2020.
+    options.target === 'next' ? 2020 : options.target,
     options.advanced,
   );
 
@@ -208,7 +209,7 @@ async function optimizeWithTerser(
   name: string,
   code: string,
   sourcemaps: boolean | undefined,
-  target: OptimizeRequest['options']['target'],
+  target: Exclude<OptimizeRequest['options']['target'], 'next'>,
   advanced: boolean | undefined,
 ): Promise<{ code: string; map?: object }> {
   const result = await minify(

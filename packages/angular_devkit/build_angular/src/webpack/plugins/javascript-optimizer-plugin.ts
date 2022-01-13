@@ -156,12 +156,12 @@ export class JavaScriptOptimizerPlugin {
           if (this.options.target) {
             if (this.options.target <= ScriptTarget.ES5) {
               target = 5;
-            } else if (this.options.target < ScriptTarget.ESNext) {
+            } else if (this.options.target === ScriptTarget.ESNext) {
+              target = 'next';
+            } else {
               target = Number(
                 ScriptTarget[this.options.target].slice(2),
               ) as OptimizeRequestOptions['target'];
-            } else {
-              target = 2020;
             }
           }
 
