@@ -7,6 +7,7 @@
  */
 
 import * as fs from 'fs';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'path';
 import { Configuration, RuleSetUseItem } from 'webpack';
 import { ExtraEntryPoint } from '../../builders/browser/schema';
@@ -71,7 +72,6 @@ function resolveGlobalStyles(
 
 // eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
-  const MiniCssExtractPlugin = require('mini-css-extract-plugin');
   const postcssImports = require('postcss-import');
   const postcssPresetEnv: typeof import('postcss-preset-env') = require('postcss-preset-env');
 
