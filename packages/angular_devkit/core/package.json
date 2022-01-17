@@ -9,7 +9,7 @@
   ],
   "dependencies": {
     "ajv-formats": "2.1.1",
-    "ajv": "8.8.2",
+    "ajv": "8.9.0",
     "fast-json-stable-stringify": "2.1.0",
     "magic-string": "0.25.7",
     "rxjs": "6.6.7",
