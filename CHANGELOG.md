@@ -1,3 +1,19 @@
+<a name="13.0.2"></a>
+
+# 13.0.2 (2022-01-18)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------------ |
+| [4f682fbd](https://github.com/angular/universal/commit/4f682fbd41657297ea1f69152f48f525678e4aab) | fix  | ensure CommonJS migrations can be accessed |
+
+## Special Thanks
+
+Adam Plumer, Alan Agius and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.1"></a>
 
 # 13.0.1 (2021-11-11)
