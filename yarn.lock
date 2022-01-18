@@ -9225,7 +9225,7 @@ postcss@8.4.4:
     picocolors "^1.0.0"
     source-map-js "^1.0.1"
 
-postcss@8.4.5, postcss@^8.2.15, postcss@^8.2.4, postcss@^8.3.7:
+postcss@8.4.5, postcss@^8.2.14, postcss@^8.2.15, postcss@^8.2.4, postcss@^8.3.7:
   version "8.4.5"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.5.tgz#bae665764dfd4c6fcc24dc0fdf7e7aa00cc77f95"
   integrity sha512-jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==
@@ -9815,6 +9815,17 @@ resolve-url-loader@4.0.0:
     convert-source-map "^1.7.0"
     loader-utils "^2.0.0"
     postcss "^7.0.35"
+    source-map "0.6.1"
+
+resolve-url-loader@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/resolve-url-loader/-/resolve-url-loader-5.0.0.tgz#ee3142fb1f1e0d9db9524d539cfa166e9314f795"
+  integrity sha512-uZtduh8/8srhBoMx//5bwqjQ+rfYOUq8zC9NrMUGtjBiGTtFJM42s58/36+hTqeqINcnYe08Nj3LkK9lW4N8Xg==
+  dependencies:
+    adjust-sourcemap-loader "^4.0.0"
+    convert-source-map "^1.7.0"
+    loader-utils "^2.0.0"
+    postcss "^8.2.14"
     source-map "0.6.1"
 
 resolve@1.21.0, resolve@^1.1.5, resolve@^1.1.6, resolve@^1.1.7, resolve@^1.10.0, resolve@^1.13.1, resolve@^1.14.2, resolve@^1.19.0, resolve@^1.20.0, resolve@^1.3.2:
