@@ -1,3 +1,26 @@
+<a name="13.1.0-next.1"></a>
+
+# 13.1.0-next.1 (2022-01-18)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                   |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------- |
+| [c38b739a](https://github.com/angular/universal/commit/c38b739aa226a723680c02d991b98078ac5b7242) | fix  | correctly handle lazy loaded routes in Clover |
+| [03c8e6b2](https://github.com/angular/universal/commit/03c8e6b2431846a1d845921d8ccde550f3cd029e) | fix  | ensure CommonJS migrations can be accessed    |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                                   |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------- |
+| [ce08aafd](https://github.com/angular/universal/commit/ce08aafdbbe90993ab432415fe56617f39c1674b) | fix  | initialNavigation should be 'enabledBlocking' |
+
+## Special Thanks
+
+Adam Plumer, Alan Agius, Doug Parker and Mike Huang
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.0.2"></a>
 
 # 13.0.2 (2022-01-18)
