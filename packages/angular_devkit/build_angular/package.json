@@ -52,7 +52,7 @@
     "postcss-loader": "6.2.1",
     "postcss-preset-env": "7.2.3",
     "regenerator-runtime": "0.13.9",
-    "resolve-url-loader": "4.0.0",
+    "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
     "sass": "1.48.0",
     "sass-loader": "12.4.0",
