@@ -1,3 +1,20 @@
+<a name="13.1.4"></a>
+
+# 13.1.4 (2022-01-19)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [2f2069dba](https://github.com/angular/angular-cli/commit/2f2069dbaa70c3d4725923f1c3ccbf56b1f57576) | fix  | disable parsing `new URL` syntax                      |
+| [bddd0fb9f](https://github.com/angular/angular-cli/commit/bddd0fb9f34a8706dd1646952eed08970b9cddbe) | fix  | support ESNext as target for JavaScript optimizations |
+
+## Special Thanks
+
+Alan Agius, Derek Cormier and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.3"></a>
 
 # 13.1.3 (2022-01-12)
