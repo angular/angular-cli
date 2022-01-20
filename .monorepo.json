@@ -89,16 +89,6 @@
       ],
       "snapshotRepo": "angular/angular-devkit-build-optimizer-builds"
     },
-    "@angular-devkit/build-ng-packagr": {
-      "name": "Build NgPackagr",
-      "links": [
-        {
-          "label": "README",
-          "url": "/packages/angular_devkit/build_ng_packagr/README.md"
-        }
-      ],
-      "snapshotRepo": "angular/angular-devkit-build-ng-packagr-builds"
-    },
     "@angular-devkit/build-angular": {
       "name": "Build Angular",
       "links": [
