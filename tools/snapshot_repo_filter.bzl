@@ -8,7 +8,7 @@ load("//:constants.bzl", "SNAPSHOT_REPOS")
 def _generate_snapshot_repo_filter():
     filter = ""
     for (i, pkg_name) in enumerate(SNAPSHOT_REPOS.keys()):
-        filter += "{sep}(..|objects|select(has(\"{pkg_name}\")))[\"{pkg_name}\"] |= \"github:{snapshot_repo}:BUILD_SCM_HASH-PLACEHOLDER\"\n".format(
+        filter += "{sep}(..|objects|select(has(\"{pkg_name}\")))[\"{pkg_name}\"] |= \"github:{snapshot_repo}#BUILD_SCM_HASH-PLACEHOLDER\"\n".format(
             sep = "| " if i > 0 else "",
             pkg_name = pkg_name,
             snapshot_repo = SNAPSHOT_REPOS[pkg_name],

@@ -152,14 +152,15 @@ const packageJsonPaths = [
   ..._findPrimaryPackageJsonFiles(path.join(__dirname, '..', 'packages'), excludeRe),
 ];
 
-function _exec(cmd: string) {
-  return execSync(cmd).toString().trim();
+function _exec(cmd: string, opts?: { cwd?: string }) {
+  return execSync(cmd, opts).toString().trim();
 }
 
 let gitShaCache: string;
 function _getSnapshotHash(_pkg: PackageInfo): string {
   if (!gitShaCache) {
-    gitShaCache = _exec('git log --format=%h -n1');
+    const opts = { cwd: __dirname }; // Ensure we call git from within this repo
+    gitShaCache = _exec('git log --format=%h -n1', opts);
   }
 
   return gitShaCache;
