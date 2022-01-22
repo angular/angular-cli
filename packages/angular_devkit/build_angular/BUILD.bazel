@@ -221,6 +221,7 @@ pkg_npm(
         "//packages/angular_devkit/architect:package.json",
         "//packages/angular_devkit/build_webpack:package.json",
         "//packages/angular_devkit/core:package.json",
+        "//packages/ngtools/webpack:package.json",
     ],
     deps = [
         ":README.md",
