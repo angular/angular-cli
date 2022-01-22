@@ -270,6 +270,7 @@ jobs:
     resource_class: medium
     steps:
       - custom_attach_workspace
+      - install_python
       - run:
           name: Decrypt Credentials
           # Note: when changing the image, you might have to re-encrypt the credentials with a

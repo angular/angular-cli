@@ -51,10 +51,10 @@
     "@angular-devkit/core" "13.2.0"
     rxjs "6.6.7"
 
-"@angular-devkit/build-angular@^13.2.0-rc":
-  version "13.2.0"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-13.2.0.tgz#5880890b5083a31f96d237ffee5f82af6fcc11a8"
-  integrity sha512-cHnm/P7uKJjKh2BCN8gnnd240J5z3IesQyRAx88kFSlL5sKCGyGoAYKAjU585/lllIXjtFXSR/S2d/cHg8ShKw==
+"@angular-devkit/build-angular@13.2.0-rc.1":
+  version "13.2.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-13.2.0-rc.1.tgz#d07eeec25c00c9ed025aa599263d98ad22d39f4a"
+  integrity sha512-kKElUuHAocImUQmYnlkmk/8UJh8eYw7GqvcfSxIcxJ8euLS2hnavmUCexxtlPsgWmwJTdwXDnRYVCmr4n8hQqA==
   dependencies:
     "@ampproject/remapping" "1.1.1"
     "@angular-devkit/architect" "0.1302.0"
@@ -212,14 +212,13 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#2024033f3123cd1beed78d43ec7269467cd9fa93":
-  version "0.0.0-354871956801929457d9f08482fb81f7012ed7c8"
-  uid "2024033f3123cd1beed78d43ec7269467cd9fa93"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#2024033f3123cd1beed78d43ec7269467cd9fa93"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#3a34722a82fb0e8cd3fa00dfc5476767a35e021a":
+  version "0.0.0-c922f5b23611024bc9d94833ae147f6048ab0275"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#3a34722a82fb0e8cd3fa00dfc5476767a35e021a"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
-    "@angular-devkit/build-angular" "^13.2.0-rc"
+    "@angular-devkit/build-angular" "13.2.0-rc.1"
     "@angular/benchpress" "0.2.1"
     "@babel/core" "^7.16.0"
     "@bazel/bazelisk" "^1.10.1"

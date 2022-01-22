@@ -70,7 +70,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         # Version of the local package being built, generated via the `--workspace_status_command` flag.
         "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
         "0.0.0-EXPERIMENTAL-PLACEHOLDER": "{BUILD_SCM_EXPERIMENTAL_VERSION}",
-        "BUILD_SCM_HASH-PLACEHOLDER": "{BUILD_SCM_COMMIT_SHA}",
+        "BUILD_SCM_HASH-PLACEHOLDER": "{BUILD_SCM_ABBREV_HASH}",
         "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
         "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
         "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
