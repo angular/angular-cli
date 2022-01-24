@@ -58,9 +58,13 @@ Releasing is performed using Angular's unified release tooling. Each week, two r
 **For a minor OR major release:**
 
 After FW releases `-rc.0` for an upcoming minor/major version, update the corresponding version in
-[`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18) to match. This
-ensures that CLI `-rc.0` depends on FW `-rc.0`. The same needs to be done for a `-next.0` release,
-and needs to be done for both minor _and_ major releases.
+[`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18) **and** peer
+dependencies on FW ([here](/packages/angular_devkit/build_angular/package.json) and
+[here](/packages/ngtools/webpack/package.json)) to match. This ensures that CLI `-rc.0` depends on
+FW `-rc.0`.
+
+The same needs to be done for a `-next.0` release, and needs to be done for both minor _and_ major
+releases.
 
 **For a major release:**
 
