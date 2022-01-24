@@ -47,8 +47,23 @@ describe('Dev Server Builder', () => {
     await createArchitect(workspaceRoot);
   });
 
-  it('works', async () => {
-    const run = await architect.scheduleTarget(webpackTargetSpec);
+  it('works with CJS config', async () => {
+    const run = await architect.scheduleTarget(webpackTargetSpec, {
+      webpackConfig: 'webpack.config.cjs',
+    });
+    const output = (await run.result) as DevServerBuildOutput;
+    expect(output.success).toBe(true);
+
+    const response = await fetch(`http://${output.address}:${output.port}/bundle.js`);
+    expect(await response.text()).toContain(`console.log('hello world')`);
+
+    await run.stop();
+  }, 30000);
+
+  it('works with ESM config', async () => {
+    const run = await architect.scheduleTarget(webpackTargetSpec, {
+      webpackConfig: 'webpack.config.mjs',
+    });
     const output = (await run.result) as DevServerBuildOutput;
     expect(output.success).toBe(true);
 

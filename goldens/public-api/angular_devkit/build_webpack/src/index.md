@@ -24,7 +24,7 @@ export type DevServerBuildOutput = BuildResult & {
     address: string;
 };
 
-// @public
+// @public (undocumented)
 export interface EmittedFiles {
     // (undocumented)
     asset?: boolean;
