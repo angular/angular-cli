@@ -47,8 +47,23 @@ describe('Webpack Builder basic test', () => {
       await createArchitect(workspaceRoot);
     });
 
-    it('works', async () => {
-      const run = await architect.scheduleTarget({ project: 'app', target: 'build' });
+    it('works with CJS config', async () => {
+      const run = await architect.scheduleTarget(
+        { project: 'app', target: 'build' },
+        { webpackConfig: 'webpack.config.cjs' },
+      );
+      const output = await run.result;
+
+      expect(output.success).toBe(true);
+      expect(await vfHost.exists(join(outputPath, 'bundle.js')).toPromise()).toBe(true);
+      await run.stop();
+    });
+
+    it('works with ESM config', async () => {
+      const run = await architect.scheduleTarget(
+        { project: 'app', target: 'build' },
+        { webpackConfig: 'webpack.config.mjs' },
+      );
       const output = await run.result;
 
       expect(output.success).toBe(true);
