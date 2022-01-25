@@ -6,7 +6,6 @@
   "bin": {
     "architect": "./bin/architect",
     "benchmark": "./bin/benchmark",
-    "build-optimizer": "./bin/build-optimizer",
     "devkit-admin": "./bin/devkit-admin",
     "ng": "./bin/ng",
     "schematics": "./bin/schematics"

@@ -217,7 +217,6 @@ The following is the list of supported scopes:
 * **@angular-devkit/architect-cli**
 * **@angular-devkit/benchmark**
 * **@angular-devkit/build-angular**
-* **@angular-devkit/build-optimizer**
 * **@angular-devkit/build-webpack**
 * **@angular-devkit/core**
 * **@angular-devkit/schematics**

@@ -79,16 +79,6 @@
       "name": "Benchmark",
       "section": "Tooling"
     },
-    "@angular-devkit/build-optimizer": {
-      "name": "Build Optimizer",
-      "links": [
-        {
-          "label": "README",
-          "url": "/packages/angular_devkit/build_optimizer/README.md"
-        }
-      ],
-      "snapshotRepo": "angular/angular-devkit-build-optimizer-builds"
-    },
     "@angular-devkit/build-angular": {
       "name": "Build Angular",
       "links": [
