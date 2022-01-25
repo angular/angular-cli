@@ -124,7 +124,7 @@ The system operates on placeholders defined inside files or their paths as loade
 | Placeholder         | Description                                                                                                                                 |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<%= expression %>` | Replaced with the result of the call of the given expression. This only supports direct expressions, no structural (for/if/...) JavaScript. |
-| `<%- expression %>` | Same as above, but the value of the result will be escaped for HTML when inserted (i.e. replacing '<' with '&lt;')                          |
+| `<%- expression %>` | Same as above, but the value of the result will be escaped for HTML when inserted (i.e. replacing '<' with '\&lt;')                         |
 | `<% inline code %>` | Inserts the given code into the template structure, allowing to insert structural JavaScript.                                               |
 | `<%# text %>`       | A comment, which gets entirely dropped.                                                                                                     |
 
