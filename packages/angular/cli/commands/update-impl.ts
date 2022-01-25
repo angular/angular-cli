@@ -297,21 +297,6 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
     };
 
-    if (options.all) {
-      const updateCmd =
-        this.packageManager === PackageManager.Yarn
-          ? `'yarn upgrade-interactive' or 'yarn upgrade'`
-          : `'${this.packageManager} update'`;
-
-      this.logger.warn(`
-        '--all' functionality has been removed as updating multiple packages at once is not recommended.
-        To update packages which don’t provide 'ng update' capabilities in your workspace 'package.json' use ${updateCmd} instead.
-        Run the package manager update command after updating packages which provide 'ng update' capabilities.
-      `);
-
-      return 0;
-    }
-
     const packages: PackageIdentifier[] = [];
     for (const request of options['--'] || []) {
       try {
