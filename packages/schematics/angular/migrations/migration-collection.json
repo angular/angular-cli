@@ -1,29 +1,3 @@
 {
-  "schematics": {
-    "schematic-options-13": {
-      "version": "13.0.0",
-      "factory": "./update-13/schematic-options",
-      "description": "Remove no longer valid Angular schematic options from `angular.json`."
-    },
-    "update-angular-config-v13": {
-      "version": "13.0.0",
-      "factory": "./update-13/update-angular-config",
-      "description": "Remove deprecated options from 'angular.json' that are no longer present in v13."
-    },
-    "update-libraries-v13": {
-      "version": "13.0.0",
-      "factory": "./update-13/update-libraries",
-      "description": "Update library projects to be published in partial mode and removed deprecated options from ng-packagr configuration."
-    },
-    "drop-ie-polyfills": {
-      "version": "13.0.0",
-      "factory": "./update-13/drop-ie-polyfills",
-      "description": "Remove polyfills required only for Internet Explorer which is no longer supported."
-    },
-    "update-gitignore": {
-      "version": "13.0.0",
-      "factory": "./update-13/update-gitignore",
-      "description": "Updating '.gitignore' to include '.angular/cache'."
-    }
-  }
+  "schematics": {}
 }
