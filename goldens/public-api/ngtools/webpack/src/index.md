@@ -46,18 +46,6 @@ export interface AngularWebpackPluginOptions {
     tsconfig: string;
 }
 
-// @public @deprecated (undocumented)
-export namespace ivy {
-    const // (undocumented)
-    AngularWebpackLoaderPath: string;
-    const // (undocumented)
-    AngularWebpackPlugin: typeof ivyInternal.AngularWebpackPlugin;
-    // (undocumented)
-    export type AngularPluginOptions = ivyInternal.AngularWebpackPluginOptions;
-    // (undocumented)
-    export type AngularWebpackPlugin = ivyInternal.AngularWebpackPlugin;
-}
-
 // (No @packageDocumentation comment for this package)
 
 ```
