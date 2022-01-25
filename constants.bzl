@@ -8,7 +8,6 @@ SNAPSHOT_REPOS = {
     "@angular/pwa": "angular/angular-pwa-builds",
     "@angular-devkit/architect": "angular/angular-devkit-architect-builds",
     "@angular-devkit/architect-cli": "angular/angular-devkit-architect-cli-builds",
-    "@angular-devkit/build-optimizer": "angular/angular-devkit-build-optimizer-builds",
     "@angular-devkit/build-angular": "angular/angular-devkit-build-angular-builds",
     "@angular-devkit/build-webpack": "angular/angular-devkit-build-webpack-builds",
     "@angular-devkit/core": "angular/angular-devkit-core-builds",
