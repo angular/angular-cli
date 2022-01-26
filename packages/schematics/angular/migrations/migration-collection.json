@@ -1,3 +1,9 @@
 {
-  "schematics": {}
+  "schematics": {
+    "update-angular-packages-version-prefix": {
+      "version": "14.0.0",
+      "factory": "./update-14/angular-packages-version-prefix",
+      "description": "Update Angular packages 'dependencies' and 'devDependencies' version prefix to '^' instead of '~'."
+    }
+  }
 }
