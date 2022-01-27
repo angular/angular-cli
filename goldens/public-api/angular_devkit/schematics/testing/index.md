@@ -6,7 +6,6 @@
 
 /// <reference types="node" />
 
-import { analytics } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Path } from '@angular-devkit/core';

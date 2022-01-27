@@ -65,7 +65,7 @@ export type CollectionDescription<CollectionMetadataT extends object> = Collecti
  */
 export type SchematicDescription<
   CollectionMetadataT extends object,
-  SchematicMetadataT extends object
+  SchematicMetadataT extends object,
 > = SchematicMetadataT & {
   readonly collection: CollectionDescription<CollectionMetadataT>;
   readonly name: string;
@@ -187,7 +187,7 @@ export interface Schematic<CollectionMetadataT extends object, SchematicMetadata
  */
 export interface TypedSchematicContext<
   CollectionMetadataT extends object,
-  SchematicMetadataT extends object
+  SchematicMetadataT extends object,
 > {
   readonly debug: boolean;
   readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
@@ -196,10 +196,6 @@ export interface TypedSchematicContext<
   readonly strategy: MergeStrategy;
   readonly interactive: boolean;
   addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
-
-  // This might be undefined if the feature is unsupported.
-  /** @deprecated since version 11 - as it's unused. */
-  readonly analytics?: analytics.Analytics;
 }
 
 /**

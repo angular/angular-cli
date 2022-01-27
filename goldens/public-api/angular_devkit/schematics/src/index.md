@@ -6,7 +6,6 @@
 
 /// <reference types="node" />
 
-import { analytics } from '@angular-devkit/core';
 import { BaseException } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
@@ -929,8 +928,6 @@ export const TreeSymbol: symbol;
 export interface TypedSchematicContext<CollectionMetadataT extends object, SchematicMetadataT extends object> {
     // (undocumented)
     addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
-    // @deprecated (undocumented)
-    readonly analytics?: analytics.Analytics;
     // (undocumented)
     readonly debug: boolean;
     // (undocumented)
