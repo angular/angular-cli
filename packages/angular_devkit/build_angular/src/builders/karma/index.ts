@@ -9,7 +9,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize } from '@angular-devkit/core';
 import { Config, ConfigOptions } from 'karma';
-import { dirname, resolve } from 'path';
+import { resolve as fsResolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import { Configuration } from 'webpack';
@@ -112,9 +112,22 @@ export function execute(
       }
 
       // prepend special webpack loader that will transform test.ts
-      if (options.include && options.include.length > 0) {
-        const mainFilePath = getSystemPath(join(normalize(context.workspaceRoot), options.main));
-        const files = findTests(options.include, dirname(mainFilePath), context.workspaceRoot);
+      if (options.include?.length) {
+        const projectName = context.target?.project;
+        if (!projectName) {
+          throw new Error('The builder requires a target.');
+        }
+
+        const projectMetadata = await context.getProjectMetadata(projectName);
+        const projectSourceRoot = getSystemPath(
+          join(
+            normalize(context.workspaceRoot),
+            (projectMetadata.root as string | undefined) ?? '',
+            (projectMetadata.sourceRoot as string | undefined) ?? '',
+          ),
+        );
+
+        const files = await findTests(options.include, context.workspaceRoot, projectSourceRoot);
         // early exit, no reason to start karma
         if (!files.length) {
           throw new Error(
@@ -131,7 +144,7 @@ export function execute(
         }
 
         rules.unshift({
-          test: mainFilePath,
+          test: fsResolve(context.workspaceRoot, options.main),
           use: {
             // cannot be a simple path as it differs between environments
             loader: SingleTestTransformLoader,
@@ -150,7 +163,7 @@ export function execute(
       };
 
       const config = await karma.config.parseConfig(
-        resolve(context.workspaceRoot, options.karmaConfig),
+        fsResolve(context.workspaceRoot, options.karmaConfig),
         transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
         { promiseConfig: true, throwErrors: true },
       );
