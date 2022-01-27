@@ -121,7 +121,7 @@ async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]
   // rebuilt if only the workspace status variables change. This could result in accidental
   // re-use of previously built package output with a different `version` in the `package.json`.
   if (mode == 'release') {
-    buildLogger.info('Building in release mode. Resetting the Bazel execroot and action cache..');
+    buildLogger.info('Building in release mode. Resetting the Bazel execroot and action cache.');
     await _exec(`${bazelCmd} clean`, false, buildLogger);
   }
 
