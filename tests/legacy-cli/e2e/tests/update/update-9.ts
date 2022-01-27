@@ -25,6 +25,9 @@ export default async function () {
 
     // Update Angular to 12
     await ng('update', '@angular/cli@12', '@angular/core@12');
+
+    // Update Angular to 13
+    await ng('update', '@angular/cli@13', '@angular/core@13');
   } finally {
     await setRegistry(true);
   }
