@@ -6,55 +6,85 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { existsSync } from 'fs';
-import * as glob from 'glob';
-import { basename, dirname, extname, join } from 'path';
-import { isDirectory } from '../../utils/is-directory';
+import { PathLike, constants, promises as fs } from 'fs';
+import glob, { hasMagic } from 'glob';
+import { basename, dirname, extname, join, relative } from 'path';
+import { promisify } from 'util';
+
+const globPromise = promisify(glob);
 
 // go through all patterns and find unique list of files
-export function findTests(patterns: string[], cwd: string, workspaceRoot: string): string[] {
-  return patterns.reduce((files, pattern) => {
-    const relativePathToMain = cwd.replace(workspaceRoot, '').substr(1); // remove leading slash
-    const tests = findMatchingTests(pattern, cwd, relativePathToMain);
-    tests.forEach((file) => {
-      if (!files.includes(file)) {
-        files.push(file);
-      }
-    });
+export async function findTests(
+  patterns: string[],
+  workspaceRoot: string,
+  projectSourceRoot: string,
+): Promise<string[]> {
+  const matchingTestsPromises = patterns.map((pattern) =>
+    findMatchingTests(pattern, workspaceRoot, projectSourceRoot),
+  );
+  const files = await Promise.all(matchingTestsPromises);
 
-    return files;
-  }, [] as string[]);
+  // Unique file names
+  return [...new Set(files.flat())];
 }
 
-function findMatchingTests(pattern: string, cwd: string, relativePathToMain: string): string[] {
-  // normalize pattern, glob lib only accepts forward slashes
-  pattern = pattern.replace(/\\/g, '/');
-  relativePathToMain = relativePathToMain.replace(/\\/g, '/');
+const normalizePath = (path: string): string => path.replace(/\\/g, '/');
 
-  // remove relativePathToMain to support relative paths from root
+async function findMatchingTests(
+  pattern: string,
+  workspaceRoot: string,
+  projectSourceRoot: string,
+): Promise<string[]> {
+  // normalize pattern, glob lib only accepts forward slashes
+  let normalizedPattern = normalizePath(pattern);
+  const relativeProjectRoot = normalizePath(relative(workspaceRoot, projectSourceRoot) + '/');
+
+  // remove relativeProjectRoot to support relative paths from root
   // such paths are easy to get when running scripts via IDEs
-  if (pattern.startsWith(relativePathToMain + '/')) {
-    pattern = pattern.substr(relativePathToMain.length + 1); // +1 to include slash
+  if (normalizedPattern.startsWith(relativeProjectRoot)) {
+    normalizedPattern = normalizedPattern.substring(relativeProjectRoot.length);
   }
 
   // special logic when pattern does not look like a glob
-  if (!glob.hasMagic(pattern)) {
-    if (isDirectory(join(cwd, pattern))) {
-      pattern = `${pattern}/**/*.spec.@(ts|tsx)`;
+  if (!hasMagic(normalizedPattern)) {
+    if (await isDirectory(join(projectSourceRoot, normalizedPattern))) {
+      normalizedPattern = `${normalizedPattern}/**/*.spec.@(ts|tsx)`;
     } else {
       // see if matching spec file exists
-      const extension = extname(pattern);
-      const matchingSpec = `${basename(pattern, extension)}.spec${extension}`;
+      const fileExt = extname(normalizedPattern);
+      // Replace extension to `.spec.ext`. Example: `src/app/app.component.ts`-> `src/app/app.component.spec.ts`
+      const potentialSpec = join(
+        dirname(normalizedPattern),
+        `${basename(normalizedPattern, fileExt)}.spec${fileExt}`,
+      );
 
-      if (existsSync(join(cwd, dirname(pattern), matchingSpec))) {
-        pattern = join(dirname(pattern), matchingSpec).replace(/\\/g, '/');
+      if (await exists(join(projectSourceRoot, potentialSpec))) {
+        return [normalizePath(potentialSpec)];
       }
     }
   }
 
-  const files = glob.sync(pattern, {
-    cwd,
+  return globPromise(normalizedPattern, {
+    cwd: projectSourceRoot,
   });
+}
 
-  return files;
+async function isDirectory(path: PathLike): Promise<boolean> {
+  try {
+    const stats = await fs.stat(path);
+
+    return stats.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+async function exists(path: PathLike): Promise<boolean> {
+  try {
+    await fs.access(path, constants.F_OK);
+
+    return true;
+  } catch {
+    return false;
+  }
 }
