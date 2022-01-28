@@ -66,14 +66,19 @@ FW `-rc.0`.
 The same needs to be done for a `-next.0` release, and needs to be done for both minor _and_ major
 releases.
 
+Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), these versions
+should be updated to match (remove `-rc.0` and `-next.0`). This can be done as part of the release
+PR ([example](https://github.com/angular/angular-cli/pull/22580/files#diff-53a0da39e6b029472ba808fdd567f8706e752434fa51be6009f0140532b9fe2f))
+or a separate PR after FW releases but before CLI releases.
+
 **For a major release:**
 
 When a release is transitioning from a prerelease to a stable release, the semver ranges for Angular dependencies within the packages' `package.json` files will need to be updated to remove the prerelease version segment.
 For example, `"@angular/compiler-cli": "^13.0.0 || ^13.0.0-next"` in a prerelease should become `"@angular/compiler-cli": "^13.0.0"` in the stable release.
 The current packages that require adjustment are:
 
-- `@angular-devkit/build-angular`: packages/angular_devkit/build_angular/package.json
-- `@ngtools/webpack`: packages/ngtools/webpack/package.json
+- `@angular-devkit/build-angular`: [packages/angular_devkit/build_angular/package.json](/packages/angular_devkit/build_angular/package.json)
+- `@ngtools/webpack`: [packages/ngtools/webpack/package.json](/packages/ngtools/webpack/package.json)
 
 ## Releasing the CLI
 
