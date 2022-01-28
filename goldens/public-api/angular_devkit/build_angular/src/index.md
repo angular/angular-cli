@@ -61,8 +61,6 @@ export interface BrowserBuilderOptions {
     resourcesOutputPath?: string;
     scripts?: ScriptElement[];
     serviceWorker?: boolean;
-    // @deprecated
-    showCircularDependencies?: boolean;
     sourceMap?: SourceMapUnion;
     statsJson?: boolean;
     stylePreprocessorOptions?: StylePreprocessorOptions;
@@ -263,8 +261,6 @@ export interface ServerBuilderOptions {
     preserveSymlinks?: boolean;
     progress?: boolean;
     resourcesOutputPath?: string;
-    // @deprecated
-    showCircularDependencies?: boolean;
     sourceMap?: SourceMapUnion_3;
     statsJson?: boolean;
     stylePreprocessorOptions?: StylePreprocessorOptions_3;

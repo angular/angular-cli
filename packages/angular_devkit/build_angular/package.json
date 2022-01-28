@@ -26,7 +26,6 @@
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "^4.9.1",
     "cacache": "15.3.0",
-    "circular-dependency-plugin": "5.2.2",
     "copy-webpack-plugin": "10.2.1",
     "core-js": "3.20.3",
     "critters": "0.0.16",

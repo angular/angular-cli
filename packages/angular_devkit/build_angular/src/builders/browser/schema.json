@@ -329,12 +329,6 @@
       "description": "Extract all licenses in a separate file.",
       "default": true
     },
-    "showCircularDependencies": {
-      "type": "boolean",
-      "description": "Show circular dependency warnings on builds.",
-      "default": false,
-      "x-deprecated": "The recommended method to detect circular dependencies in project code is to use either a lint rule or other external tooling."
-    },
     "buildOptimizer": {
       "type": "boolean",
       "description": "Enables advanced build optimizations when using the 'aot' option.",
