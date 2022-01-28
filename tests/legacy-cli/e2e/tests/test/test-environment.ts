@@ -4,7 +4,10 @@ import { updateJsonFile } from '../../utils/project';
 
 export default function () {
   // Tests run in 'dev' environment by default.
-  return writeFile('src/app/environment.spec.ts', `
+  return (
+    writeFile(
+      'src/app/environment.spec.ts',
+      `
       import { environment } from '../environments/environment';
 
       describe('Test environment', () => {
@@ -12,24 +15,30 @@ export default function () {
           expect(environment.production).toBe(false);
         });
       });
-    `)
-    .then(() => ng('test', '--watch=false'))
-    .then(() => updateJsonFile('angular.json', configJson => {
-      const appArchitect = configJson.projects['test-project'].architect;
-      appArchitect.test.configurations = {
-        production: {
-          fileReplacements: [
-            {
-              src: 'src/environments/environment.ts',
-              replaceWith: 'src/environments/environment.prod.ts',
-            }
-          ],
-        }
-      };
-    }))
+    `,
+    )
+      .then(() => ng('test', '--watch=false'))
+      .then(() =>
+        updateJsonFile('angular.json', (configJson) => {
+          const appArchitect = configJson.projects['test-project'].architect;
+          appArchitect.test.configurations = {
+            production: {
+              fileReplacements: [
+                {
+                  src: 'src/environments/environment.ts',
+                  replaceWith: 'src/environments/environment.prod.ts',
+                },
+              ],
+            },
+          };
+        }),
+      )
 
-    // Tests can run in different environment.
-    .then(() => writeFile('src/app/environment.spec.ts', `
+      // Tests can run in different environment.
+      .then(() =>
+        writeFile(
+          'src/app/environment.spec.ts',
+          `
       import { environment } from '../environments/environment';
 
       describe('Test environment', () => {
@@ -37,6 +46,9 @@ export default function () {
           expect(environment.production).toBe(true);
         });
       });
-    `))
-    .then(() => ng('test', '--prod', '--watch=false'));
+    `,
+        ),
+      )
+      .then(() => ng('test', '--configuration=production', '--watch=false'))
+  );
 }
