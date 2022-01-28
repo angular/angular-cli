@@ -1,5 +1,6 @@
 {
   "extends": "tslint:recommended",
+  "rulesDirectory": ["codelyzer"],
   "rules": {
     "align": {
       "options": ["parameters", "statements"]
@@ -10,11 +11,6 @@
     "deprecation": {
       "severity": "warning"
     },
-    "component-class-suffix": true,
-    "contextual-lifecycle": true,
-    "directive-class-suffix": true,
-    "directive-selector": [true, "attribute", "app", "camelCase"],
-    "component-selector": [true, "element", "app", "kebab-case"],
     "eofline": true,
     "import-spacing": true,
     "indent": {
@@ -49,6 +45,7 @@
         "named": "never"
       }
     },
+    "typedef": [true, "call-signature"],
     "typedef-whitespace": {
       "options": [
         {
@@ -80,6 +77,9 @@
         "check-typecast"
       ]
     },
+    "component-class-suffix": true,
+    "contextual-lifecycle": true,
+    "directive-class-suffix": true,
     "no-conflicting-lifecycle": true,
     "no-host-metadata-property": true,
     "no-input-rename": true,
@@ -91,7 +91,8 @@
     "template-banana-in-box": true,
     "template-no-negated-async": true,
     "use-lifecycle-interface": true,
-    "use-pipe-transform-interface": true
-  },
-  "rulesDirectory": ["codelyzer"]
+    "use-pipe-transform-interface": true,
+    "directive-selector": [true, "attribute", "app", "camelCase"],
+    "component-selector": [true, "element", "app", "kebab-case"]
+  }
 }
