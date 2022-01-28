@@ -10,44 +10,141 @@
   Any changes to README.md directly will result in a failure on CI.
 -->
 
-# Angular CLI
-### Development tools and libraries specialized for Angular
+<h1 align="center">Angular CLI - The CLI tool for Angular.</h1>
 
-This is the home of the DevKit and the Angular CLI code. You can find the Angular CLI specific README
-[here](/packages/angular/cli/README.md).
+<p align="center">
+  <br>
+  <img src="/docs/images/angular-cli-logo.png" alt="Angular CLI logo" width="100px" height="108px"/>
+  <br><br>
+  <i>The Angular CLI is a command-line interface tool that you use to initialize, develop, scaffold, 
+    <br>and maintain Angular applications directly from a command shell.</i>
+  <br>
+</p>
+
+<p align="center">
+  <a href="https://cli.angular.io"><strong>cli.angular.io</strong></a>
+  <br>
+</p>
+
+<p align="center">
+  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
+  ·
+  <a href="https://github.com/angular/angular-cli/issues">Submit an Issue</a>
+  ·
+  <a href="https://blog.angular.io/">Blog</a>
+  <br>
+  <br>
+</p>
+
+<p align="center">
+  <a href="https://circleci.com/gh/angular/workflows/angular-cli/tree/master">
+    <img src="https://img.shields.io/circleci/build/github/angular/angular-cli/master.svg?logo=circleci&logoColor=fff&label=CircleCI" alt="CI status" />
+  </a>&nbsp;
+  <a href="https://discord.gg/angular">
+    <img src="https://img.shields.io/discord/463752820026376202.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8" alt="Discord conversation" />
+  </a>
+</p>
+
+<hr>
+
+## Documentation
+
+Get started with Angular CLI, learn the fundamentals and explore advanced topics on our documentation website.
+
+- [Getting started][quickstart]
+- [CLI][cli]
+- [Workspace and project file structure][filestructure]
+- [Workspace configuration][workspaceconfig]
+- [Schematics][schematics]
+
+## Development Setup
 
 
-[![CircleCI branch](https://img.shields.io/circleci/project/github/angular/angular-cli/master.svg?label=circleci)](https://circleci.com/gh/angular/angular-cli) [![Dependency Status](https://david-dm.org/angular/angular-cli.svg)](https://david-dm.org/angular/angular-cli) [![devDependency Status](https://david-dm.org/angular/angular-cli/dev-status.svg)](https://david-dm.org/angular/angular-cli?type=dev) 
+### Prerequisites
 
-[![License](https://img.shields.io/npm/l/@angular/cli.svg)](/LICENSE) 
+- Install [Node.js] which includes [Node Package Manager][npm]
 
-[![GitHub forks](https://img.shields.io/github/forks/angular/angular-cli.svg?style=social&label=Fork)](https://github.com/angular/angular-cli/fork) [![GitHub stars](https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star)](https://github.com/angular/angular-cli) 
+### Setting Up a Project
+
+Install the Angular CLI globally:
+
+```
+npm install -g @angular/cli
+```
+
+Create workspace:
+
+```
+ng new [PROJECT NAME]
+```
+
+Run the application:
+
+```
+cd [PROJECT NAME]
+ng serve
+```
+
+Angular is cross-platform, fast, scalable, has incredible tooling, and is loved by millions.
+
+## Quickstart
+
+[Get started in 5 minutes][quickstart].
+
+## Ecosystem
+
+<p>
+  <img src="/docs/images/angular-ecosystem-logos.png" alt="angular ecosystem logos" width="500px" height="auto">
+</p>
+
+- [Angular Framework][aio]
+- [Angular Material][angularmaterial]
+
+## Changelog
+
+[Learn about the latest improvements][changelog].
+
+## Upgrading
+
+Check out our [upgrade guide](https://update.angular.io/) to find out the best way to upgrade your project.
+
+## Contributing
+
+### Contributing Guidelines
+
+Read through our [contributing guidelines][contributing] to learn about our submission process, coding rules and more.
+
+### Want to Help?
+
+Want to report a bug, contribute some code, or improve documentation? Excellent! Read up on our guidelines for [contributing][contributing] and then check out one of our issues labeled as <kbd>[help wanted](https://github.com/angular/angular-cli/labels/help%20wanted)</kbd> or <kbd>[good first issue](https://github.com/angular/angular-cli/labels/good%20first%20issue)</kbd>.
+
+### Code of Conduct
+
+Help us keep Angular open and inclusive. Please read and follow our [Code of Conduct][codeofconduct].
+
+### Developer Guide
+
+Read through our [developer guide][developer] to learn about how to build and test the Angular CLI locally.
 
 
+## Community
 
-### Quick Links
-[Gitter](https://gitter.im/angular/angular-cli) | [Contributing](/CONTRIBUTING.md) | [Angular CLI](http://github.com/angular/angular-cli) | 
-|---|---|---|
+Join the conversation and help the community.
 
-----
+- [Twitter][twitter]
+- [Discord][discord]
+- [Gitter][gitter]
+- [YouTube][youtube]
+- [StackOverflow][stackoverflow]
+- Find a Local [Meetup][meetup]
 
-## The Goal of Angular CLI
-
-The Angular CLI creates, manages, builds and test your Angular projects. It's built on top of the
-Angular DevKit.
-
-## The Goal of DevKit
-
-DevKit's goal is to provide a large set of libraries that can be used to manage, develop, deploy and
-analyze your code.
-
-# Packages
+## Packages
 
 This is a monorepo which contains many tools and packages:
 
 
 
-## Tools
+### Tools
 
 | Project | Package | Version | Links |
 |---|---|---|---|
@@ -56,7 +153,7 @@ This is a monorepo which contains many tools and packages:
 **Schematics CLI** | [`@angular-devkit/schematics-cli`](https://npmjs.com/package/@angular-devkit/schematics-cli) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics-cli/latest.svg)](https://npmjs.com/package/@angular-devkit/schematics-cli) |  [![snapshot](https://img.shields.io/badge/snapshot--blue.svg)](https://github.com/angular/angular-devkit-schematics-cli-builds)
 
 
-## Packages
+### Packages
 
 
 | Project | Package | Version | Links |
@@ -82,3 +179,26 @@ This is a monorepo which contains many tools and packages:
 **Webpack Angular Plugin** | [`@ngtools/webpack`](https://npmjs.com/package/@ngtools/webpack) | [![latest](https://img.shields.io/npm/v/%40ngtools%2Fwebpack/latest.svg)](https://npmjs.com/package/@ngtools/webpack) |  [![snapshot](https://img.shields.io/badge/snapshot--blue.svg)](https://github.com/angular/ngtools-webpack-builds)
 
 
+
+**Love Angular CLI? Give our repo a star :star: :arrow_up:.**
+
+[contributing]: CONTRIBUTING.md
+[developer]: docs/DEVELOPER.md
+[quickstart]: https://angular.io/start
+[changelog]: CHANGELOG.md
+[documentation]: https://angular.io/docs
+[angularmaterial]: https://material.angular.io/
+[cli]: https://cli.angular.io/
+[aio]: https://angular.io/
+[workspaceconfig]: https://angular.io/guide/workspace-config
+[schematics]: https://angular.io/guide/schematics
+[filestructure]: https://angular.io/guide/file-structure
+[node.js]: https://nodejs.org/
+[npm]: https://www.npmjs.com/get-npm
+[codeofconduct]: https://github.com/angular/angular/blob/master/CODE_OF_CONDUCT.md
+[twitter]: https://www.twitter.com/angular
+[discord]: https://discord.gg/angular
+[gitter]: https://gitter.im/angular/angular-cli
+[stackoverflow]: https://stackoverflow.com/questions/tagged/angular-cli
+[youtube]: https://youtube.com/angular
+[meetup]: https://www.meetup.com/find/?keywords=angular
