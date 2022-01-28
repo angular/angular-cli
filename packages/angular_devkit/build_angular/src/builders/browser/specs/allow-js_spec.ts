@@ -29,7 +29,7 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
-    host.replaceInFile('tsconfig.json', '"target": "es2017"', '"target": "es5", "allowJs": true');
+    host.replaceInFile('tsconfig.json', '"target": "es2020"', '"target": "es5", "allowJs": true');
 
     const run = await architect.scheduleTarget(targetSpec);
     const output = (await run.result) as BrowserBuilderOutput;
@@ -50,7 +50,7 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
-    host.replaceInFile('tsconfig.json', '"target": "es2017"', '"target": "es5", "allowJs": true');
+    host.replaceInFile('tsconfig.json', '"target": "es2020"', '"target": "es5", "allowJs": true');
 
     const overrides = { aot: true };
 
@@ -73,7 +73,7 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
-    host.replaceInFile('tsconfig.json', '"target": "es2017"', '"target": "es5", "allowJs": true');
+    host.replaceInFile('tsconfig.json', '"target": "es2020"', '"target": "es5", "allowJs": true');
 
     const overrides = { watch: true };
 
