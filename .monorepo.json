@@ -1,45 +1,4 @@
 {
-  "badges": [
-    [
-      {
-        "image": "https://img.shields.io/circleci/project/github/angular/angular-cli/master.svg?label=circleci",
-        "label": "CircleCI branch",
-        "url": "https://circleci.com/gh/angular/angular-cli"
-      },
-      {
-        "title": "![Dependency Status](https://david-dm.org/angular/angular-cli.svg)",
-        "url": "https://david-dm.org/angular/angular-cli"
-      },
-      {
-        "title": "![devDependency Status](https://david-dm.org/angular/angular-cli/dev-status.svg)",
-        "url": "https://david-dm.org/angular/angular-cli?type=dev"
-      }
-    ],
-    [
-      {
-        "label": "License",
-        "image": "https://img.shields.io/npm/l/@angular/cli.svg",
-        "url": "/LICENSE"
-      }
-    ],
-    [
-      {
-        "label": "GitHub forks",
-        "image": "https://img.shields.io/github/forks/angular/angular-cli.svg?style=social&label=Fork",
-        "url": "https://github.com/angular/angular-cli/fork"
-      },
-      {
-        "label": "GitHub stars",
-        "image": "https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star",
-        "url": "https://github.com/angular/angular-cli"
-      }
-    ]
-  ],
-  "links": {
-    "Gitter": "https://gitter.im/angular/angular-cli",
-    "Contributing": "/CONTRIBUTING.md",
-    "Angular CLI": "http://github.com/angular/angular-cli"
-  },
   "packages": {
     "@_/benchmark": {},
     "@_/builders": {},
