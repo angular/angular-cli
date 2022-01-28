@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "nine-project": {
+    "ten-project": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/nine-project",
+            "outputPath": "dist/ten-project",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -57,18 +57,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "nine-project:build"
+            "browserTarget": "ten-project:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "nine-project:build:production"
+              "browserTarget": "ten-project:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "nine-project:build"
+            "browserTarget": "ten-project:build"
           }
         },
         "test": {
@@ -94,16 +94,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "nine-project:serve"
+            "devServerTarget": "ten-project:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "nine-project:serve:production"
+              "devServerTarget": "ten-project:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "nine-project"
+  "defaultProject": "ten-project"
 }
