@@ -34,6 +34,15 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     sourcemap-codec "1.4.8"
 
+"@ampproject/remapping@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.0.0.tgz#a1ffcd0e63cae5a6a441669fac1dbc5513cf6881"
+  integrity sha512-Ag6L7Pjt3QxYKA5hgc1bvq6pQ3mD7b+BpPqciz38Het1uPsZn5C3/9NSlQyNPlKIKwZxupcU/9TMjLbcEssvsQ==
+  dependencies:
+    "@jridgewell/resolve-uri" "^3.0.3"
+    "@jridgewell/trace-mapping" "^0.2.0"
+    sourcemap-codec "1.4.8"
+
 "@angular-devkit/architect@0.1302.0-rc.1":
   version "0.1302.0-rc.1"
   resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1302.0-rc.1.tgz#090e86312f6c57da83e46cda4833b37843f1ebf1"
@@ -1417,6 +1426,14 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@jridgewell/resolve-uri/-/resolve-uri-3.0.3.tgz#b80093f4edbb5490c49746231513669c8f518acb"
   integrity sha512-fuIOnc81C5iRNevb/XPiM8Khp9bVjreydRQ37rt0C/dY0PAW1DRvEM3WrKX/5rStS5lbgwS0FCgqSndh9tvK5w==
+
+"@jridgewell/trace-mapping@^0.2.0":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.2.1.tgz#9e0a2ae258370bbb3aedbe45e26bc49e020f60a9"
+  integrity sha512-34FHiG7Gn+oXSF79LnqOogVHbsBgSnCjPYC3mfkViduAUciBbKA8lhhgeoaxytzFo7RZTloxlb9UyoW2dQgCEA==
+  dependencies:
+    "@jridgewell/resolve-uri" "^3.0.3"
+    sourcemap-codec "1.4.8"
 
 "@mark.probst/unicode-properties@~1.1.0":
   version "1.1.0"
