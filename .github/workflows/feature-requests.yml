@@ -1,0 +1,17 @@
+name: Feature request triage bot
+
+on:
+  schedule:
+    # Run at 13:00 every day
+    - cron: '0 13 * * *'
+
+jobs:
+  feature_triage:
+    # To prevent this action from running in forks, we only run it if the repository is exactly the
+    # angular/angular-cli repository.
+    if: github.repository == 'angular/angular-cli'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: angular/dev-infra/github-actions/feature-request@354871956801929457d9f08482fb81f7012ed7c8
+        with:
+          angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
