@@ -173,15 +173,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     );
   }
 
-  if (buildOptions.showCircularDependencies) {
-    const CircularDependencyPlugin = require('circular-dependency-plugin');
-    extraPlugins.push(
-      new CircularDependencyPlugin({
-        exclude: /[\\/]node_modules[\\/]/,
-      }),
-    );
-  }
-
   if (buildOptions.extractLicenses) {
     const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
     extraPlugins.push(

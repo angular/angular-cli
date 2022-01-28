@@ -9,6 +9,11 @@
       "version": "14.0.0",
       "factory": "./update-14/update-tsconfig-target",
       "description": "Update TypeScript compilation target to 'ES2020'."
+    },
+    "remove-show-circular-dependencies-option": {
+      "version": "14.0.0",
+      "factory": "./update-14/remove-show-circular-dependencies-option",
+      "description": "Remove 'showCircularDependencies' option from browser and server builders."
     }
   }
 }
