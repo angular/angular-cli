@@ -4,6 +4,11 @@
       "version": "14.0.0",
       "factory": "./update-14/angular-packages-version-prefix",
       "description": "Update Angular packages 'dependencies' and 'devDependencies' version prefix to '^' instead of '~'."
+    },
+    "update-tsconfig-target": {
+      "version": "14.0.0",
+      "factory": "./update-14/update-tsconfig-target",
+      "description": "Update TypeScript compilation target to 'ES2020'."
     }
   }
 }

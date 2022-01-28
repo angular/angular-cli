@@ -37,11 +37,11 @@ export default async function () {
   await expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/);
 
   const indexContent = await readFile('dist/test-project/index.html');
-  const mainES2017Path = indexContent.match(/src="(main\.[a-z0-9]{0,32}\.js)"/)[1];
+  const mainPath = indexContent.match(/src="(main\.[a-z0-9]{0,32}\.js)"/)[1];
 
   // Content checks
-  await expectFileToMatch(`dist/test-project/${mainES2017Path}`, bootstrapRegExp);
+  await expectFileToMatch(`dist/test-project/${mainPath}`, bootstrapRegExp);
 
   // Size checks in bytes
-  verifySize(mainES2017Path, 141032);
+  verifySize(mainPath, 141032);
 }
