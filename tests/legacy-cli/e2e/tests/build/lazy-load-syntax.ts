@@ -16,29 +16,37 @@ export default async function () {
 
   // Add app routing.
   // This is done automatically on a new app with --routing.
-  await writeFile(appRoutingModulePath, `
-    import { NgModule } from '@angular/core';
-    import { Routes, RouterModule } from '@angular/router';
+  await writeFile(
+    appRoutingModulePath,
+    `
+      import { NgModule } from '@angular/core';
+      import { Routes, RouterModule } from '@angular/router';
 
-    const routes: Routes = [];
+      const routes: Routes = [];
 
-    @NgModule({
-      imports: [RouterModule.forRoot(routes)],
-      exports: [RouterModule]
-    })
-    export class AppRoutingModule { }
-  `);
-  await prependToFile('src/app/app.module.ts',
-    `import { AppRoutingModule } from './app-routing.module';`);
+      @NgModule({
+        imports: [RouterModule.forRoot(routes)],
+        exports: [RouterModule]
+      })
+      export class AppRoutingModule { }
+    `,
+  );
+  await prependToFile(
+    'src/app/app.module.ts',
+    `import { AppRoutingModule } from './app-routing.module';`,
+  );
   await replaceInFile('src/app/app.module.ts', `imports: [`, `imports: [ AppRoutingModule,`);
   await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
 
   const originalAppRoutingModule = await readFile(appRoutingModulePath);
   // helper to replace loadChildren
   const replaceLoadChildren = async (route: string) => {
-    const content = originalAppRoutingModule.replace('const routes: Routes = [];', `
-      const routes: Routes = [{ path: 'lazy', loadChildren: ${route} }];
-    `);
+    const content = originalAppRoutingModule.replace(
+      'const routes: Routes = [];',
+      `
+       const routes: Routes = [{ path: 'lazy', loadChildren: ${route} }];
+      `,
+    );
 
     return writeFile(appRoutingModulePath, content);
   };
@@ -46,34 +54,41 @@ export default async function () {
   // Add lazy route.
   await ng('generate', 'module', 'lazy', '--routing');
   await ng('generate', 'component', 'lazy/lazy-comp');
-  await replaceInFile('src/app/lazy/lazy-routing.module.ts', 'const routes: Routes = [];', `
-    import { LazyCompComponent } from './lazy-comp/lazy-comp.component';
-    const routes: Routes = [{ path: '', component: LazyCompComponent }];
-  `);
+  await replaceInFile(
+    'src/app/lazy/lazy-routing.module.ts',
+    'const routes: Routes = [];',
+    `
+      import { LazyCompComponent } from './lazy-comp/lazy-comp.component';
+      const routes: Routes = [{ path: '', component: LazyCompComponent }];
+    `,
+  );
 
   // Add lazy route e2e
-  await writeFile('e2e/src/app.e2e-spec.ts', `
-    import { browser, logging, element, by } from 'protractor';
+  await writeFile(
+    'e2e/src/app.e2e-spec.ts',
+    `
+      import { browser, logging, element, by } from 'protractor';
 
-    describe('workspace-project App', () => {
-      it('should display lazy route', async () => {
-        await browser.get(browser.baseUrl + '/lazy');
-        expect(await element(by.css('app-lazy-comp p')).getText()).toEqual('lazy-comp works!');
-      });
+      describe('workspace-project App', () => {
+        it('should display lazy route', async () => {
+          await browser.get(browser.baseUrl + '/lazy');
+          expect(await element(by.css('app-lazy-comp p')).getText()).toEqual('lazy-comp works!');
+        });
 
-      afterEach(async () => {
-        // Assert that there are no errors emitted from the browser
-        const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-        expect(logs).not.toContain(jasmine.objectContaining({
-          level: logging.Level.SEVERE,
-        }));
+        afterEach(async () => {
+          // Assert that there are no errors emitted from the browser
+          const logs = await browser.manage().logs().get(logging.Type.BROWSER);
+          expect(logs).not.toContain(jasmine.objectContaining({
+            level: logging.Level.SEVERE,
+          }));
+        });
       });
-    });
-  `);
+    `,
+  );
 
   // Convert the default config to use JIT and prod to just do AOT.
-  // This way we can use `ng e2e` to test JIT and `ng e2e --prod` to test AOT.
-  await updateJsonFile('angular.json', json => {
+  // This way we can use `ng e2e` to test JIT and `ng e2e --configuration=production` to test AOT.
+  await updateJsonFile('angular.json', (json) => {
     const buildTarget = json['projects'][projectName]['architect']['build'];
     buildTarget['options']['aot'] = true;
     buildTarget['configurations']['development']['aot'] = false;

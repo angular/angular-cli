@@ -7,7 +7,7 @@ import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  const tag = await isPrereleaseCli() ?  '@next' : '';
+  const tag = (await isPrereleaseCli()) ? '@next' : '';
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
@@ -72,5 +72,5 @@ export default async function () {
   `,
   );
 
-  await ng('e2e', '--prod');
+  await ng('e2e', '--configuration=production');
 }

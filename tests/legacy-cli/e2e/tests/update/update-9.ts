@@ -49,9 +49,9 @@ export default async function () {
   await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
   await ng('e2e');
-  await ng('e2e', '--prod');
+  await ng('e2e', '--configuration=production');
 
   // Verify project now creates bundles
-  await noSilentNg('build', '--prod');
+  await noSilentNg('build', '--configuration=production');
   await expectFileMatchToExist('dist/nine-project/', /main\.[0-9a-f]{16}\.js/);
 }
