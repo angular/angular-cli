@@ -1,3 +1,19 @@
+<a name="13.2.1"></a>
+
+# 13.2.1 (2022-01-31)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [acd752773](https://github.com/angular/angular-cli/commit/acd752773d85e4debbc2b415c7ea369bc3d7018a) | fix  | invalid browsers version ranges |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.0"></a>
 
 # 13.2.0 (2022-01-26)
