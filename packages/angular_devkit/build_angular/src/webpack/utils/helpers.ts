@@ -13,11 +13,7 @@ import glob from 'glob';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
-import {
-  AssetPatternClass,
-  ExtraEntryPoint,
-  ExtraEntryPointClass,
-} from '../../builders/browser/schema';
+import { AssetPatternClass, ScriptElement, StyleElement } from '../../builders/browser/schema';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { VERSION } from '../../utils/package-version';
 
@@ -49,10 +45,10 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   return hashFormats[option] || hashFormats['none'];
 }
 
-export type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
+export type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
 
 export function normalizeExtraEntryPoints(
-  extraEntryPoints: ExtraEntryPoint[],
+  extraEntryPoints: (ScriptElement | StyleElement)[],
   defaultBundleName: string,
 ): NormalizedEntryPoint[] {
   return extraEntryPoints.map((entry) => {
@@ -160,7 +156,7 @@ export function getCacheSettings(
 
 export function globalScriptsByBundleName(
   root: string,
-  scripts: ExtraEntryPoint[],
+  scripts: ScriptElement[],
 ): { bundleName: string; inject: boolean; paths: string[] }[] {
   return normalizeExtraEntryPoints(scripts, 'scripts').reduce(
     (prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {

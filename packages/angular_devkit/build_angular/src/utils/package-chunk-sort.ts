@@ -6,18 +6,21 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ExtraEntryPoint } from '../builders/browser/schema';
+import { ScriptElement, StyleElement } from '../builders/browser/schema';
 import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
 
 export type EntryPointsType = [name: string, isModule: boolean];
 
 export function generateEntryPoints(options: {
-  styles: ExtraEntryPoint[];
-  scripts: ExtraEntryPoint[];
+  styles: StyleElement[];
+  scripts: ScriptElement[];
   isHMREnabled?: boolean;
 }): EntryPointsType[] {
   // Add all styles/scripts, except lazy-loaded ones.
-  const extraEntryPoints = (extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string) => {
+  const extraEntryPoints = (
+    extraEntryPoints: (ScriptElement | ScriptElement)[],
+    defaultBundleName: string,
+  ) => {
     const entryPoints = normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
       .filter((entry) => entry.inject)
       .map((entry) => entry.bundleName);
