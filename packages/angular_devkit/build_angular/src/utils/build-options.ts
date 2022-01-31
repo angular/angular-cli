@@ -17,6 +17,7 @@ import {
   IndexUnion,
   InlineStyleLanguage,
   Localize,
+  OutputHashing,
   SourceMapClass,
 } from '../builders/browser/schema';
 import { Schema as DevServerSchema } from '../builders/dev-server/schema';
@@ -42,7 +43,7 @@ export interface BuildOptions {
   bundleDependencies?: boolean;
   externalDependencies?: string[];
   watch?: boolean;
-  outputHashing?: string;
+  outputHashing?: OutputHashing;
   poll?: number;
   index?: IndexUnion;
   deleteOutputPath?: boolean;

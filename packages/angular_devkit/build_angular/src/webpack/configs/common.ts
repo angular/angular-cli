@@ -98,7 +98,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   } = await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
 
   // determine hashing format
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
   if (buildOptions.progress) {
     extraPlugins.push(new ProgressPlugin(platform));
