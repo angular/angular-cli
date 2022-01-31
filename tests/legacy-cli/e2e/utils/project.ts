@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { prerelease } from 'semver';
+import { prerelease, SemVer } from 'semver';
 import { packages } from '../../../../lib/packages';
 import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
@@ -225,8 +225,8 @@ export async function useCIChrome(projectDir: string = ''): Promise<void> {
   }
 }
 
-export function isPrereleaseCli(): boolean {
-  const pre = prerelease(packages['@angular/cli'].version);
+export const NgCLIVersion = new SemVer(packages['@angular/cli'].version);
 
-  return pre && pre.length > 0;
+export function isPrereleaseCli(): boolean {
+  return prerelease(NgCLIVersion)?.length > 0;
 }
