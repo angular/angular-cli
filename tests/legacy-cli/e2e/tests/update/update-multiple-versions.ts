@@ -6,7 +6,7 @@ import { expectToFail } from '../../utils/utils';
 
 export default async function () {
   try {
-    await createProjectFromAsset('9.0-project', true, true);
+    await createProjectFromAsset('10.0-project', true, true);
     await setRegistry(false);
     await installWorkspacePackages();
     await setRegistry(true);
@@ -16,12 +16,12 @@ export default async function () {
       extraArgs.push('--next');
     }
 
-    // Update Angular from v9 to 10
+    // Update Angular from v10 to 11
     const { stdout } = await ng('update', ...extraArgs);
-    if (!/@angular\/core\s+9\.\d\.\d+ -> 10\.\d\.\d+\s+ng update @angular\/core@10/.test(stdout)) {
-      // @angular/core                      9.x.x -> 10.x.x         ng update @angular/core@11
+    if (!/@angular\/core\s+10\.\d\.\d+ -> 11\.\d\.\d+\s+ng update @angular\/core@11/.test(stdout)) {
+      // @angular/core                      10.x.x -> 11.x.x         ng update @angular/core@11
       throw new Error(
-        `Output didn't match "@angular/core                      9.x.x -> 10.x.x         ng update @angular/core@10". OUTPUT: \n` +
+        `Output didn't match "@angular/core                      10.x.x -> 11.x.x         ng update @angular/core@11". OUTPUT: \n` +
           stdout,
       );
     }
