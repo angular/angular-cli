@@ -59,14 +59,14 @@ export interface BrowserBuilderOptions {
     preserveSymlinks?: boolean;
     progress?: boolean;
     resourcesOutputPath?: string;
-    scripts?: ExtraEntryPoint[];
+    scripts?: ScriptElement[];
     serviceWorker?: boolean;
     // @deprecated
     showCircularDependencies?: boolean;
     sourceMap?: SourceMapUnion;
     statsJson?: boolean;
     stylePreprocessorOptions?: StylePreprocessorOptions;
-    styles?: ExtraEntryPoint[];
+    styles?: StyleElement[];
     subresourceIntegrity?: boolean;
     tsConfig: string;
     vendorChunk?: boolean;
@@ -156,16 +156,6 @@ export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 export type ExtractI18nBuilderOptions = Schema_2 & JsonObject;
 
 // @public (undocumented)
-export type ExtraEntryPoint = ExtraEntryPointObject | string;
-
-// @public (undocumented)
-export interface ExtraEntryPointObject {
-    bundleName?: string;
-    inject?: boolean;
-    input: string;
-}
-
-// @public (undocumented)
 export interface FileReplacement {
     // (undocumented)
     replace?: string;
@@ -193,10 +183,10 @@ export interface KarmaBuilderOptions {
     preserveSymlinks?: boolean;
     progress?: boolean;
     reporters?: string[];
-    scripts?: ExtraEntryPoint_2[];
+    scripts?: ScriptElement_2[];
     sourceMap?: SourceMapUnion_2;
     stylePreprocessorOptions?: StylePreprocessorOptions_2;
-    styles?: ExtraEntryPoint_2[];
+    styles?: StyleElement_2[];
     tsConfig: string;
     watch?: boolean;
     webWorkerTsConfig?: string;

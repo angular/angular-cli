@@ -10,7 +10,7 @@ import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'path';
 import { Configuration, RuleSetUseItem } from 'webpack';
-import { ExtraEntryPoint } from '../../builders/browser/schema';
+import { StyleElement } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import {
@@ -27,7 +27,7 @@ import {
 } from '../utils/helpers';
 
 function resolveGlobalStyles(
-  styleEntrypoints: ExtraEntryPoint[],
+  styleEntrypoints: StyleElement[],
   root: string,
   preserveSymlinks: boolean,
 ): { entryPoints: Record<string, string[]>; noInjectNames: string[]; paths: string[] } {

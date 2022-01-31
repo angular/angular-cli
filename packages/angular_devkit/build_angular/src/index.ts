@@ -13,8 +13,6 @@ export {
   AssetPatternClass as AssetPatternObject,
   Budget,
   CrossOrigin,
-  ExtraEntryPoint,
-  ExtraEntryPointClass as ExtraEntryPointObject,
   FileReplacement,
   OptimizationClass as OptimizationObject,
   OptimizationUnion,
