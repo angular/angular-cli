@@ -189,9 +189,6 @@ export class CircularDependencyFoundException extends BaseException {
 // @public
 function classify(str: string): string;
 
-// @public @deprecated (undocumented)
-export function clean<T>(array: Array<T | undefined>): Array<T>;
-
 // @public (undocumented)
 export class ContentHasMutatedException extends BaseException {
     constructor(path: string);
@@ -353,7 +350,7 @@ function dasherize(str: string): string;
 // @public
 function decamelize(str: string): string;
 
-// @public (undocumented)
+// @public
 export function deepCopy<T>(value: T): T;
 
 // @public (undocumented)
@@ -1036,13 +1033,6 @@ class LoggingAnalytics implements Analytics {
 
 // @public (undocumented)
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
-
-// @public @deprecated (undocumented)
-export function mapObject<T, V>(obj: {
-    [k: string]: T;
-}, mapper: (k: string, v: T) => V): {
-    [k: string]: V;
-};
 
 // @public (undocumented)
 export class MergeConflictException extends BaseException {
