@@ -1,3 +1,19 @@
+<a name="12.2.16"></a>
+
+# 12.2.16 (2022-01-31)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [ebfdcc635](https://github.com/angular/angular-cli/commit/ebfdcc635ad700bc4696a36131203e172de6c59b) | fix  | invalid browsers version ranges |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.15"></a>
 
 # 12.2.15 (2022-01-12)
