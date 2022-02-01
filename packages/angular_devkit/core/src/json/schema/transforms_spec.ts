@@ -218,4 +218,42 @@ describe('addUndefinedDefaults', () => {
     expect(dataObj.obj.b).toBeTrue();
     expect(dataObj.obj.c).toBeFalse();
   });
+
+  it('should add defaults to undefined properties when using $refs', async () => {
+    const registry = new CoreSchemaRegistry();
+    registry.addPreTransform(addUndefinedDefaults);
+    const dataNoObj: Record<string, boolean> = {};
+
+    const dataObj: Record<string, boolean> = {
+      boolRef: true,
+    };
+
+    const validator = registry.compile({
+      definitions: {
+        boolRef: {
+          default: false,
+          type: 'boolean',
+        },
+      },
+      properties: {
+        bool: {
+          default: false,
+          type: 'boolean',
+        },
+        boolRef: {
+          $ref: '#/definitions/boolRef',
+        },
+      },
+    });
+
+    const result1 = await validator.pipe(mergeMap((validator) => validator(dataNoObj))).toPromise();
+    expect(result1.success).toBeTrue();
+    expect(dataNoObj['bool']).toBeFalse();
+    expect(dataNoObj['boolRef']).toBeFalse();
+
+    const result2 = await validator.pipe(mergeMap((validator) => validator(dataObj))).toPromise();
+    expect(result2.success).toBeTrue();
+    expect(dataObj['bool']).toBeFalse();
+    expect(dataObj['boolRef']).toBeTrue();
+  });
 });

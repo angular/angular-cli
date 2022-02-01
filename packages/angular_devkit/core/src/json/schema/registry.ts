@@ -209,9 +209,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
     }
 
-    if (fullReference.startsWith('#')) {
-      fullReference = fullReference.slice(0, -1);
-    }
     const resolvedSchema = this._ajv.getSchema(fullReference);
 
     return {

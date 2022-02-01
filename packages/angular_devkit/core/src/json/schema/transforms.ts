@@ -20,6 +20,8 @@ export function addUndefinedDefaults(
     return value;
   }
 
+  value ??= schema.default;
+
   const types = getTypesOfSchema(schema);
   if (types.size === 0) {
     return value;
