@@ -83,7 +83,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   const cssSourceMap = buildOptions.sourceMap.styles;
 
   // Determine hashing format.
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
   // use includePaths from appConfig
   const includePaths =

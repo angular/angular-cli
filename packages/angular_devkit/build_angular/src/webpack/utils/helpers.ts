@@ -13,7 +13,12 @@ import glob from 'glob';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
-import { AssetPatternClass, ScriptElement, StyleElement } from '../../builders/browser/schema';
+import {
+  AssetPatternClass,
+  OutputHashing,
+  ScriptElement,
+  StyleElement,
+} from '../../builders/browser/schema';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { VERSION } from '../../utils/package-version';
 
@@ -24,25 +29,40 @@ export interface HashFormat {
   script: string;
 }
 
-export function getOutputHashFormat(option: string, length = 20): HashFormat {
-  const hashFormats: { [option: string]: HashFormat } = {
-    none: { chunk: '', extract: '', file: '', script: '' },
-    media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
-    bundles: {
-      chunk: `.[contenthash:${length}]`,
-      extract: `.[contenthash:${length}]`,
-      file: '',
-      script: `.[hash:${length}]`,
-    },
-    all: {
-      chunk: `.[contenthash:${length}]`,
-      extract: `.[contenthash:${length}]`,
-      file: `.[hash:${length}]`,
-      script: `.[hash:${length}]`,
-    },
-  };
+export function getOutputHashFormat(outputHashing = OutputHashing.None, length = 20): HashFormat {
+  const hashTemplate = `.[contenthash:${length}]`;
 
-  return hashFormats[option] || hashFormats['none'];
+  switch (outputHashing) {
+    case 'media':
+      return {
+        chunk: '',
+        extract: '',
+        file: hashTemplate,
+        script: '',
+      };
+    case 'bundles':
+      return {
+        chunk: hashTemplate,
+        extract: hashTemplate,
+        file: '',
+        script: hashTemplate,
+      };
+    case 'all':
+      return {
+        chunk: hashTemplate,
+        extract: hashTemplate,
+        file: hashTemplate,
+        script: hashTemplate,
+      };
+    case 'none':
+    default:
+      return {
+        chunk: '',
+        extract: '',
+        file: '',
+        script: '',
+      };
+  }
 }
 
 export type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
