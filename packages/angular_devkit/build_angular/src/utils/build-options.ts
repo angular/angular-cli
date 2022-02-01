@@ -16,6 +16,7 @@ import {
   IndexUnion,
   InlineStyleLanguage,
   Localize,
+  OutputHashing,
   ScriptElement,
   SourceMapClass,
   StyleElement,
@@ -43,7 +44,7 @@ export interface BuildOptions {
   bundleDependencies?: boolean;
   externalDependencies?: string[];
   watch?: boolean;
-  outputHashing?: string;
+  outputHashing?: OutputHashing;
   poll?: number;
   index?: IndexUnion;
   deleteOutputPath?: boolean;
