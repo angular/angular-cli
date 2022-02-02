@@ -1,3 +1,106 @@
+<a name="14.0.0-next.0"></a>
+
+# 14.0.0-next.0 (2022-02-02)
+
+## Breaking Changes
+
+### @angular/cli
+
+- `--all` option from `ng update` has been removed without replacement. To update packages which don’t provide `ng update` capabilities in your workspace `package.json` use `npm update`, `yarn upgrade-interactive` or `yarn upgrade` instead.
+
+- Deprecated option `--prod` has been removed from all builders. `--configuration production`/`-c production` should be used instead if the default configuration of the builder is not configured to `production`.
+
+### @angular-devkit/build-angular
+
+- `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
+
+Valid extensions for `scripts` are:
+
+- `.js`
+- `.cjs`
+- `.mjs`
+- `.jsx`
+- `.cjsx`
+- `.mjsx`
+
+Valid extensions for `styles` are:
+
+- `.css`
+- `.less`
+- `.sass`
+- `.scss`
+- `.styl`
+
+- We now issue a build time error since importing a CSS file as an ECMA module is non standard Webpack specific feature, which is not supported by the Angular CLI.
+
+This feature was never truly supported by the Angular CLI, but has as such for visibility.
+
+- The deprecated `showCircularDependencies` browser and server builder option has been removed. The recommended method to detect circular dependencies in project code is to use either a lint rule or other external tools.
+
+### @angular-devkit/core
+
+- The below APIs have been removed without replacement. Users should leverage other Node.js or other APIs.
+- `fs` namespace
+- `clean`
+- `mapObject`
+
+### @angular-devkit/schematics
+
+- Deprecated `analytics` property has been removed from `TypedSchematicContext` interface
+
+### @ngtools/webpack
+
+- `ivy` namespace has been removed from the public API.
+
+- `ivy.AngularWebpackPlugin` -> `AngularWebpackPlugin`
+- `ivy.AngularPluginOptions` -> `AngularPluginOptions`
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [7e7de6858](https://github.com/angular/angular-cli/commit/7e7de6858dd71bd461ceb0f89e29e2c57099bbcc) | feat | update Angular dependencies to use `^` as version prefix        |
+| [69ecddaa7](https://github.com/angular/angular-cli/commit/69ecddaa7d8b01aa7a9e61c403a4b9a8669e34c4) | feat | update new and existing projects compilation target to `ES2020` |
+
+### @angular/cli
+
+| Commit                                                                                              | Type     | Description                                       |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------- |
+| [d94a67353](https://github.com/angular/angular-cli/commit/d94a67353dcdaa30cf5487744a7ef151a6268f2d) | refactor | remove deprecated `--all` option from `ng update` |
+| [2fc7c73d7](https://github.com/angular/angular-cli/commit/2fc7c73d7e40dbb0a593df61eeba17c8a8f618a9) | refactor | remove deprecated `--prod` flag                   |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                                                    |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| [d23a168b8](https://github.com/angular/angular-cli/commit/d23a168b8d558ae9d73c8c9eed4ff199fc4d74b9) | feat     | validate file extensions for `scripts` and `styles` options                    |
+| [07e776ea3](https://github.com/angular/angular-cli/commit/07e776ea379a50a98a50cf590156c2dc1b272e78) | fix      | fail build when importing CSS files as an ECMA modules                         |
+| [0a1cd584d](https://github.com/angular/angular-cli/commit/0a1cd584d8ed00889b177f4284baec7e5427caf2) | refactor | remove deprecated `showCircularDependencies` browser and server builder option |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type     | Description                                 |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------- |
+| [a0c02af7e](https://github.com/angular/angular-cli/commit/a0c02af7e340bb16f4e6f523c2d835c9b18926b3) | refactor | remove deprecated fs, object and array APIs |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type     | Description                            |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------- |
+| [44c1e6d0d](https://github.com/angular/angular-cli/commit/44c1e6d0d2db5f2dc212d63a34ade045cb7854d5) | refactor | remove deprecated `analytics` property |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type     | Description                     |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------- |
+| [9277eed1d](https://github.com/angular/angular-cli/commit/9277eed1d9603d5e258eb7ae27de527eba919482) | refactor | remove deprecated ivy namespace |
+
+## Special Thanks
+
+Alan Agius, Doug Parker and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.2"></a>
 
 # 13.2.2 (2022-02-02)
