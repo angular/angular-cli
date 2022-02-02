@@ -3,6 +3,7 @@
   "version": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
   "description": "Angular Build Optimizer",
   "experimental": true,
+  "private": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "bin": {
