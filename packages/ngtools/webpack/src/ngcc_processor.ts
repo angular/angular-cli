@@ -73,15 +73,6 @@ export class NgccProcessor {
     const runHashBasePath = path.join(this._nodeModulesDirectory, '.cli-ngcc');
     const projectBasePath = path.join(this._nodeModulesDirectory, '..');
     try {
-      let lockData;
-      let lockFile = 'yarn.lock';
-      try {
-        lockData = readFileSync(path.join(projectBasePath, lockFile));
-      } catch {
-        lockFile = 'package-lock.json';
-        lockData = readFileSync(path.join(projectBasePath, lockFile));
-      }
-
       let ngccConfigData;
       try {
         ngccConfigData = readFileSync(path.join(projectBasePath, 'ngcc.config.js'));
@@ -91,11 +82,12 @@ export class NgccProcessor {
 
       const relativeTsconfigPath = path.relative(projectBasePath, this.tsConfigPath);
       const tsconfigData = readFileSync(this.tsConfigPath);
+      const { lockFileData, lockFilePath } = this.findPackageManagerLockFile(projectBasePath);
 
       // Generate a hash that represents the state of the package lock file and used tsconfig
       const runHash = createHash('sha256')
-        .update(lockData)
-        .update(lockFile)
+        .update(lockFileData)
+        .update(lockFilePath)
         .update(ngccConfigData)
         .update(tsconfigData)
         .update(relativeTsconfigPath)
@@ -247,6 +239,24 @@ export class NgccProcessor {
     }
 
     throw new Error(`Cannot locate the 'node_modules' directory.`);
+  }
+
+  private findPackageManagerLockFile(projectBasePath: string): {
+    lockFilePath: string;
+    lockFileData: Buffer;
+  } {
+    for (const lockFile of ['yarn.lock', 'pnpm-lock.yaml', 'package-lock.json']) {
+      const lockFilePath = path.join(projectBasePath, lockFile);
+
+      try {
+        return {
+          lockFilePath,
+          lockFileData: readFileSync(lockFilePath),
+        };
+      } catch {}
+    }
+
+    throw new Error('Cannot locate a package manager lock file.');
   }
 }
 
