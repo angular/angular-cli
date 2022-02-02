@@ -1,3 +1,27 @@
+<a name="13.2.2"></a>
+
+# 13.2.2 (2022-02-02)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [cc5505cfc](https://github.com/angular/angular-cli/commit/cc5505cfcf12732fad4f85e6e76c8e4f0584c13a) | fix  | add `whatwg-url` to downlevel exclusion list              |
+| [ff54b49e7](https://github.com/angular/angular-cli/commit/ff54b49e7097cda2eb835bc8c9674f71fcc91c3c) | fix  | ensure to use content hash as filenames hashing mechanism |
+| [b0e2bb289](https://github.com/angular/angular-cli/commit/b0e2bb289050efc77478a0f50778abbec9c5a318) | perf | update `license-webpack-plugin` to `4.0.1`                |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [c8826a973](https://github.com/angular/angular-cli/commit/c8826a9738f860e374bd65a058c6be1b02545133) | fix  | correctly resolve schema references defaults |
+
+## Special Thanks
+
+Alan Agius, Derek Cormier and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.1"></a>
 
 # 13.2.1 (2022-01-31)
