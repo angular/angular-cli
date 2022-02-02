@@ -167,6 +167,7 @@ jobs:
     executor: action-executor
     steps:
       - custom_attach_workspace
+      - install_python
       - run:
           name: Validate Commit Messages
           command: >
@@ -250,6 +251,7 @@ jobs:
     executor: action-executor
     steps:
       - custom_attach_workspace
+      - install_python
       - run: yarn build
 
   test:

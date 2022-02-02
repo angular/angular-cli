@@ -6,9 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-
 // Same structure as used in framework packages
 export class Version {
   public readonly major: string;
@@ -22,10 +19,4 @@ export class Version {
   }
 }
 
-// TODO: Convert this to use build-time version stamping after flipping the build script to use bazel
-// export const VERSION = new Version('0.0.0-PLACEHOLDER');
-export const VERSION = new Version(
-  (
-    JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf-8')) as { version: string }
-  ).version,
-);
+export const VERSION = new Version('0.0.0-PLACEHOLDER');
