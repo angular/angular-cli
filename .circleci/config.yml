@@ -165,6 +165,7 @@ jobs:
 
   validate:
     executor: action-executor
+    resource_class: xlarge
     steps:
       - custom_attach_workspace
       - install_python
@@ -249,6 +250,7 @@ jobs:
 
   build:
     executor: action-executor
+    resource_class: xlarge
     steps:
       - custom_attach_workspace
       - install_python
