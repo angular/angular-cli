@@ -58,7 +58,7 @@ executors:
   windows-executor:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
     working_directory: ~/ng
-    resource_class: windows.medium
+    resource_class: windows.xlarge
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
       # Contents of this image:
@@ -83,11 +83,13 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
+      - run: ./.circleci/windows-env.ps1
       - run: nvm install 12.22.1
       - run: nvm use 12.22.1
       - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
+      - run: yarn global add @bazel/bazelisk@$env:BAZELISK_VERSION
 
   setup_bazel_rbe:
     parameters:
@@ -321,6 +323,8 @@ jobs:
           keys:
             - *cache_key_win
       - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
+      #TEMP: test
+      - run: bazelisk build //...
       - save_cache:
           key: *cache_key_win
           paths:
