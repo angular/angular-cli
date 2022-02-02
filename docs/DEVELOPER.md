@@ -110,6 +110,53 @@ wait forever for a debugger to attach).
 
 ![Intellij IDEA run configurations](images/run-configurations.png)
 
+### VS Code
+
+In order to debug some Angular CLI behaviour using Visual Studio Code, you can run `npm run build`, and then use a launch configuration like the following:
+
+```json
+{
+  "type": "node",
+  "request": "launch",
+  "name": "ng serve",
+  "cwd": "<path to an Angular project generated with Angular-CLI>",
+  "program": "${workspaceFolder}/dist/@angular/cli/bin/ng",
+  "args": [
+    "<ng command>",
+    ...other arguments
+  ],
+  "console": "integratedTerminal"
+}
+```
+
+Then you can add breakpoints in `dist/@angular` files.
+
+For more informations about Node.js debugging in VS Code, see the related [VS Code Documentation](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
+
+## CPU Profiling
+
+In order to investigate performance issues, CPU profiling is often useful.
+
+### Creating a profile
+
+Node.js 16+ users can use the Node.js command line argument `--cpu-prof` to create a CPU profile.
+
+```bash
+node --cpu-prof node_modules/.bin/ng build
+```
+
+In addition to this one, another, more elaborated way to capture a CPU profile using the Chrome Devtools is detailed in https://github.com/angular/angular-cli/issues/8259#issue-269908550.
+
+#### Opening a profile
+
+You can use the Chrome Devtools to process it. To do so:
+
+1. open `chrome://inspect` in Chrome
+1. click on "Open dedicated DevTools for Node"
+1. go to the "profiler" tab
+1. click on the "Load" button and select the generated `.cpuprofile` file
+1. on the left panel, select the associated file
+
 ## Creating New Packages
 
 Adding a package to this repository means running two separate commands:
