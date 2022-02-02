@@ -115,16 +115,6 @@ async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]
 
   const buildLogger = logger.createChild('build');
 
-  // If we are in release mode, run `bazel clean` to ensure the execroot and action cache
-  // are not populated. This is necessary because targets using `npm_package` rely on
-  // workspace status variables for the package version. Such NPM package targets are not
-  // rebuilt if only the workspace status variables change. This could result in accidental
-  // re-use of previously built package output with a different `version` in the `package.json`.
-  if (mode == 'release') {
-    buildLogger.info('Building in release mode. Resetting the Bazel execroot and action cache.');
-    await _exec(`${bazelCmd} clean`, false, buildLogger);
-  }
-
   await _exec(`${bazelCmd} build --config=${mode} ${targets.join(' ')}`, false, buildLogger);
 
   return targets;
