@@ -10,6 +10,7 @@ import { json, workspaces } from '@angular-devkit/core';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { PackageManager } from '../lib/config/workspace-schema';
 import { findUp } from './find-up';
 import { JSONFile, readAndParseJson } from './json-file';
 
@@ -298,18 +299,19 @@ export function getProjectByCwd(workspace: AngularWorkspace): string | null {
   return null;
 }
 
-export async function getConfiguredPackageManager(): Promise<string | null> {
-  const getPackageManager = (source: json.JsonValue | undefined): string | undefined => {
+export async function getConfiguredPackageManager(): Promise<PackageManager | null> {
+  const getPackageManager = (source: json.JsonValue | undefined): PackageManager | null => {
     if (isJsonObject(source)) {
       const value = source['packageManager'];
       if (value && typeof value === 'string') {
-        return value;
+        return value as PackageManager;
       }
     }
+
+    return null;
   };
 
-  let result: string | undefined | null;
-
+  let result: PackageManager | null = null;
   const workspace = await getWorkspace('local');
   if (workspace) {
     const project = getProjectByCwd(workspace);
@@ -317,21 +319,15 @@ export async function getConfiguredPackageManager(): Promise<string | null> {
       result = getPackageManager(workspace.projects.get(project)?.extensions['cli']);
     }
 
-    result = result ?? getPackageManager(workspace.extensions['cli']);
+    result ??= getPackageManager(workspace.extensions['cli']);
   }
 
-  if (result === undefined) {
+  if (!result) {
     const globalOptions = await getWorkspace('global');
     result = getPackageManager(globalOptions?.extensions['cli']);
-
-    if (!workspace && !globalOptions) {
-      // Only check legacy if updated workspace is not found
-      result = getLegacyPackageManager();
-    }
   }
 
-  // Default to null
-  return result ?? null;
+  return result;
 }
 
 export function migrateLegacyGlobalConfig(): boolean {
@@ -383,30 +379,6 @@ export function migrateLegacyGlobalConfig(): boolean {
   }
 
   return false;
-}
-
-// Fallback, check for packageManager in config file in v1.* global config.
-function getLegacyPackageManager(): string | null {
-  const homeDir = os.homedir();
-  if (homeDir) {
-    const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
-    if (existsSync(legacyGlobalConfigPath)) {
-      const legacy = readAndParseJson(legacyGlobalConfigPath);
-      if (!isJsonObject(legacy)) {
-        return null;
-      }
-
-      if (
-        legacy.packageManager &&
-        typeof legacy.packageManager === 'string' &&
-        legacy.packageManager !== 'default'
-      ) {
-        return legacy.packageManager;
-      }
-    }
-  }
-
-  return null;
 }
 
 export async function getSchematicDefaults(
@@ -479,4 +451,28 @@ export async function isWarningEnabled(warning: string): Promise<boolean> {
 
   // All warnings are enabled by default
   return result ?? true;
+}
+
+// Fallback, check for packageManager in config file in v1.* global config.
+function getLegacyPackageManager(): string | null {
+  const homeDir = os.homedir();
+  if (homeDir) {
+    const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
+    if (existsSync(legacyGlobalConfigPath)) {
+      const legacy = readAndParseJson(legacyGlobalConfigPath);
+      if (!isJsonObject(legacy)) {
+        return null;
+      }
+
+      if (
+        legacy.packageManager &&
+        typeof legacy.packageManager === 'string' &&
+        legacy.packageManager !== 'default'
+      ) {
+        return legacy.packageManager;
+      }
+    }
+  }
+
+  return null;
 }

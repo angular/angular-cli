@@ -261,20 +261,9 @@ export abstract class ArchitectCommand<
     }
 
     const packageManager = await getPackageManager(basePath);
-    let installSuggestion = 'Try installing with ';
-    switch (packageManager) {
-      case 'npm':
-        installSuggestion += `'npm install'`;
-        break;
-      case 'yarn':
-        installSuggestion += `'yarn'`;
-        break;
-      default:
-        installSuggestion += `the project's package manager`;
-        break;
-    }
-
-    this.logger.warn(`Node packages may not be installed. ${installSuggestion}.`);
+    this.logger.warn(
+      `Node packages may not be installed. Try installing with '${packageManager} install'.`,
+    );
   }
 
   async run(options: ArchitectCommandOptions & Arguments) {

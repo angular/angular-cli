@@ -6,16 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { execSync } from 'child_process';
-import { existsSync } from 'fs';
+import { exec as execCb, execSync } from 'child_process';
+import { constants, promises as fs } from 'fs';
 import { join } from 'path';
 import { satisfies, valid } from 'semver';
+import { promisify } from 'util';
 import { PackageManager } from '../lib/config/workspace-schema';
 import { getConfiguredPackageManager } from './config';
 
-function supports(name: string): boolean {
+const exec = promisify(execCb);
+async function supports(name: PackageManager): Promise<boolean> {
   try {
-    execSync(`${name} --version`, { stdio: 'ignore' });
+    await exec(`${name} --version`);
 
     return true;
   } catch {
@@ -23,38 +25,68 @@ function supports(name: string): boolean {
   }
 }
 
-export function supportsYarn(): boolean {
-  return supports('yarn');
-}
+async function hasLockfile(root: string, packageManager: PackageManager): Promise<boolean> {
+  try {
+    let lockfileName: string;
+    switch (packageManager) {
+      case PackageManager.Yarn:
+        lockfileName = 'yarn.lock';
+        break;
+      case PackageManager.Pnpm:
+        lockfileName = 'pnpm-lock.yaml';
+        break;
+      case PackageManager.Npm:
+      default:
+        lockfileName = 'package-lock.json';
+        break;
+    }
 
-export function supportsNpm(): boolean {
-  return supports('npm');
+    await fs.access(join(root, lockfileName), constants.F_OK);
+
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function getPackageManager(root: string): Promise<PackageManager> {
-  let packageManager = (await getConfiguredPackageManager()) as PackageManager | null;
+  const packageManager = await getConfiguredPackageManager();
   if (packageManager) {
     return packageManager;
   }
 
-  const hasYarn = supportsYarn();
-  const hasYarnLock = existsSync(join(root, 'yarn.lock'));
-  const hasNpm = supportsNpm();
-  const hasNpmLock = existsSync(join(root, 'package-lock.json'));
+  const [hasYarnLock, hasNpmLock, hasPnpmLock] = await Promise.all([
+    hasLockfile(root, PackageManager.Yarn),
+    hasLockfile(root, PackageManager.Npm),
+    hasLockfile(root, PackageManager.Pnpm),
+  ]);
 
+  const hasYarn = await supports(PackageManager.Yarn);
   if (hasYarn && hasYarnLock && !hasNpmLock) {
-    packageManager = PackageManager.Yarn;
-  } else if (hasNpm && hasNpmLock && !hasYarnLock) {
-    packageManager = PackageManager.Npm;
-  } else if (hasYarn && !hasNpm) {
-    packageManager = PackageManager.Yarn;
-  } else if (hasNpm && !hasYarn) {
-    packageManager = PackageManager.Npm;
+    return PackageManager.Yarn;
+  }
+
+  const hasPnpm = await supports(PackageManager.Pnpm);
+  if (hasPnpm && hasPnpmLock && !hasNpmLock) {
+    return PackageManager.Pnpm;
+  }
+
+  const hasNpm = await supports(PackageManager.Npm);
+  if (hasNpm && hasNpmLock && !hasYarnLock && !hasPnpmLock) {
+    return PackageManager.Npm;
+  }
+
+  if (hasYarn && !hasNpm && !hasPnpm) {
+    return PackageManager.Yarn;
+  }
+
+  if (hasPnpm && !hasYarn && !hasNpm) {
+    return PackageManager.Pnpm;
   }
 
   // TODO: This should eventually inform the user of ambiguous package manager usage.
   //       Potentially with a prompt to choose and optionally set as the default.
-  return packageManager || PackageManager.Npm;
+  return PackageManager.Npm;
 }
 
 /**
