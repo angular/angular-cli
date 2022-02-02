@@ -262,12 +262,12 @@
     tsickle "^0.38.0"
     tslib "^2.3.0"
 
-"@angular/benchpress@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@angular/benchpress/-/benchpress-0.2.1.tgz#f8b58d9acfda0d29959b87dcb8082b1c33735db5"
-  integrity sha512-ojHCP96ZunHBZpt08USSEdLJsuXnEEdJtfzl+9oTdMXbooKkzSVO7N6bVdjefbGRNAleAuSAo3gVrdPqumLznA==
+"@angular/benchpress@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@angular/benchpress/-/benchpress-0.3.0.tgz#0adf14156ff31dfee3ef607c0088e9ee6fb08777"
+  integrity sha512-ApxoY5lTj1S0QFLdq5ZdTfdkIds1m3tma9EJOZpNVHRU9eCj2D/5+VFb5tlWsv9NHQ2S0XXkJjauFOAdfzT8uw==
   dependencies:
-    "@angular/core" "^10.0.0-0 || ^11.0.0"
+    "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
 "@angular/cli@13.2.1":
@@ -326,29 +326,22 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@13.2.0":
+"@angular/core@13.2.0", "@angular/core@^13.0.0 || ^14.0.0-0":
   version "13.2.0"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-13.2.0.tgz#8db7b6f56eb2f211b72d943582061b247f39fe7f"
   integrity sha512-mWRWbbZ6k00AicA/GrxmWKaw8upo77sRQz4tSYKpwVKt2TtCeoW8OkdYUpnmuVjxpF0bD6PtVc0e1fD6es/ElA==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@^10.0.0-0 || ^11.0.0":
-  version "11.2.14"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-11.2.14.tgz#3ebe298c79d5413dc670d56b7f503bd4d788d4a8"
-  integrity sha512-vpR4XqBGitk1Faph37CSpemwIYTmJ3pdIVNoHKP6jLonpWu+0azkchf0f7oD8/2ivj2F81opcIw0tcsy/D/5Vg==
-  dependencies:
-    tslib "^2.0.0"
-
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#3a34722a82fb0e8cd3fa00dfc5476767a35e021a":
-  version "0.0.0-c922f5b23611024bc9d94833ae147f6048ab0275"
-  uid "3a34722a82fb0e8cd3fa00dfc5476767a35e021a"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#3a34722a82fb0e8cd3fa00dfc5476767a35e021a"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#838437e8f6056f933f595890019824c9283e48c6":
+  version "0.0.0-371b650cc4294b677bad453df3cb9e4a49a0941c"
+  uid "838437e8f6056f933f595890019824c9283e48c6"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#838437e8f6056f933f595890019824c9283e48c6"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
     "@angular-devkit/build-angular" "13.2.0-rc.1"
-    "@angular/benchpress" "0.2.1"
+    "@angular/benchpress" "0.3.0"
     "@babel/core" "^7.16.0"
     "@bazel/bazelisk" "^1.10.1"
     "@bazel/buildifier" "^4.0.1"
