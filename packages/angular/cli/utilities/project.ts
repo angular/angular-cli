@@ -13,12 +13,7 @@ import * as path from 'path';
 import { findUp } from './find-up';
 
 export function findWorkspaceFile(currentDirectory = process.cwd()): string | null {
-  const possibleConfigFiles = [
-    'angular.json',
-    '.angular.json',
-    'angular-cli.json',
-    '.angular-cli.json',
-  ];
+  const possibleConfigFiles = ['angular.json', '.angular.json'];
   const configFilePath = findUp(possibleConfigFiles, currentDirectory);
   if (configFilePath === null) {
     return null;

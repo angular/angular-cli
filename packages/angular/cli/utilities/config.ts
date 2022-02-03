@@ -144,16 +144,6 @@ export class AngularWorkspace {
   }
 
   static async load(workspaceFilePath: string): Promise<AngularWorkspace> {
-    const oldConfigFileNames = ['.angular-cli.json', 'angular-cli.json'];
-    if (oldConfigFileNames.includes(path.basename(workspaceFilePath))) {
-      // 1.x file format
-      // Create an empty workspace to allow update to be used
-      return new AngularWorkspace(
-        { extensions: {}, projects: new workspaces.ProjectDefinitionCollection() },
-        workspaceFilePath,
-      );
-    }
-
     const result = await workspaces.readWorkspace(
       workspaceFilePath,
       createWorkspaceHost(),
@@ -330,57 +320,6 @@ export async function getConfiguredPackageManager(): Promise<PackageManager | nu
   return result;
 }
 
-export function migrateLegacyGlobalConfig(): boolean {
-  const homeDir = os.homedir();
-  if (homeDir) {
-    const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
-    if (existsSync(legacyGlobalConfigPath)) {
-      const legacy = readAndParseJson(legacyGlobalConfigPath);
-      if (!isJsonObject(legacy)) {
-        return false;
-      }
-
-      const cli: json.JsonObject = {};
-
-      if (
-        legacy.packageManager &&
-        typeof legacy.packageManager == 'string' &&
-        legacy.packageManager !== 'default'
-      ) {
-        cli['packageManager'] = legacy.packageManager;
-      }
-
-      if (
-        isJsonObject(legacy.defaults) &&
-        isJsonObject(legacy.defaults.schematics) &&
-        typeof legacy.defaults.schematics.collection == 'string'
-      ) {
-        cli['defaultCollection'] = legacy.defaults.schematics.collection;
-      }
-
-      if (isJsonObject(legacy.warnings)) {
-        const warnings: json.JsonObject = {};
-        if (typeof legacy.warnings.versionMismatch == 'boolean') {
-          warnings['versionMismatch'] = legacy.warnings.versionMismatch;
-        }
-
-        if (Object.getOwnPropertyNames(warnings).length > 0) {
-          cli['warnings'] = warnings;
-        }
-      }
-
-      if (Object.getOwnPropertyNames(cli).length > 0) {
-        const globalPath = path.join(homeDir, globalFileName);
-        writeFileSync(globalPath, JSON.stringify({ version: 1, cli }, null, 2));
-
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
 export async function getSchematicDefaults(
   collection: string,
   schematic: string,
@@ -451,28 +390,4 @@ export async function isWarningEnabled(warning: string): Promise<boolean> {
 
   // All warnings are enabled by default
   return result ?? true;
-}
-
-// Fallback, check for packageManager in config file in v1.* global config.
-function getLegacyPackageManager(): string | null {
-  const homeDir = os.homedir();
-  if (homeDir) {
-    const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
-    if (existsSync(legacyGlobalConfigPath)) {
-      const legacy = readAndParseJson(legacyGlobalConfigPath);
-      if (!isJsonObject(legacy)) {
-        return null;
-      }
-
-      if (
-        legacy.packageManager &&
-        typeof legacy.packageManager === 'string' &&
-        legacy.packageManager !== 'default'
-      ) {
-        return legacy.packageManager;
-      }
-    }
-  }
-
-  return null;
 }
