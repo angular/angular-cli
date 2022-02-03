@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonValue, tags } from '@angular-devkit/core';
+import { JsonValue } from '@angular-devkit/core';
 import { v4 as uuidV4 } from 'uuid';
 import { Command } from '../models/command';
 import { Arguments, CommandScope } from '../models/interface';
-import { getWorkspaceRaw, migrateLegacyGlobalConfig, validateWorkspace } from '../utilities/config';
+import { getWorkspaceRaw, validateWorkspace } from '../utilities/config';
 import { JSONFile, parseJson } from '../utilities/json-file';
 import { Schema as ConfigCommandSchema } from './config';
 
@@ -103,18 +103,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
       await this.validateScope(CommandScope.InProject);
     }
 
-    let [config] = getWorkspaceRaw(level);
-
-    if (options.global && !config) {
-      try {
-        if (migrateLegacyGlobalConfig()) {
-          config = getWorkspaceRaw(level)[0];
-          this.logger.info(tags.oneLine`
-            We found a global configuration that was used in Angular CLI 1.
-            It has been automatically migrated.`);
-        }
-      } catch {}
-    }
+    const [config] = getWorkspaceRaw(level);
 
     if (options.value == undefined) {
       if (!config) {
