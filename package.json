@@ -59,7 +59,7 @@
     ]
   },
   "resolutions": {
-    "ajv-formats/ajv": "8.10.0"
+    "**/ajv-formats/ajv": "8.10.0"
   },
   "devDependencies": {
     "@ampproject/remapping": "2.0.2",
