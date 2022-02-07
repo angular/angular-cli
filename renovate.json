@@ -69,7 +69,7 @@
     },
     {
       "matchPaths": [
-        ".github/workflows/scorecard.yml"      
+        ".github/workflows/scorecard.yml"
       ],
       "matchPackagePatterns": ["*"],
       "groupName": "scorecard action dependencies",
