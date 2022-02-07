@@ -9,7 +9,6 @@
   "lockFileMaintenance": {
     "enabled": true
   },
-  "schedule": ["after 10pm every weekday", "before 4am every weekday", "every weekend"],
   "baseBranches": ["master"],
   "ignoreDeps": ["@types/node"],
   "includePaths": [
