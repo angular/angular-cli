@@ -26,6 +26,10 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_pkg/releases/download/0.6.0/rules_pkg-0.6.0.tar.gz"],
 )
 
+load("@bazel_tools//tools/sh:sh_configure.bzl", "sh_configure")
+
+sh_configure()
+
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
