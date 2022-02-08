@@ -6,7 +6,7 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@ampproject/remapping": "2.0.2",
+    "@ampproject/remapping": "2.1.0",
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
@@ -30,7 +30,7 @@
     "core-js": "3.21.0",
     "critters": "0.0.16",
     "css-loader": "6.6.0",
-    "esbuild-wasm": "0.14.18",
+    "esbuild-wasm": "0.14.20",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -41,7 +41,7 @@
     "license-webpack-plugin": "4.0.1",
     "loader-utils": "3.2.0",
     "mini-css-extract-plugin": "2.5.3",
-    "minimatch": "3.0.4",
+    "minimatch": "3.0.5",
     "open": "8.4.0",
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.18"
+    "esbuild": "0.14.20"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
