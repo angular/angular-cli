@@ -169,6 +169,12 @@ const init: any = (config: any, emitter: any) => {
   compiler.hooks.watchRun.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
   compiler.hooks.run.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
 
+  webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
+  emitter.on('exit', (done: any) => {
+    webpackMiddleware.close();
+    done();
+  });
+
   function unblock() {
     isBlocked = false;
     blocked.forEach((cb) => cb());
@@ -176,22 +182,29 @@ const init: any = (config: any, emitter: any) => {
   }
 
   let lastCompilationHash: string | undefined;
-  compiler.hooks.done.tap('karma', (stats) => {
-    if (stats.hasErrors()) {
-      lastCompilationHash = undefined;
-    } else if (stats.hash != lastCompilationHash) {
-      // Refresh karma only when there are no webpack errors, and if the compilation changed.
-      lastCompilationHash = stats.hash;
-      emitter.refreshFiles();
-    }
-    unblock();
-  });
+  let isFirstRun = true;
 
-  webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
+  return new Promise<void>((resolve) => {
+    compiler.hooks.done.tap('karma', (stats) => {
+      if (isFirstRun) {
+        // This is needed to block Karma from launching browsers before Webpack writes the assets in memory.
+        // See the below:
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/154#issuecomment-986661937
+        // https://github.com/angular/angular-cli/issues/22495
+        isFirstRun = false;
+        resolve();
+      }
 
-  emitter.on('exit', (done: any) => {
-    webpackMiddleware.close();
-    done();
+      if (stats.hasErrors()) {
+        lastCompilationHash = undefined;
+      } else if (stats.hash != lastCompilationHash) {
+        // Refresh karma only when there are no webpack errors, and if the compilation changed.
+        lastCompilationHash = stats.hash;
+        emitter.refreshFiles();
+      }
+
+      unblock();
+    });
   });
 };
 
