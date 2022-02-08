@@ -9,6 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: angular/dev-infra/github-actions/commit-message-based-labels@ea10bc11429093f71506927aac9da864ce775b4f
+      - uses: angular/dev-infra/github-actions/commit-message-based-labels@1986b1203789009dd024d2c5780fff2607b5af8f
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
