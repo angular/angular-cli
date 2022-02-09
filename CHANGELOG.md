@@ -1,3 +1,31 @@
+<a name="14.0.0-next.1"></a>
+
+# 14.0.0-next.1 (2022-02-09)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [9e69331fa](https://github.com/angular/angular-cli/commit/9e69331fa61265c77d6281232bb64a2c63509290) | feat | use PNPM as package manager when `pnpm-lock.yaml` exists |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [7ce50002a](https://github.com/angular/angular-cli/commit/7ce50002a20373d494f08bfb36e7773b39263dba) | fix  | block Karma from starting until build is complete |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [966dd01ea](https://github.com/angular/angular-cli/commit/966dd01eab02cc10eee750c8638b5cf4b58afffe) | fix  | support locating PNPM lock file during NGCC processing |
+
+## Special Thanks
+
+Alan Agius, Derek Cormier, Doug Parker and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.3"></a>
 
 # 13.2.3 (2022-02-09)
