@@ -1,3 +1,25 @@
+<a name="13.2.3"></a>
+
+# 13.2.3 (2022-02-09)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [8c8377fee](https://github.com/angular/angular-cli/commit/8c8377fee4999266f4e58bf3c3091100d4393df7) | fix  | block Karma from starting until build is complete |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [1317e470e](https://github.com/angular/angular-cli/commit/1317e470ec74d1dd9dced2d0ec0022abfe921995) | fix  | support locating PNPM lock file during NGCC processing |
+
+## Special Thanks
+
+Alan Agius, Derek Cormier and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.2"></a>
 
 # 13.2.2 (2022-02-02)
