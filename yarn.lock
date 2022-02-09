@@ -164,10 +164,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/cdk@14.0.0-next.1":
-  version "14.0.0-next.1"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-14.0.0-next.1.tgz#db2b68f689cea508d044378307080290d70a6ff8"
-  integrity sha512-lR5N7MaBZAMPDFEe40mY0NNl55X4ajlfJ3963S6pAf22EMWohuU7MdIy0rDbewwmGvSb8864TU+HqiYfk+d7Wg==
+"@angular/cdk@14.0.0-next.2":
+  version "14.0.0-next.2"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-14.0.0-next.2.tgz#60a23717737b9e88f9868143f3c60fb36edf1315"
+  integrity sha512-N4e74rGTXasunUrY7bHOrlfxZYPVonojkg2NhNRglD4wYM00+BSKx85hZnuF19cgUK2Rr8CLdesxnjeE1HJW6Q==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -217,10 +217,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#647c873bed9f9b9190f8441eea790a01ad0b2e92":
-  version "0.0.0-ea10bc11429093f71506927aac9da864ce775b4f"
-  uid "647c873bed9f9b9190f8441eea790a01ad0b2e92"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#647c873bed9f9b9190f8441eea790a01ad0b2e92"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#bc95d30fc481710a0634188e5a47ab08246cd966":
+  version "0.0.0-2c23378f310c42b482d246886ed2aab1550dc650"
+  uid bc95d30fc481710a0634188e5a47ab08246cd966
+  resolved "https://github.com/angular/dev-infra-private-builds.git#bc95d30fc481710a0634188e5a47ab08246cd966"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -297,10 +297,10 @@
     glob "7.2.0"
     yargs "^17.2.1"
 
-"@angular/material@14.0.0-next.1":
-  version "14.0.0-next.1"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-14.0.0-next.1.tgz#ac73ba42414eb19c9e4baa4283c1fedf13b4652b"
-  integrity sha512-TW8dKbcVLhMpjUqDAv4HA3WNwhZBEPbyiQVhthLHM9EY5pfZziB8NtYEz72q35EdJexgM+UOfNcadQWE4y2xCw==
+"@angular/material@14.0.0-next.2":
+  version "14.0.0-next.2"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-14.0.0-next.2.tgz#653cc2587e5f414a150598bc7781959fe187a29d"
+  integrity sha512-z1B8VGDYc6zYC9IwJWaBOb+kLQJezGa0hFvDLNOz6YzN1YfZKue6zXj8LOXr245M159NDRhh4e3s7d5ZfnUZRQ==
   dependencies:
     tslib "^2.3.0"
 
