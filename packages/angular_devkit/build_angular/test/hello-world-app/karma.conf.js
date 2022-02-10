@@ -33,7 +33,6 @@ module.exports = function(config) {
       dir: path.join(__dirname, './coverage'),
       subdir: '.',
       reporters: [
-        {type: 'html'},
         {type: 'lcov'},
       ],
     },
