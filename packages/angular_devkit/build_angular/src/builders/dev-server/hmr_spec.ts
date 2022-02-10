@@ -7,11 +7,8 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-/* eslint-disable import/no-extraneous-dependencies */
-import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser';
-import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page';
-import puppeteer from 'puppeteer/lib/cjs/puppeteer/node';
-/* eslint-enable import/no-extraneous-dependencies */
+// eslint-disable-next-line import/no-extraneous-dependencies
+import puppeteer, { Browser, Page } from 'puppeteer';
 import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../../testing/test-utils';
 

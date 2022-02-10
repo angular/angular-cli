@@ -10,9 +10,7 @@
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
 import { createProxyServer } from 'http-proxy';
-import { Browser } from 'puppeteer/lib/cjs/puppeteer/common/Browser';
-import { Page } from 'puppeteer/lib/cjs/puppeteer/common/Page';
-import puppeteer from 'puppeteer/lib/cjs/puppeteer/node';
+import puppeteer, { Browser, Page } from 'puppeteer';
 import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../../testing/test-utils';
 
