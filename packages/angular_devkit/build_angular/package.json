@@ -10,14 +10,14 @@
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "@babel/core": "7.17.0",
+    "@babel/core": "7.17.2",
     "@babel/generator": "7.17.0",
     "@babel/helper-annotate-as-pure": "7.16.7",
     "@babel/plugin-proposal-async-generator-functions": "7.16.8",
     "@babel/plugin-transform-async-to-generator": "7.16.8",
     "@babel/plugin-transform-runtime": "7.17.0",
     "@babel/preset-env": "7.16.11",
-    "@babel/runtime": "7.17.0",
+    "@babel/runtime": "7.17.2",
     "@babel/template": "7.16.7",
     "@discoveryjs/json-ext": "0.5.6",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
@@ -30,7 +30,7 @@
     "core-js": "3.21.0",
     "critters": "0.0.16",
     "css-loader": "6.6.0",
-    "esbuild-wasm": "0.14.20",
+    "esbuild-wasm": "0.14.21",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.20"
+    "esbuild": "0.14.21"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
