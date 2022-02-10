@@ -88,6 +88,8 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
     });
 
     it('should remapped instrumented code back to the original source', async () => {
+      await harness.modifyFile('karma.conf.js', (content) => content.replace('lcov', 'html'));
+
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace(
           `title = 'app'`,
