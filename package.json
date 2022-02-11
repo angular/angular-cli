@@ -69,7 +69,7 @@
     "@angular/compiler": "14.0.0-next.2",
     "@angular/compiler-cli": "14.0.0-next.2",
     "@angular/core": "14.0.0-next.2",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#bc95d30fc481710a0634188e5a47ab08246cd966",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#7098b7fe950e96c0f16d16de25853026889de75e",
     "@angular/forms": "14.0.0-next.2",
     "@angular/localize": "14.0.0-next.2",
     "@angular/material": "14.0.0-next.2",
