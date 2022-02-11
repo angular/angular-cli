@@ -62,7 +62,7 @@
     "**/ajv-formats/ajv": "8.10.0"
   },
   "devDependencies": {
-    "@ampproject/remapping": "2.1.0",
+    "@ampproject/remapping": "2.1.1",
     "@angular/animations": "14.0.0-next.2",
     "@angular/cdk": "14.0.0-next.2",
     "@angular/common": "14.0.0-next.2",
@@ -189,7 +189,7 @@
     "postcss-preset-env": "7.3.1",
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "13.3.0",
+    "puppeteer": "13.3.1",
     "quicktype-core": "6.0.69",
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "5.0.0",
