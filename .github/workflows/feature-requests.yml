@@ -1,5 +1,9 @@
 name: Feature request triage bot
 
+# Declare default permissions as read only.
+permissions:
+  contents: read
+
 on:
   schedule:
     # Run at 13:00 every day
