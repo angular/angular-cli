@@ -35,7 +35,7 @@
     "ini": "2.0.0",
     "inquirer": "8.2.0",
     "jsonc-parser": "3.0.0",
-    "npm-package-arg": "8.1.5",
+    "npm-package-arg": "9.0.0",
     "npm-pick-manifest": "7.0.0",
     "open": "8.4.0",
     "ora": "5.4.1",
