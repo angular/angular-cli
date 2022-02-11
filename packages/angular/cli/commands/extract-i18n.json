@@ -3,8 +3,6 @@
   "$id": "ng-cli://commands/extract-i18n.json",
   "description": "Extracts i18n messages from source code.",
   "$longDescription": "",
-
-  "$aliases": ["i18n-extract", "xi18n"],
   "$scope": "in",
   "$type": "architect",
   "$impl": "./extract-i18n-impl#ExtractI18nCommand",
