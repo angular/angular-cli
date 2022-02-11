@@ -1,5 +1,9 @@
 name: DevInfra
 
+# Declare default permissions as read only.
+permissions:
+  contents: read
+
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
