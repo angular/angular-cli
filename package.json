@@ -88,7 +88,7 @@
     "jasmine": "^3.6.0",
     "jasmine-core": "^4.0.0",
     "jsdom": "19.0.0",
-    "minimatch": "^4.0.0",
+    "minimatch": "^5.0.0",
     "node-fetch": "^2.6.1",
     "ora": "^5.1.0",
     "piscina": "~3.2.0",
