@@ -207,10 +207,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#9f8c2d0940cfd6d58db61b26176b0fd8d2256d9c":
-  version "0.0.0-a87135ebb421b291f986ec2c673e9c37f22dfc17"
-  uid "9f8c2d0940cfd6d58db61b26176b0fd8d2256d9c"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#9f8c2d0940cfd6d58db61b26176b0fd8d2256d9c"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#bd277985ac350efca14fba5609cac29e6ebd4420":
+  version "0.0.0-5b35e20aeb147b713c31ba5c269cf2128c746d46"
+  uid bd277985ac350efca14fba5609cac29e6ebd4420
+  resolved "https://github.com/angular/dev-infra-private-builds.git#bd277985ac350efca14fba5609cac29e6ebd4420"
   dependencies:
     "@actions/core" "^1.4.0"
     "@actions/github" "^5.0.0"
@@ -250,7 +250,7 @@
     husky "^7.0.1"
     inquirer "^8.0.0"
     jasmine "^3.7.0"
-    minimatch "^3.0.4"
+    minimatch "^4.0.0"
     multimatch "^5.0.0"
     nock "^13.0.3"
     node-fetch "^2.6.1"
@@ -7726,6 +7726,13 @@ minimatch@4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-4.1.1.tgz#88d8172f2e1babcc3e249538b1a46970dfea1300"
   integrity sha512-9ObkVPP8aM2KWHw1RMAaOoEzHjcqzE1dmEQHAOq9ySRhvVMru1VKqniUs/g6Us4KSwXKk0+uLko6caynDcWEWQ==
+  dependencies:
+    brace-expansion "^1.1.7"
+
+minimatch@^4.0.0:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-4.2.1.tgz#40d9d511a46bdc4e563c22c3080cde9c0d8299b4"
+  integrity sha512-9Uq1ChtSZO+Mxa/CL1eGizn2vRn3MlLgzhT0Iz8zaY8NdvxvB0d5QdPFmCKf7JKA9Lerx5vRrnwO03jsSfGG9g==
   dependencies:
     brace-expansion "^1.1.7"
 
