@@ -22,8 +22,5 @@
     "chokidar": {
       "optional": true
     }
-  },
-  "devDependencies": {
-    "seedrandom": "^3.0.0"
   }
 }
