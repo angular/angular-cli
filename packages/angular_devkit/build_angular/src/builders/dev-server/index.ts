@@ -192,12 +192,6 @@ export function serveWebpackBrowser(
 
     // If a locale is defined, setup localization
     if (locale) {
-      if (i18n.inlineLocales.size > 1) {
-        throw new Error(
-          'The development server only supports localizing a single locale per build.',
-        );
-      }
-
       await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions, context);
     }
 
