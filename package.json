@@ -79,7 +79,7 @@
     "@angular/router": "14.0.0-next.2",
     "@angular/service-worker": "14.0.0-next.2",
     "@babel/core": "7.17.2",
-    "@babel/generator": "7.17.3",
+    "@babel/generator": "7.17.0",
     "@babel/helper-annotate-as-pure": "7.16.7",
     "@babel/plugin-proposal-async-generator-functions": "7.16.8",
     "@babel/plugin-transform-async-to-generator": "7.16.8",
