@@ -1,3 +1,20 @@
+<a name="13.2.4"></a>
+
+# 13.2.4 (2022-02-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [48c655ac9](https://github.com/angular/angular-cli/commit/48c655ac98e1d69622dd832c6a915c48e703cd8f) | fix  | update `esbuild` to `0.14.22`          |
+| [c0736ea0b](https://github.com/angular/angular-cli/commit/c0736ea0b173861bb5ceb9315d27038eb28535e1) | fix  | update license-webpack-plugin to 4.0.2 |
+
+## Special Thanks
+
+Alan Agius, Anner Visser and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.3"></a>
 
 # 13.2.3 (2022-02-09)
