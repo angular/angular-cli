@@ -1,4 +1,4 @@
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -21,8 +21,6 @@ ts_library(
             "**/*.js",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     deps = [
         "//packages/angular_devkit/schematics",
         # ":testing",

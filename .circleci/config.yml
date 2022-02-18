@@ -262,7 +262,9 @@ jobs:
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run:
           command: yarn bazel:test
-          no_output_timeout: 20m
+          # This timeout provides time for the actual tests to timeout and report status
+          # instead of CircleCI stopping the job without test failure information.
+          no_output_timeout: 40m
       - fail_fast
 
   snapshot_publish:
