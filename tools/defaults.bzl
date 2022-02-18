@@ -1,6 +1,6 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
-load("@npm//@bazel/typescript:index.bzl", _ts_library = "ts_library")
+load("@npm//@bazel/concatjs/internal:build_defs.bzl", _ts_library = "ts_library_macro")
 load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _pkg_npm = "pkg_npm")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@npm//@angular/dev-infra-private/bazel:extract_js_module_output.bzl", "extract_js_module_output")
