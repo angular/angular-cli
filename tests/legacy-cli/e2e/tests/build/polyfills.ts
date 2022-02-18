@@ -1,4 +1,3 @@
-import { oneLineTrim } from 'common-tags';
 import {
   expectFileSizeToBeUnder,
   expectFileToExist,

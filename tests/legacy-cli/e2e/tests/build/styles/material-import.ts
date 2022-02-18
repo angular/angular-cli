@@ -1,4 +1,3 @@
-import { stripIndents } from 'common-tags';
 import { getGlobalVariable } from '../../../utils/env';
 import { replaceInFile, writeMultipleFiles } from '../../../utils/fs';
 import { installWorkspacePackages } from '../../../utils/packages';
@@ -25,12 +24,9 @@ export default async function () {
 
   for (const ext of ['css', 'scss', 'less', 'styl']) {
     await writeMultipleFiles({
-      [`src/styles.${ext}`]: stripIndents`
-        @import "~@angular/material/prebuilt-themes/indigo-pink.css";
-      `,
-      [`src/app/app.component.${ext}`]: stripIndents`
-        @import "~@angular/material/prebuilt-themes/indigo-pink.css";
-      `,
+      [`src/styles.${ext}`]: '@import "~@angular/material/prebuilt-themes/indigo-pink.css";',
+      [`src/app/app.component.${ext}`]:
+        '@import "~@angular/material/prebuilt-themes/indigo-pink.css";',
     });
 
     // change files to use preprocessor
@@ -48,12 +44,9 @@ export default async function () {
     // run build app
     await ng('build', '--source-map', '--configuration=development');
     await writeMultipleFiles({
-      [`src/styles.${ext}`]: stripIndents`
-          @import "@angular/material/prebuilt-themes/indigo-pink.css";
-        `,
-      [`src/app/app.component.${ext}`]: stripIndents`
-          @import "@angular/material/prebuilt-themes/indigo-pink.css";
-        `,
+      [`src/styles.${ext}`]: '@import "@angular/material/prebuilt-themes/indigo-pink.css";',
+      [`src/app/app.component.${ext}`]:
+        '@import "@angular/material/prebuilt-themes/indigo-pink.css";',
     });
 
     await ng('build', '--configuration=development');

@@ -1,6 +1,5 @@
 import { PathLike, promises as fs, constants } from 'fs';
 import { dirname, join } from 'path';
-import { stripIndents } from 'common-tags';
 
 export function readFile(fileName: string): Promise<string> {
   return fs.readFile(fileName, 'utf-8');
@@ -126,26 +125,16 @@ export async function expectFileToExist(fileName: string): Promise<void> {
   }
 }
 
-export function expectFileToMatch(fileName: string, regEx: RegExp | string) {
-  return readFile(fileName).then((content) => {
-    if (typeof regEx == 'string') {
-      if (content.indexOf(regEx) == -1) {
-        throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
-            Content:
-            ${content}
-            ------
-          `);
-      }
-    } else {
-      if (!content.match(regEx)) {
-        throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
-            Content:
-            ${content}
-            ------
-          `);
-      }
-    }
-  });
+export async function expectFileToMatch(fileName: string, regEx: RegExp | string): Promise<void> {
+  const content = await readFile(fileName);
+
+  const found = typeof regEx === 'string' ? content.includes(regEx) : content.match(regEx);
+
+  if (!found) {
+    throw new Error(
+      `File "${fileName}" did not contain "${regEx}"...\nContent:\n${content}\n------`,
+    );
+  }
 }
 
 export async function getFileSize(fileName: string) {
