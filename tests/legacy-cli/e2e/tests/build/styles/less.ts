@@ -6,21 +6,18 @@ import {
 } from '../../../utils/fs';
 import { expectToFail } from '../../../utils/utils';
 import { ng } from '../../../utils/process';
-import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return writeMultipleFiles({
-    'src/styles.less': stripIndents`
+    'src/styles.less': `
       @import './imported-styles.less';
       body { background-color: blue; }
     `,
-    'src/imported-styles.less': stripIndents`
-      p { background-color: red; }
-    `,
-    'src/app/app.component.less': stripIndents`
+    'src/imported-styles.less': 'p { background-color: red; }',
+    'src/app/app.component.less': `
         .outer {
           .inner {
             background: #fff;

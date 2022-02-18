@@ -1,9 +1,7 @@
 import { writeMultipleFiles, expectFileToMatch, replaceInFile } from '../../../utils/fs';
 import { expectToFail } from '../../../utils/utils';
 import { ng } from '../../../utils/process';
-import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
-import { getGlobalVariable } from '../../../utils/env';
 
 export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
@@ -15,14 +13,14 @@ export default function () {
     promise = promise.then(() => {
       return (
         writeMultipleFiles({
-          [`src/styles.${ext}`]: stripIndents`
+          [`src/styles.${ext}`]: `
           @import './imported-styles.${ext}';
           body { background-color: #00f; }
         `,
-          [`src/imported-styles.${ext}`]: stripIndents`
+          [`src/imported-styles.${ext}`]: `
           p { background-color: #f00; }
         `,
-          [`src/app/app.component.${ext}`]: stripIndents`
+          [`src/app/app.component.${ext}`]: `
           @import './imported-component-styles.${ext}';
           .outer {
             .inner {
@@ -30,9 +28,7 @@ export default function () {
             }
           }
         `,
-          [`src/app/imported-component-styles.${ext}`]: stripIndents`
-          h1 { background: #000; }
-        `,
+          [`src/app/imported-component-styles.${ext}`]: 'h1 { background: #000; }',
         })
           // change files to use preprocessor
           .then(() =>

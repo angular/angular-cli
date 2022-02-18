@@ -1,4 +1,3 @@
-import { oneLineTrim } from 'common-tags';
 import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -53,13 +52,13 @@ export default async function () {
   // index.html lists the right bundles
   await expectFileToMatch(
     'dist/test-project/index.html',
-    oneLineTrim`
-    <script src="runtime.js" type="module"></script>
-    <script src="polyfills.js" type="module"></script>
-    <script src="scripts.js" defer></script>
-    <script src="renamed-script.js" defer></script>
-    <script src="vendor.js" type="module"></script>
-    <script src="main.js" type="module"></script>
-  `,
+    [
+      '<script src="runtime.js" type="module"></script>',
+      '<script src="polyfills.js" type="module"></script>',
+      '<script src="scripts.js" defer></script>',
+      '<script src="renamed-script.js" defer></script>',
+      '<script src="vendor.js" type="module"></script>',
+      '<script src="main.js" type="module"></script>',
+    ].join(''),
   );
 }

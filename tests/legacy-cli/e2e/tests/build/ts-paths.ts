@@ -1,21 +1,14 @@
-import { stripIndents } from 'common-tags';
 import { appendToFile, createDir, replaceInFile, rimraf, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateTsConfig } from '../../utils/project';
 
 export default async function () {
-  await updateTsConfig(json => {
+  await updateTsConfig((json) => {
     json['compilerOptions']['baseUrl'] = './src';
     json['compilerOptions']['paths'] = {
-      '@shared': [
-        'app/shared',
-      ],
-      '@shared/*': [
-        'app/shared/*',
-      ],
-      '@root/*': [
-        './*',
-      ],
+      '@shared': ['app/shared'],
+      '@shared/*': ['app/shared/*'],
+      '@root/*': ['./*'],
     };
   });
 
@@ -29,14 +22,13 @@ export default async function () {
   await replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
   await ng('build', '--configuration=development');
 
-  await updateTsConfig(json => {
-    json['compilerOptions']['paths']['*'] = [
-      '*',
-      'app/shared/*',
-    ];
+  await updateTsConfig((json) => {
+    json['compilerOptions']['paths']['*'] = ['*', 'app/shared/*'];
   });
 
-  await appendToFile('src/app/app.component.ts', stripIndents`
+  await appendToFile(
+    'src/app/app.component.ts',
+    `
     import { meaning } from 'app/shared/meaning';
     import { meaning as meaning2 } from '@shared';
     import { meaning as meaning3 } from '@shared/meaning';
@@ -50,7 +42,8 @@ export default async function () {
     console.log(meaning3)
     console.log(meaning4)
     console.log(meaning5)
-  `);
+  `,
+  );
 
   await ng('build', '--configuration=development');
 

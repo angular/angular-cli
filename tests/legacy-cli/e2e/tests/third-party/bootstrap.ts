@@ -2,7 +2,6 @@ import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectFileToMatch } from '../../utils/fs';
-import { oneLineTrim } from 'common-tags';
 
 export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
@@ -24,12 +23,7 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/scripts.js', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', '* Bootstrap'))
     .then(() =>
-      expectFileToMatch(
-        'dist/test-project/index.html',
-        oneLineTrim`
-      <script src="scripts.js" defer></script>
-    `,
-      ),
+      expectFileToMatch('dist/test-project/index.html', '<script src="scripts.js" defer></script>'),
     )
     .then(() =>
       ng(
@@ -43,11 +37,6 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/scripts.js', 'jQuery'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', ':root'))
     .then(() =>
-      expectFileToMatch(
-        'dist/test-project/index.html',
-        oneLineTrim`
-    <script src="scripts.js" defer></script>
-    `,
-      ),
+      expectFileToMatch('dist/test-project/index.html', '<script src="scripts.js" defer></script>'),
     );
 }
