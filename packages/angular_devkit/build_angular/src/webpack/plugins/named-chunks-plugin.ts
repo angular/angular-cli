@@ -41,6 +41,11 @@ export class NamedChunksPlugin {
         continue;
       }
 
+      if (block.groupOptions.name) {
+        // Ignore groups which have been named already.
+        return undefined;
+      }
+
       for (const dependency of block.dependencies) {
         if (dependency instanceof ImportDependency) {
           return Template.toPath(dependency.request);
