@@ -69,10 +69,11 @@ export async function augmentAppWithServiceWorker(
 ): Promise<void> {
   const distPath = getSystemPath(normalize(outputPath));
 
-  // Determine the configuration file path
-  const configPath = ngswConfigPath
-    ? getSystemPath(normalize(ngswConfigPath))
-    : path.join(getSystemPath(appRoot), 'ngsw-config.json');
+  // Determine the configuration file path, relative to the application root.
+  const configPath = path.join(
+    getSystemPath(appRoot),
+    ngswConfigPath ? getSystemPath(normalize(ngswConfigPath)) : 'ngsw-config.json',
+  );
 
   // Read the configuration file
   let config: Config | undefined;
