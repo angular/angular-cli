@@ -11,7 +11,7 @@
     "@angular/forms": "github:angular/forms-builds#ba125154b807fc8256258e7ff2407c3d1e633ce5",
     "@angular/language-service": "github:angular/language-service-builds#dbc2805aa0175bc51854b65596d95dea9005a5b4",
     "@angular/localize": "github:angular/localize-builds#5ac5d144ee11b00d5980910dcab4e041c99f5dad",
-    "@angular/material": "github:angular/material2-builds#cede9300b8ff2e7b3d728e49a28084638d9a7533",
+    "@angular/material": "github:angular/material-builds#cede9300b8ff2e7b3d728e49a28084638d9a7533",
     "@angular/material-moment-adapter": "github:angular/material-moment-adapter-builds#43c32d9c6b12faf1d4d2c0ec50a5f58eb741de24",
     "@angular/platform-browser": "github:angular/platform-browser-builds#415998e6d9040aec5f62b54c41a358fb1d9d7a43",
     "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#2065be65d3d8e3018782e16900563cdffa5cfeae",
