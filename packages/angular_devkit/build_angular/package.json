@@ -30,7 +30,7 @@
     "core-js": "3.21.1",
     "critters": "0.0.16",
     "css-loader": "6.6.0",
-    "esbuild-wasm": "0.14.22",
+    "esbuild-wasm": "0.14.23",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -60,7 +60,7 @@
     "source-map-support": "0.5.21",
     "stylus": "0.56.0",
     "stylus-loader": "6.2.0",
-    "terser": "5.10.0",
+    "terser": "5.11.0",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.22"
+    "esbuild": "0.14.23"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
