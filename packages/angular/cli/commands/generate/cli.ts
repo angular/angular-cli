@@ -35,10 +35,20 @@ export class GenerateCommandModule
   describe = 'Generates and/or modifies files based on a schematic.';
 
   override async builder(argv: Argv): Promise<Argv<GenerateCommandArgs>> {
-    const baseYargs = await super.builder(argv);
-    const schematic = this.getSchematicName();
+    const [collectionNameFromArgs, schematicNameFromArgs] = this.parseSchematicInfo(
+      this.context.args.positional[1],
+    );
 
-    let localYargs = schematic
+    if (collectionNameFromArgs && schematicNameFromArgs) {
+      this.schematicName = schematicNameFromArgs;
+    }
+
+    const baseYargs = await super.builder(argv);
+    if (this.schematicName) {
+      return baseYargs;
+    }
+
+    let localYargs = schematicNameFromArgs
       ? baseYargs
       : baseYargs.positional('schematic', {
           describe: 'The schematic or collection:schematic to generate.',
@@ -50,7 +60,7 @@ export class GenerateCommandModule
     const workflow = this.getOrCreateWorkflow(collectionName);
     const collection = workflow.engine.createCollection(collectionName);
 
-    const schematicNames = schematic ? [schematic] : collection.listSchematicNames();
+    const schematicNames = schematicNameFromArgs ? [schematicNameFromArgs] : collection.listSchematicNames();
     const workspaceDefaultCollection = await this.getDefaultSchematicCollection();
 
     for (const schematicName of schematicNames) {

@@ -160,8 +160,8 @@ export async function parseJsonSchemaToGenerateSubCommandDescription(
 
   return {
     command: collectionNameInCommand
-      ? `${collectionNameInCommand}:`
-      : '' + generateFullCommandName(name, options),
+      ? `${collectionNameInCommand}:${generateFullCommandName(name, options)}`
+      : generateFullCommandName(name, options),
     name,
     hidden,
     deprecated,

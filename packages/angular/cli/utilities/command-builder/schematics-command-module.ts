@@ -31,7 +31,7 @@ export abstract class SchematicsCommandModule
   implements CommandModuleImplementation<SchematicsCommandArgs>
 {
   static override scope = CommandScope.In;
-  protected readonly schematicName: string | undefined;
+  protected schematicName: string | undefined;
 
   async builder(argv: Argv): Promise<Argv<SchematicsCommandArgs>> {
     const localYargs: Argv<SchematicsCommandArgs> = argv
@@ -99,10 +99,6 @@ export abstract class SchematicsCommandModule
     );
   }
 
-  protected getSchematicName(): string | undefined {
-    return this.parseSchematicInfo(this.context.args.positional[1])[1];
-  }
-
   private _workflow: NodeWorkflow | undefined;
   protected getOrCreateWorkflow(collectionName: string): NodeWorkflow {
     if (this._workflow) {
@@ -155,7 +151,7 @@ export abstract class SchematicsCommandModule
     return (this._defaultSchematicCollection = DEFAULT_SCHEMATICS_COLLECTION);
   }
 
-  private parseSchematicInfo(
+  protected parseSchematicInfo(
     schematic: string | undefined,
   ): [collectionName: string | undefined, schematicName: string | undefined] {
     if (schematic?.includes(':')) {
@@ -164,6 +160,6 @@ export abstract class SchematicsCommandModule
       return [collectionName, schematicName];
     }
 
-    return [undefined, this.schematicName ?? schematic];
+    return [undefined, schematic];
   }
 }

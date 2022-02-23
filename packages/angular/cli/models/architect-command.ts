@@ -80,6 +80,10 @@ export class ArchitectCommand<
     );
     this._architect = new Architect(this._architectHost, this._registry);
 
+    if (this.target?.includes(':')) {
+      return;
+    }
+    
     if (!this.target) {
       const specifier = this._makeTargetSpecifier(options);
       if (!specifier.project || !specifier.target) {
