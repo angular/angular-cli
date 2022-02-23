@@ -83,7 +83,7 @@ export class ArchitectCommand<
     if (this.target?.includes(':')) {
       return;
     }
-    
+
     if (!this.target) {
       const specifier = this._makeTargetSpecifier(options);
       if (!specifier.project || !specifier.target) {

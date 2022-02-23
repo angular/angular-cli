@@ -92,10 +92,13 @@ export abstract class ArchitectCommandModule
 
     let [, projectName] = this.context.args.positional;
 
-    if (projectName && !workspace.projects.has(projectName)) {
-      throw new Error(`Project '${projectName}' does not exist.`);
-    }
+    if (projectName) {
+      if (!workspace.projects.has(projectName)) {
+        throw new Error(`Project '${projectName}' does not exist.`);
+      }
 
+      return projectName;
+    }
     const targetProjectNames: string[] = [];
     for (const [name, project] of workspace.projects) {
       if (project.targets.has(target)) {

@@ -113,7 +113,7 @@ export async function runCommand(
       'unknown-options-as-args': false,
       'strip-aliased': true,
       'strip-dashed': true,
-      'camel-case-expansion': true,
+      'camel-case-expansion': false,
     })
     .option('json-help', {
       describe: 'Show help in JSON format.',

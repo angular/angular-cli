@@ -60,7 +60,9 @@ export class GenerateCommandModule
     const workflow = this.getOrCreateWorkflow(collectionName);
     const collection = workflow.engine.createCollection(collectionName);
 
-    const schematicNames = schematicNameFromArgs ? [schematicNameFromArgs] : collection.listSchematicNames();
+    const schematicNames = schematicNameFromArgs
+      ? [schematicNameFromArgs]
+      : collection.listSchematicNames();
     const workspaceDefaultCollection = await this.getDefaultSchematicCollection();
 
     for (const schematicName of schematicNames) {

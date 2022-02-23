@@ -117,14 +117,6 @@ ts_json_schema(
 )
 
 ts_json_schema(
-    name = "extract-i18n_schema",
-    src = "commands/extract-i18n.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
     name = "update_schematic_schema",
     src = "src/commands/update/schematic/schema.json",
 )

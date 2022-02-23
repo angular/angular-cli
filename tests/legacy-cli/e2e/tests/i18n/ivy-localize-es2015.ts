@@ -41,7 +41,7 @@ export default async function () {
       await ng(
         'e2e',
         `--configuration=${lang}`,
-        '--devServerTarget=',
+        '--dev-server-target=',
         `--baseUrl=http://localhost:4200/${lang}/`,
       );
     } finally {

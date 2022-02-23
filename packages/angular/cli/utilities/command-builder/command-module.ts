@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
+import { logging, strings } from '@angular-devkit/core';
 import { ArgumentsCamelCase, Argv, CamelCaseKey, CommandModule as YargsCommandModule } from 'yargs';
 import { AngularWorkspace } from '../config';
 
@@ -55,9 +55,14 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   async handler(args: ArgumentsCamelCase<T> & OtherOptions): Promise<void> {
     const { _, $0, ...options } = args;
 
-    const result = await this.run(options as unknown as Options<T> & OtherOptions);
+    const camelCasedOptions = {} as Options<T>;
+    for (const [key, value] of Object.entries(options)) {
+      camelCasedOptions[strings.camelize(key) as keyof Options<T>] = value;
+    }
+
+    const result = await this.run(camelCasedOptions);
     if (typeof result === 'number') {
-      process.exitCode = result;
+      process.exit(result);
     }
   }
 }

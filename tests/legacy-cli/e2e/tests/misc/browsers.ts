@@ -47,8 +47,8 @@ export default async function () {
     await ng(
       'e2e',
       'test-project',
-      '--protractorConfig=e2e/protractor-saucelabs.conf.js',
-      '--devServerTarget=',
+      '--protractor-config=e2e/protractor-saucelabs.conf.js',
+      '--dev-server-target=',
     );
   } finally {
     server.close();
