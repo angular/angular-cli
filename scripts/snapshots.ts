@@ -10,6 +10,7 @@ import { logging } from '@angular-devkit/core';
 import { execSync, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
+import { JsonHelp } from 'packages/angular/cli/utilities/command-builder/json-help';
 import * as path from 'path';
 import { PackageInfo, packages } from '../lib/packages';
 import build from './build-bazel';
@@ -179,14 +180,48 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
   const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
   const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
   fs.mkdirSync(helpOutputRoot);
-  const commands = require('../packages/angular/cli/commands.json');
-  for (const commandName of Object.keys(commands)) {
-    const options = { cwd: newProjectRoot };
-    const childLogger = logger.createChild(commandName);
-    const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
-    // Make sure the output is JSON before printing it, and format it as well.
-    const jsonOutput = JSON.stringify(JSON.parse(stdout.trim()), undefined, 2);
+
+  const runNgCommandJsonHelp = (args: string[]) => {
+    const childLogger = logger.createChild(args.join(''));
+    const stdout = _exec(
+      ngPath,
+      [...args, '--json-help', '--help'],
+      { cwd: newProjectRoot },
+      childLogger,
+    );
+
+    return JSON.parse(stdout.trim()) as JsonHelp;
+  };
+
+  const { subcommands: commands = [] } = runNgCommandJsonHelp([]);
+  for (const command of commands) {
+    const commandName = command.name;
+    const { options, subcommands } = runNgCommandJsonHelp([commandName]);
+
+    const subCommandsJson = subcommands?.map((s) => {
+      return {
+        ...subcommands,
+        options: runNgCommandJsonHelp([commandName, s.name]).options.filter((o) =>
+          // Filter options which are inherited from the parent command.
+          // Ex: `interactive` in `ng generate lib`.
+          options.some(({ name }) => o.name !== name),
+        ),
+      };
+    });
+
+    const jsonOutput = JSON.stringify(
+      {
+        ...command,
+        options,
+        subcommands: subCommandsJson,
+      },
+      undefined,
+      2,
+    );
+
     fs.writeFileSync(path.join(helpOutputRoot, commandName + '.json'), jsonOutput);
+
+    logger.info(path.join(helpOutputRoot, commandName + '.json'));
   }
 
   if (!githubToken) {

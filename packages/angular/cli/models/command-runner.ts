@@ -8,6 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import yargs from 'yargs';
+import { Parser } from 'yargs/helpers';
 import { AddCommandModule } from '../commands/add/cli';
 import { AnalyticsCommandModule } from '../commands/analytics/cli';
 import { BuildCommandModule } from '../commands/build/cli';
@@ -26,6 +27,7 @@ import { TestCommandModule } from '../commands/test/cli';
 import { UpdateCommandModule } from '../commands/update/cli';
 import { VersionCommandModule } from '../commands/version/cli';
 import { CommandContext, CommandScope } from '../utilities/command-builder/command-module';
+import { jsonHelpUsage } from '../utilities/command-builder/json-help';
 import { AngularWorkspace } from '../utilities/config';
 
 const COMMANDS = [
@@ -48,23 +50,43 @@ const COMMANDS = [
   RunCommandModule,
 ];
 
+const yargsParser = Parser as unknown as typeof Parser.default;
+
 export async function runCommand(
   args: string[],
   logger: logging.Logger,
   workspace: AngularWorkspace | undefined,
 ): Promise<void> {
+  const {
+    $0,
+    _: positional,
+    help = false,
+    jsonHelp = false,
+    ...rest
+  } = yargsParser(args, { boolean: ['help', 'json-help'] });
+
   const context: CommandContext = {
     workspace,
     logger,
     currentDirectory: process.cwd(),
     root: workspace?.basePath ?? process.cwd(),
+    args: {
+      positional,
+      options: {
+        help,
+        ...rest,
+      },
+    },
   };
 
   let localYargs = yargs(args);
   for (const CommandModule of COMMANDS) {
-    const scope = CommandModule.scope;
-    if ((scope === CommandScope.In && !workspace) || (scope === CommandScope.Out && workspace)) {
-      continue;
+    if (!jsonHelp) {
+      // Skip scope validation when running with '--json-help' since it's easier to generate the output for all commands this way.
+      const scope = CommandModule.scope;
+      if ((scope === CommandScope.In && !workspace) || (scope === CommandScope.Out && workspace)) {
+        continue;
+      }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,6 +101,11 @@ export async function runCommand(
     });
   }
 
+  if (jsonHelp) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (localYargs as any).getInternalMethods().getUsageInstance().help = () => jsonHelpUsage();
+  }
+
   await localYargs
     .scriptName('ng')
     .parserConfiguration({
@@ -88,10 +115,15 @@ export async function runCommand(
       'strip-dashed': true,
       'camel-case-expansion': true,
     })
+    .option('json-help', {
+      describe: 'Show help in JSON format.',
+      hidden: true,
+      type: 'boolean',
+    })
+    .help('help', 'Shows a help message for this command in the console.')
     .demandCommand()
     .recommendCommands()
     .version(false)
-    .help()
     .showHelpOnFail(false)
     .strict()
     .fail(false)
