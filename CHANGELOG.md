@@ -1,3 +1,19 @@
+<a name="14.0.0-next.3"></a>
+
+# 14.0.0-next.3 (2022-02-23)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [de1429308](https://github.com/angular/angular-cli/commit/de14293083826ee4a1b69b94d06a57603d3d76f9) | fix  | don't rename blocks which have a name |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.5"></a>
 
 # 13.2.5 (2022-02-23)
