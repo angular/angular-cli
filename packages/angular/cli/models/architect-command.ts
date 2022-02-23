@@ -8,15 +8,14 @@
 
 import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json, schema, tags } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import * as path from 'path';
-import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { parseJsonSchemaToOptions } from '../utilities/command-builder/json-schema';
 import { getPackageManager } from '../utilities/package-manager';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
-import { Arguments, Option } from './interface';
-import { parseArguments } from './parser';
+import { CommandContext } from './interface';
 
 export interface ArchitectCommandOptions extends BaseCommandOptions {
   project?: string;
@@ -25,7 +24,7 @@ export interface ArchitectCommandOptions extends BaseCommandOptions {
   target?: string;
 }
 
-export abstract class ArchitectCommand<
+export class ArchitectCommand<
   T extends ArchitectCommandOptions = ArchitectCommandOptions,
 > extends Command<T> {
   protected _architect!: Architect;
@@ -33,11 +32,15 @@ export abstract class ArchitectCommand<
   protected _registry!: json.schema.SchemaRegistry;
   protected override readonly useReportAnalytics = false;
 
-  // If this command supports running multiple targets.
-  protected multiTarget = false;
-
-  target: string | undefined;
-  missingTargetError: string | undefined;
+  constructor(
+    protected override readonly context: CommandContext,
+    protected override readonly commandName: string,
+    protected readonly multiTarget = false,
+    protected readonly target?: string,
+    protected readonly missingTargetError?: string,
+  ) {
+    super(context, commandName);
+  }
 
   protected async onMissingTarget(projectName?: string): Promise<void | number> {
     if (this.missingTargetError) {
@@ -56,7 +59,11 @@ export abstract class ArchitectCommand<
   }
 
   // eslint-disable-next-line max-lines-per-function
-  public override async initialize(options: T & Arguments): Promise<number | void> {
+  public override async initialize(options: T): Promise<number | void> {
+    if (this._registry) {
+      return;
+    }
+
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
     this._registry.useXDeprecatedProvider((msg) => this.logger.warn(msg));
@@ -74,11 +81,6 @@ export abstract class ArchitectCommand<
     this._architect = new Architect(this._architectHost, this._registry);
 
     if (!this.target) {
-      if (options.help) {
-        // This is a special case where we just return.
-        return;
-      }
-
       const specifier = this._makeTargetSpecifier(options);
       if (!specifier.project || !specifier.target) {
         this.logger.fatal('Cannot determine project or target for command.');
@@ -96,7 +98,6 @@ export abstract class ArchitectCommand<
       return 1;
     }
 
-    const commandLeftovers = options['--'];
     const targetProjectNames: string[] = [];
     for (const [name, project] of this.workspace.projects) {
       if (project.targets.has(this.target)) {
@@ -112,85 +113,85 @@ export abstract class ArchitectCommand<
       return await this.onMissingTarget();
     }
 
-    if (!projectName && commandLeftovers && commandLeftovers.length > 0) {
-      const builderNames = new Set<string>();
-      const leftoverMap = new Map<string, { optionDefs: Option[]; parsedOptions: Arguments }>();
-      let potentialProjectNames = new Set<string>(targetProjectNames);
-      for (const name of targetProjectNames) {
-        const builderName = await this._architectHost.getBuilderNameForTarget({
-          project: name,
-          target: this.target,
-        });
+    // if (!projectName && commandLeftovers && commandLeftovers.length > 0) {
+    //   const builderNames = new Set<string>();
+    //   const leftoverMap = new Map<string, { optionDefs: Option[]; parsedOptions: Arguments }>();
+    //   let potentialProjectNames = new Set<string>(targetProjectNames);
+    //   for (const name of targetProjectNames) {
+    //     const builderName = await this._architectHost.getBuilderNameForTarget({
+    //       project: name,
+    //       target: this.target,
+    //     });
 
-        if (this.multiTarget) {
-          builderNames.add(builderName);
-        }
+    //     if (this.multiTarget) {
+    //       builderNames.add(builderName);
+    //     }
 
-        let builderDesc;
-        try {
-          builderDesc = await this._architectHost.resolveBuilder(builderName);
-        } catch (e) {
-          if (e.code === 'MODULE_NOT_FOUND') {
-            await this.warnOnMissingNodeModules(this.workspace.basePath);
-            this.logger.fatal(`Could not find the '${builderName}' builder's node package.`);
+    //     let builderDesc;
+    //     try {
+    //       builderDesc = await this._architectHost.resolveBuilder(builderName);
+    //     } catch (e) {
+    //       if (e.code === 'MODULE_NOT_FOUND') {
+    //         await this.warnOnMissingNodeModules(this.workspace.basePath);
+    //         this.logger.fatal(`Could not find the '${builderName}' builder's node package.`);
 
-            return 1;
-          }
-          throw e;
-        }
+    //         return 1;
+    //       }
+    //       throw e;
+    //     }
 
-        const optionDefs = await parseJsonSchemaToOptions(
-          this._registry,
-          builderDesc.optionSchema as json.JsonObject,
-        );
-        const parsedOptions = parseArguments([...commandLeftovers], optionDefs);
-        const builderLeftovers = parsedOptions['--'] || [];
-        leftoverMap.set(name, { optionDefs, parsedOptions });
+    //     const optionDefs = await parseJsonSchemaToOptions(
+    //       this._registry,
+    //       builderDesc.optionSchema as json.JsonObject,
+    //     );
+    //     const parsedOptions = parseArguments([...commandLeftovers], optionDefs);
+    //     const builderLeftovers = parsedOptions['--'] || [];
+    //     leftoverMap.set(name, { optionDefs, parsedOptions });
 
-        potentialProjectNames = new Set(
-          builderLeftovers.filter((x) => potentialProjectNames.has(x)),
-        );
-      }
+    //     potentialProjectNames = new Set(
+    //       builderLeftovers.filter((x) => potentialProjectNames.has(x)),
+    //     );
+    //   }
 
-      if (potentialProjectNames.size === 1) {
-        projectName = [...potentialProjectNames][0];
+    //   if (potentialProjectNames.size === 1) {
+    //     projectName = [...potentialProjectNames][0];
 
-        // remove the project name from the leftovers
-        const optionInfo = leftoverMap.get(projectName);
-        if (optionInfo) {
-          const locations = [];
-          let i = 0;
-          while (i < commandLeftovers.length) {
-            i = commandLeftovers.indexOf(projectName, i + 1);
-            if (i === -1) {
-              break;
-            }
-            locations.push(i);
-          }
-          delete optionInfo.parsedOptions['--'];
-          for (const location of locations) {
-            const tempLeftovers = [...commandLeftovers];
-            tempLeftovers.splice(location, 1);
-            const tempArgs = parseArguments([...tempLeftovers], optionInfo.optionDefs);
-            delete tempArgs['--'];
-            if (JSON.stringify(optionInfo.parsedOptions) === JSON.stringify(tempArgs)) {
-              options['--'] = tempLeftovers;
-              break;
-            }
-          }
-        }
-      }
+    //     // remove the project name from the leftovers
+    //     const optionInfo = leftoverMap.get(projectName);
+    //     if (optionInfo) {
+    //       const locations = [];
+    //       let i = 0;
+    //       while (i < commandLeftovers.length) {
+    //         i = commandLeftovers.indexOf(projectName, i + 1);
+    //         if (i === -1) {
+    //           break;
+    //         }
+    //         locations.push(i);
+    //       }
+    //       delete optionInfo.parsedOptions['--'];
+    //       for (const location of locations) {
+    //         const tempLeftovers = [...commandLeftovers];
+    //         tempLeftovers.splice(location, 1);
+    //         const tempArgs = parseArguments([...tempLeftovers], optionInfo.optionDefs);
+    //         delete tempArgs['--'];
+    //         if (JSON.stringify(optionInfo.parsedOptions) === JSON.stringify(tempArgs)) {
+    //           options['--'] = tempLeftovers;
+    //           break;
+    //         }
+    //       }
+    //     }
+    //   }
 
-      if (!projectName && this.multiTarget && builderNames.size > 1) {
-        this.logger.fatal(tags.oneLine`
-          Architect commands with command line overrides cannot target different builders. The
-          '${this.target}' target would run on projects ${targetProjectNames.join()} which have the
-          following builders: ${'\n  ' + [...builderNames].join('\n  ')}
-        `);
+    //   if (!projectName && this.multiTarget && builderNames.size > 1) {
+    //     this.logger.fatal(tags.oneLine`
+    //       Architect commands with command line overrides cannot target different builders. The
+    //       '${this.target}' target would run on projects ${targetProjectNames.join()} which have the
+    //       following builders: ${'\n  ' + [...builderNames].join('\n  ')}
+    //     `);
 
-        return 1;
-      }
-    }
+    //     return 1;
+    //   }
+    // }
 
     if (!projectName && !this.multiTarget) {
       const defaultProjectName = this.workspace.extensions['defaultProject'] as string;
@@ -198,9 +199,6 @@ export abstract class ArchitectCommand<
         projectName = targetProjectNames[0];
       } else if (defaultProjectName && targetProjectNames.includes(defaultProjectName)) {
         projectName = defaultProjectName;
-      } else if (options.help) {
-        // This is a special case where we just return.
-        return;
       } else {
         this.logger.fatal(
           this.missingTargetError || 'Cannot determine project or target for command.',
@@ -230,7 +228,7 @@ export abstract class ArchitectCommand<
       throw e;
     }
 
-    this.description.options.push(
+    this.commandOptions.push(
       ...(await parseJsonSchemaToOptions(
         this._registry,
         builderDesc.optionSchema as json.JsonObject,
@@ -238,7 +236,7 @@ export abstract class ArchitectCommand<
     );
 
     // Update options to remove analytics from options if the builder isn't safelisted.
-    for (const o of this.description.options) {
+    for (const o of this.commandOptions) {
       if (o.userAnalytics && !isPackageNameSafeForAnalytics(builderConf)) {
         o.userAnalytics = undefined;
       }
@@ -266,51 +264,20 @@ export abstract class ArchitectCommand<
     );
   }
 
-  async run(options: ArchitectCommandOptions & Arguments) {
+  async run(options: T) {
     return await this.runArchitectTarget(options);
   }
 
-  protected async runSingleTarget(target: Target, targetOptions: string[]) {
-    // We need to build the builderSpec twice because architect does not understand
-    // overrides separately (getting the configuration builds the whole project, including
-    // overrides).
+  protected async runSingleTarget(target: Target, options: T) {
+    // Remove options
+    const { prod, configuration, project, target: _target, ...extraOptions } = options;
     const builderConf = await this._architectHost.getBuilderNameForTarget(target);
-    let builderDesc;
-    try {
-      builderDesc = await this._architectHost.resolveBuilder(builderConf);
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this.warnOnMissingNodeModules(this.workspace!.basePath);
-        this.logger.fatal(`Could not find the '${builderConf}' builder's node package.`);
-
-        return 1;
-      }
-      throw e;
-    }
-    const targetOptionArray = await parseJsonSchemaToOptions(
-      this._registry,
-      builderDesc.optionSchema as json.JsonObject,
-    );
-    const overrides = parseArguments(targetOptions, targetOptionArray, this.logger);
-
-    const allowAdditionalProperties =
-      typeof builderDesc.optionSchema === 'object' && builderDesc.optionSchema.additionalProperties;
-
-    if (overrides['--'] && !allowAdditionalProperties) {
-      (overrides['--'] || []).forEach((additional) => {
-        this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
-      });
-
-      return 1;
-    }
-
-    await this.reportAnalytics([this.description.name], {
+    await this.reportAnalytics([this.commandName], {
       ...((await this._architectHost.getOptionsForTarget(target)) as unknown as T),
-      ...overrides,
+      ...extraOptions,
     });
 
-    const run = await this._architect.scheduleTarget(target, overrides as json.JsonObject, {
+    const run = await this._architect.scheduleTarget(target, extraOptions as json.JsonObject, {
       logger: this.logger,
       analytics: isPackageNameSafeForAnalytics(builderConf) ? this.analytics : undefined,
     });
@@ -325,48 +292,19 @@ export abstract class ArchitectCommand<
     return success ? 0 : 1;
   }
 
-  protected async runArchitectTarget(
-    options: ArchitectCommandOptions & Arguments,
-  ): Promise<number> {
-    const extra = options['--'] || [];
-
-    try {
-      const targetSpec = this._makeTargetSpecifier(options);
-      if (!targetSpec.project && this.target) {
-        // This runs each target sequentially.
-        // Running them in parallel would jumble the log messages.
-        let result = 0;
-        for (const project of this.getProjectNamesByTarget(this.target)) {
-          result |= await this.runSingleTarget({ ...targetSpec, project } as Target, extra);
-        }
-
-        return result;
-      } else {
-        return await this.runSingleTarget(targetSpec, extra);
+  protected async runArchitectTarget(options: T): Promise<number> {
+    const targetSpec = this._makeTargetSpecifier(options);
+    if (!targetSpec.project && this.target) {
+      // This runs each target sequentially.
+      // Running them in parallel would jumble the log messages.
+      let result = 0;
+      for (const project of this.getProjectNamesByTarget(this.target)) {
+        result |= await this.runSingleTarget({ ...targetSpec, project } as Target, options);
       }
-    } catch (e) {
-      if (e instanceof schema.SchemaValidationException) {
-        const newErrors: schema.SchemaValidatorError[] = [];
-        for (const schemaError of e.errors) {
-          if (schemaError.keyword === 'additionalProperties') {
-            const unknownProperty = schemaError.params?.additionalProperty;
-            if (unknownProperty in options) {
-              const dashes = unknownProperty.length === 1 ? '-' : '--';
-              this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
-              continue;
-            }
-          }
-          newErrors.push(schemaError);
-        }
 
-        if (newErrors.length > 0) {
-          this.logger.error(new schema.SchemaValidationException(newErrors).message);
-        }
-
-        return 1;
-      } else {
-        throw e;
-      }
+      return result;
+    } else {
+      return await this.runSingleTarget(targetSpec, options);
     }
   }
 

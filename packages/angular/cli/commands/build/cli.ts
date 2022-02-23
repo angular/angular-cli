@@ -1,0 +1,21 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+import { ArchitectCommandModule } from '../../utilities/command-builder/architect-command-module';
+import { CommandModuleImplementation } from '../../utilities/command-builder/command-module';
+
+export class BuildCommandModule
+  extends ArchitectCommandModule
+  implements CommandModuleImplementation
+{
+  multiTarget = false;
+  command = 'build [project]';
+  aliases = ['b'];
+  describe =
+    'Compiles an Angular application or library into an output directory named dist/ at the given output path.';
+}

@@ -75,12 +75,7 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
   }
 
   try {
-    const maybeExitCode = await runCommand(options.cliArgs, logger, workspace);
-    if (typeof maybeExitCode === 'number') {
-      console.assert(Number.isInteger(maybeExitCode));
-
-      return maybeExitCode;
-    }
+    await runCommand(options.cliArgs, logger, workspace);
 
     return 0;
   } catch (err) {

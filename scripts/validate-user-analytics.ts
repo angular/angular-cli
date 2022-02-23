@@ -11,7 +11,6 @@ import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { CommandDescriptionMap, Option } from '../packages/angular/cli/models/interface';
 import create from './create';
 
 const userAnalyticsTable = require('./templates/user-analytics-table').default;
@@ -80,53 +79,53 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
     _updateData(userAnalytics, flagName, type);
   }
 
+  // TO
   // Creating a new project and reading the help.
-  logger.info('Creating temporary project for gathering help...');
+  // logger.info('Creating temporary project for gathering help...');
 
-  const newProjectTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-create-'));
-  const newProjectName = 'help-project';
-  const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
-  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+  // const newProjectTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-create-'));
+  // const newProjectName = 'help-project';
+  // const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
+  // await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
 
-  const commandDescription: CommandDescriptionMap = {};
+  // const commandDescription: any = {};
 
-  logger.info('Gathering options...');
+  // logger.info('Gathering options...');
 
-  const commands = require('../packages/angular/cli/commands.json');
-  const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  for (const commandName of Object.keys(commands)) {
-    const options = { cwd: newProjectRoot };
-    const childLogger = logger.createChild(commandName);
-    const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
-    commandDescription[commandName] = JSON.parse(stdout.trim());
-  }
+  // const commands = require('../packages/angular/cli/commands.json');
+  // const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
+  // for (const commandName of Object.keys(commands)) {
+  //   const options = { cwd: newProjectRoot };
+  //   const childLogger = logger.createChild(commandName);
+  //   const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
+  //   commandDescription[commandName] = JSON.parse(stdout.trim());
+  // }
 
-  function _checkOptionsForAnalytics(options: Option[]) {
-    for (const option of options) {
-      if (option.subcommands) {
-        for (const subcommand of Object.values(option.subcommands)) {
-          _checkOptionsForAnalytics(subcommand.options);
-        }
-      }
+  // function _checkOptionsForAnalytics(options: Option[]) {
+  //   // for (const option of options) {
+  //   //   if (option.subcommands) {
+  //   //     for (const subcommand of Object.values(option.subcommands)) {
+  //   //       _checkOptionsForAnalytics(subcommand.options);
+  //   //     }
+  //   //   }
+  //   //   if (option.userAnalytics === undefined) {
+  //   //     continue;
+  //   //   }
+  //   //   _updateData(option.userAnalytics, 'Flag: --' + option.name, option.type);
+  //   // }
+  // }
 
-      if (option.userAnalytics === undefined) {
-        continue;
-      }
-      _updateData(option.userAnalytics, 'Flag: --' + option.name, option.type);
-    }
-  }
+  // for (const commandName of Object.keys(commandDescription)) {
+  //   _checkOptionsForAnalytics(commandDescription[commandName].options);
+  // }
 
-  for (const commandName of Object.keys(commandDescription)) {
-    _checkOptionsForAnalytics(commandDescription[commandName].options);
-  }
+  // const generatedTable = userAnalyticsTable({ flags: data }).trim();
+  // if (dimensionsTable !== generatedTable) {
+  //   logger.error('Expected dimensions table to be the same as generated. Copy the lines below:');
+  //   logger.error(generatedTable);
 
-  const generatedTable = userAnalyticsTable({ flags: data }).trim();
-  if (dimensionsTable !== generatedTable) {
-    logger.error('Expected dimensions table to be the same as generated. Copy the lines below:');
-    logger.error(generatedTable);
-
-    return 3;
-  }
+  //   return 3;
+  // }
 
   return 0;
 }
