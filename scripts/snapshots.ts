@@ -10,11 +10,10 @@ import { logging } from '@angular-devkit/core';
 import { execSync, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
-import { JsonHelp } from 'packages/angular/cli/utilities/command-builder/json-help';
 import * as path from 'path';
 import { PackageInfo, packages } from '../lib/packages';
 import build from './build-bazel';
-import create from './create';
+import jsonHelp from './json-help';
 
 // Added to the README.md of the snapshot. This is markdown.
 const readmeHeaderFn = (pkg: PackageInfo) => `
@@ -165,64 +164,12 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
     _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
   }
 
-  // Creating a new project and reading the help.
-  logger.info('Creating temporary project...');
-  const newProjectTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-create-'));
-  const newProjectName = 'help-project';
-  const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
-  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+  await jsonHelp(undefined, logger);
 
   // Run build.
   logger.info('Building...');
   await build({ snapshot: true }, logger.createChild('build'));
 
-  logger.info('Gathering JSON Help...');
-  const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
-  fs.mkdirSync(helpOutputRoot);
-
-  const runNgCommandJsonHelp = (args: string[]) => {
-    const childLogger = logger.createChild(args.join(''));
-    const stdout = _exec(
-      ngPath,
-      [...args, '--json-help', '--help'],
-      { cwd: newProjectRoot },
-      childLogger,
-    );
-
-    return JSON.parse(stdout.trim()) as JsonHelp;
-  };
-
-  const { subcommands: commands = [] } = runNgCommandJsonHelp([]);
-  for (const command of commands) {
-    const commandName = command.name;
-    const { options, subcommands } = runNgCommandJsonHelp([commandName]);
-
-    const subCommandsJson = subcommands?.map((s) => {
-      return {
-        ...subcommands,
-        options: runNgCommandJsonHelp([commandName, s.name]).options.filter((o) =>
-          // Filter options which are inherited from the parent command.
-          // Ex: `interactive` in `ng generate lib`.
-          options.some(({ name }) => o.name !== name),
-        ),
-      };
-    });
-
-    const jsonOutput = JSON.stringify(
-      {
-        ...command,
-        options,
-        subcommands: subCommandsJson,
-      },
-      undefined,
-      2,
-    );
-
-    fs.writeFileSync(path.join(helpOutputRoot, commandName + '.json'), jsonOutput);
-
-    logger.info(path.join(helpOutputRoot, commandName + '.json'));
-  }
 
   if (!githubToken) {
     logger.info('No token given, skipping actual publishing...');

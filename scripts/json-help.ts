@@ -1,0 +1,94 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+import { logging } from '@angular-devkit/core';
+import { spawn } from 'child_process';
+import { promises as fs } from 'fs';
+import * as os from 'os';
+import { JsonHelp } from 'packages/angular/cli/utilities/command-builder/json-help';
+import * as path from 'path';
+import { packages } from '../lib/packages';
+import create from './create';
+
+export default async function (opts = {}, logger: logging.Logger) {
+  logger.info('Creating temporary project...');
+  const newProjectTempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'angular-cli-create-'));
+  const newProjectName = 'help-project';
+  const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
+  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+
+  logger.info('Gathering JSON Help...');
+  const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
+  const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
+  await fs.mkdir(helpOutputRoot);
+
+  const runNgCommandJsonHelp = async (args: string[]) => {
+    const process = spawn(ngPath, [...args, '--json-help', '--help'], {
+      cwd: newProjectRoot,
+      stdio: ['ignore', 'pipe', 'inherit'],
+    });
+
+    let result = '';
+    process.stdout.on('data', (data) => {
+      result += data.toString();
+    });
+
+    return new Promise<JsonHelp>((resolve, reject) => {
+      process
+        .on('close', (code) => {
+          if (code === 0) {
+            resolve(JSON.parse(result.trim()));
+          } else {
+            reject(
+              new Error(
+                `Command failed: ${ngPath} ${args.map((x) => JSON.stringify(x)).join(', ')}`,
+              ),
+            );
+          }
+        })
+        .on('error', (err) => reject(err));
+    });
+  };
+
+  const { subcommands: commands = [] } = await runNgCommandJsonHelp([]);
+  const commandsHelp = commands.map((command) =>
+    runNgCommandJsonHelp([command.name]).then((c) => ({
+      ...command,
+      ...c,
+    })),
+  );
+
+  for await (const command of commandsHelp) {
+    const commandName = command.name;
+
+    const subCommandsHelp = command.subcommands?.map((subcommand) =>
+      runNgCommandJsonHelp([command.name, subcommand.name]).then((s) => ({
+        ...s,
+        ...subcommand,
+        options: s.options.filter((o) =>
+          // Filter options which are inherited from the parent command.
+          // Ex: `interactive` in `ng generate lib`.
+          command.options.some(({ name }) => o.name !== name),
+        ),
+      })),
+    );
+
+    const jsonOutput = JSON.stringify(
+      {
+        ...command,
+        subcommands: subCommandsHelp ? await Promise.all(subCommandsHelp) : undefined,
+      },
+      undefined,
+      2,
+    );
+
+    const filePath = path.join(helpOutputRoot, commandName + '.json');
+    await fs.writeFile(filePath, jsonOutput);
+    logger.info(filePath);
+  }
+}
