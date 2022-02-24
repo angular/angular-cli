@@ -20,7 +20,7 @@ const metricsTableRe = /<!--METRICS_TABLE_BEGIN-->([\s\S]*)<!--METRICS_TABLE_END
 async function _checkDimensions(dimensionsTable: string, logger: logging.Logger) {
   const data: { userAnalytics: number; type: string; name: string }[] = new Array(200);
 
-  function _updateData(userAnalytics: number, name: string, type: string) {
+  function updateData(userAnalytics: number, name: string, type: string) {
     if (data[userAnalytics]) {
       if (data[userAnalytics].name !== name) {
         logger.error(tags.stripIndents`
@@ -57,7 +57,7 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
         `Invalid value found in enum AnalyticsDimensions: ${JSON.stringify(userAnalytics)}`,
       );
     }
-    _updateData(userAnalytics, flagName, type);
+    updateData(userAnalytics, flagName, type);
   }
 
   logger.info('Gathering options for user-analytics...');
@@ -69,7 +69,7 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
           const type =
             [...schema.getTypesOfSchema(value)].find((type) => type !== 'object') ?? 'string';
 
-          _updateData(value['x-user-analytics'], 'Flag: --' + strings.dasherize(key), type);
+          updateData(value['x-user-analytics'], 'Flag: --' + strings.dasherize(key), type);
         } else {
           userAnalyticsGatherer(value);
         }
