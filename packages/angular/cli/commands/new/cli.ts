@@ -43,6 +43,7 @@ export class NewCommandModule
       type: 'string',
     });
   }
+
   run(options: Options<NewCommandArgs> & OtherOptions): number | void | Promise<number | void> {
     const command = new NewCommand(this.context, 'new');
 

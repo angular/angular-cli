@@ -42,7 +42,7 @@ export default async function () {
         'e2e',
         `--configuration=${lang}`,
         '--dev-server-target=',
-        `--baseUrl=http://localhost:4200/${lang}/`,
+        `--base-url=http://localhost:4200/${lang}/`,
       );
     } finally {
       server.close();

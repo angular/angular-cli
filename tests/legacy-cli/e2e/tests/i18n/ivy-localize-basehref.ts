@@ -65,7 +65,7 @@ export default async function () {
         'e2e',
         `--configuration=${lang}`,
         '--dev-server-target=',
-        `--baseUrl=http://localhost:4200${baseHrefs[lang] || '/'}`,
+        `--base-url=http://localhost:4200${baseHrefs[lang] || '/'}`,
       );
     } finally {
       server.close();
@@ -95,7 +95,7 @@ export default async function () {
         'e2e',
         `--configuration=${lang}`,
         '--dev-server-target=',
-        `--baseUrl=http://localhost:4200/test${baseHrefs[lang] || '/'}`,
+        `--base-url=http://localhost:4200/test${baseHrefs[lang] || '/'}`,
       );
     } finally {
       server.close();

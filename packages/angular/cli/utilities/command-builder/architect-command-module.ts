@@ -90,7 +90,7 @@ export abstract class ArchitectCommandModule
       return undefined;
     }
 
-    let [, projectName] = this.context.args.positional;
+    const [, projectName] = this.context.args.positional;
 
     if (projectName) {
       if (!workspace.projects.has(projectName)) {
@@ -110,15 +110,11 @@ export abstract class ArchitectCommandModule
       return undefined;
     }
 
-    if (!projectName && !this.multiTarget) {
-      const defaultProjectName = workspace.extensions['defaultProject'] as string;
-      projectName =
-        defaultProjectName && targetProjectNames.includes(defaultProjectName)
-          ? defaultProjectName
-          : targetProjectNames[0];
-    }
+    const defaultProjectName = workspace.extensions['defaultProject'];
 
-    return projectName;
+    return typeof defaultProjectName === 'string' && targetProjectNames.includes(defaultProjectName)
+      ? defaultProjectName
+      : targetProjectNames[0];
   }
 
   private getArchitectTarget(): string {

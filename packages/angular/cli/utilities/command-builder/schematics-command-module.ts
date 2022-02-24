@@ -86,15 +86,14 @@ export abstract class SchematicsCommandModule
   }
 
   protected async getCollectionName(): Promise<string> {
-    const { options, positional } = this.context.args;
-    const collection =
-      typeof options['collection'] === 'string' ? options['collection'] : undefined;
-    const collectionAlias = typeof options['c'] === 'string' ? options['c'] : undefined;
+    const {
+      options: { collection },
+      positional,
+    } = this.context.args;
 
     return (
-      collectionAlias ||
-      collection ||
-      this.parseSchematicInfo(positional[1])[0] ||
+      (typeof collection === 'string' ? collection : undefined) ??
+      this.parseSchematicInfo(positional[1])[0] ??
       (await this.getDefaultSchematicCollection())
     );
   }

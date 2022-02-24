@@ -63,7 +63,7 @@ export async function runCommand(
     help = false,
     jsonHelp = false,
     ...rest
-  } = yargsParser(args, { boolean: ['help', 'json-help'] });
+  } = yargsParser(args, { boolean: ['help', 'json-help'], alias: { 'collection': 'c' } });
 
   const context: CommandContext = {
     workspace,
@@ -111,12 +111,15 @@ export async function runCommand(
     .parserConfiguration({
       'populate--': true,
       'unknown-options-as-args': false,
+      'dot-notation': false,
+      'boolean-negation': true,
       'strip-aliased': true,
       'strip-dashed': true,
       'camel-case-expansion': false,
     })
     .option('json-help', {
       describe: 'Show help in JSON format.',
+      implies: ['help'],
       hidden: true,
       type: 'boolean',
     })
