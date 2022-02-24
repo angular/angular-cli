@@ -16,10 +16,10 @@ import {
 import { UpdateCommand } from './update-impl';
 
 export interface UpdateCommandArgs {
-  packages: string | string[];
+  packages?: string | string[];
   force: boolean;
   next: boolean;
-  'migrate-only': boolean;
+  'migrate-only'?: boolean;
   name?: string;
   from?: string;
   to?: string;
@@ -31,7 +31,7 @@ export interface UpdateCommandArgs {
 export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
   static override scope = CommandScope.In;
 
-  command = 'update <packages..>';
+  command = 'update [packages..]';
   describe = 'Updates your workspace and its dependencies. See https://update.angular.io/.';
 
   builder(localYargs: Argv): Argv<UpdateCommandArgs> {
@@ -39,7 +39,6 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       .positional('packages', {
         description: 'The names of package(s) to update.',
         type: 'string',
-        demandOption: true,
       })
       .option('force', {
         description:
@@ -56,19 +55,18 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       .option('migrate-only', {
         description: 'Only perform a migration, do not update the installed version.',
         type: 'boolean',
-        default: false,
       })
       .option('name', {
         description: 'The name of the migration to run.',
         type: 'string',
-        // implies: ['migrate-only'],
+        implies: ['migrate-only'],
         conflicts: ['to', 'from'],
       })
       .option('from', {
         description:
           'Version from which to migrate from. Only available with a single package being updated, and only on migration only.',
         type: 'string',
-        implies: ['to' /* 'migrate-only' */],
+        implies: ['to', 'migrate-only'],
         conflicts: ['name'],
       })
       .option('to', {
@@ -76,7 +74,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           'Version up to which to apply migrations. Only available with a single package being updated, ' +
           'and only on migrations only. Requires from to be specified. Default to the installed version detected.',
         type: 'string',
-        implies: ['from' /* 'migrate-only' */],
+        implies: ['from', 'migrate-only'],
         conflicts: ['name'],
       })
       .option('allow-dirty', {

@@ -312,11 +312,24 @@ export class AddCommandModule extends SchematicCommand<AddCommandOptions> {
 
   private async executeSchematic(
     collectionName: string,
-    options: Record<string, unknown>,
+    options: AddCommandOptions & Record<string, unknown>,
   ): Promise<number | void> {
     try {
+      const {
+        collection,
+        verbose,
+        registry,
+        skipConfirmation,
+        skipInstall,
+        interactive,
+        force,
+        dryRun,
+        defaults: defaultVal,
+        ...schematicOptions
+      } = options;
+
       return await this.runSchematic({
-        schematicOptions: options,
+        schematicOptions,
         collectionName,
         schematicName: 'ng-add',
         dryRun: false,

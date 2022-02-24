@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, strings } from '@angular-devkit/core';
+import { analytics, logging, strings } from '@angular-devkit/core';
 import { ArgumentsCamelCase, Argv, CamelCaseKey, CommandModule as YargsCommandModule } from 'yargs';
+import { createAnalytics } from '../../models/analytics';
 import { AngularWorkspace } from '../config';
 
 export type Options<T> = { [key in keyof T as CamelCaseKey<key>]: T[key] };
@@ -45,6 +46,7 @@ export interface CommandModuleImplementation<T extends {} = {}>
 export abstract class CommandModule<T extends {} = {}> implements CommandModuleImplementation<T> {
   abstract readonly command: string;
   abstract readonly describe: string | false;
+  private analytics: analytics.Analytics | undefined;
   static scope = CommandScope.Both;
 
   constructor(protected readonly context: CommandContext) {}
@@ -60,7 +62,17 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       camelCasedOptions[strings.camelize(key) as keyof Options<T>] = value;
     }
 
+    const commandName = this.command.split(' ', 1)[0];
+    if (!this.analytics) {
+      this.analytics = await createAnalytics(!!this.context.workspace, commandName === 'update');
+    }
+
+    const startTime = Date.now();
     const result = await this.run(camelCasedOptions);
+
+    const endTime = Date.now();
+    this.analytics.timing(commandName, 'duration', endTime - startTime);
+
     if (typeof result === 'number') {
       process.exit(result);
     }

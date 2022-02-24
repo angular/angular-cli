@@ -301,7 +301,7 @@ export class UpdateCommand extends Command<UpdateCommandOptions> {
     const packages: PackageIdentifier[] = [];
     const packagesFromOptions =
       typeof options.packages === 'string' ? [options.packages] : options.packages;
-    for (const request of packagesFromOptions) {
+    for (const request of packagesFromOptions ?? []) {
       try {
         const packageIdentifier = npa(request);
 
@@ -850,7 +850,7 @@ export class UpdateCommand extends Command<UpdateCommandOptions> {
    * @returns the version to install or null when there is no update to install.
    */
   private async checkCLIVersion(
-    packagesToUpdate: string[] | string,
+    packagesToUpdate: string[] | string | undefined,
     verbose = false,
     next = false,
   ): Promise<string | null> {
@@ -869,12 +869,15 @@ export class UpdateCommand extends Command<UpdateCommandOptions> {
     return VERSION.full === version ? null : version;
   }
 
-  private getCLIUpdateRunnerVersion(packagesToUpdate: string[], next: boolean): string | number {
+  private getCLIUpdateRunnerVersion(
+    packagesToUpdate: string[] | undefined,
+    next: boolean,
+  ): string | number {
     if (next) {
       return 'next';
     }
 
-    const updatingAngularPackage = packagesToUpdate.find((r) => ANGULAR_PACKAGES_REGEXP.test(r));
+    const updatingAngularPackage = packagesToUpdate?.find((r) => ANGULAR_PACKAGES_REGEXP.test(r));
     if (updatingAngularPackage) {
       // If we are updating any Angular package we can update the CLI to the target version because
       // migrations for @angular/core@13 can be executed using Angular/cli@13.
