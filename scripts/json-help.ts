@@ -65,16 +65,15 @@ export default async function (opts = {}, logger: logging.Logger) {
 
   for await (const command of commandsHelp) {
     const commandName = command.name;
+    const commandOptionNames = new Set([...command.options.map(({ name }) => name)]);
 
     const subCommandsHelp = command.subcommands?.map((subcommand) =>
       runNgCommandJsonHelp([command.name, subcommand.name]).then((s) => ({
         ...s,
         ...subcommand,
-        options: s.options.filter((o) =>
-          // Filter options which are inherited from the parent command.
-          // Ex: `interactive` in `ng generate lib`.
-          command.options.some(({ name }) => o.name !== name),
-        ),
+        // Filter options which are inherited from the parent command.
+        // Ex: `interactive` in `ng generate lib`.
+        options: s.options.filter((o) => !commandOptionNames.has(o.name)),
       })),
     );
 

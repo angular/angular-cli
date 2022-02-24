@@ -57,6 +57,8 @@ export function jsonHelpUsage(): string {
 
   const hidden = new Set(hiddenOptions);
   const normalizeOptions: JsonHelpOption[] = [];
+  const allAliases = new Set([...Object.values<string[]>(aliases).flat()]);
+  const visitedOptions = new Set<string>();
 
   for (const [names, type] of [
     [array, 'array'],
@@ -66,12 +68,13 @@ export function jsonHelpUsage(): string {
     [Object.keys(choices), undefined],
   ]) {
     for (const name of names) {
-      const alias = aliases[name];
-      if (alias?.includes(name) || hidden.has(name)) {
+      if (allAliases.has(name) || hidden.has(name)) {
+        // Ignore hidden, aliases and already visited option.
         continue;
       }
 
       const positionalIndex = positional?.indexOf(name) ?? -1;
+      const alias = aliases[name];
 
       normalizeOptions.push({
         name,
@@ -96,17 +99,19 @@ export function jsonHelpUsage(): string {
       aliases: string[],
       deprecated: string | boolean,
     ][]
-  ).map(([name, description, _, aliases, deprecated]) => ({
-    name: name.split(' ', 1)[0],
-    description,
-    aliases,
-    deprecated,
-  }));
+  )
+    .map(([name, description, _, aliases, deprecated]) => ({
+      name: name.split(' ', 1)[0],
+      description,
+      aliases,
+      deprecated,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const output: JsonHelp = {
     name: context.commands.pop(),
     description: usageInstance.getUsage()[0]?.[1],
-    options: normalizeOptions,
+    options: normalizeOptions.sort((a, b) => a.name.localeCompare(b.name)),
     subcommands: subcommands.length ? subcommands : undefined,
   };
 
