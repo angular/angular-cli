@@ -39,7 +39,7 @@ import { UpdateCommandArgs } from './cli';
 
 const UPDATE_SCHEMATIC_COLLECTION = path.join(
   __dirname,
-  '../src/commands/update/schematic/collection.json',
+  '../../src/commands/update/schematic/collection.json',
 );
 
 type UpdateCommandOptions = Options<UpdateCommandArgs>;

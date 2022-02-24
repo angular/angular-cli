@@ -295,9 +295,10 @@ export async function parseJsonSchemaToOptions(
     const positional: number | undefined =
       typeof $defaultIndex == 'number' ? $defaultIndex : undefined;
 
-    const required = json.isJsonArray(current.required)
-      ? current.required.indexOf(name) != -1
-      : false;
+    const required =
+      current['x-prompt'] === undefined && json.isJsonArray(schema.required)
+        ? schema.required.includes(name)
+        : false;
     const alias = json.isJsonArray(current.aliases)
       ? [...current.aliases].map((x) => '' + x)
       : current.alias
@@ -336,5 +337,14 @@ export async function parseJsonSchemaToOptions(
   const flattenedSchema = await registry.flatten(schema).toPromise();
   json.schema.visitJsonSchema(flattenedSchema, visitor);
 
-  return options;
+  // Sort by positional and name.
+  return options.sort((a, b) => {
+    if (a.positional) {
+      return b.positional ? a.positional - b.positional : a.name.localeCompare(b.name);
+    } else if (b.positional) {
+      return -1;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
 }

@@ -31,7 +31,7 @@ export abstract class SchematicsCommandModule
   implements CommandModuleImplementation<SchematicsCommandArgs>
 {
   static override scope = CommandScope.In;
-  protected schematicName: string | undefined;
+  protected readonly schematicName: string | undefined;
 
   async builder(argv: Argv): Promise<Argv<SchematicsCommandArgs>> {
     const localYargs: Argv<SchematicsCommandArgs> = argv

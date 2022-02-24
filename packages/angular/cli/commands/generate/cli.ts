@@ -39,10 +39,6 @@ export class GenerateCommandModule
       this.context.args.positional[1],
     );
 
-    if (collectionNameFromArgs && schematicNameFromArgs) {
-      this.schematicName = schematicNameFromArgs;
-    }
-
     const baseYargs = await super.builder(argv);
     if (this.schematicName) {
       return baseYargs;
@@ -71,7 +67,9 @@ export class GenerateCommandModule
         schematicName,
         workflow.registry,
         schematic,
-        workspaceDefaultCollection === collectionName ? undefined : collectionName,
+        workspaceDefaultCollection === collectionName && !collectionNameFromArgs
+          ? undefined
+          : collectionName,
       );
 
       if (!subcommand) {
