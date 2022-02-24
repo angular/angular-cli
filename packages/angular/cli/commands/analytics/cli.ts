@@ -31,11 +31,13 @@ export class AnalyticsCommandModule extends CommandModule<AnalyticsCommandArgs> 
           'Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, ' +
           'or sets the default status for the project.',
         choices: ['on', 'off', 'ci', 'prompt'],
+        type: 'string',
         demandOption: true,
       })
       .positional('project-setting', {
         description: 'Sets the default analytics enablement status for the project.',
         choices: ['on', 'off', 'prompt'],
+        type: 'string',
       })
       .strict();
   }
