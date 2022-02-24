@@ -170,7 +170,6 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
   logger.info('Building...');
   await build({ snapshot: true }, logger.createChild('build'));
 
-
   if (!githubToken) {
     logger.info('No token given, skipping actual publishing...');
 
