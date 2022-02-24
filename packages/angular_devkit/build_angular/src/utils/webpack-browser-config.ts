@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { getSystemPath, json, logging, normalize, resolve } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import { Configuration, javascript } from 'webpack';
@@ -146,26 +146,24 @@ export async function generateBrowserWebpackConfigFromContext(
     throw new Error('The builder requires a target.');
   }
 
-  const workspaceRoot = normalize(context.workspaceRoot);
+  const workspaceRoot = context.workspaceRoot;
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = resolve(workspaceRoot, normalize((projectMetadata.root as string) || ''));
-  const projectSourceRoot = projectMetadata.sourceRoot as string | undefined;
-  const sourceRoot = projectSourceRoot
-    ? resolve(workspaceRoot, normalize(projectSourceRoot))
-    : undefined;
+  const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
+  const sourceRoot = projectMetadata.sourceRoot as string | undefined;
+  const projectSourceRoot = sourceRoot ? path.join(workspaceRoot, sourceRoot) : undefined;
 
   const normalizedOptions = normalizeBrowserSchema(
     workspaceRoot,
     projectRoot,
-    sourceRoot,
+    projectSourceRoot,
     options,
     projectMetadata,
   );
 
   const config = await generateWebpackConfig(
-    getSystemPath(workspaceRoot),
-    getSystemPath(projectRoot),
-    sourceRoot && getSystemPath(sourceRoot),
+    workspaceRoot,
+    projectRoot,
+    projectSourceRoot,
     projectName,
     normalizedOptions,
     webpackPartialGenerator,
@@ -189,8 +187,8 @@ export async function generateBrowserWebpackConfigFromContext(
 
   return {
     config,
-    projectRoot: getSystemPath(projectRoot),
-    projectSourceRoot: sourceRoot && getSystemPath(sourceRoot),
+    projectRoot,
+    projectSourceRoot,
   };
 }
 
