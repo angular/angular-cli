@@ -23,7 +23,12 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+  getPackageJsonDependency,
+} from '../utility/dependencies';
+import { latestVersions } from '../utility/latest-versions';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
@@ -226,7 +231,11 @@ function addDependencies(): Rule {
     };
     addPackageJsonDependency(host, platformServerDep);
 
-    return host;
+    addPackageJsonDependency(host, {
+      type: NodeDependencyType.Dev,
+      name: '@types/node',
+      version: latestVersions['@types/node'],
+    });
   };
 }
 

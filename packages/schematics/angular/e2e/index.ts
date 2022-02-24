@@ -20,6 +20,7 @@ import {
 } from '@angular-devkit/schematics';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
+import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
@@ -92,6 +93,11 @@ export default function (options: E2eOptions): Rule {
             type: NodeDependencyType.Dev,
             name: 'ts-node',
             version: '~9.1.1',
+          },
+          {
+            type: NodeDependencyType.Dev,
+            name: '@types/node',
+            version: latestVersions['@types/node'],
           },
         ].forEach((dep) => addPackageJsonDependency(host, dep)),
       addScriptsToPackageJson(),
