@@ -14,6 +14,7 @@ import { promisify } from 'util';
 import { packages } from '../lib/packages';
 
 const userAnalyticsTable = require('./templates/user-analytics-table').default;
+
 const dimensionsTableRe = /<!--DIMENSIONS_TABLE_BEGIN-->([\s\S]*)<!--DIMENSIONS_TABLE_END-->/m;
 const metricsTableRe = /<!--METRICS_TABLE_BEGIN-->([\s\S]*)<!--METRICS_TABLE_END-->/m;
 

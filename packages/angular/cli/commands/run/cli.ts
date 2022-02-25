@@ -8,7 +8,6 @@
 
 import { Target } from '@angular-devkit/architect';
 import { Argv } from 'yargs';
-import { Parser, hideBin } from 'yargs/helpers';
 import { ArchitectCommand } from '../../models/architect-command';
 import { getArchitectTargetOptions } from '../../utilities/command-builder/architect-command-module';
 import {
@@ -17,17 +16,9 @@ import {
   CommandScope,
   Options,
 } from '../../utilities/command-builder/command-module';
-import { addSchemaOptionsToYargs } from '../../utilities/command-builder/json-schema';
-
-const yargsParser = Parser as unknown as typeof Parser.default;
 
 export interface RunCommandArgs {
   target: string;
-}
-
-interface ParsedFreeArgs {
-  target: string;
-  help: boolean;
 }
 
 export class RunCommandModule
@@ -49,38 +40,14 @@ export class RunCommandModule
       })
       .strict();
 
-    const workspace = this.context.workspace;
-    if (!workspace) {
-      return localYargs;
-    }
-
     const target = this.makeTargetSpecifier();
     if (!target) {
       return localYargs;
     }
 
-    const schemaOptions = await getArchitectTargetOptions(workspace, target);
+    const schemaOptions = await getArchitectTargetOptions(this.context, target);
 
-    return schemaOptions
-      ? addSchemaOptionsToYargs(localYargs, schemaOptions, this.parsedFreeArgs.help)
-      : localYargs;
-  }
-
-  private _parsedFreeArgs: ParsedFreeArgs | undefined;
-  private get parsedFreeArgs(): ParsedFreeArgs {
-    if (this._parsedFreeArgs) {
-      return this._parsedFreeArgs;
-    }
-
-    const {
-      _: [_command, target = ''],
-      help = false,
-    } = yargsParser(hideBin(process.argv));
-
-    return (this._parsedFreeArgs = {
-      help,
-      target,
-    });
+    return this.addSchemaOptionsToCommand(localYargs, schemaOptions);
   }
 
   run(options: Options<RunCommandArgs>): Promise<number | void> {
@@ -90,7 +57,7 @@ export class RunCommandModule
   }
 
   protected makeTargetSpecifier(options?: Options<RunCommandArgs>): Target | undefined {
-    const architectTarget = options?.target ?? this.parsedFreeArgs.target;
+    const architectTarget = options?.target ?? this.context.args.positional[1];
     if (!architectTarget) {
       return undefined;
     }

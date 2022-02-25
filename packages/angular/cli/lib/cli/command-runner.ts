@@ -9,26 +9,27 @@
 import { logging } from '@angular-devkit/core';
 import yargs from 'yargs';
 import { Parser } from 'yargs/helpers';
-import { AddCommandModule } from '../commands/add/cli';
-import { AnalyticsCommandModule } from '../commands/analytics/cli';
-import { BuildCommandModule } from '../commands/build/cli';
-import { ConfigCommandModule } from '../commands/config/cli';
-import { DeployCommandModule } from '../commands/deploy/cli';
-import { DocCommandModule } from '../commands/doc/cli';
-import { E2eCommandModule } from '../commands/e2e/cli';
-import { ExtractI18nCommandModule } from '../commands/extract-i18n/cli';
-import { GenerateCommandModule } from '../commands/generate/cli';
-import { LintCommandModule } from '../commands/lint/cli';
-import { AwesomeCommandModule } from '../commands/make-this-awesome/cli';
-import { NewCommandModule } from '../commands/new/cli';
-import { RunCommandModule } from '../commands/run/cli';
-import { ServeCommandModule } from '../commands/serve/cli';
-import { TestCommandModule } from '../commands/test/cli';
-import { UpdateCommandModule } from '../commands/update/cli';
-import { VersionCommandModule } from '../commands/version/cli';
-import { CommandContext, CommandScope } from '../utilities/command-builder/command-module';
-import { jsonHelpUsage } from '../utilities/command-builder/json-help';
-import { AngularWorkspace } from '../utilities/config';
+import { AddCommandModule } from '../../commands/add/cli';
+import { AnalyticsCommandModule } from '../../commands/analytics/cli';
+import { BuildCommandModule } from '../../commands/build/cli';
+import { ConfigCommandModule } from '../../commands/config/cli';
+import { DeployCommandModule } from '../../commands/deploy/cli';
+import { DocCommandModule } from '../../commands/doc/cli';
+import { E2eCommandModule } from '../../commands/e2e/cli';
+import { ExtractI18nCommandModule } from '../../commands/extract-i18n/cli';
+import { GenerateCommandModule } from '../../commands/generate/cli';
+import { LintCommandModule } from '../../commands/lint/cli';
+import { AwesomeCommandModule } from '../../commands/make-this-awesome/cli';
+import { NewCommandModule } from '../../commands/new/cli';
+import { RunCommandModule } from '../../commands/run/cli';
+import { ServeCommandModule } from '../../commands/serve/cli';
+import { TestCommandModule } from '../../commands/test/cli';
+import { UpdateCommandModule } from '../../commands/update/cli';
+import { VersionCommandModule } from '../../commands/version/cli';
+import { colors } from '../../utilities/color';
+import { CommandContext, CommandScope } from '../../utilities/command-builder/command-module';
+import { jsonHelpUsage } from '../../utilities/command-builder/json-help';
+import { AngularWorkspace } from '../../utilities/config';
 
 const COMMANDS = [
   VersionCommandModule,
@@ -56,7 +57,7 @@ export async function runCommand(
   args: string[],
   logger: logging.Logger,
   workspace: AngularWorkspace | undefined,
-): Promise<void> {
+): Promise<number> {
   const {
     $0,
     _: positional,
@@ -124,12 +125,32 @@ export async function runCommand(
       type: 'boolean',
     })
     .help('help', 'Shows a help message for this command in the console.')
+    // A complete list of strings can be found: https://github.com/yargs/yargs/blob/main/locales/en.json
+    .updateStrings({
+      'Commands:': colors.cyan('Commands:'),
+      'Options:': colors.cyan('Options:'),
+      'Positionals:': colors.cyan('Positionals:'),
+      'deprecated': colors.yellow('deprecated'),
+      'deprecated: %s': colors.yellow('deprecated:') + ' %s',
+      'Did you mean %s?': 'Unknown command. Did you mean %s?',
+    })
     .demandCommand()
     .recommendCommands()
     .version(false)
     .showHelpOnFail(false)
     .strict()
-    .fail(false)
+    .fail((msg, err) => {
+      if (msg) {
+        // Validation failed example: `Unknown argument:`
+        logger.error(msg);
+        process.exit(1);
+      } else {
+        // Unknown exception, re-throw.
+        throw err;
+      }
+    })
     .wrap(yargs.terminalWidth())
     .parseAsync();
+
+  return process.exitCode ?? 0;
 }

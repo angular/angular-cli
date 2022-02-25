@@ -15,7 +15,7 @@ import {
 import { Argv } from 'yargs';
 import { getProjectByCwd, getWorkspace } from '../config';
 import { CommandModule, CommandModuleImplementation, CommandScope } from './command-module';
-import { Option, addSchemaOptionsToYargs, parseJsonSchemaToOptions } from './json-schema';
+import { Option, parseJsonSchemaToOptions } from './json-schema';
 
 const DEFAULT_SCHEMATICS_COLLECTION = '@schematics/angular';
 
@@ -59,16 +59,11 @@ export abstract class SchematicsCommandModule
 
     if (this.schematicName) {
       const collectionName = await this.getCollectionName();
-
       const workflow = this.getOrCreateWorkflow(collectionName);
       const collection = workflow.engine.createCollection(collectionName);
       const options = await this.getSchematicOptions(collection, this.schematicName, workflow);
 
-      if (options) {
-        const { help } = this.context.args.options;
-
-        return addSchemaOptionsToYargs(localYargs, options, help);
-      }
+      return this.addSchemaOptionsToCommand(localYargs, options);
     }
 
     return localYargs;
@@ -78,11 +73,15 @@ export abstract class SchematicsCommandModule
     collection: Collection<FileSystemCollectionDescription, FileSystemSchematicDescription>,
     schematicName: string,
     workflow: NodeWorkflow,
-  ): Promise<Option[] | undefined> {
+  ): Promise<Option[]> {
     const schematic = collection.createSchematic(schematicName, true);
     const { schemaJson } = schematic.description;
 
-    return schemaJson ? parseJsonSchemaToOptions(workflow.registry, schemaJson) : undefined;
+    if (!schemaJson) {
+      return [];
+    }
+
+    return parseJsonSchemaToOptions(workflow.registry, schemaJson);
   }
 
   protected async getCollectionName(): Promise<string> {

@@ -8,11 +8,11 @@
 
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
-import { runCommand } from '../../models/command-runner';
 import { colors, removeColor } from '../../utilities/color';
 import { AngularWorkspace, getWorkspaceRaw } from '../../utilities/config';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import { findWorkspaceFile } from '../../utilities/project';
+import { runCommand } from './command-runner';
 
 export { VERSION, Version } from '../../models/version';
 
@@ -75,9 +75,7 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
   }
 
   try {
-    await runCommand(options.cliArgs, logger, workspace);
-
-    return 0;
+    return await runCommand(options.cliArgs, logger, workspace);
   } catch (err) {
     if (err instanceof Error) {
       try {

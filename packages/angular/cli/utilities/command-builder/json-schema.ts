@@ -6,13 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json, strings } from '@angular-devkit/core';
+import { json, normalize, strings } from '@angular-devkit/core';
 import { Schematic } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
   FileSystemSchematicDescription,
 } from '@angular-devkit/schematics/tools';
+import * as path from 'path';
 import yargs from 'yargs';
+import { CommandContext } from './command-module';
 
 /**
  * An option description.
@@ -55,10 +57,6 @@ export interface Option extends yargs.Options {
  */
 export interface SubCommandDescription {
   /**
-   * Command usage string.
-   */
-  command: string;
-  /**
    * The name of the subcommand.
    */
   name: string;
@@ -67,11 +65,6 @@ export interface SubCommandDescription {
    * Short description (1-2 lines) of this sub command.
    */
   description: string;
-
-  /**
-   * List of all supported options.
-   */
-  options: Option[];
 
   /**
    * Aliases supported for this sub command.
@@ -89,66 +82,14 @@ export interface SubCommandDescription {
   deprecated?: boolean | string;
 }
 
-export function addSchemaOptionsToYargs<T>(
-  localYargs: yargs.Argv<T>,
-  options: Option[],
-  addDefaults = false,
-): yargs.Argv<T> {
-  for (const option of options) {
-    const {
-      default: defaultVal,
-      positional,
-      deprecated,
-      description,
-      alias,
-      type,
-      hidden,
-      name,
-      choices,
-    } = option;
-
-    const sharedOptions: yargs.Options & yargs.PositionalOptions = {
-      alias,
-      hidden,
-      description,
-      deprecated,
-      choices,
-      // This should only be done when `--help` is used otherwise default will override options set in angular.json.
-      ...(addDefaults ? { default: defaultVal } : {}),
-    };
-
-    if (addDefaults) {
-      sharedOptions.default = defaultVal;
-    }
-
-    if (positional === undefined) {
-      localYargs = localYargs.option(strings.dasherize(name), {
-        type,
-        ...sharedOptions,
-      });
-    } else {
-      localYargs = localYargs.positional(strings.dasherize(name), {
-        type: type === 'array' || type === 'count' ? 'string' : type,
-        ...sharedOptions,
-      });
-    }
-  }
-
-  return localYargs;
-}
-
 export async function parseJsonSchemaToGenerateSubCommandDescription(
   name: string,
-  registry: json.schema.SchemaRegistry,
   schematic: Schematic<FileSystemCollectionDescription, FileSystemSchematicDescription>,
-  collectionNameInCommand: string | undefined,
 ): Promise<SubCommandDescription | undefined> {
   const schema = schematic.description.schemaJson;
   if (!schema) {
     return undefined;
   }
-
-  const options = await parseJsonSchemaToOptions(registry, schema);
 
   // Deprecated is set only if it's true or a string.
   const xDeprecated = schema['x-deprecated'];
@@ -159,34 +100,18 @@ export async function parseJsonSchemaToGenerateSubCommandDescription(
   const hidden = !!schema.hidden;
 
   return {
-    command: collectionNameInCommand
-      ? `${collectionNameInCommand}:${generateFullCommandName(name, options)}`
-      : generateFullCommandName(name, options),
     name,
     hidden,
     deprecated,
     description,
-    options,
     aliases: schematic.description.aliases,
   };
-}
-
-function generateFullCommandName(name: string, options: Option[]): string {
-  const positionalArgs = options
-    .filter((o) => o.positional !== undefined)
-    .map((o) => {
-      const label = `${strings.dasherize(o.name)}${o.type === 'array' ? ' ..' : ''}`;
-
-      return o.required ? `<${label}>` : `[${label}]`;
-    })
-    .join(' ');
-
-  return `${strings.dasherize(name)}${positionalArgs ? ' ' + positionalArgs : ''}`;
 }
 
 export async function parseJsonSchemaToOptions(
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
+  interactive = true,
 ): Promise<Option[]> {
   const options: Option[] = [];
 
@@ -295,10 +220,11 @@ export async function parseJsonSchemaToOptions(
     const positional: number | undefined =
       typeof $defaultIndex == 'number' ? $defaultIndex : undefined;
 
-    const required =
-      current['x-prompt'] === undefined && json.isJsonArray(schema.required)
-        ? schema.required.includes(name)
-        : false;
+    let required = json.isJsonArray(schema.required) ? schema.required.includes(name) : false;
+    if (required && interactive && current['x-prompt']) {
+      required = false;
+    }
+
     const alias = json.isJsonArray(current.aliases)
       ? [...current.aliases].map((x) => '' + x)
       : current.alias

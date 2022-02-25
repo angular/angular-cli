@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { strings } from '@angular-devkit/core';
 import { Argv } from 'yargs';
 import {
   CommandModuleImplementation,
@@ -13,7 +14,7 @@ import {
   OtherOptions,
 } from '../../utilities/command-builder/command-module';
 import {
-  addSchemaOptionsToYargs,
+  Option,
   parseJsonSchemaToGenerateSubCommandDescription,
 } from '../../utilities/command-builder/json-schema';
 import {
@@ -56,36 +57,38 @@ export class GenerateCommandModule
     const workflow = this.getOrCreateWorkflow(collectionName);
     const collection = workflow.engine.createCollection(collectionName);
 
-    const schematicNames = schematicNameFromArgs
-      ? [schematicNameFromArgs]
-      : collection.listSchematicNames();
-    const workspaceDefaultCollection = await this.getDefaultSchematicCollection();
+    // We cannot use `collection.listSchematicNames()` as this doesn't return hidden schematics.
+    const schematicNames = new Set(Object.keys(collection.description.schematics));
+    if (schematicNameFromArgs && schematicNames.has(schematicNameFromArgs)) {
+      // No need to process all schematics since we know which one the user invoked.
+      schematicNames.clear();
+      schematicNames.add(schematicNameFromArgs);
+    }
 
+    const workspaceDefaultCollection = await this.getDefaultSchematicCollection();
     for (const schematicName of schematicNames) {
-      const schematic = collection.createSchematic(schematicName, true);
       const subcommand = await parseJsonSchemaToGenerateSubCommandDescription(
         schematicName,
-        workflow.registry,
-        schematic,
-        workspaceDefaultCollection === collectionName && !collectionNameFromArgs
-          ? undefined
-          : collectionName,
+        collection.createSchematic(schematicName, true),
       );
 
       if (!subcommand) {
         continue;
       }
 
-      const { command, hidden, description, deprecated, aliases, options } = subcommand;
-      const { help } = this.context.args.options;
+      const { name, hidden, description, deprecated, aliases } = subcommand;
+      const options = await this.getSchematicOptions(collection, schematicName, workflow);
+
+      const collectionNameInCommand =
+        workspaceDefaultCollection !== collectionName || !!collectionNameFromArgs;
 
       localYargs = localYargs.command({
-        command,
+        command: this.generateCommandString(collectionName, name, options, collectionNameInCommand),
         // When 'describe' is set to false, it results in a hidden command.
         describe: hidden ? false : description,
         deprecated,
         aliases,
-        builder: (localYargs) => addSchemaOptionsToYargs(localYargs, options, help).strict(),
+        builder: (localYargs) => this.addSchemaOptionsToCommand(localYargs, options).strict(),
         handler: (options) =>
           this.handler({ ...options, schematic: `${collectionName}:${schematicName}` }),
       });
@@ -100,5 +103,27 @@ export class GenerateCommandModule
     const command = new GenerateCommand(this.context, 'generate');
 
     return command.validateAndRun(options);
+  }
+
+  private generateCommandString(
+    collectionName: string,
+    schematicName: string,
+    options: Option[],
+    collectionNameAsCommandPrefix: boolean,
+  ): string {
+    const positionalArgs = options
+      .filter((o) => o.positional !== undefined)
+      .map((o) => {
+        const label = `${strings.dasherize(o.name)}${o.type === 'array' ? ' ..' : ''}`;
+
+        return o.required ? `<${label}>` : `[${label}]`;
+      })
+      .join(' ');
+
+    const commandNamePrefix = collectionNameAsCommandPrefix ? collectionName + ':' : '';
+
+    return `${commandNamePrefix}${strings.dasherize(schematicName)}${
+      positionalArgs ? ' ' + positionalArgs : ''
+    }`;
   }
 }

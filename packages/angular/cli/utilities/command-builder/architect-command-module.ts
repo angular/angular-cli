@@ -8,17 +8,17 @@
 
 import { Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json } from '@angular-devkit/core';
+import { json, tags } from '@angular-devkit/core';
 import { Argv } from 'yargs';
 import { ArchitectCommand } from '../../models/architect-command';
-import { AngularWorkspace } from '../config';
 import {
+  CommandContext,
   CommandModule,
   CommandModuleImplementation,
   CommandScope,
   Options,
 } from './command-module';
-import { Option, addSchemaOptionsToYargs, parseJsonSchemaToOptions } from './json-schema';
+import { Option, parseJsonSchemaToOptions } from './json-schema';
 
 export interface ArchitectCommandArgs {
   configuration?: string;
@@ -50,24 +50,14 @@ export abstract class ArchitectCommandModule
       })
       .strict();
 
-    const workspace = this.context.workspace;
-    if (!workspace) {
-      return localYargs;
-    }
     const targetSpecifier = this.makeTargetSpecifier();
     if (!targetSpecifier) {
       return localYargs;
     }
 
-    const schemaOptions = await getArchitectTargetOptions(workspace, targetSpecifier);
+    const schemaOptions = await getArchitectTargetOptions(this.context, targetSpecifier);
 
-    if (schemaOptions) {
-      const { help } = this.context.args.options;
-
-      return addSchemaOptionsToYargs(localYargs, schemaOptions, help);
-    }
-
-    return localYargs;
+    return this.addSchemaOptionsToCommand(localYargs, schemaOptions);
   }
 
   run(options: Options<ArchitectCommandArgs>): Promise<number | void> {
@@ -84,9 +74,7 @@ export abstract class ArchitectCommandModule
 
   private getArchitectProject(): string | undefined {
     const workspace = this.context.workspace;
-    const target = this.getArchitectTarget();
-
-    if (!workspace || !target) {
+    if (!workspace) {
       return undefined;
     }
 
@@ -99,10 +87,18 @@ export abstract class ArchitectCommandModule
 
       return projectName;
     }
+
+    const builderNames = new Set<string>();
     const targetProjectNames: string[] = [];
+    const target = this.getArchitectTarget();
     for (const [name, project] of workspace.projects) {
-      if (project.targets.has(target)) {
+      const projectTarget = project.targets.get(target);
+      if (projectTarget) {
         targetProjectNames.push(name);
+
+        if (this.multiTarget) {
+          builderNames.add(projectTarget.builder);
+        }
       }
     }
 
@@ -111,6 +107,15 @@ export abstract class ArchitectCommandModule
     }
 
     const defaultProjectName = workspace.extensions['defaultProject'];
+    if (!projectName && this.multiTarget && builderNames.size > 1) {
+      this.context.logger.fatal(tags.oneLine`
+        Architect commands with command line overrides cannot target different builders. The
+        '${target}' target would run on projects ${targetProjectNames.join()} which have the
+        following builders: ${'\n  ' + [...builderNames].join('\n  ')}
+      `);
+
+      return undefined;
+    }
 
     return typeof defaultProjectName === 'string' && targetProjectNames.includes(defaultProjectName)
       ? defaultProjectName
@@ -137,21 +142,31 @@ export abstract class ArchitectCommandModule
 }
 
 export async function getArchitectTargetOptions(
-  workspace: AngularWorkspace,
+  context: CommandContext,
   target: Target,
-): Promise<Option[] | undefined> {
+): Promise<Option[]> {
+  const { workspace, args } = context;
+  if (!workspace) {
+    return [];
+  }
+
   const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, workspace.basePath);
   const builderConf = await architectHost.getBuilderNameForTarget(target);
 
   let builderDesc;
   try {
     builderDesc = await architectHost.resolveBuilder(builderConf);
-  } catch {
-    return undefined;
+  } catch (e) {
+    if (e.code === 'MODULE_NOT_FOUND') {
+      throw new Error(`Could not find the '${builderConf}' builder's node package.`);
+    }
+
+    throw e;
   }
 
   return parseJsonSchemaToOptions(
     new json.schema.CoreSchemaRegistry(),
     builderDesc.optionSchema as json.JsonObject,
+    args.options.interactive !== false,
   );
 }

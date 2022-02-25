@@ -58,7 +58,6 @@ export function jsonHelpUsage(): string {
   const hidden = new Set(hiddenOptions);
   const normalizeOptions: JsonHelpOption[] = [];
   const allAliases = new Set([...Object.values<string[]>(aliases).flat()]);
-  const visitedOptions = new Set<string>();
 
   for (const [names, type] of [
     [array, 'array'],
