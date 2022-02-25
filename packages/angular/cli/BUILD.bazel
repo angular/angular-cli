@@ -330,6 +330,5 @@ pkg_npm(
         ":license",
         ":src/commands/update/schematic/collection.json",
         ":src/commands/update/schematic/schema.json",
-        ":utilities/INITIAL_COMMIT_MESSAGE.txt",
     ],
 )
