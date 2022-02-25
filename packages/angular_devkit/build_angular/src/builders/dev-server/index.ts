@@ -47,7 +47,7 @@ import { createWebpackLoggingCallback } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { Schema } from './schema';
 
-export type DevServerBuilderOptions = Schema & json.JsonObject;
+export type DevServerBuilderOptions = Schema;
 
 /**
  * @experimental Direct usage of this type is considered experimental.
@@ -82,7 +82,7 @@ export function serveWebpackBrowser(
   const browserTarget = targetFromTargetString(options.browserTarget);
 
   async function setup(): Promise<{
-    browserOptions: json.JsonObject & BrowserBuilderSchema;
+    browserOptions: BrowserBuilderSchema;
     webpackConfig: webpack.Configuration;
     projectRoot: string;
   }> {
