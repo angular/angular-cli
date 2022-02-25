@@ -8,7 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { runWebpack } from '@angular-devkit/build-webpack';
-import { json, tags } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
@@ -29,15 +29,14 @@ import { Schema as ServerBuilderOptions } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export type ServerBuilderOutput = json.JsonObject &
-  BuilderOutput & {
-    baseOutputPath: string;
-    outputPaths: string[];
-    /**
-     * @deprecated in version 9. Use 'outputPaths' instead.
-     */
-    outputPath: string;
-  };
+export type ServerBuilderOutput = BuilderOutput & {
+  baseOutputPath: string;
+  outputPaths: string[];
+  /**
+   * @deprecated in version 9. Use 'outputPaths' instead.
+   */
+  outputPath: string;
+};
 
 export { ServerBuilderOptions };
 

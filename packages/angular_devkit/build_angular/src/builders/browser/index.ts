@@ -8,7 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { json, logging, normalize } from '@angular-devkit/core';
+import { logging, normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
@@ -64,15 +64,14 @@ import { Schema as BrowserBuilderSchema } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export type BrowserBuilderOutput = json.JsonObject &
-  BuilderOutput & {
-    baseOutputPath: string;
-    outputPaths: string[];
-    /**
-     * @deprecated in version 9. Use 'outputPaths' instead.
-     */
-    outputPath: string;
-  };
+export type BrowserBuilderOutput = BuilderOutput & {
+  baseOutputPath: string;
+  outputPaths: string[];
+  /**
+   * @deprecated in version 9. Use 'outputPaths' instead.
+   */
+  outputPath: string;
+};
 
 /**
  * Maximum time in milliseconds for single build/rebuild
@@ -436,4 +435,4 @@ function checkInternetExplorerSupport(projectRoot: string, logger: logging.Logge
   }
 }
 
-export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);
+export default createBuilder<BrowserBuilderSchema>(buildWebpackBrowser);

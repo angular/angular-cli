@@ -25,7 +25,7 @@ import { createWebpackLoggingCallback } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { Format, Schema } from './schema';
 
-export type ExtractI18nBuilderOptions = Schema & JsonObject;
+export type ExtractI18nBuilderOptions = Schema;
 
 function getI18nOutfile(format: string | undefined) {
   switch (format) {

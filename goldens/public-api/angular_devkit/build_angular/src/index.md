@@ -10,8 +10,6 @@ import { BuildResult } from '@angular-devkit/build-webpack';
 import { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
-import { json } from '@angular-devkit/core';
-import { JsonObject } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
@@ -74,7 +72,7 @@ export interface BrowserBuilderOptions {
 }
 
 // @public
-export type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
+export type BrowserBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
     outputPath: string;
@@ -104,7 +102,7 @@ export enum CrossOrigin {
 }
 
 // @public (undocumented)
-export type DevServerBuilderOptions = Schema & json.JsonObject;
+export type DevServerBuilderOptions = Schema;
 
 // @public
 export type DevServerBuilderOutput = DevServerBuildOutput & {
@@ -151,7 +149,7 @@ export function executeServerBuilder(options: ServerBuilderOptions, context: Bui
 export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 
 // @public (undocumented)
-export type ExtractI18nBuilderOptions = Schema_2 & JsonObject;
+export type ExtractI18nBuilderOptions = Schema_2;
 
 // @public (undocumented)
 export interface FileReplacement {
@@ -270,7 +268,7 @@ export interface ServerBuilderOptions {
 }
 
 // @public
-export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
+export type ServerBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
     outputPath: string;
