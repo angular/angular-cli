@@ -92,11 +92,11 @@ export async function runCommand(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commandModule = new CommandModule(context) as any;
-    const describe = jsonHelp ? commandModule.FullDescribe : commandModule.describe;
+    const describe = jsonHelp ? commandModule.fullDescribe : commandModule.describe;
 
     localYargs = localYargs.command({
       command: commandModule.command,
-      aliases: commandModule.alias,
+      aliases: commandModule.aliases,
       describe:
         // We cannot add custom fields in help, such as long command description which is used in AIO.
         // Therefore, we get around this by adding a complex object as a string which we later parse when geneerating the help files.

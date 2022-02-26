@@ -67,7 +67,6 @@ export function jsonHelpUsage(): string {
     [string, 'string'],
     [boolean, 'boolean'],
     [number, 'number'],
-    [Object.keys(choices), undefined],
   ]) {
     for (const name of names) {
       if (allAliases.has(name) || hidden.has(name)) {
@@ -116,16 +115,12 @@ export function jsonHelpUsage(): string {
       return {};
     }
 
-    try {
-      const { longDescription, describe: description } = JSON.parse(rawDescription) as FullDescribe;
+    const { longDescription, describe: description } = JSON.parse(rawDescription) as FullDescribe;
 
-      return {
-        description,
-        longDescription,
-      };
-    } catch (error) {
-      return {};
-    }
+    return {
+      description,
+      longDescription,
+    };
   };
 
   const [command, rawDescription] = usageInstance.getUsage()[0] ?? [];

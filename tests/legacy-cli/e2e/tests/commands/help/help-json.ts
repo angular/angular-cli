@@ -1,17 +1,44 @@
 import { silentNg } from '../../../utils/process';
 
 export default async function () {
-  // const commands = require('@angular/cli/commands.json');
-  // for (const commandName of Object.keys(commands)) {
-  //   const { stdout } = await silentNg(commandName, '--help=json');
-  //   if (stdout.trim()) {
-  //     JSON.parse(stdout, (key, value) => {
-  //       if (key === 'name' && /[A-Z]/.test(value)) {
-  //         throw new Error(`Option named '${value}' is not kebab case.`);
-  //       }
-  //     });
-  //   } else {
-  //     console.warn(`No JSON output for command [${commandName}].`);
-  //   }
-  // }
+  // This test is use as a sanity check.
+  const addHelpOutputSnapshot = JSON.stringify({
+    name: 'analytics',
+    command: 'ng analytics <setting-or-project>',
+    description:
+      'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering.',
+    longDescription:
+      'The value of __setting-or-project__ is one of the following.\n\n- "on" : Enables analytics gathering and reporting for the user.\n- "off" : Disables analytics gathering and reporting for the user.\n- "ci" : Enables analytics and configures reporting for use with Continuous Integration,\n  which uses a common CI user.\n- "prompt" : Prompts the user to set the status interactively.\n- "project" : Sets the default status for the project to the _project-setting_ value, which can be any of the other values. The _project-setting_ argument is ignored for all other values of _setting_or_project_.\n',
+    options: [
+      {
+        name: 'help',
+        type: 'boolean',
+        description: 'Shows a help message for this command in the console.',
+      },
+      {
+        name: 'project-setting',
+        type: 'string',
+        enum: ['on', 'off', 'prompt'],
+        description: 'Sets the default analytics enablement status for the project.',
+        positional: 1,
+      },
+      {
+        name: 'setting-or-project',
+        type: 'string',
+        enum: ['on', 'off', 'ci', 'prompt'],
+        description:
+          'Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, or sets the default status for the project.',
+        positional: 0,
+      },
+    ],
+  });
+
+  const { stdout } = await silentNg('analytics', '--help', '--json-help');
+  const output = JSON.stringify(JSON.parse(stdout.trim()));
+
+  if (output !== addHelpOutputSnapshot) {
+    throw new Error(
+      `ng analytics JSON help output didn\'t match snapshot.\n\nExpected "${output}" to be "${addHelpOutputSnapshot}".`,
+    );
+  }
 }
