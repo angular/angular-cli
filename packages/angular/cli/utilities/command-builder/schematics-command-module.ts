@@ -13,6 +13,7 @@ import {
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
 import { Argv } from 'yargs';
+import { SchematicEngineHost } from '../../models/schematic-engine-host';
 import { getProjectByCwd, getWorkspace } from '../config';
 import { CommandModule, CommandModuleImplementation, CommandScope } from './command-module';
 import { Option, parseJsonSchemaToOptions } from './json-schema';
@@ -69,6 +70,7 @@ export abstract class SchematicsCommandModule
     return localYargs;
   }
 
+  /** Get schematic schema options.*/
   protected async getSchematicOptions(
     collection: Collection<FileSystemCollectionDescription, FileSystemSchematicDescription>,
     schematicName: string,
@@ -92,6 +94,7 @@ export abstract class SchematicsCommandModule
 
     return (
       (typeof collection === 'string' ? collection : undefined) ??
+      // positional = [generate, lint] or [new, collection-package]
       this.parseSchematicInfo(positional[1])[0] ??
       (await this.getDefaultSchematicCollection())
     );
@@ -114,6 +117,7 @@ export abstract class SchematicsCommandModule
           : [process.cwd(), root, __dirname]
         : // Global
           [__dirname, process.cwd()],
+      engineHostCreator: (options) => new SchematicEngineHost(options.resolvePaths),
     });
   }
 

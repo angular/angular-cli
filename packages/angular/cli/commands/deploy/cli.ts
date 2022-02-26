@@ -7,6 +7,7 @@
  */
 
 import { tags } from '@angular-devkit/core';
+import { join } from 'path';
 import { ArchitectCommandModule } from '../../utilities/command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../utilities/command-builder/command-module';
 
@@ -29,6 +30,7 @@ export class DeployCommandModule
 
   multiTarget = false;
   command = 'deploy [project]';
+  longDescriptionPath = join(__dirname, 'long-description.md');
   describe =
     'Invokes the deploy builder for a specified project or for the default project in the workspace.';
 }

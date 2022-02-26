@@ -45,6 +45,7 @@ export class VersionCommandModule extends CommandModule implements CommandModule
   command = 'version';
   aliases = ['v'];
   describe = 'Outputs Angular CLI version.';
+  longDescriptionPath?: string | undefined;
 
   builder(localYargs: Argv): Argv {
     return localYargs;

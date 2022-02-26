@@ -33,6 +33,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
 
   command = 'update [packages..]';
   describe = 'Updates your workspace and its dependencies. See https://update.angular.io/.';
+  longDescriptionPath?: string | undefined;
 
   builder(localYargs: Argv): Argv<UpdateCommandArgs> {
     return localYargs

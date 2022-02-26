@@ -16,6 +16,7 @@ import {
 export class AwesomeCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'make-this-awesome';
   describe: false = false;
+  longDescriptionPath?: string | undefined;
 
   builder(localYargs: Argv): Argv {
     return localYargs;

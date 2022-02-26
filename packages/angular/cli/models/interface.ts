@@ -10,11 +10,6 @@ import { analytics, logging } from '@angular-devkit/core';
 import { AngularWorkspace } from '../utilities/config';
 
 /**
- * Value type of arguments.
- */
-export type Value = number | string | boolean | (number | string | boolean)[];
-
-/**
  * A command runner context.
  */
 export interface CommandContext {

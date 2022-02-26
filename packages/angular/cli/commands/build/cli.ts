@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'path';
 import { ArchitectCommandModule } from '../../utilities/command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../utilities/command-builder/command-module';
 
@@ -18,4 +19,5 @@ export class BuildCommandModule
   aliases = ['b'];
   describe =
     'Compiles an Angular application or library into an output directory named dist/ at the given output path.';
+  longDescriptionPath = join(__dirname, 'long-description.md');
 }

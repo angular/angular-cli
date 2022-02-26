@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'path';
 import { ArchitectCommandModule } from '../../utilities/command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../utilities/command-builder/command-module';
 
@@ -17,4 +18,5 @@ export class TestCommandModule
   command = 'test [project]';
   aliases = ['t'];
   describe = 'Runs unit tests in a project.';
+  longDescriptionPath = join(__dirname, 'long-description.md');
 }

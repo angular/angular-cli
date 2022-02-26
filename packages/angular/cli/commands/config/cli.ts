@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'path';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -27,6 +28,7 @@ export class ConfigCommandModule
   command = 'config <json-path> [value]';
   describe =
     'Retrieves or sets Angular configuration values in the angular.json file for the workspace.';
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<ConfigCommandArgs> {
     return localYargs

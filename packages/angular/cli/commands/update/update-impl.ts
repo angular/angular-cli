@@ -17,7 +17,6 @@ import * as semver from 'semver';
 import { PackageManager } from '../../lib/config/workspace-schema';
 import { Command } from '../../models/command';
 import { SchematicEngineHost } from '../../models/schematic-engine-host';
-import { VERSION } from '../../models/version';
 import { colors } from '../../utilities/color';
 import { Options } from '../../utilities/command-builder/command-module';
 import { installAllPackages, runTempPackageBin } from '../../utilities/install-package';
@@ -35,6 +34,7 @@ import {
   getProjectDependencies,
   readPackageJson,
 } from '../../utilities/package-tree';
+import { VERSION } from '../../utilities/version';
 import { UpdateCommandArgs } from './cli';
 
 const UPDATE_SCHEMATIC_COLLECTION = path.join(

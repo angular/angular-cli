@@ -9,8 +9,11 @@
 import { Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { json, tags } from '@angular-devkit/core';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 import { Argv } from 'yargs';
 import { ArchitectCommand } from '../../models/architect-command';
+import { getPackageManager } from '../package-manager';
 import {
   CommandContext,
   CommandModule,
@@ -63,7 +66,7 @@ export abstract class ArchitectCommandModule
   run(options: Options<ArchitectCommandArgs>): Promise<number | void> {
     const command = new ArchitectCommand(
       this.context,
-      this.command.split(' ')[0],
+      this.getArchitectTarget(),
       this.multiTarget,
       this.getArchitectTarget(),
       this.missingErrorTarget,
@@ -108,13 +111,11 @@ export abstract class ArchitectCommandModule
 
     const defaultProjectName = workspace.extensions['defaultProject'];
     if (!projectName && this.multiTarget && builderNames.size > 1) {
-      this.context.logger.fatal(tags.oneLine`
+      throw new Error(tags.oneLine`
         Architect commands with command line overrides cannot target different builders. The
         '${target}' target would run on projects ${targetProjectNames.join()} which have the
         following builders: ${'\n  ' + [...builderNames].join('\n  ')}
       `);
-
-      return undefined;
     }
 
     return typeof defaultProjectName === 'string' && targetProjectNames.includes(defaultProjectName)
@@ -141,6 +142,9 @@ export abstract class ArchitectCommandModule
   }
 }
 
+/**
+ * Get architect target schema options.
+ */
 export async function getArchitectTargetOptions(
   context: CommandContext,
   target: Target,
@@ -158,6 +162,7 @@ export async function getArchitectTargetOptions(
     builderDesc = await architectHost.resolveBuilder(builderConf);
   } catch (e) {
     if (e.code === 'MODULE_NOT_FOUND') {
+      await warnOnMissingNodeModules(context);
       throw new Error(`Could not find the '${builderConf}' builder's node package.`);
     }
 
@@ -168,5 +173,31 @@ export async function getArchitectTargetOptions(
     new json.schema.CoreSchemaRegistry(),
     builderDesc.optionSchema as json.JsonObject,
     args.options.interactive !== false,
+  );
+}
+
+export async function warnOnMissingNodeModules(context: CommandContext): Promise<void> {
+  const basePath = context.workspace?.basePath;
+  if (!basePath) {
+    return;
+  }
+
+  // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
+  if (existsSync(resolve(basePath, 'node_modules'))) {
+    return;
+  }
+
+  // Check for yarn PnP files
+  if (
+    existsSync(resolve(basePath, '.pnp.js')) ||
+    existsSync(resolve(basePath, '.pnp.cjs')) ||
+    existsSync(resolve(basePath, '.pnp.mjs'))
+  ) {
+    return;
+  }
+
+  const packageManager = await getPackageManager(basePath);
+  context.logger.warn(
+    `Node packages may not be installed. Try installing with '${packageManager} install'.`,
   );
 }

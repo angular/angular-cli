@@ -7,10 +7,13 @@
  */
 
 import yargs from 'yargs';
+import { FullDescribe } from './command-module';
 
 export interface JsonHelp {
   name: string;
-  description: string;
+  description?: string;
+  command: string;
+  longDescription?: string;
   options: JsonHelpOption[];
   subcommands?: {
     name: string;
@@ -101,15 +104,36 @@ export function jsonHelpUsage(): string {
   )
     .map(([name, description, _, aliases, deprecated]) => ({
       name: name.split(' ', 1)[0],
+      command: name,
       description,
       aliases,
       deprecated,
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
+  const parseDescription = (rawDescription: string) => {
+    if (!rawDescription) {
+      return {};
+    }
+
+    try {
+      const { longDescription, describe: description } = JSON.parse(rawDescription) as FullDescribe;
+
+      return {
+        description,
+        longDescription,
+      };
+    } catch (error) {
+      return {};
+    }
+  };
+
+  const [command, rawDescription] = usageInstance.getUsage()[0] ?? [];
+
   const output: JsonHelp = {
-    name: context.commands.pop(),
-    description: usageInstance.getUsage()[0]?.[1],
+    name: [...context.commands].pop(),
+    command: command?.replace('$0', localYargs['$0']),
+    ...parseDescription(rawDescription),
     options: normalizeOptions.sort((a, b) => a.name.localeCompare(b.name)),
     subcommands: subcommands.length ? subcommands : undefined,
   };

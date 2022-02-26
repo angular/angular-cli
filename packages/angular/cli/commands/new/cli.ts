@@ -33,6 +33,7 @@ export class NewCommandModule
   command = 'new [name]';
   aliases = 'n';
   describe = 'Creates a new Angular workspace.';
+  longDescriptionPath?: string | undefined;
 
   override async builder(argv: Argv): Promise<Argv<NewCommandArgs>> {
     const baseYargs = await super.builder(argv);

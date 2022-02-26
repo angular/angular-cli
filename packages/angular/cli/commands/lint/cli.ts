@@ -7,6 +7,7 @@
  */
 
 import { tags } from '@angular-devkit/core';
+import { join } from 'path';
 import { ArchitectCommandModule } from '../../utilities/command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../utilities/command-builder/command-module';
 
@@ -25,5 +26,6 @@ export class LintCommandModule
 
   multiTarget = true;
   command = 'lint [project]';
+  longDescriptionPath = join(__dirname, 'long-description.md');
   describe = 'Runs linting tools on Angular application code in a given project folder.';
 }

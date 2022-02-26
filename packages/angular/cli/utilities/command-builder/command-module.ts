@@ -7,6 +7,7 @@
  */
 
 import { analytics, logging, normalize, strings } from '@angular-devkit/core';
+import { readFileSync } from 'fs';
 import * as path from 'path';
 import {
   ArgumentsCamelCase,
@@ -36,6 +37,7 @@ export interface CommandContext {
   root: string;
   workspace?: AngularWorkspace;
   logger: logging.Logger;
+  /** Arguments parsed in free from without parser configuration. */
   args: {
     positional: string[];
     options: {
@@ -48,19 +50,46 @@ export type OtherOptions = Record<string, unknown>;
 
 export interface CommandModuleImplementation<T extends {} = {}>
   extends Omit<YargsCommandModule<{}, T>, 'builder'> {
+  /** Path used to load the long description for the command in JSON help text. */
+  longDescriptionPath?: string;
+  /** Object declaring the options the command accepts, or a function accepting and returning a yargs instance. */
   builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
+  /** A function which will be passed the parsed argv. */
   run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
+}
+
+export interface FullDescribe {
+  describe?: string;
+  longDescription?: string;
 }
 
 export abstract class CommandModule<T extends {} = {}> implements CommandModuleImplementation<T> {
   abstract readonly command: string;
   abstract readonly describe: string | false;
+  abstract readonly longDescriptionPath?: string;
   protected shouldReportAnalytics = true;
   static scope = CommandScope.Both;
 
   private readonly optionsWithAnalytics = new Map<string, number>();
 
   constructor(protected readonly context: CommandContext) {}
+
+  /**
+   * Description object which contains the long command descroption.
+   * This is used to generate JSON help wich is used in AIO.
+   *
+   * `false` will result in a hidden command.
+   */
+  public get fullDescribe(): FullDescribe | false {
+    return this.describe === false
+      ? false
+      : {
+          describe: this.describe,
+          longDescription: this.longDescriptionPath
+            ? readFileSync(this.longDescriptionPath, 'utf8')
+            : undefined,
+        };
+  }
 
   protected get commandName(): string {
     return this.command.split(' ', 1)[0];
@@ -72,6 +101,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   async handler(args: ArgumentsCamelCase<T> & OtherOptions): Promise<void> {
     const { _, $0, ...options } = args;
 
+    // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
     const camelCasedOptions = {} as Options<T>;
     for (const [key, value] of Object.entries(options)) {
       camelCasedOptions[strings.camelize(key) as keyof Options<T>] = value;
@@ -83,7 +113,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       await this.reportAnalytics(camelCasedOptions);
     }
 
-    // Run command
+    // Run and time command.
     const startTime = Date.now();
     const result = await this.run(camelCasedOptions);
     const endTime = Date.now();
@@ -176,7 +206,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         });
       }
 
-      // Record option of analytics
+      // Record option of analytics.
       if (userAnalytics !== undefined) {
         this.optionsWithAnalytics.set(name, userAnalytics);
       }

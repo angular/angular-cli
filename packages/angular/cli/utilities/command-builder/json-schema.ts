@@ -6,15 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json, normalize, strings } from '@angular-devkit/core';
-import { Schematic } from '@angular-devkit/schematics';
-import {
-  FileSystemCollectionDescription,
-  FileSystemSchematicDescription,
-} from '@angular-devkit/schematics/tools';
-import * as path from 'path';
+import { json } from '@angular-devkit/core';
 import yargs from 'yargs';
-import { CommandContext } from './command-module';
 
 /**
  * An option description.
@@ -50,62 +43,6 @@ export interface Option extends yargs.Options {
    * If this is falsey, do not report this option.
    */
   userAnalytics?: number;
-}
-
-/**
- * A description of a command and its options.
- */
-export interface SubCommandDescription {
-  /**
-   * The name of the subcommand.
-   */
-  name: string;
-
-  /**
-   * Short description (1-2 lines) of this sub command.
-   */
-  description: string;
-
-  /**
-   * Aliases supported for this sub command.
-   */
-  aliases?: string[];
-
-  /**
-   * Whether this command should be hidden from a list of all commands.
-   */
-  hidden?: boolean;
-
-  /**
-   * Whether this command is deprecated.
-   */
-  deprecated?: boolean | string;
-}
-
-export async function parseJsonSchemaToGenerateSubCommandDescription(
-  name: string,
-  schematic: Schematic<FileSystemCollectionDescription, FileSystemSchematicDescription>,
-): Promise<SubCommandDescription | undefined> {
-  const schema = schematic.description.schemaJson;
-  if (!schema) {
-    return undefined;
-  }
-
-  // Deprecated is set only if it's true or a string.
-  const xDeprecated = schema['x-deprecated'];
-  const deprecated =
-    xDeprecated === true || typeof xDeprecated === 'string' ? xDeprecated : undefined;
-
-  const description = '' + (schema.description === undefined ? '' : schema.description);
-  const hidden = !!schema.hidden;
-
-  return {
-    name,
-    hidden,
-    deprecated,
-    description,
-    aliases: schematic.description.aliases,
-  };
 }
 
 export async function parseJsonSchemaToOptions(

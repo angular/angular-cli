@@ -7,8 +7,8 @@
  */
 
 import { SchematicCommand } from '../../models/schematic-command';
-import { VERSION } from '../../models/version';
 import { Options, OtherOptions } from '../../utilities/command-builder/command-module';
+import { VERSION } from '../../utilities/version';
 import { NewCommandArgs } from './cli';
 
 type NewCommandOptions = Options<NewCommandArgs>;

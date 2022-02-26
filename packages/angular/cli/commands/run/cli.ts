@@ -7,6 +7,7 @@
  */
 
 import { Target } from '@angular-devkit/architect';
+import { join } from 'path';
 import { Argv } from 'yargs';
 import { ArchitectCommand } from '../../models/architect-command';
 import { getArchitectTargetOptions } from '../../utilities/command-builder/architect-command-module';
@@ -30,6 +31,7 @@ export class RunCommandModule
   command = 'run <target>';
   describe =
     'Runs an Architect target with an optional custom builder configuration defined in your project.';
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   async builder(argv: Argv): Promise<Argv<RunCommandArgs>> {
     const localYargs: Argv<RunCommandArgs> = argv

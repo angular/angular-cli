@@ -10,10 +10,10 @@ import { analytics, json, tags } from '@angular-devkit/core';
 import debug from 'debug';
 import * as inquirer from 'inquirer';
 import { v4 as uuidV4 } from 'uuid';
-import { VERSION } from '../models/version';
 import { colors } from '../utilities/color';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
+import { VERSION } from '../utilities/version';
 import { AnalyticsCollector } from './analytics-collector';
 
 /* eslint-disable no-console */

@@ -31,4 +31,5 @@ export class E2eCommandModule
   command = 'e2e [project]';
   aliases = ['e'];
   describe = 'Builds and serves an Angular application, then runs end-to-end tests.';
+  longDescriptionPath?: string | undefined;
 }

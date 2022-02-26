@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'path';
 import { Argv } from 'yargs';
 import {
   CommandModuleImplementation,
@@ -31,6 +32,8 @@ export class AddCommandModule
 {
   command = 'add <collection>';
   describe = 'Adds support for an external library to your project.';
+  longDescriptionPath = join(__dirname, 'long-description.md');
+
   override async builder(argv: Argv): Promise<Argv<AddCommandArgs>> {
     const localYargs = await super.builder(argv);
 

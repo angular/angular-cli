@@ -14,7 +14,7 @@ import { writeErrorToLogFile } from '../../utilities/log-file';
 import { findWorkspaceFile } from '../../utilities/project';
 import { runCommand } from './command-runner';
 
-export { VERSION, Version } from '../../models/version';
+export { VERSION } from '../../utilities/version';
 
 const debugEnv = process.env['NG_DEBUG'];
 const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCase() !== 'false';

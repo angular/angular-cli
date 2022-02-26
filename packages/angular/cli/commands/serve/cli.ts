@@ -17,4 +17,5 @@ export class ServeCommandModule
   command = 'serve [project]';
   aliases = ['s'];
   describe = 'Builds and serves your application, rebuilding on file changes.';
+  longDescriptionPath?: string | undefined;
 }

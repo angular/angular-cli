@@ -92,10 +92,17 @@ export async function runCommand(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commandModule = new CommandModule(context) as any;
+    const describe = jsonHelp ? commandModule.FullDescribe : commandModule.describe;
+
     localYargs = localYargs.command({
       command: commandModule.command,
-      aliases: commandModule.aliases,
-      describe: commandModule.describe,
+      aliases: commandModule.alias,
+      describe:
+        // We cannot add custom fields in help, such as long command description which is used in AIO.
+        // Therefore, we get around this by adding a complex object as a string which we later parse when geneerating the help files.
+        describe !== undefined && typeof describe === 'object'
+          ? JSON.stringify(describe)
+          : describe,
       deprecated: commandModule.deprecated,
       builder: (x) => commandModule.builder(x),
       handler: (x) => commandModule.handler(x),
@@ -109,6 +116,7 @@ export async function runCommand(
 
   await localYargs
     .scriptName('ng')
+    // https://github.com/yargs/yargs/blob/main/docs/advanced.md#customizing-yargs-parser
     .parserConfiguration({
       'populate--': true,
       'unknown-options-as-args': false,
@@ -142,7 +150,7 @@ export async function runCommand(
     .fail((msg, err) => {
       if (msg) {
         // Validation failed example: `Unknown argument:`
-        logger.error(msg);
+        logger.fatal(msg);
         process.exit(1);
       } else {
         // Unknown exception, re-throw.
