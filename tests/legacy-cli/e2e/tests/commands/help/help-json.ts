@@ -8,7 +8,7 @@ export default async function () {
     description:
       'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering.',
     longDescription:
-      'The value of __setting-or-project__ is one of the following.\n\n- "on" : Enables analytics gathering and reporting for the user.\n- "off" : Disables analytics gathering and reporting for the user.\n- "ci" : Enables analytics and configures reporting for use with Continuous Integration,\n  which uses a common CI user.\n- "prompt" : Prompts the user to set the status interactively.\n- "project" : Sets the default status for the project to the _project-setting_ value, which can be any of the other values. The _project-setting_ argument is ignored for all other values of _setting_or_project_.\n',
+      'The value of `setting-or-project` is one of the following.\n\n- `on`: Enables analytics gathering and reporting for the user.\n- `off`: Disables analytics gathering and reporting for the user.\n- `ci`: Enables analytics and configures reporting for use with Continuous Integration,\n  which uses a common CI user.\n- `prompt`: Prompts the user to set the status interactively.\n- `project`: Sets the default status for the project to the `project-setting` value, which can be any of the other values. The `project-setting` argument is ignored for all other values of `setting_or_project`.\n',
     options: [
       {
         name: 'help',

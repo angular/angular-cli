@@ -137,7 +137,7 @@ export async function runCommand(
     .updateStrings({
       'Commands:': colors.cyan('Commands:'),
       'Options:': colors.cyan('Options:'),
-      'Positionals:': colors.cyan('Positionals:'),
+      'Positionals:': colors.cyan('Arguments:'),
       'deprecated': colors.yellow('deprecated'),
       'deprecated: %s': colors.yellow('deprecated:') + ' %s',
       'Did you mean %s?': 'Unknown command. Did you mean %s?',
