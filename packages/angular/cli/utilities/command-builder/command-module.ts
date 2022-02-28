@@ -62,6 +62,7 @@ export interface CommandModuleImplementation<T extends {} = {}>
 export interface FullDescribe {
   describe?: string;
   longDescription?: string;
+  longDescriptionRelativePath?: string;
 }
 
 export abstract class CommandModule<T extends {} = {}> implements CommandModuleImplementation<T> {
@@ -86,9 +87,15 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       ? false
       : {
           describe: this.describe,
-          longDescription: this.longDescriptionPath
-            ? readFileSync(this.longDescriptionPath, 'utf8')
-            : undefined,
+          ...(this.longDescriptionPath
+            ? {
+                longDescriptionRelativePath: path.relative(
+                  path.join(__dirname, '../../../../'),
+                  this.longDescriptionPath,
+                ),
+                longDescription: readFileSync(this.longDescriptionPath, 'utf8'),
+              }
+            : {}),
         };
   }
 

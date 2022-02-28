@@ -27,7 +27,12 @@ import { TestCommandModule } from '../../commands/test/cli';
 import { UpdateCommandModule } from '../../commands/update/cli';
 import { VersionCommandModule } from '../../commands/version/cli';
 import { colors } from '../../utilities/color';
-import { CommandContext, CommandModuleError } from '../../utilities/command-builder/command-module';
+import {
+  CommandContext,
+  CommandModuleError,
+  CommandScope,
+} from '../../utilities/command-builder/command-module';
+import { jsonHelpUsage } from '../../utilities/command-builder/json-help';
 import { AngularWorkspace } from '../../utilities/config';
 
 const COMMANDS = [
@@ -63,8 +68,9 @@ export async function runCommand(
     $0,
     _: positional,
     help = false,
+    jsonHelp = false,
     ...rest
-  } = yargsParser(args, { boolean: ['help'], alias: { 'collection': 'c' } });
+  } = yargsParser(args, { boolean: ['help', 'json-help'], alias: { 'collection': 'c' } });
 
   const context: CommandContext = {
     workspace,
@@ -82,13 +88,27 @@ export async function runCommand(
 
   let localYargs = yargs(args);
   for (const CommandModule of COMMANDS) {
+    if (!jsonHelp) {
+      // Skip scope validation when running with '--json-help' since it's easier to generate the output for all commands this way.
+      const scope = CommandModule.scope;
+      if ((scope === CommandScope.In && !workspace) || (scope === CommandScope.Out && workspace)) {
+        continue;
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commandModule = new CommandModule(context) as any;
+    const describe = jsonHelp ? commandModule.fullDescribe : commandModule.describe;
 
     localYargs = localYargs.command({
       command: commandModule.command,
       aliases: commandModule.aliases,
-      describe: commandModule.describe,
+      describe:
+        // We cannot add custom fields in help, such as long command description which is used in AIO.
+        // Therefore, we get around this by adding a complex object as a string which we later parse when geneerating the help files.
+        describe !== undefined && typeof describe === 'object'
+          ? JSON.stringify(describe)
+          : describe,
       deprecated: commandModule.deprecated,
       builder: (x) => commandModule.builder(x),
       handler: ({ _, $0, ...options }) => {
@@ -101,6 +121,11 @@ export async function runCommand(
         return commandModule.handler(camelCasedOptions);
       },
     });
+  }
+
+  if (jsonHelp) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (localYargs as any).getInternalMethods().getUsageInstance().help = () => jsonHelpUsage();
   }
 
   await localYargs
