@@ -9,6 +9,7 @@
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
 import { colors, removeColor } from '../../utilities/color';
+import { CommandModuleError } from '../../utilities/command-builder/command-module';
 import { AngularWorkspace, getWorkspaceRaw } from '../../utilities/config';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import { findWorkspaceFile } from '../../utilities/project';
@@ -77,7 +78,9 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
   try {
     return await runCommand(options.cliArgs, logger, workspace);
   } catch (err) {
-    if (err instanceof Error) {
+    if (err instanceof CommandModuleError) {
+      logger.fatal(`Error: ${err.message}`);
+    } else if (err instanceof Error) {
       try {
         const logPath = writeErrorToLogFile(err);
         logger.fatal(

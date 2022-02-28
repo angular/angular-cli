@@ -6,16 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Target } from '@angular-devkit/architect';
+import { Architect, Target } from '@angular-devkit/architect';
+import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
+import { json } from '@angular-devkit/core';
 import { join } from 'path';
 import { Argv } from 'yargs';
-import { ArchitectCommand } from '../../models/architect-command';
+import { isPackageNameSafeForAnalytics } from '../../models/analytics';
 import { getArchitectTargetOptions } from '../../utilities/command-builder/architect-command-module';
 import {
   CommandModule,
+  CommandModuleError,
   CommandModuleImplementation,
   CommandScope,
   Options,
+  OtherOptions,
 } from '../../utilities/command-builder/command-module';
 
 export interface RunCommandArgs {
@@ -52,10 +56,45 @@ export class RunCommandModule
     return this.addSchemaOptionsToCommand(localYargs, schemaOptions);
   }
 
-  run(options: Options<RunCommandArgs>): Promise<number | void> {
-    const command = new ArchitectCommand(this.context, 'run', false, options.target);
+  async run(options: Options<RunCommandArgs> & OtherOptions): Promise<number | void> {
+    const { logger, workspace } = this.context;
+    if (!workspace) {
+      throw new CommandModuleError('A workspace is required for this command.');
+    }
 
-    return command.validateAndRun(options);
+    const registry = new json.schema.CoreSchemaRegistry();
+    registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    registry.useXDeprecatedProvider((msg) => logger.warn(msg));
+
+    const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, workspace.basePath);
+    const architect = new Architect(architectHost, registry);
+
+    const target = this.makeTargetSpecifier(options);
+
+    if (!target) {
+      throw new CommandModuleError('Cannot determine project or target.');
+    }
+
+    const builderName = await architectHost.getBuilderNameForTarget(target);
+    await this.reportAnalytics({
+      ...(await architectHost.getOptionsForTarget(target)),
+      ...options,
+    });
+
+    const { target: _target, ...extraOptions } = options;
+    const run = await architect.scheduleTarget(target, extraOptions as json.JsonObject, {
+      logger,
+      analytics: isPackageNameSafeForAnalytics(builderName) ? await this.getAnalytics() : undefined,
+    });
+
+    const { error, success } = await run.output.toPromise();
+    await run.stop();
+
+    if (error) {
+      logger.error(error);
+    }
+
+    return success ? 0 : 1;
   }
 
   protected makeTargetSpecifier(options?: Options<RunCommandArgs>): Target | undefined {

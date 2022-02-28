@@ -119,6 +119,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     const endTime = Date.now();
 
     analytics.timing(this.commandName, 'duration', endTime - startTime);
+    await analytics.flush();
 
     if (typeof result === 'number' && result > 0) {
       process.exitCode = result;
@@ -146,7 +147,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   }
 
   private _analytics: analytics.Analytics | undefined;
-  private async getAnalytics(): Promise<analytics.Analytics> {
+  protected async getAnalytics(): Promise<analytics.Analytics> {
     if (this._analytics) {
       return this._analytics;
     }
@@ -215,3 +216,9 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     return localYargs;
   }
 }
+
+/**
+ * Creates an known command module error.
+ * This is used so during executation we can filter between known validation error and real non handled errors.
+ */
+export class CommandModuleError extends Error {}

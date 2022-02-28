@@ -6,20 +6,22 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Target } from '@angular-devkit/architect';
+import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json, tags } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Argv } from 'yargs';
-import { ArchitectCommand } from '../../models/architect-command';
+import { isPackageNameSafeForAnalytics } from '../../models/analytics';
 import { getPackageManager } from '../package-manager';
 import {
   CommandContext,
   CommandModule,
+  CommandModuleError,
   CommandModuleImplementation,
   CommandScope,
   Options,
+  OtherOptions,
 } from './command-module';
 import { Option, parseJsonSchemaToOptions } from './json-schema';
 
@@ -35,6 +37,7 @@ export abstract class ArchitectCommandModule
   static override scope = CommandScope.In;
   abstract readonly multiTarget: boolean;
   readonly missingErrorTarget: string | undefined;
+  protected override shouldReportAnalytics = false;
 
   async builder(argv: Argv): Promise<Argv<ArchitectCommandArgs>> {
     const localYargs: Argv<ArchitectCommandArgs> = argv
@@ -54,7 +57,7 @@ export abstract class ArchitectCommandModule
       .strict();
 
     const targetSpecifier = this.makeTargetSpecifier();
-    if (!targetSpecifier) {
+    if (!targetSpecifier.project) {
       return localYargs;
     }
 
@@ -63,16 +66,43 @@ export abstract class ArchitectCommandModule
     return this.addSchemaOptionsToCommand(localYargs, schemaOptions);
   }
 
-  run(options: Options<ArchitectCommandArgs>): Promise<number | void> {
-    const command = new ArchitectCommand(
-      this.context,
-      this.getArchitectTarget(),
-      this.multiTarget,
-      this.getArchitectTarget(),
-      this.missingErrorTarget,
-    );
+  async run(options: Options<ArchitectCommandArgs>): Promise<number | void> {
+    const { logger, workspace } = this.context;
+    if (!workspace) {
+      logger.fatal('A workspace is required for this command.');
 
-    return command.validateAndRun(options);
+      return 1;
+    }
+
+    const registry = new json.schema.CoreSchemaRegistry();
+    registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    registry.useXDeprecatedProvider((msg) => this.context.logger.warn(msg));
+
+    const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, workspace.basePath);
+    const architect = new Architect(architectHost, registry);
+
+    const targetSpec = this.makeTargetSpecifier(options);
+    if (!targetSpec.project) {
+      const target = this.getArchitectTarget();
+
+      // This runs each target sequentially.
+      // Running them in parallel would jumble the log messages.
+      let result = 0;
+      const projectNames = this.getProjectNamesByTarget(target);
+      if (!projectNames) {
+        throw new CommandModuleError(
+          this.missingErrorTarget ?? 'Cannot determine project or target for command.',
+        );
+      }
+
+      for (const project of projectNames) {
+        result |= await this.runSingleTarget({ ...targetSpec, project }, options, architect);
+      }
+
+      return result;
+    } else {
+      return await this.runSingleTarget(targetSpec, options, architect);
+    }
   }
 
   private getArchitectProject(): string | undefined {
@@ -85,42 +115,16 @@ export abstract class ArchitectCommandModule
 
     if (projectName) {
       if (!workspace.projects.has(projectName)) {
-        throw new Error(`Project '${projectName}' does not exist.`);
+        throw new CommandModuleError(`Project '${projectName}' does not exist.`);
       }
 
       return projectName;
     }
 
-    const builderNames = new Set<string>();
-    const targetProjectNames: string[] = [];
     const target = this.getArchitectTarget();
-    for (const [name, project] of workspace.projects) {
-      const projectTarget = project.targets.get(target);
-      if (projectTarget) {
-        targetProjectNames.push(name);
+    const projectFromTarget = this.getProjectNamesByTarget(target);
 
-        if (this.multiTarget) {
-          builderNames.add(projectTarget.builder);
-        }
-      }
-    }
-
-    if (targetProjectNames.length === 0) {
-      return undefined;
-    }
-
-    const defaultProjectName = workspace.extensions['defaultProject'];
-    if (!projectName && this.multiTarget && builderNames.size > 1) {
-      throw new Error(tags.oneLine`
-        Architect commands with command line overrides cannot target different builders. The
-        '${target}' target would run on projects ${targetProjectNames.join()} which have the
-        following builders: ${'\n  ' + [...builderNames].join('\n  ')}
-      `);
-    }
-
-    return typeof defaultProjectName === 'string' && targetProjectNames.includes(defaultProjectName)
-      ? defaultProjectName
-      : targetProjectNames[0];
+    return projectFromTarget?.length ? projectFromTarget[0] : undefined;
   }
 
   private getArchitectTarget(): string {
@@ -128,17 +132,106 @@ export abstract class ArchitectCommandModule
     return this.command?.split(' ', 1)[0];
   }
 
-  private makeTargetSpecifier(options?: Options<ArchitectCommandArgs>): Target | undefined {
-    const project = options?.project ?? this.getArchitectProject();
-    if (!project) {
-      return undefined;
-    }
-
+  private makeTargetSpecifier(options?: Options<ArchitectCommandArgs>): Target {
     return {
-      project: project,
+      project: options?.project ?? this.getArchitectProject() ?? '',
       target: this.getArchitectTarget(),
       configuration: options?.configuration ?? '',
     };
+  }
+
+  private getProjectNamesByTarget(target: string): string[] | undefined {
+    const workspace = this.context.workspace;
+    if (!workspace) {
+      throw new CommandModuleError('A workspace is required for this command.');
+    }
+
+    const allProjectsForTargetName: string[] = [];
+    for (const [name, project] of workspace.projects) {
+      if (project.targets.has(target)) {
+        allProjectsForTargetName.push(name);
+      }
+    }
+
+    if (allProjectsForTargetName.length === 0) {
+      return undefined;
+    }
+
+    if (this.multiTarget) {
+      // For multi target commands, we always list all projects that have the target.
+      return allProjectsForTargetName;
+    } else {
+      // For single target commands, we try the default project first,
+      // then the full list if it has a single project, then error out.
+      const maybeDefaultProject = workspace.extensions['defaultProject'];
+      if (
+        typeof maybeDefaultProject === 'string' &&
+        allProjectsForTargetName.includes(maybeDefaultProject)
+      ) {
+        return [maybeDefaultProject];
+      }
+
+      if (allProjectsForTargetName.length === 1) {
+        return allProjectsForTargetName;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async runSingleTarget(
+    target: Target,
+    options: Options<ArchitectCommandArgs> & OtherOptions,
+    architect: Architect,
+  ): Promise<number> {
+    // Remove options
+    const { configuration, project, ...extraOptions } = options;
+    const architectHost = await this.getArchitectHost();
+
+    let builderName: string;
+    try {
+      builderName = await architectHost.getBuilderNameForTarget(target);
+    } catch (e) {
+      throw new CommandModuleError(this.missingErrorTarget ?? e.message);
+    }
+
+    await this.reportAnalytics({
+      ...(await architectHost.getOptionsForTarget(target)),
+      ...extraOptions,
+    });
+
+    const { logger } = this.context;
+
+    const run = await architect.scheduleTarget(target, extraOptions as json.JsonObject, {
+      logger,
+      analytics: isPackageNameSafeForAnalytics(builderName) ? await this.getAnalytics() : undefined,
+    });
+
+    const { error, success } = await run.output.toPromise();
+    await run.stop();
+
+    if (error) {
+      logger.error(error);
+    }
+
+    return success ? 0 : 1;
+  }
+
+  private _architectHost: WorkspaceNodeModulesArchitectHost | undefined;
+  private getArchitectHost(): WorkspaceNodeModulesArchitectHost {
+    if (this._architectHost) {
+      return this._architectHost;
+    }
+
+    const { workspace } = this.context;
+    if (!workspace) {
+      throw new CommandModuleError('A workspace is required for this command.');
+    }
+
+    return (this._architectHost = new WorkspaceNodeModulesArchitectHost(
+      workspace,
+      workspace.basePath,
+    ));
   }
 }
 
@@ -149,7 +242,7 @@ export async function getArchitectTargetOptions(
   context: CommandContext,
   target: Target,
 ): Promise<Option[]> {
-  const { workspace, args } = context;
+  const { workspace } = context;
   if (!workspace) {
     return [];
   }
@@ -163,7 +256,7 @@ export async function getArchitectTargetOptions(
   } catch (e) {
     if (e.code === 'MODULE_NOT_FOUND') {
       await warnOnMissingNodeModules(context);
-      throw new Error(`Could not find the '${builderConf}' builder's node package.`);
+      throw new CommandModuleError(`Could not find the '${builderConf}' builder's node package.`);
     }
 
     throw e;
@@ -172,7 +265,7 @@ export async function getArchitectTargetOptions(
   return parseJsonSchemaToOptions(
     new json.schema.CoreSchemaRegistry(),
     builderDesc.optionSchema as json.JsonObject,
-    args.options.interactive !== false,
+    true,
   );
 }
 

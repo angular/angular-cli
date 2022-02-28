@@ -27,7 +27,11 @@ import { TestCommandModule } from '../../commands/test/cli';
 import { UpdateCommandModule } from '../../commands/update/cli';
 import { VersionCommandModule } from '../../commands/version/cli';
 import { colors } from '../../utilities/color';
-import { CommandContext, CommandScope } from '../../utilities/command-builder/command-module';
+import {
+  CommandContext,
+  CommandModuleError,
+  CommandScope,
+} from '../../utilities/command-builder/command-module';
 import { jsonHelpUsage } from '../../utilities/command-builder/json-help';
 import { AngularWorkspace } from '../../utilities/config';
 
@@ -148,14 +152,11 @@ export async function runCommand(
     .showHelpOnFail(false)
     .strict()
     .fail((msg, err) => {
-      if (msg) {
-        // Validation failed example: `Unknown argument:`
-        logger.fatal(msg);
-        process.exit(1);
-      } else {
-        // Unknown exception, re-throw.
-        throw err;
-      }
+      throw msg
+        ? // Validation failed example: `Unknown argument:`
+          new CommandModuleError(msg)
+        : // Unknown exception, re-throw.
+          err;
     })
     .wrap(yargs.terminalWidth())
     .parseAsync();
