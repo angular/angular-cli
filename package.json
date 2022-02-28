@@ -116,6 +116,7 @@
     "@types/semver": "^7.0.0",
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
+    "@types/yargs-parser": "^20.2.1",
     "@typescript-eslint/eslint-plugin": "5.13.0",
     "@typescript-eslint/parser": "5.13.0",
     "@yarnpkg/lockfile": "1.1.0",
@@ -217,6 +218,7 @@
     "webpack-dev-server": "4.7.4",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0",
+    "yargs-parser": "21.0.1",
     "zone.js": "^0.11.3"
   }
 }

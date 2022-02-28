@@ -51,12 +51,12 @@ ts_library(
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tools",
         "@npm//@types/inquirer",
-        "@npm//@types/minimist",
         "@npm//@types/node",
+        "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
         "@npm//inquirer",  # @external
-        "@npm//minimist",  # @external
         "@npm//symbol-observable",  # @external
+        "@npm//yargs-parser",  # @external
     ],
 )
 
