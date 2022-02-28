@@ -6,15 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { schema } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
-import { runCommand } from '../../models/command-runner';
 import { colors, removeColor } from '../../utilities/color';
+import { CommandModuleError } from '../../utilities/command-builder/command-module';
 import { AngularWorkspace, getWorkspaceRaw } from '../../utilities/config';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import { findWorkspaceFile } from '../../utilities/project';
+import { runCommand } from './command-runner';
 
-export { VERSION, Version } from '../../models/version';
+export { VERSION } from '../../utilities/version';
 
 const debugEnv = process.env['NG_DEBUG'];
 const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCase() !== 'false';
@@ -75,16 +77,11 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
   }
 
   try {
-    const maybeExitCode = await runCommand(options.cliArgs, logger, workspace);
-    if (typeof maybeExitCode === 'number') {
-      console.assert(Number.isInteger(maybeExitCode));
-
-      return maybeExitCode;
-    }
-
-    return 0;
+    return await runCommand(options.cliArgs, logger, workspace);
   } catch (err) {
-    if (err instanceof Error) {
+    if (err instanceof CommandModuleError || err instanceof schema.SchemaValidationException) {
+      logger.fatal(`Error: ${err.message}`);
+    } else if (err instanceof Error) {
       try {
         const logPath = writeErrorToLogFile(err);
         logger.fatal(

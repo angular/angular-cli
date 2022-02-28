@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json, tags } from '@angular-devkit/core';
+import { analytics, json, tags } from '@angular-devkit/core';
 import debug from 'debug';
 import * as inquirer from 'inquirer';
 import { v4 as uuidV4 } from 'uuid';
-import { VERSION } from '../models/version';
 import { colors } from '../utilities/color';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
+import { VERSION } from '../utilities/version';
 import { AnalyticsCollector } from './analytics-collector';
 
 /* eslint-disable no-console */
@@ -365,5 +365,39 @@ export async function getSharedAnalytics(): Promise<AnalyticsCollector | undefin
     analyticsDebug('Error happened during reading of analytics sharing config: %s', err.message);
 
     return undefined;
+  }
+}
+
+export async function createAnalytics(
+  workspace: boolean,
+  skipPrompt = false,
+): Promise<analytics.Analytics> {
+  let config = await getGlobalAnalytics();
+  // If in workspace and global analytics is enabled, defer to workspace level
+  if (workspace && config) {
+    const skipAnalytics =
+      skipPrompt ||
+      (process.env['NG_CLI_ANALYTICS'] &&
+        (process.env['NG_CLI_ANALYTICS'].toLowerCase() === 'false' ||
+          process.env['NG_CLI_ANALYTICS'] === '0'));
+    // TODO: This should honor the `no-interactive` option.
+    //       It is currently not an `ng` option but rather only an option for specific commands.
+    //       The concept of `ng`-wide options are needed to cleanly handle this.
+    if (!skipAnalytics && !(await hasWorkspaceAnalyticsConfiguration())) {
+      await promptProjectAnalytics();
+    }
+    config = await getWorkspaceAnalytics();
+  }
+
+  const maybeSharedAnalytics = await getSharedAnalytics();
+
+  if (config && maybeSharedAnalytics) {
+    return new analytics.MultiAnalytics([config, maybeSharedAnalytics]);
+  } else if (config) {
+    return config;
+  } else if (maybeSharedAnalytics) {
+    return maybeSharedAnalytics;
+  } else {
+    return new analytics.NoopAnalytics();
   }
 }

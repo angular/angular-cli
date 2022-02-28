@@ -29,7 +29,7 @@ export default async function () {
   });
 
   await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
-  await ng('generate', 'appShell', '--project', 'test-project');
+  await ng('generate', 'app-shell', '--project', 'test-project');
 
   if (isSnapshotBuild) {
     await updateJsonFile('package.json', (packageJson) => {

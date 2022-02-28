@@ -1,14 +1,20 @@
-import { expectFileToMatch, prependToFile, readFile, replaceInFile, writeFile } from '../../utils/fs';
+import {
+  expectFileToMatch,
+  prependToFile,
+  readFile,
+  replaceInFile,
+  writeFile,
+} from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { externalServer, langTranslations, setupI18nConfig } from './setup';
 
-export default async function() {
+export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
   // Update angular.json to only localize one locale
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     appProject.architect['build'].options.localize = ['fr'];
   });
@@ -19,7 +25,7 @@ export default async function() {
   // Augment the locale data and import into the main application file
   const localeData = await readFile('node_modules/@angular/common/locales/global/fr.js');
   await writeFile('src/fr-changed.js', localeData.replace('janvier', 'changed-janvier'));
-  await prependToFile('src/main.ts', 'import \'./fr-changed.js\';\n');
+  await prependToFile('src/main.ts', "import './fr-changed.js';\n");
 
   // Run a build and test
   await ng('build');
@@ -42,8 +48,8 @@ export default async function() {
       await ng(
         'e2e',
         `--configuration=${lang}`,
-        '--devServerTarget=',
-        `--baseUrl=http://localhost:4200/${lang}/`,
+        '--dev-server-target=',
+        `--base-url=http://localhost:4200/${lang}/`,
       );
     } finally {
       server.close();

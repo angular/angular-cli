@@ -26,24 +26,6 @@ ts_library(
         # @external_begin
         # These files are generated from the JSON schema
         "//packages/angular/cli:lib/config/workspace-schema.ts",
-        "//packages/angular/cli:commands/analytics.ts",
-        "//packages/angular/cli:commands/add.ts",
-        "//packages/angular/cli:commands/build.ts",
-        "//packages/angular/cli:commands/deploy.ts",
-        "//packages/angular/cli:commands/config.ts",
-        "//packages/angular/cli:commands/doc.ts",
-        "//packages/angular/cli:commands/e2e.ts",
-        "//packages/angular/cli:commands/easter-egg.ts",
-        "//packages/angular/cli:commands/generate.ts",
-        "//packages/angular/cli:commands/help.ts",
-        "//packages/angular/cli:commands/lint.ts",
-        "//packages/angular/cli:commands/new.ts",
-        "//packages/angular/cli:commands/serve.ts",
-        "//packages/angular/cli:commands/test.ts",
-        "//packages/angular/cli:commands/update.ts",
-        "//packages/angular/cli:commands/version.ts",
-        "//packages/angular/cli:commands/run.ts",
-        "//packages/angular/cli:commands/extract-i18n.ts",
         "//packages/angular/cli:src/commands/update/schematic/schema.ts",
         # @external_end
     ],
@@ -79,6 +61,7 @@ ts_library(
         "@npm//@types/resolve",
         "@npm//@types/semver",
         "@npm//@types/uuid",
+        "@npm//@types/yargs",
         "@npm//@yarnpkg/lockfile",
         "@npm//ansi-colors",
         "@npm//ini",
@@ -88,6 +71,7 @@ ts_library(
         "@npm//ora",
         "@npm//pacote",
         "@npm//semver",
+        "@npm//yargs",
     ],
 )
 
@@ -130,150 +114,6 @@ ts_json_schema(
     name = "cli_schema",
     src = "lib/config/workspace-schema.json",
     data = CLI_SCHEMA_DATA,
-)
-
-ts_json_schema(
-    name = "analytics_schema",
-    src = "commands/analytics.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "add_schema",
-    src = "commands/add.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "build_schema",
-    src = "commands/build.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "deploy_schema",
-    src = "commands/deploy.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "config_schema",
-    src = "commands/config.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "doc_schema",
-    src = "commands/doc.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "e2e_schema",
-    src = "commands/e2e.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "easter_egg_schema",
-    src = "commands/easter-egg.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "generate_schema",
-    src = "commands/generate.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "help_schema",
-    src = "commands/help.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "lint_schema",
-    src = "commands/lint.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "new_schema",
-    src = "commands/new.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "run_schema",
-    src = "commands/run.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "serve_schema",
-    src = "commands/serve.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "test_schema",
-    src = "commands/test.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "update_schema",
-    src = "commands/update.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "version_schema",
-    src = "commands/version.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "extract-i18n_schema",
-    src = "commands/extract-i18n.json",
-    data = [
-        "commands/definitions.json",
-    ],
 )
 
 ts_json_schema(

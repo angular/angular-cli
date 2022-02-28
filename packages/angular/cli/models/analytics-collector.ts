@@ -12,7 +12,7 @@ import debug from 'debug';
 import * as https from 'https';
 import * as os from 'os';
 import * as querystring from 'querystring';
-import { VERSION } from './version';
+import { VERSION } from '../utilities/version';
 
 interface BaseParameters extends analytics.CustomDimensionsAndMetricsOptions {
   [key: string]: string | number | boolean | undefined | (string | number | boolean | undefined)[];

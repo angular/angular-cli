@@ -6,13 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, normalize, schema, strings, tags, workspaces } from '@angular-devkit/core';
-import {
-  DryRunEvent,
-  UnsuccessfulWorkflowExecution,
-  formats,
-  workflow,
-} from '@angular-devkit/schematics';
+import { schema, tags, workspaces } from '@angular-devkit/core';
+import { DryRunEvent, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollection,
   FileSystemEngine,
@@ -22,14 +17,13 @@ import {
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
 import { colors } from '../utilities/color';
+import { parseJsonSchemaToOptions } from '../utilities/command-builder/json-schema';
 import { getProjectByCwd, getSchematicDefaults, getWorkspace } from '../utilities/config';
-import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
 import { isTTY } from '../utilities/tty';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
-import { Arguments, CommandContext, CommandDescription, Option } from './interface';
-import { parseArguments, parseFreeFormArguments } from './parser';
+import { CommandContext } from './interface';
 import { SchematicEngineHost } from './schematic-engine-host';
 
 export interface BaseSchematicSchema {
@@ -38,14 +32,13 @@ export interface BaseSchematicSchema {
   force?: boolean;
   interactive?: boolean;
   defaults?: boolean;
-  packageRegistry?: string;
+  registry?: string;
 }
 
 export interface RunSchematicOptions extends BaseSchematicSchema {
   collectionName: string;
   schematicName: string;
-  additionalOptions?: { [key: string]: {} };
-  schematicOptions?: string[];
+  schematicOptions?: Record<string, unknown>;
   showNothingDone?: boolean;
 }
 
@@ -66,12 +59,12 @@ export abstract class SchematicCommand<
   protected collectionName = this.defaultCollectionName;
   protected schematicName?: string;
 
-  constructor(context: CommandContext, description: CommandDescription, logger: logging.Logger) {
-    super(context, description, logger);
+  constructor(context: CommandContext, commandName: string) {
+    super(context, commandName);
   }
 
-  public override async initialize(options: T & Arguments) {
-    await this.createWorkflow(options);
+  public override async initialize(options: T): Promise<void> {
+    this._workflow = await this.createWorkflow(options);
 
     if (this.schematicName) {
       // Set the options.
@@ -82,97 +75,14 @@ export abstract class SchematicCommand<
         schematic.description.schemaJson || {},
       );
 
-      this.description.description = schematic.description.description;
-      this.description.options.push(...options.filter((x) => !x.hidden));
+      this.commandOptions.push(...options);
 
       // Remove any user analytics from schematics that are NOT part of our safelist.
-      for (const o of this.description.options) {
+      for (const o of this.commandOptions) {
         if (o.userAnalytics && !isPackageNameSafeForAnalytics(this.collectionName)) {
           o.userAnalytics = undefined;
         }
       }
-    }
-  }
-
-  public override async printHelp() {
-    await super.printHelp();
-    this.logger.info('');
-
-    const subCommandOption = this.description.options.filter((x) => x.subcommands)[0];
-
-    if (!subCommandOption || !subCommandOption.subcommands) {
-      return 0;
-    }
-
-    const schematicNames = Object.keys(subCommandOption.subcommands);
-
-    if (schematicNames.length > 1) {
-      this.logger.info('Available Schematics:');
-
-      const namesPerCollection: { [c: string]: string[] } = {};
-      schematicNames.forEach((name) => {
-        let [collectionName, schematicName] = name.split(/:/, 2);
-        if (!schematicName) {
-          schematicName = collectionName;
-          collectionName = this.collectionName;
-        }
-
-        if (!namesPerCollection[collectionName]) {
-          namesPerCollection[collectionName] = [];
-        }
-
-        namesPerCollection[collectionName].push(schematicName);
-      });
-
-      const defaultCollection = await this.getDefaultSchematicCollection();
-      Object.keys(namesPerCollection).forEach((collectionName) => {
-        const isDefault = defaultCollection == collectionName;
-        this.logger.info(`  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`);
-
-        namesPerCollection[collectionName].forEach((schematicName) => {
-          this.logger.info(`    ${schematicName}`);
-        });
-      });
-    }
-
-    return 0;
-  }
-
-  override async printHelpUsage() {
-    const subCommandOption = this.description.options.filter((x) => x.subcommands)[0];
-
-    if (!subCommandOption || !subCommandOption.subcommands) {
-      return;
-    }
-
-    const schematicNames = Object.keys(subCommandOption.subcommands);
-    if (schematicNames.length == 1) {
-      this.logger.info(this.description.description);
-
-      const opts = this.description.options.filter((x) => x.positional === undefined);
-      const [collectionName, schematicName] = schematicNames[0].split(/:/)[0];
-
-      // Display <collectionName:schematicName> if this is not the default collectionName,
-      // otherwise just show the schematicName.
-      const displayName =
-        collectionName == (await this.getDefaultSchematicCollection())
-          ? schematicName
-          : schematicNames[0];
-
-      const schematicOptions = subCommandOption.subcommands[schematicNames[0]].options;
-      const schematicArgs = schematicOptions.filter((x) => x.positional !== undefined);
-      const argDisplay =
-        schematicArgs.length > 0
-          ? ' ' + schematicArgs.map((a) => `<${strings.dasherize(a.name)}>`).join(' ')
-          : '';
-
-      this.logger.info(tags.oneLine`
-        usage: ng ${this.description.name} ${displayName}${argDisplay}
-        ${opts.length > 0 ? `[options]` : ``}
-      `);
-      this.logger.info('');
-    } else {
-      await super.printHelpUsage();
     }
   }
 
@@ -199,25 +109,10 @@ export abstract class SchematicCommand<
     return collection.createSchematic(schematicName, allowPrivate);
   }
 
-  protected setPathOptions(options: Option[], workingDir: string) {
-    if (workingDir === '') {
-      return {};
-    }
-
-    return options
-      .filter((o) => o.format === 'path')
-      .map((o) => o.name)
-      .reduce((acc, curr) => {
-        acc[curr] = workingDir;
-
-        return acc;
-      }, {} as { [name: string]: string });
-  }
-
   /*
    * Runtime hook to allow specifying customized workflow
    */
-  protected async createWorkflow(options: BaseSchematicSchema): Promise<workflow.BaseWorkflow> {
+  protected async createWorkflow(options: BaseSchematicSchema): Promise<NodeWorkflow> {
     if (this._workflow) {
       return this._workflow;
     }
@@ -228,7 +123,7 @@ export abstract class SchematicCommand<
       force,
       dryRun,
       packageManager: await getPackageManager(root),
-      packageRegistry: options.packageRegistry,
+      packageRegistry: options.registry,
       // A schema registry is required to allow customizing addUndefinedDefaults
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
       resolvePaths: this.workspace
@@ -294,7 +189,8 @@ export abstract class SchematicCommand<
     workflow.engineHost.registerOptionsTransform(async (_, options) => {
       if (shouldReportAnalytics) {
         shouldReportAnalytics = false;
-        await this.reportAnalytics([this.description.name], options as Arguments);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await this.reportAnalytics([this.commandName], options as any);
       }
 
       return options;
@@ -403,7 +299,7 @@ export abstract class SchematicCommand<
   }
 
   protected async runSchematic(options: RunSchematicOptions) {
-    const { schematicOptions, debug, dryRun } = options;
+    const { schematicOptions: input = {}, debug, dryRun } = options;
     let { collectionName, schematicName } = options;
 
     let nothingDone = true;
@@ -411,8 +307,6 @@ export abstract class SchematicCommand<
     let error = false;
 
     const workflow = this._workflow;
-
-    const workingDir = normalize(systemPath.relative(this.context.root, process.cwd()));
 
     // Get the option object from the schematic schema.
     const schematic = this.getSchematic(
@@ -424,36 +318,6 @@ export abstract class SchematicCommand<
     // received in our options, e.g. after alias resolution or extension.
     collectionName = schematic.collection.description.name;
     schematicName = schematic.description.name;
-
-    // Set the options of format "path".
-    let o: Option[] | null = null;
-    let args: Arguments;
-
-    if (!schematic.description.schemaJson) {
-      args = await this.parseFreeFormArguments(schematicOptions || []);
-    } else {
-      o = await parseJsonSchemaToOptions(workflow.registry, schematic.description.schemaJson);
-      args = await this.parseArguments(schematicOptions || [], o);
-    }
-
-    const allowAdditionalProperties =
-      typeof schematic.description.schemaJson === 'object' &&
-      schematic.description.schemaJson.additionalProperties;
-
-    if (args['--'] && !allowAdditionalProperties) {
-      args['--'].forEach((additional) => {
-        this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
-      });
-
-      return 1;
-    }
-
-    const pathOptions = o ? this.setPathOptions(o, workingDir) : {};
-    const input = {
-      ...pathOptions,
-      ...args,
-      ...options.additionalOptions,
-    };
 
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;
@@ -481,7 +345,7 @@ export abstract class SchematicCommand<
           loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
           break;
         case 'rename':
-          const eventToPath = event.to.startsWith('/') ? event.to.substr(1) : event.to;
+          const eventToPath = event.to.startsWith('/') ? event.to.substring(1) : event.to;
           loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
           break;
       }
@@ -545,17 +409,6 @@ export abstract class SchematicCommand<
           },
         });
     });
-  }
-
-  protected async parseFreeFormArguments(schematicOptions: string[]) {
-    return parseFreeFormArguments(schematicOptions);
-  }
-
-  protected async parseArguments(
-    schematicOptions: string[],
-    options: Option[] | null,
-  ): Promise<Arguments> {
-    return parseArguments(schematicOptions, options, this.logger);
   }
 }
 

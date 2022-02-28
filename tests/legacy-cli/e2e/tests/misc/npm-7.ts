@@ -38,7 +38,7 @@ export default async function () {
     await npm('install', '--global', 'npm@7.4.0');
 
     // Ensure `ng add` shows npm warning
-    const { message: stderrAdd } = await expectToFail(() => ng('add'));
+    const { stderr: stderrAdd } = await ng('add', '@angular/localize');
     if (!stderrAdd.includes(warningText)) {
       throw new Error('ng add expected to show npm version warning.');
     }

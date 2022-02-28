@@ -97,7 +97,7 @@ export default async function () {
 async function runTests(): Promise<void> {
   // Check that the tests succeeds both with named project, unnamed (should test app), and prod.
   await ng('e2e');
-  await ng('e2e', 'test-project', '--devServerTarget=test-project:serve:production');
+  await ng('e2e', 'test-project', '--dev-server-target=test-project:serve:production');
 
   // Validate that sourcemaps for the library exists.
   await ng('build', '--configuration=development');
