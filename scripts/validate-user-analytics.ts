@@ -6,41 +6,22 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, logging, tags } from '@angular-devkit/core';
-import { spawnSync } from 'child_process';
+import { analytics, logging, schema, strings, tags } from '@angular-devkit/core';
 import * as fs from 'fs';
-import * as os from 'os';
+import { glob as globCb } from 'glob';
 import * as path from 'path';
-import { CommandDescriptionMap, Option } from '../packages/angular/cli/models/interface';
-import create from './create';
+import { promisify } from 'util';
+import { packages } from '../lib/packages';
 
 const userAnalyticsTable = require('./templates/user-analytics-table').default;
 
 const dimensionsTableRe = /<!--DIMENSIONS_TABLE_BEGIN-->([\s\S]*)<!--DIMENSIONS_TABLE_END-->/m;
 const metricsTableRe = /<!--METRICS_TABLE_BEGIN-->([\s\S]*)<!--METRICS_TABLE_END-->/m;
 
-/**
- * Execute a command.
- * @private
- */
-function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  const { status, error, stdout } = spawnSync(command, args, {
-    stdio: ['ignore', 'pipe', 'inherit'],
-    ...opts,
-  });
-
-  if (status != 0) {
-    logger.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
-    throw error;
-  }
-
-  return stdout.toString('utf-8');
-}
-
 async function _checkDimensions(dimensionsTable: string, logger: logging.Logger) {
   const data: { userAnalytics: number; type: string; name: string }[] = new Array(200);
 
-  function _updateData(userAnalytics: number, name: string, type: string) {
+  function updateData(userAnalytics: number, name: string, type: string) {
     if (data[userAnalytics]) {
       if (data[userAnalytics].name !== name) {
         logger.error(tags.stripIndents`
@@ -77,47 +58,37 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
         `Invalid value found in enum AnalyticsDimensions: ${JSON.stringify(userAnalytics)}`,
       );
     }
-    _updateData(userAnalytics, flagName, type);
+    updateData(userAnalytics, flagName, type);
   }
 
-  // Creating a new project and reading the help.
-  logger.info('Creating temporary project for gathering help...');
+  logger.info('Gathering options for user-analytics...');
 
-  const newProjectTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-create-'));
-  const newProjectName = 'help-project';
-  const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
-  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+  const userAnalyticsGatherer = (obj: Object) => {
+    for (const [key, value] of Object.entries(obj)) {
+      if (value && typeof value === 'object') {
+        if ('x-user-analytics' in value) {
+          const type =
+            [...schema.getTypesOfSchema(value)].find((type) => type !== 'object') ?? 'string';
 
-  const commandDescription: CommandDescriptionMap = {};
-
-  logger.info('Gathering options...');
-
-  const commands = require('../packages/angular/cli/commands.json');
-  const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  for (const commandName of Object.keys(commands)) {
-    const options = { cwd: newProjectRoot };
-    const childLogger = logger.createChild(commandName);
-    const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
-    commandDescription[commandName] = JSON.parse(stdout.trim());
-  }
-
-  function _checkOptionsForAnalytics(options: Option[]) {
-    for (const option of options) {
-      if (option.subcommands) {
-        for (const subcommand of Object.values(option.subcommands)) {
-          _checkOptionsForAnalytics(subcommand.options);
+          updateData(value['x-user-analytics'], 'Flag: --' + strings.dasherize(key), type);
+        } else {
+          userAnalyticsGatherer(value);
         }
       }
-
-      if (option.userAnalytics === undefined) {
-        continue;
-      }
-      _updateData(option.userAnalytics, 'Flag: --' + option.name, option.type);
     }
-  }
+  };
 
-  for (const commandName of Object.keys(commandDescription)) {
-    _checkOptionsForAnalytics(commandDescription[commandName].options);
+  const glob = promisify(globCb);
+
+  // Find all the schemas
+  const packagesPaths = Object.values(packages).map(({ root }) => root);
+  for (const packagePath of packagesPaths) {
+    const schemasPaths = await glob('**/schema.json', { cwd: packagePath });
+
+    for (const schemaPath of schemasPaths) {
+      const schema = await fs.promises.readFile(path.join(packagePath, schemaPath), 'utf8');
+      userAnalyticsGatherer(JSON.parse(schema));
+    }
   }
 
   const generatedTable = userAnalyticsTable({ flags: data }).trim();
