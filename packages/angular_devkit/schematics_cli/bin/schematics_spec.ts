@@ -35,12 +35,11 @@ describe('schematics-cli binary', () => {
     expect(res).toEqual(0);
   });
 
-  it('listSchematics works', async () => {
+  it('errors when using camel case listSchematics', async () => {
     const args = ['--listSchematics'];
-    const res = await main({ args, stdout, stderr });
-    expect(stdout.lines).toMatch(/blank/);
-    expect(stdout.lines).toMatch(/schematic/);
-    expect(res).toEqual(0);
+    await expectAsync(main({ args, stdout, stderr })).toBeRejectedWithError(
+      'Unknown argument listSchematics. Did you mean list-schematics?',
+    );
   });
 
   it('dry-run works', async () => {

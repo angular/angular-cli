@@ -178,7 +178,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#5e484f9c4ab6b47f84263d115d6cf9e13ce4f32a":
   version "0.0.0-104c49ad795097101ab3aa268a8e9af2cdf04a8d"
-  uid "5e484f9c4ab6b47f84263d115d6cf9e13ce4f32a"
   resolved "https://github.com/angular/dev-infra-private-builds.git#5e484f9c4ab6b47f84263d115d6cf9e13ce4f32a"
   dependencies:
     "@angular-devkit/build-angular" "14.0.0-next.3"
@@ -2223,7 +2222,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/yargs-parser@*":
+"@types/yargs-parser@*", "@types/yargs-parser@^20.2.1":
   version "20.2.1"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-20.2.1.tgz#3b9ce2489919d9e4fea439b76916abc34b2df129"
   integrity sha512-7tFImggNeNBVMsn0vLrpn1H1uPrUBdnARPTpZoitY37ZrdJREzf7I16tMrlK3hen349gr1NYh8CmZQa7CTG6Aw==
@@ -9124,7 +9123,6 @@ sass@1.49.9, sass@^1.49.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
@@ -10923,6 +10921,11 @@ yaml@^1.10.0, yaml@^1.5.0:
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
+
+yargs-parser@21.0.1:
+  version "21.0.1"
+  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-21.0.1.tgz#0267f286c877a4f0f728fceb6f8a3e4cb95c6e35"
+  integrity sha512-9BK1jFpLzJROCI5TzwZL/TU4gqjK5xiHV/RfWLOahrjAko/e4DJkRDZQXfvqAsiZzzYhgAzbgz6lg48jcm4GLg==
 
 yargs-parser@^18.1.2:
   version "18.1.3"
