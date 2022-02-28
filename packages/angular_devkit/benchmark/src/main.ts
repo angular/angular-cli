@@ -11,8 +11,8 @@ import { logging, tags } from '@angular-devkit/core';
 import { ProcessOutput } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
 import { appendFileSync, writeFileSync } from 'fs';
-import minimist from 'minimist';
 import { filter, map, toArray } from 'rxjs/operators';
+import yargsParser from 'yargs-parser';
 import { Command } from '../src/command';
 import { defaultReporter } from '../src/default-reporter';
 import { defaultStatsCapture } from '../src/default-stats-capture';
@@ -25,6 +25,7 @@ export interface MainOptions {
   stderr?: ProcessOutput;
 }
 
+// eslint-disable-next-line max-lines-per-function
 export async function main({
   args,
   stdout = process.stdout,
@@ -69,13 +70,22 @@ export async function main({
     'watch-timeout': number;
     'watch-matcher'?: string;
     'watch-script'?: string;
-    '--': string[] | null;
+    '--': string[];
+    _: string[];
+    $0: string;
   }
 
   // Parse the command line.
-  const argv = minimist(args, {
+  const argv = yargsParser(args, {
     boolean: ['help', 'verbose', 'overwrite-output-file'],
     string: ['watch-matcher', 'watch-script'],
+    configuration: {
+      'dot-notation': false,
+      'boolean-negation': true,
+      'strip-aliased': true,
+      'populate--': true,
+      'camel-case-expansion': false,
+    },
     default: {
       'exit-code': 0,
       'iterations': 5,
@@ -85,8 +95,7 @@ export async function main({
       'prefix': '[benchmark]',
       'watch-timeout': 10000,
     },
-    '--': true,
-  }) as {} as BenchmarkCliArgv;
+  }) as BenchmarkCliArgv;
 
   // Create the DevKit Logger used through the CLI.
   const logger = new logging.TransformLogger('benchmark-prefix-logger', (stream) =>

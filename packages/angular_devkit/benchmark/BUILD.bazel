@@ -25,9 +25,9 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/minimist",
         "@npm//@types/node",
         "@npm//@types/pidusage",
+        "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
         "@npm//rxjs",
     ],
@@ -60,12 +60,12 @@ jasmine_node_test(
     srcs = [":benchmark_test_lib"],
     deps = [
         "@npm//jasmine",
-        "@npm//minimist",
         "@npm//pidtree",
         "@npm//pidusage",
         "@npm//source-map",
         "@npm//temp",
         "@npm//tree-kill",
+        "@npm//yargs-parser",
     ],
 )
 
