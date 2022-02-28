@@ -13,7 +13,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { PackageInfo, packages } from '../lib/packages';
 import build from './build-bazel';
-import create from './create';
+import jsonHelp from './json-help';
 
 // Added to the README.md of the snapshot. This is markdown.
 const readmeHeaderFn = (pkg: PackageInfo) => `
@@ -164,30 +164,11 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
     _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
   }
 
-  // Creating a new project and reading the help.
-  logger.info('Creating temporary project...');
-  const newProjectTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-create-'));
-  const newProjectName = 'help-project';
-  const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
-  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+  await jsonHelp(undefined, logger);
 
   // Run build.
   logger.info('Building...');
   await build({ snapshot: true }, logger.createChild('build'));
-
-  logger.info('Gathering JSON Help...');
-  const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
-  fs.mkdirSync(helpOutputRoot);
-  const commands = require('../packages/angular/cli/commands.json');
-  for (const commandName of Object.keys(commands)) {
-    const options = { cwd: newProjectRoot };
-    const childLogger = logger.createChild(commandName);
-    const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
-    // Make sure the output is JSON before printing it, and format it as well.
-    const jsonOutput = JSON.stringify(JSON.parse(stdout.trim()), undefined, 2);
-    fs.writeFileSync(path.join(helpOutputRoot, commandName + '.json'), jsonOutput);
-  }
 
   if (!githubToken) {
     logger.info('No token given, skipping actual publishing...');
