@@ -13,7 +13,6 @@
       "hidden": true
     },
     "service-worker": {
-      "aliases": ["serviceWorker"],
       "factory": "./service-worker",
       "description": "Initializes a service worker setup.",
       "schema": "./service-worker/schema.json"
@@ -102,7 +101,6 @@
       "hidden": true
     },
     "app-shell": {
-      "aliases": ["appShell"],
       "factory": "./app-shell",
       "description": "Create an app shell.",
       "schema": "./app-shell/schema.json"
@@ -114,7 +112,6 @@
       "description": "Generate a library project for Angular."
     },
     "web-worker": {
-      "aliases": ["webWorker"],
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",
       "description": "Create a Web Worker."

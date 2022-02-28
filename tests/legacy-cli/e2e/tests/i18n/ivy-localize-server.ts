@@ -116,7 +116,7 @@ export default async function () {
     const server = i18nApp(lang).listen(4200, 'localhost');
     try {
       // Execute without a devserver.
-      await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
+      await ng('e2e', `--configuration=${lang}`, '--dev-server-target=');
     } finally {
       server.close();
     }

@@ -51,7 +51,7 @@ export default async function () {
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
   await expectToFail(() => expectFileToExist('dist/test-project/main.js.map'));
   // Use two configurations and two overrides, one of which overrides a config.
-  await ng('build', '--configuration=one,two', '--vendor-chunk=false', '--sourceMap=true');
+  await ng('build', '--configuration=one,two', '--vendor-chunk=false', '--source-map=true');
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
   await expectFileToExist('dist/test-project/main.js.map');
   await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));

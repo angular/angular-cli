@@ -59,7 +59,7 @@ export default async function () {
   );
 
   // works with optimization and bundleDependencies enabled
-  await ng('run', 'test-project:server', '--optimization', '--bundleDependencies');
+  await ng('run', 'test-project:server', '--optimization', '--bundle-dependencies');
   await exec(normalize('node'), 'dist/test-project/server/main.js');
   await expectFileToMatch(
     'dist/test-project/server/index.html',

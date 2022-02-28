@@ -180,7 +180,7 @@ export default async function () {
       );
 
       // Execute without a devserver.
-      await ng('e2e', '--devServerTarget=');
+      await ng('e2e', '--dev-server-target=');
     } finally {
       server.close();
     }

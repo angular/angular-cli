@@ -17,12 +17,12 @@ const baseHrefs = {
   de: '',
 };
 
-export default async function() {
+export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
   // Update angular.json
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = appProject.i18n;
@@ -64,8 +64,8 @@ export default async function() {
       await ng(
         'e2e',
         `--configuration=${lang}`,
-        '--devServerTarget=',
-        `--baseUrl=http://localhost:4200${baseHrefs[lang] || '/'}`,
+        '--dev-server-target=',
+        `--base-url=http://localhost:4200${baseHrefs[lang] || '/'}`,
       );
     } finally {
       server.close();
@@ -73,7 +73,7 @@ export default async function() {
   }
 
   // Update angular.json
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
 
     appArchitect['build'].options.baseHref = '/test/';
@@ -94,8 +94,8 @@ export default async function() {
       await ng(
         'e2e',
         `--configuration=${lang}`,
-        '--devServerTarget=',
-        `--baseUrl=http://localhost:4200/test${baseHrefs[lang] || '/'}`,
+        '--dev-server-target=',
+        `--base-url=http://localhost:4200/test${baseHrefs[lang] || '/'}`,
       );
     } finally {
       server.close();
@@ -106,6 +106,9 @@ export default async function() {
   await ng('build', '--base-href', 'http://www.domain.com/', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     // Verify the HTML base HREF attribute is present
-    await expectFileToMatch(`${outputPath}/index.html`, `href="http://www.domain.com${baseHrefs[lang] || '/'}"`);
+    await expectFileToMatch(
+      `${outputPath}/index.html`,
+      `href="http://www.domain.com${baseHrefs[lang] || '/'}"`,
+    );
   }
 }
