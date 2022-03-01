@@ -9,13 +9,13 @@
 
 import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { logging, schema, tags, workspaces } from '@angular-devkit/core';
+import { json, logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
-import minimist from 'minimist';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
+import yargsParser from 'yargs-parser';
 import { MultiProgressBar } from '../src/progress';
 
 function findUp(names: string | string[], from: string) {
@@ -78,24 +78,43 @@ async function _executeTarget(
   parentLogger: logging.Logger,
   workspace: workspaces.WorkspaceDefinition,
   root: string,
-  argv: minimist.ParsedArgs,
+  argv: yargsParser.Arguments,
   registry: schema.SchemaRegistry,
 ) {
   const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, root);
   const architect = new Architect(architectHost, registry);
 
   // Split a target into its parts.
-  const targetStr = argv._.shift() || '';
+  const {
+    _: [targetStr = ''],
+    help,
+    ...options
+  } = argv;
   const [project, target, configuration] = targetStr.split(':');
   const targetSpec = { project, target, configuration };
 
-  delete argv['help'];
   const logger = new logging.Logger('jobs');
   const logs: logging.LogEntry[] = [];
   logger.subscribe((entry) => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
 
-  const { _, ...options } = argv;
-  const run = await architect.scheduleTarget(targetSpec, options, { logger });
+  // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
+
+  // Casting temporary until https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59065 is merged and released.
+  const { camelCase, decamelize } = yargsParser as yargsParser.Parser & {
+    camelCase(str: string): string;
+    decamelize(str: string, joinString?: string): string;
+  };
+
+  const camelCasedOptions: json.JsonObject = {};
+  for (const [key, value] of Object.entries(options)) {
+    if (/[A-Z]/.test(key)) {
+      throw new Error(`Unknown argument ${key}. Did you mean ${decamelize(key)}?`);
+    }
+
+    camelCasedOptions[camelCase(key)] = value;
+  }
+
+  const run = await architect.scheduleTarget(targetSpec, camelCasedOptions, { logger });
   const bars = new MultiProgressBar<number, BarInfo>(':name :bar (:current/:total) :status');
 
   run.progress.subscribe((update) => {
@@ -107,7 +126,7 @@ async function _executeTarget(
       name: (
         (update.target ? _targetStringFromTarget(update.target) : update.builder.name) +
         ' '.repeat(80)
-      ).substr(0, 40),
+      ).substring(0, 40),
     };
 
     if (update.status !== undefined) {
@@ -175,7 +194,15 @@ async function _executeTarget(
 
 async function main(args: string[]): Promise<number> {
   /** Parse the command line. */
-  const argv = minimist(args, { boolean: ['help'] });
+  const argv = yargsParser(args, {
+    boolean: ['help'],
+    configuration: {
+      'dot-notation': false,
+      'boolean-negation': true,
+      'strip-aliased': true,
+      'camel-case-expansion': false,
+    },
+  });
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(argv['verbose'], process.stdout, process.stderr, {
