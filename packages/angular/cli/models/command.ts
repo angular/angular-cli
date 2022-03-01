@@ -7,8 +7,8 @@
  */
 
 import { analytics, logging } from '@angular-devkit/core';
-import { Option } from '../utilities/command-builder/json-schema';
-import { AngularWorkspace } from '../utilities/config';
+import { Option } from '../src/command-builder/utilities/json-schema';
+import { AngularWorkspace } from '../src/utilities/config';
 import { CommandContext } from './interface';
 
 export interface BaseCommandOptions {

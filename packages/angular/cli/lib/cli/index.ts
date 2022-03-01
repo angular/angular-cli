@@ -9,14 +9,14 @@
 import { schema } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
-import { colors, removeColor } from '../../utilities/color';
-import { CommandModuleError } from '../../utilities/command-builder/command-module';
-import { AngularWorkspace, getWorkspaceRaw } from '../../utilities/config';
-import { writeErrorToLogFile } from '../../utilities/log-file';
-import { findWorkspaceFile } from '../../utilities/project';
-import { runCommand } from './command-runner';
+import { CommandModuleError } from '../../src/command-builder/command-module';
+import { runCommand } from '../../src/command-builder/command-runner';
+import { colors, removeColor } from '../../src/utilities/color';
+import { AngularWorkspace, getWorkspaceRaw } from '../../src/utilities/config';
+import { writeErrorToLogFile } from '../../src/utilities/log-file';
+import { findWorkspaceFile } from '../../src/utilities/project';
 
-export { VERSION } from '../../utilities/version';
+export { VERSION } from '../../src/utilities/version';
 
 const debugEnv = process.env['NG_DEBUG'];
 const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCase() !== 'false';

@@ -18,9 +18,9 @@ declare module 'ini' {
 
 declare module 'npm-pick-manifest' {
   function pickManifest(
-    metadata: import('../utilities/package-metadata').PackageMetadata,
+    metadata: import('./utilities/package-metadata').PackageMetadata,
     selector: string,
-  ): import('../utilities/package-metadata').PackageManifest;
+  ): import('./utilities/package-metadata').PackageManifest;
   export = pickManifest;
 }
 
@@ -33,5 +33,5 @@ declare module 'pacote' {
   export function packument(
     specifier: string,
     options: Record<string, unknown>,
-  ): Promise<import('../utilities/package-metadata').NpmRepositoryPackageJson>;
+  ): Promise<import('./utilities/package-metadata').NpmRepositoryPackageJson>;
 }

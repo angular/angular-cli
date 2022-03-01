@@ -10,7 +10,7 @@ import { logging } from '@angular-devkit/core';
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 import * as os from 'os';
-import { JsonHelp } from 'packages/angular/cli/utilities/command-builder/json-help';
+import { JsonHelp } from 'packages/angular/cli/src/command-builder/utilities/json-help';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 import create from './create';

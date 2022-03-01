@@ -7,7 +7,7 @@
  */
 
 import { analytics, logging } from '@angular-devkit/core';
-import { AngularWorkspace } from '../utilities/config';
+import { AngularWorkspace } from '../src/utilities/config';
 
 /**
  * A command runner context.

@@ -10,11 +10,8 @@ import { logging, tags } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as npa from 'npm-package-arg';
 import * as semver from 'semver';
-import { Dependency, JsonSchemaForNpmPackageJsonFiles } from '../../../../utilities/package-json';
-import {
-  NpmRepositoryPackageJson,
-  getNpmPackageJson,
-} from '../../../../utilities/package-metadata';
+import { Dependency, JsonSchemaForNpmPackageJsonFiles } from '../../../utilities/package-json';
+import { NpmRepositoryPackageJson, getNpmPackageJson } from '../../../utilities/package-metadata';
 import { Schema as UpdateSchema } from './schema';
 
 type VersionRange = string & { __VERSION_RANGE: void };
