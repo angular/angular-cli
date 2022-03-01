@@ -14,7 +14,7 @@ if ('NG_CLI_ANALYTICS' in process.env) {
 }
 
 try {
-  var analytics = require('../../models/analytics');
+  var analytics = require('../../src/analytics/analytics');
 
   analytics
     .hasGlobalAnalyticsConfiguration()

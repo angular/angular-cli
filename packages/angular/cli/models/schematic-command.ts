@@ -16,12 +16,12 @@ import {
 } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
-import { colors } from '../utilities/color';
-import { parseJsonSchemaToOptions } from '../utilities/command-builder/json-schema';
-import { getProjectByCwd, getSchematicDefaults, getWorkspace } from '../utilities/config';
-import { ensureCompatibleNpm, getPackageManager } from '../utilities/package-manager';
-import { isTTY } from '../utilities/tty';
-import { isPackageNameSafeForAnalytics } from './analytics';
+import { isPackageNameSafeForAnalytics } from '../src/analytics/analytics';
+import { parseJsonSchemaToOptions } from '../src/command-builder/utilities/json-schema';
+import { colors } from '../src/utilities/color';
+import { getProjectByCwd, getSchematicDefaults, getWorkspace } from '../src/utilities/config';
+import { ensureCompatibleNpm, getPackageManager } from '../src/utilities/package-manager';
+import { isTTY } from '../src/utilities/tty';
 import { BaseCommandOptions, Command } from './command';
 import { CommandContext } from './interface';
 import { SchematicEngineHost } from './schematic-engine-host';
