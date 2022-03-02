@@ -1,3 +1,35 @@
+<a name="14.0.0-next.4"></a>
+
+# 14.0.0-next.4 (2022-03-02)
+
+## Breaking Changes
+
+### @angular-devkit/architect-cli
+
+- camel case arguments are no longer allowed.
+
+### @angular-devkit/schematics-cli
+
+- camel case arguments are no longer allowed.
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type     | Description                      |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------- |
+| [5330d52ae](https://github.com/angular/angular-cli/commit/5330d52aee32daca27fa1a2fa15712f4a408602a) | refactor | replace parser with yargs-parser |
+
+### @angular-devkit/architect-cli
+
+| Commit                                                                                              | Type     | Description                      |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------- |
+| [c7556b62b](https://github.com/angular/angular-cli/commit/c7556b62b7b0eab5717ed6eeab3fa7f0f1f2a873) | refactor | replace parser with yargs-parser |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Daniele Maltese
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.3"></a>
 
 # 14.0.0-next.3 (2022-02-23)
