@@ -357,12 +357,6 @@ workflows:
                 - renovate/angular
                 - master
       - e2e-cli:
-          name: e2e-cli-node-12
-          nodeversion: '12.20'
-          <<: *only_release_branches
-          requires:
-            - build
-      - e2e-cli:
           name: e2e-cli-node-16
           nodeversion: '16.10'
           <<: *only_release_branches
