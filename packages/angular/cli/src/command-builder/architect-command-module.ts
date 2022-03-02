@@ -6,20 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect, Target } from '@angular-devkit/architect';
-import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json } from '@angular-devkit/core';
 import { Argv } from 'yargs';
-import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
+import { ArchitectBaseCommandModule } from './architect-base-command-module';
 import {
-  CommandModule,
   CommandModuleError,
   CommandModuleImplementation,
-  CommandScope,
   Options,
   OtherOptions,
 } from './command-module';
-import { getArchitectTargetOptions } from './utilities/architect';
 
 export interface ArchitectCommandArgs {
   configuration?: string;
@@ -27,13 +21,10 @@ export interface ArchitectCommandArgs {
 }
 
 export abstract class ArchitectCommandModule
-  extends CommandModule<ArchitectCommandArgs>
+  extends ArchitectBaseCommandModule<ArchitectCommandArgs>
   implements CommandModuleImplementation<ArchitectCommandArgs>
 {
-  static override scope = CommandScope.In;
   abstract readonly multiTarget: boolean;
-  readonly missingErrorTarget: string | undefined;
-  protected override shouldReportAnalytics = false;
 
   async builder(argv: Argv): Promise<Argv<ArchitectCommandArgs>> {
     const localYargs: Argv<ArchitectCommandArgs> = argv
@@ -52,17 +43,21 @@ export abstract class ArchitectCommandModule
       })
       .strict();
 
-    const targetSpecifier = this.makeTargetSpecifier();
-    if (!targetSpecifier.project) {
+    const project = this.getArchitectProject();
+    if (!project) {
       return localYargs;
     }
 
-    const schemaOptions = await getArchitectTargetOptions(this.context, targetSpecifier);
+    const target = this.getArchitectTarget();
+    const schemaOptions = await this.getArchitectTargetOptions({
+      project,
+      target,
+    });
 
     return this.addSchemaOptionsToCommand(localYargs, schemaOptions);
   }
 
-  async run(options: Options<ArchitectCommandArgs>): Promise<number | void> {
+  async run(options: Options<ArchitectCommandArgs> & OtherOptions): Promise<number | void> {
     const { logger, workspace } = this.context;
     if (!workspace) {
       logger.fatal('A workspace is required for this command.');
@@ -70,17 +65,10 @@ export abstract class ArchitectCommandModule
       return 1;
     }
 
-    const registry = new json.schema.CoreSchemaRegistry();
-    registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
-    registry.useXDeprecatedProvider((msg) => this.context.logger.warn(msg));
+    const target = this.getArchitectTarget();
+    const { configuration = '', project, ...architectOptions } = options;
 
-    const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, workspace.basePath);
-    const architect = new Architect(architectHost, registry);
-
-    const targetSpec = this.makeTargetSpecifier(options);
-    if (!targetSpec.project) {
-      const target = this.getArchitectTarget();
-
+    if (!project) {
       // This runs each target sequentially.
       // Running them in parallel would jumble the log messages.
       let result = 0;
@@ -92,12 +80,12 @@ export abstract class ArchitectCommandModule
       }
 
       for (const project of projectNames) {
-        result |= await this.runSingleTarget({ ...targetSpec, project }, options, architect);
+        result |= await this.runSingleTarget({ configuration, target, project }, architectOptions);
       }
 
       return result;
     } else {
-      return await this.runSingleTarget(targetSpec, options, architect);
+      return await this.runSingleTarget({ configuration, target, project }, architectOptions);
     }
   }
 
@@ -126,14 +114,6 @@ export abstract class ArchitectCommandModule
   private getArchitectTarget(): string {
     // 'build [project]' -> 'build'
     return this.command?.split(' ', 1)[0];
-  }
-
-  private makeTargetSpecifier(options?: Options<ArchitectCommandArgs>): Target {
-    return {
-      project: options?.project ?? this.getArchitectProject() ?? '',
-      target: this.getArchitectTarget(),
-      configuration: options?.configuration ?? '',
-    };
   }
 
   private getProjectNamesByTarget(target: string): string[] | undefined {
@@ -173,60 +153,5 @@ export abstract class ArchitectCommandModule
     }
 
     return undefined;
-  }
-
-  private async runSingleTarget(
-    target: Target,
-    options: Options<ArchitectCommandArgs> & OtherOptions,
-    architect: Architect,
-  ): Promise<number> {
-    // Remove options
-    const { configuration, project, ...extraOptions } = options;
-    const architectHost = await this.getArchitectHost();
-
-    let builderName: string;
-    try {
-      builderName = await architectHost.getBuilderNameForTarget(target);
-    } catch (e) {
-      throw new CommandModuleError(this.missingErrorTarget ?? e.message);
-    }
-
-    await this.reportAnalytics({
-      ...(await architectHost.getOptionsForTarget(target)),
-      ...extraOptions,
-    });
-
-    const { logger } = this.context;
-
-    const run = await architect.scheduleTarget(target, extraOptions as json.JsonObject, {
-      logger,
-      analytics: isPackageNameSafeForAnalytics(builderName) ? await this.getAnalytics() : undefined,
-    });
-
-    const { error, success } = await run.output.toPromise();
-    await run.stop();
-
-    if (error) {
-      logger.error(error);
-    }
-
-    return success ? 0 : 1;
-  }
-
-  private _architectHost: WorkspaceNodeModulesArchitectHost | undefined;
-  private getArchitectHost(): WorkspaceNodeModulesArchitectHost {
-    if (this._architectHost) {
-      return this._architectHost;
-    }
-
-    const { workspace } = this.context;
-    if (!workspace) {
-      throw new CommandModuleError('A workspace is required for this command.');
-    }
-
-    return (this._architectHost = new WorkspaceNodeModulesArchitectHost(
-      workspace,
-      workspace.basePath,
-    ));
   }
 }

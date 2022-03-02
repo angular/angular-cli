@@ -10,15 +10,21 @@ import { analytics, logging, normalize, strings } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import {
+  ArgumentsCamelCase,
   Argv,
   CamelCaseKey,
   PositionalOptions,
   CommandModule as YargsCommandModule,
   Options as YargsOptions,
 } from 'yargs';
+import { Parser } from 'yargs/helpers';
 import { createAnalytics } from '../analytics/analytics';
 import { AngularWorkspace } from '../utilities/config';
 import { Option } from './utilities/json-schema';
+
+const yargsParser = Parser as unknown as typeof Parser.default & {
+  camelCase(str: string): string;
+};
 
 export type Options<T> = { [key in keyof T as CamelCaseKey<key>]: T[key] };
 
@@ -55,8 +61,6 @@ export interface CommandModuleImplementation<T extends {} = {}>
   builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
   /** A function which will be passed the parsed argv. */
   run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
-  /** a function which will be passed the parsed argv. */
-  handler(args: Options<T> & OtherOptions): Promise<void> | void;
 }
 
 export interface FullDescribe {
@@ -106,16 +110,24 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   abstract builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
   abstract run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
 
-  async handler(args: Options<T> & OtherOptions): Promise<void> {
+  async handler(args: ArgumentsCamelCase<T> & OtherOptions): Promise<void> {
+    const { _, $0, ...options } = args;
+
+    // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
+    const camelCasedOptions: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(options)) {
+      camelCasedOptions[yargsParser.camelCase(key)] = value;
+    }
+
     // Gather and report analytics.
     const analytics = await this.getAnalytics();
     if (this.shouldReportAnalytics) {
-      await this.reportAnalytics(args);
+      await this.reportAnalytics(camelCasedOptions);
     }
 
     // Run and time command.
     const startTime = Date.now();
-    const result = await this.run(args);
+    const result = await this.run(camelCasedOptions as Options<T> & OtherOptions);
     const endTime = Date.now();
 
     analytics.timing(this.commandName, 'duration', endTime - startTime);
@@ -127,7 +139,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   }
 
   async reportAnalytics(
-    options: Options<T> & OtherOptions,
+    options: (Options<T> & OtherOptions) | OtherOptions,
     paths: string[] = [],
     dimensions: (boolean | number | string)[] = [],
   ): Promise<void> {

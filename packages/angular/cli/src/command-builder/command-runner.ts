@@ -51,9 +51,7 @@ const COMMANDS = [
   RunCommandModule,
 ];
 
-const yargsParser = Parser as unknown as typeof Parser.default & {
-  camelCase(str: string): string;
-};
+const yargsParser = Parser as unknown as typeof Parser.default;
 
 export async function runCommand(
   args: string[],
@@ -107,15 +105,7 @@ export async function runCommand(
           : describe,
       deprecated: commandModule.deprecated,
       builder: (x) => commandModule.builder(x),
-      handler: ({ _, $0, ...options }) => {
-        // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
-        const camelCasedOptions: Record<string, unknown> = {};
-        for (const [key, value] of Object.entries(options)) {
-          camelCasedOptions[yargsParser.camelCase(key)] = value;
-        }
-
-        return commandModule.handler(camelCasedOptions);
-      },
+      handler: (x) => commandModule.handler(x),
     });
   }
 

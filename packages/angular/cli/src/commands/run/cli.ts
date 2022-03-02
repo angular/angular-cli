@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect, Target } from '@angular-devkit/architect';
-import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json } from '@angular-devkit/core';
+import { Target } from '@angular-devkit/architect';
 import { join } from 'path';
 import { Argv } from 'yargs';
-import { isPackageNameSafeForAnalytics } from '../../analytics/analytics';
+import { ArchitectBaseCommandModule } from '../../command-builder/architect-base-command-module';
 import {
   CommandModule,
   CommandModuleError,
@@ -20,14 +18,13 @@ import {
   Options,
   OtherOptions,
 } from '../../command-builder/command-module';
-import { getArchitectTargetOptions } from '../../command-builder/utilities/architect';
 
 export interface RunCommandArgs {
   target: string;
 }
 
 export class RunCommandModule
-  extends CommandModule<RunCommandArgs>
+  extends ArchitectBaseCommandModule<RunCommandArgs>
   implements CommandModuleImplementation<RunCommandArgs>
 {
   static override scope = CommandScope.In;
@@ -51,50 +48,20 @@ export class RunCommandModule
       return localYargs;
     }
 
-    const schemaOptions = await getArchitectTargetOptions(this.context, target);
+    const schemaOptions = await this.getArchitectTargetOptions(target);
 
     return this.addSchemaOptionsToCommand(localYargs, schemaOptions);
   }
 
-  async run(options: Options<RunCommandArgs> & OtherOptions): Promise<number | void> {
-    const { logger, workspace } = this.context;
-    if (!workspace) {
-      throw new CommandModuleError('A workspace is required for this command.');
-    }
-
-    const registry = new json.schema.CoreSchemaRegistry();
-    registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
-    registry.useXDeprecatedProvider((msg) => logger.warn(msg));
-
-    const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, workspace.basePath);
-    const architect = new Architect(architectHost, registry);
-
+  async run(options: Options<RunCommandArgs> & OtherOptions): Promise<number> {
     const target = this.makeTargetSpecifier(options);
+    const { target: _target, ...extraOptions } = options;
 
     if (!target) {
       throw new CommandModuleError('Cannot determine project or target.');
     }
 
-    const builderName = await architectHost.getBuilderNameForTarget(target);
-    await this.reportAnalytics({
-      ...(await architectHost.getOptionsForTarget(target)),
-      ...options,
-    });
-
-    const { target: _target, ...extraOptions } = options;
-    const run = await architect.scheduleTarget(target, extraOptions as json.JsonObject, {
-      logger,
-      analytics: isPackageNameSafeForAnalytics(builderName) ? await this.getAnalytics() : undefined,
-    });
-
-    const { error, success } = await run.output.toPromise();
-    await run.stop();
-
-    if (error) {
-      logger.error(error);
-    }
-
-    return success ? 0 : 1;
+    return this.runSingleTarget(target, extraOptions);
   }
 
   protected makeTargetSpecifier(options?: Options<RunCommandArgs>): Target | undefined {
