@@ -15,7 +15,7 @@ import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
 import * as inquirer from 'inquirer';
-import yargsParser from 'yargs-parser';
+import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 
 /**
  * Parse the name of schematic passed in argument, and return a {collection, schematic} named
@@ -378,12 +378,6 @@ function parseArgs(args: string[]): Options {
   ): key is ElementType<typeof booleanArgs> =>
     booleanArgs.includes(key as ElementType<typeof booleanArgs>);
 
-  // Casting temporary until https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59065 is merged and released.
-  const { camelCase, decamelize } = yargsParser as yargsParser.Parser & {
-    camelCase(str: string): string;
-    decamelize(str: string, joinString?: string): string;
-  };
-
   for (const [key, value] of Object.entries(options)) {
     if (/[A-Z]/.test(key)) {
       throw new Error(`Unknown argument ${key}. Did you mean ${decamelize(key)}?`);
@@ -397,7 +391,7 @@ function parseArgs(args: string[]): Options {
   }
 
   return {
-    _,
+    _: _.map((v) => v.toString()),
     schematicOptions,
     cliOptions,
   };

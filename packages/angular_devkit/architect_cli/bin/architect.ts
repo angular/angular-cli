@@ -15,7 +15,7 @@ import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
-import yargsParser from 'yargs-parser';
+import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 import { MultiProgressBar } from '../src/progress';
 
 function findUp(names: string | string[], from: string) {
@@ -90,7 +90,7 @@ async function _executeTarget(
     help,
     ...options
   } = argv;
-  const [project, target, configuration] = targetStr.split(':');
+  const [project, target, configuration] = targetStr.toString().split(':');
   const targetSpec = { project, target, configuration };
 
   const logger = new logging.Logger('jobs');
@@ -98,13 +98,6 @@ async function _executeTarget(
   logger.subscribe((entry) => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
 
   // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
-
-  // Casting temporary until https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59065 is merged and released.
-  const { camelCase, decamelize } = yargsParser as yargsParser.Parser & {
-    camelCase(str: string): string;
-    decamelize(str: string, joinString?: string): string;
-  };
-
   const camelCasedOptions: json.JsonObject = {};
   for (const [key, value] of Object.entries(options)) {
     if (/[A-Z]/.test(key)) {
