@@ -17,14 +17,10 @@ import {
   CommandModule as YargsCommandModule,
   Options as YargsOptions,
 } from 'yargs';
-import { Parser } from 'yargs/helpers';
+import { Parser as yargsParser } from 'yargs/helpers';
 import { createAnalytics } from '../analytics/analytics';
 import { AngularWorkspace } from '../utilities/config';
 import { Option } from './utilities/json-schema';
-
-const yargsParser = Parser as unknown as typeof Parser.default & {
-  camelCase(str: string): string;
-};
 
 export type Options<T> = { [key in keyof T as CamelCaseKey<key>]: T[key] };
 
