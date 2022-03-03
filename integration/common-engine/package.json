@@ -47,16 +47,16 @@
     "@nguniversal/builders": "file:../../dist/modules-dist/builders",
     "codelyzer": "6.0.2",
     "concurrently": "7.0.0",
-    "jasmine-core": "4.0.0",
+    "jasmine-core": "4.0.1",
     "jasmine-spec-reporter": "7.0.0",
-    "karma": "6.3.16",
+    "karma": "6.3.17",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-jasmine": "4.0.1",
     "karma-jasmine-html-reporter": "1.7.0",
     "protractor": "file:../../node_modules/protractor",
     "puppeteer": "file:../../node_modules/puppeteer",
-    "ts-node": "10.4.0",
+    "ts-node": "10.6.0",
     "typescript": "file:../../node_modules/typescript"
   }
 }
