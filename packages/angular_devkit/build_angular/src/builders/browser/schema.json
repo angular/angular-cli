@@ -141,8 +141,7 @@
     },
     "resourcesOutputPath": {
       "type": "string",
-      "description": "The path where style resources will be placed, relative to outputPath.",
-      "default": ""
+      "description": "The path where style resources will be placed, relative to outputPath."
     },
     "aot": {
       "type": "boolean",
