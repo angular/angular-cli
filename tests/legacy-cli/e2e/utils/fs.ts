@@ -14,31 +14,11 @@ export function deleteFile(path: string): Promise<void> {
 }
 
 export function rimraf(path: string): Promise<void> {
-  // The below should be removed and replaced with just `rm` when support for Node.Js 12 is removed.
-  const { rm, rmdir } = fs as typeof fs & {
-    rm?: (
-      path: PathLike,
-      options?: {
-        force?: boolean;
-        maxRetries?: number;
-        recursive?: boolean;
-        retryDelay?: number;
-      },
-    ) => Promise<void>;
-  };
-
-  if (rm) {
-    return rm(path, {
-      force: true,
-      recursive: true,
-      maxRetries: 3,
-    });
-  } else {
-    return rmdir(path, {
-      recursive: true,
-      maxRetries: 3,
-    });
-  }
+  return fs.rm(path, {
+    force: true,
+    recursive: true,
+    maxRetries: 3,
+  });
 }
 
 export function moveFile(from: string, to: string): Promise<void> {
@@ -49,7 +29,7 @@ export function symlinkFile(from: string, to: string, type?: string): Promise<vo
   return fs.symlink(from, to, type);
 }
 
-export function createDir(path: string): Promise<void> {
+export function createDir(path: string): Promise<string> {
   return fs.mkdir(path, { recursive: true });
 }
 

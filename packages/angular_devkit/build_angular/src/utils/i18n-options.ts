@@ -279,25 +279,8 @@ function findLocaleDataPath(locale: string, resolver: (locale: string) => string
 
 /** Remove temporary directory used for i18n processing. */
 function deleteTempDirectory(tempPath: string): void {
-  // The below should be removed and replaced with just `rmSync` when support for Node.Js 12 is removed.
-  const { rmSync, rmdirSync } = fs as typeof fs & {
-    rmSync?: (
-      path: fs.PathLike,
-      options?: {
-        force?: boolean;
-        maxRetries?: number;
-        recursive?: boolean;
-        retryDelay?: number;
-      },
-    ) => void;
-  };
-
   try {
-    if (rmSync) {
-      rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
-    } else {
-      rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
-    }
+    fs.rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
   } catch {}
 }
 

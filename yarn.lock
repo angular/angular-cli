@@ -2013,10 +2013,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
   integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
-"@types/node@~12.12.6":
-  version "12.12.70"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.70.tgz#adf70b179c3ee17620215ee4cb5c68c95f7c37ec"
-  integrity sha512-i5y7HTbvhonZQE+GnUM2rz1Bi8QkzxdQmEv1LKOv4nWyaQk/gdeiTApuQR3PDJHX7WomAbpx2wlWSEpxXGZ/UQ==
+"@types/node@^14.15.0":
+  version "14.18.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.12.tgz#0d4557fd3b94497d793efd4e7d92df2f83b4ef24"
+  integrity sha512-q4jlIR71hUpWTnGhXWcakgkZeHa3CCjcQcnuzU8M891BAWA2jHiziiWEPEkdS5pFsz7H9HJiy8BrK7tBRNrY7A==
 
 "@types/npm-package-arg@^6.1.0":
   version "6.1.1"

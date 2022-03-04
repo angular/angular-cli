@@ -22,11 +22,11 @@ const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCa
 /* eslint-disable no-console */
 export default async function (options: { testing?: boolean; cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
-  const version = process.versions.node.split('.').map((part) => Number(part));
-  if (version[0] < 12 || (version[0] === 12 && version[1] < 20)) {
+  const [major, minor] = process.versions.node.split('.').map((part) => Number(part));
+  if (major < 14 || (major === 14 && minor < 15)) {
     process.stderr.write(
       `Node.js version ${process.version} detected.\n` +
-        'The Angular CLI requires a minimum v12.20.\n\n' +
+        'The Angular CLI requires a minimum v14.15.\n\n' +
         'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
     );
 
