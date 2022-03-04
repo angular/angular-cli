@@ -55,17 +55,14 @@
                   "properties": {
                     "glob": {
                       "type": "string",
-                      "default": "",
                       "description": "The pattern to match."
                     },
                     "input": {
                       "type": "string",
-                      "default": "",
                       "description": "The dir to search within."
                     },
                     "output": {
                       "type": "string",
-                      "default": "",
                       "description": "The output path (relative to the outDir)."
                     }
                   },
@@ -395,8 +392,7 @@
           "properties": {
             "prefix": {
               "description": "Prefix to apply to interface names. (i.e. I)",
-              "type": "string",
-              "default": ""
+              "type": "string"
             }
           }
         },

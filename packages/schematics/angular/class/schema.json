@@ -36,8 +36,7 @@
     },
     "type": {
       "type": "string",
-      "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\".",
-      "default": ""
+      "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\"."
     }
   },
   "required": ["name"]

@@ -30,7 +30,6 @@
     },
     "prefix": {
       "type": "string",
-      "default": "",
       "description": "A prefix to apply to generated selectors."
     },
     "type": {
