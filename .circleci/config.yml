@@ -17,9 +17,9 @@ orbs:
 ## IMPORTANT
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &cache_key v1-angular_devkit-14.17-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win v1-angular_devkit-win-12.22-{{ checksum "yarn.lock" }}
-var_3: &default_nodeversion '14.17'
+var_1: &cache_key v1-angular_devkit-14.19-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v1-angular_devkit-win-14.19-{{ checksum "yarn.lock" }}
+var_3: &default_nodeversion '14.19'
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
@@ -83,8 +83,8 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
-      - run: nvm install 12.22.1
-      - run: nvm use 12.22.1
+      - run: nvm install 14.19
+      - run: nvm use 14.19
       - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
