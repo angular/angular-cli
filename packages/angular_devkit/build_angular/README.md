@@ -4,16 +4,16 @@ This package contains [Architect builders](/packages/angular_devkit/architect/RE
 
 ## Builders
 
-| Name         | Description                                                                                                                                                                                                                          |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| app-shell    | Build an Angular [App shell](https://angular.io/guide/app-shell).                                                                                                                                                                    |
-| browser      | Build an Angular application targeting a browser environment.                                                                                                                                                                        |
-| dev-server   | A development server that provides live reloading.                                                                                                                                                                                   |
-| extract-i18n | Extract i18n messages from an Angular application.                                                                                                                                                                                   |
-| karma        | Execute unit tests using [Karma](https://github.com/karma-runner/karma) test runner.                                                                                                                                                 |
-| ng-packagr   | Build and package an Angular library in [Angular Package Format (APF)](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview) format using [ng-packagr](https://github.com/ng-packagr/ng-packagr). |
-| server       | Build an Angular application targeting a [Node.js](https://nodejs.org) environment.                                                                                                                                                  |
-| protractor   | **Deprecated** - Run end-to-end tests using [Protractor](https://www.protractortest.org/) framework.                                                                                                                                 |
+| Name         | Description                                                                                                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| app-shell    | Build an Angular [App shell](https://angular.io/guide/app-shell).                                                                                                                            |
+| browser      | Build an Angular application targeting a browser environment.                                                                                                                                |
+| dev-server   | A development server that provides live reloading.                                                                                                                                           |
+| extract-i18n | Extract i18n messages from an Angular application.                                                                                                                                           |
+| karma        | Execute unit tests using [Karma](https://github.com/karma-runner/karma) test runner.                                                                                                         |
+| ng-packagr   | Build and package an Angular library in [Angular Package Format (APF)](https://angular.io/guide/angular-package-format) format using [ng-packagr](https://github.com/ng-packagr/ng-packagr). |
+| server       | Build an Angular application targeting a [Node.js](https://nodejs.org) environment.                                                                                                          |
+| protractor   | **Deprecated** - Run end-to-end tests using [Protractor](https://www.protractortest.org/) framework.                                                                                         |
 
 ## Disclaimer
 
