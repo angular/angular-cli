@@ -12,7 +12,7 @@ import { tags } from '@angular-devkit/core';
 import { createProxyServer } from 'http-proxy';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { debounceTime, switchMap, take } from 'rxjs/operators';
-import { createArchitect, host } from '../../testing/test-utils';
+import { createArchitect, host } from '../../../testing/test-utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const document: any;
