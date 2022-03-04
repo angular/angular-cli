@@ -18,22 +18,5 @@ export function deleteOutputDir(root: string, outputPath: string): void {
     throw new Error('Output path MUST not be project root directory!');
   }
 
-  // The below should be removed and replace with just `rmSync` when support for Node.Js 12 is removed.
-  const { rmSync, rmdirSync } = fs as typeof fs & {
-    rmSync?: (
-      path: fs.PathLike,
-      options?: {
-        force?: boolean;
-        maxRetries?: number;
-        recursive?: boolean;
-        retryDelay?: number;
-      },
-    ) => void;
-  };
-
-  if (rmSync) {
-    rmSync(resolvedOutputPath, { force: true, recursive: true, maxRetries: 3 });
-  } else {
-    rmdirSync(resolvedOutputPath, { recursive: true, maxRetries: 3 });
-  }
+  fs.rmSync(resolvedOutputPath, { force: true, recursive: true, maxRetries: 3 });
 }

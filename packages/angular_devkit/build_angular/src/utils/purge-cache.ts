@@ -25,27 +25,12 @@ export async function purgeStaleBuildCache(context: BuilderContext): Promise<voi
     return;
   }
 
-  // The below should be removed and replaced with just `rm` when support for Node.Js 12 is removed.
-  const { rm, rmdir } = fsPromises as typeof fsPromises & {
-    rm?: (
-      path: PathLike,
-      options?: {
-        force?: boolean;
-        maxRetries?: number;
-        recursive?: boolean;
-        retryDelay?: number;
-      },
-    ) => Promise<void>;
-  };
-
   const entriesToDelete = (await fsPromises.readdir(basePath, { withFileTypes: true }))
     .filter((d) => join(basePath, d.name) !== path && d.isDirectory())
     .map((d) => {
       const subPath = join(basePath, d.name);
       try {
-        return rm
-          ? rm(subPath, { force: true, recursive: true, maxRetries: 3 })
-          : rmdir(subPath, { recursive: true, maxRetries: 3 });
+        return fsPromises.rm(subPath, { force: true, recursive: true, maxRetries: 3 });
       } catch {}
     });
 

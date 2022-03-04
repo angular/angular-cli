@@ -50,24 +50,7 @@ function _recursiveCopy(from: string, to: string, logger: logging.Logger) {
 }
 
 function rimraf(location: string) {
-  // The below should be removed and replace with just `rmSync` when support for Node.Js 12 is removed.
-  const { rmSync, rmdirSync } = fs as typeof fs & {
-    rmSync?: (
-      path: fs.PathLike,
-      options?: {
-        force?: boolean;
-        maxRetries?: number;
-        recursive?: boolean;
-        retryDelay?: number;
-      },
-    ) => void;
-  };
-
-  if (rmSync) {
-    rmSync(location, { force: true, recursive: true, maxRetries: 3 });
-  } else {
-    rmdirSync(location, { recursive: true, maxRetries: 3 });
-  }
+  fs.rmSync(location, { force: true, recursive: true, maxRetries: 3 });
 }
 
 function _clean(logger: logging.Logger) {
