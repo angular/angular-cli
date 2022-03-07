@@ -12,7 +12,7 @@
     "default": "./tools/bundles/index.js"
   },
   "engines": {
-    "node": "^12.20.0 || ^14.15.0 || >=16.10.0"
+    "node": "^14.15.0 || >=16.10.0"
   },
   "dependencies": {
     "critters": "0.0.16",

@@ -5,7 +5,7 @@
   "homepage": "https://github.com/angular/universal#readme",
   "license": "MIT",
   "engines": {
-    "node": "^12.20.0 || ^14.15.0 || >=16.10.0"
+    "node": "^14.15.0 || >=16.10.0"
   },
   "keywords": [
     "ssr",
