@@ -5,12 +5,9 @@ import { join } from 'path';
 export const release: ReleaseConfig = {
   representativeNpmPackage: '@nguniversal/common',
   npmPackages: [
-    { name: '@nguniversal/aspnetcore-engine' },
     { name: '@nguniversal/builders' },
     { name: '@nguniversal/common' },
     { name: '@nguniversal/express-engine' },
-    { name: '@nguniversal/hapi-engine' },
-    { name: '@nguniversal/socket-engine' },
   ],
   releaseNotes: {
     groupOrder: ['@nguniversal/common', '@nguniversal/builders', '@nguniversal/express-engine'],

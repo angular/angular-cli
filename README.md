@@ -37,9 +37,6 @@ The packages from this repo are published as scoped packages under [@nguniversal
 - [@nguniversal/common](/modules/common/README.md)
 - [@nguniversal/builders](/modules/builders/README.md)
 - [@nguniversal/express-engine](/modules/express-engine/README.md)
-- [@nguniversal/aspnetcore-engine](/modules/aspnetcore-engine/README.md)
-- [@nguniversal/hapi-engine](/modules/hapi-engine/README.md)
-- [@nguniversal/socket-engine](/modules/socket-engine)
 
 # Universal "Gotchas"
 
@@ -57,9 +54,7 @@ We believe that using the word "universal" is correct when referring to a JavaSc
 
 - [Adam Plumer](https://github.com/CaerusKaru) and [Fabian Wiles](https://github.com/Toxicable) - Current maintainers
 - [PatrickJS](https://twitter.com/gdi2290) and [Jeff Whelpley](https://twitter.com/jeffwhelpley) - Founders of the Angular Universal project. (Universal rendering is also called [PatrickJS-ing](https://twitter.com/jeffbcross/status/846512930971516928))
-- [Mark Pieszak](https://twitter.com/MarkPieszak) - Contributor and Evangelist, ASP.NET Core Engine
 - [Jason Jean](https://github.com/FrozenPandaz) - Express engine and Universal support for CLI
-- [Wassim Chegham](https://twitter.com/manekinekko) - Contributor and Evangelist, Hapi engine developer.
   - [Angular for the rest of us](https://medium.com/google-developer-experts/angular-universal-for-the-rest-of-us-922ca8bac84)
   - [Angular outside the browser](http://slides.com/wassimchegham/angular2-universal#/)
 - [Jeff Cross](https://twitter.com/jeffbcross) - Evangelist and performance consultant

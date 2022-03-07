@@ -48,7 +48,6 @@ def ts_library(
 
 NG_VERSION = "^13.1.0"
 RXJS_VERSION = "^6.5.5"
-HAPI_VERSION = "^18.4.0"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
 DEVKIT_CORE_VERSION = "^13.1.0"
@@ -61,7 +60,6 @@ NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
     "builders",
     "common",
     "express-engine",
-    "hapi-engine",
 ]]
 
 PKG_GROUP_REPLACEMENTS = {
@@ -70,7 +68,6 @@ PKG_GROUP_REPLACEMENTS = {
     ]""" % ",\n      ".join(["\"%s\"" % s for s in NGUNIVERSAL_SCOPED_PACKAGES]),
     "EXPRESS_VERSION": EXPRESS_VERSION,
     "EXPRESS_TYPES_VERSION": EXPRESS_TYPES_VERSION,
-    "HAPI_VERSION": HAPI_VERSION,
     "NG_VERSION": NG_VERSION,
     "RXJS_VERSION": RXJS_VERSION,
     "DEVKIT_CORE_VERSION": DEVKIT_CORE_VERSION,
@@ -171,7 +168,6 @@ def ng_package(deps = [], **kwargs):
             "critters",
             "express-engine",
             "express",
-            "@hapi/hapi",
         ],
         substitutions = select({
             "//:stamp": stamped_substitutions,

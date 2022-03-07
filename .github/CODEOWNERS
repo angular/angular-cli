@@ -1,13 +1,11 @@
-/modules/aspnetcore-engine/*                           @MarkPieszak @dgp1130
 /modules/builders                                      @alan-agius4
-/modules/common/*                                      @dgp1130 @CaerusKaru
-/modules/express-engine/*                              @dgp1130 @FrozenPandaz
-/modules/hapi-engine/*                                 @dgp1130 @CaerusKaru
+/modules/common/*                                      @dgp1130 @CaerusKaru @alan-agius4
+/modules/express-engine/*                              @dgp1130 @alan-agius4
 
 # Tooling
-/scripts/**                                        @CaerusKaru @dgp1130
-/integration/**                                    @CaerusKaru @dgp1130
-/tools/**                                          @CaerusKaru @dgp1130
+/scripts/**                                        @CaerusKaru @dgp1130 @alan-agius4
+/integration/**                                    @CaerusKaru @dgp1130 @alan-agius4
+/tools/**                                          @CaerusKaru @dgp1130 @alan-agius4
 
 # Misc
 /*                                                 @dgp1130

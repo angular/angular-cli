@@ -21,11 +21,9 @@ issues for `window is not defined` and other hiccups when adopting Angular Unive
 
 <!-- ✍️edit: -->
 
-- [ ] aspnetcore-engine
 - [ ] builders
 - [ ] common
 - [ ] express-engine
-- [ ] hapi-engine
 
 ### Is this a regression?
 

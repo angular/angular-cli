@@ -9,11 +9,9 @@ about: You have an idea that you'd like to be implemented in Angular Universal
 
 <!-- ✍️edit: -->
 
-- [ ] aspnetcore-engine
 - [ ] builders
 - [ ] common
 - [ ] express-engine
-- [ ] hapi-engine
 
 ### Description
 
