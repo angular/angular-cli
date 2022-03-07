@@ -2364,10 +2364,10 @@
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-10.2.0.tgz#e01d2bfdcfe8aa2389f31bc6b72a602628bd025b"
   integrity sha512-FaIzCnDg0x0Js5kSQn1Le3YzDHl7XxrJ0QdIw5LrDUmLsH3VXNi4/NMlSHnw5RiTTMs4UbEf98V3RJRB8exqJA==
 
-"@verdaccio/ui-theme@6.0.0-6-next.18":
-  version "6.0.0-6-next.18"
-  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-6.0.0-6-next.18.tgz#45e5854a717a58a438fc2358bb5e932e1e659fc9"
-  integrity sha512-ofh4yke0950ry+ilWCdFIjHPadKK9xvjC/nzKEaKEFAxJxTt90guZNp++l1rz/LAQ7BMAX905G/2N//6M85+tw==
+"@verdaccio/ui-theme@6.0.0-6-next.20":
+  version "6.0.0-6-next.20"
+  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-6.0.0-6-next.20.tgz#359ce91c1d7f00a9696cee282988fab667450dab"
+  integrity sha512-Mr3sNJ577lMartUC3Dbu1nTZP+wXISFI20SwjI9JmQLBw6CRZtwyUbQCrrLYiT34BMVMxC4kC9j0akxLCCcDTw==
 
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
@@ -3798,6 +3798,20 @@ css-loader@6.6.0:
   dependencies:
     icss-utils "^5.1.0"
     postcss "^8.4.5"
+    postcss-modules-extract-imports "^3.0.0"
+    postcss-modules-local-by-default "^4.0.0"
+    postcss-modules-scope "^3.0.0"
+    postcss-modules-values "^4.0.0"
+    postcss-value-parser "^4.2.0"
+    semver "^7.3.5"
+
+css-loader@6.7.0:
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.0.tgz#c1200da1dfffe6643b18bda20fdd84cad3e36d39"
+  integrity sha512-S7HCfCiDHLA+VXKqdZwyRZgoO0R9BnKDnVIoHMq5grl3N86zAu7MB+FBWHr5xOJC8SmvpTLha/2NpfFkFEN/ig==
+  dependencies:
+    icss-utils "^5.1.0"
+    postcss "^8.4.7"
     postcss-modules-extract-imports "^3.0.0"
     postcss-modules-local-by-default "^4.0.0"
     postcss-modules-scope "^3.0.0"
@@ -8560,7 +8574,16 @@ postcss@8.4.6:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postcss@8.4.7, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.5:
+postcss@8.4.8, postcss@^8.4.7:
+  version "8.4.8"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.8.tgz#dad963a76e82c081a0657d3a2f3602ce10c2e032"
+  integrity sha512-2tXEqGxrjvAO6U+CJzDL2Fk2kPHTv1jQsYkSoMeOis2SsYaXRO2COxTdQp99cYvif9JTXaAk9lYGc3VhJt7JPQ==
+  dependencies:
+    nanoid "^3.3.1"
+    picocolors "^1.0.0"
+    source-map-js "^1.0.2"
+
+postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.5:
   version "8.4.7"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.7.tgz#f99862069ec4541de386bf57f5660a6c7a0875a8"
   integrity sha512-L9Ye3r6hkkCeOETQX6iOaWZgjp3LL6Lpqm6EtgbKrgqGGteRMNb9vzBfRL96YOSu8o7x3MfIH9Mo5cPJFGrW6A==
@@ -10678,16 +10701,16 @@ verdaccio-htpasswd@10.2.0:
     http-errors "2.0.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.6.2:
-  version "5.6.2"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.6.2.tgz#6f3d4f854fc82bdce4cb420a387ecc1feaf991a1"
-  integrity sha512-r0BI31Dt5RnXxpCdWPTGXSthIg4XRB6onYRXziEi1stHd1TmwzAV35Jiv7FXu25Rwvh8dHGSozTxKi0t3kbjGg==
+verdaccio@5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.7.0.tgz#aa37ac88213b5b818169b66240893e192c9ee922"
+  integrity sha512-I4EKZ27bU9XnKkubqjPKxNo9unZ5PzgXBnC+79MEjiKKUKCt5N5lZZb4qq9fBbENyfEV51xf7Z274JxbeOXfzQ==
   dependencies:
     "@verdaccio/commons-api" "10.2.0"
     "@verdaccio/local-storage" "10.2.0"
     "@verdaccio/readme" "10.3.2"
     "@verdaccio/streams" "10.2.0"
-    "@verdaccio/ui-theme" "6.0.0-6-next.18"
+    "@verdaccio/ui-theme" "6.0.0-6-next.20"
     JSONStream "1.3.5"
     async "3.2.3"
     body-parser "1.19.1"
