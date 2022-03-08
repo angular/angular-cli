@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { StaticProvider } from '@angular/core';
+import type { StaticProvider } from '@angular/core';
 import { CommonEngine, RenderOptions as CommonRenderOptions } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 /**
  * These are the allowed options for the engine
@@ -44,18 +44,18 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
         throw new Error('You must pass in a NgModule to be bootstrapped');
       }
 
-      const req = renderOptions.req;
-      const res = renderOptions.res || req.res;
+      const { req } = renderOptions;
+      const res = renderOptions.res ?? req.res;
 
       renderOptions.url =
-        renderOptions.url || `${req.protocol}://${req.get('host') || ''}${req.originalUrl}`;
-      renderOptions.documentFilePath = renderOptions.documentFilePath || filePath;
-      renderOptions.providers = [...(renderOptions.providers || []), getReqResProviders(req, res)];
+        renderOptions.url ?? `${req.protocol}://${req.get('host') || ''}${req.baseUrl}${req.url}`;
+      renderOptions.documentFilePath = renderOptions.documentFilePath ?? filePath;
+      renderOptions.providers = [...(renderOptions.providers ?? []), getReqResProviders(req, res)];
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      (renderOptions.publicPath =
-        renderOptions.publicPath ?? setupOptions.publicPath ?? (options as any).settings?.views),
-        (renderOptions.inlineCriticalCss =
-          renderOptions.inlineCriticalCss ?? setupOptions.inlineCriticalCss);
+      renderOptions.publicPath =
+        renderOptions.publicPath ?? setupOptions.publicPath ?? (options as any).settings?.views;
+      renderOptions.inlineCriticalCss =
+        renderOptions.inlineCriticalCss ?? setupOptions.inlineCriticalCss;
 
       engine
         .render(renderOptions)
