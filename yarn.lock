@@ -314,10 +314,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#8f4e3fd07f4cec4bf900d84fc83cf8bd6127ad7e":
-  version "0.0.0-0eb963e22a7464c8794b21e73d829ecdd05bd086"
-  uid "8f4e3fd07f4cec4bf900d84fc83cf8bd6127ad7e"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#8f4e3fd07f4cec4bf900d84fc83cf8bd6127ad7e"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#3ff76be2e81bed63bef66656b4733411097002fd":
+  version "0.0.0-02a2e26963f0cf77d51eddfaa754461e115739ca"
+  uid "3ff76be2e81bed63bef66656b4733411097002fd"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#3ff76be2e81bed63bef66656b4733411097002fd"
   dependencies:
     "@angular-devkit/build-angular" "14.0.0-next.4"
     "@angular/benchpress" "0.3.0"
@@ -349,7 +349,7 @@
     tmp "^0.2.1"
     "true-case-path" "^2.2.1"
     tslib "^2.3.0"
-    typescript "~4.5.0"
+    typescript "~4.6.2"
     uuid "^8.3.2"
     yargs "^17.0.0"
     zone.js "^0.11.4"
@@ -9198,10 +9198,15 @@ typed-assert@^1.0.8:
   resolved "https://registry.yarnpkg.com/typed-assert/-/typed-assert-1.0.9.tgz#8af9d4f93432c4970ec717e3006f33f135b06213"
   integrity sha512-KNNZtayBCtmnNmbo5mG47p1XsCyrx6iVqomjcZnec/1Y5GGARaxPs6r49RnSPeUP3YjNYiU9sQHAtY4BBvnZwg==
 
-typescript@~4.5.0, typescript@~4.5.2, typescript@~4.5.4:
+typescript@~4.5.2, typescript@~4.5.4:
   version "4.5.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
   integrity sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==
+
+typescript@~4.6.2:
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.2.tgz#fe12d2727b708f4eef40f51598b3398baa9611d4"
+  integrity sha512-HM/hFigTBHZhLXshn9sN37H085+hQGeJHJ/X7LpBWLID/fbc2acUMfU+lGD98X81sKP+pFa9f0DZmCwB9GnbAg==
 
 ua-parser-js@1.0.2:
   version "1.0.2"
