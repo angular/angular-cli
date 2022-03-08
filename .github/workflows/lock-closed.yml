@@ -1,14 +1,18 @@
-name: Lock closed inactive issues
+name: Lock Inactive Issues
+
+# Declare default permissions as read only.
+permissions:
+  contents: read
 
 on:
   schedule:
-    # Run at 8:00 every day
+    # Run at 08:00 every day
     - cron: '0 8 * * *'
 
 jobs:
   lock_closed:
     runs-on: ubuntu-latest
     steps:
-      - uses: angular/dev-infra/github-actions/lock-closed@0eb963e22a7464c8794b21e73d829ecdd05bd086
+      - uses: angular/dev-infra/github-actions/lock-closed@104c49ad795097101ab3aa268a8e9af2cdf04a8d
         with:
           lock-bot-key: ${{ secrets.LOCK_BOT_PRIVATE_KEY }}
