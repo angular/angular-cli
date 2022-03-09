@@ -118,7 +118,7 @@ export async function promptGlobalAnalytics(force = false) {
         Thank you for sharing anonymous usage data. If you change your mind, the following
         command will disable this feature entirely:
 
-            ${colors.yellow('ng analytics off')}
+            ${colors.yellow('ng analytics off --global')}
       `);
       console.log('');
 
@@ -177,7 +177,7 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
         Thank you for sharing anonymous usage data. Should you change your mind, the following
         command will disable this feature entirely:
 
-            ${colors.yellow('ng analytics project off')}
+            ${colors.yellow('ng analytics off')}
       `);
       console.log('');
 

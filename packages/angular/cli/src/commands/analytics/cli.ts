@@ -16,68 +16,50 @@ import {
 import { CommandModule, Options } from '../../command-builder/command-module';
 
 interface AnalyticsCommandArgs {
-  'setting-or-project': 'on' | 'off' | 'ci' | 'project' | 'prompt' | string;
-  'project-setting'?: 'on' | 'off' | 'prompt' | string;
+  setting: 'on' | 'off' | 'prompt' | 'ci' | string;
+  global: boolean;
 }
 
 export class AnalyticsCommandModule extends CommandModule<AnalyticsCommandArgs> {
-  command = 'analytics <setting-or-project>';
+  command = 'analytics <setting>';
   describe = 'Configures the gathering of Angular CLI usage metrics.';
   longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<AnalyticsCommandArgs> {
     return localYargs
-      .positional('setting-or-project', {
-        description:
-          'Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, ' +
-          'or sets the default status for the project.',
+      .positional('setting', {
+        description: 'Directly enables or disables all usage analytics for the user.',
         choices: ['on', 'off', 'ci', 'prompt'],
         type: 'string',
         demandOption: true,
       })
-      .positional('project-setting', {
-        description: 'Sets the default analytics enablement status for the project.',
-        choices: ['on', 'off', 'prompt'],
-        type: 'string',
+      .option('global', {
+        description: `Access the global configuration in the caller's home directory.`,
+        alias: ['g'],
+        type: 'boolean',
+        default: false,
       })
       .strict();
   }
 
-  async run({
-    settingOrProject,
-    projectSetting,
-  }: Options<AnalyticsCommandArgs>): Promise<number | void> {
-    if (settingOrProject === 'project' && projectSetting === undefined) {
-      throw new Error(
-        'Argument "project" requires a second argument of one of the following value: on, off.',
-      );
-    }
-
-    switch (settingOrProject) {
+  async run({ setting, global }: Options<AnalyticsCommandArgs>): Promise<void> {
+    const level = global ? 'global' : 'local';
+    switch (setting) {
       case 'off':
-        setAnalyticsConfig('global', false);
+        setAnalyticsConfig(level, false);
         break;
       case 'on':
-        setAnalyticsConfig('global', true);
+        setAnalyticsConfig(level, true);
         break;
       case 'ci':
-        setAnalyticsConfig('global', 'ci');
-        break;
-      case 'project':
-        switch (projectSetting) {
-          case 'off':
-            setAnalyticsConfig('local', false);
-            break;
-          case 'on':
-            setAnalyticsConfig('local', true);
-            break;
-          case 'prompt':
-            await promptProjectAnalytics(true);
-            break;
-        }
+        setAnalyticsConfig(level, 'ci');
         break;
       case 'prompt':
-        await promptGlobalAnalytics(true);
+        if (global) {
+          await promptGlobalAnalytics(true);
+        } else {
+          await promptProjectAnalytics(true);
+        }
         break;
     }
   }
