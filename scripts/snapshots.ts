@@ -13,7 +13,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { PackageInfo, packages } from '../lib/packages';
 import build from './build-bazel';
-import jsonHelp from './json-help';
+import jsonHelp, { createTemporaryProject } from './json-help';
 
 // Added to the README.md of the snapshot. This is markdown.
 const readmeHeaderFn = (pkg: PackageInfo) => `
@@ -164,11 +164,15 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
     _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
   }
 
-  await jsonHelp(undefined, logger);
+  // This is needed as otherwise when we run `devkit admin create` after `bazel build` the `dist`
+  // will be overridden with the output of the legacy build.
+  const temporaryProjectRoot = await createTemporaryProject(logger);
 
   // Run build.
   logger.info('Building...');
   await build({ snapshot: true }, logger.createChild('build'));
+
+  await jsonHelp({ temporaryProjectRoot }, logger);
 
   if (!githubToken) {
     logger.info('No token given, skipping actual publishing...');

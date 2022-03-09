@@ -15,16 +15,27 @@ import * as path from 'path';
 import { packages } from '../lib/packages';
 import create from './create';
 
-export default async function (opts = {}, logger: logging.Logger) {
+export async function createTemporaryProject(logger: logging.Logger): Promise<string> {
   logger.info('Creating temporary project...');
   const newProjectTempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'angular-cli-create-'));
   const newProjectName = 'help-project';
   const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
   await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
 
+  return newProjectRoot;
+}
+
+export interface JsonHelpOptions {
+  temporaryProjectRoot?: string;
+}
+
+export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger: logging.Logger) {
   logger.info('Gathering JSON Help...');
+
+  const newProjectRoot = temporaryProjectRoot ?? (await createTemporaryProject(logger));
   const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
   const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
+
   await fs.mkdir(helpOutputRoot);
 
   const runNgCommandJsonHelp = async (args: string[]) => {
