@@ -12,7 +12,6 @@ import { json } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
-import { getPackageManager } from '../utilities/package-manager';
 import {
   CommandModule,
   CommandModuleError,
@@ -100,7 +99,7 @@ export abstract class ArchitectBaseCommandModule<T>
       builderDesc = await architectHost.resolveBuilder(builderConf);
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
-        await this.warnOnMissingNodeModules();
+        this.warnOnMissingNodeModules();
         throw new CommandModuleError(`Could not find the '${builderConf}' builder's node package.`);
       }
 
@@ -114,7 +113,7 @@ export abstract class ArchitectBaseCommandModule<T>
     );
   }
 
-  private async warnOnMissingNodeModules(): Promise<void> {
+  private warnOnMissingNodeModules(): void {
     const basePath = this.context.workspace?.basePath;
     if (!basePath) {
       return;
@@ -134,9 +133,8 @@ export abstract class ArchitectBaseCommandModule<T>
       return;
     }
 
-    const packageManager = await getPackageManager(basePath);
     this.context.logger.warn(
-      `Node packages may not be installed. Try installing with '${packageManager} install'.`,
+      `Node packages may not be installed. Try installing with '${this.context.packageManager} install'.`,
     );
   }
 }
