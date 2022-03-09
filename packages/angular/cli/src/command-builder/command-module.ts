@@ -89,10 +89,9 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
           describe: this.describe,
           ...(this.longDescriptionPath
             ? {
-                longDescriptionRelativePath: path.relative(
-                  path.join(__dirname, '../../../../'),
-                  this.longDescriptionPath,
-                ),
+                longDescriptionRelativePath: path
+                  .relative(path.join(__dirname, '../../../../'), this.longDescriptionPath)
+                  .replace(/\\/g, path.posix.sep),
                 longDescription: readFileSync(this.longDescriptionPath, 'utf8'),
               }
             : {}),
