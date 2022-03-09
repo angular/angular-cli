@@ -2354,10 +2354,10 @@
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-10.2.0.tgz#e01d2bfdcfe8aa2389f31bc6b72a602628bd025b"
   integrity sha512-FaIzCnDg0x0Js5kSQn1Le3YzDHl7XxrJ0QdIw5LrDUmLsH3VXNi4/NMlSHnw5RiTTMs4UbEf98V3RJRB8exqJA==
 
-"@verdaccio/ui-theme@6.0.0-6-next.20":
-  version "6.0.0-6-next.20"
-  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-6.0.0-6-next.20.tgz#359ce91c1d7f00a9696cee282988fab667450dab"
-  integrity sha512-Mr3sNJ577lMartUC3Dbu1nTZP+wXISFI20SwjI9JmQLBw6CRZtwyUbQCrrLYiT34BMVMxC4kC9j0akxLCCcDTw==
+"@verdaccio/ui-theme@6.0.0-6-next.21":
+  version "6.0.0-6-next.21"
+  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-6.0.0-6-next.21.tgz#cf5d023af8875d049c98f2f4239c93cc1b2e0ded"
+  integrity sha512-0lFMfUHJIJp37VTjDCXToOT2Ybqb3mzhhLbOJUX6r42BeFUz//oTxOvPBfHZcpIz2IZ22ykQ7khYt1ODH7t+SA==
 
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
@@ -3795,10 +3795,10 @@ css-loader@6.6.0:
     postcss-value-parser "^4.2.0"
     semver "^7.3.5"
 
-css-loader@6.7.0:
-  version "6.7.0"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.0.tgz#c1200da1dfffe6643b18bda20fdd84cad3e36d39"
-  integrity sha512-S7HCfCiDHLA+VXKqdZwyRZgoO0R9BnKDnVIoHMq5grl3N86zAu7MB+FBWHr5xOJC8SmvpTLha/2NpfFkFEN/ig==
+css-loader@6.7.1:
+  version "6.7.1"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.1.tgz#e98106f154f6e1baf3fc3bc455cb9981c1d5fd2e"
+  integrity sha512-yB5CNFa14MbPJcomwNh3wLThtkZgcNyI2bNMRt8iE5Z8Vwl7f8vQXFAzn2HDOJvtDq2NTZBUGMSUNNyrv3/+cw==
   dependencies:
     icss-utils "^5.1.0"
     postcss "^8.4.7"
@@ -3905,10 +3905,10 @@ date-format@^4.0.4:
   resolved "https://registry.yarnpkg.com/date-format/-/date-format-4.0.4.tgz#b58036e29e74121fca3e1b3e0dc4a62c65faa233"
   integrity sha512-/jyf4rhB17ge328HJuJjAcmRtCsGd+NDeAtahRBTaK6vSPR6MO5HlrAit3Nn7dVjaa6sowW0WXt8yQtLyZQFRg==
 
-dayjs@1.10.7:
-  version "1.10.7"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.7.tgz#2cf5f91add28116748440866a0a1d26f3a6ce468"
-  integrity sha512-P6twpd70BcPK34K26uJ1KT3wlhpuOAPoMwJzpsIWUxHZ7wpmbdZL/hQqBDfz7hGurYSa5PhzdhDHtt319hL3ig==
+dayjs@1.10.8:
+  version "1.10.8"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.8.tgz#267df4bc6276fcb33c04a6735287e3f429abec41"
+  integrity sha512-wbNwDfBHHur9UOzNUjeKUOJ0fCb0a52Wx0xInmQ7Y8FstyajiV1NmK1e00cxsr9YrE9r7yAChE0VvpuY5Rnlow==
 
 debug@2.6.9, debug@^2.2.0, debug@^2.6.9:
   version "2.6.9"
@@ -5996,6 +5996,26 @@ inquirer@8.2.0:
     strip-ansi "^6.0.0"
     through "^2.3.6"
 
+inquirer@8.2.1:
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-8.2.1.tgz#e00022e3e8930a92662f760f020686530a84671d"
+  integrity sha512-pxhBaw9cyTFMjwKtkjePWDhvwzvrNGAw7En4hottzlPvz80GZaMZthdDU35aA6/f5FRZf3uhE057q8w1DE3V2g==
+  dependencies:
+    ansi-escapes "^4.2.1"
+    chalk "^4.1.1"
+    cli-cursor "^3.1.0"
+    cli-width "^3.0.0"
+    external-editor "^3.0.3"
+    figures "^3.0.0"
+    lodash "^4.17.21"
+    mute-stream "0.0.8"
+    ora "^5.4.1"
+    run-async "^2.4.0"
+    rxjs "^7.5.5"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+    through "^2.3.6"
+
 internal-slot@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/internal-slot/-/internal-slot-1.0.3.tgz#7347e307deeea2faac2ac6205d4bc7d34967f59c"
@@ -7219,13 +7239,6 @@ minimalistic-assert@^1.0.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
   integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
-  dependencies:
-    brace-expansion "^1.1.7"
-
-minimatch@3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
-  integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
   dependencies:
     brace-expansion "^1.1.7"
 
@@ -8692,10 +8705,10 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer@13.5.0:
-  version "13.5.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-13.5.0.tgz#fd30692fbed18bd4964dce3517cc952af9b45d7d"
-  integrity sha512-raPr2YZ3RZLboGwt7jJgusJTBRDaVEUiPOSOWWFLV1oj07xqT5UqqbjmNXFXlMlkhF/NwmcEInW64VhvyllVdw==
+puppeteer@13.5.1:
+  version "13.5.1"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-13.5.1.tgz#d0f751bf36120efc2ebf74c7562a204a84e500e9"
+  integrity sha512-wWxO//vMiqxlvuzHMAJ0pRJeDHvDtM7DQpW1GKdStz2nZo2G42kOXBDgkmQ+zqjwMCFofKGesBeeKxIkX9BO+w==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.3"
@@ -9250,6 +9263,13 @@ rxjs@^7.2.0, rxjs@^7.5.2:
   version "7.5.4"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.4.tgz#3d6bd407e6b7ce9a123e76b1e770dc5761aa368d"
   integrity sha512-h5M3Hk78r6wAheJF0a5YahB1yRQKCsZ4MsGdZ5O9ETbVtjPcScGfrMmoOq7EBsCRzd4BDkvDJ7ogP8Sz5tTFiQ==
+  dependencies:
+    tslib "^2.1.0"
+
+rxjs@^7.5.5:
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.5.tgz#2ebad89af0f560f460ad5cc4213219e1f7dd4e9f"
+  integrity sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==
   dependencies:
     tslib "^2.1.0"
 
@@ -10639,10 +10659,10 @@ verdaccio-auth-memory@^10.0.0:
   dependencies:
     "@verdaccio/commons-api" "10.2.0"
 
-verdaccio-htpasswd@10.2.0:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/verdaccio-htpasswd/-/verdaccio-htpasswd-10.2.0.tgz#1f76ada84a727eef852e75bbf4b1f8b4b0919f06"
-  integrity sha512-OH62dbSWXSXZNQMTslHrNtaAZOx8is0mcJzcQV2bE9fnLEH2EJ+9JBC5helOaBEckBojuiif4xlmg9VTFeVZQw==
+verdaccio-htpasswd@10.3.0:
+  version "10.3.0"
+  resolved "https://registry.yarnpkg.com/verdaccio-htpasswd/-/verdaccio-htpasswd-10.3.0.tgz#c54ee8fddcebfff14a9ca81e346365bf150eddf5"
+  integrity sha512-UbMF9kbqo2tvOrdbC3MryE6/iXy54XlqDKpFWUKS5MTjFhP9BdQNgyTjBCM/mubO3JJug2TcVdmu/si8G4891Q==
   dependencies:
     "@verdaccio/file-locking" "10.2.0"
     apache-md5 "1.1.7"
@@ -10650,16 +10670,16 @@ verdaccio-htpasswd@10.2.0:
     http-errors "2.0.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.7.0:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.7.0.tgz#aa37ac88213b5b818169b66240893e192c9ee922"
-  integrity sha512-I4EKZ27bU9XnKkubqjPKxNo9unZ5PzgXBnC+79MEjiKKUKCt5N5lZZb4qq9fBbENyfEV51xf7Z274JxbeOXfzQ==
+verdaccio@5.7.1:
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.7.1.tgz#533e0c6a5f36e5734f946fe87295682751448997"
+  integrity sha512-B0u6U/Zwu1tsKZdmor0EnOCD4wWxrolMsizOSB43VGPsDA4tLbvobmZZ9podJKxBX6do3DCJB7BLCIlrJeEihw==
   dependencies:
     "@verdaccio/commons-api" "10.2.0"
     "@verdaccio/local-storage" "10.2.0"
     "@verdaccio/readme" "10.3.2"
     "@verdaccio/streams" "10.2.0"
-    "@verdaccio/ui-theme" "6.0.0-6-next.20"
+    "@verdaccio/ui-theme" "6.0.0-6-next.21"
     JSONStream "1.3.5"
     async "3.2.3"
     body-parser "1.19.1"
@@ -10667,11 +10687,11 @@ verdaccio@5.7.0:
     compression "1.7.4"
     cookies "0.8.0"
     cors "2.8.5"
-    dayjs "1.10.7"
+    dayjs "1.10.8"
     debug "^4.3.3"
     envinfo "7.8.1"
     eslint-import-resolver-node "0.3.6"
-    express "4.17.2"
+    express "4.17.3"
     express-rate-limit "5.5.1"
     fast-safe-stringify "2.1.1"
     handlebars "4.7.7"
@@ -10685,7 +10705,7 @@ verdaccio@5.7.0:
     marked "4.0.12"
     memoizee "0.4.15"
     mime "3.0.0"
-    minimatch "3.0.4"
+    minimatch "5.0.1"
     mkdirp "1.0.4"
     mv "2.1.1"
     pino "6.14.0"
@@ -10696,7 +10716,7 @@ verdaccio@5.7.0:
     semver "7.3.5"
     validator "13.7.0"
     verdaccio-audit "10.2.0"
-    verdaccio-htpasswd "10.2.0"
+    verdaccio-htpasswd "10.3.0"
 
 verror@1.10.0:
   version "1.10.0"
