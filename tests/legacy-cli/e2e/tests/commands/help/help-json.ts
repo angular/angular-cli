@@ -3,33 +3,32 @@ import { silentNg } from '../../../utils/process';
 export default async function () {
   // This test is use as a sanity check.
   const addHelpOutputSnapshot = JSON.stringify({
-    name: 'analytics',
-    command: 'ng analytics <setting-or-project>',
-    description:
-      'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering.',
-    longDescriptionRelativePath: '@angular/cli/src/commands/analytics/long-description.md',
-    longDescription:
-      'The value of `setting-or-project` is one of the following.\n\n- `on`: Enables analytics gathering and reporting for the user.\n- `off`: Disables analytics gathering and reporting for the user.\n- `ci`: Enables analytics and configures reporting for use with Continuous Integration,\n  which uses a common CI user.\n- `prompt`: Prompts the user to set the status interactively.\n- `project`: Sets the default status for the project to the `project-setting` value, which can be any of the other values. The `project-setting` argument is ignored for all other values of `setting_or_project`.\n',
-    options: [
+    'name': 'analytics',
+    'command': 'ng analytics <setting-or-project>',
+    'shortDescription': 'Configures the gathering of Angular CLI usage metrics.',
+    'longDescriptionRelativePath': '@angular/cli/src/commands/analytics/long-description.md',
+    'longDescription':
+      'The value of `setting-or-project` is one of the following.\n\n- `on`: Enables analytics gathering and reporting for the user.\n- `off`: Disables analytics gathering and reporting for the user.\n- `ci`: Enables analytics and configures reporting for use with Continuous Integration,\n  which uses a common CI user.\n- `prompt`: Prompts the user to set the status interactively.\n- `project`: Sets the default status for the project to the `project-setting` value, which can be any of the other values. The `project-setting` argument is ignored for all other values of `setting_or_project`.\n\nFor further details, see [Gathering an Viewing CLI Usage Analytics](cli/usage-analytics-gathering).\n',
+    'options': [
       {
-        name: 'help',
-        type: 'boolean',
-        description: 'Shows a help message for this command in the console.',
+        'name': 'help',
+        'type': 'boolean',
+        'description': 'Shows a help message for this command in the console.',
       },
       {
-        name: 'project-setting',
-        type: 'string',
-        enum: ['on', 'off', 'prompt'],
-        description: 'Sets the default analytics enablement status for the project.',
-        positional: 1,
+        'name': 'project-setting',
+        'type': 'string',
+        'enum': ['on', 'off', 'prompt'],
+        'description': 'Sets the default analytics enablement status for the project.',
+        'positional': 1,
       },
       {
-        name: 'setting-or-project',
-        type: 'string',
-        enum: ['on', 'off', 'ci', 'prompt'],
-        description:
+        'name': 'setting-or-project',
+        'type': 'string',
+        'enum': ['on', 'off', 'ci', 'prompt'],
+        'description':
           'Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, or sets the default status for the project.',
-        positional: 0,
+        'positional': 0,
       },
     ],
   });

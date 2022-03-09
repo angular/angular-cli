@@ -22,8 +22,7 @@ interface AnalyticsCommandArgs {
 
 export class AnalyticsCommandModule extends CommandModule<AnalyticsCommandArgs> {
   command = 'analytics <setting-or-project>';
-  describe =
-    'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering.';
+  describe = 'Configures the gathering of Angular CLI usage metrics.';
   longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<AnalyticsCommandArgs> {

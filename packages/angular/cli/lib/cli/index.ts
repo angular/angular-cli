@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { schema } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { format } from 'util';
 import { CommandModuleError } from '../../src/command-builder/command-module';
@@ -79,7 +78,7 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
   try {
     return await runCommand(options.cliArgs, logger, workspace);
   } catch (err) {
-    if (err instanceof CommandModuleError || err instanceof schema.SchemaValidationException) {
+    if (err instanceof CommandModuleError) {
       logger.fatal(`Error: ${err.message}`);
     } else if (err instanceof Error) {
       try {

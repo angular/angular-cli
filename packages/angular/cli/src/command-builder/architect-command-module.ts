@@ -58,14 +58,8 @@ export abstract class ArchitectCommandModule
   }
 
   async run(options: Options<ArchitectCommandArgs> & OtherOptions): Promise<number | void> {
-    const { logger, workspace } = this.context;
-    if (!workspace) {
-      logger.fatal('A workspace is required for this command.');
-
-      return 1;
-    }
-
     const target = this.getArchitectTarget();
+
     const { configuration = '', project, ...architectOptions } = options;
 
     if (!project) {
@@ -112,15 +106,11 @@ export abstract class ArchitectCommandModule
   }
 
   private getArchitectTarget(): string {
-    // 'build [project]' -> 'build'
-    return this.command?.split(' ', 1)[0];
+    return this.commandName;
   }
 
   private getProjectNamesByTarget(target: string): string[] | undefined {
-    const workspace = this.context.workspace;
-    if (!workspace) {
-      throw new CommandModuleError('A workspace is required for this command.');
-    }
+    const workspace = this.getWorkspaceOrThrow();
 
     const allProjectsForTargetName: string[] = [];
     for (const [name, project] of workspace.projects) {
