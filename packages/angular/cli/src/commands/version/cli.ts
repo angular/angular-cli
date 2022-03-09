@@ -12,7 +12,6 @@ import { resolve } from 'path';
 import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { colors } from '../../utilities/color';
-import { getPackageManager } from '../../utilities/package-manager';
 
 interface PartialPackageInfo {
   name: string;
@@ -126,7 +125,7 @@ export class VersionCommandModule extends CommandModule implements CommandModule
       `
       Angular CLI: ${ngCliVersion}
       Node: ${process.versions.node}${unsupportedNodeVersion ? ' (Unsupported)' : ''}
-      Package Manager: ${await this.getPackageManagerVersion()}
+      Package Manager: ${this.getPackageManagerVersion()}
       OS: ${process.platform} ${process.arch}
 
       Angular: ${angularCoreVersion}
@@ -194,9 +193,9 @@ export class VersionCommandModule extends CommandModule implements CommandModule
     return '<error>';
   }
 
-  private async getPackageManagerVersion(): Promise<string> {
+  private getPackageManagerVersion(): string {
     try {
-      const manager = await getPackageManager(this.context.root);
+      const manager = this.context.packageManager;
       const version = execSync(`${manager} --version`, {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'ignore'],
