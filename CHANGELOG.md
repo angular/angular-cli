@@ -1,3 +1,40 @@
+<a name="14.0.0-next.5"></a>
+
+# 14.0.0-next.5 (2022-03-09)
+
+## Breaking Changes
+
+### @angular/cli
+
+- Support for Node.js v12 has been removed as it will become EOL on 2022-04-30. Please use Node.js v14.15 or later.
+
+- Several changes in the Angular CLI commands and arguments handling.
+
+- `ng help` has been removed in favour of the `—-help` option.
+- `ng —-version` has been removed in favour of `ng version` and `ng v`.
+- Deprecated camel cased arguments are no longer supported. Ex. using `—-sourceMap` instead of `—-source-map` will result in an error.
+- `ng update`, `—-migrate-only` option no longer accepts a string of migration name, instead use `—-migrate-only -—name <migration-name>`.
+- `—-help json` help has been removed.
+
+### @angular/cli
+
+| Commit                                                                                              | Type     | Description                           |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------- |
+| [4ebfe0341](https://github.com/angular/angular-cli/commit/4ebfe03415ebe4e8f1625286d1be8bd1b54d3862) | feat     | drop support for Node.js 12           |
+| [2e0493130](https://github.com/angular/angular-cli/commit/2e0493130acfe7244f7ee3ef28c961b1b04d7722) | refactor | replace command line arguments parser |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [e28c71597](https://github.com/angular/angular-cli/commit/e28c7159725a6d23b218dc6e0f317fc6123173f7) | fix  | ignore css only chunks during naming |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.4"></a>
 
 # 14.0.0-next.4 (2022-03-02)
