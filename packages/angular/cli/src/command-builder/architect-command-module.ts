@@ -7,6 +7,7 @@
  */
 
 import { Argv } from 'yargs';
+import { getProjectByCwd } from '../utilities/config';
 import { ArchitectBaseCommandModule } from './architect-base-command-module';
 import {
   CommandModuleError,
@@ -127,14 +128,9 @@ export abstract class ArchitectCommandModule
       // For multi target commands, we always list all projects that have the target.
       return allProjectsForTargetName;
     } else {
-      // For single target commands, we try the default project first,
-      // then the full list if it has a single project, then error out.
-      const maybeDefaultProject = workspace.extensions['defaultProject'];
-      if (
-        typeof maybeDefaultProject === 'string' &&
-        allProjectsForTargetName.includes(maybeDefaultProject)
-      ) {
-        return [maybeDefaultProject];
+      const maybeProject = getProjectByCwd(workspace);
+      if (maybeProject && allProjectsForTargetName.includes(maybeProject)) {
+        return [maybeProject];
       }
 
       if (allProjectsForTargetName.length === 1) {
