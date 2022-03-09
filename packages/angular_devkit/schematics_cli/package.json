@@ -19,7 +19,7 @@
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
     "ansi-colors": "4.1.1",
-    "inquirer": "8.2.0",
+    "inquirer": "8.2.1",
     "symbol-observable": "4.0.0",
     "yargs-parser": "21.0.1"
   }
