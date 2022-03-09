@@ -173,7 +173,8 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
 
     return (this._analytics = await createAnalytics(
       !!this.context.workspace,
-      this.commandName === 'update',
+      // Don't prompt for `ng update` and `ng analytics` commands.
+      ['update', 'analytics'].includes(this.commandName),
     ));
   }
 
