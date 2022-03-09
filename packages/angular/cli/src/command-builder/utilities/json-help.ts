@@ -11,7 +11,7 @@ import { FullDescribe } from '../command-module';
 
 export interface JsonHelp {
   name: string;
-  shortDescription?: string;
+  description?: string;
   command: string;
   longDescription?: string;
   longDescriptionRelativePath?: string;
@@ -115,18 +115,18 @@ export function jsonHelpUsage(): string {
     try {
       const {
         longDescription,
-        describe: shortDescription,
+        describe: description,
         longDescriptionRelativePath,
       } = JSON.parse(rawDescription) as FullDescribe;
 
       return {
-        shortDescription,
+        description,
         longDescriptionRelativePath,
         longDescription,
       };
     } catch {
       return {
-        shortDescription: rawDescription,
+        description: rawDescription,
       };
     }
   };
