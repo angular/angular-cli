@@ -11,7 +11,7 @@ import { FullDescribe } from '../command-module';
 
 export interface JsonHelp {
   name: string;
-  description?: string;
+  shortDescription?: string;
   command: string;
   longDescription?: string;
   longDescriptionRelativePath?: string;
@@ -111,22 +111,22 @@ export function jsonHelpUsage(): string {
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const parseDescription = (rawDescription: string) => {
+  const parseDescription = (rawDescription: string): Partial<JsonHelp> => {
     try {
       const {
         longDescription,
-        describe: description,
+        describe: shortDescription,
         longDescriptionRelativePath,
       } = JSON.parse(rawDescription) as FullDescribe;
 
       return {
-        description,
+        shortDescription,
         longDescriptionRelativePath,
         longDescription,
       };
     } catch {
       return {
-        description: rawDescription,
+        shortDescription: rawDescription,
       };
     }
   };

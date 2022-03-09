@@ -6,6 +6,8 @@ or indirectly on the command line using this command.
 
 The configurable property names match command option names,
 except that in the configuration file, all names must use camelCase,
-while on the command line options can be given in either camelCase or dash-case.
+while on the command line options can be given dash-case.
 
 For further details, see [Workspace Configuration](guide/workspace-config).
+
+For configuration of CLI usage analytics, see [Gathering an Viewing CLI Usage Analytics](cli/usage-analytics-gathering).

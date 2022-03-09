@@ -13,6 +13,7 @@ import { colors } from '../../utilities/color';
 export class AwesomeCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'make-this-awesome';
   describe: false = false;
+  deprecated = false;
   longDescriptionPath?: string | undefined;
 
   builder(localYargs: Argv): Argv {

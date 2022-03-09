@@ -31,7 +31,6 @@ export abstract class ArchitectBaseCommandModule<T>
   protected readonly missingErrorTarget: string | undefined;
 
   protected async runSingleTarget(target: Target, options: OtherOptions): Promise<number> {
-    // Remove options
     const architectHost = await this.getArchitectHost();
 
     let builderName: string;
@@ -69,10 +68,7 @@ export abstract class ArchitectBaseCommandModule<T>
       return this._architectHost;
     }
 
-    const { workspace } = this.context;
-    if (!workspace) {
-      throw new CommandModuleError('A workspace is required for this command.');
-    }
+    const workspace = this.getWorkspaceOrThrow();
 
     return (this._architectHost = new WorkspaceNodeModulesArchitectHost(
       workspace,
@@ -90,23 +86,13 @@ export abstract class ArchitectBaseCommandModule<T>
     registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
     registry.useXDeprecatedProvider((msg) => this.context.logger.warn(msg));
 
-    const { workspace } = this.context;
-    if (!workspace) {
-      throw new CommandModuleError('Cannot invoke this command outside of a workspace');
-    }
-
     const architectHost = this.getArchitectHost();
 
     return (this._architect = new Architect(architectHost, registry));
   }
 
   protected async getArchitectTargetOptions(target: Target): Promise<Option[]> {
-    const { workspace } = this.context;
-    if (!workspace) {
-      throw new CommandModuleError('A workspace is required for this command.');
-    }
-
-    const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, workspace.basePath);
+    const architectHost = this.getArchitectHost();
     const builderConf = await architectHost.getBuilderNameForTarget(target);
 
     let builderDesc;

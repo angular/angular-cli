@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, logging, normalize, strings } from '@angular-devkit/core';
+import { analytics, logging, normalize, schema, strings } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import {
@@ -38,7 +38,7 @@ export interface CommandContext {
   root: string;
   workspace?: AngularWorkspace;
   logger: logging.Logger;
-  /** Arguments parsed in free from without parser configuration. */
+  /** Arguments parsed in free-from without parser configuration. */
   args: {
     positional: string[];
     options: {
@@ -121,16 +121,25 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       await this.reportAnalytics(camelCasedOptions);
     }
 
-    // Run and time command.
-    const startTime = Date.now();
-    const result = await this.run(camelCasedOptions as Options<T> & OtherOptions);
-    const endTime = Date.now();
-
-    analytics.timing(this.commandName, 'duration', endTime - startTime);
-    await analytics.flush();
-
-    if (typeof result === 'number' && result > 0) {
-      process.exitCode = result;
+    let exitCode: number | void | undefined;
+    try {
+      // Run and time command.
+      const startTime = Date.now();
+      exitCode = await this.run(camelCasedOptions as Options<T> & OtherOptions);
+      const endTime = Date.now();
+      analytics.timing(this.commandName, 'duration', endTime - startTime);
+      await analytics.flush();
+    } catch (e) {
+      if (e instanceof schema.SchemaValidationException) {
+        this.context.logger.fatal(`Error: ${e.message}`);
+        exitCode = 1;
+      } else {
+        throw e;
+      }
+    } finally {
+      if (typeof exitCode === 'number' && exitCode > 0) {
+        process.exitCode = exitCode;
+      }
     }
   }
 
@@ -222,6 +231,15 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     }
 
     return localYargs;
+  }
+
+  protected getWorkspaceOrThrow(): AngularWorkspace {
+    const { workspace } = this.context;
+    if (!workspace) {
+      throw new CommandModuleError('A workspace is required for this command.');
+    }
+
+    return workspace;
   }
 }
 
