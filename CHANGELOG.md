@@ -1,3 +1,19 @@
+<a name="13.2.6"></a>
+
+# 13.2.6 (2022-03-09)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [90a5531b1](https://github.com/angular/angular-cli/commit/90a5531b1fbe4043ab47f921ad6b858d34e7c7d0) | fix  | ignore css only chunks during naming |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Daniele Maltese
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.5"></a>
 
 # 14.0.0-next.5 (2022-03-09)
