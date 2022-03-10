@@ -60,7 +60,7 @@ export function findBootstrapModulePath(host: Tree, mainPath: string): string {
 
   const mainBuffer = host.read(mainPath);
   if (!mainBuffer) {
-    throw new SchematicsException(`Client app main file (${mainPath}) not found`);
+    throw new SchematicsException(`Client application main file (${mainPath}) not found`);
   }
   const mainText = mainBuffer.toString('utf-8');
   const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
