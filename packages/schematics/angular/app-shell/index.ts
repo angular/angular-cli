@@ -125,7 +125,7 @@ function validateProject(mainPath: string): Rule {
     const tmpl = getComponentTemplateInfo(host, componentPath);
     const template = getComponentTemplate(host, componentPath, tmpl);
     if (!routerOutletCheckRegex.test(template)) {
-      const errorMsg = `Prerequisite for app shell is to define a router-outlet in your root component.`;
+      const errorMsg = `Prerequisite for application shell is to define a router-outlet in your root component.`;
       context.logger.error(errorMsg);
       throw new SchematicsException(errorMsg);
     }

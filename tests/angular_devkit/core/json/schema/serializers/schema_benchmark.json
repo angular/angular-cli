@@ -535,7 +535,7 @@
               "default": "@schematics/angular"
             },
             "newApp": {
-              "description": "The new app schematic.",
+              "description": "The new application schematic.",
               "type": "string",
               "default": "application"
             }

@@ -90,7 +90,7 @@ describe('Service Worker Schematic', () => {
       new RegExp(
         "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
           '\\1  enabled: environment\\.production,\\n' +
-          '\\1  // Register the ServiceWorker as soon as the app is stable\\n' +
+          '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
           '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
           "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
           '\\1}\\)',
@@ -128,7 +128,7 @@ describe('Service Worker Schematic', () => {
       new RegExp(
         "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
           '\\1  enabled: env\\.production,\\n' +
-          '\\1  // Register the ServiceWorker as soon as the app is stable\\n' +
+          '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
           '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
           "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
           '\\1}\\)',
@@ -166,7 +166,7 @@ describe('Service Worker Schematic', () => {
       new RegExp(
         "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
           '\\1  enabled: environment\\.production,\\n' +
-          '\\1  // Register the ServiceWorker as soon as the app is stable\\n' +
+          '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
           '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
           "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
           '\\1}\\)',
