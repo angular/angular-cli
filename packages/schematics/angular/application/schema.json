@@ -3,7 +3,7 @@
   "$id": "SchematicsAngularApp",
   "title": "Angular Application Options Schema",
   "type": "object",
-  "description": "Generates a new basic app definition in the \"projects\" subfolder of the workspace.",
+  "description": "Generates a new basic application definition in the \"projects\" subfolder of the workspace.",
   "additionalProperties": false,
   "properties": {
     "projectRoot": {

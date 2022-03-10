@@ -95,11 +95,11 @@ function updateAppModule(mainPath: string): Rule {
       }
     }
 
-    // register SW in app module
+    // register SW in application module
     const importText = tags.stripIndent`
       ServiceWorkerModule.register('ngsw-worker.js', {
         enabled: ${importModule}.production,
-        // Register the ServiceWorker as soon as the app is stable
+        // Register the ServiceWorker as soon as the application is stable
         // or after 30 seconds (whichever comes first).
         registrationStrategy: 'registerWhenStable:30000'
       })
@@ -146,7 +146,7 @@ export default function (options: ServiceWorkerOptions): Rule {
     if (!buildTarget) {
       throw targetBuildNotFoundError();
     }
-    const buildOptions = ((buildTarget.options || {}) as unknown) as BrowserBuilderOptions;
+    const buildOptions = (buildTarget.options || {}) as unknown as BrowserBuilderOptions;
     const root = project.root;
     buildOptions.serviceWorker = true;
     buildOptions.ngswConfigPath = join(normalize(root), 'ngsw-config.json');

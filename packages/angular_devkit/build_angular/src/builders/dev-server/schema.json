@@ -75,7 +75,7 @@
     },
     "servePath": {
       "type": "string",
-      "description": "The pathname where the app will be served."
+      "description": "The pathname where the application will be served."
     },
     "disableHostCheck": {
       "type": "boolean",

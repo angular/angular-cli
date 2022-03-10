@@ -102,7 +102,7 @@
     },
     "app-shell": {
       "factory": "./app-shell",
-      "description": "Create an app shell.",
+      "description": "Create an application shell.",
       "schema": "./app-shell/schema.json"
     },
     "library": {
