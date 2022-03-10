@@ -9,21 +9,6 @@
 import yargs from 'yargs';
 import { FullDescribe } from '../command-module';
 
-export interface JsonHelp {
-  name: string;
-  shortDescription?: string;
-  command: string;
-  longDescription?: string;
-  longDescriptionRelativePath?: string;
-  options: JsonHelpOption[];
-  subcommands?: {
-    name: string;
-    description: string;
-    aliases: string[];
-    deprecated: string | boolean;
-  }[];
-}
-
 interface JsonHelpOption {
   name: string;
   type?: string;
@@ -34,6 +19,25 @@ interface JsonHelpOption {
   positional?: number;
   enum?: string[];
   description?: string;
+}
+
+interface JsonHelpDescription {
+  shortDescription?: string;
+  longDescription?: string;
+  longDescriptionRelativePath?: string;
+}
+
+interface JsonHelpSubcommand extends JsonHelpDescription {
+  name: string;
+  aliases: string[];
+  deprecated: string | boolean;
+}
+
+export interface JsonHelp extends JsonHelpDescription {
+  name: string;
+  command: string;
+  options: JsonHelpOption[];
+  subcommands?: JsonHelpSubcommand[];
 }
 
 export function jsonHelpUsage(): string {
@@ -102,34 +106,14 @@ export function jsonHelpUsage(): string {
       deprecated: string | boolean,
     ][]
   )
-    .map(([name, description, _, aliases, deprecated]) => ({
+    .map(([name, rawDescription, _, aliases, deprecated]) => ({
       name: name.split(' ', 1)[0],
       command: name,
-      description,
+      ...parseDescription(rawDescription),
       aliases,
       deprecated,
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
-
-  const parseDescription = (rawDescription: string): Partial<JsonHelp> => {
-    try {
-      const {
-        longDescription,
-        describe: shortDescription,
-        longDescriptionRelativePath,
-      } = JSON.parse(rawDescription) as FullDescribe;
-
-      return {
-        shortDescription,
-        longDescriptionRelativePath,
-        longDescription,
-      };
-    } catch {
-      return {
-        shortDescription: rawDescription,
-      };
-    }
-  };
 
   const [command, rawDescription] = usageInstance.getUsage()[0] ?? [];
 
@@ -142,4 +126,24 @@ export function jsonHelpUsage(): string {
   };
 
   return JSON.stringify(output, undefined, 2);
+}
+
+function parseDescription(rawDescription: string): JsonHelpDescription {
+  try {
+    const {
+      longDescription,
+      describe: shortDescription,
+      longDescriptionRelativePath,
+    } = JSON.parse(rawDescription) as FullDescribe;
+
+    return {
+      shortDescription,
+      longDescriptionRelativePath,
+      longDescription,
+    };
+  } catch {
+    return {
+      shortDescription: rawDescription,
+    };
+  }
 }
