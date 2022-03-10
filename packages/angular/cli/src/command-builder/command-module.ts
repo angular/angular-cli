@@ -92,7 +92,10 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
                 longDescriptionRelativePath: path
                   .relative(path.join(__dirname, '../../../../'), this.longDescriptionPath)
                   .replace(/\\/g, path.posix.sep),
-                longDescription: readFileSync(this.longDescriptionPath, 'utf8'),
+                longDescription: readFileSync(this.longDescriptionPath, 'utf8').replace(
+                  /\r\n/g,
+                  '\n',
+                ),
               }
             : {}),
         };
