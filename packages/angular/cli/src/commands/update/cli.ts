@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'path';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -33,7 +34,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
 
   command = 'update [packages..]';
   describe = 'Updates your workspace and its dependencies. See https://update.angular.io/.';
-  longDescriptionPath?: string | undefined;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<UpdateCommandArgs> {
     return localYargs
