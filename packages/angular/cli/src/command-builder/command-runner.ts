@@ -29,6 +29,7 @@ import { VersionCommandModule } from '../commands/version/cli';
 import { colors } from '../utilities/color';
 import { AngularWorkspace } from '../utilities/config';
 import { CommandContext, CommandModuleError, CommandScope } from './command-module';
+import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
 
 const COMMANDS = [
@@ -75,6 +76,7 @@ export async function runCommand(
       positional: positional.map((v) => v.toString()),
       options: {
         help,
+        jsonHelp,
         ...rest,
       },
     },
@@ -90,23 +92,7 @@ export async function runCommand(
       }
     }
 
-    const commandModule = new CommandModule(context);
-    const describe = jsonHelp ? commandModule.fullDescribe : commandModule.describe;
-
-    localYargs = localYargs.command({
-      command: commandModule.command,
-      aliases: 'aliases' in commandModule ? commandModule.aliases : undefined,
-      describe:
-        // We cannot add custom fields in help, such as long command description which is used in AIO.
-        // Therefore, we get around this by adding a complex object as a string which we later parse when generating the help files.
-        describe !== undefined && typeof describe === 'object'
-          ? JSON.stringify(describe)
-          : describe,
-      deprecated: 'deprecated' in commandModule ? commandModule.deprecated : undefined,
-      builder: (argv) => commandModule.builder(argv) as yargs.Argv,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handler: (args: any) => commandModule.handler(args),
-    });
+    localYargs = addCommandModuleToYargs(localYargs, CommandModule, context);
   }
 
   if (jsonHelp) {
@@ -142,7 +128,7 @@ export async function runCommand(
       'deprecated: %s': colors.yellow('deprecated:') + ' %s',
       'Did you mean %s?': 'Unknown command. Did you mean %s?',
     })
-    .demandCommand()
+    .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
     .version(false)
     .showHelpOnFail(false)

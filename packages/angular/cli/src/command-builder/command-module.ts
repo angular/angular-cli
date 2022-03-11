@@ -43,6 +43,7 @@ export interface CommandContext {
     positional: string[];
     options: {
       help: boolean;
+      jsonHelp: boolean;
     } & Record<string, unknown>;
   };
 }
