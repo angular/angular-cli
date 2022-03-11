@@ -3,12 +3,13 @@ import { silentNg } from '../../../utils/process';
 export default async function () {
   // This test is use as a sanity check.
   const addHelpOutputSnapshot = JSON.stringify({
-    'name': 'analytics',
-    'command': 'ng analytics <setting>',
-    'shortDescription': 'Configures the gathering of Angular CLI usage metrics.',
-    'longDescriptionRelativePath': '@angular/cli/src/commands/analytics/long-description.md',
+    'name': 'config',
+    'command': 'ng config <json-path> [value]',
+    'shortDescription':
+      'Retrieves or sets Angular configuration values in the angular.json file for the workspace.',
+    'longDescriptionRelativePath': '@angular/cli/src/commands/config/long-description.md',
     'longDescription':
-      'The value of `setting` is one of the following.\n\n- `on`: Enables analytics gathering and reporting for the user.\n- `off`: Disables analytics gathering and reporting for the user.\n- `ci`: Enables analytics and configures reporting for use with Continuous Integration,\n  which uses a common CI user.\n- `prompt`: Prompts the user to set the status interactively.\n\nFor further details, see [Gathering an Viewing CLI Usage Analytics](cli/usage-analytics-gathering).\n',
+      'A workspace has a single CLI configuration file, `angular.json`, at the top level.\nThe `projects` object contains a configuration object for each project in the workspace.\n\nYou can edit the configuration directly in a code editor,\nor indirectly on the command line using this command.\n\nThe configurable property names match command option names,\nexcept that in the configuration file, all names must use camelCase,\nwhile on the command line options can be given dash-case.\n\nFor further details, see [Workspace Configuration](guide/workspace-config).\n\nFor configuration of CLI usage analytics, see [Gathering an Viewing CLI Usage Analytics](cli/usage-analytics-gathering).\n',
     'options': [
       {
         'name': 'global',
@@ -23,21 +24,27 @@ export default async function () {
         'description': 'Shows a help message for this command in the console.',
       },
       {
-        'name': 'setting',
+        'name': 'json-path',
         'type': 'string',
-        'enum': ['on', 'off', 'ci', 'prompt'],
-        'description': 'Directly enables or disables all usage analytics for the user.',
+        'description':
+          'The configuration key to set or query, in JSON path format. For example: "a[3].foo.bar[2]". If no new value is provided, returns the current value of this key.',
         'positional': 0,
+      },
+      {
+        'name': 'value',
+        'type': 'string',
+        'description': 'If provided, a new value for the given configuration key.',
+        'positional': 1,
       },
     ],
   });
 
-  const { stdout } = await silentNg('analytics', '--help', '--json-help');
+  const { stdout } = await silentNg('config', '--help', '--json-help');
   const output = JSON.stringify(JSON.parse(stdout.trim()));
 
   if (output !== addHelpOutputSnapshot) {
     throw new Error(
-      `ng analytics JSON help output didn\'t match snapshot.\n\nExpected "${output}" to be "${addHelpOutputSnapshot}".`,
+      `ng config JSON help output didn\'t match snapshot.\n\nExpected "${output}" to be "${addHelpOutputSnapshot}".`,
     );
   }
 

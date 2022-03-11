@@ -63,10 +63,11 @@ export function isPackageNameSafeForAnalytics(name: string): boolean {
 
 /**
  * Set analytics settings. This does not work if the user is not inside a project.
- * @param level Which config to use. "global" for user-level, and "local" for project-level.
+ * @param global Which config to use. "global" for user-level, and "local" for project-level.
  * @param value Either a user ID, true to generate a new User ID, or false to disable analytics.
  */
-export function setAnalyticsConfig(level: 'global' | 'local', value: string | boolean) {
+export function setAnalyticsConfig(global: boolean, value: string | boolean): void {
+  const level = global ? 'global' : 'local';
   analyticsDebug('setting %s level analytics to: %s', level, value);
   const [config, configPath] = getWorkspaceRaw(level);
   if (!config || !configPath) {
@@ -79,6 +80,8 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
     throw new Error(`Invalid config found at ${configPath}. CLI should be an object.`);
   }
 
+  console.log(`Configured ${level} analytics to "${analyticsConfigValueToHumanFormat(value)}".`);
+
   if (value === true) {
     value = uuidV4();
   }
@@ -87,6 +90,18 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
   config.save();
 
   analyticsDebug('done');
+}
+
+export function analyticsConfigValueToHumanFormat(value: unknown): 'on' | 'off' | 'not set' | 'ci' {
+  if (value === false) {
+    return 'off';
+  } else if (value === 'ci') {
+    return 'ci';
+  } else if (typeof value === 'string' || value === true) {
+    return 'on';
+  } else {
+    return 'not set';
+  }
 }
 
 /**
@@ -110,7 +125,7 @@ export async function promptGlobalAnalytics(force = false) {
       },
     ]);
 
-    setAnalyticsConfig('global', answers.analytics);
+    setAnalyticsConfig(true, answers.analytics);
 
     if (answers.analytics) {
       console.log('');
@@ -169,7 +184,7 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
       },
     ]);
 
-    setAnalyticsConfig('local', answers.analytics);
+    setAnalyticsConfig(false, answers.analytics);
 
     if (answers.analytics) {
       console.log('');

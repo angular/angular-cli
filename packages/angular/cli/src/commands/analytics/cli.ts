@@ -6,61 +6,45 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join } from 'path';
 import { Argv } from 'yargs';
 import {
-  promptGlobalAnalytics,
-  promptProjectAnalytics,
-  setAnalyticsConfig,
-} from '../../analytics/analytics';
-import { CommandModule, Options } from '../../command-builder/command-module';
+  CommandModule,
+  CommandModuleImplementation,
+  Options,
+} from '../../command-builder/command-module';
+import {
+  addCommandModuleToYargs,
+  demandCommandFailureMessage,
+} from '../../command-builder/utilities/command';
+import { AnalyticsInfoCommandModule } from './info/cli';
+import {
+  AnalyticsCIModule,
+  AnalyticsOffModule,
+  AnalyticsOnModule,
+  AnalyticsPromptModule,
+} from './settings/cli';
 
-interface AnalyticsCommandArgs {
-  setting: 'on' | 'off' | 'prompt' | 'ci' | string;
-  global: boolean;
-}
+export class AnalyticsCommandModule extends CommandModule implements CommandModuleImplementation {
+  command = 'analytics';
+  describe =
+    'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering';
+  longDescriptionPath?: string | undefined;
 
-export class AnalyticsCommandModule extends CommandModule<AnalyticsCommandArgs> {
-  command = 'analytics <setting>';
-  describe = 'Configures the gathering of Angular CLI usage metrics.';
-  longDescriptionPath = join(__dirname, 'long-description.md');
+  builder(localYargs: Argv): Argv {
+    const subcommands = [
+      AnalyticsCIModule,
+      AnalyticsInfoCommandModule,
+      AnalyticsOffModule,
+      AnalyticsOnModule,
+      AnalyticsPromptModule,
+    ].sort();
 
-  builder(localYargs: Argv): Argv<AnalyticsCommandArgs> {
-    return localYargs
-      .positional('setting', {
-        description: 'Directly enables or disables all usage analytics for the user.',
-        choices: ['on', 'off', 'ci', 'prompt'],
-        type: 'string',
-        demandOption: true,
-      })
-      .option('global', {
-        description: `Access the global configuration in the caller's home directory.`,
-        alias: ['g'],
-        type: 'boolean',
-        default: false,
-      })
-      .strict();
-  }
-
-  async run({ setting, global }: Options<AnalyticsCommandArgs>): Promise<void> {
-    const level = global ? 'global' : 'local';
-    switch (setting) {
-      case 'off':
-        setAnalyticsConfig(level, false);
-        break;
-      case 'on':
-        setAnalyticsConfig(level, true);
-        break;
-      case 'ci':
-        setAnalyticsConfig(level, 'ci');
-        break;
-      case 'prompt':
-        if (global) {
-          await promptGlobalAnalytics(true);
-        } else {
-          await promptProjectAnalytics(true);
-        }
-        break;
+    for (const module of subcommands) {
+      localYargs = addCommandModuleToYargs(localYargs, module, this.context);
     }
+
+    return localYargs.demandCommand(1, demandCommandFailureMessage).strict();
   }
+
+  run(_options: Options<{}>): void {}
 }
