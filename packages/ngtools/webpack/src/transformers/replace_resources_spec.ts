@@ -93,7 +93,7 @@ describe('@ngtools/webpack transformers', () => {
         let AppComponent = class AppComponent {
           constructor() { this.title = 'app'; }
         };
-        AppComponent = (0, tslib_1.__decorate)([
+        AppComponent = tslib_1.__decorate([
           (0, core_1.Component)({
             selector: 'app-root',
             template: require("./app.component.html?ngResource"),
