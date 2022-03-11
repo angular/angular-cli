@@ -59,14 +59,17 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         type: 'boolean',
       })
       .option('name', {
-        description: 'The name of the migration to run.',
+        description:
+          'The name of the migration to run. ' +
+          `Only available with a single package being updated, and only with 'migrate-only' option.`,
         type: 'string',
         implies: ['migrate-only'],
         conflicts: ['to', 'from'],
       })
       .option('from', {
         description:
-          'Version from which to migrate from. Only available with a single package being updated, and only on migration only.',
+          'Version from which to migrate from. ' +
+          `Only available with a single package being updated, and only with 'migrate-only'.`,
         type: 'string',
         implies: ['to', 'migrate-only'],
         conflicts: ['name'],
@@ -74,7 +77,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       .option('to', {
         describe:
           'Version up to which to apply migrations. Only available with a single package being updated, ' +
-          'and only on migrations only. Requires from to be specified. Default to the installed version detected.',
+          `and only with 'migrate-only' option. Requires 'from' to be specified. Default to the installed version detected.`,
         type: 'string',
         implies: ['from', 'migrate-only'],
         conflicts: ['name'],
