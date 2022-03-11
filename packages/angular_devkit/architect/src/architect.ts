@@ -100,7 +100,7 @@ function _createJobHandlerFromBuilderInfo(
                 value: {
                   ...output.value,
                   ...(target ? { target } : 0),
-                } as json.JsonObject,
+                } as unknown as json.JsonObject,
               };
             } else {
               return output;

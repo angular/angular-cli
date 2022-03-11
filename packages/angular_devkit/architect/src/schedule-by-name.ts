@@ -94,7 +94,7 @@ export async function scheduleByName(
           ...output,
           ...(options.target ? { target: options.target } : 0),
           info,
-        } as BuilderOutput),
+        } as unknown as BuilderOutput),
     ),
     shareReplay(),
   );
