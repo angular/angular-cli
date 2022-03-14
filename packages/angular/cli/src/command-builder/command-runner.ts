@@ -49,7 +49,7 @@ const COMMANDS = [
   NewCommandModule,
   UpdateCommandModule,
   RunCommandModule,
-];
+].sort(); // Will be sorted by class name.
 
 const yargsParser = Parser as unknown as typeof Parser.default;
 
