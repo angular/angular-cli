@@ -19,7 +19,7 @@
     "@babel/preset-env": "7.16.11",
     "@babel/runtime": "7.17.2",
     "@babel/template": "7.16.7",
-    "@discoveryjs/json-ext": "0.5.6",
+    "@discoveryjs/json-ext": "0.5.7",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
@@ -30,7 +30,7 @@
     "core-js": "3.21.1",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
-    "esbuild-wasm": "0.14.25",
+    "esbuild-wasm": "0.14.26",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.25"
+    "esbuild": "0.14.26"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
