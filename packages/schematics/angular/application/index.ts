@@ -231,10 +231,6 @@ function addAppToWorkspaceFile(
   };
 
   return updateWorkspace((workspace) => {
-    if (workspace.projects.size === 0) {
-      workspace.extensions.defaultProject = options.name;
-    }
-
     workspace.projects.add({
       name: options.name,
       ...project,
