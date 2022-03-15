@@ -8,7 +8,6 @@
 
 import { json } from '@angular-devkit/core';
 import { join, resolve } from 'path';
-import { cachingDisabled } from './environment-options';
 import { VERSION } from './package-version';
 
 export interface NormalizedCachedOptions {
@@ -39,10 +38,6 @@ export function normalizeCacheOptions(
   const isCI = process.env['CI'] === '1' || process.env['CI']?.toLowerCase() === 'true';
 
   let cacheEnabled = enabled;
-  if (cachingDisabled !== null) {
-    cacheEnabled = !cachingDisabled;
-  }
-
   if (cacheEnabled) {
     switch (environment) {
       case 'ci':
