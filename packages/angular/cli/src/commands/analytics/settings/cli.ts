@@ -42,11 +42,12 @@ abstract class AnalyticsSettingModule
   abstract override run({ global }: Options<AnalyticsCommandArgs>): Promise<void>;
 }
 
-export class AnalyticsOffModule
+export class AnalyticsDisableModule
   extends AnalyticsSettingModule
   implements CommandModuleImplementation<AnalyticsCommandArgs>
 {
-  command = 'off';
+  command = 'disable';
+  aliases = 'off';
   describe = 'Disables analytics gathering and reporting for the user.';
 
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
@@ -55,11 +56,12 @@ export class AnalyticsOffModule
   }
 }
 
-export class AnalyticsOnModule
+export class AnalyticsEnableModule
   extends AnalyticsSettingModule
   implements CommandModuleImplementation<AnalyticsCommandArgs>
 {
-  command = 'on';
+  command = 'enable';
+  aliases = 'on';
   describe = 'Enables analytics gathering and reporting for the user.';
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
     setAnalyticsConfig(global, true);
