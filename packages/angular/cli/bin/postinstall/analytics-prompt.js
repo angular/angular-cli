@@ -17,10 +17,10 @@ try {
   var analytics = require('../../src/analytics/analytics');
 
   analytics
-    .hasGlobalAnalyticsConfiguration()
+    .hasAnalyticsConfig('global')
     .then((hasGlobalConfig) => {
       if (!hasGlobalConfig) {
-        return analytics.promptGlobalAnalytics();
+        return analytics.promptAnalytics(true /** global */);
       }
     })
     .catch(() => {});

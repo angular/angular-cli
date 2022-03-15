@@ -8,8 +8,8 @@
 
 import { Argv } from 'yargs';
 import {
-  promptGlobalAnalytics,
-  promptProjectAnalytics,
+  getAnalyticsInfoString,
+  promptAnalytics,
   setAnalyticsConfig,
 } from '../../../analytics/analytics';
 import {
@@ -39,7 +39,7 @@ abstract class AnalyticsSettingModule
       .strict();
   }
 
-  abstract override run({ global }: Options<AnalyticsCommandArgs>): void;
+  abstract override run({ global }: Options<AnalyticsCommandArgs>): Promise<void>;
 }
 
 export class AnalyticsOffModule
@@ -49,8 +49,9 @@ export class AnalyticsOffModule
   command = 'off';
   describe = 'Disables analytics gathering and reporting for the user.';
 
-  run({ global }: Options<AnalyticsCommandArgs>): void {
+  async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
     setAnalyticsConfig(global, false);
+    process.stderr.write(await getAnalyticsInfoString());
   }
 }
 
@@ -60,21 +61,9 @@ export class AnalyticsOnModule
 {
   command = 'on';
   describe = 'Enables analytics gathering and reporting for the user.';
-  run({ global }: Options<AnalyticsCommandArgs>): void {
+  async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
     setAnalyticsConfig(global, true);
-  }
-}
-
-export class AnalyticsCIModule
-  extends AnalyticsSettingModule
-  implements CommandModuleImplementation<AnalyticsCommandArgs>
-{
-  command = 'ci';
-  describe =
-    'Enables analytics and configures reporting for use with Continuous Integration, which uses a common CI user.';
-
-  run({ global }: Options<AnalyticsCommandArgs>): void {
-    setAnalyticsConfig(global, 'ci');
+    process.stderr.write(await getAnalyticsInfoString());
   }
 }
 
@@ -86,10 +75,6 @@ export class AnalyticsPromptModule
   describe = 'Prompts the user to set the analytics gathering status interactively.';
 
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
-    if (global) {
-      await promptGlobalAnalytics(true);
-    } else {
-      await promptProjectAnalytics(true);
-    }
+    await promptAnalytics(global, true);
   }
 }
