@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { colors } from './color';
-
 function isDisabled(variable: string): boolean {
   return variable === '0' || variable.toLowerCase() === 'false';
 }
@@ -77,21 +75,3 @@ export const allowMinify = debugOptimize.minify;
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 export const maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
-
-// Build cache
-const cacheVariable = process.env['NG_BUILD_CACHE'];
-export const cachingDisabled = (() => {
-  if (!isPresent(cacheVariable)) {
-    return null;
-  }
-
-  // eslint-disable-next-line no-console
-  console.warn(
-    colors.yellow(
-      `Warning: 'NG_BUILD_CACHE' environment variable support will be removed in version 14.\n` +
-        `Configure 'cli.cache' in the workspace configuration instead.`,
-    ),
-  );
-
-  return isDisabled(cacheVariable);
-})();
