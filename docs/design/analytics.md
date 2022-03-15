@@ -115,14 +115,5 @@ There are 2 ways of disabling usage analytics:
    as answering "No" to the prompt.
 1. There is an `NG_CLI_ANALYTICS` environment variable that overrides the global configuration.
    That flag is a string that represents the User ID. If the string `"false"` is used it will
-   disable analytics for this run. If the string `"ci"` is used it will show up as a CI run (see
-   below).
+   disable analytics for this run.
 
-# CI
-
-A special user named `ci` is used for analytics for tracking CI information. This is a convention
-and is in no way enforced.
-
-Running on CI by default will disable analytics (because of a lack of TTY on STDIN/OUT). It can be
-manually enabled using either a global configuration with a value of `ci`, or using the
-`NG_CLI_ANALYTICS=ci` environment variable.

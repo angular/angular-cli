@@ -18,9 +18,8 @@ import {
 } from '../../command-builder/utilities/command';
 import { AnalyticsInfoCommandModule } from './info/cli';
 import {
-  AnalyticsCIModule,
-  AnalyticsOffModule,
-  AnalyticsOnModule,
+  AnalyticsDisableModule,
+  AnalyticsEnableModule,
   AnalyticsPromptModule,
 } from './settings/cli';
 
@@ -32,12 +31,11 @@ export class AnalyticsCommandModule extends CommandModule implements CommandModu
 
   builder(localYargs: Argv): Argv {
     const subcommands = [
-      AnalyticsCIModule,
       AnalyticsInfoCommandModule,
-      AnalyticsOffModule,
-      AnalyticsOnModule,
+      AnalyticsDisableModule,
+      AnalyticsEnableModule,
       AnalyticsPromptModule,
-    ].sort();
+    ].sort(); // sort by class name.
 
     for (const module of subcommands) {
       localYargs = addCommandModuleToYargs(localYargs, module, this.context);

@@ -15,6 +15,7 @@ import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
 import { VERSION } from '../utilities/version';
 import { AnalyticsCollector } from './analytics-collector';
+import { analyticsDisabled, analyticsShareDisabled } from './analytics-environment-options';
 
 /* eslint-disable no-console */
 const analyticsDebug = debug('ng:analytics'); // Generate analytics, including settings and users.
@@ -29,13 +30,11 @@ export const AnalyticsProperties = {
     }
 
     const v = VERSION.full;
-
     // The logic is if it's a full version then we should use the prod GA property.
-    if (/^\d+\.\d+\.\d+$/.test(v) && v !== '0.0.0') {
-      _defaultAngularCliPropertyCache = AnalyticsProperties.AngularCliProd;
-    } else {
-      _defaultAngularCliPropertyCache = AnalyticsProperties.AngularCliStaging;
-    }
+    _defaultAngularCliPropertyCache =
+      /^\d+\.\d+\.\d+$/.test(v) && v !== '0.0.0'
+        ? AnalyticsProperties.AngularCliProd
+        : AnalyticsProperties.AngularCliStaging;
 
     return _defaultAngularCliPropertyCache;
   },
@@ -80,8 +79,6 @@ export function setAnalyticsConfig(global: boolean, value: string | boolean): vo
     throw new Error(`Invalid config found at ${configPath}. CLI should be an object.`);
   }
 
-  console.log(`Configured ${level} analytics to "${analyticsConfigValueToHumanFormat(value)}".`);
-
   if (value === true) {
     value = uuidV4();
   }
@@ -92,81 +89,17 @@ export function setAnalyticsConfig(global: boolean, value: string | boolean): vo
   analyticsDebug('done');
 }
 
-export function analyticsConfigValueToHumanFormat(value: unknown): 'on' | 'off' | 'not set' | 'ci' {
-  if (value === false) {
-    return 'off';
-  } else if (value === 'ci') {
-    return 'ci';
-  } else if (typeof value === 'string' || value === true) {
-    return 'on';
-  } else {
-    return 'not set';
-  }
-}
-
 /**
  * Prompt the user for usage gathering permission.
  * @param force Whether to ask regardless of whether or not the user is using an interactive shell.
  * @return Whether or not the user was shown a prompt.
  */
-export async function promptGlobalAnalytics(force = false) {
-  analyticsDebug('prompting global analytics.');
-  if (force || isTTY()) {
-    const answers = await inquirer.prompt<{ analytics: boolean }>([
-      {
-        type: 'confirm',
-        name: 'analytics',
-        message: tags.stripIndents`
-          Would you like to share anonymous usage data with the Angular Team at Google under
-          Google’s Privacy Policy at https://policies.google.com/privacy? For more details and
-          how to change this setting, see https://angular.io/analytics.
-        `,
-        default: false,
-      },
-    ]);
-
-    setAnalyticsConfig(true, answers.analytics);
-
-    if (answers.analytics) {
-      console.log('');
-      console.log(tags.stripIndent`
-        Thank you for sharing anonymous usage data. If you change your mind, the following
-        command will disable this feature entirely:
-
-            ${colors.yellow('ng analytics off --global')}
-      `);
-      console.log('');
-
-      // Send back a ping with the user `optin`.
-      const ua = new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, 'optin');
-      ua.pageview('/telemetry/optin');
-      await ua.flush();
-    } else {
-      // Send back a ping with the user `optout`. This is the only thing we send.
-      const ua = new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, 'optout');
-      ua.pageview('/telemetry/optout');
-      await ua.flush();
-    }
-
-    return true;
-  } else {
-    analyticsDebug('Either STDOUT or STDIN are not TTY and we skipped the prompt.');
-  }
-
-  return false;
-}
-
-/**
- * Prompt the user for usage gathering permission for the local project. Fails if there is no
- * local workspace.
- * @param force Whether to ask regardless of whether or not the user is using an interactive shell.
- * @return Whether or not the user was shown a prompt.
- */
-export async function promptProjectAnalytics(force = false): Promise<boolean> {
+export async function promptAnalytics(global: boolean, force = false): Promise<boolean> {
   analyticsDebug('prompting user');
-  const [config, configPath] = getWorkspaceRaw('local');
+  const level = global ? 'global' : 'local';
+  const [config, configPath] = getWorkspaceRaw(level);
   if (!config || !configPath) {
-    throw new Error(`Could not find a local workspace. Are you in a project?`);
+    throw new Error(`Could not find a ${level} workspace. Are you in a project?`);
   }
 
   if (force || isTTY()) {
@@ -176,7 +109,7 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
         name: 'analytics',
         message: tags.stripIndents`
           Would you like to share anonymous usage data about this project with the Angular Team at
-          Google under Google’s Privacy Policy at https://policies.google.com/privacy? For more
+          Google under Google’s Privacy Policy at https://policies.google.com/privacy. For more
           details and how to change this setting, see https://angular.io/analytics.
 
         `,
@@ -184,16 +117,18 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
       },
     ]);
 
-    setAnalyticsConfig(false, answers.analytics);
+    setAnalyticsConfig(global, answers.analytics);
 
     if (answers.analytics) {
       console.log('');
-      console.log(tags.stripIndent`
+      console.log(
+        tags.stripIndent`
         Thank you for sharing anonymous usage data. Should you change your mind, the following
         command will disable this feature entirely:
 
-            ${colors.yellow('ng analytics off')}
-      `);
+            ${colors.yellow(`ng analytics disable${global ? ' --global' : ''}`)}
+      `,
+      );
       console.log('');
 
       // Send back a ping with the user `optin`.
@@ -207,127 +142,39 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
       await ua.flush();
     }
 
+    process.stderr.write(await getAnalyticsInfoString());
+
     return true;
   }
 
   return false;
 }
 
-export async function hasGlobalAnalyticsConfiguration(): Promise<boolean> {
-  try {
-    const globalWorkspace = await getWorkspace('global');
-    const analyticsConfig: string | undefined | null | { uid?: string } =
-      globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analytics'];
-
-    if (analyticsConfig !== null && analyticsConfig !== undefined) {
-      return true;
-    }
-  } catch {}
-
-  return false;
-}
-
 /**
- * Get the global analytics object for the user. This returns an instance of UniversalAnalytics,
- * or undefined if analytics are disabled.
- *
- * If any problem happens, it is considered the user has been opting out of analytics.
+ * Get the analytics object for the user.
  */
-export async function getGlobalAnalytics(): Promise<AnalyticsCollector | undefined> {
-  analyticsDebug('getGlobalAnalytics');
-  const propertyId = AnalyticsProperties.AngularCliDefault;
+export async function getAnalytics(
+  level: 'local' | 'global',
+): Promise<AnalyticsCollector | undefined> {
+  analyticsDebug('getAnalytics');
 
-  if ('NG_CLI_ANALYTICS' in process.env) {
-    if (process.env['NG_CLI_ANALYTICS'] == 'false' || process.env['NG_CLI_ANALYTICS'] == '') {
-      analyticsDebug('NG_CLI_ANALYTICS is false');
-
-      return undefined;
-    }
-    if (process.env['NG_CLI_ANALYTICS'] === 'ci') {
-      analyticsDebug('Running in CI mode');
-
-      return new AnalyticsCollector(propertyId, 'ci');
-    }
-  }
-
-  // If anything happens we just keep the NOOP analytics.
-  try {
-    const globalWorkspace = await getWorkspace('global');
-    const analyticsConfig: string | undefined | null | { uid?: string } =
-      globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analytics'];
-    analyticsDebug('Client Analytics config found: %j', analyticsConfig);
-
-    if (analyticsConfig === false) {
-      analyticsDebug('Analytics disabled. Ignoring all analytics.');
-
-      return undefined;
-    } else if (analyticsConfig === undefined || analyticsConfig === null) {
-      analyticsDebug('Analytics settings not found. Ignoring all analytics.');
-
-      // globalWorkspace can be null if there is no file. analyticsConfig would be null in this
-      // case. Since there is no file, the user hasn't answered and the expected return value is
-      // undefined.
-      return undefined;
-    } else {
-      let uid: string | undefined = undefined;
-      if (typeof analyticsConfig == 'string') {
-        uid = analyticsConfig;
-      } else if (typeof analyticsConfig == 'object' && typeof analyticsConfig['uid'] == 'string') {
-        uid = analyticsConfig['uid'];
-      }
-
-      analyticsDebug('client id: %j', uid);
-      if (uid == undefined) {
-        return undefined;
-      }
-
-      return new AnalyticsCollector(propertyId, uid);
-    }
-  } catch (err) {
-    analyticsDebug('Error happened during reading of analytics config: %s', err.message);
+  if (analyticsDisabled) {
+    analyticsDebug('NG_CLI_ANALYTICS is false');
 
     return undefined;
   }
-}
 
-export async function hasWorkspaceAnalyticsConfiguration(): Promise<boolean> {
   try {
-    const globalWorkspace = await getWorkspace('local');
+    const workspace = await getWorkspace(level);
     const analyticsConfig: string | undefined | null | { uid?: string } =
-      globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analytics'];
-
-    if (analyticsConfig !== undefined) {
-      return true;
-    }
-  } catch {}
-
-  return false;
-}
-
-/**
- * Get the workspace analytics object for the user. This returns an instance of AnalyticsCollector,
- * or undefined if analytics are disabled.
- *
- * If any problem happens, it is considered the user has been opting out of analytics.
- */
-export async function getWorkspaceAnalytics(): Promise<AnalyticsCollector | undefined> {
-  analyticsDebug('getWorkspaceAnalytics');
-  try {
-    const globalWorkspace = await getWorkspace('local');
-    const analyticsConfig: string | undefined | null | { uid?: string } =
-      globalWorkspace?.getCli()['analytics'];
+      workspace?.getCli()['analytics'];
     analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
 
-    if (analyticsConfig === false) {
-      analyticsDebug('Analytics disabled. Ignoring all analytics.');
-
-      return undefined;
-    } else if (analyticsConfig === undefined || analyticsConfig === null) {
-      analyticsDebug('Analytics settings not found. Ignoring all analytics.');
-
+    if (!analyticsConfig) {
       return undefined;
     } else {
       let uid: string | undefined = undefined;
+
       if (typeof analyticsConfig == 'string') {
         uid = analyticsConfig;
       } else if (typeof analyticsConfig == 'object' && typeof analyticsConfig['uid'] == 'string') {
@@ -355,13 +202,10 @@ export async function getWorkspaceAnalytics(): Promise<AnalyticsCollector | unde
 export async function getSharedAnalytics(): Promise<AnalyticsCollector | undefined> {
   analyticsDebug('getSharedAnalytics');
 
-  const envVarName = 'NG_CLI_ANALYTICS_SHARE';
-  if (envVarName in process.env) {
-    if (process.env[envVarName] == 'false' || process.env[envVarName] == '') {
-      analyticsDebug('NG_CLI_ANALYTICS is false');
+  if (analyticsShareDisabled) {
+    analyticsDebug('NG_CLI_ANALYTICS is false');
 
-      return undefined;
-    }
+    return undefined;
   }
 
   // If anything happens we just keep the NOOP analytics.
@@ -387,21 +231,20 @@ export async function createAnalytics(
   workspace: boolean,
   skipPrompt = false,
 ): Promise<analytics.Analytics> {
-  let config = await getGlobalAnalytics();
+  let config: analytics.Analytics | undefined;
+  const isDisabledGlobally = (await getWorkspace('global'))?.getCli()['analytics'] === false;
   // If in workspace and global analytics is enabled, defer to workspace level
-  if (workspace && config) {
-    const skipAnalytics =
-      skipPrompt ||
-      (process.env['NG_CLI_ANALYTICS'] &&
-        (process.env['NG_CLI_ANALYTICS'].toLowerCase() === 'false' ||
-          process.env['NG_CLI_ANALYTICS'] === '0'));
+  if (workspace && !isDisabledGlobally) {
+    const skipAnalytics = skipPrompt || analyticsDisabled;
     // TODO: This should honor the `no-interactive` option.
     //       It is currently not an `ng` option but rather only an option for specific commands.
     //       The concept of `ng`-wide options are needed to cleanly handle this.
-    if (!skipAnalytics && !(await hasWorkspaceAnalyticsConfiguration())) {
-      await promptProjectAnalytics();
+    if (!skipAnalytics && !(await hasAnalyticsConfig('local'))) {
+      await promptAnalytics(false);
     }
-    config = await getWorkspaceAnalytics();
+    config = await getAnalytics('local');
+  } else {
+    config = await getAnalytics('global');
   }
 
   const maybeSharedAnalytics = await getSharedAnalytics();
@@ -415,4 +258,51 @@ export async function createAnalytics(
   } else {
     return new analytics.NoopAnalytics();
   }
+}
+
+function analyticsConfigValueToHumanFormat(value: unknown): 'enabled' | 'disabled' | 'not set' {
+  if (value === false) {
+    return 'disabled';
+  } else if (typeof value === 'string' || value === true) {
+    return 'enabled';
+  } else {
+    return 'not set';
+  }
+}
+
+export async function getAnalyticsInfoString(): Promise<string> {
+  const [globalWorkspace] = getWorkspaceRaw('global');
+  const [localWorkspace] = getWorkspaceRaw('local');
+  const globalSetting = globalWorkspace?.get(['cli', 'analytics']);
+  const localSetting = localWorkspace?.get(['cli', 'analytics']);
+
+  const analyticsInstance = await createAnalytics(
+    !!localWorkspace /** workspace */,
+    true /** skipPrompt */,
+  );
+
+  return (
+    tags.stripIndents`
+    Global setting: ${analyticsConfigValueToHumanFormat(globalSetting)}
+    Local setting: ${
+      localWorkspace
+        ? analyticsConfigValueToHumanFormat(localSetting)
+        : 'No local workspace configuration file.'
+    }
+    Effective status: ${
+      analyticsInstance instanceof analytics.NoopAnalytics ? 'disabled' : 'enabled'
+    }
+  ` + '\n'
+  );
+}
+
+export async function hasAnalyticsConfig(level: 'local' | 'global'): Promise<boolean> {
+  try {
+    const workspace = await getWorkspace(level);
+    if (workspace?.getCli()['analytics'] !== undefined) {
+      return true;
+    }
+  } catch {}
+
+  return false;
 }
