@@ -3371,7 +3371,7 @@ cacache@15.3.0, cacache@^15.3.0:
     tar "^6.0.2"
     unique-filename "^1.1.1"
 
-cacache@^16.0.0:
+cacache@16.0.0, cacache@^16.0.0:
   version "16.0.0"
   resolved "https://registry.yarnpkg.com/cacache/-/cacache-16.0.0.tgz#891149a9f9b0c8bbe6cd84d8ac246d6cf5ff429e"
   integrity sha512-pMX6sqJSlGpxCM257by5syifGb7zH6C30CaJXeGXqmKNrHKqvMmwM8KgKmsZcUAsnNQkt7WvENH2Kl53RpFQuA==
