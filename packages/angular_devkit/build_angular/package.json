@@ -10,14 +10,14 @@
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "@babel/core": "7.17.5",
-    "@babel/generator": "7.17.3",
+    "@babel/core": "7.17.7",
+    "@babel/generator": "7.17.7",
     "@babel/helper-annotate-as-pure": "7.16.7",
     "@babel/plugin-proposal-async-generator-functions": "7.16.8",
     "@babel/plugin-transform-async-to-generator": "7.16.8",
     "@babel/plugin-transform-runtime": "7.17.0",
     "@babel/preset-env": "7.16.11",
-    "@babel/runtime": "7.17.2",
+    "@babel/runtime": "7.17.7",
     "@babel/template": "7.16.7",
     "@discoveryjs/json-ext": "0.5.7",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
@@ -30,7 +30,7 @@
     "core-js": "3.21.1",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
-    "esbuild-wasm": "0.14.26",
+    "esbuild-wasm": "0.14.27",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.1",
@@ -60,7 +60,7 @@
     "source-map-support": "0.5.21",
     "stylus": "0.56.0",
     "stylus-loader": "6.2.0",
-    "terser": "5.12.0",
+    "terser": "5.12.1",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.26"
+    "esbuild": "0.14.27"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
