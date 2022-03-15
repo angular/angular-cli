@@ -18,6 +18,7 @@ import {
   Options as YargsOptions,
 } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
+import { PackageManager } from '../../lib/config/workspace-schema';
 import { createAnalytics } from '../analytics/analytics';
 import { AngularWorkspace } from '../utilities/config';
 import { Option } from './utilities/json-schema';
@@ -38,6 +39,7 @@ export interface CommandContext {
   root: string;
   workspace?: AngularWorkspace;
   logger: logging.Logger;
+  packageManager: PackageManager;
   /** Arguments parsed in free-from without parser configuration. */
   args: {
     positional: string[];
@@ -70,7 +72,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   abstract readonly command: string;
   abstract readonly describe: string | false;
   abstract readonly longDescriptionPath?: string;
-  protected shouldReportAnalytics = true;
+  protected readonly shouldReportAnalytics: boolean = true;
   static scope = CommandScope.Both;
 
   private readonly optionsWithAnalytics = new Map<string, number>();

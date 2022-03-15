@@ -17,10 +17,10 @@ import {
   SchematicsCommandArgs,
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
+import { demandCommandFailureMessage } from '../../command-builder/utilities/command';
 import { Option } from '../../command-builder/utilities/json-schema';
-import { GenerateCommand } from './generate-impl';
 
-export interface GenerateCommandArgs extends SchematicsCommandArgs {
+interface GenerateCommandArgs extends SchematicsCommandArgs {
   schematic?: string;
 }
 
@@ -28,39 +28,37 @@ export class GenerateCommandModule
   extends SchematicsCommandModule
   implements CommandModuleImplementation<GenerateCommandArgs>
 {
-  command = 'generate [schematic]';
+  command = 'generate';
   aliases = 'g';
   describe = 'Generates and/or modifies files based on a schematic.';
   longDescriptionPath?: string | undefined;
 
   override async builder(argv: Argv): Promise<Argv<GenerateCommandArgs>> {
-    const [, schematicNameFromArgs] = this.parseSchematicInfo(
-      // positional = [generate, component] or [generate]
-      this.context.args.positional[1],
-    );
-
-    const baseYargs = await super.builder(argv);
-    if (this.schematicName) {
-      return baseYargs;
-    }
-
-    // When we do know the schematic name we need to add the 'schematic'
-    // positional option as the schematic will be accessable as a subcommand.
-    let localYargs = schematicNameFromArgs
-      ? baseYargs
-      : baseYargs.positional('schematic', {
-          describe: 'The schematic or collection:schematic to generate.',
-          type: 'string',
-          demandOption: true,
-        });
+    let localYargs = (await super.builder(argv)).command<GenerateCommandArgs>({
+      command: '$0 <schematic>',
+      describe: 'Run the provided schematic.',
+      builder: (localYargs) =>
+        localYargs
+          .positional('schematic', {
+            describe: 'The [collection:schematic] to run.',
+            type: 'string',
+            demandOption: true,
+          })
+          .strict(),
+      handler: (options) => this.handler(options),
+    });
 
     const collectionName = await this.getCollectionName();
-    const workflow = this.getOrCreateWorkflow(collectionName);
+    const workflow = this.getOrCreateWorkflowForBuilder(collectionName);
     const collection = workflow.engine.createCollection(collectionName);
     const schematicsInCollection = collection.description.schematics;
 
     // We cannot use `collection.listSchematicNames()` as this doesn't return hidden schematics.
     const schematicNames = new Set(Object.keys(schematicsInCollection).sort());
+    const [, schematicNameFromArgs] = this.parseSchematicInfo(
+      // positional = [generate, component] or [generate]
+      this.context.args.positional[1],
+    );
 
     if (schematicNameFromArgs && schematicNames.has(schematicNameFromArgs)) {
       // No need to process all schematics since we know which one the user invoked.
@@ -97,15 +95,35 @@ export class GenerateCommandModule
       });
     }
 
-    return localYargs;
+    return localYargs.demandCommand(1, demandCommandFailureMessage);
   }
 
-  run(
-    options: Options<GenerateCommandArgs> & OtherOptions,
-  ): number | void | Promise<number | void> {
-    const command = new GenerateCommand(this.context, 'generate');
+  async run(options: Options<GenerateCommandArgs> & OtherOptions): Promise<number | void> {
+    const { dryRun, schematic, defaults, force, interactive, ...schematicOptions } = options;
 
-    return command.validateAndRun(options);
+    const [collectionName = await this.getCollectionName(), schematicName = ''] =
+      this.parseSchematicInfo(schematic);
+
+    return this.runSchematic({
+      collectionName,
+      schematicName,
+      schematicOptions,
+      executionOptions: {
+        dryRun,
+        defaults,
+        force,
+        interactive,
+      },
+    });
+  }
+
+  private async getCollectionName(): Promise<string> {
+    const [collectionName = await this.getDefaultSchematicCollection()] = this.parseSchematicInfo(
+      // positional = [generate, component] or [generate]
+      this.context.args.positional[1],
+    );
+
+    return collectionName;
   }
 
   /**

@@ -2,25 +2,5 @@
   [
     "packages/angular_devkit/build_angular/src/utils/bundle-calculator.ts",
     "packages/angular_devkit/build_angular/src/webpack/utils/stats.ts"
-  ],
-  [
-    "packages/angular/cli/src/commands/add/add-impl.ts",
-    "packages/angular/cli/src/commands/add/cli.ts"
-  ],
-  [
-    "packages/angular/cli/src/commands/config/cli.ts",
-    "packages/angular/cli/src/commands/config/config-impl.ts"
-  ],
-  [
-    "packages/angular/cli/src/commands/generate/cli.ts",
-    "packages/angular/cli/src/commands/generate/generate-impl.ts"
-  ],
-  [
-    "packages/angular/cli/src/commands/new/cli.ts",
-    "packages/angular/cli/src/commands/new/new-impl.ts"
-  ],
-  [
-    "packages/angular/cli/src/commands/update/cli.ts",
-    "packages/angular/cli/src/commands/update/update-impl.ts"
   ]
 ]

@@ -385,3 +385,42 @@ export async function isWarningEnabled(warning: string): Promise<boolean> {
   // All warnings are enabled by default
   return result ?? true;
 }
+
+export function getProjectsByPath(
+  workspace: workspaces.WorkspaceDefinition,
+  cwd: string,
+  root: string,
+): string[] {
+  if (workspace.projects.size === 1) {
+    return Array.from(workspace.projects.keys());
+  }
+
+  const isInside = (base: string, potential: string): boolean => {
+    const absoluteBase = path.resolve(root, base);
+    const absolutePotential = path.resolve(root, potential);
+    const relativePotential = path.relative(absoluteBase, absolutePotential);
+    if (!relativePotential.startsWith('..') && !path.isAbsolute(relativePotential)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const projects = Array.from(workspace.projects.entries())
+    .map(([name, project]) => [path.resolve(root, project.root), name] as [string, string])
+    .filter((tuple) => isInside(tuple[0], cwd))
+    // Sort tuples by depth, with the deeper ones first. Since the first member is a path and
+    // we filtered all invalid paths, the longest will be the deepest (and in case of equality
+    // the sort is stable and the first declared project will win).
+    .sort((a, b) => b[0].length - a[0].length);
+
+  if (projects.length === 1) {
+    return [projects[0][1]];
+  } else if (projects.length > 1) {
+    const firstPath = projects[0][0];
+
+    return projects.filter((v) => v[0] === firstPath).map((v) => v[1]);
+  }
+
+  return [];
+}
