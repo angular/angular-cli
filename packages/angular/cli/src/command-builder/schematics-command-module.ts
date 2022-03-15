@@ -6,17 +6,32 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Collection } from '@angular-devkit/schematics';
+import { schema, tags } from '@angular-devkit/core';
+import { Collection, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
+import inquirer from 'inquirer';
 import { Argv } from 'yargs';
-import { SchematicEngineHost } from '../../models/schematic-engine-host';
-import { getProjectByCwd, getWorkspace } from '../utilities/config';
-import { CommandModule, CommandModuleImplementation, CommandScope } from './command-module';
+import {
+  getProjectByCwd,
+  getProjectsByPath,
+  getSchematicDefaults,
+  getWorkspace,
+} from '../utilities/config';
+import { isTTY } from '../utilities/tty';
+import {
+  CommandModule,
+  CommandModuleImplementation,
+  CommandScope,
+  Options,
+  OtherOptions,
+} from './command-module';
 import { Option, parseJsonSchemaToOptions } from './utilities/json-schema';
+import { SchematicEngineHost } from './utilities/schematic-engine-host';
+import { subscribeToWorkflow } from './utilities/schematic-workflow';
 
 const DEFAULT_SCHEMATICS_COLLECTION = '@schematics/angular';
 
@@ -27,15 +42,20 @@ export interface SchematicsCommandArgs {
   defaults: boolean;
 }
 
+export interface SchematicsExecutionOptions extends Options<SchematicsCommandArgs> {
+  packageRegistry?: string;
+}
+
 export abstract class SchematicsCommandModule
   extends CommandModule<SchematicsCommandArgs>
   implements CommandModuleImplementation<SchematicsCommandArgs>
 {
   static override scope = CommandScope.In;
-  protected readonly schematicName: string | undefined;
+  protected readonly allowPrivateSchematics: boolean = false;
+  protected override readonly shouldReportAnalytics = false;
 
   async builder(argv: Argv): Promise<Argv<SchematicsCommandArgs>> {
-    const localYargs: Argv<SchematicsCommandArgs> = argv
+    return argv
       .option('interactive', {
         describe: 'Enable interactive input prompts.',
         type: 'boolean',
@@ -57,17 +77,6 @@ export abstract class SchematicsCommandModule
         default: false,
       })
       .strict();
-
-    if (this.schematicName) {
-      const collectionName = await this.getCollectionName();
-      const workflow = this.getOrCreateWorkflow(collectionName);
-      const collection = workflow.engine.createCollection(collectionName);
-      const options = await this.getSchematicOptions(collection, this.schematicName, workflow);
-
-      return this.addSchemaOptionsToCommand(localYargs, options);
-    }
-
-    return localYargs;
   }
 
   /** Get schematic schema options.*/
@@ -86,39 +95,147 @@ export abstract class SchematicsCommandModule
     return parseJsonSchemaToOptions(workflow.registry, schemaJson);
   }
 
-  protected async getCollectionName(): Promise<string> {
-    const {
-      options: { collection },
-      positional,
-    } = this.context.args;
-
-    return (
-      (typeof collection === 'string' ? collection : undefined) ??
-      // positional = [generate, lint] or [new, collection-package]
-      this.parseSchematicInfo(positional[1])[0] ??
-      (await this.getDefaultSchematicCollection())
-    );
-  }
-
-  private _workflow: NodeWorkflow | undefined;
-  protected getOrCreateWorkflow(collectionName: string): NodeWorkflow {
-    if (this._workflow) {
-      return this._workflow;
+  private _workflowForBuilder: NodeWorkflow | undefined;
+  protected getOrCreateWorkflowForBuilder(collectionName: string): NodeWorkflow {
+    if (this._workflowForBuilder) {
+      return this._workflowForBuilder;
     }
 
-    const { root, workspace } = this.context;
+    return (this._workflowForBuilder = new NodeWorkflow(this.context.root, {
+      resolvePaths: this.getResolvePaths(collectionName),
+      engineHostCreator: (options) => new SchematicEngineHost(options.resolvePaths),
+    }));
+  }
 
-    return new NodeWorkflow(root, {
-      resolvePaths: workspace
-        ? // Workspace
-          collectionName === DEFAULT_SCHEMATICS_COLLECTION
-          ? // Favor __dirname for @schematics/angular to use the build-in version
-            [__dirname, process.cwd(), root]
-          : [process.cwd(), root, __dirname]
-        : // Global
-          [__dirname, process.cwd()],
+  private _workflowForExecution: NodeWorkflow | undefined;
+  protected async getOrCreateWorkflowForExecution(
+    collectionName: string,
+    options: SchematicsExecutionOptions,
+  ): Promise<NodeWorkflow> {
+    if (this._workflowForExecution) {
+      return this._workflowForExecution;
+    }
+
+    const { logger, root, packageManager } = this.context;
+    const { force, dryRun, packageRegistry } = options;
+
+    const workflow = new NodeWorkflow(root, {
+      force,
+      dryRun,
+      packageManager,
+      // A schema registry is required to allow customizing addUndefinedDefaults
+      registry: new schema.CoreSchemaRegistry(formats.standardFormats),
+      packageRegistry,
+      resolvePaths: this.getResolvePaths(collectionName),
+      schemaValidation: true,
+      optionTransforms: [
+        // Add configuration file defaults
+        async (schematic, current) => {
+          const projectName =
+            typeof (current as Record<string, unknown>).project === 'string'
+              ? ((current as Record<string, unknown>).project as string)
+              : this.getProjectName();
+
+          return {
+            ...(await getSchematicDefaults(schematic.collection.name, schematic.name, projectName)),
+            ...current,
+          };
+        },
+      ],
       engineHostCreator: (options) => new SchematicEngineHost(options.resolvePaths),
     });
+
+    workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+    workflow.registry.addSmartDefaultProvider('projectName', () => this.getProjectName());
+    workflow.registry.useXDeprecatedProvider((msg) => logger.warn(msg));
+
+    let shouldReportAnalytics = true;
+    workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
+      if (shouldReportAnalytics) {
+        shouldReportAnalytics = false;
+        // ng generate lib -> ng generate
+        const commandName = this.command?.split(' ', 1)[0];
+
+        await this.reportAnalytics(options as {}, [
+          commandName,
+          schematic.collection.name.replace(/\//g, '_'),
+          schematic.name.replace(/\//g, '_'),
+        ]);
+      }
+
+      return options;
+    });
+
+    if (options.interactive !== false && isTTY()) {
+      workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
+        const questions: inquirer.QuestionCollection = definitions
+          .filter((definition) => !options.defaults || definition.default === undefined)
+          .map((definition) => {
+            const question: inquirer.Question = {
+              name: definition.id,
+              message: definition.message,
+              default: definition.default,
+            };
+
+            const validator = definition.validator;
+            if (validator) {
+              question.validate = (input) => validator(input);
+
+              // Filter allows transformation of the value prior to validation
+              question.filter = async (input) => {
+                for (const type of definition.propertyTypes) {
+                  let value;
+                  switch (type) {
+                    case 'string':
+                      value = String(input);
+                      break;
+                    case 'integer':
+                    case 'number':
+                      value = Number(input);
+                      break;
+                    default:
+                      value = input;
+                      break;
+                  }
+                  // Can be a string if validation fails
+                  const isValid = (await validator(value)) === true;
+                  if (isValid) {
+                    return value;
+                  }
+                }
+
+                return input;
+              };
+            }
+
+            switch (definition.type) {
+              case 'confirmation':
+                question.type = 'confirm';
+                break;
+              case 'list':
+                question.type = definition.multiselect ? 'checkbox' : 'list';
+                (question as inquirer.CheckboxQuestion).choices = definition.items?.map((item) => {
+                  return typeof item == 'string'
+                    ? item
+                    : {
+                        name: item.label,
+                        value: item.value,
+                      };
+                });
+                break;
+              default:
+                question.type = definition.type;
+                break;
+            }
+
+            return question;
+          });
+
+        return inquirer.prompt(questions);
+      });
+    }
+
+    return (this._workflowForExecution = workflow);
   }
 
   private _defaultSchematicCollection: string | undefined;
@@ -163,5 +280,97 @@ export abstract class SchematicsCommandModule
     }
 
     return [undefined, schematic];
+  }
+
+  protected async runSchematic(options: {
+    executionOptions: SchematicsExecutionOptions;
+    schematicOptions: OtherOptions;
+    collectionName: string;
+    schematicName: string;
+  }): Promise<number> {
+    const { logger } = this.context;
+    const { schematicOptions, executionOptions, collectionName, schematicName } = options;
+    const workflow = await this.getOrCreateWorkflowForExecution(collectionName, executionOptions);
+
+    if (!schematicName) {
+      throw new Error('schematicName cannot be undefined.');
+    }
+
+    const { unsubscribe, files } = subscribeToWorkflow(workflow, logger);
+
+    try {
+      await workflow
+        .execute({
+          collection: collectionName,
+          schematic: schematicName,
+          options: schematicOptions,
+          logger,
+          allowPrivate: this.allowPrivateSchematics,
+        })
+        .toPromise();
+
+      if (!files.size) {
+        logger.info('Nothing to be done.');
+      }
+
+      if (executionOptions.dryRun) {
+        logger.warn(`\nNOTE: The "--dry-run" option means no changes were made.`);
+      }
+    } catch (err) {
+      // In case the workflow was not successful, show an appropriate error message.
+      if (err instanceof UnsuccessfulWorkflowExecution) {
+        // "See above" because we already printed the error.
+        logger.fatal('The Schematic workflow failed. See above.');
+
+        return 1;
+      } else {
+        throw err;
+      }
+    } finally {
+      unsubscribe();
+    }
+
+    return 0;
+  }
+
+  private getProjectName(): string | undefined {
+    const { workspace, logger } = this.context;
+    if (!workspace) {
+      return undefined;
+    }
+
+    const projectNames = getProjectsByPath(workspace, process.cwd(), workspace.basePath);
+
+    if (projectNames.length === 1) {
+      return projectNames[0];
+    } else {
+      if (projectNames.length > 1) {
+        logger.warn(tags.oneLine`
+            Two or more projects are using identical roots.
+            Unable to determine project using current working directory.
+            Using default workspace project instead.
+          `);
+      }
+
+      const defaultProjectName = workspace.extensions['defaultProject'];
+      if (typeof defaultProjectName === 'string' && defaultProjectName) {
+        return defaultProjectName;
+      }
+    }
+
+    return undefined;
+  }
+
+  private getResolvePaths(collectionName: string): string[] {
+    const { workspace, root } = this.context;
+
+    return workspace
+      ? // Workspace
+        collectionName === DEFAULT_SCHEMATICS_COLLECTION
+        ? // Favor __dirname for @schematics/angular to use the build-in version
+          [__dirname, process.cwd(), root]
+        : [process.cwd(), root, __dirname]
+      : // Global
+        [__dirname, process.cwd()];
   }
 }
