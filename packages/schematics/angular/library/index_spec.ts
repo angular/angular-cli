@@ -131,7 +131,6 @@ describe('Library Schematic', () => {
 
     const workspace = getJsonFileContent(tree, '/angular.json');
     expect(workspace.projects.foo).toBeDefined();
-    expect(workspace.defaultProject).toBe('foo');
   });
 
   it('should set the prefix to lib if none is set', async () => {

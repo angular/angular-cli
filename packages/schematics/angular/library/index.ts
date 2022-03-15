@@ -82,10 +82,6 @@ function addLibToWorkspaceFile(
   projectName: string,
 ): Rule {
   return updateWorkspace((workspace) => {
-    if (workspace.projects.size === 0) {
-      workspace.extensions.defaultProject = projectName;
-    }
-
     workspace.projects.add({
       name: projectName,
       root: projectRoot,
