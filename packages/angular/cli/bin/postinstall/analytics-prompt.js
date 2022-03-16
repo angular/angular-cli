@@ -17,7 +17,7 @@ try {
   var analytics = require('../../src/analytics/analytics');
 
   analytics
-    .hasAnalyticsConfig('global')
+    .getAnalytics('global')
     .then((hasGlobalConfig) => {
       if (!hasGlobalConfig) {
         return analytics.promptAnalytics(true /** global */);
