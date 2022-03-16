@@ -152,16 +152,21 @@ export async function promptAnalytics(global: boolean, force = false): Promise<b
 
 /**
  * Get the analytics object for the user.
+ *
+ * @returns
+ * - `AnalyticsCollector` when enabled.
+ * - `analytics.NoopAnalytics` when disabled.
+ * - `undefined` when not configured.
  */
 export async function getAnalytics(
   level: 'local' | 'global',
-): Promise<AnalyticsCollector | undefined> {
+): Promise<AnalyticsCollector | analytics.NoopAnalytics | undefined> {
   analyticsDebug('getAnalytics');
 
   if (analyticsDisabled) {
     analyticsDebug('NG_CLI_ANALYTICS is false');
 
-    return undefined;
+    return new analytics.NoopAnalytics();
   }
 
   try {
@@ -170,7 +175,9 @@ export async function getAnalytics(
       workspace?.getCli()['analytics'];
     analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
 
-    if (!analyticsConfig) {
+    if (analyticsConfig === false) {
+      return new analytics.NoopAnalytics();
+    } else if (analyticsConfig === undefined || analyticsConfig === null) {
       return undefined;
     } else {
       let uid: string | undefined = undefined;
@@ -231,33 +238,49 @@ export async function createAnalytics(
   workspace: boolean,
   skipPrompt = false,
 ): Promise<analytics.Analytics> {
-  let config: analytics.Analytics | undefined;
-  const isDisabledGlobally = (await getWorkspace('global'))?.getCli()['analytics'] === false;
-  // If in workspace and global analytics is enabled, defer to workspace level
-  if (workspace && !isDisabledGlobally) {
-    const skipAnalytics = skipPrompt || analyticsDisabled;
-    // TODO: This should honor the `no-interactive` option.
-    //       It is currently not an `ng` option but rather only an option for specific commands.
-    //       The concept of `ng`-wide options are needed to cleanly handle this.
-    if (!skipAnalytics && !(await hasAnalyticsConfig('local'))) {
-      await promptAnalytics(false);
-    }
-    config = await getAnalytics('local');
-  } else {
-    config = await getAnalytics('global');
+  // Global config takes precedence over local config only for the disabled check.
+  // IE:
+  // global: disabled & local: enabled = disabled
+  // global: id: 123 & local: id: 456 = 456
+
+  // check global
+  const globalConfig = await getAnalytics('global');
+  if (globalConfig instanceof analytics.NoopAnalytics) {
+    return globalConfig;
   }
 
-  const maybeSharedAnalytics = await getSharedAnalytics();
+  let config = globalConfig;
+  // Not disabled globally, check locally.
+  if (workspace) {
+    let localConfig = await getAnalytics('local');
+    if (localConfig === undefined) {
+      if (!skipPrompt) {
+        // local is not unset, prompt user.
 
+        // TODO: This should honor the `no-interactive` option.
+        // It is currently not an `ng` option but rather only an option for specific commands.
+        // The concept of `ng`-wide options are needed to cleanly handle this.
+        await promptAnalytics(false);
+        localConfig = await getAnalytics('local');
+      }
+    }
+
+    if (localConfig instanceof analytics.NoopAnalytics) {
+      return localConfig;
+    } else if (localConfig) {
+      // Favor local settings over global when defined.
+      config = localConfig;
+    }
+  }
+
+  // Get shared analytics
+  // TODO: evalute if this should be completly removed.
+  const maybeSharedAnalytics = await getSharedAnalytics();
   if (config && maybeSharedAnalytics) {
     return new analytics.MultiAnalytics([config, maybeSharedAnalytics]);
-  } else if (config) {
-    return config;
-  } else if (maybeSharedAnalytics) {
-    return maybeSharedAnalytics;
-  } else {
-    return new analytics.NoopAnalytics();
   }
+
+  return config ?? maybeSharedAnalytics ?? new analytics.NoopAnalytics();
 }
 
 function analyticsConfigValueToHumanFormat(value: unknown): 'enabled' | 'disabled' | 'not set' {
@@ -294,15 +317,4 @@ export async function getAnalyticsInfoString(): Promise<string> {
     }
   ` + '\n'
   );
-}
-
-export async function hasAnalyticsConfig(level: 'local' | 'global'): Promise<boolean> {
-  try {
-    const workspace = await getWorkspace(level);
-    if (workspace?.getCli()['analytics'] !== undefined) {
-      return true;
-    }
-  } catch {}
-
-  return false;
 }
