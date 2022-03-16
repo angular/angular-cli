@@ -40,6 +40,8 @@ export interface JsonHelp extends JsonHelpDescription {
   subcommands?: JsonHelpSubcommand[];
 }
 
+const yargsDefaultCommandRegExp = /^\$0|\*/;
+
 export function jsonHelpUsage(): string {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const localYargs = yargs as any;
@@ -106,9 +108,10 @@ export function jsonHelpUsage(): string {
       deprecated: string | boolean,
     ][]
   )
-    .map(([name, rawDescription, _, aliases, deprecated]) => ({
-      name: name.split(' ', 1)[0],
-      command: name,
+    .map(([name, rawDescription, isDefault, aliases, deprecated]) => ({
+      name: name.split(' ', 1)[0].replace(yargsDefaultCommandRegExp, ''),
+      command: name.replace(yargsDefaultCommandRegExp, ''),
+      default: isDefault || undefined,
       ...parseDescription(rawDescription),
       aliases,
       deprecated,
@@ -116,13 +119,15 @@ export function jsonHelpUsage(): string {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const [command, rawDescription] = usageInstance.getUsage()[0] ?? [];
+  const defaultSubCommand = subcommands.find((x) => x.default)?.command ?? '';
+  const otherSubcommands = subcommands.filter((s) => !s.default);
 
   const output: JsonHelp = {
     name: [...context.commands].pop(),
-    command: command?.replace('$0', localYargs['$0']),
+    command: `${command?.replace(yargsDefaultCommandRegExp, localYargs['$0'])}${defaultSubCommand}`,
     ...parseDescription(rawDescription),
     options: normalizeOptions.sort((a, b) => a.name.localeCompare(b.name)),
-    subcommands: subcommands.length ? subcommands : undefined,
+    subcommands: otherSubcommands.length ? otherSubcommands : undefined,
   };
 
   return JSON.stringify(output, undefined, 2);
