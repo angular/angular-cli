@@ -1,3 +1,19 @@
+<a name="13.3.0"></a>
+
+# 13.3.0 (2022-03-16)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| [c995ed5e8](https://github.com/angular/angular-cli/commit/c995ed5e8a8e1b20cf376f4c48c5141fd5f4548a) | feat | support TypeScript 4.6 |
+
+## Special Thanks
+
+Alan Agius and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.2.6"></a>
 
 # 13.2.6 (2022-03-09)
