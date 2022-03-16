@@ -1,3 +1,54 @@
+<a name="14.0.0-next.6"></a>
+
+# 14.0.0-next.6 (2022-03-16)
+
+## Breaking Changes
+
+### @angular/cli
+
+- Several changes to the `ng analytics` command syntax.
+
+- `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
+- `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
+
+- Support for TypeScript 4.4 and 4.5 has been removed. Please update to TypeScript 4.6.
+
+### @angular-devkit/build-angular
+
+- `NG_BUILD_CACHE` environment variable has been removed. `cli.cache` in the workspace configuration should be used instead.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [c927c038b](https://github.com/angular/angular-cli/commit/c927c038ba356732327a026fe9a4c36ed23c9dec) | fix  | remove `@types/node` from new projects |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [afafa5788](https://github.com/angular/angular-cli/commit/afafa5788f11b8727c39bb0a390300a706aba5bc) | feat | add `--global` option to `ng analytics` command              |
+| [bb550436a](https://github.com/angular/angular-cli/commit/bb550436a476d74705742a8c36f38971b346b903) | feat | add `ng analytics info` command                              |
+| [7ab22ed40](https://github.com/angular/angular-cli/commit/7ab22ed40d521e3cec29ab2d66d0289c3cdb4106) | feat | add disable/enable aliases for off/on `ng analytics` command |
+| [7fa3e6587](https://github.com/angular/angular-cli/commit/7fa3e6587955d0638929758d3c257392c242c796) | feat | support TypeScript 4.6.2                                     |
+| [9edeb8614](https://github.com/angular/angular-cli/commit/9edeb86146131878c5e8b21b6adaa24a26f12453) | fix  | add long description to `ng update`                          |
+| [a49cdfbfe](https://github.com/angular/angular-cli/commit/a49cdfbfefbdd756882be96fb61dc8a0d374b6e0) | fix  | don't prompt for analytics when running `ng analytics`       |
+| [054ae02c2](https://github.com/angular/angular-cli/commit/054ae02c2fb8eed52af76cf39a432a3770d301e4) | fix  | favor project in cwd when running architect commands         |
+| [96a0d92da](https://github.com/angular/angular-cli/commit/96a0d92da2903edfb3835ce86b3700629d6e43ad) | fix  | remove JSON serialized description from help output          |
+| [ca401255f](https://github.com/angular/angular-cli/commit/ca401255f49568cfe5f9ec6a35ea5b91c91afa70) | fix  | sort commands in help output                                 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                             |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------- |
+| [b8564a638](https://github.com/angular/angular-cli/commit/b8564a638df3b6971ef2ac8fb838e6a7c910ac3b) | refactor | remove deprecated `NG_BUILD_CACHE` environment variable |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.0"></a>
 
 # 13.3.0 (2022-03-16)
