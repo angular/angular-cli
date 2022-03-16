@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { promises as fs } from 'fs';
 import * as os from 'os';
 import { JsonHelp } from 'packages/angular/cli/src/command-builder/utilities/json-help';
@@ -38,32 +38,18 @@ export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger
 
   await fs.mkdir(helpOutputRoot);
 
-  const runNgCommandJsonHelp = async (args: string[]) => {
-    const process = spawn(ngPath, [...args, '--json-help', '--help'], {
+  const runNgCommandJsonHelp = (args: string[]): Promise<JsonHelp> => {
+    const { stdout, status } = spawnSync(ngPath, [...args, '--json-help', '--help'], {
       cwd: newProjectRoot,
+      maxBuffer: 200_0000,
       stdio: ['ignore', 'pipe', 'inherit'],
     });
 
-    let result = '';
-    process.stdout.on('data', (data) => {
-      result += data.toString();
-    });
-
-    return new Promise<JsonHelp>((resolve, reject) => {
-      process
-        .on('close', (code) => {
-          if (code === 0) {
-            resolve(JSON.parse(result.trim()));
-          } else {
-            reject(
-              new Error(
-                `Command failed: ${ngPath} ${args.map((x) => JSON.stringify(x)).join(', ')}`,
-              ),
-            );
-          }
-        })
-        .on('error', (err) => reject(err));
-    });
+    if (status === 0) {
+      return Promise.resolve(JSON.parse(stdout.toString().trim()));
+    } else {
+      throw new Error(`Command failed: ${ngPath} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
+    }
   };
 
   const { subcommands: commands = [] } = await runNgCommandJsonHelp([]);
