@@ -4,7 +4,7 @@ export default async function () {
   // This test is use as a sanity check.
   const addHelpOutputSnapshot = JSON.stringify({
     'name': 'config',
-    'command': 'ng config <json-path> [value]',
+    'command': 'ng config [json-path] [value]',
     'shortDescription':
       'Retrieves or sets Angular configuration values in the angular.json file for the workspace.',
     'longDescriptionRelativePath': '@angular/cli/src/commands/config/long-description.md',
