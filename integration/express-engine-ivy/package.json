@@ -16,7 +16,7 @@
     "serve:ssr": "node dist/express-engine-ivy/server/main.js",
     "serve:ssr:dev": "ng run express-engine-ivy:serve-ssr:production",
     "build:ssr": "npm run build:client-and-server-bundles",
-    "build": "ng build --prod && ng run express-engine-ivy:server:production"
+    "build": "ng build --configuration production && ng run express-engine-ivy:server:production"
   },
   "private": true,
   "resolutions": {

@@ -10,7 +10,7 @@
     "e2e": "ng e2e",
     "serve:ssr:dev": "ng run app:serve-ssr",
     "serve:ssr": "node dist/app/server/main.js",
-    "build:ssr": "ng build --prod && ng run app:server:production"
+    "build:ssr": "ng build --configuration production && ng run app:server:production"
   },
   "private": true,
   "dependencies": {

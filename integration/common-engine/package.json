@@ -16,7 +16,7 @@
     "serve:ssr": "node dist/common/server/main.js",
     "serve:ssr:dev": "ng run common:serve-ssr:production",
     "build:ssr": "npm run build:client-and-server-bundles",
-    "build": "ng build --prod && ng run common:server:production"
+    "build": "ng build --configuration production && ng run common:server:production"
   },
   "private": true,
   "resolutions": {
