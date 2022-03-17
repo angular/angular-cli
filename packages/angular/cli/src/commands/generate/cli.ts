@@ -67,6 +67,10 @@ export class GenerateCommandModule
     }
 
     for (const schematicName of schematicNames) {
+      if (schematicsInCollection[schematicName].private) {
+        continue;
+      }
+
       const {
         description: {
           schemaJson,
