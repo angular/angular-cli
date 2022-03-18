@@ -13,6 +13,7 @@ import * as path from 'path';
 import { SemVer } from 'semver';
 import { colors } from '../src/utilities/color';
 import { isWarningEnabled } from '../src/utilities/config';
+import { disableVersionCheck } from '../src/utilities/environment-options';
 import { VERSION } from '../src/utilities/version';
 
 (async () => {
@@ -24,16 +25,10 @@ import { VERSION } from '../src/utilities/version';
    */
   process.env.BROWSERSLIST_IGNORE_OLD_DATA = '1';
 
-  const disableVersionCheckEnv = process.env['NG_DISABLE_VERSION_CHECK'];
   /**
    * Disable CLI version mismatch checks and forces usage of the invoked CLI
    * instead of invoking the local installed version.
    */
-  const disableVersionCheck =
-    disableVersionCheckEnv !== undefined &&
-    disableVersionCheckEnv !== '0' &&
-    disableVersionCheckEnv.toLowerCase() !== 'false';
-
   if (disableVersionCheck) {
     return (await import('./cli')).default;
   }

@@ -12,10 +12,10 @@ import * as inquirer from 'inquirer';
 import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
+import { analyticsDisabled, analyticsShareDisabled } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
 import { VERSION } from '../utilities/version';
 import { AnalyticsCollector } from './analytics-collector';
-import { analyticsDisabled, analyticsShareDisabled } from './analytics-environment-options';
 
 /* eslint-disable no-console */
 const analyticsDebug = debug('ng:analytics'); // Generate analytics, including settings and users.

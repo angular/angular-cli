@@ -12,13 +12,11 @@ import { CommandModuleError } from '../../src/command-builder/command-module';
 import { runCommand } from '../../src/command-builder/command-runner';
 import { colors, removeColor } from '../../src/utilities/color';
 import { AngularWorkspace, getWorkspaceRaw } from '../../src/utilities/config';
+import { ngDebug } from '../../src/utilities/environment-options';
 import { writeErrorToLogFile } from '../../src/utilities/log-file';
 import { findWorkspaceFile } from '../../src/utilities/project';
 
 export { VERSION } from '../../src/utilities/version';
-
-const debugEnv = process.env['NG_DEBUG'];
-const isDebug = debugEnv !== undefined && debugEnv !== '0' && debugEnv.toLowerCase() !== 'false';
 
 /* eslint-disable no-console */
 export default async function (options: { testing?: boolean; cliArgs: string[] }) {
@@ -34,7 +32,7 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
     return 3;
   }
 
-  const logger = createConsoleLogger(isDebug, process.stdout, process.stderr, {
+  const logger = createConsoleLogger(ngDebug, process.stdout, process.stderr, {
     info: (s) => (colors.enabled ? s : removeColor(s)),
     debug: (s) => (colors.enabled ? s : removeColor(s)),
     warn: (s) => (colors.enabled ? colors.bold.yellow(s) : removeColor(s)),

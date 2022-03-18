@@ -26,6 +26,7 @@ import {
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
 import { subscribeToWorkflow } from '../../command-builder/utilities/schematic-workflow';
 import { colors } from '../../utilities/color';
+import { disableVersionCheck } from '../../utilities/environment-options';
 import { installAllPackages, runTempPackageBin } from '../../utilities/install-package';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import { ensureCompatibleNpm } from '../../utilities/package-manager';
@@ -55,16 +56,6 @@ interface UpdateCommandArgs {
   verbose: boolean;
   'create-commits': boolean;
 }
-
-/**
- * Disable CLI version mismatch checks and forces usage of the invoked CLI
- * instead of invoking the local installed version.
- */
-const disableVersionCheckEnv = process.env['NG_DISABLE_VERSION_CHECK'];
-const disableVersionCheck =
-  disableVersionCheckEnv !== undefined &&
-  disableVersionCheckEnv !== '0' &&
-  disableVersionCheckEnv.toLowerCase() !== 'false';
 
 const ANGULAR_PACKAGES_REGEXP = /^@(?:angular|nguniversal)\//;
 const UPDATE_SCHEMATIC_COLLECTION = path.join(__dirname, 'schematic/collection.json');
