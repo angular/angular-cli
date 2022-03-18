@@ -12,6 +12,7 @@ import { Parser } from 'yargs/helpers';
 import { AddCommandModule } from '../commands/add/cli';
 import { AnalyticsCommandModule } from '../commands/analytics/cli';
 import { BuildCommandModule } from '../commands/build/cli';
+import { CacheCommandModule } from '../commands/cache/cli';
 import { ConfigCommandModule } from '../commands/config/cli';
 import { DeployCommandModule } from '../commands/deploy/cli';
 import { DocCommandModule } from '../commands/doc/cli';
@@ -51,6 +52,7 @@ const COMMANDS = [
   NewCommandModule,
   UpdateCommandModule,
   RunCommandModule,
+  CacheCommandModule,
 ].sort(); // Will be sorted by class name.
 
 const yargsParser = Parser as unknown as typeof Parser.default;
