@@ -159,7 +159,7 @@ export interface Collection<CollectionMetadataT extends object, SchematicMetadat
     // (undocumented)
     readonly description: CollectionDescription<CollectionMetadataT>;
     // (undocumented)
-    listSchematicNames(): string[];
+    listSchematicNames(includeHidden?: boolean): string[];
 }
 
 // @public
@@ -178,7 +178,7 @@ export class CollectionImpl<CollectionT extends object, SchematicT extends objec
     // (undocumented)
     get description(): CollectionDescription<CollectionT>;
     // (undocumented)
-    listSchematicNames(): string[];
+    listSchematicNames(includeHidden?: boolean): string[];
     // (undocumented)
     get name(): string;
 }
@@ -380,7 +380,7 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     // (undocumented)
     hasTaskExecutor(name: string): boolean;
     // (undocumented)
-    listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
+    listSchematicNames(collection: CollectionDescription<CollectionMetadataT>, includeHidden?: boolean): string[];
     // (undocumented)
     transformContext(context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT> | void;
     // (undocumented)
@@ -755,7 +755,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     // (undocumented)
     executePostTasks(): Observable<void>;
     // (undocumented)
-    listSchematicNames(collection: Collection<CollectionT, SchematicT>): string[];
+    listSchematicNames(collection: Collection<CollectionT, SchematicT>, includeHidden?: boolean): string[];
     // (undocumented)
     transformOptions<OptionT extends object, ResultT extends object>(schematic: Schematic<CollectionT, SchematicT>, options: OptionT, context?: TypedSchematicContext<CollectionT, SchematicT>): Observable<ResultT>;
     // (undocumented)

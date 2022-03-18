@@ -83,7 +83,10 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     name: string,
     requester?: CollectionDescription<CollectionMetadataT>,
   ): CollectionDescription<CollectionMetadataT>;
-  listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
+  listSchematicNames(
+    collection: CollectionDescription<CollectionMetadataT>,
+    includeHidden?: boolean,
+  ): string[];
 
   createSchematicDescription(
     name: string,
@@ -162,7 +165,7 @@ export interface Collection<CollectionMetadataT extends object, SchematicMetadat
     name: string,
     allowPrivate?: boolean,
   ): Schematic<CollectionMetadataT, SchematicMetadataT>;
-  listSchematicNames(): string[];
+  listSchematicNames(includeHidden?: boolean): string[];
 }
 
 /**

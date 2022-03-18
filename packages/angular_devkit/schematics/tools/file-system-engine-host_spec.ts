@@ -245,12 +245,38 @@ describe('FileSystemEngineHost', () => {
     expect(() => engine.createCollection('invalid-aliases-2')).toThrow();
   });
 
-  it('does not list hidden schematics', () => {
+  it(`does not list hidden schematics when 'includeHidden' is not specified`, () => {
     const engineHost = new FileSystemEngineHost(root);
     const engine = new SchematicEngine(engineHost);
     const collection = engine.createCollection('hidden-schematics');
 
-    expect(collection.listSchematicNames()).toEqual(['schematic-1', 'schematic-2']);
+    expect(collection.listSchematicNames(/** includeHidden */)).toEqual([
+      'schematic-1',
+      'schematic-2',
+    ]);
+  });
+
+  it(`does not list hidden schematics when 'includeHidden' is false`, () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+    const collection = engine.createCollection('hidden-schematics');
+
+    expect(collection.listSchematicNames(false /** includeHidden */)).toEqual([
+      'schematic-1',
+      'schematic-2',
+    ]);
+  });
+
+  it(`does list hidden schematics when 'includeHidden' is true`, () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+    const collection = engine.createCollection('hidden-schematics');
+
+    expect(collection.listSchematicNames(true /** includeHidden */)).toEqual([
+      'hidden-schematic',
+      'schematic-1',
+      'schematic-2',
+    ]);
   });
 
   it('does not list private schematics', () => {
