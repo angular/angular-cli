@@ -14,6 +14,11 @@
       "version": "14.0.0",
       "factory": "./update-14/remove-show-circular-dependencies-option",
       "description": "Remove 'showCircularDependencies' option from browser and server builders."
+    },
+    "remove-default-project-option": {
+      "version": "14.0.0",
+      "factory": "./update-14/remove-default-project-option",
+      "description": "Remove 'defaultProject' option from workspace configuration. The project to use will be determined from the current working directory."
     }
   }
 }
