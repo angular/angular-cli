@@ -11,9 +11,7 @@ describe('<%= classify(name) %><%= classify(type) %>', () => {
       declarations: [ <%= classify(name) %><%= classify(type) %> ]
     })
     .compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(<%= classify(name) %><%= classify(type) %>);
     component = fixture.componentInstance;
     fixture.detectChanges();
