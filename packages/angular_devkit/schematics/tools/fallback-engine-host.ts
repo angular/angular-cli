@@ -90,11 +90,11 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     context?: FallbackContext,
   ): Observable<ResultT> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ((observableOf(options) as any).pipe(
+    return (observableOf(options) as any).pipe(
       ...this._hosts.map((host) =>
         mergeMap((opt: {}) => host.transformOptions(schematic, opt, context)),
       ),
-    ) as {}) as Observable<ResultT>;
+    ) as {} as Observable<ResultT>;
   }
 
   transformContext(context: FallbackContext): FallbackContext {
@@ -107,11 +107,16 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     return result;
   }
 
-  listSchematicNames(collection: CollectionDescription<FallbackCollectionDescription>): string[] {
+  listSchematicNames(
+    collection: CollectionDescription<FallbackCollectionDescription>,
+    includeHidden?: boolean,
+  ): string[] {
     const allNames = new Set<string>();
     this._hosts.forEach((host) => {
       try {
-        host.listSchematicNames(collection.description).forEach((name) => allNames.add(name));
+        host
+          .listSchematicNames(collection.description, includeHidden)
+          .forEach((name) => allNames.add(name));
       } catch (_) {}
     });
 

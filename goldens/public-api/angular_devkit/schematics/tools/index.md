@@ -111,7 +111,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost_2
     // (undocumented)
     hasTaskExecutor(name: string): boolean;
     // (undocumented)
-    listSchematicNames(collection: FileSystemCollectionDesc): string[];
+    listSchematicNames(collection: FileSystemCollectionDesc, includeHidden?: boolean): string[];
     // (undocumented)
     registerContextTransform(t: ContextTransform): void;
     // (undocumented)
