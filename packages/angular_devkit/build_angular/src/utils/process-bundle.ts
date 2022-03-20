@@ -156,7 +156,7 @@ export async function inlineLocales(options: InlineOptions) {
       // Same errors will contain the full content of the file as the error message
       // Which makes it hard to find the actual error message.
       const index = error.message.indexOf(')\n');
-      const msg = index !== -1 ? error.message.substr(0, index + 1) : error.message;
+      const msg = index !== -1 ? error.message.slice(0, index + 1) : error.message;
       throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
     }
   }

@@ -587,7 +587,7 @@ function _readIdentifier(
         kind: 'identifier',
         start,
         end: context.position,
-        text: context.original.substr(start.offset, context.position.offset),
+        text: context.original.slice(start.offset, start.offset + context.position.offset),
         value,
         comments,
       };
@@ -894,8 +894,8 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
 
   const ast = _readValue(context);
   if (context.position.offset < input.length) {
-    const rest = input.substr(context.position.offset);
-    const i = rest.length > 20 ? rest.substr(0, 20) + '...' : rest;
+    const rest = input.slice(context.position.offset);
+    const i = rest.length > 20 ? rest.slice(0, 20) + '...' : rest;
     throw new Error(
       `Expected end of file, got "${i}" at ` +
         `${context.position.line}:${context.position.character}.`,

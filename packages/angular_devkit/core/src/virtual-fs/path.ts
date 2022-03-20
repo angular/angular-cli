@@ -75,7 +75,7 @@ export function extname(path: Path): string {
   if (i < 1) {
     return '';
   } else {
-    return base.substr(i);
+    return base.slice(i);
   }
 }
 
@@ -87,7 +87,7 @@ export function basename(path: Path): PathFragment {
   if (i == -1) {
     return fragment(path);
   } else {
-    return fragment(path.substr(path.lastIndexOf(NormalizedSep) + 1));
+    return fragment(path.slice(path.lastIndexOf(NormalizedSep) + 1));
   }
 }
 
@@ -102,7 +102,7 @@ export function dirname(path: Path): Path {
 
   const endIndex = index === 0 ? 1 : index; // case of file under root: '/file'
 
-  return normalize(path.substr(0, endIndex));
+  return normalize(path.slice(0, endIndex));
 }
 
 /**
@@ -233,7 +233,7 @@ export function noCacheNormalize(path: string): Path {
   // Match absolute windows path.
   const original = path;
   if (path.match(/^[A-Z]:[/\\]/i)) {
-    path = '\\' + path[0] + '\\' + path.substr(3);
+    path = '\\' + path[0] + '\\' + path.slice(3);
   }
 
   // We convert Windows paths as well here.

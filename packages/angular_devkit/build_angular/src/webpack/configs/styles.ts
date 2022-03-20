@@ -169,7 +169,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
         : undefined,
       plugins: [
         postcssImports({
-          resolve: (url: string) => (url.startsWith('~') ? url.substr(1) : url),
+          resolve: (url: string) => (url.startsWith('~') ? url.slice(1) : url),
           load: (filename: string) => {
             return new Promise<string>((resolve, reject) => {
               loader.fs.readFile(filename, (err: Error, data: Buffer) => {

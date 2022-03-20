@@ -30,7 +30,7 @@ export function move(from: string, to?: string): Rule {
     } else {
       // fromPath is a directory
       tree.getDir(fromPath).visit((path) => {
-        tree.rename(path, join(toPath, path.substr(fromPath.length)));
+        tree.rename(path, join(toPath, path.slice(fromPath.length)));
       });
     }
 

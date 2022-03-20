@@ -111,7 +111,7 @@ export function buildServePath(
   }
 
   if (servePath.endsWith('/')) {
-    servePath = servePath.substr(0, servePath.length - 1);
+    servePath = servePath.slice(0, -1);
   }
 
   if (!servePath.startsWith('/')) {
