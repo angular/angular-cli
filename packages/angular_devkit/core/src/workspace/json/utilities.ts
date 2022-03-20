@@ -287,7 +287,7 @@ function create(
       }
 
       for (const key of cache.keys()) {
-        const relativeKey = key.substr(path.length + 1);
+        const relativeKey = key.slice(path.length + 1);
         if (relativeKey.length > 0 && !relativeKey.includes('/')) {
           keys.push(`${unescapeKey(relativeKey)}`);
         }

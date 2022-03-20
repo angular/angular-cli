@@ -24,7 +24,7 @@ const gitIgnore = gitIgnoreFiles
   .filter((line) => !line.match(/^\s*$/));
 const gitIgnoreExcept = gitIgnoreFiles
   .filter((line) => line.startsWith('!'))
-  .map((line) => line.substr(1));
+  .map((line) => line.slice(1));
 
 function _gitIgnoreMatch(p: string): boolean {
   p = path.relative(path.dirname(__dirname), p);

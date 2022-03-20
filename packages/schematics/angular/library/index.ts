@@ -135,7 +135,7 @@ export default function (options: LibraryOptions): Rule {
     const workspace = await getWorkspace(host);
     const newProjectRoot = (workspace.extensions.newProjectRoot as string | undefined) || '';
 
-    let folderName = packageName.startsWith('@') ? packageName.substr(1) : packageName;
+    let folderName = packageName.startsWith('@') ? packageName.slice(1) : packageName;
     if (/[A-Z]/.test(folderName)) {
       folderName = strings.dasherize(folderName);
     }

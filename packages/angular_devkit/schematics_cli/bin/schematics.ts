@@ -197,7 +197,7 @@ export async function main({
   workflow.reporter.subscribe((event) => {
     nothingDone = false;
     // Strip leading slash to prevent confusion.
-    const eventPath = event.path.startsWith('/') ? event.path.substr(1) : event.path;
+    const eventPath = event.path.startsWith('/') ? event.path.slice(1) : event.path;
 
     switch (event.kind) {
       case 'error':
@@ -216,7 +216,7 @@ export async function main({
         loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
         break;
       case 'rename':
-        const eventToPath = event.to.startsWith('/') ? event.to.substr(1) : event.to;
+        const eventToPath = event.to.startsWith('/') ? event.to.slice(1) : event.to;
         loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
         break;
     }

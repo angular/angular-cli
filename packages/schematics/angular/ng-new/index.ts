@@ -30,7 +30,7 @@ import { Schema as NgNewOptions } from './schema';
 export default function (options: NgNewOptions): Rule {
   if (!options.directory) {
     // If scoped project (i.e. "@foo/bar"), convert directory to "foo/bar".
-    options.directory = options.name.startsWith('@') ? options.name.substr(1) : options.name;
+    options.directory = options.name.startsWith('@') ? options.name.slice(1) : options.name;
   }
 
   const workspaceOptions: WorkspaceOptions = {

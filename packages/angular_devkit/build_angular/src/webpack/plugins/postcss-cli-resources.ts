@@ -77,7 +77,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
     // If starts with a caret, remove and return remainder
     // this supports bypassing asset processing
     if (inputUrl.startsWith('^')) {
-      return inputUrl.substr(1);
+      return inputUrl.slice(1);
     }
 
     const cacheKey = path.resolve(context, inputUrl);
@@ -87,7 +87,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
     }
 
     if (inputUrl.startsWith('~')) {
-      inputUrl = inputUrl.substr(1);
+      inputUrl = inputUrl.slice(1);
     }
 
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));

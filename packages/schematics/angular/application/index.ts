@@ -271,7 +271,7 @@ export default function (options: ApplicationOptions): Rule {
     const isRootApp = options.projectRoot !== undefined;
 
     // If scoped project (i.e. "@foo/bar"), convert dir to "foo/bar".
-    let folderName = options.name.startsWith('@') ? options.name.substr(1) : options.name;
+    let folderName = options.name.startsWith('@') ? options.name.slice(1) : options.name;
     if (/[A-Z]/.test(folderName)) {
       folderName = strings.dasherize(folderName);
     }
