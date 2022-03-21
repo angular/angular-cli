@@ -1,3 +1,19 @@
+<a name="13.1.0"></a>
+
+# 13.1.0 (2022-03-21)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                    |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------ |
+| [891cbbd6](https://github.com/angular/universal/commit/891cbbd65ab2339b560622a4cdc1e1ae131b42dd) | feat | add support for TypeScript 4.6 |
+
+## Special Thanks
+
+Alan Agius and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.0-next.1"></a>
 
 # 13.1.0-next.1 (2022-01-18)
