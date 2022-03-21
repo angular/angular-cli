@@ -333,6 +333,7 @@ export abstract class SchematicsCommandModule
     return 0;
   }
 
+  private defaultProjectDeprecationWarningShown = false;
   private getProjectName(): string | undefined {
     const { workspace, logger } = this.context;
     if (!workspace) {
@@ -354,6 +355,15 @@ export abstract class SchematicsCommandModule
 
       const defaultProjectName = workspace.extensions['defaultProject'];
       if (typeof defaultProjectName === 'string' && defaultProjectName) {
+        if (!this.defaultProjectDeprecationWarningShown) {
+          logger.warn(tags.oneLine`
+            DEPRECATED: The 'defaultProject' workspace option has been deprecated.
+            The project to use will be determined from the current working directory.
+          `);
+
+          this.defaultProjectDeprecationWarningShown = true;
+        }
+
         return defaultProjectName;
       }
     }

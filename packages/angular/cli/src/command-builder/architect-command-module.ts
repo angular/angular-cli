@@ -128,13 +128,13 @@ export abstract class ArchitectCommandModule
       // For multi target commands, we always list all projects that have the target.
       return allProjectsForTargetName;
     } else {
+      if (allProjectsForTargetName.length === 1) {
+        return allProjectsForTargetName;
+      }
+
       const maybeProject = getProjectByCwd(workspace);
       if (maybeProject && allProjectsForTargetName.includes(maybeProject)) {
         return [maybeProject];
-      }
-
-      if (allProjectsForTargetName.length === 1) {
-        return allProjectsForTargetName;
       }
     }
 

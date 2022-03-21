@@ -5,10 +5,6 @@ import { updateJsonFile } from '../../utils/project';
 export default async function () {
   await ng('generate', 'app', 'secondary-app');
 
-  await updateJsonFile('angular.json', workspaceJson => {
-    workspaceJson.defaultProject = undefined;
-  });
-
   await ng('build', 'secondary-app', '--configuration=development');
 
   expectFileToExist('dist/secondary-app/index.html');
