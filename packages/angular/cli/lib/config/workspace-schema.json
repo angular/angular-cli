@@ -22,7 +22,8 @@
     },
     "defaultProject": {
       "type": "string",
-      "description": "Default project name used in commands."
+      "description": "Default project name used in commands.",
+      "x-deprecated": "The project to use will be determined from the current working directory."
     },
     "projects": {
       "type": "object",
