@@ -44,7 +44,7 @@
     "semver": "7.3.5",
     "symbol-observable": "4.0.0",
     "uuid": "8.3.2",
-    "yargs": "17.3.1"
+    "yargs": "17.4.0"
   },
   "devDependencies": {
     "rxjs": "6.6.7"
