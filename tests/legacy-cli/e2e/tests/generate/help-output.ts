@@ -86,7 +86,7 @@ export default function () {
       .then(() =>
         updateJsonFile('angular.json', (json) => {
           json.cli = json.cli || ({} as any);
-          json.cli.defaultCollection = 'fake-schematics';
+          json.cli.schematicCollections = ['fake-schematics'];
         }),
       )
       .then(() => ng('generate', 'fake', '--help'))

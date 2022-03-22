@@ -19,6 +19,11 @@
       "version": "14.0.0",
       "factory": "./update-14/remove-default-project-option",
       "description": "Remove 'defaultProject' option from workspace configuration. The project to use will be determined from the current working directory."
+    },
+    "replace-default-collection-option": {
+      "version": "14.0.0",
+      "factory": "./update-14/replace-default-collection-option",
+      "description": "Replace 'defaultCollection' option in workspace configuration with 'schematicCollections'."
     }
   }
 }

@@ -33,7 +33,7 @@ import { Option, parseJsonSchemaToOptions } from './utilities/json-schema';
 import { SchematicEngineHost } from './utilities/schematic-engine-host';
 import { subscribeToWorkflow } from './utilities/schematic-workflow';
 
-const DEFAULT_SCHEMATICS_COLLECTION = '@schematics/angular';
+export const DEFAULT_SCHEMATICS_COLLECTION = '@schematics/angular';
 
 export interface SchematicsCommandArgs {
   interactive: boolean;
@@ -95,16 +95,21 @@ export abstract class SchematicsCommandModule
     return parseJsonSchemaToOptions(workflow.registry, schemaJson);
   }
 
-  private _workflowForBuilder: NodeWorkflow | undefined;
+  private _workflowForBuilder = new Map<string, NodeWorkflow>();
   protected getOrCreateWorkflowForBuilder(collectionName: string): NodeWorkflow {
-    if (this._workflowForBuilder) {
-      return this._workflowForBuilder;
+    const cached = this._workflowForBuilder.get(collectionName);
+    if (cached) {
+      return cached;
     }
 
-    return (this._workflowForBuilder = new NodeWorkflow(this.context.root, {
+    const workflow = new NodeWorkflow(this.context.root, {
       resolvePaths: this.getResolvePaths(collectionName),
       engineHostCreator: (options) => new SchematicEngineHost(options.resolvePaths),
-    }));
+    });
+
+    this._workflowForBuilder.set(collectionName, workflow);
+
+    return workflow;
   }
 
   private _workflowForExecution: NodeWorkflow | undefined;
@@ -238,36 +243,55 @@ export abstract class SchematicsCommandModule
     return (this._workflowForExecution = workflow);
   }
 
-  private _defaultSchematicCollection: string | undefined;
-  protected async getDefaultSchematicCollection(): Promise<string> {
-    if (this._defaultSchematicCollection) {
-      return this._defaultSchematicCollection;
+  private _schematicCollections: Set<string> | undefined;
+  protected async getSchematicCollections(): Promise<Set<string>> {
+    if (this._schematicCollections) {
+      return this._schematicCollections;
     }
 
-    let workspace = await getWorkspace('local');
+    const getSchematicCollections = (
+      configSection: Record<string, unknown> | undefined,
+    ): Set<string> | undefined => {
+      if (!configSection) {
+        return undefined;
+      }
 
-    if (workspace) {
-      const project = getProjectByCwd(workspace);
+      const { schematicCollections, defaultCollection } = configSection;
+      if (Array.isArray(schematicCollections)) {
+        return new Set(schematicCollections);
+      } else if (typeof defaultCollection === 'string') {
+        return new Set([defaultCollection]);
+      }
+
+      return undefined;
+    };
+
+    const localWorkspace = await getWorkspace('local');
+    if (localWorkspace) {
+      const project = getProjectByCwd(localWorkspace);
       if (project) {
-        const value = workspace.getProjectCli(project)['defaultCollection'];
-        if (typeof value == 'string') {
-          return (this._defaultSchematicCollection = value);
+        const value = getSchematicCollections(localWorkspace.getProjectCli(project));
+        if (value) {
+          this._schematicCollections = value;
+
+          return value;
         }
       }
-
-      const value = workspace.getCli()['defaultCollection'];
-      if (typeof value === 'string') {
-        return (this._defaultSchematicCollection = value);
-      }
     }
 
-    workspace = await getWorkspace('global');
-    const value = workspace?.getCli()['defaultCollection'];
-    if (typeof value === 'string') {
-      return (this._defaultSchematicCollection = value);
+    const globalWorkspace = await getWorkspace('global');
+    const value =
+      getSchematicCollections(localWorkspace?.getCli()) ??
+      getSchematicCollections(globalWorkspace?.getCli());
+    if (value) {
+      this._schematicCollections = value;
+
+      return value;
     }
 
-    return (this._defaultSchematicCollection = DEFAULT_SCHEMATICS_COLLECTION);
+    this._schematicCollections = new Set([DEFAULT_SCHEMATICS_COLLECTION]);
+
+    return this._schematicCollections;
   }
 
   protected parseSchematicInfo(
