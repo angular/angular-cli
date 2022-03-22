@@ -20,7 +20,7 @@
     "@angular-devkit/schematics": "0.0.0",
     "ansi-colors": "4.1.1",
     "inquirer": "8.1.2",
-    "minimist": "1.2.5",
+    "minimist": "1.2.6",
     "symbol-observable": "4.0.0"
   }
 }
