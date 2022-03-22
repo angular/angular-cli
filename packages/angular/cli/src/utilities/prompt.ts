@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as inquirer from 'inquirer';
+import type { Question } from 'inquirer';
 import { isTTY } from './tty';
 
 export async function askConfirmation(
@@ -17,8 +17,7 @@ export async function askConfirmation(
   if (!isTTY()) {
     return noTTYResponse ?? defaultResponse;
   }
-
-  const question: inquirer.Question = {
+  const question: Question = {
     type: 'confirm',
     name: 'confirmation',
     prefix: '',
@@ -26,7 +25,8 @@ export async function askConfirmation(
     default: defaultResponse,
   };
 
-  const answers = await inquirer.prompt([question]);
+  const { prompt } = await import('inquirer');
+  const answers = await prompt([question]);
 
   return answers['confirmation'];
 }
