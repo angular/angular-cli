@@ -14,6 +14,7 @@ import {
   OtherOptions,
 } from '../../command-builder/command-module';
 import {
+  DEFAULT_SCHEMATICS_COLLECTION,
   SchematicsCommandArgs,
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
@@ -51,7 +52,7 @@ export class NewCommandModule
     const collectionName =
       typeof collectionNameFromArgs === 'string'
         ? collectionNameFromArgs
-        : await this.getDefaultSchematicCollection();
+        : await this.getCollectionFromConfig();
 
     const workflow = await this.getOrCreateWorkflowForBuilder(collectionName);
     const collection = workflow.engine.createCollection(collectionName);
@@ -62,7 +63,7 @@ export class NewCommandModule
 
   async run(options: Options<NewCommandArgs> & OtherOptions): Promise<number | void> {
     // Register the version of the CLI in the registry.
-    const collectionName = options.collection ?? (await this.getDefaultSchematicCollection());
+    const collectionName = options.collection ?? (await this.getCollectionFromConfig());
     const workflow = await this.getOrCreateWorkflowForExecution(collectionName, options);
     workflow.registry.addSmartDefaultProvider('ng-cli-version', () => VERSION.full);
 
@@ -88,5 +89,20 @@ export class NewCommandModule
         defaults,
       },
     });
+  }
+
+  /** Find a collection from config that has an `ng-new` schematic. */
+  private async getCollectionFromConfig(): Promise<string> {
+    for (const collectionName of await this.getSchematicCollections()) {
+      const workflow = this.getOrCreateWorkflowForBuilder(collectionName);
+      const collection = workflow.engine.createCollection(collectionName);
+      const schematicsInCollection = collection.description.schematics;
+
+      if (Object.keys(schematicsInCollection).includes(this.schematicName)) {
+        return collectionName;
+      }
+    }
+
+    return DEFAULT_SCHEMATICS_COLLECTION;
   }
 }

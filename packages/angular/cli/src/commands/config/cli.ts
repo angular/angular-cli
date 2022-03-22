@@ -103,6 +103,7 @@ export class ConfigCommandModule
     >([
       ['cli.warnings.versionMismatch', undefined],
       ['cli.defaultCollection', undefined],
+      ['cli.schematicCollections', undefined],
       ['cli.packageManager', undefined],
       ['cli.analytics', undefined],
 

@@ -9,6 +9,7 @@
 import { strings } from '@angular-devkit/core';
 import { Argv } from 'yargs';
 import {
+  CommandModuleError,
   CommandModuleImplementation,
   Options,
   OtherOptions,
@@ -48,28 +49,9 @@ export class GenerateCommandModule
       handler: (options) => this.handler(options),
     });
 
-    const collectionName = await this.getCollectionName();
-    const workflow = this.getOrCreateWorkflowForBuilder(collectionName);
-    const collection = workflow.engine.createCollection(collectionName);
-    const schematicsInCollection = collection.description.schematics;
-
-    // We cannot use `collection.listSchematicNames()` as this doesn't return hidden schematics.
-    const schematicNames = new Set(Object.keys(schematicsInCollection).sort());
-    const [, schematicNameFromArgs] = this.parseSchematicInfo(
-      // positional = [generate, component] or [generate]
-      this.context.args.positional[1],
-    );
-
-    if (schematicNameFromArgs && schematicNames.has(schematicNameFromArgs)) {
-      // No need to process all schematics since we know which one the user invoked.
-      schematicNames.clear();
-      schematicNames.add(schematicNameFromArgs);
-    }
-
-    for (const schematicName of schematicNames) {
-      if (schematicsInCollection[schematicName].private) {
-        continue;
-      }
+    for (const [schematicName, collectionName] of await this.getSchematicsToRegister()) {
+      const workflow = this.getOrCreateWorkflowForBuilder(collectionName);
+      const collection = workflow.engine.createCollection(collectionName);
 
       const {
         description: {
@@ -110,8 +92,11 @@ export class GenerateCommandModule
   async run(options: Options<GenerateCommandArgs> & OtherOptions): Promise<number | void> {
     const { dryRun, schematic, defaults, force, interactive, ...schematicOptions } = options;
 
-    const [collectionName = await this.getCollectionName(), schematicName = ''] =
-      this.parseSchematicInfo(schematic);
+    const [collectionName, schematicName] = this.parseSchematicInfo(schematic);
+
+    if (!collectionName || !schematicName) {
+      throw new CommandModuleError('A collection and schematic is required during execution.');
+    }
 
     return this.runSchematic({
       collectionName,
@@ -126,13 +111,13 @@ export class GenerateCommandModule
     });
   }
 
-  private async getCollectionName(): Promise<string> {
-    const [collectionName = await this.getDefaultSchematicCollection()] = this.parseSchematicInfo(
+  private async getCollectionNames(): Promise<string[]> {
+    const [collectionName] = this.parseSchematicInfo(
       // positional = [generate, component] or [generate]
       this.context.args.positional[1],
     );
 
-    return collectionName;
+    return collectionName ? [collectionName] : [...(await this.getSchematicCollections())];
   }
 
   /**
@@ -151,12 +136,15 @@ export class GenerateCommandModule
     );
 
     const dasherizedSchematicName = strings.dasherize(schematicName);
+    const schematicCollectionsFromConfig = await this.getSchematicCollections();
+    const collectionNames = await this.getCollectionNames();
 
-    // Only add the collection name as part of the command when it's not the default collection or when it has been provided via the CLI.
+    // Only add the collection name as part of the command when it's not a known
+    // schematics collection or when it has been provided via the CLI.
     // Ex:`ng generate @schematics/angular:component`
     const commandName =
       !!collectionNameFromArgs ||
-      (await this.getDefaultSchematicCollection()) !== (await this.getCollectionName())
+      !collectionNames.some((c) => schematicCollectionsFromConfig.has(c))
         ? collectionName + ':' + dasherizedSchematicName
         : dasherizedSchematicName;
 
@@ -170,5 +158,55 @@ export class GenerateCommandModule
       .join(' ');
 
     return `${commandName}${positionalArgs ? ' ' + positionalArgs : ''}`;
+  }
+
+  /**
+   * Get schematics that can to be registered as subcommands.
+   */
+  private async *getSchematics(): AsyncGenerator<{
+    schematicName: string;
+    collectionName: string;
+  }> {
+    const seenNames = new Set<string>();
+    for (const collectionName of await this.getCollectionNames()) {
+      const workflow = this.getOrCreateWorkflowForBuilder(collectionName);
+      const collection = workflow.engine.createCollection(collectionName);
+
+      for (const schematicName of collection.listSchematicNames(true /** includeHidden */)) {
+        // If a schematic with this same name is already registered skip.
+        if (!seenNames.has(schematicName)) {
+          seenNames.add(schematicName);
+          yield { schematicName, collectionName };
+        }
+      }
+    }
+  }
+
+  /**
+   * Get schematics that should to be registered as subcommands.
+   *
+   * @returns a sorted list of schematic that needs to be registered as subcommands.
+   */
+  private async getSchematicsToRegister(): Promise<
+    [schematicName: string, collectionName: string][]
+  > {
+    const schematicsToRegister: [schematicName: string, collectionName: string][] = [];
+    const [, schematicNameFromArgs] = this.parseSchematicInfo(
+      // positional = [generate, component] or [generate]
+      this.context.args.positional[1],
+    );
+
+    for await (const { schematicName, collectionName } of this.getSchematics()) {
+      if (schematicName === schematicNameFromArgs) {
+        return [[schematicName, collectionName]];
+      }
+
+      schematicsToRegister.push([schematicName, collectionName]);
+    }
+
+    // Didn't find the schematic or no schematic name was provided Ex: `ng generate --help`.
+    return schematicsToRegister.sort(([nameA], [nameB]) =>
+      nameA.localeCompare(nameB, undefined, { sensitivity: 'accent' }),
+    );
   }
 }
