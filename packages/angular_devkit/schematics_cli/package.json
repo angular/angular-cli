@@ -20,7 +20,7 @@
     "@schematics/schematics": "0.0.0",
     "ansi-colors": "4.1.1",
     "inquirer": "7.3.3",
-    "minimist": "1.2.5",
+    "minimist": "1.2.6",
     "symbol-observable": "3.0.0"
   }
 }
