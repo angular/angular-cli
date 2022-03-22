@@ -17,7 +17,7 @@
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
     "ansi-colors": "4.1.1",
-    "minimist": "1.2.5",
+    "minimist": "1.2.6",
     "progress": "2.0.3",
     "rxjs": "6.6.7",
     "symbol-observable": "4.0.0"
