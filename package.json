@@ -59,7 +59,7 @@
     ]
   },
   "resolutions": {
-    "**/ajv-formats/ajv": "8.10.0"
+    "**/ajv-formats/ajv": "8.11.0"
   },
   "devDependencies": {
     "@ampproject/remapping": "2.1.2",
@@ -118,16 +118,16 @@
     "@types/yargs": "^17.0.8",
     "@types/yargs-parser": "^21.0.0",
     "@typescript-eslint/eslint-plugin": "5.16.0",
-    "@typescript-eslint/parser": "5.15.0",
+    "@typescript-eslint/parser": "5.16.0",
     "@yarnpkg/lockfile": "1.1.0",
-    "ajv": "8.10.0",
+    "ajv": "8.11.0",
     "ajv-formats": "2.1.1",
     "ansi-colors": "4.1.1",
-    "babel-loader": "8.2.3",
+    "babel-loader": "8.2.4",
     "babel-plugin-istanbul": "6.1.1",
     "bootstrap": "^4.0.0",
     "browserslist": "^4.9.1",
-    "cacache": "16.0.2",
+    "cacache": "16.0.3",
     "chokidar": "^3.5.2",
     "copy-webpack-plugin": "10.2.4",
     "core-js": "3.21.1",
@@ -180,7 +180,7 @@
     "piscina": "3.2.0",
     "popper.js": "^1.14.1",
     "postcss": "8.4.12",
-    "postcss-import": "14.0.2",
+    "postcss-import": "14.1.0",
     "postcss-loader": "6.2.1",
     "postcss-preset-env": "7.4.3",
     "prettier": "^2.0.0",
@@ -199,7 +199,7 @@
     "source-map-loader": "3.0.1",
     "source-map-support": "0.5.21",
     "spdx-satisfies": "^5.0.0",
-    "stylus": "0.56.0",
+    "stylus": "0.57.0",
     "stylus-loader": "6.2.0",
     "symbol-observable": "4.0.0",
     "tar": "^6.1.6",
