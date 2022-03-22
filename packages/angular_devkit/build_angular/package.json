@@ -27,7 +27,6 @@
     "browserslist": "^4.9.1",
     "cacache": "16.0.2",
     "copy-webpack-plugin": "10.2.4",
-    "core-js": "3.21.1",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
     "esbuild-wasm": "0.14.27",

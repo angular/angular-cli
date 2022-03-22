@@ -123,15 +123,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         entryPoints['polyfills'] = [projectPolyfills];
       }
     }
-
-    if (!buildOptions.aot) {
-      const jitPolyfills = require.resolve('core-js/proposals/reflect-metadata');
-      if (entryPoints['polyfills']) {
-        entryPoints['polyfills'].push(jitPolyfills);
-      } else {
-        entryPoints['polyfills'] = [jitPolyfills];
-      }
-    }
   }
 
   if (allowedCommonJsDependencies) {

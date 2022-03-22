@@ -131,7 +131,6 @@ ts_library(
         "@npm//browserslist",
         "@npm//cacache",
         "@npm//copy-webpack-plugin",
-        "@npm//core-js",
         "@npm//critters",
         "@npm//css-loader",
         "@npm//esbuild",
