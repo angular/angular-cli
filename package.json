@@ -184,7 +184,7 @@
     "magic-string": "0.25.7",
     "mini-css-extract-plugin": "2.4.2",
     "minimatch": "3.0.4",
-    "minimist": "^1.2.0",
+    "minimist": "1.2.6",
     "ng-packagr": "~12.1.2",
     "node-fetch": "^2.2.0",
     "open": "8.2.1",
