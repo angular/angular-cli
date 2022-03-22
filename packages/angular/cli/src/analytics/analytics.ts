@@ -8,7 +8,6 @@
 
 import { analytics, json, tags } from '@angular-devkit/core';
 import debug from 'debug';
-import * as inquirer from 'inquirer';
 import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
@@ -103,7 +102,8 @@ export async function promptAnalytics(global: boolean, force = false): Promise<b
   }
 
   if (force || isTTY()) {
-    const answers = await inquirer.prompt<{ analytics: boolean }>([
+    const { prompt } = await import('inquirer');
+    const answers = await prompt<{ analytics: boolean }>([
       {
         type: 'confirm',
         name: 'analytics',

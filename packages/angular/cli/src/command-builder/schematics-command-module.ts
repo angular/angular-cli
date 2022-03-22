@@ -13,7 +13,7 @@ import {
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
-import inquirer from 'inquirer';
+import type { CheckboxQuestion, Question } from 'inquirer';
 import { Argv } from 'yargs';
 import {
   getProjectByCwd,
@@ -172,11 +172,11 @@ export abstract class SchematicsCommandModule
     });
 
     if (options.interactive !== false && isTTY()) {
-      workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
-        const questions: inquirer.QuestionCollection = definitions
+      workflow.registry.usePromptProvider(async (definitions: Array<schema.PromptDefinition>) => {
+        const questions = definitions
           .filter((definition) => !options.defaults || definition.default === undefined)
           .map((definition) => {
-            const question: inquirer.Question = {
+            const question: Question = {
               name: definition.id,
               message: definition.message,
               default: definition.default,
@@ -219,7 +219,7 @@ export abstract class SchematicsCommandModule
                 break;
               case 'list':
                 question.type = definition.multiselect ? 'checkbox' : 'list';
-                (question as inquirer.CheckboxQuestion).choices = definition.items?.map((item) => {
+                (question as CheckboxQuestion).choices = definition.items?.map((item) => {
                   return typeof item == 'string'
                     ? item
                     : {
@@ -236,7 +236,13 @@ export abstract class SchematicsCommandModule
             return question;
           });
 
-        return inquirer.prompt(questions);
+        if (questions.length) {
+          const { prompt } = await import('inquirer');
+
+          return prompt(questions);
+        } else {
+          return {};
+        }
       });
     }
 
