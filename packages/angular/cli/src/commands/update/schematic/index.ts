@@ -9,10 +9,18 @@
 import { logging, tags } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as npa from 'npm-package-arg';
+import type { Manifest } from 'pacote';
 import * as semver from 'semver';
-import { Dependency, JsonSchemaForNpmPackageJsonFiles } from '../../../utilities/package-json';
-import { NpmRepositoryPackageJson, getNpmPackageJson } from '../../../utilities/package-metadata';
+import {
+  NgPackageManifestProperties,
+  NpmRepositoryPackageJson,
+  getNpmPackageJson,
+} from '../../../utilities/package-metadata';
 import { Schema as UpdateSchema } from './schema';
+
+interface JsonSchemaForNpmPackageJsonFiles extends Manifest, NgPackageManifestProperties {
+  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
+}
 
 type VersionRange = string & { __VERSION_RANGE: void };
 type PeerVersionTransform = string | ((range: string) => string);
@@ -264,7 +272,7 @@ function _performUpdate(
     throw new SchematicsException('package.json could not be parsed: ' + e.message);
   }
 
-  const updateDependency = (deps: Dependency, name: string, newVersion: string) => {
+  const updateDependency = (deps: Record<string, string>, name: string, newVersion: string) => {
     const oldVersion = deps[name];
     // We only respect caret and tilde ranges on update.
     const execResult = /^[\^~]/.exec(oldVersion);
@@ -367,6 +375,7 @@ function _getUpdateMetadata(
     } else if (
       typeof packageGroup == 'object' &&
       packageGroup &&
+      !Array.isArray(packageGroup) &&
       Object.values(packageGroup).every((x) => typeof x == 'string')
     ) {
       result.packageGroup = packageGroup;
@@ -463,15 +472,19 @@ function _usageMessage(
     )
     .map(({ name, info, version, tag, target }) => {
       // Look for packageGroup.
-      const packageGroup = target['ng-update']['packageGroup'];
+      const packageGroup = target['ng-update']?.['packageGroup'];
       if (packageGroup) {
-        const packageGroupName = target['ng-update']['packageGroupName'] || packageGroup[0];
+        const packageGroupNames = Array.isArray(packageGroup)
+          ? packageGroup
+          : Object.keys(packageGroup);
+
+        const packageGroupName = target['ng-update']?.['packageGroupName'] || packageGroupNames[0];
         if (packageGroupName) {
           if (packageGroups.has(name)) {
             return null;
           }
 
-          packageGroup.forEach((x: string) => packageGroups.set(x, packageGroupName));
+          packageGroupNames.forEach((x: string) => packageGroups.set(x, packageGroupName));
           packageGroups.set(packageGroupName, packageGroupName);
           name = packageGroupName;
         }
@@ -663,35 +676,37 @@ function _addPackageGroup(
     return;
   }
 
-  let packageGroup = ngUpdateMetadata['packageGroup'];
+  const packageGroup = ngUpdateMetadata['packageGroup'];
   if (!packageGroup) {
     return;
   }
+  let packageGroupNormalized: Record<string, string> = {};
   if (Array.isArray(packageGroup) && !packageGroup.some((x) => typeof x != 'string')) {
-    packageGroup = packageGroup.reduce((acc, curr) => {
+    packageGroupNormalized = packageGroup.reduce((acc, curr) => {
       acc[curr] = maybePackage;
 
       return acc;
     }, {} as { [name: string]: string });
-  }
-
-  // Only need to check if it's an object because we set it right the time before.
-  if (
-    typeof packageGroup != 'object' ||
-    packageGroup === null ||
-    Object.values(packageGroup).some((v) => typeof v != 'string')
+  } else if (
+    typeof packageGroup == 'object' &&
+    packageGroup &&
+    !Array.isArray(packageGroup) &&
+    Object.values(packageGroup).every((x) => typeof x == 'string')
   ) {
-    logger.warn(`packageGroup metadata of package ${npmPackageJson.name} is malformed.`);
+    packageGroupNormalized = packageGroup;
+  } else {
+    logger.warn(`packageGroup metadata of package ${npmPackageJson.name} is malformed. Ignoring.`);
 
     return;
   }
 
-  Object.keys(packageGroup)
-    .filter((name) => !packages.has(name)) // Don't override names from the command line.
-    .filter((name) => allDependencies.has(name)) // Remove packages that aren't installed.
-    .forEach((name) => {
-      packages.set(name, packageGroup[name]);
-    });
+  for (const [name, value] of Object.entries(packageGroupNormalized)) {
+    // Don't override names from the command line.
+    // Remove packages that aren't installed.
+    if (!packages.has(name) && allDependencies.has(name)) {
+      packages.set(name, value as VersionRange);
+    }
+  }
 }
 
 /**

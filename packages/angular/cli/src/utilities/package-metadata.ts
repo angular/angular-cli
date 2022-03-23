@@ -11,32 +11,19 @@ import * as lockfile from '@yarnpkg/lockfile';
 import { existsSync, readFileSync } from 'fs';
 import * as ini from 'ini';
 import { homedir } from 'os';
-import * as pacote from 'pacote';
+import type { Manifest, Packument } from 'pacote';
 import * as path from 'path';
-import { JsonSchemaForNpmPackageJsonFiles } from './package-json';
 
-const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
-
-export interface NpmRepositoryPackageJson {
-  name: string;
-  requestedName: string;
-  description: string;
-
-  'dist-tags': {
-    [name: string]: string;
-  };
-  versions: {
-    [version: string]: JsonSchemaForNpmPackageJsonFiles;
-  };
-  time: {
-    modified: string;
-    created: string;
-
-    [version: string]: string;
-  };
+export interface PackageMetadata extends Packument, NgPackageManifestProperties {
+  tags: Record<string, PackageManifest>;
+  versions: Record<string, PackageManifest>;
 }
 
-export type NgAddSaveDepedency = 'dependencies' | 'devDependencies' | boolean;
+export interface NpmRepositoryPackageJson extends PackageMetadata {
+  requestedName?: string;
+}
+
+export type NgAddSaveDependency = 'dependencies' | 'devDependencies' | boolean;
 
 export interface PackageIdentifier {
   type: 'git' | 'tag' | 'version' | 'range' | 'file' | 'directory' | 'remote';
@@ -48,37 +35,26 @@ export interface PackageIdentifier {
   rawSpec: string;
 }
 
-export interface PackageManifest {
-  name: string;
-  version: string;
-  license?: string;
-  private?: boolean;
-  deprecated?: boolean;
-  dependencies: Record<string, string>;
-  devDependencies: Record<string, string>;
-  peerDependencies: Record<string, string>;
-  optionalDependencies: Record<string, string>;
+export interface NgPackageManifestProperties {
   'ng-add'?: {
-    save?: NgAddSaveDepedency;
+    save?: NgAddSaveDependency;
   };
   'ng-update'?: {
-    migrations: string;
-    packageGroup: Record<string, string>;
+    migrations?: string;
+    packageGroup?: string[] | Record<string, string>;
+    packageGroupName?: string;
+    requirements?: string[] | Record<string, string>;
   };
 }
 
-export interface PackageMetadata {
-  name: string;
-  tags: { [tag: string]: PackageManifest | undefined };
-  versions: Record<string, PackageManifest>;
-  'dist-tags'?: unknown;
-}
+export interface PackageManifest extends Manifest, NgPackageManifestProperties {}
 
 interface PackageManagerOptions extends Record<string, unknown> {
   forceAuth?: Record<string, unknown>;
 }
 
 let npmrc: PackageManagerOptions;
+const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
 
 function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boolean): void {
   if (!npmrc) {
@@ -231,18 +207,6 @@ function normalizeOptions(
   return options;
 }
 
-function normalizeManifest(rawManifest: { name: string; version: string }): PackageManifest {
-  // TODO: Fully normalize and sanitize
-
-  return {
-    dependencies: {},
-    devDependencies: {},
-    peerDependencies: {},
-    optionalDependencies: {},
-    ...rawManifest,
-  };
-}
-
 export async function fetchPackageMetadata(
   name: string,
   logger: logging.LoggerApi,
@@ -260,8 +224,8 @@ export async function fetchPackageMetadata(
   };
 
   ensureNpmrc(logger, usingYarn, verbose);
-
-  const response = await pacote.packument(name, {
+  const { packument } = await import('pacote');
+  const response = await packument(name, {
     fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),
@@ -269,23 +233,13 @@ export async function fetchPackageMetadata(
 
   // Normalize the response
   const metadata: PackageMetadata = {
-    name: response.name,
+    ...response,
     tags: {},
-    versions: {},
   };
 
-  if (response.versions) {
-    for (const [version, manifest] of Object.entries(response.versions)) {
-      metadata.versions[version] = normalizeManifest(manifest as { name: string; version: string });
-    }
-  }
-
   if (response['dist-tags']) {
-    // Store this for use with other npm utility packages
-    metadata['dist-tags'] = response['dist-tags'];
-
     for (const [tag, version] of Object.entries(response['dist-tags'])) {
-      const manifest = metadata.versions[version as string];
+      const manifest = metadata.versions[version];
       if (manifest) {
         metadata.tags[tag] = manifest;
       } else if (verbose) {
@@ -308,17 +262,18 @@ export async function fetchPackageManifest(
 ): Promise<PackageManifest> {
   const { usingYarn = false, verbose = false, registry } = options;
   ensureNpmrc(logger, usingYarn, verbose);
+  const { manifest } = await import('pacote');
 
-  const response = await pacote.manifest(name, {
+  const response = await manifest(name, {
     fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),
   });
 
-  return normalizeManifest(response);
+  return response;
 }
 
-export function getNpmPackageJson(
+export async function getNpmPackageJson(
   packageName: string,
   logger: logging.LoggerApi,
   options: {
@@ -334,8 +289,8 @@ export function getNpmPackageJson(
 
   const { usingYarn = false, verbose = false, registry } = options;
   ensureNpmrc(logger, usingYarn, verbose);
-
-  const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(packageName, {
+  const { packument } = await import('pacote');
+  const resultPromise = packument(packageName, {
     fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),

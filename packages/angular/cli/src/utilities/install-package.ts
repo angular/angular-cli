@@ -11,7 +11,7 @@ import { existsSync, mkdtempSync, readFileSync, realpathSync, rmdirSync, writeFi
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
 import { PackageManager } from '../../lib/config/workspace-schema';
-import { NgAddSaveDepedency } from './package-metadata';
+import { NgAddSaveDependency } from './package-metadata';
 import { Spinner } from './spinner';
 
 interface PackageManagerOptions {
@@ -70,7 +70,7 @@ export async function installAllPackages(
 export async function installPackage(
   packageName: string,
   packageManager: PackageManager = PackageManager.Npm,
-  save: Exclude<NgAddSaveDepedency, false> = true,
+  save: Exclude<NgAddSaveDependency, false> = true,
   extraArgs: string[] = [],
   cwd = process.cwd(),
 ): Promise<1 | 0> {

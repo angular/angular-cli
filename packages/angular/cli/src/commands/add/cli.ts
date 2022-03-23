@@ -27,7 +27,7 @@ import { colors } from '../../utilities/color';
 import { installPackage, installTempPackage } from '../../utilities/install-package';
 import { ensureCompatibleNpm } from '../../utilities/package-manager';
 import {
-  NgAddSaveDepedency,
+  NgAddSaveDependency,
   PackageManifest,
   fetchPackageManifest,
   fetchPackageMetadata,
@@ -165,7 +165,10 @@ export class AddCommandModule
       }
 
       // Adjust the version based on name and peer dependencies
-      if (latestManifest && Object.keys(latestManifest.peerDependencies).length === 0) {
+      if (
+        latestManifest?.peerDependencies &&
+        Object.keys(latestManifest.peerDependencies).length === 0
+      ) {
         spinner.succeed(
           `Found compatible package version: ${colors.grey(packageIdentifier.toString())}.`,
         );
@@ -217,7 +220,7 @@ export class AddCommandModule
     }
 
     let collectionName = packageIdentifier.name;
-    let savePackage: NgAddSaveDepedency | undefined;
+    let savePackage: NgAddSaveDependency | undefined;
 
     try {
       spinner.start('Loading package information from registry...');
@@ -415,7 +418,8 @@ export class AddCommandModule
     } catch {}
 
     if (projectManifest) {
-      const version = projectManifest.dependencies[name] || projectManifest.devDependencies[name];
+      const version =
+        projectManifest.dependencies?.[name] || projectManifest.devDependencies?.[name];
       if (version) {
         return version;
       }
