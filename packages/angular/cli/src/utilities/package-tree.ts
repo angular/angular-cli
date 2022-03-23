@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import { dirname, join } from 'path';
 import * as resolve from 'resolve';
-import { NgAddSaveDepedency } from './package-metadata';
+import { NgAddSaveDependency } from './package-metadata';
 
 interface PackageJson {
   name: string;
@@ -22,7 +22,7 @@ interface PackageJson {
     migrations?: string;
   };
   'ng-add'?: {
-    save?: NgAddSaveDepedency;
+    save?: NgAddSaveDependency;
   };
 }
 

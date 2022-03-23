@@ -6,32 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-declare module '@yarnpkg/lockfile' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  export function parse(data: string): Record<string, any>;
-}
-
-declare module 'ini' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  export function parse(data: string): Record<string, any>;
-}
-
 declare module 'npm-pick-manifest' {
   function pickManifest(
     metadata: import('./utilities/package-metadata').PackageMetadata,
     selector: string,
   ): import('./utilities/package-metadata').PackageManifest;
   export = pickManifest;
-}
-
-declare module 'pacote' {
-  export function manifest(
-    specifier: string,
-    options: Record<string, unknown>,
-  ): Promise<{ name: string; version: string }>;
-
-  export function packument(
-    specifier: string,
-    options: Record<string, unknown>,
-  ): Promise<import('./utilities/package-metadata').NpmRepositoryPackageJson>;
 }
