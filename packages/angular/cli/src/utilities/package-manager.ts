@@ -55,23 +55,23 @@ export async function getPackageManager(root: string): Promise<PackageManager> {
     return packageManager;
   }
 
-  const [hasYarnLock, hasNpmLock, hasPnpmLock] = await Promise.all([
+  const [hasYarnLock, hasNpmLock, hasPnpmLock, hasYarn, hasPnpm, hasNpm] = await Promise.all([
     hasLockfile(root, PackageManager.Yarn),
     hasLockfile(root, PackageManager.Npm),
     hasLockfile(root, PackageManager.Pnpm),
+    supports(PackageManager.Yarn),
+    supports(PackageManager.Pnpm),
+    supports(PackageManager.Npm),
   ]);
 
-  const hasYarn = await supports(PackageManager.Yarn);
   if (hasYarn && hasYarnLock && !hasNpmLock) {
     return PackageManager.Yarn;
   }
 
-  const hasPnpm = await supports(PackageManager.Pnpm);
   if (hasPnpm && hasPnpmLock && !hasNpmLock) {
     return PackageManager.Pnpm;
   }
 
-  const hasNpm = await supports(PackageManager.Npm);
   if (hasNpm && hasNpmLock && !hasYarnLock && !hasPnpmLock) {
     return PackageManager.Npm;
   }
@@ -98,7 +98,10 @@ export async function ensureCompatibleNpm(root: string): Promise<void> {
   }
 
   try {
-    const versionText = execSync('npm --version', { encoding: 'utf8', stdio: 'pipe' }).trim();
+    const versionText = execSync('npm --version', {
+      encoding: 'utf8',
+      stdio: 'pipe',
+    }).trim();
     const version = valid(versionText);
     if (!version) {
       return;
