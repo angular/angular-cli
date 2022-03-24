@@ -513,6 +513,8 @@ describe('Browser Builder styles', () => {
 
     const run2 = await architect.scheduleTarget(target, overrides);
     await expectAsync(run2.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
+    await run2.stop();
+    await run.stop();
   });
 
   it('supports Protocol-relative Url', async () => {

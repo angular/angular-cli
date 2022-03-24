@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+import { existsSync, mkdtempSync, readFileSync, realpathSync, unlinkSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
 import { basename, dirname, join } from 'path';
 import { main } from './main';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-const temp = require('temp');
 
 // We only care about the write method in these mocks of NodeJS.WriteStream.
 class MockWriteStream {
@@ -29,7 +27,7 @@ describe('benchmark binary', () => {
   const exitCodeOneScript = require.resolve(join(__dirname, './test/exit-code-one.js'));
   const benchmarkWatchScript = require.resolve(join(__dirname, './test/watch-test-cmd.js'));
   const watchTriggerScript = require.resolve(join(__dirname, './test/watch-test-script.js'));
-  const outputFileRoot = temp.mkdirSync('benchmark-binary-spec-');
+  const outputFileRoot = mkdtempSync(join(realpathSync(tmpdir()), 'benchmark-binary-spec-'));
   const outputFile = join(outputFileRoot, 'output.log');
   let stdout: MockWriteStream, stderr: MockWriteStream;
 

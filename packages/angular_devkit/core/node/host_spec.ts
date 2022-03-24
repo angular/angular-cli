@@ -6,15 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable import/no-extraneous-dependencies */
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsAsyncHost, NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
-import { Observable, Subscription } from 'rxjs';
-
-const temp = require('temp');
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 // TODO: replace this with an "it()" macro that's reusable globally.
 let linuxOnlyIt: typeof it = it;
@@ -27,11 +25,11 @@ describe('NodeJsAsyncHost', () => {
   let host: virtualFs.Host<fs.Stats>;
 
   beforeEach(() => {
-    root = temp.mkdirSync('core-node-spec-');
+    root = fs.mkdtempSync(join(fs.realpathSync(tmpdir()), 'core-node-spec-'));
     host = new virtualFs.ScopedHost(new NodeJsAsyncHost(), normalize(root));
   });
 
-  afterEach((done) => host.delete(normalize('/')).toPromise().then(done, done.fail));
+  afterEach(async () => host.delete(normalize('/')).toPromise());
 
   it('should get correct result for exists', async () => {
     const filePath = normalize('not-found');
@@ -42,35 +40,30 @@ describe('NodeJsAsyncHost', () => {
 
   linuxOnlyIt(
     'can watch',
-    (done) => {
-      let obs: Observable<virtualFs.HostWatchEvent>;
-      let subscription: Subscription;
+    async () => {
       const content = virtualFs.stringToFileBuffer('hello world');
       const content2 = virtualFs.stringToFileBuffer('hello world 2');
       const allEvents: virtualFs.HostWatchEvent[] = [];
 
-      Promise.resolve()
-        .then(() => fs.mkdirSync(root + '/sub1'))
-        .then(() => fs.writeFileSync(root + '/sub1/file1', 'hello world'))
-        .then(() => {
-          obs = host.watch(normalize('/sub1'), { recursive: true })!;
-          expect(obs).not.toBeNull();
-          subscription = obs.subscribe((event) => {
-            allEvents.push(event);
-          });
-        })
-        .then(() => new Promise((resolve) => setTimeout(resolve, 100)))
-        // Discard the events registered so far.
-        .then(() => allEvents.splice(0))
-        .then(() => host.write(normalize('/sub1/sub2/file3'), content).toPromise())
-        .then(() => host.write(normalize('/sub1/file2'), content2).toPromise())
-        .then(() => host.delete(normalize('/sub1/file1')).toPromise())
-        .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
-        .then(() => {
-          expect(allEvents.length).toBe(3);
-          subscription.unsubscribe();
-        })
-        .then(done, done.fail);
+      fs.mkdirSync(root + '/sub1');
+      fs.writeFileSync(root + '/sub1/file1', 'hello world');
+
+      const obs = host.watch(normalize('/sub1'), { recursive: true });
+      expect(obs).toBeDefined();
+      const subscription = obs!.subscribe((event) => {
+        allEvents.push(event);
+      });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Discard the events registered so far.
+      allEvents.splice(0);
+      await host.write(normalize('/sub1/sub2/file3'), content).toPromise();
+      await host.write(normalize('/sub1/file2'), content2).toPromise();
+      await host.delete(normalize('/sub1/file1')).toPromise();
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      expect(allEvents.length).toBe(3);
+      subscription.unsubscribe();
     },
     30000,
   );
@@ -81,7 +74,7 @@ describe('NodeJsSyncHost', () => {
   let host: virtualFs.SyncDelegateHost<fs.Stats>;
 
   beforeEach(() => {
-    root = temp.mkdirSync('core-node-spec-');
+    root = fs.mkdtempSync(join(fs.realpathSync(tmpdir()), 'core-node-spec-'));
     host = new virtualFs.SyncDelegateHost(
       new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(root)),
     );
@@ -92,56 +85,47 @@ describe('NodeJsSyncHost', () => {
 
   linuxOnlyIt(
     'can watch',
-    (done) => {
-      let obs: Observable<virtualFs.HostWatchEvent>;
-      let subscription: Subscription;
+    async () => {
       const content = virtualFs.stringToFileBuffer('hello world');
       const content2 = virtualFs.stringToFileBuffer('hello world 2');
       const allEvents: virtualFs.HostWatchEvent[] = [];
 
-      Promise.resolve()
-        .then(() => fs.mkdirSync(root + '/sub1'))
-        .then(() => fs.writeFileSync(root + '/sub1/file1', 'hello world'))
-        .then(() => {
-          obs = host.watch(normalize('/sub1'), { recursive: true })!;
-          expect(obs).not.toBeNull();
-          subscription = obs.subscribe((event) => {
-            allEvents.push(event);
-          });
-        })
-        .then(() => new Promise((resolve) => setTimeout(resolve, 100)))
-        // Discard the events registered so far.
-        .then(() => allEvents.splice(0))
-        .then(() => {
-          host.write(normalize('/sub1/sub2/file3'), content);
-          host.write(normalize('/sub1/file2'), content2);
-          host.delete(normalize('/sub1/file1'));
-        })
-        .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
-        .then(() => {
-          expect(allEvents.length).toBe(3);
-          subscription.unsubscribe();
-        })
-        .then(done, done.fail);
+      fs.mkdirSync(root + '/sub1');
+      fs.writeFileSync(root + '/sub1/file1', 'hello world');
+
+      const obs = host.watch(normalize('/sub1'), { recursive: true });
+      expect(obs).toBeDefined();
+      const subscription = obs!.subscribe((event) => {
+        allEvents.push(event);
+      });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Discard the events registered so far.
+      allEvents.splice(0);
+
+      host.write(normalize('/sub1/sub2/file3'), content);
+      host.write(normalize('/sub1/file2'), content2);
+      host.delete(normalize('/sub1/file1'));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      expect(allEvents.length).toBe(3);
+      subscription.unsubscribe();
     },
     30000,
   );
 
   linuxOnlyIt(
     'rename to a non-existing dir',
-    (done) => {
-      Promise.resolve()
-        .then(() => fs.mkdirSync(root + '/rename'))
-        .then(() => fs.writeFileSync(root + '/rename/a.txt', 'hello world'))
-        .then(() => {
-          host.rename(normalize('/rename/a.txt'), normalize('/rename/b/c/d/a.txt'));
-          if (fs.existsSync(root + '/rename/b/c/d/a.txt')) {
-            const resContent = host.read(normalize('/rename/b/c/d/a.txt'));
-            const content = virtualFs.fileBufferToString(resContent);
-            expect(content).toEqual('hello world');
-          }
-        })
-        .then(done, done.fail);
+    () => {
+      fs.mkdirSync(root + '/rename');
+      fs.writeFileSync(root + '/rename/a.txt', 'hello world');
+
+      host.rename(normalize('/rename/a.txt'), normalize('/rename/b/c/d/a.txt'));
+      if (fs.existsSync(root + '/rename/b/c/d/a.txt')) {
+        const resContent = host.read(normalize('/rename/b/c/d/a.txt'));
+        const content = virtualFs.fileBufferToString(resContent);
+        expect(content).toEqual('hello world');
+      }
     },
     30000,
   );

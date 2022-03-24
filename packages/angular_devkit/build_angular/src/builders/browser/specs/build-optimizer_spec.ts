@@ -30,11 +30,8 @@ describe('Browser Builder build optimizer', () => {
   it('fails if AOT is disabled', async () => {
     const overrides = { aot: false, buildOptimizer: true };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-
-    try {
-      await run.result;
-      expect('THE ABOVE LINE SHOULD THROW').toBe('');
-    } catch {}
+    await expectAsync(run.result).toBeRejectedWithError();
+    await run.stop();
   });
 
   it('reduces bundle size', async () => {

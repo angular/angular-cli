@@ -65,6 +65,7 @@ describe('Browser Builder output path', () => {
 
     expect(await host.exists(join(host.root(), 'dist')).toPromise()).toBe(false);
     expect(await host.exists(join(host.root(), 'src-link')).toPromise()).toBe(true);
+    await run.stop();
   });
 
   it('does not allow output path to be project root', async () => {

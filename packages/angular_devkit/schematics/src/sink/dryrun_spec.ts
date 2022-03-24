@@ -18,7 +18,7 @@ const host = new virtualFs.test.TestHost({
 });
 
 describe('DryRunSink', () => {
-  it('works when creating everything', (done) => {
+  it('works when creating everything', async () => {
     const tree = new HostCreateTree(host);
 
     tree.create('/test', 'testing 1 2');
@@ -34,21 +34,20 @@ describe('DryRunSink', () => {
     expect(treeFiles).toEqual(files.map(normalize));
 
     const sink = new DryRunSink(new virtualFs.SimpleMemoryHost());
-    sink.reporter
-      .pipe(toArray())
-      .toPromise()
-      .then((infos) => {
-        expect(infos.length).toBe(4);
-        for (const info of infos) {
-          expect(info.kind).toBe('create');
-        }
-      })
-      .then(done, done.fail);
 
-    sink.commit(tree).toPromise().then(done, done.fail);
+    const [infos] = await Promise.all([
+      sink.reporter.pipe(toArray()).toPromise(),
+      sink.commit(tree).toPromise(),
+    ]);
+
+    expect(infos.length).toBe(4);
+
+    for (const info of infos) {
+      expect(info.kind).toBe('create');
+    }
   });
 
-  it('works with root', (done) => {
+  it('works with root', async () => {
     const tree = new HostTree(host);
 
     tree.create('/test', 'testing 1 2');
@@ -68,14 +67,11 @@ describe('DryRunSink', () => {
     outputHost.write(normalize('/hello'), virtualFs.stringToFileBuffer('')).subscribe();
 
     const sink = new DryRunSink(outputHost);
-    sink.reporter
-      .pipe(toArray())
-      .toPromise()
-      .then((infos) => {
-        expect(infos.map((x) => x.kind)).toEqual(['create', 'update']);
-      })
-      .then(done, done.fail);
+    const [infos] = await Promise.all([
+      sink.reporter.pipe(toArray()).toPromise(),
+      sink.commit(tree).toPromise(),
+    ]);
 
-    sink.commit(tree).toPromise().then(done, done.fail);
+    expect(infos.map((x) => x.kind)).toEqual(['create', 'update']);
   });
 });

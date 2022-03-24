@@ -57,7 +57,7 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
       const buildCount = await harness
         .execute()
         .pipe(
-          timeout(BUILD_TIMEOUT * 2),
+          timeout(BUILD_TIMEOUT),
           concatMap(async ({ result }, index) => {
             expect(result?.success).toBe(true);
 
