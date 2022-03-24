@@ -202,7 +202,6 @@
     "stylus-loader": "6.2.0",
     "symbol-observable": "4.0.0",
     "tar": "^6.1.6",
-    "temp": "^0.9.0",
     "terser": "5.12.1",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",

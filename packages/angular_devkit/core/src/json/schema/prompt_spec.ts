@@ -11,7 +11,7 @@ import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 
 describe('Prompt Provider', () => {
-  it('sets properties with answer', (done) => {
+  it('sets properties with answer', async () => {
     const registry = new CoreSchemaRegistry();
     const data: any = {};
 
@@ -19,7 +19,7 @@ describe('Prompt Provider', () => {
       return { [definitions[0].id]: true };
     });
 
-    registry
+    await registry
       .compile({
         properties: {
           test: {
@@ -34,11 +34,10 @@ describe('Prompt Provider', () => {
           expect(data.test).toBe(true);
         }),
       )
-      .toPromise()
-      .then(done, done.fail);
+      .toPromise();
   });
 
-  it('supports mixed schema references', (done) => {
+  it('supports mixed schema references', async () => {
     const registry = new CoreSchemaRegistry();
     const data: any = {};
 
@@ -50,7 +49,7 @@ describe('Prompt Provider', () => {
       };
     });
 
-    registry
+    await registry
       .compile({
         properties: {
           bool: {
@@ -96,12 +95,11 @@ describe('Prompt Provider', () => {
           expect(data.obj.deep.three).toEqual('test3-answer');
         }),
       )
-      .toPromise()
-      .then(done, done.fail);
+      .toPromise();
   });
 
   describe('with shorthand', () => {
-    it('supports message value', (done) => {
+    it('supports message value', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -112,7 +110,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -122,11 +120,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes enums', (done) => {
+    it('analyzes enums', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -138,7 +135,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -149,11 +146,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes boolean properties', (done) => {
+    it('analyzes boolean properties', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -165,7 +161,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -175,13 +171,12 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
   });
 
   describe('with longhand', () => {
-    it('supports message option', (done) => {
+    it('supports message option', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -192,7 +187,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -204,11 +199,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes enums WITH explicit list type', (done) => {
+    it('analyzes enums WITH explicit list type', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -220,7 +214,7 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: 'one' };
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -234,11 +228,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes list with true multiselect option and object items', (done) => {
+    it('analyzes list with true multiselect option and object items', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -254,7 +247,7 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: { 'value': 'one', 'label': 'one' } };
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -272,11 +265,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes list with false multiselect option and object items', (done) => {
+    it('analyzes list with false multiselect option and object items', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -292,7 +284,7 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: { 'value': 'one', 'label': 'one' } };
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -310,11 +302,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes list without multiselect option and object items', (done) => {
+    it('analyzes list without multiselect option and object items', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -330,7 +321,7 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: { 'value': 'two', 'label': 'two' } };
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -347,11 +338,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes enums WITHOUT explicit list type', (done) => {
+    it('analyzes enums WITHOUT explicit list type', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -364,7 +354,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -377,11 +367,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes enums WITHOUT explicit list type and multiselect', (done) => {
+    it('analyzes enums WITHOUT explicit list type and multiselect', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -394,7 +383,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -407,11 +396,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('analyzes boolean properties', (done) => {
+    it('analyzes boolean properties', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -423,7 +411,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -435,11 +423,10 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
 
-    it('allows prompt type override', (done) => {
+    it('allows prompt type override', async () => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -451,7 +438,7 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      registry
+      await registry
         .compile({
           properties: {
             test: {
@@ -464,8 +451,7 @@ describe('Prompt Provider', () => {
           },
         })
         .pipe(mergeMap((validator) => validator(data)))
-        .toPromise()
-        .then(done, done.fail);
+        .toPromise();
     });
   });
 });

@@ -57,7 +57,6 @@ jasmine_node_test(
     srcs = [":node_test_lib"],
     deps = [
         "@npm//chokidar",
-        "@npm//temp",
         # @node_module: ajv
         # @node_module: fast_json_stable_stringify
         # @node_module: magic_string

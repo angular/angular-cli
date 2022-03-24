@@ -156,6 +156,7 @@ describe('Browser Builder index HTML processing', () => {
         `<script src="polyfills.js" type="module"></script>` +
         `<script src="vendor.js" type="module"></script><script src="main.js" type="module"></script></body></html>`,
     );
+    await run.stop();
   });
 
   it('uses the output value from the index option longform', async () => {
@@ -202,6 +203,7 @@ describe('Browser Builder index HTML processing', () => {
         `<script src="polyfills.js" type="module"></script>` +
         `<script src="vendor.js" type="module"></script><script src="main.js" type="module"></script></body></html>`,
     );
+    await run.stop();
   });
 
   it('creates subdirectories for output value from the index option longform', async () => {
@@ -248,5 +250,6 @@ describe('Browser Builder index HTML processing', () => {
         `<script src="polyfills.js" type="module"></script>` +
         `<script src="vendor.js" type="module"></script><script src="main.js" type="module"></script></body></html>`,
     );
+    await run.stop();
   });
 });

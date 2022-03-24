@@ -62,5 +62,7 @@ describe('Browser Builder resolve json module', () => {
         take(2),
       )
       .toPromise();
+
+    await run.stop();
   });
 });

@@ -7,8 +7,9 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { debounceTime, take, tap, timeout } from 'rxjs/operators';
 import { createArchitect, host } from '../../../testing/test-utils';
+import { BUILD_TIMEOUT } from '../index';
 
 describe('Browser Builder poll', () => {
   const target = { project: 'app', target: 'build' };
@@ -21,13 +22,14 @@ describe('Browser Builder poll', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('works', async () => {
-    const overrides = { watch: true, poll: 10000 };
+    const overrides = { watch: true, poll: 4000 };
     const intervals: number[] = [];
     let startTime: number | undefined;
 
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
+        timeout(BUILD_TIMEOUT),
         // Debounce 1s, otherwise changes are too close together and polling doesn't work.
         debounceTime(1000),
         tap((buildEvent) => {
@@ -46,5 +48,7 @@ describe('Browser Builder poll', () => {
     const median = intervals[Math.trunc(intervals.length / 2)];
     expect(median).toBeGreaterThan(3000);
     expect(median).toBeLessThan(12000);
+
+    await run.stop();
   });
 });

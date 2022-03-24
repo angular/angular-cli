@@ -65,7 +65,7 @@ describe('Browser Builder lazy modules', () => {
 
       const { files } = await browserBuild(architect, host, target, { aot: true });
       const data = await files['src_app_lazy_lazy_module_ts.js'];
-      expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
+      expect(data).not.toBeUndefined();
       expect(data).toContain('LazyModule.ɵmod');
     });
   });
@@ -85,7 +85,8 @@ describe('Browser Builder lazy modules', () => {
       const run = await architect.scheduleTarget(target, {}, { logger });
       const output = await run.result;
       expect(output.success).toBe(false);
-      expect(hasMissingModuleError(logs.join())).toBe(true, 'Should show missing module error');
+      expect(hasMissingModuleError(logs.join())).toBeTrue();
+      await run.stop();
     });
 
     it('should show error when lazy route is invalid on watch mode AOT', async () => {
@@ -98,7 +99,7 @@ describe('Browser Builder lazy modules', () => {
       const run = await architect.scheduleTarget(target, overrides);
       await run.output
         .pipe(
-          debounceTime(3000),
+          debounceTime(1500),
           tap((buildEvent) => {
             buildNumber++;
             switch (buildNumber) {

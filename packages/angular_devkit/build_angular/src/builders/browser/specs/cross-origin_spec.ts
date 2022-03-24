@@ -99,5 +99,6 @@ describe('Browser Builder crossOrigin', () => {
     const fileName = join(normalize(output.outputPath), 'runtime.js');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     expect(content).toContain('script.crossOrigin = "use-credentials"');
+    await run.stop();
   });
 });

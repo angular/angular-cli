@@ -63,7 +63,6 @@ jasmine_node_test(
         "@npm//pidtree",
         "@npm//pidusage",
         "@npm//source-map",
-        "@npm//temp",
         "@npm//tree-kill",
         "@npm//yargs-parser",
     ],

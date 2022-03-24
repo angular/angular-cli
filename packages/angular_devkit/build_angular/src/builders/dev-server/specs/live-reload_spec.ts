@@ -11,7 +11,7 @@ import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
 import { createProxyServer } from 'http-proxy';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { debounceTime, switchMap, take } from 'rxjs/operators';
+import { debounceTime, finalize, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,7 +131,6 @@ describe('Dev Server Builder live-reload', () => {
   let browser: Browser;
   let page: Page;
   let runs: BuilderRun[];
-  let proxy: ProxyInstance | undefined;
 
   beforeAll(async () => {
     browser = await puppeteer.launch({
@@ -164,8 +163,6 @@ describe('Dev Server Builder live-reload', () => {
   });
 
   afterEach(async () => {
-    proxy?.server.close();
-    proxy = undefined;
     await host.restore().toPromise();
     await page.close();
     await Promise.all(runs.map((r) => r.stop()));
@@ -227,6 +224,9 @@ describe('Dev Server Builder live-reload', () => {
           buildCount++;
         }),
         take(2),
+        finalize(() => {
+          proxy?.server.close();
+        }),
       )
       .toPromise();
   });
@@ -258,6 +258,9 @@ describe('Dev Server Builder live-reload', () => {
           buildCount++;
         }),
         take(2),
+        finalize(() => {
+          proxy?.server.close();
+        }),
       )
       .toPromise();
   });
