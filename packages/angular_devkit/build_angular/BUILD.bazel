@@ -184,16 +184,17 @@ ts_library(
     testonly = True,
     srcs = glob(
         include = [
-            "plugins/**/*_spec.ts",
-            "src/utils/**/*_spec.ts",
-            "src/babel/**/*_spec.ts",
-            "src/angular-cli-files/**/*_spec.ts",
+            "src/**/*_spec.ts",
+        ],
+        exclude = [
+            "src/builders/**/*_spec.ts",
         ],
     ),
     data = glob(["test/**/*"]),
     # strict_checks = False,
     deps = [
         ":build_angular",
+        ":build_angular_test_utils",
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "@npm//prettier",
@@ -249,6 +250,9 @@ ts_library(
             "src/test-utils.ts",
             "src/testing/**/*.ts",
             "src/**/tests/*.ts",
+        ],
+        exclude = [
+            "src/testing/**/*_spec.ts",
         ],
     ),
     data = glob(["test/**/*"]),
