@@ -29,10 +29,10 @@
     "copy-webpack-plugin": "10.2.4",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
-    "esbuild-wasm": "0.14.27",
+    "esbuild-wasm": "0.14.28",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
-    "inquirer": "8.2.1",
+    "inquirer": "8.2.2",
     "jsonc-parser": "3.0.0",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.2",
@@ -70,7 +70,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.27"
+    "esbuild": "0.14.28"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
