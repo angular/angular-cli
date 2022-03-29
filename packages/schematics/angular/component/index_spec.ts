@@ -397,4 +397,27 @@ describe('Component Schematic', () => {
     );
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
   });
+
+  it('should respect templateUrl when style=none and changeDetection=OnPush', async () => {
+    const options = { ...defaultOptions, style: Style.None, changeDetection: 'OnPush' };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).not.toMatch(/styleUrls: /);
+    expect(content).toMatch(/templateUrl: '.\/foo.component.html',\n/);
+    expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
+  });
+
+  it('should respect inlineTemplate when style=none and changeDetection=OnPush', async () => {
+    const options = {
+      ...defaultOptions,
+      style: Style.None,
+      changeDetection: 'OnPush',
+      inlineTemplate: true,
+    };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).not.toMatch(/styleUrls: /);
+    expect(content).toMatch(/template: `(\n(.|)*){3}\n\s*`,\n/);
+    expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
+  });
 });
