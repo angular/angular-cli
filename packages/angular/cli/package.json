@@ -11,9 +11,6 @@
     "angular-cli",
     "Angular CLI"
   ],
-  "scripts": {
-    "postinstall": "node ./bin/postinstall/script.js"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"

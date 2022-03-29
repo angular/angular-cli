@@ -250,26 +250,26 @@ export async function createAnalytics(
   }
 
   let config = globalConfig;
-  // Not disabled globally, check locally.
-  if (workspace) {
-    let localConfig = await getAnalytics('local');
-    if (localConfig === undefined) {
+  // Not disabled globally, check locally or not set globally and command is run outside of workspace example: `ng new`
+  if (workspace || globalConfig === undefined) {
+    const level = workspace ? 'local' : 'global';
+    let localOrGlobalConfig = await getAnalytics(level);
+    if (localOrGlobalConfig === undefined) {
       if (!skipPrompt) {
-        // local is not unset, prompt user.
-
+        // config is unset, prompt user.
         // TODO: This should honor the `no-interactive` option.
         // It is currently not an `ng` option but rather only an option for specific commands.
         // The concept of `ng`-wide options are needed to cleanly handle this.
-        await promptAnalytics(false);
-        localConfig = await getAnalytics('local');
+        await promptAnalytics(!workspace /** global */);
+        localOrGlobalConfig = await getAnalytics(level);
       }
     }
 
-    if (localConfig instanceof analytics.NoopAnalytics) {
-      return localConfig;
-    } else if (localConfig) {
+    if (localOrGlobalConfig instanceof analytics.NoopAnalytics) {
+      return localOrGlobalConfig;
+    } else if (localOrGlobalConfig) {
       // Favor local settings over global when defined.
-      config = localConfig;
+      config = localOrGlobalConfig;
     }
   }
 
