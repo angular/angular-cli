@@ -6,15 +6,15 @@ import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }
     <p>
       <%= dasherize(name) %> works!
     </p>
-  `,<% } else { %>
-  templateUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.html',<% } if(inlineStyle) { %>
+  `<% } else { %>
+  templateUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.html'<% } if(inlineStyle) { %>,
   styles: [<% if(displayBlock){ %>
     `
       :host {
         display: block;
       }
     `<% } %>
-  ]<% } else if (style !== 'none') { %>
+  ]<% } else if (style !== 'none') { %>,
   styleUrls: ['./<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.<%= style %>']<% } %><% if(!!viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
