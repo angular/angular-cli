@@ -64,8 +64,14 @@ yarn_install(
         "//:.yarn/releases/yarn-1.22.17.cjs",
         "//:.yarnrc",
     ],
+    # Currently disabled due to:
+    #  1. Missing Windows support currently.
+    #  2. Incompatibilites with the `ts_library` rule.
     exports_directories_only = False,
     package_json = "//:package.json",
+    # We prefer to symlink the `node_modules` to only maintain a single install.
+    # See https://github.com/angular/dev-infra/pull/446#issuecomment-1059820287 for details.
+    symlink_node_modules = True,
     yarn = "//:.yarn/releases/yarn-1.22.17.cjs",
     yarn_lock = "//:yarn.lock",
 )
