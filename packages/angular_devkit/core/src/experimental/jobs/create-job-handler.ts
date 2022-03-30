@@ -8,7 +8,7 @@
 
 import { Observable, Observer, Subject, Subscription, from, isObservable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { BaseException } from '../../exception/index';
+import { BaseException } from '../../exception';
 import { JsonValue } from '../../json/index';
 import { LoggerApi } from '../../logger';
 import { isPromise } from '../../utils/index';
@@ -34,7 +34,7 @@ export class ChannelAlreadyExistException extends BaseException {
 export interface SimpleJobHandlerContext<
   A extends JsonValue,
   I extends JsonValue,
-  O extends JsonValue
+  O extends JsonValue,
 > extends JobHandlerContext<A, I, O> {
   createChannel: (name: string) => Observer<JsonValue>;
   input: Observable<I>;

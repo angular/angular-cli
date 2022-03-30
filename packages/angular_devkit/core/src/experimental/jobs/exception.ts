@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseException } from '../../exception/index';
+import { BaseException } from '../../exception';
 import { JobName } from './api';
 
 export class JobNameAlreadyRegisteredException extends BaseException {
