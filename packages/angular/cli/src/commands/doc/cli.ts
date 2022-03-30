@@ -28,7 +28,7 @@ export class DocCommandModule
   aliases = ['d'];
   describe =
     'Opens the official Angular documentation (angular.io) in a browser, and searches for a given keyword.';
-  longDescriptionPath?: string | undefined;
+  longDescriptionPath?: string;
 
   builder(localYargs: Argv): Argv<DocCommandArgs> {
     return localYargs

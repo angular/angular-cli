@@ -17,19 +17,19 @@ export class E2eCommandModule
   multiTarget = true;
   override missingErrorTarget = tags.stripIndents`
   Cannot find "e2e" target for the specified project.
-  
+
   You should add a package that implements end-to-end testing capabilities.
-  
+
   For example:
     Cypress: ng add @cypress/schematic
     Nightwatch: ng add @nightwatch/schematics
     WebdriverIO: ng add @wdio/schematics
-  
+
   More options will be added to the list as they become available.
   `;
 
   command = 'e2e [project]';
   aliases = ['e'];
   describe = 'Builds and serves an Angular application, then runs end-to-end tests.';
-  longDescriptionPath?: string | undefined;
+  longDescriptionPath?: string;
 }
