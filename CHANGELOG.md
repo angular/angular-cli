@@ -1,3 +1,98 @@
+<a name="14.0.0-next.7"></a>
+
+# 14.0.0-next.7 (2022-03-30)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- Reflect metadata polyfill is no longer automatically provided in JIT mode
+  Reflect metadata support is not required by Angular in JIT applications compiled by the CLI.
+  Applications built in AOT mode did not and will continue to not provide the polyfill.
+  For the majority of applications, the reflect metadata polyfill removal should have no effect.
+  However, if an application uses JIT mode and also uses the previously polyfilled reflect metadata JavaScript APIs, the polyfill will need to be manually added to the application after updating.
+  To replicate the previous behavior, the `core-js` package should be manually installed and the `import 'core-js/proposals/reflect-metadata';` statement should be added to the application's `polyfills.ts` file.
+
+## Deprecations
+
+### @angular/cli
+
+- The `defaultCollection` workspace option has been deprecated in favor of `schematicCollections`.
+
+  Before
+
+  ```json
+  "defaultCollection": "@angular/material"
+  ```
+
+  After
+
+  ```json
+  "schematicCollections": ["@angular/material"]
+  ```
+
+- The `defaultProject` workspace option has been deprecated. The project to use will be determined from the current working directory.
+
+### @angular-devkit/core
+
+- - `ContentHasMutatedException`, `InvalidUpdateRecordException`, `UnimplementedException` and `MergeConflictException` symbol from `@angular-devkit/core` have been deprecated in favor of the symbol from `@angular-devkit/schematics`.
+  - `UnsupportedPlatformException` - A custom error exception should be created instead.
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [e5bf35ea3](https://github.com/angular/angular-cli/commit/e5bf35ea3061a3e532aa85df44551107e62e24c5) | feat | add `ng cache` command                                                        |
+| [366cabc66](https://github.com/angular/angular-cli/commit/366cabc66c3dd836e2fdfea8dad6c4c7c2096b1d) | feat | add support for multiple schematics collections                               |
+| [036327e9c](https://github.com/angular/angular-cli/commit/036327e9ca838f9ef3f117fbd18949d9d357e68d) | feat | deprecated `defaultProject` option                                            |
+| [8e66c9188](https://github.com/angular/angular-cli/commit/8e66c9188be827380e5acda93c7e21fae718b9ce) | fix  | `ng g` show descrption from `collection.json` if not present in `schema.json` |
+| [09f8659ce](https://github.com/angular/angular-cli/commit/09f8659cedcba70903140d0c3eb5d0e10ebb506c) | fix  | display package manager during `ng update`                                    |
+| [5a8bdeb43](https://github.com/angular/angular-cli/commit/5a8bdeb434c7561334bfc8865ed279110a44bd93) | fix  | hide private schematics from `ng g` help output                               |
+| [8a396de6a](https://github.com/angular/angular-cli/commit/8a396de6a8a58347d2201a43d7f5101f94f20e89) | fix  | print entire config when no positional args are provided to `ng config`       |
+| [efc3c3225](https://github.com/angular/angular-cli/commit/efc3c32257a65caf36999dc34cadc41eedcbf323) | fix  | remove analytics prompt postinstall script                                    |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------- |
+| [e49220fba](https://github.com/angular/angular-cli/commit/e49220fba0d158be0971989e26eb199ec02fa113) | feat | add migratiom to remove `defaultProject` in workspace config                                      |
+| [09a71bab6](https://github.com/angular/angular-cli/commit/09a71bab6044e517319f061dbd4555ce57fe6485) | fix  | Consolidated setup with a single `beforeEach()`                                                   |
+| [a5e99762e](https://github.com/angular/angular-cli/commit/a5e99762ef0bb05a23823d4923a2863e0b232ec9) | fix  | fix extra comma added when use --change-detection=onPush and --style=none to generate a component |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [371da23be](https://github.com/angular/angular-cli/commit/371da23be0d0b1fd880d93c68049fcac97685120) | fix  | add `node_modules` prefix to excludes RegExp   |
+| [2ab77429b](https://github.com/angular/angular-cli/commit/2ab77429bb213a515a2334ff6c577be561117108) | fix  | allow Workers in Stackblitz                    |
+| [fac9cca66](https://github.com/angular/angular-cli/commit/fac9cca66bef73ce403314609a51e63a2764ccbe) | fix  | don't override asset info when updating assets |
+| [966d25b55](https://github.com/angular/angular-cli/commit/966d25b55eeb6cb84eaca183b30e7d3b0d0a2188) | fix  | remove unneeded JIT reflect metadata polyfill  |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type     | Description                                          |
+| --------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------- |
+| [455aeea12](https://github.com/angular/angular-cli/commit/455aeea12d8509a526a28cf126899e60c4a21cef) | fix      | add Angular CLI major version as analytics dimension |
+| [c5b3e9299](https://github.com/angular/angular-cli/commit/c5b3e9299130132aecfa19219405e1964d0c5443) | refactor | deprecate unused exception classes                   |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [c9c781c7d](https://github.com/angular/angular-cli/commit/c9c781c7d5f3c6de780912fd7c624a457e6da14c) | feat | add parameter to `listSchematicNames` to allow returning hidden schematics. |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [0c344259d](https://github.com/angular/angular-cli/commit/0c344259dcdc10a35840151bfe3ae1b27f9b53ff) | fix  | update peer dependency to reflect TS 4.6 support |
+
+## Special Thanks
+
+Adrien Crivelli, Alan Agius, Charles Lyding, Doug Parker, Paul Gschwendtner, Tobias Speicher, alkavats1 and gauravsoni119
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.1"></a>
 
 # 13.3.1 (2022-03-30)
