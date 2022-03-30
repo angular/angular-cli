@@ -1,3 +1,51 @@
+<a name="13.3.1"></a>
+
+# 13.3.1 (2022-03-30)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------- |
+| [cf3cb2ecf](https://github.com/angular/angular-cli/commit/cf3cb2ecf9ca47a984c4272f0094f2a1c68c7dfe) | fix  | fix extra comma added when use --change-detection=onPush and --style=none to generate a component |
+
+### @angular-devkit/architect-cli
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [9f8d4dea0](https://github.com/angular/angular-cli/commit/9f8d4dea0449e236de7b928c5cc97e597a6f5844) | fix  | update `minimist` to `1.2.6` |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [ba3486de9](https://github.com/angular/angular-cli/commit/ba3486de94e733addf0ac17706b806dd813c9046) | fix  | update `minimist` to `1.2.6` |
+
+### @angular-devkit/benchmark
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [1f7fa6970](https://github.com/angular/angular-cli/commit/1f7fa6970e8cddb2ba0c42df0e048a57292b7fe8) | fix  | update `minimist` to `1.2.6` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [293526c31](https://github.com/angular/angular-cli/commit/293526c31db9f0becc0ffc2d60999c80afa8a308) | fix  | add `node_modules` prefix to excludes RegExp   |
+| [58ed97410](https://github.com/angular/angular-cli/commit/58ed97410b760909d523b05c3b4a06364e3c9a0f) | fix  | allow Workers in Stackblitz                    |
+| [4cd2331d3](https://github.com/angular/angular-cli/commit/4cd2331d34e2a9ab2ed78edf0284dbfefef511a5) | fix  | don't override asset info when updating assets |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [c7c75820f](https://github.com/angular/angular-cli/commit/c7c75820f1d4ef827336626b78c8c3e5c0bd1f00) | fix  | add Angular CLI major version as analytics dimension |
+
+## Special Thanks
+
+Alan Agius and gauravsoni119
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.0"></a>
 
 # 13.3.0 (2022-03-16)
