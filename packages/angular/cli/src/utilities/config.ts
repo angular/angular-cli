@@ -7,7 +7,7 @@
  */
 
 import { json, workspaces } from '@angular-devkit/core';
-import { existsSync, readFileSync, statSync, writeFileSync } from 'fs';
+import { existsSync, promises as fs, writeFileSync } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { PackageManager } from '../../lib/config/workspace-schema';
@@ -20,22 +20,26 @@ function isJsonObject(value: json.JsonValue | undefined): value is json.JsonObje
 
 function createWorkspaceHost(): workspaces.WorkspaceHost {
   return {
-    async readFile(path) {
-      return readFileSync(path, 'utf-8');
+    readFile(path) {
+      return fs.readFile(path, 'utf-8');
     },
     async writeFile(path, data) {
-      writeFileSync(path, data);
+      await fs.writeFile(path, data);
     },
     async isDirectory(path) {
       try {
-        return statSync(path).isDirectory();
+        const stats = await fs.stat(path);
+
+        return stats.isDirectory();
       } catch {
         return false;
       }
     },
     async isFile(path) {
       try {
-        return statSync(path).isFile();
+        const stats = await fs.stat(path);
+
+        return stats.isFile();
       } catch {
         return false;
       }
