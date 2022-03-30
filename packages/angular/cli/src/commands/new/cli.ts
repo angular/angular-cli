@@ -18,7 +18,6 @@ import {
   SchematicsCommandArgs,
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
-import { ensureCompatibleNpm } from '../../utilities/package-manager';
 import { VERSION } from '../../utilities/version';
 
 interface NewCommandArgs extends SchematicsCommandArgs {
@@ -75,7 +74,7 @@ export class NewCommandModule
       !schematicOptions.skipInstall &&
       (schematicOptions.packageManager === undefined || schematicOptions.packageManager === 'npm')
     ) {
-      await ensureCompatibleNpm(this.context.root);
+      this.context.packageManager.ensureCompatibility();
     }
 
     return this.runSchematic({

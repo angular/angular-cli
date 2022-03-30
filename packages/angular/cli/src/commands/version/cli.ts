@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { execSync } from 'child_process';
 import nodeModule from 'module';
 import { resolve } from 'path';
 import { Argv } from 'yargs';
@@ -49,10 +48,10 @@ export class VersionCommandModule extends CommandModule implements CommandModule
   }
 
   async run(): Promise<void> {
-    const logger = this.context.logger;
+    const { packageManager, logger, root } = this.context;
     const localRequire = nodeModule.createRequire(resolve(__filename, '../../../'));
     // Trailing slash is used to allow the path to be treated as a directory
-    const workspaceRequire = nodeModule.createRequire(this.context.root + '/');
+    const workspaceRequire = nodeModule.createRequire(root + '/');
 
     const cliPackage: PartialPackageInfo = localRequire('./package.json');
     let workspacePackage: PartialPackageInfo | undefined;
@@ -119,7 +118,7 @@ export class VersionCommandModule extends CommandModule implements CommandModule
       `
       Angular CLI: ${ngCliVersion}
       Node: ${process.versions.node}${unsupportedNodeVersion ? ' (Unsupported)' : ''}
-      Package Manager: ${this.getPackageManagerVersion()}
+      Package Manager: ${packageManager.name} ${packageManager.version ?? '<error>'} 
       OS: ${process.platform} ${process.arch}
 
       Angular: ${angularCoreVersion}
@@ -185,25 +184,5 @@ export class VersionCommandModule extends CommandModule implements CommandModule
     }
 
     return '<error>';
-  }
-
-  private getPackageManagerVersion(): string {
-    try {
-      const manager = this.context.packageManager;
-      const version = execSync(`${manager} --version`, {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-        env: {
-          ...process.env,
-          //  NPM updater notifier will prevents the child process from closing until it timeout after 3 minutes.
-          NO_UPDATE_NOTIFIER: '1',
-          NPM_CONFIG_UPDATE_NOTIFIER: 'false',
-        },
-      }).trim();
-
-      return `${manager} ${version}`;
-    } catch {
-      return '<error>';
-    }
   }
 }

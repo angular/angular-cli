@@ -29,7 +29,7 @@ import { UpdateCommandModule } from '../commands/update/cli';
 import { VersionCommandModule } from '../commands/version/cli';
 import { colors } from '../utilities/color';
 import { AngularWorkspace, getWorkspace } from '../utilities/config';
-import { getPackageManager } from '../utilities/package-manager';
+import { PackageManagerUtils } from '../utilities/package-manager';
 import { CommandContext, CommandModuleError, CommandScope } from './command-module';
 import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
@@ -80,14 +80,13 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   }
 
   const root = workspace?.basePath ?? process.cwd();
-
   const context: CommandContext = {
     globalConfiguration,
     workspace,
     logger,
     currentDirectory: process.cwd(),
-    root: workspace?.basePath ?? process.cwd(),
-    packageManager: await getPackageManager(workspace?.basePath ?? process.cwd()),
+    root,
+    packageManager: new PackageManagerUtils({ globalConfiguration, workspace, root }),
     args: {
       positional: positional.map((v) => v.toString()),
       options: {

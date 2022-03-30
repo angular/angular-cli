@@ -24,8 +24,6 @@ import {
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
 import { colors } from '../../utilities/color';
-import { installPackage, installTempPackage } from '../../utilities/install-package';
-import { ensureCompatibleNpm } from '../../utilities/package-manager';
 import {
   NgAddSaveDependency,
   PackageManifest,
@@ -107,9 +105,9 @@ export class AddCommandModule
 
   // eslint-disable-next-line max-lines-per-function
   async run(options: Options<AddCommandArgs> & OtherOptions): Promise<number | void> {
-    const { root, logger, packageManager } = this.context;
+    const { logger, packageManager } = this.context;
     const { verbose, registry, collection, skipConfirmation } = options;
-    await ensureCompatibleNpm(root);
+    packageManager.ensureCompatibility();
 
     let packageIdentifier;
     try {
@@ -137,8 +135,8 @@ export class AddCommandModule
     const spinner = new Spinner();
 
     spinner.start('Determining package manager...');
-    const usingYarn = packageManager === PackageManager.Yarn;
-    spinner.info(`Using package manager: ${colors.grey(packageManager)}`);
+    const usingYarn = packageManager.name === PackageManager.Yarn;
+    spinner.info(`Using package manager: ${colors.grey(packageManager.name)}`);
 
     if (packageIdentifier.name && packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
       // only package name provided; search for viable version
@@ -270,30 +268,28 @@ export class AddCommandModule
     if (savePackage === false) {
       // Temporary packages are located in a different directory
       // Hence we need to resolve them using the temp path
-      const { status, tempNodeModules } = await installTempPackage(
+      const { success, tempNodeModules } = await packageManager.installTemp(
         packageIdentifier.raw,
-        packageManager,
         registry ? [`--registry="${registry}"`] : undefined,
       );
       const resolvedCollectionPath = require.resolve(join(collectionName, 'package.json'), {
         paths: [tempNodeModules],
       });
 
-      if (status !== 0) {
-        return status;
+      if (!success) {
+        return 1;
       }
 
       collectionName = dirname(resolvedCollectionPath);
     } else {
-      const status = await installPackage(
+      const success = await packageManager.install(
         packageIdentifier.raw,
-        packageManager,
         savePackage,
         registry ? [`--registry="${registry}"`] : undefined,
       );
 
-      if (status !== 0) {
-        return status;
+      if (!success) {
+        return 1;
       }
     }
 
