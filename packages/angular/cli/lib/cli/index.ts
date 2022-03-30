@@ -11,10 +11,8 @@ import { format } from 'util';
 import { CommandModuleError } from '../../src/command-builder/command-module';
 import { runCommand } from '../../src/command-builder/command-runner';
 import { colors, removeColor } from '../../src/utilities/color';
-import { AngularWorkspace, getWorkspaceRaw } from '../../src/utilities/config';
 import { ngDebug } from '../../src/utilities/environment-options';
 import { writeErrorToLogFile } from '../../src/utilities/log-file';
-import { findWorkspaceFile } from '../../src/utilities/project';
 
 export { VERSION } from '../../src/utilities/version';
 
@@ -51,30 +49,8 @@ export default async function (options: { testing?: boolean; cliArgs: string[] }
     logger.error(format(...args));
   };
 
-  let workspace;
-  const workspaceFile = findWorkspaceFile();
-  if (workspaceFile === null) {
-    const [, localPath] = getWorkspaceRaw('local');
-    if (localPath !== null) {
-      logger.fatal(
-        `An invalid configuration file was found ['${localPath}'].` +
-          ' Please delete the file before running the command.',
-      );
-
-      return 1;
-    }
-  } else {
-    try {
-      workspace = await AngularWorkspace.load(workspaceFile);
-    } catch (e) {
-      logger.fatal(`Unable to read workspace file '${workspaceFile}': ${e.message}`);
-
-      return 1;
-    }
-  }
-
   try {
-    return await runCommand(options.cliArgs, logger, workspace);
+    return await runCommand(options.cliArgs, logger);
   } catch (err) {
     if (err instanceof CommandModuleError) {
       logger.fatal(`Error: ${err.message}`);

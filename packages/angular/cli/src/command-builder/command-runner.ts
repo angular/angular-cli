@@ -28,7 +28,7 @@ import { TestCommandModule } from '../commands/test/cli';
 import { UpdateCommandModule } from '../commands/update/cli';
 import { VersionCommandModule } from '../commands/version/cli';
 import { colors } from '../utilities/color';
-import { AngularWorkspace } from '../utilities/config';
+import { AngularWorkspace, getWorkspace } from '../utilities/config';
 import { getPackageManager } from '../utilities/package-manager';
 import { CommandContext, CommandModuleError, CommandScope } from './command-module';
 import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
@@ -57,11 +57,7 @@ const COMMANDS = [
 
 const yargsParser = Parser as unknown as typeof Parser.default;
 
-export async function runCommand(
-  args: string[],
-  logger: logging.Logger,
-  workspace: AngularWorkspace | undefined,
-): Promise<number> {
+export async function runCommand(args: string[], logger: logging.Logger): Promise<number> {
   const {
     $0,
     _: positional,
@@ -70,7 +66,23 @@ export async function runCommand(
     ...rest
   } = yargsParser(args, { boolean: ['help', 'json-help'], alias: { 'collection': 'c' } });
 
+  let workspace: AngularWorkspace | undefined;
+  let globalConfiguration: AngularWorkspace | undefined;
+  try {
+    [workspace, globalConfiguration] = await Promise.all([
+      getWorkspace('local'),
+      getWorkspace('global'),
+    ]);
+  } catch (e) {
+    logger.fatal(e.message);
+
+    return 1;
+  }
+
+  const root = workspace?.basePath ?? process.cwd();
+
   const context: CommandContext = {
+    globalConfiguration,
     workspace,
     logger,
     currentDirectory: process.cwd(),
