@@ -150,22 +150,20 @@ export class AngularWorkspace {
   }
 }
 
-const cachedWorkspaces = new Map<string, AngularWorkspace | null>();
-
+const cachedWorkspaces = new Map<string, AngularWorkspace | undefined>();
 export async function getWorkspace(
   level: 'local' | 'global' = 'local',
-): Promise<AngularWorkspace | null> {
-  const cached = cachedWorkspaces.get(level);
-  if (cached !== undefined) {
-    return cached;
+): Promise<AngularWorkspace | undefined> {
+  if (cachedWorkspaces.has(level)) {
+    return cachedWorkspaces.get(level);
   }
 
   const configPath = level === 'local' ? projectFilePath() : globalFilePath();
 
   if (!configPath) {
-    cachedWorkspaces.set(level, null);
+    cachedWorkspaces.set(level, undefined);
 
-    return null;
+    return undefined;
   }
 
   try {

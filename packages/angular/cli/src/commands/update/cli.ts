@@ -8,12 +8,12 @@
 
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
-import { execSync } from 'child_process';
-import { existsSync, promises as fsPromises } from 'fs';
+import { execSync, spawnSync } from 'child_process';
+import { existsSync, promises as fs } from 'fs';
 import npa from 'npm-package-arg';
 import pickManifest from 'npm-pick-manifest';
 import * as path from 'path';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import * as semver from 'semver';
 import { Argv } from 'yargs';
 import { PackageManager } from '../../../lib/config/workspace-schema';
@@ -27,9 +27,7 @@ import { SchematicEngineHost } from '../../command-builder/utilities/schematic-e
 import { subscribeToWorkflow } from '../../command-builder/utilities/schematic-workflow';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
-import { installAllPackages, runTempPackageBin } from '../../utilities/install-package';
 import { writeErrorToLogFile } from '../../utilities/log-file';
-import { ensureCompatibleNpm } from '../../utilities/package-manager';
 import {
   PackageIdentifier,
   PackageManifest,
@@ -167,7 +165,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
   async run(options: Options<UpdateCommandArgs>): Promise<number | void> {
     const { logger, packageManager } = this.context;
 
-    await ensureCompatibleNpm(this.context.root);
+    packageManager.ensureCompatibility();
 
     // Check if the current installed CLI version is older than the latest compatible version.
     if (!disableVersionCheck) {
@@ -183,11 +181,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
             `Installing a temporary Angular CLI versioned ${cliVersionToInstall} to perform the update.`,
         );
 
-        return runTempPackageBin(
-          `@angular/cli@${cliVersionToInstall}`,
-          packageManager,
-          process.argv.slice(2),
-        );
+        return this.runTempBinary(`@angular/cli@${cliVersionToInstall}`, process.argv.slice(2));
       }
     }
 
@@ -233,7 +227,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     logger.info(`Found ${rootDependencies.size} dependencies.`);
 
     const workflow = new NodeWorkflow(this.context.root, {
-      packageManager: this.context.packageManager,
+      packageManager: packageManager.name,
       packageManagerForce: options.force,
       // __dirname -> favor @schematics/update from this package
       // Otherwise, use packages from the active workspace (migrations)
@@ -252,7 +246,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           force: options.force,
           next: options.next,
           verbose: options.verbose,
-          packageManager,
+          packageManager: packageManager.name,
           packages: [],
         },
       );
@@ -681,28 +675,27 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         verbose: options.verbose,
         force: options.force,
         next: options.next,
-        packageManager: this.context.packageManager,
+        packageManager: this.context.packageManager.name,
         packages: packagesToUpdate,
       },
     );
 
     if (success) {
       try {
-        await fsPromises.rm(path.join(this.context.root, 'node_modules'), {
+        await fs.rm(path.join(this.context.root, 'node_modules'), {
           force: true,
           recursive: true,
           maxRetries: 3,
         });
       } catch {}
 
-      const result = await installAllPackages(
-        this.context.packageManager,
+      const installationSuccess = await this.context.packageManager.installAll(
         options.force ? ['--force'] : [],
         this.context.root,
       );
 
-      if (result !== 0) {
-        return result;
+      if (!installationSuccess) {
+        return 1;
       }
     }
 
@@ -891,7 +884,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       this.context.logger,
       {
         verbose,
-        usingYarn: this.context.packageManager === PackageManager.Yarn,
+        usingYarn: this.context.packageManager.name === PackageManager.Yarn,
       },
     );
 
@@ -927,6 +920,52 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     // This is important because we might end up in a scenario where locally Angular v12 is installed, updating NGRX from 11 to 12.
     // We end up using Angular ClI v13 to run the migrations if we run the migrations using the CLI installed major version + 1 logic.
     return VERSION.major;
+  }
+
+  private async runTempBinary(packageName: string, args: string[] = []): Promise<number> {
+    const { success, tempNodeModules } = await this.context.packageManager.installTemp(packageName);
+    if (!success) {
+      return 1;
+    }
+
+    // Remove version/tag etc... from package name
+    // Ex: @angular/cli@latest -> @angular/cli
+    const packageNameNoVersion = packageName.substring(0, packageName.lastIndexOf('@'));
+    const pkgLocation = join(tempNodeModules, packageNameNoVersion);
+    const packageJsonPath = join(pkgLocation, 'package.json');
+
+    // Get a binary location for this package
+    let binPath: string | undefined;
+    if (existsSync(packageJsonPath)) {
+      const content = await fs.readFile(packageJsonPath, 'utf-8');
+      if (content) {
+        const { bin = {} } = JSON.parse(content);
+        const binKeys = Object.keys(bin);
+
+        if (binKeys.length) {
+          binPath = resolve(pkgLocation, bin[binKeys[0]]);
+        }
+      }
+    }
+
+    if (!binPath) {
+      throw new Error(`Cannot locate bin for temporary package: ${packageNameNoVersion}.`);
+    }
+
+    const { status, error } = spawnSync(process.execPath, [binPath, ...args], {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NG_DISABLE_VERSION_CHECK: 'true',
+        NG_CLI_ANALYTICS: 'false',
+      },
+    });
+
+    if (status === null && error) {
+      throw error;
+    }
+
+    return status ?? 0;
   }
 }
 

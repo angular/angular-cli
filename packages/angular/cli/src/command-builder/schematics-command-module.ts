@@ -122,7 +122,7 @@ export abstract class SchematicsCommandModule
     const workflow = new NodeWorkflow(root, {
       force,
       dryRun,
-      packageManager,
+      packageManager: packageManager.name,
       // A schema registry is required to allow customizing addUndefinedDefaults
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
       packageRegistry,
