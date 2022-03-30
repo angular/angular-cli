@@ -20,7 +20,7 @@ export class AnalyticsInfoCommandModule
 {
   command = 'info';
   describe = 'Prints analytics gathering and reporting configuration in the console.';
-  longDescriptionPath?: string | undefined;
+  longDescriptionPath?: string;
 
   builder(localYargs: Argv): Argv {
     return localYargs.strict();

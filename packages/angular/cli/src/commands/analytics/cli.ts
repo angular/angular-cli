@@ -27,7 +27,7 @@ export class AnalyticsCommandModule extends CommandModule implements CommandModu
   command = 'analytics';
   describe =
     'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering';
-  longDescriptionPath?: string | undefined;
+  longDescriptionPath?: string;
 
   builder(localYargs: Argv): Argv {
     const subcommands = [
