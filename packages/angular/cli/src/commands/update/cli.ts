@@ -220,7 +220,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       }
     }
 
-    logger.info(`Using package manager: '${packageManager}'`);
+    logger.info(`Using package manager: ${colors.grey(packageManager.name)}`);
     logger.info('Collecting installed dependencies...');
 
     const rootDependencies = await getProjectDependencies(this.context.root);
