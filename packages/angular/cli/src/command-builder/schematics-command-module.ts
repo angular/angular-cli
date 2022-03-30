@@ -15,12 +15,7 @@ import {
 } from '@angular-devkit/schematics/tools';
 import type { CheckboxQuestion, Question } from 'inquirer';
 import { Argv } from 'yargs';
-import {
-  getProjectByCwd,
-  getProjectsByPath,
-  getSchematicDefaults,
-  getWorkspace,
-} from '../utilities/config';
+import { getProjectByCwd, getProjectsByPath, getSchematicDefaults } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
 import {
   CommandModule,
@@ -272,11 +267,11 @@ export abstract class SchematicsCommandModule
       return undefined;
     };
 
-    const localWorkspace = await getWorkspace('local');
-    if (localWorkspace) {
-      const project = getProjectByCwd(localWorkspace);
+    const { workspace, globalConfiguration } = this.context;
+    if (workspace) {
+      const project = getProjectByCwd(workspace);
       if (project) {
-        const value = getSchematicCollections(localWorkspace.getProjectCli(project));
+        const value = getSchematicCollections(workspace.getProjectCli(project));
         if (value) {
           this._schematicCollections = value;
 
@@ -285,10 +280,9 @@ export abstract class SchematicsCommandModule
       }
     }
 
-    const globalWorkspace = await getWorkspace('global');
     const value =
-      getSchematicCollections(localWorkspace?.getCli()) ??
-      getSchematicCollections(globalWorkspace?.getCli());
+      getSchematicCollections(workspace?.getCli()) ??
+      getSchematicCollections(globalConfiguration?.getCli());
     if (value) {
       this._schematicCollections = value;
 

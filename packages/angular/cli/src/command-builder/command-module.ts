@@ -38,6 +38,7 @@ export interface CommandContext {
   currentDirectory: string;
   root: string;
   workspace?: AngularWorkspace;
+  globalConfiguration?: AngularWorkspace;
   logger: logging.Logger;
   packageManager: PackageManager;
   /** Arguments parsed in free-from without parser configuration. */
