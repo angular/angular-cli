@@ -15,7 +15,7 @@ import {
 } from '@angular-devkit/schematics/tools';
 import type { CheckboxQuestion, Question } from 'inquirer';
 import { Argv } from 'yargs';
-import { getProjectByCwd, getProjectsByPath, getSchematicDefaults } from '../utilities/config';
+import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { isTTY } from '../utilities/tty';
 import {
   CommandModule,
@@ -364,32 +364,23 @@ export abstract class SchematicsCommandModule
       return undefined;
     }
 
-    const projectNames = getProjectsByPath(workspace, process.cwd(), workspace.basePath);
+    const projectName = getProjectByCwd(workspace);
+    if (projectName) {
+      return projectName;
+    }
 
-    if (projectNames.length === 1) {
-      return projectNames[0];
-    } else {
-      if (projectNames.length > 1) {
+    const defaultProjectName = workspace.extensions['defaultProject'];
+    if (typeof defaultProjectName === 'string' && defaultProjectName) {
+      if (!this.defaultProjectDeprecationWarningShown) {
         logger.warn(tags.oneLine`
-            Two or more projects are using identical roots.
-            Unable to determine project using current working directory.
-            Using default workspace project instead.
-          `);
-      }
-
-      const defaultProjectName = workspace.extensions['defaultProject'];
-      if (typeof defaultProjectName === 'string' && defaultProjectName) {
-        if (!this.defaultProjectDeprecationWarningShown) {
-          logger.warn(tags.oneLine`
             DEPRECATED: The 'defaultProject' workspace option has been deprecated.
             The project to use will be determined from the current working directory.
           `);
 
-          this.defaultProjectDeprecationWarningShown = true;
-        }
-
-        return defaultProjectName;
+        this.defaultProjectDeprecationWarningShown = true;
       }
+
+      return defaultProjectName;
     }
 
     return undefined;
