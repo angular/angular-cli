@@ -39,9 +39,14 @@ export class TransferSizePlugin {
             actions.push(
               brotliCompressAsync(scriptAsset.source.source())
                 .then((result) => {
-                  compilation.updateAsset(assetName, (s) => s, {
-                    estimatedTransferSize: result.length,
-                  });
+                  compilation.updateAsset(
+                    assetName,
+                    (s) => s,
+                    (assetInfo) => ({
+                      ...assetInfo,
+                      estimatedTransferSize: result.length,
+                    }),
+                  );
                 })
                 .catch((error) => {
                   compilation.warnings.push(

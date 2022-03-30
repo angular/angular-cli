@@ -71,9 +71,10 @@ export class CssOptimizerPlugin {
 
               if (cachedOutput) {
                 await this.addWarnings(compilation, cachedOutput.warnings);
-                compilation.updateAsset(name, cachedOutput.source, {
+                compilation.updateAsset(name, cachedOutput.source, (assetInfo) => ({
+                  ...assetInfo,
                   minimized: true,
-                });
+                }));
                 continue;
               }
             }
@@ -93,7 +94,10 @@ export class CssOptimizerPlugin {
             const optimizedAsset = map
               ? new SourceMapSource(code, name, map)
               : new OriginalSource(code, name);
-            compilation.updateAsset(name, optimizedAsset, { minimized: true });
+            compilation.updateAsset(name, optimizedAsset, (assetInfo) => ({
+              ...assetInfo,
+              minimized: true,
+            }));
 
             await cacheItem?.storePromise({
               source: optimizedAsset,

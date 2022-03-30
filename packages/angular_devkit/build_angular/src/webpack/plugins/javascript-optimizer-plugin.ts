@@ -123,9 +123,10 @@ export class JavaScriptOptimizerPlugin {
               >();
 
               if (cachedOutput) {
-                compilation.updateAsset(name, cachedOutput.source, {
+                compilation.updateAsset(name, cachedOutput.source, (assetInfo) => ({
+                  ...assetInfo,
                   minimized: true,
-                });
+                }));
                 continue;
               }
             }
@@ -209,7 +210,10 @@ export class JavaScriptOptimizerPlugin {
                       const optimizedAsset = map
                         ? new SourceMapSource(code, name, map)
                         : new OriginalSource(code, name);
-                      compilation.updateAsset(name, optimizedAsset, { minimized: true });
+                      compilation.updateAsset(name, optimizedAsset, (assetInfo) => ({
+                        ...assetInfo,
+                        minimized: true,
+                      }));
 
                       return cacheItem?.storePromise({
                         source: optimizedAsset,
