@@ -12,7 +12,7 @@ import * as json from './json/index';
 import * as logging from './logger/index';
 import * as workspaces from './workspace';
 
-export * from './exception/exception';
+export * from './exception';
 export * from './json/index';
 export * from './utils/index';
 export * from './virtual-fs/index';

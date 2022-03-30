@@ -189,7 +189,7 @@ export class CircularDependencyFoundException extends BaseException {
 // @public
 function classify(str: string): string;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class ContentHasMutatedException extends BaseException {
     constructor(path: string);
 }
@@ -532,7 +532,7 @@ export class InvalidPathException extends BaseException {
     constructor(path: string);
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class InvalidUpdateRecordException extends BaseException {
     constructor();
 }
@@ -1034,7 +1034,7 @@ class LoggingAnalytics implements Analytics {
 // @public (undocumented)
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class MergeConflictException extends BaseException {
     constructor(path: string);
 }
@@ -2013,7 +2013,7 @@ function trimNewlines(strings: TemplateStringsArray, ...values: any[]): string;
 // @public
 function underscore(str: string): string;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class UnimplementedException extends BaseException {
     constructor();
 }
@@ -2023,7 +2023,7 @@ export class UnknownException extends BaseException {
     constructor(message: string);
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class UnsupportedPlatformException extends BaseException {
     constructor();
 }
