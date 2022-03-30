@@ -81,7 +81,6 @@ ts_library(
         include = [
             "package.json",
             "builders.json",
-            "esbuild-check.js",
             "src/**/schema.json",
             "src/**/*.js",
             "src/**/*.html",

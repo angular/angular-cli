@@ -178,7 +178,7 @@ export class JavaScriptOptimizerPlugin {
             // Perform a single native esbuild support check.
             // This removes the need for each worker to perform the check which would
             // otherwise require spawning a separate process per worker.
-            alwaysUseWasm: !EsbuildExecutor.hasNativeSupport(),
+            alwaysUseWasm: !(await EsbuildExecutor.hasNativeSupport()),
           };
 
           // Sort scripts so larger scripts start first - worker pool uses a FIFO queue

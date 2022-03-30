@@ -6,14 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { spawnSync } from 'child_process';
 import type {
   FormatMessagesOptions,
   PartialMessage,
   TransformOptions,
   TransformResult,
 } from 'esbuild';
-import * as path from 'path';
 
 /**
  * Provides the ability to execute esbuild regardless of the current platform's support
@@ -44,23 +42,15 @@ export class EsbuildExecutor
   /**
    * Determines whether the native variant of esbuild can be used on the current platform.
    *
-   * @returns True, if the native variant of esbuild is support; False, if the WASM variant is required.
+   * @returns A promise which resolves to `true`, if the native variant of esbuild is support or `false`, if the WASM variant is required.
    */
-  static hasNativeSupport(): boolean {
+  static async hasNativeSupport(): Promise<boolean> {
     // Try to use native variant to ensure it is functional for the platform.
-    // Spawning a separate esbuild check process is used to determine if the native
-    // variant is viable. If check fails, the WASM variant is initialized instead.
-    // Attempting to call one of the native esbuild functions is not a viable test
-    // currently since esbuild spawn errors are currently not propagated through the
-    // call stack for the esbuild function. If this limitation is removed in the future
-    // then the separate process spawn check can be removed in favor of a direct function
-    // call check.
     try {
-      const { status, error } = spawnSync(process.execPath, [
-        path.join(__dirname, '../../../esbuild-check.js'),
-      ]);
+      const { formatMessages } = await import('esbuild');
+      await formatMessages([], { kind: 'error' });
 
-      return status === 0 && error === undefined;
+      return true;
     } catch {
       return false;
     }
@@ -77,7 +67,7 @@ export class EsbuildExecutor
     }
 
     // If the WASM variant was preferred at class construction or native is not supported, use WASM
-    if (this.alwaysUseWasm || !EsbuildExecutor.hasNativeSupport()) {
+    if (this.alwaysUseWasm || !(await EsbuildExecutor.hasNativeSupport())) {
       await this.useWasm();
       this.initialized = true;
 
