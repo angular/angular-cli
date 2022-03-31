@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { getSystemPath } from '@angular-devkit/core';
 import type { CompilerOptions } from '@angular/compiler-cli';
 import { AngularWebpackPlugin } from '@ngtools/webpack';
 import { ScriptTarget } from 'typescript';
@@ -59,7 +58,7 @@ export function createIvyPlugin(
   const fileReplacements: Record<string, string> = {};
   if (buildOptions.fileReplacements) {
     for (const replacement of buildOptions.fileReplacements) {
-      fileReplacements[getSystemPath(replacement.replace)] = getSystemPath(replacement.with);
+      fileReplacements[replacement.replace] = replacement.with;
     }
   }
 

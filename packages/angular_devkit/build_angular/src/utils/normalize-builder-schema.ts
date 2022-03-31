@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json, normalize } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import {
   AssetPatternClass,
   Schema as BrowserBuilderSchema,
@@ -48,14 +48,11 @@ export function normalizeBrowserSchema(
     cache: normalizeCacheOptions(metadata, workspaceRoot),
     assets: normalizeAssetPatterns(
       options.assets || [],
-      normalize(workspaceRoot),
-      normalize(projectRoot),
-      projectSourceRoot ? normalize(projectSourceRoot) : undefined,
+      workspaceRoot,
+      projectRoot,
+      projectSourceRoot,
     ),
-    fileReplacements: normalizeFileReplacements(
-      options.fileReplacements || [],
-      normalize(workspaceRoot),
-    ),
+    fileReplacements: normalizeFileReplacements(options.fileReplacements || [], workspaceRoot),
     optimization: normalizeOptimization(options.optimization),
     sourceMap: normalizedSourceMapOptions,
     preserveSymlinks:

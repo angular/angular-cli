@@ -12,7 +12,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { JsonObject, normalize } from '@angular-devkit/core';
+import { JsonObject } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { normalizeOptimization } from '../../utils';
@@ -114,8 +114,8 @@ async function _renderUniversal(
 
     if (browserOptions.serviceWorker) {
       await augmentAppWithServiceWorker(
-        normalize(projectRoot),
-        normalize(outputPath),
+        projectRoot,
+        outputPath,
         browserOptions.baseHref || '/',
         browserOptions.ngswConfigPath,
       );

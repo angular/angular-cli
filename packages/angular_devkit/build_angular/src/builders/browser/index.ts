@@ -8,7 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { logging, normalize } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
@@ -106,9 +106,9 @@ async function initialize(
   if (options.assets?.length && !adjustedOptions.assets?.length) {
     normalizeAssetPatterns(
       options.assets,
-      normalize(context.workspaceRoot),
-      normalize(projectRoot),
-      projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
+      context.workspaceRoot,
+      projectRoot,
+      projectSourceRoot,
     ).forEach(({ output }) => {
       if (output.startsWith('..')) {
         throw new Error('An asset cannot be written to a location outside of the output path.');
@@ -268,9 +268,9 @@ export function buildWebpackBrowser(
                     await copyAssets(
                       normalizeAssetPatterns(
                         options.assets,
-                        normalize(context.workspaceRoot),
-                        normalize(projectRoot),
-                        projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
+                        context.workspaceRoot,
+                        projectRoot,
+                        projectSourceRoot,
                       ),
                       Array.from(outputPaths.values()),
                       context.workspaceRoot,
@@ -347,8 +347,8 @@ export function buildWebpackBrowser(
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
                       await augmentAppWithServiceWorker(
-                        normalize(projectRoot),
-                        normalize(outputPath),
+                        projectRoot,
+                        outputPath,
                         getLocaleBaseHref(i18n, locale) || options.baseHref || '/',
                         options.ngswConfigPath,
                       );

@@ -7,9 +7,8 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import { getSystemPath, join, normalize } from '@angular-devkit/core';
 import { Config, ConfigOptions } from 'karma';
-import { resolve as fsResolve } from 'path';
+import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import { Configuration } from 'webpack';
@@ -119,12 +118,13 @@ export function execute(
         }
 
         const projectMetadata = await context.getProjectMetadata(projectName);
-        const projectSourceRoot = getSystemPath(
-          join(
-            normalize(context.workspaceRoot),
-            (projectMetadata.root as string | undefined) ?? '',
-            (projectMetadata.sourceRoot as string | undefined) ?? '',
-          ),
+        const projectRoot = path.join(
+          context.workspaceRoot,
+          (projectMetadata.root as string | undefined) ?? '',
+        );
+        const projectSourceRoot = path.join(
+          projectRoot,
+          (projectMetadata.sourceRoot as string | undefined) ?? '',
         );
 
         const files = await findTests(options.include, context.workspaceRoot, projectSourceRoot);
@@ -144,7 +144,7 @@ export function execute(
         }
 
         rules.unshift({
-          test: fsResolve(context.workspaceRoot, options.main),
+          test: path.resolve(context.workspaceRoot, options.main),
           use: {
             // cannot be a simple path as it differs between environments
             loader: SingleTestTransformLoader,
@@ -163,7 +163,7 @@ export function execute(
       };
 
       const config = await karma.config.parseConfig(
-        fsResolve(context.workspaceRoot, options.karmaConfig),
+        path.resolve(context.workspaceRoot, options.karmaConfig),
         transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
         { promiseConfig: true, throwErrors: true },
       );

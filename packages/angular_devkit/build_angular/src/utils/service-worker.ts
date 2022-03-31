@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Path, getSystemPath, normalize } from '@angular-devkit/core';
 import type { Config, Filesystem } from '@angular/service-worker/config';
 import * as crypto from 'crypto';
 import { createReadStream, promises as fs, constants as fsConstants } from 'fs';
@@ -62,17 +61,15 @@ class CliFilesystem implements Filesystem {
 }
 
 export async function augmentAppWithServiceWorker(
-  appRoot: Path,
-  outputPath: Path,
+  appRoot: string,
+  outputPath: string,
   baseHref: string,
   ngswConfigPath?: string,
 ): Promise<void> {
-  const distPath = getSystemPath(normalize(outputPath));
-
   // Determine the configuration file path
   const configPath = ngswConfigPath
-    ? getSystemPath(normalize(ngswConfigPath))
-    : path.join(getSystemPath(appRoot), 'ngsw-config.json');
+    ? path.normalize(ngswConfigPath)
+    : path.join(appRoot, 'ngsw-config.json');
 
   // Read the configuration file
   let config: Config | undefined;
@@ -83,7 +80,7 @@ export async function augmentAppWithServiceWorker(
     if (error.code === 'ENOENT') {
       throw new Error(
         'Error: Expected to find an ngsw-config.json configuration file' +
-          ` in the ${getSystemPath(appRoot)} folder. Either provide one or` +
+          ` in the ${appRoot} folder. Either provide one or` +
           ' disable Service Worker in the angular.json configuration file.',
       );
     } else {
@@ -101,12 +98,12 @@ export async function augmentAppWithServiceWorker(
   ).Generator;
 
   // Generate the manifest
-  const generator = new GeneratorConstructor(new CliFilesystem(distPath), baseHref);
+  const generator = new GeneratorConstructor(new CliFilesystem(outputPath), baseHref);
   const output = await generator.process(config);
 
   // Write the manifest
   const manifest = JSON.stringify(output, null, 2);
-  await fs.writeFile(path.join(distPath, 'ngsw.json'), manifest);
+  await fs.writeFile(path.join(outputPath, 'ngsw.json'), manifest);
 
   // Find the service worker package
   const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js');
@@ -114,7 +111,7 @@ export async function augmentAppWithServiceWorker(
   // Write the worker code
   await fs.copyFile(
     workerPath,
-    path.join(distPath, 'ngsw-worker.js'),
+    path.join(outputPath, 'ngsw-worker.js'),
     fsConstants.COPYFILE_FICLONE,
   );
 
@@ -123,12 +120,12 @@ export async function augmentAppWithServiceWorker(
   try {
     await fs.copyFile(
       safetyPath,
-      path.join(distPath, 'worker-basic.min.js'),
+      path.join(outputPath, 'worker-basic.min.js'),
       fsConstants.COPYFILE_FICLONE,
     );
     await fs.copyFile(
       safetyPath,
-      path.join(distPath, 'safety-worker.js'),
+      path.join(outputPath, 'safety-worker.js'),
       fsConstants.COPYFILE_FICLONE,
     );
   } catch (error) {
