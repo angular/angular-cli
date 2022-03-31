@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseException, Path, getSystemPath, join, normalize } from '@angular-devkit/core';
+import { BaseException } from '@angular-devkit/core';
 import { existsSync } from 'fs';
+import * as path from 'path';
 import { FileReplacement } from '../builders/browser/schema';
 
 export class MissingFileReplacementException extends BaseException {
@@ -17,29 +18,29 @@ export class MissingFileReplacementException extends BaseException {
 }
 
 export interface NormalizedFileReplacement {
-  replace: Path;
-  with: Path;
+  replace: string;
+  with: string;
 }
 
 export function normalizeFileReplacements(
   fileReplacements: FileReplacement[],
-  root: Path,
+  workspaceRoot: string,
 ): NormalizedFileReplacement[] {
   if (fileReplacements.length === 0) {
     return [];
   }
 
   const normalizedReplacement = fileReplacements.map((replacement) =>
-    normalizeFileReplacement(replacement, root),
+    normalizeFileReplacement(replacement, workspaceRoot),
   );
 
   for (const { replace, with: replacementWith } of normalizedReplacement) {
-    if (!existsSync(getSystemPath(replacementWith))) {
-      throw new MissingFileReplacementException(getSystemPath(replacementWith));
+    if (!existsSync(replacementWith)) {
+      throw new MissingFileReplacementException(replacementWith);
     }
 
-    if (!existsSync(getSystemPath(replace))) {
-      throw new MissingFileReplacementException(getSystemPath(replace));
+    if (!existsSync(replace)) {
+      throw new MissingFileReplacementException(replace);
     }
   }
 
@@ -48,27 +49,22 @@ export function normalizeFileReplacements(
 
 function normalizeFileReplacement(
   fileReplacement: FileReplacement,
-  root?: Path,
+  root: string,
 ): NormalizedFileReplacement {
-  let replacePath: Path;
-  let withPath: Path;
+  let replacePath: string;
+  let withPath: string;
   if (fileReplacement.src && fileReplacement.replaceWith) {
-    replacePath = normalize(fileReplacement.src);
-    withPath = normalize(fileReplacement.replaceWith);
+    replacePath = fileReplacement.src;
+    withPath = fileReplacement.replaceWith;
   } else if (fileReplacement.replace && fileReplacement.with) {
-    replacePath = normalize(fileReplacement.replace);
-    withPath = normalize(fileReplacement.with);
+    replacePath = fileReplacement.replace;
+    withPath = fileReplacement.with;
   } else {
     throw new Error(`Invalid file replacement: ${JSON.stringify(fileReplacement)}`);
   }
 
-  // TODO: For 7.x should this only happen if not absolute?
-  if (root) {
-    replacePath = join(root, replacePath);
-  }
-  if (root) {
-    withPath = join(root, withPath);
-  }
-
-  return { replace: replacePath, with: withPath };
+  return {
+    replace: path.join(root, replacePath),
+    with: path.join(root, withPath),
+  };
 }
