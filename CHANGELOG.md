@@ -141,6 +141,34 @@ Alan Agius and gauravsoni119
 
 <!-- CHANGELOG SPLIT MARKER -->
 
+<a name="12.2.17"></a>
+
+# 12.2.17 (2022-03-31)
+
+### @angular-devkit/architect-cli
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [ccb0f95f3](https://github.com/angular/angular-cli/commit/ccb0f95f33ff0d23a0ff9b237d0d78fc4c864787) | fix  | update `minimist` to `1.2.6` |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [abcdf4df2](https://github.com/angular/angular-cli/commit/abcdf4df20c29907ee28a38842942464addcf259) | fix  | update `minimist` to `1.2.6` |
+
+### @angular-devkit/benchmark
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [2656a330e](https://github.com/angular/angular-cli/commit/2656a330eb365f37c3b6f8894436b4449d157e63) | fix  | update `minimist` to `1.2.6` |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="11.2.19"></a>
 
 # 11.2.19 (2022-03-30)
