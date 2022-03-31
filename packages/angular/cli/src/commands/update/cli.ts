@@ -70,7 +70,8 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     return localYargs
       .positional('packages', {
         description: 'The names of package(s) to update.',
-        coerce: (value) => (typeof value === 'string' ? [value] : value) as string[] | undefined,
+        type: 'string',
+        array: true,
       })
       .option('force', {
         description:
@@ -872,15 +873,12 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
    * @returns the version to install or null when there is no update to install.
    */
   private async checkCLIVersion(
-    packagesToUpdate: string[] | string | undefined,
+    packagesToUpdate: string[] | undefined,
     verbose = false,
     next = false,
   ): Promise<string | null> {
     const { version } = await fetchPackageManifest(
-      `@angular/cli@${this.getCLIUpdateRunnerVersion(
-        typeof packagesToUpdate === 'string' ? [packagesToUpdate] : packagesToUpdate,
-        next,
-      )}`,
+      `@angular/cli@${this.getCLIUpdateRunnerVersion(packagesToUpdate, next)}`,
       this.context.logger,
       {
         verbose,
