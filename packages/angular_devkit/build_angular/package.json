@@ -42,7 +42,7 @@
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.2.0",
     "mini-css-extract-plugin": "2.5.3",
-    "minimatch": "3.0.4",
+    "minimatch": "3.0.5",
     "open": "8.4.0",
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
