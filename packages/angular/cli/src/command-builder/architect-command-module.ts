@@ -8,6 +8,7 @@
 
 import { Argv } from 'yargs';
 import { getProjectByCwd } from '../utilities/config';
+import { memoize } from '../utilities/memoize';
 import { ArchitectBaseCommandModule } from './architect-base-command-module';
 import {
   CommandModuleError,
@@ -110,6 +111,7 @@ export abstract class ArchitectCommandModule
     return this.commandName;
   }
 
+  @memoize
   private getProjectNamesByTarget(target: string): string[] | undefined {
     const workspace = this.getWorkspaceOrThrow();
 

@@ -14,6 +14,7 @@ import { join } from 'path';
 import { satisfies, valid } from 'semver';
 import { PackageManager } from '../../lib/config/workspace-schema';
 import { AngularWorkspace, getProjectByCwd } from './config';
+import { memoize } from './memoize';
 import { Spinner } from './spinner';
 
 interface PackageManagerOptions {
@@ -218,7 +219,7 @@ export class PackageManagerUtils {
     });
   }
 
-  // TODO(alan-agius4): use the memoize decorator when it's merged.
+  @memoize
   private getVersion(name: PackageManager): string | undefined {
     try {
       return execSync(`${name} --version`, {
@@ -236,7 +237,7 @@ export class PackageManagerUtils {
     }
   }
 
-  // TODO(alan-agius4): use the memoize decorator when it's merged.
+  @memoize
   private getName(): PackageManager {
     const packageManager = this.getConfiguredPackageManager();
     if (packageManager) {

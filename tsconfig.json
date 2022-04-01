@@ -5,6 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
+    "experimentalDecorators": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noUnusedParameters": false,

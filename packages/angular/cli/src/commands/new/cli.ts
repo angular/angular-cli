@@ -63,10 +63,14 @@ export class NewCommandModule
   async run(options: Options<NewCommandArgs> & OtherOptions): Promise<number | void> {
     // Register the version of the CLI in the registry.
     const collectionName = options.collection ?? (await this.getCollectionFromConfig());
-    const workflow = await this.getOrCreateWorkflowForExecution(collectionName, options);
-    workflow.registry.addSmartDefaultProvider('ng-cli-version', () => VERSION.full);
-
     const { dryRun, force, interactive, defaults, collection, ...schematicOptions } = options;
+    const workflow = await this.getOrCreateWorkflowForExecution(collectionName, {
+      dryRun,
+      force,
+      interactive,
+      defaults,
+    });
+    workflow.registry.addSmartDefaultProvider('ng-cli-version', () => VERSION.full);
 
     // Compatibility check for NPM 7
     if (
