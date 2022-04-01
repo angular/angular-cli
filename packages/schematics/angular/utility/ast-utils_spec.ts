@@ -260,7 +260,7 @@ describe('ast utils', () => {
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
-        (elements as unknown) as ts.Node[],
+        elements as unknown as ts.Node[],
         `, 'bar'`,
         filePath,
         elements.pos,
@@ -281,7 +281,7 @@ describe('ast utils', () => {
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
-        (elements as unknown) as ts.Node[],
+        elements as unknown as ts.Node[],
         `'bar'`,
         filePath,
         elements.pos,
@@ -312,7 +312,7 @@ describe('ast utils', () => {
 
       const source = getTsSource(modulePath, moduleContent);
       const change = () => addRouteDeclarationToModule(source, './src/app', '');
-      expect(change).toThrowError(`Couldn't find a route declaration in ./src/app.`);
+      expect(change).toThrowError(/Couldn't find a route declaration in \.\/src\/app/);
     });
 
     it(`should throw an error when router module doesn't have arguments`, () => {
@@ -631,6 +631,17 @@ describe('ast utils', () => {
         // eslint-disable-next-line max-len
         /RouterModule\.forRoot\(\[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]\)/,
       );
+    });
+
+    it('should error if sourcefile is empty', () => {
+      const change = () =>
+        addRouteDeclarationToModule(
+          getTsSource(modulePath, ''),
+          './src/app',
+          `{ path: 'foo', component: FooComponent }`,
+        );
+
+      expect(change).toThrowError(/Couldn't find a route declaration in \.\/src\/app/);
     });
   });
 
