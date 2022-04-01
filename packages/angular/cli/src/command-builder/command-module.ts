@@ -20,6 +20,7 @@ import {
 import { Parser as yargsParser } from 'yargs/helpers';
 import { createAnalytics } from '../analytics/analytics';
 import { AngularWorkspace } from '../utilities/config';
+import { memoize } from '../utilities/memoize';
 import { PackageManagerUtils } from '../utilities/package-manager';
 import { Option } from './utilities/json-schema';
 
@@ -169,17 +170,13 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     });
   }
 
-  private _analytics: analytics.Analytics | undefined;
-  protected async getAnalytics(): Promise<analytics.Analytics> {
-    if (this._analytics) {
-      return this._analytics;
-    }
-
-    return (this._analytics = await createAnalytics(
+  @memoize
+  protected getAnalytics(): Promise<analytics.Analytics> {
+    return createAnalytics(
       !!this.context.workspace,
       // Don't prompt for `ng update` and `ng analytics` commands.
       ['update', 'analytics'].includes(this.commandName),
-    ));
+    );
   }
 
   /**

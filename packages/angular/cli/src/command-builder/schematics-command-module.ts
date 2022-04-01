@@ -16,6 +16,7 @@ import {
 import type { CheckboxQuestion, Question } from 'inquirer';
 import { Argv } from 'yargs';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
+import { memoize } from '../utilities/memoize';
 import { isTTY } from '../utilities/tty';
 import {
   CommandModule,
@@ -90,32 +91,19 @@ export abstract class SchematicsCommandModule
     return parseJsonSchemaToOptions(workflow.registry, schemaJson);
   }
 
-  private _workflowForBuilder = new Map<string, NodeWorkflow>();
+  @memoize
   protected getOrCreateWorkflowForBuilder(collectionName: string): NodeWorkflow {
-    const cached = this._workflowForBuilder.get(collectionName);
-    if (cached) {
-      return cached;
-    }
-
-    const workflow = new NodeWorkflow(this.context.root, {
+    return new NodeWorkflow(this.context.root, {
       resolvePaths: this.getResolvePaths(collectionName),
       engineHostCreator: (options) => new SchematicEngineHost(options.resolvePaths),
     });
-
-    this._workflowForBuilder.set(collectionName, workflow);
-
-    return workflow;
   }
 
-  private _workflowForExecution: NodeWorkflow | undefined;
+  @memoize
   protected async getOrCreateWorkflowForExecution(
     collectionName: string,
     options: SchematicsExecutionOptions,
   ): Promise<NodeWorkflow> {
-    if (this._workflowForExecution) {
-      return this._workflowForExecution;
-    }
-
     const { logger, root, packageManager } = this.context;
     const { force, dryRun, packageRegistry } = options;
 
@@ -241,15 +229,11 @@ export abstract class SchematicsCommandModule
       });
     }
 
-    return (this._workflowForExecution = workflow);
+    return workflow;
   }
 
-  private _schematicCollections: Set<string> | undefined;
+  @memoize
   protected async getSchematicCollections(): Promise<Set<string>> {
-    if (this._schematicCollections) {
-      return this._schematicCollections;
-    }
-
     const getSchematicCollections = (
       configSection: Record<string, unknown> | undefined,
     ): Set<string> | undefined => {
@@ -273,8 +257,6 @@ export abstract class SchematicsCommandModule
       if (project) {
         const value = getSchematicCollections(workspace.getProjectCli(project));
         if (value) {
-          this._schematicCollections = value;
-
           return value;
         }
       }
@@ -284,14 +266,10 @@ export abstract class SchematicsCommandModule
       getSchematicCollections(workspace?.getCli()) ??
       getSchematicCollections(globalConfiguration?.getCli());
     if (value) {
-      this._schematicCollections = value;
-
       return value;
     }
 
-    this._schematicCollections = new Set([DEFAULT_SCHEMATICS_COLLECTION]);
-
-    return this._schematicCollections;
+    return new Set([DEFAULT_SCHEMATICS_COLLECTION]);
   }
 
   protected parseSchematicInfo(
