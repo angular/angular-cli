@@ -50,8 +50,9 @@ export class LintCommand extends ArchitectCommand<LintCommandSchema> {
       if (error) {
         throw error;
       }
-
-      return status ?? 0;
     }
+
+    // Return an exit code to force the command to exit after adding the package
+    return 1;
   }
 }
