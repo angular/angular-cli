@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { Question } from 'inquirer';
+import type { ListChoiceOptions, ListQuestion, Question } from 'inquirer';
 import { isTTY } from './tty';
 
 export async function askConfirmation(
@@ -29,4 +29,28 @@ export async function askConfirmation(
   const answers = await prompt([question]);
 
   return answers['confirmation'];
+}
+
+export async function askQuestion(
+  message: string,
+  choices: ListChoiceOptions[],
+  defaultResponseIndex: number,
+  noTTYResponse: null | string,
+): Promise<string | null> {
+  if (!isTTY()) {
+    return noTTYResponse;
+  }
+  const question: ListQuestion = {
+    type: 'list',
+    name: 'answer',
+    prefix: '',
+    message,
+    choices,
+    default: defaultResponseIndex,
+  };
+
+  const { prompt } = await import('inquirer');
+  const answers = await prompt([question]);
+
+  return answers['answer'];
 }

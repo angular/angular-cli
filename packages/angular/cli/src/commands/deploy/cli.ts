@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { join } from 'path';
+import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
 
@@ -15,18 +15,33 @@ export class DeployCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {
-  override missingErrorTarget = tags.stripIndents`
-  Cannot find "deploy" target for the specified project.
-
-  You should add a package that implements deployment capabilities for your
-  favorite platform.
-  
-  For example:
-    ng add @angular/fire
-    ng add @azure/ng-deploy
-  
-  Find more packages on npm https://www.npmjs.com/search?q=ng%20deploy
-  `;
+  // The below choices should be kept in sync with the list in https://angular.io/guide/deployment
+  override missingTargetChoices: MissingTargetChoice[] = [
+    {
+      name: 'Amazon S3',
+      value: '@jefiozie/ngx-aws-deploy',
+    },
+    {
+      name: 'Azure',
+      value: '@azure/ng-deploy',
+    },
+    {
+      name: 'Firebase',
+      value: '@angular/fire',
+    },
+    {
+      name: 'Netlify',
+      value: '@netlify-builder/deploy',
+    },
+    {
+      name: 'NPM',
+      value: 'ngx-deploy-npm',
+    },
+    {
+      name: 'GitHub Pages',
+      value: 'angular-cli-ghpages',
+    },
+  ];
 
   multiTarget = false;
   command = 'deploy [project]';

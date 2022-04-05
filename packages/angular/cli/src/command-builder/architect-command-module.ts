@@ -70,9 +70,7 @@ export abstract class ArchitectCommandModule
       let result = 0;
       const projectNames = this.getProjectNamesByTarget(target);
       if (!projectNames) {
-        throw new CommandModuleError(
-          this.missingErrorTarget ?? 'Cannot determine project or target for command.',
-        );
+        return this.onMissingTarget('Cannot determine project or target for command.');
       }
 
       for (const project of projectNames) {
@@ -105,10 +103,6 @@ export abstract class ArchitectCommandModule
     const projectFromTarget = this.getProjectNamesByTarget(target);
 
     return projectFromTarget?.length ? projectFromTarget[0] : undefined;
-  }
-
-  private getArchitectTarget(): string {
-    return this.commandName;
   }
 
   @memoize
