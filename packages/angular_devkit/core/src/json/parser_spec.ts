@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonParseMode, parseJson, parseJsonAst } from './parser';
+import { JsonParseMode, parseJsonAst } from './parser';
 
 // Node 6 compatibility.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,7 +14,7 @@ function entries(x: { [key: string]: any }): any {
   return Object.keys(x).map((k) => [k, x[k]]);
 }
 
-describe('parseJson and parseJsonAst', () => {
+describe('parseJsonAst', () => {
   describe('generic', () => {
     const numbers = {};
     const errors = ['', '-abcdefghijklmnopqrstuvwxyz'];
@@ -25,7 +25,6 @@ describe('parseJson and parseJsonAst', () => {
         expect(ast.start).toEqual({ offset: start[0], line: start[1], character: start[2] });
         expect(ast.end).toEqual({ offset: end[0], line: end[1], character: end[2] });
         expect(ast.value).toEqual(JSON.parse(n));
-        expect(parseJson(n)).toEqual(JSON.parse(n));
         expect(ast.text).toBe(text === undefined ? n : text);
       });
     }
@@ -33,7 +32,6 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
-        expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
@@ -98,7 +96,6 @@ describe('parseJson and parseJsonAst', () => {
         expect(ast.start).toEqual({ offset: start[0], line: start[1], character: start[2] });
         expect(ast.end).toEqual({ offset: end[0], line: end[1], character: end[2] });
         expect(ast.value).toEqual(JSON.parse(n));
-        expect(parseJson(n)).toEqual(JSON.parse(n));
         expect(ast.text).toBe(text === undefined ? n : text);
       });
     }
@@ -106,7 +103,6 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
-        expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
@@ -144,7 +140,6 @@ describe('parseJson and parseJsonAst', () => {
         expect(ast.start).toEqual({ offset: start[0], line: start[1], character: start[2] });
         expect(ast.end).toEqual({ offset: end[0], line: end[1], character: end[2] });
         expect(ast.value).toEqual(JSON.parse(n));
-        expect(parseJson(n)).toEqual(JSON.parse(n));
         expect(ast.text).toBe(text === undefined ? n : text);
       });
     }
@@ -152,7 +147,6 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
-        expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
@@ -180,7 +174,6 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
-        expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
@@ -223,7 +216,6 @@ describe('parseJson and parseJsonAst', () => {
         expect(ast.start).toEqual({ offset: start[0], line: start[1], character: start[2] });
         expect(ast.end).toEqual({ offset: end[0], line: end[1], character: end[2] });
         expect(ast.value).toEqual(JSON.parse(n));
-        expect(parseJson(n)).toEqual(JSON.parse(n));
         expect(ast.text).toBe(text === undefined ? n : text);
       });
     }
@@ -231,7 +223,6 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
-        expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
@@ -269,7 +260,6 @@ describe('parseJson and parseJsonAst', () => {
         expect(ast.start).toEqual({ offset: start[0], line: start[1], character: start[2] });
         expect(ast.end).toEqual({ offset: end[0], line: end[1], character: end[2] });
         expect(ast.value).toEqual(JSON.parse(n));
-        expect(parseJson(n)).toEqual(JSON.parse(n));
         expect(ast.text).toBe(text === undefined ? n : text);
       });
     }
@@ -277,7 +267,6 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
-        expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
@@ -322,7 +311,6 @@ describe('parseJson and parseJsonAst', () => {
         expect(ast.start).toEqual({ offset: start[0], line: start[1], character: start[2] });
         expect(ast.end).toEqual({ offset: end[0], line: end[1], character: end[2] });
         expect(ast.value).toEqual(value);
-        expect(parseJson(n, JsonParseMode.Loose)).toEqual(value);
         expect(ast.text).toBe(text === undefined ? n : text);
       });
     }
@@ -330,68 +318,8 @@ describe('parseJson and parseJsonAst', () => {
     for (const n of errors) {
       it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n, JsonParseMode.Loose)).toThrow();
-        expect(() => parseJson(n, JsonParseMode.Loose)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
-  });
-
-  describe('complex', () => {
-    it('strips comments', () => {
-      expect(
-        parseJson(
-          `
-        // THIS IS A COMMENT
-        {
-          /* THIS IS ALSO A COMMENT */ // IGNORED BECAUSE COMMENT
-          // AGAIN, COMMENT /* THIS SHOULD NOT BE WEIRD
-          "a": "this // should not be a comment",
-          "a2": "this /* should also not be a comment",
-          /* MULTIPLE
-             LINE
-             COMMENT
-             \\o/ */
-          "b" /* COMMENT */: /* YOU GUESSED IT */ 1 // COMMENT
-          , /* STILL VALID */
-          "c": 2
-        }
-      `,
-          JsonParseMode.Loose,
-        ),
-      ).toEqual({
-        a: 'this // should not be a comment',
-        a2: 'this /* should also not be a comment',
-        b: 1,
-        c: 2,
-      });
-    });
-
-    it('works with json5.org example', () => {
-      const input = `{
-        // comments
-        unquoted: 'and you can quote me on that',
-        'singleQuotes': 'I can use "double quotes" here',
-        lineBreaks: "Look, Mom! \\
-No \\\\n's!",
-        hexadecimal: 0xdecaf,
-        leadingDecimalPoint: .8675309, andTrailing: 8675309.,
-        positiveSign: +1,
-        trailingComma: 'in objects', andIn: ['arrays',],
-        "backwardsCompatible": "with JSON",
-      }`;
-
-      expect(parseJson(input, JsonParseMode.Json5)).toEqual({
-        unquoted: 'and you can quote me on that',
-        singleQuotes: 'I can use "double quotes" here',
-        lineBreaks: "Look, Mom! \nNo \\n's!",
-        hexadecimal: 0xdecaf,
-        leadingDecimalPoint: 0.8675309,
-        andTrailing: 8675309,
-        positiveSign: +1,
-        trailingComma: 'in objects',
-        andIn: ['arrays'],
-        backwardsCompatible: 'with JSON',
-      });
-    });
   });
 });

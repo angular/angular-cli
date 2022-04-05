@@ -23,7 +23,7 @@ import {
   JsonAstString,
   Position,
 } from './parser_ast';
-import { JsonArray, JsonObject, JsonValue } from './utils';
+import { JsonArray, JsonObject } from './utils';
 
 export class JsonException extends BaseException {}
 
@@ -58,16 +58,6 @@ export class InvalidJsonCharacterException extends JsonException {
 export class UnexpectedEndOfInputException extends JsonException {
   constructor(_context: JsonParserContext) {
     super(`Unexpected end of file.`);
-  }
-}
-
-/**
- * An error happened within a file.
- * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
- */
-export class PathSpecificJsonException extends JsonException {
-  constructor(public path: string, public exception: JsonException) {
-    super(`An error happened at file path ${JSON.stringify(path)}: ${exception.message}`);
   }
 }
 
@@ -903,52 +893,4 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
   }
 
   return ast;
-}
-
-/**
- * Options for the parseJson() function.
- * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
- */
-export interface ParseJsonOptions {
-  /**
-   * If omitted, will only emit errors related to the content of the JSON. If specified, any
-   * JSON errors will also include the path of the file that caused the error.
-   */
-  path?: string;
-}
-
-/**
- * Parse a JSON string into its value.  This discards the AST and only returns the value itself.
- *
- * If a path option is pass, it also absorbs JSON parsing errors and return a new error with the
- * path in it. Useful for showing errors when parsing from a file.
- *
- * @deprecated Deprecated since version 11. Use 3rd party JSON parsers such as `jsonc-parser` instead.
- * @param input The string to parse.
- * @param mode The mode to parse the input with. {@see JsonParseMode}.
- * @param options Additional optinos for parsing.
- * @returns {JsonValue} The value represented by the JSON string.
- */
-export function parseJson(
-  input: string,
-  mode = JsonParseMode.Default,
-  options?: ParseJsonOptions,
-): JsonValue {
-  try {
-    // Try parsing for the fastest path available, if error, uses our own parser for better errors.
-    if (mode == JsonParseMode.Strict) {
-      try {
-        return JSON.parse(input);
-      } catch (err) {
-        return parseJsonAst(input, mode).value;
-      }
-    }
-
-    return parseJsonAst(input, mode).value;
-  } catch (e) {
-    if (options && options.path && e instanceof JsonException) {
-      throw new PathSpecificJsonException(options.path, e);
-    }
-    throw e;
-  }
 }
