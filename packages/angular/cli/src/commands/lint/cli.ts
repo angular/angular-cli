@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { join } from 'path';
+import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
 
@@ -15,14 +15,12 @@ export class LintCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {
-  override missingErrorTarget = tags.stripIndents`
-  Cannot find "lint" target for the specified project.
-  
-  You should add a package that implements linting capabilities.
-  
-  For example:
-    ng add @angular-eslint/schematics
-  `;
+  override missingTargetChoices: MissingTargetChoice[] = [
+    {
+      name: 'ESLint',
+      value: '@angular-eslint/schematics',
+    },
+  ];
 
   multiTarget = true;
   command = 'lint [project]';

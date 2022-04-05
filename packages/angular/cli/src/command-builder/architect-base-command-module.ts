@@ -9,9 +9,12 @@
 import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { json } from '@angular-devkit/core';
+import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
+import { askConfirmation, askQuestion } from '../utilities/prompt';
+import { isTTY } from '../utilities/tty';
 import {
   CommandModule,
   CommandModuleError,
@@ -21,13 +24,18 @@ import {
 } from './command-module';
 import { Option, parseJsonSchemaToOptions } from './utilities/json-schema';
 
+export interface MissingTargetChoice {
+  name: string;
+  value: string;
+}
+
 export abstract class ArchitectBaseCommandModule<T>
   extends CommandModule<T>
   implements CommandModuleImplementation<T>
 {
   static override scope = CommandScope.In;
   protected override shouldReportAnalytics = false;
-  protected readonly missingErrorTarget: string | undefined;
+  protected readonly missingTargetChoices: MissingTargetChoice[] | undefined;
 
   protected async runSingleTarget(target: Target, options: OtherOptions): Promise<number> {
     const architectHost = await this.getArchitectHost();
@@ -36,7 +44,7 @@ export abstract class ArchitectBaseCommandModule<T>
     try {
       builderName = await architectHost.getBuilderNameForTarget(target);
     } catch (e) {
-      throw new CommandModuleError(this.missingErrorTarget ?? e.message);
+      return this.onMissingTarget(e.message);
     }
 
     await this.reportAnalytics({
@@ -135,6 +143,79 @@ export abstract class ArchitectBaseCommandModule<T>
 
     this.context.logger.warn(
       `Node packages may not be installed. Try installing with '${this.context.packageManager} install'.`,
+    );
+  }
+
+  protected getArchitectTarget(): string {
+    return this.commandName;
+  }
+
+  protected async onMissingTarget(defaultMessage: string): Promise<1> {
+    const { logger } = this.context;
+    const choices = this.missingTargetChoices;
+
+    if (!choices?.length) {
+      logger.error(defaultMessage);
+
+      return 1;
+    }
+
+    const missingTargetMessage =
+      `Cannot find "${this.getArchitectTarget()}" target for the specified project.\n` +
+      `You can add a package that implements these capabilities.\n\n` +
+      `For example:\n` +
+      choices.map(({ name, value }) => `  ${name}: ng add ${value}`).join('\n') +
+      '\n';
+
+    if (isTTY()) {
+      // Use prompts to ask the user if they'd like to install a package.
+      logger.warn(missingTargetMessage);
+
+      const packageToInstall = await this.getMissingTargetPackageToInstall(choices);
+      if (packageToInstall) {
+        // Example run: `ng add @angular-eslint/schematics`.
+        const binPath = resolve(__dirname, '../../bin/ng.js');
+        const { error } = spawnSync(process.execPath, [binPath, 'add', packageToInstall], {
+          stdio: 'inherit',
+        });
+
+        if (error) {
+          throw error;
+        }
+      }
+    } else {
+      // Non TTY display error message.
+      logger.error(missingTargetMessage);
+    }
+
+    return 1;
+  }
+
+  private async getMissingTargetPackageToInstall(
+    choices: MissingTargetChoice[],
+  ): Promise<string | null> {
+    if (choices.length === 1) {
+      // Single choice
+      const { name, value } = choices[0];
+      if (await askConfirmation(`Would you like to add ${name} now?`, true, false)) {
+        return value;
+      }
+
+      return null;
+    }
+
+    // Multiple choice
+    return askQuestion(
+      `Would you like to add a package with "${this.getArchitectTarget()}" capabilities now?`,
+      [
+        {
+          name: 'No',
+          value: null,
+        },
+        ...choices,
+      ],
+      0,
+      null,
     );
   }
 }
