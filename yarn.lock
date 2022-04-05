@@ -2053,10 +2053,10 @@
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz#8467d4b3c087805d63580480890791277ce35c44"
   integrity sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==
 
-"@types/jasmine@^3.4.4":
-  version "3.10.5"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.10.5.tgz#ae155a9ec66e765c39646fb74c438cffcd6e3f78"
-  integrity sha512-RYxEJkk/RK1S6W0nMOx9Mxm5v2bKwAVjzTHiBcHkQskwKDqHKHjSU46jx/q9IffyuctNl8ebaAjb5/461faKqQ==
+"@types/jasmine@^4.0.0":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-4.0.2.tgz#9a03589f6aa00ef42a90a8d37f09c893efced14c"
+  integrity sha512-mSPIWhDyQ4nzYdR6Ixy15VhVKMVw93mSUlQxxpVb4S9Hj90lBvg+7kkBw23uYcv8CESPPXit+u3cARYcPeC8Jg==
 
 "@types/jsdom@^16.2.10":
   version "16.2.14"
@@ -5904,11 +5904,6 @@ jasmine-core@~2.8.0:
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.8.0.tgz#bcc979ae1f9fd05701e45e52e65d3a5d63f1a24e"
   integrity sha1-vMl5rh+f0FcB5F5S5l06XWPxok4=
 
-jasmine-core@~3.99.0:
-  version "3.99.1"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.99.1.tgz#5bfa4b2d76618868bfac4c8ff08bb26fffa4120d"
-  integrity sha512-Hu1dmuoGcZ7AfyynN3LsfruwMbxMALMka+YtZeGoLuDEySVmVAPaonkNoBRIw/ectu8b9tVQCJNgp4a4knp+tg==
-
 jasmine-reporters@~2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/jasmine-reporters/-/jasmine-reporters-2.5.0.tgz#f9e2e0f82aaa2e07e8d553be56457efe0fd8b39e"
@@ -5926,13 +5921,13 @@ jasmine@2.8.0:
     glob "^7.0.6"
     jasmine-core "~2.8.0"
 
-jasmine@^3.6.0:
-  version "3.99.0"
-  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.99.0.tgz#7cc7aeda7ade2d57694fc818a374f778cbb4ea62"
-  integrity sha512-YIThBuHzaIIcjxeuLmPD40SjxkEcc8i//sGMDKCgkRMVgIwRJf5qyExtlJpQeh7pkeoBSOe6lQEdg+/9uKg9mw==
+jasmine@^4.0.0:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-4.0.2.tgz#6f5ff7fbf6b67f56600235fdb7d299ac52876c4b"
+  integrity sha512-YsrgxJQEggxzByYe4j68eQLOiQeSrPDYGv4sHhGBp3c6HHdq+uPXeAQ73kOAQpdLZ3/0zN7x/TZTloqeE1/qIA==
   dependencies:
     glob "^7.1.6"
-    jasmine-core "~3.99.0"
+    jasmine-core "^4.0.0"
 
 jasminewd2@^2.1.0:
   version "2.2.0"
