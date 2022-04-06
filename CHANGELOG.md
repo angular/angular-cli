@@ -1,3 +1,37 @@
+<a name="14.0.0-next.8"></a>
+
+# 14.0.0-next.8 (2022-04-06)
+
+## Breaking Changes
+
+### @angular-devkit/core
+
+- `parseJson` and `ParseJsonOptions` APIs have been removed in favor of 3rd party JSON parsers such as `jsonc-parser`.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [7db433bb0](https://github.com/angular/angular-cli/commit/7db433bb066cc077d0c1cff7668d557c1c17160f) | fix  | provide actionable error message when routing declaration cannot be found |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [0316dea67](https://github.com/angular/angular-cli/commit/0316dea676be522b04d654054880cc5794e3c8b3) | feat | add prompts on missing builder targets |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type     | Description                                               |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| [67144b9e5](https://github.com/angular/angular-cli/commit/67144b9e54b5a9bfbc963e386b01275be5eaccf5) | refactor | remove deprecated `parseJson` and `ParseJsonOptions` APIs |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.2"></a>
 
 # 13.3.2 (2022-04-06)
