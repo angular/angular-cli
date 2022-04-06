@@ -29,7 +29,7 @@
     "@yarnpkg/lockfile": "1.1.0",
     "ansi-colors": "4.1.1",
     "debug": "4.3.4",
-    "ini": "2.0.0",
+    "ini": "3.0.0",
     "inquirer": "8.2.2",
     "jsonc-parser": "3.0.0",
     "npm-package-arg": "9.0.2",
