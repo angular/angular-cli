@@ -39,7 +39,7 @@ let linkerPluginCreator:
  */
 let i18nPluginCreators: I18nPluginCreators | undefined;
 
-async function requiresLinking(path: string, source: string): Promise<boolean> {
+export async function requiresLinking(path: string, source: string): Promise<boolean> {
   // @angular/core and @angular/compiler will cause false positives
   // Also, TypeScript files do not require linking
   if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {

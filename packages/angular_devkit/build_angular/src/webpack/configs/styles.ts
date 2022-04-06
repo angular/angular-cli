@@ -26,7 +26,7 @@ import {
   normalizeExtraEntryPoints,
 } from '../utils/helpers';
 
-function resolveGlobalStyles(
+export function resolveGlobalStyles(
   styleEntrypoints: StyleElement[],
   root: string,
   preserveSymlinks: boolean,
