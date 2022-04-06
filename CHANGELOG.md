@@ -1,3 +1,31 @@
+<a name="13.3.2"></a>
+
+# 13.3.2 (2022-04-06)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [49dc63d09](https://github.com/angular/angular-cli/commit/49dc63d09a7a7f2b7759b47e79fac934b867e9b4) | fix  | ensure lint command auto-add exits after completion |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [bbe74b87e](https://github.com/angular/angular-cli/commit/bbe74b87e52579c06b911db6173f33c67b8010a6) | fix  | provide actionable error message when routing declaration cannot be found |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [c97c8e7c9](https://github.com/angular/angular-cli/commit/c97c8e7c9bbcad66ba80967681cac46042c3aca7) | fix  | update `minimatch` dependency to `3.0.5` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Morga Cezary
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.7"></a>
 
 # 14.0.0-next.7 (2022-03-30)
