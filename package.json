@@ -149,7 +149,7 @@
     "http-proxy": "^1.18.1",
     "https-proxy-agent": "5.0.0",
     "husky": "7.0.4",
-    "ini": "2.0.0",
+    "ini": "3.0.0",
     "inquirer": "8.2.2",
     "jasmine": "^4.0.0",
     "jasmine-core": "~4.0.0",
