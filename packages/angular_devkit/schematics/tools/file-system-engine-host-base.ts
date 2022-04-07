@@ -102,6 +102,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
   protected abstract _resolveReferenceString(
     name: string,
     parentPath: string,
+    collectionDescription: FileSystemCollectionDesc,
   ): { ref: RuleFactory<{}>; path: string } | null;
   protected abstract _transformCollectionDescription(
     name: string,
@@ -234,7 +235,11 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     if (!partialDesc.factory) {
       throw new SchematicMissingFactoryException(name);
     }
-    const resolvedRef = this._resolveReferenceString(partialDesc.factory, collectionPath);
+    const resolvedRef = this._resolveReferenceString(
+      partialDesc.factory,
+      collectionPath,
+      collection,
+    );
     if (!resolvedRef) {
       throw new FactoryCannotBeResolvedException(name);
     }
