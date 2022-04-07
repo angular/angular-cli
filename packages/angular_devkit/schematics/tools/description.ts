@@ -23,6 +23,7 @@ export interface FileSystemCollectionDescription {
   readonly path: string;
   readonly version?: string;
   readonly schematics: { [name: string]: FileSystemSchematicDesc };
+  readonly encapsulation?: boolean;
 }
 
 export interface FileSystemSchematicJsonDescription {
@@ -63,7 +64,8 @@ export declare type FileSystemSchematic = Schematic<
   FileSystemCollectionDescription,
   FileSystemSchematicDescription
 >;
-export declare type FileSystemCollectionDesc = CollectionDescription<FileSystemCollectionDescription>;
+export declare type FileSystemCollectionDesc =
+  CollectionDescription<FileSystemCollectionDescription>;
 export declare type FileSystemSchematicDesc = SchematicDescription<
   FileSystemCollectionDescription,
   FileSystemSchematicDescription

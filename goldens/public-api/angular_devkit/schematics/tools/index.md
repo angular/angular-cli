@@ -60,6 +60,8 @@ export type FileSystemCollectionDesc = CollectionDescription<FileSystemCollectio
 // @public (undocumented)
 export interface FileSystemCollectionDescription {
     // (undocumented)
+    readonly encapsulation?: boolean;
+    // (undocumented)
     readonly name: string;
     // (undocumented)
     readonly path: string;
@@ -121,7 +123,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost_2
     // (undocumented)
     protected abstract _resolveCollectionPath(name: string, requester?: string): string;
     // (undocumented)
-    protected abstract _resolveReferenceString(name: string, parentPath: string): {
+    protected abstract _resolveReferenceString(name: string, parentPath: string, collectionDescription: FileSystemCollectionDesc): {
         ref: RuleFactory<{}>;
         path: string;
     } | null;
@@ -183,7 +185,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     // (undocumented)
     protected _resolveCollectionPath(name: string, requester?: string): string;
     // (undocumented)
-    protected _resolveReferenceString(refString: string, parentPath: string): {
+    protected _resolveReferenceString(refString: string, parentPath: string, collectionDescription?: FileSystemCollectionDesc): {
         ref: RuleFactory<{}>;
         path: string;
     } | null;
