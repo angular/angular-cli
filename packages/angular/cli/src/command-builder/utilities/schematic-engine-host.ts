@@ -7,7 +7,7 @@
  */
 
 import { RuleFactory, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { NodeModulesEngineHost } from '@angular-devkit/schematics/tools';
+import { FileSystemCollectionDesc, NodeModulesEngineHost } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
 import { parse as parseJson } from 'jsonc-parser';
 import nodeModule from 'module';
@@ -16,22 +16,19 @@ import { Script } from 'vm';
 
 /**
  * Environment variable to control schematic package redirection
- * Default: Angular schematics only
  */
 const schematicRedirectVariable = process.env['NG_SCHEMATIC_REDIRECT']?.toLowerCase();
 
-function shouldWrapSchematic(schematicFile: string): boolean {
+function shouldWrapSchematic(schematicFile: string, schematicEncapsulation: boolean): boolean {
   // Check environment variable if present
-  if (schematicRedirectVariable !== undefined) {
-    switch (schematicRedirectVariable) {
-      case '0':
-      case 'false':
-      case 'off':
-      case 'none':
-        return false;
-      case 'all':
-        return true;
-    }
+  switch (schematicRedirectVariable) {
+    case '0':
+    case 'false':
+    case 'off':
+    case 'none':
+      return false;
+    case 'all':
+      return true;
   }
 
   const normalizedSchematicFile = schematicFile.replace(/\\/g, '/');
@@ -45,20 +42,29 @@ function shouldWrapSchematic(schematicFile: string): boolean {
     return false;
   }
 
-  // Default is only first-party Angular schematic packages
+  // Check for first-party Angular schematic packages
   // Angular schematics are safe to use in the wrapped VM context
-  return /\/node_modules\/@(?:angular|schematics|nguniversal)\//.test(normalizedSchematicFile);
+  if (/\/node_modules\/@(?:angular|schematics|nguniversal)\//.test(normalizedSchematicFile)) {
+    return true;
+  }
+
+  // Otherwise use the value of the schematic collection's encapsulation option (current default of false)
+  return schematicEncapsulation;
 }
 
 export class SchematicEngineHost extends NodeModulesEngineHost {
-  protected override _resolveReferenceString(refString: string, parentPath: string) {
+  protected override _resolveReferenceString(
+    refString: string,
+    parentPath: string,
+    collectionDescription?: FileSystemCollectionDesc,
+  ) {
     const [path, name] = refString.split('#', 2);
     // Mimic behavior of ExportStringRef class used in default behavior
     const fullPath = path[0] === '.' ? resolve(parentPath ?? process.cwd(), path) : path;
 
     const schematicFile = require.resolve(fullPath, { paths: [parentPath] });
 
-    if (shouldWrapSchematic(schematicFile)) {
+    if (shouldWrapSchematic(schematicFile, !!collectionDescription?.encapsulation)) {
       const schematicPath = dirname(schematicFile);
 
       const moduleCache = new Map<string, unknown>();
@@ -78,7 +84,7 @@ export class SchematicEngineHost extends NodeModulesEngineHost {
     }
 
     // All other schematics use default behavior
-    return super._resolveReferenceString(refString, parentPath);
+    return super._resolveReferenceString(refString, parentPath, collectionDescription);
   }
 }
 
@@ -128,6 +134,17 @@ function wrap(
     if (legacyModules[id]) {
       // Provide compatibility modules for older versions of @angular/cdk
       return legacyModules[id];
+    } else if (id.startsWith('schematics:')) {
+      // Schematics built-in modules use the `schematics` scheme (similar to the Node.js `node` scheme)
+      const builtinId = id.slice(11);
+      const builtinModule = loadBuiltinModule(builtinId);
+      if (!builtinModule) {
+        throw new Error(
+          `Unknown schematics built-in module '${id}' requested from schematic '${schematicFile}'`,
+        );
+      }
+
+      return builtinModule;
     } else if (id.startsWith('@angular-devkit/') || id.startsWith('@schematics/')) {
       // Files should not redirect `@angular/core` and instead use the direct
       // dependency if available. This allows old major version migrations to continue to function
@@ -200,4 +217,8 @@ function wrap(
   const exportsFactory = script.runInNewContext(context);
 
   return exportsFactory;
+}
+
+function loadBuiltinModule(id: string): unknown {
+  return undefined;
 }
