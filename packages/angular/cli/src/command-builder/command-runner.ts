@@ -57,6 +57,18 @@ const COMMANDS = [
 
 const yargsParser = Parser as unknown as typeof Parser.default;
 
+// https://github.com/yargs/yargs/blob/main/docs/advanced.md#customizing-yargs-parser
+const PARSER_CONFIGURATION: Partial<yargs.ParserConfigurationOptions> = {
+  'populate--': true,
+  'duplicate-arguments-array': false,
+  'unknown-options-as-args': false,
+  'dot-notation': false,
+  'boolean-negation': true,
+  'strip-aliased': true,
+  'strip-dashed': true,
+  'camel-case-expansion': false,
+};
+
 export async function runCommand(args: string[], logger: logging.Logger): Promise<number> {
   const {
     $0,
@@ -64,7 +76,11 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     help = false,
     jsonHelp = false,
     ...rest
-  } = yargsParser(args, { boolean: ['help', 'json-help'], alias: { 'collection': 'c' } });
+  } = yargsParser(args, {
+    boolean: ['help', 'json-help'],
+    alias: { 'collection': 'c' },
+    configuration: PARSER_CONFIGURATION,
+  });
 
   let workspace: AngularWorkspace | undefined;
   let globalConfiguration: AngularWorkspace | undefined;
@@ -117,16 +133,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
 
   await localYargs
     .scriptName('ng')
-    // https://github.com/yargs/yargs/blob/main/docs/advanced.md#customizing-yargs-parser
-    .parserConfiguration({
-      'populate--': true,
-      'unknown-options-as-args': false,
-      'dot-notation': false,
-      'boolean-negation': true,
-      'strip-aliased': true,
-      'strip-dashed': true,
-      'camel-case-expansion': false,
-    })
+    .parserConfiguration(PARSER_CONFIGURATION)
     .option('json-help', {
       describe: 'Show help in JSON format.',
       implies: ['help'],
