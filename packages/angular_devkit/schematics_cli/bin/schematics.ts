@@ -366,6 +366,7 @@ function parseArgs(args: string[]): Options {
       'boolean-negation': true,
       'strip-aliased': true,
       'camel-case-expansion': false,
+      'duplicate-arguments-array': false,
     },
   });
 
