@@ -194,6 +194,7 @@ async function main(args: string[]): Promise<number> {
       'boolean-negation': true,
       'strip-aliased': true,
       'camel-case-expansion': false,
+      'duplicate-arguments-array': false,
     },
   });
 
