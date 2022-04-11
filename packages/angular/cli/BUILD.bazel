@@ -60,7 +60,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/npm-package-arg",
         "@npm//@types/pacote",
-        "@npm//@types/resolve",
         "@npm//@types/semver",
         "@npm//@types/uuid",
         "@npm//@types/yargs",
