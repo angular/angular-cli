@@ -51,7 +51,7 @@ export class AnalyticsDisableModule
   describe = 'Disables analytics gathering and reporting for the user.';
 
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
-    setAnalyticsConfig(global, false);
+    await setAnalyticsConfig(global, false);
     process.stderr.write(await getAnalyticsInfoString());
   }
 }
@@ -64,7 +64,7 @@ export class AnalyticsEnableModule
   aliases = 'on';
   describe = 'Enables analytics gathering and reporting for the user.';
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
-    setAnalyticsConfig(global, true);
+    await setAnalyticsConfig(global, true);
     process.stderr.write(await getAnalyticsInfoString());
   }
 }

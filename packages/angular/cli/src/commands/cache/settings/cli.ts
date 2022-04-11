@@ -25,8 +25,8 @@ export class CacheDisableModule extends CommandModule implements CommandModuleIm
     return localYargs;
   }
 
-  run(): void {
-    updateCacheConfig('enabled', false);
+  run(): Promise<void> {
+    return updateCacheConfig(this.getWorkspaceOrThrow(), 'enabled', false);
   }
 }
 
@@ -41,7 +41,7 @@ export class CacheEnableModule extends CommandModule implements CommandModuleImp
     return localYargs;
   }
 
-  run(): void {
-    updateCacheConfig('enabled', true);
+  run(): Promise<void> {
+    return updateCacheConfig(this.getWorkspaceOrThrow(), 'enabled', true);
   }
 }
