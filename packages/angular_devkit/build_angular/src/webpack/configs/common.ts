@@ -397,6 +397,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       asyncWebAssembly: true,
     },
     infrastructureLogging: {
+      debug: verbose,
       level: verbose ? 'verbose' : 'error',
     },
     stats: getStatsOptions(verbose),
