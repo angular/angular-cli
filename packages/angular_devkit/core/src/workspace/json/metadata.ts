@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JSONPath, Node, findNodeAtLocation, getNodeValue } from 'jsonc-parser';
 import { JsonValue } from '../../json';
-import { JsonAstArray, JsonAstKeyValue, JsonAstNode, JsonAstObject } from '../../json/parser_ast';
 import { ProjectDefinition, TargetDefinition, WorkspaceDefinition } from '../definitions';
 
 export const JsonWorkspaceSymbol = Symbol.for('@angular/core:workspace-json');
@@ -24,56 +24,63 @@ interface ChangeValues {
   targetcollection: Iterable<[string, TargetDefinition]>;
 }
 
-export interface JsonChange<T extends keyof ChangeValues = keyof ChangeValues> {
-  // core collections can only be added as they are managed directly by _Collection_ objects
-  op: T extends 'json' | 'project' | 'target' ? 'add' | 'remove' | 'replace' : 'add';
-  path: string;
-  node: JsonAstNode | JsonAstKeyValue;
-  value?: ChangeValues[T];
-  type: T;
+export interface JsonChange {
+  value?: unknown;
+  type?: keyof ChangeValues;
+  jsonPath: string[];
+}
+
+function escapeKey(key: string): string | number {
+  return key.replace('~', '~0').replace('/', '~1');
 }
 
 export class JsonWorkspaceMetadata {
-  readonly changes: JsonChange[] = [];
+  readonly changes = new Map<string, JsonChange>();
 
-  constructor(readonly filePath: string, readonly ast: JsonAstObject, readonly raw: string) {}
+  hasLegacyTargetsName = true;
+
+  constructor(readonly filePath: string, private readonly ast: Node, readonly raw: string) {}
 
   get hasChanges(): boolean {
-    return this.changes.length > 0;
+    return this.changes.size > 0;
   }
 
   get changeCount(): number {
-    return this.changes.length;
+    return this.changes.size;
   }
 
-  findChangesForPath(path: string): JsonChange[] {
-    return this.changes.filter((c) => c.path === path);
+  getNodeValueFromAst(path: JSONPath): unknown {
+    const node = findNodeAtLocation(this.ast, path);
+
+    return node && getNodeValue(node);
+  }
+
+  findChangesForPath(path: string): JsonChange | undefined {
+    return this.changes.get(path);
   }
 
   addChange<T extends keyof ChangeValues = keyof ChangeValues>(
-    op: 'add' | 'remove' | 'replace',
-    path: string,
-    node: JsonAstArray | JsonAstObject | JsonAstKeyValue,
-    value?: ChangeValues[T],
+    jsonPath: string[],
+    value: ChangeValues[T] | undefined,
     type?: T,
   ): void {
-    // Remove redundant operations
-    if (op === 'remove' || op === 'replace') {
-      for (let i = this.changes.length - 1; i >= 0; --i) {
-        const currentPath = this.changes[i].path;
-        if (currentPath === path || currentPath.startsWith(path + '/')) {
-          if (op === 'replace' && currentPath === path && this.changes[i].op === 'add') {
-            op = 'add';
-          }
-          this.changes.splice(i, 1);
-        }
+    let currentPath = '';
+    for (let index = 0; index < jsonPath.length - 1; index++) {
+      currentPath = currentPath + '/' + escapeKey(jsonPath[index]);
+      if (this.changes.has(currentPath)) {
+        // Ignore changes on children as parent is updated.
+        return;
       }
     }
 
-    this.changes.push({ op, path, node, value, type: op === 'remove' || !type ? 'json' : type });
-  }
+    const pathKey = '/' + jsonPath.map((k) => escapeKey(k)).join('/');
+    for (const key of this.changes.keys()) {
+      if (key.startsWith(pathKey + '/')) {
+        // changes on the same or child paths are redundant.
+        this.changes.delete(key);
+      }
+    }
 
-  reset(): void {
-    this.changes.length = 0;
+    this.changes.set(pathKey, { jsonPath, type, value });
   }
 }

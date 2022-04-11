@@ -6,7 +6,7 @@
       "prefix": "abc"
     }
   },
-  "x-baz": 10,
+  "x-baz": 1,
   "x-foo": {
     "is": ["good", "great", "awesome"]
   },
@@ -14,7 +14,7 @@
   "projects": {
     "new": {
       "root": "src",
-      "targets": {
+      "architect": {
         "build": {
           "builder": "build-builder",
           "options": {
@@ -29,5 +29,5 @@
         }
       }
     }
-  }
+  },
 }

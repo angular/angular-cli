@@ -39,7 +39,7 @@ ts_library(
         "@npm//ajv",
         "@npm//ajv-formats",
         "@npm//fast-json-stable-stringify",
-        "@npm//magic-string",
+        "@npm//jsonc-parser",
         "@npm//rxjs",
         "@npm//source-map",  # @external
         # @node_module: typescript:es2015.proxy
@@ -71,7 +71,6 @@ jasmine_node_test(
     deps = [
         # @node_module: ajv
         # @node_module: fast_json_stable_stringify
-        # @node_module: magic_string
         # @node_module: source_map
     ],
 )

@@ -6,14 +6,14 @@
       "prefix": "abc"
     }
   },
-  "x-baz": 10,
+  "x-baz": 1,
   "x-foo": {
     "is": ["good", "great", "awesome"]
   },
   "x-bar": 5,
   "projects": {
     "new": {
-      "root": "src"
+      "root": "src7"
     }
-  }
+  },
 }

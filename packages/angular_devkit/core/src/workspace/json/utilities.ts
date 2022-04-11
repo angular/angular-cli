@@ -6,265 +6,132 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonObject, JsonValue } from '../../json';
-import { JsonAstArray, JsonAstKeyValue, JsonAstNode, JsonAstObject } from '../../json/parser_ast';
+import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../../json';
 
-const stableStringify = require('fast-json-stable-stringify');
-
-interface CacheEntry {
-  value?: JsonValue;
-  node?: JsonAstNode;
-  parent: JsonAstArray | JsonAstKeyValue | JsonAstObject;
-}
-
-export type ChangeListener = (
-  op: 'add' | 'remove' | 'replace',
-  path: string,
-  node: JsonAstArray | JsonAstObject | JsonAstKeyValue,
-  value?: JsonValue,
-) => void;
+export type ChangeListener = (path: string[], newValue: JsonValue | undefined) => void;
 
 type ChangeReporter = (
-  path: string,
-  parent: JsonAstArray | JsonAstKeyValue | JsonAstObject,
-  node?: JsonAstNode,
-  old?: JsonValue,
-  current?: JsonValue,
+  path: string[],
+  target: JsonObject | JsonArray,
+  oldValue: JsonValue | undefined,
+  newValue: JsonValue | undefined,
 ) => void;
 
 // lib.es5 PropertyKey is string | number | symbol which doesn't overlap ProxyHandler PropertyKey which is string | symbol.
 // See https://github.com/microsoft/TypeScript/issues/42894
 type ProxyPropertyKey = string | symbol;
 
-function findNode(
-  parent: JsonAstArray | JsonAstObject,
-  p: ProxyPropertyKey,
-): { node?: JsonAstNode; parent: JsonAstArray | JsonAstKeyValue | JsonAstObject } {
-  if (parent.kind === 'object') {
-    const entry = parent.properties.find((entry) => entry.key.value === p);
-    if (entry) {
-      return { node: entry.value, parent: entry };
-    }
-  } else {
-    const index = Number(p);
-    if (!isNaN(index)) {
-      return { node: parent.elements[index], parent };
-    }
-  }
-
-  return { parent };
-}
-
-function createPropertyDescriptor(value: JsonValue | undefined): PropertyDescriptor {
-  return {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    value,
-  };
-}
-
-export function escapeKey(key: string | number): string | number {
-  if (typeof key === 'number') {
-    return key;
-  }
-
-  return key.replace('~', '~0').replace('/', '~1');
-}
-
-export function unescapeKey(key: string | number): string | number {
-  if (typeof key === 'number') {
-    return key;
-  }
-
-  return key.replace('~1', '/').replace('~0', '~');
-}
-
 export function createVirtualAstObject<T extends object = JsonObject>(
-  root: JsonAstObject,
+  root: JsonObject | JsonArray,
   options: {
     exclude?: string[];
     include?: string[];
     listener?: ChangeListener;
-    base?: object;
   } = {},
 ): T {
-  const reporter: ChangeReporter = (path, parent, node, old, current) => {
-    if (options.listener) {
-      if (old === current || stableStringify(old) === stableStringify(current)) {
-        return;
-      }
+  const reporter: ChangeReporter = (path, target, oldValue, newValue) => {
+    if (!options.listener) {
+      return;
+    }
 
-      const op = old === undefined ? 'add' : current === undefined ? 'remove' : 'replace';
-      options.listener(op, path, parent, current);
+    if (oldValue === newValue || JSON.stringify(oldValue) === JSON.stringify(newValue)) {
+      // same value
+      return;
+    }
+
+    if (Array.isArray(target)) {
+      // For arrays we remove the index and update the entire value as keeping
+      // track of changes by indices can be rather complex.
+      options.listener(path.slice(0, -1), target);
+    } else {
+      options.listener(path, newValue);
     }
   };
 
   return create(
-    root,
-    '',
+    Array.isArray(root) ? [...root] : { ...root },
+    [],
     reporter,
     new Set(options.exclude),
-    options.include && options.include.length > 0 ? new Set(options.include) : undefined,
-    options.base,
+    options.include?.length ? new Set(options.include) : undefined,
   ) as T;
 }
 
 function create(
-  ast: JsonAstObject | JsonAstArray,
-  path: string,
+  obj: JsonObject | JsonArray,
+  path: string[],
   reporter: ChangeReporter,
   excluded = new Set<ProxyPropertyKey>(),
   included?: Set<ProxyPropertyKey>,
-  base?: object,
 ) {
-  const cache = new Map<string, CacheEntry>();
-  const alteredNodes = new Set<JsonAstNode>();
-
-  if (!base) {
-    if (ast.kind === 'object') {
-      base = Object.create(null) as object;
-    } else {
-      base = [];
-      (base as Array<unknown>).length = ast.elements.length;
-    }
-  }
-
-  return new Proxy(base, {
+  return new Proxy(obj, {
     getOwnPropertyDescriptor(target: {}, p: ProxyPropertyKey): PropertyDescriptor | undefined {
-      const descriptor = Reflect.getOwnPropertyDescriptor(target, p);
-      if (descriptor || typeof p === 'symbol') {
-        return descriptor;
-      } else if (excluded.has(p) || (included && !included.has(p))) {
+      if (excluded.has(p) || (included && !included.has(p))) {
         return undefined;
       }
 
-      const propertyPath = path + '/' + escapeKey(p);
-      const cacheEntry = cache.get(propertyPath);
-      if (cacheEntry) {
-        if (cacheEntry.value !== undefined) {
-          return createPropertyDescriptor(cacheEntry.value);
-        }
-
-        return undefined;
-      }
-
-      const { node } = findNode(ast, p);
-      if (node) {
-        return createPropertyDescriptor(node.value);
-      }
-
-      return undefined;
+      return Reflect.getOwnPropertyDescriptor(target, p);
     },
     has(target: {}, p: ProxyPropertyKey): boolean {
-      if (Reflect.has(target, p)) {
-        return true;
-      } else if (typeof p === 'symbol' || excluded.has(p)) {
+      if (typeof p === 'symbol' || excluded.has(p)) {
         return false;
       }
 
-      return cache.has(path + '/' + escapeKey(p)) || findNode(ast, p) !== undefined;
+      return Reflect.has(target, p);
     },
     get(target: {}, p: ProxyPropertyKey): unknown {
-      if (typeof p === 'symbol' || Reflect.has(target, p)) {
-        return Reflect.get(target, p);
-      } else if (excluded.has(p) || (included && !included.has(p))) {
+      if (excluded.has(p) || (included && !included.has(p))) {
         return undefined;
       }
 
-      const propertyPath = path + '/' + escapeKey(p);
-      const cacheEntry = cache.get(propertyPath);
-      if (cacheEntry) {
-        return cacheEntry.value;
+      const value = Reflect.get(target, p);
+      if (typeof p === 'symbol') {
+        return value;
       }
 
-      const { node, parent } = findNode(ast, p);
-      let value;
-      if (node) {
-        if (node.kind === 'object' || node.kind === 'array') {
-          value = create(node, propertyPath, (path, parent, vnode, old, current) => {
-            if (!alteredNodes.has(node)) {
-              reporter(path, parent, vnode, old, current);
-            }
-          });
-        } else {
-          value = node.value;
-        }
-
-        cache.set(propertyPath, { node, parent, value });
+      if ((isJsonObject(value) && !(value instanceof Map)) || Array.isArray(value)) {
+        return create(value, [...path, p], reporter);
+      } else {
+        return value;
       }
-
-      return value;
     },
     set(target: {}, p: ProxyPropertyKey, value: unknown): boolean {
-      if (value === undefined) {
-        // setting to undefined is equivalent to a delete
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return this.deleteProperty!(target, p);
-      }
-
-      if (typeof p === 'symbol' || Reflect.has(target, p)) {
-        return Reflect.set(target, p, value);
-      } else if (excluded.has(p) || (included && !included.has(p))) {
+      if (excluded.has(p) || (included && !included.has(p))) {
         return false;
       }
 
-      // TODO: Check if is JSON value
-      const jsonValue = value as JsonValue;
-
-      const propertyPath = path + '/' + escapeKey(p);
-      const cacheEntry = cache.get(propertyPath);
-      if (cacheEntry) {
-        const oldValue = cacheEntry.value;
-        cacheEntry.value = value as JsonValue;
-        if (cacheEntry.node && oldValue !== value) {
-          alteredNodes.add(cacheEntry.node);
-        }
-        reporter(propertyPath, cacheEntry.parent, cacheEntry.node, oldValue, jsonValue);
-      } else {
-        const { node, parent } = findNode(ast, p);
-        cache.set(propertyPath, { node, parent, value: value as JsonValue });
-        if (node && node.value !== value) {
-          alteredNodes.add(node);
-        }
-        reporter(propertyPath, parent, node, node && node.value, value as JsonValue);
+      if (value === undefined) {
+        // setting to undefined is equivalent to a delete.
+        return this.deleteProperty?.(target, p) ?? false;
       }
 
-      return true;
+      if (typeof p === 'symbol') {
+        return Reflect.set(target, p, value);
+      }
+
+      const existingValue = getCurrentValue(target, p);
+      if (Reflect.set(target, p, value)) {
+        reporter([...path, p], target, existingValue, value as JsonValue);
+
+        return true;
+      }
+
+      return false;
     },
     deleteProperty(target: {}, p: ProxyPropertyKey): boolean {
-      if (typeof p === 'symbol' || Reflect.has(target, p)) {
-        return Reflect.deleteProperty(target, p);
-      } else if (excluded.has(p) || (included && !included.has(p))) {
+      if (excluded.has(p)) {
         return false;
       }
 
-      const propertyPath = path + '/' + escapeKey(p);
-      const cacheEntry = cache.get(propertyPath);
-      if (cacheEntry) {
-        const oldValue = cacheEntry.value;
-        cacheEntry.value = undefined;
-        if (cacheEntry.node) {
-          alteredNodes.add(cacheEntry.node);
-        }
-        if (cacheEntry.parent.kind === 'keyvalue') {
-          // Remove the entire key/value pair from this JSON object
-          reporter(propertyPath, ast, cacheEntry.node, oldValue, undefined);
-        } else {
-          reporter(propertyPath, cacheEntry.parent, cacheEntry.node, oldValue, undefined);
-        }
-      } else {
-        const { node, parent } = findNode(ast, p);
-        if (node) {
-          cache.set(propertyPath, { node, parent, value: undefined });
-          alteredNodes.add(node);
-          if (parent.kind === 'keyvalue') {
-            // Remove the entire key/value pair from this JSON object
-            reporter(propertyPath, ast, node, node && node.value, undefined);
-          } else {
-            reporter(propertyPath, parent, node, node && node.value, undefined);
-          }
-        }
+      if (typeof p === 'symbol') {
+        return Reflect.deleteProperty(target, p);
+      }
+
+      const existingValue = getCurrentValue(target, p);
+      if (Reflect.deleteProperty(target, p)) {
+        reporter([...path, p], target, existingValue, undefined);
+
+        return true;
       }
 
       return true;
@@ -277,23 +144,21 @@ function create(
       return false;
     },
     ownKeys(target: {}): ProxyPropertyKey[] {
-      let keys: ProxyPropertyKey[];
-      if (ast.kind === 'object') {
-        keys = ast.properties
-          .map((entry) => entry.key.value)
-          .filter((p) => !excluded.has(p) && (!included || included.has(p)));
-      } else {
-        keys = [];
-      }
-
-      for (const key of cache.keys()) {
-        const relativeKey = key.slice(path.length + 1);
-        if (relativeKey.length > 0 && !relativeKey.includes('/')) {
-          keys.push(`${unescapeKey(relativeKey)}`);
-        }
-      }
-
-      return [...new Set([...keys, ...Reflect.ownKeys(target)])];
+      return Reflect.ownKeys(target).filter(
+        (p) => !excluded.has(p) && (!included || included.has(p)),
+      );
     },
   });
+}
+
+function getCurrentValue(target: object, property: string): JsonValue | undefined {
+  if (Array.isArray(target) && isFinite(+property)) {
+    return target[+property];
+  }
+
+  if (target && property in target) {
+    return (target as JsonObject)[property];
+  }
+
+  return undefined;
 }
