@@ -99,9 +99,9 @@ describe('ProjectDefinitionCollection', () => {
   });
 
   it('listens to an addition via set', () => {
-    const listener = (name: string, action: string) => {
+    const listener = (name: string, value?: ProjectDefinition) => {
       expect(name).toBe('my-app');
-      expect(action).toBe('add');
+      expect(value?.root).toBe('src/my-app');
     };
 
     const collection = new ProjectDefinitionCollection(undefined, listener);
@@ -114,13 +114,9 @@ describe('ProjectDefinitionCollection', () => {
   });
 
   it('listens to an addition via add', () => {
-    const listener = (name: string, action: string, value?: ProjectDefinition) => {
+    const listener = (name: string, value?: ProjectDefinition) => {
       expect(name).toBe('my-app');
-      expect(action).toBe('add');
-      expect(value).not.toBeUndefined();
-      if (value) {
-        expect(value.root).toBe('src/my-app');
-      }
+      expect(value?.root).toBe('src/my-app');
     };
 
     const collection = new ProjectDefinitionCollection(undefined, listener);
@@ -136,9 +132,9 @@ describe('ProjectDefinitionCollection', () => {
       'my-app': { root: 'src/my-app', extensions: {}, targets: new TargetDefinitionCollection() },
     };
 
-    const listener = (name: string, action: string) => {
+    const listener = (name: string, value?: ProjectDefinition) => {
       expect(name).toBe('my-app');
-      expect(action).toBe('remove');
+      expect(value).toBeUndefined();
     };
 
     const collection = new ProjectDefinitionCollection(initial, listener);
@@ -151,22 +147,9 @@ describe('ProjectDefinitionCollection', () => {
       'my-app': { root: 'src/my-app', extensions: {}, targets: new TargetDefinitionCollection() },
     };
 
-    const listener = (
-      name: string,
-      action: string,
-      newValue?: ProjectDefinition,
-      oldValue?: ProjectDefinition,
-    ) => {
+    const listener = (name: string, value?: ProjectDefinition) => {
       expect(name).toBe('my-app');
-      expect(action).toBe('replace');
-      expect(newValue).not.toBeUndefined();
-      if (newValue) {
-        expect(newValue.root).toBe('src/my-app2');
-      }
-      expect(oldValue).not.toBeUndefined();
-      if (oldValue) {
-        expect(oldValue.root).toBe('src/my-app');
-      }
+      expect(value?.root).toBe('src/my-app2');
     };
 
     const collection = new ProjectDefinitionCollection(initial, listener);
@@ -198,14 +181,10 @@ describe('TargetDefinitionCollection', () => {
 
     const build = collection.get('build');
     expect(build).not.toBeUndefined();
-    if (build) {
-      expect(build.builder).toBe('builder:build');
-    }
+    expect(build?.builder).toBe('builder:build');
     const test = collection.get('test');
     expect(test).not.toBeUndefined();
-    if (test) {
-      expect(test.builder).toBe('builder:test');
-    }
+    expect(test?.builder).toBe('builder:test');
   });
 
   it('can be created with a listener', () => {
@@ -233,21 +212,15 @@ describe('TargetDefinitionCollection', () => {
     expect(collection.size).toBe(2);
 
     const build = collection.get('build');
-    expect(build).not.toBeUndefined();
-    if (build) {
-      expect(build.builder).toBe('builder:build');
-    }
+    expect(build?.builder).toBe('builder:build');
     const test = collection.get('test');
-    expect(test).not.toBeUndefined();
-    if (test) {
-      expect(test.builder).toBe('builder:test');
-    }
+    expect(test?.builder).toBe('builder:test');
   });
 
   it('listens to an addition via set', () => {
-    const listener = (name: string, action: string) => {
+    const listener = (name: string, value?: TargetDefinition) => {
       expect(name).toBe('build');
-      expect(action).toBe('add');
+      expect(value?.builder).toBe('builder:build');
     };
 
     const collection = new TargetDefinitionCollection(undefined, listener);
@@ -256,13 +229,9 @@ describe('TargetDefinitionCollection', () => {
   });
 
   it('listens to an addition via add', () => {
-    const listener = (name: string, action: string, value?: TargetDefinition) => {
+    const listener = (name: string, value?: TargetDefinition) => {
       expect(name).toBe('build');
-      expect(action).toBe('add');
-      expect(value).not.toBeUndefined();
-      if (value) {
-        expect(value.builder).toBe('builder:build');
-      }
+      expect(value?.builder).toBe('builder:build');
     };
 
     const collection = new TargetDefinitionCollection(undefined, listener);
@@ -278,9 +247,8 @@ describe('TargetDefinitionCollection', () => {
       'build': { builder: 'builder:build' },
     };
 
-    const listener = (name: string, action: string) => {
+    const listener = (name: string, value?: TargetDefinition) => {
       expect(name).toBe('build');
-      expect(action).toBe('remove');
     };
 
     const collection = new TargetDefinitionCollection(initial, listener);
@@ -293,22 +261,9 @@ describe('TargetDefinitionCollection', () => {
       'build': { builder: 'builder:build' },
     };
 
-    const listener = (
-      name: string,
-      action: string,
-      newValue?: TargetDefinition,
-      oldValue?: TargetDefinition,
-    ) => {
+    const listener = (name: string, value?: TargetDefinition) => {
       expect(name).toBe('build');
-      expect(action).toBe('replace');
-      expect(newValue).not.toBeUndefined();
-      if (newValue) {
-        expect(newValue.builder).toBe('builder:test');
-      }
-      expect(oldValue).not.toBeUndefined();
-      if (oldValue) {
-        expect(oldValue.builder).toBe('builder:build');
-      }
+      expect(value?.builder).toBe('builder:test');
     };
 
     const collection = new TargetDefinitionCollection(initial, listener);

@@ -87,6 +87,7 @@ export class JSONFile {
 
     const edits = modify(this.content, jsonPath, value, {
       getInsertionIndex,
+      // TODO: use indentation from original file.
       formattingOptions: {
         insertSpaces: true,
         tabSize: 2,

@@ -11,7 +11,7 @@
     "ajv-formats": "2.1.1",
     "ajv": "8.11.0",
     "fast-json-stable-stringify": "2.1.0",
-    "magic-string": "0.26.1",
+    "jsonc-parser": "3.0.0",
     "rxjs": "6.6.7",
     "source-map": "0.7.3"
   },

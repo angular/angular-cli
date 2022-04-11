@@ -11,5 +11,5 @@
     "is": ["good", "great", "awesome"]
   },
   "x-bar": 5,
-  "x-array": []
+  "x-array": [],
 }

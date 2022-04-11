@@ -1,6 +1,5 @@
 {
   "version": 1,
-  // Comment
   "x-foo": {
     "is": ["good", "great", "awesome"]
   },

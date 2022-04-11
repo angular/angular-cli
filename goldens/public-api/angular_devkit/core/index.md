@@ -366,7 +366,7 @@ export type DeepReadonlyObject<T> = {
 };
 
 // @public (undocumented)
-type DefinitionCollectionListener<V extends object> = (name: string, action: 'add' | 'remove' | 'replace', newValue: V | undefined, oldValue: V | undefined, collection: DefinitionCollection<V>) => void;
+type DefinitionCollectionListener<V extends object> = (name: string, newValue: V | undefined, collection: DefinitionCollection<V>) => void;
 
 // @public (undocumented)
 export class DependencyNotFoundException extends BaseException {

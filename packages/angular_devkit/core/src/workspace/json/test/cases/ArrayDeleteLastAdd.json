@@ -8,7 +8,11 @@
   },
   "x-baz": 1,
   "x-foo": {
-    "is": ["good", "great", "new"]
+    "is": [
+      "good",
+      "great",
+      "new"
+    ]
   },
   "x-bar": 5,
 }
