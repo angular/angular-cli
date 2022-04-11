@@ -82,7 +82,13 @@ export function runWebpackDevServer(
           });
 
           const devServer = createWebpackDevServer(webpackCompiler, devServerConfig);
-          devServer.startCallback(() => {
+          devServer.startCallback((err) => {
+            if (err) {
+              obs.error(err);
+
+              return;
+            }
+
             const address = devServer.server?.address();
             if (!address) {
               obs.error(new Error(`Dev-server address info is not defined.`));
