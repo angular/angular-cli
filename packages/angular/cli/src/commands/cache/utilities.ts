@@ -9,16 +9,18 @@
 import { isJsonObject } from '@angular-devkit/core';
 import { resolve } from 'path';
 import { Cache, Environment } from '../../../lib/config/workspace-schema';
-import { AngularWorkspace, getWorkspaceRaw } from '../../utilities/config';
+import { AngularWorkspace } from '../../utilities/config';
 
-export function updateCacheConfig<K extends keyof Cache>(key: K, value: Cache[K]): void {
-  const [localWorkspace] = getWorkspaceRaw('local');
-  if (!localWorkspace) {
-    throw new Error('Cannot find workspace configuration file.');
-  }
+export function updateCacheConfig<K extends keyof Cache>(
+  workspace: AngularWorkspace,
+  key: K,
+  value: Cache[K],
+): Promise<void> {
+  const cli = (workspace.extensions['cli'] ??= {}) as Record<string, Record<string, unknown>>;
+  const cache = (cli['cache'] ??= {});
+  cache[key] = value;
 
-  localWorkspace.modify(['cli', 'cache', key], value);
-  localWorkspace.save();
+  return workspace.save();
 }
 
 export function getCacheConfig(workspace: AngularWorkspace | undefined): Required<Cache> {

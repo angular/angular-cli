@@ -10,7 +10,7 @@ import { analytics, json, tags } from '@angular-devkit/core';
 import debug from 'debug';
 import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
-import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
+import { AngularWorkspace, getWorkspace } from '../utilities/config';
 import { analyticsDisabled, analyticsShareDisabled } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
 import { VERSION } from '../utilities/version';
@@ -64,27 +64,21 @@ export function isPackageNameSafeForAnalytics(name: string): boolean {
  * @param global Which config to use. "global" for user-level, and "local" for project-level.
  * @param value Either a user ID, true to generate a new User ID, or false to disable analytics.
  */
-export function setAnalyticsConfig(global: boolean, value: string | boolean): void {
+export async function setAnalyticsConfig(global: boolean, value: string | boolean): Promise<void> {
   const level = global ? 'global' : 'local';
   analyticsDebug('setting %s level analytics to: %s', level, value);
-  const [config, configPath] = getWorkspaceRaw(level);
-  if (!config || !configPath) {
+  const workspace = await getWorkspace(level);
+  if (!workspace) {
     throw new Error(`Could not find ${level} workspace.`);
   }
 
-  const cli = config.get(['cli']);
-
-  if (cli !== undefined && !json.isJsonObject(cli as json.JsonValue)) {
-    throw new Error(`Invalid config found at ${configPath}. CLI should be an object.`);
+  const cli = (workspace.extensions['cli'] ??= {});
+  if (!workspace || !json.isJsonObject(cli)) {
+    throw new Error(`Invalid config found at ${workspace.filePath}. CLI should be an object.`);
   }
 
-  if (value === true) {
-    value = uuidV4();
-  }
-
-  config.modify(['cli', 'analytics'], value);
-  config.save();
-
+  cli.analytics = value === true ? uuidV4() : value;
+  await workspace.save();
   analyticsDebug('done');
 }
 
@@ -96,8 +90,8 @@ export function setAnalyticsConfig(global: boolean, value: string | boolean): vo
 export async function promptAnalytics(global: boolean, force = false): Promise<boolean> {
   analyticsDebug('prompting user');
   const level = global ? 'global' : 'local';
-  const [config, configPath] = getWorkspaceRaw(level);
-  if (!config || !configPath) {
+  const workspace = await getWorkspace(level);
+  if (!workspace) {
     throw new Error(`Could not find a ${level} workspace. Are you in a project?`);
   }
 
@@ -117,7 +111,7 @@ export async function promptAnalytics(global: boolean, force = false): Promise<b
       },
     ]);
 
-    setAnalyticsConfig(global, answers.analytics);
+    await setAnalyticsConfig(global, answers.analytics);
 
     if (answers.analytics) {
       console.log('');
@@ -172,7 +166,7 @@ export async function getAnalytics(
   try {
     const workspace = await getWorkspace(level);
     const analyticsConfig: string | undefined | null | { uid?: string } =
-      workspace?.getCli()['analytics'];
+      workspace?.getCli()?.['analytics'];
     analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
 
     if (analyticsConfig === false) {
@@ -218,7 +212,7 @@ export async function getSharedAnalytics(): Promise<AnalyticsCollector | undefin
   // If anything happens we just keep the NOOP analytics.
   try {
     const globalWorkspace = await getWorkspace('global');
-    const analyticsConfig = globalWorkspace?.getCli()['analyticsSharing'];
+    const analyticsConfig = globalWorkspace?.getCli()?.['analyticsSharing'];
 
     if (!analyticsConfig || !analyticsConfig.tracking || !analyticsConfig.uuid) {
       return undefined;
@@ -294,10 +288,10 @@ function analyticsConfigValueToHumanFormat(value: unknown): 'enabled' | 'disable
 }
 
 export async function getAnalyticsInfoString(): Promise<string> {
-  const [globalWorkspace] = getWorkspaceRaw('global');
-  const [localWorkspace] = getWorkspaceRaw('local');
-  const globalSetting = globalWorkspace?.get(['cli', 'analytics']);
-  const localSetting = localWorkspace?.get(['cli', 'analytics']);
+  const globalWorkspace = await getWorkspace('global');
+  const localWorkspace = await getWorkspace('local');
+  const globalSetting = globalWorkspace?.getCli()?.['analytics'];
+  const localSetting = localWorkspace?.getCli()?.['analytics'];
 
   const analyticsInstance = await createAnalytics(
     !!localWorkspace /** workspace */,

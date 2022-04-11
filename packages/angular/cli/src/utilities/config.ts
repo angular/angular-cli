@@ -117,7 +117,10 @@ function globalFilePath(): string | null {
 export class AngularWorkspace {
   readonly basePath: string;
 
-  constructor(private workspace: workspaces.WorkspaceDefinition, readonly filePath: string) {
+  constructor(
+    private readonly workspace: workspaces.WorkspaceDefinition,
+    readonly filePath: string,
+  ) {
     this.basePath = path.dirname(filePath);
   }
 
@@ -132,15 +135,19 @@ export class AngularWorkspace {
   // Temporary helper functions to support refactoring
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCli(): Record<string, any> {
-    return (this.workspace.extensions['cli'] as Record<string, unknown>) || {};
+  getCli(): Record<string, any> | undefined {
+    return this.workspace.extensions['cli'] as Record<string, unknown>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getProjectCli(projectName: string): Record<string, any> {
+  getProjectCli(projectName: string): Record<string, any> | undefined {
     const project = this.workspace.projects.get(projectName);
 
-    return (project?.extensions['cli'] as Record<string, unknown>) || {};
+    return project?.extensions['cli'] as Record<string, unknown>;
+  }
+
+  save(): Promise<void> {
+    return workspaces.writeWorkspace(this.workspace, createWorkspaceHost(), this.filePath);
   }
 
   static async load(workspaceFilePath: string): Promise<AngularWorkspace> {
@@ -162,12 +169,15 @@ export async function getWorkspace(
     return cachedWorkspaces.get(level);
   }
 
-  const configPath = level === 'local' ? projectFilePath() : globalFilePath();
-
+  let configPath = level === 'local' ? projectFilePath() : globalFilePath();
   if (!configPath) {
-    cachedWorkspaces.set(level, undefined);
+    if (level === 'local') {
+      cachedWorkspaces.set(level, undefined);
 
-    return undefined;
+      return undefined;
+    }
+
+    configPath = createGlobalSettings();
   }
 
   try {
