@@ -33,6 +33,7 @@ import { PackageManagerUtils } from '../utilities/package-manager';
 import { CommandContext, CommandModuleError, CommandScope } from './command-module';
 import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
+import { normalizeOptionsMiddleware } from './utilities/normalize-options-middleware';
 
 const COMMANDS = [
   VersionCommandModule,
@@ -145,6 +146,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     })
     .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
+    .middleware(normalizeOptionsMiddleware)
     .version(false)
     .showHelpOnFail(false)
     .strict()
