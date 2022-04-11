@@ -138,7 +138,7 @@
     "debug": "^4.1.1",
     "esbuild": "0.14.34",
     "esbuild-wasm": "0.14.34",
-    "eslint": "8.12.0",
+    "eslint": "8.13.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.26.0",
@@ -170,7 +170,7 @@
     "magic-string": "0.26.1",
     "mini-css-extract-plugin": "2.6.0",
     "minimatch": "5.0.1",
-    "ng-packagr": "14.0.0-next.4",
+    "ng-packagr": "14.0.0-next.5",
     "node-fetch": "^2.2.0",
     "npm-package-arg": "9.0.2",
     "open": "8.4.0",
@@ -218,7 +218,7 @@
     "webpack-dev-server": "4.8.1",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0",
-    "yargs": "17.4.0",
+    "yargs": "17.4.1",
     "yargs-parser": "21.0.1",
     "zone.js": "^0.11.3"
   }
