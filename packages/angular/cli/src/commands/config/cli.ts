@@ -97,28 +97,21 @@ export class ConfigCommandModule
       throw new CommandModuleError('Invalid Path.');
     }
 
-    const validCliPaths = new Map<
-      string,
-      ((arg: string | number | boolean | undefined) => string) | undefined
-    >([
-      ['cli.warnings.versionMismatch', undefined],
-      ['cli.defaultCollection', undefined],
-      ['cli.schematicCollections', undefined],
-      ['cli.packageManager', undefined],
-      ['cli.analytics', undefined],
+    const validGlobalCliPaths = new Set<string>([
+      'cli.warnings.versionMismatch',
+      'cli.defaultCollection',
+      'cli.schematicCollections',
+      'cli.packageManager',
 
-      ['cli.analyticsSharing.tracking', undefined],
-      ['cli.analyticsSharing.uuid', (v) => (v === '' ? uuidV4() : `${v}`)],
-
-      ['cli.cache.enabled', undefined],
-      ['cli.cache.environment', undefined],
-      ['cli.cache.path', undefined],
+      'cli.analytics',
+      'cli.analyticsSharing.tracking',
+      'cli.analyticsSharing.uuid',
     ]);
 
     if (
       options.global &&
       !options.jsonPath.startsWith('schematics.') &&
-      !validCliPaths.has(options.jsonPath)
+      !validGlobalCliPaths.has(options.jsonPath)
     ) {
       throw new CommandModuleError('Invalid Path.');
     }
@@ -130,7 +123,13 @@ export class ConfigCommandModule
       throw new CommandModuleError('Confguration file cannot be found.');
     }
 
-    const value = validCliPaths.get(options.jsonPath)?.(options.value) ?? options.value;
+    const normalizeUUIDValue = (v: string | undefined) => (v === '' ? uuidV4() : `${v}`);
+
+    const value =
+      options.jsonPath === 'cli.analyticsSharing.uuid'
+        ? normalizeUUIDValue(options.value)
+        : options.value;
+
     const modified = config.modify(parseJsonPath(options.jsonPath), normalizeValue(value));
 
     if (!modified) {
