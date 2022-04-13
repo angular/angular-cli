@@ -4,7 +4,7 @@ import { logging } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import * as colors from 'ansi-colors';
 import glob from 'glob';
-import minimist from 'minimist';
+import yargsParser from 'yargs-parser';
 import * as path from 'path';
 import { setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
@@ -25,7 +25,6 @@ Error.stackTraceLimit = Infinity;
  *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
  *                    tag instead of using the latest master.
  *   --ng-snapshots   Install angular snapshot builds in the test project.
- *   --ve             Use the View Engine compiler.
  *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
  *   --ignore         Ignore tests matching this glob pattern.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
@@ -38,9 +37,13 @@ Error.stackTraceLimit = Infinity;
  *   --tmpdir=path    Override temporary directory to use for new projects.
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
-const argv = minimist(process.argv.slice(2), {
+const argv = yargsParser(process.argv.slice(2), {
   boolean: ['debug', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose'],
   string: ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
+  configuration: {
+    'dot-notation': false,
+    'camel-case-expansion': false,
+  },
 });
 
 /**
@@ -93,7 +96,7 @@ const tests = allTests.filter((name) => {
 
   return argv._.some((argName) => {
     return (
-      path.join(process.cwd(), argName) == path.join(__dirname, 'e2e', name) ||
+      path.join(process.cwd(), argName + '') == path.join(__dirname, 'e2e', name) ||
       argName == name ||
       argName == name.replace(/\.ts$/, '')
     );
