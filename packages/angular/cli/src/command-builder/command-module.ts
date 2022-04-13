@@ -48,6 +48,7 @@ export interface CommandContext {
     options: {
       help: boolean;
       jsonHelp: boolean;
+      getYargsCompletions: boolean;
     } & Record<string, unknown>;
   };
 }

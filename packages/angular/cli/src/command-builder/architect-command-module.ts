@@ -29,10 +29,15 @@ export abstract class ArchitectCommandModule
   abstract readonly multiTarget: boolean;
 
   async builder(argv: Argv): Promise<Argv<ArchitectCommandArgs>> {
+    const project = this.getArchitectProject();
+    const { jsonHelp, getYargsCompletions, help } = this.context.args.options;
+
     const localYargs: Argv<ArchitectCommandArgs> = argv
       .positional('project', {
         describe: 'The name of the project to build. Can be an application or a library.',
         type: 'string',
+        // Hide choices from JSON help so that we don't display them in AIO.
+        choices: jsonHelp ? undefined : this.getProjectChoices(),
       })
       .option('configuration', {
         describe:
@@ -42,10 +47,15 @@ export abstract class ArchitectCommandModule
           `For more information, see https://angular.io/guide/workspace-config#alternate-build-configurations.`,
         alias: 'c',
         type: 'string',
+        // Show only in when using --help and auto completion because otherwise comma seperated configuration values will be invalid.
+        // Also, hide choices from JSON help so that we don't display them in AIO.
+        choices:
+          (getYargsCompletions || help) && !jsonHelp && project
+            ? this.getConfigurationChoices(project)
+            : undefined,
       })
       .strict();
 
-    const project = this.getArchitectProject();
     if (!project) {
       return localYargs;
     }
@@ -92,11 +102,7 @@ export abstract class ArchitectCommandModule
     const [, projectName] = this.context.args.positional;
 
     if (projectName) {
-      if (!workspace.projects.has(projectName)) {
-        throw new CommandModuleError(`Project '${projectName}' does not exist.`);
-      }
-
-      return projectName;
+      return workspace.projects.has(projectName) ? projectName : undefined;
     }
 
     const target = this.getArchitectTarget();
@@ -135,5 +141,25 @@ export abstract class ArchitectCommandModule
     }
 
     return undefined;
+  }
+
+  /** @returns a sorted list of project names to be used for auto completion. */
+  private getProjectChoices(): string[] | undefined {
+    const { workspace } = this.context;
+
+    return workspace ? [...workspace.projects.keys()].sort() : undefined;
+  }
+
+  /** @returns a sorted list of configuration names to be used for auto completion. */
+  private getConfigurationChoices(project: string): string[] | undefined {
+    const projectDefinition = this.context.workspace?.projects.get(project);
+    if (!projectDefinition) {
+      return undefined;
+    }
+
+    const target = this.getArchitectTarget();
+    const configurations = projectDefinition.targets.get(target)?.configurations;
+
+    return configurations ? Object.keys(configurations).sort() : undefined;
   }
 }

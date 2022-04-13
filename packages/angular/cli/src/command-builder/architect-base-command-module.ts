@@ -7,7 +7,10 @@
  */
 
 import { Architect, Target } from '@angular-devkit/architect';
-import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
+import {
+  NodeModulesBuilderInfo,
+  WorkspaceNodeModulesArchitectHost,
+} from '@angular-devkit/architect/node';
 import { json } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
@@ -100,9 +103,15 @@ export abstract class ArchitectBaseCommandModule<T>
 
   protected async getArchitectTargetOptions(target: Target): Promise<Option[]> {
     const architectHost = this.getArchitectHost();
-    const builderConf = await architectHost.getBuilderNameForTarget(target);
+    let builderConf: string;
 
-    let builderDesc;
+    try {
+      builderConf = await architectHost.getBuilderNameForTarget(target);
+    } catch {
+      return [];
+    }
+
+    let builderDesc: NodeModulesBuilderInfo;
     try {
       builderDesc = await architectHost.resolveBuilder(builderConf);
     } catch (e) {
