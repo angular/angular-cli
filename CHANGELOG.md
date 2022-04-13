@@ -1,3 +1,33 @@
+<a name="14.0.0-next.9"></a>
+
+# 14.0.0-next.9 (2022-04-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [607a723f7](https://github.com/angular/angular-cli/commit/607a723f7d623ec8a15054722b2afd13042f66a1) | feat | add support for auto completion           |
+| [ff4eba3d4](https://github.com/angular/angular-cli/commit/ff4eba3d4a9417d2baef70aaa953bdef4bb426a6) | fix  | handle duplicate arguments                |
+| [bf15b202b](https://github.com/angular/angular-cli/commit/bf15b202bb1cd073fe01cf387dce2c033b5bb14c) | fix  | remove cache path from global valid paths |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [be2b268c3](https://github.com/angular/angular-cli/commit/be2b268c36f9ae465b9233f7bf705717712e3cf1) | fix  | display debug logs when using the `--verbose` option |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Type | Description                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------- |
+| [3afd1ab9c](https://github.com/angular/angular-cli/commit/3afd1ab9c0a347950c8477608ad9b81cf75fa891) | fix  | emit devserver setup errors |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.3"></a>
 
 # 13.3.3 (2022-04-13)
