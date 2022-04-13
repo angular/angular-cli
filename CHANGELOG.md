@@ -1,3 +1,25 @@
+<a name="13.3.3"></a>
+
+# 13.3.3 (2022-04-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [d38b247cf](https://github.com/angular/angular-cli/commit/d38b247cf19edf5ecf7792343fa2bc8c05a3a8b8) | fix  | display debug logs when using the `--verbose` option |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Type | Description                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------- |
+| [5682baee4](https://github.com/angular/angular-cli/commit/5682baee4b562b314dad781403dcc0c46e0a8abb) | fix  | emit devserver setup errors |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.8"></a>
 
 # 14.0.0-next.8 (2022-04-06)
