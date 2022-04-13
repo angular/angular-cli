@@ -11,7 +11,6 @@ import { join } from 'path';
 import { Argv } from 'yargs';
 import { ArchitectBaseCommandModule } from '../../command-builder/architect-base-command-module';
 import {
-  CommandModule,
   CommandModuleError,
   CommandModuleImplementation,
   CommandScope,
@@ -35,11 +34,16 @@ export class RunCommandModule
   longDescriptionPath = join(__dirname, 'long-description.md');
 
   async builder(argv: Argv): Promise<Argv<RunCommandArgs>> {
+    const { jsonHelp, getYargsCompletions, help } = this.context.args.options;
+
     const localYargs: Argv<RunCommandArgs> = argv
       .positional('target', {
         describe: 'The Architect target to run.',
         type: 'string',
         demandOption: true,
+        // Show only in when using --help and auto completion because otherwise comma seperated configuration values will be invalid.
+        // Also, hide choices from JSON help so that we don't display them in AIO.
+        choices: (getYargsCompletions || help) && !jsonHelp ? this.getTargetChoices() : undefined,
       })
       .strict();
 
@@ -77,5 +81,30 @@ export class RunCommandModule
       target,
       configuration,
     };
+  }
+
+  /** @returns a sorted list of target specifiers to be used for auto completion. */
+  private getTargetChoices(): string[] | undefined {
+    if (!this.context.workspace) {
+      return;
+    }
+
+    const targets = [];
+    for (const [projectName, project] of this.context.workspace.projects) {
+      for (const [targetName, target] of project.targets) {
+        const currentTarget = `${projectName}:${targetName}`;
+        targets.push(currentTarget);
+
+        if (!target.configurations) {
+          continue;
+        }
+
+        for (const configName of Object.keys(target.configurations)) {
+          targets.push(`${currentTarget}:${configName}`);
+        }
+      }
+    }
+
+    return targets.sort();
   }
 }

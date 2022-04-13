@@ -13,6 +13,7 @@ import { AddCommandModule } from '../commands/add/cli';
 import { AnalyticsCommandModule } from '../commands/analytics/cli';
 import { BuildCommandModule } from '../commands/build/cli';
 import { CacheCommandModule } from '../commands/cache/cli';
+import { CompletionCommandModule } from '../commands/completion/cli';
 import { ConfigCommandModule } from '../commands/config/cli';
 import { DeployCommandModule } from '../commands/deploy/cli';
 import { DocCommandModule } from '../commands/doc/cli';
@@ -54,6 +55,7 @@ const COMMANDS = [
   UpdateCommandModule,
   RunCommandModule,
   CacheCommandModule,
+  CompletionCommandModule,
 ].sort(); // Will be sorted by class name.
 
 const yargsParser = Parser as unknown as typeof Parser.default;
@@ -61,11 +63,18 @@ const yargsParser = Parser as unknown as typeof Parser.default;
 export async function runCommand(args: string[], logger: logging.Logger): Promise<number> {
   const {
     $0,
-    _: positional,
+    _,
     help = false,
     jsonHelp = false,
+    getYargsCompletions = false,
     ...rest
-  } = yargsParser(args, { boolean: ['help', 'json-help'], alias: { 'collection': 'c' } });
+  } = yargsParser(args, {
+    boolean: ['help', 'json-help', 'get-yargs-completions'],
+    alias: { 'collection': 'c' },
+  });
+
+  // When `getYargsCompletions` is true the scriptName 'ng' at index 0 is not removed.
+  const positional = getYargsCompletions ? _.slice(1) : _;
 
   let workspace: AngularWorkspace | undefined;
   let globalConfiguration: AngularWorkspace | undefined;
@@ -93,6 +102,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
       options: {
         help,
         jsonHelp,
+        getYargsCompletions,
         ...rest,
       },
     },
@@ -111,9 +121,16 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     localYargs = addCommandModuleToYargs(localYargs, CommandModule, context);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const usageInstance = (localYargs as any).getInternalMethods().getUsageInstance();
   if (jsonHelp) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (localYargs as any).getInternalMethods().getUsageInstance().help = () => jsonHelpUsage();
+    usageInstance.help = () => jsonHelpUsage();
+  }
+
+  if (getYargsCompletions) {
+    // When in auto completion mode avoid printing description as it causes a slugish
+    // experience when there are a large set of options.
+    usageInstance.getDescriptions = () => ({});
   }
 
   await localYargs

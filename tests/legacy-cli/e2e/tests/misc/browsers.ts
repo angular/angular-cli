@@ -1,7 +1,7 @@
 import express from 'express';
 import * as path from 'path';
 import { copyProjectAsset } from '../../utils/assets';
-import { appendToFile, replaceInFile } from '../../utils/fs';
+import { replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
