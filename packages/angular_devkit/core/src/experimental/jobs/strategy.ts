@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import stableStringify from 'fast-json-stable-stringify';
 import { Observable, Subject, concat, of } from 'rxjs';
 import { finalize, ignoreElements, share, shareReplay, tap } from 'rxjs/operators';
-import { JsonValue } from '../../json';
+import { JsonObject, JsonValue, isJsonObject } from '../../json';
 import {
   JobDescription,
   JobHandler,
@@ -60,7 +59,7 @@ export namespace strategy {
   /**
    * Creates a JobStrategy that will always reuse a running job, and restart it if the job ended.
    * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
-   *        is.
+   * is.
    */
   export function reuse<
     A extends JsonValue = JsonValue,
@@ -115,7 +114,7 @@ export namespace strategy {
   /**
    * Creates a JobStrategy that will reuse a running job if the argument matches.
    * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
-   *        is.
+   * is.
    */
   export function memoize<
     A extends JsonValue = JsonValue,
@@ -126,7 +125,17 @@ export namespace strategy {
 
     return (handler, options) => {
       const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
-        const argumentJson = stableStringify(argument);
+        const argumentJson = JSON.stringify(
+          isJsonObject(argument)
+            ? Object.keys(argument)
+                .sort()
+                .reduce((result, key) => {
+                  result[key] = argument[key];
+
+                  return result;
+                }, {} as JsonObject)
+            : argument,
+        );
         const maybeJob = runs.get(argumentJson);
 
         if (maybeJob) {
