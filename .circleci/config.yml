@@ -220,6 +220,11 @@ jobs:
           command: |
             mkdir /mnt/ramdisk/e2e-yarn
             node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+      - run:
+          name: Execute CLI E2E Tests Subset with esbuild builder
+          command: |
+            mkdir /mnt/ramdisk/e2e-esbuild
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --esbuild --tmpdir=/mnt/ramdisk/e2e-esbuild --glob="{tests/basic/**,tests/build/prod-build.ts}" --ignore="tests/basic/{environment,rebuild,serve,scripts-array}.ts"
       - fail_fast
 
   test-browsers:
