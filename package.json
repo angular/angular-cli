@@ -52,7 +52,7 @@
     "@angular/router": "14.0.0-next.13",
     "@angular/service-worker": "14.0.0-next.13",
     "@bazel/bazelisk": "1.11.0",
-    "@bazel/buildifier": "5.0.1",
+    "@bazel/buildifier": "5.1.0",
     "@bazel/concatjs": "5.4.0",
     "@bazel/esbuild": "5.4.0",
     "@bazel/ibazel": "0.16.2",
