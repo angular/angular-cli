@@ -75,11 +75,7 @@ jobs:
     steps:
       - custom_attach_workspace
       - copy-bazel-config
-      - run:
-          command: yarn bazel test //...
-          # This timeout provides time for the actual tests to timeout and report status
-          # instead of CircleCI stopping the job without test failure information.
-          no_output_timeout: 20m
+      - run: yarn bazel test //...
       - run: scripts/build-modules-dist.sh
 
       - save_cache:
