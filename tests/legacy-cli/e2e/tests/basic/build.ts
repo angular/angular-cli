@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
@@ -18,7 +19,15 @@ export default async function () {
 
   // Production build
   const { stderr: stderrProgress, stdout } = await ng('build', '--progress');
-  await expectFileToMatch('dist/test-project/index.html', /main\.[a-zA-Z0-9]{16}\.js/);
+  if (getGlobalVariable('argv')['esbuild']) {
+    // esbuild uses an 8 character hash
+    await expectFileToMatch('dist/test-project/index.html', /main\.[a-zA-Z0-9]{8}\.js/);
+
+    // EXPERIMENTAL_ESBUILD: esbuild does not yet output build stats
+    return;
+  } else {
+    await expectFileToMatch('dist/test-project/index.html', /main\.[a-zA-Z0-9]{16}\.js/);
+  }
 
   if (!stdout.includes('Initial Total')) {
     throw new Error(`Expected stdout to contain 'Initial Total' but it did not.\n${stdout}`);

@@ -33,6 +33,15 @@ export default async function () {
       // Ensure local test registry is used inside a project
       await writeFile('.npmrc', `registry=${testRegistry}`);
     }
+
+    // Setup esbuild builder if requested on the commandline
+    const useEsbuildBuilder = !!getGlobalVariable('argv')['esbuild'];
+    if (useEsbuildBuilder) {
+      await updateJsonFile('angular.json', (json) => {
+        json['projects']['test-project']['architect']['build']['builder'] =
+          '@angular-devkit/build-angular:browser-esbuild';
+      });
+    }
   }
 
   await prepareProjectForE2e('test-project');
