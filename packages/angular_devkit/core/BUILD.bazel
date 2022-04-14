@@ -38,7 +38,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//ajv",
         "@npm//ajv-formats",
-        "@npm//fast-json-stable-stringify",
         "@npm//jsonc-parser",
         "@npm//rxjs",
         "@npm//source-map",  # @external
