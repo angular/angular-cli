@@ -5,7 +5,7 @@ load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
 load("@npm//@bazel/jasmine:index.bzl", _jasmine_node_test = "jasmine_node_test")
 load("@npm//@bazel/esbuild:index.bzl", "esbuild")
 load(
-    "@npm//@bazel/typescript:index.bzl",
+    "@npm//@bazel/concatjs:index.bzl",
     _ts_library = "ts_library",
 )
 

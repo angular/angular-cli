@@ -216,7 +216,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#5a82e6017227f7017c76c8117bcbf975e19ef894":
   version "0.0.0-09337b0b54f7f450f6ce0ef61ade54511c0c8e19"
-  uid "5a82e6017227f7017c76c8117bcbf975e19ef894"
   resolved "https://github.com/angular/dev-infra-private-builds.git#5a82e6017227f7017c76c8117bcbf975e19ef894"
   dependencies:
     "@angular-devkit/build-angular" "14.0.0-next.6"
@@ -1227,12 +1226,7 @@
   resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.11.0.tgz#f98d8438b4c14e3328126618b96775d271caa5f8"
   integrity sha512-lxiQzVqSGDG0PIDQGJdVDjp7T+50p5NnM4EnRJa76mkZp6u5ul19GJNKhPKi81TZQALZEZDxAgxVqQKkWTUOxA==
 
-"@bazel/buildifier@4.2.5":
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-4.2.5.tgz#de51339613e2ca1f39dda6ade8b0062e6575b3e1"
-  integrity sha512-lTg3YEuCO1e7dCc/fLUWu5R7KOHmpPDSkoSeT+rPrszFfxqrWGJTSxZbtk/4AJZnuC3p704po8RUJinPtmxTmQ==
-
-"@bazel/buildifier@^5.0.1":
+"@bazel/buildifier@5.0.1", "@bazel/buildifier@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-5.0.1.tgz#8946848cf2c28717ec8fb4ff46e424aeba82be74"
   integrity sha512-3eMWxdFtcQf+Jw55PZqD/I9N785wp6QQ2k/SZst7R64KAGrS8Ke1EhPXaZHZBkXao5GXrm6SNLDV287xg2kguA==
@@ -1246,25 +1240,34 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
-"@bazel/esbuild@4.6.1":
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-4.6.1.tgz#823178fc3959ce880c1c89d0b29be215137eb0fc"
-  integrity sha512-EkLQN+DnqCTz1jDKgLA8dKwJUaehznhy/+0qH8Vz3MG4Zy7ibV3qJsNPYBHOndRJMoxoxv3OMybFLnHfQsuPWQ==
+"@bazel/concatjs@5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@bazel/concatjs/-/concatjs-5.4.0.tgz#04e752a6ea3e684f00879e6683657c4ede72df6e"
+  integrity sha512-jlupaDKxqFS3B1lttOIgkKxirP7v5Qx7KCFtOXO7JxtvYJD/qKtKXEQggTrGKJqLPyiZlNiYimHHGICLSWIZcQ==
+  dependencies:
+    protobufjs "6.8.8"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
 
 "@bazel/esbuild@5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.3.0.tgz#b1c6dfa92d7e56952231ea3a0a3eb02804535d7f"
   integrity sha512-UshiI+YFQmSoYW4ej2IxLNnZ2hceIsggTMYTpr16sx0FMOaFQuI3zV0w1/wu+coT18cco0bV/5AZBPV0I0f+Ug==
 
-"@bazel/ibazel@0.15.10":
-  version "0.15.10"
-  resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.15.10.tgz#cf0cff1aec6d8e7bb23e1fc618d09fbd39b7a13f"
-  integrity sha512-0v+OwCQ6fsGFa50r6MXWbUkSGuWOoZ22K4pMSdtWiL5LKFIE4kfmMmtQS+M7/ICNwk2EIYob+NRreyi/DGUz5A==
+"@bazel/esbuild@5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.4.0.tgz#94b68f71726c96f60937e0c2bb71ab04c6a0b868"
+  integrity sha512-jX5aPvlXqi1pqNOogJRYUiUCCqC+378QZestcW3MG/vHyMavVTCC4xvas94nnhtzc7UvufOWhYz/S1m8Orca8g==
 
-"@bazel/jasmine@4.6.1":
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-4.6.1.tgz#f1b618d8190fe30db03e6613255704c92c90c8b7"
-  integrity sha512-SkzBYh4f4BALB6du3/g0Z3lu3N9jcH3kVQHxqwmKkBHCp9Nny0xzhhEje/o5ncSNt+SMwIPwBrTGMPQnUUfmfg==
+"@bazel/ibazel@0.16.2":
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.16.2.tgz#05dd7f06659759fda30f87b15534f1e42f1201bb"
+  integrity sha512-KgqAWMH0emL6f3xH6nqyTryoBMqlJ627LBIe9PT1PRRQPz2FtHib3FIHJPukp1slzF3hJYZvdiVwgPnHbaSOOA==
+
+"@bazel/jasmine@5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-5.4.0.tgz#186f837951b678c39274dd9321779a40012a6bc5"
+  integrity sha512-hUMbuSKr6U9VXRHXfv0KIWVBue5fFskPAVbDK4dWUVuac8V2vVNQadtppOHPFOzzqZdDsUuSyXCDjqGUZYVm+Q==
   dependencies:
     c8 "~7.5.0"
     jasmine-reporters "~2.5.0"
@@ -1284,17 +1287,6 @@
   resolved "https://registry.yarnpkg.com/@bazel/terser/-/terser-5.3.0.tgz#50d0f67f6111640b11800cac90d39f26d02eb8dd"
   integrity sha512-M4We9XzocIk9ivvgCV2zIIwHEdhP8C+BQQbsrmt5h63S0XKMVrn5bEQiWqE1Q9WxyrZ7pUqHGVelYV/d7QFvtQ==
 
-"@bazel/typescript@4.6.1":
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-4.6.1.tgz#5c674698bda53006d784cb40ba1e2cb1263ecc20"
-  integrity sha512-T/2mOB9lSySaIQH47JsbKE8UG7eEChFltXCVNw2xk1+Eu7ym+osSIjaXoQVBPmAl/6qmIEzTyBIjFPEU2ohVrw==
-  dependencies:
-    "@bazel/worker" "4.6.1"
-    protobufjs "6.8.8"
-    semver "5.6.0"
-    source-map-support "0.5.9"
-    tsutils "3.21.0"
-
 "@bazel/typescript@5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-5.3.0.tgz#84ff0f0d5a1c885c8246b52dc4351029d03213cb"
@@ -1305,13 +1297,6 @@
     semver "5.6.0"
     source-map-support "0.5.9"
     tsutils "3.21.0"
-
-"@bazel/worker@4.6.1":
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-4.6.1.tgz#96925f5819344225d4fe40ffa630a3c5f4847a0b"
-  integrity sha512-D6TsHxGSljmlLoz8FXL1+ISh8XnDuRkBpT6Mz0wD62eWajUZASTfX9I4HNiLNbsWY4Omc7nKXI+j4R8/BLciFg==
-  dependencies:
-    google-protobuf "^3.6.1"
 
 "@bazel/worker@5.3.0":
   version "5.3.0"
