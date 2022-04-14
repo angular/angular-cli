@@ -117,6 +117,10 @@ export function execute(
             ? waitUntilServerIsListening(nodeServerPort)
             : EMPTY,
         ),
+        finalize(() => {
+          void br.stop();
+          void sr.stop();
+        }),
       );
     }),
     concatMap(([builderOutput, nodeServerPort]) => {
