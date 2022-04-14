@@ -311,9 +311,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#6890e7f37f75e6e4e31589c193f39b3ef18224dc":
-  version "0.0.0-a18ea6f7729b23e24ed3273d662fd0c8d42b3545"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#6890e7f37f75e6e4e31589c193f39b3ef18224dc"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#52ba2da4e57da6c2e9feaf693cac3b104ca8926c":
+  version "0.0.0-656b11bb3b85ec17adda406269f27954b6daf3dd"
+  uid "52ba2da4e57da6c2e9feaf693cac3b104ca8926c"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#52ba2da4e57da6c2e9feaf693cac3b104ca8926c"
   dependencies:
     "@angular-devkit/build-angular" "14.0.0-next.8"
     "@angular/benchpress" "0.3.0"
@@ -325,7 +326,7 @@
     "@bazel/runfiles" "5.4.0"
     "@bazel/terser" "5.4.0"
     "@bazel/typescript" "5.4.0"
-    "@microsoft/api-extractor" "7.21.3"
+    "@microsoft/api-extractor" "7.22.1"
     "@types/browser-sync" "^2.26.3"
     "@types/node" "16.10.9"
     "@types/node-fetch" "^2.5.10"
@@ -336,7 +337,7 @@
     "@types/yargs" "^17.0.0"
     browser-sync "^2.27.7"
     chalk "^4.1.0"
-    clang-format "1.6.0"
+    clang-format "1.7.0"
     node-fetch "^2.6.1"
     prettier "2.6.2"
     protractor "^7.0.0"
@@ -1602,10 +1603,19 @@
     "@microsoft/tsdoc-config" "~0.16.1"
     "@rushstack/node-core-library" "3.45.2"
 
-"@microsoft/api-extractor@7.21.3":
-  version "7.21.3"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.21.3.tgz#ae47c7c7dfe96263439257b6f2d8f3184a2144d6"
-  integrity sha512-ZQwuu5QbJq/TMDGr8NGmt4p/kcceaQAhQYQ4DszwNKDaCi/IhGVtO2zRcjSt8DEI2XD40s/CAOPYyF2C+Y99Ow==
+"@microsoft/api-extractor-model@7.17.0":
+  version "7.17.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.17.0.tgz#1b98f323cc7852ea98457eba74ee6702bb0e3e40"
+  integrity sha512-IsZD3vXVyfR3+sKPXwi8QRJ3hb+Wkgoc4LTeRmUgNb16PqhYvwE1Yyu7dapoa2q3qta1yo5NAXU2v3cY7yzYeA==
+  dependencies:
+    "@microsoft/tsdoc" "0.14.1"
+    "@microsoft/tsdoc-config" "~0.16.1"
+    "@rushstack/node-core-library" "3.45.2"
+
+"@microsoft/api-extractor@7.22.0":
+  version "7.22.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.22.0.tgz#90a4c9eb92487fa70a47e454a7f639ee357759b4"
+  integrity sha512-Yj5KMR6KH+Ytjth09+XgMSTJINF8mWL89/x+IsohFtoOy5xf3Mj3y6EV9C9/6LuJOEpg29yl0dkmyUXtbK11ZA==
   dependencies:
     "@microsoft/api-extractor-model" "7.16.2"
     "@microsoft/tsdoc" "0.14.1"
@@ -1620,12 +1630,12 @@
     source-map "~0.6.1"
     typescript "~4.5.2"
 
-"@microsoft/api-extractor@7.22.0":
-  version "7.22.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.22.0.tgz#90a4c9eb92487fa70a47e454a7f639ee357759b4"
-  integrity sha512-Yj5KMR6KH+Ytjth09+XgMSTJINF8mWL89/x+IsohFtoOy5xf3Mj3y6EV9C9/6LuJOEpg29yl0dkmyUXtbK11ZA==
+"@microsoft/api-extractor@7.22.1":
+  version "7.22.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.22.1.tgz#e3e30610a26805f558ac26ef2a4e2154cac6f0aa"
+  integrity sha512-xF23JUFyersyM9nJdX/OBfObaKWSK+wmNkMY4g2lX5XMlgq/daqVYLIjeTCKLXxruqM4BjyZkBzqNLNVv51+rg==
   dependencies:
-    "@microsoft/api-extractor-model" "7.16.2"
+    "@microsoft/api-extractor-model" "7.17.0"
     "@microsoft/tsdoc" "0.14.1"
     "@microsoft/tsdoc-config" "~0.16.1"
     "@rushstack/node-core-library" "3.45.2"
@@ -2763,7 +2773,7 @@ async-each-series@0.1.1:
   resolved "https://registry.yarnpkg.com/async-each-series/-/async-each-series-0.1.1.tgz#7617c1917401fd8ca4a28aadce3dbae98afeb432"
   integrity sha1-dhfBkXQB/Yykooqtzj266Yr+tDI=
 
-async@1.5.2, async@^1.5.2:
+async@1.5.2:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
   integrity sha1-7GphrlZIDAw8skHJVhjiCJL5Zyo=
@@ -2774,6 +2784,11 @@ async@^2.6.2:
   integrity sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==
   dependencies:
     lodash "^4.17.14"
+
+async@^3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.2.3.tgz#ac53dafd3f4720ee9e8a160628f18ea91df196c9"
+  integrity sha512-spZRyzKL5l5BZQrr/6m/SqFdBN0q3OCI0f9rjfBzCMBIP4p75P620rR3gTmaksNOhmzgdxcaxdNfMy6anrbM0g==
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -3266,12 +3281,12 @@ chrome-trace-event@^1.0.2:
   resolved "https://registry.yarnpkg.com/chrome-trace-event/-/chrome-trace-event-1.0.3.tgz#1015eced4741e15d06664a957dbbf50d041e26ac"
   integrity sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==
 
-clang-format@1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/clang-format/-/clang-format-1.6.0.tgz#48fac4387712aeeae0f47b5d72f639f3fd95f4b6"
-  integrity sha512-W3/L7fWkA8DoLkz9UGjrRnNi+J5a5TuS2HDLqk6WsicpOzb66MBu4eY/EcXhicHriVnAXWQVyk5/VeHWY6w4ow==
+clang-format@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/clang-format/-/clang-format-1.7.0.tgz#c06c63ec1ae2a2590d8eac2562daeb877ca30d44"
+  integrity sha512-BNuK+rXAK/Fk0rOQ1DW6bpSQUAZz6tpbZHTQn6m4PsgEkE1SNr6AQ/hhFK/b4KJrl4zjcl68molP+rEaKSZRAQ==
   dependencies:
-    async "^1.5.2"
+    async "^3.2.3"
     glob "^7.0.0"
     resolve "^1.1.6"
 
