@@ -30,7 +30,7 @@
     "critters": "0.0.16",
     "css-loader": "6.7.1",
     "esbuild-wasm": "0.14.36",
-    "glob": "7.2.0",
+    "glob": "8.0.1",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.2",
     "jsonc-parser": "3.0.0",

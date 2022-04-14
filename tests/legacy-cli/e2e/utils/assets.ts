@@ -25,16 +25,15 @@ export function copyAssets(assetName: string, to?: string) {
 
   return Promise.resolve()
     .then(() => {
-      const allFiles = glob.sync(join(root, '**/*'), { dot: true, nodir: true });
+      const allFiles = glob.sync('**/*', { dot: true, nodir: true, cwd: root });
 
       return allFiles.reduce((promise, filePath) => {
-        const relPath = relative(root, filePath);
         const toPath =
           to !== undefined
-            ? resolve(getGlobalVariable('tmp-root'), 'test-project', to, relPath)
-            : join(tempRoot, relPath);
+            ? resolve(getGlobalVariable('tmp-root'), 'test-project', to, filePath)
+            : join(tempRoot, filePath);
 
-        return promise.then(() => copyFile(filePath, toPath));
+        return promise.then(() => copyFile(join(root, filePath), toPath));
       }, Promise.resolve());
     })
     .then(() => tempRoot);
