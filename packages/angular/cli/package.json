@@ -38,7 +38,7 @@
     "ora": "5.4.1",
     "pacote": "13.1.1",
     "resolve": "1.22.0",
-    "semver": "7.3.6",
+    "semver": "7.3.7",
     "symbol-observable": "4.0.0",
     "uuid": "8.3.2",
     "yargs": "17.4.1"
