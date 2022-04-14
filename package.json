@@ -145,7 +145,7 @@
     "express": "4.17.3",
     "fast-json-stable-stringify": "2.1.0",
     "font-awesome": "^4.7.0",
-    "glob": "7.2.0",
+    "glob": "8.0.1",
     "http-proxy": "^1.18.1",
     "https-proxy-agent": "5.0.0",
     "husky": "7.0.4",
