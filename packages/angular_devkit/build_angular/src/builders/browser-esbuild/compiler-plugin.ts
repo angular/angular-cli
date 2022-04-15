@@ -16,7 +16,7 @@ import ts from 'typescript';
 import angularApplicationPreset from '../../babel/presets/application';
 import { requiresLinking } from '../../babel/webpack-loader';
 import { loadEsmModule } from '../../utils/load-esm';
-import { BundleStylesheetOptions, bundleStylesheetText } from './stylesheets';
+import { BundleStylesheetOptions, bundleStylesheetFile, bundleStylesheetText } from './stylesheets';
 
 interface EmitFileResult {
   content?: string;
@@ -191,17 +191,27 @@ export function createCompilerPlugin(
         // Create TypeScript compiler host
         const host = ts.createIncrementalCompilerHost(compilerOptions);
 
-        // Temporarily add a readResource hook to allow for a transformResource hook.
-        // Once the AOT compiler allows only a transformResource hook this can be removed.
-        (host as CompilerHost).readResource = function (fileName) {
-          // Provide same no file found behavior as @ngtools/webpack
-          return this.readFile(fileName) ?? '';
+        // Temporarily process external resources via readResource.
+        // The AOT compiler currently requires this hook to allow for a transformResource hook.
+        // Once the AOT compiler allows only a transformResource hook, this can be reevaluated.
+        (host as CompilerHost).readResource = async function (fileName) {
+          // Template resources (.html) files are not bundled or transformed
+          if (fileName.endsWith('.html')) {
+            return this.readFile(fileName) ?? '';
+          }
+
+          const { contents, errors, warnings } = await bundleStylesheetFile(fileName, styleOptions);
+
+          (result.errors ??= []).push(...errors);
+          (result.warnings ??= []).push(...warnings);
+
+          return contents;
         };
 
         // Add an AOT compiler resource transform hook
         (host as CompilerHost).transformResource = async function (data, context) {
-          // Only style resources are transformed currently
-          if (context.type !== 'style') {
+          // Only inline style resources are transformed separately currently
+          if (context.resourceFile || context.type !== 'style') {
             return null;
           }
 

@@ -160,8 +160,9 @@ export async function buildEsbuildBrowser(
         { virtualName: `angular:style/global;${name}`, resolvePath: workspaceRoot },
         {
           optimization: !!optimizationOptions.styles.minify,
-          sourcemap: !!sourcemapOptions.styles,
+          sourcemap: !!sourcemapOptions.styles && (sourcemapOptions.hidden ? 'external' : true),
           outputNames: noInjectNames.includes(name) ? { media: outputNames.media } : outputNames,
+          includePaths: options.stylePreprocessorOptions?.includePaths,
         },
       );
 
@@ -334,6 +335,7 @@ async function bundleCode(
             // of sourcemap processing.
             !!sourcemapOptions.styles && (sourcemapOptions.hidden ? false : 'inline'),
           outputNames,
+          includePaths: options.stylePreprocessorOptions?.includePaths,
         },
       ),
     ],
