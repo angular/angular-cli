@@ -9,6 +9,7 @@
 import type { BuildOptions, OutputFile } from 'esbuild';
 import * as path from 'path';
 import { DEFAULT_OUTDIR, bundle } from './esbuild';
+import { createSassPlugin } from './sass-plugin';
 
 export interface BundleStylesheetOptions {
   workspaceRoot?: string;
@@ -16,6 +17,7 @@ export interface BundleStylesheetOptions {
   preserveSymlinks?: boolean;
   sourcemap: boolean | 'external' | 'inline';
   outputNames?: { bundles?: string; media?: string };
+  includePaths?: string[];
 }
 
 async function bundleStylesheet(
@@ -39,7 +41,7 @@ async function bundleStylesheet(
     conditions: ['style'],
     mainFields: ['style'],
     plugins: [
-      // TODO: preprocessor plugins
+      createSassPlugin({ sourcemap: !!options.sourcemap, includePaths: options.includePaths }),
     ],
   });
 
