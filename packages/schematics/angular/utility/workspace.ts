@@ -6,19 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json, virtualFs, workspaces } from '@angular-devkit/core';
+import { json, workspaces } from '@angular-devkit/core';
 import { Rule, Tree, noop } from '@angular-devkit/schematics';
 import { ProjectType } from './workspace-models';
 
 function createHost(tree: Tree): workspaces.WorkspaceHost {
   return {
     async readFile(path: string): Promise<string> {
-      const data = tree.read(path);
-      if (!data) {
-        throw new Error('File not found.');
-      }
-
-      return virtualFs.fileBufferToString(data);
+      return tree.readText(path);
     },
     async writeFile(path: string, data: string): Promise<void> {
       return tree.overwrite(path, data);

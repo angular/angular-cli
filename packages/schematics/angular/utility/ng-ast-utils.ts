@@ -13,11 +13,7 @@ import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescri
 import { findNode, getSourceNodes } from '../utility/ast-utils';
 
 export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallExpression | null {
-  const mainBuffer = host.read(mainPath);
-  if (!mainBuffer) {
-    throw new SchematicsException(`Main file (${mainPath}) not found`);
-  }
-  const mainText = mainBuffer.toString('utf-8');
+  const mainText = host.readText(mainPath);
   const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
 
   const allNodes = getSourceNodes(source);
@@ -58,11 +54,7 @@ export function findBootstrapModulePath(host: Tree, mainPath: string): string {
 
   const bootstrapModule = bootstrapCall.arguments[0];
 
-  const mainBuffer = host.read(mainPath);
-  if (!mainBuffer) {
-    throw new SchematicsException(`Client application main file (${mainPath}) not found`);
-  }
-  const mainText = mainBuffer.toString('utf-8');
+  const mainText = host.readText(mainPath);
   const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
   const allNodes = getSourceNodes(source);
   const bootstrapModuleRelativePath = allNodes

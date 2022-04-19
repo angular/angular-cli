@@ -28,13 +28,9 @@ function addSchematicToCollectionJson(
   description: JsonObject,
 ): Rule {
   return (tree: Tree) => {
-    const collectionJsonContent = tree.read(collectionPath);
-    if (!collectionJsonContent) {
-      throw new Error('Invalid collection path: ' + collectionPath);
-    }
+    const collectionJson = tree.readJson(collectionPath);
 
-    const collectionJson = JSON.parse(collectionJsonContent.toString());
-    if (!isJsonObject(collectionJson.schematics)) {
+    if (!isJsonObject(collectionJson) || !isJsonObject(collectionJson.schematics)) {
       throw new Error('Invalid collection.json; schematics needs to be an object.');
     }
 
@@ -55,16 +51,13 @@ export default function (options: Schema): Rule {
 
     let collectionPath: Path | undefined;
     try {
-      const packageJsonContent = tree.read('/package.json');
-      if (packageJsonContent) {
-        const packageJson = JSON.parse(packageJsonContent.toString()) as {
-          schematics: unknown;
-        };
-        if (typeof packageJson.schematics === 'string') {
-          const p = normalize(packageJson.schematics);
-          if (tree.exists(p)) {
-            collectionPath = p;
-          }
+      const packageJson = tree.readJson('/package.json') as {
+        schematics: unknown;
+      };
+      if (typeof packageJson.schematics === 'string') {
+        const p = normalize(packageJson.schematics);
+        if (tree.exists(p)) {
+          collectionPath = p;
         }
       }
     } catch {}

@@ -36,11 +36,7 @@ function addDeclarationToNgModule(options: DirectiveOptions): Rule {
     }
 
     const modulePath = options.module;
-    const text = host.read(modulePath);
-    if (text === null) {
-      throw new SchematicsException(`File ${modulePath} does not exist.`);
-    }
-    const sourceText = text.toString('utf-8');
+    const sourceText = host.readText(modulePath);
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const directivePath =
@@ -66,11 +62,7 @@ function addDeclarationToNgModule(options: DirectiveOptions): Rule {
 
     if (options.export) {
       // Need to refresh the AST because we overwrote the file in the host.
-      const text = host.read(modulePath);
-      if (text === null) {
-        throw new SchematicsException(`File ${modulePath} does not exist.`);
-      }
-      const sourceText = text.toString('utf-8');
+      const sourceText = host.readText(modulePath);
       const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
       const exportRecorder = host.beginUpdate(modulePath);
