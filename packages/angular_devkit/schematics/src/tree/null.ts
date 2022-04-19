@@ -6,7 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseException, Path, PathFragment, dirname, join, normalize } from '@angular-devkit/core';
+import {
+  BaseException,
+  JsonValue,
+  Path,
+  PathFragment,
+  dirname,
+  join,
+  normalize,
+} from '@angular-devkit/core';
 import { FileDoesNotExistException } from '../exception/exception';
 import { Action } from './action';
 import { DirEntry, MergeStrategy, Tree, TreeSymbol, UpdateRecorder } from './interface';
@@ -58,6 +66,9 @@ export class NullTree implements Tree {
     return null;
   }
   readText(path: string): string {
+    throw new FileDoesNotExistException(path);
+  }
+  readJson(path: string): JsonValue {
     throw new FileDoesNotExistException(path);
   }
   get(_path: string) {

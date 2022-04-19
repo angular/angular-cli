@@ -7,6 +7,7 @@
 /// <reference types="node" />
 
 import { BaseException } from '@angular-devkit/core';
+import { JsonValue } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Path } from '@angular-devkit/core';
@@ -234,6 +235,8 @@ export class DelegateTree implements Tree_2 {
     overwrite(path: string, content: Buffer | string): void;
     // (undocumented)
     read(path: string): Buffer | null;
+    // (undocumented)
+    readJson(path: string): JsonValue;
     // (undocumented)
     readText(path: string): string;
     // (undocumented)
@@ -548,6 +551,8 @@ export class HostTree implements Tree_2 {
     overwrite(path: string, content: Buffer | string): void;
     // (undocumented)
     read(path: string): Buffer | null;
+    // (undocumented)
+    readJson(path: string): JsonValue;
     // (undocumented)
     readText(path: string): string;
     // (undocumented)

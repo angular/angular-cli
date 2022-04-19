@@ -7,6 +7,7 @@
  */
 
 import {
+  JsonValue,
   Path,
   PathFragment,
   PathIsDirectoryException,
@@ -16,6 +17,7 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
+import { ParseError, parse as jsoncParse, printParseErrorCode } from 'jsonc-parser';
 import { EMPTY, Observable } from 'rxjs';
 import { concatMap, map, mergeMap } from 'rxjs/operators';
 import { TextDecoder } from 'util';
@@ -308,6 +310,22 @@ export class HostTree implements Tree {
       }
       throw e;
     }
+  }
+
+  readJson(path: string): JsonValue {
+    const content = this.readText(path);
+    const errors: ParseError[] = [];
+    const result = jsoncParse(content, errors, { allowTrailingComma: true });
+
+    // If there is a parse error throw with the error information
+    if (errors[0]) {
+      const { error, offset } = errors[0];
+      throw new Error(
+        `Failed to parse "${path}" as JSON. ${printParseErrorCode(error)} at offset: ${offset}.`,
+      );
+    }
+
+    return result;
   }
 
   exists(path: string): boolean {

@@ -7,6 +7,7 @@
  */
 
 import {
+  JsonValue,
   NormalizedRoot,
   Path,
   PathFragment,
@@ -115,6 +116,9 @@ export class ScopedTree implements Tree {
   }
   readText(path: string): string {
     return this._base.readText(this._fullPath(path));
+  }
+  readJson(path: string): JsonValue {
+    return this._base.readJson(this._fullPath(path));
   }
   exists(path: string): boolean {
     return this._base.exists(this._fullPath(path));
