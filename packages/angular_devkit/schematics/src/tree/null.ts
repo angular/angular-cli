@@ -57,6 +57,9 @@ export class NullTree implements Tree {
   read(_path: string) {
     return null;
   }
+  readText(path: string): string {
+    throw new FileDoesNotExistException(path);
+  }
   get(_path: string) {
     return null;
   }

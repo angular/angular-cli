@@ -235,6 +235,8 @@ export class DelegateTree implements Tree_2 {
     // (undocumented)
     read(path: string): Buffer | null;
     // (undocumented)
+    readText(path: string): string;
+    // (undocumented)
     rename(from: string, to: string): void;
     // (undocumented)
     get root(): DirEntry;
@@ -546,6 +548,8 @@ export class HostTree implements Tree_2 {
     overwrite(path: string, content: Buffer | string): void;
     // (undocumented)
     read(path: string): Buffer | null;
+    // (undocumented)
+    readText(path: string): string;
     // (undocumented)
     rename(from: string, to: string): void;
     // (undocumented)

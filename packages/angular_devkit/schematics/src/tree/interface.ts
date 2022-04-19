@@ -83,6 +83,17 @@ export interface Tree {
 
   // Readonly.
   read(path: string): Buffer | null;
+
+  /**
+   * Reads a file from the Tree as a UTF-8 encoded text file.
+   *
+   * @param path The path of the file to read.
+   * @returns A string containing the contents of the file.
+   * @throws {@link FileDoesNotExistException} if the file is not found.
+   * @throws An error if the file contains invalid UTF-8 characters.
+   */
+  readText(path: string): string;
+
   exists(path: string): boolean;
   get(path: string): FileEntry | null;
   getDir(path: string): DirEntry;
