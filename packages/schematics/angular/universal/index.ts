@@ -99,12 +99,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
 }
 
 function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
-  const moduleBuffer = host.read(modulePath);
-  if (!moduleBuffer) {
-    throw new SchematicsException(`Module file (${modulePath}) not found`);
-  }
-  const moduleFileText = moduleBuffer.toString('utf-8');
-
+  const moduleFileText = host.readText(modulePath);
   const source = ts.createSourceFile(modulePath, moduleFileText, ts.ScriptTarget.Latest, true);
 
   const decoratorMetadata = getDecoratorMetadata(source, 'NgModule', '@angular/core')[0];

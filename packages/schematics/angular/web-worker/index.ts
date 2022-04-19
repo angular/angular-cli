@@ -65,7 +65,7 @@ function addSnippet(options: WebWorkerOptions): Rule {
     `;
 
     // Append the worker creation snippet.
-    const originalContent = host.read(siblingModulePath);
+    const originalContent = host.readText(siblingModulePath);
     host.overwrite(siblingModulePath, originalContent + '\n' + workerCreationSnippet);
 
     return host;
