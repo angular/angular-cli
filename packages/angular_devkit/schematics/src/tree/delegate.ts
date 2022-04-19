@@ -35,6 +35,9 @@ export class DelegateTree implements Tree {
   read(path: string): Buffer | null {
     return this._other.read(path);
   }
+  readText(path: string): string {
+    return this._other.readText(path);
+  }
   exists(path: string): boolean {
     return this._other.exists(path);
   }

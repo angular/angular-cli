@@ -11,6 +11,29 @@ import { FilterHostTree, HostTree } from './host-tree';
 import { MergeStrategy } from './interface';
 
 describe('HostTree', () => {
+  describe('readText', () => {
+    it('returns text when reading a file that exists', () => {
+      const tree = new HostTree();
+      tree.create('/textfile1', 'abc');
+      tree.create('/textfile2', '123');
+      expect(tree.readText('/textfile1')).toEqual('abc');
+      expect(tree.readText('/textfile2')).toEqual('123');
+    });
+
+    it('throws an error when a file does not exist', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      expect(() => tree.readText(path)).toThrowError(`Path "${path}" does not exist.`);
+    });
+
+    it('throws an error when invalid UTF-8 characters are present', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      tree.create(path, Buffer.from([0xff, 0xff, 0xff, 0xff]));
+      expect(() => tree.readText(path)).toThrowError(`Failed to decode "${path}" as UTF-8 text.`);
+    });
+  });
+
   describe('merge', () => {
     it('should create files from each tree', () => {
       const tree = new HostTree();

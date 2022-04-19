@@ -113,6 +113,9 @@ export class ScopedTree implements Tree {
   read(path: string): Buffer | null {
     return this._base.read(this._fullPath(path));
   }
+  readText(path: string): string {
+    return this._base.readText(this._fullPath(path));
+  }
   exists(path: string): boolean {
     return this._base.exists(this._fullPath(path));
   }
