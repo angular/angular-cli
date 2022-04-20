@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, normalize, strings } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -16,6 +16,7 @@ import {
   chain,
   mergeWith,
   move,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
