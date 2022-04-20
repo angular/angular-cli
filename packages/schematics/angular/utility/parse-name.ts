@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// import { relative, Path } from "../../../angular_devkit/core/src/virtual-fs";
 import { Path, basename, dirname, join, normalize } from '@angular-devkit/core';
 
 export interface Location {
