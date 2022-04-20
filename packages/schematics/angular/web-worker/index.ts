@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, normalize, strings, tags } from '@angular-devkit/core';
+import { join, normalize, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -18,6 +18,7 @@ import {
   mergeWith,
   move,
   noop,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { parseName } from '../utility/parse-name';

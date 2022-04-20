@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { strings } from '@angular-devkit/core';
 import {
   FileOperator,
   Rule,
@@ -20,6 +19,7 @@ import {
   mergeWith,
   move,
   noop,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';

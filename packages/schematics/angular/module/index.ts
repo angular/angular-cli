@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Path, normalize, strings } from '@angular-devkit/core';
+import { Path, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -19,6 +19,7 @@ import {
   move,
   noop,
   schematic,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { Schema as ComponentOptions } from '../component/schema';

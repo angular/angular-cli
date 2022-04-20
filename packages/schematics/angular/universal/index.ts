@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonValue, Path, basename, join, normalize, strings } from '@angular-devkit/core';
+import { JsonValue, Path, basename, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -17,6 +17,7 @@ import {
   chain,
   mergeWith,
   move,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
