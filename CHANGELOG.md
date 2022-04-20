@@ -1,3 +1,31 @@
+<a name="14.0.0-next.10"></a>
+
+# 14.0.0-next.10 (2022-04-20)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [78460e995](https://github.com/angular/angular-cli/commit/78460e995a192336db3c4be9d0592b4e7a2ff2c8) | fix  | remove type casting and add optional chaining for current in optionTransforms |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [1a160dac0](https://github.com/angular/angular-cli/commit/1a160dac00f34aab089053281c640dba3efd597f) | fix  | ensure karma sourcemap support on Windows |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [464cf330a](https://github.com/angular/angular-cli/commit/464cf330a14397470e1e57450a77f421a45a927e) | feat | support null for options parameter from OptionTransform type |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Daniil Dubrava
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.9"></a>
 
 # 14.0.0-next.9 (2022-04-13)
