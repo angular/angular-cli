@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { strings } from '@angular-devkit/core';
 import * as formats from './formats/index';
 import { FilePredicate, MergeStrategy, Tree as TreeInterface } from './tree/interface';
 import { branch, empty, merge, partition } from './tree/static';
@@ -33,8 +34,7 @@ export * from './engine/schematic';
 export * from './sink/dryrun';
 export * from './sink/host';
 export * from './sink/sink';
-export { formats };
-export { workflow };
+export { formats, strings, workflow };
 
 export interface TreeConstructor {
   empty(): TreeInterface;
