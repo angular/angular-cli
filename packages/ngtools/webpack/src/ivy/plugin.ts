@@ -612,6 +612,7 @@ export class AngularWebpackPlugin {
         return {
           emitter: this.createFileEmitter(
             builder,
+            compilerOptions,
             mergeTransformers(angularCompiler.prepareEmit().transformers, transformers),
             getDependencies,
             (sourceFile) => {
@@ -672,7 +673,7 @@ export class AngularWebpackPlugin {
     const transformers = createJitTransformers(builder, this.compilerCli, this.pluginOptions);
 
     return {
-      fileEmitter: this.createFileEmitter(builder, transformers, () => []),
+      fileEmitter: this.createFileEmitter(builder, compilerOptions, transformers, () => []),
       builder,
       internalFiles: undefined,
     };
@@ -680,10 +681,13 @@ export class AngularWebpackPlugin {
 
   private createFileEmitter(
     program: ts.BuilderProgram,
+    compilerOptions: CompilerOptions,
     transformers: ts.CustomTransformers = {},
     getExtraDependencies: (sourceFile: ts.SourceFile) => Iterable<string>,
     onAfterEmit?: (sourceFile: ts.SourceFile) => void,
   ): FileEmitter {
+    const host = ts.createCompilerHost(compilerOptions);
+
     return async (file: string) => {
       const filePath = normalizePath(file);
       if (this.requiredFilesToEmitCache.has(filePath)) {
@@ -699,8 +703,18 @@ export class AngularWebpackPlugin {
       let map: string | undefined;
       program.emit(
         sourceFile,
-        (filename, data) => {
-          if (filename.endsWith('.map')) {
+        (
+          filename,
+          data,
+          writeByteOrderMark: boolean,
+          onError?: (message: string) => void,
+          sourceFiles?: readonly ts.SourceFile[],
+        ) => {
+          if (filename.endsWith('.d.ts.map')) {
+            host.writeFile(filename, data, writeByteOrderMark, onError, sourceFiles);
+          } else if (filename.endsWith('.d.ts')) {
+            host.writeFile(filename, data, writeByteOrderMark, onError, sourceFiles);
+          } else if (filename.endsWith('.map')) {
             map = data;
           } else if (filename.endsWith('.js')) {
             content = data;
