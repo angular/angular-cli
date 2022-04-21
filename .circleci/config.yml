@@ -29,6 +29,8 @@ var_5: &only_release_branches
   filters:
     branches:
       only:
+        - main
+        # TODO(BRANCH_RENAME_CLEANUP): remove
         - master
         - /\d+\.\d+\.x/
 
@@ -353,6 +355,8 @@ workflows:
             branches:
               only:
                 - renovate/angular
+                - main
+                # TODO(BRANCH_RENAME_CLEANUP): remove
                 - master
       - e2e-cli:
           name: e2e-cli-ng-ve-snapshots
