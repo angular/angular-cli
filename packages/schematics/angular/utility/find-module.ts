@@ -17,6 +17,7 @@ export interface ModuleOptions {
   skipImport?: boolean;
   moduleExt?: string;
   routingModuleExt?: string;
+  standalone?: boolean;
 }
 
 export const MODULE_EXT = '.module.ts';
@@ -28,6 +29,11 @@ export const ROUTING_MODULE_EXT = '-routing.module.ts';
 export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path | undefined {
   // eslint-disable-next-line no-prototype-builtins
   if (options.hasOwnProperty('skipImport') && options.skipImport) {
+    return undefined;
+  }
+
+  // eslint-disable-next-line no-prototype-builtins
+  if (options.hasOwnProperty('standalone') && options.standalone) {
     return undefined;
   }
 

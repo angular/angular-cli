@@ -119,6 +119,41 @@ describe('Component Schematic', () => {
     );
   });
 
+  it('should create a standalone component', async () => {
+    const options = { ...defaultOptions, standalone: true };
+
+    const fooModule = '/projects/bar/src/app/foo/foo.module.ts';
+    appTree.create(
+      fooModule,
+      `
+      import { NgModule } from '@angular/core';
+
+      @NgModule({
+        imports: [],
+        declarations: []
+      })
+      export class FooModule { }
+    `,
+    );
+
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const files = tree.files;
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/projects/bar/src/app/foo/foo.component.css',
+        '/projects/bar/src/app/foo/foo.component.html',
+        '/projects/bar/src/app/foo/foo.component.spec.ts',
+        '/projects/bar/src/app/foo/foo.component.ts',
+      ]),
+    );
+
+    const fooComponentContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(fooComponentContent).toContain('standalone: true,');
+
+    const fooModuleContent = tree.readContent(fooModule);
+    expect(fooModuleContent).not.toContain('FooComponent');
+  });
+
   it('should find the closest module', async () => {
     const options = { ...defaultOptions };
     const fooModule = '/projects/bar/src/app/foo/foo.module.ts';
