@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { createHash } from 'crypto';
 import * as path from 'path';
 import * as vm from 'vm';
 import type { Asset, Compilation } from 'webpack';
@@ -100,6 +99,7 @@ export class WebpackResourceLoader {
     this._reverseDependencies.set(file, new Set(resources));
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private async _compile(
     filePath?: string,
     data?: string,
@@ -110,6 +110,16 @@ export class WebpackResourceLoader {
     if (!this._parentCompilation) {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
     }
+
+    const { context, webpack } = this._parentCompilation.compiler;
+    const {
+      EntryPlugin,
+      NormalModule,
+      library,
+      node,
+      sources,
+      util: { createHash },
+    } = webpack;
 
     const getEntry = (): string => {
       if (filePath) {
@@ -122,7 +132,9 @@ export class WebpackResourceLoader {
         );
       } else if (data) {
         // Create a special URL for reading the resource from memory
-        return `angular-resource:${resourceType},${createHash('md5').update(data).digest('hex')}`;
+        return `angular-resource:${resourceType},${createHash('xxhash64')
+          .update(data)
+          .digest('hex')}`;
       }
 
       throw new Error(`"filePath", "resourceType" or "data" must be specified.`);
@@ -150,8 +162,6 @@ export class WebpackResourceLoader {
       },
     };
 
-    const { context, webpack } = this._parentCompilation.compiler;
-    const { EntryPlugin, NormalModule, library, node, sources } = webpack;
     const childCompiler = this._parentCompilation.createChildCompiler(
       'angular-compiler:resource',
       outputOptions,
