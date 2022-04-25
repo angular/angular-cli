@@ -144,7 +144,7 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
 
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
-  let branch = opts.branch || 'master';
+  let branch = opts.branch || 'main';
 
   // CIRCLE_BRANCH
   if (typeof process.env['CIRCLE_BRANCH'] == 'string') {
