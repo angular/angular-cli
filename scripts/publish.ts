@@ -65,10 +65,10 @@ function _branchCheck(args: PublishArgs, logger: logging.Logger) {
   const branch = ref.trim().replace(/^refs\/heads\//, '');
 
   switch (branch) {
-    case 'master':
+    case 'main':
       if (args.tag !== 'next') {
         throw new Error(tags.oneLine`
-          Releasing from master requires a next tag. Use --no-branchCheck to
+          Releasing from main requires a next tag. Use --no-branchCheck to
           skip this check.
         `);
       }
