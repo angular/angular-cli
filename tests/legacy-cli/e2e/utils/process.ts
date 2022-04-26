@@ -194,7 +194,26 @@ export function execWithEnv(
   return _exec({ env, stdin }, cmd, args);
 }
 
-export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
+export async function execAndCaptureError(
+  cmd: string,
+  args: string[],
+  env?: { [varname: string]: string },
+  stdin?: string,
+): Promise<Error> {
+  try {
+    await _exec({ env, stdin }, cmd, args);
+    throw new Error('Tried to capture subprocess exception, but it completed successfully.');
+  } catch (err) {
+    return err;
+  }
+}
+
+export function execAndWaitForOutputToMatch(
+  cmd: string,
+  args: string[],
+  match: RegExp,
+  env?: { [varName: string]: string },
+) {
   if (cmd === 'ng' && args[0] === 'serve') {
     // Accept matches up to 20 times after the initial match.
     // Useful because the Webpack watcher can rebuild a few times due to files changes that
@@ -202,7 +221,7 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
     // This seems to be due to host file system differences, see
     // https://nodejs.org/docs/latest/api/fs.html#fs_caveats
     return concat(
-      from(_exec({ waitForMatch: match }, cmd, args)),
+      from(_exec({ waitForMatch: match, env }, cmd, args)),
       defer(() => waitForAnyProcessOutputToMatch(match, 2500)).pipe(
         repeat(20),
         catchError(() => EMPTY),
@@ -211,7 +230,7 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
       .pipe(takeLast(1))
       .toPromise();
   } else {
-    return _exec({ waitForMatch: match }, cmd, args);
+    return _exec({ waitForMatch: match, env }, cmd, args);
   }
 }
 
