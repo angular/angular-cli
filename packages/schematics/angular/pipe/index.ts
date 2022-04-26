@@ -30,7 +30,7 @@ import { Schema as PipeOptions } from './schema';
 
 function addDeclarationToNgModule(options: PipeOptions): Rule {
   return (host: Tree) => {
-    if (options.skipImport || !options.module) {
+    if (options.skipImport || options.standalone || !options.module) {
       return host;
     }
 

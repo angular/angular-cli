@@ -420,4 +420,22 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/template: `(\n(.|)*){3}\n\s*`,\n/);
     expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
   });
+
+  it('should create a standalone component', async () => {
+    const options = { ...defaultOptions, standalone: true };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    const componentContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(componentContent).toContain('standalone: true');
+    expect(componentContent).toContain('class FooComponent');
+    expect(moduleContent).not.toContain('FooComponent');
+  });
+
+  it('should declare standalone components in the `imports` of a test', async () => {
+    const options = { ...defaultOptions, standalone: true };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const testContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
+    expect(testContent).toContain('imports: [ FooComponent ]');
+    expect(testContent).not.toContain('declarations');
+  });
 });

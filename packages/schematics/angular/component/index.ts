@@ -39,7 +39,7 @@ function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
 
 function addDeclarationToNgModule(options: ComponentOptions): Rule {
   return (host: Tree) => {
-    if (options.skipImport || !options.module) {
+    if (options.skipImport || options.standalone || !options.module) {
       return host;
     }
 

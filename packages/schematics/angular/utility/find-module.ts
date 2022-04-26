@@ -17,6 +17,7 @@ export interface ModuleOptions {
   skipImport?: boolean;
   moduleExt?: string;
   routingModuleExt?: string;
+  standalone?: boolean;
 }
 
 export const MODULE_EXT = '.module.ts';
@@ -26,8 +27,7 @@ export const ROUTING_MODULE_EXT = '-routing.module.ts';
  * Find the module referred by a set of options passed to the schematics.
  */
 export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path | undefined {
-  // eslint-disable-next-line no-prototype-builtins
-  if (options.hasOwnProperty('skipImport') && options.skipImport) {
+  if (options.standalone || options.skipImport) {
     return undefined;
   }
 

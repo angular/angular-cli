@@ -183,4 +183,14 @@ describe('Directive Schematic', () => {
     expect(files).toContain('/projects/bar/src/app/foo.directive.ts');
     expect(files).not.toContain('/projects/bar/src/app/foo.directive.spec.ts');
   });
+
+  it('should create a standalone directive', async () => {
+    const options = { ...defaultOptions, standalone: true };
+    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    const directiveContent = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    expect(directiveContent).toContain('standalone: true');
+    expect(directiveContent).toContain('class FooDirective');
+    expect(moduleContent).not.toContain('FooDirective');
+  });
 });

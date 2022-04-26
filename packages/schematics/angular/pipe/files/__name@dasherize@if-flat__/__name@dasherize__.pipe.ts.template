@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: '<%= camelize(name) %>'
+  name: '<%= camelize(name) %>'<% if(standalone) {%>,
+  standalone: true<%}%>
 })
 export class <%= classify(name) %>Pipe implements PipeTransform {
 
