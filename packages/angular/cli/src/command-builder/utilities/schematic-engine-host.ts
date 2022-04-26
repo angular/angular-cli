@@ -195,7 +195,9 @@ function wrap(
   const schematicCode = readFileSync(schematicFile, 'utf8');
   // `module` is required due to @angular/localize ng-add being in UMD format
   const headerCode = '(function() {\nvar exports = {};\nvar module = { exports };\n';
-  const footerCode = exportName ? `\nreturn exports['${exportName}'];});` : '\nreturn exports;});';
+  const footerCode = exportName
+    ? `\nreturn module.exports['${exportName}'];});`
+    : '\nreturn module.exports;});';
 
   const script = new Script(headerCode + schematicCode + footerCode, {
     filename: schematicFile,
