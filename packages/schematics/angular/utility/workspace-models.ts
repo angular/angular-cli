@@ -11,6 +11,12 @@ export enum ProjectType {
   Library = 'library',
 }
 
+/**
+ * An enum of the official Angular builders.
+ * Each enum value provides the fully qualified name of the associated builder.
+ * This enum can be used when analyzing the `builder` fields of project configurations from the
+ * `angular.json` workspace file.
+ */
 export enum Builders {
   AppShell = '@angular-devkit/build-angular:app-shell',
   Server = '@angular-devkit/build-angular:server',
