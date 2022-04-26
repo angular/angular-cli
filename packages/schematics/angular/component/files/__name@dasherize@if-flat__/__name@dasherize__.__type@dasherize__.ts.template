@@ -1,7 +1,8 @@
 import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
 
 @Component({<% if(!skipSelector) {%>
-  selector: '<%= selector %>',<%}%><% if(inlineTemplate) { %>
+  selector: '<%= selector %>',<%}%><% if(standalone) {%>
+  standalone: true,<%}%><% if(inlineTemplate) { %>
   template: `
     <p>
       <%= dasherize(name) %> works!

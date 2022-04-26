@@ -48,6 +48,12 @@
       "alias": "t",
       "x-user-analytics": 10
     },
+    "standalone": {
+      "description": "Whether the generated component is standalone.",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": 15
+    },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the new component.",
       "enum": ["Emulated", "None", "ShadowDom"],

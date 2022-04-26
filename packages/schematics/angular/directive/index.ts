@@ -31,7 +31,7 @@ import { Schema as DirectiveOptions } from './schema';
 
 function addDeclarationToNgModule(options: DirectiveOptions): Rule {
   return (host: Tree) => {
-    if (options.skipImport || !options.module) {
+    if (options.skipImport || options.standalone || !options.module) {
       return host;
     }
 

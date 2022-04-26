@@ -45,6 +45,12 @@
       "description": "Do not import this pipe into the owning NgModule.",
       "x-user-analytics": 18
     },
+    "standalone": {
+      "description": "Whether the generated pipe is standalone.",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": 15
+    },
     "module": {
       "type": "string",
       "description": "The declaring NgModule.",
