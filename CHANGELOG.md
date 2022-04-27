@@ -1,3 +1,25 @@
+<a name="13.3.4"></a>
+
+# 13.3.4 (2022-04-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [f4da75656](https://github.com/angular/angular-cli/commit/f4da756560358273098df2a5cae7848201206c77) | fix  | change wrapping of schematic code |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [5d0141bfb](https://github.com/angular/angular-cli/commit/5d0141bfb4ae80b1a7543eab64e9c381c932eaef) | fix  | correctly resolve custom service worker configuration file |
+
+## Special Thanks
+
+Charles Lyding and Wagner Maciel
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.11"></a>
 
 # 14.0.0-next.11 (2022-04-21)
