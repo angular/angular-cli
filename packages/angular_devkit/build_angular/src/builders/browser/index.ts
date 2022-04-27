@@ -354,6 +354,7 @@ export function buildWebpackBrowser(
                     try {
                       await augmentAppWithServiceWorker(
                         normalize(projectRoot),
+                        context.workspaceRoot,
                         normalize(outputPath),
                         getLocaleBaseHref(i18n, locale) || options.baseHref || '/',
                         options.ngswConfigPath,
