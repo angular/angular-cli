@@ -62,13 +62,14 @@ class CliFilesystem implements Filesystem {
 
 export async function augmentAppWithServiceWorker(
   appRoot: string,
+  workspaceRoot: string,
   outputPath: string,
   baseHref: string,
   ngswConfigPath?: string,
 ): Promise<void> {
   // Determine the configuration file path
   const configPath = ngswConfigPath
-    ? path.normalize(ngswConfigPath)
+    ? path.join(workspaceRoot, ngswConfigPath)
     : path.join(appRoot, 'ngsw-config.json');
 
   // Read the configuration file
