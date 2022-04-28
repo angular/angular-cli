@@ -6,6 +6,7 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 
 licenses(["notice"])  # MIT
@@ -209,10 +210,17 @@ ts_library(
     ],
 )
 
-jasmine_node_test(
-    name = "build_angular_test",
-    srcs = [":build_angular_test_lib"],
-)
+[
+    jasmine_node_test(
+        name = "build_angular_test_" + toolchain_name,
+        srcs = [":build_angular_test_lib"],
+        toolchain = toolchain,
+    )
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
+    )
+]
 
 genrule(
     name = "license",
@@ -383,16 +391,23 @@ LARGE_SPECS = {
 ]
 
 [
-    jasmine_node_test(
-        name = "build_angular_" + spec + "_test",
-        size = LARGE_SPECS[spec].get("size", "medium"),
-        flaky = LARGE_SPECS[spec].get("flaky", False),
-        shard_count = LARGE_SPECS[spec].get("shards", 2),
-        # These tests are resource intensive and should not be over-parallized as they will
-        # compete for the resources of other parallel tests slowing everything down.
-        # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
-        tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
-        deps = [":build_angular_" + spec + "_test_lib"],
+    [
+        jasmine_node_test(
+            name = "build_angular_" + spec + "_test_" + toolchain_name,
+            size = LARGE_SPECS[spec].get("size", "medium"),
+            flaky = LARGE_SPECS[spec].get("flaky", False),
+            shard_count = LARGE_SPECS[spec].get("shards", 2),
+            # These tests are resource intensive and should not be over-parallized as they will
+            # compete for the resources of other parallel tests slowing everything down.
+            # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
+            tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
+            toolchain = toolchain,
+            deps = [":build_angular_" + spec + "_test_lib"],
+        )
+        for spec in LARGE_SPECS
+    ]
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
     )
-    for spec in LARGE_SPECS
 ]
