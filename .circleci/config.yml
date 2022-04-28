@@ -56,7 +56,7 @@ jobs:
   setup:
     executor: action-executor
     steps:
-      # After checkout, rebase on top of master. By default, PRs are not rebased on top of master,
+      # After checkout, rebase on top of main. By default, PRs are not rebased on top of main,
       # which we want. See https://discuss.circleci.com/t/1662
       - checkout:
           post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
@@ -147,7 +147,7 @@ workflows:
 general:
   branches:
     only:
-      - master
+      - main
       # 5.2.x, 6.0.x, etc
       - /\d+\.\d+\.x/
       # 5.x, 6.x, etc

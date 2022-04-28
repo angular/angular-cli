@@ -9,7 +9,7 @@
   "lockFileMaintenance": {
     "enabled": true
   },
-  "baseBranches": ["master"],
+  "baseBranches": ["main"],
   "ignoreDeps": ["@types/node"],
   "includePaths": [
     "WORKSPACE",
