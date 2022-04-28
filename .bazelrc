@@ -50,6 +50,9 @@ test --incompatible_strict_action_env
 # Enable remote caching of build/action tree
 build --experimental_remote_merkle_tree_cache
 
+# Ensure sandboxing is enabled even for exclusive tests
+test --incompatible_exclusive_test_sandboxed
+
 ###############################
 # Saucelabs support           #
 # Turn on these settings with #
