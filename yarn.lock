@@ -9,23 +9,23 @@
   dependencies:
     "@jridgewell/trace-mapping" "^0.3.0"
 
-"@angular-devkit/architect@0.1400.0-next.11":
-  version "0.1400.0-next.11"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1400.0-next.11.tgz#0c265e7425ee70658f4d56f832d4b7bdcfe0824c"
-  integrity sha512-bc2PmHGWpqPuneVwSBIa8jI3Vsq/bDUJJ1vZPhqS9VqblWHaqmBqdUTjT5f7Uqs3g1bUdYWQbUZIixPYrr2xnQ==
+"@angular-devkit/architect@0.1400.0-next.12":
+  version "0.1400.0-next.12"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1400.0-next.12.tgz#3ed6123a99b8b0197876cddf643672a633ac95a7"
+  integrity sha512-VyhMYICfDX5enrzbyQSKe74TC6GKE08VRYmE4EwK7EOtn9Hz14HuLtZhdwg5IlcV/hdKCsCHuQ/XZNQaTjfsdg==
   dependencies:
-    "@angular-devkit/core" "14.0.0-next.11"
+    "@angular-devkit/core" "14.0.0-next.12"
     rxjs "6.6.7"
 
-"@angular-devkit/build-angular@14.0.0-next.11":
-  version "14.0.0-next.11"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-14.0.0-next.11.tgz#e7e6438d72dcd17f0ad6ef11a8827c921c339ea4"
-  integrity sha512-li7c+b6qQqiKEENsXUkfU26MGDUb0WTx3OkKUciy6+eOqg8ns6dJDSXh83alGBvOodwH/UkCpfAKw4tBWA23gA==
+"@angular-devkit/build-angular@14.0.0-next.12":
+  version "14.0.0-next.12"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-14.0.0-next.12.tgz#28270cc0dca559481d36ef55d5133558a3831f44"
+  integrity sha512-GKeXMq2eLoH31f3JZNd2UdkI3m0z/YLKIg6g1kK3bG8cBTayXRCgcyKaIBvCc1nN+DfBduMnTBKBzmaeGl+dXA==
   dependencies:
     "@ampproject/remapping" "2.1.2"
-    "@angular-devkit/architect" "0.1400.0-next.11"
-    "@angular-devkit/build-webpack" "0.1400.0-next.11"
-    "@angular-devkit/core" "14.0.0-next.11"
+    "@angular-devkit/architect" "0.1400.0-next.12"
+    "@angular-devkit/build-webpack" "0.1400.0-next.12"
+    "@angular-devkit/core" "14.0.0-next.12"
     "@babel/core" "7.17.9"
     "@babel/generator" "7.17.9"
     "@babel/helper-annotate-as-pure" "7.16.7"
@@ -36,7 +36,7 @@
     "@babel/runtime" "7.17.9"
     "@babel/template" "7.16.7"
     "@discoveryjs/json-ext" "0.5.7"
-    "@ngtools/webpack" "14.0.0-next.11"
+    "@ngtools/webpack" "14.0.0-next.12"
     ansi-colors "4.1.1"
     babel-loader "8.2.4"
     babel-plugin-istanbul "6.1.1"
@@ -87,18 +87,18 @@
   optionalDependencies:
     esbuild "0.14.36"
 
-"@angular-devkit/build-webpack@0.1400.0-next.11":
-  version "0.1400.0-next.11"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-webpack/-/build-webpack-0.1400.0-next.11.tgz#8cbdd0140749e19f4eb28f005ef841e3eb4f5e3d"
-  integrity sha512-obQSQ1nU8SKaUVRrmqBH34f4v2d8JKnXgyZtdxjHjyVpTF1sT9lOuaDxC7i+geQwov06L1o1n6EHnLJtfp2cFQ==
+"@angular-devkit/build-webpack@0.1400.0-next.12":
+  version "0.1400.0-next.12"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-webpack/-/build-webpack-0.1400.0-next.12.tgz#19c321d13ea92526a2b3414f00e568a9322da1bf"
+  integrity sha512-PR7e8yQMG0VAdXSHc11xttzT4WKRXxSb10Pe2qQxKubMPpfRiMljoUQ4K39/0zdkiKlNI5XWItk8zA5cwZFU2A==
   dependencies:
-    "@angular-devkit/architect" "0.1400.0-next.11"
+    "@angular-devkit/architect" "0.1400.0-next.12"
     rxjs "6.6.7"
 
-"@angular-devkit/core@14.0.0-next.11":
-  version "14.0.0-next.11"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-14.0.0-next.11.tgz#29a10e3a7dc15affbdc26a246ec6f30ed826486f"
-  integrity sha512-mCNTL8YCzvHp4OLnlkJw/hUGIi6GIbh9C7KmgqFEW9xwODfJBL96qbFShDbr7InU6N3q4eefwdw8ICcqB0B9sA==
+"@angular-devkit/core@14.0.0-next.12":
+  version "14.0.0-next.12"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-14.0.0-next.12.tgz#3e6a8c565b69d1324f8f0a4d35e49221aca348b8"
+  integrity sha512-eX1UFpBQ4RD4mTuKNhFJqaBkBUIXbWnX6CJuKmjQgyXxkrh+PnaLZdjKp8qZBi37ttrJZ/hDmFHGPOOtgvFKGA==
   dependencies:
     ajv "8.11.0"
     ajv-formats "2.1.1"
@@ -174,12 +174,11 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7577b56c92cf09d8dcd4a86584fded1ec69e78ac":
-  version "0.0.0-6ea40a1d2ad71bc2acb1d6b1bdc957a32d272e16"
-  uid "7577b56c92cf09d8dcd4a86584fded1ec69e78ac"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#7577b56c92cf09d8dcd4a86584fded1ec69e78ac"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#4149a6bb4dd87882532f0bab753e877b61a7cb50":
+  version "0.0.0-303acfd7f5ae3118193047f604d821f3604a0512"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#4149a6bb4dd87882532f0bab753e877b61a7cb50"
   dependencies:
-    "@angular-devkit/build-angular" "14.0.0-next.11"
+    "@angular-devkit/build-angular" "14.0.0-next.12"
     "@angular/benchpress" "0.3.0"
     "@babel/core" "^7.16.0"
     "@bazel/buildifier" "5.1.0"
@@ -204,7 +203,7 @@
     node-fetch "^2.6.1"
     prettier "2.6.2"
     protractor "^7.0.0"
-    selenium-webdriver "4.1.1"
+    selenium-webdriver "4.1.2"
     send "^0.18.0"
     tmp "^0.2.1"
     "true-case-path" "^2.2.1"
@@ -1534,10 +1533,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.14.1.tgz#155ef21065427901994e765da8a0ba0eaae8b8bd"
   integrity sha512-6Wci+Tp3CgPt/B9B0a3J4s3yMgLNSku6w5TV6mN+61C71UqsRBv2FUibBf3tPGlNxebgPHMEUzKpb1ggE8KCKw==
 
-"@ngtools/webpack@14.0.0-next.11":
-  version "14.0.0-next.11"
-  resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-14.0.0-next.11.tgz#f5be27ab37b6d7097693a59c1f0a6be66f3a37f3"
-  integrity sha512-oph82/ud1tFtkTL6iqq6MDxPMxrX1lfnZgyorYlYx7rxw6j3SZpjFRCP19UUUlNisqIMLZXCeor0+IXeOlposA==
+"@ngtools/webpack@14.0.0-next.12":
+  version "14.0.0-next.12"
+  resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-14.0.0-next.12.tgz#6920a8a54abd2a5bc41f671ed4e18d8b3be0502b"
+  integrity sha512-i2+IT0i9IicplJaesp4ELUbbtKvH0skQeQvpQ9Md9HHj4miKaGnj1eMIbVxQrY2PCPyz2Mxva2iHXSfVCE1N4w==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -9189,7 +9188,6 @@ sass@^1.49.9:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz":
   version "0.0.0"
-  uid "992e2cb0d91e54b27a4f5bbd2049f3b774718115"
   resolved "https://saucelabs.com/downloads/sc-4.6.4-linux.tar.gz#992e2cb0d91e54b27a4f5bbd2049f3b774718115"
 
 saucelabs@^1.5.0:
@@ -9254,10 +9252,10 @@ selenium-webdriver@3.6.0, selenium-webdriver@^3.0.1:
     tmp "0.0.30"
     xml2js "^0.4.17"
 
-selenium-webdriver@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/selenium-webdriver/-/selenium-webdriver-4.1.1.tgz#da083177d811f36614950e809e2982570f67d02e"
-  integrity sha512-Fr9e9LC6zvD6/j7NO8M1M/NVxFX67abHcxDJoP5w2KN/Xb1SyYLjMVPGgD14U2TOiKe4XKHf42OmFw9g2JgCBQ==
+selenium-webdriver@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/selenium-webdriver/-/selenium-webdriver-4.1.2.tgz#d463b4335632d2ea41a9e988e435a55dc41f5314"
+  integrity sha512-e4Ap8vQvhipgBB8Ry9zBiKGkU6kHKyNnWiavGGLKkrdW81Zv7NVMtFOL/j3yX0G8QScM7XIXijKssNd4EUxSOw==
   dependencies:
     jszip "^3.6.0"
     tmp "^0.2.1"
