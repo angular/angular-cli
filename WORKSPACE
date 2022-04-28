@@ -22,8 +22,8 @@ http_archive(
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "2b2004784358655f334925e7eadc7ba80f701144363df949b3293e1ae7a2fb7b",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.4.0/rules_nodejs-5.4.0.tar.gz"],
+    sha256 = "280cefd3649b9648fdc444e9d6ed17c949152ff28d7e23638390ae8b93941d60",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.4.1/rules_nodejs-5.4.1.tar.gz"],
 )
 
 load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_dependencies")
