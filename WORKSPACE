@@ -88,3 +88,13 @@ load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies",
 aspect_bazel_lib_dependencies()
 
 register_jq_toolchains(version = "1.6")
+
+nodejs_register_toolchains(
+    name = "node14",
+    node_version = "14.17.1",
+)
+
+nodejs_register_toolchains(
+    name = "node16",
+    node_version = "16.13.1",
+)
