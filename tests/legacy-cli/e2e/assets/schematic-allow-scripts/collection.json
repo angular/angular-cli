@@ -1,0 +1,9 @@
+{
+  "schematics": {
+    "test": {
+      "factory": "./index.js",
+      "schema": "./schema.json",
+      "description": "test schematic that creates a directory with a local test package that should not run its post-install script"
+    }
+  }
+}

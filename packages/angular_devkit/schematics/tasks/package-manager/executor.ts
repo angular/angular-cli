@@ -100,6 +100,10 @@ export default function (
       args.push(taskPackageManagerProfile.quietArgument);
     }
 
+    if (!options.allowScripts) {
+      args.push('--ignore-scripts');
+    }
+
     if (factoryOptions.registry) {
       args.push(`--registry="${factoryOptions.registry}"`);
     }

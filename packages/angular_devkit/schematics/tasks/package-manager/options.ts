@@ -23,4 +23,5 @@ export interface NodePackageTaskOptions {
   workingDirectory?: string;
   packageName?: string;
   packageManager?: string;
+  allowScripts?: boolean;
 }
