@@ -13,6 +13,7 @@ export default async function () {
         ...process.env,
         HOME: home,
         NG_FORCE_TTY: '1',
+        NG_FORCE_AUTOCOMPLETE: 'false',
       },
       'y' /* stdin */,
     );
@@ -29,6 +30,7 @@ export default async function () {
       HOME: home,
       NG_FORCE_TTY: '1',
       NG_CLI_ANALYTICS: 'false',
+      NG_FORCE_AUTOCOMPLETE: 'false',
     });
 
     if (ANALYTICS_PROMPT.test(stdout)) {
@@ -42,6 +44,7 @@ export default async function () {
       ...process.env,
       HOME: home,
       NG_FORCE_TTY: '1',
+      NG_FORCE_AUTOCOMPLETE: 'false',
     });
 
     if (ANALYTICS_PROMPT.test(stdout)) {

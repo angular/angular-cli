@@ -18,8 +18,17 @@ function isEnabled(variable: string | undefined): boolean {
   return isPresent(variable) && (variable === '1' || variable.toLowerCase() === 'true');
 }
 
+function optional(variable: string | undefined): boolean | undefined {
+  if (!isPresent(variable)) {
+    return undefined;
+  }
+
+  return isEnabled(variable);
+}
+
 export const analyticsDisabled = isDisabled(process.env['NG_CLI_ANALYTICS']);
 export const analyticsShareDisabled = isDisabled(process.env['NG_CLI_ANALYTICS_SHARE']);
 export const isCI = isEnabled(process.env['CI']);
 export const disableVersionCheck = isEnabled(process.env['NG_DISABLE_VERSION_CHECK']);
 export const ngDebug = isEnabled(process.env['NG_DEBUG']);
+export const forceAutocomplete = optional(process.env['NG_FORCE_AUTOCOMPLETE']);
