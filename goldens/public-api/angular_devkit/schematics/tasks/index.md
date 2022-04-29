@@ -11,6 +11,8 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
     constructor(workingDirectory?: string);
     constructor(options: NodePackageInstallTaskOptions);
     // (undocumented)
+    allowScripts: boolean;
+    // (undocumented)
     hideOutput: boolean;
     // (undocumented)
     packageManager?: string;

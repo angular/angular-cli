@@ -15,11 +15,13 @@ interface NodePackageInstallTaskOptions {
   workingDirectory?: string;
   quiet?: boolean;
   hideOutput?: boolean;
+  allowScripts?: boolean;
 }
 
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
   quiet = true;
   hideOutput = true;
+  allowScripts = false;
   workingDirectory?: string;
   packageManager?: string;
   packageName?: string;
@@ -45,6 +47,9 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
       if (options.packageName != undefined) {
         this.packageName = options.packageName;
       }
+      if (options.allowScripts !== undefined) {
+        this.allowScripts = options.allowScripts;
+      }
     }
   }
 
@@ -58,6 +63,7 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
         workingDirectory: this.workingDirectory,
         packageManager: this.packageManager,
         packageName: this.packageName,
+        allowScripts: this.allowScripts,
       },
     };
   }
