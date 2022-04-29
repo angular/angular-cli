@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { env } from 'process';
-import { execWithEnv } from '../../utils/process';
+import { execAndCaptureError, execWithEnv } from '../../utils/process';
 
 const AUTOCOMPLETION_PROMPT = /Would you like to enable autocompletion\?/;
 const DEFAULT_ENV = Object.freeze({
@@ -81,6 +81,161 @@ export default async function () {
     if (stdout.includes('Appended `source <(ng completion script)`')) {
       throw new Error(
         'CLI printed that it successfully set up autocompletion when it actually' + " didn't.",
+      );
+    }
+
+    if (!stdout.includes("Ok, you won't be prompted again.")) {
+      throw new Error('CLI did not inform the user they will not be prompted again.');
+    }
+  });
+
+  // Does *not* prompt if the user already accepted (even if they delete the completion config).
+  await mockHome(async (home) => {
+    const bashrc = path.join(home, '.bashrc');
+    await fs.writeFile(bashrc, '# Other commands...');
+
+    const { stdout: stdout1 } = await execWithEnv(
+      'ng',
+      ['version'],
+      {
+        ...DEFAULT_ENV,
+        SHELL: '/bin/bash',
+        HOME: home,
+      },
+      'y' /* stdin: accept prompt */,
+    );
+
+    if (!AUTOCOMPLETION_PROMPT.test(stdout1)) {
+      throw new Error('First execution did not prompt for autocompletion setup.');
+    }
+
+    const bashrcContents1 = await fs.readFile(bashrc, 'utf-8');
+    if (!bashrcContents1.includes('source <(ng completion script)')) {
+      throw new Error(
+        '`~/.bashrc` file was not updated after the user accepted the autocompletion' +
+          ` prompt. Contents:\n${bashrcContents1}`,
+      );
+    }
+
+    // User modifies their configuration and removes `ng completion`.
+    await fs.writeFile(bashrc, '# Some new commands...');
+
+    const { stdout: stdout2 } = await execWithEnv('ng', ['version'], {
+      ...DEFAULT_ENV,
+      SHELL: '/bin/bash',
+      HOME: home,
+    });
+
+    if (AUTOCOMPLETION_PROMPT.test(stdout2)) {
+      throw new Error(
+        'Subsequent execution after rejecting autocompletion setup prompted again' +
+          ' when it should not have.',
+      );
+    }
+
+    const bashrcContents2 = await fs.readFile(bashrc, 'utf-8');
+    if (bashrcContents2 !== '# Some new commands...') {
+      throw new Error(
+        '`~/.bashrc` file was incorrectly modified when using a modified `~/.bashrc`' +
+          ` after previously accepting the autocompletion prompt. Contents:\n${bashrcContents2}`,
+      );
+    }
+  });
+
+  // Does *not* prompt if the user already rejected.
+  await mockHome(async (home) => {
+    const bashrc = path.join(home, '.bashrc');
+    await fs.writeFile(bashrc, '# Other commands...');
+
+    const { stdout: stdout1 } = await execWithEnv(
+      'ng',
+      ['version'],
+      {
+        ...DEFAULT_ENV,
+        SHELL: '/bin/bash',
+        HOME: home,
+      },
+      'n' /* stdin: reject prompt */,
+    );
+
+    if (!AUTOCOMPLETION_PROMPT.test(stdout1)) {
+      throw new Error('First execution did not prompt for autocompletion setup.');
+    }
+
+    const { stdout: stdout2 } = await execWithEnv('ng', ['version'], {
+      ...DEFAULT_ENV,
+      SHELL: '/bin/bash',
+      HOME: home,
+    });
+
+    if (AUTOCOMPLETION_PROMPT.test(stdout2)) {
+      throw new Error(
+        'Subsequent execution after rejecting autocompletion setup prompted again' +
+          ' when it should not have.',
+      );
+    }
+
+    const bashrcContents = await fs.readFile(bashrc, 'utf-8');
+    if (bashrcContents !== '# Other commands...') {
+      throw new Error(
+        '`~/.bashrc` file was incorrectly modified when the user never accepted the' +
+          ` autocompletion prompt. Contents:\n${bashrcContents}`,
+      );
+    }
+  });
+
+  // Prompts user again on subsequent execution after accepting prompt but failing to setup.
+  await mockHome(async (home) => {
+    const bashrc = path.join(home, '.bashrc');
+    await fs.writeFile(bashrc, '# Other commands...');
+
+    // Make `~/.bashrc` readonly. This is enough for the CLI to verify that the file exists and
+    // `ng completion` is not in it, but will fail when actually trying to modify the file.
+    await fs.chmod(bashrc, 0o444);
+
+    const err = await execAndCaptureError(
+      'ng',
+      ['version'],
+      {
+        ...DEFAULT_ENV,
+        SHELL: '/bin/bash',
+        HOME: home,
+      },
+      'y' /* stdin: accept prompt */,
+    );
+
+    if (!err.message.includes('Failed to append autocompletion setup')) {
+      throw new Error(
+        `Failed first execution did not print the expected error message. Actual:\n${err.message}`,
+      );
+    }
+
+    // User corrects file permissions between executions.
+    await fs.chmod(bashrc, 0o777);
+
+    const { stdout: stdout2 } = await execWithEnv(
+      'ng',
+      ['version'],
+      {
+        ...DEFAULT_ENV,
+        SHELL: '/bin/bash',
+        HOME: home,
+      },
+      'y' /* stdin: accept prompt */,
+    );
+
+    if (!AUTOCOMPLETION_PROMPT.test(stdout2)) {
+      throw new Error(
+        'Subsequent execution after failed autocompletion setup did not prompt again when it should' +
+          ' have.',
+      );
+    }
+
+    const bashrcContents = await fs.readFile(bashrc, 'utf-8');
+    if (!bashrcContents.includes('ng completion script')) {
+      throw new Error(
+        '`~/.bashrc` file does not include `ng completion` after the user never accepted the' +
+          ` autocompletion prompt a second time. Contents:\n${bashrcContents}`,
       );
     }
   });
