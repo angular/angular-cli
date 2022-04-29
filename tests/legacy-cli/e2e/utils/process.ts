@@ -11,6 +11,7 @@ interface ExecOptions {
   silent?: boolean;
   waitForMatch?: RegExp;
   env?: { [varname: string]: string };
+  stdin?: string;
 }
 
 let _processes: child_process.ChildProcess[] = [];
@@ -107,6 +108,10 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
         ),
       );
     });
+    childProcess.on('error', (error) => {
+      err.message += `${error}...\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
+      reject(err);
+    });
 
     if (options.waitForMatch) {
       const match = options.waitForMatch;
@@ -122,6 +127,12 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
           matched = true;
         }
       });
+    }
+
+    // Provide input to stdin if given.
+    if (options.stdin) {
+      childProcess.stdin.write(options.stdin);
+      childProcess.stdin.end();
     }
   });
 }
@@ -174,8 +185,13 @@ export function silentExec(cmd: string, ...args: string[]) {
   return _exec({ silent: true }, cmd, args);
 }
 
-export function execWithEnv(cmd: string, args: string[], env: { [varname: string]: string }) {
-  return _exec({ env }, cmd, args);
+export function execWithEnv(
+  cmd: string,
+  args: string[],
+  env: { [varname: string]: string },
+  stdin?: string,
+) {
+  return _exec({ env, stdin }, cmd, args);
 }
 
 export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
