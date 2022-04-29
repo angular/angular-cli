@@ -259,6 +259,12 @@ jobs:
       - custom_attach_workspace
       - run: yarn build
 
+  build-bazel:
+    executor: action-executor
+    steps:
+      - custom_attach_workspace
+      - run: yarn build:bazel
+
   test:
     executor: test-executor
     resource_class: xlarge
@@ -378,12 +384,9 @@ workflows:
             - build
 
       # Bazel jobs
-      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
-      # will catch any build errors before proceeding to the more lengthy and resource intensive
-      # Bazel jobs.
       - test:
           requires:
-            - build
+            - build-bazel
 
       # Windows jobs
       - e2e-cli-win:
