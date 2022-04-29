@@ -6,13 +6,23 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { env } from 'process';
 import { colors } from '../utilities/color';
+import { getWorkspace } from '../utilities/config';
 import { forceAutocomplete } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
+
+/** Interface for the autocompletion configuration stored in the global workspace. */
+interface CompletionConfig {
+  /**
+   * Whether or not the user has been prompted to set up autocompletion. If `true`, should *not*
+   * prompt them again.
+   */
+  prompted?: boolean;
+}
 
 /**
  * Checks if it is appropriate to prompt the user to setup autocompletion. If not, does nothing. If
@@ -24,14 +34,27 @@ export async function considerSettingUpAutocompletion(
   logger: logging.Logger,
 ): Promise<number | undefined> {
   // Check if we should prompt the user to setup autocompletion.
-  if (!(await shouldPromptForAutocompletionSetup())) {
-    return undefined; // Already set up, nothing to do.
+  const completionConfig = await getCompletionConfig();
+  if (!(await shouldPromptForAutocompletionSetup(completionConfig))) {
+    return undefined; // Already set up or prompted previously, nothing to do.
   }
 
   // Prompt the user and record their response.
   const shouldSetupAutocompletion = await promptForAutocompletion();
   if (!shouldSetupAutocompletion) {
-    return undefined; // User rejected the prompt and doesn't want autocompletion.
+    // User rejected the prompt and doesn't want autocompletion.
+    logger.info(
+      `
+Ok, you won't be prompted again. Should you change your mind, the following command will set up autocompletion for you:
+
+    ${colors.yellow(`ng completion`)}
+    `.trim(),
+    );
+
+    // Save configuration to remember that the user was prompted and avoid prompting again.
+    await setCompletionConfig({ ...completionConfig, prompted: true });
+
+    return undefined;
   }
 
   // User accepted the prompt, set up autocompletion.
@@ -54,10 +77,36 @@ Appended \`source <(ng completion script)\` to \`${rcFile}\`. Restart your termi
     `.trim(),
   );
 
+  // Save configuration to remember that the user was prompted.
+  await setCompletionConfig({ ...completionConfig, prompted: true });
+
   return undefined;
 }
 
-async function shouldPromptForAutocompletionSetup(): Promise<boolean> {
+async function getCompletionConfig(): Promise<CompletionConfig | undefined> {
+  const wksp = await getWorkspace('global');
+
+  return wksp?.getCli()?.['completion'];
+}
+
+async function setCompletionConfig(config: CompletionConfig): Promise<void> {
+  const wksp = await getWorkspace('global');
+  if (!wksp) {
+    throw new Error(`Could not find global workspace`);
+  }
+
+  wksp.extensions['cli'] ??= {};
+  const cli = wksp.extensions['cli'];
+  if (!json.isJsonObject(cli)) {
+    throw new Error(
+      `Invalid config found at ${wksp.filePath}. \`extensions.cli\` should be an object.`,
+    );
+  }
+  cli.completion = config as json.JsonObject;
+  await wksp.save();
+}
+
+async function shouldPromptForAutocompletionSetup(config?: CompletionConfig): Promise<boolean> {
   // Force whether or not to prompt for autocomplete to give an easy path for e2e testing to skip.
   if (forceAutocomplete !== undefined) {
     return forceAutocomplete;
@@ -65,6 +114,11 @@ async function shouldPromptForAutocompletionSetup(): Promise<boolean> {
 
   // Non-interactive and continuous integration systems don't care about autocompletion.
   if (!isTTY()) {
+    return false;
+  }
+
+  // Skip prompt if the user has already been prompted.
+  if (config?.prompted) {
     return false;
   }
 
