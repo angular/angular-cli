@@ -76,7 +76,7 @@ PKG_GROUP_REPLACEMENTS = {
     "TSLIB_VERSION": TSLIB_VERSION,
 }
 
-def ng_module(name, package_name, module_name = None, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
+def ng_module(name, package_name, module_name = None, tsconfig = None, testonly = False, deps = [], **kwargs):
     deps = deps + ["@npm//tslib", "@npm//@types/node"]
 
     if not tsconfig:
@@ -90,7 +90,6 @@ def ng_module(name, package_name, module_name = None, tsconfig = None, testonly 
         module_name = package_name,
         package_name = package_name,
         flat_module_out_file = name,
-        bundle_dts = bundle_dts,
         tsconfig = tsconfig,
         testonly = testonly,
         deps = deps,
