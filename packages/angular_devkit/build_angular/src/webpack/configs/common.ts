@@ -365,8 +365,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         },
         {
           test: /\.[cm]?[tj]sx?$/,
-          // The below is needed due to a bug in `@babel/runtime`. See: https://github.com/babel/babel/issues/12824
-          resolve: { fullySpecified: false },
           exclude: [
             /[\\/]node_modules[/\\](?:core-js|@babel|tslib|web-animations-js|web-streams-polyfill|whatwg-url)[/\\]/,
           ],
