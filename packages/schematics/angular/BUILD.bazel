@@ -112,6 +112,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node/testing",
         "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/testing",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
         "@npm//@types/browserslist",
