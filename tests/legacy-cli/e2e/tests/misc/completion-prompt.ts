@@ -240,6 +240,31 @@ export default async function () {
     }
   });
 
+  // Does *not* prompt for `ng update` commands.
+  await mockHome(async (home) => {
+    // Use `ng update --help` so it's actually a no-op and we don't need to setup a project.
+    const { stdout } = await execWithEnv('ng', ['update', '--help'], {
+      ...DEFAULT_ENV,
+      HOME: home,
+    });
+
+    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
+      throw new Error('`ng update` command incorrectly prompted for autocompletion setup.');
+    }
+  });
+
+  // Does *not* prompt for `ng completion` commands.
+  await mockHome(async (home) => {
+    const { stdout } = await execWithEnv('ng', ['completion'], {
+      ...DEFAULT_ENV,
+      HOME: home,
+    });
+
+    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
+      throw new Error('`ng completion` command incorrectly prompted for autocompletion setup.');
+    }
+  });
+
   // Does *not* prompt user for CI executions.
   {
     const { stdout } = await execWithEnv('ng', ['version'], {

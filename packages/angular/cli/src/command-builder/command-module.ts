@@ -125,7 +125,10 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     }
 
     // Set up autocompletion if appropriate.
-    const autocompletionExitCode = await considerSettingUpAutocompletion(this.context.logger);
+    const autocompletionExitCode = await considerSettingUpAutocompletion(
+      this.commandName,
+      this.context.logger,
+    );
     if (autocompletionExitCode !== undefined) {
       process.exitCode = autocompletionExitCode;
 
