@@ -31,11 +31,12 @@ interface CompletionConfig {
  * @returns an exit code if the program should terminate, undefined otherwise.
  */
 export async function considerSettingUpAutocompletion(
+  command: string,
   logger: logging.Logger,
 ): Promise<number | undefined> {
   // Check if we should prompt the user to setup autocompletion.
   const completionConfig = await getCompletionConfig();
-  if (!(await shouldPromptForAutocompletionSetup(completionConfig))) {
+  if (!(await shouldPromptForAutocompletionSetup(command, completionConfig))) {
     return undefined; // Already set up or prompted previously, nothing to do.
   }
 
@@ -106,10 +107,18 @@ async function setCompletionConfig(config: CompletionConfig): Promise<void> {
   await wksp.save();
 }
 
-async function shouldPromptForAutocompletionSetup(config?: CompletionConfig): Promise<boolean> {
+async function shouldPromptForAutocompletionSetup(
+  command: string,
+  config?: CompletionConfig,
+): Promise<boolean> {
   // Force whether or not to prompt for autocomplete to give an easy path for e2e testing to skip.
   if (forceAutocomplete !== undefined) {
     return forceAutocomplete;
+  }
+
+  // Don't prompt on `ng update` or `ng completion`.
+  if (command === 'update' || command === 'completion') {
+    return false;
   }
 
   // Non-interactive and continuous integration systems don't care about autocompletion.
