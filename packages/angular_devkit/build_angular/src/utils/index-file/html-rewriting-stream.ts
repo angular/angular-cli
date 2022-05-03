@@ -6,14 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { RewritingStream } from 'parse5-html-rewriting-stream';
 import { Readable, Writable } from 'stream';
+import { loadEsmModule } from '../load-esm';
 
 export async function htmlRewritingStream(content: string): Promise<{
-  rewriter: import('parse5-html-rewriting-stream');
+  rewriter: RewritingStream;
   transformedContent: Promise<string>;
 }> {
   const chunks: Buffer[] = [];
-  const rewriter = new (await import('parse5-html-rewriting-stream')).default();
+  const { RewritingStream } = await loadEsmModule<typeof import('parse5-html-rewriting-stream')>(
+    'parse5-html-rewriting-stream',
+  );
+  const rewriter = new RewritingStream();
 
   return {
     rewriter,

@@ -30,7 +30,13 @@ function updateIndexFile(path: string): Rule {
       throw new SchematicsException(`Could not read index file: ${path}`);
     }
 
-    const rewriter = new (await import('parse5-html-rewriting-stream')).default();
+    // Temporary workaround to support ESM-only package.
+    // When TypeScript supports dynamic imports, the below `new Function` can be removed.
+    const { RewritingStream } = await (new Function(
+      `return import('parse5-html-rewriting-stream');`,
+    )() as Promise<typeof import('parse5-html-rewriting-stream')>);
+    const rewriter = new RewritingStream();
+
     let needsNoScript = true;
     rewriter.on('startTag', (startTag) => {
       if (startTag.tagName === 'noscript') {

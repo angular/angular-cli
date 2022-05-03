@@ -119,7 +119,6 @@ ts_library(
         "@npm//@types/loader-utils",
         "@npm//@types/minimatch",
         "@npm//@types/node",
-        "@npm//@types/parse5-html-rewriting-stream",
         "@npm//@types/postcss-preset-env",
         "@npm//@types/semver",
         "@npm//@types/text-table",
