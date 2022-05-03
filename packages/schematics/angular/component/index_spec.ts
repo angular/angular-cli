@@ -426,9 +426,11 @@ describe('Component Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     const componentContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
-    expect(componentContent).toContain('standalone: true');
+    expect(componentContent).toContain('@angular/common');
     expect(componentContent).toContain('class FooComponent');
     expect(moduleContent).not.toContain('FooComponent');
+    expect(componentContent).toContain('standalone: true');
+    expect(componentContent).toContain('imports: [CommonModule]');
   });
 
   it('should declare standalone components in the `imports` of a test', async () => {
