@@ -248,7 +248,6 @@ jobs:
         # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
         # too early without Saucelabs not being ready.
       - run: ./scripts/saucelabs/wait-for-tunnel.sh
-      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
       - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
       - run: ./scripts/saucelabs/stop-tunnel.sh
       - fail_fast
