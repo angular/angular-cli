@@ -151,6 +151,7 @@ async function generateServiceWorker(
 
     await augmentAppWithServiceWorker(
       projectRoot,
+      context.workspaceRoot,
       normalize(outputPath),
       browserOptions.baseHref || '/',
       browserOptions.ngswConfigPath,

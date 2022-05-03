@@ -159,6 +159,7 @@ async function _renderUniversal(
         try {
           await augmentAppWithServiceWorker(
             projectRoot,
+            context.workspaceRoot,
             normalize(outputPath),
             browserOptions.baseHref || '/',
             browserOptions.ngswConfigPath,
