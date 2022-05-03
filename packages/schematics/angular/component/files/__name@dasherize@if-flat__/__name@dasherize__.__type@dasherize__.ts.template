@@ -1,8 +1,10 @@
-import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
+import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';<% if(standalone) {%>
+import { CommonModule } from '@angular/common';<% } %>
 
 @Component({<% if(!skipSelector) {%>
   selector: '<%= selector %>',<%}%><% if(standalone) {%>
-  standalone: true,<%}%><% if(inlineTemplate) { %>
+  standalone: true,
+  imports: [CommonModule], <%}%><% if(inlineTemplate) { %>
   template: `
     <p>
       <%= dasherize(name) %> works!
