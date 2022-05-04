@@ -193,7 +193,9 @@ export async function initializeAutocomplete(): Promise<string> {
   if (!shell) {
     throw new Error(
       '`$SHELL` environment variable not set. Angular CLI autocompletion only supports Bash or' +
-        ' Zsh.',
+        " Zsh. If you're on Windows, Cmd and Powershell don't support command autocompletion," +
+        ' but Git Bash or Windows Subsystem for Linux should work, so please try again in one of' +
+        ' those environments.',
     );
   }
   const home = env['HOME'];
@@ -234,7 +236,7 @@ export async function initializeAutocomplete(): Promise<string> {
   return rcFile;
 }
 
-/** Returns an ordered list of possibile candidates of RC files used by the given shell. */
+/** Returns an ordered list of possible candidates of RC files used by the given shell. */
 function getShellRunCommandCandidates(shell: string, home: string): string[] | undefined {
   if (shell.toLowerCase().includes('bash')) {
     return ['.bashrc', '.bash_profile', '.profile'].map((file) => path.join(home, file));
