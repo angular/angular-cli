@@ -101,6 +101,7 @@ ts_library(
         "@npm//@angular/localize",
         "@npm//@angular/service-worker",
         "@npm//@babel/core",
+        "@npm//@babel/generator",
         "@npm//@babel/helper-annotate-as-pure",
         "@npm//@babel/plugin-proposal-async-generator-functions",
         "@npm//@babel/plugin-transform-async-to-generator",
