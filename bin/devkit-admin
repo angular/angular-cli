@@ -17,10 +17,10 @@
 require('../lib/bootstrap-local');
 
 
-const minimist = require('minimist');
+const yargsParser = require('yargs-parser');
 const path = require('path');
 
-const args = minimist(process.argv.slice(2), {
+const args = yargsParser(process.argv.slice(2), {
   boolean: ['verbose']
 });
 const scriptName = args._.shift();
