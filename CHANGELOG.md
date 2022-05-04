@@ -1,3 +1,19 @@
+<a name="13.1.1"></a>
+
+# 13.1.1 (2022-05-04)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------------ |
+| [4762906c](https://github.com/angular/universal/commit/4762906cb9ef03a24fc174f5ac4728a8a90049b2) | fix  | address service worker generation failures |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.0"></a>
 
 # 13.1.0 (2022-03-21)
