@@ -47,7 +47,7 @@ Share the link to the repo below along with step-by-step instructions to reprodu
 
 Issues that don't have enough info and can't be reproduced will be closed.
 
-You can read more about issue submission guidelines here: https://github.com/angular/universal/blob/master/CONTRIBUTING.md#-submitting-an-issue
+You can read more about issue submission guidelines here: https://github.com/angular/universal/blob/main/CONTRIBUTING.md#-submitting-an-issue
 -->
 
 ## 🔥 Exception or Error

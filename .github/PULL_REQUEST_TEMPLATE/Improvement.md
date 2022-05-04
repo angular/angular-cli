@@ -7,7 +7,7 @@ about: You have made an improvement to Angular Universal
 
 Please check if your PR fulfills the following requirements:
 
-- [ ] The commit message follows our guidelines: https://github.com/angular/universal/blob/master/CONTRIBUTING.md#commit
+- [ ] The commit message follows our guidelines: https://github.com/angular/universal/blob/main/CONTRIBUTING.md#commit
 - [ ] Tests for the changes have been added (for bug fixes / features)
 - [ ] Docs have been added / updated (for bug fixes / features)
 

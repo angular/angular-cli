@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/angular/universal/tree/master.svg?style=shield)](https://circleci.com/gh/angular/universal/tree/master)
+[![CircleCI](https://circleci.com/gh/angular/universal/tree/main.svg?style=shield)](https://circleci.com/gh/angular/universal/tree/main)
 [![Join the chat at https://gitter.im/angular/universal](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/universal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Angular Universal
@@ -24,7 +24,7 @@ The Angular Universal project is a community driven project to expand on the cor
 
 This repository will host the various tools like engines to integrate with various backends(NodeJS, ASP.NET etc.) and also extra modules and examples to help you started with server side rendering.
 
-The Universal project is driven by community contributions. Please check [our contributing guidelines](https://github.com/angular/universal/blob/master/CONTRIBUTING.md) and send us your Pull Requests!
+The Universal project is driven by community contributions. Please check [our contributing guidelines](https://github.com/angular/universal/blob/main/CONTRIBUTING.md) and send us your Pull Requests!
 
 # Getting Started
 

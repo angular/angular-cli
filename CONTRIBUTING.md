@@ -75,7 +75,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 - Make your changes in a new git branch:
 
   ```shell
-  git checkout -b my-fix-branch master
+  git checkout -b my-fix-branch main
   ```
 
 - Create your patch, **including appropriate test cases**.
@@ -98,7 +98,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
   git push origin my-fix-branch
   ```
 
-- In GitHub, send a pull request to `universal:master`.
+- In GitHub, send a pull request to `universal:main`.
 - If we suggest changes then:
 
   - Make the required updates.
@@ -106,7 +106,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
   - Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
 
     ```shell
-    git rebase master -i
+    git rebase upstream/main -i
     git push -f
     ```
 
@@ -123,10 +123,10 @@ from the main (upstream) repository:
   git push origin --delete my-fix-branch
   ```
 
-- Check out the master branch:
+- Check out the main branch:
 
   ```shell
-  git checkout master -f
+  git checkout main -f
   ```
 
 - Delete the local branch:
@@ -135,10 +135,10 @@ from the main (upstream) repository:
   git branch -D my-fix-branch
   ```
 
-- Update your master with the latest upstream version:
+- Update your local `main` with the latest upstream version:
 
   ```shell
-  git pull --ff upstream master
+  git pull --ff upstream main
   ```
 
 ## <a name="rules"></a> Coding Rules
@@ -233,7 +233,7 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [coc]: https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
-[dev-doc]: https://github.com/angular/angular/blob/master/DEVELOPER.md
+[dev-doc]: https://github.com/angular/angular/blob/main/DEVELOPER.md
 [github]: https://github.com/angular/universal
 [gitter]: https://gitter.im/angular/universal
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
