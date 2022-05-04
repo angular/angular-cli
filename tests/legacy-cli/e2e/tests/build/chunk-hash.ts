@@ -1,22 +1,21 @@
 import * as fs from 'fs';
 
-import {ng} from '../../utils/process';
-import {writeFile, prependToFile, replaceInFile} from '../../utils/fs';
+import { ng } from '../../utils/process';
+import { writeFile, prependToFile, replaceInFile } from '../../utils/fs';
 
 const OUTPUT_RE = /(main|polyfills|vendor|inline|styles|\d+)\.[a-z0-9]+\.(chunk|bundle)\.(js|css)$/;
 
 function generateFileHashMap(): Map<string, string> {
   const hashes = new Map<string, string>();
 
-  fs.readdirSync('./dist')
-    .forEach(name => {
-      if (!name.match(OUTPUT_RE)) {
-        return;
-      }
+  fs.readdirSync('./dist').forEach((name) => {
+    if (!name.match(OUTPUT_RE)) {
+      return;
+    }
 
-      const [module, hash] = name.split('.');
-      hashes.set(module, hash);
-    });
+    const [module, hash] = name.split('.');
+    hashes.set(module, hash);
+  });
 
   return hashes;
 }
@@ -24,24 +23,24 @@ function generateFileHashMap(): Map<string, string> {
 function validateHashes(
   oldHashes: Map<string, string>,
   newHashes: Map<string, string>,
-  shouldChange: Array<string>): void {
-
+  shouldChange: Array<string>,
+): void {
   console.log('  Validating hashes...');
   console.log(`  Old hashes: ${JSON.stringify([...oldHashes])}`);
   console.log(`  New hashes: ${JSON.stringify([...newHashes])}`);
 
   oldHashes.forEach((hash, module) => {
-      if (hash == newHashes.get(module)) {
-        if (shouldChange.includes(module)) {
-          throw new Error(`Module "${module}" did not change hash (${hash})...`);
-        }
-      } else if (!shouldChange.includes(module)) {
-        throw new Error(`Module "${module}" changed hash (${hash})...`);
+    if (hash == newHashes.get(module)) {
+      if (shouldChange.includes(module)) {
+        throw new Error(`Module "${module}" did not change hash (${hash})...`);
       }
-    });
+    } else if (!shouldChange.includes(module)) {
+      throw new Error(`Module "${module}" changed hash (${hash})...`);
+    }
+  });
 }
 
-export default function() {
+export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
   return;
 
@@ -50,14 +49,25 @@ export default function() {
   // First, collect the hashes.
   return Promise.resolve()
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
-    .then(() => prependToFile('src/app/app.module.ts', `
+    .then(() =>
+      prependToFile(
+        'src/app/app.module.ts',
+        `
       import { RouterModule } from '@angular/router';
       import { ReactiveFormsModule } from '@angular/forms';
-    `))
-    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
+    `,
+      ),
+    )
+    .then(() =>
+      replaceInFile(
+        'src/app/app.module.ts',
+        'imports: [',
+        `imports: [
       RouterModule.forRoot([{ path: "lazy", loadChildren: "./lazy/lazy.module#LazyModule" }]),
       ReactiveFormsModule,
-    `))
+    `,
+      ),
+    )
     .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       oldHashes = generateFileHashMap();
@@ -88,13 +98,24 @@ export default function() {
       validateHashes(oldHashes, newHashes, ['main']);
       oldHashes = newHashes;
     })
-    .then(() => prependToFile('src/app/lazy/lazy.module.ts', `
+    .then(() =>
+      prependToFile(
+        'src/app/lazy/lazy.module.ts',
+        `
       import { ReactiveFormsModule } from '@angular/forms';
-    `))
-    .then(() => replaceInFile('src/app/lazy/lazy.module.ts', 'imports: [', `
+    `,
+      ),
+    )
+    .then(() =>
+      replaceInFile(
+        'src/app/lazy/lazy.module.ts',
+        'imports: [',
+        `
       imports: [
          ReactiveFormsModule,
-    `))
+    `,
+      ),
+    )
     .then(() => ng('build', '--output-hashing=all', '--configuration=development'))
     .then(() => {
       newHashes = generateFileHashMap();

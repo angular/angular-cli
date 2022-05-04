@@ -6,7 +6,7 @@ import { expectToFail } from '../../utils/utils';
 
 export default async function () {
   // Force duplicate modules
-  await updateJsonFile('package.json', json => {
+  await updateJsonFile('package.json', (json) => {
     json.dependencies = {
       ...json.dependencies,
       'tslib': '2.0.0',
@@ -17,7 +17,8 @@ export default async function () {
 
   await installWorkspacePackages();
 
-  await writeFile('./src/main.ts',
+  await writeFile(
+    './src/main.ts',
     `
         import { __assign as __assign_0 } from 'tslib';
         import { __assign as __assign_1 } from 'tslib-1';
@@ -28,14 +29,23 @@ export default async function () {
             __assign_1,
             __assign_2,
         })
-    `);
+    `,
+  );
 
-  const { stderr } = await ng('build', '--verbose', '--no-vendor-chunk', '--no-progress', '--configuration=development');
+  const { stderr } = await ng(
+    'build',
+    '--verbose',
+    '--no-vendor-chunk',
+    '--no-progress',
+    '--configuration=development',
+  );
   const outFile = 'dist/test-project/main.js';
 
   if (/\[DedupeModuleResolvePlugin\]:.+tslib-1-copy.+ -> .+tslib-1.+/.test(stderr)) {
     await expectFileToMatch(outFile, './node_modules/tslib-1/tslib.es6.js');
-    await expectToFail(() => expectFileToMatch(outFile, './node_modules/tslib-1-copy/tslib.es6.js'));
+    await expectToFail(() =>
+      expectFileToMatch(outFile, './node_modules/tslib-1-copy/tslib.es6.js'),
+    );
   } else if (/\[DedupeModuleResolvePlugin\]:.+tslib-1.+ -> .+tslib-1-copy.+/.test(stderr)) {
     await expectFileToMatch(outFile, './node_modules/tslib-1-copy/tslib.es6.js');
     await expectToFail(() => expectFileToMatch(outFile, './node_modules/tslib-1/tslib.es6.js'));

@@ -2,7 +2,7 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  await updateJsonFile('tsconfig.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', (tsconfig) => {
     tsconfig.compilerOptions.traceResolution = true;
   });
 
@@ -11,7 +11,7 @@ export default async function () {
     throw new Error(`Modules resolutions must be printed when 'traceResolution' is enabled.`);
   }
 
-  await updateJsonFile('tsconfig.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', (tsconfig) => {
     tsconfig.compilerOptions.traceResolution = false;
   });
 

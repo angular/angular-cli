@@ -6,13 +6,15 @@ export default function () {
   // TypeError: Assignment to constant variable.
   return;
 
-  return updateJsonFile('tsconfig.json', configJson => {
+  return updateJsonFile('tsconfig.json', (configJson) => {
     const compilerOptions = configJson['compilerOptions'];
     compilerOptions['target'] = 'es2015';
   })
-    .then(() => updateJsonFile('src/tsconfig.spec.json', configJson => {
-      const compilerOptions = configJson['compilerOptions'];
-      compilerOptions['target'] = 'es2015';
-    }))
+    .then(() =>
+      updateJsonFile('src/tsconfig.spec.json', (configJson) => {
+        const compilerOptions = configJson['compilerOptions'];
+        compilerOptions['target'] = 'es2015';
+      }),
+    )
     .then(() => ng('test', '--watch=false'));
 }

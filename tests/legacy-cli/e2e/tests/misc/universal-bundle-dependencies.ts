@@ -9,8 +9,8 @@ import {
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
-export default async function() {
-  await updateJsonFile('angular.json', workspaceJson => {
+export default async function () {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect['server'] = {
       builder: '@angular-devkit/build-angular:server',

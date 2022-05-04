@@ -1,4 +1,4 @@
-import { ng } from "../../utils/process";
+import { ng } from '../../utils/process';
 
 export default async function () {
   try {
@@ -9,4 +9,4 @@ export default async function () {
       throw error;
     }
   }
-};
+}

@@ -4,7 +4,6 @@ import { readFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
-
 export default async function () {
   if (getGlobalVariable('argv')['ng-snapshots']) {
     // The snapshots job won't work correctly because it doesn't use semver for Angular.

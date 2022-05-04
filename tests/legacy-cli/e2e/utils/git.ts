@@ -1,5 +1,4 @@
-import {git, silentGit} from './process';
-
+import { git, silentGit } from './process';
 
 export function gitClean() {
   console.log('  Cleaning git...');
@@ -8,22 +7,23 @@ export function gitClean() {
     .then(() => {
       // Checkout missing files
       return silentGit('status', '--porcelain')
-        .then(({ stdout }) => stdout
-          .split(/[\n\r]+/g)
-          .filter(line => line.match(/^ D/))
-          .map(line => line.replace(/^\s*\S+\s+/, '')))
-        .then(files => silentGit('checkout', ...files));
+        .then(({ stdout }) =>
+          stdout
+            .split(/[\n\r]+/g)
+            .filter((line) => line.match(/^ D/))
+            .map((line) => line.replace(/^\s*\S+\s+/, '')),
+        )
+        .then((files) => silentGit('checkout', ...files));
     })
     .then(() => expectGitToBeClean());
 }
 
 export function expectGitToBeClean() {
-  return silentGit('status', '--porcelain')
-    .then(({ stdout }) => {
-      if (stdout != '') {
-        throw new Error('Git repo is not clean...\n' + stdout);
-      }
-    });
+  return silentGit('status', '--porcelain').then(({ stdout }) => {
+    if (stdout != '') {
+      throw new Error('Git repo is not clean...\n' + stdout);
+    }
+  });
 }
 
 export function gitCommit(message: string) {

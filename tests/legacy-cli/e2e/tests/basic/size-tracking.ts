@@ -1,16 +1,22 @@
-import { appendToFile, moveDirectory, prependToFile, replaceInFile, writeFile } from '../../utils/fs';
+import {
+  appendToFile,
+  moveDirectory,
+  prependToFile,
+  replaceInFile,
+  writeFile,
+} from '../../utils/fs';
 import { ng } from '../../utils/process';
-
 
 export default async function () {
   // Store the production build for artifact storage on CircleCI
   if (process.env['CIRCLECI']) {
-
     // Add initial app routing.
     // This is done automatically on a new app with --routing but must be done manually on
     // existing apps.
     const appRoutingModulePath = 'src/app/app-routing.module.ts';
-    await writeFile(appRoutingModulePath, `
+    await writeFile(
+      appRoutingModulePath,
+      `
       import { NgModule } from '@angular/core';
       import { Routes, RouterModule } from '@angular/router';
 
@@ -21,9 +27,12 @@ export default async function () {
         exports: [RouterModule]
       })
       export class AppRoutingModule { }
-    `);
-    await prependToFile('src/app/app.module.ts',
-      `import { AppRoutingModule } from './app-routing.module';`);
+    `,
+    );
+    await prependToFile(
+      'src/app/app.module.ts',
+      `import { AppRoutingModule } from './app-routing.module';`,
+    );
     await replaceInFile('src/app/app.module.ts', `imports: [`, `imports: [ AppRoutingModule,`);
     await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
 
