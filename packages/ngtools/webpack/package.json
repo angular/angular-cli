@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/webpack",
+  "homepage": "https://github.com/angular/angular-cli/tree/main/packages/ngtools/webpack",
   "dependencies": {},
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",

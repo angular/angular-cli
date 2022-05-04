@@ -23,7 +23,7 @@ What distinguishes Schematics from other generators, such as Yeoman or Yarn Crea
 
 # Tooling
 
-Schematics is a library, and does not work by itself. A [reference CLI](https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/schematics_cli/bin/schematics.ts) is available on this repository, and is published on NPM at [@angular-devkit/schematics-cli](https://www.npmjs.com/package/@angular-devkit/schematics-cli). This document explains the library usage and the tooling API, but does not go into the tool implementation itself.
+Schematics is a library, and does not work by itself. A [reference CLI](https://github.com/angular/angular-cli/blob/main/packages/angular_devkit/schematics_cli/bin/schematics.ts) is available on this repository, and is published on NPM at [@angular-devkit/schematics-cli](https://www.npmjs.com/package/@angular-devkit/schematics-cli). This document explains the library usage and the tooling API, but does not go into the tool implementation itself.
 
 The tooling is responsible for the following tasks:
 

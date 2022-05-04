@@ -30,8 +30,6 @@ var_5: &only_release_branches
     branches:
       only:
         - main
-        # TODO(BRANCH_RENAME_CLEANUP): remove
-        - master
         - /\d+\.\d+\.x/
 
 # Executor Definitions
@@ -364,8 +362,6 @@ workflows:
               only:
                 - renovate/angular
                 - main
-                # TODO(BRANCH_RENAME_CLEANUP): remove
-                - master
       - e2e-cli:
           name: e2e-cli-node-16
           nodeversion: '16.10'
