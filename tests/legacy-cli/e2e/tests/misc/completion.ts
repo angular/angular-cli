@@ -4,6 +4,14 @@ import * as path from 'path';
 import { execAndCaptureError, execAndWaitForOutputToMatch } from '../../utils/process';
 
 export default async function () {
+  // Windows Cmd and Powershell do not support autocompletion. Run a different set of tests to
+  // confirm autocompletion fails gracefully.
+  if (process.platform === 'win32') {
+    await windowsTests();
+
+    return;
+  }
+
   // Generates new `.bashrc` file.
   await mockHome(async (home) => {
     await execAndWaitForOutputToMatch(
@@ -302,25 +310,37 @@ source <(ng completion script)
   }
 
   // Fails for no `$SHELL`.
-  {
+  await mockHome(async (home) => {
     const err = await execAndCaptureError('ng', ['completion'], {
       ...process.env,
       SHELL: undefined,
+      HOME: home,
     });
     if (!err.message.includes('`$SHELL` environment variable not set.')) {
       throw new Error(`Expected unset \`$SHELL\` error message, but got:\n\n${err.message}`);
     }
-  }
+  });
 
   // Fails for unknown `$SHELL`.
-  {
+  await mockHome(async (home) => {
     const err = await execAndCaptureError('ng', ['completion'], {
       ...process.env,
       SHELL: '/usr/bin/unknown',
+      HOME: home,
     });
     if (!err.message.includes('Unknown `$SHELL` environment variable')) {
       throw new Error(`Expected unknown \`$SHELL\` error message, but got:\n\n${err.message}`);
     }
+  });
+}
+
+async function windowsTests(): Promise<void> {
+  // Should fail with a clear error message.
+  const err = await execAndCaptureError('ng', ['completion']);
+  if (!err.message.includes("Cmd and Powershell don't support command autocompletion")) {
+    throw new Error(
+      `Expected Windows autocompletion to fail with custom error, but got:\n\n${err.message}`,
+    );
   }
 }
 

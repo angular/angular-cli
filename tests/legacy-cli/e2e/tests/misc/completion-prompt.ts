@@ -19,6 +19,13 @@ const DEFAULT_ENV = Object.freeze({
 });
 
 export default async function () {
+  // Windows Cmd and Powershell do not support autocompletion. Run a different set of tests to
+  // confirm autocompletion skips the prompt appropriately.
+  if (process.platform === 'win32') {
+    await windowsTests();
+    return;
+  }
+
   // Sets up autocompletion after user accepts a prompt from any command.
   await mockHome(async (home) => {
     const bashrc = path.join(home, '.bashrc');
@@ -42,7 +49,7 @@ export default async function () {
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
     if (!bashrcContents.includes('source <(ng completion script)')) {
       throw new Error(
-        'Autocompletion was *not* added to `~/.bashrc` after accepting the setup' + ' prompt.',
+        'Autocompletion was *not* added to `~/.bashrc` after accepting the setup prompt.',
       );
     }
 
@@ -74,13 +81,13 @@ export default async function () {
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
     if (bashrcContents.includes('ng completion')) {
       throw new Error(
-        'Autocompletion was incorrectly added to `~/.bashrc` after refusing the setup' + ' prompt.',
+        'Autocompletion was incorrectly added to `~/.bashrc` after refusing the setup prompt.',
       );
     }
 
     if (stdout.includes('Appended `source <(ng completion script)`')) {
       throw new Error(
-        'CLI printed that it successfully set up autocompletion when it actually' + " didn't.",
+        "CLI printed that it successfully set up autocompletion when it actually didn't.",
       );
     }
 
@@ -358,6 +365,23 @@ source <(ng completion script)
       throw new Error(
         "Execution with an existing `ng completion` line in the user's RC file" +
           ' prompted for autocompletion setup but should not have.',
+      );
+    }
+  });
+}
+
+async function windowsTests(): Promise<void> {
+  // Should *not* prompt on Windows, autocompletion isn't supported.
+  await mockHome(async (home) => {
+    const bashrc = path.join(home, '.bashrc');
+    await fs.writeFile(bashrc, `# Other content...`);
+
+    const { stdout } = await execWithEnv('ng', ['version'], { ...env });
+
+    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
+      throw new Error(
+        'Execution prompted to set up autocompletion on Windows despite not actually being' +
+          ' supported.',
       );
     }
   });
