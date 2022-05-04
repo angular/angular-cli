@@ -4,13 +4,10 @@ import { deleteFile, expectFileToExist } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
 
-
-export default async function() {
-  await expectToFail(() => ng(
-    'config',
-    '--global',
-    'schematics.@schematics/angular.component.inlineStyle',
-  ));
+export default async function () {
+  await expectToFail(() =>
+    ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle'),
+  );
 
   await ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle', 'false');
   let output = await ng(

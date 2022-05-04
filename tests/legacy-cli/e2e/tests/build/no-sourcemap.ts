@@ -5,11 +5,17 @@ export default async function () {
   await ng('build', '--output-hashing=none', '--source-map', 'false');
   await testForSourceMaps(3);
 
-  await ng('build', '--output-hashing=none', '--source-map', 'false', '--configuration=development');
+  await ng(
+    'build',
+    '--output-hashing=none',
+    '--source-map',
+    'false',
+    '--configuration=development',
+  );
   await testForSourceMaps(4);
 }
 
-async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> {
+async function testForSourceMaps(expectedNumberOfFiles: number): Promise<void> {
   const files = fs.readdirSync('./dist/test-project');
 
   let count = 0;
@@ -31,6 +37,8 @@ async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> 
   }
 
   if (count < expectedNumberOfFiles) {
-    throw new Error(`Javascript file count is low. Expected ${expectedNumberOfFiles} but found ${count}`);
+    throw new Error(
+      `Javascript file count is low. Expected ${expectedNumberOfFiles} but found ${count}`,
+    );
   }
 }

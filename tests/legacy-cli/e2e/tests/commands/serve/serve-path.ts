@@ -8,24 +8,30 @@ export default function () {
   return Promise.resolve()
     .then(() => ngServe('--serve-path', 'test/'))
     .then(() => request('http://localhost:4200/test'))
-    .then(body => {
+    .then((body) => {
       if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value.');
       }
     })
     .then(() => request('http://localhost:4200/test/abc'))
-    .then(body => {
+    .then((body) => {
       if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value.');
       }
     })
-    .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
-    // .then(() => ngServe('--base-href', 'test/'))
-    // .then(() => request('http://localhost:4200/test'))
-    // .then(body => {
-    //   if (!body.match(/<app-root><\/app-root>/)) {
-    //     throw new Error('Response does not match expected value.');
-    //   }
-    // })
-    // .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; });
+    .then(
+      () => killAllProcesses(),
+      (err) => {
+        killAllProcesses();
+        throw err;
+      },
+    );
+  // .then(() => ngServe('--base-href', 'test/'))
+  // .then(() => request('http://localhost:4200/test'))
+  // .then(body => {
+  //   if (!body.match(/<app-root><\/app-root>/)) {
+  //     throw new Error('Response does not match expected value.');
+  //   }
+  // })
+  // .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; });
 }

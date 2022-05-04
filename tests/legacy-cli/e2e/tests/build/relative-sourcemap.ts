@@ -8,13 +8,12 @@ export default async function () {
   await ng('generate', 'application', 'secondary-project', '--skip-install');
   await ng('build', 'secondary-project', '--configuration=development');
 
-
   await ng('build', '--output-hashing=none', '--source-map', '--configuration=development');
   const content = fs.readFileSync('./dist/secondary-project/main.js.map', 'utf8');
-  const {sources} = JSON.parse(content);
+  const { sources } = JSON.parse(content);
   for (const source of sources) {
-      if (isAbsolute(source)) {
-        throw new Error(`Expected ${source} to be relative.`);
-      }
+    if (isAbsolute(source)) {
+      throw new Error(`Expected ${source} to be relative.`);
+    }
   }
 }

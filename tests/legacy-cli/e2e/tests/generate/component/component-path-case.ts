@@ -11,7 +11,7 @@ export default async function () {
 
   try {
     // Generate a component
-    await ng('generate', 'component', `${upperDirs}/test-component`)
+    await ng('generate', 'component', `${upperDirs}/test-component`);
 
     // Ensure component is created in the correct location relative to the workspace root
     await expectFileToExist(join(componentDirectory, 'test-component.component.ts'));

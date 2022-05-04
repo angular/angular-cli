@@ -1,9 +1,8 @@
-import {join} from 'path';
-import {ng} from '../../../utils/process';
-import {expectFileToExist,expectFileToMatch} from '../../../utils/fs';
+import { join } from 'path';
+import { ng } from '../../../utils/process';
+import { expectFileToExist, expectFileToMatch } from '../../../utils/fs';
 
-
-export default async function() {
+export default async function () {
   // Does not create a sub directory.
   const guardDir = join('src', 'app');
 

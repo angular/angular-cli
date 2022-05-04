@@ -1,5 +1,4 @@
-const global: {[name: string]: any} = Object.create(null);
-
+const global: { [name: string]: any } = Object.create(null);
 
 export function setGlobalVariable(name: string, value: any) {
   global[name] = value;

@@ -11,12 +11,12 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { langTranslations, setupI18nConfig } from './setup';
 
-export default async function() {
+export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
   // Update angular.json
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = appProject.i18n;

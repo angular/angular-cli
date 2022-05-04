@@ -10,7 +10,7 @@ const extraErrors = [
   `main.ts is not part of the TypeScript compilation.`,
 ];
 
-export default function() {
+export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   if (process.platform.startsWith('win')) {
@@ -28,11 +28,11 @@ export default function() {
     Promise.resolve()
       // Save the original contents of `./src/app/app.component.ts`.
       .then(() => readFile('./src/app/app.component.ts'))
-      .then(contents => (origContent = contents))
+      .then((contents) => (origContent = contents))
       // Check `part of the TypeScript compilation` errors.
       // These should show an error only for the missing file.
       .then(() =>
-        updateJsonFile('./tsconfig.app.json', configJson => {
+        updateJsonFile('./tsconfig.app.json', (configJson) => {
           (configJson.include = undefined), (configJson.files = ['src/main.ts']);
         }),
       )
@@ -41,12 +41,12 @@ export default function() {
         if (!message.includes('polyfills.ts is missing from the TypeScript compilation')) {
           throw new Error(`Expected missing TS file error, got this instead:\n${message}`);
         }
-        if (extraErrors.some(e => message.includes(e))) {
+        if (extraErrors.some((e) => message.includes(e))) {
           throw new Error(`Did not expect extra errors but got:\n${message}`);
         }
       })
       .then(() =>
-        updateJsonFile('./tsconfig.app.json', configJson => {
+        updateJsonFile('./tsconfig.app.json', (configJson) => {
           configJson.include = ['src/**/*.ts'];
           configJson.exclude = ['**/**.spec.ts'];
           configJson.files = undefined;
@@ -60,7 +60,7 @@ export default function() {
         if (!message.includes('Declaration or statement expected.')) {
           throw new Error(`Expected syntax error, got this instead:\n${message}`);
         }
-        if (extraErrors.some(e => message.includes(e))) {
+        if (extraErrors.some((e) => message.includes(e))) {
           throw new Error(`Did not expect extra errors but got:\n${message}`);
         }
       })
@@ -76,7 +76,7 @@ export default function() {
         ) {
           throw new Error(`Expected static analysis error, got this instead:\n${message}`);
         }
-        if (extraErrors.some(e => message.includes(e))) {
+        if (extraErrors.some((e) => message.includes(e))) {
           throw new Error(`Did not expect extra errors but got:\n${message}`);
         }
       })
