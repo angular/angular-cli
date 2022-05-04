@@ -1,3 +1,19 @@
+<a name="13.3.5"></a>
+
+# 13.3.5 (2022-05-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [6da0910d3](https://github.com/angular/angular-cli/commit/6da0910d345eb84084e32a462432a508d518f402) | fix  | update `@ampproject/remapping` to `2.2.0` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.12"></a>
 
 # 14.0.0-next.12 (2022-04-27)
