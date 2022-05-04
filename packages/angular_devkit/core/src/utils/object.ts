@@ -33,7 +33,7 @@ export function deepCopy<T>(value: T): T {
     for (const key of Object.getOwnPropertyNames(valueCasted)) {
       copy[key] = deepCopy(valueCasted[key]);
     }
-    valueCasted[copySymbol] = undefined;
+    delete valueCasted[copySymbol];
 
     return copy;
   } else {
