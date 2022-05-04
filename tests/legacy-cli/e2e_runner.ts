@@ -23,7 +23,7 @@ Error.stackTraceLimit = Infinity;
  *   --noglobal       Skip linking your local @angular/cli directory. Can save a few seconds.
  *   --nosilent       Never silence ng commands.
  *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
- *                    tag instead of using the latest master.
+ *                    tag instead of using the latest `main`.
  *   --ng-snapshots   Install angular snapshot builds in the test project.
  *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
  *   --ignore         Ignore tests matching this glob pattern.
