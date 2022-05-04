@@ -1,3 +1,54 @@
+<a name="14.0.0-next.13"></a>
+
+# 14.0.0-next.13 (2022-05-04)
+
+## Breaking Changes
+
+### @angular-devkit/schematics
+
+- Schematics `NodePackageInstallTask` will not execute package scripts by default
+  The `NodePackageInstallTask` will now use the package manager's `--ignore-scripts` option by default.
+  The `--ignore-scripts` option will prevent package scripts from executing automatically during an install.
+  If a schematic installs packages that need their `install`/`postinstall` scripts to be executed, the
+  `NodePackageInstallTask` now contains an `allowScripts` boolean option which can be enabled to provide the
+  previous behavior for that individual task. As with previous behavior, the `allowScripts` option will
+  prevent the individual task's usage of the `--ignore-scripts` option but will not override the package
+  manager's existing configuration.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [3fa38b08b](https://github.com/angular/angular-cli/commit/3fa38b08ba8ef57a6079873223a7d6088d5ea64e) | feat | introduce `addDependency` rule to utilities                        |
+| [b07ccfbb1](https://github.com/angular/angular-cli/commit/b07ccfbb1b2045d285c23dd4b654e1380892fcb2) | feat | introduce a utility subpath export for Angular rules and utilities |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| [4212fb8de](https://github.com/angular/angular-cli/commit/4212fb8de2f4f3e80831a0803acc5fc6e54db1e1) | feat | add prompt to set up CLI autocompletion                                            |
+| [fb0622893](https://github.com/angular/angular-cli/commit/fb06228932299870774a7b254f022573f5d8175f) | feat | don't prompt to set up autocompletion for `ng update` and `ng completion` commands |
+| [022d8c7bb](https://github.com/angular/angular-cli/commit/022d8c7bb142e8b83f9805a39bc1ae312da465eb) | feat | make `ng completion` set up CLI autocompletion by modifying `.bashrc` files        |
+| [2e15df941](https://github.com/angular/angular-cli/commit/2e15df9417dcc47b12785a8c4c9074bf05d0450c) | feat | remember after prompting users to set up autocompletion and don't prompt again     |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [0e6425fd8](https://github.com/angular/angular-cli/commit/0e6425fd88ea32679516251efdca6ff07cc4b56a) | feat | disable package script execution by default in `NodePackageInstallTask` |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [243cb4062](https://github.com/angular/angular-cli/commit/243cb40622fef4107b0162bc7b6a374471cebc14) | fix  | remove `@schematics/angular` utility deep import usage |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Paul Gschwendtner and Pawel Kozlowski
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.5"></a>
 
 # 13.3.5 (2022-05-04)
