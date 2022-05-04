@@ -1,10 +1,9 @@
-import {ng} from '../../utils/process';
-import {expectFileToExist, moveFile} from '../../utils/fs';
-import {getGlobalVariable} from '../../utils/env';
+import { ng } from '../../utils/process';
+import { expectFileToExist, moveFile } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
 import * as path from 'path';
 
-
-export default function() {
+export default function () {
   const tmp = getGlobalVariable('tmp-root');
 
   return Promise.resolve()

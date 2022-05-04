@@ -1,7 +1,6 @@
 import { expectFileToExist, expectFileToMatch, rimraf } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 
-
 export default async function () {
   await ng('add', '@angular-devkit-tests/ng-add-simple', '--skip-confirmation');
   await expectFileToMatch('package.json', /@angular-devkit-tests\/ng-add-simple/);

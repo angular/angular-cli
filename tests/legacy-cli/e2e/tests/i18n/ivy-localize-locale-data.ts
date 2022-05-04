@@ -10,12 +10,12 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { setupI18nConfig } from './setup';
 
-export default async function() {
+export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
   // Update angular.json
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = appProject.i18n;
@@ -30,7 +30,7 @@ export default async function() {
   }
 
   // Update angular.json
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = appProject.i18n;
@@ -40,12 +40,16 @@ export default async function() {
   });
 
   const { stderr: err2 } = await ng('build');
-  if (err2.includes(`Locale data for 'en-US' cannot be found.  No locale data will be included for this locale.`)) {
+  if (
+    err2.includes(
+      `Locale data for 'en-US' cannot be found.  No locale data will be included for this locale.`,
+    )
+  ) {
     throw new Error('locale data not found warning shown');
   }
 
   // Update angular.json
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = appProject.i18n;
@@ -55,7 +59,11 @@ export default async function() {
   });
 
   const { stderr: err3 } = await ng('build', '--configuration=development');
-  if (err3.includes(`Locale data for 'en-x-abc' cannot be found.  No locale data will be included for this locale.`)) {
+  if (
+    err3.includes(
+      `Locale data for 'en-x-abc' cannot be found.  No locale data will be included for this locale.`,
+    )
+  ) {
     throw new Error('locale data not found warning shown');
   }
 }

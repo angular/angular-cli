@@ -1,7 +1,7 @@
 import { prependToFile, writeFile } from '../../../utils/fs';
 import { execAndWaitForOutputToMatch, killAllProcesses } from '../../../utils/process';
 
-export default async function() {
+export default async function () {
   // Simulate a JS library using a Node.js specific module
   await writeFile('src/node-usage.js', `const path = require('path');\n`);
   await prependToFile('src/main.ts', `import './node-usage';\n`);

@@ -4,7 +4,7 @@ import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  await updateJsonFile('angular.json', workspace => {
+  await updateJsonFile('angular.json', (workspace) => {
     const build = workspace.projects['test-project'].architect.build;
     build.defaultConfiguration = undefined;
     build.options = {
@@ -21,7 +21,7 @@ export default async function () {
   await expectFileToExist('dist/test-project/main.js.map');
 
   // Add new configuration and set "defaultConfiguration"
-  await updateJsonFile('angular.json', workspace => {
+  await updateJsonFile('angular.json', (workspace) => {
     const build = workspace.projects['test-project'].architect.build;
     build.defaultConfiguration = 'foo';
     build.configurations.foo = {

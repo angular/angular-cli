@@ -3,13 +3,16 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  await writeFile('src/app/app.component.spec.ts', `
+  await writeFile(
+    'src/app/app.component.spec.ts',
+    `
       it('show fail', () => {
         expect(undefined).toBeTruthy();
       });
-    `);
+    `,
+  );
 
-  await updateJsonFile('angular.json', configJson => {
+  await updateJsonFile('angular.json', (configJson) => {
     const appArchitect = configJson.projects['test-project'].architect;
     appArchitect.test.options.sourceMap = {
       scripts: true,
@@ -23,10 +26,10 @@ export default async function () {
   } catch (error) {
     if (!error.message.includes('app.component.spec.ts')) {
       throw error;
-    };
+    }
   }
 
-  await updateJsonFile('angular.json', configJson => {
+  await updateJsonFile('angular.json', (configJson) => {
     const appArchitect = configJson.projects['test-project'].architect;
     appArchitect.test.options.sourceMap = true;
   });
@@ -38,10 +41,10 @@ export default async function () {
   } catch (error) {
     if (!error.message.includes('app.component.spec.ts')) {
       throw error;
-    };
+    }
   }
 
-  await updateJsonFile('angular.json', configJson => {
+  await updateJsonFile('angular.json', (configJson) => {
     const appArchitect = configJson.projects['test-project'].architect;
     appArchitect.test.options.sourceMap = false;
   });
@@ -53,6 +56,6 @@ export default async function () {
   } catch (error) {
     if (!error.message.includes('main.js')) {
       throw error;
-    };
+    }
   }
 }

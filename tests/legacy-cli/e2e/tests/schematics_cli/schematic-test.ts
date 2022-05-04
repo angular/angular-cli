@@ -11,11 +11,7 @@ export default async function () {
     return;
   }
 
-  await silentNpm(
-    'install',
-    '-g',
-    '@angular-devkit/schematics-cli',
-  );
+  await silentNpm('install', '-g', '@angular-devkit/schematics-cli');
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 
   const startCwd = process.cwd();

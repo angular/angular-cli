@@ -19,6 +19,8 @@ export default async function () {
   }
 
   if (!message.includes('(src/app/app.component.spec.ts:4:25)')) {
-    throw new Error(`Expected logs to contain relative path to (src/app/app.component.spec.ts:4:25)\n${message}`);
+    throw new Error(
+      `Expected logs to contain relative path to (src/app/app.component.spec.ts:4:25)\n${message}`,
+    );
   }
 }

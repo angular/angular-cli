@@ -4,7 +4,7 @@ import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { readNgVersion } from '../../utils/version';
 
-export default async function() {
+export default async function () {
   // Setup a library
   await ng('generate', 'library', 'i18n-lib-test');
   await replaceInFile(

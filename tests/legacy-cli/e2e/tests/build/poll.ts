@@ -1,14 +1,11 @@
 import { appendToFile } from '../../utils/fs';
-import {
-  killAllProcesses,
-  waitForAnyProcessOutputToMatch,
-} from '../../utils/process';
+import { killAllProcesses, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { expectToFail, wait } from '../../utils/utils';
 
 const webpackGoodRegEx = / Compiled successfully./;
 
-export default async function() {
+export default async function () {
   try {
     await ngServe('--poll=10000');
 

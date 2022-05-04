@@ -3,7 +3,7 @@ import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 import { getGlobalVariable, setGlobalVariable } from '../utils/env';
 
-export default function() {
+export default function () {
   const argv = getGlobalVariable('argv');
 
   // Get to a temporary directory.
