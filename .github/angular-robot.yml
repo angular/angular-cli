@@ -58,11 +58,11 @@ merge:
     checks are still failing:
 
     {{PLACEHOLDER}}
-     
+
     **If you want your PR to be merged, it has to pass all the CI checks.**
-     
-    If you can't get the PR to a green state due to flakes or broken master,
-    please try rebasing to master and/or restarting the CI job. If that fails
+
+    If you can't get the PR to a green state due to flakes or broken `main`,
+    please try rebasing to `main` and/or restarting the CI job. If that fails
     and you believe that the issue is not due to your change, please contact the
     caretaker and ask for help.
 # options for the triage plugin
