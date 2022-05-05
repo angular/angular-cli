@@ -1,4 +1,5 @@
-import { request } from '../../utils/http';
+import * as assert from 'assert';
+import fetch from 'node-fetch';
 import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { updateJsonFile } from '../../utils/project';
@@ -11,11 +12,10 @@ export default function () {
   return (
     Promise.resolve()
       .then(() => ngServe())
-      .then(() => request('http://localhost:4200/'))
-      .then((body) => {
-        if (!body.match(/<app-root><\/app-root>/)) {
-          throw new Error('Response does not match expected value.');
-        }
+      .then(() => fetch('http://localhost:4200/', { headers: { 'Accept': 'text/html' } }))
+      .then(async (response) => {
+        assert.strictEqual(response.status, 200);
+        assert.match(await response.text(), /<app-root><\/app-root>/);
       })
       .then(
         () => killAllProcesses(),
@@ -33,11 +33,10 @@ export default function () {
         }),
       )
       .then(() => ngServe())
-      .then(() => request('http://localhost:4200/'))
-      .then((body) => {
-        if (!body.match(/<app-root><\/app-root>/)) {
-          throw new Error('Response does not match expected value.');
-        }
+      .then(() => fetch('http://localhost:4200/', { headers: { 'Accept': 'text/html' } }))
+      .then(async (response) => {
+        assert.strictEqual(response.status, 200);
+        assert.match(await response.text(), /<app-root><\/app-root>/);
       })
       .then(
         () => killAllProcesses(),
