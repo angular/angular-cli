@@ -1,4 +1,4 @@
-import { request } from '../../utils/http';
+import fetch from 'node-fetch';
 import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 
@@ -18,9 +18,9 @@ export default async function () {
 }
 
 async function verifyResponse(): Promise<void> {
-  const response = await request('http://localhost:4200/');
+  const response = await fetch('http://localhost:4200/');
 
-  if (!/<app-root><\/app-root>/.test(response)) {
+  if (!/<app-root><\/app-root>/.test(await response.text())) {
     throw new Error('Response does not match expected value.');
   }
 }
