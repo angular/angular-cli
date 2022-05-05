@@ -2,11 +2,13 @@ import express from 'express';
 import * as http from 'http';
 
 import { writeFile } from '../../utils/fs';
-import { request } from '../../utils/http';
+import fetch from 'node-fetch';
 import { killAllProcesses, ng } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
+import { AddressInfo } from 'net';
+import * as assert from 'assert';
 
 export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
@@ -16,13 +18,13 @@ export default function () {
   const server = http.createServer(app);
   server.listen(0);
 
-  app.set('port', server.address().port);
+  app.set('port', (server.address() as AddressInfo).port);
   app.get('/api/test', function (req, res) {
     res.send('TEST_API_RETURN');
   });
 
   const backendHost = 'localhost';
-  const backendPort = server.address().port;
+  const backendPort = (server.address() as AddressInfo).port;
   const proxyServerUrl = `http://${backendHost}:${backendPort}`;
   const proxyConfigFile = 'proxy.config.json';
   const proxyConfig = {
@@ -35,11 +37,10 @@ export default function () {
     Promise.resolve()
       .then(() => writeFile(proxyConfigFile, JSON.stringify(proxyConfig, null, 2)))
       .then(() => ngServe('--proxy-config', proxyConfigFile))
-      .then(() => request('http://localhost:4200/api/test'))
-      .then((body) => {
-        if (!body.match(/TEST_API_RETURN/)) {
-          throw new Error('Response does not match expected value.');
-        }
+      .then(() => fetch('http://localhost:4200/api/test'))
+      .then(async (response) => {
+        assert.strictEqual(response.status, 200);
+        assert.match(await response.text(), /TEST_API_RETURN/);
       })
       .then(
         () => killAllProcesses(),
@@ -56,11 +57,10 @@ export default function () {
       //   };
       // }))
       // .then(() => ngServe())
-      // .then(() => request('http://localhost:4200/api/test'))
-      // .then(body => {
-      //   if (!body.match(/TEST_API_RETURN/)) {
-      //     throw new Error('Response does not match expected value.');
-      //   }
+      // .then(() => fetch('http://localhost:4200/api/test'))
+      // .then(async (response) => {
+      //   assert.strictEqual(response.status, 200);
+      //   assert.match(await response.text(), /TEST_API_RETURN/)
       // })
       // .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
 

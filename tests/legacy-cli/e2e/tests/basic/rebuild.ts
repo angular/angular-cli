@@ -6,7 +6,7 @@ import {
 } from '../../utils/process';
 import { writeFile, writeMultipleFiles } from '../../utils/fs';
 import { wait } from '../../utils/utils';
-import { request } from '../../utils/http';
+import fetch from 'node-fetch';
 
 const validBundleRegEx = / Compiled successfully./;
 
@@ -136,7 +136,8 @@ export default function () {
         ]),
       )
       .then(() => wait(2000))
-      .then(() => request('http://localhost:4200/main.js'))
+      .then(() => fetch('http://localhost:4200/main.js'))
+      .then((response) => response.text())
       .then((body) => {
         if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
           throw new Error('Expected golden value 1.');
@@ -157,7 +158,8 @@ export default function () {
         ]),
       )
       .then(() => wait(2000))
-      .then(() => request('http://localhost:4200/main.js'))
+      .then(() => fetch('http://localhost:4200/main.js'))
+      .then((response) => response.text())
       .then((body) => {
         if (!body.match(/testingTESTING123/)) {
           throw new Error('Expected component HTML to update.');
@@ -172,7 +174,8 @@ export default function () {
         ]),
       )
       .then(() => wait(2000))
-      .then(() => request('http://localhost:4200/main.js'))
+      .then(() => fetch('http://localhost:4200/main.js'))
+      .then((response) => response.text())
       .then((body) => {
         if (!body.match(/color:\s?blue/)) {
           throw new Error('Expected component CSS to update.');
