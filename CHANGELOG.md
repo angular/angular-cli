@@ -1,3 +1,41 @@
+<a name="14.0.0-next.0"></a>
+
+# 14.0.0-next.0 (2022-05-05)
+
+## Breaking Changes
+
+### @nguniversal/common
+
+- Support for Node.js v12 has been removed as it will become EOL on 2022-04-30. Please use Node.js v14.15 or later.
+
+###
+
+- Deprecated `@nguniversal/aspnetcore-engine`, `@nguniversal/hapi-engine` and `@nguniversal/socket-engine` has been removed in favor of `@nguniversal/common`.
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                 |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------- |
+| [46caf56c](https://github.com/angular/universal/commit/46caf56c59e026935b8ed33bad780ce1fa8ac215) | feat | drop support for Node.js 12 |
+
+###
+
+| Commit                                                                                           | Type     | Description               |
+| ------------------------------------------------------------------------------------------------ | -------- | ------------------------- |
+| [2a84fe03](https://github.com/angular/universal/commit/2a84fe03cf7c9c3bae9593e213126c8cadfd3a92) | refactor | remove deprecated engines |
+
+### express-engine
+
+| Commit                                                                                           | Type | Description                                    |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------------------------- |
+| [ccc09c12](https://github.com/angular/universal/commit/ccc09c128569e9d555c6c86f7a19cce3757e0692) | fix  | construct req url instead of using originalUrl |
+
+## Special Thanks
+
+Adam Plumer, Alan Agius, Conrad Magnus Kirschner, Doug Parker and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.1.1"></a>
 
 # 13.1.1 (2022-05-04)
