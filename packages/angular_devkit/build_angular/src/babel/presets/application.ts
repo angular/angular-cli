@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { ɵParsedTranslation } from '@angular/localize/private';
+import type { ɵParsedTranslation } from '@angular/localize';
 import type {
   DiagnosticHandlingStrategy,
   Diagnostics,
