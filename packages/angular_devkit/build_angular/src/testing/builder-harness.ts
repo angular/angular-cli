@@ -113,7 +113,7 @@ export class BuilderHarness<T> {
     return this;
   }
 
-  withBuilderTarget<O>(
+  withBuilderTarget<O extends object>(
     target: string,
     handler: BuilderHandlerFn<O & json.JsonObject>,
     options?: O,
@@ -178,12 +178,12 @@ export class BuilderHarness<T> {
       getOptions: async (project, target, configuration) => {
         this.validateProjectName(project);
         if (target === this.targetName) {
-          return this.options.get(configuration ?? null) ?? {};
+          return (this.options.get(configuration ?? null) ?? {}) as json.JsonObject;
         } else if (configuration !== undefined) {
           // Harness builder targets currently do not support configurations
           return {};
         } else {
-          return (this.builderTargets.get(target)?.options as json.JsonObject) || {};
+          return (this.builderTargets.get(target)?.options || {}) as json.JsonObject;
         }
       },
       hasTarget: async (project, target) => {

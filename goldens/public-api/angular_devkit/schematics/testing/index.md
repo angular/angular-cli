@@ -25,9 +25,9 @@ export class SchematicTestRunner {
     // (undocumented)
     registerCollection(collectionName: string, collectionPath: string): void;
     // (undocumented)
-    runExternalSchematicAsync<SchematicSchemaT>(collectionName: string, schematicName: string, opts?: SchematicSchemaT, tree?: Tree_2): Observable<UnitTestTree>;
+    runExternalSchematicAsync<SchematicSchemaT extends object>(collectionName: string, schematicName: string, opts?: SchematicSchemaT, tree?: Tree_2): Observable<UnitTestTree>;
     // (undocumented)
-    runSchematicAsync<SchematicSchemaT>(schematicName: string, opts?: SchematicSchemaT, tree?: Tree_2): Observable<UnitTestTree>;
+    runSchematicAsync<SchematicSchemaT extends object>(schematicName: string, opts?: SchematicSchemaT, tree?: Tree_2): Observable<UnitTestTree>;
     // (undocumented)
     get tasks(): TaskConfiguration[];
 }
