@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -18,6 +17,7 @@ import {
   mergeWith,
   move,
   noop,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
@@ -31,16 +31,12 @@ import { Schema as DirectiveOptions } from './schema';
 
 function addDeclarationToNgModule(options: DirectiveOptions): Rule {
   return (host: Tree) => {
-    if (options.skipImport || !options.module) {
+    if (options.skipImport || options.standalone || !options.module) {
       return host;
     }
 
     const modulePath = options.module;
-    const text = host.read(modulePath);
-    if (text === null) {
-      throw new SchematicsException(`File ${modulePath} does not exist.`);
-    }
-    const sourceText = text.toString('utf-8');
+    const sourceText = host.readText(modulePath);
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const directivePath =
@@ -66,11 +62,7 @@ function addDeclarationToNgModule(options: DirectiveOptions): Rule {
 
     if (options.export) {
       // Need to refresh the AST because we overwrote the file in the host.
-      const text = host.read(modulePath);
-      if (text === null) {
-        throw new SchematicsException(`File ${modulePath} does not exist.`);
-      }
-      const sourceText = text.toString('utf-8');
+      const sourceText = host.readText(modulePath);
       const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
       const exportRecorder = host.beginUpdate(modulePath);

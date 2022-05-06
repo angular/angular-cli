@@ -18,7 +18,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import { getWorkspace, updateWorkspace } from '@schematics/angular/utility/workspace';
+import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { posix } from 'path';
 import { Readable, Writable } from 'stream';
 import { Schema as PwaOptions } from './schema';
@@ -87,7 +87,7 @@ export default function (options: PwaOptions): Rule {
       options.title = options.project;
     }
 
-    const workspace = await getWorkspace(host);
+    const workspace = await readWorkspace(host);
 
     if (!options.project) {
       throw new SchematicsException('Option "project" is required.');
@@ -158,8 +158,9 @@ export default function (options: PwaOptions): Rule {
     // Setup service worker schematic options
     const { title, ...swOptions } = options;
 
+    await writeWorkspace(host, workspace);
+
     return chain([
-      updateWorkspace(workspace),
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
       mergeWith(apply(url('./files/root'), [template({ ...options }), move(sourcePath)])),
       mergeWith(

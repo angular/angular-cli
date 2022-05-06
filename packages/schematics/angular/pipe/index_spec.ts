@@ -147,4 +147,14 @@ describe('Pipe Schematic', () => {
     expect(files).not.toContain('/projects/bar/src/app/foo.pipe.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
   });
+
+  it('should create a standalone pipe', async () => {
+    const options = { ...defaultOptions, standalone: true };
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
+    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    const pipeContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+    expect(pipeContent).toContain('standalone: true');
+    expect(pipeContent).toContain('class FooPipe');
+    expect(moduleContent).not.toContain('FooPipe');
+  });
 });

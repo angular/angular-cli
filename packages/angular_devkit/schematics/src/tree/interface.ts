@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Path, PathFragment } from '@angular-devkit/core';
+import { JsonValue, Path, PathFragment } from '@angular-devkit/core';
 import { Action } from './action';
 
 export enum MergeStrategy {
@@ -83,6 +83,31 @@ export interface Tree {
 
   // Readonly.
   read(path: string): Buffer | null;
+
+  /**
+   * Reads a file from the Tree as a UTF-8 encoded text file.
+   *
+   * @param path The path of the file to read.
+   * @returns A string containing the contents of the file.
+   * @throws {@link FileDoesNotExistException} if the file is not found.
+   * @throws An error if the file contains invalid UTF-8 characters.
+   */
+  readText(path: string): string;
+
+  /**
+   * Reads and parses a file from the Tree as a UTF-8 encoded JSON file.
+   * Supports parsing JSON (RFC 8259) with the following extensions:
+   * * Single-line and multi-line JavaScript comments
+   * * Trailing commas within objects and arrays
+   *
+   * @param path The path of the file to read.
+   * @returns A JsonValue containing the parsed contents of the file.
+   * @throws {@link FileDoesNotExistException} if the file is not found.
+   * @throws An error if the file contains invalid UTF-8 characters.
+   * @throws An error if the file contains malformed JSON.
+   */
+  readJson(path: string): JsonValue;
+
   exists(path: string): boolean;
   get(path: string): FileEntry | null;
   getDir(path: string): DirEntry;

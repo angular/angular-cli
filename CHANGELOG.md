@@ -1,3 +1,169 @@
+<a name="14.0.0-next.13"></a>
+
+# 14.0.0-next.13 (2022-05-04)
+
+## Breaking Changes
+
+### @angular-devkit/schematics
+
+- Schematics `NodePackageInstallTask` will not execute package scripts by default
+  The `NodePackageInstallTask` will now use the package manager's `--ignore-scripts` option by default.
+  The `--ignore-scripts` option will prevent package scripts from executing automatically during an install.
+  If a schematic installs packages that need their `install`/`postinstall` scripts to be executed, the
+  `NodePackageInstallTask` now contains an `allowScripts` boolean option which can be enabled to provide the
+  previous behavior for that individual task. As with previous behavior, the `allowScripts` option will
+  prevent the individual task's usage of the `--ignore-scripts` option but will not override the package
+  manager's existing configuration.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [3fa38b08b](https://github.com/angular/angular-cli/commit/3fa38b08ba8ef57a6079873223a7d6088d5ea64e) | feat | introduce `addDependency` rule to utilities                        |
+| [b07ccfbb1](https://github.com/angular/angular-cli/commit/b07ccfbb1b2045d285c23dd4b654e1380892fcb2) | feat | introduce a utility subpath export for Angular rules and utilities |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| [4212fb8de](https://github.com/angular/angular-cli/commit/4212fb8de2f4f3e80831a0803acc5fc6e54db1e1) | feat | add prompt to set up CLI autocompletion                                            |
+| [fb0622893](https://github.com/angular/angular-cli/commit/fb06228932299870774a7b254f022573f5d8175f) | feat | don't prompt to set up autocompletion for `ng update` and `ng completion` commands |
+| [022d8c7bb](https://github.com/angular/angular-cli/commit/022d8c7bb142e8b83f9805a39bc1ae312da465eb) | feat | make `ng completion` set up CLI autocompletion by modifying `.bashrc` files        |
+| [2e15df941](https://github.com/angular/angular-cli/commit/2e15df9417dcc47b12785a8c4c9074bf05d0450c) | feat | remember after prompting users to set up autocompletion and don't prompt again     |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [0e6425fd8](https://github.com/angular/angular-cli/commit/0e6425fd88ea32679516251efdca6ff07cc4b56a) | feat | disable package script execution by default in `NodePackageInstallTask` |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [243cb4062](https://github.com/angular/angular-cli/commit/243cb40622fef4107b0162bc7b6a374471cebc14) | fix  | remove `@schematics/angular` utility deep import usage |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Paul Gschwendtner and Pawel Kozlowski
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="13.3.5"></a>
+
+# 13.3.5 (2022-05-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [6da0910d3](https://github.com/angular/angular-cli/commit/6da0910d345eb84084e32a462432a508d518f402) | fix  | update `@ampproject/remapping` to `2.2.0` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="14.0.0-next.12"></a>
+
+# 14.0.0-next.12 (2022-04-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [4b07aa345](https://github.com/angular/angular-cli/commit/4b07aa345d18ae6cb92284cdf13941b61ae69008) | fix  | change wrapping of schematic code |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [7b78b7840](https://github.com/angular/angular-cli/commit/7b78b7840e95b0f4dca2fcb9218b67dd7500ff2c) | feat | add --standalone to ng generate |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [00186fb93](https://github.com/angular/angular-cli/commit/00186fb93f66d8da51886de37cfa4599f3e89af9) | feat | add initial experimental esbuild-based application browser builder |
+| [7abe212c6](https://github.com/angular/angular-cli/commit/7abe212c655dfeecf91ab022759f3f8ab59a3a7d) | fix  | correctly resolve custom service worker configuration file         |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [25498ad5b](https://github.com/angular/angular-cli/commit/25498ad5b2ba6fa5a88c9802ddeb0ed85c5d9b60) | feat | re-export core string helpers from schematics package |
+| [33f9f3de8](https://github.com/angular/angular-cli/commit/33f9f3de869bba2ecd855a01cc9a0a36651bd281) | feat | support reading JSON content directly from a Tree     |
+| [01297f450](https://github.com/angular/angular-cli/commit/01297f450387dea02eafd6f5701c417ab5c5d844) | feat | support reading text content directly from a Tree     |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [044101554](https://github.com/angular/angular-cli/commit/044101554dfbca07d74f2a4391f94875df7928d2) | perf | use Webpack's built-in xxhash64 support |
+
+## Special Thanks
+
+Charles Lyding, Doug Parker, Kristiyan Kostadinov, Paul Gschwendtner and Wagner Maciel
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="13.3.4"></a>
+
+# 13.3.4 (2022-04-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [f4da75656](https://github.com/angular/angular-cli/commit/f4da756560358273098df2a5cae7848201206c77) | fix  | change wrapping of schematic code |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [5d0141bfb](https://github.com/angular/angular-cli/commit/5d0141bfb4ae80b1a7543eab64e9c381c932eaef) | fix  | correctly resolve custom service worker configuration file |
+
+## Special Thanks
+
+Charles Lyding and Wagner Maciel
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="14.0.0-next.11"></a>
+
+# 14.0.0-next.11 (2022-04-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [78460e995](https://github.com/angular/angular-cli/commit/78460e995a192336db3c4be9d0592b4e7a2ff2c8) | fix  | remove type casting and add optional chaining for current in optionTransforms |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [1a160dac0](https://github.com/angular/angular-cli/commit/1a160dac00f34aab089053281c640dba3efd597f) | fix  | ensure karma sourcemap support on Windows |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [464cf330a](https://github.com/angular/angular-cli/commit/464cf330a14397470e1e57450a77f421a45a927e) | feat | support null for options parameter from OptionTransform type |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Daniil Dubrava
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="14.0.0-next.10"></a>
+
+# 14.0.0-next.10 (2022-04-21)
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.9"></a>
 
 # 14.0.0-next.9 (2022-04-13)

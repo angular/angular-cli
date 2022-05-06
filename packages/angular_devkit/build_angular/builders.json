@@ -11,6 +11,11 @@
       "schema": "./src/builders/browser/schema.json",
       "description": "Build a browser application."
     },
+    "browser-esbuild": {
+      "implementation": "./src/builders/browser-esbuild",
+      "schema": "./src/builders/browser/schema.json",
+      "description": "Build a browser application."
+    },
     "dev-server": {
       "implementation": "./src/builders/dev-server",
       "schema": "./src/builders/dev-server/schema.json",

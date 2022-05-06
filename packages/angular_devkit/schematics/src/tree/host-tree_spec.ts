@@ -11,6 +11,84 @@ import { FilterHostTree, HostTree } from './host-tree';
 import { MergeStrategy } from './interface';
 
 describe('HostTree', () => {
+  describe('readText', () => {
+    it('returns text when reading a file that exists', () => {
+      const tree = new HostTree();
+      tree.create('/textfile1', 'abc');
+      tree.create('/textfile2', '123');
+      expect(tree.readText('/textfile1')).toEqual('abc');
+      expect(tree.readText('/textfile2')).toEqual('123');
+    });
+
+    it('throws an error when a file does not exist', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      expect(() => tree.readText(path)).toThrowError(`Path "${path}" does not exist.`);
+    });
+
+    it('throws an error when invalid UTF-8 characters are present', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      tree.create(path, Buffer.from([0xff, 0xff, 0xff, 0xff]));
+      expect(() => tree.readText(path)).toThrowError(`Failed to decode "${path}" as UTF-8 text.`);
+    });
+  });
+
+  describe('readJson', () => {
+    it('returns a JSON value when reading a file that exists', () => {
+      const tree = new HostTree();
+      tree.create('/textfile1', '{ "a": true, "b": "xyz" }');
+      tree.create('/textfile2', '123');
+      tree.create('/textfile3', 'null');
+      expect(tree.readJson('/textfile1')).toEqual({ a: true, b: 'xyz' });
+      expect(tree.readJson('/textfile2')).toEqual(123);
+      expect(tree.readJson('/textfile3')).toBeNull();
+    });
+
+    it('returns a JSON value when reading a file with comments', () => {
+      const tree = new HostTree();
+      tree.create(
+        '/textfile1',
+        '{ "a": true, /* inner object\nmultiline comment\n */ "b": "xyz" }',
+      );
+      tree.create('/textfile2', '123 // number value');
+      tree.create('/textfile3', 'null // null value');
+      expect(tree.readJson('/textfile1')).toEqual({ a: true, b: 'xyz' });
+      expect(tree.readJson('/textfile2')).toEqual(123);
+      expect(tree.readJson('/textfile3')).toBeNull();
+    });
+
+    it('returns a JSON value when reading a file with trailing commas', () => {
+      const tree = new HostTree();
+      tree.create('/textfile1', '{ "a": true, "b": "xyz", }');
+      tree.create('/textfile2', '[5, 4, 3, 2, 1, ]');
+      expect(tree.readJson('/textfile1')).toEqual({ a: true, b: 'xyz' });
+      expect(tree.readJson('/textfile2')).toEqual([5, 4, 3, 2, 1]);
+    });
+
+    it('throws an error when a file does not exist', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      expect(() => tree.readJson(path)).toThrowError(`Path "${path}" does not exist.`);
+    });
+
+    it('throws an error if the JSON is malformed', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      tree.create(path, '{ "a": true;;;;; "b": "xyz" }');
+      expect(() => tree.readJson(path)).toThrowError(
+        `Failed to parse "${path}" as JSON. InvalidSymbol at offset: 7.`,
+      );
+    });
+
+    it('throws an error when invalid UTF-8 characters are present', () => {
+      const tree = new HostTree();
+      const path = '/textfile1';
+      tree.create(path, Buffer.from([0xff, 0xff, 0xff, 0xff]));
+      expect(() => tree.readJson(path)).toThrowError(`Failed to decode "${path}" as UTF-8 text.`);
+    });
+  });
+
   describe('merge', () => {
     it('should create files from each tree', () => {
       const tree = new HostTree();

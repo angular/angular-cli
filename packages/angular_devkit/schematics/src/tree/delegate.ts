@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonValue } from '@angular-devkit/core';
 import { Action } from './action';
 import {
   DirEntry,
@@ -34,6 +35,12 @@ export class DelegateTree implements Tree {
   // Readonly.
   read(path: string): Buffer | null {
     return this._other.read(path);
+  }
+  readText(path: string): string {
+    return this._other.readText(path);
+  }
+  readJson(path: string): JsonValue {
+    return this._other.readJson(path);
   }
   exists(path: string): boolean {
     return this._other.exists(path);

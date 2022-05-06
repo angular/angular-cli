@@ -1,1 +1,5 @@
-To enable bash and zsh real-time type-ahead autocompletion, copy and paste the generated script to your `.bashrc`, `.bash_profile`, `.zshrc` or `.zsh_profile`.
+To enable Bash and Zsh real-time type-ahead autocompletion, run
+`ng completion` and restart your terminal.
+
+Alternatively, append `source <(ng completion script)` to the appropriate `.bashrc`,
+`.bash_profile`, `.zshrc`, `.zsh_profile`, or `.profile` file.

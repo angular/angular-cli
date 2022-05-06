@@ -3,7 +3,7 @@ import { createDir, writeFile } from '../../utils/fs';
 import { ng, silentGit } from '../../utils/process';
 import { prepareProjectForE2e } from '../../utils/project';
 
-export default async function() {
+export default async function () {
   process.chdir(getGlobalVariable('tmp-root'));
 
   await createDir('./subdirectory');
@@ -15,7 +15,7 @@ export default async function() {
   process.chdir('./subdirectory-test-project');
   await prepareProjectForE2e('subdirectory-test-project');
 
-  await writeFile('../added.ts', 'console.log(\'created\');\n');
+  await writeFile('../added.ts', "console.log('created');\n");
   await silentGit('add', '../added.ts');
 
   const { stderr } = await ng('update', '@angular/cli');

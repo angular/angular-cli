@@ -8,7 +8,6 @@
 
 import type { CompilerHost, CompilerOptions, NgtscProgram } from '@angular/compiler-cli';
 import { strict as assert } from 'assert';
-import { createHash } from 'crypto';
 import * as ts from 'typescript';
 import type { Compilation, Compiler, Module, NormalModule } from 'webpack';
 import { NgccProcessor } from '../ngcc_processor';
@@ -107,6 +106,7 @@ export class AngularWebpackPlugin {
   private builder?: ts.EmitAndSemanticDiagnosticsBuilderProgram;
   private sourceFileCache?: SourceFileCache;
   private webpackCache?: ReturnType<Compilation['getCache']>;
+  private webpackCreateHash?: Compiler['webpack']['util']['createHash'];
   private readonly fileDependencies = new Map<string, Set<string>>();
   private readonly requiredFilesToEmit = new Set<string>();
   private readonly requiredFilesToEmitCache = new Map<string, EmitFileResult | undefined>();
@@ -141,6 +141,7 @@ export class AngularWebpackPlugin {
   // eslint-disable-next-line max-lines-per-function
   apply(compiler: Compiler): void {
     const { NormalModuleReplacementPlugin, util } = compiler.webpack;
+    this.webpackCreateHash = util.createHash;
 
     // Setup file replacements with webpack
     for (const [key, value] of Object.entries(this.pluginOptions.fileReplacements)) {
@@ -745,9 +746,11 @@ export class AngularWebpackPlugin {
     filePath: string,
     content: string,
   ): Promise<FileEmitHistoryItem> {
+    assert.ok(this.webpackCreateHash, 'File emitter is used prior to Webpack compilation');
+
     const historyData: FileEmitHistoryItem = {
       length: content.length,
-      hash: createHash('md5').update(content).digest(),
+      hash: this.webpackCreateHash('xxhash64').update(content).digest() as Uint8Array,
     };
 
     if (this.webpackCache) {

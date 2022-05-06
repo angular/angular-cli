@@ -106,6 +106,8 @@ export class ConfigCommandModule
       'cli.analytics',
       'cli.analyticsSharing.tracking',
       'cli.analyticsSharing.uuid',
+
+      'cli.completion.prompted',
     ]);
 
     if (

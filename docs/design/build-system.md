@@ -24,7 +24,7 @@ It's not strictly accurate because some options remove certain processing stages
 This diagram doesn't show these conditionals and only shows the possible processing steps.
 Relative paths, such as `./raw-css-loader.ts`, refer to internal plugins, while other names usually refer to public npm packages.
 
-![Overview diagram](https://g.gravizo.com/source/svg?https://raw.githubusercontent.com/angular/angular-cli/master/docs/design/build-system-overview.dot)
+![Overview diagram](https://g.gravizo.com/source/svg?https://raw.githubusercontent.com/angular/angular-cli/main/docs/design/build-system-overview.dot)
 
 ## Loading and processing sources
 
@@ -128,7 +128,7 @@ We also use Terser's mangling, by which names, but not properties, are renamed t
 The main characteristics of Terser to keep in mind is that it operates via static analysis and does not support the indirection introduced by module loading.
 Thus the rest of the pipeline is directed towards providing Terser with code that can be removed via static analysis in large single modules scopes.
 
-To this end we developed [@angular-devkit/build-optimizer](https://github.com/angular/angular-cli/tree/master/packages/angular_devkit/build_optimizer), a post-processing tool for TS code.
+To this end we developed [@angular-devkit/build-optimizer](https://github.com/angular/angular-cli/tree/main/packages/angular_devkit/build_optimizer), a post-processing tool for TS code.
 Build Optimizer searches for code patterns produced by the TypeScript and Angular compiler that are known to inhibit dead code elimination, and converts them into equivalent structures that enable it instead (the link above contains some examples).
 It also adds Terser [annotations](https://github.com/terser/terser#annotations) marking top-level functions as free from side effects for libraries that have the `sideEffects` flag set to false in `package.json`.
 

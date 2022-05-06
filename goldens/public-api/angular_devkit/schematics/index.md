@@ -7,11 +7,13 @@
 /// <reference types="node" />
 
 import { BaseException } from '@angular-devkit/core';
+import { JsonValue } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Path } from '@angular-devkit/core';
 import { PathFragment } from '@angular-devkit/core';
 import { schema } from '@angular-devkit/core';
+import { strings } from '@angular-devkit/core';
 import { Subject } from 'rxjs';
 import { Url } from 'url';
 import { virtualFs } from '@angular-devkit/core';
@@ -233,6 +235,10 @@ export class DelegateTree implements Tree_2 {
     overwrite(path: string, content: Buffer | string): void;
     // (undocumented)
     read(path: string): Buffer | null;
+    // (undocumented)
+    readJson(path: string): JsonValue;
+    // (undocumented)
+    readText(path: string): string;
     // (undocumented)
     rename(from: string, to: string): void;
     // (undocumented)
@@ -546,6 +552,10 @@ export class HostTree implements Tree_2 {
     // (undocumented)
     read(path: string): Buffer | null;
     // (undocumented)
+    readJson(path: string): JsonValue;
+    // (undocumented)
+    readText(path: string): string;
+    // (undocumented)
     rename(from: string, to: string): void;
     // (undocumented)
     get root(): DirEntry;
@@ -840,6 +850,8 @@ export function source(tree: Tree_2): Source;
 
 // @public (undocumented)
 const standardFormats: schema.SchemaFormat[];
+
+export { strings }
 
 // @public (undocumented)
 export interface TaskConfiguration<T = {}> {

@@ -10,7 +10,6 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 import * as http from 'http';
 import * as path from 'path';
-import * as glob from 'glob';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 
@@ -27,29 +26,6 @@ let isBlocked = false;
 let webpackMiddleware: any;
 let successCb: () => void;
 let failureCb: () => void;
-
-// Add files to the Karma files array.
-function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
-  const defaults = {
-    included: true,
-    served: true,
-    watched: true,
-  };
-
-  const processedFiles = newFiles
-    // Remove globs that do not match any files, otherwise Karma will show a warning for these.
-    .filter((file) => glob.sync(file.pattern, { nodir: true }).length != 0)
-    // Fill in pattern properties with defaults.
-    .map((file) => ({ ...defaults, ...file }));
-
-  // It's important to not replace the array, because
-  // karma already has a reference to the existing array.
-  if (prepend) {
-    files.unshift(...processedFiles);
-  } else {
-    files.push(...processedFiles);
-  }
-}
 
 const init: any = (config: any, emitter: any) => {
   if (!config.buildWebpack) {
@@ -73,13 +49,14 @@ const init: any = (config: any, emitter: any) => {
     const smsPath = path.dirname(require.resolve('source-map-support'));
     const ksmsPath = path.dirname(require.resolve('karma-source-map-support'));
 
-    addKarmaFiles(
-      config.files,
-      [
-        { pattern: path.join(smsPath, 'browser-source-map-support.js'), watched: false },
-        { pattern: path.join(ksmsPath, 'client.js'), watched: false },
-      ],
-      true,
+    config.files.unshift(
+      {
+        pattern: path.join(smsPath, 'browser-source-map-support.js'),
+        included: true,
+        served: true,
+        watched: false,
+      },
+      { pattern: path.join(ksmsPath, 'client.js'), included: true, served: true, watched: false },
     );
   }
 

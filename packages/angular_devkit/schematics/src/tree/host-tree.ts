@@ -7,6 +7,7 @@
  */
 
 import {
+  JsonValue,
   Path,
   PathFragment,
   PathIsDirectoryException,
@@ -16,8 +17,10 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
+import { ParseError, parse as jsoncParse, printParseErrorCode } from 'jsonc-parser';
 import { EMPTY, Observable } from 'rxjs';
 import { concatMap, map, mergeMap } from 'rxjs/operators';
+import { TextDecoder } from 'util';
 import {
   ContentHasMutatedException,
   FileAlreadyExistException,
@@ -162,10 +165,10 @@ export class HostTree implements Tree {
       return tree._ancestry.has(this._id);
     }
     if (tree instanceof DelegateTree) {
-      return this.isAncestorOf(((tree as unknown) as { _other: Tree })._other);
+      return this.isAncestorOf((tree as unknown as { _other: Tree })._other);
     }
     if (tree instanceof ScopedTree) {
-      return this.isAncestorOf(((tree as unknown) as { _base: Tree })._base);
+      return this.isAncestorOf((tree as unknown as { _base: Tree })._base);
     }
 
     return false;
@@ -206,9 +209,9 @@ export class HostTree implements Tree {
               throw new MergeConflictException(path);
             }
 
-            this._record.overwrite(path, (content as {}) as virtualFs.FileBuffer).subscribe();
+            this._record.overwrite(path, content as {} as virtualFs.FileBuffer).subscribe();
           } else {
-            this._record.create(path, (content as {}) as virtualFs.FileBuffer).subscribe();
+            this._record.create(path, content as {} as virtualFs.FileBuffer).subscribe();
           }
 
           return;
@@ -234,7 +237,7 @@ export class HostTree implements Tree {
           }
           // We use write here as merge validation has already been done, and we want to let
           // the CordHost do its job.
-          this._record.write(path, (content as {}) as virtualFs.FileBuffer).subscribe();
+          this._record.write(path, content as {} as virtualFs.FileBuffer).subscribe();
 
           return;
         }
@@ -289,6 +292,42 @@ export class HostTree implements Tree {
 
     return entry ? entry.content : null;
   }
+
+  readText(path: string): string {
+    const data = this.read(path);
+    if (data === null) {
+      throw new FileDoesNotExistException(path);
+    }
+
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+
+    try {
+      // With the `fatal` option enabled, invalid data will throw a TypeError
+      return decoder.decode(data);
+    } catch (e) {
+      if (e instanceof TypeError) {
+        throw new Error(`Failed to decode "${path}" as UTF-8 text.`);
+      }
+      throw e;
+    }
+  }
+
+  readJson(path: string): JsonValue {
+    const content = this.readText(path);
+    const errors: ParseError[] = [];
+    const result = jsoncParse(content, errors, { allowTrailingComma: true });
+
+    // If there is a parse error throw with the error information
+    if (errors[0]) {
+      const { error, offset } = errors[0];
+      throw new Error(
+        `Failed to parse "${path}" as JSON. ${printParseErrorCode(error)} at offset: ${offset}.`,
+      );
+    }
+
+    return result;
+  }
+
   exists(path: string): boolean {
     return this._recordSync.isFile(this._normalizePath(path));
   }
@@ -337,7 +376,7 @@ export class HostTree implements Tree {
       throw new FileDoesNotExistException(p);
     }
     const c = typeof content == 'string' ? Buffer.from(content) : content;
-    this._record.overwrite(p, (c as {}) as virtualFs.FileBuffer).subscribe();
+    this._record.overwrite(p, c as {} as virtualFs.FileBuffer).subscribe();
   }
   beginUpdate(path: string): UpdateRecorder {
     const entry = this.get(path);
@@ -371,7 +410,7 @@ export class HostTree implements Tree {
       throw new FileAlreadyExistException(p);
     }
     const c = typeof content == 'string' ? Buffer.from(content) : content;
-    this._record.create(p, (c as {}) as virtualFs.FileBuffer).subscribe();
+    this._record.create(p, c as {} as virtualFs.FileBuffer).subscribe();
   }
   delete(path: string): void {
     this._recordSync.delete(this._normalizePath(path));
@@ -476,7 +515,7 @@ export class FilterHostTree extends HostTree {
             return EMPTY;
           }
 
-          return newBackend.write(path, (content as {}) as virtualFs.FileBuffer);
+          return newBackend.write(path, content as {} as virtualFs.FileBuffer);
         }),
       );
     };

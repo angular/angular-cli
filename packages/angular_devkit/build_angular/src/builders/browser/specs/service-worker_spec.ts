@@ -52,6 +52,24 @@ describe('Browser Builder service worker', () => {
     await run.stop();
   });
 
+  it('supports specifying a custom service worker configuration file', async () => {
+    host.writeMultipleFiles({
+      'src/configs/ngsw.json': JSON.stringify(manifest),
+      'src/assets/folder-asset.txt': 'folder-asset.txt',
+      'src/styles.css': `body { background: url(./spectrum.png); }`,
+    });
+
+    const overrides = { serviceWorker: true, ngswConfigPath: 'src/configs/ngsw.json' };
+
+    const run = await architect.scheduleTarget(target, overrides);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    expect(host.scopedSync().exists(normalize('dist/ngsw.json'))).toBeTrue();
+  });
+
   it('works with service worker', async () => {
     host.writeMultipleFiles({
       'src/ngsw-config.json': JSON.stringify(manifest),

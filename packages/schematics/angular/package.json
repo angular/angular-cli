@@ -8,6 +8,13 @@
     "code generation",
     "schematics"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./utility": "./utility/index.js",
+    "./utility/*": "./utility/*.js",
+    "./migrations/migration-collection.json": "./migrations/migration-collection.json",
+    "./*": "./*.js"
+  },
   "schematics": "./collection.json",
   "dependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",

@@ -59,6 +59,12 @@
       "format": "html-selector",
       "description": "The HTML selector to use for this directive."
     },
+    "standalone": {
+      "description": "Whether the generated directive is standalone.",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": 15
+    },
     "flat": {
       "type": "boolean",
       "description": "When true (the default), creates the new files at the top level of the current project.",

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, normalize, strings } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -16,13 +16,14 @@ import {
   chain,
   mergeWith,
   move,
+  strings,
   url,
 } from '@angular-devkit/schematics';
+import { readWorkspace, writeWorkspace } from '../utility';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
 
@@ -40,7 +41,7 @@ function addScriptsToPackageJson(): Rule {
 export default function (options: E2eOptions): Rule {
   return async (host: Tree) => {
     const appProject = options.relatedAppName;
-    const workspace = await getWorkspace(host);
+    const workspace = await readWorkspace(host);
     const project = workspace.projects.get(appProject);
     if (!project) {
       throw new SchematicsException(`Project name "${appProject}" doesn't not exist.`);
@@ -65,8 +66,9 @@ export default function (options: E2eOptions): Rule {
       },
     });
 
+    await writeWorkspace(host, workspace);
+
     return chain([
-      updateWorkspace(workspace),
       mergeWith(
         apply(url('./files'), [
           applyTemplates({

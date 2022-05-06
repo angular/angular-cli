@@ -29,7 +29,7 @@ var_5: &only_release_branches
   filters:
     branches:
       only:
-        - master
+        - main
         - /\d+\.\d+\.x/
 
 # Executor Definitions
@@ -218,6 +218,11 @@ jobs:
           command: |
             mkdir /mnt/ramdisk/e2e-yarn
             node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+      - run:
+          name: Execute CLI E2E Tests Subset with esbuild builder
+          command: |
+            mkdir /mnt/ramdisk/e2e-esbuild
+            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --esbuild --tmpdir=/mnt/ramdisk/e2e-esbuild --glob="{tests/basic/**,tests/build/prod-build.ts}" --ignore="tests/basic/{environment,rebuild,serve,scripts-array}.ts"
       - fail_fast
 
   test-browsers:
@@ -241,7 +246,6 @@ jobs:
         # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
         # too early without Saucelabs not being ready.
       - run: ./scripts/saucelabs/wait-for-tunnel.sh
-      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
       - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
       - run: ./scripts/saucelabs/stop-tunnel.sh
       - fail_fast
@@ -318,7 +322,7 @@ jobs:
           name: Execute E2E Tests
           command: |
             if (Test-Path env:CIRCLE_PULL_REQUEST) {
-              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts,tests/test/test-sourcemap.ts,tests/misc/check-postinstalls.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
             } else {
               node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
             }
@@ -357,7 +361,7 @@ workflows:
             branches:
               only:
                 - renovate/angular
-                - master
+                - main
       - e2e-cli:
           name: e2e-cli-node-16
           nodeversion: '16.10'

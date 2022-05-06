@@ -2,7 +2,7 @@ import { expectFileToExist, expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
-export default async function() {
+export default async function () {
   // Licenses should be left intact if extraction is disabled
   await ng('build', '--extract-licenses=false', '--output-hashing=none');
 

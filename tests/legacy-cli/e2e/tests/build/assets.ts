@@ -16,9 +16,11 @@ export default async function () {
   await expectToFail(() => expectFileToExist('dist/test-project/assets/.gitkeep'));
 
   // Ensure `followSymlinks` option follows symlinks
-  await updateJsonFile('angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
-    appArchitect['build'].options.assets = [{ glob: '**/*', input: 'src/assets', output: 'assets', followSymlinks: true }];
+    appArchitect['build'].options.assets = [
+      { glob: '**/*', input: 'src/assets', output: 'assets', followSymlinks: true },
+    ];
   });
   fs.mkdirSync('dirToSymlink/subdir1', { recursive: true });
   fs.mkdirSync('dirToSymlink/subdir2/subsubdir1', { recursive: true });

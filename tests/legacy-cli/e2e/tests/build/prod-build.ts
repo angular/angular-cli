@@ -1,5 +1,6 @@
 import { statSync } from 'fs';
 import { join } from 'path';
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, expectFileToMatch, readFile } from '../../utils/fs';
 import { noSilentNg } from '../../utils/process';
 
@@ -32,12 +33,15 @@ export default async function () {
   await noSilentNg('build');
   await expectFileToExist(join(process.cwd(), 'dist'));
   // Check for cache busting hash script src
-  await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{16}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{16}\.css/);
-  await expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/);
+  await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-zA-Z]{8,16}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-zA-Z]{8,16}\.css/);
+  if (!getGlobalVariable('argv')['esbuild']) {
+    // EXPERIMENTAL_ESBUILD: esbuild does not yet extract license text
+    await expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/);
+  }
 
   const indexContent = await readFile('dist/test-project/index.html');
-  const mainPath = indexContent.match(/src="(main\.[a-z0-9]{0,32}\.js)"/)[1];
+  const mainPath = indexContent.match(/src="(main\.[0-9a-zA-Z]{0,32}\.js)"/)[1];
 
   // Content checks
   await expectFileToMatch(`dist/test-project/${mainPath}`, bootstrapRegExp);

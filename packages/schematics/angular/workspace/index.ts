@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { strings } from '@angular-devkit/core';
 import {
   Rule,
   apply,
@@ -14,6 +13,7 @@ import {
   filter,
   mergeWith,
   noop,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { latestVersions } from '../utility/latest-versions';

@@ -19,6 +19,7 @@ import {
 } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { createAnalytics } from '../analytics/analytics';
+import { considerSettingUpAutocompletion } from '../utilities/completion';
 import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
 import { PackageManagerUtils } from '../utilities/package-manager';
@@ -121,6 +122,17 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     const camelCasedOptions: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(options)) {
       camelCasedOptions[yargsParser.camelCase(key)] = value;
+    }
+
+    // Set up autocompletion if appropriate.
+    const autocompletionExitCode = await considerSettingUpAutocompletion(
+      this.commandName,
+      this.context.logger,
+    );
+    if (autocompletionExitCode !== undefined) {
+      process.exitCode = autocompletionExitCode;
+
+      return;
     }
 
     // Gather and report analytics.

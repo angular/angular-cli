@@ -21,6 +21,7 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { readWorkspace, writeWorkspace } from '../utility';
 import {
   addSymbolToNgModuleMetadata,
   getEnvironmentExportName,
@@ -32,7 +33,6 @@ import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/d
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
-import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions } from '../utility/workspace-models';
 import { Schema as ServiceWorkerOptions } from './schema';
 
@@ -122,11 +122,7 @@ function updateAppModule(mainPath: string): Rule {
 }
 
 function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
-  const buffer = host.read(path);
-  if (!buffer) {
-    throw new SchematicsException(`Could not read file (${path}).`);
-  }
-  const content = buffer.toString();
+  const content = host.readText(path);
   const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
 
   return source;
@@ -134,7 +130,7 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 
 export default function (options: ServiceWorkerOptions): Rule {
   return async (host: Tree, context: SchematicContext) => {
-    const workspace = await getWorkspace(host);
+    const workspace = await readWorkspace(host);
     const project = workspace.projects.get(options.project);
     if (!project) {
       throw new SchematicsException(`Invalid project name (${options.project})`);
@@ -167,9 +163,10 @@ export default function (options: ServiceWorkerOptions): Rule {
 
     context.addTask(new NodePackageInstallTask());
 
+    await writeWorkspace(host, workspace);
+
     return chain([
       mergeWith(templateSource),
-      updateWorkspace(workspace),
       addDependencies(),
       updateAppModule(buildOptions.main),
     ]);

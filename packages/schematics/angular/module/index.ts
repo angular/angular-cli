@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Path, normalize, strings } from '@angular-devkit/core';
+import { Path, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -19,6 +19,7 @@ import {
   move,
   noop,
   schematic,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { Schema as ComponentOptions } from '../component/schema';
@@ -54,11 +55,7 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
     const modulePath = options.module;
 
-    const text = host.read(modulePath);
-    if (text === null) {
-      throw new SchematicsException(`File ${modulePath} does not exist.`);
-    }
-    const sourceText = text.toString();
+    const sourceText = host.readText(modulePath);
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const relativePath = buildRelativeModulePath(options, modulePath);
@@ -100,12 +97,8 @@ function addRouteDeclarationToNgModule(
       path = options.module;
     }
 
-    const text = host.read(path);
-    if (!text) {
-      throw new Error(`Couldn't find the module nor its routing module.`);
-    }
+    const sourceText = host.readText(path);
 
-    const sourceText = text.toString();
     const addDeclaration = addRouteDeclarationToModule(
       ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
       path,
