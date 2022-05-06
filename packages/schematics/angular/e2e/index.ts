@@ -94,7 +94,7 @@ export default function (options: E2eOptions): Rule {
           {
             type: NodeDependencyType.Dev,
             name: 'ts-node',
-            version: '~9.1.1',
+            version: latestVersions['ts-node'],
           },
           {
             type: NodeDependencyType.Dev,
