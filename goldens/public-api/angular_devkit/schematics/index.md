@@ -71,7 +71,7 @@ export function applyContentTemplate<T>(options: T): FileOperator;
 export function applyPathTemplate<T extends PathTemplateData>(data: T, options?: PathTemplateOptions): FileOperator;
 
 // @public (undocumented)
-export function applyTemplates<T>(options: T): Rule;
+export function applyTemplates<T extends object>(options: T): Rule;
 
 // @public (undocumented)
 export function applyToSubtree(path: string, rules: Rule[]): Rule;
@@ -904,11 +904,11 @@ export class TaskScheduler {
     // (undocumented)
     finalize(): ReadonlyArray<TaskInfo>;
     // (undocumented)
-    schedule<T>(taskConfiguration: TaskConfiguration<T>): TaskId;
+    schedule<T extends object>(taskConfiguration: TaskConfiguration<T>): TaskId;
 }
 
 // @public (undocumented)
-export function template<T>(options: T): Rule;
+export function template<T extends object>(options: T): Rule;
 
 // @public (undocumented)
 export const TEMPLATE_FILENAME_RE: RegExp;
@@ -939,7 +939,7 @@ export const TreeSymbol: symbol;
 // @public
 export interface TypedSchematicContext<CollectionMetadataT extends object, SchematicMetadataT extends object> {
     // (undocumented)
-    addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
+    addTask<T extends object>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
     // (undocumented)
     readonly debug: boolean;
     // (undocumented)

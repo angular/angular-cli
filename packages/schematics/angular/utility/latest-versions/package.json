@@ -11,7 +11,7 @@
     "karma-jasmine-html-reporter": "~1.7.0",
     "karma-jasmine": "~5.0.0",
     "karma": "~6.3.0",
-    "ng-packagr": "^14.0.0-next.2",
+    "ng-packagr": "^14.0.0-next.8",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "ts-node": "~10.7.0",

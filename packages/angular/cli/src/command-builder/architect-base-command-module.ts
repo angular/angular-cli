@@ -32,7 +32,7 @@ export interface MissingTargetChoice {
   value: string;
 }
 
-export abstract class ArchitectBaseCommandModule<T>
+export abstract class ArchitectBaseCommandModule<T extends object>
   extends CommandModule<T>
   implements CommandModuleImplementation<T>
 {

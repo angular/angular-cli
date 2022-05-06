@@ -78,7 +78,7 @@ export class SchematicTestRunner {
     this._engineHost.registerCollection(collectionName, collectionPath);
   }
 
-  runSchematicAsync<SchematicSchemaT>(
+  runSchematicAsync<SchematicSchemaT extends object>(
     schematicName: string,
     opts?: SchematicSchemaT,
     tree?: Tree,
@@ -92,7 +92,7 @@ export class SchematicTestRunner {
       .pipe(map((tree) => new UnitTestTree(tree)));
   }
 
-  runExternalSchematicAsync<SchematicSchemaT>(
+  runExternalSchematicAsync<SchematicSchemaT extends object>(
     collectionName: string,
     schematicName: string,
     opts?: SchematicSchemaT,

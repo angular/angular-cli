@@ -163,24 +163,24 @@ export function renameTemplateFiles(): Rule {
   );
 }
 
-export function template<T>(options: T): Rule {
+export function template<T extends object>(options: T): Rule {
   return chain([
     contentTemplate(options),
     // Force cast to PathTemplateData. We need the type for the actual pathTemplate() call,
     // but in this case we cannot do anything as contentTemplate are more permissive.
     // Since values are coerced to strings in PathTemplates it will be fine in the end.
-    pathTemplate((options as {}) as PathTemplateData),
+    pathTemplate(options as {} as PathTemplateData),
   ]);
 }
 
-export function applyTemplates<T>(options: T): Rule {
+export function applyTemplates<T extends object>(options: T): Rule {
   return forEach(
     when(
       (path) => path.endsWith('.template'),
       composeFileOperators([
         applyContentTemplate(options),
         // See above for this weird cast.
-        applyPathTemplate((options as {}) as PathTemplateData),
+        applyPathTemplate(options as {} as PathTemplateData),
         (entry) => {
           return {
             content: entry.content,
