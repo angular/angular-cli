@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';<% } %>
 @Component({<% if(!skipSelector) {%>
   selector: '<%= selector %>',<%}%><% if(standalone) {%>
   standalone: true,
-  imports: [CommonModule], <%}%><% if(inlineTemplate) { %>
+  imports: [CommonModule],<%}%><% if(inlineTemplate) { %>
   template: `
     <p>
       <%= dasherize(name) %> works!
