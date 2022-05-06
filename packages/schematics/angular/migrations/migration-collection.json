@@ -24,6 +24,11 @@
       "version": "14.0.0",
       "factory": "./update-14/replace-default-collection-option",
       "description": "Replace 'defaultCollection' option in workspace configuration with 'schematicCollections'."
+    },
+    "update-libraries-secondary-entrypoints": {
+      "version": "14.0.0",
+      "factory": "./update-14/update-libraries-secondary-entrypoints",
+      "description": "Remove 'package.json' files from library projects secondary entrypoints."
     }
   }
 }
