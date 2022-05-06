@@ -93,6 +93,8 @@ triage:
 
 # Size checking
 size:
+  # Size checking for production build is performed via the E2E test `build/prod-build`
+  disabled: true
   circleCiStatusName: 'ci/circleci: e2e-cli'
   maxSizeIncrease: 10000
   comment: false
