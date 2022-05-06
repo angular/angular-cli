@@ -202,7 +202,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
         context.reportRunning();
         let result;
         try {
-          result = fn(i.options as OptT, context);
+          result = fn(i.options as unknown as OptT, context);
           if (isBuilderOutput(result)) {
             result = of(result);
           } else if (!isObservable(result) && isAsyncIterable(result)) {

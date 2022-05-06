@@ -12,7 +12,7 @@ import { CommandContext, CommandModule, CommandModuleImplementation } from '../c
 export const demandCommandFailureMessage = `You need to specify a command before moving on. Use '--help' to view the available commands.`;
 
 export function addCommandModuleToYargs<
-  T,
+  T extends object,
   U extends Partial<CommandModuleImplementation> & {
     new (context: CommandContext): Partial<CommandModuleImplementation> & CommandModule;
   },

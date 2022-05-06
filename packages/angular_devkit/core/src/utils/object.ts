@@ -12,7 +12,7 @@ export function deepCopy<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map((o) => deepCopy(o)) as unknown as T;
   } else if (value && typeof value === 'object') {
-    const valueCasted = value as {
+    const valueCasted = value as unknown as {
       [copySymbol]?: T;
       toJSON?: () => string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

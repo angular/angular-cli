@@ -402,7 +402,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       throw new Error(source);
     }
 
-    this._sourceMap.set(source, provider);
+    this._sourceMap.set(source, provider as unknown as SmartDefaultProvider<{}>);
 
     if (!this._smartDefaultKeyword) {
       this._smartDefaultKeyword = true;

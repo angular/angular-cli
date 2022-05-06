@@ -141,7 +141,7 @@ export class TaskScheduler {
     return new Set(tasks);
   }
 
-  schedule<T>(taskConfiguration: TaskConfiguration<T>): TaskId {
+  schedule<T extends object>(taskConfiguration: TaskConfiguration<T>): TaskId {
     const dependencies = this._mapDependencies(taskConfiguration.dependencies);
     const priority = this._calculatePriority(dependencies);
 
@@ -275,7 +275,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     const host = this._host;
     this._taskSchedulers.push(taskScheduler);
 
-    function addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId {
+    function addTask<T extends object>(
+      task: TaskConfigurationGenerator<T>,
+      dependencies?: Array<TaskId>,
+    ): TaskId {
       const config = task.toConfiguration();
 
       if (!host.hasTaskExecutor(config.name)) {

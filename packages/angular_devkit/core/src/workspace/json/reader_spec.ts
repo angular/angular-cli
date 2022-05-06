@@ -317,7 +317,7 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
 
     const workspace = await readJsonWorkspace('', host);
 
-    Object.assign(workspace.extensions['x-foo'], { x: 9, y: 8 }, { z: 7 });
+    Object.assign(workspace.extensions['x-foo']!, { x: 9, y: 8 }, { z: 7 });
     expect(workspace.extensions['x-foo']).toEqual({
       is: ['good', 'great', 'awesome'],
       x: 9,
@@ -355,7 +355,7 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-foo'] = Object.assign(
-      workspace.extensions['x-foo'],
+      workspace.extensions['x-foo']!,
       { x: 9, y: 8 },
       { z: 7 },
     );

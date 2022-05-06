@@ -210,12 +210,16 @@ export function augmentHostWithNgcc(
 
   if (host.resolveTypeReferenceDirectives) {
     const baseResolveTypeReferenceDirectives = host.resolveTypeReferenceDirectives;
-    host.resolveTypeReferenceDirectives = function (names: string[], ...parameters) {
+    host.resolveTypeReferenceDirectives = function (
+      names: string[] | ts.FileReference[],
+      ...parameters
+    ) {
       return names.map((name) => {
-        const result = baseResolveTypeReferenceDirectives.call(host, [name], ...parameters);
+        const fileName = typeof name === 'string' ? name : name.fileName;
+        const result = baseResolveTypeReferenceDirectives.call(host, [fileName], ...parameters);
 
         if (result[0] && ngcc) {
-          ngcc.processModule(name, result[0]);
+          ngcc.processModule(fileName, result[0]);
         }
 
         return result[0];
@@ -223,14 +227,15 @@ export function augmentHostWithNgcc(
     };
   } else {
     host.resolveTypeReferenceDirectives = function (
-      moduleNames: string[],
+      moduleNames: string[] | ts.FileReference[],
       containingFile: string,
       redirectedReference: ts.ResolvedProjectReference | undefined,
       options: ts.CompilerOptions,
     ) {
       return moduleNames.map((name) => {
+        const fileName = typeof name === 'string' ? name : name.fileName;
         const result = ts.resolveTypeReferenceDirective(
-          name,
+          fileName,
           containingFile,
           options,
           host,
@@ -238,7 +243,7 @@ export function augmentHostWithNgcc(
         ).resolvedTypeReferenceDirective;
 
         if (result && ngcc) {
-          ngcc.processModule(name, result);
+          ngcc.processModule(fileName, result);
         }
 
         return result;
