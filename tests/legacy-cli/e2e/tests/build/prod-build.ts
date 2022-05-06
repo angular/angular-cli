@@ -24,8 +24,6 @@ function verifySize(bundle: string, baselineBytes: number) {
 }
 
 export default async function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-angular.
-
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   const bootstrapRegExp = /bootstrapModule\([_a-zA-Z]+[0-9]*\)\./;
