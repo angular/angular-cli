@@ -8,6 +8,7 @@
 
 import * as path from 'path';
 import { CompilerOptions } from 'typescript';
+
 import type { Configuration } from 'webpack';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -15,6 +16,9 @@ export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'pat
 
 // Extract Resolver type from Webpack types since it is not directly exported
 type Resolver = Exclude<Exclude<Configuration['resolve'], undefined>['resolver'], undefined>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DoResolveValue = any;
 
 interface PathPattern {
   starIndex: number;
@@ -154,8 +158,29 @@ export class TypeScriptPathsPlugin {
         // For example, if the first one resolves, any others are not needed and do not need
         // to be created.
         const replacements = findReplacements(originalRequest, this.patterns);
+        const basePath = this.baseUrl ?? '';
 
-        const tryResolve = () => {
+        const attemptResolveRequest = (request: DoResolveValue): Promise<DoResolveValue | null> => {
+          return new Promise((resolve, reject) => {
+            resolver.doResolve(
+              target,
+              request,
+              '',
+              resolveContext,
+              (error: Error | null, result: DoResolveValue) => {
+                if (error) {
+                  reject(error);
+                } else if (result) {
+                  resolve(result);
+                } else {
+                  resolve(null);
+                }
+              },
+            );
+          });
+        };
+
+        const tryNextReplacement = () => {
           const next = replacements.next();
           if (next.done) {
             callback();
@@ -163,31 +188,45 @@ export class TypeScriptPathsPlugin {
             return;
           }
 
-          const potentialRequest = {
+          const targetPath = path.resolve(basePath, next.value);
+          // If there is no extension. i.e. the target does not refer to an explicit
+          // file, then this is a candidate for module/package resolution.
+          const canBeModule = path.extname(targetPath) === '';
+
+          // Resolution in the target location, preserving the original request.
+          // This will work with the `resolve-in-package` resolution hook, supporting
+          // package exports for e.g. locally-built APF libraries.
+          const potentialRequestAsPackage = {
             ...request,
-            request: path.resolve(this.baseUrl ?? '', next.value),
+            path: targetPath,
             typescriptPathMapped: true,
           };
 
-          resolver.doResolve(
-            target,
-            potentialRequest,
-            '',
-            resolveContext,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (error: Error | null, result: any) => {
-              if (error) {
-                callback(error);
-              } else if (result) {
-                callback(undefined, result);
-              } else {
-                tryResolve();
-              }
-            },
-          );
+          // Resolution in the original callee location, but with the updated request
+          // to point to the mapped target location.
+          const potentialRequestAsFile = {
+            ...request,
+            request: targetPath,
+            typescriptPathMapped: true,
+          };
+
+          let resultPromise = attemptResolveRequest(potentialRequestAsFile);
+
+          // If the request can be a module, we configure the resolution to try package/module
+          // resolution if the file resolution did not have a result.
+          if (canBeModule) {
+            resultPromise = resultPromise.then(
+              (result) => result ?? attemptResolveRequest(potentialRequestAsPackage),
+            );
+          }
+
+          // If we have a result, complete. If not, and no error, try the next replacement.
+          resultPromise
+            .then((res) => (res === null ? tryNextReplacement() : callback(undefined, res)))
+            .catch((error) => callback(error));
         };
 
-        tryResolve();
+        tryNextReplacement();
       },
     );
   }
