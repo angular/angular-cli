@@ -147,7 +147,7 @@
     "glob": "8.0.1",
     "http-proxy": "^1.18.1",
     "https-proxy-agent": "5.0.1",
-    "husky": "7.0.4",
+    "husky": "8.0.1",
     "ini": "3.0.0",
     "inquirer": "8.2.4",
     "jasmine": "^4.0.0",
