@@ -121,16 +121,10 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     localYargs = addCommandModuleToYargs(localYargs, CommandModule, context);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const usageInstance = (localYargs as any).getInternalMethods().getUsageInstance();
   if (jsonHelp) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const usageInstance = (localYargs as any).getInternalMethods().getUsageInstance();
     usageInstance.help = () => jsonHelpUsage();
-  }
-
-  if (getYargsCompletions) {
-    // When in auto completion mode avoid printing description as it causes a slugish
-    // experience when there are a large set of options.
-    usageInstance.getDescriptions = () => ({});
   }
 
   await localYargs
