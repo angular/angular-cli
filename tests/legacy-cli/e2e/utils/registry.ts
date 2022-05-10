@@ -1,17 +1,24 @@
-import { ChildProcess, spawn } from 'child_process';
-import { copyFileSync, mkdtempSync, realpathSync } from 'fs';
+import { spawn } from 'child_process';
+import { mkdtempSync, realpathSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { writeFile } from './fs';
+import { getGlobalVariable } from './env';
+import { writeFile, readFile } from './fs';
 
-export function createNpmRegistry(withAuthentication = false): ChildProcess {
+export async function createNpmRegistry(
+  port: number,
+  httpsPort: number,
+  withAuthentication = false,
+) {
   // Setup local package registry
   const registryPath = mkdtempSync(join(realpathSync(tmpdir()), 'angular-cli-e2e-registry-'));
 
-  copyFileSync(
+  let configContent = await readFile(
     join(__dirname, '../../', withAuthentication ? 'verdaccio_auth.yaml' : 'verdaccio.yaml'),
-    join(registryPath, 'verdaccio.yaml'),
   );
+  configContent = configContent.replace(/\$\{HTTP_PORT\}/g, String(port));
+  configContent = configContent.replace(/\$\{HTTPS_PORT\}/g, String(httpsPort));
+  await writeFile(join(registryPath, 'verdaccio.yaml'), configContent);
 
   return spawn('node', [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'], {
     cwd: registryPath,
@@ -21,7 +28,6 @@ export function createNpmRegistry(withAuthentication = false): ChildProcess {
 
 // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
 const VALID_TOKEN = `dGVzdGluZzpzM2NyZXQ=`;
-const SECURE_REGISTRY = `//localhost:4876/`;
 
 export function createNpmConfigForAuthentication(
   /**
@@ -42,7 +48,7 @@ export function createNpmConfigForAuthentication(
   invalidToken = false,
 ): Promise<void> {
   const token = invalidToken ? `invalid=` : VALID_TOKEN;
-  const registry = SECURE_REGISTRY;
+  const registry = (getGlobalVariable('package-secure-registry') as string).replace(/^\w+:/, '');
 
   return writeFile(
     '.npmrc',
@@ -68,7 +74,7 @@ export function setNpmEnvVarsForAuthentication(
   delete process.env['NPM_CONFIG_REGISTRY'];
 
   const registryKey = useYarnEnvVariable ? 'YARN_REGISTRY' : 'NPM_CONFIG_REGISTRY';
-  process.env[registryKey] = `http:${SECURE_REGISTRY}`;
+  process.env[registryKey] = getGlobalVariable('package-secure-registry');
 
   process.env['NPM_CONFIG__AUTH'] = invalidToken ? `invalid=` : VALID_TOKEN;
 
