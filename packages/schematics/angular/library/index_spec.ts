@@ -236,10 +236,7 @@ describe('Library Schematic', () => {
         .toPromise();
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
-      expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
-      expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(2);
-      expect(tsConfigJson.compilerOptions.paths.foo[0]).toEqual('dist/foo/foo');
-      expect(tsConfigJson.compilerOptions.paths.foo[1]).toEqual('dist/foo');
+      expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['dist/foo']);
     });
 
     it(`should append to existing paths mappings`, async () => {
@@ -259,10 +256,7 @@ describe('Library Schematic', () => {
         .toPromise();
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
-      expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
-      expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(3);
-      expect(tsConfigJson.compilerOptions.paths.foo[1]).toEqual('dist/foo/foo');
-      expect(tsConfigJson.compilerOptions.paths.foo[2]).toEqual('dist/foo');
+      expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['libs/*', 'dist/foo']);
     });
 
     it(`should not modify the file when --skipTsConfig`, async () => {
@@ -316,10 +310,7 @@ describe('Library Schematic', () => {
     expect(cfg.projects['@myscope/mylib']).toBeDefined();
 
     const rootTsCfg = getJsonFileContent(tree, '/tsconfig.json');
-    expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual([
-      'dist/myscope/mylib/myscope-mylib',
-      'dist/myscope/mylib',
-    ]);
+    expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib']);
 
     const karmaConf = getFileContent(tree, '/projects/myscope/mylib/karma.conf.js');
     expect(karmaConf).toContain(
