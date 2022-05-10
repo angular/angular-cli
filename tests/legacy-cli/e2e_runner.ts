@@ -9,6 +9,7 @@ import * as path from 'path';
 import { setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
+import { AddressInfo, createServer, Server } from 'net';
 
 Error.stackTraceLimit = Infinity;
 
@@ -122,93 +123,99 @@ if (testsToRun.length == allTests.length) {
 setGlobalVariable('argv', argv);
 setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
-setGlobalVariable('package-registry', 'http://localhost:4873');
 
-const registryProcess = createNpmRegistry();
-const secureRegistryProcess = createNpmRegistry(true);
+Promise.all([findFreePort(), findFreePort()])
+  .then(async ([httpPort, httpsPort]) => {
+    setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
+    setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
 
-testsToRun
-  .reduce((previous, relativeName, testIndex) => {
-    // Make sure this is a windows compatible path.
-    let absoluteName = path.join(e2eRoot, relativeName);
-    if (/^win/.test(process.platform)) {
-      absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
-    }
+    const registryProcess = await createNpmRegistry(httpPort, httpPort);
+    const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
 
-    return previous.then(() => {
-      currentFileName = relativeName.replace(/\.ts$/, '');
-      const start = +new Date();
+    return testsToRun
+      .reduce((previous, relativeName, testIndex) => {
+        // Make sure this is a windows compatible path.
+        let absoluteName = path.join(e2eRoot, relativeName);
+        if (/^win/.test(process.platform)) {
+          absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+        }
 
-      const module = require(absoluteName);
-      const originalEnvVariables = {
-        ...process.env,
-      };
+        return previous.then(() => {
+          currentFileName = relativeName.replace(/\.ts$/, '');
+          const start = +new Date();
 
-      const fn: (skipClean?: () => void) => Promise<void> | void =
-        typeof module == 'function'
-          ? module
-          : typeof module.default == 'function'
-          ? module.default
-          : () => {
-              throw new Error('Invalid test module.');
-            };
+          const module = require(absoluteName);
+          const originalEnvVariables = {
+            ...process.env,
+          };
 
-      let clean = true;
-      let previousDir = null;
+          const fn: (skipClean?: () => void) => Promise<void> | void =
+            typeof module == 'function'
+              ? module
+              : typeof module.default == 'function'
+              ? module.default
+              : () => {
+                  throw new Error('Invalid test module.');
+                };
 
-      return Promise.resolve()
-        .then(() => printHeader(currentFileName, testIndex))
-        .then(() => (previousDir = process.cwd()))
-        .then(() => logStack.push(lastLogger().createChild(currentFileName)))
-        .then(() => fn(() => (clean = false)))
-        .then(
-          () => logStack.pop(),
-          (err) => {
-            logStack.pop();
-            throw err;
-          },
-        )
-        .then(() => console.log('----'))
-        .then(() => {
-          // If we're not in a setup, change the directory back to where it was before the test.
-          // This allows tests to chdir without worrying about keeping the original directory.
-          if (!allSetups.includes(relativeName) && previousDir) {
-            process.chdir(previousDir);
+          let clean = true;
+          let previousDir = null;
 
-            // Restore env variables before each test.
-            console.log('  Restoring original environment variables...');
-            process.env = originalEnvVariables;
-          }
-        })
-        .then(() => {
-          // Only clean after a real test, not a setup step. Also skip cleaning if the test
-          // requested an exception.
-          if (!allSetups.includes(relativeName) && clean) {
-            logStack.push(new logging.NullLogger());
-            return gitClean().then(
+          return Promise.resolve()
+            .then(() => printHeader(currentFileName, testIndex))
+            .then(() => (previousDir = process.cwd()))
+            .then(() => logStack.push(lastLogger().createChild(currentFileName)))
+            .then(() => fn(() => (clean = false)))
+            .then(
               () => logStack.pop(),
               (err) => {
                 logStack.pop();
                 throw err;
               },
+            )
+            .then(() => console.log('----'))
+            .then(() => {
+              // If we're not in a setup, change the directory back to where it was before the test.
+              // This allows tests to chdir without worrying about keeping the original directory.
+              if (!allSetups.includes(relativeName) && previousDir) {
+                process.chdir(previousDir);
+
+                // Restore env variables before each test.
+                console.log('  Restoring original environment variables...');
+                process.env = originalEnvVariables;
+              }
+            })
+            .then(() => {
+              // Only clean after a real test, not a setup step. Also skip cleaning if the test
+              // requested an exception.
+              if (!allSetups.includes(relativeName) && clean) {
+                logStack.push(new logging.NullLogger());
+                return gitClean().then(
+                  () => logStack.pop(),
+                  (err) => {
+                    logStack.pop();
+                    throw err;
+                  },
+                );
+              }
+            })
+            .then(
+              () => printFooter(currentFileName, start),
+              (err) => {
+                printFooter(currentFileName, start);
+                console.error(err);
+                throw err;
+              },
             );
-          }
-        })
-        .then(
-          () => printFooter(currentFileName, start),
-          (err) => {
-            printFooter(currentFileName, start);
-            console.error(err);
-            throw err;
-          },
-        );
-    });
-  }, Promise.resolve())
+        });
+      }, Promise.resolve())
+      .finally(() => {
+        registryProcess.kill();
+        secureRegistryProcess.kill();
+      });
+  })
   .then(
     () => {
-      registryProcess.kill();
-      secureRegistryProcess.kill();
-
       console.log(colors.green('Done.'));
       process.exit(0);
     },
@@ -217,9 +224,6 @@ testsToRun
       console.error(colors.red(`Test "${currentFileName}" failed...`));
       console.error(colors.red(err.message));
       console.error(colors.red(err.stack));
-
-      registryProcess.kill();
-      secureRegistryProcess.kill();
 
       if (argv.debug) {
         console.log(`Current Directory: ${process.cwd()}`);
@@ -256,4 +260,16 @@ function printFooter(testName: string, startTime: number) {
   const t = Math.round((Date.now() - startTime) / 10) / 100;
   console.log(colors.green('Last step took ') + colors.bold.blue('' + t) + colors.green('s...'));
   console.log('');
+}
+
+function findFreePort() {
+  return new Promise<number>((resolve, reject) => {
+    const srv = createServer();
+    srv.once('listening', () => {
+      const port = (srv.address() as AddressInfo).port;
+      srv.close((e) => (e ? reject(e) : resolve(port)));
+    });
+    srv.once('error', (e) => srv.close(() => reject(e)));
+    srv.listen();
+  });
 }

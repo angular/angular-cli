@@ -5,10 +5,10 @@ auth:
       testing:
         name: testing
         password: s3cret
-listen: localhost:4876
+listen: localhost:${HTTPS_PORT}
 uplinks:
   local:
-    url: http://localhost:4873
+    url: http://localhost:${HTTP_PORT}
     cache: false
     maxage: 20m
     max_fails: 32
