@@ -139,7 +139,6 @@ export default function (options: LibraryOptions): Rule {
 
     const projectRoot = join(normalize(newProjectRoot), folderName);
     const distRoot = `dist/${folderName}`;
-    const pathImportLib = `${distRoot}/${folderName.replace('/', '-')}`;
     const sourceDir = `${projectRoot}/src/lib`;
 
     const templateSource = apply(url('./files'), [
@@ -162,7 +161,7 @@ export default function (options: LibraryOptions): Rule {
       mergeWith(templateSource),
       addLibToWorkspaceFile(options, projectRoot, packageName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
-      options.skipTsConfig ? noop() : updateTsConfig(packageName, pathImportLib, distRoot),
+      options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
       schematic('module', {
         name: options.name,
         commonModule: false,
