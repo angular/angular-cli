@@ -73,9 +73,9 @@
     "esbuild": "0.14.38"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
-    "@angular/localize": "^14.0.0 || ^14.0.0-next",
-    "@angular/service-worker": "^14.0.0 || ^14.0.0-next",
+    "@angular/compiler-cli": "^14.0.0 || ^14.0.0-rc",
+    "@angular/localize": "^14.0.0 || ^14.0.0-rc",
+    "@angular/service-worker": "^14.0.0 || ^14.0.0-rc",
     "karma": "^6.3.0",
     "ng-packagr": "^14.0.0 || ^14.0.0-next",
     "protractor": "^7.0.0",
