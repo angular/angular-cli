@@ -1,3 +1,34 @@
+<a name="14.0.0-rc.0"></a>
+
+# 14.0.0-rc.0 (2022-05-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [d46cf6744](https://github.com/angular/angular-cli/commit/d46cf6744eadb70008df1ef25e24fb1db58bb997) | fix  | display option descriptions during auto completion         |
+| [644f86d55](https://github.com/angular/angular-cli/commit/644f86d55b75a289e641ba280e8456be82383b06) | fix  | improve error message for Windows autocompletion use cases |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [7e8e42063](https://github.com/angular/angular-cli/commit/7e8e42063f354c402d758f10c8ba9bee7e0c8aff) | fix  | add migration to remove `package.json` in libraries secondary entrypoints |
+| [1921b07ee](https://github.com/angular/angular-cli/commit/1921b07eeb710875825dc6f7a4452bd5462e6ba7) | fix  | don't add path mapping to old entrypoint definition file                  |
+| [27cb29438](https://github.com/angular/angular-cli/commit/27cb29438aa01b185b2dca3617100d87f45f14e8) | fix  | remove extra space in standalone imports                                  |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [ac1383f9e](https://github.com/angular/angular-cli/commit/ac1383f9e5d491181812c090bd4323f46110f3d8) | fix  | properly handle locally-built APF v14 libraries |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Cédric Exbrayat, Doug Parker, Jason Bedard, Kristiyan Kostadinov, Paul Gschwendtner and alkavats1
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-next.13"></a>
 
 # 14.0.0-next.13 (2022-05-04)
