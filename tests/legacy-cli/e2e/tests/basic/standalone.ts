@@ -22,7 +22,7 @@ import { ng } from '../../utils/process';
 const STANDALONE_MAIN_CONTENT = `
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { bootstrapApplication } from '@angular/platform-browser';
+import { bootstrapApplication, provideProtractorTestingSupport } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -41,7 +41,9 @@ export class AppComponent {
   isVisible = true;
 }
 
-bootstrapApplication(AppComponent);
+bootstrapApplication(AppComponent, {
+  providers: [ provideProtractorTestingSupport() ],
+});
 `;
 
 export default async function () {
