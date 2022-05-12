@@ -29,6 +29,30 @@ export enum DependencyType {
 }
 
 /**
+ * An enum used to specify the dependency installation behavior for the {@link addDependency}
+ * schematics rule. The installation behavior affects if and when {@link NodePackageInstallTask}
+ * will be scheduled when using the rule.
+ */
+export enum InstallBehavior {
+  /**
+   * No installation will occur as a result of the rule when specified.
+   *
+   * NOTE: This does not prevent other rules from scheduling a {@link NodePackageInstallTask}
+   * which may install the dependency.
+   */
+  None,
+  /**
+   * Automatically determine the need to schedule a {@link NodePackageInstallTask} based on
+   * previous usage of the {@link addDependency} within the schematic.
+   */
+  Auto,
+  /**
+   * Always schedule a {@link NodePackageInstallTask} when the rule is executed.
+   */
+  Always,
+}
+
+/**
  * Adds a package as a dependency to a `package.json`. By default the `package.json` located
  * at the schematic's root will be used. The `manifestPath` option can be used to explicitly specify
  * a `package.json` in different location. The type of the dependency can also be specified instead
@@ -58,9 +82,19 @@ export function addDependency(
      * Defaults to `/package.json`.
      */
     packageJsonPath?: string;
+    /**
+     * The dependency installation behavior to use to determine whether a
+     * {@link NodePackageInstallTask} should be scheduled after adding the dependency.
+     * Defaults to {@link InstallBehavior.Auto}.
+     */
+    install?: InstallBehavior;
   } = {},
 ): Rule {
-  const { type = DependencyType.Default, packageJsonPath = '/package.json' } = options;
+  const {
+    type = DependencyType.Default,
+    packageJsonPath = '/package.json',
+    install = InstallBehavior.Auto,
+  } = options;
 
   return (tree, context) => {
     const manifest = tree.readJson(packageJsonPath) as MinimalPackageManifest;
@@ -86,7 +120,10 @@ export function addDependency(
     tree.overwrite(packageJsonPath, JSON.stringify(manifest, null, 2));
 
     const installPaths = installTasks.get(context) ?? new Set<string>();
-    if (!installPaths.has(packageJsonPath)) {
+    if (
+      install === InstallBehavior.Always ||
+      (install === InstallBehavior.Auto && !installPaths.has(packageJsonPath))
+    ) {
       context.addTask(
         new NodePackageInstallTask({ workingDirectory: path.dirname(packageJsonPath) }),
       );
