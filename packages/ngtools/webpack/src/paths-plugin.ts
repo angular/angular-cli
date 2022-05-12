@@ -8,17 +8,20 @@
 
 import * as path from 'path';
 import { CompilerOptions } from 'typescript';
-
-import type { Configuration } from 'webpack';
+import type { Resolver } from 'webpack';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {}
 
-// Extract Resolver type from Webpack types since it is not directly exported
-type Resolver = Exclude<Exclude<Configuration['resolve'], undefined>['resolver'], undefined>;
+// Extract ResolverRequest type from Webpack types since it is not directly exported
+type ResolverRequest = NonNullable<Parameters<Parameters<Resolver['resolve']>[4]>[2]>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DoResolveValue = any;
+interface PathPluginResolverRequest extends ResolverRequest {
+  context?: {
+    issuer?: string;
+  };
+  typescriptPathMapped?: boolean;
+}
 
 interface PathPattern {
   starIndex: number;
@@ -106,178 +109,171 @@ export class TypeScriptPathsPlugin {
 
     // To support synchronous resolvers this hook cannot be promise based.
     // Webpack supports synchronous resolution with `tap` and `tapAsync` hooks.
-    resolver.getHook('described-resolve').tapAsync(
-      'TypeScriptPathsPlugin',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (request: any, resolveContext, callback) => {
-        // Preprocessing of the options will ensure that `patterns` is either undefined or has elements to check
-        if (!this.patterns) {
-          callback();
-
-          return;
-        }
-
-        if (!request || request.typescriptPathMapped) {
-          callback();
-
-          return;
-        }
-
-        const originalRequest = request.request || request.path;
-        if (!originalRequest) {
-          callback();
-
-          return;
-        }
-
-        // Only work on Javascript/TypeScript issuers.
-        if (!request.context.issuer || !request.context.issuer.match(/\.[cm]?[jt]sx?$/)) {
-          callback();
-
-          return;
-        }
-
-        switch (originalRequest[0]) {
-          case '.':
-          case '/':
-            // Relative or absolute requests are not mapped
+    resolver
+      .getHook('described-resolve')
+      .tapAsync(
+        'TypeScriptPathsPlugin',
+        (request: PathPluginResolverRequest, resolveContext, callback) => {
+          // Preprocessing of the options will ensure that `patterns` is either undefined or has elements to check
+          if (!this.patterns) {
             callback();
 
             return;
-          case '!':
-            // Ignore all webpack special requests
-            if (originalRequest.length > 1 && originalRequest[1] === '!') {
+          }
+
+          if (!request || request.typescriptPathMapped) {
+            callback();
+
+            return;
+          }
+
+          const originalRequest = request.request || request.path;
+          if (!originalRequest) {
+            callback();
+
+            return;
+          }
+
+          // Only work on Javascript/TypeScript issuers.
+          if (!request?.context?.issuer?.match(/\.[cm]?[jt]sx?$/)) {
+            callback();
+
+            return;
+          }
+
+          switch (originalRequest[0]) {
+            case '.':
+            case '/':
+              // Relative or absolute requests are not mapped
+              callback();
+
+              return;
+            case '!':
+              // Ignore all webpack special requests
+              if (originalRequest.length > 1 && originalRequest[1] === '!') {
+                callback();
+
+                return;
+              }
+              break;
+          }
+
+          // A generator is used to limit the amount of replacements requests that need to be created.
+          // For example, if the first one resolves, any others are not needed and do not need
+          // to be created.
+          const requests = this.createReplacementRequests(request, originalRequest);
+
+          const tryResolve = () => {
+            const next = requests.next();
+            if (next.done) {
               callback();
 
               return;
             }
-            break;
-        }
 
-        // A generator is used to limit the amount of replacements that need to be created.
-        // For example, if the first one resolves, any others are not needed and do not need
-        // to be created.
-        const replacements = findReplacements(originalRequest, this.patterns);
-        const basePath = this.baseUrl ?? '';
-
-        const attemptResolveRequest = (request: DoResolveValue): Promise<DoResolveValue | null> => {
-          return new Promise((resolve, reject) => {
             resolver.doResolve(
               target,
-              request,
+              next.value,
               '',
               resolveContext,
-              (error: Error | null, result: DoResolveValue) => {
+              (error: Error | null | undefined, result: ResolverRequest | null | undefined) => {
                 if (error) {
-                  reject(error);
+                  callback(error);
                 } else if (result) {
-                  resolve(result);
+                  callback(undefined, result);
                 } else {
-                  resolve(null);
+                  tryResolve();
                 }
               },
             );
-          });
-        };
-
-        const tryNextReplacement = () => {
-          const next = replacements.next();
-          if (next.done) {
-            callback();
-
-            return;
-          }
-
-          const targetPath = path.resolve(basePath, next.value);
-          // If there is no extension. i.e. the target does not refer to an explicit
-          // file, then this is a candidate for module/package resolution.
-          const canBeModule = path.extname(targetPath) === '';
-
-          // Resolution in the target location, preserving the original request.
-          // This will work with the `resolve-in-package` resolution hook, supporting
-          // package exports for e.g. locally-built APF libraries.
-          const potentialRequestAsPackage = {
-            ...request,
-            path: targetPath,
-            typescriptPathMapped: true,
           };
 
-          // Resolution in the original callee location, but with the updated request
-          // to point to the mapped target location.
-          const potentialRequestAsFile = {
-            ...request,
-            request: targetPath,
-            typescriptPathMapped: true,
-          };
-
-          let resultPromise = attemptResolveRequest(potentialRequestAsFile);
-
-          // If the request can be a module, we configure the resolution to try package/module
-          // resolution if the file resolution did not have a result.
-          if (canBeModule) {
-            resultPromise = resultPromise.then(
-              (result) => result ?? attemptResolveRequest(potentialRequestAsPackage),
-            );
-          }
-
-          // If we have a result, complete. If not, and no error, try the next replacement.
-          resultPromise
-            .then((res) => (res === null ? tryNextReplacement() : callback(undefined, res)))
-            .catch((error) => callback(error));
-        };
-
-        tryNextReplacement();
-      },
-    );
+          tryResolve();
+        },
+      );
   }
-}
 
-function* findReplacements(
-  originalRequest: string,
-  patterns: PathPattern[],
-): IterableIterator<string> {
-  // check if any path mapping rules are relevant
-  for (const { starIndex, prefix, suffix, potentials } of patterns) {
-    let partial;
-
-    if (starIndex === -1) {
-      // No star means an exact match is required
-      if (prefix === originalRequest) {
-        partial = '';
-      }
-    } else if (starIndex === 0 && !suffix) {
-      // Everything matches a single wildcard pattern ("*")
-      partial = originalRequest;
-    } else if (!suffix) {
-      // No suffix means the star is at the end of the pattern
-      if (originalRequest.startsWith(prefix)) {
-        partial = originalRequest.slice(prefix.length);
-      }
-    } else {
-      // Star was in the middle of the pattern
-      if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
-        partial = originalRequest.substring(prefix.length, originalRequest.length - suffix.length);
-      }
+  *findReplacements(originalRequest: string): IterableIterator<string> {
+    if (!this.patterns) {
+      return;
     }
 
-    // If request was not matched, move on to the next pattern
-    if (partial === undefined) {
-      continue;
-    }
+    // check if any path mapping rules are relevant
+    for (const { starIndex, prefix, suffix, potentials } of this.patterns) {
+      let partial;
 
-    // Create the full replacement values based on the original request and the potentials
-    // for the successfully matched pattern.
-    for (const { hasStar, prefix, suffix } of potentials) {
-      let replacement = prefix;
-
-      if (hasStar) {
-        replacement += partial;
-        if (suffix) {
-          replacement += suffix;
+      if (starIndex === -1) {
+        // No star means an exact match is required
+        if (prefix === originalRequest) {
+          partial = '';
+        }
+      } else if (starIndex === 0 && !suffix) {
+        // Everything matches a single wildcard pattern ("*")
+        partial = originalRequest;
+      } else if (!suffix) {
+        // No suffix means the star is at the end of the pattern
+        if (originalRequest.startsWith(prefix)) {
+          partial = originalRequest.slice(prefix.length);
+        }
+      } else {
+        // Star was in the middle of the pattern
+        if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
+          partial = originalRequest.substring(
+            prefix.length,
+            originalRequest.length - suffix.length,
+          );
         }
       }
 
-      yield replacement;
+      // If request was not matched, move on to the next pattern
+      if (partial === undefined) {
+        continue;
+      }
+
+      // Create the full replacement values based on the original request and the potentials
+      // for the successfully matched pattern.
+      for (const { hasStar, prefix, suffix } of potentials) {
+        let replacement = prefix;
+
+        if (hasStar) {
+          replacement += partial;
+          if (suffix) {
+            replacement += suffix;
+          }
+        }
+
+        yield replacement;
+      }
+    }
+  }
+
+  *createReplacementRequests(
+    request: PathPluginResolverRequest,
+    originalRequest: string,
+  ): IterableIterator<PathPluginResolverRequest> {
+    for (const replacement of this.findReplacements(originalRequest)) {
+      const targetPath = path.resolve(this.baseUrl ?? '', replacement);
+      // Resolution in the original callee location, but with the updated request
+      // to point to the mapped target location.
+      yield {
+        ...request,
+        request: targetPath,
+        typescriptPathMapped: true,
+      };
+
+      // If there is no extension. i.e. the target does not refer to an explicit
+      // file, then this is a candidate for module/package resolution.
+      const canBeModule = path.extname(targetPath) === '';
+      if (canBeModule) {
+        // Resolution in the target location, preserving the original request.
+        // This will work with the `resolve-in-package` resolution hook, supporting
+        // package exports for e.g. locally-built APF libraries.
+        yield {
+          ...request,
+          path: targetPath,
+          typescriptPathMapped: true,
+        };
+      }
     }
   }
 }
