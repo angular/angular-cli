@@ -275,7 +275,7 @@ export class SchematicNameCollisionException extends BaseException {
 }
 
 // @public (undocumented)
-export function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {} | null>(schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext | undefined) => Observable<T>;
+export function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {} | null>(schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext) => Observable<T>;
 
 // (No @packageDocumentation comment for this package)
 
