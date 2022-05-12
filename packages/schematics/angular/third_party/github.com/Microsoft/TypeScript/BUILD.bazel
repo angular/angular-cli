@@ -1,11 +1,11 @@
 load("//tools:defaults.bzl", "ts_library")
 
 # files fetched on 2022-05-06 from
-# https://github.com/microsoft/TypeScript/releases/tag/v4.7-beta
+# https://github.com/microsoft/TypeScript/releases/tag/v4.7-rc
 
 # Commands to download:
-# curl https://raw.githubusercontent.com/microsoft/TypeScript/v4.7-beta/lib/typescript.d.ts -o packages/schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript.d.ts
-# curl https://raw.githubusercontent.com/microsoft/TypeScript/v4.7-beta/lib/typescript.js -o packages/schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript.js
+# curl https://raw.githubusercontent.com/microsoft/TypeScript/v4.7-rc/lib/typescript.d.ts -o packages/schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript.d.ts
+# curl https://raw.githubusercontent.com/microsoft/TypeScript/v4.7-rc/lib/typescript.js -o packages/schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript.js
 
 licenses(["notice"])  # Apache 2.0
 
