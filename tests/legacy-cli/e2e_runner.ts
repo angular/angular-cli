@@ -70,7 +70,7 @@ function lastLogger() {
 }
 
 const testGlob = argv.glob || 'tests/**/*.ts';
-let currentFileName = null;
+let currentFileName = '';
 
 const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync('setup/**/*.ts', { nodir: true, cwd: e2eRoot }).sort();
@@ -157,7 +157,7 @@ Promise.all([findFreePort(), findFreePort()]).then(async ([httpPort, httpsPort])
                 };
 
           let clean = true;
-          let previousDir = null;
+          let previousDir: string | null = null;
 
           return Promise.resolve()
             .then(() => printHeader(currentFileName, testIndex))

@@ -8,8 +8,8 @@ export default function () {
 
   const firstLocalIp = Object.values(os.networkInterfaces())
     .flat()
-    .filter((ni) => ni.family === 'IPv4' && !ni.internal)
-    .map((ni) => ni.address)
+    .filter((ni) => ni?.family === 'IPv4' && !ni?.internal)
+    .map((ni) => ni!.address)
     .shift();
   const publicHost = `${firstLocalIp}:4200`;
   const localAddress = `http://${publicHost}`;

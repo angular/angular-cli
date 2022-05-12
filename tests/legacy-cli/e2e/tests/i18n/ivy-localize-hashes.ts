@@ -27,7 +27,7 @@ export default async function () {
         continue;
       }
 
-      hashes.set(`${lang}/${match.groups.name}`, match.groups.hash);
+      hashes.set(`${lang}/${match!.groups!.name}`, match!.groups!.hash);
     }
   }
 
@@ -48,12 +48,12 @@ export default async function () {
         continue;
       }
 
-      const id = `${lang}/${match.groups.name}`;
+      const id = `${lang}/${match!.groups!.name}`;
       const hash = hashes.get(id);
       if (!hash) {
         throw new Error('Unexpected output entry: ' + id);
       }
-      if (hash === match.groups.hash) {
+      if (hash === match!.groups!.hash) {
         throw new Error('Hash value did not change for entry: ' + id);
       }
 

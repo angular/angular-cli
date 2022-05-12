@@ -12,11 +12,11 @@ export default async function () {
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
-    const packagesToInstall = [];
+    const packagesToInstall: string[] = [];
     await updateJsonFile('package.json', (packageJson) => {
       const dependencies = packageJson['dependencies'];
       // Iterate over all of the packages to update them to the snapshot version.
-      for (const [name, version] of Object.entries(snapshots.dependencies)) {
+      for (const [name, version] of Object.entries<string>(snapshots.dependencies)) {
         if (name in dependencies && dependencies[name] !== version) {
           packagesToInstall.push(version);
         }

@@ -408,7 +408,7 @@ source <(ng completion script)
 
       const localCliDir = path.join(projectDir, 'node_modules', '.bin');
       const localCliBinary = path.join(localCliDir, 'ng');
-      const pathDirs = process.env['PATH'].split(':');
+      const pathDirs = process.env['PATH']!.split(':');
       const pathEnvVar = [...pathDirs, localCliDir].join(':');
       const { stdout } = await execWithEnv(localCliBinary, ['version'], {
         ...DEFAULT_ENV,

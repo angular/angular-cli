@@ -3,7 +3,7 @@ import { execWithEnv, extractNpmEnv } from '../utils/process';
 import { isPrereleaseCli } from '../utils/project';
 
 export default async function () {
-  const testRegistry = getGlobalVariable('package-registry');
+  const testRegistry: string = getGlobalVariable('package-registry');
   await execWithEnv(
     'npm',
     [

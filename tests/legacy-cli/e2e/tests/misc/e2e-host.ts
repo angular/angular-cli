@@ -3,7 +3,7 @@ import { killAllProcesses, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  const interfaces = [].concat.apply([], Object.values(os.networkInterfaces()));
+  const interfaces = Object.values(os.networkInterfaces()).flat() as os.NetworkInterfaceInfo[];
   let host = '';
   for (const { family, address, internal } of interfaces) {
     if (family === 'IPv4' && !internal) {

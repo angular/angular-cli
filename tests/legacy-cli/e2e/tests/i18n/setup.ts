@@ -98,12 +98,12 @@ export const formats = {
   'json': {
     ext: 'json',
     sourceCheck: '"locale": "en-US"',
-    replacements: [],
+    replacements: [] as RegExp[][],
   },
   'arb': {
     ext: 'arb',
     sourceCheck: '"@@locale": "en-US"',
-    replacements: [],
+    replacements: [] as RegExp[][],
   },
 };
 
@@ -248,7 +248,7 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
   for (const { lang, translationReplacements } of langTranslations) {
     if (lang != sourceLocale) {
       await copyFile(translationFile, `src/locale/messages.${lang}.${formats[format].ext}`);
-      for (const replacements of translationReplacements) {
+      for (const replacements of translationReplacements!) {
         await replaceInFile(
           `src/locale/messages.${lang}.${formats[format].ext}`,
           new RegExp(replacements[0], 'g'),
