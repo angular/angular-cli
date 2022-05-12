@@ -15,7 +15,7 @@ import {
   callRule,
   chain,
 } from '@angular-devkit/schematics';
-import { DependencyType, addDependency } from './dependency';
+import { DependencyType, InstallBehavior, addDependency } from './dependency';
 
 async function testRule(rule: Rule, tree: Tree): Promise<TaskConfigurationGenerator[]> {
   const tasks: TaskConfigurationGenerator[] = [];
@@ -192,6 +192,58 @@ describe('addDependency', () => {
     ]);
   });
 
+  it('schedules a package install task when install behavior is auto', async () => {
+    const tree = new EmptyTree();
+    tree.create('/abc/package.json', JSON.stringify({}));
+
+    const rule = addDependency('@angular/core', '^14.0.0', {
+      packageJsonPath: '/abc/package.json',
+      install: InstallBehavior.Auto,
+    });
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/abc' }),
+      },
+    ]);
+  });
+
+  it('schedules a package install task when install behavior is always', async () => {
+    const tree = new EmptyTree();
+    tree.create('/abc/package.json', JSON.stringify({}));
+
+    const rule = addDependency('@angular/core', '^14.0.0', {
+      packageJsonPath: '/abc/package.json',
+      install: InstallBehavior.Always,
+    });
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/abc' }),
+      },
+    ]);
+  });
+
+  it('does not schedule a package install task when install behavior is none', async () => {
+    const tree = new EmptyTree();
+    tree.create('/abc/package.json', JSON.stringify({}));
+
+    const rule = addDependency('@angular/core', '^14.0.0', {
+      packageJsonPath: '/abc/package.json',
+      install: InstallBehavior.None,
+    });
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks).toEqual([]);
+  });
+
   it('does not schedule a package install task if version is the same', async () => {
     const tree = new EmptyTree();
     tree.create(
@@ -208,7 +260,7 @@ describe('addDependency', () => {
     expect(tasks).toEqual([]);
   });
 
-  it('only schedules one package install task for the same manifest path', async () => {
+  it('only schedules one package install task for the same manifest path by default', async () => {
     const tree = new EmptyTree();
     tree.create('/package.json', JSON.stringify({}));
 
@@ -220,6 +272,86 @@ describe('addDependency', () => {
     const tasks = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
+      },
+    ]);
+  });
+
+  it('only schedules one package install task for the same manifest path with auto install behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({}));
+
+    const rule = chain([
+      addDependency('@angular/core', '^14.0.0', { install: InstallBehavior.Auto }),
+      addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.Auto }),
+    ]);
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
+      },
+    ]);
+  });
+
+  it('only schedules one package install task for the same manifest path with mixed auto/none install behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({}));
+
+    const rule = chain([
+      addDependency('@angular/core', '^14.0.0', { install: InstallBehavior.Auto }),
+      addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.None }),
+    ]);
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
+      },
+    ]);
+  });
+
+  it('only schedules one package install task for the same manifest path with mixed always then auto install behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({}));
+
+    const rule = chain([
+      addDependency('@angular/core', '^14.0.0', { install: InstallBehavior.Always }),
+      addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.Auto }),
+    ]);
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
+      },
+    ]);
+  });
+
+  it('schedules multiple package install tasks for the same manifest path with mixed auto then always install behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({}));
+
+    const rule = chain([
+      addDependency('@angular/core', '^14.0.0', { install: InstallBehavior.Auto }),
+      addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.Always }),
+    ]);
+
+    const tasks = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
+      },
       {
         name: 'node-package',
         options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
