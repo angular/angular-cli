@@ -145,7 +145,7 @@ export function callRule(rule: Rule, input: Tree_2 | Observable<Tree_2>, context
 export function callSource(source: Source, context: SchematicContext): Observable<Tree_2>;
 
 // @public
-export function chain(rules: Rule[]): Rule;
+export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule;
 
 // @public (undocumented)
 export class CircularCollectionException extends BaseException {

@@ -33,9 +33,14 @@ export function empty(): Source {
 /**
  * Chain multiple rules into a single rule.
  */
-export function chain(rules: Rule[]): Rule {
-  return (tree, context) => {
-    return rules.reduce<Tree | Observable<Tree>>((acc, curr) => callRule(curr, acc, context), tree);
+export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule {
+  return async (initialTree, context) => {
+    let intermediateTree: Observable<Tree> | undefined;
+    for await (const rule of rules) {
+      intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+    }
+
+    return () => intermediateTree;
   };
 }
 
