@@ -53,7 +53,8 @@ export default async function () {
 
   // It should correctly generate assetGroups and include at least one URL in each group.
   const ngswJson = JSON.parse(await readFile(ngswPath));
-  const assetGroups = ngswJson.assetGroups.map(({ name, urls }) => ({
+  // @ts-ignore
+  const assetGroups: any[] = ngswJson.assetGroups.map(({ name, urls }) => ({
     name,
     urlCount: urls.length,
   }));

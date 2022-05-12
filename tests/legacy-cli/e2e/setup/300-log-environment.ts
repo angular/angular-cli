@@ -10,7 +10,7 @@ export default async function () {
       return;
     }
 
-    console.log(`  ${envName}: ${process.env[envName].replace(/[\n\r]+/g, '\n        ')}`);
+    console.log(`  ${envName}: ${process.env[envName]!.replace(/[\n\r]+/g, '\n        ')}`);
   });
 
   await node('--version');

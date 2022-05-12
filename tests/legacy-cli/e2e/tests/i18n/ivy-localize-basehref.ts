@@ -11,7 +11,7 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { externalServer, langTranslations, setupI18nConfig } from './setup';
 
-const baseHrefs = {
+const baseHrefs: { [l: string]: string } = {
   'en-US': '/en/',
   fr: '/fr-FR/',
   de: '',
@@ -59,7 +59,7 @@ export default async function () {
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 
     // Execute Application E2E tests for a production build without dev server
-    const server = externalServer(outputPath, baseHrefs[lang] || '/');
+    const server = externalServer(outputPath, (baseHrefs[lang] as string) || '/');
     try {
       await ng(
         'e2e',

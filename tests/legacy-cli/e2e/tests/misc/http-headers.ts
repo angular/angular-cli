@@ -24,7 +24,7 @@ export default async function () {
     };
   });
 
-  let errorMessage = null;
+  let errorMessage: string | null = null;
   try {
     await ng('e2e');
   } catch (error) {

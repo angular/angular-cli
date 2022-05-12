@@ -39,7 +39,7 @@ export default async function () {
   }
 
   const indexContent = await readFile('dist/test-project/index.html');
-  const mainPath = indexContent.match(/src="(main\.[0-9a-zA-Z]{0,32}\.js)"/)[1];
+  const mainPath = indexContent.match(/src="(main\.[0-9a-zA-Z]{0,32}\.js)"/)![1];
 
   // Content checks
   await expectFileToMatch(`dist/test-project/${mainPath}`, bootstrapRegExp);

@@ -29,7 +29,7 @@ export function symlinkFile(from: string, to: string, type?: string): Promise<vo
   return fs.symlink(from, to, type);
 }
 
-export function createDir(path: string): Promise<string> {
+export function createDir(path: string): Promise<string | undefined> {
   return fs.mkdir(path, { recursive: true });
 }
 

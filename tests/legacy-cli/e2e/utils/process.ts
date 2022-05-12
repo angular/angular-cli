@@ -10,7 +10,7 @@ import treeKill from 'tree-kill';
 interface ExecOptions {
   silent?: boolean;
   waitForMatch?: RegExp;
-  env?: { [varname: string]: string };
+  env?: NodeJS.ProcessEnv;
   stdin?: string;
   cwd?: string;
 }
@@ -61,7 +61,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   }
 
   const childProcess = child_process.spawn(cmd, args, spawnOptions);
-  childProcess.stdout.on('data', (data: Buffer) => {
+  // @ts-ignore
+  childProcess.stdout!.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
       return;
@@ -72,7 +73,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
       .filter((line) => line !== '')
       .forEach((line) => console.log('  ' + line));
   });
-  childProcess.stderr.on('data', (data: Buffer) => {
+  // @ts-ignore
+  childProcess.stderr!.on('data', (data: Buffer) => {
     stderr += data.toString('utf-8');
     if (options.silent) {
       return;
@@ -118,13 +120,15 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
     if (options.waitForMatch) {
       const match = options.waitForMatch;
-      childProcess.stdout.on('data', (data: Buffer) => {
+      // @ts-ignore
+      childProcess.stdout!.on('data', (data: Buffer) => {
         if (data.toString().match(match)) {
           resolve({ stdout, stderr });
           matched = true;
         }
       });
-      childProcess.stderr.on('data', (data: Buffer) => {
+      // @ts-ignore
+      childProcess.stderr!.on('data', (data: Buffer) => {
         if (data.toString().match(match)) {
           resolve({ stdout, stderr });
           matched = true;
@@ -134,8 +138,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
     // Provide input to stdin if given.
     if (options.stdin) {
-      childProcess.stdin.write(options.stdin);
-      childProcess.stdin.end();
+      childProcess.stdin!.write(options.stdin);
+      childProcess.stdin!.end();
     }
   });
 }
@@ -143,7 +147,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 export function extractNpmEnv() {
   return Object.keys(process.env)
     .filter((v) => NPM_CONFIG_RE.test(v))
-    .reduce(
+    .reduce<NodeJS.ProcessEnv>(
       (vars, n) => {
         vars[n] = process.env[n];
         return vars;
@@ -171,13 +175,15 @@ export function waitForAnyProcessOutputToMatch(
       new Promise((resolve) => {
         let stdout = '';
         let stderr = '';
-        childProcess.stdout.on('data', (data: Buffer) => {
+        // @ts-ignore
+        childProcess.stdout!.on('data', (data: Buffer) => {
           stdout += data.toString();
           if (data.toString().match(match)) {
             resolve({ stdout, stderr });
           }
         });
-        childProcess.stderr.on('data', (data: Buffer) => {
+        // @ts-ignore
+        childProcess.stderr!.on('data', (data: Buffer) => {
           stderr += data.toString();
           if (data.toString().match(match)) {
             resolve({ stdout, stderr });
@@ -216,19 +222,14 @@ export function silentExec(cmd: string, ...args: string[]) {
   return _exec({ silent: true }, cmd, args);
 }
 
-export function execWithEnv(
-  cmd: string,
-  args: string[],
-  env: { [varname: string]: string },
-  stdin?: string,
-) {
+export function execWithEnv(cmd: string, args: string[], env: NodeJS.ProcessEnv, stdin?: string) {
   return _exec({ env, stdin }, cmd, args);
 }
 
 export async function execAndCaptureError(
   cmd: string,
   args: string[],
-  env?: { [varname: string]: string },
+  env?: NodeJS.ProcessEnv,
   stdin?: string,
 ): Promise<Error> {
   try {
@@ -243,7 +244,7 @@ export function execAndWaitForOutputToMatch(
   cmd: string,
   args: string[],
   match: RegExp,
-  env?: { [varName: string]: string },
+  env?: NodeJS.ProcessEnv,
 ) {
   if (cmd === 'ng' && args[0] === 'serve') {
     // Accept matches up to 20 times after the initial match.

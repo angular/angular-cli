@@ -39,7 +39,7 @@ export default async function () {
 
   const currentDirectory = process.cwd();
 
-  const extraArgs = [];
+  const extraArgs: string[] = [];
   if (isPrereleaseCli()) {
     extraArgs.push('--next');
   }

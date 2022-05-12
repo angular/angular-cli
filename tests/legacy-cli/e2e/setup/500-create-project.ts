@@ -17,12 +17,10 @@ export default async function () {
     process.chdir(argv.reuse);
     await gitClean();
   } else {
-    const extraArgs = [];
-
     // Ensure local test registry is used when outside a project
     await setNPMConfigRegistry(true);
 
-    await ng('new', 'test-project', '--skip-install', ...extraArgs);
+    await ng('new', 'test-project', '--skip-install');
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
 

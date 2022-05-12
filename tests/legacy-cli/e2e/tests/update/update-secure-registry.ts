@@ -8,7 +8,7 @@ export default async function () {
   delete process.env['NPM_CONFIG_REGISTRY'];
   const worksMessage = 'We analyzed your package.json';
 
-  const extraArgs = [];
+  const extraArgs: string[] = [];
   if (isPrereleaseCli()) {
     extraArgs.push('--next');
   }

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { prerelease, SemVer } from 'semver';
+import yargsParser from 'yargs-parser';
 import { packages } from '../../../../lib/packages';
 import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
@@ -25,9 +26,8 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 export function ngServe(...args: string[]) {
   return execAndWaitForOutputToMatch('ng', ['serve', ...args], / Compiled successfully./);
 }
-
-export async function prepareProjectForE2e(name) {
-  const argv: string[] = getGlobalVariable('argv');
+export async function prepareProjectForE2e(name: string) {
+  const argv: yargsParser.Arguments = getGlobalVariable('argv');
 
   await git('config', 'user.email', 'angular-core+e2e@google.com');
   await git('config', 'user.name', 'Angular CLI E2e');
@@ -88,7 +88,7 @@ export function useSha() {
     return updateJsonFile('package.json', (json) => {
       // Install over the project with snapshot builds.
       function replaceDependencies(key: string) {
-        const missingSnapshots = [];
+        const missingSnapshots: string[] = [];
         Object.keys(json[key] || {})
           .filter((name) => name.match(/^@angular\//))
           .forEach((name) => {
@@ -229,5 +229,5 @@ export async function useCIChrome(projectDir: string = ''): Promise<void> {
 export const NgCLIVersion = new SemVer(packages['@angular/cli'].version);
 
 export function isPrereleaseCli(): boolean {
-  return prerelease(NgCLIVersion)?.length > 0;
+  return (prerelease(NgCLIVersion)?.length ?? 0) > 0;
 }
