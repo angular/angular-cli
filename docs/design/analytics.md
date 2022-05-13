@@ -31,8 +31,8 @@ To create a new dimension (tracking a new flag):
    defined on GA.
 1. Use the ID of the dimension as the `x-user-analytics` value in the `schema.json` file.
 1. Add a new row to the table below in the same PR as the one adding the dimension to the code.
-1. New dimensions PRs need to be approved by [stephenfluin@google.com](mailto:stephenfluin@google.com) and
-   [iminar@google.com](mailto:iminar@google.com). **This is not negotiable.**
+1. New dimension PRs need to be approved by the tooling and DevRel leads.
+   **This is not negotiable.**
 
 **DO NOT ADD `x-user-analytics` FOR VALUES THAT ARE USER IDENTIFIABLE (PII), FOR EXAMPLE A
 PROJECT NAME TO BUILD OR A MODULE NAME.**
@@ -117,4 +117,3 @@ There are 2 ways of disabling usage analytics:
 1. There is an `NG_CLI_ANALYTICS` environment variable that overrides the global configuration.
    That flag is a string that represents the User ID. If the string `"false"` is used it will
    disable analytics for this run.
-
