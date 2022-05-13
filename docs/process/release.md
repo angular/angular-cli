@@ -15,13 +15,7 @@ Caretaker calendar can be found [here](https://calendar.google.com/calendar/embe
 
 Each shift consists of two caretakers. The primary caretaker is responsible for
 merging PRs to `main` and patch whereas the secondary caretaker is responsible
-for the release. Primary-secondary pairs are as follows:
-
-| Primary | Secondary |
-| ------- | --------- |
-| Alan    | Doug      |
-| Charles | Keen      |
-| Filipe  | Joey      |
+for the release.
 
 ## Merging PRs
 
