@@ -14,6 +14,7 @@ import {
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
 import type { CheckboxQuestion, Question } from 'inquirer';
+import { resolve } from 'path';
 import { Argv } from 'yargs';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
@@ -232,6 +233,12 @@ export abstract class SchematicsCommandModule
 
   @memoize
   protected async getSchematicCollections(): Promise<Set<string>> {
+    // Resolve relative collections from the location of `angular.json`
+    const resolveRelativeCollection = (collectionName: string) =>
+      collectionName.charAt(0) === '.'
+        ? resolve(this.context.root, collectionName)
+        : collectionName;
+
     const getSchematicCollections = (
       configSection: Record<string, unknown> | undefined,
     ): Set<string> | undefined => {
@@ -241,9 +248,9 @@ export abstract class SchematicsCommandModule
 
       const { schematicCollections, defaultCollection } = configSection;
       if (Array.isArray(schematicCollections)) {
-        return new Set(schematicCollections);
+        return new Set(schematicCollections.map((c) => resolveRelativeCollection(c)));
       } else if (typeof defaultCollection === 'string') {
-        return new Set([defaultCollection]);
+        return new Set([resolveRelativeCollection(defaultCollection)]);
       }
 
       return undefined;
