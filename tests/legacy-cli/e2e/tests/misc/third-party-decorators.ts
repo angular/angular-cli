@@ -15,7 +15,9 @@ export default async function () {
     packageJson['devDependencies']['typescript'] = '~4.6.2';
   });
 
-  await installWorkspacePackages();
+  // Force is need to prevent npm 7+ from failing due to potential peer dependency resolution range errors.
+  // This is especially common when testing snapshot builds for new prereleases.
+  await installWorkspacePackages({ force: true });
 
   // Create an app that uses ngrx decorators and has e2e tests.
   await writeMultipleFiles({
