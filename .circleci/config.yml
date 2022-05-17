@@ -357,11 +357,11 @@ workflows:
           snapshots: true
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - main
+          # filters:
+          #   branches:
+          #     only:
+          #       - renovate/angular
+          #       - main
       - e2e-cli:
           name: e2e-cli-node-16
           nodeversion: '16.10'
