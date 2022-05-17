@@ -12,6 +12,7 @@ interface ExecOptions {
   waitForMatch?: RegExp;
   env?: { [varname: string]: string };
   stdin?: string;
+  cwd?: string;
 }
 
 let _processes: child_process.ChildProcess[] = [];
@@ -28,7 +29,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
   let stdout = '';
   let stderr = '';
-  const cwd = process.cwd();
+  const cwd = options.cwd ?? process.cwd();
   const env = options.env;
   console.log(
     `==========================================================================================`,
@@ -108,8 +109,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
         ),
       );
     });
-    childProcess.on('error', (error) => {
-      err.message += `${error}...\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
+    childProcess.on('error', (err) => {
+      err.message += `${err}...\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
       reject(err);
     });
 
@@ -257,8 +258,24 @@ export function silentNg(...args: string[]) {
   return _exec({ silent: true }, 'ng', args);
 }
 
-export function silentNpm(...args: string[]) {
-  return _exec({ silent: true }, 'npm', args);
+export function silentNpm(...args: string[]): Promise<ProcessOutput>;
+export function silentNpm(args: string[], options?: { cwd?: string }): Promise<ProcessOutput>;
+export function silentNpm(
+  ...args: string[] | [args: string[], options?: { cwd?: string }]
+): Promise<ProcessOutput> {
+  if (Array.isArray(args[0])) {
+    const [params, options] = args;
+    return _exec(
+      {
+        silent: true,
+        cwd: (options as { cwd?: string } | undefined)?.cwd,
+      },
+      'npm',
+      params,
+    );
+  } else {
+    return _exec({ silent: true }, 'npm', args as string[]);
+  }
 }
 
 export function silentYarn(...args: string[]) {

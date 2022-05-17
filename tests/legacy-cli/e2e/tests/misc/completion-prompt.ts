@@ -2,7 +2,13 @@ import { promises as fs } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { env } from 'process';
-import { execAndCaptureError, execWithEnv } from '../../utils/process';
+import { getGlobalVariable } from '../../utils/env';
+import {
+  execAndCaptureError,
+  execAndWaitForOutputToMatch,
+  execWithEnv,
+  silentNpm,
+} from '../../utils/process';
 
 const AUTOCOMPLETION_PROMPT = /Would you like to enable autocompletion\?/;
 const DEFAULT_ENV = Object.freeze({
@@ -17,6 +23,8 @@ const DEFAULT_ENV = Object.freeze({
   // Analytics wants to prompt for a first command as well, but we don't care about that here.
   NG_CLI_ANALYTICS: 'false',
 });
+
+const testRegistry = getGlobalVariable('package-registry');
 
 export default async function () {
   // Windows Cmd and Powershell do not support autocompletion. Run a different set of tests to
@@ -366,6 +374,58 @@ source <(ng completion script)
         "Execution with an existing `ng completion` line in the user's RC file" +
           ' prompted for autocompletion setup but should not have.',
       );
+    }
+  });
+
+  // Prompts when a global CLI install is present on the system.
+  await mockHome(async (home) => {
+    const bashrc = path.join(home, '.bashrc');
+    await fs.writeFile(bashrc, `# Other content...`);
+
+    await execAndWaitForOutputToMatch('ng', ['version'], AUTOCOMPLETION_PROMPT, {
+      ...DEFAULT_ENV,
+      SHELL: '/bin/bash',
+      HOME: home,
+    });
+  });
+
+  // Does *not* prompt when a global CLI install is missing from the system.
+  await mockHome(async (home) => {
+    try {
+      // Temporarily uninstall the global CLI binary from the system.
+      await silentNpm(['uninstall', '--global', '@angular/cli', `--registry=${testRegistry}`]);
+
+      // Setup a fake project directory with a local install of the CLI.
+      const projectDir = path.join(home, 'project');
+      await fs.mkdir(projectDir);
+      await silentNpm(['init', '-y', `--registry=${testRegistry}`], { cwd: projectDir });
+      await silentNpm(['install', '@angular/cli', `--registry=${testRegistry}`], {
+        cwd: projectDir,
+      });
+
+      const bashrc = path.join(home, '.bashrc');
+      await fs.writeFile(bashrc, `# Other content...`);
+
+      const localCliDir = path.join(projectDir, 'node_modules', '.bin');
+      const localCliBinary = path.join(localCliDir, 'ng');
+      const pathDirs = process.env['PATH'].split(':');
+      const pathEnvVar = [...pathDirs, localCliDir].join(':');
+      const { stdout } = await execWithEnv(localCliBinary, ['version'], {
+        ...DEFAULT_ENV,
+        SHELL: '/bin/bash',
+        HOME: home,
+        PATH: pathEnvVar,
+      });
+
+      if (AUTOCOMPLETION_PROMPT.test(stdout)) {
+        throw new Error(
+          'Execution without a global CLI install prompted for autocompletion setup but should' +
+            ' not have.',
+        );
+      }
+    } finally {
+      // Reinstall global CLI for remainder of the tests.
+      await silentNpm(['install', '--global', '@angular/cli', `--registry=${testRegistry}`]);
     }
   });
 }
