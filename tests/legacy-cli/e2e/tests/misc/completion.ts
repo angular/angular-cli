@@ -1,7 +1,16 @@
+import { execFile } from 'child_process';
 import { promises as fs } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { execAndCaptureError, execAndWaitForOutputToMatch } from '../../utils/process';
+import { getGlobalVariable } from '../../utils/env';
+import {
+  execAndCaptureError,
+  execAndWaitForOutputToMatch,
+  execWithEnv,
+  silentNpm,
+} from '../../utils/process';
+
+const testRegistry = getGlobalVariable('package-registry');
 
 export default async function () {
   // Windows Cmd and Powershell do not support autocompletion. Run a different set of tests to
@@ -330,6 +339,50 @@ source <(ng completion script)
     });
     if (!err.message.includes('Unknown `$SHELL` environment variable')) {
       throw new Error(`Expected unknown \`$SHELL\` error message, but got:\n\n${err.message}`);
+    }
+  });
+
+  // Does *not* warn when a global CLI install is present on the system.
+  await mockHome(async (home) => {
+    const { stdout } = await execWithEnv('ng', ['completion'], {
+      ...process.env,
+      'SHELL': '/usr/bin/zsh',
+      'HOME': home,
+    });
+
+    if (stdout.includes('there does not seem to be a global install of the Angular CLI')) {
+      throw new Error(`CLI warned about missing global install, but one should exist.`);
+    }
+  });
+
+  // Warns when a global CLI install is *not* present on the system.
+  await mockHome(async (home) => {
+    try {
+      // Temporarily uninstall the global CLI binary from the system.
+      await silentNpm(['uninstall', '--global', '@angular/cli', `--registry=${testRegistry}`]);
+
+      // Setup a fake project directory with a local install of the CLI.
+      const projectDir = path.join(home, 'project');
+      await fs.mkdir(projectDir);
+      await silentNpm(['init', '-y', `--registry=${testRegistry}`], { cwd: projectDir });
+      await silentNpm(['install', '@angular/cli', `--registry=${testRegistry}`], {
+        cwd: projectDir,
+      });
+
+      // Invoke the local CLI binary.
+      const localCliBinary = path.join(projectDir, 'node_modules', '.bin', 'ng');
+      const { stdout } = await execWithEnv(localCliBinary, ['completion'], {
+        ...process.env,
+        'SHELL': '/usr/bin/zsh',
+        'HOME': home,
+      });
+
+      if (stdout.includes('there does not seem to be a global install of the Angular CLI')) {
+        throw new Error(`CLI warned about missing global install, but one should exist.`);
+      }
+    } finally {
+      // Reinstall global CLI for remainder of the tests.
+      await silentNpm(['install', '--global', '@angular/cli', `--registry=${testRegistry}`]);
     }
   });
 }
