@@ -77,7 +77,9 @@ export default async function (options: { cliArgs: string[] }) {
     } else if (typeof err === 'number') {
       // Log nothing.
     } else {
-      logger.fatal('An unexpected error occurred: ' + JSON.stringify(err));
+      logger.fatal(
+        `An unexpected error occurred: ${'toString' in err ? err.toString() : JSON.stringify(err)}`,
+      );
     }
 
     return 1;

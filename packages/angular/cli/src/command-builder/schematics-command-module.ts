@@ -321,11 +321,11 @@ export abstract class SchematicsCommandModule
       if (err instanceof UnsuccessfulWorkflowExecution) {
         // "See above" because we already printed the error.
         logger.fatal('The Schematic workflow failed. See above.');
-
-        return 1;
       } else {
-        throw err;
+        logger.fatal(err.message);
       }
+
+      return 1;
     } finally {
       unsubscribe();
     }
