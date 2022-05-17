@@ -8,14 +8,10 @@
 
 import { join } from 'path';
 import yargs, { Argv } from 'yargs';
-import {
-  CommandModule,
-  CommandModuleImplementation,
-  CommandScope,
-} from '../../command-builder/command-module';
+import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { addCommandModuleToYargs } from '../../command-builder/utilities/command';
 import { colors } from '../../utilities/color';
-import { initializeAutocomplete } from '../../utilities/completion';
+import { hasGlobalCliInstall, initializeAutocomplete } from '../../utilities/completion';
 
 export class CompletionCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'completion';
@@ -43,6 +39,16 @@ Appended \`source <(ng completion script)\` to \`${rcFile}\`. Restart your termi
     ${colors.yellow('source <(ng completion script)')}
       `.trim(),
     );
+
+    if ((await hasGlobalCliInstall()) === false) {
+      this.context.logger.warn(
+        'Setup completed successfully, but there does not seem to be a global install of the' +
+          ' Angular CLI. For autocompletion to work, the CLI will need to be on your `$PATH`, which' +
+          ' is typically done with the `-g` flag in `npm install -g @angular/cli`.' +
+          '\n\n' +
+          'For more information, see https://angular.io/cli/completion#global-install',
+      );
+    }
 
     return 0;
   }
