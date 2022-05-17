@@ -1,3 +1,6 @@
+import * as assert from 'assert';
+import { execSync } from 'child_process';
+import { valid as validSemVer } from 'semver';
 import { rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, npm } from '../../utils/process';
@@ -16,6 +19,23 @@ export default async function () {
   if (process.platform.startsWith('win')) {
     return;
   }
+
+  // Get current package manager version to restore after tests
+  const initialVersionText = execSync('npm --version', {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+    env: {
+      ...process.env,
+      //  NPM updater notifier will prevent the child process from closing until it timeouts after 3 minutes.
+      NO_UPDATE_NOTIFIER: '1',
+      NPM_CONFIG_UPDATE_NOTIFIER: 'false',
+    },
+  }).trim();
+  const initialVersion = validSemVer(initialVersionText);
+  assert.ok(
+    initialVersion,
+    `Invalid npm version string returned from "npm --version" [${initialVersionText}]`,
+  );
 
   const currentDirectory = process.cwd();
 
@@ -89,7 +109,7 @@ export default async function () {
     // Change directory back
     process.chdir(currentDirectory);
 
-    // Reset version back to 6.x
-    await npm('install', '--global', 'npm@6');
+    // Reset version back to initial version
+    await npm('install', '--global', `npm@${initialVersion}`);
   }
 }
