@@ -1,3 +1,36 @@
+<a name="14.0.0-rc.1"></a>
+
+# 14.0.0-rc.1 (2022-05-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [6f6b453fb](https://github.com/angular/angular-cli/commit/6f6b453fbf90adad16eba7ea8929a11235c1061b) | fix  | `ng doc` doesn't open browser in Windows                                            |
+| [160cb0718](https://github.com/angular/angular-cli/commit/160cb071870602d9e7fece2ce381facb71e7d762) | fix  | correctly handle `--search` option in `ng doc`                                      |
+| [4b22593c4](https://github.com/angular/angular-cli/commit/4b22593c4a269ea4bd63cef39009aad69f159fa1) | fix  | ensure all available package migrations are executed                                |
+| [bdf2b9bfa](https://github.com/angular/angular-cli/commit/bdf2b9bfa9893a940ba254073d024172e0dc1abc) | fix  | print schematic errors correctly                                                    |
+| [db0cb5593](https://github.com/angular/angular-cli/commit/db0cb5593dcde395f1877f7c9b6bdf911cd26654) | fix  | resolve relative schematic from `angular.json` instead of current working directory |
+| [e5bdadac4](https://github.com/angular/angular-cli/commit/e5bdadac44ac023363bc0a2473892fc17430b81f) | fix  | skip prompt or warn when setting up autocompletion without a global CLI install     |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [b928d973e](https://github.com/angular/angular-cli/commit/b928d973e97f33220afe16549b41c4031feb5c5e) | fix  | alphabetically order imports during component generation |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [587082fb0](https://github.com/angular/angular-cli/commit/587082fb0fa7bdb6cddb36327f791889d76e3e7b) | fix  | close compiler on Karma exit |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Elton Coelho, George Kalpakas and Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.6"></a>
 
 # 13.3.6 (2022-05-18)
