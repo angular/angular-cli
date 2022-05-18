@@ -1,0 +1,25 @@
+load("//tools:defaults.bzl", "ts_library")
+
+ts_library(
+    name = "utils",
+    testonly = True,
+    srcs = glob(["**/*.ts"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//lib",
+        "//tests/legacy-cli/e2e/ng-snapshot",
+        "@npm//@types/glob",
+        "@npm//@types/node-fetch",
+        "@npm//@types/semver",
+        "@npm//@types/yargs-parser",
+        "@npm//ansi-colors",
+        "@npm//glob",
+        "@npm//protractor",
+        "@npm//puppeteer",
+        "@npm//rxjs",
+        "@npm//semver",
+        "@npm//tree-kill",
+        "@npm//verdaccio",
+        "@npm//verdaccio-auth-memory",
+    ],
+)

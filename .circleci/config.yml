@@ -254,6 +254,12 @@ jobs:
       - custom_attach_workspace
       - run: yarn build
 
+  build-bazel-e2e:
+    executor: action-executor
+    steps:
+      - custom_attach_workspace
+      - run: yarn bazel build //tests/legacy-cli/...
+
   test:
     executor: test-executor
     resource_class: xlarge
@@ -376,6 +382,12 @@ workflows:
       # will catch any build errors before proceeding to the more lengthy and resource intensive
       # Bazel jobs.
       - test:
+          requires:
+            - build
+
+      # Compile the e2e tests with bazel to ensure the non-runtime typescript
+      # compilation completes succesfully.
+      - build-bazel-e2e:
           requires:
             - build
 
