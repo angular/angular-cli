@@ -107,7 +107,7 @@ import { VERSION } from '../src/utilities/version';
     });
   })
   .then((exitCode: number) => {
-    process.exit(exitCode);
+    process.exitCode = exitCode;
   })
   .catch((err: Error) => {
     // eslint-disable-next-line  no-console
