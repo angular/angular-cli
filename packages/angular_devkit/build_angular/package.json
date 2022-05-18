@@ -22,7 +22,7 @@
     "@discoveryjs/json-ext": "0.5.6",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
     "ansi-colors": "4.1.1",
-    "babel-loader": "8.2.3",
+    "babel-loader": "8.2.5",
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "^4.9.1",
     "cacache": "15.3.0",
