@@ -1,0 +1,25 @@
+load("//tools:defaults.bzl", "ts_library")
+
+ts_library(
+    name = "runner",
+    testonly = True,
+    srcs = glob(["**/*.ts"]),
+    data = [
+        "verdaccio.yaml",
+        "verdaccio_auth.yaml",
+    ],
+    deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//tests/legacy-cli/e2e/assets",
+        "//tests/legacy-cli/e2e/utils",
+        "@npm//@types/glob",
+        "@npm//@types/yargs-parser",
+        "@npm//ansi-colors",
+        "@npm//yargs-parser",
+
+        # Loaded dynamically at runtime, not compiletime deps
+        "//tests/legacy-cli/e2e/setup",
+        "//tests/legacy-cli/e2e/tests",
+    ],
+)

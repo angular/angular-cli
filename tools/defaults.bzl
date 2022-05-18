@@ -1,7 +1,7 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
 load("@npm//@bazel/concatjs/internal:build_defs.bzl", _ts_library = "ts_library_macro")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _pkg_npm = "pkg_npm")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _pkg_npm = "pkg_npm")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@npm//@angular/dev-infra-private/bazel:extract_js_module_output.bzl", "extract_js_module_output")
 load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
@@ -49,6 +49,8 @@ def ts_library(
         # @external_end
         **kwargs
     )
+
+js_library = _js_library
 
 def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
     """Override of pkg_npm to produce package outputs and version substitutions conventional to the angular-cli project.

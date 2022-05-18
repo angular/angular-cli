@@ -1,0 +1,11 @@
+load("//tools:defaults.bzl", "js_library")
+
+js_library(
+    name = "assets",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@npm//jasmine-spec-reporter",
+        "@npm//ts-node",
+    ],
+)
