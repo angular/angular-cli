@@ -1,4 +1,4 @@
-import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';<% if(standalone) {%>
+import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%>Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';<% if(standalone) {%>
 import { CommonModule } from '@angular/common';<% } %>
 
 @Component({<% if(!skipSelector) {%>
