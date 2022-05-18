@@ -1,7 +1,8 @@
+import { appendFile } from 'fs/promises';
 import { SemVer } from 'semver';
 import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, readFile } from '../../utils/fs';
-import { setRegistry } from '../../utils/packages';
+import { getActivePackageManager, setRegistry } from '../../utils/packages';
 import { ng, noSilentNg } from '../../utils/process';
 import { isPrereleaseCli, useCIChrome, useCIDefaults, NgCLIVersion } from '../../utils/project';
 
@@ -12,7 +13,18 @@ export default async function () {
     await setRegistry(false);
     await createProjectFromAsset('10.0-project', true);
 
-    // CLI proiject version
+    // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
+    // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
+    // npm ERR! Conflicting peer dependency: @angular/compiler-cli@11.2.14
+    // npm ERR! node_modules/@angular/compiler-cli
+    // npm ERR!   peer @angular/compiler-cli@"^11.0.0 || ^11.2.0-next" from @angular-devkit/build-angular@0.1102.19
+    // npm ERR!   node_modules/@angular-devkit/build-angular
+    // npm ERR!     dev @angular-devkit/build-angular@"~0.1102.19" from the root project
+    if (getActivePackageManager() === 'npm') {
+      await appendFile('.npmrc', '\nlegacy-peer-deps=true');
+    }
+
+    // CLI project version
     const { version: cliVersion } = JSON.parse(
       await readFile('./node_modules/@angular/cli/package.json'),
     );
@@ -30,7 +42,10 @@ export default async function () {
       // - 12 -> 13
       const { stdout } = await ng('update', `@angular/cli@${version}`, `@angular/core@${version}`);
       if (!stdout.includes("Executing migrations of package '@angular/cli'")) {
-        throw new Error('Update did not execute migrations. OUTPUT: \n' + stdout);
+        throw new Error('Update did not execute migrations for @angular/cli. OUTPUT: \n' + stdout);
+      }
+      if (!stdout.includes("Executing migrations of package '@angular/core'")) {
+        throw new Error('Update did not execute migrations for @angular/core. OUTPUT: \n' + stdout);
       }
     }
   } finally {
