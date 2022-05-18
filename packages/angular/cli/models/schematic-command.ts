@@ -21,6 +21,7 @@ import {
 } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
+import { resolve } from 'path';
 import { colors } from '../utilities/color';
 import { getProjectByCwd, getSchematicDefaults, getWorkspace } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
@@ -373,6 +374,12 @@ export abstract class SchematicCommand<
   }
 
   protected async getDefaultSchematicCollection(): Promise<string> {
+    // Resolve relative collections from the location of `angular.json`
+    const resolveRelativeCollection = (collectionName: string) =>
+      collectionName.charAt(0) === '.'
+        ? resolve(this.context.root, collectionName)
+        : collectionName;
+
     let workspace = await getWorkspace('local');
 
     if (workspace) {
@@ -380,13 +387,13 @@ export abstract class SchematicCommand<
       if (project && workspace.getProjectCli(project)) {
         const value = workspace.getProjectCli(project)['defaultCollection'];
         if (typeof value == 'string') {
-          return value;
+          return resolveRelativeCollection(value);
         }
       }
       if (workspace.getCli()) {
         const value = workspace.getCli()['defaultCollection'];
         if (typeof value == 'string') {
-          return value;
+          return resolveRelativeCollection(value);
         }
       }
     }
@@ -395,7 +402,7 @@ export abstract class SchematicCommand<
     if (workspace && workspace.getCli()) {
       const value = workspace.getCli()['defaultCollection'];
       if (typeof value == 'string') {
-        return value;
+        return resolveRelativeCollection(value);
       }
     }
 
