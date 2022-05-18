@@ -17,6 +17,15 @@ Each shift consists of two caretakers. The primary caretaker is responsible for
 merging PRs to `main` and patch whereas the secondary caretaker is responsible
 for the release.
 
+At the end of each caretaker's rotation, they should peform a handoff in which they provide
+information to the next caretaker about the current state of the repository and update the
+access group to now include the next caretaker and their secondary. To perform this update
+to the access group, the caretaker can run:
+
+```bash
+$ yarn ng-dev caretaker handoff
+```
+
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
