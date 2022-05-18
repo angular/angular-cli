@@ -83,8 +83,8 @@ export class DocCommandModule
 
     await open(
       options.search
-        ? `https://${domain}/api?query=${options.keyword}`
-        : `https://${domain}/docs?search=${options.keyword}`,
+        ? `https://${domain}/docs?search=${options.keyword}`
+        : `https://${domain}/api?query=${options.keyword}`,
     );
   }
 }
