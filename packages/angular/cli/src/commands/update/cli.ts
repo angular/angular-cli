@@ -787,8 +787,9 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           options.createCommits,
         );
 
-        if (!result) {
-          return 0;
+        // A non-zero value is a failure for the package's migrations
+        if (result !== 0) {
+          return result;
         }
       }
     }
