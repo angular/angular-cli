@@ -23,6 +23,15 @@ for the release. Primary-secondary pairs are as follows:
 | Charles | Keen      |
 | Filipe  | Joey      |
 
+At the end of each caretaker's rotation, they should peform a handoff in which they provide
+information to the next caretaker about the current state of the repository and update the
+access group to now include the next caretaker and their secondary. To perform this update
+to the access group, the caretaker can run:
+
+```bash
+$ yarn ng-dev caretaker handoff
+```
+
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
