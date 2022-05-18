@@ -149,7 +149,7 @@ const init: any = (config: any, emitter: any) => {
   webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
   emitter.on('exit', (done: any) => {
     webpackMiddleware.close();
-    done();
+    compiler.close(() => done());
   });
 
   function unblock() {
