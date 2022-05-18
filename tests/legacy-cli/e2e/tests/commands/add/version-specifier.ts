@@ -1,11 +1,19 @@
+import { appendFile } from 'fs/promises';
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
-import { uninstallPackage } from '../../../utils/packages';
+import { getActivePackageManager, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/localize');
+
+  // If using npm, enable the force option to allow testing the output behavior of the
+  // `ng add` command itself and not the behavior of npm which may otherwise fail depending
+  // on the npm version in use and the version specifier supplied in each test.
+  if (getActivePackageManager() === 'npm') {
+    appendFile('.npmrc', '\nforce=true\n');
+  }
 
   const tag = (await isPrereleaseCli()) ? '@next' : '';
 
