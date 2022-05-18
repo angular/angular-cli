@@ -1,3 +1,25 @@
+<a name="13.3.6"></a>
+
+# 13.3.6 (2022-05-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [e20964c43](https://github.com/angular/angular-cli/commit/e20964c43c52125b6d2bfa9bbea444fb2eea1e15) | fix  | resolve relative schematic from `angular.json` instead of current working directory |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [16fec8d58](https://github.com/angular/angular-cli/commit/16fec8d58b6ec421df5e7809c45838baf232b4a9) | fix  | update `babel-loader` to 8.2.5 |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Jason Bedard and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-rc.0"></a>
 
 # 14.0.0-rc.0 (2022-05-11)
