@@ -1,7 +1,5 @@
-// This may seem awkward but we're using Logger in our e2e. At this point the unit tests
-// have run already so it should be "safe", teehee.
-import { logging } from '@angular-devkit/core';
-import { createConsoleLogger } from '@angular-devkit/core/node';
+import { logging } from '../../packages/angular_devkit/core/src';
+import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
 import * as colors from 'ansi-colors';
 import glob from 'glob';
 import yargsParser from 'yargs-parser';
