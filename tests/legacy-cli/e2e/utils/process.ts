@@ -15,6 +15,8 @@ interface ExecOptions {
   cwd?: string;
 }
 
+const NPM_CONFIG_RE = /^npm_config_/i;
+
 let _processes: child_process.ChildProcess[] = [];
 
 export type ProcessOutput = {
@@ -136,6 +138,20 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
       childProcess.stdin.end();
     }
   });
+}
+
+export function extractNpmEnv() {
+  return Object.keys(process.env)
+    .filter((v) => NPM_CONFIG_RE.test(v))
+    .reduce(
+      (vars, n) => {
+        vars[n] = process.env[n];
+        return vars;
+      },
+      {
+        PATH: process.env.PATH,
+      },
+    );
 }
 
 export function waitForAnyProcessOutputToMatch(
@@ -269,21 +285,22 @@ export function silentNpm(
       {
         silent: true,
         cwd: (options as { cwd?: string } | undefined)?.cwd,
+        env: extractNpmEnv(),
       },
       'npm',
       params,
     );
   } else {
-    return _exec({ silent: true }, 'npm', args as string[]);
+    return _exec({ silent: true, env: extractNpmEnv() }, 'npm', args as string[]);
   }
 }
 
 export function silentYarn(...args: string[]) {
-  return _exec({ silent: true }, 'yarn', args);
+  return _exec({ silent: true, env: extractNpmEnv() }, 'yarn', args);
 }
 
 export function npm(...args: string[]) {
-  return _exec({}, 'npm', args);
+  return _exec({ env: extractNpmEnv() }, 'npm', args);
 }
 
 export function node(...args: string[]) {
