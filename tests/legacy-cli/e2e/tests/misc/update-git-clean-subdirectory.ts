@@ -4,7 +4,7 @@ import { ng, silentGit } from '../../utils/process';
 import { prepareProjectForE2e } from '../../utils/project';
 
 export default async function () {
-  process.chdir(getGlobalVariable('tmp-root'));
+  process.chdir(getGlobalVariable('projects-root'));
 
   await createDir('./subdirectory');
   process.chdir('./subdirectory');

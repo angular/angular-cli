@@ -17,5 +17,4 @@ export default function () {
   }
   console.log(`  Using "${tempRoot}" as temporary directory for a new project.`);
   setGlobalVariable('tmp-root', tempRoot);
-  process.chdir(tempRoot);
 }

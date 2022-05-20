@@ -1,5 +1,5 @@
 import { getGlobalVariable } from '../utils/env';
-import { execWithEnv } from '../utils/process';
+import { execWithEnv, extractNpmEnv } from '../utils/process';
 import { isPrereleaseCli } from '../utils/project';
 
 export default async function () {
@@ -18,7 +18,7 @@ export default async function () {
       isPrereleaseCli() ? 'next' : 'latest',
     ],
     {
-      ...process.env,
+      ...extractNpmEnv(),
       // Also set an auth token value for the local test registry which is required by npm 7+
       // even though it is never actually used.
       'NPM_CONFIG__AUTH': 'e2e-testing',

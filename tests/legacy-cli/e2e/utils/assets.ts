@@ -11,7 +11,7 @@ export function assetDir(assetName: string) {
 }
 
 export function copyProjectAsset(assetName: string, to?: string) {
-  const tempRoot = join(getGlobalVariable('tmp-root'), 'test-project');
+  const tempRoot = join(getGlobalVariable('projects-root'), 'test-project');
   const sourcePath = assetDir(assetName);
   const targetPath = join(tempRoot, to || assetName);
 
@@ -20,7 +20,7 @@ export function copyProjectAsset(assetName: string, to?: string) {
 
 export function copyAssets(assetName: string, to?: string) {
   const seed = +Date.now();
-  const tempRoot = join(getGlobalVariable('tmp-root'), 'assets', assetName + '-' + seed);
+  const tempRoot = join(getGlobalVariable('projects-root'), 'assets', assetName + '-' + seed);
   const root = assetDir(assetName);
 
   return Promise.resolve()
@@ -30,7 +30,7 @@ export function copyAssets(assetName: string, to?: string) {
       return allFiles.reduce((promise, filePath) => {
         const toPath =
           to !== undefined
-            ? resolve(getGlobalVariable('tmp-root'), 'test-project', to, filePath)
+            ? resolve(getGlobalVariable('projects-root'), 'test-project', to, filePath)
             : join(tempRoot, filePath);
 
         return promise.then(() => copyFile(join(root, filePath), toPath));

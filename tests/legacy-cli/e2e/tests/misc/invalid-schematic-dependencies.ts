@@ -1,5 +1,5 @@
 import { expectFileToMatch } from '../../utils/fs';
-import { execWithEnv, ng, silentNpm } from '../../utils/process';
+import { execWithEnv, extractNpmEnv, ng, silentNpm } from '../../utils/process';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 
@@ -29,7 +29,7 @@ async function publishOutdated(npmSpecifier: string): Promise<void> {
     '--registry=https://registry.npmjs.org',
   );
   await execWithEnv('npm', ['publish', stdoutPack.trim(), '--tag=outdated'], {
-    ...process.env,
+    ...extractNpmEnv(),
     // Also set an auth token value for the local test registry which is required by npm 7+
     // even though it is never actually used.
     'NPM_CONFIG__AUTH': 'e2e-testing',
