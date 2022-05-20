@@ -90,12 +90,15 @@ export class JavaScriptOptimizerPlugin {
     const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
 
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
+      const logger = compilation.getLogger('build-angular.JavaScriptOptimizerPlugin');
+
       compilation.hooks.processAssets.tapPromise(
         {
           name: PLUGIN_NAME,
           stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
         },
         async (compilationAssets) => {
+          logger.time('optimize js assets');
           const scriptsToOptimize = [];
           const cache =
             compilation.options.cache && compilation.getCache('JavaScriptOptimizerPlugin');
@@ -123,6 +126,7 @@ export class JavaScriptOptimizerPlugin {
               >();
 
               if (cachedOutput) {
+                logger.debug(`${name} restored from cache`);
                 compilation.updateAsset(name, cachedOutput.source, (assetInfo) => ({
                   ...assetInfo,
                   minimized: true,
@@ -195,6 +199,8 @@ export class JavaScriptOptimizerPlugin {
           try {
             const tasks = [];
             for (const { name, code, map, cacheItem } of scriptsToOptimize) {
+              logger.time(`optimize asset: ${name}`);
+
               tasks.push(
                 workerPool
                   .run({
@@ -215,6 +221,8 @@ export class JavaScriptOptimizerPlugin {
                         minimized: true,
                       }));
 
+                      logger.timeEnd(`optimize asset: ${name}`);
+
                       return cacheItem?.storePromise({
                         source: optimizedAsset,
                       });
@@ -233,6 +241,8 @@ export class JavaScriptOptimizerPlugin {
           } finally {
             void workerPool.destroy();
           }
+
+          logger.timeEnd('optimize js assets');
         },
       );
     });
