@@ -40,6 +40,8 @@ export class CssOptimizerPlugin {
     const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
 
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
+      const logger = compilation.getLogger('build-angular.CssOptimizerPlugin');
+
       compilation.hooks.processAssets.tapPromise(
         {
           name: PLUGIN_NAME,
@@ -48,6 +50,7 @@ export class CssOptimizerPlugin {
         async (compilationAssets) => {
           const cache = compilation.options.cache && compilation.getCache(PLUGIN_NAME);
 
+          logger.time('optimize css assets');
           for (const assetName of Object.keys(compilationAssets)) {
             if (!/\.(?:css|scss|sass|less|styl)$/.test(assetName)) {
               continue;
@@ -70,6 +73,7 @@ export class CssOptimizerPlugin {
               >();
 
               if (cachedOutput) {
+                logger.debug(`${name} restored from cache`);
                 await this.addWarnings(compilation, cachedOutput.warnings);
                 compilation.updateAsset(name, cachedOutput.source, (assetInfo) => ({
                   ...assetInfo,
@@ -82,12 +86,15 @@ export class CssOptimizerPlugin {
             const { source, map: inputMap } = styleAssetSource.sourceAndMap();
             const input = typeof source === 'string' ? source : source.toString();
 
+            const optimizeAssetLabel = `optimize asset: ${asset.name}`;
+            logger.time(optimizeAssetLabel);
             const { code, warnings, map } = await this.optimize(
               input,
               asset.name,
               inputMap,
               this.targets,
             );
+            logger.timeEnd(optimizeAssetLabel);
 
             await this.addWarnings(compilation, warnings);
 
@@ -104,6 +111,7 @@ export class CssOptimizerPlugin {
               warnings,
             });
           }
+          logger.timeEnd('optimize css assets');
         },
       );
     });
