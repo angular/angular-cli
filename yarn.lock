@@ -9746,6 +9746,15 @@ sass@1.51.0, sass@^1.49.9:
     immutable "^4.0.0"
     source-map-js ">=0.6.2 <2.0.0"
 
+sass@1.52.0:
+  version "1.52.0"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.52.0.tgz#3dc755ff459858ce7062887181648701f028c4f5"
+  integrity sha512-6EnTglag2oVD8sNJCxUi2Jd3ICH9tJ5Mqudt/gIZNBR2uKJUBZuTpW9O1t04SkDLP7VFa76FCWTV2rwchqM8Kw==
+  dependencies:
+    chokidar ">=3.0.0 <4.0.0"
+    immutable "^4.0.0"
+    source-map-js ">=0.6.2 <2.0.0"
+
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz":
   version "0.0.0"
   uid e5d7f82ad98251a653d1b0537f1103e49eda5e11
