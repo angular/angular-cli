@@ -47,7 +47,7 @@
     "piscina": "3.2.0",
     "postcss": "8.4.14",
     "postcss-import": "14.1.0",
-    "postcss-loader": "6.2.1",
+    "postcss-loader": "7.0.0",
     "postcss-preset-env": "7.6.0",
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "5.0.0",
