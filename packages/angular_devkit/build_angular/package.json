@@ -58,7 +58,7 @@
     "source-map-loader": "3.0.1",
     "source-map-support": "0.5.21",
     "stylus": "0.57.0",
-    "stylus-loader": "6.2.0",
+    "stylus-loader": "7.0.0",
     "terser": "5.13.1",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",

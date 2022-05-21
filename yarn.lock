@@ -10521,6 +10521,15 @@ stylus-loader@6.2.0:
     klona "^2.0.4"
     normalize-path "^3.0.0"
 
+stylus-loader@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/stylus-loader/-/stylus-loader-7.0.0.tgz#31fb929cd3a7c447a07a0b0148b48480eb2c3f4a"
+  integrity sha512-WTbtLrNfOfLgzTaR9Lj/BPhQroKk/LC1hfTXSUbrxmxgfUo3Y3LpmKRVA2R1XbjvTAvOfaian9vOyfv1z99E+A==
+  dependencies:
+    fast-glob "^3.2.11"
+    klona "^2.0.5"
+    normalize-path "^3.0.0"
+
 stylus@0.57.0, stylus@^0.57.0:
   version "0.57.0"
   resolved "https://registry.yarnpkg.com/stylus/-/stylus-0.57.0.tgz#a46f04f426c19ceef54abb1a9d189fd4e886df41"
