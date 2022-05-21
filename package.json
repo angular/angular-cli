@@ -201,7 +201,7 @@
     "source-map-support": "0.5.21",
     "spdx-satisfies": "^5.0.0",
     "stylus": "0.57.0",
-    "stylus-loader": "6.2.0",
+    "stylus-loader": "7.0.0",
     "symbol-observable": "4.0.0",
     "tar": "^6.1.6",
     "terser": "5.13.1",
