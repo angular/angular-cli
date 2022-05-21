@@ -22,7 +22,7 @@ setPublicVar PATH "${HOME}/.npm-global/bin:${PATH}";
 # Define SauceLabs environment variables for CircleCI.
 ####################################################################################################
 setPublicVar SAUCE_USERNAME "angular-tooling";
-setSecretVar SAUCE_ACCESS_KEY "8c4ffce86ae6-c419-8ef4-0513-54267305";
+setSecretVar SAUCE_ACCESS_KEY "e05dabf6fe0e-2c18-abf4-496d-1d010490";
 setPublicVar SAUCE_LOG_FILE /tmp/angular/sauce-connect.log
 setPublicVar SAUCE_READY_FILE /tmp/angular/sauce-connect-ready-file.lock
 setPublicVar SAUCE_PID_FILE /tmp/angular/sauce-connect-pid-file.lock
