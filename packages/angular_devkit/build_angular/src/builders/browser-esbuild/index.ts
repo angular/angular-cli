@@ -20,7 +20,7 @@ import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-brows
 import { resolveGlobalStyles } from '../../webpack/configs';
 import { Schema as BrowserBuilderOptions, SourceMapClass } from '../browser/schema';
 import { createCompilerPlugin } from './compiler-plugin';
-import { bundle, logMessages } from './esbuild';
+import { DEFAULT_OUTDIR, bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
 import { normalizeOptions } from './options';
 import { bundleStylesheetText } from './stylesheets';
@@ -116,11 +116,13 @@ export async function execute(
     // Entries in the metafile are relative to the `absWorkingDir` option which is set to the workspaceRoot
     const relativeFilePath = path.relative(workspaceRoot, outputFile.path);
     const entryPoint = result.metafile?.outputs[relativeFilePath]?.entryPoint;
+
+    outputFile.path = path.relative(DEFAULT_OUTDIR, outputFile.path);
+
     if (entryPoint) {
       // An entryPoint value indicates an initial file
       initialFiles.push({
-        // Remove leading directory separator
-        file: outputFile.path.slice(1),
+        file: outputFile.path,
         name: entryPointNameLookup.get(entryPoint) ?? '',
         extension: path.extname(outputFile.path),
       });
@@ -147,7 +149,9 @@ export async function execute(
       !!options.preserveSymlinks,
     );
     for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
-      const virtualEntryData = files.map((file) => `@import '${file}';`).join('\n');
+      const virtualEntryData = files
+        .map((file) => `@import '${file.replace(/\\/g, '/')}';`)
+        .join('\n');
       const sheetResult = await bundleStylesheetText(
         virtualEntryData,
         { virtualName: `angular:style/global;${name}`, resolvePath: workspaceRoot },
@@ -172,7 +176,7 @@ export async function execute(
       // The virtual stylesheets will be named `stdin` by esbuild. This must be replaced
       // with the actual name of the global style and the leading directory separator must
       // also be removed to make the path relative.
-      const sheetPath = sheetResult.path.replace('stdin', name).slice(1);
+      const sheetPath = sheetResult.path.replace('stdin', name);
       outputFiles.push(createOutputFileFromText(sheetPath, sheetResult.contents));
       if (sheetResult.map) {
         outputFiles.push(createOutputFileFromText(sheetPath + '.map', sheetResult.map));
@@ -203,10 +207,13 @@ export async function execute(
       optimization: optimizationOptions,
       crossOrigin: options.crossOrigin,
     });
-    indexHtmlGenerator.readAsset = async function (path: string): Promise<string> {
+
+    /** Virtual output path to support reading in-memory files. */
+    const virtualOutputPath = '/';
+    indexHtmlGenerator.readAsset = async function (filePath: string): Promise<string> {
       // Remove leading directory separator
-      path = path.slice(1);
-      const file = outputFiles.find((file) => file.path === path);
+      const relativefilePath = path.relative(virtualOutputPath, filePath);
+      const file = outputFiles.find((file) => file.path === relativefilePath);
       if (file) {
         return file.text;
       }
@@ -217,7 +224,7 @@ export async function execute(
     const { content, warnings, errors } = await indexHtmlGenerator.process({
       baseHref: options.baseHref,
       lang: undefined,
-      outputPath: '/', // Virtual output path to support reading in-memory files
+      outputPath: virtualOutputPath,
       files: initialFiles,
     });
 
@@ -280,7 +287,7 @@ async function bundleCode(
     metafile: true,
     minify: optimizationOptions.scripts,
     pure: ['forwardRef'],
-    outdir: '/',
+    outdir: DEFAULT_OUTDIR,
     sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
     splitting: true,
     tsconfig,
