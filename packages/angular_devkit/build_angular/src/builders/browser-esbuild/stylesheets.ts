@@ -8,7 +8,7 @@
 
 import type { BuildOptions, OutputFile } from 'esbuild';
 import * as path from 'path';
-import { bundle } from './esbuild';
+import { DEFAULT_OUTDIR, bundle } from './esbuild';
 
 export interface BundleStylesheetOptions {
   workspaceRoot?: string;
@@ -32,7 +32,7 @@ async function bundleStylesheet(
     logLevel: 'silent',
     minify: options.optimization,
     sourcemap: options.sourcemap,
-    outdir: '/',
+    outdir: DEFAULT_OUTDIR,
     write: false,
     platform: 'browser',
     preserveSymlinks: options.preserveSymlinks,
@@ -50,6 +50,7 @@ async function bundleStylesheet(
   const resourceFiles: OutputFile[] = [];
   if (result.outputFiles) {
     for (const outputFile of result.outputFiles) {
+      outputFile.path = path.relative(DEFAULT_OUTDIR, outputFile.path);
       const filename = path.basename(outputFile.path);
       if (filename.endsWith('.css')) {
         outputPath = outputFile.path;
