@@ -378,6 +378,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
                 scriptTarget,
                 aot: buildOptions.aot,
                 optimize: buildOptions.buildOptimizer,
+                supportedBrowsers: buildOptions.supportedBrowsers,
                 instrumentCode: codeCoverage
                   ? {
                       includedBasePath: sourceRoot,

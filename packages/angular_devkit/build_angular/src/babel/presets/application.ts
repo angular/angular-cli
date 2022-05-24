@@ -47,7 +47,7 @@ export interface ApplicationPresetOptions {
     linkerPluginCreator: typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin;
   };
 
-  forceES5?: boolean;
+  forcePresetEnv?: boolean;
   forceAsyncTransformation?: boolean;
   instrumentCode?: {
     includedBasePath: string;
@@ -59,6 +59,7 @@ export interface ApplicationPresetOptions {
     wrapDecorators: boolean;
   };
 
+  supportedBrowsers?: string[];
   diagnosticReporter?: DiagnosticReporter;
 }
 
@@ -178,14 +179,13 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     );
   }
 
-  if (options.forceES5) {
+  if (options.forcePresetEnv) {
     presets.push([
       require('@babel/preset-env').default,
       {
         bugfixes: true,
         modules: false,
-        // Comparable behavior to tsconfig target of ES5
-        targets: { ie: 9 },
+        targets: options.supportedBrowsers,
         exclude: ['transform-typeof-symbol'],
       },
     ]);
