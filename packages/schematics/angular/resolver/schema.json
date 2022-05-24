@@ -29,6 +29,9 @@
     "path": {
       "type": "string",
       "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
       "description": "The path at which to create the interface that defines the resolver, relative to the current workspace.",
       "visible": false
     },

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { schema, tags } from '@angular-devkit/core';
+import { normalize as devkitNormalize, isJsonObject, schema, tags } from '@angular-devkit/core';
 import { Collection, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
@@ -14,7 +14,7 @@ import {
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
 import type { CheckboxQuestion, Question } from 'inquirer';
-import { resolve } from 'path';
+import { relative, resolve } from 'path';
 import { Argv } from 'yargs';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
@@ -133,10 +133,16 @@ export abstract class SchematicsCommandModule
     });
 
     workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
-    workflow.registry.addSmartDefaultProvider('projectName', () => this.getProjectName());
     workflow.registry.useXDeprecatedProvider((msg) => logger.warn(msg));
+    workflow.registry.addSmartDefaultProvider('projectName', () => this.getProjectName());
+
+    const workingDir = devkitNormalize(relative(this.context.root, process.cwd()));
+    workflow.registry.addSmartDefaultProvider('workingDirectory', () =>
+      workingDir === '' ? undefined : workingDir,
+    );
 
     let shouldReportAnalytics = true;
+
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
       if (shouldReportAnalytics) {
         shouldReportAnalytics = false;
@@ -148,6 +154,35 @@ export abstract class SchematicsCommandModule
           schematic.collection.name.replace(/\//g, '_'),
           schematic.name.replace(/\//g, '_'),
         ]);
+      }
+
+      // TODO: The below should be removed in version 15 when we change 1P schematics to use the `workingDirectory smart default`.
+      // Handle `"format": "path"` options.
+      const schema = schematic?.schemaJson;
+      if (!options || !schema || !isJsonObject(schema)) {
+        return options;
+      }
+
+      if (!('path' in options && (options as Record<string, unknown>)['path'] === undefined)) {
+        return options;
+      }
+
+      const properties = schema?.['properties'];
+      if (!properties || !isJsonObject(properties)) {
+        return options;
+      }
+
+      const property = properties['path'];
+      if (!property || !isJsonObject(property)) {
+        return options;
+      }
+
+      if (property['format'] === 'path' && !property['$default']) {
+        (options as Record<string, unknown>)['path'] = workingDir || undefined;
+        this.context.logger.warn(
+          `The 'path' option in '${schematic?.schema}' is using deprecated behaviour.` +
+            `'workingDirectory' smart default provider should be used instead.`,
+        );
       }
 
       return options;
@@ -356,9 +391,9 @@ export abstract class SchematicsCommandModule
     if (typeof defaultProjectName === 'string' && defaultProjectName) {
       if (!this.defaultProjectDeprecationWarningShown) {
         logger.warn(tags.oneLine`
-            DEPRECATED: The 'defaultProject' workspace option has been deprecated.
-            The project to use will be determined from the current working directory.
-          `);
+             DEPRECATED: The 'defaultProject' workspace option has been deprecated.
+             The project to use will be determined from the current working directory.
+           `);
 
         this.defaultProjectDeprecationWarningShown = true;
       }

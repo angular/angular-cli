@@ -17,7 +17,9 @@
     },
     "path": {
       "type": "string",
-      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
       "description": "The path at which to create the service, relative to the workspace root.",
       "visible": false
     },
