@@ -130,7 +130,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         alias: ['C'],
         default: false,
       })
-      .check(({ packages, next, 'allow-dirty': allowDirty, 'migrate-only': migrateOnly }) => {
+      .check(({ packages, 'allow-dirty': allowDirty, 'migrate-only': migrateOnly }) => {
         const { logger } = this.context;
 
         // This allows the user to easily reset any changes from the update.
@@ -151,10 +151,6 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
             throw new CommandModuleError(
               `A single package must be specified when using the 'migrate-only' option.`,
             );
-          }
-
-          if (next) {
-            logger.warn(`'next' option has no effect when using 'migrate-only' option.`);
           }
         }
 
