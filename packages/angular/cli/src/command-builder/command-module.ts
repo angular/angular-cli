@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, logging, normalize, schema, strings } from '@angular-devkit/core';
+import { analytics, logging, schema, strings } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import {
@@ -197,8 +197,6 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
    * **Note:** This method should be called from the command bundler method.
    */
   protected addSchemaOptionsToCommand<T>(localYargs: Argv<T>, options: Option[]): Argv<T> {
-    const workingDir = normalize(path.relative(this.context.root, process.cwd()));
-
     for (const option of options) {
       const {
         default: defaultVal,
@@ -211,7 +209,6 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         hidden,
         name,
         choices,
-        format,
       } = option;
 
       const sharedOptions: YargsOptions & PositionalOptions = {
@@ -223,11 +220,6 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         // This should only be done when `--help` is used otherwise default will override options set in angular.json.
         ...(this.context.args.options.help ? { default: defaultVal } : {}),
       };
-
-      // Special case for schematics
-      if (workingDir && format === 'path' && name === 'path' && hidden) {
-        sharedOptions.default = workingDir;
-      }
 
       if (positional === undefined) {
         localYargs = localYargs.option(strings.dasherize(name), {

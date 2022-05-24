@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { schema, tags } from '@angular-devkit/core';
+import { normalize as devkitNormalize, isJsonObject, schema, tags } from '@angular-devkit/core';
 import { Collection, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
@@ -14,7 +14,7 @@ import {
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
 import type { CheckboxQuestion, Question } from 'inquirer';
-import { resolve } from 'path';
+import { relative, resolve } from 'path';
 import { Argv } from 'yargs';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
@@ -137,6 +137,8 @@ export abstract class SchematicsCommandModule
     workflow.registry.useXDeprecatedProvider((msg) => logger.warn(msg));
 
     let shouldReportAnalytics = true;
+    const workingDir = devkitNormalize(relative(this.context.root, process.cwd()));
+
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
       if (shouldReportAnalytics) {
         shouldReportAnalytics = false;
@@ -148,6 +150,30 @@ export abstract class SchematicsCommandModule
           schematic.collection.name.replace(/\//g, '_'),
           schematic.name.replace(/\//g, '_'),
         ]);
+      }
+
+      // Handle `"format": "path"` options.
+      const schema = schematic?.schemaJson;
+      if (!options || workingDir === '' || !schema || !isJsonObject(schema)) {
+        return options;
+      }
+
+      if (!('path' in options && (options as Record<string, unknown>)['path'] === undefined)) {
+        return options;
+      }
+
+      const properties = schema?.['properties'];
+      if (!properties || !isJsonObject(properties)) {
+        return options;
+      }
+
+      const property = properties['path'];
+      if (!property || !isJsonObject(property)) {
+        return options;
+      }
+
+      if (property['format'] === 'path') {
+        (options as Record<string, unknown>)['path'] = workingDir;
       }
 
       return options;
