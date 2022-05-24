@@ -15,6 +15,7 @@ You can specify more than one package. Each package follows the convention of `[
 | Flag             | Argument  | Description                                                                                                                                                                                 |
 | ---------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--force`        | `boolean` | If true, skip the verification step and perform the update even if some peer dependencies would be invalidated. Peer dependencies errors will still be shown as warning. Defaults to false. |
+| `--interactive`  | `boolean` | Ask for migration selection. Defaults to `true`. When set to `false` it uses the defaults for each migration.                                                                               |
 | `--next`         | `boolean` | If true, allows version discovery to include Beta and RC. Defaults to false.                                                                                                                |
 | `--migrate-only` | `boolean` | If true, don't change the `package.json` file, only apply migration scripts.                                                                                                                |
 | `--from`         | `version` | Apply migrations from a certain version number.                                                                                                                                             |
@@ -148,9 +149,9 @@ I have a dependency on Angular, Material and CLI. I want to update the CLI, then
 
 #### Details
 
-1. `ng update @angular/cli`.  
+1. `ng update @angular/cli`.
    Updates the CLI and packages that have a peer dependencies on the CLI (none), running refactoring tools from CLI 1 to 6.
-1. `ng update @angular/core`.  
+1. `ng update @angular/core`.
    Updates the Core package and all packages that have a peer dependency on it. This can get tricky if `@angular/material` get caught in the update because the version installed does not directly allow the new version of `@angular/core`. In this case
 
 ### Complex Case

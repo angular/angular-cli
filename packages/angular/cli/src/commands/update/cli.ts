@@ -41,12 +41,15 @@ import {
   readPackageJson,
 } from '../../utilities/package-tree';
 import { VERSION } from '../../utilities/version';
+import { CheckboxQuestion, CheckboxChoiceOptions } from 'inquirer';
+import { isTTY } from '../../utilities/tty';
 
 interface UpdateCommandArgs {
   packages?: string[];
   force: boolean;
   next: boolean;
   'migrate-only'?: boolean;
+  interactive?: boolean;
   name?: string;
   from?: string;
   to?: string;
@@ -88,6 +91,13 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       .option('migrate-only', {
         description: 'Only perform a migration, do not update the installed version.',
         type: 'boolean',
+        implies: ['no-interactive'],
+      })
+      .option('interactive', {
+        description:
+          'Ask for migration selection. Defaults to `true`. When set to `false` it uses the defaults for each migration.',
+        type: 'boolean',
+        default: true,
       })
       .option('name', {
         description:
@@ -333,14 +343,45 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     from: string,
     to: string,
     commit?: boolean,
+    interactive?: boolean,
   ): Promise<number> {
     const collection = workflow.engine.createCollection(collectionPath);
     const migrationRange = new semver.Range(
       '>' + (semver.prerelease(from) ? from.split('-')[0] + '-0' : from) + ' <=' + to.split('-')[0],
     );
     const migrations = [];
+    let migrationsToExecute: null | string[] = null;
+
+    if (interactive !== false && isTTY()) {
+      const migrationsListName = 'code_migrations';
+      const question: CheckboxQuestion = {
+        name: migrationsListName,
+        message: 'Please select the migrations you want to execute.',
+        type: 'checkbox',
+        choices: [],
+      };
+      const choices: CheckboxChoiceOptions[] = [];
+
+      for (const name of collection.listSchematicNames()) {
+        const schematic = workflow.engine.createSchematic(name, collection);
+        choices.push({
+          name: `${schematic.description.name}: ${schematic.description.description}`,
+          value: schematic.description.name,
+          checked: schematic.description.optional === true ? false : true,
+        });
+      }
+
+      if (choices.length) {
+        const { prompt } = await import('inquirer');
+        migrationsToExecute = (await prompt([{ ...question, choices }]))[migrationsListName];
+      }
+    }
 
     for (const name of collection.listSchematicNames()) {
+      if (migrationsToExecute !== null && !migrationsToExecute.includes(name)) {
+        continue;
+      }
+
       const schematic = workflow.engine.createSchematic(name, collection);
       const description = schematic.description as typeof schematic.description & {
         version?: string;
@@ -522,6 +563,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       from,
       options.to || packageNode.version,
       options.createCommits,
+      options.interactive,
     );
   }
 
@@ -785,6 +827,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           migration.from,
           migration.to,
           options.createCommits,
+          options.interactive,
         );
 
         // A non-zero value is a failure for the package's migrations

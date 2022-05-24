@@ -34,6 +34,7 @@ export interface FileSystemSchematicJsonDescription {
   readonly description: string;
   readonly schema?: string;
   readonly extends?: string;
+  readonly optional?: boolean;
 }
 
 export interface FileSystemSchematicDescription extends FileSystemSchematicJsonDescription {
