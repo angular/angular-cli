@@ -13,7 +13,8 @@
     "./utility": "./utility/index.js",
     "./utility/*": "./utility/*.js",
     "./migrations/migration-collection.json": "./migrations/migration-collection.json",
-    "./*": "./*.js"
+    "./*": "./*.js",
+    "./private/components": "./private/components.js"
   },
   "schematics": "./collection.json",
   "dependencies": {
