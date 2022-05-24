@@ -9,14 +9,14 @@
 import { workspaces } from '@angular-devkit/core';
 import { SchematicsException } from '@angular-devkit/schematics';
 import { Tree } from '@angular-devkit/schematics/src/tree/interface';
-import { getWorkspace } from '@schematics/angular/utility/workspace';
+import { readWorkspace } from '@schematics/angular/utility';
 import * as ts from 'typescript';
 
 export async function getProject(
   host: Tree,
   projectName: string,
 ): Promise<workspaces.ProjectDefinition> {
-  const workspace = await getWorkspace(host);
+  const workspace = await readWorkspace(host);
   const project = workspace.projects.get(projectName);
 
   if (!project || project.extensions.projectType !== 'application') {

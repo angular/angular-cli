@@ -22,17 +22,18 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {
+  DependencyType,
+  addDependency,
+  readWorkspace,
+  updateWorkspace,
+} from '@schematics/angular/utility';
+import {
   addImportToModule,
   findNode,
   getDecoratorMetadata,
 } from '@schematics/angular/utility/ast-utils';
 import { InsertChange, applyToUpdateRecorder } from '@schematics/angular/utility/change';
-import {
-  NodeDependencyType,
-  addPackageJsonDependency,
-} from '@schematics/angular/utility/dependencies';
 import { findBootstrapModulePath } from '@schematics/angular/utility/ng-ast-utils';
-import { getWorkspace, updateWorkspace } from '@schematics/angular/utility/workspace';
 import { posix } from 'path';
 import * as ts from 'typescript';
 
@@ -40,7 +41,7 @@ import { Schema as NgAddOptions } from './schema';
 
 export default function (options: NgAddOptions): Rule {
   return async (host, context) => {
-    const workspace = await getWorkspace(host);
+    const workspace = await readWorkspace(host);
     const project = workspace.projects.get(options.project);
 
     if (project.extensions.projectType !== 'application') {
@@ -59,37 +60,19 @@ export default function (options: NgAddOptions): Rule {
     return chain([
       augmentAppModuleRule(project, clientBuildTarget, options),
       options.ssr ? addSSRRule(project, clientBuildTarget) : noop(),
-      options.prerender ? addPreRenderRule() : noop(),
+      options.prerender
+        ? addDependency('@nguniversal/builders', '~0.0.0-PLACEHOLDER', {
+            type: DependencyType.Dev,
+          })
+        : noop(),
       addScriptsRule(options),
       updateWorkspaceRule(options),
     ]);
   };
 }
 
-function addPreRenderRule(): Rule {
-  return async (host) => {
-    addPackageJsonDependency(host, {
-      name: '@nguniversal/builders',
-      type: NodeDependencyType.Dev,
-      version: '~0.0.0-PLACEHOLDER',
-    });
-  };
-}
-
 function addSSRRule(project: ProjectDefinition, buildTarget: TargetDefinition): Rule {
-  return async (host) => {
-    addPackageJsonDependency(host, {
-      type: NodeDependencyType.Default,
-      name: 'express',
-      version: 'EXPRESS_VERSION',
-    });
-
-    addPackageJsonDependency(host, {
-      type: NodeDependencyType.Dev,
-      name: '@types/express',
-      version: 'EXPRESS_TYPES_VERSION',
-    });
-
+  return async () => {
     const templateSource = apply(url('./files/src'), [
       applyTemplates({}),
       move(project.sourceRoot ?? '/src'),
@@ -102,7 +85,17 @@ function addSSRRule(project: ProjectDefinition, buildTarget: TargetDefinition): 
       move(project.root),
     ]);
 
-    return chain([mergeWith(templateSource), mergeWith(rootSource)]);
+    return chain([
+      addDependency('express', 'EXPRESS_VERSION', {
+        type: DependencyType.Default,
+      }),
+
+      addDependency('@types/express', 'EXPRESS_TYPES_VERSION', {
+        type: DependencyType.Dev,
+      }),
+      mergeWith(templateSource),
+      mergeWith(rootSource),
+    ]);
   };
 }
 

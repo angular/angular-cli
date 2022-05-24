@@ -9,7 +9,6 @@
 import { dirname, join, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -21,14 +20,9 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
-import {
-  NodeDependencyType,
-  addPackageJsonDependency,
-} from '@schematics/angular/utility/dependencies';
+import { DependencyType, addDependency, updateWorkspace } from '@schematics/angular/utility';
 import { JSONFile } from '@schematics/angular/utility/json-file';
-import { updateWorkspace } from '@schematics/angular/utility/workspace';
 import * as ts from 'typescript';
 
 import {
@@ -263,34 +257,22 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
   };
 }
 
-function addDependencies(options: UniversalOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    if (!options.skipInstall) {
-      context.addTask(new NodePackageInstallTask());
-    }
-    addPackageJsonDependency(host, {
-      name: '@nguniversal/builders',
-      type: NodeDependencyType.Dev,
-      version: '^0.0.0-PLACEHOLDER',
-    });
-
-    addPackageJsonDependency(host, {
-      type: NodeDependencyType.Default,
-      name: '@nguniversal/express-engine',
-      version: '^0.0.0-PLACEHOLDER',
-    });
-    addPackageJsonDependency(host, {
-      type: NodeDependencyType.Default,
-      name: 'express',
-      version: 'EXPRESS_VERSION',
-    });
-    addPackageJsonDependency(host, {
-      type: NodeDependencyType.Dev,
-      name: '@types/express',
-      version: 'EXPRESS_TYPES_VERSION',
-    });
-
-    return host;
+function addDependencies(): Rule {
+  return (_host: Tree) => {
+    return chain([
+      addDependency('@nguniversal/builders', '^0.0.0-PLACEHOLDER', {
+        type: DependencyType.Dev,
+      }),
+      addDependency('@nguniversal/express-engine', '^0.0.0-PLACEHOLDER', {
+        type: DependencyType.Default,
+      }),
+      addDependency('express', 'EXPRESS_VERSION', {
+        type: DependencyType.Default,
+      }),
+      addDependency('@types/express', 'EXPRESS_TYPES_VERSION', {
+        type: DependencyType.Dev,
+      }),
+    ]);
   };
 }
 
@@ -333,7 +315,7 @@ export default function (options: AddUniversalOptions): Rule {
       updateWorkspaceConfigRule(options),
       routingInitialNavigationRule(options),
       addServerFile(options),
-      addDependencies(options),
+      addDependencies(),
     ]);
   };
 }
