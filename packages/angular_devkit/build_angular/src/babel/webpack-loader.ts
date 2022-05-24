@@ -72,18 +72,26 @@ export default custom<ApplicationPresetOptions>(() => {
 
   return {
     async customOptions(options, { source, map }) {
-      const { i18n, scriptTarget, aot, optimize, instrumentCode, ...rawOptions } =
-        options as AngularBabelLoaderOptions;
+      const {
+        i18n,
+        scriptTarget,
+        aot,
+        optimize,
+        instrumentCode,
+        supportedBrowsers,
+        ...rawOptions
+      } = options as AngularBabelLoaderOptions;
 
       // Must process file if plugins are added
       let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
 
       const customOptions: ApplicationPresetOptions = {
         forceAsyncTransformation: false,
-        forceES5: false,
+        forcePresetEnv: false,
         angularLinker: undefined,
         i18n: undefined,
         instrumentCode: undefined,
+        supportedBrowsers,
       };
 
       // Analyze file for linking
@@ -107,19 +115,34 @@ export default custom<ApplicationPresetOptions>(() => {
 
       // Analyze for ES target processing
       const esTarget = scriptTarget as ScriptTarget | undefined;
-      if (esTarget !== undefined) {
-        if (esTarget < ScriptTarget.ES2015) {
-          customOptions.forceES5 = true;
-        } else if (esTarget >= ScriptTarget.ES2017 || /\.[cm]?js$/.test(this.resourcePath)) {
-          // Application code (TS files) will only contain native async if target is ES2017+.
-          // However, third-party libraries can regardless of the target option.
-          // APF packages with code in [f]esm2015 directories is downlevelled to ES2015 and
-          // will not have native async.
-          customOptions.forceAsyncTransformation =
-            !/[\\/][_f]?esm2015[\\/]/.test(this.resourcePath) && source.includes('async');
-        }
-        shouldProcess ||= customOptions.forceAsyncTransformation || customOptions.forceES5 || false;
+      const isJsFile = /\.[cm]?js$/.test(this.resourcePath);
+
+      // The below should be dropped when we no longer support ES5 TypeScript output.
+      if (esTarget === ScriptTarget.ES5) {
+        // This is needed because when target is ES5 we change the TypeScript target to ES2015
+        // because it simplifies build-optimization passes.
+        // @see https://github.com/angular/angular-cli/blob/22af6520834171d01413d4c7e4a9f13fb752252e/packages/angular_devkit/build_angular/src/webpack/plugins/typescript.ts#L51-L56
+        customOptions.forcePresetEnv = true;
+        // Comparable behavior to tsconfig target of ES5
+        customOptions.supportedBrowsers = ['IE 9'];
+      } else if (isJsFile) {
+        // Applications code ES version can be controlled using TypeScript's `target` option.
+        // However, this doesn't effect libraries and hence we use preset-env to downlevel ES fetaures
+        // based on the supported browsers in browserlist.
+        customOptions.forcePresetEnv = true;
       }
+
+      if ((esTarget !== undefined && esTarget >= ScriptTarget.ES2017) || isJsFile) {
+        // Application code (TS files) will only contain native async if target is ES2017+.
+        // However, third-party libraries can regardless of the target option.
+        // APF packages with code in [f]esm2015 directories is downlevelled to ES2015 and
+        // will not have native async.
+        customOptions.forceAsyncTransformation =
+          !/[\\/][_f]?esm2015[\\/]/.test(this.resourcePath) && source.includes('async');
+      }
+
+      shouldProcess ||=
+        customOptions.forceAsyncTransformation || customOptions.forcePresetEnv || false;
 
       // Analyze for i18n inlining
       if (
