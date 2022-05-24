@@ -53,7 +53,7 @@
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
     "sass": "1.52.1",
-    "sass-loader": "12.6.0",
+    "sass-loader": "13.0.0",
     "semver": "7.3.7",
     "source-map-loader": "3.0.1",
     "source-map-support": "0.5.21",

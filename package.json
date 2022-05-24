@@ -192,7 +192,7 @@
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
     "sass": "1.52.1",
-    "sass-loader": "12.6.0",
+    "sass-loader": "13.0.0",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz",
     "semver": "7.3.7",
     "shelljs": "^0.8.5",
