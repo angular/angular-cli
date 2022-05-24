@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { logging } from '@angular-devkit/core';
 import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
@@ -141,12 +142,12 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile(
         'src/main.ts',
         `
-        (async () => {
-          for await (const o of [1, 2, 3]) {
-            console.log("for await...of");
-          }
-        })();
-        `,
+         (async () => {
+           for await (const o of [1, 2, 3]) {
+             console.log("for await...of");
+           }
+         })();
+         `,
       );
 
       harness.useTarget('build', {
@@ -176,14 +177,14 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile(
         'src/es2015-syntax.js',
         `
-          class foo {
-            bar() {
-              console.log('baz');
-            }
-          }
+           class foo {
+             bar() {
+               console.log('baz');
+             }
+           }
 
-          (new foo()).bar();
-        `,
+           (new foo()).bar();
+         `,
       );
 
       harness.useTarget('build', {
@@ -197,6 +198,56 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
+    });
+
+    it('a deprecation warning should be issued when targetting ES5', async () => {
+      await harness.modifyFile('src/tsconfig.app.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        if (!tsconfig.compilerOptions) {
+          tsconfig.compilerOptions = {};
+        }
+        tsconfig.compilerOptions.target = 'es5';
+
+        return JSON.stringify(tsconfig);
+      });
+      await harness.writeFiles({
+        'src/tsconfig.worker.json': `{
+          "extends": "../tsconfig.json",
+          "compilerOptions": {
+            "outDir": "../out-tsc/worker",
+            "lib": [
+              "es2018",
+              "webworker"
+            ],
+            "types": []
+          },
+          "include": [
+            "**/*.worker.ts",
+          ]
+        }`,
+        'src/app/app.worker.ts': `
+        /// <reference lib="webworker" />
+
+        const prefix: string = 'Data: ';
+        addEventListener('message', ({ data }) => {
+          postMessage(prefix + data);
+        });
+      `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        webWorkerTsConfig: 'src/tsconfig.worker.json',
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const deprecationMessages = logs.filter(({ message }) =>
+        message.startsWith('DEPRECATED: ES5 output is deprecated'),
+      );
+
+      expect(deprecationMessages).toHaveSize(1);
     });
   });
 });
