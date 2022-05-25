@@ -1,3 +1,29 @@
+<a name="14.0.0-rc.2"></a>
+
+# 14.0.0-rc.2 (2022-05-25)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [3012036e8](https://github.com/angular/angular-cli/commit/3012036e81fc6e5fc6c0f1df7ec626f91285673e) | fix  | populate path with working directory in nested schematics |
+| [142da460b](https://github.com/angular/angular-cli/commit/142da460b22e07a5a37b6140b50663446c3a2dbf) | fix  | remove incorrect warning during `ng update`               |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [1b27af07e](https://github.com/angular/angular-cli/commit/1b27af07e1116d505a41b1146db7e735f411ddaa) | fix  | add debugging and timing information in JavaScript and CSS optimization plugins |
+| [72e820e7b](https://github.com/angular/angular-cli/commit/72e820e7b2bc6904b030f1092bbb610334a4036f) | fix  | better handle Windows paths in esbuild experimental builder                     |
+| [c52d10d1f](https://github.com/angular/angular-cli/commit/c52d10d1fc4b70483a2043edfa73dc0f323f6bf1) | fix  | close dev-server on error                                                       |
+| [4d5f6c659](https://github.com/angular/angular-cli/commit/4d5f6c65918c1a8a4bde0a0af01089242d1cdc4a) | fix  | downlevel libraries based on the browserslist configurations                    |
+
+## Special Thanks
+
+Alan Agius, Joey Perrott and Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.7"></a>
 
 # 13.3.7 (2022-05-25)
