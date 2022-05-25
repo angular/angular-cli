@@ -281,7 +281,7 @@ async function bundleCode(
     assetNames: outputNames.media,
     target: 'es2020',
     mainFields: ['es2020', 'browser', 'module', 'main'],
-    conditions: ['es2020', 'module'],
+    conditions: ['es2020', 'es2015', 'module'],
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
     logLevel: options.verbose ? 'debug' : 'silent',
     metafile: true,
