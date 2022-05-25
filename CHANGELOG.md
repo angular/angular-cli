@@ -1,3 +1,19 @@
+<a name="13.3.7"></a>
+
+# 13.3.7 (2022-05-25)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [a54018d8f](https://github.com/angular/angular-cli/commit/a54018d8f5f976034bf0a33f826245b7a6b74bbe) | fix  | add debugging and timing information in JavaScript and CSS optimization plugins |
+
+## Special Thanks
+
+Alan Agius and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.6"></a>
 
 # 13.3.6 (2022-05-18)
