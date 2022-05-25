@@ -33,7 +33,14 @@ export async function prepareProjectForE2e(name) {
   await git('config', 'user.name', 'Angular CLI E2e');
   await git('config', 'commit.gpgSign', 'false');
 
-  await ng('generate', '@schematics/angular:e2e', '--related-app-name', name);
+  if (argv['ng-snapshots'] || argv['ng-tag']) {
+    await useSha();
+  }
+
+  console.log(`Project ${name} created... Installing packages.`);
+  await installWorkspacePackages();
+
+  await ng('generate', 'e2e', '--related-app-name', name);
 
   await useCIChrome('e2e');
   await useCIChrome('');
@@ -41,12 +48,6 @@ export async function prepareProjectForE2e(name) {
   // legacy projects
   await useCIChrome('src');
 
-  if (argv['ng-snapshots'] || argv['ng-tag']) {
-    await useSha();
-  }
-
-  console.log(`Project ${name} created... Installing npm.`);
-  await installWorkspacePackages();
   await useCIDefaults(name);
   // Force sourcemaps to be from the root of the filesystem.
   await updateJsonFile('tsconfig.json', (json) => {
