@@ -7,6 +7,7 @@ const globAsync = promisify(glob);
 const CURRENT_SCRIPT_PACKAGES: ReadonlySet<string> = new Set([
   'esbuild (postinstall)',
   'nice-napi (install)',
+  'sass-embedded (postinstall)',
 ]);
 
 const POTENTIAL_SCRIPTS: ReadonlyArray<string> = ['preinstall', 'install', 'postinstall'];

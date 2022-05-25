@@ -21,7 +21,7 @@ interface NodePackageInstallTaskOptions {
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
   quiet = true;
   hideOutput = true;
-  allowScripts = false;
+  allowScripts = true;
   workingDirectory?: string;
   packageManager?: string;
   packageName?: string;

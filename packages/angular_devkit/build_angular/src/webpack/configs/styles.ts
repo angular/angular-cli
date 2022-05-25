@@ -276,13 +276,13 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
         {
           loader: require.resolve('sass-loader'),
           options: {
-            implementation: sassImplementation,
+            implementation: require('sass-embedded'),
             sourceMap: true,
             sassOptions: {
               // Prevent use of `fibers` package as it no longer works in newer Node.js versions
               fiber: false,
               // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
+              //   precision: 8,
               includePaths,
               // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
               // Ex: /* autoprefixer grid: autoplace */
@@ -308,14 +308,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
         {
           loader: require.resolve('sass-loader'),
           options: {
-            implementation: sassImplementation,
+            implementation: require('sass-embedded'),
             sourceMap: true,
             sassOptions: {
               // Prevent use of `fibers` package as it no longer works in newer Node.js versions
               fiber: false,
               indentedSyntax: true,
               // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
+              //    precision: 8,
               includePaths,
               // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
               // Ex: /* autoprefixer grid: autoplace */
