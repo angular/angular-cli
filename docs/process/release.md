@@ -11,16 +11,27 @@ $ git remote add upstream https://github.com/angular/angular-cli.git
 
 The caretaker should triage issues, merge PR, and sheppard the release.
 
-Caretaker calendar can be found [here](https://calendar.google.com/calendar/embed?src=angular.io_jf53juok1lhpm84hv6bo6fmgbc%40group.calendar.google.com&ctz=America%2FLos_Angeles).
+Caretaker rotation can be found
+[here](https://rotations.corp.google.com/rotation/5117919353110528) and individual shifts can
+be modified as necessary to accomodate caretaker's schedules. This automatically syncs to a
+Google Calendar
+[here](https://calendar.google.com/calendar/u/0/embed?src=c_6s96kkvd7nhink3e2gnkvfrt1g@group.calendar.google.com).
+Click the "+" button in the bottom right to add it to your calendar to see shifts alongside the
+rest of your schedule.
 
-Each shift consists of two caretakers. The primary caretaker is responsible for
-merging PRs to `main` and patch whereas the secondary caretaker is responsible
-for the release.
+The primary caretaker is responsible for both merging PRs and performing the weekly release.
+The secondary caretaker does not have any _direct_ responsibilities, but they may need to take
+over the primary's responsibilities if the primary is unavailable for an extended time (a day
+or more) or in the event of an emergency.
 
-At the end of each caretaker's rotation, they should peform a handoff in which they provide
-information to the next caretaker about the current state of the repository and update the
-access group to now include the next caretaker and their secondary. To perform this update
-to the access group, the caretaker can run:
+The primary is also responsible for releasing
+[Angular Universal](https://github.com/angular/universal/), but _not_ responsible for merging
+PRs.
+
+At the end of each caretaker's rotation, the primary should peform a handoff in which they
+provide information to the next caretaker about the current state of the repository and update
+the access group to now include the next caretakers. To perform this update to the access group,
+the caretaker can run:
 
 ```bash
 $ yarn ng-dev caretaker handoff
@@ -95,12 +106,14 @@ navigate the prompts:
 yarn ng-dev release publish
 ```
 
-## Changing shifts
+Releases should be done in "reverse semver order", meaning they should follow:
 
-If you need to update the
-[caretaker calendar](https://calendar.google.com/calendar/embed?src=angular.io_jf53juok1lhpm84hv6bo6fmgbc%40group.calendar.google.com&ctz=America%2FLos_Angeles)
-to modify shifts, **make sure you are logged in as your @angular.io account** and
-click the "+ Google Calendar" button in the bottom right to add it to your Google
-Calendar account. You should then be able to find and modify events on
-calendar.google.com. The calendar is a part of the `angular.io` organization, so
-events can only be modified by users in the same organization.
+Oldest LTS -> Newest LTS -> Patch -> RC -> Next
+
+This can skip any versions which don't need releases, so most weeks are just "Patch -> Next".
+
+### Angular Universal
+
+After CLI releases, the primary is also responsible for releasing Angular Universal if necessary.
+Follow [the instructions there](https://github.com/angular/universal/blob/main/docs/process/release.md)
+for the release process. If there are no changes to Universal, then the release can be skipped.
