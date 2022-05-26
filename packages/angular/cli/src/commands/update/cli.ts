@@ -686,8 +686,26 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         });
       } catch {}
 
+      let forceInstall = options.force;
+      // npm 7+ can fail due to it incorrectly resolving peer dependencies that have valid SemVer
+      // ranges during an update. Update will set correct versions of dependencies within the
+      // package.json file. The force option is set to workaround these errors.
+      // Example error:
+      // npm ERR! Conflicting peer dependency: @angular/compiler-cli@14.0.0-rc.0
+      // npm ERR! node_modules/@angular/compiler-cli
+      // npm ERR!   peer @angular/compiler-cli@"^14.0.0 || ^14.0.0-rc" from @angular-devkit/build-angular@14.0.0-rc.0
+      // npm ERR!   node_modules/@angular-devkit/build-angular
+      // npm ERR!     dev @angular-devkit/build-angular@"~14.0.0-rc.0" from the root project
+      if (
+        this.context.packageManager.name === PackageManager.Npm &&
+        this.context.packageManager.version &&
+        semver.gte(this.context.packageManager.version, '7.0.0', { includePrerelease: true })
+      ) {
+        logVerbose('NPM 7+ detected -- enabling force option for package installation');
+        forceInstall = true;
+      }
       const installationSuccess = await this.context.packageManager.installAll(
-        options.force ? ['--force'] : [],
+        forceInstall ? ['--force'] : [],
         this.context.root,
       );
 
