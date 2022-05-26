@@ -83,8 +83,8 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
-      - run: nvm install 14.19
-      - run: nvm use 14.19
+      - run: nvm install 16.10
+      - run: nvm use 16.10
       - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
