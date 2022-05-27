@@ -15,7 +15,6 @@ import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
 import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options';
 
 interface PackageManagerProfile {
-  quietArgument?: string;
   commands: {
     installAll?: string;
     installPackage: string;
@@ -24,7 +23,6 @@ interface PackageManagerProfile {
 
 const packageManagers: { [name: string]: PackageManagerProfile } = {
   'npm': {
-    quietArgument: '--quiet',
     commands: {
       installAll: 'install',
       installPackage: 'install',
@@ -37,13 +35,11 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
     },
   },
   'yarn': {
-    quietArgument: '--silent',
     commands: {
       installPackage: 'add',
     },
   },
   'pnpm': {
-    quietArgument: '--silent',
     commands: {
       installAll: 'install',
       installPackage: 'install',
@@ -81,10 +77,15 @@ export default function (
 
     const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
     const spawnOptions: SpawnOptions = {
-      stdio: options.hideOutput ? 'pipe' : 'inherit',
       shell: true,
       cwd: path.join(rootDirectory, options.workingDirectory || ''),
     };
+    if (options.hideOutput) {
+      spawnOptions.stdio = options.quiet ? ['ignore', 'ignore', 'pipe'] : 'pipe';
+    } else {
+      spawnOptions.stdio = options.quiet ? ['ignore', 'ignore', 'inherit'] : 'inherit';
+    }
+
     const args: string[] = [];
 
     if (options.packageName) {
@@ -94,10 +95,6 @@ export default function (
       args.push(options.packageName);
     } else if (options.command === 'install' && taskPackageManagerProfile.commands.installAll) {
       args.push(taskPackageManagerProfile.commands.installAll);
-    }
-
-    if (options.quiet && taskPackageManagerProfile.quietArgument) {
-      args.push(taskPackageManagerProfile.quietArgument);
     }
 
     if (!options.allowScripts) {
