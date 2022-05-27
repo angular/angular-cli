@@ -98,10 +98,9 @@ const tests = allTests.filter((name) => {
 });
 
 // Remove tests that are not part of this shard.
-const shardedTests = tests.filter((name, i) => shardId === null || i % nbShards == shardId);
-const testsToRun = allSetups.concat(shardedTests);
+const testsToRun = tests.filter((name, i) => shardId === null || i % nbShards == shardId);
 
-if (shardedTests.length === 0) {
+if (testsToRun.length === 0) {
   console.log(`No tests would be ran, aborting.`);
   process.exit(1);
 }
@@ -114,28 +113,27 @@ console.log(testsToRun.join('\n'));
 if (testsToRun.length == allTests.length) {
   console.log(`Running ${testsToRun.length} tests`);
 } else {
-  console.log(`Running ${testsToRun.length} tests (${allTests.length + allSetups.length} total)`);
+  console.log(`Running ${testsToRun.length} tests (${allTests.length} total)`);
 }
 
 setGlobalVariable('argv', argv);
 setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
+let lastTestRun: string | null = null;
+
 Promise.all([findFreePort(), findFreePort()])
   .then(async ([httpPort, httpsPort]) => {
     setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
     setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
-
-    let lastTestRun: string | null = null;
 
     // NPM registries for the lifetime of the test execution
     const registryProcess = await createNpmRegistry(httpPort, httpPort);
     const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
 
     try {
-      for (const [testIndex, test] of testsToRun.entries()) {
-        await runTest((lastTestRun = test), testIndex);
-      }
+      await runSteps(runSetup, allSetups, 'setup');
+      await runSteps(runTest, testsToRun, 'test');
 
       console.log(colors.green('Done.'));
     } catch (err) {
@@ -165,16 +163,43 @@ Promise.all([findFreePort(), findFreePort()])
     () => process.exit(1),
   );
 
-async function runTest(relativeName: string, testIndex: number) {
-  // Make sure this is a windows compatible path.
-  let absoluteName = path.join(e2eRoot, relativeName);
-  if (/^win/.test(process.platform)) {
-    absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+async function runSteps(
+  run: (name: string) => Promise<void> | void,
+  steps: string[],
+  type: 'setup' | 'test',
+) {
+  for (const [stepIndex, relativeName] of steps.entries()) {
+    // Make sure this is a windows compatible path.
+    let absoluteName = path.join(e2eRoot, relativeName).replace(/\.ts$/, '');
+    if (/^win/.test(process.platform)) {
+      absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+    }
+
+    const name = relativeName.replace(/\.ts$/, '');
+    const start = Date.now();
+
+    printHeader(relativeName, stepIndex, steps.length, type);
+
+    // Run the test function with the current file on the logStack.
+    logStack.push(lastLogger().createChild(absoluteName));
+    try {
+      await run((lastTestRun = absoluteName));
+    } finally {
+      logStack.pop();
+    }
+
+    console.log('----');
+    printFooter(name, type, start);
   }
+}
 
-  const currentFileName = relativeName.replace(/\.ts$/, '');
-  const start = +new Date();
+async function runSetup(absoluteName: string) {
+  const module = require(absoluteName);
 
+  await (typeof module === 'function' ? module : module.default)();
+}
+
+async function runTest(absoluteName: string) {
   const module = require(absoluteName);
   const originalEnvVariables = {
     ...process.env,
@@ -189,70 +214,50 @@ async function runTest(relativeName: string, testIndex: number) {
           throw new Error('Invalid test module.');
         };
 
-  printHeader(currentFileName, testIndex);
-
   let clean = true;
   let previousDir = process.cwd();
-  try {
-    // Run the test function with the current file on the logStack.
-    logStack.push(lastLogger().createChild(currentFileName));
+
+  await fn(() => (clean = false));
+
+  // Change the directory back to where it was before the test.
+  // This allows tests to chdir without worrying about keeping the original directory.
+  if (previousDir) {
+    process.chdir(previousDir);
+
+    // Restore env variables before each test.
+    console.log('Restoring original environment variables...');
+    process.env = originalEnvVariables;
+  }
+
+  // Skip cleaning if the test requested an exception.
+  if (clean) {
+    logStack.push(new logging.NullLogger());
     try {
-      await fn(() => (clean = false));
+      await gitClean();
     } finally {
       logStack.pop();
     }
-
-    console.log('----');
-
-    // If we're not in a setup, change the directory back to where it was before the test.
-    // This allows tests to chdir without worrying about keeping the original directory.
-    if (!allSetups.includes(relativeName) && previousDir) {
-      process.chdir(previousDir);
-
-      // Restore env variables before each test.
-      console.log('  Restoring original environment variables...');
-      process.env = originalEnvVariables;
-    }
-
-    // Only clean after a real test, not a setup step. Also skip cleaning if the test
-    // requested an exception.
-    if (!allSetups.includes(relativeName) && clean) {
-      logStack.push(new logging.NullLogger());
-      try {
-        await gitClean();
-      } finally {
-        logStack.pop();
-      }
-    }
-
-    printFooter(currentFileName, start);
-  } catch (err) {
-    printFooter(currentFileName, start);
-    console.error(err);
-    throw err;
   }
 }
 
-function printHeader(testName: string, testIndex: number) {
-  const text = `${testIndex + 1} of ${testsToRun.length}`;
-  const fullIndex =
-    (testIndex < allSetups.length
-      ? testIndex
-      : (testIndex - allSetups.length) * nbShards + shardId + allSetups.length) + 1;
-  const length = tests.length + allSetups.length;
+function printHeader(testName: string, testIndex: number, count: number, type: 'setup' | 'test') {
+  const text = `${testIndex + 1} of ${count}`;
+  const fullIndex = testIndex * nbShards + shardId + 1;
   const shard =
-    shardId === null
+    shardId === null || type !== 'test'
       ? ''
-      : colors.yellow(` [${shardId}:${nbShards}]` + colors.bold(` (${fullIndex}/${length})`));
+      : colors.yellow(` [${shardId}:${nbShards}]` + colors.bold(` (${fullIndex}/${tests.length})`));
   console.log(
-    colors.green(`Running "${colors.bold.blue(testName)}" (${colors.bold.white(text)}${shard})...`),
+    colors.green(
+      `Running ${type} "${colors.bold.blue(testName)}" (${colors.bold.white(text)}${shard})...`,
+    ),
   );
 }
 
-function printFooter(testName: string, startTime: number) {
+function printFooter(testName: string, type: 'setup' | 'test', startTime: number) {
   // Round to hundredth of a second.
   const t = Math.round((Date.now() - startTime) / 10) / 100;
-  console.log(colors.green('Last step took ') + colors.bold.blue('' + t) + colors.green('s...'));
+  console.log(colors.green(`Last ${type} took `) + colors.bold.blue('' + t) + colors.green('s...'));
   console.log('');
 }
 
