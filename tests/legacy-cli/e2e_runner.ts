@@ -70,7 +70,6 @@ function lastLogger() {
 }
 
 const testGlob = argv.glob || 'tests/**/*.ts';
-let currentFileName = '';
 
 const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync('setup/**/*.ts', { nodir: true, cwd: e2eRoot }).sort();
@@ -122,124 +121,117 @@ setGlobalVariable('argv', argv);
 setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
-Promise.all([findFreePort(), findFreePort()]).then(async ([httpPort, httpsPort]) => {
-  setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
-  setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
+Promise.all([findFreePort(), findFreePort()])
+  .then(async ([httpPort, httpsPort]) => {
+    setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
+    setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
 
-  const registryProcess = await createNpmRegistry(httpPort, httpPort);
-  const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
+    let lastTestRun: string | null = null;
 
-  return (
-    testsToRun
-      .reduce((previous, relativeName, testIndex) => {
-        // Make sure this is a windows compatible path.
-        let absoluteName = path.join(e2eRoot, relativeName);
-        if (/^win/.test(process.platform)) {
-          absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+    // NPM registries for the lifetime of the test execution
+    const registryProcess = await createNpmRegistry(httpPort, httpPort);
+    const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
+
+    try {
+      for (const [testIndex, test] of testsToRun.entries()) {
+        await runTest((lastTestRun = test), testIndex);
+      }
+
+      console.log(colors.green('Done.'));
+    } catch (err) {
+      console.log('\n');
+      console.error(colors.red(`Test "${lastTestRun}" failed...`));
+      console.error(colors.red(err.message));
+      console.error(colors.red(err.stack));
+
+      if (argv.debug) {
+        console.log(`Current Directory: ${process.cwd()}`);
+        console.log('Will loop forever while you debug... CTRL-C to quit.');
+
+        /* eslint-disable no-constant-condition */
+        while (1) {
+          // That's right!
         }
+      }
 
-        return previous.then(() => {
-          currentFileName = relativeName.replace(/\.ts$/, '');
-          const start = +new Date();
-
-          const module = require(absoluteName);
-          const originalEnvVariables = {
-            ...process.env,
-          };
-
-          const fn: (skipClean?: () => void) => Promise<void> | void =
-            typeof module == 'function'
-              ? module
-              : typeof module.default == 'function'
-              ? module.default
-              : () => {
-                  throw new Error('Invalid test module.');
-                };
-
-          let clean = true;
-          let previousDir: string | null = null;
-
-          return Promise.resolve()
-            .then(() => printHeader(currentFileName, testIndex))
-            .then(() => (previousDir = process.cwd()))
-            .then(() => logStack.push(lastLogger().createChild(currentFileName)))
-            .then(() => fn(() => (clean = false)))
-            .then(
-              () => logStack.pop(),
-              (err) => {
-                logStack.pop();
-                throw err;
-              },
-            )
-            .then(() => console.log('----'))
-            .then(() => {
-              // If we're not in a setup, change the directory back to where it was before the test.
-              // This allows tests to chdir without worrying about keeping the original directory.
-              if (!allSetups.includes(relativeName) && previousDir) {
-                process.chdir(previousDir);
-
-                // Restore env variables before each test.
-                console.log('  Restoring original environment variables...');
-                process.env = originalEnvVariables;
-              }
-            })
-            .then(() => {
-              // Only clean after a real test, not a setup step. Also skip cleaning if the test
-              // requested an exception.
-              if (!allSetups.includes(relativeName) && clean) {
-                logStack.push(new logging.NullLogger());
-                return gitClean().then(
-                  () => logStack.pop(),
-                  (err) => {
-                    logStack.pop();
-                    throw err;
-                  },
-                );
-              }
-            })
-            .then(
-              () => printFooter(currentFileName, start),
-              (err) => {
-                printFooter(currentFileName, start);
-                console.error(err);
-                throw err;
-              },
-            );
-        });
-      }, Promise.resolve())
-      // Output success vs failure information.
-      .then(
-        () => console.log(colors.green('Done.')),
-        (err) => {
-          console.log('\n');
-          console.error(colors.red(`Test "${currentFileName}" failed...`));
-          console.error(colors.red(err.message));
-          console.error(colors.red(err.stack));
-
-          if (argv.debug) {
-            console.log(`Current Directory: ${process.cwd()}`);
-            console.log('Will loop forever while you debug... CTRL-C to quit.');
-
-            /* eslint-disable no-constant-condition */
-            while (1) {
-              // That's right!
-            }
-          }
-
-          return Promise.reject(err);
-        },
-      )
-      // Kill the registry processes before exiting.
-      .finally(() => {
-        registryProcess.kill();
-        secureRegistryProcess.kill();
-      })
-      .then(
-        () => process.exit(0),
-        () => process.exit(1),
-      )
+      throw err;
+    } finally {
+      registryProcess.kill();
+      secureRegistryProcess.kill();
+    }
+  })
+  .then(
+    () => process.exit(0),
+    () => process.exit(1),
   );
-});
+
+async function runTest(relativeName: string, testIndex: number) {
+  // Make sure this is a windows compatible path.
+  let absoluteName = path.join(e2eRoot, relativeName);
+  if (/^win/.test(process.platform)) {
+    absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+  }
+
+  const currentFileName = relativeName.replace(/\.ts$/, '');
+  const start = +new Date();
+
+  const module = require(absoluteName);
+  const originalEnvVariables = {
+    ...process.env,
+  };
+
+  const fn: (skipClean?: () => void) => Promise<void> | void =
+    typeof module == 'function'
+      ? module
+      : typeof module.default == 'function'
+      ? module.default
+      : () => {
+          throw new Error('Invalid test module.');
+        };
+
+  printHeader(currentFileName, testIndex);
+
+  let clean = true;
+  let previousDir = process.cwd();
+  try {
+    // Run the test function with the current file on the logStack.
+    logStack.push(lastLogger().createChild(currentFileName));
+    try {
+      await fn(() => (clean = false));
+    } finally {
+      logStack.pop();
+    }
+
+    console.log('----');
+
+    // If we're not in a setup, change the directory back to where it was before the test.
+    // This allows tests to chdir without worrying about keeping the original directory.
+    if (!allSetups.includes(relativeName) && previousDir) {
+      process.chdir(previousDir);
+
+      // Restore env variables before each test.
+      console.log('  Restoring original environment variables...');
+      process.env = originalEnvVariables;
+    }
+
+    // Only clean after a real test, not a setup step. Also skip cleaning if the test
+    // requested an exception.
+    if (!allSetups.includes(relativeName) && clean) {
+      logStack.push(new logging.NullLogger());
+      try {
+        await gitClean();
+      } finally {
+        logStack.pop();
+      }
+    }
+
+    printFooter(currentFileName, start);
+  } catch (err) {
+    printFooter(currentFileName, start);
+    console.error(err);
+    throw err;
+  }
+}
 
 function printHeader(testName: string, testIndex: number) {
   const text = `${testIndex + 1} of ${testsToRun.length}`;
