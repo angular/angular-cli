@@ -101,7 +101,18 @@ export default function (
     }
 
     if (!options.allowScripts) {
-      args.push('--ignore-scripts');
+      // Yarn requires special handling since Yarn 2+ no longer has the `--ignore-scripts` flag
+      if (taskPackageManagerName === 'yarn') {
+        spawnOptions.env = {
+          ...process.env,
+          // Supported with yarn 1
+          'npm_config_ignore_scripts': 'true',
+          // Supported with yarn 2+
+          'YARN_ENABLE_SCRIPTS': 'false',
+        };
+      } else {
+        args.push('--ignore-scripts');
+      }
     }
 
     if (factoryOptions.registry) {
