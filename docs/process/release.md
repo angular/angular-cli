@@ -87,9 +87,23 @@ or a separate PR after FW releases but before CLI releases.
 
 **For a major release:**
 
-When a release is transitioning from a prerelease to a stable release, the semver ranges for Angular dependencies within the packages' `package.json` files will need to be updated to remove the prerelease version segment.
-For example, `"@angular/compiler-cli": "^13.0.0 || ^13.0.0-next"` in a prerelease should become `"@angular/compiler-cli": "^13.0.0"` in the stable release.
-The current packages that require adjustment are:
+**As part of the release PR**, make sure to:
+
+- modify
+  [`latest-versions.ts`](https://github.com/angular/angular-cli/blob/main/packages/schematics/angular/utility/latest-versions.ts#L18)
+  so the Angular semver is updated from `~13.0.0-rc` to just `~13.0.0`.
+  - This is the version generated in `ng new` schematics and needs to be updated to avoid having
+    users generate projects with `-rc` in the dependencies.
+- update the
+  [`ng-packagr`](https://github.com/angular/angular-cli/blob/main/packages/schematics/angular/utility/latest-versions/package.json#L15)
+  dependency to a stable version (ex. from `^13.0.0-next.0` to `^13.0.0`).
+
+When a release is transitioning from a prerelease to a stable release, the semver ranges for Angular
+dependencies within the packages' `package.json` files will need to be updated to remove the
+prerelease version segment. For example, `"@angular/compiler-cli": "^13.0.0 || ^13.0.0-next"` in a
+prerelease should become `"@angular/compiler-cli": "^13.0.0"` in the stable release. This can happen
+as a follow-up item _after_ the release PR and the stable release, actually shipped in the `13.0.1`
+release. The current packages that require adjustment are:
 
 - `@angular-devkit/build-angular`: [packages/angular_devkit/build_angular/package.json](/packages/angular_devkit/build_angular/package.json)
 - `@ngtools/webpack`: [packages/ngtools/webpack/package.json](/packages/ngtools/webpack/package.json)
