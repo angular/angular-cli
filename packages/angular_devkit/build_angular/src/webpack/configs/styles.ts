@@ -121,19 +121,10 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   const extraPostcssPlugins: import('postcss').Plugin[] = [];
 
   // Attempt to setup Tailwind CSS
-  // A configuration file can exist in the project or workspace root
-  const tailwindConfigFile = 'tailwind.config.js';
-  let tailwindConfigPath;
-  for (const basePath of [wco.projectRoot, wco.root]) {
-    const fullPath = path.join(basePath, tailwindConfigFile);
-    if (fs.existsSync(fullPath)) {
-      tailwindConfigPath = fullPath;
-      break;
-    }
-  }
   // Only load Tailwind CSS plugin if configuration file was found.
   // This acts as a guard to ensure the project actually wants to use Tailwind CSS.
   // The package may be unknowningly present due to a third-party transitive package dependency.
+  const tailwindConfigPath = getTailwindConfigPath(wco);
   if (tailwindConfigPath) {
     let tailwindPackagePath;
     try {
@@ -401,4 +392,22 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     },
     plugins: extraPlugins,
   };
+}
+
+function getTailwindConfigPath({ projectRoot, root }: WebpackConfigOptions): string | undefined {
+  // A configuration file can exist in the project or workspace root
+  // The list of valid config files can be found:
+  // https://github.com/tailwindlabs/tailwindcss/blob/8845d112fb62d79815b50b3bae80c317450b8b92/src/util/resolveConfigPath.js#L46-L52
+  const tailwindConfigFiles = ['tailwind.config.js', 'tailwind.config.cjs'];
+  for (const basePath of [projectRoot, root]) {
+    for (const configFile of tailwindConfigFiles) {
+      // Irrespective of the name project level configuration should always take precedence.
+      const fullPath = path.join(basePath, configFile);
+      if (fs.existsSync(fullPath)) {
+        return fullPath;
+      }
+    }
+  }
+
+  return undefined;
 }
