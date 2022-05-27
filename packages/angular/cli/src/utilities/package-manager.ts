@@ -18,7 +18,6 @@ import { memoize } from './memoize';
 import { Spinner } from './spinner';
 
 interface PackageManagerOptions {
-  silent: string;
   saveDev: string;
   install: string;
   installAll?: string;
@@ -79,28 +78,24 @@ export class PackageManagerUtils {
     cwd?: string,
   ): Promise<boolean> {
     const packageManagerArgs = this.getArguments();
-    const installArgs: string[] = [
-      packageManagerArgs.install,
-      packageName,
-      packageManagerArgs.silent,
-    ];
+    const installArgs: string[] = [packageManagerArgs.install, packageName];
 
     if (save === 'devDependencies') {
       installArgs.push(packageManagerArgs.saveDev);
     }
 
-    return this.run([...installArgs, ...extraArgs], cwd);
+    return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
   }
 
   /** Install all packages. */
   async installAll(extraArgs: string[] = [], cwd?: string): Promise<boolean> {
     const packageManagerArgs = this.getArguments();
-    const installArgs: string[] = [packageManagerArgs.silent];
+    const installArgs: string[] = [];
     if (packageManagerArgs.installAll) {
       installArgs.push(packageManagerArgs.installAll);
     }
 
-    return this.run([...installArgs, ...extraArgs], cwd);
+    return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
   }
 
   /** Install a single package temporary. */
@@ -160,7 +155,6 @@ export class PackageManagerUtils {
     switch (this.name) {
       case PackageManager.Yarn:
         return {
-          silent: '--silent',
           saveDev: '--dev',
           install: 'add',
           prefix: '--modules-folder',
@@ -168,7 +162,6 @@ export class PackageManagerUtils {
         };
       case PackageManager.Pnpm:
         return {
-          silent: '--silent',
           saveDev: '--save-dev',
           install: 'add',
           installAll: 'install',
@@ -177,7 +170,6 @@ export class PackageManagerUtils {
         };
       default:
         return {
-          silent: '--quiet',
           saveDev: '--save-dev',
           install: 'install',
           installAll: 'install',
@@ -187,7 +179,12 @@ export class PackageManagerUtils {
     }
   }
 
-  private async run(args: string[], cwd = process.cwd()): Promise<boolean> {
+  private async run(
+    args: string[],
+    options: { cwd?: string; silent?: boolean } = {},
+  ): Promise<boolean> {
+    const { cwd = process.cwd(), silent = false } = options;
+
     const spinner = new Spinner();
     spinner.start('Installing packages...');
 
@@ -195,7 +192,8 @@ export class PackageManagerUtils {
       const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
 
       const childProcess = spawn(this.name, args, {
-        stdio: 'pipe',
+        // Always pipe stderr to allow for failures to be reported
+        stdio: silent ? ['ignore', 'ignore', 'pipe'] : 'pipe',
         shell: true,
         cwd,
       }).on('close', (code: number) => {
