@@ -3,9 +3,10 @@ import { SpawnOptions } from 'child_process';
 import * as child_process from 'child_process';
 import { concat, defer, EMPTY, from } from 'rxjs';
 import { repeat, takeLast } from 'rxjs/operators';
-import { getGlobalVariable } from './env';
+import { getGlobalVariable, getGlobalVariablesEnv } from './env';
 import { catchError } from 'rxjs/operators';
 import treeKill from 'tree-kill';
+import { delimiter, join, resolve } from 'path';
 
 interface ExecOptions {
   silent?: boolean;
@@ -300,22 +301,21 @@ export function silentNpm(
       {
         silent: true,
         cwd: (options as { cwd?: string } | undefined)?.cwd,
-        env: extractNpmEnv(),
       },
       'npm',
       params,
     );
   } else {
-    return _exec({ silent: true, env: extractNpmEnv() }, 'npm', args as string[]);
+    return _exec({ silent: true }, 'npm', args as string[]);
   }
 }
 
 export function silentYarn(...args: string[]) {
-  return _exec({ silent: true, env: extractNpmEnv() }, 'yarn', args);
+  return _exec({ silent: true }, 'yarn', args);
 }
 
 export function npm(...args: string[]) {
-  return _exec({ env: extractNpmEnv() }, 'npm', args);
+  return _exec({}, 'npm', args);
 }
 
 export function node(...args: string[]) {
@@ -328,4 +328,40 @@ export function git(...args: string[]) {
 
 export function silentGit(...args: string[]) {
   return _exec({ silent: true }, 'git', args);
+}
+
+/**
+ * Launch the given entry in an child process isolated to the test environment.
+ *
+ * The test environment includes the local NPM registry, isolated NPM globals,
+ * the PATH variable only referencing the local node_modules and local NPM
+ * registry (not the test runner or standard global node_modules).
+ */
+export async function launchTestProcess(entry: string, ...args: any[]) {
+  const tempRoot: string = getGlobalVariable('tmp-root');
+
+  // Extract explicit environment variables for the test process.
+  const env: NodeJS.ProcessEnv = {
+    ...extractNpmEnv(),
+    ...getGlobalVariablesEnv(),
+  };
+
+  // Modify the PATH environment variable...
+  let paths = process.env.PATH!.split(delimiter);
+
+  // Only include paths within the sandboxed test environment or external
+  // non angular-cli paths such as /usr/bin for generic commands.
+  paths = paths.filter((p) => p.startsWith(tempRoot) || !p.includes('angular-cli'));
+
+  // Ensure the custom npm global bin is on the PATH
+  // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables
+  if (process.platform.startsWith('win')) {
+    paths.unshift(env.NPM_CONFIG_PREFIX!);
+  } else {
+    paths.unshift(join(env.NPM_CONFIG_PREFIX!, 'bin'));
+  }
+
+  env.PATH = paths.join(delimiter);
+
+  return _exec({ env }, process.execPath, [resolve(__dirname, 'run_test_process'), entry, ...args]);
 }

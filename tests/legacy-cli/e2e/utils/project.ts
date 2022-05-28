@@ -7,7 +7,7 @@ import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { installWorkspacePackages } from './packages';
-import { execAndWaitForOutputToMatch, git, ng } from './process';
+import { exec, execAndWaitForOutputToMatch, git, ng } from './process';
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath).then((tsConfigJson) => {
@@ -41,6 +41,26 @@ export async function prepareProjectForE2e(name: string) {
   await installWorkspacePackages();
 
   await ng('generate', 'e2e', '--related-app-name', name);
+
+  // Initialize selenium webdriver.
+  // Often fails the first time so attempt twice if necessary.
+  const runWebdriverUpdate = () =>
+    exec(
+      'node',
+      'node_modules/protractor/bin/webdriver-manager',
+      'update',
+      '--standalone',
+      'false',
+      '--gecko',
+      'false',
+      '--versions.chrome',
+      '101.0.4951.41',
+    );
+  try {
+    await runWebdriverUpdate();
+  } catch (e) {
+    await runWebdriverUpdate();
+  }
 
   await useCIChrome('e2e');
   await useCIChrome('');

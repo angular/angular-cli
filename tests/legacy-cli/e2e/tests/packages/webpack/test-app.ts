@@ -3,7 +3,7 @@ import { createProjectFromAsset } from '../../../utils/assets';
 import { expectFileSizeToBeUnder, expectFileToMatch, replaceInFile } from '../../../utils/fs';
 import { execWithEnv } from '../../../utils/process';
 
-export default async function (skipCleaning: () => void) {
+export default async function () {
   const webpackCLIBin = normalize('node_modules/.bin/webpack-cli');
 
   await createProjectFromAsset('webpack/test-app');
@@ -30,6 +30,4 @@ export default async function (skipCleaning: () => void) {
     'DISABLE_V8_COMPILE_CACHE': '1',
   });
   await expectFileToMatch('dist/app.main.js', 'AppModule');
-
-  skipCleaning();
 }

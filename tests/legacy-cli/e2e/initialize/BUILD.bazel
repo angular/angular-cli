@@ -1,0 +1,15 @@
+load("//tools:defaults.bzl", "ts_library")
+
+ts_library(
+    name = "initialize",
+    testonly = True,
+    srcs = glob(["**/*.ts"]),
+    data = [
+        "//:package.json",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//tests/legacy-cli/e2e/utils",
+        "@npm//@types/yargs-parser",
+    ],
+)
