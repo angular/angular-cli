@@ -59,13 +59,6 @@ export default function () {
       // Should run side-by-side with `ng serve`
       .then(() => execAndWaitForOutputToMatch('ng', ['serve'], / Compiled successfully./))
       .then(() => ng('e2e', 'test-project', '--dev-server-target='))
-      // Should fail without updated webdriver
-      .then(() => replaceInFile('e2e/protractor.conf.js', /chromeDriver: String.raw`[^`]*`,/, ''))
-      .then(() =>
-        expectToFail(() =>
-          ng('e2e', 'test-project', '--no-webdriver-update', '--dev-server-target='),
-        ),
-      )
       .finally(() => killAllProcesses())
   );
 }

@@ -4,10 +4,12 @@ import * as colors from 'ansi-colors';
 import glob from 'glob';
 import yargsParser from 'yargs-parser';
 import * as path from 'path';
-import { setGlobalVariable } from './e2e/utils/env';
+import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
 import { AddressInfo, createServer, Server } from 'net';
+import { launchTestProcess } from './e2e/utils/process';
+import { join } from 'path';
 
 Error.stackTraceLimit = Infinity;
 
@@ -73,6 +75,7 @@ const testGlob = argv.glob || 'tests/**/*.ts';
 
 const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync('setup/**/*.ts', { nodir: true, cwd: e2eRoot }).sort();
+const allInitializers = glob.sync('initialize/**/*.ts', { nodir: true, cwd: e2eRoot }).sort();
 const allTests = glob
   .sync(testGlob, { nodir: true, cwd: e2eRoot, ignore: argv.ignore })
   // Replace windows slashes.
@@ -133,6 +136,7 @@ Promise.all([findFreePort(), findFreePort()])
 
     try {
       await runSteps(runSetup, allSetups, 'setup');
+      await runSteps(runInitializer, allInitializers, 'initializer');
       await runSteps(runTest, testsToRun, 'test');
 
       console.log(colors.green('Done.'));
@@ -166,7 +170,7 @@ Promise.all([findFreePort(), findFreePort()])
 async function runSteps(
   run: (name: string) => Promise<void> | void,
   steps: string[],
-  type: 'setup' | 'test',
+  type: 'setup' | 'test' | 'initializer',
 ) {
   for (const [stepIndex, relativeName] of steps.entries()) {
     // Make sure this is a windows compatible path.
@@ -199,48 +203,37 @@ async function runSetup(absoluteName: string) {
   await (typeof module === 'function' ? module : module.default)();
 }
 
+/**
+ * Run a file from the projects root directory in a subprocess via launchTestProcess().
+ */
+async function runInitializer(absoluteName: string) {
+  process.chdir(getGlobalVariable('projects-root'));
+
+  await launchTestProcess(absoluteName);
+}
+
+/**
+ * Run a file from the main 'test-project' directory in a subprocess via launchTestProcess().
+ */
 async function runTest(absoluteName: string) {
-  const module = require(absoluteName);
-  const originalEnvVariables = {
-    ...process.env,
-  };
+  process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
-  const fn: (skipClean?: () => void) => Promise<void> | void =
-    typeof module == 'function'
-      ? module
-      : typeof module.default == 'function'
-      ? module.default
-      : () => {
-          throw new Error('Invalid test module.');
-        };
+  await launchTestProcess(absoluteName);
 
-  let clean = true;
-  let previousDir = process.cwd();
-
-  await fn(() => (clean = false));
-
-  // Change the directory back to where it was before the test.
-  // This allows tests to chdir without worrying about keeping the original directory.
-  if (previousDir) {
-    process.chdir(previousDir);
-
-    // Restore env variables before each test.
-    console.log('Restoring original environment variables...');
-    process.env = originalEnvVariables;
-  }
-
-  // Skip cleaning if the test requested an exception.
-  if (clean) {
-    logStack.push(new logging.NullLogger());
-    try {
-      await gitClean();
-    } finally {
-      logStack.pop();
-    }
+  logStack.push(new logging.NullLogger());
+  try {
+    await gitClean();
+  } finally {
+    logStack.pop();
   }
 }
 
-function printHeader(testName: string, testIndex: number, count: number, type: 'setup' | 'test') {
+function printHeader(
+  testName: string,
+  testIndex: number,
+  count: number,
+  type: 'setup' | 'initializer' | 'test',
+) {
   const text = `${testIndex + 1} of ${count}`;
   const fullIndex = testIndex * nbShards + shardId + 1;
   const shard =
@@ -254,7 +247,7 @@ function printHeader(testName: string, testIndex: number, count: number, type: '
   );
 }
 
-function printFooter(testName: string, type: 'setup' | 'test', startTime: number) {
+function printFooter(testName: string, type: 'setup' | 'initializer' | 'test', startTime: number) {
   // Round to hundredth of a second.
   const t = Math.round((Date.now() - startTime) / 10) / 100;
   console.log(colors.green(`Last ${type} took `) + colors.bold.blue('' + t) + colors.green('s...'));

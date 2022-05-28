@@ -20,6 +20,7 @@ ts_library(
 
         # Loaded dynamically at runtime, not compiletime deps
         "//tests/legacy-cli/e2e/setup",
+        "//tests/legacy-cli/e2e/initialize",
         "//tests/legacy-cli/e2e/tests",
     ],
 )
