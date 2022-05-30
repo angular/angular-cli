@@ -1,5 +1,4 @@
 {
   "name": "@angular-devkit/schematics/tools",
-  "main": "index.js",
   "typings": "index.d.ts"
 }
