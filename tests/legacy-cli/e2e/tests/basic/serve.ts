@@ -7,13 +7,13 @@ export default async function () {
     // Serve works without HMR
     await ngServe('--no-hmr');
     await verifyResponse();
-    killAllProcesses();
+    await killAllProcesses();
 
     // Serve works with HMR
     await ngServe('--hmr');
     await verifyResponse();
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }
 

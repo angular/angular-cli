@@ -26,6 +26,6 @@ export default async function () {
       writeFile('src/app/type.ts', `export type MyType = string;`),
     ]);
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }

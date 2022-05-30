@@ -20,6 +20,6 @@ export default async function () {
       /Module not found: Error: Can't resolve 'path'/,
     );
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }

@@ -114,12 +114,6 @@ export default function () {
           throw new Error('Expected no error but an error was shown.');
         }
       })
-      .then(
-        () => killAllProcesses(),
-        (err: any) => {
-          killAllProcesses();
-          throw err;
-        },
-      )
+      .finally(() => killAllProcesses())
   );
 }

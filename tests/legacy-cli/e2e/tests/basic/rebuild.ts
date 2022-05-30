@@ -181,12 +181,6 @@ export default function () {
           throw new Error('Expected component CSS to update.');
         }
       })
-      .then(
-        () => killAllProcesses(),
-        (err: unknown) => {
-          killAllProcesses();
-          throw err;
-        },
-      )
+      .finally(() => killAllProcesses())
   );
 }

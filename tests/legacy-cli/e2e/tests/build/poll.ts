@@ -24,6 +24,6 @@ export default async function () {
     // But a rebuild should happen roughly within the 10 second window.
     await waitForAnyProcessOutputToMatch(webpackGoodRegEx, 7000);
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }

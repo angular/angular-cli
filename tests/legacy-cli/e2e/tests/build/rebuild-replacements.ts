@@ -13,7 +13,6 @@ export default async function () {
     return;
   }
 
-  let error;
   try {
     await execAndWaitForOutputToMatch(
       'ng',
@@ -26,12 +25,7 @@ export default async function () {
     // Should trigger a rebuild.
     await appendToFile('src/environments/environment.prod.ts', `console.log('PROD');`);
     await waitForAnyProcessOutputToMatch(webpackGoodRegEx, 45000);
-  } catch (e) {
-    error = e;
-  }
-
-  killAllProcesses();
-  if (error) {
-    throw error;
+  } finally {
+    await killAllProcesses();
   }
 }

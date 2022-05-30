@@ -5,7 +5,7 @@ import { concat, defer, EMPTY, from } from 'rxjs';
 import { repeat, takeLast } from 'rxjs/operators';
 import { getGlobalVariable } from './env';
 import { catchError } from 'rxjs/operators';
-const treeKill = require('tree-kill');
+import treeKill from 'tree-kill';
 
 interface ExecOptions {
   silent?: boolean;
@@ -189,8 +189,22 @@ export function waitForAnyProcessOutputToMatch(
   return Promise.race(matchPromises.concat([timeoutPromise]));
 }
 
-export function killAllProcesses(signal = 'SIGTERM') {
-  _processes.forEach((process) => treeKill(process.pid, signal));
+export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
+  await Promise.all(
+    _processes.map(
+      ({ pid }) =>
+        new Promise<void>((resolve, reject) => {
+          treeKill(pid, signal, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }),
+    ),
+  );
+
   _processes = [];
 }
 
