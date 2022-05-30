@@ -17,6 +17,6 @@ export default async function () {
     assert.strictEqual(response.status, 200);
     assert.match(await response.text(), /<app-root><\/app-root>/);
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }

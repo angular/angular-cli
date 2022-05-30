@@ -33,53 +33,16 @@ export default function () {
     },
   };
 
-  return (
-    Promise.resolve()
-      .then(() => writeFile(proxyConfigFile, JSON.stringify(proxyConfig, null, 2)))
-      .then(() => ngServe('--proxy-config', proxyConfigFile))
-      .then(() => fetch('http://localhost:4200/api/test'))
-      .then(async (response) => {
-        assert.strictEqual(response.status, 200);
-        assert.match(await response.text(), /TEST_API_RETURN/);
-      })
-      .then(
-        () => killAllProcesses(),
-        (err) => {
-          killAllProcesses();
-          throw err;
-        },
-      )
-
-      // .then(() => updateJsonFile('angular.json', configJson => {
-      //   const app = configJson.defaults;
-      //   app.serve = {
-      //     proxyConfig: proxyConfigFile
-      //   };
-      // }))
-      // .then(() => ngServe())
-      // .then(() => fetch('http://localhost:4200/api/test'))
-      // .then(async (response) => {
-      //   assert.strictEqual(response.status, 200);
-      //   assert.match(await response.text(), /TEST_API_RETURN/)
-      // })
-      // .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
-
-      .then(
-        () => server.close(),
-        (err) => {
-          server.close();
-          throw err;
-        },
-      )
-  );
-
-  // // A non-existing proxy file should error.
-  // .then(() => expectToFail(() => ng('serve', '--proxy-config', 'proxy.non-existent.json')))
-  // .then(() => updateJsonFile('angular.json', configJson => {
-  //   const app = configJson.defaults;
-  //   app.serve = {
-  //     proxyConfig: 'proxy.non-existent.json'
-  //   };
-  // }))
-  // .then(() => expectToFail(() => ng('serve')));
+  return Promise.resolve()
+    .then(() => writeFile(proxyConfigFile, JSON.stringify(proxyConfig, null, 2)))
+    .then(() => ngServe('--proxy-config', proxyConfigFile))
+    .then(() => fetch('http://localhost:4200/api/test'))
+    .then(async (response) => {
+      assert.strictEqual(response.status, 200);
+      assert.match(await response.text(), /TEST_API_RETURN/);
+    })
+    .finally(async () => {
+      await killAllProcesses();
+      server.close();
+    });
 }

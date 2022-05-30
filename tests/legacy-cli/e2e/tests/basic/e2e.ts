@@ -66,12 +66,6 @@ export default function () {
           ng('e2e', 'test-project', '--no-webdriver-update', '--dev-server-target='),
         ),
       )
-      .then(
-        () => killAllProcesses(),
-        (err) => {
-          killAllProcesses();
-          throw err;
-        },
-      )
+      .finally(() => killAllProcesses())
   );
 }

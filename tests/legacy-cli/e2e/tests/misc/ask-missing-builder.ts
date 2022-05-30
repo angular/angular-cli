@@ -14,7 +14,7 @@ export default async function () {
       /Would you like to add a package with "deploy" capabilities/,
     );
 
-    killAllProcesses();
+    await killAllProcesses();
 
     // Execute a command with TTY force enabled
     execWithEnv('ng', ['lint'], {
@@ -26,6 +26,6 @@ export default async function () {
     // Check if the prompt is shown
     await waitForAnyProcessOutputToMatch(/Would you like to add ESLint now/);
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }

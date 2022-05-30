@@ -20,6 +20,6 @@ export default async function () {
       throw new Error('Title of the process was not properly set.');
     }
   } finally {
-    killAllProcesses();
+    await killAllProcesses();
   }
 }
