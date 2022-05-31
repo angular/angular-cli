@@ -1,3 +1,34 @@
+<a name="14.0.0-rc.3"></a>
+
+# 14.0.0-rc.3 (2022-05-31)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [b97772dfc](https://github.com/angular/angular-cli/commit/b97772dfc03401fe1faa79e77742905341bd5d46) | fix  | support silent package installs with Yarn 2+                    |
+| [87cd5cd43](https://github.com/angular/angular-cli/commit/87cd5cd4311e71a15ea1ecb82dde7480036cb815) | fix  | workaround npm 7+ peer dependency resolve errors during updates |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [2adf252dc](https://github.com/angular/angular-cli/commit/2adf252dc8a7eb0ce504de771facca56730e5272) | fix  | add es2015 exports package condition to browser-esbuild         |
+| [48630ccfd](https://github.com/angular/angular-cli/commit/48630ccfd7a672fc5174ef484b3bd5c549d32fef) | fix  | detect `tailwind.config.cjs` as valid tailwindcss configuration |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [48f9b79bc](https://github.com/angular/angular-cli/commit/48f9b79bc4d43d0180bab5af5726621a68204a15) | fix  | support ignore scripts package installs with Yarn 2+ |
+| [3471cd6d8](https://github.com/angular/angular-cli/commit/3471cd6d8696ae9c28dba901d3e0f6868d69efc8) | fix  | support quiet package installs with Yarn 2+          |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0-rc.2"></a>
 
 # 14.0.0-rc.2 (2022-05-25)
