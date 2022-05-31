@@ -13,11 +13,8 @@ Simply answer "Yes" and the CLI will take care of the rest.
 
 ```
 $ ng serve
-? Would you like to enable autocompletion? This will set up your terminal so pressing TAB while
-typing Angular CLI commands will show possible options and autocomplete arguments. (Enabling
-autocompletion will modify configuration files in your home directory.) Yes
-Appended `source <(ng completion script)` to `/home/my-username/.bashrc`. Restart your terminal or
-run:
+? Would you like to enable autocompletion? This will set up your terminal so pressing TAB while typing Angular CLI commands will show possible options and autocomplete arguments. (Enabling autocompletion will modify configuration files in your home directory.) Yes
+Appended `source <(ng completion script)` to `/home/my-username/.bashrc`. Restart your terminal or run:
 
 source <(ng completion script)
 
