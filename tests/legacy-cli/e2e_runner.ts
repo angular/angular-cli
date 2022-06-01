@@ -122,15 +122,15 @@ setGlobalVariable('argv', argv);
 setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
-Promise.all([findFreePort(), findFreePort()])
-  .then(async ([httpPort, httpsPort]) => {
-    setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
-    setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
+Promise.all([findFreePort(), findFreePort()]).then(async ([httpPort, httpsPort]) => {
+  setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
+  setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
 
-    const registryProcess = await createNpmRegistry(httpPort, httpPort);
-    const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
+  const registryProcess = await createNpmRegistry(httpPort, httpPort);
+  const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
 
-    return testsToRun
+  return (
+    testsToRun
       .reduce((previous, relativeName, testIndex) => {
         // Make sure this is a windows compatible path.
         let absoluteName = path.join(e2eRoot, relativeName);
@@ -207,35 +207,39 @@ Promise.all([findFreePort(), findFreePort()])
             );
         });
       }, Promise.resolve())
+      // Output success vs failure information.
+      .then(
+        () => console.log(colors.green('Done.')),
+        (err) => {
+          console.log('\n');
+          console.error(colors.red(`Test "${currentFileName}" failed...`));
+          console.error(colors.red(err.message));
+          console.error(colors.red(err.stack));
+
+          if (argv.debug) {
+            console.log(`Current Directory: ${process.cwd()}`);
+            console.log('Will loop forever while you debug... CTRL-C to quit.');
+
+            /* eslint-disable no-constant-condition */
+            while (1) {
+              // That's right!
+            }
+          }
+
+          return Promise.reject(err);
+        },
+      )
+      // Kill the registry processes before exiting.
       .finally(() => {
         registryProcess.kill();
         secureRegistryProcess.kill();
-      });
-  })
-  .then(
-    () => {
-      console.log(colors.green('Done.'));
-      process.exit(0);
-    },
-    (err) => {
-      console.log('\n');
-      console.error(colors.red(`Test "${currentFileName}" failed...`));
-      console.error(colors.red(err.message));
-      console.error(colors.red(err.stack));
-
-      if (argv.debug) {
-        console.log(`Current Directory: ${process.cwd()}`);
-        console.log('Will loop forever while you debug... CTRL-C to quit.');
-
-        /* eslint-disable no-constant-condition */
-        while (1) {
-          // That's right!
-        }
-      }
-
-      process.exit(1);
-    },
+      })
+      .then(
+        () => process.exit(0),
+        () => process.exit(1),
+      )
   );
+});
 
 function printHeader(testName: string, testIndex: number) {
   const text = `${testIndex + 1} of ${testsToRun.length}`;
