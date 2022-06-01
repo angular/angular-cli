@@ -13,7 +13,7 @@ import * as path from 'path';
 import { env } from 'process';
 import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
-import { forceAutocomplete } from '../utilities/environment-options';
+import { forceAutocomplete, isCI } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
 
 /** Interface for the autocompletion configuration stored in the global workspace. */
@@ -125,6 +125,11 @@ async function shouldPromptForAutocompletionSetup(
   // Force whether or not to prompt for autocomplete to give an easy path for e2e testing to skip.
   if (forceAutocomplete !== undefined) {
     return forceAutocomplete;
+  }
+
+  // We should not try to setup auto completion in CI environments.
+  if (isCI) {
+    return false;
   }
 
   // Don't prompt on `ng update` or `ng completion`.
