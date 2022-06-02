@@ -26,7 +26,7 @@ interface PackageManagerOptions {
 }
 
 export interface PackageManagerUtilsContext {
-  globalConfiguration?: AngularWorkspace;
+  globalConfiguration: AngularWorkspace;
   workspace?: AngularWorkspace;
   root: string;
 }
@@ -326,7 +326,7 @@ export class PackageManagerUtils {
     }
 
     if (!result) {
-      result = getPackageManager(globalWorkspace?.extensions['cli']);
+      result = getPackageManager(globalWorkspace.extensions['cli']);
     }
 
     return result;

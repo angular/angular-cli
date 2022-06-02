@@ -40,7 +40,7 @@ export interface CommandContext {
   currentDirectory: string;
   root: string;
   workspace?: AngularWorkspace;
-  globalConfiguration?: AngularWorkspace;
+  globalConfiguration: AngularWorkspace;
   logger: logging.Logger;
   packageManager: PackageManagerUtils;
   /** Arguments parsed in free-from without parser configuration. */
