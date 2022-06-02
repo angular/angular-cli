@@ -1,3 +1,11 @@
+<a name="13.3.8"></a>
+
+# 13.3.8 (2022-06-02)
+
+Patch release as part of the v14 launch process. No changes from v13.3.7.
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.7"></a>
 
 # 13.3.7 (2022-05-25)
