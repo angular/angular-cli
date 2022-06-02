@@ -11,7 +11,7 @@ export default async function () {
     // We need to use the public registry because in the local NPM server we don't have
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
     await setRegistry(false);
-    await createProjectFromAsset('10.0-project', true);
+    await createProjectFromAsset('12.0-project', true);
 
     // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
     // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
@@ -73,15 +73,16 @@ export default async function () {
   // Setup testing to use CI Chrome.
   await useCIChrome('./');
   await useCIChrome('./e2e/');
-  await useCIDefaults('ten-project');
+  await useCIDefaults('twelve-project');
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
+
   await ng('e2e');
   await ng('e2e', '--configuration=production');
 
   // Verify project now creates bundles
   await noSilentNg('build', '--configuration=production');
-  await expectFileMatchToExist('dist/ten-project/', /main\.[0-9a-f]{16}\.js/);
+  await expectFileMatchToExist('dist/twelve-project/', /main\.[0-9a-f]{16}\.js/);
 }
