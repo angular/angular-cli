@@ -95,7 +95,8 @@ function createProxy(target: string, secure: boolean, ws = true): ProxyInstance 
 
 async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
   const baseUrl = url.replace(/^http/, 'ws');
-  const socksRequest = baseUrl[baseUrl.length - 1] === '/' ? `${baseUrl}ws` : `${baseUrl}/ws`;
+  const socksRequest =
+    baseUrl[baseUrl.length - 1] === '/' ? `${baseUrl}ng-cli-ws` : `${baseUrl}/ng-cli-ws`;
   // Create a Chrome dev tools session so that we can capturing websocket request.
   // https://github.com/puppeteer/puppeteer/issues/2974
 
