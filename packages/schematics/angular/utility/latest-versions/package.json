@@ -1,6 +1,6 @@
 {
   "description": "Package versions used by schematics in @schematics/angular.",
-  "comment": "This file is needed so that depedencies are synced by Renovate.",
+  "comment": "This file is needed so that dependencies are synced by Renovate.",
   "private": true,
   "dependencies": {
     "@types/jasmine": "~4.0.0",
