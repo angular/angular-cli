@@ -298,7 +298,7 @@ function getWebSocketSettings(
     };
   }
 
-  const webSocketPath = posix.join(servePath, 'ws');
+  const webSocketPath = posix.join(servePath, 'ng-cli-ws');
 
   return {
     webSocketServer: {
