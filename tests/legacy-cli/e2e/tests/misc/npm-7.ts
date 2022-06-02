@@ -1,6 +1,6 @@
 import { rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
-import { ng, npm } from '../../utils/process';
+import { execWithEnv, ng, npm } from '../../utils/process';
 import { isPrereleaseCli } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
@@ -38,10 +38,12 @@ export default async function () {
     await npm('install', '--global', 'npm@7.4.0');
 
     // Ensure `ng add` shows npm warning
-    // The below command will fail with the below due to incorrect peerDeps
-    const { message: stderrAdd } = await expectToFail(() =>
-      ng('add', '@angular/localize', '--skip-confirmation'),
+    const { stderr: stderrAdd } = await execWithEnv(
+      'ng',
+      ['add', '@angular/localize', '--skip-confirmation'],
+      { ...process.env, 'NPM_CONFIG_legacy_peer_deps': 'true' },
     );
+
     if (!stderrAdd.includes(warningText)) {
       throw new Error('ng add expected to show npm version warning.');
     }
