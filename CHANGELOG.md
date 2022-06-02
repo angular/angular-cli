@@ -1,20 +1,6 @@
-<a name="14.0.0-rc.1"></a>
+<a name="14.0.0"></a>
 
-# 14.0.0-rc.1 (2022-05-31)
-
-No user-visible changes, just an RC release to test internal infrastructure changes.
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.0.0-rc.0"></a>
-
-# 14.0.0-rc.0 (2022-05-11)
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.0.0-next.0"></a>
-
-# 14.0.0-next.0 (2022-05-05)
+# 14.0.0 (2022-06-02)
 
 ## Breaking Changes
 
