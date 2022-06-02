@@ -7,7 +7,7 @@
  */
 
 import { json, workspaces } from '@angular-devkit/core';
-import { existsSync, promises as fs, writeFileSync } from 'fs';
+import { existsSync, promises as fs } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { PackageManager } from '../../lib/config/workspace-schema';
@@ -51,6 +51,7 @@ export const workspaceSchemaPath = path.join(__dirname, '../../lib/config/schema
 
 const configNames = ['angular.json', '.angular.json'];
 const globalFileName = '.angular-config.json';
+const defaultGlobalFilePath = path.join(os.homedir(), globalFileName);
 
 function xdgConfigHome(home: string, configFile?: string): string {
   // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -106,9 +107,8 @@ function globalFilePath(): string | null {
     return xdgConfigOld;
   }
 
-  const p = path.join(home, globalFileName);
-  if (existsSync(p)) {
-    return p;
+  if (existsSync(defaultGlobalFilePath)) {
+    return defaultGlobalFilePath;
   }
 
   return null;
@@ -147,7 +147,12 @@ export class AngularWorkspace {
   }
 
   save(): Promise<void> {
-    return workspaces.writeWorkspace(this.workspace, createWorkspaceHost(), this.filePath);
+    return workspaces.writeWorkspace(
+      this.workspace,
+      createWorkspaceHost(),
+      this.filePath,
+      workspaces.WorkspaceFormat.JSON,
+    );
   }
 
   static async load(workspaceFilePath: string): Promise<AngularWorkspace> {
@@ -162,22 +167,38 @@ export class AngularWorkspace {
 }
 
 const cachedWorkspaces = new Map<string, AngularWorkspace | undefined>();
+
+export async function getWorkspace(level: 'global'): Promise<AngularWorkspace>;
+export async function getWorkspace(level: 'local'): Promise<AngularWorkspace | undefined>;
 export async function getWorkspace(
-  level: 'local' | 'global' = 'local',
+  level: 'local' | 'global',
+): Promise<AngularWorkspace | undefined>;
+
+export async function getWorkspace(
+  level: 'local' | 'global',
 ): Promise<AngularWorkspace | undefined> {
   if (cachedWorkspaces.has(level)) {
     return cachedWorkspaces.get(level);
   }
 
-  let configPath = level === 'local' ? projectFilePath() : globalFilePath();
+  const configPath = level === 'local' ? projectFilePath() : globalFilePath();
   if (!configPath) {
-    if (level === 'local') {
-      cachedWorkspaces.set(level, undefined);
+    if (level === 'global') {
+      // Unlike a local config, a global config is not mandatory.
+      // So we create an empty one in memory and keep it as such until it has been modified and saved.
+      const globalWorkspace = new AngularWorkspace(
+        { extensions: {}, projects: new workspaces.ProjectDefinitionCollection() },
+        defaultGlobalFilePath,
+      );
 
-      return undefined;
+      cachedWorkspaces.set(level, globalWorkspace);
+
+      return globalWorkspace;
     }
 
-    configPath = createGlobalSettings();
+    cachedWorkspaces.set(level, undefined);
+
+    return undefined;
   }
 
   try {
@@ -193,26 +214,24 @@ export async function getWorkspace(
   }
 }
 
-export function createGlobalSettings(): string {
-  const home = os.homedir();
-  if (!home) {
-    throw new Error('No home directory found.');
-  }
-
-  const globalPath = path.join(home, globalFileName);
-  writeFileSync(globalPath, JSON.stringify({ version: 1 }));
-
-  return globalPath;
-}
-
-export function getWorkspaceRaw(
+/**
+ * This method will load the workspace configuration in raw JSON format.
+ * When `level` is `global` and file doesn't exists, it will be created.
+ *
+ * NB: This method is intended to be used only for `ng config`.
+ */
+export async function getWorkspaceRaw(
   level: 'local' | 'global' = 'local',
-): [JSONFile | null, string | null] {
+): Promise<[JSONFile | null, string | null]> {
   let configPath = level === 'local' ? projectFilePath() : globalFilePath();
 
   if (!configPath) {
     if (level === 'global') {
-      configPath = createGlobalSettings();
+      configPath = defaultGlobalFilePath;
+      // Config doesn't exist, force create it.
+
+      const globalWorkspace = await getWorkspace('global');
+      await globalWorkspace.save();
     } else {
       return [null, null];
     }

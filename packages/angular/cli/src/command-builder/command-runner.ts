@@ -77,7 +77,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   const positional = getYargsCompletions ? _.slice(1) : _;
 
   let workspace: AngularWorkspace | undefined;
-  let globalConfiguration: AngularWorkspace | undefined;
+  let globalConfiguration: AngularWorkspace;
   try {
     [workspace, globalConfiguration] = await Promise.all([
       getWorkspace('local'),

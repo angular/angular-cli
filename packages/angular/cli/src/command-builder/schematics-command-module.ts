@@ -304,7 +304,7 @@ export abstract class SchematicsCommandModule
 
     const value =
       getSchematicCollections(workspace?.getCli()) ??
-      getSchematicCollections(globalConfiguration?.getCli());
+      getSchematicCollections(globalConfiguration.getCli());
     if (value) {
       return value;
     }

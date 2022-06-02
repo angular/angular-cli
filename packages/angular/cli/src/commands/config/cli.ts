@@ -57,7 +57,7 @@ export class ConfigCommandModule
 
   async run(options: Options<ConfigCommandArgs>): Promise<number | void> {
     const level = options.global ? 'global' : 'local';
-    const [config] = getWorkspaceRaw(level);
+    const [config] = await getWorkspaceRaw(level);
 
     if (options.value == undefined) {
       if (!config) {
@@ -118,7 +118,7 @@ export class ConfigCommandModule
       throw new CommandModuleError('Invalid Path.');
     }
 
-    const [config, configPath] = getWorkspaceRaw(options.global ? 'global' : 'local');
+    const [config, configPath] = await getWorkspaceRaw(options.global ? 'global' : 'local');
     const { logger } = this.context;
 
     if (!config || !configPath) {
