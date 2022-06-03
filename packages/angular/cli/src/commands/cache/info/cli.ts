@@ -22,7 +22,7 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
   command = 'info';
   describe = 'Prints persistent disk cache configuration and statistics in the console.';
   longDescriptionPath?: string | undefined;
-  static override scope: CommandScope.In;
+  static override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {
     return localYargs.strict();

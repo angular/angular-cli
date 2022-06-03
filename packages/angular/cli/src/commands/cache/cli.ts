@@ -26,7 +26,7 @@ export class CacheCommandModule extends CommandModule implements CommandModuleIm
   command = 'cache';
   describe = 'Configure persistent disk cache and retrieve cache statistics.';
   longDescriptionPath = join(__dirname, 'long-description.md');
-  static override scope: CommandScope.In;
+  static override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {
     const subcommands = [
