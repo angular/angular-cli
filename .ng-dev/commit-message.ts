@@ -3,7 +3,7 @@ import {
   COMMIT_TYPES,
   CommitMessageConfig,
   ScopeRequirement,
-} from '@angular/dev-infra-private/ng-dev/commit-message/config';
+} from '@angular/dev-infra-private/ng-dev';
 import { packages } from '../lib/packages';
 
 /**
