@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { createConsoleLogger } from '@angular-devkit/core/node';
+import { logging } from '@angular-devkit/core';
 import { format } from 'util';
 import { CommandModuleError } from '../../src/command-builder/command-module';
 import { runCommand } from '../../src/command-builder/command-runner';
@@ -16,26 +16,54 @@ import { writeErrorToLogFile } from '../../src/utilities/log-file';
 
 export { VERSION } from '../../src/utilities/version';
 
+const MIN_NODEJS_VERISON = [14, 15] as const;
+
 /* eslint-disable no-console */
 export default async function (options: { cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
   const [major, minor] = process.versions.node.split('.').map((part) => Number(part));
-  if (major < 14 || (major === 14 && minor < 15)) {
+  if (
+    major < MIN_NODEJS_VERISON[0] ||
+    (major === MIN_NODEJS_VERISON[0] && minor < MIN_NODEJS_VERISON[1])
+  ) {
     process.stderr.write(
       `Node.js version ${process.version} detected.\n` +
-        'The Angular CLI requires a minimum v14.15.\n\n' +
+        `The Angular CLI requires a minimum of v${MIN_NODEJS_VERISON[0]}.${MIN_NODEJS_VERISON[1]}.\n\n` +
         'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
     );
 
     return 3;
   }
 
-  const logger = createConsoleLogger(ngDebug, process.stdout, process.stderr, {
-    info: (s) => (colors.enabled ? s : removeColor(s)),
-    debug: (s) => (colors.enabled ? s : removeColor(s)),
-    warn: (s) => (colors.enabled ? colors.bold.yellow(s) : removeColor(s)),
-    error: (s) => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
-    fatal: (s) => (colors.enabled ? colors.bold.red(s) : removeColor(s)),
+  const colorLevels: Record<string, (message: string) => string> = {
+    info: (s) => s,
+    debug: (s) => s,
+    warn: (s) => colors.bold.yellow(s),
+    error: (s) => colors.bold.red(s),
+    fatal: (s) => colors.bold.red(s),
+  };
+  const logger = new logging.IndentLogger('cli-main-logger');
+  const logInfo = console.log;
+  const logError = console.error;
+
+  const loggerFinished = logger.forEach((entry) => {
+    if (!ngDebug && entry.level === 'debug') {
+      return;
+    }
+
+    const color = colors.enabled ? colorLevels[entry.level] : removeColor;
+    const message = color(entry.message);
+
+    switch (entry.level) {
+      case 'warn':
+      case 'fatal':
+      case 'error':
+        logError(message);
+        break;
+      default:
+        logInfo(message);
+        break;
+    }
   });
 
   // Redirect console to logger
@@ -83,5 +111,8 @@ export default async function (options: { cliArgs: string[] }) {
     }
 
     return 1;
+  } finally {
+    logger.complete();
+    await loggerFinished;
   }
 }
