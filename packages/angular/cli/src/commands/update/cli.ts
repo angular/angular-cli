@@ -686,7 +686,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         });
       } catch {}
 
-      let forceInstall = options.force;
+      let forceInstall = false;
       // npm 7+ can fail due to it incorrectly resolving peer dependencies that have valid SemVer
       // ranges during an update. Update will set correct versions of dependencies within the
       // package.json file. The force option is set to workaround these errors.
