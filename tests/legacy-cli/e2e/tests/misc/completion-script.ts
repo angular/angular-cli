@@ -1,4 +1,4 @@
-import { execAndWaitForOutputToMatch } from '../../utils/process';
+import { exec, execAndWaitForOutputToMatch } from '../../utils/process';
 
 export default async function () {
   // ng build
@@ -54,10 +54,17 @@ export default async function () {
     ['--get-yargs-completions', 'ng', 'run', 'test-project:'],
     /test-project\\:test/,
   );
-  await execAndWaitForOutputToMatch(
+
+  const { stdout: noServeStdout } = await exec(
     'ng',
-    ['--get-yargs-completions', 'ng', 'run', 'test-project:build'],
-    // does not include 'test-project:serve'
-    /^((?!:serve).)*$/,
+    '--get-yargs-completions',
+    'ng',
+    'run',
+    'test-project:build',
   );
+  if (noServeStdout.includes(':serve')) {
+    throw new Error(
+      `':serve' should not have been listed as a completion option.\nSTDOUT:\n${noServeStdout}`,
+    );
+  }
 }
