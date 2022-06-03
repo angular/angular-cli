@@ -19,7 +19,7 @@ export class CacheDisableModule extends CommandModule implements CommandModuleIm
   aliases = 'off';
   describe = 'Disables persistent disk cache for all projects in the workspace.';
   longDescriptionPath: string | undefined;
-  static override scope: CommandScope.In;
+  static override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {
     return localYargs;
@@ -35,7 +35,7 @@ export class CacheEnableModule extends CommandModule implements CommandModuleImp
   aliases = 'on';
   describe = 'Enables disk cache for all projects in the workspace.';
   longDescriptionPath: string | undefined;
-  static override scope: CommandScope.In;
+  static override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {
     return localYargs;
