@@ -131,8 +131,8 @@ export function createCompilerPlugin(
 
       // Temporary deep import for transformer support
       const {
-        createAotTransformers,
         mergeTransformers,
+        replaceBootstrap,
       } = require('@ngtools/webpack/src/ivy/transformation');
 
       // Setup defines based on the values provided by the Angular compiler-cli
@@ -270,10 +270,9 @@ export function createCompilerPlugin(
 
         fileEmitter = createFileEmitter(
           builder,
-          mergeTransformers(
-            angularCompiler.prepareEmit().transformers,
-            createAotTransformers(builder, {}),
-          ),
+          mergeTransformers(angularCompiler.prepareEmit().transformers, {
+            before: [replaceBootstrap(() => builder.getProgram().getTypeChecker())],
+          }),
           () => [],
         );
 
