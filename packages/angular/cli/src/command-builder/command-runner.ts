@@ -155,6 +155,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
       'deprecated: %s': colors.yellow('deprecated:') + ' %s',
       'Did you mean %s?': 'Unknown command. Did you mean %s?',
     })
+    .epilogue(colors.gray(getEpilogue(!!workspace)))
     .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
     .middleware(normalizeOptionsMiddleware)
@@ -172,4 +173,19 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .parseAsync();
 
   return process.exitCode ?? 0;
+}
+
+function getEpilogue(isInsideWorkspace: boolean): string {
+  let message: string;
+  if (isInsideWorkspace) {
+    message =
+      'The above commands are available when running the Angular CLI inside a workspace.' +
+      'More commands are available when running outside a workspace.\n';
+  } else {
+    message =
+      'The above commands are available when running the Angular CLI outside a workspace.' +
+      'More commands are available when running inside a workspace.\n';
+  }
+
+  return message + 'For more information, see https://angular.io/cli/.\n';
 }
