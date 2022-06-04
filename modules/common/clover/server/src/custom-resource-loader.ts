@@ -12,11 +12,14 @@ import { normalize } from 'path';
 
 export class CustomResourceLoader extends ResourceLoader {
   constructor(
-    private readonly baseUrl: string,
+    readonly headers: Record<string, string | undefined | string[]> | undefined,
     private readonly publicPath: string,
+    private readonly baseUrl: string,
     private readonly fileCache: Map<string, Buffer>,
   ) {
-    super();
+    super({
+      userAgent: headers?.['user-agent'] as string | undefined,
+    });
   }
 
   fetch(url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {

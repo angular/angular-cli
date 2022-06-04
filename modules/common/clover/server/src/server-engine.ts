@@ -51,8 +51,9 @@ export class Engine {
     const inlineCriticalCss = options.inlineCriticalCss !== false;
 
     const customResourceLoader = new CustomResourceLoader(
-      origin,
+      options.headers,
       options.publicPath,
+      origin,
       this.resourceLoaderCache,
     );
 
@@ -76,7 +77,6 @@ export class Engine {
         resources: customResourceLoader,
         url: options.url,
         referrer: options.headers?.referrer as string | undefined,
-        userAgent: options.headers?.['user-agent'] as string | undefined,
         beforeParse: (window) => {
           augmentWindowWithStubs(window);
           window.ngRenderMode = true;
