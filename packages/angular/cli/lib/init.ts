@@ -10,11 +10,19 @@ import 'symbol-observable';
 // symbol polyfill must go first
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { SemVer } from 'semver';
+import { SemVer, major } from 'semver';
 import { colors } from '../src/utilities/color';
 import { isWarningEnabled } from '../src/utilities/config';
 import { disableVersionCheck } from '../src/utilities/environment-options';
 import { VERSION } from '../src/utilities/version';
+
+/**
+ * Angular CLI versions prior to v14 may not exit correctly if not forcibly exited
+ * via `process.exit()`. When bootstrapping, `forceExit` will be set to `true`
+ * if the local CLI version is less than v14 to prevent the CLI from hanging on
+ * exit in those cases.
+ */
+let forceExit = false;
 
 (async () => {
   /**
@@ -55,6 +63,11 @@ import { VERSION } from '../src/utilities/version';
         // eslint-disable-next-line  no-console
         console.error('Version mismatch check skipped. Unable to retrieve local version: ' + error);
       }
+    }
+
+    // Ensure older versions of the CLI fully exit
+    if (major(localVersion) < 14) {
+      forceExit = true;
     }
 
     let isGlobalGreater = false;
@@ -107,6 +120,9 @@ import { VERSION } from '../src/utilities/version';
     });
   })
   .then((exitCode: number) => {
+    if (forceExit) {
+      process.exit(exitCode);
+    }
     process.exitCode = exitCode;
   })
   .catch((err: Error) => {
