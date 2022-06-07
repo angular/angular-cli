@@ -5,7 +5,7 @@ merge:
   # the status will be added to your pull requests
   status:
     # set to true to disable
-    disabled: false
+    disabled: true
     # the name of the status
     context: 'ci/angular: merge status'
     # text to show when all checks pass
@@ -60,7 +60,7 @@ merge:
 # options for the triage plugin
 triage:
   # set to true to disable
-  disabled: false
+  disabled: true
   # number of the milestone to apply when the issue has not been triaged yet
   needsTriageMilestone: 11,
   # number of the milestone to apply when the issue is triaged
