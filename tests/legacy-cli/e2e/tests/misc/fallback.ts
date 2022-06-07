@@ -17,13 +17,7 @@ export default function () {
         assert.strictEqual(response.status, 200);
         assert.match(await response.text(), /<app-root><\/app-root>/);
       })
-      .then(
-        () => killAllProcesses(),
-        (err) => {
-          killAllProcesses();
-          throw err;
-        },
-      )
+      .finally(() => killAllProcesses())
       // should correctly fallback to a changed index
       .then(() => moveFile('src/index.html', 'src/not-index.html'))
       .then(() =>
