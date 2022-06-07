@@ -17,6 +17,13 @@ export default async function () {
   process.env.NPM_CONFIG_USERCONFIG = npmrc;
   process.env.NPM_CONFIG_PREFIX = npmModulesPrefix;
 
+  // Snapshot builds may contain versions that are not yet released (e.g., RC phase main branch).
+  // In this case peer dependency ranges may not resolve causing npm 7+ to fail during tests.
+  // To support this case, legacy peer dependency mode is enabled for snapshot builds.
+  if (getGlobalVariable('argv')['ng-snapshots']) {
+    process.env['NPM_CONFIG_legacy_peer_deps'] = 'true';
+  }
+
   // Configure the registry and prefix used within the test sandbox
   await writeFile(npmrc, `registry=${npmRegistry}\nprefix=${npmModulesPrefix}`);
   await mkdir(npmModulesPrefix);

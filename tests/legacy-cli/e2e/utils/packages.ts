@@ -50,7 +50,6 @@ export async function setRegistry(useTestRegistry: boolean): Promise<void> {
     : 'https://registry.npmjs.org';
 
   const isCI = getGlobalVariable('ci');
-  const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
 
   // Ensure local test registry is used when outside a project
   if (isCI) {
@@ -59,12 +58,5 @@ export async function setRegistry(useTestRegistry: boolean): Promise<void> {
   } else {
     // Yarn supports both `NPM_CONFIG_REGISTRY` and `YARN_REGISTRY`.
     process.env['NPM_CONFIG_REGISTRY'] = url;
-  }
-
-  // Snapshot builds may contain versions that are not yet released (e.g., RC phase main branch).
-  // In this case peer dependency ranges may not resolve causing npm 7+ to fail during tests.
-  // To support this case, legacy peer dependency mode is enabled for snapshot builds.
-  if (isSnapshotBuild) {
-    process.env['NPM_CONFIG_legacy_peer_deps'] = 'true';
   }
 }
