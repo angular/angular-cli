@@ -146,10 +146,10 @@ function wrap(
 
       return builtinModule;
     } else if (id.startsWith('@angular-devkit/') || id.startsWith('@schematics/')) {
-      // Files should not redirect `@angular/core` and instead use the direct
-      // dependency if available. This allows old major version migrations to continue to function
-      // even though the latest major version may have breaking changes in `@angular/core`.
-      if (id.startsWith('@angular-devkit/core')) {
+      // Files should not redirect `@angular-devkit/core` and `@schematics/angular`.
+      // Instead use the direct dependency if available. This allows old major version migrations and schematics (ex: `ng add @angular/pwa`)
+      // to continue to function even though the latest major version may have breaking changes.
+      if (id.startsWith('@angular-devkit/core') || id.startsWith('@schematics/angular')) {
         try {
           return schematicRequire(id);
         } catch (e) {
