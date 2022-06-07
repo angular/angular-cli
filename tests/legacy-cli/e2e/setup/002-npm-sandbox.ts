@@ -16,6 +16,7 @@ export default async function () {
   // isolated within this e2e test invocation.
   process.env.NPM_CONFIG_USERCONFIG = npmrc;
   process.env.NPM_CONFIG_PREFIX = npmModulesPrefix;
+  process.env.NPM_CONFIG_REGISTRY = npmRegistry;
 
   // Snapshot builds may contain versions that are not yet released (e.g., RC phase main branch).
   // In this case peer dependency ranges may not resolve causing npm 7+ to fail during tests.
