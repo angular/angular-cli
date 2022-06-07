@@ -1,4 +1,4 @@
-import { exec, execAndWaitForOutputToMatch } from '../../utils/process';
+import { exec, execAndWaitForOutputToMatch } from '../../../utils/process';
 
 export default async function () {
   // ng build

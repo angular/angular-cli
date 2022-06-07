@@ -2,13 +2,13 @@ import { promises as fs } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { env } from 'process';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable } from '../../../utils/env';
 import {
   execAndCaptureError,
   execAndWaitForOutputToMatch,
   execWithEnv,
   silentNpm,
-} from '../../utils/process';
+} from '../../../utils/process';
 
 const AUTOCOMPLETION_PROMPT = /Would you like to enable autocompletion\?/;
 const DEFAULT_ENV = Object.freeze({
