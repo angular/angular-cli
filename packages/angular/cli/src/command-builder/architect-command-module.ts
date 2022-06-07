@@ -104,7 +104,6 @@ export abstract class ArchitectCommandModule
     if (projectName) {
       return workspace.projects.has(projectName) ? projectName : undefined;
     }
-
     const target = this.getArchitectTarget();
     const projectFromTarget = this.getProjectNamesByTarget(target);
 
@@ -114,8 +113,8 @@ export abstract class ArchitectCommandModule
   @memoize
   private getProjectNamesByTarget(target: string): string[] | undefined {
     const workspace = this.getWorkspaceOrThrow();
-
     const allProjectsForTargetName: string[] = [];
+
     for (const [name, project] of workspace.projects) {
       if (project.targets.has(target)) {
         allProjectsForTargetName.push(name);
@@ -135,8 +134,17 @@ export abstract class ArchitectCommandModule
       }
 
       const maybeProject = getProjectByCwd(workspace);
-      if (maybeProject && allProjectsForTargetName.includes(maybeProject)) {
-        return [maybeProject];
+      if (maybeProject) {
+        return allProjectsForTargetName.includes(maybeProject) ? [maybeProject] : undefined;
+      }
+
+      const { getYargsCompletions, help } = this.context.args.options;
+      if (!getYargsCompletions && !help) {
+        // Only issue the below error when not in help / completion mode.
+        throw new CommandModuleError(
+          'Cannot determine project for command. ' +
+            'Pass the project name as a command line argument or change the current working directory to a project directory.',
+        );
       }
     }
 
