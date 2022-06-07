@@ -7216,10 +7216,10 @@ next-tick@1, next-tick@^1.1.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
   integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
 
-ng-packagr@14.0.0-next.10:
-  version "14.0.0-next.10"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-14.0.0-next.10.tgz#2f287e822a699467c369ccd06d6916786e31b41c"
-  integrity sha512-xLrWiRT4if1NgqJ42H13rnuodEKzAHeJRmaXnn/NWXEj4xZseZ1A3HclMWgA/u+HtyeHuWrNvvuR5vCKLrzIpA==
+ng-packagr@14.0.0:
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-14.0.0.tgz#ce54d2c065f188d8c6230c03d3e20c37de5adc5d"
+  integrity sha512-jHkpWm2yEpMPbY0Qz3sfDh+7uAfyskEMesEPA1aGQXxvwiIaCl+8RFRdPQxObYOj8Uv7ZJxoyUkqi8KqI5RV9g==
   dependencies:
     "@rollup/plugin-json" "^4.1.0"
     "@rollup/plugin-node-resolve" "^13.1.3"
@@ -7244,7 +7244,7 @@ ng-packagr@14.0.0-next.10:
     rollup-plugin-sourcemaps "^0.6.3"
     rxjs "^7.5.5"
     sass "^1.49.9"
-    stylus "^0.57.0"
+    stylus "^0.58.0"
   optionalDependencies:
     esbuild "^0.14.29"
 
@@ -9712,7 +9712,7 @@ stylus-loader@6.2.0:
     klona "^2.0.4"
     normalize-path "^3.0.0"
 
-stylus@0.57.0, stylus@^0.57.0:
+stylus@0.57.0:
   version "0.57.0"
   resolved "https://registry.yarnpkg.com/stylus/-/stylus-0.57.0.tgz#a46f04f426c19ceef54abb1a9d189fd4e886df41"
   integrity sha512-yOI6G8WYfr0q8v8rRvE91wbxFU+rJPo760Va4MF6K0I6BZjO4r+xSynkvyPBP9tV1CIEUeRsiidjIs2rzb1CnQ==
@@ -9721,6 +9721,17 @@ stylus@0.57.0, stylus@^0.57.0:
     debug "^4.3.2"
     glob "^7.1.6"
     safer-buffer "^2.1.2"
+    sax "~1.2.4"
+    source-map "^0.7.3"
+
+stylus@^0.58.0:
+  version "0.58.1"
+  resolved "https://registry.yarnpkg.com/stylus/-/stylus-0.58.1.tgz#7e425bb493c10dde94cf427a138d3eae875a3b44"
+  integrity sha512-AYiCHm5ogczdCPMfe9aeQa4NklB2gcf4D/IhzYPddJjTgPc+k4D/EVE0yfQbZD43MHP3lPy+8NZ9fcFxkrgs/w==
+  dependencies:
+    css "^3.0.0"
+    debug "^4.3.2"
+    glob "^7.1.6"
     sax "~1.2.4"
     source-map "^0.7.3"
 
