@@ -22,10 +22,6 @@ export class DeployCommandModule
       value: '@jefiozie/ngx-aws-deploy',
     },
     {
-      name: 'Azure',
-      value: '@azure/ng-deploy',
-    },
-    {
       name: 'Firebase',
       value: '@angular/fire',
     },
