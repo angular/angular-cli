@@ -52,11 +52,6 @@ export async function setRegistry(useTestRegistry: boolean): Promise<void> {
   const isCI = getGlobalVariable('ci');
 
   // Ensure local test registry is used when outside a project
-  if (isCI) {
-    // Safe to set a user configuration on CI
-    await npm('config', 'set', 'registry', url);
-  } else {
-    // Yarn supports both `NPM_CONFIG_REGISTRY` and `YARN_REGISTRY`.
-    process.env['NPM_CONFIG_REGISTRY'] = url;
-  }
+  // Yarn supports both `NPM_CONFIG_REGISTRY` and `YARN_REGISTRY`.
+  process.env['NPM_CONFIG_REGISTRY'] = url;
 }
