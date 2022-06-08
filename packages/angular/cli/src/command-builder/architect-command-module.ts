@@ -94,16 +94,18 @@ export abstract class ArchitectCommandModule
   }
 
   private getArchitectProject(): string | undefined {
-    const workspace = this.context.workspace;
-    if (!workspace) {
-      return undefined;
-    }
-
-    const [, projectName] = this.context.args.positional;
+    const { options, positional } = this.context.args;
+    const [, projectName] = positional;
 
     if (projectName) {
-      return workspace.projects.has(projectName) ? projectName : undefined;
+      return projectName;
     }
+
+    // Yargs allows positional args to be used as flags.
+    if (typeof options['project'] === 'string') {
+      return options['project'];
+    }
+
     const target = this.getArchitectTarget();
     const projectFromTarget = this.getProjectNamesByTarget(target);
 
