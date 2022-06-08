@@ -11,9 +11,13 @@ const testFunction: () => Promise<void> | void =
         throw new Error('Invalid test module.');
       };
 
-(async () => Promise.resolve(testFunction()))()
-  .finally(killAllProcesses)
-  .catch((e) => {
+(async () => {
+  try {
+    await testFunction();
+  } catch (e) {
     console.error(e);
     process.exitCode = -1;
-  });
+  } finally {
+    await killAllProcesses();
+  }
+})();

@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { getGlobalVariable, setGlobalVariable } from '../utils/env';
+import { getGlobalVariable } from '../utils/env';
 
 /**
  * Configure npm to use a unique sandboxed environment.

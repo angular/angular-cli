@@ -1,5 +1,5 @@
 import * as os from 'os';
-import { killAllProcesses, ng } from '../../utils/process';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
@@ -12,18 +12,13 @@ export default async function () {
     }
   }
 
-  try {
-    await updateJsonFile('angular.json', (workspaceJson) => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
-      appArchitect.serve.options = appArchitect.serve.options || {};
-      appArchitect.serve.options.port = 8888;
-      appArchitect.serve.options.host = host;
-    });
+  await updateJsonFile('angular.json', (workspaceJson) => {
+    const appArchitect = workspaceJson.projects['test-project'].architect;
+    appArchitect.serve.options = appArchitect.serve.options || {};
+    appArchitect.serve.options.port = 8888;
+    appArchitect.serve.options.host = host;
+  });
 
-    await ng('e2e');
-
-    await ng('e2e', '--host', host);
-  } finally {
-    await killAllProcesses();
-  }
+  await ng('e2e');
+  await ng('e2e', '--host', host);
 }
