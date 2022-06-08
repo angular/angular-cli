@@ -1,5 +1,5 @@
 import { moveFile } from '../../utils/fs';
-import { installPackage, uninstallPackage } from '../../utils/packages';
+import { getActivePackageManager, installPackage, uninstallPackage } from '../../utils/packages';
 import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
@@ -14,7 +14,13 @@ export default async function () {
       /Could not find the '@angular-devkit\/build-angular:browser' builder's node package\./,
     );
     await expectToFail(() =>
-      execAndWaitForOutputToMatch('ng', ['build'], /Node packages may not be installed\./),
+      execAndWaitForOutputToMatch(
+        'ng',
+        ['build'],
+        new RegExp(
+          `Node packages may not be installed\. Try installing with '${getActivePackageManager()} install'\.`,
+        ),
+      ),
     );
 
     await moveFile('node_modules', 'temp_node_modules');
@@ -25,7 +31,13 @@ export default async function () {
       ['build'],
       /Could not find the '@angular-devkit\/build-angular:browser' builder's node package\./,
     );
-    await execAndWaitForOutputToMatch('ng', ['build'], /Node packages may not be installed\./);
+    await execAndWaitForOutputToMatch(
+      'ng',
+      ['build'],
+      new RegExp(
+        `Node packages may not be installed\. Try installing with '${getActivePackageManager()} install'\.`,
+      ),
+    );
   } finally {
     await moveFile('temp_node_modules', 'node_modules');
     await installPackage('@angular-devkit/build-angular');

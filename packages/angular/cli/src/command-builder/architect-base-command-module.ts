@@ -151,7 +151,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     }
 
     this.context.logger.warn(
-      `Node packages may not be installed. Try installing with '${this.context.packageManager} install'.`,
+      `Node packages may not be installed. Try installing with '${this.context.packageManager.name} install'.`,
     );
   }
 
