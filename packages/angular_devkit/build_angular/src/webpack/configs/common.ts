@@ -33,6 +33,7 @@ import { NamedChunksPlugin } from '../plugins/named-chunks-plugin';
 import { ProgressPlugin } from '../plugins/progress-plugin';
 import { TransferSizePlugin } from '../plugins/transfer-size-plugin';
 import { createIvyPlugin } from '../plugins/typescript';
+import { WatchFilesLogsPlugin } from '../plugins/watch-files-logs-plugin';
 import {
   assetPatterns,
   externalizePackages,
@@ -202,6 +203,10 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         append: hiddenSourceMap ? false : undefined,
       }),
     );
+  }
+
+  if (verbose) {
+    extraPlugins.push(new WatchFilesLogsPlugin());
   }
 
   if (buildOptions.statsJson) {
