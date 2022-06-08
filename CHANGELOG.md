@@ -1,3 +1,47 @@
+<a name="14.0.1"></a>
+
+# 14.0.1 (2022-06-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------- |
+| [e4fb96657](https://github.com/angular/angular-cli/commit/e4fb96657f044d97562008b5b3c6f3a55ac8ba3a) | fix  | add text to help output to indicate that additional commands are available when ran in different context |
+| [7952e5790](https://github.com/angular/angular-cli/commit/7952e579066f7191f4b82a10816c6a41a4ea5644) | fix  | avoid creating unnecessary global configuration                                                          |
+| [66a1d6b9d](https://github.com/angular/angular-cli/commit/66a1d6b9d2e1fba3d5ee88a6c5d81206f530ce3a) | fix  | correct scope cache command                                                                              |
+| [e2d964289](https://github.com/angular/angular-cli/commit/e2d964289fe2a418e5f4e421249e2f8da64185cc) | fix  | correctly print package manager name when an install is needed                                           |
+| [75fd3330d](https://github.com/angular/angular-cli/commit/75fd3330d4c27263522ea931eb1545ce0a34ab6a) | fix  | during an update only use package manager force option with npm 7+                                       |
+| [e223890c1](https://github.com/angular/angular-cli/commit/e223890c1235b4564ec15eb99d71256791a21c3c) | fix  | ensure full process exit with older local CLI versions                                                   |
+| [0cca3638a](https://github.com/angular/angular-cli/commit/0cca3638adb46cd5d0c18b823c83d4b604d7c798) | fix  | handle project being passed as a flag                                                                    |
+| [b1451cb5e](https://github.com/angular/angular-cli/commit/b1451cb5e90f43df365202a6fdfcfbc9e0853ca4) | fix  | improve resilience of logging during process exit                                                        |
+| [17fec1357](https://github.com/angular/angular-cli/commit/17fec13577ac333fc66c3752c75be58146c9ebac) | fix  | provide actionable error when project cannot be determined                                               |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [73dcf39c6](https://github.com/angular/angular-cli/commit/73dcf39c6e7678a3915a113fd72829549ccc3b8e) | fix  | remove strict setting under application project |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [c788d5b56](https://github.com/angular/angular-cli/commit/c788d5b56a1a191e7ca53c3b63245e3979a1cf44) | fix  | log modified and removed files when using the `verbose` option |
+| [6e8fe0ed5](https://github.com/angular/angular-cli/commit/6e8fe0ed54d88132da0238fdb3a6e97330c85ff7) | fix  | replace dev-server socket path from `/ws` to `/ng-cli-ws`      |
+| [651adadf4](https://github.com/angular/angular-cli/commit/651adadf4df8b66c60771f27737cb2a67957b46a) | fix  | update Angular peer dependencies to 14.0 stable                |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [cfd264d06](https://github.com/angular/angular-cli/commit/cfd264d061109c7989933e51a14b6bf83b289b07) | fix  | add peer dependency on Angular CLI |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0"></a>
 
 # 14.0.0 (2022-06-02)
