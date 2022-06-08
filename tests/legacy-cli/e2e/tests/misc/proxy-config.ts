@@ -34,7 +34,7 @@ export default function () {
   return Promise.resolve()
     .then(() => writeFile(proxyConfigFile, JSON.stringify(proxyConfig, null, 2)))
     .then(() => ngServe('--proxy-config', proxyConfigFile))
-    .then(() => fetch('http://localhost:4200/api/test'))
+    .then((port) => fetch(`http://localhost:${port}/api/test`))
     .then(async (response) => {
       assert.strictEqual(response.status, 200);
       assert.match(await response.text(), /TEST_API_RETURN/);

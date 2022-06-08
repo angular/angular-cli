@@ -8,9 +8,9 @@ export default async function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   try {
-    await ngServe('--ssl', 'true');
+    const port = await ngServe('--ssl', 'true');
 
-    const response = await fetch('https://localhost:4200/', {
+    const response = await fetch(`https://localhost:${port}/`, {
       agent: new Agent({ rejectUnauthorized: false }),
     });
 

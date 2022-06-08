@@ -11,12 +11,12 @@ export default function () {
     .filter((ni) => ni?.family === 'IPv4' && !ni?.internal)
     .map((ni) => ni!.address)
     .shift();
-  const publicHost = `${firstLocalIp}:4200`;
+  const publicHost = `${firstLocalIp}`;
   const localAddress = `http://${publicHost}`;
 
   return Promise.resolve()
     .then(() => ngServe('--host=0.0.0.0', `--public-host=${publicHost}`))
-    .then(() => fetch(localAddress))
+    .then((port) => fetch(`${localAddress}:${port}`))
     .then((response) => response.text())
     .then((body) => {
       if (!body.match(/<app-root><\/app-root>/)) {
@@ -25,7 +25,7 @@ export default function () {
     })
     .then(() => killAllProcesses())
     .then(() => ngServe('--host=0.0.0.0', `--disable-host-check`))
-    .then(() => fetch(localAddress))
+    .then((port) => fetch(`${localAddress}:${port}`))
     .then((response) => response.text())
     .then((body) => {
       if (!body.match(/<app-root><\/app-root>/)) {
@@ -35,7 +35,7 @@ export default function () {
 
     .then(() => killAllProcesses())
     .then(() => ngServe('--host=0.0.0.0', `--public-host=${localAddress}`))
-    .then(() => fetch(localAddress))
+    .then((port) => fetch(`${localAddress}:${port}`))
     .then((response) => response.text())
     .then((body) => {
       if (!body.match(/<app-root><\/app-root>/)) {
@@ -44,7 +44,7 @@ export default function () {
     })
     .then(() => killAllProcesses())
     .then(() => ngServe('--host=0.0.0.0', `--public-host=${firstLocalIp}`))
-    .then(() => fetch(localAddress))
+    .then((port) => fetch(`${localAddress}:${port}`))
     .then((response) => response.text())
     .then((body) => {
       if (!body.match(/<app-root><\/app-root>/)) {
