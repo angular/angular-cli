@@ -1,3 +1,25 @@
+<a name="14.1.0-next.0"></a>
+
+# 14.1.0-next.0 (2022-06-08)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [707911d42](https://github.com/angular/angular-cli/commit/707911d423873623d4201d2fbce4a294ab73a135) | feat | support controlling `addDependency` utility rule install behavior |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [526cdb263](https://github.com/angular/angular-cli/commit/526cdb263a8c74ad228f584f70dc029aa69351d7) | feat | allow `chain` rule to accept iterables of rules |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Jason Bedard and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.1"></a>
 
 # 14.0.1 (2022-06-08)
