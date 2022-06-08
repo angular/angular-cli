@@ -2,6 +2,7 @@ import express from 'express';
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, expectFileToMatch, writeFile } from '../../utils/fs';
+import { findFreePort } from '../../utils/network';
 import { installWorkspacePackages } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -13,6 +14,7 @@ const snapshots = require('../../ng-snapshot/package.json');
 export default async function () {
   // TODO: Re-enable pending further Ivy/Universal/i18n work
   return;
+  const port = await findFreePort();
 
   // Setup i18n tests and config.
   await setupI18nConfig();
@@ -113,10 +115,10 @@ export default async function () {
     const { i18nApp } = (await import(serverBundle)) as {
       i18nApp(locale: string): express.Express;
     };
-    const server = i18nApp(lang).listen(4200, 'localhost');
+    const server = i18nApp(lang).listen(port, 'localhost');
     try {
       // Execute without a devserver.
-      await ng('e2e', `--configuration=${lang}`, '--dev-server-target=');
+      await ng('e2e', `--port=${port}`, `--configuration=${lang}`, '--dev-server-target=');
     } finally {
       server.close();
     }

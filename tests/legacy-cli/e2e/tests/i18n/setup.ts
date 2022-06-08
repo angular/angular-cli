@@ -9,11 +9,13 @@ import {
   replaceInFile,
   writeFile,
 } from '../../utils/fs';
+import { findFreePort } from '../../utils/network';
 import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
+import { Server } from 'http';
+import { AddressInfo } from 'net';
 
 // Configurations for each locale.
 export const baseDir = 'dist/test-project';
@@ -67,13 +69,33 @@ export const langTranslations = [
 ];
 export const sourceLocale = langTranslations[0].lang;
 
-export const externalServer = (outputPath: string, baseUrl = '/') => {
+export interface ExternalServer {
+  readonly server: Server;
+  readonly port: number;
+  readonly url: string;
+}
+
+/**
+ * Create an `express` `http.Server` listening on a random port.
+ *
+ * Call .close() on the server return value to close the server.
+ */
+export async function externalServer(outputPath: string, baseUrl = '/'): Promise<ExternalServer> {
   const app = express();
   app.use(baseUrl, express.static(resolve(outputPath)));
 
-  // call .close() on the return value to close the server.
-  return app.listen(4200, 'localhost');
-};
+  return new Promise((resolve) => {
+    const server = app.listen(0, 'localhost', () => {
+      const { port } = server.address() as AddressInfo;
+
+      resolve({
+        server,
+        port,
+        url: `http://localhost:${port}${baseUrl}`,
+      });
+    });
+  });
+}
 
 export const formats = {
   'xlf': {

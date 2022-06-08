@@ -8,11 +8,13 @@ import {
   replaceInFile,
   writeFile,
 } from '../../utils/fs';
+import { findFreePort } from '../../utils/network';
 import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
+import { externalServer } from './setup';
 
 export default async function () {
   // TEMP: disable pending i18n updates
@@ -154,9 +156,7 @@ export default async function () {
     await expectFileToExist(`${baseDir}/${lang}/ngsw.json`);
 
     // Ivy i18n doesn't yet work with `ng serve` so we must use a separate server.
-    const app = express();
-    app.use(express.static(resolve(baseDir, lang)));
-    const server = app.listen(4200, 'localhost');
+    const { server, port } = await externalServer(resolve(baseDir, lang));
     try {
       // Add E2E test for locale
       await writeFile(
@@ -180,7 +180,7 @@ export default async function () {
       );
 
       // Execute without a devserver.
-      await ng('e2e', '--dev-server-target=');
+      await ng('e2e', '--dev-server-target=', `--port=${port}`);
     } finally {
       server.close();
     }
