@@ -58,7 +58,7 @@ executors:
   windows-executor:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
     working_directory: ~/ng
-    resource_class: windows.medium
+    resource_class: windows.large
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
       # Contents of this image:
@@ -297,7 +297,7 @@ jobs:
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
-    parallelism: 8
+    parallelism: 6
     steps:
       - checkout
       - run:
