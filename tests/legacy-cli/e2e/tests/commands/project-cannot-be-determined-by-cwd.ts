@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { expectFileNotToExist, expectFileToExist } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
@@ -26,6 +27,9 @@ export default async function () {
 
     // Help should still work
     execAndWaitForOutputToMatch('ng', ['build', '--help'], /--configuration/);
+
+    // Yargs allows positional args to be passed as flags. Verify that in this case the project can be determined.
+    await ng('build', '--project=third-app', '--configuration=development');
 
     process.chdir(join(startCwd, 'projects/second-app'));
     await ng('build', '--configuration=development');
