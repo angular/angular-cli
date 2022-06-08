@@ -7,7 +7,7 @@ import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
-import { AddressInfo, createServer, Server } from 'net';
+import { AddressInfo, createServer } from 'net';
 import { launchTestProcess } from './e2e/utils/process';
 import { join } from 'path';
 
@@ -123,8 +123,6 @@ setGlobalVariable('argv', argv);
 setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
-let lastTestRun: string | null = null;
-
 Promise.all([findFreePort(), findFreePort()])
   .then(async ([httpPort, httpsPort]) => {
     setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
@@ -142,7 +140,6 @@ Promise.all([findFreePort(), findFreePort()])
       console.log(colors.green('Done.'));
     } catch (err) {
       console.log('\n');
-      console.error(colors.red(`Test "${lastTestRun}" failed...`));
       console.error(colors.red(err.message));
       console.error(colors.red(err.stack));
 
@@ -187,7 +184,11 @@ async function runSteps(
     // Run the test function with the current file on the logStack.
     logStack.push(lastLogger().createChild(absoluteName));
     try {
-      await run((lastTestRun = absoluteName));
+      await run(absoluteName);
+    } catch (e) {
+      console.log('\n');
+      console.error(colors.red(`Step "${absoluteName}" failed...`));
+      throw e;
     } finally {
       logStack.pop();
     }
