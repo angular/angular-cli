@@ -6,6 +6,7 @@ import { packages } from '../../../../lib/packages';
 import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
+import { findFreePort } from './network';
 import { installWorkspacePackages } from './packages';
 import { exec, execAndWaitForOutputToMatch, git, ng } from './process';
 
@@ -23,8 +24,16 @@ export function updateTsConfig(fn: (json: any) => any | void) {
   return updateJsonFile('tsconfig.json', fn);
 }
 
-export function ngServe(...args: string[]) {
-  return execAndWaitForOutputToMatch('ng', ['serve', ...args], / Compiled successfully./);
+export async function ngServe(...args: string[]) {
+  const port = await findFreePort();
+
+  await execAndWaitForOutputToMatch(
+    'ng',
+    ['serve', '--port', String(port), ...args],
+    / Compiled successfully./,
+  );
+
+  return port;
 }
 export async function prepareProjectForE2e(name: string) {
   const argv: yargsParser.Arguments = getGlobalVariable('argv');

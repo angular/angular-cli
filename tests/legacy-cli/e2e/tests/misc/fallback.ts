@@ -12,7 +12,7 @@ export default function () {
   return (
     Promise.resolve()
       .then(() => ngServe())
-      .then(() => fetch('http://localhost:4200/', { headers: { 'Accept': 'text/html' } }))
+      .then((port) => fetch(`http://localhost:${port}/`, { headers: { 'Accept': 'text/html' } }))
       .then(async (response) => {
         assert.strictEqual(response.status, 200);
         assert.match(await response.text(), /<app-root><\/app-root>/);
@@ -27,7 +27,7 @@ export default function () {
         }),
       )
       .then(() => ngServe())
-      .then(() => fetch('http://localhost:4200/', { headers: { 'Accept': 'text/html' } }))
+      .then((port) => fetch(`http://localhost:${port}/`, { headers: { 'Accept': 'text/html' } }))
       .then(async (response) => {
         assert.strictEqual(response.status, 200);
         assert.match(await response.text(), /<app-root><\/app-root>/);

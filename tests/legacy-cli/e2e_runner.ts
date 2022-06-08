@@ -7,9 +7,9 @@ import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
-import { AddressInfo, createServer } from 'net';
 import { launchTestProcess } from './e2e/utils/process';
 import { join } from 'path';
+import { findFreePort } from './e2e/utils/network';
 
 Error.stackTraceLimit = Infinity;
 
@@ -253,16 +253,4 @@ function printFooter(testName: string, type: 'setup' | 'initializer' | 'test', s
   const t = Math.round((Date.now() - startTime) / 10) / 100;
   console.log(colors.green(`Last ${type} took `) + colors.bold.blue('' + t) + colors.green('s...'));
   console.log('');
-}
-
-function findFreePort() {
-  return new Promise<number>((resolve, reject) => {
-    const srv = createServer();
-    srv.once('listening', () => {
-      const port = (srv.address() as AddressInfo).port;
-      srv.close((e) => (e ? reject(e) : resolve(port)));
-    });
-    srv.once('error', (e) => srv.close(() => reject(e)));
-    srv.listen();
-  });
 }

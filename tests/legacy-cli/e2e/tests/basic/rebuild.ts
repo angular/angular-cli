@@ -7,12 +7,15 @@ import {
 import { writeFile, writeMultipleFiles } from '../../utils/fs';
 import { wait } from '../../utils/utils';
 import fetch from 'node-fetch';
+import { findFreePort } from '../../utils/network';
 
 const validBundleRegEx = / Compiled successfully./;
 
-export default function () {
+export default async function () {
+  const port = await findFreePort();
+
   return (
-    execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
+    execAndWaitForOutputToMatch('ng', ['serve', '--port', String(port)], validBundleRegEx)
       // Add a lazy module.
       .then(() => ng('generate', 'module', 'lazy', '--routing'))
       // Should trigger a rebuild with a new bundle.
@@ -136,7 +139,7 @@ export default function () {
         ]),
       )
       .then(() => wait(2000))
-      .then(() => fetch('http://localhost:4200/main.js'))
+      .then(() => fetch(`http://localhost:${port}/main.js`))
       .then((response) => response.text())
       .then((body) => {
         if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
@@ -158,7 +161,7 @@ export default function () {
         ]),
       )
       .then(() => wait(2000))
-      .then(() => fetch('http://localhost:4200/main.js'))
+      .then(() => fetch(`http://localhost:${port}/main.js`))
       .then((response) => response.text())
       .then((body) => {
         if (!body.match(/testingTESTING123/)) {
@@ -174,7 +177,7 @@ export default function () {
         ]),
       )
       .then(() => wait(2000))
-      .then(() => fetch('http://localhost:4200/main.js'))
+      .then(() => fetch(`http://localhost:${port}/main.js`))
       .then((response) => response.text())
       .then((body) => {
         if (!body.match(/color:\s?blue/)) {
