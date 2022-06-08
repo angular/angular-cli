@@ -62,7 +62,6 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   }
 
   const childProcess = child_process.spawn(cmd, args, spawnOptions);
-  // @ts-ignore
   childProcess.stdout!.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
@@ -74,7 +73,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
       .filter((line) => line !== '')
       .forEach((line) => console.log('  ' + line));
   });
-  // @ts-ignore
+
   childProcess.stderr!.on('data', (data: Buffer) => {
     stderr += data.toString('utf-8');
     if (options.silent) {
@@ -121,14 +120,14 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
     if (options.waitForMatch) {
       const match = options.waitForMatch;
-      // @ts-ignore
+
       childProcess.stdout!.on('data', (data: Buffer) => {
         if (data.toString().match(match)) {
           resolve({ stdout, stderr });
           matched = true;
         }
       });
-      // @ts-ignore
+
       childProcess.stderr!.on('data', (data: Buffer) => {
         if (data.toString().match(match)) {
           resolve({ stdout, stderr });
@@ -176,14 +175,14 @@ export function waitForAnyProcessOutputToMatch(
       new Promise((resolve) => {
         let stdout = '';
         let stderr = '';
-        // @ts-ignore
+
         childProcess.stdout!.on('data', (data: Buffer) => {
           stdout += data.toString();
           if (data.toString().match(match)) {
             resolve({ stdout, stderr });
           }
         });
-        // @ts-ignore
+
         childProcess.stderr!.on('data', (data: Buffer) => {
           stderr += data.toString();
           if (data.toString().match(match)) {
@@ -197,22 +196,31 @@ export function waitForAnyProcessOutputToMatch(
 }
 
 export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
-  await Promise.all(
-    _processes.map(
-      ({ pid }) =>
-        new Promise<void>((resolve, reject) => {
-          treeKill(pid, signal, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        }),
-    ),
-  );
+  const processesToKill: Promise<void>[] = [];
 
-  _processes = [];
+  while (_processes.length) {
+    const childProc = _processes.pop();
+    if (!childProc) {
+      continue;
+    }
+
+    processesToKill.push(
+      new Promise<void>((resolve, reject) => {
+        treeKill(childProc.pid, signal, (err) => {
+          if (err && !err.message.includes('not found')) {
+            // Ignore process not found errors.
+            // This is due to a race condition with the `waitForMatch` logic.
+            // where promises are resolved on matches and not when the process terminates.
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }),
+    );
+  }
+
+  await Promise.all(processesToKill);
 }
 
 export function exec(cmd: string, ...args: string[]) {
