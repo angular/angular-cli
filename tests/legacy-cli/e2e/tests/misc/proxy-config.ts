@@ -5,8 +5,6 @@ import { writeFile } from '../../utils/fs';
 import fetch from 'node-fetch';
 import { killAllProcesses, ng } from '../../utils/process';
 import { ngServe } from '../../utils/project';
-import { updateJsonFile } from '../../utils/project';
-import { expectToFail } from '../../utils/utils';
 import { AddressInfo } from 'net';
 import * as assert from 'assert';
 
