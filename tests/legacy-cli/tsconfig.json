@@ -1,0 +1,5 @@
+{
+  "extends": "../../tsconfig-test.json",
+  "compilerOptions": { "paths": {} },
+  "exclude": ["e2e/assets/**"]
+}
