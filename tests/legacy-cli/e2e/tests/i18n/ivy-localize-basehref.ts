@@ -59,13 +59,17 @@ export default async function () {
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 
     // Execute Application E2E tests for a production build without dev server
-    const server = externalServer(outputPath, (baseHrefs[lang] as string) || '/');
+    const { server, port, url } = await externalServer(
+      outputPath,
+      (baseHrefs[lang] as string) || '/',
+    );
     try {
       await ng(
         'e2e',
+        `--port=${port}`,
         `--configuration=${lang}`,
         '--dev-server-target=',
-        `--base-url=http://localhost:4200${baseHrefs[lang] || '/'}`,
+        `--base-url=${url}`,
       );
     } finally {
       server.close();
@@ -89,13 +93,17 @@ export default async function () {
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 
     // Execute Application E2E tests for a production build without dev server
-    const server = externalServer(outputPath, '/test' + (baseHrefs[lang] || '/'));
+    const { server, port, url } = await externalServer(
+      outputPath,
+      '/test' + (baseHrefs[lang] || '/'),
+    );
     try {
       await ng(
         'e2e',
+        `--port=${port}`,
         `--configuration=${lang}`,
         '--dev-server-target=',
-        `--base-url=http://localhost:4200/test${baseHrefs[lang] || '/'}`,
+        `--base-url=${url}`,
       );
     } finally {
       server.close();
