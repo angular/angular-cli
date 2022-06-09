@@ -133,18 +133,17 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run:
-          name: Rebase PR on target branch
-          command: >
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              # User is required for rebase.
-              git config user.name "angular-ci"
-              git config user.email "angular-ci"
-              # Rebase PR on top of target branch.
-              node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
-            else
-              echo "This build is not over a PR, nothing to do."
-            fi
+      - when:
+          condition: <<environment.CIRCLE_PULL_REQUEST>>
+          steps:
+            - run:
+                name: Rebase PR on target branch
+                comand: |
+                  # User is required for rebase.
+                  git config user.name "angular-ci"
+                  git config user.email "angular-ci"
+                  # Rebase PR on top of target branch.
+                  node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
       - restore_cache:
           keys:
             - *cache_key
@@ -168,14 +167,12 @@ jobs:
     executor: action-executor
     steps:
       - custom_attach_workspace
-      - run:
-          name: Validate Commit Messages
-          command: >
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              yarn ng-dev commit-message validate-range <<pipeline.git.base_revision>> <<pipeline.git.revision>>
-            else
-              echo "This build is not over a PR, nothing to do."
-            fi
+      - when:
+          condition: <<environment.CIRCLE_PULL_REQUEST>>
+          steps:
+            - run:
+                name: Validate Commit Messages
+                command: yarn ng-dev commit-message validate-range <<pipeline.git.base_revision>> <<pipeline.git.revision>>
       - run:
           name: Validate Code Formatting
           command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
@@ -301,18 +298,17 @@ jobs:
     parallelism: 8
     steps:
       - checkout
-      - run:
-          name: Rebase PR on target branch
-          command: |
-            if (Test-Path env:CIRCLE_PR_NUMBER) {
-              # User is required for rebase.
-              git config user.name "angular-ci"
-              git config user.email "angular-ci"
-              # Rebase PR on top of target branch.
-              node tools/rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER
-            } else {
-              echo "This build is not over a PR, nothing to do."
-            }
+      - when:
+          condition: <<environment.CIRCLE_PULL_REQUEST>>
+          steps:
+            - run:
+                name: Rebase PR on target branch
+                comand: |
+                  # User is required for rebase.
+                  git config user.name "angular-ci"
+                  git config user.email "angular-ci"
+                  # Rebase PR on top of target branch.
+                  node tools/rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER
       - setup_windows
       - restore_cache:
           keys:
@@ -322,15 +318,22 @@ jobs:
           key: *cache_key_win
           paths:
             - ~/.cache/yarn
-      # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
-      - run:
-          name: Execute E2E Tests
-          command: |
-            if (Test-Path env:CIRCLE_PULL_REQUEST) {
-              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts,tests/test/test-sourcemap.ts,tests/misc/check-postinstalls.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
-            } else {
-              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
-            }
+      # Run partial e2e suite on PRs only.
+      - when:
+          condition: <<environment.CIRCLE_PULL_REQUEST>>
+          steps:
+            - run:
+                name: Execute E2E Tests Subset
+                command: |
+                  node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts,tests/test/test-sourcemap.ts,tests/misc/check-postinstalls.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+      # Release branches will run the full e2e suite.
+      - unless:
+          condition: <<environment.CIRCLE_PULL_REQUEST>>
+          steps:
+            - run:
+              name: Execute E2E Tests Subset
+              command: |
+                node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
       - fail_fast
 
 workflows:
