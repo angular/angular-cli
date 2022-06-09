@@ -198,7 +198,7 @@ jobs:
     executor:
       name: test-executor
       nodeversion: << parameters.nodeversion >>
-    parallelism: 6
+    parallelism: 8
     steps:
       - custom_attach_workspace
       - browser-tools/install-chrome
