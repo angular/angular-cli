@@ -10,8 +10,9 @@ import { analytics, json, tags } from '@angular-devkit/core';
 import debug from 'debug';
 import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
-import { AngularWorkspace, getWorkspace } from '../utilities/config';
+import { getWorkspace } from '../utilities/config';
 import { analyticsDisabled, analyticsShareDisabled } from '../utilities/environment-options';
+import { assertIsError } from '../utilities/error';
 import { isTTY } from '../utilities/tty';
 import { VERSION } from '../utilities/version';
 import { AnalyticsCollector } from './analytics-collector';
@@ -190,6 +191,7 @@ export async function getAnalytics(
       return new AnalyticsCollector(AnalyticsProperties.AngularCliDefault, uid);
     }
   } catch (err) {
+    assertIsError(err);
     analyticsDebug('Error happened during reading of analytics config: %s', err.message);
 
     return undefined;
@@ -222,6 +224,7 @@ export async function getSharedAnalytics(): Promise<AnalyticsCollector | undefin
       return new AnalyticsCollector(analyticsConfig.tracking, analyticsConfig.uuid);
     }
   } catch (err) {
+    assertIsError(err);
     analyticsDebug('Error happened during reading of analytics sharing config: %s', err.message);
 
     return undefined;

@@ -30,6 +30,7 @@ import { UpdateCommandModule } from '../commands/update/cli';
 import { VersionCommandModule } from '../commands/version/cli';
 import { colors } from '../utilities/color';
 import { AngularWorkspace, getWorkspace } from '../utilities/config';
+import { assertIsError } from '../utilities/error';
 import { PackageManagerUtils } from '../utilities/package-manager';
 import { CommandContext, CommandModuleError, CommandScope } from './command-module';
 import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
@@ -84,6 +85,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
       getWorkspace('global'),
     ]);
   } catch (e) {
+    assertIsError(e);
     logger.fatal(e.message);
 
     return 1;

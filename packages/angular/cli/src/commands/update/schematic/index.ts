@@ -11,6 +11,7 @@ import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devk
 import * as npa from 'npm-package-arg';
 import type { Manifest } from 'pacote';
 import * as semver from 'semver';
+import { assertIsError } from '../../../utilities/error';
 import {
   NgPackageManifestProperties,
   NpmRepositoryPackageJson,
@@ -269,6 +270,7 @@ function _performUpdate(
   try {
     packageJson = JSON.parse(packageJsonContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
   } catch (e) {
+    assertIsError(e);
     throw new SchematicsException('package.json could not be parsed: ' + e.message);
   }
 
@@ -772,6 +774,7 @@ function _getAllDependencies(tree: Tree): Array<readonly [string, VersionRange]>
   try {
     packageJson = JSON.parse(packageJsonContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
   } catch (e) {
+    assertIsError(e);
     throw new SchematicsException('package.json could not be parsed: ' + e.message);
   }
 

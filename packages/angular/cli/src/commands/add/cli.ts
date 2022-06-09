@@ -24,6 +24,7 @@ import {
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
 import { colors } from '../../utilities/color';
+import { assertIsError } from '../../utilities/error';
 import {
   NgAddSaveDependency,
   PackageManifest,
@@ -113,6 +114,7 @@ export class AddCommandModule
     try {
       packageIdentifier = npa(collection);
     } catch (e) {
+      assertIsError(e);
       logger.error(e.message);
 
       return 1;
@@ -151,6 +153,7 @@ export class AddCommandModule
           verbose,
         });
       } catch (e) {
+        assertIsError(e);
         spinner.fail(`Unable to load package information from registry: ${e.message}`);
 
         return 1;
@@ -237,6 +240,7 @@ export class AddCommandModule
         spinner.succeed(`Package information loaded.`);
       }
     } catch (e) {
+      assertIsError(e);
       spinner.fail(`Unable to fetch package information for '${packageIdentifier}': ${e.message}`);
 
       return 1;
@@ -341,6 +345,7 @@ export class AddCommandModule
 
       return true;
     } catch (e) {
+      assertIsError(e);
       if (e.code !== 'MODULE_NOT_FOUND') {
         throw e;
       }

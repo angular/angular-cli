@@ -16,6 +16,7 @@ import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
+import { assertIsError } from '../utilities/error';
 import { askConfirmation, askQuestion } from '../utilities/prompt';
 import { isTTY } from '../utilities/tty';
 import {
@@ -47,6 +48,8 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     try {
       builderName = await architectHost.getBuilderNameForTarget(target);
     } catch (e) {
+      assertIsError(e);
+
       return this.onMissingTarget(e.message);
     }
 
@@ -115,6 +118,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     try {
       builderDesc = await architectHost.resolveBuilder(builderConf);
     } catch (e) {
+      assertIsError(e);
       if (e.code === 'MODULE_NOT_FOUND') {
         this.warnOnMissingNodeModules();
         throw new CommandModuleError(`Could not find the '${builderConf}' builder's node package.`);

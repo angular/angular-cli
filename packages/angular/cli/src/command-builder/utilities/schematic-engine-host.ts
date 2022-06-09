@@ -13,6 +13,7 @@ import { parse as parseJson } from 'jsonc-parser';
 import nodeModule from 'module';
 import { dirname, resolve } from 'path';
 import { Script } from 'vm';
+import { assertIsError } from '../../utilities/error';
 
 /**
  * Environment variable to control schematic package redirection
@@ -153,6 +154,7 @@ function wrap(
         try {
           return schematicRequire(id);
         } catch (e) {
+          assertIsError(e);
           if (e.code !== 'MODULE_NOT_FOUND') {
             throw e;
           }

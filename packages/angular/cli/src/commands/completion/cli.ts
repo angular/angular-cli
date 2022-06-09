@@ -12,6 +12,7 @@ import { CommandModule, CommandModuleImplementation } from '../../command-builde
 import { addCommandModuleToYargs } from '../../command-builder/utilities/command';
 import { colors } from '../../utilities/color';
 import { hasGlobalCliInstall, initializeAutocomplete } from '../../utilities/completion';
+import { assertIsError } from '../../utilities/error';
 
 export class CompletionCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'completion';
@@ -27,6 +28,7 @@ export class CompletionCommandModule extends CommandModule implements CommandMod
     try {
       rcFile = await initializeAutocomplete();
     } catch (err) {
+      assertIsError(err);
       this.context.logger.error(err.message);
 
       return 1;
