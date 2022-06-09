@@ -1,4 +1,4 @@
-import { expectFileNotToExist, expectFileToMatch, readFile, writeFile } from '../../utils/fs';
+import { expectFileNotToExist, expectFileToMatch, readFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 import { externalServer, langTranslations, setupI18nConfig } from './setup';
@@ -7,9 +7,13 @@ export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
-  await writeFile('.browserslistrc', 'Chrome 65');
+  const { stderr } = await ng('build', '--source-map');
+  if (/Locale data for .+ cannot be found/.test(stderr)) {
+    throw new Error(
+      `A warning for a locale not found was shown. This should not happen.\n\nSTDERR:\n${stderr}\n`,
+    );
+  }
 
-  await ng('build', '--source-map');
   for (const { lang, outputPath, translation } of langTranslations) {
     await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
