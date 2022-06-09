@@ -94,7 +94,7 @@ commands:
             Expand-Archive -Path 'aim_drivers.zip'
 
             ./aim_ll/x64/aim_ll.exe --install ./aim_drivers
-            ./aim_ll/x64/aim_ll.exe -a -s 3G -m X: -p "/fs:ntfs /q /y"
+            ./aim_ll/x64/aim_ll.exe -a -s 4G -m X: -p "/fs:ntfs /q /y"
       - run: nvm install 16.10
       - run: nvm use 16.10
       - run: npm install -g yarn@1.22.10
@@ -309,7 +309,7 @@ jobs:
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
-    parallelism: 8
+    parallelism: 6
     steps:
       - checkout
       - run:

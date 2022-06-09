@@ -207,14 +207,11 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
     processesToKill.push(
       new Promise<void>((resolve, reject) => {
         treeKill(childProc.pid, signal, (err) => {
-          if (err && !err.message.includes('not found')) {
-            // Ignore process not found errors.
-            // This is due to a race condition with the `waitForMatch` logic.
-            // where promises are resolved on matches and not when the process terminates.
-            reject(err);
-          } else {
-            resolve();
-          }
+          // Ignore errors.
+          // This is due to a race condition with the `waitForMatch` logic.
+          // where promises are resolved on matches and not when the process terminates.
+
+          resolve();
         });
       }),
     );
