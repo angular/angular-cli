@@ -83,6 +83,25 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
+      - run:
+          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
+          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
+          name: 'Arsenal Image Mounter (RAM Disk)'
+          command: |
+            # Download AIM Drivers
+            Invoke-WebRequest 'https://github.com/ArsenalRecon/Arsenal-Image-Mounter/raw/988930e4b3180ec34661504e6f9906f98943a022/DriverSetup/DriverFiles.zip' -OutFile 'aim_drivers.zip' -UseBasicParsing
+            Expand-Archive -Path 'aim_drivers.zip'
+
+            # Download AIM CLI
+            Invoke-WebRequest 'https://github.com/ArsenalRecon/Arsenal-Image-Mounter/raw/988930e4b3180ec34661504e6f9906f98943a022/Command%20line%20applications/aim_ll.zip' -OutFile 'aim_ll.zip' -UseBasicParsing
+            Expand-Archive -Path 'aim_ll.zip'
+
+            # Install AIM drivers
+            ./aim_ll/x64/aim_ll.exe --install ./aim_drivers
+
+            # Setup RAM disk mount. Same parameters as ImDisk
+            # See: https://support.circleci.com/hc/en-us/articles/4411520952091-Create-a-windows-RAM-disk
+            ./aim_ll/x64/aim_ll.exe -a -s 5G -m X: -p "/fs:ntfs /q /y"
       - run: nvm install 16.10
       - run: nvm use 16.10
       - run: npm install -g yarn@1.22.10
@@ -326,10 +345,11 @@ jobs:
       - run:
           name: Execute E2E Tests
           command: |
+            mkdir X:/ramdisk/e2e-main
             if (Test-Path env:CIRCLE_PULL_REQUEST) {
-              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts,tests/test/test-sourcemap.ts,tests/misc/check-postinstalls.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts,tests/test/test-sourcemap.ts,tests/misc/check-postinstalls.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=X:/ramdisk/e2e-main
             } else {
-              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
+              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=X:/ramdisk/e2e-main
             }
       - fail_fast
 
