@@ -205,16 +205,13 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
     }
 
     processesToKill.push(
-      new Promise<void>((resolve, reject) => {
-        treeKill(childProc.pid, signal, (err) => {
-          if (err && !err.message.includes('not found')) {
-            // Ignore process not found errors.
-            // This is due to a race condition with the `waitForMatch` logic.
-            // where promises are resolved on matches and not when the process terminates.
-            reject(err);
-          } else {
-            resolve();
-          }
+      new Promise<void>((resolve) => {
+        treeKill(childProc.pid, signal, () => {
+          // Ignore all errors.
+          // This is due to a race condition with the `waitForMatch` logic.
+          // where promises are resolved on matches and not when the process terminates.
+          // Also in some cases in windows we get `The operation attempted is not supported`.
+          resolve();
         });
       }),
     );
