@@ -1,4 +1,4 @@
-import { expectFileToMatch, moveFile, writeFile } from '../../../utils/fs';
+import { expectFileToMatch, writeFile } from '../../../utils/fs';
 import { installPackage } from '../../../utils/packages';
 import { ng, silentExec } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
@@ -19,11 +19,6 @@ export default async function () {
 
   // Create configuration file
   await silentExec('npx', 'tailwindcss', 'init');
-
-  // tailwind doesn't create the config file with a cjs extension.
-  // We need to rename it manually until
-  // https://github.com/tailwindlabs/tailwindcss/commit/6c63f67d20c433b5c7281e9e26744038ed41ccc2 is released.
-  await moveFile('tailwind.config.js', 'tailwind.config.cjs');
 
   // Add Tailwind directives to a global style
   await writeFile('src/styles.css', '@tailwind base; @tailwind components;');
