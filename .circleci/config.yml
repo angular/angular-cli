@@ -83,18 +83,24 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
+      - run:
+          name: 'ImDisk'
+          command: |
+            # Download Arsenal Image Mounter and it's drivers
+            Invoke-WebRequest 'https://github.com/ArsenalRecon/Arsenal-Image-Mounter/raw/988930e4b3180ec34661504e6f9906f98943a022/Command%20line%20applications/aim_ll.zip' -OutFile 'aim_ll.zip' -UseBasicParsing
+            Invoke-WebRequest 'https://github.com/ArsenalRecon/Arsenal-Image-Mounter/raw/988930e4b3180ec34661504e6f9906f98943a022/DriverSetup/DriverFiles.zip' -OutFile 'aim_drivers.zip' -UseBasicParsing
+
+            Expand-Archive -Path 'aim_ll.zip'
+            Expand-Archive -Path 'aim_drivers.zip'
+
+            ./aim_ll/x64/aim_ll.exe --install ./aim_drivers
+            ./aim_ll/x64/aim_ll.exe -a -s 3G -m X: -p "/fs:ntfs /q /y"
       - run: nvm install 16.10
       - run: nvm use 16.10
       - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
       - run: git config --global core.longpaths true
-      - run:
-          name: 'ImDisk'
-          command: |
-            choco install imdisk
-            imdisk -a -s 3G -m X: -p "/fs:ntfs /q /y"
-
   setup_bazel_rbe:
     parameters:
       key:
@@ -332,12 +338,7 @@ jobs:
           name: Execute E2E Tests
           command: |
             mkdir X:/ramdisk/e2e-main
-            mklink /j "C:/ramdisk/e2e-main" "X:/ramdisk/e2e-main"
-            if (Test-Path env:CIRCLE_PULL_REQUEST) {
-              node tests\legacy-cli\run_e2e.js "--glob={tests/basic/**,tests/i18n/extract-ivy*.ts,tests/build/profile.ts,tests/test/test-sourcemap.ts,tests/misc/check-postinstalls.ts}" --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX  --tmpdir=C:/ramdisk/e2e-main
-            } else {
-              node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=C:/ramdisk/e2e-main
-            }
+            node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=X:/ramdisk/e2e-main
       - fail_fast
 
 workflows:
