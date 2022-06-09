@@ -17,6 +17,7 @@ import type { CheckboxQuestion, Question } from 'inquirer';
 import { relative, resolve } from 'path';
 import { Argv } from 'yargs';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
+import { assertIsError } from '../utilities/error';
 import { memoize } from '../utilities/memoize';
 import { isTTY } from '../utilities/tty';
 import {
@@ -364,6 +365,7 @@ export abstract class SchematicsCommandModule
         // "See above" because we already printed the error.
         logger.fatal('The Schematic workflow failed. See above.');
       } else {
+        assertIsError(err);
         logger.fatal(err.message);
       }
 

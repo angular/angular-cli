@@ -15,6 +15,7 @@ import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
 import { forceAutocomplete } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
+import { assertIsError } from './error';
 
 /** Interface for the autocompletion configuration stored in the global workspace. */
 interface CompletionConfig {
@@ -64,6 +65,7 @@ Ok, you won't be prompted again. Should you change your mind, the following comm
   try {
     rcFile = await initializeAutocomplete();
   } catch (err) {
+    assertIsError(err);
     // Failed to set up autocompeletion, log the error and abort.
     logger.error(err.message);
 
@@ -247,6 +249,7 @@ export async function initializeAutocomplete(): Promise<string> {
       '\n\n# Load Angular CLI autocompletion.\nsource <(ng completion script)\n',
     );
   } catch (err) {
+    assertIsError(err);
     throw new Error(`Failed to append autocompletion setup to \`${rcFile}\`:\n${err.message}`);
   }
 

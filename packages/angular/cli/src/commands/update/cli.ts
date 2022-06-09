@@ -8,7 +8,7 @@
 
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
-import { execSync, spawnSync } from 'child_process';
+import { SpawnSyncReturns, execSync, spawnSync } from 'child_process';
 import { existsSync, promises as fs } from 'fs';
 import npa from 'npm-package-arg';
 import pickManifest from 'npm-pick-manifest';
@@ -27,6 +27,7 @@ import { SchematicEngineHost } from '../../command-builder/utilities/schematic-e
 import { subscribeToWorkflow } from '../../command-builder/utilities/schematic-workflow';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
+import { assertIsError } from '../../utilities/error';
 import { writeErrorToLogFile } from '../../utilities/log-file';
 import {
   PackageIdentifier,
@@ -211,6 +212,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
 
         packages.push(packageIdentifier as PackageIdentifier);
       } catch (e) {
+        assertIsError(e);
         logger.error(e.message);
 
         return 1;
@@ -281,6 +283,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       if (e instanceof UnsuccessfulWorkflowExecution) {
         logger.error(`${colors.symbols.cross} Migration failed. See above for further details.\n`);
       } else {
+        assertIsError(e);
         const logPath = writeErrorToLogFile(e);
         logger.fatal(
           `${colors.symbols.cross} Migration failed: ${e.message}\n` +
@@ -484,6 +487,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       try {
         migrations = require.resolve(migrations, { paths: [packagePath] });
       } catch (e) {
+        assertIsError(e);
         if (e.code === 'MODULE_NOT_FOUND') {
           logger.error('Migrations for package were not found.');
         } else {
@@ -577,6 +581,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           verbose: options.verbose,
         });
       } catch (e) {
+        assertIsError(e);
         logger.error(`Error fetching metadata for '${packageName}': ` + e.message);
 
         return 1;
@@ -593,6 +598,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         try {
           manifest = pickManifest(metadata, requestIdentifier.fetchSpec);
         } catch (e) {
+          assertIsError(e);
           if (e.code === 'ETARGET') {
             // If not found and next was used and user did not provide a specifier, try latest.
             // Package may not have a next tag.
@@ -604,6 +610,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
               try {
                 manifest = pickManifest(metadata, 'latest');
               } catch (e) {
+                assertIsError(e);
                 if (e.code !== 'ETARGET' && e.code !== 'ENOVERSIONS') {
                   throw e;
                 }
@@ -746,6 +753,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
               }),
             );
           } catch (e) {
+            assertIsError(e);
             if (e.code === 'MODULE_NOT_FOUND') {
               // Fallback to trying to resolve the package's main entry point
               packagePath = require.resolve(migration.package, { paths: [this.context.root] });
@@ -754,6 +762,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
             }
           }
         } catch (e) {
+          assertIsError(e);
           if (e.code === 'MODULE_NOT_FOUND') {
             logVerbose(e.toString());
             logger.error(
@@ -781,6 +790,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           try {
             migrations = require.resolve(migration.collection, { paths: [packagePath] });
           } catch (e) {
+            assertIsError(e);
             if (e.code === 'MODULE_NOT_FOUND') {
               logger.error(`Migrations for package (${migration.package}) were not found.`);
             } else {
@@ -821,7 +831,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     try {
       commitNeeded = hasChangesToCommit();
     } catch (err) {
-      logger.error(`  Failed to read Git tree:\n${err.stderr}`);
+      logger.error(`  Failed to read Git tree:\n${(err as SpawnSyncReturns<string>).stderr}`);
 
       return false;
     }
@@ -836,7 +846,9 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     try {
       createCommit(message);
     } catch (err) {
-      logger.error(`Failed to commit update (${message}):\n${err.stderr}`);
+      logger.error(
+        `Failed to commit update (${message}):\n${(err as SpawnSyncReturns<string>).stderr}`,
+      );
 
       return false;
     }

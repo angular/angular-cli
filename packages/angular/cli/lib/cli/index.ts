@@ -92,7 +92,7 @@ export default async function (options: { cliArgs: string[] }) {
       } catch (e) {
         logger.fatal(
           `An unhandled exception occurred: ${err.message}\n` +
-            `Fatal error writing debug log file: ${e.message}`,
+            `Fatal error writing debug log file: ${e}`,
         );
         if (err.stack) {
           logger.fatal(err.stack);
@@ -105,9 +105,7 @@ export default async function (options: { cliArgs: string[] }) {
     } else if (typeof err === 'number') {
       // Log nothing.
     } else {
-      logger.fatal(
-        `An unexpected error occurred: ${'toString' in err ? err.toString() : JSON.stringify(err)}`,
-      );
+      logger.fatal(`An unexpected error occurred: ${err}`);
     }
 
     return 1;
