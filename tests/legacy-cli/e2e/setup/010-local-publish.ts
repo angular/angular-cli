@@ -1,11 +1,10 @@
 import { getGlobalVariable } from '../utils/env';
-import { execWithEnv, extractNpmEnv } from '../utils/process';
+import { globalNpm, extractNpmEnv } from '../utils/process';
 import { isPrereleaseCli } from '../utils/project';
 
 export default async function () {
   const testRegistry: string = getGlobalVariable('package-registry');
-  await execWithEnv(
-    'npm',
+  await globalNpm(
     [
       'run',
       'admin',
