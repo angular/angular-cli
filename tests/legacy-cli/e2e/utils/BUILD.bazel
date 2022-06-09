@@ -14,6 +14,7 @@ ts_library(
         "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
         "@npm//glob",
+        "@npm//npm",
         "@npm//protractor",
         "@npm//puppeteer",
         "@npm//rxjs",

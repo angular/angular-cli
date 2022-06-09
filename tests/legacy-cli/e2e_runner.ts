@@ -55,6 +55,11 @@ const argv = yargsParser(process.argv.slice(2), {
  */
 process.exitCode = 255;
 
+/**
+ * Mark this process as the main e2e_runner
+ */
+process.env.LEGACY_CLI_RUNNER = '1';
+
 const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr, {
   info: (s) => s,
   debug: (s) => s,

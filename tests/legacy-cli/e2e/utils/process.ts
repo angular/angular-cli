@@ -322,6 +322,16 @@ export function silentYarn(...args: string[]) {
   return _exec({ silent: true }, 'yarn', args);
 }
 
+export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
+  if (!process.env.LEGACY_CLI_RUNNER) {
+    throw new Error(
+      'The global npm cli should only be executed from the primary e2e runner process',
+    );
+  }
+
+  return _exec({ silent: true, env }, 'node', [require.resolve('npm'), ...args]);
+}
+
 export function npm(...args: string[]) {
   return _exec({}, 'npm', args);
 }
