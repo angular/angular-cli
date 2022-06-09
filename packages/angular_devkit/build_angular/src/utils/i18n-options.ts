@@ -200,14 +200,14 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
         localeDataPath = findLocaleDataPath(first.toLowerCase(), localeResolver);
         if (localeDataPath) {
           context.logger.warn(
-            `Locale data for '${locale}' cannot be found.  Using locale data for '${first}'.`,
+            `Locale data for '${locale}' cannot be found. Using locale data for '${first}'.`,
           );
         }
       }
     }
     if (!localeDataPath) {
       context.logger.warn(
-        `Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`,
+        `Locale data for '${locale}' cannot be found. No locale data will be included for this locale.`,
       );
     } else {
       desc.dataPath = localeDataPath;
@@ -268,12 +268,8 @@ function findLocaleDataPath(locale: string, resolver: (locale: string) => string
   try {
     return resolver(scrubbedLocale);
   } catch {
-    if (scrubbedLocale === 'en-US') {
-      // fallback to known existing en-US locale data as of 9.0
-      return findLocaleDataPath('en-US-POSIX', resolver);
-    }
-
-    return null;
+    // fallback to known existing en-US locale data as of 14.0
+    return scrubbedLocale === 'en-US' ? findLocaleDataPath('en', resolver) : null;
   }
 }
 

@@ -25,7 +25,7 @@ export default async function () {
   });
 
   const { stderr: err1 } = await ng('build');
-  if (!err1.includes(`Locale data for 'fr-Abcd' cannot be found.  Using locale data for 'fr'.`)) {
+  if (!err1.includes(`Locale data for 'fr-Abcd' cannot be found. Using locale data for 'fr'.`)) {
     throw new Error('locale data fallback warning not shown');
   }
 
