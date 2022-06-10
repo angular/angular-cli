@@ -10,7 +10,6 @@
     "noImplicitOverride": true,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
-    "useUnknownInCatchVariables": false,
     "outDir": "./dist",
     "rootDir": ".",
     "skipLibCheck": true,

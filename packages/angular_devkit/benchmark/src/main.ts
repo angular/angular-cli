@@ -221,11 +221,7 @@ export async function main({
       return 1;
     }
   } catch (error) {
-    if (error.message) {
-      logger.fatal(error.message);
-    } else {
-      logger.fatal(error);
-    }
+    logger.fatal(error instanceof Error ? error.message : `${error}`);
 
     return 1;
   }
