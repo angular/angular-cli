@@ -105,7 +105,7 @@ export function runWebpack(
           } catch (err) {
             if (err) {
               context.logger.error(
-                `\nAn error occurred during the build:\n${(err && err.stack) || err}`,
+                `\nAn error occurred during the build:\n${err instanceof Error ? err.stack : err}`,
               );
             }
             throw err;
