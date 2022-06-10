@@ -82,7 +82,7 @@ let forceExit = false;
       // If using the update command and the global version is greater, use the newer update command
       // This allows improvements in update to be used in older versions that do not have bootstrapping
       if (
-        process.argv[2] === 'update' &&
+        (process.argv[2] === 'update' || process.argv[2] === 'completion') &&
         cli.VERSION &&
         cli.VERSION.major - globalVersion.major <= 1
       ) {
