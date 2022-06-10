@@ -2,7 +2,6 @@ import { getGlobalVariable } from '../../utils/env';
 import {
   appendToFile,
   copyFile,
-  expectFileToExist,
   expectFileToMatch,
   replaceInFile,
   writeFile,
@@ -15,10 +14,6 @@ import { readNgVersion } from '../../utils/version';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  // TEMP: disable pending i18n updates
-  // TODO: when re-enabling, use setupI18nConfig and helpers like other i18n tests.
-  return;
-
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
 
   await updateJsonFile('package.json', (packageJson) => {
@@ -79,7 +74,6 @@ export default async function () {
     serverOptions.localize = true;
 
     // Add locale definitions to the project
-    // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = (appProject.i18n = { locales: {} });
     for (const { lang } of langTranslations) {
       if (lang == 'en-US') {
@@ -105,7 +99,6 @@ export default async function () {
 
   // Extract the translation messages and copy them for each language.
   await ng('extract-i18n', '--output-path=src/locale');
-  await expectFileToExist('src/locale/messages.xlf');
   await expectFileToMatch('src/locale/messages.xlf', `source-language="en-US"`);
   await expectFileToMatch('src/locale/messages.xlf', `An introduction header for this sample`);
 
@@ -131,7 +124,6 @@ export default async function () {
 
   // Build each locale and verify the output.
   await ng('run', 'test-project:app-shell');
-
   for (const { lang, translation } of langTranslations) {
     await expectFileToMatch(`${browserBaseDir}/${lang}/index.html`, translation);
   }
