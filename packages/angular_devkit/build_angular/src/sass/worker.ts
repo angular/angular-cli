@@ -60,7 +60,8 @@ parentPort.on('message', ({ id, hasImporter, options }: RenderRequestMessage) =>
     const result = renderSync(options);
 
     parentPort?.postMessage({ id, result });
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     // Needed because V8 will only serialize the message and stack properties of an Error instance.
     const { formatted, file, line, column, message, stack } = error;
     parentPort?.postMessage({ id, error: { formatted, file, line, column, message, stack } });

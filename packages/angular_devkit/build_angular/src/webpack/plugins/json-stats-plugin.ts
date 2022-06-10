@@ -9,6 +9,7 @@
 import { createWriteStream, promises as fsPromises } from 'fs';
 import { dirname } from 'path';
 import { Compiler } from 'webpack';
+import { assertIsError } from '../../utils/error';
 
 import { addError } from '../../utils/webpack-diagnostics';
 
@@ -29,6 +30,7 @@ export class JsonStatsPlugin {
             .on('error', reject),
         );
       } catch (error) {
+        assertIsError(error);
         addError(
           stats.compilation,
           `Unable to write stats file: ${error.message || 'unknown error'}`,

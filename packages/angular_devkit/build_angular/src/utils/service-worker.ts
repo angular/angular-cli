@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import { createReadStream, promises as fs, constants as fsConstants } from 'fs';
 import * as path from 'path';
 import { pipeline } from 'stream';
+import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
 
 class CliFilesystem implements Filesystem {
@@ -78,6 +79,7 @@ export async function augmentAppWithServiceWorker(
     const configurationData = await fs.readFile(configPath, 'utf-8');
     config = JSON.parse(configurationData) as Config;
   } catch (error) {
+    assertIsError(error);
     if (error.code === 'ENOENT') {
       throw new Error(
         'Error: Expected to find an ngsw-config.json configuration file' +
@@ -130,6 +132,7 @@ export async function augmentAppWithServiceWorker(
       fsConstants.COPYFILE_FICLONE,
     );
   } catch (error) {
+    assertIsError(error);
     if (error.code !== 'ENOENT') {
       throw error;
     }

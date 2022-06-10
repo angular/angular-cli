@@ -16,6 +16,7 @@ import { JsonObject } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { normalizeOptimization } from '../../utils';
+import { assertIsError } from '../../utils/error';
 import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
@@ -199,6 +200,7 @@ async function _appShellBuilder(
     return result;
   } catch (err) {
     spinner?.fail('Application shell generation failed.');
+    assertIsError(err);
 
     return { success: false, error: err.message };
   } finally {

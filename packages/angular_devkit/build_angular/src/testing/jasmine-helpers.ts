@@ -95,7 +95,7 @@ export function expectFile<T>(path: string, harness: BuilderHarness<T>): Harness
       try {
         return expect(harness.readFile(path)).withContext(`With file content for '${path}'`);
       } catch (e) {
-        if (e.code !== 'ENOENT') {
+        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
           throw e;
         }
 
@@ -112,7 +112,7 @@ export function expectFile<T>(path: string, harness: BuilderHarness<T>): Harness
           `With file size for '${path}'`,
         );
       } catch (e) {
-        if (e.code !== 'ENOENT') {
+        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
           throw e;
         }
 

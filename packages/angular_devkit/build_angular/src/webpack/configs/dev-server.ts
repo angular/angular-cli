@@ -13,6 +13,7 @@ import { URL, pathToFileURL } from 'url';
 import { Configuration, RuleSetRule } from 'webpack';
 import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
+import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { HmrLoader } from '../plugins/hmr/hmr-loader';
@@ -193,6 +194,7 @@ async function addProxyConfig(root: string, proxyConfig: string | undefined) {
       try {
         return require(proxyPath);
       } catch (e) {
+        assertIsError(e);
         if (e.code === 'ERR_REQUIRE_ESM') {
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
