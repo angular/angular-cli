@@ -57,7 +57,7 @@ function _listSchematics(workflow: NodeWorkflow, collectionName: string, logger:
     const collection = workflow.engine.createCollection(collectionName);
     logger.info(collection.listSchematicNames().join('\n'));
   } catch (error) {
-    logger.fatal(error.message);
+    logger.fatal(error instanceof Error ? error.message : `${error}`);
 
     return 1;
   }
@@ -285,10 +285,10 @@ export async function main({
     if (err instanceof UnsuccessfulWorkflowExecution) {
       // "See above" because we already printed the error.
       logger.fatal('The Schematic workflow failed. See above.');
-    } else if (debug) {
+    } else if (debug && err instanceof Error) {
       logger.fatal(`An error occured:\n${err.stack}`);
     } else {
-      logger.fatal(`Error: ${err.message}`);
+      logger.fatal(`Error: ${err instanceof Error ? err.message : err}`);
     }
 
     return 1;
