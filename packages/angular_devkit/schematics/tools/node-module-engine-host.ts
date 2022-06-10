@@ -67,7 +67,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
 
       collectionPath = this.resolve(schematics, packageJsonPath, references);
     } catch (e) {
-      if (e.code !== 'MODULE_NOT_FOUND') {
+      if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
         throw e;
       }
     }
@@ -77,7 +77,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
       try {
         collectionPath = require.resolve(name, resolveOptions);
       } catch (e) {
-        if (e.code !== 'MODULE_NOT_FOUND') {
+        if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
           throw e;
         }
       }
