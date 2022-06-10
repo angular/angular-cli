@@ -1,4 +1,4 @@
-import { expectFileNotToExist, expectFileToExist, rimraf } from '../../utils/fs';
+import { expectFileNotToExist, expectFileToExist, rimraf, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
@@ -7,6 +7,10 @@ const overriddenCachePath = '.cache/angular-cli';
 
 export default async function () {
   const originalCIValue = process.env['CI'];
+
+  // No need to include all applications code to verify disk cache existence.
+  await writeFile('src/main.ts', 'console.log(1);');
+  await writeFile('src/polyfills.ts', 'console.log(1);');
 
   try {
     // Should be enabled by default.
