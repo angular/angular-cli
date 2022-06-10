@@ -45,7 +45,7 @@ function loadFSWatcher() {
       // eslint-disable-next-line import/no-extraneous-dependencies
       FSWatcher = require('chokidar').FSWatcher;
     } catch (e) {
-      if (e.code !== 'MODULE_NOT_FOUND') {
+      if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
         throw new Error(
           'As of angular-devkit version 8.0, the "chokidar" package ' +
             'must be installed in order to use watch() features.',
