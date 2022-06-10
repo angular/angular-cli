@@ -12,18 +12,15 @@ import { JsonValue, experimental as core_experimental, schema } from '../../../s
 export class NodeModuleJobRegistry<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue
+  MinimumOutputValueT extends JsonValue = JsonValue,
 > implements
-    core_experimental.jobs.Registry<
-      MinimumArgumentValueT,
-      MinimumInputValueT,
-      MinimumOutputValueT
-    > {
+    core_experimental.jobs.Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>
+{
   protected _resolve(name: string): string | null {
     try {
       return require.resolve(name);
     } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
+      if ((e as NodeJS.ErrnoException).code === 'MODULE_NOT_FOUND') {
         return null;
       }
       throw e;
