@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import assert from 'assert';
 import * as path from 'path';
 import * as vm from 'vm';
 import type { Asset, Compilation } from 'webpack';
@@ -115,6 +116,7 @@ export class WebpackResourceLoader {
     const {
       EntryPlugin,
       NormalModule,
+      WebpackError,
       library,
       node,
       sources,
@@ -208,8 +210,9 @@ export class WebpackResourceLoader {
               compilation.assets[outputFilePath] = new sources.RawSource(output);
             }
           } catch (error) {
+            assert(error instanceof Error, 'catch clause variable is not an Error instance');
             // Use compilation errors, as otherwise webpack will choke
-            compilation.errors.push(error);
+            compilation.errors.push(new WebpackError(error.message));
           }
         });
       },
