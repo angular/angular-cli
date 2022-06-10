@@ -8,6 +8,7 @@
 
 import { basename, dirname, extname } from 'path';
 import { Compilation, Compiler, sources } from 'webpack';
+import { assertIsError } from '../../utils/error';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import {
   IndexHtmlGenerator,
@@ -77,6 +78,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
         warnings.forEach((msg) => addWarning(this.compilation, msg));
         errors.forEach((msg) => addError(this.compilation, msg));
       } catch (error) {
+        assertIsError(error);
         addError(this.compilation, error.message);
       }
     };

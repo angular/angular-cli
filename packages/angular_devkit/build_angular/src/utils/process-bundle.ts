@@ -21,6 +21,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { workerData } from 'worker_threads';
 import { allowMinify, shouldBeautify } from './environment-options';
+import { assertIsError } from './error';
 import { I18nOptions } from './i18n-options';
 import { loadEsmModule } from './load-esm';
 
@@ -151,14 +152,14 @@ export async function inlineLocales(options: InlineOptions) {
       filename: options.filename,
     });
   } catch (error) {
-    if (error.message) {
-      // Make the error more readable.
-      // Same errors will contain the full content of the file as the error message
-      // Which makes it hard to find the actual error message.
-      const index = error.message.indexOf(')\n');
-      const msg = index !== -1 ? error.message.slice(0, index + 1) : error.message;
-      throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
-    }
+    assertIsError(error);
+
+    // Make the error more readable.
+    // Same errors will contain the full content of the file as the error message
+    // Which makes it hard to find the actual error message.
+    const index = error.message.indexOf(')\n');
+    const msg = index !== -1 ? error.message.slice(0, index + 1) : error.message;
+    throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
   }
 
   if (!ast) {

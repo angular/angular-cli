@@ -10,6 +10,7 @@ import { interpolateName } from 'loader-utils';
 import * as path from 'path';
 import { Declaration, Plugin } from 'postcss';
 import * as url from 'url';
+import { assertIsError } from '../../utils/error';
 
 function wrapUrl(url: string): string {
   let wrappedUrl;
@@ -172,6 +173,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
         try {
           processedUrl = await process(originalUrl, context, resourceCache);
         } catch (err) {
+          assertIsError(err);
           loader.emitError(decl.error(err.message, { word: originalUrl }));
           continue;
         }

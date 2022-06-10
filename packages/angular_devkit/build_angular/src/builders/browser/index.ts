@@ -29,6 +29,7 @@ import {
 } from '../../utils/bundle-calculator';
 import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
+import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
 import { I18nOptions } from '../../utils/i18n-options';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
@@ -278,6 +279,7 @@ export function buildWebpackBrowser(
                     spinner.succeed('Copying assets complete.');
                   } catch (err) {
                     spinner.fail(colors.redBright('Copying of assets failed.'));
+                    assertIsError(err);
 
                     return { success: false, error: 'Unable to copy assets: ' + err.message };
                   }

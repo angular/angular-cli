@@ -16,6 +16,7 @@ import { json, tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import * as url from 'url';
 import { runModuleAsObservableFork } from '../../utils';
+import { assertIsError } from '../../utils/error';
 import { DevServerBuilderOptions } from '../dev-server/index';
 import { Schema as ProtractorBuilderOptions } from './schema';
 
@@ -56,6 +57,7 @@ async function updateWebdriver() {
 
     path = require.resolve(webdriverDeepImport, { paths: [protractorPath] });
   } catch (error) {
+    assertIsError(error);
     if (error.code !== 'MODULE_NOT_FOUND') {
       throw error;
     }

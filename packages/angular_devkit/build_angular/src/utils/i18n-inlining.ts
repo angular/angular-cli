@@ -12,6 +12,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { BundleActionExecutor } from './action-executor';
 import { copyAssets } from './copy-assets';
+import { assertIsError } from './error';
 import { I18nOptions } from './i18n-options';
 import { InlineOptions } from './process-bundle';
 import { Spinner } from './spinner';
@@ -52,6 +53,7 @@ function emittedFilesToInlineOptions(
       action.map = fs.readFileSync(originalMapPath, 'utf8');
       originalFiles.push(originalMapPath);
     } catch (err) {
+      assertIsError(err);
       if (err.code !== 'ENOENT') {
         throw err;
       }
@@ -121,6 +123,7 @@ export async function i18nInlineEmittedFiles(
       '',
     );
   } catch (err) {
+    assertIsError(err);
     spinner.fail('Localized bundle generation failed: ' + err.message);
 
     return false;

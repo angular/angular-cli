@@ -13,6 +13,7 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import { NormalizedOptimizationOptions, deleteOutputDir } from '../../utils';
 import { copyAssets } from '../../utils/copy-assets';
+import { assertIsError } from '../../utils/error';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
@@ -134,8 +135,8 @@ export async function execute(
   try {
     await fs.mkdir(outputPath, { recursive: true });
   } catch (e) {
-    const reason = 'message' in e ? e.message : 'Unknown error';
-    context.logger.error('Unable to create output directory: ' + reason);
+    assertIsError(e);
+    context.logger.error('Unable to create output directory: ' + e.message);
 
     return { success: false };
   }
