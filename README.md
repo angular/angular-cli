@@ -69,7 +69,7 @@ Get started with Angular CLI, learn the fundamentals and explore advanced topics
 Install the Angular CLI globally:
 
 ```
-npm install -g @angular/cli
+npm install --location=global @angular/cli
 ```
 
 Create workspace:
