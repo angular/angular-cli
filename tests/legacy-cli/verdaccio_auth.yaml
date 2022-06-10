@@ -1,4 +1,6 @@
-storage: ./storage
+store:
+  memory:
+    limit: 1500
 auth:
   auth-memory:
     users:

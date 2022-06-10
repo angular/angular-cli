@@ -21,5 +21,6 @@ ts_library(
         "@npm//tree-kill",
         "@npm//verdaccio",
         "@npm//verdaccio-auth-memory",
+        "@npm//verdaccio-memory",
     ],
 )
