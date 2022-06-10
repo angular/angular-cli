@@ -179,7 +179,7 @@ async function _executeTarget(
     logs.forEach((l) => parentLogger.next(l));
 
     parentLogger.fatal('Exception:');
-    parentLogger.fatal(err.stack);
+    parentLogger.fatal((err instanceof Error && err.stack) || `${err}`);
 
     return 2;
   }

@@ -136,13 +136,10 @@ describe('architect', () => {
     await run.stop();
   });
 
-  it(`errors when target configuration doesn't exists`, async () => {
-    try {
-      await architect.scheduleBuilder('test:test:invalid', {});
-      throw new Error('should have thrown');
-    } catch (err) {
-      expect(err.message).toContain('Job name "test:test:invalid" does not exist.');
-    }
+  it(`errors when target configuration does not exist`, async () => {
+    await expectAsync(architect.scheduleBuilder('test:test:invalid', {})).toBeRejectedWithError(
+      'Job name "test:test:invalid" does not exist.',
+    );
   });
 
   it('errors when builder cannot be resolved', async () => {
