@@ -18,7 +18,7 @@ orbs:
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-14.19-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win v1-angular_devkit-win-14.19-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v1-angular_devkit-win-16.10-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion '14.19'
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
@@ -83,12 +83,6 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
-      - run:
-          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
-          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
-          name: 'Arsenal Image Mounter (RAM Disk)'
-          command: |
-            pwsh ./.circleci/win-ram-disk.ps1
       - run: nvm install 16.10
       - run: nvm use 16.10
       - run: npm install -g yarn@1.22.10
@@ -323,11 +317,20 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key_win
+      - run:
+          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
+          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
+          name: 'Arsenal Image Mounter (RAM Disk)'
+          command: |
+            pwsh ./.circleci/win-ram-disk.ps1
       - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
       - save_cache:
           key: *cache_key_win
           paths:
             - ~/.cache/yarn
+            # Path where Arsenal Image Mounter files are downloaded.
+            # Must match path in .circleci/win-ram-disk.ps1
+            - ./aim
       # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
       - run:
           name: Execute E2E Tests
