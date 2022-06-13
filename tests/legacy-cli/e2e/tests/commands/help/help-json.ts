@@ -52,13 +52,21 @@ export default async function () {
   try {
     JSON.parse(stdout2.trim());
   } catch (error) {
-    throw new Error(`'ng --help ---json-help' failed to return JSON.\n${error.message}`);
+    throw new Error(
+      `'ng --help ---json-help' failed to return JSON.\n${
+        error instanceof Error ? error.message : error
+      }`,
+    );
   }
 
   const { stdout: stdout3 } = await silentNg('generate', '--help', '--json-help');
   try {
     JSON.parse(stdout3.trim());
   } catch (error) {
-    throw new Error(`'ng generate --help ---json-help' failed to return JSON.\n${error.message}`);
+    throw new Error(
+      `'ng generate --help ---json-help' failed to return JSON.\n${
+        error instanceof Error ? error.message : error
+      }`,
+    );
   }
 }

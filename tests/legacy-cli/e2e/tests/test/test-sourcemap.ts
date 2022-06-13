@@ -16,7 +16,7 @@ export default async function () {
     await ng('test', '--no-watch', '--source-map');
     throw new Error('ng test should have failed.');
   } catch (error) {
-    if (!error.message.includes('app.component.spec.ts')) {
+    if (!(error instanceof Error && error.message.includes('app.component.spec.ts'))) {
       throw error;
     }
   }
@@ -26,7 +26,7 @@ export default async function () {
     await ng('test', '--no-watch', '--no-source-map');
     throw new Error('ng test should have failed.');
   } catch (error) {
-    if (!error.message.includes('main.js')) {
+    if (!(error instanceof Error && error.message.includes('main.js'))) {
       throw error;
     }
   }
