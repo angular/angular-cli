@@ -242,7 +242,10 @@ export async function execAndCaptureError(
     await _exec({ env, stdin }, cmd, args);
     throw new Error('Tried to capture subprocess exception, but it completed successfully.');
   } catch (err) {
-    return err;
+    if (err instanceof Error) {
+      return err;
+    }
+    throw new Error('Subprocess exception was not an Error instance');
   }
 }
 

@@ -12,7 +12,7 @@ export default async function () {
   try {
     await ng('add', `@angular/material${tag}`, '--unknown', '--skip-confirmation');
   } catch (error) {
-    if (!(error.message && error.message.includes(`Unknown option: '--unknown'`))) {
+    if (!(error instanceof Error && error.message.includes(`Unknown option: '--unknown'`))) {
       throw error;
     }
   }

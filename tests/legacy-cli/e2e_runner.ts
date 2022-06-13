@@ -139,9 +139,13 @@ Promise.all([findFreePort(), findFreePort()])
 
       console.log(colors.green('Done.'));
     } catch (err) {
-      console.log('\n');
-      console.error(colors.red(err.message));
-      console.error(colors.red(err.stack));
+      if (err instanceof Error) {
+        console.log('\n');
+        console.error(colors.red(err.message));
+        if (err.stack) {
+          console.error(colors.red(err.stack));
+        }
+      }
 
       if (argv.debug) {
         console.log(`Current Directory: ${process.cwd()}`);
