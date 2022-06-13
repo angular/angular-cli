@@ -43,34 +43,24 @@ describe('find-module', () => {
 
     it('should throw if no modules found', () => {
       host.create('/foo/src/app/oops.module.ts', 'app module');
-      try {
-        findModule(host, 'foo/src/app/bar');
-        throw new Error('Succeeded, should have failed');
-      } catch (err) {
-        expect(err.message).toMatch(/More than one module matches/);
-      }
+
+      expect(() => findModule(host, 'foo/src/app/bar')).toThrowError(
+        /More than one module matches/,
+      );
     });
 
     it('should throw if only routing modules were found', () => {
       host = new EmptyTree();
       host.create('/foo/src/app/anything-routing.module.ts', 'anything routing module');
 
-      try {
-        findModule(host, 'foo/src/app/anything-routing');
-        throw new Error('Succeeded, should have failed');
-      } catch (err) {
-        expect(err.message).toMatch(/Could not find a non Routing NgModule/);
-      }
+      expect(() => findModule(host, 'foo/src/app/anything-routing')).toThrowError(
+        /Could not find a non Routing NgModule/,
+      );
     });
 
     it('should throw if two modules found', () => {
-      try {
-        host = new EmptyTree();
-        findModule(host, 'foo/src/app/bar');
-        throw new Error('Succeeded, should have failed');
-      } catch (err) {
-        expect(err.message).toMatch(/Could not find an NgModule/);
-      }
+      host = new EmptyTree();
+      expect(() => findModule(host, 'foo/src/app/bar')).toThrowError(/Could not find an NgModule/);
     });
 
     it('should accept custom ext for module', () => {
