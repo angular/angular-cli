@@ -112,14 +112,6 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
 
   let localYargs = yargs(args);
   for (const CommandModule of COMMANDS) {
-    if (!jsonHelp) {
-      // Skip scope validation when running with '--json-help' since it's easier to generate the output for all commands this way.
-      const scope = CommandModule.scope;
-      if ((scope === CommandScope.In && !workspace) || (scope === CommandScope.Out && workspace)) {
-        continue;
-      }
-    }
-
     localYargs = addCommandModuleToYargs(localYargs, CommandModule, context);
   }
 
@@ -157,7 +149,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
       'deprecated: %s': colors.yellow('deprecated:') + ' %s',
       'Did you mean %s?': 'Unknown command. Did you mean %s?',
     })
-    .epilogue(colors.gray(getEpilogue(!!workspace)))
+    .epilogue(colors.gray('For more information, see https://angular.io/cli/.\n'))
     .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
     .middleware(normalizeOptionsMiddleware)
@@ -175,19 +167,4 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .parseAsync();
 
   return process.exitCode ?? 0;
-}
-
-function getEpilogue(isInsideWorkspace: boolean): string {
-  let message: string;
-  if (isInsideWorkspace) {
-    message =
-      'The above commands are available when running the Angular CLI inside a workspace.' +
-      'More commands are available when running outside a workspace.\n';
-  } else {
-    message =
-      'The above commands are available when running the Angular CLI outside a workspace.' +
-      'More commands are available when running inside a workspace.\n';
-  }
-
-  return message + 'For more information, see https://angular.io/cli/.\n';
 }

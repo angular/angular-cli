@@ -26,7 +26,7 @@ export class RunCommandModule
   extends ArchitectBaseCommandModule<RunCommandArgs>
   implements CommandModuleImplementation<RunCommandArgs>
 {
-  static override scope = CommandScope.In;
+  override scope = CommandScope.In;
 
   command = 'run <target>';
   describe =
