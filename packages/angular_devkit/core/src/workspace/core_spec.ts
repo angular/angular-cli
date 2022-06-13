@@ -116,12 +116,9 @@ describe('readWorkspace', () => {
       },
     };
 
-    try {
-      await readWorkspace(requestedPath, host);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('Unable to determine format for workspace path');
-    }
+    await expectAsync(readWorkspace(requestedPath, host)).toBeRejectedWithError(
+      /Unable to determine format for workspace path/,
+    );
   });
 
   it('errors when reading from specified file path with invalid specified format', async () => {
@@ -146,12 +143,9 @@ describe('readWorkspace', () => {
       },
     };
 
-    try {
-      await readWorkspace(requestedPath, host, 12 as WorkspaceFormat);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('Unsupported workspace format');
-    }
+    await expectAsync(
+      readWorkspace(requestedPath, host, 12 as WorkspaceFormat),
+    ).toBeRejectedWithError(/Unsupported workspace format/);
   });
 
   it('attempts to find/read from directory path', async () => {
@@ -260,12 +254,9 @@ describe('readWorkspace', () => {
       },
     };
 
-    try {
-      await readWorkspace(requestedPath, host);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('Unable to locate a workspace file');
-    }
+    await expectAsync(readWorkspace(requestedPath, host)).toBeRejectedWithError(
+      /Unable to locate a workspace file/,
+    );
   });
 });
 
@@ -324,12 +315,9 @@ describe('writeWorkspace', () => {
       },
     };
 
-    try {
-      await writeWorkspace({} as WorkspaceDefinition, host, requestedPath, 12 as WorkspaceFormat);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('Unsupported workspace format');
-    }
+    await expectAsync(
+      writeWorkspace({} as WorkspaceDefinition, host, requestedPath, 12 as WorkspaceFormat),
+    ).toBeRejectedWithError(/Unsupported workspace format/);
   });
 
   it('errors when writing custom workspace without specified format', async () => {
@@ -356,11 +344,8 @@ describe('writeWorkspace', () => {
       },
     };
 
-    try {
-      await writeWorkspace({} as WorkspaceDefinition, host, requestedPath);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('A format is required');
-    }
+    await expectAsync(
+      writeWorkspace({} as WorkspaceDefinition, host, requestedPath),
+    ).toBeRejectedWithError(/A format is required/);
   });
 });
