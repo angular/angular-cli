@@ -159,13 +159,10 @@ describe('Component Schematic', () => {
 
   it('should fail if specified module does not exist', async () => {
     const options = { ...defaultOptions, module: '/projects/bar/src/app.moduleXXX.ts' };
-    let thrownError: Error | null = null;
-    try {
-      await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
-    } catch (err) {
-      thrownError = err;
-    }
-    expect(thrownError).toBeDefined();
+
+    await expectAsync(
+      schematicRunner.runSchematicAsync('component', options, appTree).toPromise(),
+    ).toBeRejected();
   });
 
   it('should handle upper case paths', async () => {

@@ -72,13 +72,10 @@ describe('Pipe Schematic', () => {
 
   it('should fail if specified module does not exist', async () => {
     const options = { ...defaultOptions, module: '/projects/bar/src/app/app.moduleXXX.ts' };
-    let thrownError: Error | null = null;
-    try {
-      await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
-    } catch (err) {
-      thrownError = err;
-    }
-    expect(thrownError).toBeDefined();
+
+    await expectAsync(
+      schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise(),
+    ).toBeRejected();
   });
 
   it('should handle a path in the name and module options', async () => {
