@@ -55,7 +55,7 @@
     "sass": "1.52.2",
     "sass-loader": "13.0.0",
     "semver": "7.3.7",
-    "source-map-loader": "3.0.1",
+    "source-map-loader": "4.0.0",
     "source-map-support": "0.5.21",
     "stylus": "0.58.1",
     "stylus-loader": "7.0.0",

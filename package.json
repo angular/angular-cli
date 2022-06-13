@@ -197,7 +197,7 @@
     "semver": "7.3.7",
     "shelljs": "^0.8.5",
     "source-map": "0.7.3",
-    "source-map-loader": "3.0.1",
+    "source-map-loader": "4.0.0",
     "source-map-support": "0.5.21",
     "spdx-satisfies": "^5.0.0",
     "stylus": "0.58.1",
