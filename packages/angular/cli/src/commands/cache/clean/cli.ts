@@ -19,7 +19,7 @@ export class CacheCleanModule extends CommandModule implements CommandModuleImpl
   command = 'clean';
   describe = 'Deletes persistent disk cache from disk.';
   longDescriptionPath: string | undefined;
-  static override scope = CommandScope.In;
+  override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {
     return localYargs.strict();

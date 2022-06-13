@@ -37,7 +37,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
   extends CommandModule<T>
   implements CommandModuleImplementation<T>
 {
-  static override scope = CommandScope.In;
+  override scope = CommandScope.In;
   protected override shouldReportAnalytics = false;
   protected readonly missingTargetChoices: MissingTargetChoice[] | undefined;
 
