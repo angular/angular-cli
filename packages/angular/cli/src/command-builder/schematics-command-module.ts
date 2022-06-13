@@ -47,7 +47,7 @@ export abstract class SchematicsCommandModule
   extends CommandModule<SchematicsCommandArgs>
   implements CommandModuleImplementation<SchematicsCommandArgs>
 {
-  static override scope = CommandScope.In;
+  override scope = CommandScope.In;
   protected readonly allowPrivateSchematics: boolean = false;
   protected override readonly shouldReportAnalytics = false;
 

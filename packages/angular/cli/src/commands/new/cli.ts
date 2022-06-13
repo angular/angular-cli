@@ -29,7 +29,7 @@ export class NewCommandModule
   implements CommandModuleImplementation<NewCommandArgs>
 {
   private readonly schematicName = 'ng-new';
-  static override scope = CommandScope.Out;
+  override scope = CommandScope.Out;
   protected override allowPrivateSchematics = true;
 
   command = 'new [name]';

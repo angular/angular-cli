@@ -58,6 +58,8 @@ export type OtherOptions = Record<string, unknown>;
 
 export interface CommandModuleImplementation<T extends {} = {}>
   extends Omit<YargsCommandModule<{}, T>, 'builder' | 'handler'> {
+  /** Scope in which the command can be executed in. */
+  scope: CommandScope;
   /** Path used to load the long description for the command in JSON help text. */
   longDescriptionPath?: string;
   /** Object declaring the options the command accepts, or a function accepting and returning a yargs instance. */
@@ -77,7 +79,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   abstract readonly describe: string | false;
   abstract readonly longDescriptionPath?: string;
   protected readonly shouldReportAnalytics: boolean = true;
-  static scope = CommandScope.Both;
+  readonly scope: CommandScope = CommandScope.Both;
 
   private readonly optionsWithAnalytics = new Map<string, number>();
 
