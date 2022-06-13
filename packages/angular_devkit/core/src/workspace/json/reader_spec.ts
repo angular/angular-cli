@@ -120,12 +120,9 @@ describe('readJsonWorkpace Parsing', () => {
       }
     `);
 
-    try {
-      await readJsonWorkspace('', host);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('Invalid format version detected');
-    }
+    await expectAsync(readJsonWorkspace('', host)).toBeRejectedWithError(
+      /Invalid format version detected/,
+    );
   });
 
   it('errors on missing version', async () => {
@@ -136,12 +133,9 @@ describe('readJsonWorkpace Parsing', () => {
       }
     `);
 
-    try {
-      await readJsonWorkspace('', host);
-      fail();
-    } catch (e) {
-      expect(e.message).toContain('version specifier not found');
-    }
+    await expectAsync(readJsonWorkspace('', host)).toBeRejectedWithError(
+      /version specifier not found/,
+    );
   });
 });
 

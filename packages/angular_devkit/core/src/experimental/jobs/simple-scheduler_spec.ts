@@ -13,7 +13,11 @@ import { promisify } from 'util';
 import { JobHandlerContext, JobOutboundMessage, JobOutboundMessageKind, JobState } from './api';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
-import { SimpleScheduler } from './simple-scheduler';
+import {
+  JobArgumentSchemaValidationError,
+  JobOutputSchemaValidationError,
+  SimpleScheduler,
+} from './simple-scheduler';
 
 const flush = promisify(setImmediate);
 
@@ -94,16 +98,9 @@ describe('SimpleScheduler', () => {
     );
 
     await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
-    try {
-      await scheduler.schedule('add', ['1', 2, 3, 4]).output.toPromise();
-      expect(true).toBe(false);
-    } catch (e) {
-      // TODO: enable this when https://github.com/bazelbuild/rules_typescript/commit/37807e2c4
-      // is released, otherwise this breaks because bazel downgrade to ES5 which does not support
-      // extending Error.
-      // expect(e instanceof JobInboundMessageSchemaValidationError).toBe(true);
-      expect(e.message).toMatch(/"\/0" must be number/);
-    }
+    await expectAsync(
+      scheduler.schedule('add', ['1', 2, 3, 4]).output.toPromise(),
+    ).toBeRejectedWithError(JobArgumentSchemaValidationError);
   });
 
   it('validates outputs', async () => {
@@ -115,16 +112,9 @@ describe('SimpleScheduler', () => {
       },
     );
 
-    try {
-      await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
-      expect(true).toBe(false);
-    } catch (e) {
-      // TODO: enable this when https://github.com/bazelbuild/rules_typescript/commit/37807e2c4
-      // is released, otherwise this breaks because bazel downgrade to ES5 which does not support
-      // extending Error.
-      // expect(e instanceof JobOutputSchemaValidationError).toBe(true);
-      expect(e.message).toMatch(/"".*number/);
-    }
+    await expectAsync(
+      scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise(),
+    ).toBeRejectedWithError(JobOutputSchemaValidationError);
   });
 
   it('works with dependencies', async () => {

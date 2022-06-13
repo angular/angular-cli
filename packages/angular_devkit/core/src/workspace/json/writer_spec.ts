@@ -45,7 +45,7 @@ function createTestCaseHost(inputData = '') {
         );
         expect(data).toEqual(testCase);
       } catch (e) {
-        fail(`Unable to load test case '${path}': ${e.message || e}`);
+        fail(`Unable to load test case '${path}': ${e instanceof Error ? e.message : e}`);
       }
     },
     async isFile() {
