@@ -24,10 +24,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   // 'i18nDuplicateTranslation',
   // 'i18nMissingTranslation',
 
-  // * Serviceworker support
-  'ngswConfigPath',
-  'serviceWorker',
-
   // * Stylesheet preprocessor support
   'inlineStyleLanguage',
   // The following option has no effect until preprocessors are supported
