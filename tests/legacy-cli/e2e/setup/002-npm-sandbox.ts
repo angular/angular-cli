@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { getGlobalVariable } from '../utils/env';
+import { getGlobalVariable, setGlobalVariable } from '../utils/env';
 
 /**
  * Configure npm to use a unique sandboxed environment.
@@ -28,6 +28,8 @@ export default async function () {
   // Configure the registry and prefix used within the test sandbox
   await writeFile(npmrc, `registry=${npmRegistry}\nprefix=${npmModulesPrefix}`);
   await mkdir(npmModulesPrefix);
+
+  setGlobalVariable('npm-global', npmModulesPrefix);
 
   console.log(`  Using "${npmModulesPrefix}" as e2e test global npm cache.`);
 }
