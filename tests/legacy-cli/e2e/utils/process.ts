@@ -32,10 +32,17 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   let stdout = '';
   let stderr = '';
   const cwd = options.cwd ?? process.cwd();
-  const env = options.env;
+  const env = options.env ?? process.env;
   console.log(
     `==========================================================================================`,
   );
+
+  // Ensure the custom npm and yarn global bin is on the PATH
+  // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables
+  const paths = [
+    join(getGlobalVariable('npm-global'), process.platform.startsWith('win') ? '' : 'bin'),
+    env.PATH || process.env['PATH'],
+  ].join(delimiter);
 
   args = args.filter((x) => x !== undefined);
   const flags = [
@@ -51,7 +58,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
   const spawnOptions: SpawnOptions = {
     cwd,
-    ...(env ? { env } : {}),
+    env: { ...env, PATH: paths },
   };
 
   if (process.platform.startsWith('win')) {
@@ -146,15 +153,10 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 export function extractNpmEnv() {
   return Object.keys(process.env)
     .filter((v) => NPM_CONFIG_RE.test(v))
-    .reduce<NodeJS.ProcessEnv>(
-      (vars, n) => {
-        vars[n] = process.env[n];
-        return vars;
-      },
-      {
-        PATH: process.env.PATH,
-      },
-    );
+    .reduce<NodeJS.ProcessEnv>((vars, n) => {
+      vars[n] = process.env[n];
+      return vars;
+    }, {});
 }
 
 export function waitForAnyProcessOutputToMatch(
@@ -364,19 +366,11 @@ export async function launchTestProcess(entry: string, ...args: any[]) {
   };
 
   // Modify the PATH environment variable...
-  let paths = process.env.PATH!.split(delimiter);
+  let paths = (env.PATH || process.env.PATH)!.split(delimiter);
 
   // Only include paths within the sandboxed test environment or external
   // non angular-cli paths such as /usr/bin for generic commands.
   paths = paths.filter((p) => p.startsWith(tempRoot) || !p.includes('angular-cli'));
-
-  // Ensure the custom npm global bin is on the PATH
-  // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables
-  if (process.platform.startsWith('win')) {
-    paths.unshift(env.NPM_CONFIG_PREFIX!);
-  } else {
-    paths.unshift(join(env.NPM_CONFIG_PREFIX!, 'bin'));
-  }
 
   env.PATH = paths.join(delimiter);
 
