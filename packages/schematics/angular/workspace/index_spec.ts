@@ -28,6 +28,9 @@ describe('Workspace Schematic', () => {
     const files = tree.files;
     expect(files).toEqual(
       jasmine.arrayContaining([
+        '/.vscode/extensions.json',
+        '/.vscode/launch.json',
+        '/.vscode/tasks.json',
         '/.editorconfig',
         '/angular.json',
         '/.gitignore',
@@ -66,6 +69,9 @@ describe('Workspace Schematic', () => {
     const files = tree.files;
     expect(files).toEqual(
       jasmine.arrayContaining([
+        '/.vscode/extensions.json',
+        '/.vscode/launch.json',
+        '/.vscode/tasks.json',
         '/angular.json',
         '/.gitignore',
         '/package.json',
@@ -105,5 +111,25 @@ describe('Workspace Schematic', () => {
     );
     expect(compilerOptions.strict).toBe(true);
     expect(angularCompilerOptions.strictTemplates).toBe(true);
+  });
+
+  it('should add vscode testing configuration', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('workspace', { ...defaultOptions })
+      .toPromise();
+    const { configurations } = parseJson(tree.readContent('.vscode/launch.json').toString());
+    expect(configurations).toContain(jasmine.objectContaining({ name: 'ng test' }));
+    const { tasks } = parseJson(tree.readContent('.vscode/tasks.json').toString());
+    expect(tasks).toContain(jasmine.objectContaining({ type: 'npm', script: 'test' }));
+  });
+
+  it('should not add vscode testing configuration when using minimal', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('workspace', { ...defaultOptions, minimal: true })
+      .toPromise();
+    const { configurations } = parseJson(tree.readContent('.vscode/launch.json').toString());
+    expect(configurations).not.toContain(jasmine.objectContaining({ name: 'ng test' }));
+    const { tasks } = parseJson(tree.readContent('.vscode/tasks.json').toString());
+    expect(tasks).not.toContain(jasmine.objectContaining({ type: 'npm', script: 'test' }));
   });
 });
