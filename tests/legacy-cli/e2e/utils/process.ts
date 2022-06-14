@@ -49,7 +49,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
   console.log(colors.blue(`Running \`${cmd} ${args.map((x) => `"${x}"`).join(' ')}\`${flags}...`));
   console.log(colors.blue(`CWD: ${cwd}`));
-  console.log(colors.blue(`ENV: ${JSON.stringify(env)}`));
+
   const spawnOptions: SpawnOptions = {
     cwd,
     ...(env ? { env } : {}),
