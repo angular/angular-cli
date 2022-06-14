@@ -1,6 +1,6 @@
 import { AddressInfo, createServer } from 'net';
 
-export function findFreePort() {
+export function findFreePort(): Promise<number> {
   return new Promise<number>((resolve, reject) => {
     const srv = createServer();
     srv.once('listening', () => {
