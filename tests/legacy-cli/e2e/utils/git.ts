@@ -1,20 +1,8 @@
 import { git, silentGit } from './process';
 
 export async function gitClean(): Promise<void> {
-  console.log('  Cleaning git...');
-
   await silentGit('clean', '-df');
   await silentGit('reset', '--hard');
-
-  // Checkout missing files
-  const { stdout } = await silentGit('status', '--porcelain');
-  const files = stdout
-    .split(/[\n\r]+/g)
-    .filter((line) => line.match(/^ D/))
-    .map((line) => line.replace(/^\s*\S+\s+/, ''));
-
-  await silentGit('checkout', ...files);
-  await expectGitToBeClean();
 }
 
 export async function expectGitToBeClean(): Promise<void> {
