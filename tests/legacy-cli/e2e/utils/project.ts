@@ -73,11 +73,8 @@ export async function prepareProjectForE2e(name: string) {
 
   await useCIChrome('e2e');
   await useCIChrome('');
-
-  // legacy projects
-  await useCIChrome('src');
-
   await useCIDefaults(name);
+
   // Force sourcemaps to be from the root of the filesystem.
   await updateJsonFile('tsconfig.json', (json) => {
     json['compilerOptions']['sourceRoot'] = '/';
@@ -85,25 +82,19 @@ export async function prepareProjectForE2e(name: string) {
   await gitCommit('prepare-project-for-e2e');
 }
 
-export function useBuiltPackages() {
-  return Promise.resolve().then(() =>
-    updateJsonFile('package.json', (json) => {
-      if (!json['dependencies']) {
-        json['dependencies'] = {};
-      }
-      if (!json['devDependencies']) {
-        json['devDependencies'] = {};
-      }
+export function useBuiltPackages(): Promise<void> {
+  return updateJsonFile('package.json', (json) => {
+    json['dependencies'] ??= {};
+    json['devDependencies'] ??= {};
 
-      for (const packageName of Object.keys(packages)) {
-        if (json['dependencies'].hasOwnProperty(packageName)) {
-          json['dependencies'][packageName] = packages[packageName].tar;
-        } else if (json['devDependencies'].hasOwnProperty(packageName)) {
-          json['devDependencies'][packageName] = packages[packageName].tar;
-        }
+    for (const packageName of Object.keys(packages)) {
+      if (packageName in json['dependencies']) {
+        json['dependencies'][packageName] = packages[packageName].tar;
+      } else if (packageName in json['devDependencies']) {
+        json['devDependencies'][packageName] = packages[packageName].tar;
       }
-    }),
-  );
+    }
+  });
 }
 
 export function useSha() {
@@ -155,46 +146,6 @@ export function useSha() {
   }
 }
 
-export function useNgVersion(version: string) {
-  return updateJsonFile('package.json', (json) => {
-    // Install over the project with specific versions.
-    Object.keys(json['dependencies'] || {})
-      .filter((name) => name.match(/^@angular\//))
-      .forEach((name) => {
-        const pkgName = name.split(/\//)[1];
-        if (pkgName == 'cli') {
-          return;
-        }
-        json['dependencies'][`@angular/${pkgName}`] = version;
-      });
-
-    Object.keys(json['devDependencies'] || {})
-      .filter((name) => name.match(/^@angular\//))
-      .forEach((name) => {
-        const pkgName = name.split(/\//)[1];
-        if (pkgName == 'cli') {
-          return;
-        }
-        json['devDependencies'][`@angular/${pkgName}`] = version;
-      });
-    // Set the correct peer dependencies for @angular/core and @angular/compiler-cli.
-    // This list should be kept up to date with each major release.
-    if (version.startsWith('^5')) {
-      json['devDependencies']['typescript'] = '>=2.4.2 <2.5';
-      json['dependencies']['rxjs'] = '^5.5.0';
-      json['dependencies']['zone.js'] = '~0.8.4';
-    } else if (version.startsWith('^6')) {
-      json['devDependencies']['typescript'] = '>=2.7.2 <2.8';
-      json['dependencies']['rxjs'] = '^6.0.0';
-      json['dependencies']['zone.js'] = '~0.8.26';
-    } else if (version.startsWith('^7')) {
-      json['devDependencies']['typescript'] = '>=3.1.1 <3.2';
-      json['dependencies']['rxjs'] = '^6.0.0';
-      json['dependencies']['zone.js'] = '~0.8.26';
-    }
-  });
-}
-
 export function useCIDefaults(projectName = 'test-project') {
   return updateJsonFile('angular.json', (workspaceJson) => {
     // Disable progress reporting on CI to reduce spam.
@@ -205,13 +156,6 @@ export function useCIDefaults(projectName = 'test-project') {
     // Disable auto-updating webdriver in e2e.
     if (appTargets.e2e) {
       appTargets.e2e.options.webdriverUpdate = false;
-    }
-
-    // legacy project structure
-    const e2eProject = workspaceJson.projects[projectName + '-e2e'];
-    if (e2eProject) {
-      const e2eTargets = e2eProject.targets || e2eProject.architect;
-      e2eTargets.e2e.options.webdriverUpdate = false;
     }
   });
 }
