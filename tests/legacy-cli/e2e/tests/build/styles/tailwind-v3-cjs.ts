@@ -1,5 +1,5 @@
 import { expectFileToMatch, writeFile } from '../../../utils/fs';
-import { installPackage } from '../../../utils/packages';
+import { installPackage, uninstallPackage } from '../../../utils/packages';
 import { ng, silentExec } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 import { expectToFail } from '../../../utils/utils';
@@ -31,4 +31,7 @@ export default async function () {
   await expectToFail(() =>
     expectFileToMatch('dist/test-project/styles.css', '@tailwind base; @tailwind components;'),
   );
+
+  // Uninstall Tailwind
+  await uninstallPackage('tailwindcss');
 }

@@ -19,8 +19,6 @@ Error.stackTraceLimit = Infinity;
  * Here's a short description of those flags:
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
  *   --noproject      Skip creating a project or using one.
- *   --nobuild        Skip building the packages. Use with --noglobal and --reuse to quickly
- *                    rerun tests.
  *   --noglobal       Skip linking your local @angular/cli directory. Can save a few seconds.
  *   --nosilent       Never silence ng commands.
  *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
@@ -34,7 +32,6 @@ Error.stackTraceLimit = Infinity;
  *   --nb-shards      Total number of shards that this is part of. Default is 2 if --shard is
  *                    passed in.
  *   --shard          Index of this processes' shard.
- *   --devkit=path    Path to the devkit to use. The devkit will be built prior to running.
  *   --tmpdir=path    Override temporary directory to use for new projects.
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */

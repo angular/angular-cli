@@ -51,7 +51,6 @@ export default async function () {
   // Update angular.json
   await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
-    // tslint:disable-next-line: no-any
     const i18n: Record<string, any> = appProject.i18n;
 
     i18n.sourceLocale = 'en-x-abc';

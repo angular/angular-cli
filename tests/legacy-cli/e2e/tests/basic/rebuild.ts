@@ -1,32 +1,24 @@
-import {
-  killAllProcesses,
-  waitForAnyProcessOutputToMatch,
-  execAndWaitForOutputToMatch,
-  ng,
-} from '../../utils/process';
+import { waitForAnyProcessOutputToMatch, silentNg } from '../../utils/process';
 import { writeFile, writeMultipleFiles } from '../../utils/fs';
-import { wait } from '../../utils/utils';
 import fetch from 'node-fetch';
-import { findFreePort } from '../../utils/network';
+import { ngServe } from '../../utils/project';
 
 const validBundleRegEx = / Compiled successfully./;
 
 export default async function () {
-  const port = await findFreePort();
+  const port = await ngServe();
+  // Add a lazy module.
+  await silentNg('generate', 'module', 'lazy', '--routing');
 
-  return (
-    execAndWaitForOutputToMatch('ng', ['serve', '--port', String(port)], validBundleRegEx)
-      // Add a lazy module.
-      .then(() => ng('generate', 'module', 'lazy', '--routing'))
-      // Should trigger a rebuild with a new bundle.
-      // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
-      // the file, otherwise rebuilds can be too fast and fail CI.
-      .then(() =>
-        Promise.all([
-          waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
-          writeFile(
-            'src/app/app.module.ts',
-            `
+  // Should trigger a rebuild with a new bundle.
+  // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
+  // the file, otherwise rebuilds can be too fast and fail CI.
+  // Count the bundles.
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(/lazy_module_ts\.js/),
+    writeFile(
+      'src/app/app.module.ts',
+      `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { FormsModule } from '@angular/forms';
@@ -52,138 +44,122 @@ export default async function () {
         })
         export class AppModule { }
       `,
-          ),
-        ]),
-      )
-      // Count the bundles.
-      .then((results) => {
-        const stdout = results[0].stdout;
-        if (!/lazy_module_ts\.js/g.test(stdout)) {
-          throw new Error('Expected webpack to create a new chunk, but did not.');
-        }
-      })
-      // Change multiple files and check that all of them are invalidated and recompiled.
-      .then(() =>
-        Promise.all([
-          waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
-          writeMultipleFiles({
-            'src/app/app.module.ts': `
-          import { BrowserModule } from '@angular/platform-browser';
-          import { NgModule } from '@angular/core';
+    ),
+  ]);
 
-          import { AppComponent } from './app.component';
+  // Change multiple files and check that all of them are invalidated and recompiled.
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(validBundleRegEx),
+    writeMultipleFiles({
+      'src/app/app.module.ts': `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
 
-          @NgModule({
-            declarations: [
-              AppComponent
-            ],
-            imports: [
-              BrowserModule
-            ],
-            providers: [],
-            bootstrap: [AppComponent]
-          })
-          export class AppModule { }
+        import { AppComponent } from './app.component';
 
-          console.log('$$_E2E_GOLDEN_VALUE_1');
-          export let X = '$$_E2E_GOLDEN_VALUE_2';
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule
+          ],
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+
+        console.log('$$_E2E_GOLDEN_VALUE_1');
+        export let X = '$$_E2E_GOLDEN_VALUE_2';
         `,
-            'src/main.ts': `
-          import { enableProdMode } from '@angular/core';
-          import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+      'src/main.ts': `
+        import { enableProdMode } from '@angular/core';
+        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-          import { AppModule } from './app/app.module';
-          import { environment } from './environments/environment';
+        import { AppModule } from './app/app.module';
+        import { environment } from './environments/environment';
 
-          if (environment.production) {
-            enableProdMode();
-          }
+        if (environment.production) {
+          enableProdMode();
+        }
 
-          platformBrowserDynamic().bootstrapModule(AppModule);
+        platformBrowserDynamic().bootstrapModule(AppModule);
 
-          import * as m from './app/app.module';
-          console.log(m.X);
-          console.log('$$_E2E_GOLDEN_VALUE_3');
+        import * as m from './app/app.module';
+        console.log(m.X);
+        console.log('$$_E2E_GOLDEN_VALUE_3');
         `,
-          }),
-        ]),
-      )
-      .then(() =>
-        Promise.all([
-          waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
-          writeMultipleFiles({
-            'src/app/app.module.ts': `
+    }),
+  ]);
 
-          import { BrowserModule } from '@angular/platform-browser';
-          import { NgModule } from '@angular/core';
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(validBundleRegEx),
+    writeMultipleFiles({
+      'src/app/app.module.ts': `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
 
-          import { AppComponent } from './app.component';
+        import { AppComponent } from './app.component';
 
-          @NgModule({
-            declarations: [
-              AppComponent
-            ],
-            imports: [
-              BrowserModule
-            ],
-            providers: [],
-            bootstrap: [AppComponent]
-          })
-          export class AppModule { }
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule
+          ],
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
 
-          console.log('$$_E2E_GOLDEN_VALUE_1');
-          export let X = '$$_E2E_GOLDEN_VALUE_2';
-          console.log('File changed with no import/export changes');
+        console.log('$$_E2E_GOLDEN_VALUE_1');
+        export let X = '$$_E2E_GOLDEN_VALUE_2';
+        console.log('File changed with no import/export changes');
         `,
-          }),
-        ]),
-      )
-      .then(() => wait(2000))
-      .then(() => fetch(`http://localhost:${port}/main.js`))
-      .then((response) => response.text())
-      .then((body) => {
-        if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
-          throw new Error('Expected golden value 1.');
-        }
-        if (!body.match(/\$\$_E2E_GOLDEN_VALUE_2/)) {
-          throw new Error('Expected golden value 2.');
-        }
-        if (!body.match(/\$\$_E2E_GOLDEN_VALUE_3/)) {
-          throw new Error('Expected golden value 3.');
-        }
-      })
-      .then(() =>
-        Promise.all([
-          waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
-          writeMultipleFiles({
-            'src/app/app.component.html': '<h1>testingTESTING123</h1>',
-          }),
-        ]),
-      )
-      .then(() => wait(2000))
-      .then(() => fetch(`http://localhost:${port}/main.js`))
-      .then((response) => response.text())
-      .then((body) => {
-        if (!body.match(/testingTESTING123/)) {
-          throw new Error('Expected component HTML to update.');
-        }
-      })
-      .then(() =>
-        Promise.all([
-          waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
-          writeMultipleFiles({
-            'src/app/app.component.css': ':host { color: blue; }',
-          }),
-        ]),
-      )
-      .then(() => wait(2000))
-      .then(() => fetch(`http://localhost:${port}/main.js`))
-      .then((response) => response.text())
-      .then((body) => {
-        if (!body.match(/color:\s?blue/)) {
-          throw new Error('Expected component CSS to update.');
-        }
-      })
-      .finally(() => killAllProcesses())
-  );
+    }),
+  ]);
+  {
+    const response = await fetch(`http://localhost:${port}/main.js`);
+    const body = await response.text();
+    if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
+      throw new Error('Expected golden value 1.');
+    }
+    if (!body.match(/\$\$_E2E_GOLDEN_VALUE_2/)) {
+      throw new Error('Expected golden value 2.');
+    }
+    if (!body.match(/\$\$_E2E_GOLDEN_VALUE_3/)) {
+      throw new Error('Expected golden value 3.');
+    }
+  }
+
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(validBundleRegEx),
+    writeMultipleFiles({
+      'src/app/app.component.html': '<h1>testingTESTING123</h1>',
+    }),
+  ]);
+
+  {
+    const response = await fetch(`http://localhost:${port}/main.js`);
+    const body = await response.text();
+    if (!body.match(/testingTESTING123/)) {
+      throw new Error('Expected component HTML to update.');
+    }
+  }
+
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(validBundleRegEx),
+    writeMultipleFiles({
+      'src/app/app.component.css': ':host { color: blue; }',
+    }),
+  ]);
+
+  {
+    const response = await fetch(`http://localhost:${port}/main.js`);
+    const body = await response.text();
+    if (!body.match(/color:\s?blue/)) {
+      throw new Error('Expected component CSS to update.');
+    }
+  }
 }

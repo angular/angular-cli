@@ -9,13 +9,7 @@
 import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { externalServer, langTranslations, setupI18nConfig } from './setup';
-
-const baseHrefs: { [l: string]: string } = {
-  'en-US': '/en/',
-  fr: '/fr-FR/',
-  de: '',
-};
+import { baseHrefs, externalServer, langTranslations, setupI18nConfig } from './setup';
 
 export default async function () {
   // Setup i18n tests and config.
@@ -55,9 +49,6 @@ export default async function () {
     // Verify the HTML base HREF attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `href="${baseHrefs[lang] || '/'}"`);
 
-    // Execute Application E2E tests with dev server
-    await ng('e2e', `--configuration=${lang}`, '--port=0');
-
     // Execute Application E2E tests for a production build without dev server
     const { server, port, url } = await externalServer(
       outputPath,
@@ -89,9 +80,6 @@ export default async function () {
     // Verify the HTML base HREF attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `href="/test${baseHrefs[lang] || '/'}"`);
 
-    // Execute Application E2E tests with dev server
-    await ng('e2e', `--configuration=${lang}`, '--port=0');
-
     // Execute Application E2E tests for a production build without dev server
     const { server, port, url } = await externalServer(
       outputPath,
@@ -108,15 +96,5 @@ export default async function () {
     } finally {
       server.close();
     }
-  }
-
-  // Test absolute base href.
-  await ng('build', '--base-href', 'http://www.domain.com/', '--configuration=development');
-  for (const { lang, outputPath } of langTranslations) {
-    // Verify the HTML base HREF attribute is present
-    await expectFileToMatch(
-      `${outputPath}/index.html`,
-      `href="http://www.domain.com${baseHrefs[lang] || '/'}"`,
-    );
   }
 }

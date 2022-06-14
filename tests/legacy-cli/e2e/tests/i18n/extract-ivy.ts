@@ -3,7 +3,6 @@ import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, writeFile } from '../../utils/fs';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
-import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
@@ -31,7 +30,7 @@ export default async function () {
     throw new Error('Expected no warnings to be shown');
   }
 
-  expectFileToMatch('messages.xlf', 'Hello world');
+  await expectFileToMatch('messages.xlf', 'Hello world');
 
   await uninstallPackage('@angular/localize');
 }
