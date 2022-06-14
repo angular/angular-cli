@@ -48,8 +48,20 @@ export async function prepareProjectForE2e(name: string) {
 
   console.log(`Project ${name} created... Installing packages.`);
   await installWorkspacePackages();
-
   await ng('generate', 'e2e', '--related-app-name', name);
+
+  const protractorPath = require.resolve('protractor');
+  const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
+    paths: [protractorPath],
+  });
+  const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
+    chrome: { last: string };
+  };
+
+  const chromeDriverVersion = webdriverUpdate.chrome.last.match(/chromedriver_([\d|\.]+)/)?.[1];
+  if (!chromeDriverVersion) {
+    throw new Error('Could not extract chrome webdriver version.');
+  }
 
   // Initialize selenium webdriver.
   // Often fails the first time so attempt twice if necessary.
@@ -63,11 +75,11 @@ export async function prepareProjectForE2e(name: string) {
       '--gecko',
       'false',
       '--versions.chrome',
-      '101.0.4951.41',
+      chromeDriverVersion,
     );
   try {
     await runWebdriverUpdate();
-  } catch (e) {
+  } catch {
     await runWebdriverUpdate();
   }
 
