@@ -17,6 +17,7 @@ import { assertIsError } from '../../utils/error';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
+import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { resolveGlobalStyles } from '../../webpack/configs';
 import { Schema as BrowserBuilderOptions, SourceMapClass } from '../browser/schema';
@@ -61,6 +62,7 @@ export async function execute(
   }
 
   const {
+    projectRoot,
     workspaceRoot,
     mainEntryPoint,
     polyfillsEntryPoint,
@@ -248,6 +250,24 @@ export async function execute(
   await Promise.all(
     outputFiles.map((file) => fs.writeFile(path.join(outputPath, file.path), file.contents)),
   );
+
+  // Augment the application with service worker support
+  // TODO: This should eventually operate on the in-memory files prior to writing the output files
+  if (options.serviceWorker) {
+    try {
+      await augmentAppWithServiceWorker(
+        projectRoot,
+        workspaceRoot,
+        outputPath,
+        options.baseHref || '/',
+        options.ngswConfigPath,
+      );
+    } catch (error) {
+      context.logger.error(error instanceof Error ? error.message : `${error}`);
+
+      return { success: false };
+    }
+  }
 
   context.logger.info(`Complete. [${(Date.now() - startTime) / 1000} seconds]`);
 
