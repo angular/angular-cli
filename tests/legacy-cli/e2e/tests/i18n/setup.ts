@@ -9,7 +9,6 @@ import {
   replaceInFile,
   writeFile,
 } from '../../utils/fs';
-import { findFreePort } from '../../utils/network';
 import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -127,6 +126,12 @@ export const formats = {
     sourceCheck: '"@@locale": "en-US"',
     replacements: [] as RegExp[][],
   },
+};
+
+export const baseHrefs: { [l: string]: string } = {
+  'en-US': '/en/',
+  fr: '/fr-FR/',
+  de: '',
 };
 
 export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {

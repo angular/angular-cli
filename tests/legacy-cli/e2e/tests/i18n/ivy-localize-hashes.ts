@@ -23,11 +23,11 @@ export default async function () {
   for (const { lang, outputPath } of langTranslations) {
     for (const entry of fs.readdirSync(outputPath)) {
       const match = entry.match(OUTPUT_RE);
-      if (!match) {
+      if (!match?.groups) {
         continue;
       }
 
-      hashes.set(`${lang}/${match!.groups!.name}`, match!.groups!.hash);
+      hashes.set(`${lang}/${match.groups.name}`, match.groups.hash);
     }
   }
 
@@ -44,16 +44,16 @@ export default async function () {
   for (const { lang, outputPath } of langTranslations) {
     for (const entry of fs.readdirSync(outputPath)) {
       const match = entry.match(OUTPUT_RE);
-      if (!match) {
+      if (!match?.groups) {
         continue;
       }
 
-      const id = `${lang}/${match!.groups!.name}`;
+      const id = `${lang}/${match.groups.name}`;
       const hash = hashes.get(id);
       if (!hash) {
         throw new Error('Unexpected output entry: ' + id);
       }
-      if (hash === match!.groups!.hash) {
+      if (hash === match.groups!.hash) {
         throw new Error('Hash value did not change for entry: ' + id);
       }
 

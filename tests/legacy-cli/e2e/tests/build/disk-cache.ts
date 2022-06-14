@@ -1,5 +1,5 @@
 import { expectFileNotToExist, expectFileToExist, rimraf, writeFile } from '../../utils/fs';
-import { ng } from '../../utils/process';
+import { silentNg } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 const defaultCachePath = '.angular/cache';
@@ -53,5 +53,5 @@ async function configureAndRunTest(cacheOptions?: {
     }),
   ]);
 
-  await ng('build');
+  await silentNg('build');
 }

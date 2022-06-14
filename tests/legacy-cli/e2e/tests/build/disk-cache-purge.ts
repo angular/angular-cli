@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { createDir, expectFileNotToExist, expectFileToExist, writeFile } from '../../utils/fs';
-import { ng } from '../../utils/process';
+import { silentNg } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
@@ -25,7 +25,7 @@ export default async function () {
   await createDir(staleCachePath);
   await expectFileToExist(staleCachePath);
 
-  await ng('build');
+  await silentNg('build');
   await expectFileToExist(cachePath);
   await expectFileNotToExist(staleCachePath);
 }
