@@ -1,3 +1,19 @@
+<a name="13.3.8"></a>
+
+# 13.3.8 (2022-06-15)
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [c7f994f88](https://github.com/angular/angular-cli/commit/c7f994f88a396be96c01da1017a15083d5f544fb) | fix  | add peer dependency on Angular CLI |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.7"></a>
 
 # 13.3.7 (2022-05-25)
