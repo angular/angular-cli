@@ -168,10 +168,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#7848e7d088fbe777681d3631994ab49750cb72ba":
-  version "0.0.0-2207080d84b0c0d87d39e1683939004f5147faf9"
-  uid "7848e7d088fbe777681d3631994ab49750cb72ba"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#7848e7d088fbe777681d3631994ab49750cb72ba"
+"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#2026ed3ca13661bf30bf19aebdc6b2a5244b561e":
+  version "0.0.0-b84f2b4ffa4a67e2bf44bc03d6bbe71cca027003"
+  uid "2026ed3ca13661bf30bf19aebdc6b2a5244b561e"
+  resolved "https://github.com/angular/dev-infra-private-builds.git#2026ed3ca13661bf30bf19aebdc6b2a5244b561e"
   dependencies:
     "@angular-devkit/build-angular" "14.1.0-next.0"
     "@angular/benchpress" "0.3.0"
@@ -196,7 +196,7 @@
     chalk "^4.1.0"
     clang-format "1.8.0"
     node-fetch "^2.6.1"
-    prettier "2.6.2"
+    prettier "2.7.0"
     protractor "^7.0.0"
     selenium-webdriver "4.2.0"
     send "^0.18.0"
@@ -8515,7 +8515,12 @@ prettier-bytes@^1.0.4:
   resolved "https://registry.yarnpkg.com/prettier-bytes/-/prettier-bytes-1.0.4.tgz#994b02aa46f699c50b6257b5faaa7fe2557e62d6"
   integrity sha512-dLbWOa4xBn+qeWeIF60qRoB6Pk2jX5P3DIVgOQyMyvBpu931Q+8dXz8X0snJiFkQdohDDLnZQECjzsAj75hgZQ==
 
-prettier@2.6.2, prettier@^2.0.0:
+prettier@2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.7.0.tgz#a4fdae07e5596c51c9857ea676cd41a0163879d6"
+  integrity sha512-nwoX4GMFgxoPC6diHvSwmK/4yU8FFH3V8XWtLQrbj4IBsK2pkYhG4kf/ljF/haaZ/aii+wNJqISrCDPgxGWDVQ==
+
+prettier@^2.0.0:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.2.tgz#e26d71a18a74c3d0f0597f55f01fb6c06c206032"
   integrity sha512-PkUpF+qoXTqhOeWL9fu7As8LXsIUZ1WYaJiY/a7McAQzxjk82OF0tibkFXVCDImZtWxbvojFjerkiLb0/q8mew==
