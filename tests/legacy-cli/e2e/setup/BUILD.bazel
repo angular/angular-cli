@@ -7,5 +7,6 @@ ts_library(
     visibility = ["//visibility:public"],
     deps = [
         "//tests/legacy-cli/e2e/utils",
+        "@npm//semver",
     ],
 )

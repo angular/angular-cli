@@ -338,6 +338,15 @@ export function silentGit(...args: string[]) {
   return _exec({ silent: true }, 'git', args);
 }
 
+function getGitEnv() {
+  return Object.keys(process.env)
+    .filter((v) => v.startsWith('GIT_'))
+    .reduce<{ [k: string]: string }>((vars, n) => {
+      vars[n] = process.env[n]!;
+      return vars;
+    }, {});
+}
+
 /**
  * Launch the given entry in an child process isolated to the test environment.
  *
@@ -352,6 +361,7 @@ export async function launchTestProcess(entry: string, ...args: any[]) {
   const env: NodeJS.ProcessEnv = {
     ...extractNpmEnv(),
     ...getGlobalVariablesEnv(),
+    ...getGitEnv(),
   };
 
   // Modify the PATH environment variable...

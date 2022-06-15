@@ -1,4 +1,4 @@
-import { ng } from '../utils/process';
+import { git, ng } from '../utils/process';
 
 export default async function () {
   console.log('Environment:');
@@ -14,4 +14,6 @@ export default async function () {
   });
 
   await ng('version');
+  await git('--version');
+  await git('config', '--list', '--show-origin');
 }
