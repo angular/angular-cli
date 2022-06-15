@@ -113,14 +113,20 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
       reject(
         new Error(
-          `Running "${cmd} ${args.join(
-            ' ',
-          )}" returned error. ${error}...\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`,
+          `Running "${cmd} ${args.join(' ')}" returned error. ${error}...\n\nENV:${JSON.stringify(
+            process.env,
+            null,
+            2,
+          )}\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`,
         ),
       );
     });
     childProcess.on('error', (err) => {
-      err.message += `${err}...\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
+      err.message += `${err}...\n\nENV:${JSON.stringify(
+        process.env,
+        null,
+        2,
+      )}\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
       reject(err);
     });
 
