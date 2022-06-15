@@ -1,3 +1,19 @@
+<a name="14.0.1"></a>
+
+# 14.0.1 (2022-06-15)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                  |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
+| [baff49b3](https://github.com/angular/universal/commit/baff49b353111e1f183b023ad94643fc4cb7bbf2) | fix  | correctly handle headers for jsdom in Clover |
+
+## Special Thanks
+
+Alan Agius and hiepxanh
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.0"></a>
 
 # 14.0.0 (2022-06-02)
