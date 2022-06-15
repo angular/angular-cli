@@ -1,3 +1,32 @@
+<a name="14.1.0-next.1"></a>
+
+# 14.1.0-next.1 (2022-06-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [82ec1af4e](https://github.com/angular/angular-cli/commit/82ec1af4e1e34fe5b18db328b4bce6405a03c7b8) | fix  | show more actionable error when command is ran in wrong scope |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [7cbbf2f2b](https://github.com/angular/angular-cli/commit/7cbbf2f2ba83d27812e9b83859524937dad31fb1) | fix  | remove vscode testing configurations for `minimal` workspaces |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [b06ae5514](https://github.com/angular/angular-cli/commit/b06ae55140c01f8b5107527fd0af1da3b04a721f) | feat | add service worker support to experimental esbuild builder |
+| [1f66edebc](https://github.com/angular/angular-cli/commit/1f66edebcc968ed01acd06506226f5cd60c71afe) | fix  | replace fallback locale for `en-US`                        |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Jason Bedard and Julien Marcou
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.2"></a>
 
 # 14.0.2 (2022-06-15)
