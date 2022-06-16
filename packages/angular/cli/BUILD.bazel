@@ -4,9 +4,12 @@
 # found in the LICENSE file at https://angular.io/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+
+# @external_begin
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+# @external_end
 
 licenses(["notice"])  # MIT
 
@@ -78,6 +81,7 @@ ts_library(
     ],
 )
 
+# @external_begin
 CLI_SCHEMA_DATA = [
     "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.json",
     "//packages/angular_devkit/build_angular:src/builders/browser/schema.json",
@@ -123,6 +127,7 @@ ts_json_schema(
     name = "update_schematic_schema",
     src = "src/commands/update/schematic/schema.json",
 )
+# @external_end
 
 ts_library(
     name = "angular-cli_test_lib",
@@ -150,6 +155,7 @@ jasmine_node_test(
     srcs = [":angular-cli_test_lib"],
 )
 
+# @external_begin
 genrule(
     name = "license",
     srcs = ["//:LICENSE"],
@@ -175,3 +181,4 @@ pkg_npm(
         ":src/commands/update/schematic/schema.json",
     ],
 )
+# @external_end
