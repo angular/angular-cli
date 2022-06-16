@@ -1,6 +1,9 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+
+# @external_begin
 load("@npm//@angular/dev-infra-private/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+# @external_end
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -65,6 +68,7 @@ jasmine_node_test(
     ],
 )
 
+# @external_begin
 genrule(
     name = "license",
     srcs = ["//:LICENSE"],
@@ -100,3 +104,4 @@ api_golden_test_npm_package(
     npm_package = "angular_cli/packages/angular_devkit/schematics/npm_package",
     types = ["@npm//@types/node"],
 )
+# @external_end
