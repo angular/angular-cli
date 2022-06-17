@@ -1,8 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "noEmit": true
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.mts"],
   "exclude": []
 }
