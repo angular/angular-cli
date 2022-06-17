@@ -20,11 +20,11 @@ import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { resolveGlobalStyles } from '../../webpack/configs';
-import { Schema as BrowserBuilderOptions, SourceMapClass } from '../browser/schema';
 import { createCompilerPlugin } from './compiler-plugin';
 import { DEFAULT_OUTDIR, bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
 import { normalizeOptions } from './options';
+import { Schema as BrowserBuilderOptions, SourceMapClass } from './schema';
 import { bundleStylesheetText } from './stylesheets';
 
 /**
@@ -35,7 +35,7 @@ import { bundleStylesheetText } from './stylesheets';
  * @returns A promise with the builder result output
  */
 // eslint-disable-next-line max-lines-per-function
-export async function execute(
+export async function buildEsbuildBrowser(
   options: BrowserBuilderOptions,
   context: BuilderContext,
 ): Promise<BuilderOutput> {
@@ -312,6 +312,7 @@ async function bundleCode(
     sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
     splitting: true,
     tsconfig,
+    external: options.externalDependencies,
     write: false,
     platform: 'browser',
     preserveSymlinks: options.preserveSymlinks,
@@ -339,4 +340,4 @@ async function bundleCode(
   });
 }
 
-export default createBuilder(execute);
+export default createBuilder(buildEsbuildBrowser);
