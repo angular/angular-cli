@@ -193,7 +193,6 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 Must be one of the following:
 
 <%
-const { COMMIT_TYPES, ScopeRequirement } = require('../../.ng-dev/commit-message');
 for (const typeName of Object.keys(COMMIT_TYPES).sort()) {
   const type = COMMIT_TYPES[typeName];
 %>* **<%= typeName %>**: <%= type.description %><%
@@ -214,8 +213,7 @@ The scope should be the name of the npm package affected as perceived by the per
 The following is the list of supported scopes:
 
 <%
-const { commitMessage } = require('../../.ng-dev/commit-message');
-for (const scope of commitMessage.scopes) {
+for (const scope of Object.keys(packages)) {
 %>* **<%= scope %>**
 <% } %>
 
