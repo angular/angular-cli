@@ -1,10 +1,10 @@
-import '../lib/bootstrap-local';
+import '../lib/bootstrap-local.js';
 
 import { ReleaseConfig } from '@angular/dev-infra-private/ng-dev';
-import { releasePackages } from '../lib/packages';
-import buildPackages from '../scripts/build';
+import packages from '../lib/packages.js';
+import buildPackages from '../scripts/build.js';
 
-const npmPackages = Object.entries(releasePackages).map(([name, { experimental }]) => ({
+const npmPackages = Object.entries(packages.releasePackages).map(([name, { experimental }]) => ({
   name,
   experimental,
 }));
@@ -13,7 +13,7 @@ const npmPackages = Object.entries(releasePackages).map(([name, { experimental }
 export const release: ReleaseConfig = {
   representativeNpmPackage: '@angular/cli',
   npmPackages,
-  buildPackages: () => buildPackages(),
+  buildPackages: () => buildPackages.default(),
   releaseNotes: {
     groupOrder: [
       '@angular/cli',

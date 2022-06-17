@@ -24,6 +24,7 @@
     "build:bazel": "node ./bin/devkit-admin build-bazel",
     "build-tsc": "tsc -p tsconfig.json",
     "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
+    "ng-dev": "TS_NODE_PROJECT=$PWD/.ng-dev/tsconfig.json node_modules/@angular/dev-infra-private/ng-dev/bundles/cli.mjs",
     "templates": "node ./bin/devkit-admin templates",
     "validate": "node ./bin/devkit-admin validate",
     "postinstall": "yarn webdriver-update && yarn husky install",
@@ -31,8 +32,8 @@
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 103.0.5060.24",
     "public-api:check": "node goldens/public-api/manage.js test",
     "public-api:update": "node goldens/public-api/manage.js accept",
-    "ts-circular-deps:check": "ng-dev ts-circular-deps check --config ./packages/circular-deps-test.conf.js",
-    "ts-circular-deps:approve": "ng-dev ts-circular-deps approve --config ./packages/circular-deps-test.conf.js",
+    "ts-circular-deps:check": "yarn -s ng-dev ts-circular-deps check --config ./packages/circular-deps-test.conf.js",
+    "ts-circular-deps:approve": "yarn -s ng-dev ts-circular-deps approve --config ./packages/circular-deps-test.conf.js",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json"
   },
   "repository": {
@@ -69,7 +70,7 @@
     "@angular/compiler": "14.0.2",
     "@angular/compiler-cli": "14.0.2",
     "@angular/core": "14.0.2",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#c13dbe7aac0b5230b65c4de7dc08650332b4750a",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#132c156fd32ea70e3755df0fdb211ef5b6299936",
     "@angular/forms": "14.0.2",
     "@angular/localize": "14.0.2",
     "@angular/material": "14.0.1",
