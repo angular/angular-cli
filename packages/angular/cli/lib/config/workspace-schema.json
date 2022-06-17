@@ -341,6 +341,7 @@
                     "enum": [
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
+                      "@angular-devkit/build-angular:browser-esbuild",
                       "@angular-devkit/build-angular:dev-server",
                       "@angular-devkit/build-angular:extract-i18n",
                       "@angular-devkit/build-angular:karma",
@@ -408,6 +409,28 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/browser/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:browser-esbuild"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/builders/browser-esbuild/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/builders/browser-esbuild/schema.json"
                   }
                 }
               }
