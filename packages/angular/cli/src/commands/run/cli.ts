@@ -45,6 +45,21 @@ export class RunCommandModule
         // Also, hide choices from JSON help so that we don't display them in AIO.
         choices: (getYargsCompletions || help) && !jsonHelp ? this.getTargetChoices() : undefined,
       })
+      .middleware((args) => {
+        // TODO: remove in version 15.
+        const { configuration, target } = args;
+        if (typeof configuration === 'string' && target) {
+          const targetWithConfig = target.split(':', 2);
+          targetWithConfig.push(configuration);
+
+          throw new CommandModuleError(
+            'Unknown argument: configuration.\n' +
+              `Provide the configuration as part of the target 'ng run ${targetWithConfig.join(
+                ':',
+              )}'.`,
+          );
+        }
+      }, true)
       .strict();
 
     const target = this.makeTargetSpecifier();
