@@ -154,6 +154,7 @@ Alan Agius, Charles Lyding and Doug Parker
 - Support for TypeScript 4.4 and 4.5 has been removed. Please update to TypeScript 4.6.
 - `--all` option from `ng update` has been removed without replacement. To update packages which don’t provide `ng update` capabilities in your workspace `package.json` use `npm update`, `yarn upgrade-interactive` or `yarn upgrade` instead.
 - Deprecated option `--prod` has been removed from all builders. `--configuration production`/`-c production` should be used instead if the default configuration of the builder is not configured to `production`.
+- `--configuration` cannot be used with `ng run`. Provide the configuration as part of the target. Ex: `ng run project:builder:configuration`.
 - Deprecated `ng x18n` and `ng i18n-extract` commands have been removed in favor of `ng extract-i18n`.
 - Several changes in the Angular CLI commands and arguments handling.
 
