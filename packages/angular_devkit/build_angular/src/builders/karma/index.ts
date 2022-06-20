@@ -118,14 +118,8 @@ export function execute(
         }
 
         const projectMetadata = await context.getProjectMetadata(projectName);
-        const projectRoot = path.join(
-          context.workspaceRoot,
-          (projectMetadata.root as string | undefined) ?? '',
-        );
-        const projectSourceRoot = path.join(
-          projectRoot,
-          (projectMetadata.sourceRoot as string | undefined) ?? '',
-        );
+        const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '') as string;
+        const projectSourceRoot = path.join(context.workspaceRoot, sourceRoot);
 
         const files = await findTests(options.include, context.workspaceRoot, projectSourceRoot);
         // early exit, no reason to start karma
