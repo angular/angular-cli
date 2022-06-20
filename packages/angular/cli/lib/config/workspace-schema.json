@@ -67,7 +67,8 @@
               "description": "Show a warning when the global version is newer than the local one.",
               "type": "boolean"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "analytics": {
           "type": ["boolean", "string"],
@@ -86,7 +87,8 @@
               "type": "string",
               "format": "uuid"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "cache": {
           "description": "Control disk cache.",
@@ -105,7 +107,74 @@
               "description": "Cache base path.",
               "type": "string"
             }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "cliGlobalOptions": {
+      "type": "object",
+      "properties": {
+        "defaultCollection": {
+          "description": "The default schematics collection to use.",
+          "type": "string",
+          "x-deprecated": "Use 'schematicCollections' instead."
+        },
+        "schematicCollections": {
+          "type": "array",
+          "description": "The list of schematic collections to use.",
+          "items": {
+            "type": "string",
+            "uniqueItems": true
           }
+        },
+        "packageManager": {
+          "description": "Specify which package manager tool to use.",
+          "type": "string",
+          "enum": ["npm", "cnpm", "yarn", "pnpm"]
+        },
+        "warnings": {
+          "description": "Control CLI specific console warnings",
+          "type": "object",
+          "properties": {
+            "versionMismatch": {
+              "description": "Show a warning when the global version is newer than the local one.",
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "analytics": {
+          "type": ["boolean", "string"],
+          "description": "Share anonymous usage data with the Angular Team at Google."
+        },
+        "analyticsSharing": {
+          "type": "object",
+          "properties": {
+            "tracking": {
+              "description": "Analytics sharing info tracking ID.",
+              "type": "string",
+              "pattern": "^(GA|UA)?-\\d+-\\d+$"
+            },
+            "uuid": {
+              "description": "Analytics sharing info universally unique identifier.",
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false
+        },
+        "completion": {
+          "type": "object",
+          "description": "Angular CLI completion settings.",
+          "properties": {
+            "prompted": {
+              "type": "boolean",
+              "description": "Whether the user has been prompted to add completion command prompt."
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -575,14 +644,13 @@
       "type": "object",
       "properties": {
         "$schema": {
-          "type": "string",
-          "format": "uri"
+          "type": "string"
         },
         "version": {
           "$ref": "#/definitions/fileVersion"
         },
         "cli": {
-          "$ref": "#/definitions/cliOptions"
+          "$ref": "#/definitions/cliGlobalOptions"
         },
         "schematics": {
           "$ref": "#/definitions/schematicOptions"

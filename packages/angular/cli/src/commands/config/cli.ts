@@ -97,27 +97,6 @@ export class ConfigCommandModule
       throw new CommandModuleError('Invalid Path.');
     }
 
-    const validGlobalCliPaths = new Set<string>([
-      'cli.warnings.versionMismatch',
-      'cli.defaultCollection',
-      'cli.schematicCollections',
-      'cli.packageManager',
-
-      'cli.analytics',
-      'cli.analyticsSharing.tracking',
-      'cli.analyticsSharing.uuid',
-
-      'cli.completion.prompted',
-    ]);
-
-    if (
-      options.global &&
-      !options.jsonPath.startsWith('schematics.') &&
-      !validGlobalCliPaths.has(options.jsonPath)
-    ) {
-      throw new CommandModuleError('Invalid Path.');
-    }
-
     const [config, configPath] = await getWorkspaceRaw(options.global ? 'global' : 'local');
     const { logger } = this.context;
 
@@ -140,7 +119,7 @@ export class ConfigCommandModule
       return 1;
     }
 
-    await validateWorkspace(parseJson(config.content));
+    await validateWorkspace(parseJson(config.content), options.global ?? false);
 
     config.save();
 
