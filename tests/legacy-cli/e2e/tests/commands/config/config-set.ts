@@ -1,8 +1,23 @@
-import { ng } from '../../../utils/process';
+import { ng, silentNg } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
-  await expectToFail(() => ng('config', 'cli.warnings.zzzz'));
+  let ngError: Error;
+
+  ngError = await expectToFail(() => silentNg('config', 'cli.warnings.zzzz', 'true'));
+  if (
+    !ngError.message.includes(
+      'Data path "/cli/warnings" must NOT have additional properties(zzzz).',
+    )
+  ) {
+    throw new Error('Should have failed with must NOT have additional properties(zzzz).');
+  }
+
+  ngError = await expectToFail(() => silentNg('config', 'cli.warnings.zzzz'));
+  if (!ngError.message.includes('Value cannot be found.')) {
+    throw new Error('Should have failed with Value cannot be found.');
+  }
+
   await ng('config', 'cli.warnings.versionMismatch', 'false');
   const { stdout } = await ng('config', 'cli.warnings.versionMismatch');
   if (!stdout.includes('false')) {
