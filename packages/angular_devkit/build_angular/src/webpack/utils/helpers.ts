@@ -126,8 +126,8 @@ export function getInstrumentationExcludedPaths(
 
   for (const excludeGlob of excludedPaths) {
     glob
-      .sync(path.join(sourceRoot, excludeGlob), { nodir: true })
-      .forEach((p) => excluded.add(path.normalize(p)));
+      .sync(excludeGlob, { nodir: true, cwd: sourceRoot })
+      .forEach((p) => excluded.add(path.join(sourceRoot, p)));
   }
 
   return excluded;
