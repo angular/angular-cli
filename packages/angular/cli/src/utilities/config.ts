@@ -240,11 +240,20 @@ export async function getWorkspaceRaw(
   return [new JSONFile(configPath), configPath];
 }
 
-export async function validateWorkspace(data: json.JsonObject): Promise<void> {
-  const schema = readAndParseJson(workspaceSchemaPath) as json.schema.JsonSchema;
+export async function validateWorkspace(data: json.JsonObject, isGlobal: boolean): Promise<void> {
+  const schema = readAndParseJson(workspaceSchemaPath);
+
+  // We should eventually have a dedicated global config schema and use that to validate.
+  const schemaToValidate: json.schema.JsonSchema = isGlobal
+    ? {
+        '$ref': '#/definitions/global',
+        definitions: schema['definitions'],
+      }
+    : schema;
+
   const { formats } = await import('@angular-devkit/schematics');
   const registry = new json.schema.CoreSchemaRegistry(formats.standardFormats);
-  const validator = await registry.compile(schema).toPromise();
+  const validator = await registry.compile(schemaToValidate).toPromise();
 
   const { success, errors } = await validator(data).toPromise();
   if (!success) {
