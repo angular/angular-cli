@@ -53,7 +53,9 @@ function convertJsonWorkspace(workspace: WorkspaceDefinition, schema?: string): 
     $schema: schema || './node_modules/@angular/cli/lib/config/schema.json',
     version: 1,
     ...workspace.extensions,
-    projects: workspace.projects ? convertJsonProjectCollection(workspace.projects) : {},
+    ...(isEmpty(workspace.projects)
+      ? {}
+      : { projects: convertJsonProjectCollection(workspace.projects) }),
   };
 
   return obj;
