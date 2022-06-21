@@ -10,6 +10,7 @@ import { analytics, logging, schema, strings } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import {
+  Arguments,
   ArgumentsCamelCase,
   Argv,
   CamelCaseKey,
@@ -199,6 +200,8 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
    * **Note:** This method should be called from the command bundler method.
    */
   protected addSchemaOptionsToCommand<T>(localYargs: Argv<T>, options: Option[]): Argv<T> {
+    const booleanOptionsWithNoPrefix = new Set<string>();
+
     for (const option of options) {
       const {
         default: defaultVal,
@@ -223,13 +226,27 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         ...(this.context.args.options.help ? { default: defaultVal } : {}),
       };
 
+      // TODO(alanagius4): remove in a major version.
+      // the below is an interim workaround to handle options which have been defined in the schema with `no` prefix.
+      let dashedName = strings.dasherize(name);
+      if (type === 'boolean' && dashedName.startsWith('no-')) {
+        dashedName = dashedName.slice(3);
+        booleanOptionsWithNoPrefix.add(dashedName);
+
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Warning: '${name}' option has been declared with a 'no' prefix in the schema.` +
+            'Please file an issue with the author of this package.',
+        );
+      }
+
       if (positional === undefined) {
-        localYargs = localYargs.option(strings.dasherize(name), {
+        localYargs = localYargs.option(dashedName, {
           type,
           ...sharedOptions,
         });
       } else {
-        localYargs = localYargs.positional(strings.dasherize(name), {
+        localYargs = localYargs.positional(dashedName, {
           type: type === 'array' || type === 'count' ? 'string' : type,
           ...sharedOptions,
         });
@@ -239,6 +256,19 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       if (userAnalytics !== undefined) {
         this.optionsWithAnalytics.set(name, userAnalytics);
       }
+    }
+
+    // TODO(alanagius4): remove in a major version.
+    // the below is an interim workaround to handle options which have been defined in the schema with `no` prefix.
+    if (booleanOptionsWithNoPrefix.size) {
+      localYargs.middleware((options: Arguments) => {
+        for (const key of booleanOptionsWithNoPrefix) {
+          if (key in options) {
+            options[`no-${key}`] = !options[key];
+            delete options[key];
+          }
+        }
+      }, false);
     }
 
     return localYargs;

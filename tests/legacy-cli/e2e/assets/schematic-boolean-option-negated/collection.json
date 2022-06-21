@@ -1,0 +1,9 @@
+{
+  "schematics": {
+    "test": {
+      "factory": "./index.js",
+      "schema": "./schema.json",
+      "description": "test schematic that logs the options in the console."
+    }
+  }
+}
