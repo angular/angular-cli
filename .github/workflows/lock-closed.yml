@@ -13,6 +13,6 @@ jobs:
   lock_closed:
     runs-on: ubuntu-latest
     steps:
-      - uses: angular/dev-infra/github-actions/lock-closed@684962a29f0beba95e0b1ecfd360760e7f011041
+      - uses: angular/dev-infra/github-actions/lock-closed@860ebf16b8617ce999394c2c70a8af307bb0ddc2
         with:
           lock-bot-key: ${{ secrets.LOCK_BOT_PRIVATE_KEY }}
