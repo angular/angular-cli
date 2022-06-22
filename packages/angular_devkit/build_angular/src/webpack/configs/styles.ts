@@ -107,14 +107,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  const sassImplementation = new SassWorkerImplementation();
-  extraPlugins.push({
-    apply(compiler) {
-      compiler.hooks.shutdown.tap('sass-worker', () => {
-        sassImplementation.close();
-      });
-    },
-  });
+  const sassImplementation = require('sass');
 
   const assetNameTemplate = assetNameTemplateFactory(hashFormat);
 
@@ -268,17 +261,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           loader: require.resolve('sass-loader'),
           options: {
             implementation: sassImplementation,
+            api: 'modern',
             sourceMap: true,
             sassOptions: {
-              // Prevent use of `fibers` package as it no longer works in newer Node.js versions
-              fiber: false,
-              // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
-              includePaths,
+              loadPaths: includePaths,
               // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
               // Ex: /* autoprefixer grid: autoplace */
               // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-              outputStyle: 'expanded',
+              style: 'expanded',
               // Silences compiler warnings from 3rd party stylesheets
               quietDeps: !buildOptions.verbose,
               verbose: buildOptions.verbose,
@@ -300,18 +290,16 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           loader: require.resolve('sass-loader'),
           options: {
             implementation: sassImplementation,
+            api: 'modern',
             sourceMap: true,
             sassOptions: {
               // Prevent use of `fibers` package as it no longer works in newer Node.js versions
-              fiber: false,
-              indentedSyntax: true,
-              // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
-              includePaths,
+              syntax: 'indented',
+              loadPaths: includePaths,
               // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
               // Ex: /* autoprefixer grid: autoplace */
               // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-              outputStyle: 'expanded',
+              style: 'expanded',
               // Silences compiler warnings from 3rd party stylesheets
               quietDeps: !buildOptions.verbose,
               verbose: buildOptions.verbose,
