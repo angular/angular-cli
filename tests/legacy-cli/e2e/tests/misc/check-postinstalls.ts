@@ -13,16 +13,24 @@ const POTENTIAL_SCRIPTS: ReadonlyArray<string> = ['preinstall', 'install', 'post
 
 // Some packages include test and/or example code that causes false positives
 const FALSE_POSITIVE_PATHS: ReadonlySet<string> = new Set([
-  'node_modules/jasmine-spec-reporter/examples/protractor/package.json',
-  'node_modules/resolve/test/resolver/multirepo/package.json',
+  'jasmine-spec-reporter/examples/protractor/package.json',
+  'resolve/test/resolver/multirepo/package.json',
 ]);
+
+const INNER_NODE_MODULES_SEGMENT = '/node_modules/';
 
 export default async function () {
   const manifestPaths = await globAsync('node_modules/**/package.json');
   const newPackages: string[] = [];
 
   for (const manifestPath of manifestPaths) {
-    if (FALSE_POSITIVE_PATHS.has(manifestPath)) {
+    const lastNodeModuleIndex = manifestPath.lastIndexOf(INNER_NODE_MODULES_SEGMENT);
+    const packageRelativePath = manifestPath.slice(
+      lastNodeModuleIndex === -1
+        ? INNER_NODE_MODULES_SEGMENT.length - 1
+        : lastNodeModuleIndex + INNER_NODE_MODULES_SEGMENT.length,
+    );
+    if (FALSE_POSITIVE_PATHS.has(packageRelativePath)) {
       continue;
     }
 
