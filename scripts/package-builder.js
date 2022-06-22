@@ -24,20 +24,12 @@ const bazelCmd = process.env.BAZEL ?? `yarn --cwd "${baseDir}" --silent bazel`;
 /** @type {string} The absolute path to the bazel-bin directory. */
 const bazelBin = exec(`${bazelCmd} info bazel-bin`, true);
 
-/**
- * @type {string}
- * The relative path to the entry script (i.e. the one loaded when the Node.js process launched).
- * It is relative to `baseDir`.
- */
-const scriptPath = relative(baseDir, require.main.filename);
-
 module.exports = {
   baseDir,
   bazelBin,
   bazelCmd,
   buildTargetPackages,
   exec,
-  scriptPath,
 };
 
 /**
@@ -51,7 +43,6 @@ module.exports = {
  */
 function buildTargetPackages(destDir, description, isRelease = false) {
   console.info('##################################');
-  console.info(`${scriptPath}:`);
   console.info('  Building @nguniversal/* npm packages');
   console.info(`  Mode: ${description}`);
   console.info('##################################');

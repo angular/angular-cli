@@ -1,5 +1,5 @@
 import { CommitMessageConfig } from '@angular/dev-infra-private/ng-dev/commit-message/config';
-import { release } from './release';
+import { release } from './release.mjs';
 
 /**
  * The configuration for `ng-dev commit-message` commands.

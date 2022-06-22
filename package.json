@@ -23,6 +23,7 @@
   },
   "scripts": {
     "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
+    "ng-dev": "ts-node --esm --project .ng-dev/tsconfig.json node_modules/@angular/dev-infra-private/ng-dev/bundles/cli.mjs",
     "build": "npm run bazel:build",
     "bazel:build": "bazel build //modules/...",
     "test": "bazel test //modules/...",
@@ -45,7 +46,7 @@
     "@angular/compiler": "14.1.0-next.0",
     "@angular/compiler-cli": "14.1.0-next.0",
     "@angular/core": "14.1.0-next.0",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#fb0ce9d4c7f9a15e0351dc30f771993d757dc870",
+    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#262cb3bb487e8dddb3c404f4f2c8b34a9a1f14c2",
     "@angular/platform-browser": "14.1.0-next.0",
     "@angular/platform-browser-dynamic": "14.1.0-next.0",
     "@angular/platform-server": "14.1.0-next.0",
