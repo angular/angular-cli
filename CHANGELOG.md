@@ -1,3 +1,19 @@
+<a name="14.0.2"></a>
+
+# 14.0.2 (2022-06-23)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                     |
+| ------------------------------------------------------------------------------------------------ | ---- | ----------------------------------------------- |
+| [ddffd973](https://github.com/angular/universal/commit/ddffd97309fa7cddc20e6b5ea4735b2f5fc429a9) | fix  | correctly handle path normalizations on Windows |
+
+## Special Thanks
+
+Alan Agius and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.0-next.0"></a>
 
 # 14.1.0-next.0 (2022-06-15)
