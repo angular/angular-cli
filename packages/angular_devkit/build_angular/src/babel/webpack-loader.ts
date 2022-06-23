@@ -125,7 +125,7 @@ export default custom<ApplicationPresetOptions>(() => {
         customOptions.forcePresetEnv = true;
         // Comparable behavior to tsconfig target of ES5
         customOptions.supportedBrowsers = ['IE 9'];
-      } else if (isJsFile) {
+      } else if (isJsFile && customOptions.supportedBrowsers?.length) {
         // Applications code ES version can be controlled using TypeScript's `target` option.
         // However, this doesn't effect libraries and hence we use preset-env to downlevel ES fetaures
         // based on the supported browsers in browserlist.
