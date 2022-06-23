@@ -15,7 +15,6 @@ import {
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
-import { normalize, resolve as resolvePath } from '@angular-devkit/core';
 import * as fs from 'fs';
 import ora from 'ora';
 import * as path from 'path';
@@ -92,9 +91,11 @@ async function _renderUniversal(
     throw new Error('The builder requires a target.');
   }
 
-  const root = normalize(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = resolvePath(root, normalize((projectMetadata.root as string) || ''));
+  const projectRoot = path.join(
+    context.workspaceRoot,
+    (projectMetadata.root as string | undefined) ?? '',
+  );
 
   // Users can specify a different base html file e.g. "src/home.html"
   const indexFile = getIndexOutputFile(browserOptions);
@@ -160,7 +161,7 @@ async function _renderUniversal(
           await augmentAppWithServiceWorker(
             projectRoot,
             context.workspaceRoot,
-            normalize(outputPath),
+            outputPath,
             browserOptions.baseHref || '/',
             browserOptions.ngswConfigPath,
           );

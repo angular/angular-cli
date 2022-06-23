@@ -15,7 +15,6 @@ import {
 import { BrowserBuilderOptions, BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
-import { normalize, resolve } from '@angular-devkit/core';
 import express from 'express';
 import * as http from 'http';
 import ora from 'ora';
@@ -145,14 +144,16 @@ async function generateServiceWorker(
       throw new Error('The builder requires a target.');
     }
 
-    const root = normalize(context.workspaceRoot);
     const projectMetadata = await context.getProjectMetadata(projectName);
-    const projectRoot = resolve(root, normalize((projectMetadata.root as string) ?? ''));
+    const projectRoot = path.join(
+      context.workspaceRoot,
+      (projectMetadata.root as string | undefined) ?? '',
+    );
 
     await augmentAppWithServiceWorker(
       projectRoot,
       context.workspaceRoot,
-      normalize(outputPath),
+      outputPath,
       browserOptions.baseHref || '/',
       browserOptions.ngswConfigPath,
     );
