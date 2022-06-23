@@ -95,6 +95,7 @@
     "@discoveryjs/json-ext": "0.5.7",
     "@types/babel__core": "7.1.19",
     "@types/babel__template": "7.4.1",
+    "@types/browserslist": "^4.15.0",
     "@types/cacache": "^15.0.0",
     "@types/debug": "^4.1.2",
     "@types/express": "^4.16.0",
