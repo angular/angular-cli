@@ -1,3 +1,35 @@
+<a name="14.0.3"></a>
+
+# 14.0.3 (2022-06-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [b3db91baf](https://github.com/angular/angular-cli/commit/b3db91baf50c92589549a66ffef437f7890d3de7) | fix  | disable version check when running `ng completion` commands            |
+| [cdab9fa74](https://github.com/angular/angular-cli/commit/cdab9fa7431db7e2a75e04e776555b8e5e15fc94) | fix  | provide an actionable error when using `--configuration` with `ng run` |
+| [5521648e3](https://github.com/angular/angular-cli/commit/5521648e33af634285f6352b43a324a1ee023e27) | fix  | temporarily handle boolean options in schema prefixed with `no`        |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [5e960ce24](https://github.com/angular/angular-cli/commit/5e960ce246e7090f57ce22723911a743aa8fcb0c) | fix  | fix incorrect glob cwd in karma when using `--include` option |
+| [1b5e92075](https://github.com/angular/angular-cli/commit/1b5e92075e64563459942d4de785f1a8bef46ec7) | fix  | handle `codeCoverageExclude` correctly in Windows             |
+| [ff6d81a45](https://github.com/angular/angular-cli/commit/ff6d81a4539657446c8f5770cefe688d2d578450) | fix  | ignore supported browsers during i18n extraction              |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [170c16f2e](https://github.com/angular/angular-cli/commit/170c16f2ea769e76a48f1ac215ee88ba47ff511d) | fix  | workspace writer skip creating empty projects property |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.0-next.1"></a>
 
 # 14.1.0-next.1 (2022-06-15)
