@@ -233,6 +233,8 @@ export async function execute(
 
       return partials;
     },
+    // During extraction we don't need specific browser support.
+    { supportedBrowsers: undefined },
   );
 
   // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
