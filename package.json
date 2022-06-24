@@ -190,7 +190,7 @@
     "postcss-preset-env": "7.7.0",
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "14.2.1",
+    "puppeteer": "15.0.1",
     "quicktype-core": "6.0.69",
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "5.0.0",
