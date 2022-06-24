@@ -1,18 +1,17 @@
 {
-  "pinVersions": false,
-  "semanticCommits": true,
-  "semanticPrefix": "build",
+  "rangeStrategy": "replace",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "build",
+  "semanticCommitScope": null,
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
   "labels": ["target: minor", "action: merge"],
   "timezone": "America/Tijuana",
-  "lockFileMaintenance": {
-    "enabled": true
-  },
-  "schedule": ["after 10pm every weekday", "before 4am every weekday", "every weekend"],
+  "lockFileMaintenance": { "enabled": true },
+  "schedule": ["after 10:00pm every weekday", "before 4:00am every weekday", "every weekend"],
   "baseBranches": ["main"],
   "ignoreDeps": ["@types/node", "quicktype-core"],
-  "packageFiles": [
+  "includePaths": [
     "WORKSPACE",
     "package.json",
     "packages/**/package.json",
@@ -21,33 +20,30 @@
   ],
   "packageRules": [
     {
-      "packagePatterns": ["^@angular/.*", "angular/dev-infra"],
       "groupName": "angular",
-      "pinVersions": false
+      "matchPackagePatterns": ["^@angular/.*", "angular/dev-infra"]
     },
     {
-      "packagePatterns": ["^@babel/.*"],
       "groupName": "babel",
-      "pinVersions": false
+      "matchPackagePatterns": ["^@babel/.*"]
     },
     {
-      "packagePatterns": ["^@bazel/.*", "^build_bazel.*"],
       "groupName": "bazel",
-      "pinVersions": false
+      "matchPackagePatterns": ["^@bazel/.*", "^build_bazel.*"]
     },
     {
-      "packageNames": ["typescript", "rxjs", "tslib"],
-      "separateMinorPatch": true
+      "separateMinorPatch": true,
+      "matchPackageNames": ["typescript", "rxjs", "tslib"]
     },
     {
-      "packageNames": ["typescript", "rxjs", "tslib"],
-      "updateTypes": ["major"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": ["typescript", "rxjs", "tslib"],
+      "matchUpdateTypes": ["major"]
     },
     {
-      "packageNames": ["typescript"],
-      "updateTypes": ["minor"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["minor"]
     },
     {
       "matchPaths": [
