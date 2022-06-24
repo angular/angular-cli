@@ -16,7 +16,7 @@ interface ExecOptions {
   cwd?: string;
 }
 
-const NPM_CONFIG_RE = /^npm_config_/i;
+const NPM_CONFIG_RE = /^(npm_config_|yarn_)/i;
 
 let _processes: child_process.ChildProcess[] = [];
 
@@ -40,6 +40,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   // Ensure the custom npm and yarn global bin is on the PATH
   // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables
   const paths = [
+    join(getGlobalVariable('yarn-global'), 'bin'),
     join(getGlobalVariable('npm-global'), process.platform.startsWith('win') ? '' : 'bin'),
     env.PATH || process.env['PATH'],
   ].join(delimiter);
