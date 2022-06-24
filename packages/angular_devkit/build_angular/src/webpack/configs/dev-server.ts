@@ -75,6 +75,10 @@ export async function getDevServerConfig(
           },
         ],
       },
+      // When setupExitSignals is enabled webpack-dev-server will shutdown gracefully which would
+      // require CTRL+C to be pressed multiple times to exit.
+      // See: https://github.com/webpack/webpack-dev-server/blob/c76b6d11a3821436c5e20207c8a38deb6ab7e33c/lib/Server.js#L1801-L1827
+      setupExitSignals: false,
       compress: false,
       static: false,
       server: getServerConfig(root, wco.buildOptions),
