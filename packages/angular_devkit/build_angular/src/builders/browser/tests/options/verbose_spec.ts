@@ -102,5 +102,59 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         )
         .toPromise();
     });
+
+    it('should not include error stacktraces when false', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        verbose: false,
+        styles: ['./src/styles.scss'],
+      });
+
+      // Create a compilatation error.
+      await harness.writeFile('./src/styles.scss', `@import 'invalid-module';`);
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching(`SassError: Can't find stylesheet to import.`),
+        }),
+      );
+      expect(logs).not.toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching('styles.scss.webpack'),
+        }),
+      );
+      expect(logs).not.toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching('at Object.loader'),
+        }),
+      );
+    });
+
+    it('should include error stacktraces when true', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        verbose: true,
+        styles: ['./src/styles.scss'],
+      });
+
+      // Create a compilatation error.
+      await harness.writeFile('./src/styles.scss', `@import 'invalid-module';`);
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+
+      expect(logs).toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching('styles.scss.webpack'),
+        }),
+      );
+      expect(logs).toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching('at Object.loader'),
+        }),
+      );
+    });
   });
 });
