@@ -29,6 +29,8 @@ export interface HashFormat {
   script: string;
 }
 
+export type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean | undefined>;
+
 export function getOutputHashFormat(outputHashing = OutputHashing.None, length = 20): HashFormat {
   const hashTemplate = `.[contenthash:${length}]`;
 
@@ -276,7 +278,6 @@ export function externalizePackages(
   }
 }
 
-type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean>;
 export function getStatsOptions(verbose = false): WebpackStatsOptions {
   const webpackOutputOptions: WebpackStatsOptions = {
     all: false, // Fallback value for stats options when an option is not defined. It has precedence over local webpack defaults.
@@ -306,6 +307,7 @@ export function getStatsOptions(verbose = false): WebpackStatsOptions {
     version: true,
     chunkModules: true,
     errorDetails: true,
+    errorStack: true,
     moduleTrace: true,
     logging: 'verbose',
     modulesSpace: Infinity,

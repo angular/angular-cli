@@ -15,7 +15,7 @@ import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { colors as ansiColors, removeColor } from '../../utils/color';
 import { markAsyncChunksNonInitial } from './async-chunks';
-import { getStatsOptions, normalizeExtraEntryPoints } from './helpers';
+import { WebpackStatsOptions, getStatsOptions, normalizeExtraEntryPoints } from './helpers';
 
 export function formatSize(size: number): string {
   if (size <= 0) {
@@ -317,8 +317,10 @@ function statsToString(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function statsWarningsToString(json: StatsCompilation, statsConfig: any): string {
+export function statsWarningsToString(
+  json: StatsCompilation,
+  statsConfig: WebpackStatsOptions,
+): string {
   const colors = statsConfig.colors;
   const c = (x: string) => (colors ? ansiColors.reset.cyan(x) : x);
   const y = (x: string) => (colors ? ansiColors.reset.yellow(x) : x);
@@ -352,8 +354,10 @@ export function statsWarningsToString(json: StatsCompilation, statsConfig: any):
   return output ? '\n' + output : output;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function statsErrorsToString(json: StatsCompilation, statsConfig: any): string {
+export function statsErrorsToString(
+  json: StatsCompilation,
+  statsConfig: WebpackStatsOptions,
+): string {
   const colors = statsConfig.colors;
   const c = (x: string) => (colors ? ansiColors.reset.cyan(x) : x);
   const yb = (x: string) => (colors ? ansiColors.reset.yellowBright(x) : x);
@@ -369,7 +373,17 @@ export function statsErrorsToString(json: StatsCompilation, statsConfig: any): s
     if (typeof error === 'string') {
       output += r(`Error: ${error}\n\n`);
     } else {
-      const file = error.file || error.moduleName;
+      let file = error.file || error.moduleName;
+      // Clean up error paths
+      // Ex: ./src/app/styles.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js....
+      // to ./src/app/styles.scss.webpack
+      if (file && !statsConfig.errorDetails) {
+        const webpackPathIndex = file.indexOf('.webpack[');
+        if (webpackPathIndex !== -1) {
+          file = file.substring(0, webpackPathIndex);
+        }
+      }
+
       if (file) {
         output += c(file);
         if (error.loc) {
@@ -377,10 +391,18 @@ export function statsErrorsToString(json: StatsCompilation, statsConfig: any): s
         }
         output += ' - ';
       }
-      if (!/^error/i.test(error.message)) {
+
+      // In most cases webpack will add stack traces to error messages.
+      // This below cleans up the error from stacks.
+      // See: https://github.com/webpack/webpack/issues/15980
+      const message = statsConfig.errorStack
+        ? error.message
+        : /[\s\S]+?(?=[\n\s]+at)/.exec(error.message)?.[0] ?? error.message;
+
+      if (!/^error/i.test(message)) {
         output += r('Error: ');
       }
-      output += `${error.message}\n\n`;
+      output += `${message}\n\n`;
     }
   }
 
@@ -428,9 +450,14 @@ export function webpackStatsLogger(
 ): void {
   logger.info(statsToString(json, config.stats, budgetFailures));
 
+  if (typeof config.stats !== 'object') {
+    throw new Error('Invalid Webpack stats configuration.');
+  }
+
   if (statsHasWarnings(json)) {
     logger.warn(statsWarningsToString(json, config.stats));
   }
+
   if (statsHasErrors(json)) {
     logger.error(statsErrorsToString(json, config.stats));
   }
