@@ -12,7 +12,7 @@
     "ajv": "8.11.0",
     "jsonc-parser": "3.0.0",
     "rxjs": "6.6.7",
-    "source-map": "0.7.3"
+    "source-map": "0.7.4"
   },
   "peerDependencies": {
     "chokidar": "^3.5.2"
