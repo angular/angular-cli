@@ -45,7 +45,7 @@ export class NewCommandModule
     });
 
     const {
-      options: { collectionNameFromArgs },
+      options: { collection: collectionNameFromArgs },
     } = this.context.args;
 
     const collectionName =
