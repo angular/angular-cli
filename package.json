@@ -173,7 +173,7 @@
     "mini-css-extract-plugin": "2.6.1",
     "minimatch": "5.1.0",
     "ng-packagr": "14.0.2",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^3.0.0",
     "npm": "^8.11.0",
     "npm-package-arg": "9.1.0",
     "open": "8.4.0",
