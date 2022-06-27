@@ -53,6 +53,16 @@ export interface AngularWebpackPluginOptions {
   inlineStyleFileExtension?: string;
 }
 
+/**
+ * The Angular compilation state that is maintained across each Webpack compilation.
+ */
+interface AngularCompilationState {
+  ngccProcessor?: NgccProcessor;
+  resourceLoader?: WebpackResourceLoader;
+  previousUnused?: Set<string>;
+  pathsPlugin: TypeScriptPathsPlugin;
+}
+
 function initializeNgccProcessor(
   compiler: Compiler,
   tsconfig: string,
@@ -138,9 +148,8 @@ export class AngularWebpackPlugin {
     return this.pluginOptions;
   }
 
-  // eslint-disable-next-line max-lines-per-function
   apply(compiler: Compiler): void {
-    const { NormalModuleReplacementPlugin, util } = compiler.webpack;
+    const { NormalModuleReplacementPlugin, WebpackError, util } = compiler.webpack;
     this.webpackCreateHash = util.createHash;
 
     // Setup file replacements with webpack
@@ -175,171 +184,185 @@ export class AngularWebpackPlugin {
     // Load the compiler-cli if not already available
     compiler.hooks.beforeCompile.tapPromise(PLUGIN_NAME, () => this.initializeCompilerCli());
 
-    let ngccProcessor: NgccProcessor | undefined;
-    let resourceLoader: WebpackResourceLoader | undefined;
-    let previousUnused: Set<string> | undefined;
+    const compilationState: AngularCompilationState = { pathsPlugin };
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
-      // Register plugin to ensure deterministic emit order in multi-plugin usage
-      const emitRegistration = this.registerWithCompilation(compilation);
-      this.watchMode = compiler.watchMode;
-
-      // Initialize webpack cache
-      if (!this.webpackCache && compilation.options.cache) {
-        this.webpackCache = compilation.getCache(PLUGIN_NAME);
+      try {
+        this.setupCompilation(compilation, compilationState);
+      } catch (error) {
+        compilation.errors.push(
+          new WebpackError(
+            `Failed to initialize Angular compilation - ${
+              error instanceof Error ? error.message : error
+            }`,
+          ),
+        );
       }
+    });
+  }
 
-      // Initialize the resource loader if not already setup
-      if (!resourceLoader) {
-        resourceLoader = new WebpackResourceLoader(this.watchMode);
+  private setupCompilation(compilation: Compilation, state: AngularCompilationState): void {
+    const compiler = compilation.compiler;
+
+    // Register plugin to ensure deterministic emit order in multi-plugin usage
+    const emitRegistration = this.registerWithCompilation(compilation);
+    this.watchMode = compiler.watchMode;
+
+    // Initialize webpack cache
+    if (!this.webpackCache && compilation.options.cache) {
+      this.webpackCache = compilation.getCache(PLUGIN_NAME);
+    }
+
+    // Initialize the resource loader if not already setup
+    if (!state.resourceLoader) {
+      state.resourceLoader = new WebpackResourceLoader(this.watchMode);
+    }
+
+    // Initialize and process eager ngcc if not already setup
+    if (!state.ngccProcessor) {
+      const { processor, errors, warnings } = initializeNgccProcessor(
+        compiler,
+        this.pluginOptions.tsconfig,
+        this.compilerNgccModule,
+      );
+
+      processor.process();
+      warnings.forEach((warning) => addWarning(compilation, warning));
+      errors.forEach((error) => addError(compilation, error));
+
+      state.ngccProcessor = processor;
+    }
+
+    // Setup and read TypeScript and Angular compiler configuration
+    const { compilerOptions, rootNames, errors } = this.loadConfiguration();
+
+    // Create diagnostics reporter and report configuration file errors
+    const diagnosticsReporter = createDiagnosticsReporter(compilation, (diagnostic) =>
+      this.compilerCli.formatDiagnostics([diagnostic]),
+    );
+    diagnosticsReporter(errors);
+
+    // Update TypeScript path mapping plugin with new configuration
+    state.pathsPlugin.update(compilerOptions);
+
+    // Create a Webpack-based TypeScript compiler host
+    const system = createWebpackSystem(
+      // Webpack lacks an InputFileSytem type definition with sync functions
+      compiler.inputFileSystem as InputFileSystemSync,
+      normalizePath(compiler.context),
+    );
+    const host = ts.createIncrementalCompilerHost(compilerOptions, system);
+
+    // Setup source file caching and reuse cache from previous compilation if present
+    let cache = this.sourceFileCache;
+    let changedFiles;
+    if (cache) {
+      changedFiles = new Set<string>();
+      for (const changedFile of [...compiler.modifiedFiles, ...compiler.removedFiles]) {
+        const normalizedChangedFile = normalizePath(changedFile);
+        // Invalidate file dependencies
+        this.fileDependencies.delete(normalizedChangedFile);
+        // Invalidate existing cache
+        cache.invalidate(normalizedChangedFile);
+
+        changedFiles.add(normalizedChangedFile);
       }
+    } else {
+      // Initialize a new cache
+      cache = new SourceFileCache();
+      // Only store cache if in watch mode
+      if (this.watchMode) {
+        this.sourceFileCache = cache;
+      }
+    }
+    augmentHostWithCaching(host, cache);
 
-      // Initialize and process eager ngcc if not already setup
-      if (!ngccProcessor) {
-        const { processor, errors, warnings } = initializeNgccProcessor(
-          compiler,
-          this.pluginOptions.tsconfig,
-          this.compilerNgccModule,
+    const moduleResolutionCache = ts.createModuleResolutionCache(
+      host.getCurrentDirectory(),
+      host.getCanonicalFileName.bind(host),
+      compilerOptions,
+    );
+
+    // Setup source file dependency collection
+    augmentHostWithDependencyCollection(host, this.fileDependencies, moduleResolutionCache);
+
+    // Setup on demand ngcc
+    augmentHostWithNgcc(host, state.ngccProcessor, moduleResolutionCache);
+
+    // Setup resource loading
+    state.resourceLoader.update(compilation, changedFiles);
+    augmentHostWithResources(host, state.resourceLoader, {
+      directTemplateLoading: this.pluginOptions.directTemplateLoading,
+      inlineStyleFileExtension: this.pluginOptions.inlineStyleFileExtension,
+    });
+
+    // Setup source file adjustment options
+    augmentHostWithReplacements(host, this.pluginOptions.fileReplacements, moduleResolutionCache);
+    augmentHostWithSubstitutions(host, this.pluginOptions.substitutions);
+
+    // Create the file emitter used by the webpack loader
+    const { fileEmitter, builder, internalFiles } = this.pluginOptions.jitMode
+      ? this.updateJitProgram(compilerOptions, rootNames, host, diagnosticsReporter)
+      : this.updateAotProgram(
+          compilerOptions,
+          rootNames,
+          host,
+          diagnosticsReporter,
+          state.resourceLoader,
         );
 
-        processor.process();
-        warnings.forEach((warning) => addWarning(compilation, warning));
-        errors.forEach((error) => addError(compilation, error));
+    // Set of files used during the unused TypeScript file analysis
+    const currentUnused = new Set<string>();
 
-        ngccProcessor = processor;
+    for (const sourceFile of builder.getSourceFiles()) {
+      if (internalFiles?.has(sourceFile)) {
+        continue;
       }
 
-      // Setup and read TypeScript and Angular compiler configuration
-      const { compilerOptions, rootNames, errors } = this.loadConfiguration();
+      // Ensure all program files are considered part of the compilation and will be watched.
+      // Webpack does not normalize paths. Therefore, we need to normalize the path with FS seperators.
+      compilation.fileDependencies.add(externalizePath(sourceFile.fileName));
 
-      // Create diagnostics reporter and report configuration file errors
-      const diagnosticsReporter = createDiagnosticsReporter(compilation, (diagnostic) =>
-        this.compilerCli.formatDiagnostics([diagnostic]),
-      );
-      diagnosticsReporter(errors);
+      // Add all non-declaration files to the initial set of unused files. The set will be
+      // analyzed and pruned after all Webpack modules are finished building.
+      if (!sourceFile.isDeclarationFile) {
+        currentUnused.add(normalizePath(sourceFile.fileName));
+      }
+    }
 
-      // Update TypeScript path mapping plugin with new configuration
-      pathsPlugin.update(compilerOptions);
+    compilation.hooks.finishModules.tapPromise(PLUGIN_NAME, async (modules) => {
+      // Rebuild any remaining AOT required modules
+      await this.rebuildRequiredFiles(modules, compilation, fileEmitter);
 
-      // Create a Webpack-based TypeScript compiler host
-      const system = createWebpackSystem(
-        // Webpack lacks an InputFileSytem type definition with sync functions
-        compiler.inputFileSystem as InputFileSystemSync,
-        normalizePath(compiler.context),
-      );
-      const host = ts.createIncrementalCompilerHost(compilerOptions, system);
+      // Clear out the Webpack compilation to avoid an extra retaining reference
+      state.resourceLoader?.clearParentCompilation();
 
-      // Setup source file caching and reuse cache from previous compilation if present
-      let cache = this.sourceFileCache;
-      let changedFiles;
-      if (cache) {
-        changedFiles = new Set<string>();
-        for (const changedFile of [...compiler.modifiedFiles, ...compiler.removedFiles]) {
-          const normalizedChangedFile = normalizePath(changedFile);
-          // Invalidate file dependencies
-          this.fileDependencies.delete(normalizedChangedFile);
-          // Invalidate existing cache
-          cache.invalidate(normalizedChangedFile);
+      // Analyze program for unused files
+      if (compilation.errors.length > 0) {
+        return;
+      }
 
-          changedFiles.add(normalizedChangedFile);
-        }
-      } else {
-        // Initialize a new cache
-        cache = new SourceFileCache();
-        // Only store cache if in watch mode
-        if (this.watchMode) {
-          this.sourceFileCache = cache;
+      for (const webpackModule of modules) {
+        const resource = (webpackModule as NormalModule).resource;
+        if (resource) {
+          this.markResourceUsed(normalizePath(resource), currentUnused);
         }
       }
-      augmentHostWithCaching(host, cache);
 
-      const moduleResolutionCache = ts.createModuleResolutionCache(
-        host.getCurrentDirectory(),
-        host.getCanonicalFileName.bind(host),
-        compilerOptions,
-      );
-
-      // Setup source file dependency collection
-      augmentHostWithDependencyCollection(host, this.fileDependencies, moduleResolutionCache);
-
-      // Setup on demand ngcc
-      augmentHostWithNgcc(host, ngccProcessor, moduleResolutionCache);
-
-      // Setup resource loading
-      resourceLoader.update(compilation, changedFiles);
-      augmentHostWithResources(host, resourceLoader, {
-        directTemplateLoading: this.pluginOptions.directTemplateLoading,
-        inlineStyleFileExtension: this.pluginOptions.inlineStyleFileExtension,
-      });
-
-      // Setup source file adjustment options
-      augmentHostWithReplacements(host, this.pluginOptions.fileReplacements, moduleResolutionCache);
-      augmentHostWithSubstitutions(host, this.pluginOptions.substitutions);
-
-      // Create the file emitter used by the webpack loader
-      const { fileEmitter, builder, internalFiles } = this.pluginOptions.jitMode
-        ? this.updateJitProgram(compilerOptions, rootNames, host, diagnosticsReporter)
-        : this.updateAotProgram(
-            compilerOptions,
-            rootNames,
-            host,
-            diagnosticsReporter,
-            resourceLoader,
-          );
-
-      // Set of files used during the unused TypeScript file analysis
-      const currentUnused = new Set<string>();
-
-      for (const sourceFile of builder.getSourceFiles()) {
-        if (internalFiles?.has(sourceFile)) {
+      for (const unused of currentUnused) {
+        if (state.previousUnused?.has(unused)) {
           continue;
         }
-
-        // Ensure all program files are considered part of the compilation and will be watched.
-        // Webpack does not normalize paths. Therefore, we need to normalize the path with FS seperators.
-        compilation.fileDependencies.add(externalizePath(sourceFile.fileName));
-
-        // Add all non-declaration files to the initial set of unused files. The set will be
-        // analyzed and pruned after all Webpack modules are finished building.
-        if (!sourceFile.isDeclarationFile) {
-          currentUnused.add(normalizePath(sourceFile.fileName));
-        }
+        addWarning(
+          compilation,
+          `${unused} is part of the TypeScript compilation but it's unused.\n` +
+            `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
+        );
       }
-
-      compilation.hooks.finishModules.tapPromise(PLUGIN_NAME, async (modules) => {
-        // Rebuild any remaining AOT required modules
-        await this.rebuildRequiredFiles(modules, compilation, fileEmitter);
-
-        // Clear out the Webpack compilation to avoid an extra retaining reference
-        resourceLoader?.clearParentCompilation();
-
-        // Analyze program for unused files
-        if (compilation.errors.length > 0) {
-          return;
-        }
-
-        for (const webpackModule of modules) {
-          const resource = (webpackModule as NormalModule).resource;
-          if (resource) {
-            this.markResourceUsed(normalizePath(resource), currentUnused);
-          }
-        }
-
-        for (const unused of currentUnused) {
-          if (previousUnused && previousUnused.has(unused)) {
-            continue;
-          }
-          addWarning(
-            compilation,
-            `${unused} is part of the TypeScript compilation but it's unused.\n` +
-              `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
-          );
-        }
-        previousUnused = currentUnused;
-      });
-
-      // Store file emitter for loader usage
-      emitRegistration.update(fileEmitter);
+      state.previousUnused = currentUnused;
     });
+
+    // Store file emitter for loader usage
+    emitRegistration.update(fileEmitter);
   }
 
   private registerWithCompilation(compilation: Compilation) {
