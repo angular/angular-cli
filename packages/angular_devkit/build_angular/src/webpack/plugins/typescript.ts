@@ -26,7 +26,6 @@ function ensureIvy(wco: WebpackConfigOptions): void {
   wco.tsConfig.options.enableIvy = true;
 }
 
-let es5TargetWarningsShown = false;
 export function createIvyPlugin(
   wco: WebpackConfigOptions,
   aot: boolean,
@@ -54,13 +53,9 @@ export function createIvyPlugin(
   // as for third-party libraries. This greatly reduces the complexity of static analysis.
   if (wco.scriptTarget < ScriptTarget.ES2015) {
     compilerOptions.target = ScriptTarget.ES2015;
-    if (!es5TargetWarningsShown) {
-      wco.logger.warn(
-        'DEPRECATED: ES5 output is deprecated. Please update TypeScript `target` compiler option to ES2015 or later.',
-      );
-
-      es5TargetWarningsShown = true;
-    }
+    wco.logger.warn(
+      'DEPRECATED: ES5 output is deprecated. Please update TypeScript `target` compiler option to ES2015 or later.',
+    );
   }
 
   const fileReplacements: Record<string, string> = {};
