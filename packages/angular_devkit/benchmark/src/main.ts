@@ -111,8 +111,7 @@ export async function main({
   );
 
   // Create a separate instance to prevent unintended global changes to the color configuration
-  // Create function is not defined in the typings. See: https://github.com/doowb/ansi-colors/pull/44
-  const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
+  const colors = ansiColors.create();
 
   // Log to console.
   logger.pipe(filter((entry) => entry.level != 'debug' || argv['verbose'])).subscribe((entry) => {

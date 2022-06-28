@@ -117,8 +117,7 @@ export async function main({
   const { cliOptions, schematicOptions, _ } = parseArgs(args);
 
   // Create a separate instance to prevent unintended global changes to the color configuration
-  // Create function is not defined in the typings. See: https://github.com/doowb/ansi-colors/pull/44
-  const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
+  const colors = ansiColors.create();
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
