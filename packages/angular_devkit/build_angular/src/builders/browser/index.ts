@@ -67,11 +67,20 @@ import { Schema as BrowserBuilderSchema } from './schema';
  */
 export type BrowserBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
+  /**
+   * @deprecated in version 14. Use 'outputs' instead.
+   */
   outputPaths: string[];
   /**
-   * @deprecated in version 9. Use 'outputPaths' instead.
+   * @deprecated in version 9. Use 'outputs' instead.
    */
   outputPath: string;
+
+  outputs: {
+    locale?: string;
+    path: string;
+    baseHref: string;
+  }[];
 };
 
 /**
@@ -173,6 +182,8 @@ export function buildWebpackBrowser(
       // eslint-disable-next-line max-lines-per-function
       ({ config, projectRoot, projectSourceRoot, i18n, target, cacheOptions }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
+
+        const defaultBaseHref = options.baseHref ?? '/';
 
         return runWebpack(config, context, {
           webpackFactory: require('webpack') as typeof webpack,
@@ -308,7 +319,7 @@ export function buildWebpackBrowser(
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
                       const { content, warnings, errors } = await indexHtmlGenerator.process({
-                        baseHref: getLocaleBaseHref(i18n, locale) || options.baseHref,
+                        baseHref: getLocaleBaseHref(i18n, locale) || defaultBaseHref,
                         // i18nLocale is used when Ivy is disabled
                         lang: locale || undefined,
                         outputPath,
@@ -352,7 +363,7 @@ export function buildWebpackBrowser(
                         projectRoot,
                         context.workspaceRoot,
                         outputPath,
-                        getLocaleBaseHref(i18n, locale) || options.baseHref || '/',
+                        getLocaleBaseHref(i18n, locale) ?? defaultBaseHref,
                         options.ngswConfigPath,
                       );
                     } catch (error) {
@@ -378,6 +389,15 @@ export function buildWebpackBrowser(
                 baseOutputPath,
                 outputPath: baseOutputPath,
                 outputPaths: (outputPaths && Array.from(outputPaths.values())) || [baseOutputPath],
+                outputs: (outputPaths &&
+                  [...outputPaths.entries()].map(([locale, path]) => ({
+                    locale,
+                    path,
+                    baseHref: getLocaleBaseHref(i18n, locale) ?? defaultBaseHref,
+                  }))) || {
+                  path: baseOutputPath,
+                  baseHref: defaultBaseHref,
+                },
               } as BrowserBuilderOutput),
           ),
         );

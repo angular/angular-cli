@@ -83,8 +83,10 @@ export async function browserBuild(
     };
   }
 
-  expect(output.outputPaths[0]).not.toBeUndefined();
-  const outputPath = normalize(output.outputPaths[0]);
+  const [{ path, baseHref }] = output.outputs;
+  expect(baseHref).toBeTruthy();
+  expect(path).toBeTruthy();
+  const outputPath = normalize(path);
 
   const fileNames = await host.list(outputPath).toPromise();
   const files = fileNames.reduce((acc: { [name: string]: Promise<string> }, path) => {
