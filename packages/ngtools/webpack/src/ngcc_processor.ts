@@ -117,29 +117,34 @@ export class NgccProcessor {
     // that we cannot setup multiple cluster masters with different options.
     // - We will not be able to have concurrent builds otherwise Ex: App-Shell,
     // as NGCC will create a lock file for both builds and it will cause builds to fails.
-    const { status, error } = spawnSync(
-      process.execPath,
-      [
-        this.compilerNgcc.ngccMainFilePath,
-        '--source' /** basePath */,
-        this._nodeModulesDirectory,
-        '--properties' /** propertiesToConsider */,
-        ...this.propertiesToConsider,
-        '--first-only' /** compileAllFormats */,
-        '--create-ivy-entry-points' /** createNewEntryPointFormats */,
-        '--async',
-        '--tsconfig' /** tsConfigPath */,
-        this.tsConfigPath,
-        '--use-program-dependencies',
-      ],
-      {
-        stdio: ['inherit', process.stderr, process.stderr],
-      },
-    );
+    const originalProcessTitle = process.title;
+    try {
+      const { status, error } = spawnSync(
+        process.execPath,
+        [
+          this.compilerNgcc.ngccMainFilePath,
+          '--source' /** basePath */,
+          this._nodeModulesDirectory,
+          '--properties' /** propertiesToConsider */,
+          ...this.propertiesToConsider,
+          '--first-only' /** compileAllFormats */,
+          '--create-ivy-entry-points' /** createNewEntryPointFormats */,
+          '--async',
+          '--tsconfig' /** tsConfigPath */,
+          this.tsConfigPath,
+          '--use-program-dependencies',
+        ],
+        {
+          stdio: ['inherit', process.stderr, process.stderr],
+        },
+      );
 
-    if (status !== 0) {
-      const errorMessage = error?.message || '';
-      throw new Error(errorMessage + `NGCC failed${errorMessage ? ', see above' : ''}.`);
+      if (status !== 0) {
+        const errorMessage = error?.message || '';
+        throw new Error(errorMessage + `NGCC failed${errorMessage ? ', see above' : ''}.`);
+      }
+    } finally {
+      process.title = originalProcessTitle;
     }
 
     timeEnd(timeLabel);
