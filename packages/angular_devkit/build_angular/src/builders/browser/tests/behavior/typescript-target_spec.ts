@@ -243,11 +243,11 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      const deprecationMessages = logs.filter(({ message }) =>
-        message.startsWith('DEPRECATED: ES5 output is deprecated'),
+      expect(logs).toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching('DEPRECATED: ES5 output is deprecated'),
+        }),
       );
-
-      expect(deprecationMessages).toHaveSize(1);
     });
   });
 });
