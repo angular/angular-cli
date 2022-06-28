@@ -62,7 +62,7 @@ async function _renderUniversal(
       })
     : undefined;
 
-  for (const outputPath of browserResult.outputPaths) {
+  for (const { path: outputPath, baseHref } of browserResult.outputs) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
     const browserIndexOutputPath = path.join(outputPath, 'index.html');
     const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
@@ -117,7 +117,7 @@ async function _renderUniversal(
         projectRoot,
         root,
         outputPath,
-        browserOptions.baseHref || '/',
+        baseHref,
         browserOptions.ngswConfigPath,
       );
     }

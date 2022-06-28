@@ -76,6 +76,11 @@ export type BrowserBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
     outputPath: string;
+    outputs: {
+        locale?: string;
+        path: string;
+        baseHref: string;
+    }[];
 };
 
 // @public (undocumented)
@@ -272,6 +277,10 @@ export type ServerBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
     outputPath: string;
+    outputs: {
+        locale?: string;
+        path: string;
+    }[];
 };
 
 // @public (undocumented)
