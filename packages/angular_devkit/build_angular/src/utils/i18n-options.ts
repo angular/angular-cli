@@ -246,15 +246,15 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
 
   // If inlining store the output in a temporary location to facilitate post-processing
   if (i18n.shouldInline) {
+    // TODO: we should likely save these in the .angular directory in the next major version.
+    // We'd need to do a migration to add the temp directory to gitignore.
     const tempPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-i18n-'));
     buildOptions.outputPath = tempPath;
 
-    process.on('exit', () => deleteTempDirectory(tempPath));
-    process.once('SIGINT', () => {
-      deleteTempDirectory(tempPath);
-
-      // Needed due to `ora` as otherwise process will not terminate.
-      process.kill(process.pid, 'SIGINT');
+    process.on('exit', () => {
+      try {
+        fs.rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
+      } catch {}
     });
   }
 
@@ -271,13 +271,6 @@ function findLocaleDataPath(locale: string, resolver: (locale: string) => string
     // fallback to known existing en-US locale data as of 14.0
     return scrubbedLocale === 'en-US' ? findLocaleDataPath('en', resolver) : null;
   }
-}
-
-/** Remove temporary directory used for i18n processing. */
-function deleteTempDirectory(tempPath: string): void {
-  try {
-    fs.rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
-  } catch {}
 }
 
 export function loadTranslations(
