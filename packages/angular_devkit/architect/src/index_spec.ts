@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json, schema } from '@angular-devkit/core';
+import { json, logging, schema } from '@angular-devkit/core';
 import { timer } from 'rxjs';
 import { map, take, tap, toArray } from 'rxjs/operators';
 import { promisify } from 'util';
@@ -204,6 +204,36 @@ describe('architect', () => {
     expect(called).toBe(1);
     expect(results).toBe(10);
     expect(all.length).toBe(10);
+  });
+
+  it('propagates all logging entries', async () => {
+    const logCount = 100;
+
+    testArchitectHost.addBuilder(
+      'package:test-logging',
+      createBuilder(async (_, context) => {
+        for (let i = 0; i < logCount; ++i) {
+          context.logger.info(i.toString());
+        }
+
+        return { success: true };
+      }),
+    );
+
+    const logger = new logging.Logger('test-logger');
+    const logs: string[] = [];
+    logger.subscribe({
+      next(entry) {
+        logs.push(entry.message);
+      },
+    });
+    const run = await architect.scheduleBuilder('package:test-logging', {}, { logger });
+    expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
+    await run.stop();
+
+    for (let i = 0; i < logCount; ++i) {
+      expect(logs[i]).toBe(i.toString());
+    }
   });
 
   it('reports errors in the builder', async () => {
