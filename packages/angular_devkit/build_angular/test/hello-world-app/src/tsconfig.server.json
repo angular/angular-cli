@@ -8,8 +8,5 @@
   },
   "files": [
     "main.server.ts"
-  ],
-  "angularCompilerOptions": {
-    "entryModule": "app/app.server.module#AppServerModule"
-  }
+  ]
 }
