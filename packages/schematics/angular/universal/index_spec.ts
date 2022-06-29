@@ -97,9 +97,6 @@ describe('Universal Schematic', () => {
         types: ['node'],
       },
       files: ['src/main.server.ts'],
-      angularCompilerOptions: {
-        entryModule: './src/app/app.server.module#AppServerModule',
-      },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
     expect(angularConfig.projects.workspace.architect.server.options.tsConfig).toEqual(
@@ -122,9 +119,6 @@ describe('Universal Schematic', () => {
         types: ['node'],
       },
       files: ['src/main.server.ts'],
-      angularCompilerOptions: {
-        entryModule: './src/app/app.server.module#AppServerModule',
-      },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
     expect(angularConfig.projects.bar.architect.server.options.tsConfig).toEqual(
