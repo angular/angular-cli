@@ -11,7 +11,7 @@
     "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@babel/core": "7.18.6",
-    "@babel/generator": "7.18.6",
+    "@babel/generator": "7.18.7",
     "@babel/helper-annotate-as-pure": "7.18.6",
     "@babel/plugin-proposal-async-generator-functions": "7.18.6",
     "@babel/plugin-transform-async-to-generator": "7.18.6",
