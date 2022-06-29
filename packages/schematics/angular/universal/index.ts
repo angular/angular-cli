@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonValue, Path, basename, join, normalize } from '@angular-devkit/core';
+import { JsonValue, Path, basename, dirname, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -77,6 +77,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       }
 
       const mainPath = options.main as string;
+      const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
       const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
       clientProject.targets.add({
         name: 'server',
@@ -84,11 +85,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         defaultConfiguration: 'production',
         options: {
           outputPath: `dist/${options.project}/server`,
-          main: join(
-            normalize(clientProject.root),
-            'src',
-            mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts',
-          ),
+          main: join(normalize(sourceRoot), mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
           tsConfig: serverTsConfig,
           ...(buildTarget?.options ? getServerOptions(buildTarget?.options) : {}),
         },
@@ -147,12 +144,12 @@ function wrapBootstrapCall(mainFile: string): Rule {
       `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''}};\n` +
       `
 
-if (document.readyState === 'complete') {
-  bootstrap();
-} else {
-  document.addEventListener('DOMContentLoaded', bootstrap);
-}
-`;
+ if (document.readyState === 'complete') {
+   bootstrap();
+ } else {
+   document.addEventListener('DOMContentLoaded', bootstrap);
+ }
+ `;
 
     // in some cases we need to cater for a trailing semicolon such as;
     // bootstrap().catch(err => console.log(err));
@@ -252,13 +249,6 @@ export default function (options: UniversalOptions): Rule {
     const clientBuildOptions = (clientBuildTarget.options ||
       {}) as unknown as BrowserBuilderOptions;
 
-    const clientTsConfig = normalize(clientBuildOptions.tsConfig);
-    const tsConfigExtends = basename(clientTsConfig);
-    // this is needed because prior to version 8, tsconfig might have been in 'src'
-    // and we don't want to break the 'ng add @nguniversal/express-engine schematics'
-    const rootInSrc = clientProject.root === '' && clientTsConfig.includes('src/');
-    const tsConfigDirectory = join(normalize(clientProject.root), rootInSrc ? 'src' : '');
-
     if (!options.skipInstall) {
       context.addTask(new NodePackageInstallTask());
     }
@@ -266,21 +256,24 @@ export default function (options: UniversalOptions): Rule {
     const templateSource = apply(url('./files/src'), [
       applyTemplates({
         ...strings,
-        ...(options as object),
+        ...options,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
       }),
       move(join(normalize(clientProject.root), 'src')),
     ]);
 
+    const clientTsConfig = normalize(clientBuildOptions.tsConfig);
+    const tsConfigExtends = basename(clientTsConfig);
+    const tsConfigDirectory = dirname(clientTsConfig);
+
     const rootSource = apply(url('./files/root'), [
       applyTemplates({
         ...strings,
-        ...(options as object),
+        ...options,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         tsConfigExtends,
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
-        rootInSrc,
       }),
       move(tsConfigDirectory),
     ]);
