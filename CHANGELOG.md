@@ -1,3 +1,49 @@
+<a name="14.1.0-next.3"></a>
+
+# 14.1.0-next.3 (2022-06-29)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [5a012b5fc](https://github.com/angular/angular-cli/commit/5a012b5fce2f38fa6b97c84c874e85dc726d2f0d) | fix  | correctly handle `--collection` option in `ng new` |
+| [8b65abe1b](https://github.com/angular/angular-cli/commit/8b65abe1b037cf00cb3c95ab98f7b6ba3ceef561) | fix  | improve global schema validation                   |
+| [4fa039b69](https://github.com/angular/angular-cli/commit/4fa039b692be8bc97d0b382f015783d12f214a65) | fix  | remove color from help epilogue                    |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [ab8ab30c8](https://github.com/angular/angular-cli/commit/ab8ab30c879f04777b9a444a7f3072682ea161b5) | fix  | use `sourceRoot` instead of `src` in universal schematic |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [ecdbe721a](https://github.com/angular/angular-cli/commit/ecdbe721a1be10a59e7ee1b2f446b20c1e7de95b) | fix  | complete builders on the next event loop iteration |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [4fcfc37cb](https://github.com/angular/angular-cli/commit/4fcfc37cb957513cb61d01946959669559e93393) | fix  | exit dev-server when CTRL+C is pressed                                 |
+| [2b962549d](https://github.com/angular/angular-cli/commit/2b962549d3c8c4aa3814f604ef67525822a5e04d) | fix  | exit localized builds when CTRL+C is pressed                           |
+| [b40aeed44](https://github.com/angular/angular-cli/commit/b40aeed4414afcb1c90c7f0c609aa78f13790f03) | fix  | hide stacktraces from webpack errors                                   |
+| [43f495d57](https://github.com/angular/angular-cli/commit/43f495d57be37fa81cfade3d8e4291483a971f7c) | fix  | set base-href in service worker manifest when using i18n and app-shell |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [7ababc210](https://github.com/angular/angular-cli/commit/7ababc210b3eb023bfd4c8f05178cb2f75472bb2) | fix  | restore process title after NGCC is executed           |
+| [34ecf669d](https://github.com/angular/angular-cli/commit/34ecf669ddb05da84f200d6972dbc8439007e1aa) | fix  | show a compilation error on invalid TypeScript version |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Jason Bedard, Paul Gschwendtner, Tim Bowersox and renovate[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.4"></a>
 
 # 14.0.4 (2022-06-29)
