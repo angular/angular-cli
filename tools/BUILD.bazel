@@ -15,8 +15,10 @@ nodejs_binary(
     name = "ng_cli_schema",
     data = [
         "ng_cli_schema_generator.js",
+        "@npm//@apidevtools/json-schema-ref-parser",
     ],
     entry_point = "ng_cli_schema_generator.js",
+    templated_args = ["--bazel_patch_module_resolver"],
 )
 
 nodejs_binary(

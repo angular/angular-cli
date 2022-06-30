@@ -79,6 +79,7 @@
     "@angular/platform-server": "14.0.3",
     "@angular/router": "14.0.3",
     "@angular/service-worker": "14.0.3",
+    "@apidevtools/json-schema-ref-parser": "~9.0.9",
     "@babel/core": "7.18.6",
     "@babel/generator": "7.18.7",
     "@babel/helper-annotate-as-pure": "7.18.6",

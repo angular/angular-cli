@@ -170,7 +170,6 @@
 
 "@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#67631cd48a5d0cab942279b1205b0e2b1736ae56":
   version "0.0.0-f5e706a8bd255a86681369fabf0b8ebed4858b30"
-  uid "67631cd48a5d0cab942279b1205b0e2b1736ae56"
   resolved "https://github.com/angular/dev-infra-private-builds.git#67631cd48a5d0cab942279b1205b0e2b1736ae56"
   dependencies:
     "@angular-devkit/build-angular" "14.1.0-next.2"
@@ -264,6 +263,16 @@
   integrity sha512-uzDwCJOcBstIdjmAtHqX/mHVqK3N767oxiLrpXPAlWZN66cTdwAdrxDEoSHC1DOurvSMYAtSvFT5ggE/NyM65A==
   dependencies:
     tslib "^2.3.0"
+
+"@apidevtools/json-schema-ref-parser@~9.0.9":
+  version "9.0.9"
+  resolved "https://registry.yarnpkg.com/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-9.0.9.tgz#d720f9256e3609621280584f2b47ae165359268b"
+  integrity sha512-GBD2Le9w2+lVFoc4vswGI/TjkNIZSVp7+9xPf+X3uidBfWnAeUWmquteSyt0+VCrhNMWj/FTABISQrD3Z/YA+w==
+  dependencies:
+    "@jsdevtools/ono" "^7.1.3"
+    "@types/json-schema" "^7.0.6"
+    call-me-maybe "^1.0.1"
+    js-yaml "^4.1.0"
 
 "@assemblyscript/loader@^0.10.1":
   version "0.10.1"
@@ -2282,6 +2291,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@jsdevtools/ono@^7.1.3":
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/@jsdevtools/ono/-/ono-7.1.3.tgz#9df03bbd7c696a5c58885c34aa06da41c8543796"
+  integrity sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==
+
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
@@ -2873,7 +2887,7 @@
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-4.0.3.tgz#097ce710d70eb7f3662e96c1f75824dd22c27d5c"
   integrity sha512-Opp1LvvEuZdk8fSSvchK2mZwhVrsNT0JgJE9Di6MjnaIpmEXM8TLCPPrVtNTYh8+5MPdY8j9bAHMu2SSfwpZJg==
 
-"@types/json-schema@*", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
+"@types/json-schema@*", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.6", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
   integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==
@@ -4261,6 +4275,11 @@ call-bind@^1.0.0, call-bind@^1.0.2:
   dependencies:
     function-bind "^1.1.1"
     get-intrinsic "^1.0.2"
+
+call-me-maybe@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/call-me-maybe/-/call-me-maybe-1.0.1.tgz#26d208ea89e37b5cbde60250a15f031c16a4d66b"
+  integrity sha512-wCyFsDQkKPwwF8BDwOiWNx/9K45L/hvggQiDbve+viMNMQnWhrlYIuBk09offfwCRtCO9P6XwUttufzU11WCVw==
 
 callsites@^3.0.0:
   version "3.1.0"
@@ -10403,7 +10422,6 @@ sass@1.53.0, sass@^1.49.9:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz":
   version "0.0.0"
-  uid e5d7f82ad98251a653d1b0537f1103e49eda5e11
   resolved "https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz#e5d7f82ad98251a653d1b0537f1103e49eda5e11"
 
 saucelabs@^1.5.0:

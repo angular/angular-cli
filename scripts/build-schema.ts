@@ -55,5 +55,5 @@ export default async function (argv: {}, logger: logging.Logger) {
   const cliJsonSchema = require('../tools/ng_cli_schema_generator');
   const inputPath = 'packages/angular/cli/lib/config/workspace-schema.json';
   const outputPath = path.join(dist, inputPath.replace('workspace-schema.json', 'schema.json'));
-  cliJsonSchema.generate(inputPath, outputPath);
+  await cliJsonSchema.generate(inputPath, outputPath);
 }

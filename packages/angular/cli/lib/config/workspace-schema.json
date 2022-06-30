@@ -183,46 +183,46 @@
       "type": "object",
       "properties": {
         "@schematics/angular:application": {
-          "$ref": "../../../../schematics/angular/application/schema.json"
+          "$ref": "#/definitions/schematicsAngularApplicationSchema"
         },
         "@schematics/angular:class": {
-          "$ref": "../../../../schematics/angular/class/schema.json"
+          "$ref": "#/definitions/schematicsAngularClassSchema"
         },
         "@schematics/angular:component": {
-          "$ref": "../../../../schematics/angular/component/schema.json"
+          "$ref": "#/definitions/schematicsAngularComponentSchema"
         },
         "@schematics/angular:directive": {
-          "$ref": "../../../../schematics/angular/directive/schema.json"
+          "$ref": "#/definitions/schematicsAngularDirectiveSchema"
         },
         "@schematics/angular:enum": {
-          "$ref": "../../../../schematics/angular/enum/schema.json"
+          "$ref": "#/definitions/schematicsAngularEnumSchema"
         },
         "@schematics/angular:guard": {
-          "$ref": "../../../../schematics/angular/guard/schema.json"
+          "$ref": "#/definitions/schematicsAngularGuardSchema"
         },
         "@schematics/angular:interceptor": {
-          "$ref": "../../../../schematics/angular/interceptor/schema.json"
+          "$ref": "#/definitions/schematicsAngularInterceptorSchema"
         },
         "@schematics/angular:interface": {
-          "$ref": "../../../../schematics/angular/interface/schema.json"
+          "$ref": "#/definitions/schematicsAngularInterfaceSchema"
         },
         "@schematics/angular:library": {
-          "$ref": "../../../../schematics/angular/library/schema.json"
+          "$ref": "#/definitions/schematicsAngularLibrarySchema"
         },
         "@schematics/angular:pipe": {
-          "$ref": "../../../../schematics/angular/pipe/schema.json"
+          "$ref": "#/definitions/schematicsAngularPipeSchema"
         },
         "@schematics/angular:ng-new": {
-          "$ref": "../../../../schematics/angular/ng-new/schema.json"
+          "$ref": "#/definitions/schematicsAngularNgNewSchema"
         },
         "@schematics/angular:resolver": {
-          "$ref": "../../../../schematics/angular/resolver/schema.json"
+          "$ref": "#/definitions/schematicsAngularResolverSchema"
         },
         "@schematics/angular:service": {
-          "$ref": "../../../../schematics/angular/service/schema.json"
+          "$ref": "#/definitions/schematicsAngularServiceSchema"
         },
         "@schematics/angular:web-worker": {
-          "$ref": "../../../../schematics/angular/web-worker/schema.json"
+          "$ref": "#/definitions/schematicsAngularWebWorkerSchema"
         }
       },
       "additionalProperties": {
@@ -450,12 +450,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/app-shell/schema.json"
+                  "$ref": "#/definitions/angularBuildersAppShellSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/app-shell/schema.json"
+                    "$ref": "#/definitions/angularBuildersAppShellSchema"
                   }
                 }
               }
@@ -472,12 +472,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/browser/schema.json"
+                  "$ref": "#/definitions/angularBuildersBrowserSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/browser/schema.json"
+                    "$ref": "#/definitions/angularBuildersBrowserSchema"
                   }
                 }
               }
@@ -494,12 +494,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/browser-esbuild/schema.json"
+                  "$ref": "#/definitions/angularBuildersBrowserEsBuildSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/browser-esbuild/schema.json"
+                    "$ref": "#/definitions/angularBuildersBrowserEsBuildSchema"
                   }
                 }
               }
@@ -516,12 +516,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/dev-server/schema.json"
+                  "$ref": "#/definitions/angularBuildersDevServerSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/dev-server/schema.json"
+                    "$ref": "#/definitions/angularBuildersDevServerSchema"
                   }
                 }
               }
@@ -538,12 +538,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/extract-i18n/schema.json"
+                  "$ref": "#/definitions/angularBuildersExtractI18nSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/extract-i18n/schema.json"
+                    "$ref": "#/definitions/angularBuildersExtractI18nSchema"
                   }
                 }
               }
@@ -560,12 +560,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/karma/schema.json"
+                  "$ref": "#/definitions/angularBuildersKarmaSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/karma/schema.json"
+                    "$ref": "#/definitions/angularBuildersKarmaSchema"
                   }
                 }
               }
@@ -582,12 +582,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/protractor/schema.json"
+                  "$ref": "#/definitions/angularBuildersProtractorSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/protractor/schema.json"
+                    "$ref": "#/definitions/angularBuildersProtractorSchema"
                   }
                 }
               }
@@ -604,12 +604,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/server/schema.json"
+                  "$ref": "#/definitions/angularBuildersServerSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/server/schema.json"
+                    "$ref": "#/definitions/angularBuildersServerSchema"
                   }
                 }
               }
@@ -626,12 +626,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/ng-packagr/schema.json"
+                  "$ref": "#/definitions/angularBuildersNgPackagrSchema"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/ng-packagr/schema.json"
+                    "$ref": "#/definitions/angularBuildersNgPackagrSchema"
                   }
                 }
               }
@@ -657,6 +657,76 @@
         }
       },
       "required": ["version"]
+    },
+
+    "schematicsAngularApplicationSchema": {
+      "$ref": "../../../../schematics/angular/application/schema.json"
+    },
+    "schematicsAngularClassSchema": {
+      "$ref": "../../../../schematics/angular/class/schema.json"
+    },
+    "schematicsAngularComponentSchema": {
+      "$ref": "../../../../schematics/angular/component/schema.json"
+    },
+    "schematicsAngularDirectiveSchema": {
+      "$ref": "../../../../schematics/angular/directive/schema.json"
+    },
+    "schematicsAngularEnumSchema": {
+      "$ref": "../../../../schematics/angular/enum/schema.json"
+    },
+    "schematicsAngularGuardSchema": {
+      "$ref": "../../../../schematics/angular/guard/schema.json"
+    },
+    "schematicsAngularInterceptorSchema": {
+      "$ref": "../../../../schematics/angular/interceptor/schema.json"
+    },
+    "schematicsAngularInterfaceSchema": {
+      "$ref": "../../../../schematics/angular/interface/schema.json"
+    },
+    "schematicsAngularLibrarySchema": {
+      "$ref": "../../../../schematics/angular/library/schema.json"
+    },
+    "schematicsAngularPipeSchema": {
+      "$ref": "../../../../schematics/angular/pipe/schema.json"
+    },
+    "schematicsAngularNgNewSchema": {
+      "$ref": "../../../../schematics/angular/ng-new/schema.json"
+    },
+    "schematicsAngularResolverSchema": {
+      "$ref": "../../../../schematics/angular/resolver/schema.json"
+    },
+    "schematicsAngularServiceSchema": {
+      "$ref": "../../../../schematics/angular/service/schema.json"
+    },
+    "schematicsAngularWebWorkerSchema": {
+      "$ref": "../../../../schematics/angular/web-worker/schema.json"
+    },
+    "angularBuildersAppShellSchema": {
+      "$ref": "../../../../schematics/angular/app-shell/schema.json"
+    },
+    "angularBuildersBrowserSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/browser/schema.json"
+    },
+    "angularBuildersBrowserEsBuildSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/browser-esbuild/schema.json"
+    },
+    "angularBuildersDevServerSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/dev-server/schema.json"
+    },
+    "angularBuildersExtractI18nSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/extract-i18n/schema.json"
+    },
+    "angularBuildersKarmaSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/karma/schema.json"
+    },
+    "angularBuildersProtractorSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/protractor/schema.json"
+    },
+    "angularBuildersServerSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/server/schema.json"
+    },
+    "angularBuildersNgPackagrSchema": {
+      "$ref": "../../../../angular_devkit/build_angular/src/builders/ng-packagr/schema.json"
     }
   }
 }

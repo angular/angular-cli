@@ -36,7 +36,7 @@ cli_json_schema = rule(
         "_binary": attr.label(
             default = Label("//tools:ng_cli_schema"),
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
     },
     outputs = {
