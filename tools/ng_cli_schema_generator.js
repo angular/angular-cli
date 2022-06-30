@@ -39,10 +39,11 @@ function generate(inPath, outPath) {
               throw new Error(`Error while resolving $ref ${value} in ${nestedSchemaPath}.`);
             }
           case '$id':
-          case '$id':
-          case '$schema':
           case 'id':
+          case '$schema':
           case 'required':
+          case 'x-prompt':
+          case 'x-user-analytics':
             return undefined;
           default:
             return value;
@@ -69,7 +70,22 @@ function generate(inPath, outPath) {
   outPath = resolve(buildWorkspaceDirectory, outPath);
 
   mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, JSON.stringify(schemaParsed, undefined, 2));
+  writeFileSync(
+    outPath,
+    JSON.stringify(
+      schemaParsed,
+      (key, value) => {
+        if (key === 'x-deprecated') {
+          // Needed for IDEs, and will be replaced to 'deprecated' later on. This must be a boolean.
+          // https://json-schema.org/draft/2020-12/json-schema-validation.html#name-deprecated
+          return !!value;
+        }
+
+        return value;
+      },
+      2,
+    ).replace(/"x-deprecated"/g, '"deprecated"'),
+  );
 }
 
 if (require.main === module) {
