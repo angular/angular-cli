@@ -9,12 +9,9 @@
 import * as fs from 'fs';
 import glob from 'glob';
 import * as path from 'path';
+import { promisify } from 'util';
 
-function globAsync(pattern: string, options: glob.IOptions) {
-  return new Promise<string[]>((resolve, reject) =>
-    glob(pattern, options, (e, m) => (e ? reject(e) : resolve(m))),
-  );
-}
+const globPromise = promisify(glob);
 
 export async function copyAssets(
   entries: {
@@ -33,10 +30,12 @@ export async function copyAssets(
 
   for (const entry of entries) {
     const cwd = path.resolve(root, entry.input);
-    const files = await globAsync(entry.glob, {
+    const files = await globPromise(entry.glob, {
       cwd,
       dot: true,
       nodir: true,
+      root: cwd,
+      nomount: true,
       ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
       follow: entry.followSymlinks,
     });

@@ -54,6 +54,10 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         test: 'glob with spec suffix',
         input: ['**/*.pipe.spec.ts', '**/*.pipe.spec.ts', '**/*test.service.spec.ts'],
       },
+      {
+        test: 'glob with forward slash and spec suffix',
+        input: ['/**/*test.service.spec.ts'],
+      },
     ].forEach((options, index) => {
       it(`should work with ${options.test} (${index})`, async () => {
         await harness.writeFiles({
