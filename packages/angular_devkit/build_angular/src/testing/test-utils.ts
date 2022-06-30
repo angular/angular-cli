@@ -83,8 +83,7 @@ export async function browserBuild(
     };
   }
 
-  const [{ path, baseHref }] = output.outputs;
-  expect(baseHref).toBeTruthy();
+  const [{ path }] = output.outputs;
   expect(path).toBeTruthy();
   const outputPath = normalize(path);
 
