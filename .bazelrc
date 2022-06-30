@@ -8,6 +8,10 @@ build --strategy=TypeScriptCompile=worker
 # Enable debugging tests with --config=debug
 test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
 
+# Enable debugging tests with --config=no-sharding
+# The below is useful to while using `fit` and `fdescribe` to avoid sharing and re-runs of failed flaky tests.
+test:no-sharding --flaky_test_attempts=1 --test_sharding_strategy=disabled
+
 ###############################
 # Filesystem interactions     #
 ###############################
