@@ -37,6 +37,21 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
       harness.expectFile(coveragePath).content.not.toContain('app.component.ts');
     });
 
+    it('should exclude file from coverage when set when glob starts with a forward slash', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        codeCoverage: true,
+        codeCoverageExclude: ['/**/app.component.ts'],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      await setTimeoutPromise(1000);
+      harness.expectFile(coveragePath).content.not.toContain('app.component.ts');
+    });
+
     it('should not exclude file from coverage when set', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,

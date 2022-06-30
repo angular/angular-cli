@@ -121,15 +121,15 @@ export function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath:
 }
 
 export function getInstrumentationExcludedPaths(
-  sourceRoot: string,
+  root: string,
   excludedPaths: string[],
 ): Set<string> {
   const excluded = new Set<string>();
 
   for (const excludeGlob of excludedPaths) {
     glob
-      .sync(excludeGlob, { nodir: true, cwd: sourceRoot })
-      .forEach((p) => excluded.add(path.join(sourceRoot, p)));
+      .sync(excludeGlob, { nodir: true, cwd: root, root, nomount: true })
+      .forEach((p) => excluded.add(path.join(root, p)));
   }
 
   return excluded;

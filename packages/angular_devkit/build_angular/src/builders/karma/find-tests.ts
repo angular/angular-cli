@@ -66,6 +66,8 @@ async function findMatchingTests(
 
   return globPromise(normalizedPattern, {
     cwd: projectSourceRoot,
+    root: projectSourceRoot,
+    nomount: true,
   });
 }
 
