@@ -289,7 +289,7 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
   [print, sign and one of scan+email, fax or mail the form][corporate-cla].
 
 
-[coc]: https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
+[coc]: https://github.com/angular/code-of-conduct/blob/main/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
 [dev-doc]: https://github.com/angular/angular-cli/blob/main/packages/angular/cli/README.md#development-hints-for-working-on-angular-cli
