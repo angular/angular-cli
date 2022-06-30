@@ -39,6 +39,27 @@ describe('Browser Builder base href', () => {
     await run.stop();
   });
 
+  it('should not override base href in HTML when option is not set', async () => {
+    host.writeMultipleFiles({
+      'src/index.html': `
+      <html>
+        <head><base href="."></head>
+        <body></body>
+      </html>
+      `,
+    });
+
+    const run = await architect.scheduleTarget(targetSpec);
+    const output = (await run.result) as BrowserBuilderOutput;
+
+    expect(output.success).toBeTrue();
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
+    const content = virtualFs.fileBufferToString(await host.read(fileName).toPromise());
+    expect(content).toContain(`<base href=".">`);
+
+    await run.stop();
+  });
+
   it('should insert base href in the the correct position', async () => {
     host.writeMultipleFiles({
       'src/index.html': tags.oneLine`

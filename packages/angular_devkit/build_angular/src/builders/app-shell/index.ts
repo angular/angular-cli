@@ -118,7 +118,7 @@ async function _renderUniversal(
         projectRoot,
         root,
         outputPath,
-        baseHref,
+        baseHref ?? '/',
         browserOptions.ngswConfigPath,
       );
     }
