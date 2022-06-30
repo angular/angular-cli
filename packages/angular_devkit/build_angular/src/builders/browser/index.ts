@@ -79,7 +79,7 @@ export type BrowserBuilderOutput = BuilderOutput & {
   outputs: {
     locale?: string;
     path: string;
-    baseHref: string;
+    baseHref?: string;
   }[];
 };
 
@@ -182,8 +182,6 @@ export function buildWebpackBrowser(
       // eslint-disable-next-line max-lines-per-function
       ({ config, projectRoot, projectSourceRoot, i18n, target, cacheOptions }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
-
-        const defaultBaseHref = options.baseHref ?? '/';
 
         return runWebpack(config, context, {
           webpackFactory: require('webpack') as typeof webpack,
@@ -319,7 +317,7 @@ export function buildWebpackBrowser(
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
                       const { content, warnings, errors } = await indexHtmlGenerator.process({
-                        baseHref: getLocaleBaseHref(i18n, locale) || defaultBaseHref,
+                        baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
                         // i18nLocale is used when Ivy is disabled
                         lang: locale || undefined,
                         outputPath,
@@ -363,7 +361,7 @@ export function buildWebpackBrowser(
                         projectRoot,
                         context.workspaceRoot,
                         outputPath,
-                        getLocaleBaseHref(i18n, locale) ?? defaultBaseHref,
+                        getLocaleBaseHref(i18n, locale) ?? options.baseHref ?? '/',
                         options.ngswConfigPath,
                       );
                     } catch (error) {
@@ -393,10 +391,10 @@ export function buildWebpackBrowser(
                   [...outputPaths.entries()].map(([locale, path]) => ({
                     locale,
                     path,
-                    baseHref: getLocaleBaseHref(i18n, locale) ?? defaultBaseHref,
+                    baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
                   }))) || {
                   path: baseOutputPath,
-                  baseHref: defaultBaseHref,
+                  baseHref: options.baseHref,
                 },
               } as BrowserBuilderOutput),
           ),
