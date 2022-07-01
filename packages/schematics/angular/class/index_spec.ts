@@ -83,7 +83,7 @@ describe('Class Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('class', options, appTree).toPromise();
     const classPath = '/projects/bar/src/app/foo.model.ts';
     const content = tree.readContent(classPath);
-    expect(content).toMatch(/export class Foo/);
+    expect(content).toMatch(/export class FooModel/);
   });
 
   it('should respect the path option', async () => {
