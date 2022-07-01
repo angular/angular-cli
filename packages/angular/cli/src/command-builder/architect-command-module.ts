@@ -144,8 +144,14 @@ export abstract class ArchitectCommandModule
       if (!getYargsCompletions && !help) {
         // Only issue the below error when not in help / completion mode.
         throw new CommandModuleError(
-          'Cannot determine project for command. ' +
-            'Pass the project name as a command line argument or change the current working directory to a project directory.',
+          'Cannot determine project for command.\n' +
+            'This is a multi-project workspace and more than one project supports this command. ' +
+            `Run "ng ${this.command}" to execute the command for a specific project or change the current ` +
+            'working directory to a project directory.\n\n' +
+            `Available projects are:\n${allProjectsForTargetName
+              .sort()
+              .map((p) => `- ${p}`)
+              .join('\n')}`,
         );
       }
     }

@@ -1,13 +1,12 @@
 import { join } from 'path';
-import { expectFileNotToExist, expectFileToExist } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
   const errorMessage =
-    'Cannot determine project for command. ' +
-    'Pass the project name as a command line argument or change the current working directory to a project directory';
+    'Cannot determine project for command.\n' +
+    'This is a multi-project workspace and more than one project supports this command.';
 
   // Delete root project
   await updateJsonFile('angular.json', (workspaceJson) => {
