@@ -20,6 +20,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { parseName } from './parse-name';
+import { validateClassName } from './validation';
 import { createDefaultPath } from './workspace';
 
 export interface GenerateFromFilesOptions {
@@ -43,6 +44,8 @@ export function generateFromFiles(
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
+
+    validateClassName(strings.classify(options.name));
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
