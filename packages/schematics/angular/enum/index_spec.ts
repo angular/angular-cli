@@ -73,4 +73,12 @@ describe('Enum Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('enum', options, appTree).toPromise();
     expect(tree.files).toContain('/projects/bar/src/app/foo.enum.ts');
   });
+
+  it('should error when class name contains invalid characters', async () => {
+    const options = { ...defaultOptions, name: '1Clazz' };
+
+    await expectAsync(
+      schematicRunner.runSchematicAsync('enum', options, appTree).toPromise(),
+    ).toBeRejectedWithError('Class name "1Clazz" is invalid.');
+  });
 });

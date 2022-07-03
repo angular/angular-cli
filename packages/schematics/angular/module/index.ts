@@ -33,6 +33,7 @@ import {
   findModuleFromOptions,
 } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
+import { validateClassName } from '../utility/validation';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as ModuleOptions, RoutingScope } from './schema';
 
@@ -149,6 +150,7 @@ export default function (options: ModuleOptions): Rule {
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
+    validateClassName(strings.classify(options.name));
 
     const templateSource = apply(url('./files'), [
       options.routing || (isLazyLoadedModuleGen && routingModulePath)
