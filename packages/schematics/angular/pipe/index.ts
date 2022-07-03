@@ -8,7 +8,6 @@
 
 import {
   Rule,
-  SchematicsException,
   Tree,
   apply,
   applyTemplates,
@@ -25,6 +24,7 @@ import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils'
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
+import { validateClassName } from '../utility/validation';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as PipeOptions } from './schema';
 
@@ -84,15 +84,13 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 
 export default function (options: PipeOptions): Rule {
   return async (host: Tree) => {
-    if (options.path === undefined) {
-      options.path = await createDefaultPath(host, options.project as string);
-    }
-
+    options.path ??= await createDefaultPath(host, options.project as string);
     options.module = findModuleFromOptions(host, options);
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
+    validateClassName(strings.classify(options.name));
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),

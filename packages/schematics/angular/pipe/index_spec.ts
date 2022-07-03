@@ -154,4 +154,12 @@ describe('Pipe Schematic', () => {
     expect(pipeContent).toContain('class FooPipe');
     expect(moduleContent).not.toContain('FooPipe');
   });
+
+  it('should error when class name contains invalid characters', async () => {
+    const options = { ...defaultOptions, name: '1Clazz' };
+
+    await expectAsync(
+      schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise(),
+    ).toBeRejectedWithError('Class name "1Clazz" is invalid.');
+  });
 });

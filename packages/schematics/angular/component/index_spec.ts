@@ -209,7 +209,7 @@ describe('Component Schematic', () => {
 
     await expectAsync(
       schematicRunner.runSchematicAsync('component', options, appTree).toPromise(),
-    ).toBeRejectedWithError('Selector (app-1-one) is invalid.');
+    ).toBeRejectedWithError('Selector "app-1-one" is invalid.');
   });
 
   it('should use the default project prefix if none is passed', async () => {
