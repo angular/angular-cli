@@ -43,7 +43,7 @@
     "minimatch": "5.1.0",
     "open": "8.4.0",
     "ora": "5.4.1",
-    "parse5-html-rewriting-stream": "6.0.1",
+    "parse5-html-rewriting-stream": "7.0.0",
     "piscina": "3.2.0",
     "postcss": "8.4.14",
     "postcss-import": "14.1.0",
