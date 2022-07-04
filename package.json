@@ -152,7 +152,7 @@
     "https-proxy-agent": "5.0.1",
     "husky": "8.0.1",
     "ini": "3.0.0",
-    "inquirer": "8.2.4",
+    "inquirer": "9.0.0",
     "jasmine": "^4.0.0",
     "jasmine-core": "~4.2.0",
     "jasmine-spec-reporter": "~7.0.0",
