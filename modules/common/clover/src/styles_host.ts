@@ -34,7 +34,7 @@ export class SSRStylesHost extends SharedStylesHost implements OnDestroy {
   private _addStyle(style: string): void {
     const element = this._styleNodesInDOM?.get(style);
     if (element) {
-      if (typeof ngDevMode !== undefined && ngDevMode) {
+      if (typeof ngDevMode !== 'undefined' && ngDevMode) {
         element.setAttribute('_ng-style-re-used', '');
       }
 
