@@ -32,7 +32,7 @@
     "esbuild-wasm": "0.14.47",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
-    "inquirer": "8.2.4",
+    "inquirer": "9.0.0",
     "jsonc-parser": "3.0.0",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.3",
