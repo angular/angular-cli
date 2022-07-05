@@ -12,7 +12,9 @@ import { addWarning } from '../../utils/webpack-diagnostics';
 
 // Webpack doesn't export these so the deep imports can potentially break.
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
+const CommonJsExportsDependency = require('webpack/lib/dependencies/CommonJsExportsDependency');
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
+const CommonJsSelfReferenceDependency = require('webpack/lib/dependencies/CommonJsSelfReferenceDependency');
 
 export interface CommonJsUsageWarnPluginOptions {
   /** A list of CommonJS packages that are allowed to be used without a warning. */
@@ -105,7 +107,12 @@ export class CommonJsUsageWarnPlugin {
     checkParentModules = false,
   ): boolean {
     for (const dep of dependencies) {
-      if (dep instanceof CommonJsRequireDependency || dep instanceof AMDDefineDependency) {
+      if (
+        dep instanceof CommonJsRequireDependency ||
+        dep instanceof CommonJsExportsDependency ||
+        dep instanceof CommonJsSelfReferenceDependency ||
+        dep instanceof AMDDefineDependency
+      ) {
         return true;
       }
 
