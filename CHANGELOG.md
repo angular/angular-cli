@@ -1,3 +1,42 @@
+<a name="14.1.0-next.4"></a>
+
+# 14.1.0-next.4 (2022-07-06)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [cbccfd426](https://github.com/angular/angular-cli/commit/cbccfd426a2e27c1fd2e274aaee4d02c53eb7c9e) | fix  | during an update only use package manager force option with npm 7+                   |
+| [dbe0dc174](https://github.com/angular/angular-cli/commit/dbe0dc174339d872426501c1c1dca689db2b9bad) | fix  | improve error message for project-specific ng commands when run outside of a project |
+| [93ba050b0](https://github.com/angular/angular-cli/commit/93ba050b0c6b58274661d2063174920d191a7639) | fix  | show deprecated workspace config options in IDE                                      |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [9e3152466](https://github.com/angular/angular-cli/commit/9e3152466b9b3cdb00450f63399e7b8043250fe7) | fix  | prevent importing `RouterModule` parallel to `RoutingModule` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [7a2460914](https://github.com/angular/angular-cli/commit/7a246091435773ff4d669b1dfe2684b366010919) | fix  | disable glob mounting for patterns that start with a forward slash  |
+| [88701115c](https://github.com/angular/angular-cli/commit/88701115c69ced4bbc1bea07e4ef8941a2b54771) | fix  | don't override base-href in HTML when it's not set in builder       |
+| [d2bbcd7b6](https://github.com/angular/angular-cli/commit/d2bbcd7b6803fcc9da27f804f12f194110d26eb2) | fix  | improve detection of CommonJS dependencies                          |
+| [53e9c459d](https://github.com/angular/angular-cli/commit/53e9c459d6b5fae3884128beaa941c71cd6562cc) | fix  | support hidden component stylesheet sourcemaps with esbuild builder |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [5319428e1](https://github.com/angular/angular-cli/commit/5319428e14a7e364a58caa8ca936964cfc5503cf) | fix  | do not run ngcc when `node_modules` does not exist |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, JoostK and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.5"></a>
 
 # 14.0.5 (2022-07-06)
