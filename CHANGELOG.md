@@ -1,3 +1,19 @@
+<a name="14.1.0-next.2"></a>
+
+# 14.1.0-next.2 (2022-07-06)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                  |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------- |
+| [1815b10f](https://github.com/angular/universal/commit/1815b10feba34a5dcb1d12567c9d4b4d774e45ee) | fix  | handle `ngDevMode` correctly |
+
+## Special Thanks
+
+Alan Agius, Angular Robot, Paul Gschwendtner, arturovt and renovate[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.3"></a>
 
 # 14.0.3 (2022-07-06)
