@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';<% if (commonModule) { %>
 import { CommonModule } from '@angular/common';<% } %><% if (lazyRouteWithoutRouteModule) { %>
 import { Routes, RouterModule } from '@angular/router';<% } %>
-<% if (routing || lazyRouteWithRouteModule) { %>
+<% if ((!lazyRoute && routing) || lazyRouteWithRouteModule) { %>
 import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %>
 <% if (lazyRouteWithoutRouteModule) { %>
 const routes: Routes = [
@@ -11,7 +11,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [],
   imports: [<% if (commonModule) { %>
-    CommonModule<% } %><% if (routing || lazyRouteWithRouteModule) { %>,
+    CommonModule<% } %><% if ((!lazyRoute && routing) || lazyRouteWithRouteModule) { %>,
     <%= classify(name) %>RoutingModule<% } %><% if (lazyRouteWithoutRouteModule) { %>,
     RouterModule.forChild(routes)<% } %>
   ]
