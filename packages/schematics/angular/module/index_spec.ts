@@ -288,5 +288,46 @@ describe('Module Schematic', () => {
         `loadChildren: () => import('../bar/bar.module').then(m => m.BarModule)`,
       );
     });
+
+    it('should not add reference to RouterModule when referencing lazy routing module', async () => {
+      // Delete routing module
+      appTree.delete('/projects/bar/src/app/app-routing.module.ts');
+
+      // Update app.module to contain the route config.
+      appTree.overwrite(
+        'projects/bar/src/app/app.module.ts',
+        `
+          import { NgModule } from '@angular/core';
+          import { RouterModule } from '@angular/router';
+          import { BrowserModule } from '@angular/platform-browser';
+          import { AppComponent } from './app.component';
+
+
+          @NgModule({
+            imports: [BrowserModule, RouterModule.forRoot([])],
+            declarations: [AppComponent],
+          })
+          export class AppModule {}
+      `,
+      );
+
+      const tree = await schematicRunner
+        .runSchematicAsync(
+          'module',
+          {
+            ...defaultOptions,
+            name: 'bar',
+            route: 'bar',
+            routing: true,
+            module: 'app.module.ts',
+          },
+          appTree,
+        )
+        .toPromise();
+
+      const content = tree.readContent('/projects/bar/src/app/bar/bar.module.ts');
+      expect(content).toContain('RouterModule.forChild(routes)');
+      expect(content).not.toContain('BarRoutingModule');
+    });
   });
 });
