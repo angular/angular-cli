@@ -142,11 +142,8 @@ pkg_npm(
         "//packages/angular_devkit/core:package.json",
     ],
     deps = [
-        "library/library-long.md",
         ":README.md",
         ":angular",
-        ":app-shell/app-shell-long.md",
-        ":e2e/e2e-long.md",
         ":license",
         ":migrations/migration-collection.json",
         ":utility/latest-versions/package.json",
