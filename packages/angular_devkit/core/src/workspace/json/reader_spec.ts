@@ -137,6 +137,24 @@ describe('readJsonWorkpace Parsing', () => {
       /version specifier not found/,
     );
   });
+
+  it('warns on missing root property in a project', async () => {
+    const host = createTestHost(stripIndent`
+      {
+        "version": 1,
+        "projects": {
+          "foo": {}
+        }
+      }
+    `);
+
+    const consoleWarnSpy = spyOn(console, 'warn').and.callFake(() => undefined);
+    await expectAsync(readJsonWorkspace('', host));
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      `Project "foo" is missing a required property "root". This will become an error in the next major version.`,
+    );
+  });
 });
 
 describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
