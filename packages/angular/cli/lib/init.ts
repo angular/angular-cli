@@ -24,7 +24,7 @@ import { VERSION } from '../src/utilities/version';
  */
 let forceExit = false;
 
-(async () => {
+(async (): Promise<typeof import('./cli').default | null> => {
   /**
    * Disable Browserslist old data warning as otherwise with every release we'd need to update this dependency
    * which is cumbersome considering we pin versions and the warning is not user actionable.
@@ -42,6 +42,8 @@ let forceExit = false;
   }
 
   let cli;
+  const rawCommandName = process.argv[2];
+
   try {
     // No error implies a projectLocalCli, which will load whatever
     // version of ng-cli you have installed in a local package.json
@@ -68,6 +70,11 @@ let forceExit = false;
     // Ensure older versions of the CLI fully exit
     if (major(localVersion) < 14) {
       forceExit = true;
+
+      // Versions prior to 14 didn't implement completion command.
+      if (rawCommandName === 'completion') {
+        return null;
+      }
     }
 
     let isGlobalGreater = false;
@@ -78,7 +85,6 @@ let forceExit = false;
       console.error('Version mismatch check skipped. Unable to compare local version: ' + error);
     }
 
-    const rawCommandName = process.argv[2];
     // When using the completion command, don't show the warning as otherwise this will break completion.
     if (isGlobalGreater && rawCommandName !== 'completion') {
       // If using the update command and the global version is greater, use the newer update command
@@ -114,14 +120,12 @@ let forceExit = false;
 
   return cli;
 })()
-  .then((cli) => {
-    return cli({
+  .then((cli) =>
+    cli?.({
       cliArgs: process.argv.slice(2),
-      inputStream: process.stdin,
-      outputStream: process.stdout,
-    });
-  })
-  .then((exitCode: number) => {
+    }),
+  )
+  .then((exitCode = 0) => {
     if (forceExit) {
       process.exit(exitCode);
     }
