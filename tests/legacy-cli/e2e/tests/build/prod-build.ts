@@ -26,7 +26,7 @@ function verifySize(bundle: string, baselineBytes: number) {
 export default async function () {
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  const bootstrapRegExp = /bootstrapModule\([_a-zA-Z]+[0-9]*\)\./;
+  const bootstrapRegExp = /bootstrapModule\([\$_a-zA-Z]+[0-9]*\)\./;
 
   await noSilentNg('build');
   await expectFileToExist(join(process.cwd(), 'dist'));
