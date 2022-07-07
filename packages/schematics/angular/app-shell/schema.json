@@ -5,7 +5,6 @@
   "type": "object",
   "description": "Generates an application shell for running a server-side version of an app.",
   "additionalProperties": false,
-  "long-description": "./app-shell-long.md",
   "properties": {
     "project": {
       "type": "string",

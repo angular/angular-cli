@@ -5,7 +5,6 @@
   "type": "object",
   "additionalProperties": false,
   "description": "Generates a new, generic end-to-end test definition for the given or default project.",
-  "long-description": "e2e-long.md",
   "properties": {
     "rootSelector": {
       "description": "The HTML selector for the root component of the test app.",
