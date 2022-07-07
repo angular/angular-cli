@@ -12,7 +12,9 @@ import { getWorkspace as readWorkspace, updateWorkspace, writeWorkspace } from '
 const TEST_WORKSPACE_CONTENT = JSON.stringify({
   version: 1,
   projects: {
-    'test': {},
+    test: {
+      root: '',
+    },
   },
 });
 

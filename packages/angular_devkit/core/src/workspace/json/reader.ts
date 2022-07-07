@@ -60,8 +60,10 @@ export async function readJsonWorkspace(
       // TODO: Diagnostic reporting support
       throw new Error(message);
     },
-    warn(_message, _node) {
+    warn(message, _node) {
       // TODO: Diagnostic reporting support
+      // eslint-disable-next-line no-console
+      console.warn(message);
     },
   };
 
@@ -167,6 +169,13 @@ function parseProject(
   }
 
   const projectNodeValue = getNodeValue(projectNode);
+  if (!('root' in projectNodeValue)) {
+    // TODO(alan-agius4): change this to error in v15.
+    context.warn(
+      `Project "${projectName}" is missing a required property "root". This will become an error in the next major version.`,
+      projectNodeValue,
+    );
+  }
 
   for (const [name, value] of Object.entries<JsonValue>(projectNodeValue)) {
     switch (name) {
