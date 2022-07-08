@@ -12,6 +12,11 @@ import { Chunk, Compilation, Compiler, sources as webpackSources } from 'webpack
 
 const Entrypoint = require('webpack/lib/Entrypoint');
 
+/**
+ * The name of the plugin provided to Webpack when tapping Webpack compiler hooks.
+ */
+const PLUGIN_NAME = 'scripts-webpack-plugin';
+
 export interface ScriptsWebpackPluginOptions {
   name: string;
   sourceMap?: boolean;
@@ -97,8 +102,8 @@ export class ScriptsWebpackPlugin {
       .filter((script) => !!script)
       .map((script) => path.resolve(this.options.basePath || '', script));
 
-    compiler.hooks.thisCompilation.tap('scripts-webpack-plugin', (compilation) => {
-      compilation.hooks.additionalAssets.tapPromise('scripts-webpack-plugin', async () => {
+    compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+      compilation.hooks.additionalAssets.tapPromise(PLUGIN_NAME, async () => {
         if (await this.shouldSkip(compilation, scripts)) {
           if (this._cachedOutput) {
             this._insertOutput(compilation, this._cachedOutput, true);
@@ -149,19 +154,32 @@ export class ScriptsWebpackPlugin {
         });
 
         const combinedSource = new webpackSources.CachedSource(concatSource);
-        const filename = interpolateName(
-          { resourcePath: 'scripts.js' },
-          this.options.filename as string,
-          {
-            content: combinedSource.source(),
-          },
-        );
 
-        const output = { filename, source: combinedSource };
+        const output = { filename: this.options.filename, source: combinedSource };
         this._insertOutput(compilation, output);
         this._cachedOutput = output;
         addDependencies(compilation, scripts);
       });
+      compilation.hooks.processAssets.tapPromise(
+        {
+          name: PLUGIN_NAME,
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_DEV_TOOLING,
+        },
+        async () => {
+          const assetName = this.options.filename;
+          const asset = compilation.getAsset(assetName);
+          if (asset) {
+            const interpolatedFilename = interpolateName(
+              { resourcePath: 'scripts.js' },
+              assetName,
+              { content: asset.source.source() },
+            );
+            if (assetName !== interpolatedFilename) {
+              compilation.renameAsset(assetName, interpolatedFilename);
+            }
+          }
+        },
+      );
     });
   }
 }
