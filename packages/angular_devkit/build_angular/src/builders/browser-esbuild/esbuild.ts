@@ -16,10 +16,6 @@ import {
   build,
   formatMessages,
 } from 'esbuild';
-import { resolve } from 'path';
-
-/** Default outdir setting for esbuild. */
-export const DEFAULT_OUTDIR = resolve('/virtual-output');
 
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
