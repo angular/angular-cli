@@ -226,18 +226,12 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         ...(this.context.args.options.help ? { default: defaultVal } : {}),
       };
 
-      // TODO(alanagius4): remove in a major version.
-      // the below is an interim workaround to handle options which have been defined in the schema with `no` prefix.
       let dashedName = strings.dasherize(name);
+
+      // Handle options which have been defined in the schema with `no` prefix.
       if (type === 'boolean' && dashedName.startsWith('no-')) {
         dashedName = dashedName.slice(3);
         booleanOptionsWithNoPrefix.add(dashedName);
-
-        // eslint-disable-next-line no-console
-        console.warn(
-          `Warning: '${name}' option has been declared with a 'no' prefix in the schema.` +
-            'Please file an issue with the author of this package.',
-        );
       }
 
       if (positional === undefined) {
@@ -258,8 +252,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       }
     }
 
-    // TODO(alanagius4): remove in a major version.
-    // the below is an interim workaround to handle options which have been defined in the schema with `no` prefix.
+    // Handle options which have been defined in the schema with `no` prefix.
     if (booleanOptionsWithNoPrefix.size) {
       localYargs.middleware((options: Arguments) => {
         for (const key of booleanOptionsWithNoPrefix) {
