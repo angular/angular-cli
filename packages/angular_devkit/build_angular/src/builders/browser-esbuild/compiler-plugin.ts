@@ -116,7 +116,12 @@ function convertTypeScriptDiagnostic(
 // This is a non-watch version of the compiler code from `@ngtools/webpack` augmented for esbuild
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
-  pluginOptions: { sourcemap: boolean; tsconfig: string; advancedOptimizations?: boolean },
+  pluginOptions: {
+    sourcemap: boolean;
+    tsconfig: string;
+    advancedOptimizations?: boolean;
+    thirdPartySourcemaps?: boolean;
+  },
   styleOptions: BundleStylesheetOptions,
 ): Plugin {
   return {
@@ -318,10 +323,14 @@ export function createCompilerPlugin(
             };
           }
 
+          const useInputSourcemap =
+            pluginOptions.sourcemap &&
+            (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
+
           const data = typescriptResult.content ?? '';
           const babelResult = await transformAsync(data, {
             filename: args.path,
-            inputSourceMap: (pluginOptions.sourcemap ? undefined : false) as undefined,
+            inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
             sourceMaps: pluginOptions.sourcemap ? 'inline' : false,
             compact: false,
             configFile: false,
@@ -355,10 +364,14 @@ export function createCompilerPlugin(
           )
         ).createEs2015LinkerPlugin;
 
+        const useInputSourcemap =
+          pluginOptions.sourcemap &&
+          (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
+
         const data = await fs.readFile(args.path, 'utf-8');
         const result = await transformAsync(data, {
           filename: args.path,
-          inputSourceMap: (pluginOptions.sourcemap ? undefined : false) as undefined,
+          inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
           sourceMaps: pluginOptions.sourcemap ? 'inline' : false,
           compact: false,
           configFile: false,
