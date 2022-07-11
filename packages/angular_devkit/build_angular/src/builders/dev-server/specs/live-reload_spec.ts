@@ -9,9 +9,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
+import { createServer } from 'http';
 import { createProxyServer } from 'http-proxy';
+import { AddressInfo } from 'net';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { debounceTime, finalize, switchMap, take } from 'rxjs/operators';
+import { debounceTime, switchMap, take } from 'rxjs/operators';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,10 +24,20 @@ interface ProxyInstance {
   url: string;
 }
 
-let proxyPort = 9100;
-function createProxy(target: string, secure: boolean, ws = true): ProxyInstance {
-  proxyPort++;
+function findFreePort(): Promise<number> {
+  return new Promise<number>((resolve, reject) => {
+    const server = createServer();
+    server.once('listening', () => {
+      const port = (server.address() as AddressInfo).port;
+      server.close((e) => (e ? reject(e) : resolve(port)));
+    });
+    server.once('error', (e) => server.close(() => reject(e)));
+    server.listen();
+  });
+}
 
+async function createProxy(target: string, secure: boolean, ws = true): Promise<ProxyInstance> {
+  const proxyPort = await findFreePort();
   const server = createProxyServer({
     ws,
     target,
@@ -125,6 +137,7 @@ async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
 
 describe('Dev Server Builder live-reload', () => {
   const target = { project: 'app', target: 'serve' };
+  // TODO: check if the below is still true.
   // Avoid using port `0` as these tests will behave differrently and tests will pass when they shouldn't.
   // Port 0 and host 0.0.0.0 have special meaning in dev-server.
   const overrides = { hmr: false, watch: true, port: 4202, liveReload: true };
@@ -155,7 +168,7 @@ describe('Dev Server Builder live-reload', () => {
 
     host.writeMultipleFiles({
       'src/app/app.component.html': `
-        <p>{{title}}</p>
+        <p>{{ title }}</p>
       `,
     });
 
@@ -173,11 +186,10 @@ describe('Dev Server Builder live-reload', () => {
     const run = await architect.scheduleTarget(target, overrides);
     runs.push(run);
 
-    let buildCount = 0;
     await run.output
       .pipe(
         debounceTime(1000),
-        switchMap(async (buildEvent) => {
+        switchMap(async (buildEvent, buildCount) => {
           expect(buildEvent.success).toBe(true);
           const url = buildEvent.baseUrl as string;
           switch (buildCount) {
@@ -190,8 +202,6 @@ describe('Dev Server Builder live-reload', () => {
               expect(innerText).toBe('app-live-reload');
               break;
           }
-
-          buildCount++;
         }),
         take(2),
       )
@@ -204,32 +214,33 @@ describe('Dev Server Builder live-reload', () => {
 
     let proxy: ProxyInstance | undefined;
     let buildCount = 0;
-    await run.output
-      .pipe(
-        debounceTime(1000),
-        switchMap(async (buildEvent) => {
-          expect(buildEvent.success).toBe(true);
-          const url = buildEvent.baseUrl as string;
-          switch (buildCount) {
-            case 0:
-              proxy = createProxy(url, false);
-              await goToPageAndWaitForWS(page, proxy.url);
-              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
-              break;
-            case 1:
-              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-              expect(innerText).toBe('app-live-reload');
-              break;
-          }
+    try {
+      await run.output
+        .pipe(
+          debounceTime(1000),
+          switchMap(async (buildEvent) => {
+            expect(buildEvent.success).toBe(true);
+            const url = buildEvent.baseUrl as string;
+            switch (buildCount) {
+              case 0:
+                proxy = await createProxy(url, false);
+                await goToPageAndWaitForWS(page, proxy.url);
+                host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
+                break;
+              case 1:
+                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+                expect(innerText).toBe('app-live-reload');
+                break;
+            }
 
-          buildCount++;
-        }),
-        take(2),
-        finalize(() => {
-          proxy?.server.close();
-        }),
-      )
-      .toPromise();
+            buildCount++;
+          }),
+          take(2),
+        )
+        .toPromise();
+    } finally {
+      proxy?.server.close();
+    }
   });
 
   it('works without https -> http proxy', async () => {
@@ -237,32 +248,31 @@ describe('Dev Server Builder live-reload', () => {
     runs.push(run);
 
     let proxy: ProxyInstance | undefined;
-    let buildCount = 0;
-    await run.output
-      .pipe(
-        debounceTime(1000),
-        switchMap(async (buildEvent) => {
-          expect(buildEvent.success).toBe(true);
-          const url = buildEvent.baseUrl as string;
-          switch (buildCount) {
-            case 0:
-              proxy = createProxy(url, true);
-              await goToPageAndWaitForWS(page, proxy.url);
-              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
-              break;
-            case 1:
-              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-              expect(innerText).toBe('app-live-reload');
-              break;
-          }
 
-          buildCount++;
-        }),
-        take(2),
-        finalize(() => {
-          proxy?.server.close();
-        }),
-      )
-      .toPromise();
+    try {
+      await run.output
+        .pipe(
+          debounceTime(1000),
+          switchMap(async (buildEvent, buildCount) => {
+            expect(buildEvent.success).toBe(true);
+            const url = buildEvent.baseUrl as string;
+            switch (buildCount) {
+              case 0:
+                proxy = await createProxy(url, true);
+                await goToPageAndWaitForWS(page, proxy.url);
+                host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
+                break;
+              case 1:
+                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+                expect(innerText).toBe('app-live-reload');
+                break;
+            }
+          }),
+          take(2),
+        )
+        .toPromise();
+    } finally {
+      proxy?.server.close();
+    }
   });
 });
