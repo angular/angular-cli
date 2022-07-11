@@ -103,13 +103,23 @@ export function addDependency(
     if (!dependencySection) {
       // Section is not present. The dependency can be added to a new object literal for the section.
       manifest[type] = { [name]: specifier };
-    } else if (dependencySection[name] === specifier) {
-      // Already present with same specifier
-      return;
-    } else if (dependencySection[name]) {
-      // Already present but different specifier
-      throw new Error(`Package dependency "${name}" already exists with a different specifier.`);
     } else {
+      const existingSpecifier = dependencySection[name];
+
+      if (existingSpecifier === specifier) {
+        // Already present with same specifier
+        return;
+      }
+
+      if (existingSpecifier) {
+        // Already present but different specifier
+        // This warning may become an error in the future
+        context.logger.warn(
+          `Package dependency "${name}" already exists with a different specifier. ` +
+            `"${existingSpecifier}" will be replaced with "${specifier}".`,
+        );
+      }
+
       // Add new dependency in alphabetical order
       const entries = Object.entries(dependencySection);
       entries.push([name, specifier]);

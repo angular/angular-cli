@@ -17,17 +17,31 @@ import {
 } from '@angular-devkit/schematics';
 import { DependencyType, InstallBehavior, addDependency } from './dependency';
 
-async function testRule(rule: Rule, tree: Tree): Promise<TaskConfigurationGenerator[]> {
+interface LogEntry {
+  type: 'warn';
+  message: string;
+}
+
+async function testRule(
+  rule: Rule,
+  tree: Tree,
+): Promise<{ tasks: TaskConfigurationGenerator[]; logs: LogEntry[] }> {
   const tasks: TaskConfigurationGenerator[] = [];
+  const logs: LogEntry[] = [];
   const context = {
     addTask(task: TaskConfigurationGenerator) {
       tasks.push(task);
+    },
+    logger: {
+      warn(message: string): void {
+        logs.push({ type: 'warn', message });
+      },
     },
   };
 
   await callRule(rule, tree, context as unknown as SchematicContext).toPromise();
 
-  return tasks;
+  return { tasks, logs };
 }
 
 describe('addDependency', () => {
@@ -49,7 +63,7 @@ describe('addDependency', () => {
     });
   });
 
-  it('throws if a package is already present with a different specifier', async () => {
+  it('warns if a package is already present with a different specifier', async () => {
     const tree = new EmptyTree();
     tree.create(
       '/package.json',
@@ -60,9 +74,14 @@ describe('addDependency', () => {
 
     const rule = addDependency('@angular/core', '^14.0.0');
 
-    await expectAsync(testRule(rule, tree)).toBeRejectedWithError(
-      undefined,
-      'Package dependency "@angular/core" already exists with a different specifier.',
+    const { logs } = await testRule(rule, tree);
+    expect(logs).toContain(
+      jasmine.objectContaining({
+        type: 'warn',
+        message:
+          'Package dependency "@angular/core" already exists with a different specifier. ' +
+          '"^13.0.0" will be replaced with "^14.0.0".',
+      }),
     );
   });
 
@@ -164,7 +183,7 @@ describe('addDependency', () => {
 
     const rule = addDependency('@angular/core', '^14.0.0');
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -182,7 +201,7 @@ describe('addDependency', () => {
       packageJsonPath: '/abc/package.json',
     });
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -201,7 +220,7 @@ describe('addDependency', () => {
       install: InstallBehavior.Auto,
     });
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -220,7 +239,7 @@ describe('addDependency', () => {
       install: InstallBehavior.Always,
     });
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -239,7 +258,7 @@ describe('addDependency', () => {
       install: InstallBehavior.None,
     });
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks).toEqual([]);
   });
@@ -255,7 +274,7 @@ describe('addDependency', () => {
 
     const rule = addDependency('@angular/core', '^14.0.0');
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks).toEqual([]);
   });
@@ -269,7 +288,7 @@ describe('addDependency', () => {
       addDependency('@angular/common', '^14.0.0'),
     ]);
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -288,7 +307,7 @@ describe('addDependency', () => {
       addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.Auto }),
     ]);
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -307,7 +326,7 @@ describe('addDependency', () => {
       addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.None }),
     ]);
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -326,7 +345,7 @@ describe('addDependency', () => {
       addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.Auto }),
     ]);
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -345,7 +364,7 @@ describe('addDependency', () => {
       addDependency('@angular/common', '^14.0.0', { install: InstallBehavior.Always }),
     ]);
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
@@ -369,7 +388,7 @@ describe('addDependency', () => {
       addDependency('@angular/common', '^14.0.0', { packageJsonPath: '/abc/package.json' }),
     ]);
 
-    const tasks = await testRule(rule, tree);
+    const { tasks } = await testRule(rule, tree);
 
     expect(tasks.map((task) => task.toConfiguration())).toEqual([
       {
