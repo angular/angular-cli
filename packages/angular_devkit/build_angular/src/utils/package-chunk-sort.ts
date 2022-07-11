@@ -15,6 +15,7 @@ export function generateEntryPoints(options: {
   styles: StyleElement[];
   scripts: ScriptElement[];
   isHMREnabled?: boolean;
+  scriptType?: false | 'text/javascript' | 'module';
 }): EntryPointsType[] {
   // Add all styles/scripts, except lazy-loaded ones.
   const extraEntryPoints = (
@@ -29,13 +30,15 @@ export function generateEntryPoints(options: {
     return [...new Set(entryPoints)].map<EntryPointsType>((f) => [f, false]);
   };
 
+  const isModule = options.scriptType === 'module';
+
   const entryPoints: EntryPointsType[] = [
-    ['runtime', !options.isHMREnabled],
-    ['polyfills', true],
+    ['runtime', isModule ? !options.isHMREnabled : false],
+    ['polyfills', isModule],
     ...extraEntryPoints(options.styles, 'styles'),
     ...extraEntryPoints(options.scripts, 'scripts'),
-    ['vendor', true],
-    ['main', true],
+    ['vendor', isModule],
+    ['main', isModule],
   ];
 
   const duplicates = entryPoints.filter(

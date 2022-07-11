@@ -324,7 +324,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       libraryTarget: isPlatformServer ? 'commonjs' : undefined,
       crossOriginLoading,
       trustedTypes: 'angular#bundler',
-      scriptType: 'module',
+      scriptType: scriptTarget <= ScriptTarget.ES5 ? 'text/javascript' : 'module',
     },
     watch: buildOptions.watch,
     watchOptions: {

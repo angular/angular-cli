@@ -300,6 +300,7 @@ export function buildWebpackBrowser(
                   const entrypoints = generateEntryPoints({
                     scripts: options.scripts ?? [],
                     styles: options.styles ?? [],
+                    scriptType: config.output?.scriptType,
                   });
 
                   const indexHtmlGenerator = new IndexHtmlGenerator({
