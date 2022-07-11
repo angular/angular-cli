@@ -29,6 +29,7 @@ import {
   JsonStatsPlugin,
   ScriptsWebpackPlugin,
 } from '../plugins';
+import { DevToolsIgnorePlugin } from '../plugins/devtools-ignore-plugin';
 import { NamedChunksPlugin } from '../plugins/named-chunks-plugin';
 import { ProgressPlugin } from '../plugins/progress-plugin';
 import { TransferSizePlugin } from '../plugins/transfer-size-plugin';
@@ -44,6 +45,8 @@ import {
   getStatsOptions,
   globalScriptsByBundleName,
 } from '../utils/helpers';
+
+const VENDORS_TEST = /[\\/]node_modules[\\/]/;
 
 // eslint-disable-next-line max-lines-per-function
 export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration> {
@@ -189,6 +192,8 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     if (stylesSourceMap) {
       include.push(/css$/);
     }
+
+    extraPlugins.push(new DevToolsIgnorePlugin());
 
     extraPlugins.push(
       new SourceMapDevToolPlugin({
@@ -434,7 +439,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
             name: 'vendor',
             chunks: (chunk) => chunk.name === 'main',
             enforce: true,
-            test: /[\\/]node_modules[\\/]/,
+            test: VENDORS_TEST,
           },
         },
       },
