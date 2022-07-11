@@ -323,6 +323,7 @@ async function bundleCode(
         // JS/TS options
         {
           sourcemap: !!sourcemapOptions.scripts,
+          thirdPartySourcemaps: sourcemapOptions.vendor,
           tsconfig,
           advancedOptimizations: options.buildOptimizer,
         },
