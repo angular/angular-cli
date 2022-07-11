@@ -15,10 +15,4 @@ export default async function () {
     ['generate', './schematic-boolean-option-negated:test', '--watch'],
     /noWatch: false/,
   );
-
-  await execAndWaitForOutputToMatch(
-    'ng',
-    ['generate', './schematic-boolean-option-negated:test'],
-    /'noWatch' option has been declared with a 'no' prefix in the schema/,
-  );
 }
