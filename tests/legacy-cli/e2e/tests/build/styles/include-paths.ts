@@ -61,26 +61,25 @@ export default async function () {
   });
 
   await ng('build', '--configuration=development');
-
-  expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/);
-  expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/);
+  await expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/);
+  await expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/);
   if (!esbuild) {
     // These checks are for the less and stylus files
-    expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/);
-    expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/);
-    expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/);
-    expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/);
+    await expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/);
+    await expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/);
+    await expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/);
+    await expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/);
   }
 
   // esbuild currently only supports AOT and not JIT mode
   if (!esbuild) {
-    ng('build', '--no-aot', '--configuration=development');
+    await ng('build', '--no-aot', '--configuration=development');
 
-    expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/);
-    expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/);
-    expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/);
-    expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/);
-    expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/);
-    expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/);
+    await expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/);
+    await expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/);
+    await expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/);
+    await expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/);
+    await expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/);
+    await expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/);
   }
 }
