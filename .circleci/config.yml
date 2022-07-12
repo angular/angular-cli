@@ -343,12 +343,51 @@ jobs:
             }
       - fail_fast
 
+  test-win:
+    executor: windows-executor
+    steps:
+      - checkout
+      - run:
+          name: Rebase PR on target branch
+          command: |
+            if (Test-Path env:CIRCLE_PR_NUMBER) {
+              # User is required for rebase.
+              git config user.name "angular-ci"
+              git config user.email "angular-ci"
+              # Rebase PR on top of target branch.
+              node tools/rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER
+            } else {
+              echo "This build is not over a PR, nothing to do."
+            }
+      - setup_windows
+      - run: ./.circleci/env.windows.sh
+      - restore_cache:
+          keys:
+            - *cache_key_win
+      - run:
+          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
+          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
+          name: 'Arsenal Image Mounter (RAM Disk)'
+          command: |
+            pwsh ./.circleci/win-ram-disk.ps1
+      - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
+      # Install project dependencies, and install Bazelisk globally. This is necessary as
+      # Windows might error when `bazel` is invoked from the project node modules. The Bazel
+      # invocation might modify the symlinked project `node_modules` again, causing failures.
+      - run: npm i -g @bazel/bazelisk@${BAZELISK_VERSION}
+      - run:
+          name: tests
+          command: bazelisk test //packages/...
+          no_output_timeout: 40m
+      - fail_fast
+
 workflows:
   version: 2
   default_workflow:
     jobs:
       # Linux jobs
       - setup
+      - test-win
       - lint:
           requires:
             - setup
