@@ -14,6 +14,16 @@
       ],
       "snapshotRepo": "angular/cli-builds"
     },
+    "@angular/create": {
+      "name": "Angular Create",
+      "section": "Misc",
+      "links": [
+        {
+          "label": "README",
+          "url": "/packages/angular/create/README.md"
+        }
+      ]
+    },
     "@angular/pwa": {
       "name": "Angular PWA Schematics",
       "section": "Schematics",
