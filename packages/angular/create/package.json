@@ -1,0 +1,18 @@
+{
+  "name": "@angular/create",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Scaffold an Angular CLI workspace.",
+  "keywords": [
+    "angular",
+    "angular-cli",
+    "Angular CLI",
+    "code generation",
+    "schematics"
+  ],
+  "bin": {
+    "create": "./src/index.js"
+  },
+  "dependencies": {
+    "@angular/cli": "0.0.0-PLACEHOLDER"
+  }
+}

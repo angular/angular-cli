@@ -39,7 +39,7 @@ export async function prepareProjectForE2e(name: string) {
   const argv: yargsParser.Arguments = getGlobalVariable('argv');
 
   await git('config', 'user.email', 'angular-core+e2e@google.com');
-  await git('config', 'user.name', 'Angular CLI E2e');
+  await git('config', 'user.name', 'Angular CLI E2E');
   await git('config', 'commit.gpgSign', 'false');
 
   if (argv['ng-snapshots'] || argv['ng-tag']) {
