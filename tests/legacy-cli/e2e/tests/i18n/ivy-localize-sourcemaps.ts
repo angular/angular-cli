@@ -6,7 +6,7 @@ export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
-  const { stderr } = await ng('build', '--source-map');
+  await ng('build', '--source-map');
 
   for (const { outputPath } of langTranslations) {
     // Ensure sourcemap for modified file contains content
