@@ -1,3 +1,38 @@
+<a name="14.0.6"></a>
+
+# 14.0.6 (2022-07-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [178550529](https://github.com/angular/angular-cli/commit/1785505290940dad2ef9a62d4725e0d1b4b486d4) | fix  | handle cases when completion is enabled and running in an older CLI workspace |
+| [10f24498e](https://github.com/angular/angular-cli/commit/10f24498ec2938487ae80d6ecea584e20b01dcbe) | fix  | remove deprecation warning of `no` prefixed schema options                    |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [dfa6d73c5](https://github.com/angular/angular-cli/commit/dfa6d73c5c45d3c3276fb1fecfb6535362d180c5) | fix  | remove browserslist configuration |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------- |
+| [4d848c4e6](https://github.com/angular/angular-cli/commit/4d848c4e6f6944f32b9ecb2cf2db5c544b3894fe) | fix  | generate different content hashes for scripts which are changed during the optimization phase |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [2500f34a4](https://github.com/angular/angular-cli/commit/2500f34a401c2ffb03b1dfa41299d91ddebe787e) | fix  | provide actionable warning when a workspace project has missing `root` property |
+
+## Special Thanks
+
+Alan Agius and martinfrancois
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.5"></a>
 
 # 14.0.5 (2022-07-06)
