@@ -82,8 +82,25 @@ const allTests = glob
   .sync(testGlob, { nodir: true, cwd: e2eRoot, ignore: argv.ignore })
   // Replace windows slashes.
   .map((name) => name.replace(/\\/g, '/'))
-  .sort()
-  .filter((name) => !name.endsWith('/setup.ts'));
+  .filter((name) => {
+    if (name.endsWith('/setup.ts')) {
+      return false;
+    }
+
+    // The below is to exclude specific tests that are not intented to run for the current package manager.
+    // This is also important as without the trickery the tests that take the longest ex: update.ts (2.5mins)
+    // will be executed on the same shard.
+    const fileName = path.basename(name);
+    if (
+      (fileName.startsWith('yarn-') && !argv.yarn) ||
+      (fileName.startsWith('npm-') && argv.yarn)
+    ) {
+      return false;
+    }
+
+    return true;
+  })
+  .sort();
 
 const shardId = 'shard' in argv ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;
