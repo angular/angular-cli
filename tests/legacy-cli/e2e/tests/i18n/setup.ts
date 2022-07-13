@@ -1,22 +1,15 @@
 import express from 'express';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import {
-  appendToFile,
-  copyFile,
-  expectFileToExist,
-  expectFileToMatch,
-  replaceInFile,
-  writeFile,
-} from '../../utils/fs';
+import { appendToFile, copyFile, createDir, replaceInFile, writeFile } from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
-import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 import { Server } from 'http';
 import { AddressInfo } from 'net';
 
 // Configurations for each locale.
+const translationFile = 'src/locale/messages.xlf';
 export const baseDir = 'dist/test-project';
 export const langTranslations = [
   {
@@ -96,45 +89,13 @@ export async function externalServer(outputPath: string, baseUrl = '/'): Promise
   });
 }
 
-export const formats = {
-  'xlf': {
-    ext: 'xlf',
-    sourceCheck: 'source-language="en-US"',
-    replacements: [[/source/g, 'target']],
-  },
-  'xlf2': {
-    ext: 'xlf',
-    sourceCheck: 'srcLang="en-US"',
-    replacements: [[/source/g, 'target']],
-  },
-  'xmb': {
-    ext: 'xmb',
-    sourceCheck: '<!DOCTYPE messagebundle',
-    replacements: [
-      [/messagebundle/g, 'translationbundle'],
-      [/msg/g, 'translation'],
-      [/<source>.*?<\/source>/g, ''],
-    ],
-  },
-  'json': {
-    ext: 'json',
-    sourceCheck: '"locale": "en-US"',
-    replacements: [] as RegExp[][],
-  },
-  'arb': {
-    ext: 'arb',
-    sourceCheck: '"@@locale": "en-US"',
-    replacements: [] as RegExp[][],
-  },
-};
-
 export const baseHrefs: { [l: string]: string } = {
   'en-US': '/en/',
   fr: '/fr-FR/',
   de: '',
 };
 
-export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
+export async function setupI18nConfig() {
   // Add component with i18n content, both translations and localeData (plural, dates).
   await writeFile(
     'src/app/app.component.ts',
@@ -160,6 +121,41 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
     <p id="date">{{ jan | date : 'LLLL' }}</p>
     <p id="plural" i18n>Updated {minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}</p>
   `,
+  );
+
+  await createDir(dirname(translationFile));
+  await writeFile(
+    translationFile,
+    `
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+      <file source-language="en-US" datatype="plaintext" original="ng2.template">
+        <body>
+          <trans-unit id="4286451273117902052" datatype="html">
+            <source>Hello <x id="INTERPOLATION" equiv-text="{{ title }}"/>! </source>
+            <context-group purpose="location">
+              <context context-type="sourcefile">src/app/app.component.html</context>
+              <context context-type="linenumber">2,3</context>
+            </context-group>
+            <note priority="1" from="description">An introduction header for this sample</note>
+          </trans-unit>
+          <trans-unit id="4606963464835766483" datatype="html">
+            <source>Updated <x id="ICU" equiv-text="{minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}" xid="1887283401472369100"/></source>
+            <context-group purpose="location">
+              <context context-type="sourcefile">src/app/app.component.html</context>
+              <context context-type="linenumber">5,6</context>
+            </context-group>
+          </trans-unit>
+          <trans-unit id="2002272803511843863" datatype="html">
+            <source>{VAR_PLURAL, plural, =0 {just now} =1 {one minute ago} other {<x id="INTERPOLATION"/> minutes ago}}</source>
+            <context-group purpose="location">
+              <context context-type="sourcefile">src/app/app.component.html</context>
+              <context context-type="linenumber">5,6</context>
+            </context-group>
+          </trans-unit>
+        </body>
+      </file>
+    </xliff>`,
   );
 
   // Add a dynamic import to ensure syntax is supported
@@ -241,11 +237,10 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
       if (lang === sourceLocale) {
         i18n.sourceLocale = lang;
       } else {
-        i18n.locales[lang] = `src/locale/messages.${lang}.${formats[format].ext}`;
+        i18n.locales[lang] = `src/locale/messages.${lang}.xlf`;
       }
 
       buildConfigs[lang] = { localize: [lang] };
-
       serveConfigs[lang] = { browserTarget: `test-project:build:${lang}` };
       e2eConfigs[lang] = {
         specs: [`./src/app.${lang}.e2e-spec.ts`],
@@ -259,32 +254,24 @@ export async function setupI18nConfig(format: keyof typeof formats = 'xlf') {
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
+
   await installPackage(localizeVersion);
-
-  // Extract the translation messages.
-  await ng('extract-i18n', '--output-path=src/locale', `--format=${format}`);
-  const translationFile = `src/locale/messages.${formats[format].ext}`;
-  await expectFileToExist(translationFile);
-  await expectFileToMatch(translationFile, formats[format].sourceCheck);
-
-  if (format !== 'json') {
-    await expectFileToMatch(translationFile, `An introduction header for this sample`);
-  }
 
   // Make translations for each language.
   for (const { lang, translationReplacements } of langTranslations) {
     if (lang != sourceLocale) {
-      await copyFile(translationFile, `src/locale/messages.${lang}.${formats[format].ext}`);
+      await copyFile(translationFile, `src/locale/messages.${lang}.xlf`);
       for (const replacements of translationReplacements!) {
         await replaceInFile(
-          `src/locale/messages.${lang}.${formats[format].ext}`,
+          `src/locale/messages.${lang}.xlf`,
           new RegExp(replacements[0], 'g'),
           replacements[1] as string,
         );
       }
-      for (const replacement of formats[format].replacements) {
+
+      for (const replacement of [[/source/g, 'target']]) {
         await replaceInFile(
-          `src/locale/messages.${lang}.${formats[format].ext}`,
+          `src/locale/messages.${lang}.xlf`,
           new RegExp(replacement[0], 'g'),
           replacement[1] as string,
         );
