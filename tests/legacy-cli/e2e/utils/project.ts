@@ -177,17 +177,18 @@ export async function useCIChrome(projectDir: string = ''): Promise<void> {
   const karmaConf = path.join(projectDir, 'karma.conf.js');
 
   const chromePath = require('puppeteer').executablePath();
-  const protractorPath = require.resolve('protractor');
-  const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
-    paths: [protractorPath],
-  });
-  const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
-    chrome: { last: string };
-  };
-  const chromeDriverPath = webdriverUpdate.chrome.last;
 
   // Use Puppeteer in protractor if a config is found on the project.
   if (fs.existsSync(protractorConf)) {
+    const protractorPath = require.resolve('protractor');
+    const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
+      paths: [protractorPath],
+    });
+    const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
+      chrome: { last: string };
+    };
+    const chromeDriverPath = webdriverUpdate.chrome.last;
+
     await replaceInFile(
       protractorConf,
       `browserName: 'chrome'`,
