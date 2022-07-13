@@ -18,7 +18,7 @@ export default async function () {
     await setRegistry(false);
     await createProjectFromAsset('13.0-project', true);
 
-    // A missing stylesheet error will trigger the stuck process issue with v12 when building
+    // A missing stylesheet error will trigger the stuck process issue with v13 when building
     await moveFile('src/styles.css', 'src/styles.scss');
     await expectToFail(() => noSilentNg('build'));
 
