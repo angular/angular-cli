@@ -1,3 +1,48 @@
+<a name="14.1.0-rc.0"></a>
+
+# 14.1.0-rc.0 (2022-07-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [2731fe7f6](https://github.com/angular/angular-cli/commit/2731fe7f67f3f2b81fae2f49aabba75436eda250) | fix  | handle cases when completion is enabled and running in an older CLI workspace |
+| [669345998](https://github.com/angular/angular-cli/commit/669345998b7720b0e7be53aaee920a385cb8ef86) | fix  | remove deprecation warning of `no` prefixed schema options                    |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [b8bf3b480](https://github.com/angular/angular-cli/commit/b8bf3b480bef752641370e542ebb5aee649a8ac6) | fix  | only issue a warning for addDependency existing specifier |
+| [14f8f5c5a](https://github.com/angular/angular-cli/commit/14f8f5c5abef19807b3cd2a17aa132117a03a54a) | fix  | remove browserslist configuration                         |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------- |
+| [248860ad6](https://github.com/angular/angular-cli/commit/248860ad674b54f750bb5c197588bb6d031be208) | feat | add Sass file support to experimental esbuild-based builder                                   |
+| [b3a14d056](https://github.com/angular/angular-cli/commit/b3a14d05629ba6e3b23c09b1bfdbc4b35d534813) | fix  | allow third-party sourcemaps to be ignored in esbuild builder                                 |
+| [53dd929e5](https://github.com/angular/angular-cli/commit/53dd929e59f98a7088d150e861d18e97e6de4114) | fix  | ensure esbuild builder sourcemap sources are relative to workspace                            |
+| [357c45e48](https://github.com/angular/angular-cli/commit/357c45e48431f9a6d79469a48e344dfc0132664f) | fix  | generate different content hashes for scripts which are changed during the optimization phase |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [624e0b0ec](https://github.com/angular/angular-cli/commit/624e0b0ec6d74d87914a2385cc42f0108beebbcc) | fix  | provide actionable warning when a workspace project has missing `root` property |
+
+### @angular/create
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [cfe93fbc8](https://github.com/angular/angular-cli/commit/cfe93fbc89fad2f58826f0118ce7ff421cd0e4f2) | feat | add support for `yarn create` and `npm init` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Jason Bedard and martinfrancois
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.6"></a>
 
 # 14.0.6 (2022-07-13)
