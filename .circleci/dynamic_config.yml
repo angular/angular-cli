@@ -22,9 +22,28 @@ parameters:
 ## IMPORTANT
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &cache_key v3-angular_devkit-14.17-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win v3-angular_devkit-win-16.10-{{ checksum "yarn.lock" }}
+var_1: &cache_key v4-angular_devkit-14.17-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v4-angular_devkit-win-16.10-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion '14.17'
+var_4: &cache_paths
+  - node_modules
+  - packages/angular/cli/node_modules
+  - packages/angular/create/node_modules
+  - packages/angular/cwa/node_modules
+  - packages/angular_devkit/architect_cli/node_modules
+  - packages/angular_devkit/architect_cli/node_modules
+  - packages/angular_devkit/benchmark/node_modules
+  - packages/angular_devkit/build_angular/node_modules
+  - packages/angular_devkit/build_webpack/node_modules
+  - packages/angular_devkit/core/node_modules
+  - packages/angular_devkit/schematics/node_modules
+  - packages/angular_devkit/schematics_cli/node_modules
+  - packages/ngtools/webpack/node_modules
+  - packages/schematics/angular/node_modules
+  # Path where Arsenal Image Mounter files are downloaded.
+  # Must match path in .circleci/win-ram-disk.ps1
+  - ./aim
+
 # Filter to only release branches on a given job.
 var_5: &only_release_branches
   filters:
@@ -148,10 +167,6 @@ jobs:
     executor: action-executor
     steps:
       - setup_linux
-      - save_cache:
-          key: *cache_key
-          paths:
-            - node_modules
       - run: yarn lint
 
   validate:
@@ -243,6 +258,10 @@ jobs:
     executor: action-executor
     steps:
       - setup_linux
+      - save_cache:
+          key: *cache_key
+          paths: *cache_paths
+
       - run: yarn build
 
   build-bazel-e2e:
@@ -316,11 +335,7 @@ jobs:
       - run: yarn install --frozen-lockfile --non-interactive
       - save_cache:
           key: *cache_key_win
-          paths:
-            - node_modules
-            # Path where Arsenal Image Mounter files are downloaded.
-            # Must match path in .circleci/win-ram-disk.ps1
-            - ./aim
+          paths: *cache_paths
       # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
       - run:
           name: Execute E2E Tests
