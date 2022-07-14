@@ -123,6 +123,9 @@ commands:
       - restore_cache:
           keys:
             - *cache_key
+      - run:
+          name: Initialize Environment
+          command: ./.circleci/env.sh
       - run: yarn install --frozen-lockfile --non-interactive
 
   setup_bazel_rbe:
@@ -209,10 +212,6 @@ jobs:
       - setup_linux
       - browser-tools/install-chrome
       - run:
-          name: Initialize Environment
-          command: |
-            ./.circleci/env.sh
-      - run:
           name: Execute CLI E2E Tests
           command: |
             mkdir /mnt/ramdisk/e2e-main
@@ -237,9 +236,6 @@ jobs:
     resource_class: medium
     steps:
       - setup_linux
-      - run:
-          name: Initialize Environment
-          command: ./.circleci/env.sh
       - run:
           name: Initialize Saucelabs
           command: setSecretVar SAUCE_ACCESS_KEY $(echo $SAUCE_ACCESS_KEY | rev)

@@ -8,7 +8,6 @@ readonly envHelpersPath="$projectDir/.circleci/env-helpers.inc.sh";
 source $envHelpersPath;
 echo "source $envHelpersPath;" >> $BASH_ENV;
 
-
 ####################################################################################################
 # Define PUBLIC environment variables for CircleCI.
 ####################################################################################################
@@ -33,3 +32,6 @@ setPublicVar SAUCE_READY_FILE_TIMEOUT 120
 
 # Source `$BASH_ENV` to make the variables available immediately.
 source $BASH_ENV;
+
+# Disable husky
+setPublicVar HUSKY 0
