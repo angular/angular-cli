@@ -9,6 +9,7 @@ workflows:
   run_filter:
     jobs:
       - path-filtering/filter:
+          name: setup
           # Compare files on main
           base-revision: main
           # 3-column space-separated table for mapping; `path-to-test parameter-to-set value-for-parameter` for each row
