@@ -354,26 +354,6 @@ workflows:
           requires:
             - build
 
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          nodeversion: '16.10'
-          snapshots: true
-          pre-steps:
-            - run:
-                name: Check if e2e snapshots should be executed.
-                command: >
-                  if [[ "<<pipeline.parameters.snapshot_changed>>" != "true" ]] && [[ -n "{$CIRCLE_PULL_REQUEST}" ]]; then
-                    circleci-agent step halt
-                  fi
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - main
-                # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
-                - /^pull\/.*/
-
       # Bazel jobs
       # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
       # will catch any build errors before proceeding to the more lengthy and resource intensive
@@ -398,3 +378,15 @@ workflows:
           <<: *only_release_branches
           requires:
             - e2e-cli
+
+  snapshots_workflow:
+    # Only run snapshots on the main branch or when the files has changes
+    when:
+      or:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.snapshot_changed >>
+    jobs:
+      - e2e-cli:
+          name: e2e-cli-ng-snapshots
+          nodeversion: '16.10'
+          snapshots: true
