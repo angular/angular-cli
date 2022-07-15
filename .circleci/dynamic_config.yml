@@ -303,7 +303,7 @@ jobs:
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
-    parallelism: 9
+    parallelism: 16
     steps:
       - checkout
       - run:

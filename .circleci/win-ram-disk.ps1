@@ -27,4 +27,4 @@ if (-not (Test-Path -Path $aimContents)) {
 
 # Setup RAM disk mount. Same parameters as ImDisk
 # See: https://support.circleci.com/hc/en-us/articles/4411520952091-Create-a-windows-RAM-disk
-./aim/cli/x64/aim_ll.exe -a -s 5G -m X: -p "/fs:ntfs /q /y"
+./aim/cli/x64/aim_ll.exe -a -s 4G -m X: -p "/fs:ntfs /q /y"
