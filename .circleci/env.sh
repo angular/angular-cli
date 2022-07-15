@@ -33,3 +33,6 @@ setPublicVar SAUCE_READY_FILE_TIMEOUT 120
 
 # Source `$BASH_ENV` to make the variables available immediately.
 source $BASH_ENV;
+
+# Disable husky.
+setPublicVar HUSKY 0
