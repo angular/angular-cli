@@ -37,6 +37,8 @@ var_5: &only_release_branches
         - main
         - /\d+\.\d+\.x/
 
+var_6: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
+
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
 executors:
@@ -206,7 +208,7 @@ jobs:
       - run: yarn -s admin validate
       - run: yarn -s check-tooling-setup
 
-  e2e-cli:
+  e2e-tests:
     parameters:
       nodeversion:
         type: string
@@ -214,6 +216,10 @@ jobs:
       snapshots:
         type: boolean
         default: false
+      subset:
+        type: enum
+        enum: *all_e2e_subsets
+        default: 'npm'
     executor:
       name: test-executor
       nodeversion: << parameters.nodeversion >>
@@ -222,21 +228,31 @@ jobs:
       - custom_attach_workspace
       - browser-tools/install-chrome
       - initialize_env
-      - run:
-          name: Execute CLI E2E Tests
-          command: |
-            mkdir /mnt/ramdisk/e2e-main
-            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e-main
-      - run:
-          name: Execute CLI E2E Tests Subset with Yarn
-          command: |
-            mkdir /mnt/ramdisk/e2e-yarn
-            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e-yarn --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
-      - run:
-          name: Execute CLI E2E Tests Subset with esbuild builder
-          command: |
-            mkdir /mnt/ramdisk/e2e-esbuild
-            node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --esbuild --tmpdir=/mnt/ramdisk/e2e-esbuild --glob="{tests/basic/**,tests/build/prod-build.ts,tests/build/relative-sourcemap.ts,tests/build/styles/scss.ts,tests/build/styles/include-paths.ts,tests/commands/add/add-pwa.ts}" --ignore="tests/basic/{environment,rebuild,serve,scripts-array}.ts"
+      - run: mkdir /mnt/ramdisk/e2e
+      - when:
+          condition:
+            equal: ['npm', << parameters.subset >>]
+          steps:
+            - run:
+                name: Execute CLI E2E Tests with NPM
+                command: |
+                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e
+      - when:
+          condition:
+            equal: ['esbuild', << parameters.subset >>]
+          steps:
+            - run:
+                name: Execute CLI E2E Tests Subset with Esbuild
+                command: |
+                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --esbuild --tmpdir=/mnt/ramdisk/e2e --glob="{tests/basic/**,tests/build/prod-build.ts,tests/build/relative-sourcemap.ts,tests/build/styles/scss.ts,tests/build/styles/include-paths.ts,tests/commands/add/add-pwa.ts}" --ignore="tests/basic/{environment,rebuild,serve,scripts-array}.ts"
+      - when:
+          condition:
+            equal: ['yarn', << parameters.subset >>]
+          steps:
+            - run:
+                name: Execute CLI E2E Tests Subset with Yarn
+                command: |
+                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
       - fail_fast
 
   test-browsers:
@@ -361,22 +377,37 @@ workflows:
           requires:
             - setup
 
-      - e2e-cli:
-          name: e2e-cli
+      - e2e-tests:
+          name: e2e-cli-<< matrix.subset >>
           nodeversion: '14.15'
+          matrix:
+            parameters:
+              subset: *all_e2e_subsets
+          filters:
+            branches:
+              ignore:
+                - main
+                - /\d+\.\d+\.x/
           requires:
             - build
 
-      - e2e-cli:
-          name: e2e-cli-node-16
-          nodeversion: '16.10'
+      - e2e-tests:
+          name: e2e-cli-node-<<matrix.nodeversion>>-<< matrix.subset >>
+          matrix:
+            alias: e2e-cli
+            parameters:
+              nodeversion: ['14.15', '16.10']
+              subset: *all_e2e_subsets
+          requires:
+            - build
           <<: *only_release_branches
-          requires:
-            - build
 
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
+      - e2e-tests:
+          name: e2e-snapshots-<< matrix.subset >>
           nodeversion: '16.10'
+          matrix:
+            parameters:
+              subset: *all_e2e_subsets
           snapshots: true
           pre-steps:
             - when:
