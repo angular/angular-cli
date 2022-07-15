@@ -81,6 +81,12 @@ commands:
           command: |
             curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
 
+  initialize_env:
+    steps:
+      - run:
+          name: Initialize Environment
+          command: ./.circleci/env.sh
+
   custom_attach_workspace:
     description: Attach workspace at a predefined location
     steps:
@@ -88,6 +94,7 @@ commands:
           at: *workspace_location
   setup_windows:
     steps:
+      - initialize_env
       - run: nvm install 16.10
       - run: nvm use 16.10
       - run: npm install -g yarn@1.22.10
@@ -150,6 +157,7 @@ jobs:
             else
               echo "This build is not over a PR, nothing to do."
             fi
+      - initialize_env
       - restore_cache:
           keys:
             - *cache_key
@@ -208,10 +216,7 @@ jobs:
     steps:
       - custom_attach_workspace
       - browser-tools/install-chrome
-      - run:
-          name: Initialize Environment
-          command: |
-            ./.circleci/env.sh
+      - initialize_env
       - run:
           name: Execute CLI E2E Tests
           command: |
@@ -237,9 +242,7 @@ jobs:
     resource_class: medium
     steps:
       - custom_attach_workspace
-      - run:
-          name: Initialize Environment
-          command: ./.circleci/env.sh
+      - initialize_env
       - run:
           name: Initialize Saucelabs
           command: setSecretVar SAUCE_ACCESS_KEY $(echo $SAUCE_ACCESS_KEY | rev)
