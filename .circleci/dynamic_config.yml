@@ -382,12 +382,15 @@ workflows:
           nodeversion: '16.10'
           snapshots: true
           pre-steps:
-            - run:
-                name: Check if e2e snapshots should be executed.
-                command: >
-                  if [[ "<<pipeline.parameters.snapshot_changed>>" != "true" ]] && [[ -n "{$CIRCLE_PULL_REQUEST}" ]]; then
-                    circleci-agent step halt
-                  fi
+            - when:
+                condition:
+                  and:
+                    - not:
+                        equal: [main, << pipeline.git.branch >>]
+                    - not: << pipeline.parameters.snapshot_changed >>
+                steps:
+                  # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
+                  - run: circleci-agent step halt
           requires:
             - build
           filters:
