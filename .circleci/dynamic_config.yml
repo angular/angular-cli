@@ -77,6 +77,7 @@ commands:
     steps:
       - run:
           name: 'Cancel workflow on fail'
+          shell: bash
           when: on_fail
           command: |
             curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
