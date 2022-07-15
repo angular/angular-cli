@@ -81,6 +81,22 @@ commands:
           command: |
             curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
 
+  rebase_pr:
+    steps:
+      - run:
+          name: Rebase PR on target branch
+          shell: bash
+          command: >
+            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+              # User is required for rebase.
+              git config user.name "angular-ci"
+              git config user.email "angular-ci"
+              # Rebase PR on top of target branch.
+              node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
+            else
+              echo "This build is not over a PR, nothing to do."
+            fi
+
   custom_attach_workspace:
     description: Attach workspace at a predefined location
     steps:
@@ -138,18 +154,7 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run:
-          name: Rebase PR on target branch
-          command: >
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              # User is required for rebase.
-              git config user.name "angular-ci"
-              git config user.email "angular-ci"
-              # Rebase PR on top of target branch.
-              node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
-            else
-              echo "This build is not over a PR, nothing to do."
-            fi
+      - rebase_pr
       - restore_cache:
           keys:
             - *cache_key
@@ -306,18 +311,7 @@ jobs:
     parallelism: 8
     steps:
       - checkout
-      - run:
-          name: Rebase PR on target branch
-          command: |
-            if (Test-Path env:CIRCLE_PR_NUMBER) {
-              # User is required for rebase.
-              git config user.name "angular-ci"
-              git config user.email "angular-ci"
-              # Rebase PR on top of target branch.
-              node tools/rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER
-            } else {
-              echo "This build is not over a PR, nothing to do."
-            }
+      - rebase_pr
       - setup_windows
       - restore_cache:
           keys:
