@@ -1,10 +1,10 @@
-$aimCache = "../.cache/aim";
-$aimContents = "./aim";
-
-$aimDrivers = $aimCache + "/aim_drivers.zip"
-$aimCli = $aimCache + "/aim_ll.zip"
+$aimCache = "./aim";
 
 if (-not (Test-Path -Path $aimCache)) {
+
+  $aimDrivers = $aimCache + "/aim_drivers.zip"
+  $aimCli = $aimCache + "/aim_ll.zip"
+
   echo "Arsenal Image Mounter files not found in cache. Downloading..."
 
   New-Item -Type Directory -Path $aimCache
@@ -25,6 +25,3 @@ if (-not (Test-Path -Path $aimCache)) {
 } else {
   echo "Arsenal Image Mounter files found in cache. Skipping download."
 }
-
-Expand-Archive -Path $aimDrivers -DestinationPath $aimContents/drivers
-Expand-Archive -Path $aimCli -DestinationPath $aimContents/cli

@@ -23,7 +23,7 @@ parameters:
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-14.19-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win v1-angular_devkit-win-16.10.0-{{ checksum "yarn.lock" }}
+var_1_win: &cache_key_win v2-angular_devkit-win-16.10-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion '14.19'
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
@@ -328,7 +328,7 @@ jobs:
             - ~/.cache/yarn
             # Path where Arsenal Image Mounter files are downloaded.
             # Must match path in .circleci/win-ram-disk.ps1
-            - ~/.cache/aim
+            - ./aim
       - persist_to_workspace:
           root: *workspace_location
           paths:
@@ -337,7 +337,7 @@ jobs:
   e2e-cli-win:
     executor: windows-executor
     resource_class: windows.large
-    parallelism: 16
+    parallelism: 12
     steps:
       - custom_attach_workspace
       - run: nvm install 16.10
@@ -348,6 +348,9 @@ jobs:
           # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
           name: 'Setup Arsenal Image Mounter (RAM Disk)'
           command: |
+            Expand-Archive -Path ./aim/aim_drivers.zip -DestinationPath ./aim/drivers
+            Expand-Archive -Path ./aim/aim_ll.zip -DestinationPath ./aim/cli
+
             # Install AIM drivers
             ./aim/cli/x64/aim_ll.exe --install ./aim/drivers
 
