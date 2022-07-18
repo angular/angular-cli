@@ -162,6 +162,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         exclude_prefixes = [
             "packages",  # Exclude compiled outputs of dependent packages
         ],
+        allow_overwrites = True,
     )
 
     _pkg_npm(
