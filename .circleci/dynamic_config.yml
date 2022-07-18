@@ -309,19 +309,25 @@ jobs:
             } else {
               echo "This build is not over a PR, nothing to do."
             }
-      - run: nvm install 16.10
-      - run: nvm use 16.10
-      - run: npm install -g yarn@1.22.10
       - restore_cache:
           keys:
             - *cache_key_win
       - run:
           # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
           # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
-          name: 'Download Arsenal Image Mounter (RAM Disk)'
+          name: 'Setup Arsenal Image Mounter (RAM Disk)'
           command: |
             pwsh ./.circleci/win-ram-disk.ps1
-      - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
+      - run:
+          name: Copy files to RAM Disk
+          shell: bash
+          command: |
+            mkdir X:/ramdisk
+            cp -r . X:/ramdisk/ng --verbose
+      - run: nvm install 16.10
+      - run: nvm use 16.10
+      - run: npm install -g yarn@1.22.10
+      - run: yarn --cwd X:/ramdisk/ng install --frozen-lockfile --cache-folder ../.cache/yarn
       - save_cache:
           key: *cache_key_win
           paths:
@@ -330,10 +336,9 @@ jobs:
             # Must match path in .circleci/win-ram-disk.ps1
             - ./aim
       - persist_to_workspace:
-          root: *workspace_location
+          root: X:/ramdisk/ng
           paths:
             - ./*
-
   e2e-cli-win:
     executor: windows-executor
     resource_class: windows.large
@@ -348,14 +353,7 @@ jobs:
           # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
           name: 'Setup Arsenal Image Mounter (RAM Disk)'
           command: |
-            Expand-Archive -Path ./aim/aim_drivers.zip -DestinationPath ./aim/drivers
-            Expand-Archive -Path ./aim/aim_ll.zip -DestinationPath ./aim/cli
-
-            # Install AIM drivers
-            ./aim/cli/x64/aim_ll.exe --install ./aim/drivers
-
-            # Setup RAM disk mount. Same parameters as ImDisk
-            ./aim/cli/x64/aim_ll.exe -a -s 4G -m X: -p "/fs:ntfs /q /y"
+            pwsh ./.circleci/win-ram-disk.ps1
       - run:
           name: Execute E2E Tests
           command: |
