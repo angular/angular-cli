@@ -386,7 +386,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
                 supportedBrowsers: buildOptions.supportedBrowsers,
                 instrumentCode: codeCoverage
                   ? {
-                      includedBasePath: sourceRoot,
+                      includedBasePath: sourceRoot ?? projectRoot,
                       excludedPaths: getInstrumentationExcludedPaths(root, codeCoverageExclude),
                     }
                   : undefined,
