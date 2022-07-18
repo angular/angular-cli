@@ -19,6 +19,7 @@ def ts_library(
         tsconfig = None,
         testonly = False,
         deps = [],
+        templated_args = [],
         devmode_module = None,
         devmode_target = None,
         **kwargs):

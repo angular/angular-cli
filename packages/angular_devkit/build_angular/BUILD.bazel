@@ -393,6 +393,7 @@ LARGE_SPECS = {
         # compete for the resources of other parallel tests slowing everything down.
         # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
         tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
+        templated_args = ["--nobazel_run_linker"],
         deps = [":build_angular_" + spec + "_test_lib"],
     )
     for spec in LARGE_SPECS
