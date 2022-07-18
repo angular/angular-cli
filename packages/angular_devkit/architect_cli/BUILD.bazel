@@ -24,7 +24,6 @@ ts_library(
         "@npm//@types/progress",
         "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
-        "@npm//rxjs",
     ],
 )
 

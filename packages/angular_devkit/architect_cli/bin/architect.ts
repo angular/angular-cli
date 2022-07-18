@@ -14,7 +14,6 @@ import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
 import * as path from 'path';
-import { tap } from 'rxjs/operators';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 import { MultiProgressBar } from '../src/progress';
 
@@ -151,27 +150,22 @@ async function _executeTarget(
 
   // Wait for full completion of the builder.
   try {
-    const { success } = await run.output
-      .pipe(
-        tap((result) => {
-          if (result.success) {
-            parentLogger.info(colors.green('SUCCESS'));
-          } else {
-            parentLogger.info(colors.red('FAILURE'));
-          }
-          parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
+    const result = await run.output.toPromise();
+    if (result.success) {
+      parentLogger.info(colors.green('SUCCESS'));
+    } else {
+      parentLogger.info(colors.red('FAILURE'));
+    }
+    parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
 
-          parentLogger.info('\nLogs:');
-          logs.forEach((l) => parentLogger.next(l));
-          logs.splice(0);
-        }),
-      )
-      .toPromise();
+    parentLogger.info('\nLogs:');
+    logs.forEach((l) => parentLogger.next(l));
+    logs.splice(0);
 
     await run.stop();
     bars.terminate();
 
-    return success ? 0 : 1;
+    return result.success ? 0 : 1;
   } catch (err) {
     parentLogger.info(colors.red('ERROR'));
     parentLogger.info('\nLogs:');
