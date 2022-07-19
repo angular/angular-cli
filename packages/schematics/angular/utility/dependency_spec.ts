@@ -15,7 +15,7 @@ import {
   callRule,
   chain,
 } from '@angular-devkit/schematics';
-import { DependencyType, InstallBehavior, addDependency } from './dependency';
+import { DependencyType, ExistingBehavior, InstallBehavior, addDependency } from './dependency';
 
 interface LogEntry {
   type: 'warn';
@@ -63,7 +63,7 @@ describe('addDependency', () => {
     });
   });
 
-  it('warns if a package is already present with a different specifier', async () => {
+  it('warns if a package is already present with a different specifier by default', async () => {
     const tree = new EmptyTree();
     tree.create(
       '/package.json',
@@ -83,6 +83,64 @@ describe('addDependency', () => {
           '"^13.0.0" will be replaced with "^14.0.0".',
       }),
     );
+  });
+
+  it('warns if a package is already present with a different specifier with replace behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        dependencies: { '@angular/core': '^13.0.0' },
+      }),
+    );
+
+    const rule = addDependency('@angular/core', '^14.0.0', { existing: ExistingBehavior.Replace });
+
+    const { logs } = await testRule(rule, tree);
+    expect(logs).toContain(
+      jasmine.objectContaining({
+        type: 'warn',
+        message:
+          'Package dependency "@angular/core" already exists with a different specifier. ' +
+          '"^13.0.0" will be replaced with "^14.0.0".',
+      }),
+    );
+  });
+
+  it('replaces the specifier if a package is already present with a different specifier with replace behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        dependencies: { '@angular/core': '^13.0.0' },
+      }),
+    );
+
+    const rule = addDependency('@angular/core', '^14.0.0', { existing: ExistingBehavior.Replace });
+
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual({
+      dependencies: { '@angular/core': '^14.0.0' },
+    });
+  });
+
+  it('does not replace the specifier if a package is already present with a different specifier with skip behavior', async () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        dependencies: { '@angular/core': '^13.0.0' },
+      }),
+    );
+
+    const rule = addDependency('@angular/core', '^14.0.0', { existing: ExistingBehavior.Skip });
+
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual({
+      dependencies: { '@angular/core': '^13.0.0' },
+    });
   });
 
   it('adds a package version with other packages in alphabetical order', async () => {
