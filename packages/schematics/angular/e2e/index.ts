@@ -20,6 +20,7 @@ import {
 import {
   AngularBuilder,
   DependencyType,
+  ExistingBehavior,
   addDependency,
   updateWorkspace,
 } from '@schematics/angular/utility';
@@ -92,7 +93,10 @@ export default function (options: E2eOptions): Rule {
         ]),
       ),
       ...E2E_DEV_DEPENDENCIES.map((name) =>
-        addDependency(name, latestVersions[name], { type: DependencyType.Dev }),
+        addDependency(name, latestVersions[name], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+        }),
       ),
       addScriptsToPackageJson(),
     ]);

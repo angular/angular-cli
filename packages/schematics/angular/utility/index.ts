@@ -18,4 +18,4 @@ export {
 export { Builders as AngularBuilder } from './workspace-models';
 
 // Package dependency related rules and types
-export { DependencyType, InstallBehavior, addDependency } from './dependency';
+export { DependencyType, ExistingBehavior, InstallBehavior, addDependency } from './dependency';
