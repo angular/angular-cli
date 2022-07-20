@@ -73,11 +73,11 @@
     "esbuild": "0.14.49"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next || ^14.1.0-next",
-    "@angular/localize": "^14.0.0 || ^14.0.0-next || ^14.1.0-next",
-    "@angular/service-worker": "^14.0.0 || ^14.0.0-next || ^14.1.0-next",
+    "@angular/compiler-cli": "^14.0.0",
+    "@angular/localize": "^14.0.0",
+    "@angular/service-worker": "^14.0.0",
     "karma": "^6.3.0",
-    "ng-packagr": "^14.0.0 || ^14.0.0-next || ^14.1.0-next",
+    "ng-packagr": "^14.0.0",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
     "typescript": ">=4.6.2 <4.8"
