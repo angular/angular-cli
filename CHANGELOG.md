@@ -1,3 +1,19 @@
+<a name="13.3.9"></a>
+
+# 13.3.9 (2022-07-20)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [0d62716ae](https://github.com/angular/angular-cli/commit/0d62716ae3753bb463de6b176ae07520ebb24fc9) | fix  | update terser to address CVE-2022-25858 |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.0-rc.3"></a>
 
 # 14.1.0-rc.3 (2022-07-14)
