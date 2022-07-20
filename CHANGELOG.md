@@ -1,3 +1,32 @@
+<a name="14.0.7"></a>
+
+# 14.0.7 (2022-07-20)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [f653bf4fb](https://github.com/angular/angular-cli/commit/f653bf4fbb69b9e0fa0e6440a88a30f17566d9a3) | fix  | incorrect logo for Angular Material |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [5810c2cc2](https://github.com/angular/angular-cli/commit/5810c2cc2dd21e5922a5eaa330e854e4327a0500) | fix  | fallback to use projectRoot when sourceRoot is missing during coverage |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [2ba4678b6](https://github.com/angular/angular-cli/commit/2ba4678b6ba2164e80cb661758565c133e08afaa) | fix  | add i18n as valid project extension |
+| [c2201c835](https://github.com/angular/angular-cli/commit/c2201c835801ef9c1cc6cacec2748c8ca341519d) | fix  | log name of invalid extension too   |
+
+## Special Thanks
+
+Alan Agius, Fortunato Ventre, Katerina Skroumpelou and Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.0.6"></a>
 
 # 14.0.6 (2022-07-13)
