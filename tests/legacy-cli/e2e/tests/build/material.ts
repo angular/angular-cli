@@ -1,13 +1,15 @@
+import { SemVer } from 'semver';
 import { getGlobalVariable } from '../../utils/env';
 import { replaceInFile } from '../../utils/fs';
 import { installPackage, installWorkspacePackages } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
+import { readNgVersion } from '../../utils/version';
 
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  const tag = await isPrereleaseCli() ?  '@next' : '';
+  const tag = (await isPrereleaseCli()) ? '@next' : `@${new SemVer(readNgVersion()).major}`;
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
@@ -28,7 +30,7 @@ export default async function () {
 
     await installWorkspacePackages();
   } else {
-    await installPackage('@angular/material-moment-adapter');
+    await installPackage(`@angular/material-moment-adapter${tag}`);
   }
 
   await installPackage('moment');
