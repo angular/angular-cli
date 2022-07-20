@@ -1,3 +1,13 @@
+<a name="14.1.0-rc.0"></a>
+
+# 14.1.0-rc.0 (2022-07-20)
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.0-next.2"></a>
 
 # 14.1.0-next.2 (2022-07-06)
