@@ -123,11 +123,19 @@ const tests = allTests.filter((name) => {
 const testsToRun = tests.filter((name, i) => shardId === null || i % nbShards == shardId);
 
 if (testsToRun.length === 0) {
-  console.log(`No tests would be ran, aborting.`);
-  process.exit(1);
+  if (shardId !== null && tests.length >= shardId ? 1 : 0) {
+    console.log(`No tests to run on shard ${shardId}, exiting.`);
+    process.exit(0);
+  } else {
+    console.log(`No tests would be ran, aborting.`);
+    process.exit(1);
+  }
 }
 
-console.log(testsToRun.join('\n'));
+if (shardId !== null) {
+  console.log(`Running shard ${shardId} of ${nbShards}`);
+}
+
 /**
  * Load all the files from the e2e, filter and sort them and build a promise of their default
  * export.
@@ -137,6 +145,8 @@ if (testsToRun.length == allTests.length) {
 } else {
   console.log(`Running ${testsToRun.length} tests (${allTests.length} total)`);
 }
+
+console.log(['Tests:', ...testsToRun].join('\n '));
 
 setGlobalVariable('argv', argv);
 setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
@@ -156,7 +166,11 @@ Promise.all([findFreePort(), findFreePort()])
       await runSteps(runInitializer, allInitializers, 'initializer');
       await runSteps(runTest, testsToRun, 'test');
 
-      console.log(colors.green('Done.'));
+      if (shardId !== null) {
+        console.log(colors.green(`Done shard ${shardId} of ${nbShards}.`));
+      } else {
+        console.log(colors.green('Done.'));
+      }
     } catch (err) {
       if (err instanceof Error) {
         console.log('\n');
@@ -164,6 +178,8 @@ Promise.all([findFreePort(), findFreePort()])
         if (err.stack) {
           console.error(colors.red(err.stack));
         }
+      } else {
+        console.error(colors.red(String(err)));
       }
 
       if (argv.debug) {
@@ -192,6 +208,8 @@ async function runSteps(
   steps: string[],
   type: 'setup' | 'test' | 'initializer',
 ) {
+  const capsType = type[0].toUpperCase() + type.slice(1);
+
   for (const [stepIndex, relativeName] of steps.entries()) {
     // Make sure this is a windows compatible path.
     let absoluteName = path.join(e2eRoot, relativeName).replace(/\.ts$/, '');
@@ -210,7 +228,8 @@ async function runSteps(
       await run(absoluteName);
     } catch (e) {
       console.log('\n');
-      console.error(colors.red(`Step "${absoluteName}" failed...`));
+      console.error(colors.red(`${capsType} "${name}" failed...`));
+
       throw e;
     } finally {
       logStack.pop();
@@ -272,8 +291,14 @@ function printHeader(
 }
 
 function printFooter(testName: string, type: 'setup' | 'initializer' | 'test', startTime: number) {
+  const capsType = type[0].toUpperCase() + type.slice(1);
+
   // Round to hundredth of a second.
   const t = Math.round((Date.now() - startTime) / 10) / 100;
-  console.log(colors.green(`Last ${type} took `) + colors.bold.blue('' + t) + colors.green('s...'));
+  console.log(
+    colors.green(`${capsType} "${colors.bold.blue(testName)}" took `) +
+      colors.bold.blue('' + t) +
+      colors.green('s...'),
+  );
   console.log('');
 }
