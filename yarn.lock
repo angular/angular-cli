@@ -7947,10 +7947,10 @@ next-tick@1, next-tick@^1.1.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
   integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
 
-ng-packagr@14.0.4:
-  version "14.0.4"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-14.0.4.tgz#0dec63d7e829f0aa728d2c90829c35f881e9242c"
-  integrity sha512-GqrokUDpJTYoKKwIFJK+daiOff+G4oVlV7KVfIicpSwg2R++FCWolRCwqn571wMEHssyH8qIsDYSRocA4YLRFA==
+ng-packagr@14.1.0:
+  version "14.1.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-14.1.0.tgz#f0d3b291dd3d361b90acd6cebe8af41c35597414"
+  integrity sha512-08B+bOp53YhmPobI1tK0YwGUAysden/PHtBUtmLaJxIHYVZqzH/RIFVaZLx+k+70TFqs+P2Hjpmo3wblWqFzxg==
   dependencies:
     "@rollup/plugin-json" "^4.1.0"
     "@rollup/plugin-node-resolve" "^13.1.3"
