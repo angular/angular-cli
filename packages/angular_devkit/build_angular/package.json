@@ -61,7 +61,7 @@
     "source-map-support": "0.5.21",
     "stylus": "0.56.0",
     "stylus-loader": "6.2.0",
-    "terser": "5.11.0",
+    "terser": "5.14.2",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
