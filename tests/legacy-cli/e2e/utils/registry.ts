@@ -1,9 +1,8 @@
 import { spawn } from 'child_process';
-import { mkdtempSync, realpathSync } from 'fs';
-import { tmpdir } from 'os';
 import { join } from 'path';
 import { getGlobalVariable } from './env';
 import { writeFile, readFile } from './fs';
+import { mktempd } from './utils';
 
 export async function createNpmRegistry(
   port: number,
@@ -11,7 +10,7 @@ export async function createNpmRegistry(
   withAuthentication = false,
 ) {
   // Setup local package registry
-  const registryPath = mkdtempSync(join(realpathSync(tmpdir()), 'angular-cli-e2e-registry-'));
+  const registryPath = await mktempd('angular-cli-e2e-registry-');
 
   let configContent = await readFile(
     join(__dirname, '../../', withAuthentication ? 'verdaccio_auth.yaml' : 'verdaccio.yaml'),
