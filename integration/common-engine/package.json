@@ -46,7 +46,7 @@
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
     "@nguniversal/builders": "file:../../dist/modules-dist/builders",
     "codelyzer": "6.0.2",
-    "concurrently": "7.2.2",
+    "concurrently": "7.3.0",
     "jasmine-core": "4.2.0",
     "jasmine-spec-reporter": "7.0.0",
     "karma": "6.4.0",
