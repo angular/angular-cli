@@ -1,3 +1,19 @@
+<a name="12.2.18"></a>
+
+# 12.2.18 (2022-07-21)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [4d723ca95](https://github.com/angular/angular-cli/commit/4d723ca95913fd8643059d22151571f240cec998) | fix  | update terser to address CVE-2022-25858 |
+
+## Special Thanks
+
+Alan Agius, Joey Perrott and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="12.2.17"></a>
 
 # 12.2.17 (2022-03-31)
