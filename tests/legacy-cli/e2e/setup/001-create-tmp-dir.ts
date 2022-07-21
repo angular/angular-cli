@@ -1,9 +1,8 @@
-import { mkdtempSync, realpathSync } from 'fs';
-import { tmpdir } from 'os';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 import { getGlobalVariable, setGlobalVariable } from '../utils/env';
+import { mktempd } from '../utils/utils';
 
-export default function () {
+export default async function () {
   const argv = getGlobalVariable('argv');
 
   // Get to a temporary directory.
@@ -13,7 +12,7 @@ export default function () {
   } else if (argv.tmpdir) {
     tempRoot = argv.tmpdir;
   } else {
-    tempRoot = mkdtempSync(join(realpathSync(tmpdir()), 'angular-cli-e2e-'));
+    tempRoot = await mktempd('angular-cli-e2e-');
   }
   console.log(`  Using "${tempRoot}" as temporary directory for a new project.`);
   setGlobalVariable('tmp-root', tempRoot);
