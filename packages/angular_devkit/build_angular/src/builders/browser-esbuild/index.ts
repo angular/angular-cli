@@ -149,7 +149,10 @@ export async function buildEsbuildBrowser(
     const { entryPoints: stylesheetEntrypoints, noInjectNames } = resolveGlobalStyles(
       options.styles,
       workspaceRoot,
-      !!options.preserveSymlinks,
+      // preserveSymlinks is always true here to allow the bundler to handle the option
+      true,
+      // skipResolution to leverage the bundler's more comprehensive resolution
+      true,
     );
     for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
       const virtualEntryData = files
@@ -164,6 +167,7 @@ export async function buildEsbuildBrowser(
           sourcemap: !!sourcemapOptions.styles && (sourcemapOptions.hidden ? 'external' : true),
           outputNames: noInjectNames.includes(name) ? { media: outputNames.media } : outputNames,
           includePaths: options.stylePreprocessorOptions?.includePaths,
+          preserveSymlinks: options.preserveSymlinks,
         },
       );
 

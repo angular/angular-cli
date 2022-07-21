@@ -30,6 +30,7 @@ export function resolveGlobalStyles(
   styleEntrypoints: StyleElement[],
   root: string,
   preserveSymlinks: boolean,
+  skipResolution = false,
 ): { entryPoints: Record<string, string[]>; noInjectNames: string[]; paths: string[] } {
   const entryPoints: Record<string, string[]> = {};
   const noInjectNames: string[] = [];
@@ -40,22 +41,25 @@ export function resolveGlobalStyles(
   }
 
   for (const style of normalizeExtraEntryPoints(styleEntrypoints, 'styles')) {
-    let resolvedPath = path.resolve(root, style.input);
-    if (!fs.existsSync(resolvedPath)) {
-      try {
-        resolvedPath = require.resolve(style.input, { paths: [root] });
-      } catch {}
+    let stylesheetPath = style.input;
+    if (!skipResolution) {
+      stylesheetPath = path.resolve(root, stylesheetPath);
+      if (!fs.existsSync(stylesheetPath)) {
+        try {
+          stylesheetPath = require.resolve(style.input, { paths: [root] });
+        } catch {}
+      }
     }
 
     if (!preserveSymlinks) {
-      resolvedPath = fs.realpathSync(resolvedPath);
+      stylesheetPath = fs.realpathSync(stylesheetPath);
     }
 
     // Add style entry points.
     if (entryPoints[style.bundleName]) {
-      entryPoints[style.bundleName].push(resolvedPath);
+      entryPoints[style.bundleName].push(stylesheetPath);
     } else {
-      entryPoints[style.bundleName] = [resolvedPath];
+      entryPoints[style.bundleName] = [stylesheetPath];
     }
 
     // Add non injected styles to the list.
@@ -64,7 +68,7 @@ export function resolveGlobalStyles(
     }
 
     // Add global css paths.
-    paths.push(resolvedPath);
+    paths.push(stylesheetPath);
   }
 
   return { entryPoints, noInjectNames, paths };

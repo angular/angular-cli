@@ -38,8 +38,8 @@ async function bundleStylesheet(
     write: false,
     platform: 'browser',
     preserveSymlinks: options.preserveSymlinks,
-    conditions: ['style'],
-    mainFields: ['style'],
+    conditions: ['style', 'sass'],
+    mainFields: ['style', 'sass'],
     plugins: [
       createSassPlugin({ sourcemap: !!options.sourcemap, includePaths: options.includePaths }),
     ],
