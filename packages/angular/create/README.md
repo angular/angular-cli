@@ -1,19 +1,25 @@
 # `@angular/create`
 
-# Create an Angular CLI workspace
+## Create an Angular CLI workspace
 
 Scaffold an Angular CLI workspace without needing to install the Angular CLI globally. All of the [ng new](https://angular.io/cli/new) options and features are supported.
 
-# Usage
+## Usage
 
-NPM
+### npm
 
 ```
 npm init @angular [project-name] -- [...options]
 ```
 
-Yarn
+### yarn
 
 ```
 yarn create @angular [project-name] [...options]
+```
+
+### pnpm
+
+```
+pnpm create @angular [project-name] [...options]
 ```
