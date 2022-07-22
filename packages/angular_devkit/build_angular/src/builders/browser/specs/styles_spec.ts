@@ -7,6 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
+import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { normalize, tags } from '@angular-devkit/core';
 import { dirname } from 'path';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
@@ -259,7 +260,19 @@ describe('Browser Builder styles', () => {
     });
   });
 
+  /**
+   * font-awesome mock to avoid having an extra dependency.
+   */
+  function mockFontAwesomePackage(host: TestProjectHost): void {
+    host.writeMultipleFiles({
+      'node_modules/font-awesome/scss/font-awesome.scss': `
+         * { color: red }
+      `,
+    });
+  }
+
   it(`supports font-awesome imports`, async () => {
+    mockFontAwesomePackage(host);
     host.writeMultipleFiles({
       'src/styles.scss': `
         @import "font-awesome/scss/font-awesome";
@@ -271,6 +284,7 @@ describe('Browser Builder styles', () => {
   });
 
   it(`supports font-awesome imports (tilde)`, async () => {
+    mockFontAwesomePackage(host);
     host.writeMultipleFiles({
       'src/styles.scss': `
         $fa-font-path: "~font-awesome/fonts";

@@ -349,7 +349,6 @@ LARGE_SPECS = {
             "@npm//@angular/animations",
             "@npm//@angular/material",
             "@npm//bootstrap",
-            "@npm//font-awesome",
             "@npm//jquery",
             "@npm//popper.js",
         ],
