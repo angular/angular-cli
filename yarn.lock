@@ -124,7 +124,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#80fc63daf535db5a7df49eb8c1dd2f86be28660a":
   version "0.0.0-66fefa85b03fe2265f8a564b1f72f06a08f66250"
-  uid "80fc63daf535db5a7df49eb8c1dd2f86be28660a"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#80fc63daf535db5a7df49eb8c1dd2f86be28660a"
   dependencies:
     "@angular-devkit/build-angular" "14.1.0-rc.3"
@@ -199,10 +198,17 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@14.1.0", "@angular/core@^13.0.0 || ^14.0.0-0":
+"@angular/core@14.1.0":
   version "14.1.0"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-14.1.0.tgz#5a0fa164ca180027d4c54a5b70e7357918f9af9b"
   integrity sha512-3quEsHmQifJOQ2oij5K+cjGjmhsKsyZI1+OTHWNZ6IXeuYviZv4U/Cui9fUJ1RN3CZxH3NzWB3gB/5qYFQfOgg==
+  dependencies:
+    tslib "^2.3.0"
+
+"@angular/core@^13.0.0 || ^14.0.0-0":
+  version "14.0.6"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-14.0.6.tgz#697d52ca9d772877a5138af26d1d9c5e7c267ade"
+  integrity sha512-hyQ3s9Yrm3ejhumgAC9ENhMFmvmPlJkk1tEOjruyoiHwK4EOaDpI+GCNQIBUB1Z3B/QLMlgZeMXrULQztjSQwg==
   dependencies:
     tslib "^2.3.0"
 
@@ -231,7 +237,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#64aa04a20d8b2f868322dab6e4ede0af46ed412f":
   version "0.0.0-66fefa85b03fe2265f8a564b1f72f06a08f66250"
-  uid "64aa04a20d8b2f868322dab6e4ede0af46ed412f"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#64aa04a20d8b2f868322dab6e4ede0af46ed412f"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -5760,11 +5765,6 @@ follow-redirects@^1.0.0, follow-redirects@^1.14.0:
   version "1.15.1"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
   integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
-
-font-awesome@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
-  integrity sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==
 
 foreground-child@^2.0.0:
   version "2.0.0"
