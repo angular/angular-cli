@@ -4,7 +4,6 @@
   "newProjectRoot": "./projects",
   "cli": {},
   "schematics": {},
-  "targets": {},
   "projects": {
     "app": {
       "root": "src",
