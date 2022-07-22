@@ -20,17 +20,33 @@ import { WorkspaceHost } from '../host';
 import { JsonWorkspaceMetadata, JsonWorkspaceSymbol } from './metadata';
 import { createVirtualAstObject } from './utilities';
 
+const ANGULAR_WORKSPACE_EXTENSIONS = Object.freeze([
+  'cli',
+  'defaultProject',
+  'newProjectRoot',
+  'schematics',
+]);
+const ANGULAR_PROJECT_EXTENSIONS = Object.freeze(['cli', 'schematics', 'projectType', 'i18n']);
+
 interface ParserContext {
   readonly host: WorkspaceHost;
   readonly metadata: JsonWorkspaceMetadata;
   readonly trackChanges: boolean;
+  readonly unprefixedWorkspaceExtensions: ReadonlySet<string>;
+  readonly unprefixedProjectExtensions: ReadonlySet<string>;
   error(message: string, node: JsonValue): void;
   warn(message: string, node: JsonValue): void;
+}
+
+export interface JsonWorkspaceOptions {
+  allowedProjectExtensions?: string[];
+  allowedWorkspaceExtensions?: string[];
 }
 
 export async function readJsonWorkspace(
   path: string,
   host: WorkspaceHost,
+  options: JsonWorkspaceOptions = {},
 ): Promise<WorkspaceDefinition> {
   const raw = await host.readFile(path);
   if (raw === undefined) {
@@ -56,6 +72,14 @@ export async function readJsonWorkspace(
     host,
     metadata: new JsonWorkspaceMetadata(path, ast, raw),
     trackChanges: true,
+    unprefixedWorkspaceExtensions: new Set([
+      ...ANGULAR_WORKSPACE_EXTENSIONS,
+      ...(options.allowedWorkspaceExtensions ?? []),
+    ]),
+    unprefixedProjectExtensions: new Set([
+      ...ANGULAR_PROJECT_EXTENSIONS,
+      ...(options.allowedProjectExtensions ?? []),
+    ]),
     error(message, _node) {
       // TODO: Diagnostic reporting support
       throw new Error(message);
@@ -71,10 +95,6 @@ export async function readJsonWorkspace(
 
   return workspace;
 }
-
-const specialWorkspaceExtensions = ['cli', 'defaultProject', 'newProjectRoot', 'schematics'];
-
-const specialProjectExtensions = ['cli', 'schematics', 'projectType', 'i18n'];
 
 function parseWorkspace(workspaceNode: Node, context: ParserContext): WorkspaceDefinition {
   const jsonMetadata = context.metadata;
@@ -99,7 +119,7 @@ function parseWorkspace(workspaceNode: Node, context: ParserContext): WorkspaceD
 
       projects = parseProjectsObject(nodes, context);
     } else {
-      if (!specialWorkspaceExtensions.includes(name) && !/^[a-z]{1,3}-.*/.test(name)) {
+      if (!context.unprefixedWorkspaceExtensions.has(name) && !/^[a-z]{1,3}-.*/.test(name)) {
         context.warn(`Project extension with invalid name (${name}) found.`, name);
       }
       if (extensions) {
@@ -201,7 +221,7 @@ function parseProject(
         }
         break;
       default:
-        if (!specialProjectExtensions.includes(name) && !/^[a-z]{1,3}-.*/.test(name)) {
+        if (!context.unprefixedProjectExtensions.has(name) && !/^[a-z]{1,3}-.*/.test(name)) {
           context.warn(`Project extension with invalid name (${name}) found.`, name);
         }
         if (extensions) {
