@@ -116,9 +116,6 @@ commands:
       - initialize_env
       - run: nvm install 16.10
       - run: nvm use 16.10
-      - run: npm install -g yarn@1.22.10
-      - run: node --version
-      - run: yarn --version
       - run: git config --global core.longpaths true
 
   setup_bazel_rbe:
@@ -326,10 +323,8 @@ jobs:
       - fail_fast
 
   # Windows jobs
-  e2e-cli-win:
+  setup-win:
     executor: windows-executor
-    resource_class: windows.large
-    parallelism: 16
     steps:
       - checkout
       - rebase_pr
@@ -340,9 +335,9 @@ jobs:
       - run:
           # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
           # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
-          name: 'Arsenal Image Mounter (RAM Disk)'
-          command: |
-            pwsh ./.circleci/win-ram-disk.ps1
+          name: 'Download Arsenal Image Mounter (RAM Disk)'
+          command: pwsh ./.circleci/win-ram-disk_download.ps1
+      - run: npm install -g yarn@1.22.10
       - run: yarn install --frozen-lockfile --cache-folder ../.cache/yarn
       - save_cache:
           key: *cache_key_win
@@ -351,7 +346,24 @@ jobs:
             # Path where Arsenal Image Mounter files are downloaded.
             # Must match path in .circleci/win-ram-disk.ps1
             - ./aim
-      # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
+      - persist_to_workspace:
+          root: *workspace_location
+          paths:
+            - ./*
+      - fail_fast
+
+  e2e-cli-win:
+    executor: windows-executor
+    resource_class: windows.xlarge
+    parallelism: 19
+    steps:
+      - custom_attach_workspace
+      - setup_windows
+      - run:
+          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
+          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
+          name: 'Setup Arsenal Image Mounter (RAM Disk)'
+          command: pwsh ./.circleci/win-ram-disk_setup.ps1
       - run:
           name: Execute E2E Tests
           command: |
@@ -441,7 +453,10 @@ workflows:
             - build
 
       # Windows jobs
-      - e2e-cli-win
+      - setup-win
+      - e2e-cli-win:
+          requires:
+            - setup-win
 
       # Publish jobs
       - snapshot_publish:
