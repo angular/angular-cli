@@ -342,7 +342,7 @@ async function bundleCode(
       ),
     ],
     define: {
-      'ngDevMode': optimizationOptions.scripts ? 'false' : 'true',
+      ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
       'ngJitMode': 'false',
     },
   });
