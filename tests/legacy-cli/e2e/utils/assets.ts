@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { chmod } from 'fs/promises';
 import glob from 'glob';
 import { getGlobalVariable } from './env';
 import { relative, resolve } from 'path';
@@ -33,7 +34,9 @@ export function copyAssets(assetName: string, to?: string) {
             ? resolve(getGlobalVariable('projects-root'), 'test-project', to, filePath)
             : join(tempRoot, filePath);
 
-        return promise.then(() => copyFile(join(root, filePath), toPath));
+        return promise
+          .then(() => copyFile(join(root, filePath), toPath))
+          .then(() => chmod(toPath, 0o777));
       }, Promise.resolve());
     })
     .then(() => tempRoot);
