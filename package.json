@@ -65,7 +65,7 @@
     "@types/express": "~4.17.6",
     "@types/fs-extra": "^9.0.0",
     "@types/jasmine": "^4.0.0",
-    "@types/jsdom": "^16.2.10",
+    "@types/jsdom": "^20.0.0",
     "@types/node": "^14.15.0",
     "@typescript-eslint/eslint-plugin": "5.30.7",
     "@typescript-eslint/parser": "5.30.7",
