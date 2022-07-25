@@ -24,12 +24,14 @@ export default async function () {
 
   // Major should succeed, but we don't need to test it here since it's tested everywhere else.
   // Major+1 and -1 should fail architect commands, but allow other commands.
-  await fakeCoreVersion(cliMajor + 1);
-  await expectToFail(() => ng('build'), 'Should fail Major+1');
-  await ng('version');
-  await fakeCoreVersion(cliMajor - 1);
-  await ng('version');
-
-  // Restore the original core package.json.
-  await writeFile(angularCorePkgPath, originalAngularCorePkgJson);
+  try {
+    await fakeCoreVersion(cliMajor + 1);
+    await expectToFail(() => ng('build'), 'Should fail Major+1');
+    await ng('version');
+    await fakeCoreVersion(cliMajor - 1);
+    await ng('version');
+  } finally {
+    // Restore the original core package.json.
+    await writeFile(angularCorePkgPath, originalAngularCorePkgJson);
+  }
 }
