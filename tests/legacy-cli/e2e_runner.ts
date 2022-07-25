@@ -242,13 +242,15 @@ async function runInitializer(absoluteName: string) {
 async function runTest(absoluteName: string) {
   process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
-  await launchTestProcess(absoluteName);
-
-  logStack.push(new logging.NullLogger());
   try {
-    await gitClean();
+    await launchTestProcess(absoluteName);
   } finally {
-    logStack.pop();
+    logStack.push(new logging.NullLogger());
+    try {
+      await gitClean();
+    } finally {
+      logStack.pop();
+    }
   }
 }
 
