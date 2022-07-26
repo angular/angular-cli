@@ -7,14 +7,20 @@
  */
 
 /* eslint-disable import/no-extraneous-dependencies */
-import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
 import { createServer } from 'http';
 import { createProxyServer } from 'http-proxy';
 import { AddressInfo } from 'net';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { debounceTime, switchMap, take } from 'rxjs/operators';
-import { createArchitect, host } from '../../../testing/test-utils';
+import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs/operators';
+import { serveWebpackBrowser } from '../../index';
+import {
+  BASE_OPTIONS,
+  BUILD_TIMEOUT,
+  DEV_SERVER_BUILDER_INFO,
+  describeBuilder,
+  setupBrowserTarget,
+} from '../setup';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const document: any;
@@ -132,135 +138,74 @@ async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
     }),
     page.goto(url),
   ]);
+
   await client.detach();
 }
 
-describe('Dev Server Builder live-reload', () => {
-  const target = { project: 'app', target: 'serve' };
-  // TODO: check if the below is still true.
-  // Avoid using port `0` as these tests will behave differrently and tests will pass when they shouldn't.
-  // Port 0 and host 0.0.0.0 have special meaning in dev-server.
-  const overrides = { hmr: false, watch: true, port: 4202, liveReload: true };
-  let architect: Architect;
-  let browser: Browser;
-  let page: Page;
-  let runs: BuilderRun[];
+describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
+  describe('Behavior: "Dev-server builder live-reload with proxies"', () => {
+    let browser: Browser;
+    let page: Page;
 
-  beforeAll(async () => {
-    browser = await puppeteer.launch({
-      // MacOSX users need to set the local binary manually because Chrome has lib files with
-      // spaces in them which Bazel does not support in runfiles
-      // See: https://github.com/angular/angular-cli/pull/17624
-      // eslint-disable-next-line max-len
-      // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-      ignoreHTTPSErrors: true,
-      args: ['--no-sandbox', '--disable-gpu'],
-    });
-  });
-
-  afterAll(async () => {
-    await browser.close();
-  });
-
-  beforeEach(async () => {
-    await host.initialize().toPromise();
-    architect = (await createArchitect(host.root())).architect;
-
-    host.writeMultipleFiles({
-      'src/app/app.component.html': `
-        <p>{{ title }}</p>
-      `,
+    const SERVE_OPTIONS = Object.freeze({
+      ...BASE_OPTIONS,
+      hmr: false,
+      watch: true,
+      liveReload: true,
     });
 
-    runs = [];
-    page = await browser.newPage();
-  });
+    beforeAll(async () => {
+      browser = await puppeteer.launch({
+        // MacOSX users need to set the local binary manually because Chrome has lib files with
+        // spaces in them which Bazel does not support in runfiles
+        // See: https://github.com/angular/angular-cli/pull/17624
+        // eslint-disable-next-line max-len
+        // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+        ignoreHTTPSErrors: true,
+        args: ['--no-sandbox', '--disable-gpu'],
+      });
+    });
 
-  afterEach(async () => {
-    await host.restore().toPromise();
-    await page.close();
-    await Promise.all(runs.map((r) => r.stop()));
-  });
+    afterAll(async () => {
+      await browser.close();
+    });
 
-  it('works without proxy', async () => {
-    const run = await architect.scheduleTarget(target, overrides);
-    runs.push(run);
+    beforeEach(async () => {
+      setupBrowserTarget(harness, {
+        polyfills: 'src/polyfills.ts',
+      });
 
-    await run.output
-      .pipe(
-        debounceTime(1000),
-        switchMap(async (buildEvent, buildCount) => {
-          expect(buildEvent.success).toBe(true);
-          const url = buildEvent.baseUrl as string;
-          switch (buildCount) {
-            case 0:
-              await goToPageAndWaitForWS(page, url);
-              host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
-              break;
-            case 1:
-              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-              expect(innerText).toBe('app-live-reload');
-              break;
-          }
-        }),
-        take(2),
-      )
-      .toPromise();
-  });
+      page = await browser.newPage();
+    });
 
-  it('works without http -> http proxy', async () => {
-    const run = await architect.scheduleTarget(target, overrides);
-    runs.push(run);
+    afterEach(async () => {
+      await page.close();
+    });
 
-    let proxy: ProxyInstance | undefined;
-    let buildCount = 0;
-    try {
-      await run.output
+    it('works without proxy', async () => {
+      harness.useTarget('serve', {
+        ...SERVE_OPTIONS,
+      });
+
+      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+
+      const buildCount = await harness
+        .execute()
         .pipe(
           debounceTime(1000),
-          switchMap(async (buildEvent) => {
-            expect(buildEvent.success).toBe(true);
-            const url = buildEvent.baseUrl as string;
-            switch (buildCount) {
-              case 0:
-                proxy = await createProxy(url, false);
-                await goToPageAndWaitForWS(page, proxy.url);
-                host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
-                break;
-              case 1:
-                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-                expect(innerText).toBe('app-live-reload');
-                break;
+          timeout(BUILD_TIMEOUT * 2),
+          switchMap(async ({ result }, index) => {
+            expect(result?.success).toBeTrue();
+            if (typeof result?.baseUrl !== 'string') {
+              throw new Error('Expected "baseUrl" to be a string.');
             }
 
-            buildCount++;
-          }),
-          take(2),
-        )
-        .toPromise();
-    } finally {
-      proxy?.server.close();
-    }
-  });
-
-  it('works without https -> http proxy', async () => {
-    const run = await architect.scheduleTarget(target, overrides);
-    runs.push(run);
-
-    let proxy: ProxyInstance | undefined;
-
-    try {
-      await run.output
-        .pipe(
-          debounceTime(1000),
-          switchMap(async (buildEvent, buildCount) => {
-            expect(buildEvent.success).toBe(true);
-            const url = buildEvent.baseUrl as string;
-            switch (buildCount) {
+            switch (index) {
               case 0:
-                proxy = await createProxy(url, true);
-                await goToPageAndWaitForWS(page, proxy.url);
-                host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-live-reload'`);
+                await goToPageAndWaitForWS(page, result.baseUrl);
+                await harness.modifyFile('src/app/app.component.ts', (content) =>
+                  content.replace(`'app'`, `'app-live-reload'`),
+                );
                 break;
               case 1:
                 const innerText = await page.evaluate(() => document.querySelector('p').innerText);
@@ -269,10 +214,99 @@ describe('Dev Server Builder live-reload', () => {
             }
           }),
           take(2),
+          count(),
         )
         .toPromise();
-    } finally {
-      proxy?.server.close();
-    }
+
+      expect(buildCount).toBe(2);
+    });
+
+    it('works without http -> http proxy', async () => {
+      harness.useTarget('serve', {
+        ...SERVE_OPTIONS,
+      });
+
+      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+
+      let proxy: ProxyInstance | undefined;
+      const buildCount = await harness
+        .execute()
+        .pipe(
+          debounceTime(1000),
+          timeout(BUILD_TIMEOUT * 2),
+          switchMap(async ({ result }, index) => {
+            expect(result?.success).toBeTrue();
+            if (typeof result?.baseUrl !== 'string') {
+              throw new Error('Expected "baseUrl" to be a string.');
+            }
+
+            switch (index) {
+              case 0:
+                proxy = await createProxy(result.baseUrl, false);
+                await goToPageAndWaitForWS(page, proxy.url);
+                await harness.modifyFile('src/app/app.component.ts', (content) =>
+                  content.replace(`'app'`, `'app-live-reload'`),
+                );
+                break;
+              case 1:
+                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+                expect(innerText).toBe('app-live-reload');
+                break;
+            }
+          }),
+          take(2),
+          count(),
+          finalize(() => {
+            proxy?.server.close();
+          }),
+        )
+        .toPromise();
+
+      expect(buildCount).toBe(2);
+    });
+
+    it('works without https -> http proxy', async () => {
+      harness.useTarget('serve', {
+        ...SERVE_OPTIONS,
+      });
+
+      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+
+      let proxy: ProxyInstance | undefined;
+      const buildCount = await harness
+        .execute()
+        .pipe(
+          debounceTime(1000),
+          timeout(BUILD_TIMEOUT * 2),
+          switchMap(async ({ result }, index) => {
+            expect(result?.success).toBeTrue();
+            if (typeof result?.baseUrl !== 'string') {
+              throw new Error('Expected "baseUrl" to be a string.');
+            }
+
+            switch (index) {
+              case 0:
+                proxy = await createProxy(result.baseUrl, true);
+                await goToPageAndWaitForWS(page, proxy.url);
+                await harness.modifyFile('src/app/app.component.ts', (content) =>
+                  content.replace(`'app'`, `'app-live-reload'`),
+                );
+                break;
+              case 1:
+                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+                expect(innerText).toBe('app-live-reload');
+                break;
+            }
+          }),
+          take(2),
+          count(),
+          finalize(() => {
+            proxy?.server.close();
+          }),
+        )
+        .toPromise();
+
+      expect(buildCount).toBe(2);
+    });
   });
 });
