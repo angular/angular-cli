@@ -2313,12 +2313,20 @@
   dependencies:
     "@types/parse5-sax-parser" "*"
 
-"@types/parse5-sax-parser@*":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@types/parse5-sax-parser/-/parse5-sax-parser-7.0.0.tgz#6b6fd46ef05c3c58392fc4d915f07969f7ce1a90"
-  integrity sha512-wR3hG33tMsLOdqtcJT0XuGi1Ik3dTP+/ZWN1AckYmEagO/SWoL99GPyv21ZI/FAHOtYWB02TEV3+Y5zqkC4L+Q==
+"@types/parse5-sax-parser@*", "@types/parse5-sax-parser@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@types/parse5-sax-parser/-/parse5-sax-parser-5.0.2.tgz#4cdca0f8bc0ce71b17e27b96e7ca9b5f79e861ff"
+  integrity sha512-EQtGoduLbdMmS4N27g6wcXdCCJ70dWYemfogWuumYg+JmzRqwYvTRAbGOYFortSHtS/qRzRCFwcP3ixy62RsdA==
   dependencies:
-    parse5-sax-parser "*"
+    "@types/node" "*"
+    "@types/parse5" "*"
+
+"@types/parse5@*":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/parse5/-/parse5-7.0.0.tgz#8b412a0a4461c84d6280a372bfa8c57a418a06bd"
+  integrity sha512-f2SeAxumolBmhuR62vNGTsSAvdz/Oj0k682xNrcKJ4dmRnTPODB74j6CPoNPzBPTHsu7Y7W7u93Mgp8Ovo8vWw==
+  dependencies:
+    parse5 "*"
 
 "@types/pidusage@^2.0.1":
   version "2.0.2"
@@ -8337,19 +8345,19 @@ parse5-htmlparser2-tree-adapter@^6.0.1:
   dependencies:
     parse5 "^6.0.1"
 
-parse5-sax-parser@*:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/parse5-sax-parser/-/parse5-sax-parser-7.0.0.tgz#4c05064254f0488676aca75fb39ca069ec96dee5"
-  integrity sha512-5A+v2SNsq8T6/mG3ahcz8ZtQ0OUFTatxPbeidoMB7tkJSGDY3tdfl4MHovtLQHkEn5CGxijNWRQHhRQ6IRpXKg==
-  dependencies:
-    parse5 "^7.0.0"
-
 parse5-sax-parser@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/parse5-sax-parser/-/parse5-sax-parser-6.0.1.tgz#98b4d366b5b266a7cd90b4b58906667af882daba"
   integrity sha512-kXX+5S81lgESA0LsDuGjAlBybImAChYRMT+/uKCEXFBFOeEhS52qUCydGhU3qLRD8D9DVjaUo821WK7DM4iCeg==
   dependencies:
     parse5 "^6.0.1"
+
+parse5@*:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.0.0.tgz#51f74a5257f5fcc536389e8c2d0b3802e1bfa91a"
+  integrity sha512-y/t8IXSPWTuRZqXc0ajH/UwDj4mnqLEbSttNbThcFhGrZuOyoyvNBO85PBp2jQa55wY9d07PBNjsK8ZP3K5U6g==
+  dependencies:
+    entities "^4.3.0"
 
 parse5@6.0.1, parse5@^6.0.1:
   version "6.0.1"
@@ -8360,13 +8368,6 @@ parse5@^5.0.0:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-5.1.1.tgz#f68e4e5ba1852ac2cadc00f4555fff6c2abb6178"
   integrity sha512-ugq4DFI0Ptb+WWjAdOK16+u/nHfiIrcE+sh8kZMaM0WllQKLI9rOUq6c2b7cwPkXdzfQESqvoqK6ug7U/Yyzug==
-
-parse5@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.0.0.tgz#51f74a5257f5fcc536389e8c2d0b3802e1bfa91a"
-  integrity sha512-y/t8IXSPWTuRZqXc0ajH/UwDj4mnqLEbSttNbThcFhGrZuOyoyvNBO85PBp2jQa55wY9d07PBNjsK8ZP3K5U6g==
-  dependencies:
-    entities "^4.3.0"
 
 parseurl@~1.3.2, parseurl@~1.3.3:
   version "1.3.3"

@@ -60,7 +60,8 @@
     ]
   },
   "resolutions": {
-    "**/ajv-formats/ajv": "8.11.0"
+    "**/ajv-formats/ajv": "8.11.0",
+    "@types/parse5-html-rewriting-stream/@types/parse5-sax-parser": "^5.0.2"
   },
   "devDependencies": {
     "@ampproject/remapping": "2.2.0",
