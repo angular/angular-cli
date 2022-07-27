@@ -28,13 +28,4 @@ nodejs_binary(
     entry_point = "quicktype_runner.js",
     templated_args = ["--bazel_patch_module_resolver"],
 )
-
-platform(
-    name = "rbe_platform_with_network_access",
-    exec_properties = {
-        "dockerNetwork": "standard",
-    },
-    parents = ["@npm//@angular/build-tooling/bazel/remote-execution:platform"],
-)
-
 # @external_end
