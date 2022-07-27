@@ -34,7 +34,7 @@ platform(
     exec_properties = {
         "dockerNetwork": "standard",
     },
-    parents = ["@npm//@angular/dev-infra-private/bazel/remote-execution:platform"],
+    parents = ["@npm//@angular/build-tooling/bazel/remote-execution:platform"],
 )
 
 # @external_end
