@@ -18,7 +18,7 @@ async function _runTemplate(inputPath: string, outputPath: string, logger: loggi
 
   // TODO(ESM): Consider making this an actual import statement.
   const { COMMIT_TYPES, ScopeRequirement } = await new Function(
-    `return import('@angular/dev-infra-private/ng-dev');`,
+    `return import('@angular/ng-dev');`,
   )();
 
   const template = require(inputPath).default;
