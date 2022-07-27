@@ -118,8 +118,8 @@ build:remote --jobs=150
 
 # Setup the toolchain and platform for the remote build execution. The platform
 # is provided by the shared dev-infra package and targets k8 remote containers.
-build:remote --crosstool_top=@npm//@angular/dev-infra-private/bazel/remote-execution/cpp:cc_toolchain_suite
-build:remote --extra_toolchains=@npm//@angular/dev-infra-private/bazel/remote-execution/cpp:cc_toolchain
+build:remote --crosstool_top=@npm//@angular/build-tooling/bazel/remote-execution/cpp:cc_toolchain_suite
+build:remote --extra_toolchains=@npm//@angular/build-tooling/bazel/remote-execution/cpp:cc_toolchain
 build:remote --extra_execution_platforms=//tools:rbe_platform_with_network_access
 build:remote --host_platform=//tools:rbe_platform_with_network_access
 build:remote --platforms=//tools:rbe_platform_with_network_access

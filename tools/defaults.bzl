@@ -3,7 +3,7 @@
 load("@npm//@bazel/concatjs/internal:build_defs.bzl", _ts_library = "ts_library_macro")
 load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _pkg_npm = "pkg_npm")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("@npm//@angular/dev-infra-private/bazel:extract_js_module_output.bzl", "extract_js_module_output")
+load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
 load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
