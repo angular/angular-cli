@@ -122,6 +122,42 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1addc303bef0b6acc0dca0961e9e642629f3a5cd":
+  version "0.0.0-fa61d03a603e04af2b66f3598f1af01da1e1cfb1"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1addc303bef0b6acc0dca0961e9e642629f3a5cd"
+  dependencies:
+    "@angular-devkit/build-angular" "14.1.0-rc.3"
+    "@angular/benchpress" "0.3.0"
+    "@babel/core" "^7.16.0"
+    "@bazel/buildifier" "5.1.0"
+    "@bazel/concatjs" "5.5.2"
+    "@bazel/esbuild" "5.5.2"
+    "@bazel/protractor" "5.5.2"
+    "@bazel/runfiles" "5.5.2"
+    "@bazel/terser" "5.5.2"
+    "@bazel/typescript" "5.5.2"
+    "@microsoft/api-extractor" "7.28.4"
+    "@types/browser-sync" "^2.26.3"
+    "@types/node" "16.10.9"
+    "@types/selenium-webdriver" "^4.0.18"
+    "@types/send" "^0.17.1"
+    "@types/tmp" "^0.2.1"
+    "@types/uuid" "^8.3.1"
+    "@types/yargs" "^17.0.0"
+    browser-sync "^2.27.7"
+    clang-format "1.8.0"
+    prettier "2.7.1"
+    protractor "^7.0.0"
+    selenium-webdriver "4.3.1"
+    send "^0.18.0"
+    source-map "^0.7.4"
+    tmp "^0.2.1"
+    "true-case-path" "^2.2.1"
+    tslib "^2.3.0"
+    typescript "~4.7.3"
+    uuid "^8.3.2"
+    yargs "^17.0.0"
+
 "@angular/cdk@14.1.0":
   version "14.1.0"
   resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-14.1.0.tgz#abf5ad3cdd96e42666bce949833ac1c2405ab031"
@@ -168,43 +204,6 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/dev-infra-private@https://github.com/angular/dev-infra-private-builds.git#b2da73b3dddddd6a253ee8ea48ef387b20f5aedf":
-  version "0.0.0-114c5a9e0c063e65dc42ded4d2ae07a3cca5418a"
-  resolved "https://github.com/angular/dev-infra-private-builds.git#b2da73b3dddddd6a253ee8ea48ef387b20f5aedf"
-  dependencies:
-    "@angular-devkit/build-angular" "14.1.0-rc.3"
-    "@angular/benchpress" "0.3.0"
-    "@babel/core" "^7.16.0"
-    "@bazel/buildifier" "5.1.0"
-    "@bazel/concatjs" "5.5.2"
-    "@bazel/esbuild" "5.5.2"
-    "@bazel/protractor" "5.5.2"
-    "@bazel/runfiles" "5.5.2"
-    "@bazel/terser" "5.5.2"
-    "@bazel/typescript" "5.5.2"
-    "@microsoft/api-extractor" "7.28.4"
-    "@types/browser-sync" "^2.26.3"
-    "@types/node" "16.10.9"
-    "@types/selenium-webdriver" "^4.0.18"
-    "@types/send" "^0.17.1"
-    "@types/tmp" "^0.2.1"
-    "@types/uuid" "^8.3.1"
-    "@types/yargs" "^17.0.0"
-    "@yarnpkg/lockfile" "^1.1.0"
-    browser-sync "^2.27.7"
-    clang-format "1.8.0"
-    prettier "2.7.1"
-    protractor "^7.0.0"
-    selenium-webdriver "4.3.1"
-    send "^0.18.0"
-    source-map "^0.7.4"
-    tmp "^0.2.1"
-    "true-case-path" "^2.2.1"
-    tslib "^2.3.0"
-    typescript "~4.7.3"
-    uuid "^8.3.2"
-    yargs "^17.0.0"
-
 "@angular/forms@14.1.0":
   version "14.1.0"
   resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-14.1.0.tgz#17a7ec211a11b75572d89359f08c277cfcdb1210"
@@ -227,6 +226,13 @@
   integrity sha512-0UXfMqP5+Nzd6gbLplQpUX3E0rRRwhVEnAo8Z1hllGdJIY0meunMnTZCWsvYQ7SU/W+VbqnmtBmg5EOfYsjpiQ==
   dependencies:
     tslib "^2.3.0"
+
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#865c7687cdca2bd512040330e1677eecaa26e46a":
+  version "0.0.0-fa61d03a603e04af2b66f3598f1af01da1e1cfb1"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#865c7687cdca2bd512040330e1677eecaa26e46a"
+  dependencies:
+    "@yarnpkg/lockfile" "^1.1.0"
+    typescript "~4.7.3"
 
 "@angular/platform-browser-dynamic@14.1.0":
   version "14.1.0"

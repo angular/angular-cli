@@ -1,6 +1,6 @@
 import '../lib/bootstrap-local.js';
 
-import { ReleaseConfig } from '@angular/dev-infra-private/ng-dev';
+import { ReleaseConfig } from '@angular/ng-dev';
 import packages from '../lib/packages.js';
 import buildPackages from '../scripts/build.js';
 
