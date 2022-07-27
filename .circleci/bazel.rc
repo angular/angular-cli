@@ -7,9 +7,6 @@ build --announce_rc
 # Don't be spammy in the logs
 build --noshow_progress
 
-# Don't run manual tests
-test --test_tag_filters=-manual
-
 # Workaround https://github.com/bazelbuild/bazel/issues/3645
 # Bazel doesn't calculate the memory ceiling correctly when running under Docker.
 # Limit Bazel to consuming resources that fit in CircleCI "xlarge" class
