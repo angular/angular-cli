@@ -181,7 +181,7 @@ export abstract class SchematicsCommandModule
       if (property['format'] === 'path' && !property['$default']) {
         (options as Record<string, unknown>)['path'] = workingDir || undefined;
         this.context.logger.warn(
-          `The 'path' option in '${schematic?.schema}' is using deprecated behaviour.` +
+          `The 'path' option in '${schematic?.schema}' is using deprecated behaviour. ` +
             `'workingDirectory' smart default provider should be used instead.`,
         );
       }
