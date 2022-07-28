@@ -165,9 +165,17 @@ export function useCIDefaults(projectName = 'test-project') {
     const appTargets = project.targets || project.architect;
     appTargets.build.options.progress = false;
     appTargets.test.options.progress = false;
-    // Disable auto-updating webdriver in e2e.
     if (appTargets.e2e) {
+      // Disable auto-updating webdriver in e2e.
       appTargets.e2e.options.webdriverUpdate = false;
+      // Use a random port in e2e.
+      appTargets.e2e.options.port = 0;
+    }
+
+    if (appTargets.serve) {
+      // Use a random port in serve.
+      appTargets.serve.options ??= {};
+      appTargets.serve.options.port = 0;
     }
   });
 }
