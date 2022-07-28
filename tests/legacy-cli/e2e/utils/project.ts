@@ -171,6 +171,12 @@ export function useCIDefaults(projectName = 'test-project') {
       // Use a random port in e2e.
       appTargets.e2e.options.port = 0;
     }
+
+    if (appTargets.serve) {
+      // Use a random port in serve.
+      appTargets.serve.options ??= {};
+      appTargets.serve.options.port = 0;
+    }
   });
 }
 
