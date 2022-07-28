@@ -34,7 +34,7 @@ describe('Dev Server Builder', () => {
     expect(output.success).toBe(true);
 
     // When webpack-dev-server doesn't have `contentBase: false`, this will serve the repo README.
-    const response = await fetch('http://localhost:4200/README.md', {
+    const response = await fetch(`http://localhost:${output.port}/README.md`, {
       headers: {
         'Accept': 'text/html',
       },
