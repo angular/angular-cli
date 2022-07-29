@@ -159,8 +159,8 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
             "substituted_with_snapshot_repos/": "",
             "substituted/": "",
         },
-        exclude_prefixes = [
-            "packages",  # Exclude compiled outputs of dependent packages
+        exclude_srcs_patterns = [
+            "packages/**/*",  # Exclude compiled outputs of dependent packages
         ],
         allow_overwrites = True,
     )
