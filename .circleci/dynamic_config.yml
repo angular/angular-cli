@@ -328,7 +328,6 @@ jobs:
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
-    resource_class: windows.large
     parallelism: 16
     steps:
       - checkout
