@@ -66,7 +66,7 @@
   "devDependencies": {
     "@ampproject/remapping": "2.2.0",
     "@angular/animations": "14.1.0",
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#ad29881a78cf810fbb9547b79244cf8efd31ceb4",
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a88566c9ed0b053dbe2773e89a8a83084f432ec8",
     "@angular/cdk": "14.1.0",
     "@angular/common": "14.1.0",
     "@angular/compiler": "14.1.0",
@@ -75,7 +75,7 @@
     "@angular/forms": "14.1.0",
     "@angular/localize": "14.1.0",
     "@angular/material": "14.1.0",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#4c21a1af919f3deec04671400c7449ae6376121c",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#3535c23e172bbe5ecc5cd0a0fdceeb178a2e7826",
     "@angular/platform-browser": "14.1.0",
     "@angular/platform-browser-dynamic": "14.1.0",
     "@angular/platform-server": "14.1.0",
