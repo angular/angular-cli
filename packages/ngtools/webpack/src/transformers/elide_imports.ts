@@ -54,39 +54,8 @@ export function elideImports(
       return;
     }
 
-    let symbol: ts.Symbol | undefined;
-    if (ts.isTypeReferenceNode(node)) {
-      if (!compilerOptions.emitDecoratorMetadata) {
-        // Skip and mark as unused if emitDecoratorMetadata is disabled.
-        return;
-      }
-
-      const parent = node.parent;
-      let isTypeReferenceForDecoratoredNode = false;
-
-      switch (parent.kind) {
-        case ts.SyntaxKind.GetAccessor:
-        case ts.SyntaxKind.PropertyDeclaration:
-        case ts.SyntaxKind.MethodDeclaration:
-          isTypeReferenceForDecoratoredNode = !!parent.decorators?.length;
-          break;
-        case ts.SyntaxKind.Parameter:
-          // - A constructor parameter can be decorated or the class itself is decorated.
-          // - The parent of the parameter is decorated example a method declaration or a set accessor.
-          // In all cases we need the type reference not to be elided.
-          isTypeReferenceForDecoratoredNode = !!(
-            parent.decorators?.length ||
-            (ts.isSetAccessor(parent.parent) && !!parent.parent.decorators?.length) ||
-            (ts.isConstructorDeclaration(parent.parent) &&
-              !!parent.parent.parent.decorators?.length)
-          );
-          break;
-      }
-
-      if (isTypeReferenceForDecoratoredNode) {
-        symbol = typeChecker.getSymbolAtLocation(node.typeName);
-      }
-    } else {
+    if (!ts.isTypeReferenceNode(node)) {
+      let symbol: ts.Symbol | undefined;
       switch (node.kind) {
         case ts.SyntaxKind.Identifier:
           const parent = node.parent;
@@ -106,10 +75,10 @@ export function elideImports(
           symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
           break;
       }
-    }
 
-    if (symbol) {
-      usedSymbols.add(symbol);
+      if (symbol) {
+        usedSymbols.add(symbol);
+      }
     }
 
     ts.forEachChild(node, visit);
@@ -153,7 +122,7 @@ export function elideImports(
         clausesCount += namedBindings.elements.length;
 
         for (const specifier of namedBindings.elements) {
-          if (isUnused(specifier.name)) {
+          if (specifier.isTypeOnly || isUnused(specifier.name)) {
             removedClausesCount++;
             // in case we don't have any more namedImports we should remove the parent ie the {}
             const nodeToRemove =
@@ -168,7 +137,7 @@ export function elideImports(
       if (node.importClause.name) {
         clausesCount++;
 
-        if (isUnused(node.importClause.name)) {
+        if (node.importClause.isTypeOnly || isUnused(node.importClause.name)) {
           specifierNodeRemovals.push(node.importClause.name);
         }
       }
