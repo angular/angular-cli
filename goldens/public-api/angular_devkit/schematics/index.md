@@ -699,6 +699,9 @@ export interface RandomOptions {
 }
 
 // @public (undocumented)
+export function rename(match: FilePredicate<boolean>, to: FilePredicate<string>): Rule;
+
+// @public (undocumented)
 export interface RenameFileAction extends ActionBase {
     // (undocumented)
     readonly kind: 'r';

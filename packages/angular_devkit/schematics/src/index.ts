@@ -23,6 +23,7 @@ export * from './rules/base';
 export * from './rules/call';
 export * from './rules/move';
 export * from './rules/random';
+export * from './rules/rename';
 export * from './rules/schematic';
 export * from './rules/template';
 export * from './rules/url';
