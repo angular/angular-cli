@@ -440,6 +440,44 @@ describe('@ngtools/webpack transformers', () => {
         experimentalDecorators: true,
       };
 
+      it('should elide type only named imports', () => {
+        const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { type OnChanges, type SimpleChanges } from './type';
+
+          @Decorator()
+          export class Foo implements OnChanges {
+            ngOnChanges(changes: SimpleChanges) { }
+          }
+
+          ${dummyNode}
+        `;
+
+        const output = tags.stripIndent`
+          import { __decorate } from "tslib";
+          import { Decorator } from './decorator';
+
+          let Foo = class Foo { ngOnChanges(changes) { } };
+          Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
+        `;
+
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
+
+        expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+      });
+
       it('should not remove ctor parameter type reference', () => {
         const input = tags.stripIndent`
           import { Decorator } from './decorator';
