@@ -11,7 +11,12 @@ import { existsSync, promises as fsPromises } from 'fs';
 import { extname, posix, resolve } from 'path';
 import { URL, pathToFileURL } from 'url';
 import { Configuration, RuleSetRule } from 'webpack';
-import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
+import type {
+  Configuration as DevServerConfiguration,
+  NextFunction,
+  Request,
+  Response,
+} from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
 import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';
@@ -86,6 +91,26 @@ export async function getDevServerConfig(
       devMiddleware: {
         publicPath: servePath,
         stats: false,
+      },
+      setupMiddlewares: (middlewares, _devServer) => {
+        // Temporary workaround for https://github.com/webpack/webpack-dev-server/issues/4180
+        middlewares.push({
+          name: 'options-request-response',
+          path: '*',
+          middleware: (req: Request, res: Response, next: NextFunction) => {
+            if (req.method === 'OPTIONS') {
+              res.statusCode = 204;
+              res.setHeader('Content-Length', 0);
+              res.end();
+
+              return;
+            }
+
+            next();
+          },
+        });
+
+        return middlewares;
       },
       liveReload,
       hot: hmr && !liveReload ? 'only' : hmr,
