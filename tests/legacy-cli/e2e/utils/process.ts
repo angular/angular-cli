@@ -96,39 +96,42 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   _processes.push(childProcess);
 
   // Create the error here so the stack shows who called this function.
+  const error = new Error();
 
-  return new Promise((resolve, reject) => {
+  // Return log info about the current process status
+  function envDump() {
+    return [
+      `ENV:${JSON.stringify(spawnOptions.env, null, 2)}`,
+      `STDOUT:\n${stdout}`,
+      `STDERR:\n${stderr}`,
+    ].join('\n\n');
+  }
+
+  return new Promise<ProcessOutput>((resolve, reject) => {
     let matched = false;
 
-    childProcess.on('exit', (error: any) => {
+    childProcess.on('exit', (code: number) => {
       _processes = _processes.filter((p) => p !== childProcess);
 
       if (options.waitForMatch && !matched) {
-        error = `Output didn't match '${options.waitForMatch}'.`;
+        reject(
+          `Process output didn't match - "${cmd} ${args.join(' ')}": '${
+            options.waitForMatch
+          }': ${code}...\n\n${envDump()}\n`,
+        );
+        return;
       }
 
-      if (!error) {
+      if (!code) {
         resolve({ stdout, stderr });
         return;
       }
 
-      reject(
-        new Error(
-          `Running "${cmd} ${args.join(' ')}" returned error. ${error}...\n\nENV:${JSON.stringify(
-            process.env,
-            null,
-            2,
-          )}\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`,
-        ),
-      );
+      reject(`Process exit error - "${cmd} ${args.join(' ')}": ${code}...\n\n${envDump()}\n`);
     });
+
     childProcess.on('error', (err) => {
-      err.message += `${err}...\n\nENV:${JSON.stringify(
-        process.env,
-        null,
-        2,
-      )}\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
-      reject(err);
+      reject(`Process error - "${cmd} ${args.join(' ')}": ${err}...\n\n${envDump()}\n`);
     });
 
     if (options.waitForMatch) {
@@ -154,6 +157,9 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
       childProcess.stdin!.write(options.stdin);
       childProcess.stdin!.end();
     }
+  }).catch((err) => {
+    error.message = err.toString();
+    return Promise.reject(error);
   });
 }
 
