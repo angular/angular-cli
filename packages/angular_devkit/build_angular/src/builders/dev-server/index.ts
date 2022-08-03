@@ -43,6 +43,7 @@ import {
   getStylesConfig,
 } from '../../webpack/configs';
 import { IndexHtmlWebpackPlugin } from '../../webpack/plugins/index-html-webpack-plugin';
+import { ServiceWorkerPlugin } from '../../webpack/plugins/service-worker-plugin';
 import { createWebpackLoggingCallback } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { Schema } from './schema';
@@ -205,6 +206,8 @@ export function serveWebpackBrowser(
       webpackConfig = await transforms.webpackConfiguration(webpackConfig);
     }
 
+    webpackConfig.plugins ??= [];
+
     if (browserOptions.index) {
       const { scripts = [], styles = [], baseHref } = browserOptions;
       const entrypoints = generateEntryPoints({
@@ -216,7 +219,6 @@ export function serveWebpackBrowser(
         isHMREnabled: !!webpackConfig.devServer?.hot,
       });
 
-      webpackConfig.plugins ??= [];
       webpackConfig.plugins.push(
         new IndexHtmlWebpackPlugin({
           indexPath: path.resolve(workspaceRoot, getIndexInputFile(browserOptions.index)),
@@ -230,6 +232,18 @@ export function serveWebpackBrowser(
           optimization: normalizeOptimization(browserOptions.optimization),
           crossOrigin: browserOptions.crossOrigin,
           lang: locale,
+        }),
+      );
+    }
+
+    if (browserOptions.serviceWorker) {
+      webpackConfig.plugins.push(
+        new ServiceWorkerPlugin({
+          baseHref: browserOptions.baseHref,
+          root: context.workspaceRoot,
+          projectRoot,
+          outputPath: path.join(context.workspaceRoot, browserOptions.outputPath),
+          ngswConfigPath: browserOptions.ngswConfigPath,
         }),
       );
     }

@@ -8,34 +8,31 @@
 
 import type { Config, Filesystem } from '@angular/service-worker/config';
 import * as crypto from 'crypto';
-import { createReadStream, promises as fs, constants as fsConstants } from 'fs';
+import { constants as fsConstants, promises as fsPromises } from 'fs';
 import * as path from 'path';
-import { pipeline } from 'stream';
 import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
 
 class CliFilesystem implements Filesystem {
-  constructor(private base: string) {}
+  constructor(private fs: typeof fsPromises, private base: string) {}
 
   list(dir: string): Promise<string[]> {
     return this._recursiveList(this._resolve(dir), []);
   }
 
   read(file: string): Promise<string> {
-    return fs.readFile(this._resolve(file), 'utf-8');
+    return this.fs.readFile(this._resolve(file), 'utf-8');
   }
 
-  hash(file: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const hash = crypto.createHash('sha1').setEncoding('hex');
-      pipeline(createReadStream(this._resolve(file)), hash, (error) =>
-        error ? reject(error) : resolve(hash.read()),
-      );
-    });
+  async hash(file: string): Promise<string> {
+    return crypto
+      .createHash('sha1')
+      .update(await this.fs.readFile(this._resolve(file)))
+      .digest('hex');
   }
 
-  write(file: string, content: string): Promise<void> {
-    return fs.writeFile(this._resolve(file), content);
+  write(_file: string, _content: string): never {
+    throw new Error('This should never happen.');
   }
 
   private _resolve(file: string): string {
@@ -44,12 +41,15 @@ class CliFilesystem implements Filesystem {
 
   private async _recursiveList(dir: string, items: string[]): Promise<string[]> {
     const subdirectories = [];
-    for await (const entry of await fs.opendir(dir)) {
-      if (entry.isFile()) {
+    for (const entry of await this.fs.readdir(dir)) {
+      const entryPath = path.join(dir, entry);
+      const stats = await this.fs.stat(entryPath);
+
+      if (stats.isFile()) {
         // Uses posix paths since the service worker expects URLs
-        items.push('/' + path.relative(this.base, path.join(dir, entry.name)).replace(/\\/g, '/'));
-      } else if (entry.isDirectory()) {
-        subdirectories.push(path.join(dir, entry.name));
+        items.push('/' + path.relative(this.base, entryPath).replace(/\\/g, '/'));
+      } else if (stats.isDirectory()) {
+        subdirectories.push(entryPath);
       }
     }
 
@@ -67,6 +67,8 @@ export async function augmentAppWithServiceWorker(
   outputPath: string,
   baseHref: string,
   ngswConfigPath?: string,
+  inputputFileSystem = fsPromises,
+  outputFileSystem = fsPromises,
 ): Promise<void> {
   // Determine the configuration file path
   const configPath = ngswConfigPath
@@ -76,7 +78,7 @@ export async function augmentAppWithServiceWorker(
   // Read the configuration file
   let config: Config | undefined;
   try {
-    const configurationData = await fs.readFile(configPath, 'utf-8');
+    const configurationData = await inputputFileSystem.readFile(configPath, 'utf-8');
     config = JSON.parse(configurationData) as Config;
   } catch (error) {
     assertIsError(error);
@@ -101,36 +103,37 @@ export async function augmentAppWithServiceWorker(
   ).Generator;
 
   // Generate the manifest
-  const generator = new GeneratorConstructor(new CliFilesystem(outputPath), baseHref);
+  const generator = new GeneratorConstructor(
+    new CliFilesystem(outputFileSystem, outputPath),
+    baseHref,
+  );
   const output = await generator.process(config);
 
   // Write the manifest
   const manifest = JSON.stringify(output, null, 2);
-  await fs.writeFile(path.join(outputPath, 'ngsw.json'), manifest);
+  await outputFileSystem.writeFile(path.join(outputPath, 'ngsw.json'), manifest);
 
   // Find the service worker package
   const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js');
 
+  const copy = async (src: string, dest: string): Promise<void> => {
+    const resolvedDest = path.join(outputPath, dest);
+
+    return inputputFileSystem === outputFileSystem
+      ? // Native FS (Builder).
+        inputputFileSystem.copyFile(workerPath, resolvedDest, fsConstants.COPYFILE_FICLONE)
+      : // memfs (Webpack): Read the file from the input FS (disk) and write it to the output FS (memory).
+        outputFileSystem.writeFile(resolvedDest, await inputputFileSystem.readFile(src));
+  };
+
   // Write the worker code
-  await fs.copyFile(
-    workerPath,
-    path.join(outputPath, 'ngsw-worker.js'),
-    fsConstants.COPYFILE_FICLONE,
-  );
+  await copy(workerPath, 'ngsw-worker.js');
 
   // If present, write the safety worker code
-  const safetyPath = path.join(path.dirname(workerPath), 'safety-worker.js');
   try {
-    await fs.copyFile(
-      safetyPath,
-      path.join(outputPath, 'worker-basic.min.js'),
-      fsConstants.COPYFILE_FICLONE,
-    );
-    await fs.copyFile(
-      safetyPath,
-      path.join(outputPath, 'safety-worker.js'),
-      fsConstants.COPYFILE_FICLONE,
-    );
+    const safetyPath = path.join(path.dirname(workerPath), 'safety-worker.js');
+    await copy(safetyPath, 'worker-basic.min.js');
+    await copy(safetyPath, 'safety-worker.js');
   } catch (error) {
     assertIsError(error);
     if (error.code !== 'ENOENT') {
