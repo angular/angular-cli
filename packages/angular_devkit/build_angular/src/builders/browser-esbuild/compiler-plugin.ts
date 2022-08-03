@@ -341,7 +341,7 @@ export function createCompilerPlugin(
               [
                 angularApplicationPreset,
                 {
-                  forceAsyncTransformation: data.includes('async'),
+                  forceAsyncTransformation: /for\s+await\s*\(|async\s+function\s*\*/.test(data),
                   optimize: pluginOptions.advancedOptimizations && {},
                 },
               ],
@@ -388,7 +388,8 @@ export function createCompilerPlugin(
                   linkerPluginCreator,
                 },
                 forceAsyncTransformation:
-                  !/[\\/][_f]?esm2015[\\/]/.test(args.path) && data.includes('async'),
+                  !/[\\/][_f]?esm2015[\\/]/.test(args.path) &&
+                  /for\s+await\s*\(|async\s+function\s*\*/.test(data),
                 optimize: pluginOptions.advancedOptimizations && {
                   looseEnums: angularPackage,
                   pureTopLevel: angularPackage,
