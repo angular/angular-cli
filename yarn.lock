@@ -9289,10 +9289,10 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer@15.5.0:
-  version "15.5.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-15.5.0.tgz#446e01547ba0f47c37ac2148e5333433b4ecb371"
-  integrity sha512-+vZPU8iBSdCx1Kn5hHas80fyo0TiVyMeqLGv/1dygX2HKhAZjO9YThadbRTCoTYq0yWw+w/CysldPsEekDtjDQ==
+puppeteer@16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-16.0.0.tgz#9efb6cdb57e3e51cf060a33f6289e88200dd4672"
+  integrity sha512-FgSe21IHNHkqv1SiJiob4ANsxVujcINa4p3MaDEMyoZsocbgSgwYE0c9lnF8eoinw4id3vx4DOXwhFdOOwVlDg==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.4"
@@ -9305,7 +9305,7 @@ puppeteer@15.5.0:
     rimraf "3.0.2"
     tar-fs "2.1.1"
     unbzip2-stream "1.4.3"
-    ws "8.8.0"
+    ws "8.8.1"
 
 q@1.4.1:
   version "1.4.1"
@@ -11584,12 +11584,7 @@ write-file-atomic@^4.0.0, write-file-atomic@^4.0.1:
     imurmurhash "^0.1.4"
     signal-exit "^3.0.7"
 
-ws@8.8.0:
-  version "8.8.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.8.0.tgz#8e71c75e2f6348dbf8d78005107297056cb77769"
-  integrity sha512-JDAgSYQ1ksuwqfChJusw1LSJ8BizJ2e/vVu5Lxjq3YvNJNlROv1ui4i+c/kUUrPheBvQl4c5UbERhTwKa6QBJQ==
-
-ws@>=8.7.0, ws@^8.4.2:
+ws@8.8.1, ws@>=8.7.0, ws@^8.4.2:
   version "8.8.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.8.1.tgz#5dbad0feb7ade8ecc99b830c1d77c913d4955ff0"
   integrity sha512-bGy2JzvzkPowEJV++hF07hAD6niYSr0JzBNo/J29WsB57A2r7Wlc1UFcTR9IzrPvuNVO4B8LGqF8qcpsVOhJCA==
