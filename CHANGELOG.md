@@ -1,3 +1,46 @@
+<a name="14.1.1"></a>
+
+# 14.1.1 (2022-08-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [4ee825bac](https://github.com/angular/angular-cli/commit/4ee825baca21c21db844bdf718b6ec29dc6c3d42) | fix  | catch clause variable is not an Error instance |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| [83dcfb32f](https://github.com/angular/angular-cli/commit/83dcfb32f8ef3334f83bb36a2c3097fe9f8a4e4b) | fix  | prevent numbers from class names |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [ef6da4aad](https://github.com/angular/angular-cli/commit/ef6da4aad76ff534d4edb9e73c2d56c53b649b15) | fix  | allow the esbuild-based builder to fully resolve global stylesheet packages |
+| [eed54b359](https://github.com/angular/angular-cli/commit/eed54b359d2b514156242529ee8a25b51c50dae0) | fix  | catch clause variable is not an Error instance                              |
+| [c98471094](https://github.com/angular/angular-cli/commit/c9847109438d33d38a31ded20a1cab2721fc1fbd) | fix  | correctly respond to preflight requests                                     |
+| [94b444e4c](https://github.com/angular/angular-cli/commit/94b444e4caff4c3092e0291d9109e2abed966656) | fix  | correctly set `ngDevMode` in esbuilder                                      |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [44c18082a](https://github.com/angular/angular-cli/commit/44c18082a5963b7f9d0f1577a0975b2f35abe6a2) | fix  | `classify` string util should concat string without using a `.` |
+
+### @angular/create
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [cb0d3fb33](https://github.com/angular/angular-cli/commit/cb0d3fb33f196393761924731c3c3786a3a3493b) | fix  | use appropriate package manager to install dependencies |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Jason Bedard and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.0"></a>
 
 # 14.1.0 (2022-07-20)
