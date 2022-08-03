@@ -104,7 +104,10 @@ export class EsbuildExecutor
     this.alwaysUseWasm = true;
   }
 
-  async transform(input: string, options?: TransformOptions): Promise<TransformResult> {
+  async transform(
+    input: string | Uint8Array,
+    options?: TransformOptions,
+  ): Promise<TransformResult> {
     await this.ensureEsbuild();
 
     return this.esbuildTransform(input, options);
