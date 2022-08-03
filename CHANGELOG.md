@@ -1,3 +1,19 @@
+<a name="14.2.0-next.0"></a>
+
+# 14.2.0-next.0 (2022-08-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [596037010](https://github.com/angular/angular-cli/commit/596037010a8113809657cebc9385d040922e6d86) | fix  | add missing space after period in warning text |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Jason Bedard and angular-robot[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.1"></a>
 
 # 14.1.1 (2022-08-03)
