@@ -323,11 +323,23 @@ export function createCompilerPlugin(
             };
           }
 
+          const data = typescriptResult.content ?? '';
+          const forceAsyncTransformation = /for\s+await\s*\(|async\s+function\s*\*/.test(data);
           const useInputSourcemap =
             pluginOptions.sourcemap &&
             (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
 
-          const data = typescriptResult.content ?? '';
+          // If no additional transformations are needed, return the TypeScript output directly
+          if (!forceAsyncTransformation && !pluginOptions.advancedOptimizations) {
+            return {
+              // Strip sourcemaps if they should not be used
+              contents: useInputSourcemap
+                ? data
+                : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
+              loader: 'js',
+            };
+          }
+
           const babelResult = await transformAsync(data, {
             filename: args.path,
             inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
@@ -341,7 +353,7 @@ export function createCompilerPlugin(
               [
                 angularApplicationPreset,
                 {
-                  forceAsyncTransformation: /for\s+await\s*\(|async\s+function\s*\*/.test(data),
+                  forceAsyncTransformation,
                   optimize: pluginOptions.advancedOptimizations && {},
                 },
               ],
@@ -356,6 +368,26 @@ export function createCompilerPlugin(
       );
 
       build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+        const data = await fs.readFile(args.path, 'utf-8');
+        const forceAsyncTransformation =
+          !/[\\/][_f]?esm2015[\\/]/.test(args.path) &&
+          /for\s+await\s*\(|async\s+function\s*\*/.test(data);
+        const shouldLink = await requiresLinking(args.path, data);
+        const useInputSourcemap =
+          pluginOptions.sourcemap &&
+          (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
+
+        // If no additional transformations are needed, return the TypeScript output directly
+        if (!forceAsyncTransformation && !pluginOptions.advancedOptimizations && !shouldLink) {
+          return {
+            // Strip sourcemaps if they should not be used
+            contents: useInputSourcemap
+              ? data
+              : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
+            loader: 'js',
+          };
+        }
+
         const angularPackage = /[\\/]node_modules[\\/]@angular[\\/]/.test(args.path);
 
         const linkerPluginCreator = (
@@ -364,11 +396,6 @@ export function createCompilerPlugin(
           )
         ).createEs2015LinkerPlugin;
 
-        const useInputSourcemap =
-          pluginOptions.sourcemap &&
-          (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
-
-        const data = await fs.readFile(args.path, 'utf-8');
         const result = await transformAsync(data, {
           filename: args.path,
           inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
@@ -383,13 +410,11 @@ export function createCompilerPlugin(
               angularApplicationPreset,
               {
                 angularLinker: {
-                  shouldLink: await requiresLinking(args.path, data),
+                  shouldLink,
                   jitMode: false,
                   linkerPluginCreator,
                 },
-                forceAsyncTransformation:
-                  !/[\\/][_f]?esm2015[\\/]/.test(args.path) &&
-                  /for\s+await\s*\(|async\s+function\s*\*/.test(data),
+                forceAsyncTransformation,
                 optimize: pluginOptions.advancedOptimizations && {
                   looseEnums: angularPackage,
                   pureTopLevel: angularPackage,
