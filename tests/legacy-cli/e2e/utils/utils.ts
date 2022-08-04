@@ -1,4 +1,4 @@
-import { mkdtemp, realpath } from 'fs/promises';
+import { mkdtemp, realpath, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import path from 'path';
 
@@ -25,4 +25,19 @@ export function wait(msecs: number): Promise<void> {
 
 export async function mktempd(prefix: string): Promise<string> {
   return realpath(await mkdtemp(path.join(tmpdir(), prefix)));
+}
+
+export async function mockHome(cb: (home: string) => Promise<void>): Promise<void> {
+  const tempHome = await mktempd('angular-cli-e2e-home-');
+
+  const oldHome = process.env.HOME;
+  process.env.HOME = tempHome;
+
+  try {
+    await cb(tempHome);
+  } finally {
+    process.env.HOME = oldHome;
+
+    await rm(tempHome, { recursive: true, force: true });
+  }
 }

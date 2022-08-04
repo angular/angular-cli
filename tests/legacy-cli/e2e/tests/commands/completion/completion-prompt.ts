@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import { env } from 'process';
 import { getGlobalVariable } from '../../../utils/env';
-import { mktempd } from '../../../utils/utils';
+import { mockHome } from '../../../utils/utils';
 
 import {
   execAndCaptureError,
@@ -446,14 +446,4 @@ async function windowsTests(): Promise<void> {
       );
     }
   });
-}
-
-async function mockHome(cb: (home: string) => Promise<void>): Promise<void> {
-  const tempHome = await mktempd('angular-cli-e2e-home-');
-
-  try {
-    await cb(tempHome);
-  } finally {
-    await fs.rm(tempHome, { recursive: true, force: true });
-  }
 }
