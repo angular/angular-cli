@@ -160,7 +160,6 @@ if (testsToRun.length == allTests.length) {
 console.log(['Tests:', ...testsToRun].join('\n '));
 
 setGlobalVariable('argv', argv);
-setGlobalVariable('ci', process.env['CI']?.toLowerCase() === 'true' || process.env['CI'] === '1');
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
 Promise.all([findFreePort(), findFreePort()])
