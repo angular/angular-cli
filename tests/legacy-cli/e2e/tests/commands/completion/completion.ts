@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { getGlobalVariable } from '../../../utils/env';
-import { mktempd } from '../../../utils/utils';
+import { mockHome } from '../../../utils/utils';
 import {
   execAndCaptureError,
   execAndWaitForOutputToMatch,
@@ -29,7 +29,6 @@ export default async function () {
       {
         ...process.env,
         'SHELL': '/bin/bash',
-        'HOME': home,
       },
     );
 
@@ -52,7 +51,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/usr/bin/zsh',
-        'HOME': home,
       },
     );
 
@@ -77,7 +75,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/bin/bash',
-        'HOME': home,
       },
     );
 
@@ -103,7 +100,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/bin/bash',
-        'HOME': home,
       },
     );
 
@@ -129,7 +125,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/bin/bash',
-        'HOME': home,
       },
     );
 
@@ -160,7 +155,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/bin/bash',
-        'HOME': home,
       },
     );
 
@@ -196,7 +190,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/usr/bin/zsh',
-        'HOME': home,
       },
     );
 
@@ -222,7 +215,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/usr/bin/zsh',
-        'HOME': home,
       },
     );
 
@@ -248,7 +240,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/usr/bin/zsh',
-        'HOME': home,
       },
     );
 
@@ -279,7 +270,6 @@ source <(ng completion script)
       {
         ...process.env,
         'SHELL': '/usr/bin/zsh',
-        'HOME': home,
       },
     );
 
@@ -322,7 +312,6 @@ source <(ng completion script)
     const err = await execAndCaptureError('ng', ['completion'], {
       ...process.env,
       SHELL: undefined,
-      HOME: home,
     });
     if (!err.message.includes('`$SHELL` environment variable not set.')) {
       throw new Error(`Expected unset \`$SHELL\` error message, but got:\n\n${err.message}`);
@@ -334,7 +323,6 @@ source <(ng completion script)
     const err = await execAndCaptureError('ng', ['completion'], {
       ...process.env,
       SHELL: '/usr/bin/unknown',
-      HOME: home,
     });
     if (!err.message.includes('Unknown `$SHELL` environment variable')) {
       throw new Error(`Expected unknown \`$SHELL\` error message, but got:\n\n${err.message}`);
@@ -346,7 +334,6 @@ source <(ng completion script)
     const { stdout } = await execWithEnv('ng', ['completion'], {
       ...process.env,
       'SHELL': '/usr/bin/zsh',
-      'HOME': home,
     });
 
     if (stdout.includes('there does not seem to be a global install of the Angular CLI')) {
@@ -373,7 +360,6 @@ source <(ng completion script)
       const { stdout } = await execWithEnv(localCliBinary, ['completion'], {
         ...process.env,
         'SHELL': '/usr/bin/zsh',
-        'HOME': home,
       });
 
       if (stdout.includes('there does not seem to be a global install of the Angular CLI')) {
@@ -393,15 +379,5 @@ async function windowsTests(): Promise<void> {
     throw new Error(
       `Expected Windows autocompletion to fail with custom error, but got:\n\n${err.message}`,
     );
-  }
-}
-
-async function mockHome(cb: (home: string) => Promise<void>): Promise<void> {
-  const tempHome = await mktempd('angular-cli-e2e-home-');
-
-  try {
-    await cb(tempHome);
-  } finally {
-    await fs.rm(tempHome, { recursive: true, force: true });
   }
 }
