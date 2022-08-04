@@ -9,7 +9,7 @@
 
 import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json, logging, schema, tags, workspaces } from '@angular-devkit/core';
+import { JsonValue, json, logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
@@ -76,7 +76,7 @@ async function _executeTarget(
   parentLogger: logging.Logger,
   workspace: workspaces.WorkspaceDefinition,
   root: string,
-  argv: yargsParser.Arguments,
+  argv: ReturnType<typeof yargsParser>,
   registry: schema.SchemaRegistry,
 ) {
   const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, root);
@@ -102,7 +102,7 @@ async function _executeTarget(
       throw new Error(`Unknown argument ${key}. Did you mean ${decamelize(key)}?`);
     }
 
-    camelCasedOptions[camelCase(key)] = value;
+    camelCasedOptions[camelCase(key)] = value as JsonValue;
   }
 
   const run = await architect.scheduleTarget(targetSpec, camelCasedOptions, { logger });

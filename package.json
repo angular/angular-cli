@@ -196,7 +196,7 @@
     "regenerator-runtime": "0.13.9",
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
-    "sass": "1.54.1",
+    "sass": "1.54.2",
     "sass-loader": "13.0.2",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz",
     "semver": "7.3.7",
@@ -223,7 +223,7 @@
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0",
     "yargs": "17.5.1",
-    "yargs-parser": "21.0.1",
+    "yargs-parser": "21.1.0",
     "zone.js": "^0.11.3"
   }
 }
