@@ -155,7 +155,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
       }
 
       const value = decl.value;
-      const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+?))\s*\)/g;
+      const urlRegex = /url(?:\(\s*['"]?)(.*?)(?:['"]?\s*\))/g;
       const segments: string[] = [];
 
       let match;
@@ -168,7 +168,7 @@ export default function (options?: PostcssCliResourcesOptions): Plugin {
 
       // eslint-disable-next-line no-cond-assign
       while ((match = urlRegex.exec(value))) {
-        const originalUrl = match[1] || match[2] || match[3];
+        const originalUrl = match[1];
         let processedUrl;
         try {
           processedUrl = await process(originalUrl, context, resourceCache);

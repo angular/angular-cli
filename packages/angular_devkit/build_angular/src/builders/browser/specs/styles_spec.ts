@@ -679,4 +679,17 @@ describe('Browser Builder styles', () => {
 
     await browserBuild(architect, host, target, { styles: ['src/styles.css'] });
   });
+
+  it('works when Data URI has escaped quote', async () => {
+    const svgData = `"data:image/svg+xml;charset=utf-8,<svg width=/"16/" height=/"15/"></svg>"`;
+
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        div { background: url(${svgData}) }
+      `,
+    });
+
+    const result = await browserBuild(architect, host, target, { styles: ['src/styles.css'] });
+    expect(await result.files['styles.css']).toContain(svgData);
+  });
 });
