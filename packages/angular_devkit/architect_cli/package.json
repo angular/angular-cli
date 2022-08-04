@@ -19,7 +19,7 @@
     "ansi-colors": "4.1.3",
     "progress": "2.0.3",
     "symbol-observable": "4.0.0",
-    "yargs-parser": "21.0.1"
+    "yargs-parser": "21.1.0"
   },
   "devDependencies": {
     "@types/progress": "2.0.5"
