@@ -8,6 +8,7 @@
 
 import type { BuildOptions, OutputFile } from 'esbuild';
 import * as path from 'path';
+import { createCssResourcePlugin } from './css-resource-plugin';
 import { bundle } from './esbuild';
 import { createSassPlugin } from './sass-plugin';
 
@@ -18,6 +19,7 @@ export interface BundleStylesheetOptions {
   sourcemap: boolean | 'external' | 'inline';
   outputNames?: { bundles?: string; media?: string };
   includePaths?: string[];
+  externalDependencies?: string[];
 }
 
 async function bundleStylesheet(
@@ -42,9 +44,13 @@ async function bundleStylesheet(
     write: false,
     platform: 'browser',
     preserveSymlinks: options.preserveSymlinks,
+    external: options.externalDependencies,
     conditions: ['style', 'sass'],
     mainFields: ['style', 'sass'],
-    plugins: [createSassPlugin({ sourcemap: !!options.sourcemap, loadPaths })],
+    plugins: [
+      createSassPlugin({ sourcemap: !!options.sourcemap, loadPaths }),
+      createCssResourcePlugin(),
+    ],
   });
 
   // Extract the result of the bundling from the output files
