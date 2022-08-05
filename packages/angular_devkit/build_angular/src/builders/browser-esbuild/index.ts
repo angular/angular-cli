@@ -168,6 +168,7 @@ export async function buildEsbuildBrowser(
           outputNames: noInjectNames.includes(name) ? { media: outputNames.media } : outputNames,
           includePaths: options.stylePreprocessorOptions?.includePaths,
           preserveSymlinks: options.preserveSymlinks,
+          externalDependencies: options.externalDependencies,
         },
       );
 
@@ -354,6 +355,7 @@ async function bundleCode(
             !!sourcemapOptions.styles && (sourcemapOptions.hidden ? false : 'inline'),
           outputNames,
           includePaths: options.stylePreprocessorOptions?.includePaths,
+          externalDependencies: options.externalDependencies,
         },
       ),
     ],
