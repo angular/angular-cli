@@ -9,7 +9,14 @@
 import type { CompilerHost } from '@angular/compiler-cli';
 import { transformAsync } from '@babel/core';
 import * as assert from 'assert';
-import type { OnStartResult, PartialMessage, PartialNote, Plugin, PluginBuild } from 'esbuild';
+import type {
+  OnStartResult,
+  OutputFile,
+  PartialMessage,
+  PartialNote,
+  Plugin,
+  PluginBuild,
+} from 'esbuild';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import ts from 'typescript';
@@ -190,8 +197,14 @@ export function createCompilerPlugin(
       // The file emitter created during `onStart` that will be used during the build in `onLoad` callbacks for TS files
       let fileEmitter: FileEmitter | undefined;
 
+      // The stylesheet resources from component stylesheets that will be added to the build results output files
+      let stylesheetResourceFiles: OutputFile[];
+
       build.onStart(async () => {
         const result: OnStartResult = {};
+
+        // Reset stylesheet resource output files
+        stylesheetResourceFiles = [];
 
         // Create TypeScript compiler host
         const host = ts.createIncrementalCompilerHost(compilerOptions);
@@ -205,10 +218,14 @@ export function createCompilerPlugin(
             return this.readFile(fileName) ?? '';
           }
 
-          const { contents, errors, warnings } = await bundleStylesheetFile(fileName, styleOptions);
+          const { contents, resourceFiles, errors, warnings } = await bundleStylesheetFile(
+            fileName,
+            styleOptions,
+          );
 
           (result.errors ??= []).push(...errors);
           (result.warnings ??= []).push(...warnings);
+          stylesheetResourceFiles.push(...resourceFiles);
 
           return contents;
         };
@@ -224,7 +241,7 @@ export function createCompilerPlugin(
           // or the file containing the inline component style text (containingFile).
           const file = context.resourceFile ?? context.containingFile;
 
-          const { contents, errors, warnings } = await bundleStylesheetText(
+          const { contents, resourceFiles, errors, warnings } = await bundleStylesheetText(
             data,
             {
               resolvePath: path.dirname(file),
@@ -235,6 +252,7 @@ export function createCompilerPlugin(
 
           (result.errors ??= []).push(...errors);
           (result.warnings ??= []).push(...warnings);
+          stylesheetResourceFiles.push(...resourceFiles);
 
           return { content: contents };
         };
@@ -428,6 +446,12 @@ export function createCompilerPlugin(
           contents: result?.code ?? data,
           loader: 'js',
         };
+      });
+
+      build.onEnd((result) => {
+        if (stylesheetResourceFiles.length) {
+          result.outputFiles?.push(...stylesheetResourceFiles);
+        }
       });
     },
   };
