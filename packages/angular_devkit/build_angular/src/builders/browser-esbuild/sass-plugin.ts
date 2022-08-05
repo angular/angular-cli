@@ -6,54 +6,74 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { Plugin, PluginBuild } from 'esbuild';
-import type { LegacyResult } from 'sass';
-import { SassWorkerImplementation } from '../../sass/sass-service';
+import type { PartialMessage, Plugin, PluginBuild } from 'esbuild';
+import type { CompileResult } from 'sass';
+import { fileURLToPath } from 'url';
 
-export function createSassPlugin(options: { sourcemap: boolean; includePaths?: string[] }): Plugin {
+export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: string[] }): Plugin {
   return {
     name: 'angular-sass',
     setup(build: PluginBuild): void {
-      let sass: SassWorkerImplementation;
+      let sass: typeof import('sass');
 
-      build.onStart(() => {
-        sass = new SassWorkerImplementation();
+      build.onStart(async () => {
+        // Lazily load Sass
+        sass = await import('sass');
       });
 
-      build.onEnd(() => {
-        sass?.close();
-      });
-
-      build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
-        const result = await new Promise<LegacyResult>((resolve, reject) => {
-          sass.render(
-            {
-              file: args.path,
-              includePaths: options.includePaths,
-              indentedSyntax: args.path.endsWith('.sass'),
-              outputStyle: 'expanded',
-              sourceMap: options.sourcemap,
-              sourceMapContents: options.sourcemap,
-              sourceMapEmbed: options.sourcemap,
-              quietDeps: true,
+      build.onLoad({ filter: /\.s[ac]ss$/ }, (args) => {
+        try {
+          const warnings: PartialMessage[] = [];
+          // Use sync version as async version is slower.
+          const { css, sourceMap, loadedUrls } = sass.compile(args.path, {
+            style: 'expanded',
+            loadPaths: options.loadPaths,
+            sourceMap: options.sourcemap,
+            sourceMapIncludeSources: options.sourcemap,
+            quietDeps: true,
+            logger: {
+              warn: (text, _options) => {
+                warnings.push({
+                  text,
+                });
+              },
             },
-            (error, result) => {
-              if (error) {
-                reject(error);
-              }
-              if (result) {
-                resolve(result);
-              }
-            },
-          );
-        });
+          });
 
-        return {
-          contents: result.css,
-          loader: 'css',
-          watchFiles: result.stats.includedFiles,
-        };
+          return {
+            loader: 'css',
+            contents: css + sourceMapToUrlComment(sourceMap),
+            watchFiles: loadedUrls.map((url) => fileURLToPath(url)),
+            warnings,
+          };
+        } catch (error) {
+          if (error instanceof sass.Exception) {
+            const file = error.span.url ? fileURLToPath(error.span.url) : undefined;
+
+            return {
+              loader: 'css',
+              errors: [
+                {
+                  text: error.toString(),
+                },
+              ],
+              watchFiles: file ? [file] : undefined,
+            };
+          }
+
+          throw error;
+        }
       });
     },
   };
+}
+
+function sourceMapToUrlComment(sourceMap: CompileResult['sourceMap']): string {
+  if (!sourceMap) {
+    return '';
+  }
+
+  const urlSourceMap = Buffer.from(JSON.stringify(sourceMap), 'utf-8').toString('base64');
+
+  return `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${urlSourceMap}`;
 }
