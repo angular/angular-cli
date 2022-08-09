@@ -212,6 +212,7 @@ ts_library(
     jasmine_node_test(
         name = "build_angular_test_" + toolchain_name,
         srcs = [":build_angular_test_lib"],
+        tags = [toolchain_name],
         toolchain = toolchain,
     )
     for toolchain_name, toolchain in zip(
@@ -293,8 +294,10 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
-        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
-        "tags": ["no-remote-exec"],
+        "tags": [
+            # TODO: node crashes with an internal error on node16
+            "node16-broken",
+        ],
     },
     "dev-server": {
         "shards": 10,
@@ -398,7 +401,10 @@ LARGE_SPECS = {
             # These tests are resource intensive and should not be over-parallized as they will
             # compete for the resources of other parallel tests slowing everything down.
             # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
-            tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
+            tags = [
+                "cpu:2",
+                toolchain_name,
+            ] + LARGE_SPECS[spec].get("tags", []),
             toolchain = toolchain,
             deps = [":build_angular_" + spec + "_test_lib"],
         )

@@ -78,6 +78,7 @@ ts_library(
     jasmine_node_test(
         name = "schematics_cli_test_" + toolchain_name,
         srcs = [":schematics_cli_test_lib"],
+        tags = [toolchain_name],
         toolchain = toolchain,
     )
     for toolchain_name, toolchain in zip(
