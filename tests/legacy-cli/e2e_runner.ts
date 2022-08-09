@@ -33,11 +33,22 @@ Error.stackTraceLimit = Infinity;
  *                    passed in.
  *   --shard          Index of this processes' shard.
  *   --tmpdir=path    Override temporary directory to use for new projects.
+ *   --yarn           Use yarn as package manager.
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = yargsParser(process.argv.slice(2), {
-  boolean: ['debug', 'esbuild', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose'],
+  boolean: [
+    'debug',
+    'esbuild',
+    'ng-snapshots',
+    'noglobal',
+    'nosilent',
+    'noproject',
+    'verbose',
+    'yarn',
+  ],
   string: ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
+  number: ['nb-shards', 'shard'],
   configuration: {
     'dot-notation': false,
     'camel-case-expansion': false,
