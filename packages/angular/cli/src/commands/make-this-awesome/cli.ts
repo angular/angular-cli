@@ -12,7 +12,7 @@ import { colors } from '../../utilities/color';
 
 export class AwesomeCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'make-this-awesome';
-  describe: false = false;
+  describe = false as const;
   deprecated = false;
   longDescriptionPath?: string | undefined;
 
