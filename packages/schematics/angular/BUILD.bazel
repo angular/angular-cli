@@ -87,6 +87,7 @@ ts_library(
     jasmine_node_test(
         name = "no_typescript_runtime_dep_test_" + toolchain_name,
         srcs = ["no_typescript_runtime_dep_spec.js"],
+        tags = [toolchain_name],
         toolchain = toolchain,
         deps = [
             ":angular",
@@ -130,6 +131,7 @@ ts_library(
     jasmine_node_test(
         name = "angular_test_" + toolchain_name,
         srcs = [":angular_test_lib"],
+        tags = [toolchain_name],
         toolchain = toolchain,
         deps = [
             "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",

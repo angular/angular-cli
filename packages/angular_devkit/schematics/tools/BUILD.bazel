@@ -62,6 +62,7 @@ ts_library(
     jasmine_node_test(
         name = "tools_test_" + toolchain_name,
         srcs = [":tools_test_lib"],
+        tags = [toolchain_name],
         toolchain = toolchain,
         deps = [
             "@npm//jasmine",
