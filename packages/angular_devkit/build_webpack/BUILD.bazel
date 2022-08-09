@@ -92,6 +92,7 @@ ts_library(
     jasmine_node_test(
         name = "build_webpack_test_" + toolchain_name,
         srcs = [":build_webpack_test_lib"],
+        tags = [toolchain_name],
         # Turns off nodejs require patches and turns on the linker, which sets up up node_modules
         # so that standard node module resolution work.
         templated_args = ["--nobazel_patch_module_resolver"],

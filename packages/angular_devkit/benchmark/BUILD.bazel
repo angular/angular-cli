@@ -60,6 +60,7 @@ ts_library(
     jasmine_node_test(
         name = "benchmark_test_" + toolchain_name,
         srcs = [":benchmark_test_lib"],
+        tags = [toolchain_name],
         toolchain = toolchain,
         deps = [
             "@npm//jasmine",

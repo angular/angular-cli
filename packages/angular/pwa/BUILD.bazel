@@ -66,6 +66,7 @@ ts_library(
     jasmine_node_test(
         name = "pwa_test_" + toolchain_name,
         srcs = [":pwa_test_lib"],
+        tags = [toolchain_name],
         toolchain = toolchain,
     )
     for toolchain_name, toolchain in zip(
