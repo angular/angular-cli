@@ -172,7 +172,7 @@ export class NgBuildAnalyticsPlugin {
   protected _collectBundleStats(compilation: Compilation) {
     const chunkAssets = new Set<string>();
     for (const chunk of compilation.chunks) {
-      if (!chunk.rendered) {
+      if (!chunk.rendered || chunk.files.size === 0) {
         continue;
       }
 
