@@ -73,7 +73,7 @@
     "critters": "0.0.16",
     "cross-env": "^7.0.3",
     "domino": "^2.1.2",
-    "esbuild": "^0.14.0",
+    "esbuild": "^0.15.0",
     "eslint": "8.20.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-header": "3.1.1",
