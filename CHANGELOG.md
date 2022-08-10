@@ -1,3 +1,29 @@
+<a name="14.1.2"></a>
+
+# 14.1.2 (2022-08-10)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [3e19c842c](https://github.com/angular/angular-cli/commit/3e19c842cc2a7f2dc62904f5f88025a4687d378a) | fix  | avoid collect stats from chunks with no files                             |
+| [d0a0c597c](https://github.com/angular/angular-cli/commit/d0a0c597cd09b1ce4d7134d3e330982b522f28a9) | fix  | correctly handle data URIs with escaped quotes in stylesheets             |
+| [67b3a086f](https://github.com/angular/angular-cli/commit/67b3a086fe90d1b7e5443e8a9f29b12367dd07e7) | fix  | process stylesheet resources from url tokens with esbuild browser builder |
+| [e6c45c316](https://github.com/angular/angular-cli/commit/e6c45c316ebcd1b5a16b410a3743088e9e9f789c) | perf | reduce babel transformation in esbuild builder                            |
+| [38b71bcc0](https://github.com/angular/angular-cli/commit/38b71bcc0ddca1a34a5a4480ecd0b170bd1e9620) | perf | use esbuild in esbuild builder to downlevel native async/await            |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [dd47a5e8c](https://github.com/angular/angular-cli/commit/dd47a5e8c543cbd3bb37afe5040a72531b028347) | fix  | elide type only named imports when using `emitDecoratorMetadata` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Jason Bedard
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.1"></a>
 
 # 14.1.1 (2022-08-03)
