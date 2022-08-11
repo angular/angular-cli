@@ -26,7 +26,7 @@ By default, disk cache is only enabled for local environments. The value of envi
 
 - `all` - allows disk cache on all machines.
 - `local` - allows disk cache only on development machines.
-- `ci` - allows disk cache only on continuous integration (Ci) systems.
+- `ci` - allows disk cache only on continuous integration (CI) systems.
 
 To change the environment setting to `all`, run the following command:
 
