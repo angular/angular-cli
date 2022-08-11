@@ -7,7 +7,7 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import { Observable, of as observableOf } from 'rxjs';
+import { Observable } from 'rxjs';
 import { concatMap, first, map } from 'rxjs/operators';
 import { callRule } from '../rules/call';
 import { Tree } from '../tree/interface';
@@ -29,7 +29,8 @@ export class InvalidSchematicsNameException extends BaseException {
 }
 
 export class SchematicImpl<CollectionT extends object, SchematicT extends object>
-  implements Schematic<CollectionT, SchematicT> {
+  implements Schematic<CollectionT, SchematicT>
+{
   constructor(
     private _description: SchematicDescription<CollectionT, SchematicT>,
     private _factory: RuleFactory<{}>,
@@ -73,7 +74,7 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
           input = tree;
         }
 
-        return callRule(this._factory(transformedOptions), observableOf(input), context).pipe(
+        return callRule(this._factory(transformedOptions), input, context).pipe(
           map((output) => {
             if (output === input) {
               return tree;
