@@ -120,7 +120,7 @@ function parseWorkspace(workspaceNode: Node, context: ParserContext): WorkspaceD
       projects = parseProjectsObject(nodes, context);
     } else {
       if (!context.unprefixedWorkspaceExtensions.has(name) && !/^[a-z]{1,3}-.*/.test(name)) {
-        context.warn(`Project extension with invalid name (${name}) found.`, name);
+        context.warn(`Workspace extension with invalid name (${name}) found.`, name);
       }
       if (extensions) {
         extensions[name] = value;
