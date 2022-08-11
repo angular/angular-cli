@@ -20,12 +20,15 @@ import { StateKey, TransferState, makeStateKey } from '@angular/platform-browser
 import { Observable, of } from 'rxjs';
 import { filter, take, tap } from 'rxjs/operators';
 
+type ResponseType = HttpRequest<unknown>['responseType'];
+
 interface TransferHttpResponse {
   body?: any | null;
   headers?: Record<string, string[]>;
   status?: number;
   statusText?: string;
   url?: string;
+  responseType?: ResponseType;
 }
 
 @Injectable()
@@ -36,6 +39,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     method: string,
     url: string,
     params: HttpParams,
+    responseType?: ResponseType,
   ): StateKey<TransferHttpResponse> {
     // make the params encoded same as a url so it's easy to identify
     const encodedParams = params
@@ -43,7 +47,8 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
       .sort()
       .map((k) => `${k}=${params.getAll(k)}`)
       .join('&');
-    const key = (method === 'GET' ? 'G.' : 'H.') + url + '?' + encodedParams;
+
+    const key = (method === 'GET' ? 'G.' : 'H.') + responseType + '.' + url + '?' + encodedParams;
 
     return makeStateKey(key);
   }
@@ -66,15 +71,38 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    const storeKey = this.makeCacheKey(req.method, req.url, req.params);
+    const storeKey = this.makeCacheKey(req.method, req.url, req.params, req.responseType);
 
     if (this.transferState.hasKey(storeKey)) {
       // Request found in cache. Respond using it.
       const response = this.transferState.get(storeKey, {});
+      let body: ArrayBuffer | Blob | string | undefined = response.body;
+
+      switch (response.responseType) {
+        case 'arraybuffer':
+          {
+            // If we're in Node...
+            if (typeof Buffer !== 'undefined') {
+              const buf = Buffer.from(response.body);
+              body = new ArrayBuffer(buf.length);
+              const view = new Uint8Array(body);
+              for (let i = 0; i < buf.length; ++i) {
+                view[i] = buf[i];
+              }
+            } else if (typeof TextEncoder !== 'undefined') {
+              // Modern browsers implement TextEncode.
+              body = new TextEncoder().encode(response.body).buffer;
+            }
+          }
+          break;
+        case 'blob':
+          body = new Blob([response.body]);
+          break;
+      }
 
       return of(
         new HttpResponse<any>({
-          body: response.body,
+          body,
           headers: new HttpHeaders(response.headers),
           status: response.status,
           statusText: response.statusText,
@@ -95,6 +123,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
             status: event.status,
             statusText: event.statusText,
             url: event.url ?? '',
+            responseType: req.responseType,
           });
         }
       }),

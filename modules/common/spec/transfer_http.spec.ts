@@ -32,8 +32,9 @@ describe('TransferHttp', () => {
         'GET',
         'https://google.com/api',
         new HttpParams().append('foo', 'bar'),
+        'text',
       );
-      expect(key).toEqual('G.https://google.com/api?foo=bar');
+      expect(key).toEqual('G.text.https://google.com/api?foo=bar');
     });
     it('should sort the keys by unicode points', () => {
       const interceptor = new TransferHttpCacheInterceptor(mockAppRef(), mockTransferState());
@@ -41,8 +42,9 @@ describe('TransferHttp', () => {
         'GET',
         'https://google.com/api',
         new HttpParams().append('b', 'foo').append('a', 'bar'),
+        'text',
       );
-      expect(key).toEqual('G.https://google.com/api?a=bar&b=foo');
+      expect(key).toEqual('G.text.https://google.com/api?a=bar&b=foo');
     });
     it('should make equal keys if order of params changes', () => {
       const interceptor = new TransferHttpCacheInterceptor(mockAppRef(), mockTransferState());
@@ -50,11 +52,13 @@ describe('TransferHttp', () => {
         'GET',
         'https://google.com/api',
         new HttpParams().append('a', 'bar').append('b', 'foo'),
+        'text',
       );
       const key2 = interceptor['makeCacheKey'](
         'GET',
         'https://google.com/api',
         new HttpParams().append('b', 'foo').append('a', 'bar'),
+        'text',
       );
       expect(key1).toEqual(key2);
     });
@@ -64,8 +68,9 @@ describe('TransferHttp', () => {
         'GET',
         'https://google.com/api',
         new HttpParams().append('b', 'xyz').append('a', 'foo').append('a', 'bar'),
+        'text',
       );
-      expect(key).toEqual('G.https://google.com/api?a=foo,bar&b=xyz');
+      expect(key).toEqual('G.text.https://google.com/api?a=foo,bar&b=xyz');
     });
   });
 });
