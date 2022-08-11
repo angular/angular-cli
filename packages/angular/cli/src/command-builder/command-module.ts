@@ -140,8 +140,11 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
 
     // Gather and report analytics.
     const analytics = await this.getAnalytics();
+    let stopPeriodicFlushes: (() => Promise<void>) | undefined;
+
     if (this.shouldReportAnalytics) {
       await this.reportAnalytics(camelCasedOptions);
+      stopPeriodicFlushes = this.periodicAnalyticsFlush(analytics);
     }
 
     let exitCode: number | void | undefined;
@@ -151,7 +154,6 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       exitCode = await this.run(camelCasedOptions as Options<T> & OtherOptions);
       const endTime = Date.now();
       analytics.timing(this.commandName, 'duration', endTime - startTime);
-      await analytics.flush();
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
         this.context.logger.fatal(`Error: ${e.message}`);
@@ -160,6 +162,8 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         throw e;
       }
     } finally {
+      await stopPeriodicFlushes?.();
+
       if (typeof exitCode === 'number' && exitCode > 0) {
         process.exitCode = exitCode;
       }
@@ -170,6 +174,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     options: (Options<T> & OtherOptions) | OtherOptions,
     paths: string[] = [],
     dimensions: (boolean | number | string)[] = [],
+    title?: string,
   ): Promise<void> {
     for (const [name, ua] of this.optionsWithAnalytics) {
       const value = options[name];
@@ -183,6 +188,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     analytics.pageview('/command/' + [this.commandName, ...paths].join('/'), {
       dimensions,
       metrics: [],
+      title,
     });
   }
 
@@ -274,6 +280,26 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     }
 
     return workspace;
+  }
+
+  /**
+   * Flush on an interval (if the event loop is waiting).
+   *
+   * @returns a method that when called will terminate the periodic
+   * flush and call flush one last time.
+   */
+  private periodicAnalyticsFlush(analytics: analytics.Analytics): () => Promise<void> {
+    let analyticsFlushPromise = Promise.resolve();
+    const analyticsFlushInterval = setInterval(() => {
+      analyticsFlushPromise = analyticsFlushPromise.then(() => analytics.flush());
+    }, 2000);
+
+    return () => {
+      clearInterval(analyticsFlushInterval);
+
+      // Flush one last time.
+      return analyticsFlushPromise.then(() => analytics.flush());
+    };
   }
 }
 
