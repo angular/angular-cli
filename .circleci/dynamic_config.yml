@@ -374,6 +374,10 @@ workflows:
           requires:
             - setup
 
+      - test-browsers:
+          requires:
+            - build
+
       - e2e-tests:
           name: e2e-cli-<< matrix.subset >>
           nodeversion: '14.15'
