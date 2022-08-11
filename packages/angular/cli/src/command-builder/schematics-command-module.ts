@@ -147,14 +147,13 @@ export abstract class SchematicsCommandModule
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
       if (shouldReportAnalytics) {
         shouldReportAnalytics = false;
-        // ng generate lib -> ng generate
-        const commandName = this.command?.split(' ', 1)[0];
 
-        await this.reportAnalytics(options as {}, [
-          commandName,
-          schematic.collection.name.replace(/\//g, '_'),
-          schematic.name.replace(/\//g, '_'),
-        ]);
+        await this.reportAnalytics(
+          options as {},
+          undefined /** paths */,
+          undefined /** dimensions */,
+          schematic.collection.name + ':' + schematic.name,
+        );
       }
 
       // TODO: The below should be removed in version 15 when we change 1P schematics to use the `workingDirectory smart default`.
