@@ -1,3 +1,32 @@
+<a name="14.2.0-next.1"></a>
+
+# 14.2.0-next.1 (2022-08-11)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [44c25511e](https://github.com/angular/angular-cli/commit/44c25511ea2adbd4fbe82a6122fc00af612be8e8) | feat | add ability to serve service worker when using dev-server                 |
+| [3fb569b5c](https://github.com/angular/angular-cli/commit/3fb569b5c82f22afca4dc59313356f198755827e) | feat | switch to Sass modern API in esbuild builder                              |
+| [7de9b470c](https://github.com/angular/angular-cli/commit/7de9b470cb54d974027a8baf88b611585fc526c7) | fix  | avoid collect stats from chunks with no files                             |
+| [70bc35456](https://github.com/angular/angular-cli/commit/70bc35456aa5b58ce1a0e2440ebb6533c7f5e48b) | fix  | correctly handle data URIs with escaped quotes in stylesheets             |
+| [f474bf532](https://github.com/angular/angular-cli/commit/f474bf532f89a296eb1b47f941998d73c1c51e8a) | fix  | process stylesheet resources from url tokens with esbuild browser builder |
+| [50c783307](https://github.com/angular/angular-cli/commit/50c783307eb1253f4f2a87502bd7a19f6a409aeb) | fix  | use valid CSS comment for sourcemaps with Sass in esbuild builder         |
+| [3e3dc6962](https://github.com/angular/angular-cli/commit/3e3dc6962d49cb8e8575146b22d134732cfff39f) | perf | reduce babel transformation in esbuild builder                            |
+| [8f9cee351](https://github.com/angular/angular-cli/commit/8f9cee351e5cc7da5a75b1a9b06306bc224e6b56) | perf | use esbuild in esbuild builder to downlevel native async/await            |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [cf9afeec2](https://github.com/angular/angular-cli/commit/cf9afeec20c035386a081fdeec98c9f26f82692e) | fix  | elide type only named imports when using `emitDecoratorMetadata` |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Jason Bedard
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.2"></a>
 
 # 14.1.2 (2022-08-10)
