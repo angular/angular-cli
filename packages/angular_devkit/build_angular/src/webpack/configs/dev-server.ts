@@ -92,26 +92,6 @@ export async function getDevServerConfig(
         publicPath: servePath,
         stats: false,
       },
-      setupMiddlewares: (middlewares, _devServer) => {
-        // Temporary workaround for https://github.com/webpack/webpack-dev-server/issues/4180
-        middlewares.push({
-          name: 'options-request-response',
-          path: '*',
-          middleware: (req: Request, res: Response, next: NextFunction) => {
-            if (req.method === 'OPTIONS') {
-              res.statusCode = 204;
-              res.setHeader('Content-Length', 0);
-              res.end();
-
-              return;
-            }
-
-            next();
-          },
-        });
-
-        return middlewares;
-      },
       liveReload,
       hot: hmr && !liveReload ? 'only' : hmr,
       proxy: await addProxyConfig(root, proxyConfig),
