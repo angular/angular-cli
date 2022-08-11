@@ -53,10 +53,15 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return this.onMissingTarget(e.message);
     }
 
-    await this.reportAnalytics({
-      ...(await architectHost.getOptionsForTarget(target)),
-      ...options,
-    });
+    await this.reportAnalytics(
+      {
+        ...(await architectHost.getOptionsForTarget(target)),
+        ...options,
+      },
+      undefined /** paths */,
+      undefined /** dimensions */,
+      builderName,
+    );
 
     const { logger } = this.context;
 
