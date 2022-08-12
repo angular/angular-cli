@@ -122,10 +122,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#2693a8869061a076eb8687c08aa22e4785eb3749":
-  version "0.0.0-1c22264e2b24f792a02ca397fa587bff03111a13"
-  uid "2693a8869061a076eb8687c08aa22e4785eb3749"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#2693a8869061a076eb8687c08aa22e4785eb3749"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#a9bafebdb359b24c28e09010c5e6ec3fc8f64032":
+  version "0.0.0-55daf7df431dd8a4c38628df746e9d7658e58a1f"
+  uid a9bafebdb359b24c28e09010c5e6ec3fc8f64032
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a9bafebdb359b24c28e09010c5e6ec3fc8f64032"
   dependencies:
     "@angular-devkit/build-angular" "14.2.0-next.0"
     "@angular/benchpress" "0.3.0"
@@ -160,10 +160,10 @@
     uuid "^8.3.2"
     yargs "^17.0.0"
 
-"@angular/cdk@14.1.1":
-  version "14.1.1"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-14.1.1.tgz#34e40a12e78b3a9db902d6c3fb3a407cc6875e43"
-  integrity sha512-Um4d5aWp7ACHd7O2cF3B4IXbQrnzMVvKlUVoKIBI4+EcCF70vAJrfXrAJoXIzLpte3MCDa6wO3wUX7uIJ4VlAQ==
+"@angular/cdk@14.1.2":
+  version "14.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-14.1.2.tgz#0f046241e51167534718cebf63abdc35408ad972"
+  integrity sha512-hJMhQmWWXTgwUa51OvEUgSATduEILCmGXpbsvC+REMMOo9rTd3u+cfrJW9OKl7Weq86VhKQ0WSfbn3MVyhUVBg==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -229,17 +229,17 @@
     glob "8.0.3"
     yargs "^17.2.1"
 
-"@angular/material@14.1.1":
-  version "14.1.1"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-14.1.1.tgz#fd8021addad113476d29ac279e23aa2a86022e08"
-  integrity sha512-HU83cgnAayItSXhyMdu1+edXj2DMjGXndvFicf300JtyliyjFmVzuM78O7hIJWLhT4Mohh/GkTlOSp4sc8xXhQ==
+"@angular/material@14.1.2":
+  version "14.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-14.1.2.tgz#4754f08755a5d0ae34553bf773ea0d50018e8ddb"
+  integrity sha512-riDaeOFF+fzjOxeWlqtVAT7lHlqoyzxE24Z7r7qyYriU+EndfEfOv9XQFup5BkqvDvzN9My+1vI562caWM3nfQ==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#8026354b6d00023c223a950d6ac2e44c69a261b5":
-  version "0.0.0-1c22264e2b24f792a02ca397fa587bff03111a13"
-  uid "8026354b6d00023c223a950d6ac2e44c69a261b5"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#8026354b6d00023c223a950d6ac2e44c69a261b5"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#b3fa973d98f1eee8969c4dd50fe7e7e93b6568c9":
+  version "0.0.0-55daf7df431dd8a4c38628df746e9d7658e58a1f"
+  uid b3fa973d98f1eee8969c4dd50fe7e7e93b6568c9
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#b3fa973d98f1eee8969c4dd50fe7e7e93b6568c9"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.7.3"
