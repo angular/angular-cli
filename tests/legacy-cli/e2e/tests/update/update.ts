@@ -2,16 +2,17 @@ import { appendFile } from 'fs/promises';
 import { SemVer } from 'semver';
 import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, readFile } from '../../utils/fs';
-import { getActivePackageManager, setRegistry } from '../../utils/packages';
+import { getActivePackageManager } from '../../utils/packages';
 import { ng, noSilentNg } from '../../utils/process';
 import { isPrereleaseCli, useCIChrome, useCIDefaults, NgCLIVersion } from '../../utils/project';
 
 export default async function () {
+  let restoreRegistry: (() => Promise<void>) | undefined;
+
   try {
     // We need to use the public registry because in the local NPM server we don't have
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
-    await setRegistry(false);
-    await createProjectFromAsset('12.0-project', true);
+    restoreRegistry = await createProjectFromAsset('12.0-project', true);
 
     // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
     // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
@@ -49,7 +50,7 @@ export default async function () {
       }
     }
   } finally {
-    await setRegistry(true);
+    await restoreRegistry?.();
   }
 
   // Update Angular current build

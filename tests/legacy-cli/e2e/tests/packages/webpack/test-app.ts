@@ -5,8 +5,7 @@ import { execWithEnv } from '../../../utils/process';
 
 export default async function () {
   const webpackCLIBin = normalize('node_modules/.bin/webpack-cli');
-
-  await createProjectFromAsset('webpack/test-app');
+  const restoreRegistry = await createProjectFromAsset('webpack/test-app');
 
   // DISABLE_V8_COMPILE_CACHE=1 is required to disable the `v8-compile-cache` package.
   // It currently does not support dynamic import expressions which are now required by the
@@ -30,4 +29,5 @@ export default async function () {
     'DISABLE_V8_COMPILE_CACHE': '1',
   });
   await expectFileToMatch('dist/app.main.js', 'AppModule');
+  await restoreRegistry();
 }

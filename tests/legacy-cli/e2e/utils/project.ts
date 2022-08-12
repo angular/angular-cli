@@ -94,16 +94,16 @@ export async function prepareProjectForE2e(name: string) {
   await gitCommit('prepare-project-for-e2e');
 }
 
-export function useBuiltPackages(): Promise<void> {
+export function useBuiltPackagesVersions(): Promise<void> {
   return updateJsonFile('package.json', (json) => {
     json['dependencies'] ??= {};
     json['devDependencies'] ??= {};
 
     for (const packageName of Object.keys(packages)) {
       if (packageName in json['dependencies']) {
-        json['dependencies'][packageName] = packages[packageName].tar;
+        json['dependencies'][packageName] = packages[packageName].version;
       } else if (packageName in json['devDependencies']) {
-        json['devDependencies'][packageName] = packages[packageName].tar;
+        json['devDependencies'][packageName] = packages[packageName].version;
       }
     }
   });

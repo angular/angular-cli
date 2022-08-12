@@ -2,10 +2,10 @@ import { join } from 'path';
 import { chmod } from 'fs/promises';
 import glob from 'glob';
 import { getGlobalVariable } from './env';
-import { relative, resolve } from 'path';
-import { copyFile, writeFile } from './fs';
-import { installWorkspacePackages } from './packages';
-import { useBuiltPackages } from './project';
+import { resolve } from 'path';
+import { copyFile } from './fs';
+import { installWorkspacePackages, setRegistry } from './packages';
+import { useBuiltPackagesVersions } from './project';
 
 export function assetDir(assetName: string) {
   return join(__dirname, '../assets', assetName);
@@ -42,24 +42,26 @@ export function copyAssets(assetName: string, to?: string) {
     .then(() => tempRoot);
 }
 
+/**
+ * @returns a method that once called will restore the environment
+ * to use the local NPM registry.
+ * */
 export async function createProjectFromAsset(
   assetName: string,
   useNpmPackages = false,
   skipInstall = false,
-) {
+): Promise<() => Promise<void>> {
   const dir = await copyAssets(assetName);
   process.chdir(dir);
-  if (!useNpmPackages) {
-    await useBuiltPackages();
-    if (!getGlobalVariable('ci')) {
-      const testRegistry = getGlobalVariable('package-registry');
-      await writeFile('.npmrc', `registry=${testRegistry}`);
-    }
-  }
 
+  await setRegistry(!useNpmPackages /** useTestRegistry */);
+
+  if (!useNpmPackages) {
+    await useBuiltPackagesVersions();
+  }
   if (!skipInstall) {
     await installWorkspacePackages();
   }
 
-  return dir;
+  return () => setRegistry(true /** useTestRegistry */);
 }
