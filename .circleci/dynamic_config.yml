@@ -328,7 +328,7 @@ jobs:
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
-    parallelism: 16
+    parallelism: 12
     steps:
       - checkout
       - rebase_pr
