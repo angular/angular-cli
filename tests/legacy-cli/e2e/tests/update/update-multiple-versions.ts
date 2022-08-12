@@ -1,14 +1,13 @@
 import { createProjectFromAsset } from '../../utils/assets';
-import { installWorkspacePackages, setRegistry } from '../../utils/packages';
+import { setRegistry } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { isPrereleaseCli } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
+  let restoreRegistry: (() => Promise<void>) | undefined;
   try {
-    await createProjectFromAsset('12.0-project', true, true);
-    await setRegistry(false);
-    await installWorkspacePackages();
+    restoreRegistry = await createProjectFromAsset('12.0-project', true);
     await setRegistry(true);
 
     const extraArgs = ['--force'];
@@ -38,6 +37,6 @@ export default async function () {
       );
     }
   } finally {
-    await setRegistry(true);
+    await restoreRegistry?.();
   }
 }

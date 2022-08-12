@@ -1,6 +1,5 @@
 import { createProjectFromAsset } from '../../utils/assets';
 import { moveFile, replaceInFile } from '../../utils/fs';
-import { setRegistry } from '../../utils/packages';
 import { noSilentNg } from '../../utils/process';
 import { useCIChrome, useCIDefaults } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
@@ -12,11 +11,12 @@ import { expectToFail } from '../../utils/utils';
  */
 
 export default async function () {
+  let restoreRegistry: (() => Promise<void>) | undefined;
+
   try {
     // We need to use the public registry because in the local NPM server we don't have
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
-    await setRegistry(false);
-    await createProjectFromAsset('13.0-project', true);
+    restoreRegistry = await createProjectFromAsset('13.0-project', true);
 
     // A missing stylesheet error will trigger the stuck process issue with v13 when building
     await moveFile('src/styles.css', 'src/styles.scss');
@@ -30,6 +30,6 @@ export default async function () {
     await useCIDefaults('thirteen-project');
     await noSilentNg('test', '--watch=false');
   } finally {
-    await setRegistry(true);
+    await restoreRegistry?.();
   }
 }
