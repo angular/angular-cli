@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { Path, PathFragment, getSystemPath, join, normalize, virtualFs } from '../../src';
+import { Path, getSystemPath, join, normalize, virtualFs } from '../../src';
 import { NodeJsSyncHost } from '../host';
 
 /**

@@ -260,7 +260,7 @@ export function createCompilerPlugin(
         // Create the Angular specific program that contains the Angular compiler
         const angularProgram = new compilerCli.NgtscProgram(rootNames, compilerOptions, host);
         const angularCompiler = angularProgram.compiler;
-        const { ignoreForDiagnostics, ignoreForEmit } = angularCompiler;
+        const { ignoreForDiagnostics } = angularCompiler;
         const typeScriptProgram = angularProgram.getTsProgram();
 
         const builder = ts.createAbstractBuilder(typeScriptProgram, host);

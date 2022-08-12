@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { PathLike, existsSync, promises as fsPromises } from 'fs';
+import { existsSync, promises as fsPromises } from 'fs';
 import { join } from 'path';
 import { normalizeCacheOptions } from './normalize-cache';
 
