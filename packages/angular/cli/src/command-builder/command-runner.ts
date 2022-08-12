@@ -32,7 +32,7 @@ import { colors } from '../utilities/color';
 import { AngularWorkspace, getWorkspace } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { PackageManagerUtils } from '../utilities/package-manager';
-import { CommandContext, CommandModuleError, CommandScope } from './command-module';
+import { CommandContext, CommandModuleError } from './command-module';
 import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
 import { normalizeOptionsMiddleware } from './utilities/normalize-options-middleware';

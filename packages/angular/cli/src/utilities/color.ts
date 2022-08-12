@@ -9,8 +9,6 @@
 import * as ansiColors from 'ansi-colors';
 import { WriteStream } from 'tty';
 
-type AnsiColors = typeof ansiColors;
-
 function supportColor(): boolean {
   if (process.env.FORCE_COLOR !== undefined) {
     // 2 colors: FORCE_COLOR = 0 (Disables colors), depth 1

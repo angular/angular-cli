@@ -11,12 +11,7 @@ import { existsSync, promises as fsPromises } from 'fs';
 import { extname, posix, resolve } from 'path';
 import { URL, pathToFileURL } from 'url';
 import { Configuration, RuleSetRule } from 'webpack';
-import type {
-  Configuration as DevServerConfiguration,
-  NextFunction,
-  Request,
-  Response,
-} from 'webpack-dev-server';
+import type { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
 import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';

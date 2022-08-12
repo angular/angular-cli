@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { spawn, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { promises as fs } from 'fs';
 import * as os from 'os';
 import { JsonHelp } from 'packages/angular/cli/src/command-builder/utilities/json-help';

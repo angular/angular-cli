@@ -1,5 +1,5 @@
 import { getGlobalVariable } from './env';
-import { ProcessOutput, npm, silentNpm, silentYarn } from './process';
+import { ProcessOutput, silentNpm, silentYarn } from './process';
 
 export function getActivePackageManager(): 'npm' | 'yarn' {
   const value = getGlobalVariable('package-manager');
@@ -48,8 +48,6 @@ export async function setRegistry(useTestRegistry: boolean): Promise<void> {
   const url = useTestRegistry
     ? getGlobalVariable('package-registry')
     : 'https://registry.npmjs.org';
-
-  const isCI = getGlobalVariable('ci');
 
   // Ensure local test registry is used when outside a project
   // Yarn supports both `NPM_CONFIG_REGISTRY` and `YARN_REGISTRY`.
