@@ -986,7 +986,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     if (
       this.context.packageManager.name === PackageManager.Npm &&
       this.context.packageManager.version &&
-      semver.gte(this.context.packageManager.version, '7.0.0', { includePrerelease: true })
+      semver.gte(this.context.packageManager.version, '7.0.0')
     ) {
       if (verbose) {
         this.context.logger.info(
