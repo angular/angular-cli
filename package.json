@@ -118,7 +118,7 @@
     "@types/postcss-preset-env": "^7.0.0",
     "@types/progress": "^2.0.3",
     "@types/resolve": "^1.17.1",
-    "@types/semver": "^7.0.0",
+    "@types/semver": "^7.3.12",
     "@types/text-table": "^0.2.1",
     "@types/uuid": "^8.0.0",
     "@types/yargs": "^17.0.8",

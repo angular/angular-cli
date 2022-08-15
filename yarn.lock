@@ -129,7 +129,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#08f0188fccf98139207fbd5e683533950e9068e2":
   version "0.0.0-b158ee64c37844b5bc8fed167815f6f0e99c3ae7"
-  uid "08f0188fccf98139207fbd5e683533950e9068e2"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#08f0188fccf98139207fbd5e683533950e9068e2"
   dependencies:
     "@angular-devkit/build-angular" "14.2.0-next.0"
@@ -243,7 +242,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#a9d380df54092930c4eabbab114c29ac125759f4":
   version "0.0.0-b158ee64c37844b5bc8fed167815f6f0e99c3ae7"
-  uid a9d380df54092930c4eabbab114c29ac125759f4
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#a9d380df54092930c4eabbab114c29ac125759f4"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -2359,10 +2357,10 @@
   dependencies:
     "@types/ws" "*"
 
-"@types/semver@^7.0.0":
-  version "7.3.10"
-  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.3.10.tgz#5f19ee40cbeff87d916eedc8c2bfe2305d957f73"
-  integrity sha512-zsv3fsC7S84NN6nPK06u79oWgrPVd0NvOyqgghV1haPaFcVxIrP4DLomRwGAXk0ui4HZA7mOcSFL98sMVW9viw==
+"@types/semver@^7.3.12":
+  version "7.3.12"
+  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.3.12.tgz#920447fdd78d76b19de0438b7f60df3c4a80bf1c"
+  integrity sha512-WwA1MW0++RfXmCr12xeYOOC5baSC9mSb0ZqCquFzKhcoF4TvHu5MKOuXsncgZcpVFhB1pXd5hZmM0ryAoCp12A==
 
 "@types/send@^0.17.1":
   version "0.17.1"
@@ -9715,7 +9713,6 @@ sass@^1.49.9:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz":
   version "0.0.0"
-  uid e5d7f82ad98251a653d1b0537f1103e49eda5e11
   resolved "https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz#e5d7f82ad98251a653d1b0537f1103e49eda5e11"
 
 saucelabs@^1.5.0:
