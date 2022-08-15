@@ -1,5 +1,5 @@
 # Disable NG CLI TTY mode
-test --action_env=NG_FORCE_TTY=false
+build --action_env=NG_FORCE_TTY=false
 
 # Make TypeScript compilation fast, by keeping a few copies of the compiler
 # running as daemons, and cache SourceFile AST's to reduce parse time.
@@ -49,6 +49,12 @@ test --incompatible_strict_action_env
 
 # Enable remote caching of build/action tree
 build --experimental_remote_merkle_tree_cache
+
+# Ensure that tags applied in BUILDs propagate to actions
+build --incompatible_allow_tags_propagation
+
+# Don't check if output files have been modified
+build --noexperimental_check_output_files
 
 # Ensure sandboxing is enabled even for exclusive tests
 test --incompatible_exclusive_test_sandboxed
@@ -146,6 +152,9 @@ build:remote --google_default_credentials
 # These settings are required for rules_nodejs
 ###############################
 
+# Fixes use of npm paths with spaces such as some within the puppeteer module
+build --experimental_inprocess_symlink_creation
+
 ####################################################
 # User bazel configuration
 # NOTE: This needs to be the *last* entry in the config.
@@ -157,4 +166,4 @@ try-import .bazelrc.user
 
 # Enable runfiles even on Windows.
 # Architect resolves output files from data files, and this isn't possible without runfile support.
-test --enable_runfiles
+build --enable_runfiles
