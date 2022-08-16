@@ -161,7 +161,7 @@ const init: any = (config: any, emitter: any) => {
   let lastCompilationHash: string | undefined;
   let isFirstRun = true;
 
-  return new Promise<void>((resolve) => {
+  return new Promise<void>((resolve, reject) => {
     compiler.hooks.done.tap('karma', (stats) => {
       if (isFirstRun) {
         // This is needed to block Karma from launching browsers before Webpack writes the assets in memory.
@@ -169,7 +169,9 @@ const init: any = (config: any, emitter: any) => {
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154#issuecomment-986661937
         // https://github.com/angular/angular-cli/issues/22495
         isFirstRun = false;
-        resolve();
+        // In singleRun mode, if there are compilation errors, the process should terminate 
+        // in error at this point. In watch mode, the process is kept alive regardless.
+        config.singleRun && stats.hasErrors() ? reject() : resolve();
       }
 
       if (stats.hasErrors()) {
