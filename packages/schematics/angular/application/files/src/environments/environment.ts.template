@@ -14,3 +14,4 @@ export const environment = {
  * on performance if an error is thrown.
  */
 // import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
+import 'zone.js/plugins/async-stack-tagging'; // Included with Angular CLI to support async stack tagging API.

@@ -38,7 +38,7 @@ describe('Migration to update Angular packages version prefix to `^` instead of 
           '@nguniversal/commom': '^13.1.0',
           'rxjs': '~7.4.0',
           'tslib': '^2.3.0',
-          'zone.js': '~0.11.4',
+          'zone.js': '~0.11.8',
         },
         devDependencies: {
           '@angular-devkit/build-angular': '~13.1.3',
@@ -74,7 +74,7 @@ describe('Migration to update Angular packages version prefix to `^` instead of 
       '@nguniversal/commom': '^13.1.0',
       'rxjs': '~7.4.0',
       'tslib': '^2.3.0',
-      'zone.js': '~0.11.4',
+      'zone.js': '~0.11.8',
     });
 
     expect(pkg['devDependencies']).toEqual({
