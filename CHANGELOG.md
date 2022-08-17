@@ -1,3 +1,19 @@
+<a name="14.1.3"></a>
+
+# 14.1.3 (2022-08-17)
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [365035cb3](https://github.com/angular/angular-cli/commit/365035cb37c57e07cb96e45a38f266b16b4e2fbf) | fix  | update workspace extension warning to use correct phrasing |
+
+## Special Thanks
+
+AgentEnder, Alan Agius, Charles Lyding and Jason Bedard
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.2"></a>
 
 # 14.1.2 (2022-08-10)
