@@ -1,3 +1,13 @@
+<a name="14.2.0-next.0"></a>
+
+# 14.2.0-next.0 (2022-08-17)
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and angular-robot[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.1.0"></a>
 
 # 14.1.0 (2022-08-17)
