@@ -1,26 +1,16 @@
-<a name="14.1.0-rc.0"></a>
+<a name="14.1.0"></a>
 
-# 14.1.0-rc.0 (2022-07-20)
-
-## Special Thanks
-
-Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.1.0-next.2"></a>
-
-# 14.1.0-next.2 (2022-07-06)
+# 14.1.0 (2022-08-17)
 
 ### @nguniversal/common
 
-| Commit                                                                                           | Type | Description                  |
-| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------- |
-| [1815b10f](https://github.com/angular/universal/commit/1815b10feba34a5dcb1d12567c9d4b4d774e45ee) | fix  | handle `ngDevMode` correctly |
+| Commit                                                                                           | Type | Description                                                         |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------------------------------------- |
+| [26f2aa57](https://github.com/angular/universal/commit/26f2aa576b7a0be25aebf8f8f9f75fb57c23be28) | feat | add support for `blob` and `arraybuffer` in TransferHttpCacheModule |
 
 ## Special Thanks
 
-Alan Agius, Angular Robot, Paul Gschwendtner, arturovt and renovate[bot]
+Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and renovate[bot]
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -40,22 +30,6 @@ Alan Agius, Paul Gschwendtner and arturovt
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="14.1.0-next.1"></a>
-
-# 14.1.0-next.1 (2022-06-23)
-
-### @nguniversal/builders
-
-| Commit                                                                                           | Type | Description                                     |
-| ------------------------------------------------------------------------------------------------ | ---- | ----------------------------------------------- |
-| [c1383d13](https://github.com/angular/universal/commit/c1383d1305550af3914e07415c3ef700ca33a21c) | fix  | correctly handle path normalizations on Windows |
-
-## Special Thanks
-
-Alan Agius, Doug Parker, Paul Gschwendtner and renovate[bot]
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="14.0.2"></a>
 
 # 14.0.2 (2022-06-23)
@@ -69,22 +43,6 @@ Alan Agius, Doug Parker, Paul Gschwendtner and renovate[bot]
 ## Special Thanks
 
 Alan Agius and Paul Gschwendtner
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.1.0-next.0"></a>
-
-# 14.1.0-next.0 (2022-06-15)
-
-### @nguniversal/common
-
-| Commit                                                                                           | Type | Description                                  |
-| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
-| [baff49b3](https://github.com/angular/universal/commit/baff49b353111e1f183b023ad94643fc4cb7bbf2) | fix  | correctly handle headers for jsdom in Clover |
-
-## Special Thanks
-
-Alan Agius and hiepxanh
 
 <!-- CHANGELOG SPLIT MARKER -->
 
