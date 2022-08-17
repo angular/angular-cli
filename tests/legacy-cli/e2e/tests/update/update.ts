@@ -4,7 +4,7 @@ import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, readFile } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, noSilentNg } from '../../utils/process';
-import { isPrereleaseCli, useCIChrome, useCIDefaults, NgCLIVersion } from '../../utils/project';
+import { isPrereleaseCli, useCIChrome, useCIDefaults, getNgCLIVersion } from '../../utils/project';
 
 export default async function () {
   let restoreRegistry: (() => Promise<void>) | undefined;
@@ -32,7 +32,7 @@ export default async function () {
     const cliMajorProjectVersion = new SemVer(cliVersion).major;
 
     // CLI current version.
-    const cliMajorVersion = NgCLIVersion.major;
+    const cliMajorVersion = getNgCLIVersion().major;
 
     for (let version = cliMajorProjectVersion + 1; version < cliMajorVersion; version++) {
       // Run all the migrations until the current build major version - 1.
