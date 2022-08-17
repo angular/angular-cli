@@ -1,6 +1,12 @@
 import { getGlobalVariable } from './env';
 import { ProcessOutput, silentNpm, silentYarn } from './process';
 
+export interface PkgInfo {
+  readonly name: string;
+  readonly version: string;
+  readonly path: string;
+}
+
 export function getActivePackageManager(): 'npm' | 'yarn' {
   const value = getGlobalVariable('package-manager');
   if (value && value !== 'npm' && value !== 'yarn') {
