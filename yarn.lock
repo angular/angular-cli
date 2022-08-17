@@ -2446,6 +2446,14 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.8.tgz#b94a4391c85666c7b73299fd3ad79d4faa435310"
   integrity sha512-ipixuVrh2OdNmauvtT51o3d8z12p6LtFW9in7U79der/kwejjdNchQC5UMn5u/KxNoM7VHHOs/l8KS8uHxhODQ==
 
+"@types/tar@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@types/tar/-/tar-6.1.2.tgz#e60108a7d1b08cc91bf2faf1286cc08fdad48bbe"
+  integrity sha512-bnX3RRm70/n1WMwmevdOAeDU4YP7f5JSubgnuU+yrO+xQQjwDboJj3u2NTJI5ngCQhXihqVVAH5h5J8YpdpEvg==
+  dependencies:
+    "@types/node" "*"
+    minipass "^3.3.5"
+
 "@types/text-table@^0.2.1":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@types/text-table/-/text-table-0.2.2.tgz#774c90cfcfbc8b4b0ebb00fecbe861dc8b1e8e26"
@@ -7738,6 +7746,13 @@ minipass@^3.0.0, minipass@^3.1.1, minipass@^3.1.6:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/minipass/-/minipass-3.3.4.tgz#ca99f95dd77c43c7a76bf51e6d200025eee0ffae"
   integrity sha512-I9WPbWHCGu8W+6k1ZiGpPu0GkoKBeorkfKNuAFBNS1HNFJvke82sxvI5bzcCNpWPorkOO5QQ+zomzzwRxejXiw==
+  dependencies:
+    yallist "^4.0.0"
+
+minipass@^3.3.5:
+  version "3.3.5"
+  resolved "https://registry.yarnpkg.com/minipass/-/minipass-3.3.5.tgz#6da7e53a48db8a856eeb9153d85b230a2119e819"
+  integrity sha512-rQ/p+KfKBkeNwo04U15i+hOwoVBVmekmm/HcfTkTN2t9pbQKCMm4eN5gFeqgrrSp/kH/7BYYhTIHOxGqzbBPaA==
   dependencies:
     yallist "^4.0.0"
 
