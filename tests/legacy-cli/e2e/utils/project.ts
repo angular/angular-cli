@@ -2,12 +2,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { prerelease, SemVer } from 'semver';
 import yargsParser from 'yargs-parser';
-import { packages } from '../../../../lib/packages';
 import { getGlobalVariable } from './env';
 import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { findFreePort } from './network';
-import { installWorkspacePackages } from './packages';
+import { installWorkspacePackages, PkgInfo } from './packages';
 import { exec, execAndWaitForOutputToMatch, git, ng } from './process';
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
@@ -96,6 +95,8 @@ export async function prepareProjectForE2e(name: string) {
 }
 
 export function useBuiltPackagesVersions(): Promise<void> {
+  const packages: { [name: string]: PkgInfo } = getGlobalVariable('package-tars');
+
   return updateJsonFile('package.json', (json) => {
     json['dependencies'] ??= {};
     json['devDependencies'] ??= {};
@@ -221,8 +222,12 @@ export async function useCIChrome(projectDir: string = ''): Promise<void> {
   }
 }
 
-export const NgCLIVersion = new SemVer(packages['@angular/cli'].version);
+export function getNgCLIVersion(): SemVer {
+  const packages: { [name: string]: PkgInfo } = getGlobalVariable('package-tars');
+
+  return new SemVer(packages['@angular/cli'].version);
+}
 
 export function isPrereleaseCli(): boolean {
-  return (prerelease(NgCLIVersion)?.length ?? 0) > 0;
+  return (prerelease(getNgCLIVersion())?.length ?? 0) > 0;
 }

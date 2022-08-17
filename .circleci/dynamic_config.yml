@@ -274,7 +274,7 @@ jobs:
         # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
         # too early without Saucelabs not being ready.
       - run: ./scripts/saucelabs/wait-for-tunnel.sh
-      - run: node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
+      - run: node ./tests/legacy-cli/run_e2e --glob="tests/misc/browsers.ts"
       - run: ./scripts/saucelabs/stop-tunnel.sh
       - fail_fast
 
@@ -283,6 +283,10 @@ jobs:
     steps:
       - custom_attach_workspace
       - run: yarn build
+      - persist_to_workspace:
+          root: *workspace_location
+          paths:
+            - dist/_*.tgz
 
   build-bazel-e2e:
     executor: action-executor
@@ -386,6 +390,8 @@ jobs:
             # Path where Arsenal Image Mounter files are downloaded.
             # Must match path in .circleci/win-ram-disk.ps1
             - ./aim
+      # Build the npm packages for the e2e tests
+      - run: yarn build
       # Run partial e2e suite on PRs only. Release branches will run the full e2e suite.
       - run:
           name: Execute E2E Tests

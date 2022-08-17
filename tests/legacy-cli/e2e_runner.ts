@@ -10,6 +10,9 @@ import { createNpmRegistry } from './e2e/utils/registry';
 import { launchTestProcess } from './e2e/utils/process';
 import { join } from 'path';
 import { findFreePort } from './e2e/utils/network';
+import { extractFile } from './e2e/utils/tar';
+import { realpathSync } from 'fs';
+import { PkgInfo } from './e2e/utils/packages';
 
 Error.stackTraceLimit = Infinity;
 
@@ -34,6 +37,8 @@ Error.stackTraceLimit = Infinity;
  *   --shard          Index of this processes' shard.
  *   --tmpdir=path    Override temporary directory to use for new projects.
  *   --yarn           Use yarn as package manager.
+ *   --package=path   An npm package to be published before running tests
+ *
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = yargsParser(process.argv.slice(2), {
@@ -49,9 +54,13 @@ const argv = yargsParser(process.argv.slice(2), {
   ],
   string: ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
   number: ['nb-shards', 'shard'],
+  array: ['package'],
   configuration: {
     'dot-notation': false,
     'camel-case-expansion': false,
+  },
+  default: {
+    'package': ['./dist/_*.tgz'],
   },
 });
 
@@ -162,10 +171,11 @@ console.log(['Tests:', ...testsToRun].join('\n '));
 setGlobalVariable('argv', argv);
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 
-Promise.all([findFreePort(), findFreePort()])
-  .then(async ([httpPort, httpsPort]) => {
+Promise.all([findFreePort(), findFreePort(), findPackageTars()])
+  .then(async ([httpPort, httpsPort, packageTars]) => {
     setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
     setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
+    setGlobalVariable('package-tars', packageTars);
 
     // NPM registries for the lifetime of the test execution
     const registryProcess = await createNpmRegistry(httpPort, httpPort);
@@ -307,4 +317,24 @@ function printFooter(testName: string, type: 'setup' | 'initializer' | 'test', s
       colors.green('s...'),
   );
   console.log('');
+}
+
+// Collect the packages passed as arguments and return as {package-name => pkg-path}
+async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
+  const pkgs: string[] = (getGlobalVariable('argv').package as string[]).flatMap((p) =>
+    glob.sync(p, { realpath: true }),
+  );
+
+  const pkgJsons = await Promise.all(pkgs.map((pkg) => extractFile(pkg, './package/package.json')));
+
+  return pkgs.reduce((all, pkg, i) => {
+    const json = pkgJsons[i].toString('utf8');
+    const { name, version } = JSON.parse(json);
+    if (!name) {
+      throw new Error(`Package ${pkg} - package.json name/version not found`);
+    }
+
+    all[name] = { path: realpathSync(pkg), name, version };
+    return all;
+  }, {} as { [pkg: string]: PkgInfo });
 }
