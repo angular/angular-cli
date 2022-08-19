@@ -11,6 +11,9 @@ import { InlineAngularResourceLoaderPath } from '../loaders/inline-resource';
 
 export const NG_COMPONENT_RESOURCE_QUERY = 'ngResource';
 
+/** Whether the current version of TypeScript is after 4.8. */
+const IS_TS_48 = isAfterVersion(4, 8);
+
 export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
   getTypeChecker: () => ts.TypeChecker,
@@ -24,27 +27,13 @@ export function replaceResources(
 
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
-        const decorators = ts.visitNodes(node.decorators, (node) =>
-          ts.isDecorator(node)
-            ? visitDecorator(
-                nodeFactory,
-                node,
-                typeChecker,
-                resourceImportDeclarations,
-                moduleKind,
-                inlineStyleFileExtension,
-              )
-            : node,
-        );
-
-        return nodeFactory.updateClassDeclaration(
+        return visitClassDeclaration(
+          nodeFactory,
+          typeChecker,
           node,
-          decorators,
-          node.modifiers,
-          node.name,
-          node.typeParameters,
-          node.heritageClauses,
-          node.members,
+          resourceImportDeclarations,
+          moduleKind,
+          inlineStyleFileExtension,
         );
       }
 
@@ -74,6 +63,75 @@ export function replaceResources(
       return updatedSourceFile;
     };
   };
+}
+
+/**
+ * Replaces the resources inside of a `ClassDeclaration`. This is a backwards-compatibility layer
+ * to support TypeScript versions older than 4.8 where the decorators of a node were in a separate
+ * array, rather than being part of its `modifiers` array.
+ *
+ * TODO: remove this function and use the `NodeFactory` directly once support for TypeScript
+ * 4.6 and 4.7 has been dropped.
+ */
+function visitClassDeclaration(
+  nodeFactory: ts.NodeFactory,
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration,
+  resourceImportDeclarations: ts.ImportDeclaration[],
+  moduleKind: ts.ModuleKind | undefined,
+  inlineStyleFileExtension: string | undefined,
+): ts.ClassDeclaration {
+  let decorators: ts.Decorator[] | undefined;
+  let modifiers: ts.Modifier[] | undefined;
+
+  if (IS_TS_48) {
+    node.modifiers?.forEach((modifier) => {
+      if (ts.isDecorator(modifier)) {
+        decorators ??= [];
+        decorators.push(modifier);
+      } else {
+        modifiers = modifiers ??= [];
+        modifiers.push(modifier);
+      }
+    });
+  } else {
+    decorators = node.decorators as unknown as ts.Decorator[];
+    modifiers = node.modifiers as unknown as ts.Modifier[];
+  }
+
+  if (!decorators || decorators.length === 0) {
+    return node;
+  }
+
+  decorators = decorators.map((current) =>
+    visitDecorator(
+      nodeFactory,
+      current,
+      typeChecker,
+      resourceImportDeclarations,
+      moduleKind,
+      inlineStyleFileExtension,
+    ),
+  );
+
+  return IS_TS_48
+    ? nodeFactory.updateClassDeclaration(
+        node,
+        [...decorators, ...(modifiers ?? [])],
+        node.name,
+        node.typeParameters,
+        node.heritageClauses,
+        node.members,
+      )
+    : nodeFactory.updateClassDeclaration(
+        node,
+        decorators,
+        modifiers,
+        node.name,
+        node.typeParameters,
+        node.heritageClauses,
+        node.members,
+      );
 }
 
 function visitDecorator(
@@ -326,4 +384,17 @@ function getDecoratorOrigin(
   }
 
   return null;
+}
+
+/** Checks if the current version of TypeScript is after the specified major/minor versions. */
+function isAfterVersion(targetMajor: number, targetMinor: number): boolean {
+  const [major, minor] = ts.versionMajorMinor.split('.').map((part) => parseInt(part));
+
+  if (major < targetMajor) {
+    return false;
+  } else if (major > targetMajor) {
+    return true;
+  } else {
+    return minor >= targetMinor;
+  }
 }

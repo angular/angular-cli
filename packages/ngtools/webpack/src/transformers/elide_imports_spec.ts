@@ -773,7 +773,7 @@ describe('@ngtools/webpack transformers', () => {
         ): ts.Transformer<ts.SourceFile> => {
           const visit: ts.Visitor = (node) => {
             if (ts.isShorthandPropertyAssignment(node)) {
-              return ts.createPropertyAssignment(node.name, node.name);
+              return ts.factory.createPropertyAssignment(node.name, node.name);
             }
 
             return ts.visitEachChild(node, (child) => visit(child), context);
