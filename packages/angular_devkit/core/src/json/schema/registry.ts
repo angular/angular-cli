@@ -649,7 +649,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       let value = source(schema);
-      if (isObservable(value)) {
+      if (isObservable<{}>(value)) {
         value = await value.toPromise();
       }
 
