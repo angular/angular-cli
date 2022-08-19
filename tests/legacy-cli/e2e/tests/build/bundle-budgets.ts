@@ -17,7 +17,7 @@ export default async function () {
     ];
   });
 
-  const errorMessage = await expectToFail(() => ng('build'));
+  const { message: errorMessage } = await expectToFail(() => ng('build'));
   if (!/Error.+budget/.test(errorMessage)) {
     throw new Error('Budget error: all, max error.');
   }
