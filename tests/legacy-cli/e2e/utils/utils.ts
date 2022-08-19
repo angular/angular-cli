@@ -3,7 +3,7 @@ import { mkdtemp, realpath, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import path from 'path';
 
-export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Promise<any> {
+export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Promise<Error> {
   return fn().then(
     () => {
       const functionSource = fn.name || (<any>fn).source || fn.toString();
@@ -13,7 +13,7 @@ export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Pro
       );
     },
     (err) => {
-      return err;
+      return err instanceof Error ? err : new Error(err);
     },
   );
 }

@@ -29,8 +29,6 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   // Create a separate instance to prevent unintended global changes to the color configuration
   const colors = ansiColors.create();
 
-  let stdout = '';
-  let stderr = '';
   const cwd = options.cwd ?? process.cwd();
   const env = options.env ?? process.env;
   console.log(
@@ -69,48 +67,65 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   }
 
   const childProcess = child_process.spawn(cmd, args, spawnOptions);
-  childProcess.stdout!.on('data', (data: Buffer) => {
-    stdout += data.toString('utf-8');
-    if (options.silent) {
-      return;
-    }
-    data
-      .toString('utf-8')
-      .split(/[\n\r]+/)
-      .filter((line) => line !== '')
-      .forEach((line) => console.log('  ' + line));
-  });
-
-  childProcess.stderr!.on('data', (data: Buffer) => {
-    stderr += data.toString('utf-8');
-    if (options.silent) {
-      return;
-    }
-    data
-      .toString('utf-8')
-      .split(/[\n\r]+/)
-      .filter((line) => line !== '')
-      .forEach((line) => console.error(colors.yellow('  ' + line)));
-  });
 
   _processes.push(childProcess);
 
   // Create the error here so the stack shows who called this function.
   const error = new Error();
 
-  // Return log info about the current process status
-  function envDump() {
-    return [
-      `ENV:${JSON.stringify(spawnOptions.env, null, 2)}`,
-      `STDOUT:\n${stdout}`,
-      `STDERR:\n${stderr}`,
-    ].join('\n\n');
-  }
-
   return new Promise<ProcessOutput>((resolve, reject) => {
+    let stdout = '';
+    let stderr = '';
     let matched = false;
 
-    childProcess.on('exit', (code: number) => {
+    // Return log info about the current process status
+    function envDump() {
+      return [
+        `ENV:${JSON.stringify(spawnOptions.env, null, 2)}`,
+        `STDOUT:\n${stdout}`,
+        `STDERR:\n${stderr}`,
+      ].join('\n\n');
+    }
+
+    childProcess.stdout!.on('data', (data: Buffer) => {
+      stdout += data.toString('utf-8');
+
+      if (options.waitForMatch && stdout.match(options.waitForMatch)) {
+        resolve({ stdout, stderr });
+        matched = true;
+      }
+
+      if (options.silent) {
+        return;
+      }
+
+      data
+        .toString('utf-8')
+        .split(/[\n\r]+/)
+        .filter((line) => line !== '')
+        .forEach((line) => console.log('  ' + line));
+    });
+
+    childProcess.stderr!.on('data', (data: Buffer) => {
+      stderr += data.toString('utf-8');
+
+      if (options.waitForMatch && stderr.match(options.waitForMatch)) {
+        resolve({ stdout, stderr });
+        matched = true;
+      }
+
+      if (options.silent) {
+        return;
+      }
+
+      data
+        .toString('utf-8')
+        .split(/[\n\r]+/)
+        .filter((line) => line !== '')
+        .forEach((line) => console.error(colors.yellow('  ' + line)));
+    });
+
+    childProcess.on('close', (code: number) => {
       _processes = _processes.filter((p) => p !== childProcess);
 
       if (options.waitForMatch && !matched) {
@@ -133,24 +148,6 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     childProcess.on('error', (err) => {
       reject(`Process error - "${cmd} ${args.join(' ')}": ${err}...\n\n${envDump()}\n`);
     });
-
-    if (options.waitForMatch) {
-      const match = options.waitForMatch;
-
-      childProcess.stdout!.on('data', (data: Buffer) => {
-        if (data.toString().match(match)) {
-          resolve({ stdout, stderr });
-          matched = true;
-        }
-      });
-
-      childProcess.stderr!.on('data', (data: Buffer) => {
-        if (data.toString().match(match)) {
-          resolve({ stdout, stderr });
-          matched = true;
-        }
-      });
-    }
 
     // Provide input to stdin if given.
     if (options.stdin) {
@@ -192,14 +189,14 @@ export function waitForAnyProcessOutputToMatch(
 
         childProcess.stdout!.on('data', (data: Buffer) => {
           stdout += data.toString();
-          if (data.toString().match(match)) {
+          if (stdout.match(match)) {
             resolve({ stdout, stderr });
           }
         });
 
         childProcess.stderr!.on('data', (data: Buffer) => {
           stderr += data.toString();
-          if (data.toString().match(match)) {
+          if (stderr.match(match)) {
             resolve({ stdout, stderr });
           }
         });
