@@ -68,7 +68,13 @@ Get started with Angular CLI, learn the fundamentals and explore advanced topics
 
 Install the Angular CLI globally:
 
+```bash
+# Nodejs v16+
+npm install --location=global @angular/cli
 ```
+Or
+```bash
+# Nodejs v14
 npm install -g @angular/cli
 ```
 
