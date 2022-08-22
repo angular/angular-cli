@@ -93,32 +93,45 @@ export async function buildEsbuildBrowser(
     ),
   );
 
-  // Execute esbuild
-  const result = await bundleCode(
-    workspaceRoot,
-    entryPoints,
-    outputNames,
-    options,
-    optimizationOptions,
-    sourcemapOptions,
-    tsconfig,
-  );
+  const [codeResults, styleResults] = await Promise.all([
+    // Execute esbuild to bundle the application code
+    bundleCode(
+      workspaceRoot,
+      entryPoints,
+      outputNames,
+      options,
+      optimizationOptions,
+      sourcemapOptions,
+      tsconfig,
+    ),
+    // Execute esbuild to bundle the global stylesheets
+    bundleGlobalStylesheets(
+      workspaceRoot,
+      outputNames,
+      options,
+      optimizationOptions,
+      sourcemapOptions,
+    ),
+  ]);
 
   // Log all warnings and errors generated during bundling
-  await logMessages(context, result);
+  await logMessages(context, {
+    errors: [...codeResults.errors, ...styleResults.errors],
+    warnings: [...codeResults.warnings, ...styleResults.warnings],
+  });
 
   // Return if the bundling failed to generate output files or there are errors
-  if (!result.outputFiles || result.errors.length) {
+  if (!codeResults.outputFiles || codeResults.errors.length) {
     return { success: false };
   }
 
-  // Structure the bundling output files
+  // Structure the code bundling output files
   const initialFiles: FileInfo[] = [];
   const outputFiles: OutputFile[] = [];
-  for (const outputFile of result.outputFiles) {
+  for (const outputFile of codeResults.outputFiles) {
     // Entries in the metafile are relative to the `absWorkingDir` option which is set to the workspaceRoot
     const relativeFilePath = path.relative(workspaceRoot, outputFile.path);
-    const entryPoint = result.metafile?.outputs[relativeFilePath]?.entryPoint;
+    const entryPoint = codeResults.metafile?.outputs[relativeFilePath]?.entryPoint;
 
     outputFile.path = relativeFilePath;
 
@@ -133,6 +146,15 @@ export async function buildEsbuildBrowser(
     outputFiles.push(outputFile);
   }
 
+  // Add global stylesheets output files
+  outputFiles.push(...styleResults.outputFiles);
+  initialFiles.push(...styleResults.initialFiles);
+
+  // Return if the global stylesheet bundling has errors
+  if (styleResults.errors.length) {
+    return { success: false };
+  }
+
   // Create output directory if needed
   try {
     await fs.mkdir(outputPath, { recursive: true });
@@ -140,25 +162,6 @@ export async function buildEsbuildBrowser(
     assertIsError(e);
     context.logger.error('Unable to create output directory: ' + e.message);
 
-    return { success: false };
-  }
-
-  // Process global stylesheets
-  const styleResults = await bundleGlobalStylesheets(
-    workspaceRoot,
-    outputNames,
-    options,
-    optimizationOptions,
-    sourcemapOptions,
-  );
-  outputFiles.push(...styleResults.outputFiles);
-  initialFiles.push(...styleResults.initialFiles);
-
-  // Log all warnings and errors generated during bundling
-  await logMessages(context, styleResults);
-
-  // Return if the bundling has errors
-  if (styleResults.errors.length) {
     return { success: false };
   }
 
