@@ -72,7 +72,7 @@
         },
         "analytics": {
           "type": ["boolean", "string"],
-          "description": "Share anonymous usage data with the Angular Team at Google."
+          "description": "Share pseudonymous usage data with the Angular Team at Google."
         },
         "analyticsSharing": {
           "type": "object",
@@ -147,7 +147,7 @@
         },
         "analytics": {
           "type": ["boolean", "string"],
-          "description": "Share anonymous usage data with the Angular Team at Google."
+          "description": "Share pseudonymous usage data with the Angular Team at Google."
         },
         "analyticsSharing": {
           "type": "object",

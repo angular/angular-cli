@@ -1,7 +1,7 @@
 import { execWithEnv } from '../../utils/process';
 import { mockHome } from '../../utils/utils';
 
-const ANALYTICS_PROMPT = /Would you like to share anonymous usage data/;
+const ANALYTICS_PROMPT = /Would you like to share pseudonymous usage data/;
 
 export default async function () {
   // CLI should prompt for analytics permissions.
