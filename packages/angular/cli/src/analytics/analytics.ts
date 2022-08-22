@@ -103,8 +103,8 @@ export async function promptAnalytics(global: boolean, force = false): Promise<b
         type: 'confirm',
         name: 'analytics',
         message: tags.stripIndents`
-          Would you like to share anonymous usage data about this project with the Angular Team at
-          Google under Google’s Privacy Policy at https://policies.google.com/privacy. For more
+          Would you like to share pseudonymous usage data about this project with the Angular Team
+          at Google under Google's Privacy Policy at https://policies.google.com/privacy. For more
           details and how to change this setting, see https://angular.io/analytics.
 
         `,
@@ -118,7 +118,7 @@ export async function promptAnalytics(global: boolean, force = false): Promise<b
       console.log('');
       console.log(
         tags.stripIndent`
-        Thank you for sharing anonymous usage data. Should you change your mind, the following
+        Thank you for sharing pseudonymous usage data. Should you change your mind, the following
         command will disable this feature entirely:
 
             ${colors.yellow(`ng analytics disable${global ? ' --global' : ''}`)}
