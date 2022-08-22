@@ -706,4 +706,20 @@ describe('Browser Builder styles', () => {
     const result = await browserBuild(architect, host, target, { styles: ['src/styles.css'] });
     expect(await result.files['styles.css']).toContain(svgData);
   });
+
+  it('works when Data URI has parenthesis', async () => {
+    const svgData =
+      '"data:image/svg+xml;charset=utf-8,<svg>' +
+      `<mask id='clip'><g><circle mask='url(%23clip)' cx='11.5' cy='11.5' r='9.25'/><use xlink:href='#text' mask='url(#clip)'/></g>` +
+      '</svg>"';
+
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        div { background: url(${svgData}) }
+      `,
+    });
+
+    const result = await browserBuild(architect, host, target, { styles: ['src/styles.css'] });
+    expect(await result.files['styles.css']).toContain(svgData);
+  });
 });
