@@ -169,6 +169,15 @@ export function extractNpmEnv() {
     }, {});
 }
 
+function extractCIEnv(): NodeJS.ProcessEnv {
+  return Object.keys(process.env)
+    .filter((v) => v.startsWith('SAUCE_') || v === 'CI' || v === 'CIRCLECI')
+    .reduce<NodeJS.ProcessEnv>((vars, n) => {
+      vars[n] = process.env[n];
+      return vars;
+    }, {});
+}
+
 export function waitForAnyProcessOutputToMatch(
   match: RegExp,
   timeout = 30000,
@@ -372,6 +381,7 @@ export async function launchTestProcess(entry: string, ...args: any[]) {
   // Extract explicit environment variables for the test process.
   const env: NodeJS.ProcessEnv = {
     ...extractNpmEnv(),
+    ...extractCIEnv(),
     ...getGlobalVariablesEnv(),
   };
 

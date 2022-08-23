@@ -5,10 +5,6 @@ import { replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
-  if (!process.env['E2E_BROWSERS']) {
-    return;
-  }
-
   // Ensure SauceLabs configuration
   if (!process.env['SAUCE_USERNAME'] || !process.env['SAUCE_ACCESS_KEY']) {
     throw new Error('SauceLabs is not configured.');
