@@ -16,12 +16,10 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
     setup(build: PluginBuild): void {
       let sass: typeof import('sass');
 
-      build.onStart(async () => {
-        // Lazily load Sass
-        sass = await import('sass');
-      });
+      build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
+        // Lazily load Sass when a Sass file is found
+        sass ??= await import('sass');
 
-      build.onLoad({ filter: /\.s[ac]ss$/ }, (args) => {
         try {
           const warnings: PartialMessage[] = [];
           // Use sync version as async version is slower.
