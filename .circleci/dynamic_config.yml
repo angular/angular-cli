@@ -237,7 +237,7 @@ jobs:
             - run:
                 name: Execute CLI E2E Tests with NPM
                 command: |
-                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e
+                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e --ignore="tests/misc/browsers.ts"
       - when:
           condition:
             equal: ['esbuild', << parameters.subset >>]
@@ -259,8 +259,6 @@ jobs:
   test-browsers:
     executor:
       name: test-executor
-    environment:
-      E2E_BROWSERS: true
     resource_class: medium
     steps:
       - custom_attach_workspace
@@ -355,7 +353,7 @@ jobs:
           name: Execute E2E Tests
           command: |
             mkdir X:/ramdisk/e2e-main
-            node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=X:/ramdisk/e2e-main
+            node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=X:/ramdisk/e2e-main --ignore="tests/misc/browsers.ts"
       - fail_fast
 
 workflows:
