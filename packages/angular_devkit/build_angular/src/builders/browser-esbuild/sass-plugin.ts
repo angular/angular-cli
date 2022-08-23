@@ -42,7 +42,7 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
 
           return {
             loader: 'css',
-            contents: `${css}\n${sourceMapToUrlComment(sourceMap)}`,
+            contents: sourceMap ? `${css}\n${sourceMapToUrlComment(sourceMap)}` : css,
             watchFiles: loadedUrls.map((url) => fileURLToPath(url)),
             warnings,
           };
@@ -68,11 +68,7 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
   };
 }
 
-function sourceMapToUrlComment(sourceMap: CompileResult['sourceMap']): string {
-  if (!sourceMap) {
-    return '';
-  }
-
+function sourceMapToUrlComment(sourceMap: Exclude<CompileResult['sourceMap'], undefined>): string {
   const urlSourceMap = Buffer.from(JSON.stringify(sourceMap), 'utf-8').toString('base64');
 
   return `/*# sourceMappingURL=data:application/json;charset=utf-8;base64,${urlSourceMap} */`;
