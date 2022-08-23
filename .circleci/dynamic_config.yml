@@ -87,7 +87,7 @@ executors:
   windows-executor:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
     working_directory: ~/ng
-    resource_class: windows.medium
+    resource_class: windows.2xlarge
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
       # Contents of this image:
@@ -138,7 +138,7 @@ commands:
       - initialize_env
       - run: nvm install 16.10
       - run: nvm use 16.10
-      - run: npm install -g yarn@1.22.10
+      - run: npm install -g yarn@1.22.10 @bazel/bazelisk@${BAZELISK_VERSION}
       - run: node --version
       - run: yarn --version
 
@@ -470,6 +470,47 @@ jobs:
             node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX --tmpdir=X:/ramdisk/e2e-main --ignore="tests/misc/browsers.ts"
       - fail_fast
 
+  bazel-e2e-cli-win:
+    executor: windows-executor
+    parallelism: 6
+    steps:
+      - checkout
+      - rebase_pr
+      - setup_windows
+      - restore_cache:
+          keys:
+            - *cache_key_win
+      - run:
+          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
+          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
+          name: 'Arsenal Image Mounter (RAM Disk)'
+          command: |
+            pwsh ./.circleci/win-ram-disk.ps1
+      - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - save_cache:
+          key: *cache_key_win
+          paths:
+            - ~/.cache/yarn
+            # Path where Arsenal Image Mounter files are downloaded.
+            # Must match path in .circleci/win-ram-disk.ps1
+            - ./aim
+      - run:
+          name: Execute E2E Tests
+          environment:
+            # Required by `yarn ng-dev`
+            PWD: .
+          command: |
+            mkdir X:/ramdisk/e2e
+            bazel test --define=E2E_TEMP=X:/ramdisk/e2e --define=E2E_SHARD_TOTAL=$env:CIRCLE_NODE_TOTAL --define=E2E_SHARD=$env:CIRCLE_NODE_INDEX --config=e2e //tests/legacy-cli:e2e.npm
+          # This timeout provides time for the actual tests to timeout and report status
+          # instead of CircleCI stopping the job without test failure information.
+          no_output_timeout: 40m
+      - fail_fast
+      - store_artifacts:
+          path: dist/testlogs/tests/legacy-cli/e2e.npm
+      - store_test_results:
+          path: dist/testlogs/tests/legacy-cli/e2e.npm
+
 workflows:
   version: 2
   default_workflow:
@@ -555,6 +596,8 @@ workflows:
 
       # Windows jobs
       - e2e-cli-win
+
+      - bazel-e2e-cli-win
 
       # Bazel jobs
       - bazel-build:
