@@ -37,7 +37,13 @@ var_5: &only_release_branches
         - main
         - /\d+\.\d+\.x/
 
-var_6: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
+var_6: &only_pull_requests
+  filters:
+    branches:
+      only:
+        - /pull\/\d+/
+
+var_7: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
@@ -323,6 +329,23 @@ jobs:
             yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
       - fail_fast
 
+  publish_artifacts:
+    executor: action-executor
+    environment:
+    steps:
+      - custom_attach_workspace
+      - run:
+          name: Create artifacts for packages
+          command: yarn ng-dev release build
+      - run:
+          name: Copy tarballs to folder
+          command: |
+            mkdir -p dist/artifacts/
+            cp dist/*.tgz dist/artifacts/
+      - store_artifacts:
+          path: dist/artifacts/
+          destination: angular
+
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
@@ -450,3 +473,8 @@ workflows:
           requires:
             - setup
             - e2e-cli
+
+      - publish_artifacts:
+          <<: *only_pull_requests
+          requires:
+            - build
