@@ -34,8 +34,7 @@ build --symlink_prefix=dist/
 build --nowatchfs
 
 # Turn off legacy external runfiles
-run --nolegacy_external_runfiles
-test --nolegacy_external_runfiles
+build --nolegacy_external_runfiles
 
 # Turn on --incompatible_strict_action_env which was on by default
 # in Bazel 0.21.0 but turned off again in 0.22.0. Follow
@@ -51,7 +50,7 @@ test --incompatible_strict_action_env
 build --experimental_remote_merkle_tree_cache
 
 # Ensure that tags applied in BUILDs propagate to actions
-build --incompatible_allow_tags_propagation
+build --experimental_allow_tags_propagation
 
 # Don't check if output files have been modified
 build --noexperimental_check_output_files
