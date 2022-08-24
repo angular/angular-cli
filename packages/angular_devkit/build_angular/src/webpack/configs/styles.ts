@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'path';
-import { Configuration, RuleSetUseItem } from 'webpack';
+import { Configuration, RuleSetUseItem, WebpackError } from 'webpack';
 import { StyleElement } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { WebpackConfigOptions } from '../../utils/build-options';
@@ -112,10 +112,20 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   const sassImplementation = new SassWorkerImplementation();
+  const sassTildeUsageMessage = new Set<string>();
+
   extraPlugins.push({
     apply(compiler) {
       compiler.hooks.shutdown.tap('sass-worker', () => {
         sassImplementation.close();
+      });
+
+      compiler.hooks.afterCompile.tap('sass-worker', (compilation) => {
+        for (const message of sassTildeUsageMessage) {
+          compilation.warnings.push(new WebpackError(message));
+        }
+
+        sassTildeUsageMessage.clear();
       });
     },
   });
@@ -274,6 +284,15 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
             implementation: sassImplementation,
             sourceMap: true,
             sassOptions: {
+              importer: (url: string, from: string) => {
+                if (url.charAt(0) === '~') {
+                  sassTildeUsageMessage.add(
+                    `'${from}' imports '${url}' with a tilde. Usage of '~' in imports is deprecated.`,
+                  );
+                }
+
+                return null;
+              },
               // Prevent use of `fibers` package as it no longer works in newer Node.js versions
               fiber: false,
               // bootstrap-sass requires a minimum precision of 8
@@ -306,6 +325,15 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
             implementation: sassImplementation,
             sourceMap: true,
             sassOptions: {
+              importer: (url: string, from: string) => {
+                if (url.charAt(0) === '~') {
+                  sassTildeUsageMessage.add(
+                    `'${from}' imports '${url}' with a tilde. Usage of '~' in imports is deprecated.`,
+                  );
+                }
+
+                return null;
+              },
               // Prevent use of `fibers` package as it no longer works in newer Node.js versions
               fiber: false,
               indentedSyntax: true,
