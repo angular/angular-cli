@@ -59,10 +59,24 @@ export async function normalizeOptions(
     outputNames.media = path.join(options.resourcesOutputPath, outputNames.media);
   }
 
+  // Setup bundler entry points
+  const entryPoints: Record<string, string> = {
+    main: mainEntryPoint,
+  };
+  if (polyfillsEntryPoint) {
+    entryPoints['polyfills'] = polyfillsEntryPoint;
+  }
+  // Create reverse lookup used during index HTML generation
+  const entryPointNameLookup: ReadonlyMap<string, string> = new Map(
+    Object.entries(entryPoints).map(
+      ([name, filePath]) => [path.relative(workspaceRoot, filePath), name] as const,
+    ),
+  );
+
   return {
     workspaceRoot,
-    mainEntryPoint,
-    polyfillsEntryPoint,
+    entryPoints,
+    entryPointNameLookup,
     optimizationOptions,
     outputPath,
     sourcemapOptions,
