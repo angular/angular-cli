@@ -64,8 +64,8 @@ export async function buildEsbuildBrowser(
   const {
     projectRoot,
     workspaceRoot,
-    mainEntryPoint,
-    polyfillsEntryPoint,
+    entryPoints,
+    entryPointNameLookup,
     optimizationOptions,
     outputPath,
     sourcemapOptions,
@@ -79,19 +79,15 @@ export async function buildEsbuildBrowser(
     deleteOutputDir(workspaceRoot, options.outputPath);
   }
 
-  // Setup bundler entry points
-  const entryPoints: Record<string, string> = {
-    main: mainEntryPoint,
-  };
-  if (polyfillsEntryPoint) {
-    entryPoints['polyfills'] = polyfillsEntryPoint;
+  // Create output directory if needed
+  try {
+    await fs.mkdir(outputPath, { recursive: true });
+  } catch (e) {
+    assertIsError(e);
+    context.logger.error('Unable to create output directory: ' + e.message);
+
+    return { success: false };
   }
-  // Create reverse lookup used during index HTML generation
-  const entryPointNameLookup: ReadonlyMap<string, string> = new Map(
-    Object.entries(entryPoints).map(
-      ([name, filePath]) => [path.relative(workspaceRoot, filePath), name] as const,
-    ),
-  );
 
   const [codeResults, styleResults] = await Promise.all([
     // Execute esbuild to bundle the application code
@@ -152,16 +148,6 @@ export async function buildEsbuildBrowser(
 
   // Return if the global stylesheet bundling has errors
   if (styleResults.errors.length) {
-    return { success: false };
-  }
-
-  // Create output directory if needed
-  try {
-    await fs.mkdir(outputPath, { recursive: true });
-  } catch (e) {
-    assertIsError(e);
-    context.logger.error('Unable to create output directory: ' + e.message);
-
     return { success: false };
   }
 
