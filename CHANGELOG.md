@@ -1,22 +1,28 @@
-<a name="14.2.0-rc.0"></a>
+<a name="14.2.0"></a>
 
-# 14.2.0-rc.0 (2022-08-17)
+# 14.2.0 (2022-08-25)
 
-<!-- CHANGELOG SPLIT MARKER -->
+### @angular/cli
 
-<a name="14.2.0-next.2"></a>
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [596037010](https://github.com/angular/angular-cli/commit/596037010a8113809657cebc9385d040922e6d86) | fix  | add missing space after period in warning text |
 
-# 14.2.0-next.2 (2022-08-17)
+### @angular-devkit/build-angular
 
-### @angular-devkit/core
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [db17eac25](https://github.com/angular/angular-cli/commit/db17eac2517e32c3d147ca9e191871b92e6e7888) | fix  | update workspace extension warning to use correct phrasing |
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [44c25511e](https://github.com/angular/angular-cli/commit/44c25511ea2adbd4fbe82a6122fc00af612be8e8) | feat | add ability to serve service worker when using dev-server         |
+| [3fb569b5c](https://github.com/angular/angular-cli/commit/3fb569b5c82f22afca4dc59313356f198755827e) | feat | switch to Sass modern API in esbuild builder                      |
+| [5bd03353a](https://github.com/angular/angular-cli/commit/5bd03353ac6bb19c983efb7ff015e7aec3ff61d1) | fix  | correct esbuild builder global stylesheet sourcemap URL           |
+| [c4402b1bd](https://github.com/angular/angular-cli/commit/c4402b1bd32cdb0cdd7aeab14239b57ee700d361) | fix  | correctly handle parenthesis in url                               |
+| [50c783307](https://github.com/angular/angular-cli/commit/50c783307eb1253f4f2a87502bd7a19f6a409aeb) | fix  | use valid CSS comment for sourcemaps with Sass in esbuild builder |
+| [4c251853f](https://github.com/angular/angular-cli/commit/4c251853fbc66c6c9aae171dc75612db31afe2fb) | perf | avoid extra string creation with no sourcemaps for esbuild sass   |
+| [d97640534](https://github.com/angular/angular-cli/commit/d9764053478620a5f4a3349c377c74415435bcbb) | perf | with esbuild builder only load Sass compiler when needed          |
 
 ## Special Thanks
 
-AgentEnder, Alan Agius, Charles Lyding and Jason Bedard
+Alan Agius, Charles Lyding, Doug Parker, Jason Bedard, Joey Perrott, Kristiyan Kostadinov and angular-robot[bot]
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -33,35 +39,6 @@ AgentEnder, Alan Agius, Charles Lyding and Jason Bedard
 ## Special Thanks
 
 AgentEnder, Alan Agius, Charles Lyding and Jason Bedard
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.2.0-next.1"></a>
-
-# 14.2.0-next.1 (2022-08-11)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
-| [44c25511e](https://github.com/angular/angular-cli/commit/44c25511ea2adbd4fbe82a6122fc00af612be8e8) | feat | add ability to serve service worker when using dev-server                 |
-| [3fb569b5c](https://github.com/angular/angular-cli/commit/3fb569b5c82f22afca4dc59313356f198755827e) | feat | switch to Sass modern API in esbuild builder                              |
-| [7de9b470c](https://github.com/angular/angular-cli/commit/7de9b470cb54d974027a8baf88b611585fc526c7) | fix  | avoid collect stats from chunks with no files                             |
-| [70bc35456](https://github.com/angular/angular-cli/commit/70bc35456aa5b58ce1a0e2440ebb6533c7f5e48b) | fix  | correctly handle data URIs with escaped quotes in stylesheets             |
-| [f474bf532](https://github.com/angular/angular-cli/commit/f474bf532f89a296eb1b47f941998d73c1c51e8a) | fix  | process stylesheet resources from url tokens with esbuild browser builder |
-| [50c783307](https://github.com/angular/angular-cli/commit/50c783307eb1253f4f2a87502bd7a19f6a409aeb) | fix  | use valid CSS comment for sourcemaps with Sass in esbuild builder         |
-| [3e3dc6962](https://github.com/angular/angular-cli/commit/3e3dc6962d49cb8e8575146b22d134732cfff39f) | perf | reduce babel transformation in esbuild builder                            |
-| [8f9cee351](https://github.com/angular/angular-cli/commit/8f9cee351e5cc7da5a75b1a9b06306bc224e6b56) | perf | use esbuild in esbuild builder to downlevel native async/await            |
-
-### @ngtools/webpack
-
-| Commit                                                                                              | Type | Description                                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
-| [cf9afeec2](https://github.com/angular/angular-cli/commit/cf9afeec20c035386a081fdeec98c9f26f82692e) | fix  | elide type only named imports when using `emitDecoratorMetadata` |
-
-## Special Thanks
-
-Alan Agius, Charles Lyding and Jason Bedard
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -88,22 +65,6 @@ Alan Agius, Charles Lyding and Jason Bedard
 ## Special Thanks
 
 Alan Agius, Charles Lyding and Jason Bedard
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.2.0-next.0"></a>
-
-# 14.2.0-next.0 (2022-08-03)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                    |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
-| [596037010](https://github.com/angular/angular-cli/commit/596037010a8113809657cebc9385d040922e6d86) | fix  | add missing space after period in warning text |
-
-## Special Thanks
-
-Alan Agius, Charles Lyding, Doug Parker, Jason Bedard and angular-robot[bot]
 
 <!-- CHANGELOG SPLIT MARKER -->
 
