@@ -386,10 +386,15 @@ async function bundleGlobalStylesheets(
     // with the actual name of the global style and the leading directory separator must
     // also be removed to make the path relative.
     const sheetPath = sheetResult.path.replace('stdin', name);
-    outputFiles.push(createOutputFileFromText(sheetPath, sheetResult.contents));
+    let sheetContents = sheetResult.contents;
     if (sheetResult.map) {
       outputFiles.push(createOutputFileFromText(sheetPath + '.map', sheetResult.map));
+      sheetContents = sheetContents.replace(
+        'sourceMappingURL=stdin.css.map',
+        `sourceMappingURL=${name}.css.map`,
+      );
     }
+    outputFiles.push(createOutputFileFromText(sheetPath, sheetContents));
 
     if (!noInjectNames.includes(name)) {
       initialFiles.push({
