@@ -1,3 +1,15 @@
+<a name="14.2.1"></a>
+
+# 14.2.1 (2022-08-26)
+
+Re-release of `14.2.0` to fix #23804.
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.0"></a>
 
 # 14.2.0 (2022-08-25)
