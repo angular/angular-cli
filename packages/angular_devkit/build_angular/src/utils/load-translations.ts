@@ -26,9 +26,11 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
     const content = fs.readFileSync(path, 'utf8');
     const unusedParsers = new Map();
     for (const [format, parser] of Object.entries(parsers)) {
-      const analysis = analyze(parser, path, content);
+      const analysis = parser.analyze(path, content);
       if (analysis.canParse) {
-        const { locale, translations } = parser.parse(path, content, analysis.hint);
+        // Types don't overlap here so we need to use any.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { locale, translations } = parser.parse(path, content, analysis.hint as any);
         const integrity = 'sha256-' + createHash('sha256').update(content).digest('base64');
 
         return { format, locale, translations, diagnostics, integrity };
@@ -46,18 +48,6 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
         messages.join('\n'),
     );
   };
-
-  // TODO: `parser.canParse()` is deprecated; remove this polyfill once we are sure all parsers provide the `parser.analyze()` method.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function analyze(parser: any, path: string, content: string) {
-    if (parser.analyze !== undefined) {
-      return parser.analyze(path, content);
-    } else {
-      const hint = parser.canParse(path, content);
-
-      return { canParse: hint !== false, hint, diagnostics };
-    }
-  }
 }
 
 async function importParsers() {
