@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { readdir } from 'fs/promises';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
@@ -26,7 +27,8 @@ export default async function () {
   await expectFileToMatch('dist/test-project/main.js', 'src_app_app_worker_ts');
 
   await ng('build', '--output-hashing=none');
-  const chunkId = '151';
+
+  const chunkId = await getWorkerChunkId();
   await expectFileToExist(`dist/test-project/${chunkId}.js`);
   await expectFileToMatch('dist/test-project/main.js', chunkId);
 
@@ -52,4 +54,15 @@ export default async function () {
   );
 
   await ng('e2e');
+}
+
+async function getWorkerChunkId(): Promise<string> {
+  const files = await readdir('dist/test-project');
+  const fileName = files.find((f) => /^\d{3}\.js$/.test(f));
+
+  if (!fileName) {
+    throw new Error('Cannot determine worker chunk Id.');
+  }
+
+  return fileName.substring(0, 3);
 }
