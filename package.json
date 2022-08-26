@@ -108,7 +108,7 @@
     "@types/jasmine": "~4.3.0",
     "@types/karma": "^6.3.0",
     "@types/loader-utils": "^2.0.0",
-    "@types/minimatch": "3.0.5",
+    "@types/minimatch": "5.1.0",
     "@types/node": "^14.15.0",
     "@types/node-fetch": "^2.1.6",
     "@types/npm-package-arg": "^6.1.0",
