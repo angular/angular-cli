@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { mkdtemp, realpath, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import path from 'path';
@@ -40,4 +41,12 @@ export async function mockHome(cb: (home: string) => Promise<void>): Promise<voi
 
     await rm(tempHome, { recursive: true, force: true });
   }
+}
+
+export function assertIsError(value: unknown): asserts value is Error & { code?: string } {
+  const isError =
+    value instanceof Error ||
+    // The following is needing to identify errors coming from RxJs.
+    (typeof value === 'object' && value && 'name' in value && 'message' in value);
+  assert(isError, 'catch clause variable is not an Error instance');
 }
