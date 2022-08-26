@@ -1,3 +1,19 @@
+<a name="14.2.1"></a>
+
+# 14.2.1 (2022-08-26)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [e4ca46866](https://github.com/angular/angular-cli/commit/e4ca4686627bd31604cf68bc1d2473337e26864c) | fix  | update ng-packagr version to `^14.2.0` |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.0"></a>
 
 # 14.2.0 (2022-08-25)
