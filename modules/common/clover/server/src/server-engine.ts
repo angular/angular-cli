@@ -11,7 +11,7 @@ import {
   ɵNGRenderModeAPI as NGRenderModeAPI,
 } from '@nguniversal/common/clover';
 import * as fs from 'fs';
-import { JSDOM } from 'jsdom';
+import { CookieJar, JSDOM } from 'jsdom';
 import * as path from 'path';
 import { URL } from 'url';
 import { CustomResourceLoader } from './custom-resource-loader';
@@ -77,6 +77,9 @@ export class Engine {
         resources: customResourceLoader,
         url: options.url,
         referrer: options.headers?.referrer as string | undefined,
+        cookieJar: new CookieJar(undefined, {
+          allowSpecialUseDomain: true,
+        }),
         beforeParse: (window) => {
           augmentWindowWithStubs(window);
           window.ngRenderMode = true;
