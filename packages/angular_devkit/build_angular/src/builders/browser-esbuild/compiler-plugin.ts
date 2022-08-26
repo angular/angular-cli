@@ -213,8 +213,8 @@ export function createCompilerPlugin(
         // The AOT compiler currently requires this hook to allow for a transformResource hook.
         // Once the AOT compiler allows only a transformResource hook, this can be reevaluated.
         (host as CompilerHost).readResource = async function (fileName) {
-          // Template resources (.html) files are not bundled or transformed
-          if (fileName.endsWith('.html')) {
+          // Template resources (.html/.svg) files are not bundled or transformed
+          if (fileName.endsWith('.html') || fileName.endsWith('.svg')) {
             return this.readFile(fileName) ?? '';
           }
 
