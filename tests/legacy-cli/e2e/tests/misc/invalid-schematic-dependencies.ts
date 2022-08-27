@@ -4,6 +4,9 @@ import { installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 
 export default async function () {
+  // TODO(alanagius): re-enable once material version 15.0.0-next is out.
+  return;
+
   // Must publish old version to local registry to allow install. This is especially important
   // for release commits as npm will try to request tooling packages that are not on the npm registry yet
   await publishOutdated('@schematics/angular@7');

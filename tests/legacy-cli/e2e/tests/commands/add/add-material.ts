@@ -1,33 +1,38 @@
+import { assertIsError } from '../../../utils/utils';
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
 import { uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
 
 export default async function () {
-  // forcibly remove in case another test doesn't clean itself up
-  await rimraf('node_modules/@angular/material');
+  // TODO(alanagius): re-enable material once version 15.0.0-next is out.
+  return;
 
-  const tag = (await isPrereleaseCli()) ? '@next' : '';
+  // // forcibly remove in case another test doesn't clean itself up
+  // await rimraf('node_modules/@angular/material');
 
-  try {
-    await ng('add', `@angular/material${tag}`, '--unknown', '--skip-confirmation');
-  } catch (error) {
-    if (!(error instanceof Error && error.message.includes(`Unknown option: '--unknown'`))) {
-      throw error;
-    }
-  }
+  // const tag = (await isPrereleaseCli()) ? '@next' : '';
 
-  await ng(
-    'add',
-    `@angular/material${tag}`,
-    '--theme',
-    'custom',
-    '--verbose',
-    '--skip-confirmation',
-  );
-  await expectFileToMatch('package.json', /@angular\/material/);
+  // try {
+  //   await ng('add', `@angular/material${tag}`, '--unknown', '--skip-confirmation');
+  // } catch (error) {
+  //   assertIsError(error);
+  //   if (!error.message.includes(`Unknown option: '--unknown'`)) {
+  //     throw error;
+  //   }
+  // }
 
-  // Clean up existing cdk package
-  // Not doing so can cause adding material to fail if an incompatible cdk is present
-  await uninstallPackage('@angular/cdk');
+  // await ng(
+  //   'add',
+  //   `@angular/material${tag}`,
+  //   '--theme',
+  //   'custom',
+  //   '--verbose',
+  //   '--skip-confirmation',
+  // );
+  // await expectFileToMatch('package.json', /@angular\/material/);
+
+  // // Clean up existing cdk package
+  // // Not doing so can cause adding material to fail if an incompatible cdk is present
+  // await uninstallPackage('@angular/cdk');
 }
