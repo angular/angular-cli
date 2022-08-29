@@ -295,6 +295,8 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
+        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
+        "tags": ["no-remote-exec"],
     },
     "dev-server": {
         "shards": 10,
@@ -327,6 +329,8 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
+        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
+        "tags": ["no-remote-exec"],
         # NB: multiple shards will compete for port 4200 so limiting to 1
         "shards": 1,
     },
