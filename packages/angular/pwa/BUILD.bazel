@@ -55,7 +55,6 @@ ts_library(
     name = "pwa_test_lib",
     testonly = True,
     srcs = glob(["pwa/**/*_spec.ts"]),
-    # strict_checks = False,
     deps = [
         ":pwa",
         "//packages/angular_devkit/schematics/testing",

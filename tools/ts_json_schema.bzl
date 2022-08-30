@@ -3,7 +3,6 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-# @external_begin
 def _ts_json_schema_interface_impl(ctx):
     args = [
         ctx.files.src[0].path,
@@ -35,14 +34,13 @@ _ts_json_schema_interface = rule(
         "_binary": attr.label(
             default = Label("//tools:quicktype_runner"),
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
     },
     outputs = {
         "ts": "%{out}",
     },
 )
-# @external_end
 
 # Generates a TS file that contains the interface for a JSON Schema file. Takes a single `src`
 # argument as input, an optional data field for reference files, and produces a
@@ -52,11 +50,9 @@ _ts_json_schema_interface = rule(
 def ts_json_schema(name, src, data = []):
     out = src.replace(".json", ".ts")
 
-    # @external_begin
     _ts_json_schema_interface(
         name = name + ".interface",
         src = src,
         out = out,
         data = data,
     )
-    # @external_end

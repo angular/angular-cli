@@ -56,7 +56,6 @@ ts_library(
         "//packages/schematics/angular:" + src.replace(".json", ".ts")
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
-    # strict_checks = False,
     data = glob(
         include = [
             "collection.json",
