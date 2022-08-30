@@ -148,11 +148,8 @@ describe('readJsonWorkpace Parsing', () => {
       }
     `);
 
-    const consoleWarnSpy = spyOn(console, 'warn').and.callFake(() => undefined);
-    await expectAsync(readJsonWorkspace('', host));
-
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      `Project "foo" is missing a required property "root". This will become an error in the next major version.`,
+    await expectAsync(readJsonWorkspace('', host)).toBeRejectedWithError(
+      /Project "foo" is missing a required property "root"/,
     );
   });
 });
