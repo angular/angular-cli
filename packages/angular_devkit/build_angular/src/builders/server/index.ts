@@ -66,29 +66,6 @@ export function execute(
   const baseOutputPath = path.resolve(root, options.outputPath);
   let outputPaths: undefined | Map<string, string>;
 
-  if (typeof options.bundleDependencies === 'string') {
-    options.bundleDependencies = options.bundleDependencies === 'all';
-    context.logger.warn(
-      `Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`,
-    );
-  }
-
-  if (!options.bundleDependencies) {
-    // eslint-disable-next-line import/no-extraneous-dependencies
-    const { __processed_by_ivy_ngcc__, main = '' } = require('@angular/core/package.json');
-    if (
-      !__processed_by_ivy_ngcc__ ||
-      !__processed_by_ivy_ngcc__.main ||
-      (main as string).includes('__ivy_ngcc__')
-    ) {
-      context.logger.warn(tags.stripIndent`
-      Warning: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
-      unless 'node_modules' are transformed using the standalone Angular compatibility compiler (NGCC).
-      See: https://angular.io/guide/ivy#ivy-and-universal-app-shell
-    `);
-    }
-  }
-
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     concatMap(({ config, i18n, target }) => {
       return runWebpack(config, context, {

@@ -244,7 +244,7 @@ export interface ProtractorBuilderOptions {
 
 // @public (undocumented)
 export interface ServerBuilderOptions {
-    bundleDependencies?: BundleDependenciesUnion;
+    bundleDependencies?: boolean;
     deleteOutputPath?: boolean;
     // @deprecated
     deployUrl?: string;
