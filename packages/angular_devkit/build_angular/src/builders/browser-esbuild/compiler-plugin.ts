@@ -342,7 +342,7 @@ export function createCompilerPlugin(
           }
 
           const data = typescriptResult.content ?? '';
-          const forceAsyncTransformation = /for\s+await\s*\(|async\s+function\s*\*/.test(data);
+          const forceAsyncTransformation = /async\s+function\s*\*/.test(data);
           const useInputSourcemap =
             pluginOptions.sourcemap &&
             (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
@@ -388,8 +388,7 @@ export function createCompilerPlugin(
       build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
         const data = await fs.readFile(args.path, 'utf-8');
         const forceAsyncTransformation =
-          !/[\\/][_f]?esm2015[\\/]/.test(args.path) &&
-          /for\s+await\s*\(|async\s+function\s*\*/.test(data);
+          !/[\\/][_f]?esm2015[\\/]/.test(args.path) && /async\s+function\s*\*/.test(data);
         const shouldLink = await requiresLinking(args.path, data);
         const useInputSourcemap =
           pluginOptions.sourcemap &&
