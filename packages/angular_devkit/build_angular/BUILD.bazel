@@ -198,7 +198,6 @@ ts_library(
         ],
     ),
     data = glob(["test/**/*"]),
-    # strict_checks = False,
     deps = [
         ":build_angular",
         ":build_angular_test_utils",

@@ -3,7 +3,6 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-# @external_begin
 def _cli_json_schema_interface_impl(ctx):
     args = [
         ctx.files.src[0].path,
@@ -36,11 +35,10 @@ cli_json_schema = rule(
         "_binary": attr.label(
             default = Label("//tools:ng_cli_schema"),
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
     },
     outputs = {
         "json": "%{out}",
     },
 )
-# @external_end
