@@ -25,13 +25,6 @@
       "description": "The name of the main entry-point file.",
       "default": "main.server.ts"
     },
-    "appDir": {
-      "type": "string",
-      "format": "path",
-      "description": "The name of the application folder.",
-      "default": "app",
-      "x-deprecated": "This option has no effect."
-    },
     "rootModuleFileName": {
       "type": "string",
       "format": "path",
