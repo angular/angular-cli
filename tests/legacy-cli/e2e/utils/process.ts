@@ -345,7 +345,7 @@ export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
     );
   }
 
-  return _exec({ silent: true, env }, 'node', [require.resolve('npm'), ...args]);
+  return _exec({ silent: true, env }, process.execPath, [require.resolve('npm'), ...args]);
 }
 
 export function npm(...args: string[]) {
@@ -353,7 +353,7 @@ export function npm(...args: string[]) {
 }
 
 export function node(...args: string[]) {
-  return _exec({}, 'node', args);
+  return _exec({}, process.execPath, args);
 }
 
 export function git(...args: string[]) {
