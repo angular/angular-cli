@@ -3,14 +3,11 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
+load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
-
-# @external_begin
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
-load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-# @external_end
 
 licenses(["notice"])  # MIT
 
@@ -60,7 +57,6 @@ ts_library(
         "//packages/angular_devkit/architect:src/progress-schema.ts",
         "//packages/angular_devkit/architect:builders/operator-schema.ts",
     ],
-    # strict_checks = False,
     data = glob(
         include = ["**/*.json"],
         exclude = [
@@ -82,7 +78,6 @@ ts_library(
     name = "architect_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
-    # strict_checks = False,
     deps = [
         ":architect",
         "//packages/angular_devkit/architect/testing",

@@ -19,8 +19,6 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tasks/node",
     module_root = "index.d.ts",
-    # The attribute below is needed in g3 to turn off strict typechecking
-    # strict_checks = False,
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
