@@ -1,5 +1,5 @@
 import * as ansiColors from 'ansi-colors';
-import { SpawnOptions } from 'child_process';
+import { spawn, SpawnOptions } from 'child_process';
 import * as child_process from 'child_process';
 import { concat, defer, EMPTY, from } from 'rxjs';
 import { repeat, takeLast } from 'rxjs/operators';
@@ -121,7 +121,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
         .forEach((line) => console.error(colors.yellow('  ' + line)));
     });
 
-    childProcess.on('close', (code: number) => {
+    childProcess.on('close', (code) => {
       _processes = _processes.filter((p) => p !== childProcess);
 
       if (options.waitForMatch && !matched) {
@@ -371,7 +371,7 @@ export function silentGit(...args: string[]) {
  * the PATH variable only referencing the local node_modules and local NPM
  * registry (not the test runner or standard global node_modules).
  */
-export async function launchTestProcess(entry: string, ...args: any[]) {
+export async function launchTestProcess(entry: string, ...args: any[]): Promise<void> {
   const tempRoot: string = getGlobalVariable('tmp-root');
 
   // Extract explicit environment variables for the test process.
@@ -382,13 +382,30 @@ export async function launchTestProcess(entry: string, ...args: any[]) {
   };
 
   // Modify the PATH environment variable...
-  let paths = (env.PATH || process.env.PATH)!.split(delimiter);
+  env.PATH = (env.PATH || process.env.PATH)
+    ?.split(delimiter)
+    // Only include paths within the sandboxed test environment or external
+    // non angular-cli paths such as /usr/bin for generic commands.
+    .filter((p) => p.startsWith(tempRoot) || !p.includes('angular-cli'))
+    .join(delimiter);
 
-  // Only include paths within the sandboxed test environment or external
-  // non angular-cli paths such as /usr/bin for generic commands.
-  paths = paths.filter((p) => p.startsWith(tempRoot) || !p.includes('angular-cli'));
+  const testProcessArgs = [resolve(__dirname, 'run_test_process'), entry, ...args];
 
-  env.PATH = paths.join(delimiter);
+  return new Promise<void>((resolve, reject) => {
+    spawn(process.execPath, testProcessArgs, {
+      stdio: 'inherit',
+      env,
+    })
+      .on('close', (code) => {
+        if (!code) {
+          resolve();
+          return;
+        }
 
-  return _exec({ env }, process.execPath, [resolve(__dirname, 'run_test_process'), entry, ...args]);
+        reject(`Process error - "${testProcessArgs}`);
+      })
+      .on('error', (err) => {
+        reject(`Process exit error - "${testProcessArgs}]\n\n${err}`);
+      });
+  });
 }
