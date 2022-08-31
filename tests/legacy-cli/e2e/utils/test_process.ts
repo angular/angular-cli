@@ -16,7 +16,6 @@ const testFunction: () => Promise<void> | void =
     await testFunction();
   } catch (e) {
     console.error('Test Process error', e);
-    console.error(`ENV:${JSON.stringify(process.env, null, 2)}`);
     process.exitCode = -1;
   } finally {
     await killAllProcesses();

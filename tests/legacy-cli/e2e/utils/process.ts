@@ -80,11 +80,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
     // Return log info about the current process status
     function envDump() {
-      return [
-        `ENV:${JSON.stringify(spawnOptions.env, null, 2)}`,
-        `STDOUT:\n${stdout}`,
-        `STDERR:\n${stderr}`,
-      ].join('\n\n');
+      return `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`;
     }
 
     childProcess.stdout!.on('data', (data: Buffer) => {
