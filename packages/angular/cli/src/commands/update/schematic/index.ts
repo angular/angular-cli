@@ -561,9 +561,26 @@ function _buildPackageInfo(
     const content = JSON.parse(packageContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
     installedVersion = content.version;
   }
+
+  const packageVersionsNonDeprecated: string[] = [];
+  const packageVersionsDeprecated: string[] = [];
+
+  for (const [version, { deprecated }] of Object.entries(npmPackageJson.versions)) {
+    if (deprecated) {
+      packageVersionsDeprecated.push(version);
+    } else {
+      packageVersionsNonDeprecated.push(version);
+    }
+  }
+
+  const findSatisfyingVersion = (targetVersion: VersionRange): VersionRange | undefined =>
+    ((semver.maxSatisfying(packageVersionsNonDeprecated, targetVersion) ??
+      semver.maxSatisfying(packageVersionsDeprecated, targetVersion)) as VersionRange | null) ??
+    undefined;
+
   if (!installedVersion) {
     // Find the version from NPM that fits the range to max.
-    installedVersion = semver.maxSatisfying(Object.keys(npmPackageJson.versions), packageJsonRange);
+    installedVersion = findSatisfyingVersion(packageJsonRange);
   }
 
   if (!installedVersion) {
@@ -586,10 +603,7 @@ function _buildPackageInfo(
     } else if (targetVersion == 'next') {
       targetVersion = npmPackageJson['dist-tags']['latest'] as VersionRange;
     } else {
-      targetVersion = semver.maxSatisfying(
-        Object.keys(npmPackageJson.versions),
-        targetVersion,
-      ) as VersionRange;
+      targetVersion = findSatisfyingVersion(targetVersion);
     }
   }
 
