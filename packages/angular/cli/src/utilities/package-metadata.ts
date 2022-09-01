@@ -47,7 +47,9 @@ export interface NgPackageManifestProperties {
   };
 }
 
-export interface PackageManifest extends Manifest, NgPackageManifestProperties {}
+export interface PackageManifest extends Manifest, NgPackageManifestProperties {
+  deprecated?: boolean;
+}
 
 interface PackageManagerOptions extends Record<string, unknown> {
   forceAuth?: Record<string, unknown>;
