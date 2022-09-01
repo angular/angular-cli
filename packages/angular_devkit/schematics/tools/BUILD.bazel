@@ -35,6 +35,8 @@ ts_library(
     ],
 )
 
+# @external_begin
+
 ts_library(
     name = "tools_test_lib",
     testonly = True,
@@ -71,3 +73,5 @@ ts_library(
         TOOLCHAINS_VERSIONS,
     )
 ]
+
+# @external_end
