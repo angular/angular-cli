@@ -10,9 +10,9 @@ licenses(["notice"])
 
 exports_files([
     "LICENSE",
-    "tsconfig.json",  # @external
-    "tsconfig-test.json",  # @external
-    "tsconfig-build.json",  # @external
+    "tsconfig.json",
+    "tsconfig-test.json",
+    "tsconfig-build.json",
     "package.json",
 ])
 

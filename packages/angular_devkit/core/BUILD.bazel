@@ -39,7 +39,7 @@ ts_library(
         "@npm//ajv-formats",
         "@npm//jsonc-parser",
         "@npm//rxjs",
-        "@npm//source-map",  # @external
+        "@npm//source-map",
         # @node_module: typescript:es2015.proxy
         # @node_module: typescript:es2015.reflect
         # @node_module: typescript:es2015.symbol.wellknown

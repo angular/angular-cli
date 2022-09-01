@@ -55,9 +55,9 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
-        "@npm//inquirer",  # @external
-        "@npm//symbol-observable",  # @external
-        "@npm//yargs-parser",  # @external
+        "@npm//inquirer",
+        "@npm//symbol-observable",
+        "@npm//yargs-parser",
     ],
 )
 
