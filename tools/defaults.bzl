@@ -46,17 +46,16 @@ def ts_library(
         **kwargs
     )
 
-NG_VERSION = "^14.1.0-next"
+NG_VERSION = "^14.2.0"
 RXJS_VERSION = "^6.5.5"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
-DEVKIT_CORE_VERSION = "^14.1.0-next"
-DEVKIT_ARCHITECT_VERSION = "^0.1400.0-next"
-DEVKIT_BUILD_ANGULAR_VERSION = "^14.1.0-next"
+DEVKIT_CORE_VERSION = "^14.2.0"
+DEVKIT_ARCHITECT_VERSION = "^0.1402.0"
+DEVKIT_BUILD_ANGULAR_VERSION = "^14.2.0"
 TSLIB_VERSION = "^2.3.0"
 
 NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
-    "aspnetcore-engine",
     "builders",
     "common",
     "express-engine",
