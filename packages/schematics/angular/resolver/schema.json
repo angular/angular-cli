@@ -43,5 +43,5 @@
       }
     }
   },
-  "required": ["name"]
+  "required": ["name", "project"]
 }

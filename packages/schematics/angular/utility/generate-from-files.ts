@@ -28,7 +28,7 @@ export interface GenerateFromFilesOptions {
   name: string;
   path?: string;
   prefix?: string;
-  project?: string;
+  project: string;
   skipTests?: boolean;
 }
 
@@ -37,7 +37,7 @@ export function generateFromFiles(
   extraTemplateValues: Record<string, string | ((v: string) => string)> = {},
 ): Rule {
   return async (host: Tree) => {
-    options.path ??= await createDefaultPath(host, options.project as string);
+    options.path ??= await createDefaultPath(host, options.project);
     options.prefix ??= '';
     options.flat ??= true;
 

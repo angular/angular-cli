@@ -43,5 +43,5 @@
       "x-user-analytics": 12
     }
   },
-  "required": ["name"]
+  "required": ["name", "project"]
 }

@@ -55,5 +55,5 @@
       "x-prompt": "Which interfaces would you like to implement?"
     }
   },
-  "required": ["name"]
+  "required": ["name", "project"]
 }
