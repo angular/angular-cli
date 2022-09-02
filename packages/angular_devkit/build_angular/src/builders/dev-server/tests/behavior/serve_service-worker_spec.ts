@@ -42,6 +42,23 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
   };
 
   describe('Behavior: "dev-server builder serves service worker"', () => {
+    beforeEach(() => {
+      harness.useProject('test', {
+        root: '.',
+        sourceRoot: 'src',
+        cli: {
+          cache: {
+            enabled: false,
+          },
+        },
+        i18n: {
+          sourceLocale: {
+            'code': 'fr',
+          },
+        },
+      });
+    });
+
     it('works with service worker', async () => {
       setupBrowserTarget(harness, {
         serviceWorker: true,
@@ -99,11 +116,36 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
           hashTable: {
             '/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
             '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-            '/index.html': 'cb8ad8c81cd422699d6d831b6f25ad4481f2c90a',
+            '/index.html': '9d232e3e13b4605d197037224a2a6303dd337480',
             '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
           },
         }),
       );
+    });
+
+    it('works with localize', async () => {
+      setupBrowserTarget(harness, {
+        serviceWorker: true,
+        assets: ['src/favicon.ico', 'src/assets'],
+        styles: ['src/styles.css'],
+        localize: ['fr'],
+      });
+
+      await harness.writeFiles({
+        'ngsw-config.json': JSON.stringify(manifest),
+        'src/assets/folder-asset.txt': 'folder-asset.txt',
+        'src/styles.css': `body { background: url(./spectrum.png); }`,
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, '/ngsw.json');
+
+      expect(result?.success).toBeTrue();
+
+      expect(await response?.json()).toBeDefined();
     });
 
     it('works in watch mode', async () => {
