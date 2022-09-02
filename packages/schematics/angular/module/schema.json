@@ -64,5 +64,5 @@
       "alias": "m"
     }
   },
-  "required": ["name"]
+  "required": ["name", "project"]
 }
