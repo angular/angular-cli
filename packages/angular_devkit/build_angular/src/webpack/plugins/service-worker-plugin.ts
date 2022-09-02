@@ -12,7 +12,6 @@ import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 export interface ServiceWorkerPluginOptions {
   projectRoot: string;
   root: string;
-  outputPath: string;
   baseHref?: string;
   ngswConfigPath?: string;
 }
@@ -21,8 +20,16 @@ export class ServiceWorkerPlugin {
   constructor(private readonly options: ServiceWorkerPluginOptions) {}
 
   apply(compiler: Compiler) {
-    compiler.hooks.done.tapPromise('angular-service-worker', async (_compilation) => {
-      const { projectRoot, root, baseHref = '', ngswConfigPath, outputPath } = this.options;
+    compiler.hooks.done.tapPromise('angular-service-worker', async ({ compilation }) => {
+      const { projectRoot, root, baseHref = '', ngswConfigPath } = this.options;
+      // We use the output path from the compilation instead of build options since during
+      // localization the output path is modified to a temp directory.
+      // See: https://github.com/angular/angular-cli/blob/7e64b1537d54fadb650559214fbb12707324cd75/packages/angular_devkit/build_angular/src/utils/i18n-options.ts#L251-L252
+      const outputPath = compilation.outputOptions.path;
+
+      if (!outputPath) {
+        throw new Error('Compilation output path cannot be empty.');
+      }
 
       await augmentAppWithServiceWorker(
         projectRoot,

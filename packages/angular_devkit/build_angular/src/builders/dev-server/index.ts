@@ -242,7 +242,6 @@ export function serveWebpackBrowser(
           baseHref: browserOptions.baseHref,
           root: context.workspaceRoot,
           projectRoot,
-          outputPath: path.join(context.workspaceRoot, browserOptions.outputPath),
           ngswConfigPath: browserOptions.ngswConfigPath,
         }),
       );
