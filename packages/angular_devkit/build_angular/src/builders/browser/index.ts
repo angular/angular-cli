@@ -173,6 +173,19 @@ export function buildWebpackBrowser(
       // Check and warn about IE browser support
       checkInternetExplorerSupport(initialization.projectRoot, context.logger);
 
+      // Add index file to watched files.
+      if (options.watch) {
+        const indexInputFile = path.join(context.workspaceRoot, getIndexInputFile(options.index));
+        initialization.config.plugins ??= [];
+        initialization.config.plugins.push({
+          apply: (compiler: webpack.Compiler) => {
+            compiler.hooks.thisCompilation.tap('build-angular', (compilation) => {
+              compilation.fileDependencies.add(indexInputFile);
+            });
+          },
+        });
+      }
+
       return {
         ...initialization,
         cacheOptions: normalizeCacheOptions(projectMetadata, context.workspaceRoot),
