@@ -129,7 +129,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1ef843fcf4880c4881a2db7f925c10fa860002ae":
   version "0.0.0-3238f034456be0ac0fbc94a3333b4ba82a8cbacf"
-  uid "1ef843fcf4880c4881a2db7f925c10fa860002ae"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1ef843fcf4880c4881a2db7f925c10fa860002ae"
   dependencies:
     "@angular-devkit/build-angular" "14.2.0-rc.0"
@@ -243,7 +242,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#bc4f1f64acf0ff18f7eab7748e1844260c6530fc":
   version "0.0.0-3238f034456be0ac0fbc94a3333b4ba82a8cbacf"
-  uid bc4f1f64acf0ff18f7eab7748e1844260c6530fc
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#bc4f1f64acf0ff18f7eab7748e1844260c6530fc"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -4378,10 +4376,10 @@ dev-ip@^1.0.1:
   resolved "https://registry.yarnpkg.com/dev-ip/-/dev-ip-1.0.1.tgz#a76a3ed1855be7a012bb8ac16cb80f3c00dc28f0"
   integrity sha512-LmVkry/oDShEgSZPNgqCIp2/TlqtExeGmymru3uCELnfyjY11IzpAproLYs+1X88fXO6DBoYP3ul2Xo2yz2j6A==
 
-devtools-protocol@0.0.1019158:
-  version "0.0.1019158"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1019158.tgz#4b08d06108a784a2134313149626ba55f030a86f"
-  integrity sha512-wvq+KscQ7/6spEV7czhnZc9RM/woz1AY+/Vpd8/h2HFMwJSdTliu7f/yr1A6vDdJfKICZsShqsYpEQbdhg8AFQ==
+devtools-protocol@0.0.1036444:
+  version "0.0.1036444"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1036444.tgz#a570d3cdde61527c82f9b03919847b8ac7b1c2b9"
+  integrity sha512-0y4f/T8H9lsESV9kKP1HDUXgHxCdniFeJh6Erq+FbdOEvp/Ydp9t8kcAAM5gOd17pMrTDlFWntoHtzzeTUWKNw==
 
 dezalgo@^1.0.0:
   version "1.0.4"
@@ -9222,14 +9220,14 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer@17.0.0:
-  version "17.0.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-17.0.0.tgz#85fea801a7b8b8c9e2913b1491e98c867be49a6b"
-  integrity sha512-T2rdzlPxnPezF218kywFP3O+0YI5/8Kl8riNUicGb+KuMyDTrqRjhSOSDp6coQ1T4QYPBARTFp4EMBepMOzAQA==
+puppeteer@17.1.0:
+  version "17.1.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-17.1.0.tgz#27dfc629092a5ac1b6f6c30ec200c4147af2847c"
+  integrity sha512-cPBHruFaUGNTekw0I8P6vBY4sV9gFyh3WjDDv0UzlwSSRQVSl+igcuPVqa7NKDjKccki9X1nVn6HalIqBoJz6g==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.4"
-    devtools-protocol "0.0.1019158"
+    devtools-protocol "0.0.1036444"
     extract-zip "2.0.1"
     https-proxy-agent "5.0.1"
     progress "2.0.3"
@@ -9811,7 +9809,6 @@ sass@^1.49.9:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz":
   version "0.0.0"
-  uid e5d7f82ad98251a653d1b0537f1103e49eda5e11
   resolved "https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz#e5d7f82ad98251a653d1b0537f1103e49eda5e11"
 
 saucelabs@^1.5.0:
