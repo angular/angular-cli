@@ -11,30 +11,11 @@ import { AngularWebpackPlugin } from '@ngtools/webpack';
 import { ScriptTarget } from 'typescript';
 import { WebpackConfigOptions } from '../../utils/build-options';
 
-function ensureIvy(wco: WebpackConfigOptions): void {
-  if (wco.tsConfig.options.enableIvy !== false) {
-    return;
-  }
-
-  wco.logger.warn(
-    'Project is attempting to disable the Ivy compiler. ' +
-      'Angular versions 12 and higher do not support the deprecated View Engine compiler for applications. ' +
-      'The Ivy compiler will be used to build this project. ' +
-      '\nFor additional information or if the build fails, please see https://angular.io/guide/ivy',
-  );
-
-  wco.tsConfig.options.enableIvy = true;
-}
-
 export function createIvyPlugin(
   wco: WebpackConfigOptions,
   aot: boolean,
   tsconfig: string,
 ): AngularWebpackPlugin {
-  if (aot) {
-    ensureIvy(wco);
-  }
-
   const { buildOptions } = wco;
   const optimize = buildOptions.optimization.scripts;
 

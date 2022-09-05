@@ -166,7 +166,6 @@ export function createCompilerPlugin(
         rootNames,
         errors: configurationDiagnostics,
       } = compilerCli.readConfiguration(pluginOptions.tsconfig, {
-        enableIvy: true,
         noEmitOnError: false,
         suppressOutputPathCheck: true,
         outDir: undefined,
