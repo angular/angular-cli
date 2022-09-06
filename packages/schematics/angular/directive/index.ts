@@ -20,70 +20,12 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
-import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
+import { findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { validateHtmlSelector } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as DirectiveOptions } from './schema';
-
-function addDeclarationToNgModule(options: DirectiveOptions): Rule {
-  return (host: Tree) => {
-    if (options.skipImport || options.standalone || !options.module) {
-      return host;
-    }
-
-    const modulePath = options.module;
-    const sourceText = host.readText(modulePath);
-    const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
-
-    const directivePath =
-      `/${options.path}/` +
-      (options.flat ? '' : strings.dasherize(options.name) + '/') +
-      strings.dasherize(options.name) +
-      '.directive';
-    const relativePath = buildRelativePath(modulePath, directivePath);
-    const classifiedName = strings.classify(`${options.name}Directive`);
-    const declarationChanges = addDeclarationToModule(
-      source,
-      modulePath,
-      classifiedName,
-      relativePath,
-    );
-    const declarationRecorder = host.beginUpdate(modulePath);
-    for (const change of declarationChanges) {
-      if (change instanceof InsertChange) {
-        declarationRecorder.insertLeft(change.pos, change.toAdd);
-      }
-    }
-    host.commitUpdate(declarationRecorder);
-
-    if (options.export) {
-      // Need to refresh the AST because we overwrote the file in the host.
-      const sourceText = host.readText(modulePath);
-      const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
-
-      const exportRecorder = host.beginUpdate(modulePath);
-      const exportChanges = addExportToModule(
-        source,
-        modulePath,
-        strings.classify(`${options.name}Directive`),
-        relativePath,
-      );
-
-      for (const change of exportChanges) {
-        if (change instanceof InsertChange) {
-          exportRecorder.insertLeft(change.pos, change.toAdd);
-        }
-      }
-      host.commitUpdate(exportRecorder);
-    }
-
-    return host;
-  };
-}
 
 function buildSelector(options: DirectiveOptions, projectPrefix: string) {
   let selector = options.name;
@@ -127,6 +69,13 @@ export default function (options: DirectiveOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return chain([addDeclarationToNgModule(options), mergeWith(templateSource)]);
+    return chain([
+      addDeclarationToNgModule({
+        type: 'directive',
+
+        ...options,
+      }),
+      mergeWith(templateSource),
+    ]);
   };
 }

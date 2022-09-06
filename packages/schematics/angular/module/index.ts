@@ -47,7 +47,7 @@ function buildRelativeModulePath(options: ModuleOptions, modulePath: string): st
   return buildRelativePath(modulePath, importModulePath);
 }
 
-function addDeclarationToNgModule(options: ModuleOptions): Rule {
+function addImportToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
     if (!options.module) {
       return host;
@@ -179,7 +179,7 @@ export default function (options: ModuleOptions): Rule {
     };
 
     return chain([
-      !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : noop(),
+      !isLazyLoadedModuleGen ? addImportToNgModule(options) : noop(),
       addRouteDeclarationToNgModule(options, routingModulePath),
       mergeWith(templateSource),
       isLazyLoadedModuleGen ? schematic('component', componentOptions) : noop(),
