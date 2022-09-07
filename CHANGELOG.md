@@ -1,3 +1,25 @@
+<a name="14.2.0-rc.0"></a>
+
+# 14.2.0-rc.0 (2022-09-07)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                  |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
+| [6dcce858](https://github.com/angular/universal/commit/6dcce858ee4dae07268f26835f27136a354d227c) | fix  | handle cookies with localhost domain as path |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                             |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------- |
+| [d9a13469](https://github.com/angular/universal/commit/d9a13469a039bfca94939ecac6201973990b7b96) | fix  | remove default value of `appDir` option |
+
+## Special Thanks
+
+Alan Agius and angular-robot[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.0-next.0"></a>
 
 # 14.2.0-next.0 (2022-08-17)
