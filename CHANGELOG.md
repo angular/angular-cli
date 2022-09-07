@@ -1,6 +1,6 @@
-<a name="14.2.0-rc.0"></a>
+<a name="14.2.0"></a>
 
-# 14.2.0-rc.0 (2022-09-07)
+# 14.2.0 (2022-09-07)
 
 ### @nguniversal/common
 
@@ -13,16 +13,6 @@
 | Commit                                                                                           | Type | Description                             |
 | ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------- |
 | [d9a13469](https://github.com/angular/universal/commit/d9a13469a039bfca94939ecac6201973990b7b96) | fix  | remove default value of `appDir` option |
-
-## Special Thanks
-
-Alan Agius and angular-robot[bot]
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.2.0-next.0"></a>
-
-# 14.2.0-next.0 (2022-08-17)
 
 ## Special Thanks
 
