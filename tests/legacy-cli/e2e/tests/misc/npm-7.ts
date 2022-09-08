@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { execSync } from 'child_process';
 import { valid as validSemVer } from 'semver';
 import { rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
@@ -21,16 +20,7 @@ export default async function () {
   }
 
   // Get current package manager version to restore after tests
-  const initialVersionText = execSync('npm --version', {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    env: {
-      ...process.env,
-      //  NPM updater notifier will prevent the child process from closing until it timeouts after 3 minutes.
-      NO_UPDATE_NOTIFIER: '1',
-      NPM_CONFIG_UPDATE_NOTIFIER: 'false',
-    },
-  }).trim();
+  const initialVersionText = (await npm('--version')).stdout.trim();
   const initialVersion = validSemVer(initialVersionText);
   assert.ok(
     initialVersion,

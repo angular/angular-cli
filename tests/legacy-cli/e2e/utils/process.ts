@@ -16,7 +16,7 @@ interface ExecOptions {
   cwd?: string;
 }
 
-const NPM_CONFIG_RE = /^(npm_config_|yarn_)/i;
+const NPM_CONFIG_RE = /^(npm_config_|yarn_|no_update_notifier)/i;
 
 let _processes: child_process.ChildProcess[] = [];
 
