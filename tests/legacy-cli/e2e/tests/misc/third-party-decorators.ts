@@ -5,14 +5,11 @@ import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
   await updateJsonFile('package.json', (packageJson) => {
-    // Install ngrx
-    packageJson['dependencies']['@ngrx/effects'] = '^13.2.0';
-    packageJson['dependencies']['@ngrx/schematics'] = '^13.2.0';
-    packageJson['dependencies']['@ngrx/store'] = '^13.2.0';
-    packageJson['dependencies']['@ngrx/store-devtools'] = '^13.2.0';
-
-    // TODO(crisbeto): ngrx hasn't been updated for TS 4.7 yet.
-    packageJson['devDependencies']['typescript'] = '~4.6.2';
+    // Install NGRX
+    packageJson['dependencies']['@ngrx/effects'] = '^14.3.0';
+    packageJson['dependencies']['@ngrx/schematics'] = '^14.3.0';
+    packageJson['dependencies']['@ngrx/store'] = '^14.3.0';
+    packageJson['dependencies']['@ngrx/store-devtools'] = '^14.3.0';
   });
 
   // Force is need to prevent npm 7+ from failing due to potential peer dependency resolution range errors.
