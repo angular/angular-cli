@@ -41,6 +41,11 @@ export default async function () {
   setGlobalVariable('npm-global', npmModulesPrefix);
   setGlobalVariable('yarn-global', yarnModulesPrefix);
 
+  // Disable all update/notification related npm/yarn features such as the NPM updater notifier.
+  // The NPM updater notifier may prevent the child process from closing until it timeouts after 3 minutes.
+  process.env.NO_UPDATE_NOTIFIER = '1';
+  process.env.NPM_CONFIG_UPDATE_NOTIFIER = 'false';
+
   console.log(`  Using "${npmModulesPrefix}" as e2e test global npm bin dir.`);
   console.log(`  Using "${yarnModulesPrefix}" as e2e test global yarn bin dir.`);
 }
