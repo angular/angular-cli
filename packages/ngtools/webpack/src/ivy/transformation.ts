@@ -74,6 +74,12 @@ export function mergeTransformers(
   return result;
 }
 
+/**
+ * The name of the Angular platform that should be replaced within
+ * bootstrap call expressions to support AOT.
+ */
+const PLATFORM_BROWSER_DYNAMIC_NAME = 'platformBrowserDynamic';
+
 export function replaceBootstrap(
   getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
@@ -86,7 +92,7 @@ export function replaceBootstrap(
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
         const target = node.expression;
-        if (target.text === 'platformBrowserDynamic') {
+        if (target.text === PLATFORM_BROWSER_DYNAMIC_NAME) {
           if (!bootstrapNamespace) {
             bootstrapNamespace = nodeFactory.createUniqueName('__NgCli_bootstrap_');
             bootstrapImport = nodeFactory.createImportDeclaration(
@@ -115,6 +121,10 @@ export function replaceBootstrap(
     };
 
     return (sourceFile: ts.SourceFile) => {
+      if (!sourceFile.text.includes(PLATFORM_BROWSER_DYNAMIC_NAME)) {
+        return sourceFile;
+      }
+
       let updatedSourceFile = ts.visitEachChild(sourceFile, visitNode, context);
 
       if (bootstrapImport) {
