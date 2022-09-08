@@ -235,7 +235,7 @@ jobs:
             - run:
                 name: Execute CLI E2E Tests with NPM
                 command: |
-                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e --ignore="tests/misc/browsers.ts"
+                  yarn e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk/e2e --ignore="tests/misc/browsers.ts"
       - when:
           condition:
             equal: ['esbuild', << parameters.subset >>]
@@ -243,7 +243,7 @@ jobs:
             - run:
                 name: Execute CLI E2E Tests Subset with Esbuild
                 command: |
-                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --esbuild --tmpdir=/mnt/ramdisk/e2e --glob="{tests/basic/**,tests/build/prod-build.ts,tests/build/relative-sourcemap.ts,tests/build/styles/scss.ts,tests/build/styles/include-paths.ts,tests/commands/add/add-pwa.ts}" --ignore="tests/basic/{environment,rebuild,serve,scripts-array}.ts"
+                  yarn e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --esbuild --tmpdir=/mnt/ramdisk/e2e --glob="{tests/basic/**,tests/build/prod-build.ts,tests/build/relative-sourcemap.ts,tests/build/styles/scss.ts,tests/build/styles/include-paths.ts,tests/commands/add/add-pwa.ts}" --ignore="tests/basic/{environment,rebuild,serve,scripts-array}.ts"
       - when:
           condition:
             equal: ['yarn', << parameters.subset >>]
@@ -251,7 +251,7 @@ jobs:
             - run:
                 name: Execute CLI E2E Tests Subset with Yarn
                 command: |
-                  node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
+                  yarn e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --yarn --tmpdir=/mnt/ramdisk/e2e --glob="{tests/basic/**,tests/update/**,tests/commands/add/**}"
       - fail_fast
 
   test-browsers:
