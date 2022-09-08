@@ -1,5 +1,6 @@
 import { join } from 'path';
 import yargsParser from 'yargs-parser';
+import { IS_BAZEL } from '../utils/bazel';
 import { getGlobalVariable } from '../utils/env';
 import { expectFileToExist } from '../utils/fs';
 import { gitClean } from '../utils/git';
@@ -23,11 +24,13 @@ export default async function () {
 
     // Install puppeteer in the parent directory for use by the CLI within any test project.
     // Align the version with the primary project package.json.
-    const puppeteerVersion = require('../../../../package.json').devDependencies.puppeteer.replace(
-      /^[\^~]/,
-      '',
-    );
-    await installPackage(`puppeteer@${puppeteerVersion}`);
+    // Bazel has own browser toolchains
+    // TODO(bazel): remove non-bazel
+    if (!IS_BAZEL) {
+      const puppeteerVersion =
+        require('../../../../package.json').devDependencies.puppeteer.replace(/^[\^~]/, '');
+      await installPackage(`puppeteer@${puppeteerVersion}`);
+    }
 
     await ng('new', 'test-project', '--skip-install');
     await expectFileToExist(join(process.cwd(), 'test-project'));

@@ -29,7 +29,18 @@ export default async function () {
           colors: true,
           logLevel: config.LOG_INFO,
           autoWatch: true,
-          browsers: ['ChromeHeadless'],
+          browsers: ['ChromeHeadlessNoSandbox'],
+          customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+              base: 'ChromeHeadless',
+              flags: [
+                '--no-sandbox',
+                '--headless',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+              ],
+            }
+          },
           singleRun: false,
           restartOnFileChange: true
         });

@@ -98,3 +98,14 @@ nodejs_register_toolchains(
     name = "node16",
     node_version = "16.13.1",
 )
+
+register_toolchains(
+    "@npm//@angular/build-tooling/bazel/git-toolchain:git_linux_toolchain",
+    "@npm//@angular/build-tooling/bazel/git-toolchain:git_macos_x86_toolchain",
+    "@npm//@angular/build-tooling/bazel/git-toolchain:git_macos_arm64_toolchain",
+    "@npm//@angular/build-tooling/bazel/git-toolchain:git_windows_toolchain",
+)
+
+load("@npm//@angular/build-tooling/bazel/browsers:browser_repositories.bzl", "browser_repositories")
+
+browser_repositories()
