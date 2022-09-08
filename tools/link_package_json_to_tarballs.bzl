@@ -8,7 +8,7 @@ load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 def link_package_json_to_tarballs(name, src, pkg_deps, out):
     """Substitute tar paths into a package.json file for the packages it depends on.
 
-    src and pkg_deps must be labels in the bazel-out tree for the derived path to the npm_package_archive.tar.gz to be correct.
+    src and pkg_deps must be labels in the bazel-out tree for the derived path to the npm_package_archive.tgz to be correct.
 
     Args:
         name: Name of the rule
@@ -41,7 +41,7 @@ def link_package_json_to_tarballs(name, src, pkg_deps, out):
         # for the tar for this package as that would create a circular dependency.
         pkg_label = to_label(pkg_dep)
         if pkg_label.package != src_pkg:
-            pkg_tar = "@%s//%s:npm_package_archive.tar.gz" % (pkg_label.workspace_name, pkg_label.package)
+            pkg_tar = "@%s//%s:npm_package_archive.tgz" % (pkg_label.workspace_name, pkg_label.package)
             srcs.append(pkg_tar)
 
         # Deriving the absolute path to the tar in the execroot requries different
@@ -53,7 +53,7 @@ def link_package_json_to_tarballs(name, src, pkg_deps, out):
             name = "%s_%s_filter" % (name, i),
             srcs = srcs,
             cmd = """
-                TAR=$$(dirname $$({abs_path_sandbox} || {abs_path_nosandbox}))/npm_package_archive.tar.gz
+                TAR=$$(dirname $$({abs_path_sandbox} || {abs_path_nosandbox}))/npm_package_archive.tgz
                 PKGNAME=$$(cat $(execpath {pkg_name}))
                 if [[ "$$TAR" != *bazel-out* ]]; then
                     echo "ERROR: package.json passed to substitute_tar_deps must be in the output tree. You can use copy_to_bin to copy a source file to the output tree."
