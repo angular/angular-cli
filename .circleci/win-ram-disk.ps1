@@ -26,5 +26,6 @@ if (-not (Test-Path -Path $aimContents)) {
 ./aim/cli/x64/aim_ll.exe --install ./aim/drivers
 
 # Setup RAM disk mount. Same parameters as ImDisk
+# Ensure size is large enough to support the bazel 'shard_count's such as for e2e tests.
 # See: https://support.circleci.com/hc/en-us/articles/4411520952091-Create-a-windows-RAM-disk
-./aim/cli/x64/aim_ll.exe -a -s 5G -m X: -p "/fs:ntfs /q /y"
+./aim/cli/x64/aim_ll.exe -a -s 12G -m X: -p "/fs:ntfs /q /y"

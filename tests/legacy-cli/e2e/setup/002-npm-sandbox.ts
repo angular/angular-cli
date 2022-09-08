@@ -24,6 +24,10 @@ export default async function () {
   process.env.NPM_CONFIG_PREFIX = npmModulesPrefix;
   process.env.YARN_CONFIG_PREFIX = yarnModulesPrefix;
 
+  // Put the npm+yarn caches in the temp dir
+  process.env.NPM_CONFIG_CACHE = join(tempRoot, 'npm-cache');
+  process.env.YARN_CACHE_FOLDER = join(tempRoot, 'yarn-cache');
+
   // Snapshot builds may contain versions that are not yet released (e.g., RC phase main branch).
   // In this case peer dependency ranges may not resolve causing npm 7+ to fail during tests.
   // To support this case, legacy peer dependency mode is enabled for snapshot builds.

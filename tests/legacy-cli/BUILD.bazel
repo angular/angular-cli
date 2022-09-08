@@ -1,4 +1,5 @@
 load("//tools:defaults.bzl", "ts_library")
+load(":e2e.bzl", "e2e_suites")
 
 ts_library(
     name = "runner",
@@ -11,16 +12,25 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "//tests/legacy-cli/e2e/assets",
         "//tests/legacy-cli/e2e/utils",
         "@npm//@types/glob",
         "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
         "@npm//yargs-parser",
+    ],
+)
 
+e2e_suites(
+    name = "e2e",
+    data = [
+        ":runner",
+
+        # Tests + setup
         # Loaded dynamically at runtime, not compiletime deps
+        "//tests/legacy-cli/e2e/assets",
         "//tests/legacy-cli/e2e/setup",
         "//tests/legacy-cli/e2e/initialize",
         "//tests/legacy-cli/e2e/tests",
     ],
+    runner = ":e2e_runner.ts",
 )

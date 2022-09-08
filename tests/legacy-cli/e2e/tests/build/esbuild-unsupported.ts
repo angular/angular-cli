@@ -1,7 +1,13 @@
 import { join } from 'path';
+import { IS_BAZEL } from '../../utils/bazel';
 import { execWithEnv } from '../../utils/process';
 
 export default async function () {
+  // TODO(bazel): fails with bazel on windows
+  if (IS_BAZEL && process.platform.startsWith('win')) {
+    return;
+  }
+
   // Set the esbuild native binary path to a non-existent file to simulate a spawn error.
   // The build should still succeed by falling back to the WASM variant of esbuild.
   await execWithEnv('ng', ['build'], {

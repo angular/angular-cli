@@ -90,6 +90,10 @@ build:snapshot --workspace_status_command="yarn -s ng-dev release build-env-stam
 build:snapshot --stamp
 build:snapshot --//:enable_snapshot_repo_deps
 
+build:e2e --workspace_status_command="yarn -s ng-dev release build-env-stamp --mode=release"
+build:e2e --stamp
+test:e2e  --test_timeout=3600
+
 build:local --//:enable_package_json_tar_deps
 
 ###############################
