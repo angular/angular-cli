@@ -181,6 +181,8 @@ Promise.all([findFreePort(), findFreePort()])
       } else {
         console.log(colors.green('Done.'));
       }
+
+      process.exitCode = 0;
     } catch (err) {
       if (err instanceof Error) {
         console.log('\n');
@@ -202,16 +204,16 @@ Promise.all([findFreePort(), findFreePort()])
         }
       }
 
-      throw err;
+      process.exitCode = 1;
     } finally {
       registryProcess.kill();
       secureRegistryProcess.kill();
     }
   })
-  .then(
-    () => process.exit(0),
-    () => process.exit(1),
-  );
+  .catch((err) => {
+    console.error(colors.red(`Unkown Error: ${err}`));
+    process.exitCode = 1;
+  });
 
 async function runSteps(
   run: (name: string) => Promise<void> | void,
