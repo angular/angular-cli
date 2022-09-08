@@ -59,7 +59,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
     in the same folder to exist.
 
     Args:
-        name: Name of the pkg_npm rule. '_archive.tar.gz' is appended to create the tarball.
+        name: Name of the pkg_npm rule. '_archive.tgz' is appended to create the tarball.
         pkg_deps: package.json files of dependent packages. These are used for local path substitutions when --config=local is set.
         use_prodmode_output: False to ship ES5 devmode output, True to ship ESM output. Defaults to False.
         **kwargs: Additional arguments passed to the real pkg_npm.
@@ -116,7 +116,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
     )
 
     # Copy package.json files to bazel-out so we can use their bazel-out paths to determine
-    # the corresponding package npm package tar.gz path for substitutions.
+    # the corresponding package npm package tgz path for substitutions.
     copy_to_bin(
         name = "package_json_copy",
         srcs = [pkg_json],
@@ -195,7 +195,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
     pkg_tar(
         name = name + "_archive",
         srcs = [":%s" % name],
-        extension = "tar.gz",
+        extension = "tgz",
         strip_prefix = "./%s" % name,
         visibility = visibility,
     )
