@@ -1,3 +1,36 @@
+<a name="14.2.2"></a>
+
+# 14.2.2 (2022-09-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [5405a9b3b](https://github.com/angular/angular-cli/commit/5405a9b3b56675dc671e1ef27410e632f3f6f536) | fix  | favor non deprecated packages during update |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [6bfd6a7fb](https://github.com/angular/angular-cli/commit/6bfd6a7fbcaf433bd2c380087803044df4c6d8ee) | fix  | update minimum Angular version to 14.2 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [2b00bca61](https://github.com/angular/angular-cli/commit/2b00bca615a2c79b0a0311c83cb9f1450b6f1745) | fix  | allow esbuild-based builder to use SVG Angular templates  |
+| [45c95e1bf](https://github.com/angular/angular-cli/commit/45c95e1bf1327532ceeb1277fa6f4ce7c3a45581) | fix  | change service worker errors to compilation errors        |
+| [ecc014d66](https://github.com/angular/angular-cli/commit/ecc014d669efe9609177354c465f24a1c94279cd) | fix  | handle service-worker serving with localize in dev-server |
+| [39ea128c1](https://github.com/angular/angular-cli/commit/39ea128c1294046525a8c098ed6a776407990365) | fix  | handling of `@media` queries inside css layers            |
+| [17b7e1bdf](https://github.com/angular/angular-cli/commit/17b7e1bdfce5823718d1fa915d25858f4b0d7110) | fix  | issue warning when using deprecated tilde imports         |
+| [3afd784f1](https://github.com/angular/angular-cli/commit/3afd784f1f00ee07f68ba112bea7786ccb2d4f35) | fix  | watch index file when running build in watch mode         |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Jason Bedard and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.1"></a>
 
 # 14.2.1 (2022-08-26)
