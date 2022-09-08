@@ -76,9 +76,6 @@ export function resolveGlobalStyles(
 
 // eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
-  const postcssImports = require('postcss-import');
-  const postcssPresetEnv: typeof import('postcss-preset-env') = require('postcss-preset-env');
-
   const { root, buildOptions } = wco;
   const extraPlugins: Configuration['plugins'] = [];
 
@@ -156,11 +153,9 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     }
   }
 
-  const postcssPresetEnvPlugin = postcssPresetEnv({
-    browsers: buildOptions.supportedBrowsers,
-    autoprefixer: true,
-    stage: 3,
-  });
+  const postcssImports = require('postcss-import');
+  const autoprefixer: typeof import('autoprefixer') = require('autoprefixer');
+
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const optionGenerator = (loader: any) => ({
@@ -198,7 +193,10 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           extracted,
         }),
         ...extraPostcssPlugins,
-        postcssPresetEnvPlugin,
+        autoprefixer({
+          ignoreUnknownVersions: true,
+          overrideBrowserslist: buildOptions.supportedBrowsers,
+        }),
       ],
     });
     // postcss-loader fails when trying to determine configuration files for data URIs

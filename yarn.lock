@@ -129,7 +129,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#f2a04c81f9cfbf8a86e595ca5d1ca1da50ddf9dd":
   version "0.0.0-1c648b45459fa32ffd7de8a8fc07bde6bdbef923"
-  uid f2a04c81f9cfbf8a86e595ca5d1ca1da50ddf9dd
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#f2a04c81f9cfbf8a86e595ca5d1ca1da50ddf9dd"
   dependencies:
     "@angular-devkit/build-angular" "14.2.0-rc.0"
@@ -243,7 +242,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#20aa4d8a5ec774e1f21fbc50bca511c229a1a7f8":
   version "0.0.0-1c648b45459fa32ffd7de8a8fc07bde6bdbef923"
-  uid "20aa4d8a5ec774e1f21fbc50bca511c229a1a7f8"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#20aa4d8a5ec774e1f21fbc50bca511c229a1a7f8"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -1434,14 +1432,6 @@
     "@csstools/selector-specificity" "^2.0.2"
     postcss-selector-parser "^6.0.10"
 
-"@csstools/postcss-cascade-layers@^1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@csstools/postcss-cascade-layers/-/postcss-cascade-layers-1.0.6.tgz#a52da13b91fc184a52337b4e938c3d3188e537b0"
-  integrity sha512-ei4Vh4AJwTCXTNj7uzwduoZDO7nLPksQ0TI7OzUlyFq4P4Uhu6hU7R4AlLimDP/s6D3PQdHmRL4f7UOy370UHA==
-  dependencies:
-    "@csstools/selector-specificity" "^2.0.2"
-    postcss-selector-parser "^6.0.10"
-
 "@csstools/postcss-color-function@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@csstools/postcss-color-function/-/postcss-color-function-1.1.1.tgz#2bd36ab34f82d0497cfacdc9b18d34b5e6f64b6b"
@@ -2436,14 +2426,6 @@
   resolved "https://registry.yarnpkg.com/@types/pidusage/-/pidusage-2.0.2.tgz#3f8c4b19ba7ea438a733d093661e92b60e5f88ee"
   integrity sha512-lHgpGZjXDfjggZDLkgp4zQTYkvXq4S7RxjBjrDcPe1MBU72hESWxubutx8+AM4QkJdRxAhrQyxSA6pzHKJKlsQ==
 
-"@types/postcss-preset-env@^7.0.0":
-  version "7.7.0"
-  resolved "https://registry.yarnpkg.com/@types/postcss-preset-env/-/postcss-preset-env-7.7.0.tgz#b58c07c304b3c3439bf9ce7eba5c9d46db4f2677"
-  integrity sha512-biD8MwSiZo1Nztn1cIBPMcKNKzgFyU05AB96HIF9y3G4f9vdx2O60DHCSpWXChTp6mOEGu15fqIw2DetVVjghw==
-  dependencies:
-    autoprefixer "^10.4.7"
-    postcss "^8.4.14"
-
 "@types/progress@2.0.5", "@types/progress@^2.0.3":
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/@types/progress/-/progress-2.0.5.tgz#6e0febf3a82cc0ffdc1cebb4e56d6949fd108775"
@@ -3246,7 +3228,7 @@ atomic-sleep@^1.0.0:
   resolved "https://registry.yarnpkg.com/atomic-sleep/-/atomic-sleep-1.0.0.tgz#eb85b77a601fc932cfe432c5acd364a9e2c9075b"
   integrity sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==
 
-autoprefixer@^10.4.7, autoprefixer@^10.4.8:
+autoprefixer@10.4.8, autoprefixer@^10.4.8:
   version "10.4.8"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.4.8.tgz#92c7a0199e1cfb2ad5d9427bd585a3d75895b9e5"
   integrity sha512-75Jr6Q/XpTqEf6D2ltS5uMewJIx5irCU1oBYJrWjFenq/m12WRRrz6g15L1EIoYvPLXTbEry7rDOwrcYNj77xw==
@@ -4213,7 +4195,7 @@ css-what@^6.0.1:
   resolved "https://registry.yarnpkg.com/css-what/-/css-what-6.1.0.tgz#fb5effcf76f1ddea2c81bdfaa4de44e79bac70f4"
   integrity sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==
 
-cssdb@^7.0.0, cssdb@^7.0.1:
+cssdb@^7.0.0:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/cssdb/-/cssdb-7.0.1.tgz#3810a0c67ae06362982dfe965dbedf57a0f26617"
   integrity sha512-pT3nzyGM78poCKLAEy2zWIVX2hikq6dIrjuZzLV98MumBg+xMTNYfHx7paUlfiRTgg91O/vR889CIf+qiv79Rw==
@@ -8068,7 +8050,6 @@ npm@^8.11.0:
     "@npmcli/fs" "^2.1.0"
     "@npmcli/map-workspaces" "^2.0.3"
     "@npmcli/package-json" "^2.0.0"
-    "@npmcli/promise-spawn" "^3.0.0"
     "@npmcli/run-script" "^4.2.1"
     abbrev "~1.1.1"
     archy "~1.0.0"
@@ -8079,7 +8060,6 @@ npm@^8.11.0:
     cli-table3 "^0.6.2"
     columnify "^1.6.0"
     fastest-levenshtein "^1.0.12"
-    fs-minipass "^2.1.0"
     glob "^8.0.1"
     graceful-fs "^4.2.10"
     hosted-git-info "^5.1.0"
@@ -8099,7 +8079,6 @@ npm@^8.11.0:
     libnpmteam "^4.0.4"
     libnpmversion "^3.0.7"
     make-fetch-happen "^10.2.0"
-    minimatch "^5.1.0"
     minipass "^3.1.6"
     minipass-pipeline "^1.2.4"
     mkdirp "^1.0.4"
@@ -8915,61 +8894,6 @@ postcss-preset-env@7.8.0, postcss-preset-env@^7.4.2:
     postcss-selector-not "^6.0.1"
     postcss-value-parser "^4.2.0"
 
-postcss-preset-env@7.8.1:
-  version "7.8.1"
-  resolved "https://registry.yarnpkg.com/postcss-preset-env/-/postcss-preset-env-7.8.1.tgz#2bfe935736727ab601a5c718bf24fc9f858eceb0"
-  integrity sha512-8884CHxQaoN1i4iEK+JvzOe8emODb5R4p/0dw4yEdo7QM4RdUk2sBx0fnzFyJt8BLfZSCGeVkKZ4HC564waBpQ==
-  dependencies:
-    "@csstools/postcss-cascade-layers" "^1.0.6"
-    "@csstools/postcss-color-function" "^1.1.1"
-    "@csstools/postcss-font-format-keywords" "^1.0.1"
-    "@csstools/postcss-hwb-function" "^1.0.2"
-    "@csstools/postcss-ic-unit" "^1.0.1"
-    "@csstools/postcss-is-pseudo-class" "^2.0.7"
-    "@csstools/postcss-nested-calc" "^1.0.0"
-    "@csstools/postcss-normalize-display-values" "^1.0.1"
-    "@csstools/postcss-oklab-function" "^1.1.1"
-    "@csstools/postcss-progressive-custom-properties" "^1.3.0"
-    "@csstools/postcss-stepped-value-functions" "^1.0.1"
-    "@csstools/postcss-text-decoration-shorthand" "^1.0.0"
-    "@csstools/postcss-trigonometric-functions" "^1.0.2"
-    "@csstools/postcss-unset-value" "^1.0.2"
-    autoprefixer "^10.4.8"
-    browserslist "^4.21.3"
-    css-blank-pseudo "^3.0.3"
-    css-has-pseudo "^3.0.4"
-    css-prefers-color-scheme "^6.0.3"
-    cssdb "^7.0.1"
-    postcss-attribute-case-insensitive "^5.0.2"
-    postcss-clamp "^4.1.0"
-    postcss-color-functional-notation "^4.2.4"
-    postcss-color-hex-alpha "^8.0.4"
-    postcss-color-rebeccapurple "^7.1.1"
-    postcss-custom-media "^8.0.2"
-    postcss-custom-properties "^12.1.8"
-    postcss-custom-selectors "^6.0.3"
-    postcss-dir-pseudo-class "^6.0.5"
-    postcss-double-position-gradients "^3.1.2"
-    postcss-env-function "^4.0.6"
-    postcss-focus-visible "^6.0.4"
-    postcss-focus-within "^5.0.4"
-    postcss-font-variant "^5.0.0"
-    postcss-gap-properties "^3.0.5"
-    postcss-image-set-function "^4.0.7"
-    postcss-initial "^4.0.1"
-    postcss-lab-function "^4.2.1"
-    postcss-logical "^5.0.4"
-    postcss-media-minmax "^5.0.0"
-    postcss-nesting "^10.1.10"
-    postcss-opacity-percentage "^1.1.2"
-    postcss-overflow-shorthand "^3.0.4"
-    postcss-page-break "^3.0.4"
-    postcss-place "^7.0.5"
-    postcss-pseudo-class-any-link "^7.1.6"
-    postcss-replace-overflow-wrap "^4.0.0"
-    postcss-selector-not "^6.0.1"
-    postcss-value-parser "^4.2.0"
-
 postcss-pseudo-class-any-link@^7.1.6:
   version "7.1.6"
   resolved "https://registry.yarnpkg.com/postcss-pseudo-class-any-link/-/postcss-pseudo-class-any-link-7.1.6.tgz#2693b221902da772c278def85a4d9a64b6e617ab"
@@ -9012,7 +8936,7 @@ postcss-value-parser@^4.0.0, postcss-value-parser@^4.1.0, postcss-value-parser@^
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@8.4.16, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.14, postcss@^8.4.7, postcss@^8.4.8:
+postcss@8.4.16, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.7, postcss@^8.4.8:
   version "8.4.16"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.16.tgz#33a1d675fac39941f5f445db0de4db2b6e01d43c"
   integrity sha512-ipHE1XBvKzm5xI7hiHCZJCSugxvsdq2mPnsq5+UF+VHCjiBvtDrlxJfMBToWaP9D5XlgNmcFGqoHmUn0EYEaRQ==
