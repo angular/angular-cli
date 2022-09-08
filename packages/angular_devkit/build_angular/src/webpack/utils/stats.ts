@@ -397,7 +397,7 @@ export function statsErrorsToString(
       // See: https://github.com/webpack/webpack/issues/15980
       const message = statsConfig.errorStack
         ? error.message
-        : /[\s\S]+?(?=[\n\s]+at)/.exec(error.message)?.[0] ?? error.message;
+        : /[\s\S]+?(?=\n+\s+at\s)/.exec(error.message)?.[0] ?? error.message;
 
       if (!/^error/i.test(message)) {
         output += r('Error: ');
