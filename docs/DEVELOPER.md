@@ -85,7 +85,7 @@ You can find more info about debugging [tests with Bazel in the docs.](https://g
 - Compile the packages being tested: `yarn build`
 - Run all tests: `node tests/legacy-cli/run_e2e.js`
 - Run a subset of the tests: `node tests/legacy-cli/run_e2e.js tests/legacy-cli/e2e/tests/i18n/ivy-localize-*`
-- Run on a custom set of npm packages (tar files): `node tests/legacy-cli/run_e2e.js --package _angular_cli.tgz _angular_create.tgz dist/*.tgz ...`
+- Run on a custom set of npm packages (tar files): `node tests/legacy-cli/run_e2e.js --package _angular_cli.tgz _angular_create.tgz dist/*.tgz tests/legacy-cli/e2e/tests/i18n/ivy-localize-*`
 
 When running the debug commands, Node will stop and wait for a debugger to attach.
 You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also, see [IDE Specific Usage](#ide-specific-usage) for a

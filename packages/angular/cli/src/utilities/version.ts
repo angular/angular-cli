@@ -23,7 +23,7 @@ class Version {
   }
 }
 
-// TODO: Convert this to use build-time version stamping after flipping the build script to use bazel
+// TODO(bazel): Convert this to use build-time version stamping after flipping the build script to use bazel
 // export const VERSION = new Version('0.0.0-PLACEHOLDER');
 export const VERSION = new Version(
   (
