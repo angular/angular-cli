@@ -139,7 +139,7 @@ export default async function (
   for (const target of targets) {
     const packageDir = target.replace(/\/\/packages\/(.*):npm_package_archive/, '$1');
     const bazelOutDir = join(bazelBin, 'packages', packageDir, 'npm_package');
-    const tarPath = `${bazelBin}/packages/${packageDir}/npm_package_archive.tar.gz`;
+    const tarPath = `${bazelBin}/packages/${packageDir}/npm_package_archive.tgz`;
     const packageJsonPath = `${bazelOutDir}/package.json`;
     const packageName = require(packageJsonPath).name;
     const destDir = `${distRoot}/${packageName}`;
