@@ -1,11 +1,7 @@
-load("//tools:defaults.bzl", "js_library")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
-js_library(
+copy_to_bin(
     name = "assets",
     srcs = glob(["**"]),
     visibility = ["//visibility:public"],
-    deps = [
-        "@npm//jasmine-spec-reporter",
-        "@npm//ts-node",
-    ],
 )

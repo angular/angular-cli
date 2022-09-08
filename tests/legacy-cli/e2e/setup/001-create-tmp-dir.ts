@@ -12,7 +12,7 @@ export default async function () {
   } else if (argv.tmpdir) {
     tempRoot = argv.tmpdir;
   } else {
-    tempRoot = await mktempd('angular-cli-e2e-');
+    tempRoot = await mktempd('angular-cli-e2e-', process.env.E2E_TEMP);
   }
   console.log(`  Using "${tempRoot}" as temporary directory for a new project.`);
   setGlobalVariable('tmp-root', tempRoot);

@@ -47,7 +47,9 @@ var_6: &only_pull_requests
       only:
         - /pull\/\d+/
 
-var_7: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
+# All e2e test suites
+var_7_subsets: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
+var_7_build_types: &all_e2e_build_types ['e2e', 'snapshot']
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
@@ -71,6 +73,16 @@ executors:
       - image: cimg/node:<< parameters.nodeversion >>
     working_directory: ~/ng
     resource_class: large
+
+  bazel-executor:
+    parameters:
+      nodeversion:
+        type: string
+        default: *default_nodeversion
+    docker:
+      - image: cimg/node:<< parameters.nodeversion >>
+    working_directory: ~/ng
+    resource_class: 2xlarge
 
   windows-executor:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
@@ -136,6 +148,7 @@ commands:
         type: env_var_name
         default: CIRCLE_PROJECT_REPONAME
     steps:
+      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run:
           name: 'Setup bazel RBE remote execution'
           command: |
@@ -288,15 +301,18 @@ jobs:
           paths:
             - dist/_*.tgz
 
-  build-bazel-e2e:
-    executor: action-executor
+  bazel-build:
+    executor: bazel-executor
     steps:
       - custom_attach_workspace
-      - run: yarn bazel build //tests/legacy-cli/...
+      - setup_bazel_rbe
+      - run:
+          name: Bazel Build Packages
+          command: yarn bazel build //...
+      - fail_fast
 
-  unit-test:
-    executor: test-executor
-    resource_class: xlarge
+  bazel-test:
+    executor: bazel-executor
     parameters:
       nodeversion:
         type: string
@@ -327,6 +343,60 @@ jobs:
                 # This timeout provides time for the actual tests to timeout and report status
                 # instead of CircleCI stopping the job without test failure information.
                 no_output_timeout: 40m
+      - fail_fast
+
+  bazel-e2e-tests:
+    executor: bazel-executor
+    parallelism: 4
+    parameters:
+      build_type:
+        type: enum
+        enum: *all_e2e_build_types
+        default: 'e2e'
+      subset:
+        type: enum
+        enum: *all_e2e_subsets
+        default: 'npm'
+    steps:
+      - custom_attach_workspace
+      - browser-tools/install-chrome
+      - initialize_env
+      - setup_bazel_rbe
+      - run: mkdir /mnt/ramdisk/e2e
+      - run:
+          name: Test << parameters.build_type >> << parameters.subset >>
+          command: yarn bazel test --define E2E_TEMP=/mnt/ramdisk/e2e --define E2E_SHARD_TOTAL=${CIRCLE_NODE_TOTAL} --define E2E_SHARD=${CIRCLE_NODE_INDEX} --config=<< parameters.build_type >> //tests/legacy-cli:e2e.<< parameters.subset >>
+          no_output_timeout: 40m
+      - store_artifacts:
+          path: dist/testlogs/tests/legacy-cli/e2e.<< parameters.subset >>
+      - store_test_results:
+          path: dist/testlogs/tests/legacy-cli/e2e.<< parameters.subset >>
+      - fail_fast
+
+  bazel-test-browsers:
+    executor: bazel-executor
+    steps:
+      - custom_attach_workspace
+      - initialize_env
+      - setup_bazel_rbe
+      - run:
+          name: Initialize Saucelabs
+          command: setSecretVar SAUCE_ACCESS_KEY $(echo $SAUCE_ACCESS_KEY | rev)
+      - run:
+          name: Start Saucelabs Tunnel
+          command: ./scripts/saucelabs/start-tunnel.sh
+          background: true
+        # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
+        # too early without Saucelabs not being ready.
+      - run: ./scripts/saucelabs/wait-for-tunnel.sh
+      - run:
+          name: E2E Saucelabs Tests
+          command: yarn bazel test --config=saucelabs //tests/legacy-cli:e2e.saucelabs
+      - run: ./scripts/saucelabs/stop-tunnel.sh
+      - store_artifacts:
+          path: dist/testlogs/tests/legacy-cli/e2e.saucelabs
+      - store_test_results:
+          path: dist/testlogs/tests/legacy-cli/e2e.saucelabs
       - fail_fast
 
   snapshot_publish:
@@ -475,22 +545,64 @@ workflows:
       # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
       # will catch any build errors before proceeding to the more lengthy and resource intensive
       # Bazel jobs.
-      - unit-test:
+      - bazel-test:
           name: test-node<< matrix.nodeversion >>
           matrix:
             parameters:
               nodeversion: *all_nodeversion_major
           requires:
-            - build
-
-      # Compile the e2e tests with bazel to ensure the non-runtime typescript
-      # compilation completes succesfully.
-      - build-bazel-e2e:
-          requires:
-            - build
+            - bazel-build
 
       # Windows jobs
       - e2e-cli-win
+
+      # Bazel jobs
+      - bazel-build:
+          requires:
+            - setup
+
+      - bazel-e2e-tests:
+          name: bazel-e2e-cli-<< matrix.subset >>
+          matrix:
+            parameters:
+              subset: *all_e2e_subsets
+          build_type: 'e2e'
+          filters:
+            branches:
+              ignore:
+                - main
+                - /\d+\.\d+\.x/
+          requires:
+            - bazel-build
+
+      - bazel-e2e-tests:
+          name: bazel-e2e-snapshots-<< matrix.subset >>
+          matrix:
+            parameters:
+              subset: *all_e2e_subsets
+          build_type: 'snapshot'
+          pre-steps:
+            - when:
+                condition:
+                  and:
+                    - not:
+                        equal: [main, << pipeline.git.branch >>]
+                    - not: << pipeline.parameters.snapshot_changed >>
+                steps:
+                  # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
+                  - run: circleci-agent step halt
+          requires:
+            - bazel-build
+          filters:
+            branches:
+              only:
+                - main
+                # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
+                - /^pull\/.*/
+
+      - bazel-test-browsers:
+          requires:
+            - bazel-build
 
       # Publish jobs
       - snapshot_publish:
