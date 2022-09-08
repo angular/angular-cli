@@ -1,3 +1,42 @@
+<a name="15.0.0-next.0"></a>
+
+# 15.0.0-next.0 (2022-09-08)
+
+## Breaking Changes
+
+### @angular/cli
+
+- The 'path' option in schematics schema no longer has a special meaning. Use 'workingDirectory' smart default provider should be used instead.
+
+### @schematics/angular
+
+- Removed unused`appDir` option from Universal and App-Shell schematic. This option can safely be removed if present since it no longer has effect.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type     | Description                     |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------- |
+| [57d93fb7d](https://github.com/angular/angular-cli/commit/57d93fb7d979e68c2a4e6f6046ff633f69098afe) | fix      | mark project as required option |
+| [69b221498](https://github.com/angular/angular-cli/commit/69b2214987c8fad6efd091782cf28b20be62d244) | refactor | remove deprecated appDir option |
+
+### @angular/cli
+
+| Commit                                                                                              | Type     | Description                    |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------ |
+| [774d349b7](https://github.com/angular/angular-cli/commit/774d349b73a436a99f2ea932b7509dab7c1d5e45) | refactor | remove deprecated path handler |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [feb06753d](https://github.com/angular/angular-cli/commit/feb06753d59f782c6ad8fd59a60537863094f498) | perf | use esbuild-based builder to directly downlevel for await...of |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Ruslan Lekhman and angular-robot[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.2"></a>
 
 # 14.2.2 (2022-09-08)
