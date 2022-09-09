@@ -250,37 +250,29 @@ async function runSteps(
   }
 }
 
-async function runSetup(absoluteName: string) {
+function runSetup(absoluteName: string): Promise<void> {
   const module = require(absoluteName);
 
-  await (typeof module === 'function' ? module : module.default)();
+  return (typeof module === 'function' ? module : module.default)();
 }
 
 /**
  * Run a file from the projects root directory in a subprocess via launchTestProcess().
  */
-async function runInitializer(absoluteName: string) {
+function runInitializer(absoluteName: string): Promise<void> {
   process.chdir(getGlobalVariable('projects-root'));
 
-  await launchTestProcess(absoluteName);
+  return launchTestProcess(absoluteName);
 }
 
 /**
  * Run a file from the main 'test-project' directory in a subprocess via launchTestProcess().
  */
-async function runTest(absoluteName: string) {
+async function runTest(absoluteName: string): Promise<void> {
   process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
-  try {
-    await launchTestProcess(absoluteName);
-  } finally {
-    logStack.push(new logging.NullLogger());
-    try {
-      await gitClean();
-    } finally {
-      logStack.pop();
-    }
-  }
+  await launchTestProcess(absoluteName);
+  await gitClean();
 }
 
 function printHeader(
