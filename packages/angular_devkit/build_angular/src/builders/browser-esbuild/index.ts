@@ -18,8 +18,10 @@ import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
+import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { resolveGlobalStyles } from '../../webpack/configs';
+import { transformSupportedBrowsersToTargets } from '../../webpack/utils/esbuild-targets';
 import { createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
@@ -89,6 +91,10 @@ export async function buildEsbuildBrowser(
     return { success: false };
   }
 
+  const target = transformSupportedBrowsersToTargets(
+    getSupportedBrowsers(projectRoot, context.logger),
+  );
+
   const [codeResults, styleResults] = await Promise.all([
     // Execute esbuild to bundle the application code
     bundleCode(
@@ -99,6 +105,7 @@ export async function buildEsbuildBrowser(
       optimizationOptions,
       sourcemapOptions,
       tsconfig,
+      target,
     ),
     // Execute esbuild to bundle the global stylesheets
     bundleGlobalStylesheets(
@@ -107,6 +114,7 @@ export async function buildEsbuildBrowser(
       options,
       optimizationOptions,
       sourcemapOptions,
+      target,
     ),
   ]);
 
@@ -248,6 +256,7 @@ async function bundleCode(
   optimizationOptions: NormalizedOptimizationOptions,
   sourcemapOptions: SourceMapClass,
   tsconfig: string,
+  target: string[],
 ) {
   return bundle({
     absWorkingDir: workspaceRoot,
@@ -256,7 +265,7 @@ async function bundleCode(
     entryPoints,
     entryNames: outputNames.bundles,
     assetNames: outputNames.media,
-    target: 'es2020',
+    target,
     supported: {
       // Native async/await is not supported with Zone.js. Disabling support here will cause
       // esbuild to downlevel async/await and for await...of to a Zone.js supported form. However, esbuild
@@ -301,6 +310,7 @@ async function bundleCode(
           outputNames,
           includePaths: options.stylePreprocessorOptions?.includePaths,
           externalDependencies: options.externalDependencies,
+          target,
         },
       ),
     ],
@@ -317,6 +327,7 @@ async function bundleGlobalStylesheets(
   options: BrowserBuilderOptions,
   optimizationOptions: NormalizedOptimizationOptions,
   sourcemapOptions: SourceMapClass,
+  target: string[],
 ) {
   const outputFiles: OutputFile[] = [];
   const initialFiles: FileInfo[] = [];
@@ -347,6 +358,7 @@ async function bundleGlobalStylesheets(
         outputNames: noInjectNames.includes(name) ? { media: outputNames.media } : outputNames,
         includePaths: options.stylePreprocessorOptions?.includePaths,
         preserveSymlinks: options.preserveSymlinks,
+        target,
         externalDependencies: options.externalDependencies,
       },
     );

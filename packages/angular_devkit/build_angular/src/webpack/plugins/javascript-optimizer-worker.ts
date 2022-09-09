@@ -7,8 +7,9 @@
  */
 
 import remapping from '@ampproject/remapping';
-import type { TransformFailure, TransformResult } from 'esbuild';
+import type { TransformResult } from 'esbuild';
 import { minify } from 'terser';
+import { transformSupportedBrowsersToTargets } from '../utils/esbuild-targets';
 import { EsbuildExecutor } from './esbuild-executor';
 
 /**
@@ -46,9 +47,9 @@ export interface OptimizeRequestOptions {
    */
   sourcemap?: boolean;
   /**
-   * Specifies the target ECMAScript version for the output code.
+   * A list of supported browsers.
    */
-  target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 'next';
+  supportedBrowsers: string[];
   /**
    * Controls whether esbuild should only use the WASM-variant instead of trying to
    * use the native variant. Some platforms may not support the native-variant and
@@ -105,8 +106,6 @@ export default async function ({ asset, options }: OptimizeRequest) {
     asset.name,
     esbuildResult.code,
     options.sourcemap,
-    // Terser only supports up to ES2020.
-    options.target === 'next' ? 2020 : options.target,
     options.advanced,
   );
 
@@ -141,7 +140,7 @@ export default async function ({ asset, options }: OptimizeRequest) {
  * @param options The optimization request options to apply to the content.
  * @returns A promise that resolves with the optimized code, source map, and any warnings.
  */
-async function optimizeWithEsbuild(
+function optimizeWithEsbuild(
   content: string,
   name: string,
   options: OptimizeRequest['options'],
@@ -150,49 +149,23 @@ async function optimizeWithEsbuild(
     esbuild = new EsbuildExecutor(options.alwaysUseWasm);
   }
 
-  let result: TransformResult;
-  try {
-    result = await esbuild.transform(content, {
-      minifyIdentifiers: !options.keepIdentifierNames,
-      minifySyntax: true,
-      // NOTE: Disabling whitespace ensures unused pure annotations are kept
-      minifyWhitespace: false,
-      pure: ['forwardRef'],
-      legalComments: options.removeLicenses ? 'none' : 'inline',
-      sourcefile: name,
-      sourcemap: options.sourcemap && 'external',
-      define: options.define,
-      // This option should always be disabled for browser builds as we don't rely on `.name`
-      // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
-      // We enable `keepNames` only for server builds as Domino relies on `.name`.
-      // Once we no longer rely on Domino for SSR we should be able to remove this.
-      keepNames: options.keepNames,
-      target: `es${options.target}`,
-    });
-  } catch (error) {
-    const failure = error as TransformFailure;
-
-    // If esbuild fails with only ES5 support errors, fallback to just terser.
-    // This will only happen if ES5 is the output target and a global script contains ES2015+ syntax.
-    // In that case, the global script is technically already invalid for the target environment but
-    // this is and has been considered a configuration issue. Global scripts must be compatible with
-    // the target environment.
-    if (
-      failure.errors?.every((error) =>
-        error.text.includes('to the configured target environment ("es5") is not supported yet'),
-      )
-    ) {
-      result = {
-        code: content,
-        map: '',
-        warnings: [],
-      };
-    } else {
-      throw error;
-    }
-  }
-
-  return result;
+  return esbuild.transform(content, {
+    minifyIdentifiers: !options.keepIdentifierNames,
+    minifySyntax: true,
+    // NOTE: Disabling whitespace ensures unused pure annotations are kept
+    minifyWhitespace: false,
+    pure: ['forwardRef'],
+    legalComments: options.removeLicenses ? 'none' : 'inline',
+    sourcefile: name,
+    sourcemap: options.sourcemap && 'external',
+    define: options.define,
+    // This option should always be disabled for browser builds as we don't rely on `.name`
+    // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
+    // We enable `keepNames` only for server builds as Domino relies on `.name`.
+    // Once we no longer rely on Domino for SSR we should be able to remove this.
+    keepNames: options.keepNames,
+    target: transformSupportedBrowsersToTargets(options.supportedBrowsers),
+  });
 }
 
 /**
@@ -201,7 +174,6 @@ async function optimizeWithEsbuild(
  * @param name The name of the JavaScript asset. Used to generate source maps.
  * @param code The JavaScript asset source content to optimize.
  * @param sourcemaps If true, generate an output source map for the optimized code.
- * @param target Specifies the target ECMAScript version for the output code.
  * @param advanced Controls advanced optimizations.
  * @returns A promise that resolves with the optimized code and source map.
  */
@@ -209,7 +181,6 @@ async function optimizeWithTerser(
   name: string,
   code: string,
   sourcemaps: boolean | undefined,
-  target: Exclude<OptimizeRequest['options']['target'], 'next'>,
   advanced: boolean | undefined,
 ): Promise<{ code: string; map?: object }> {
   const result = await minify(
@@ -219,7 +190,7 @@ async function optimizeWithTerser(
         passes: advanced ? 2 : 1,
         pure_getters: advanced,
       },
-      ecma: target,
+      ecma: 2020,
       // esbuild in the first pass is used to minify identifiers instead of mangle here
       mangle: false,
       // esbuild in the first pass is used to minify function names

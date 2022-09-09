@@ -7,7 +7,6 @@
  */
 
 import { custom } from 'babel-loader';
-import { ScriptTarget } from 'typescript';
 import { loadEsmModule } from '../utils/load-esm';
 import { VERSION } from '../utils/package-version';
 import { ApplicationPresetOptions, I18nPluginCreators } from './presets/application';
@@ -72,18 +71,8 @@ export default custom<ApplicationPresetOptions>(() => {
 
   return {
     async customOptions(options, { source, map }) {
-      const {
-        i18n,
-        scriptTarget,
-        aot,
-        optimize,
-        instrumentCode,
-        supportedBrowsers,
-        ...rawOptions
-      } = options as AngularBabelLoaderOptions;
-
-      // Must process file if plugins are added
-      let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
+      const { i18n, aot, optimize, instrumentCode, supportedBrowsers, ...rawOptions } =
+        options as AngularBabelLoaderOptions;
 
       const customOptions: ApplicationPresetOptions = {
         forceAsyncTransformation: false,
@@ -110,39 +99,11 @@ export default custom<ApplicationPresetOptions>(() => {
           jitMode: aot !== true,
           linkerPluginCreator,
         };
-        shouldProcess = true;
       }
 
-      // Analyze for ES target processing
-      const esTarget = scriptTarget as ScriptTarget | undefined;
-      const isJsFile = /\.[cm]?js$/.test(this.resourcePath);
-
-      // The below should be dropped when we no longer support ES5 TypeScript output.
-      if (esTarget === ScriptTarget.ES5) {
-        // This is needed because when target is ES5 we change the TypeScript target to ES2015
-        // because it simplifies build-optimization passes.
-        // @see https://github.com/angular/angular-cli/blob/22af6520834171d01413d4c7e4a9f13fb752252e/packages/angular_devkit/build_angular/src/webpack/plugins/typescript.ts#L51-L56
-        customOptions.forcePresetEnv = true;
-        // Comparable behavior to tsconfig target of ES5
-        customOptions.supportedBrowsers = ['IE 9'];
-      } else if (isJsFile && customOptions.supportedBrowsers?.length) {
-        // Applications code ES version can be controlled using TypeScript's `target` option.
-        // However, this doesn't effect libraries and hence we use preset-env to downlevel ES fetaures
-        // based on the supported browsers in browserlist.
-        customOptions.forcePresetEnv = true;
-      }
-
-      if ((esTarget !== undefined && esTarget >= ScriptTarget.ES2017) || isJsFile) {
-        // Application code (TS files) will only contain native async if target is ES2017+.
-        // However, third-party libraries can regardless of the target option.
-        // APF packages with code in [f]esm2015 directories is downlevelled to ES2015 and
-        // will not have native async.
-        customOptions.forceAsyncTransformation =
-          !/[\\/][_f]?esm2015[\\/]/.test(this.resourcePath) && source.includes('async');
-      }
-
-      shouldProcess ||=
-        customOptions.forceAsyncTransformation || customOptions.forcePresetEnv || false;
+      // Always force usage of preset-env.
+      customOptions.forcePresetEnv = true;
+      customOptions.forceAsyncTransformation = source.includes('async');
 
       // Analyze for i18n inlining
       if (
@@ -177,8 +138,6 @@ export default custom<ApplicationPresetOptions>(() => {
             this.addDependency(file);
           }
         }
-
-        shouldProcess = true;
       }
 
       if (optimize) {
@@ -192,8 +151,6 @@ export default custom<ApplicationPresetOptions>(() => {
           // no decorators that contain non-local effects.
           wrapDecorators: !!this._module?.factoryMeta?.sideEffectFree,
         };
-
-        shouldProcess = true;
       }
 
       if (
@@ -207,8 +164,6 @@ export default custom<ApplicationPresetOptions>(() => {
           includedBasePath: instrumentCode.includedBasePath,
           inputSourceMap: map,
         };
-
-        shouldProcess = true;
       }
 
       // Add provided loader options to default base options
@@ -222,12 +177,6 @@ export default custom<ApplicationPresetOptions>(() => {
           rawOptions,
         }),
       };
-
-      // Skip babel processing if no actions are needed
-      if (!shouldProcess) {
-        // Force the current file to be ignored
-        loaderOptions.ignore = [() => true];
-      }
 
       return { custom: customOptions, loader: loaderOptions };
     },

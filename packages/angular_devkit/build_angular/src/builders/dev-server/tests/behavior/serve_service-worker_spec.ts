@@ -42,7 +42,11 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
   };
 
   describe('Behavior: "dev-server builder serves service worker"', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      // Application code is not needed for these tests
+      await harness.writeFile('src/main.ts', '');
+      await harness.writeFile('src/polyfills.ts', '');
+
       harness.useProject('test', {
         root: '.',
         sourceRoot: 'src',

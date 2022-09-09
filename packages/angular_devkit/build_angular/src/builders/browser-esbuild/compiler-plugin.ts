@@ -181,18 +181,6 @@ export function createCompilerPlugin(
         enableResourceInlining: false,
       });
 
-      // Adjust the esbuild output target based on the tsconfig target
-      if (
-        compilerOptions.target === undefined ||
-        compilerOptions.target <= ts.ScriptTarget.ES2015
-      ) {
-        build.initialOptions.target = 'es2015';
-      } else if (compilerOptions.target >= ts.ScriptTarget.ESNext) {
-        build.initialOptions.target = 'esnext';
-      } else {
-        build.initialOptions.target = ts.ScriptTarget[compilerOptions.target].toLowerCase();
-      }
-
       // The file emitter created during `onStart` that will be used during the build in `onLoad` callbacks for TS files
       let fileEmitter: FileEmitter | undefined;
 
