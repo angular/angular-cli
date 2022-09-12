@@ -1,34 +1,3 @@
 {
-  "schematics": {
-    "update-angular-packages-version-prefix": {
-      "version": "14.0.0",
-      "factory": "./update-14/angular-packages-version-prefix",
-      "description": "Update Angular packages 'dependencies' and 'devDependencies' version prefix to '^' instead of '~'."
-    },
-    "update-tsconfig-target": {
-      "version": "14.0.0",
-      "factory": "./update-14/update-tsconfig-target",
-      "description": "Update TypeScript compilation target to 'ES2020'."
-    },
-    "remove-show-circular-dependencies-option": {
-      "version": "14.0.0",
-      "factory": "./update-14/remove-show-circular-dependencies-option",
-      "description": "Remove 'showCircularDependencies' option from browser and server builders."
-    },
-    "remove-default-project-option": {
-      "version": "14.0.0",
-      "factory": "./update-14/remove-default-project-option",
-      "description": "Remove 'defaultProject' option from workspace configuration. The project to use will be determined from the current working directory."
-    },
-    "replace-default-collection-option": {
-      "version": "14.0.0",
-      "factory": "./update-14/replace-default-collection-option",
-      "description": "Replace 'defaultCollection' option in workspace configuration with 'schematicCollections'."
-    },
-    "update-libraries-secondary-entrypoints": {
-      "version": "14.0.0",
-      "factory": "./update-14/update-libraries-secondary-entrypoints",
-      "description": "Remove 'package.json' files from library projects secondary entrypoints."
-    }
-  }
+  "schematics": {}
 }
