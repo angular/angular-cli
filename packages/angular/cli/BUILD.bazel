@@ -9,7 +9,7 @@ load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
 load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
-licenses(["notice"])  # MIT
+licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
