@@ -5,7 +5,7 @@
 
 load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 
-licenses(["notice"])  # MIT
+licenses(["notice"])
 
 ts_library(
     name = "create",

@@ -5,7 +5,7 @@
 
 load("//tools:defaults.bzl", "ts_library")
 
-licenses(["notice"])  # MIT
+licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 

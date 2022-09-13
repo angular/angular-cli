@@ -9,7 +9,7 @@ load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
-licenses(["notice"])  # MIT License
+licenses(["notice"])
 
 # @angular-devkit/core
 
