@@ -9,7 +9,7 @@ load("//tools:ts_json_schema.bzl", "ts_json_schema")
 load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 
-licenses(["notice"])  # MIT
+licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
