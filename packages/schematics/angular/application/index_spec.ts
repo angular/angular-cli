@@ -547,7 +547,7 @@ describe('Application Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('application', options, workspaceTree)
       .toPromise();
-    const exists = tree.exists('/projects/my-cool/.browserslistrc');
+    const exists = tree.exists('/projects/my-cool/tsconfig.app.json');
     expect(exists).toBeTrue();
   });
 
@@ -556,7 +556,7 @@ describe('Application Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('application', options, workspaceTree)
       .toPromise();
-    const exists = tree.exists('/projects/foo/my-cool/.browserslistrc');
+    const exists = tree.exists('/projects/foo/my-cool/tsconfig.app.json');
     expect(exists).toBeTrue();
   });
 
@@ -565,7 +565,7 @@ describe('Application Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('application', options, workspaceTree)
       .toPromise();
-    const exists = tree.exists('/projects/my-cool/.browserslistrc');
+    const exists = tree.exists('/projects/my-cool/tsconfig.app.json');
     expect(exists).toBeTrue();
   });
 
@@ -574,7 +574,7 @@ describe('Application Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('application', options, workspaceTree)
       .toPromise();
-    const exists = tree.exists('/projects/foo/my-cool/.browserslistrc');
+    const exists = tree.exists('/projects/foo/my-cool/tsconfig.app.json');
     expect(exists).toBeTrue();
   });
 
@@ -584,8 +584,7 @@ describe('Application Schematic', () => {
       .runSchematicAsync('application', options, workspaceTree)
       .toPromise();
 
-    const exists = tree.exists('/projects/foo.bar_buz/.browserslistrc');
-    expect(exists).toBeTrue();
+    expect(tree.exists('/projects/foo.bar_buz/tsconfig.app.json')).toBeTrue();
   });
 
   it('should support creating scoped application', async () => {

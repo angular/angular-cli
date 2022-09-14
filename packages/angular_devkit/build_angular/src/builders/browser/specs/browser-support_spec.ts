@@ -21,7 +21,9 @@ describe('Browser Builder browser support', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('warns when IE is present in browserslist', async () => {
-    host.appendToFile('.browserslistrc', '\nIE 9');
+    host.writeMultipleFiles({
+      '.browserslistrc': '\nIE 9',
+    });
 
     const logger = new logging.Logger('');
     const logs: string[] = [];

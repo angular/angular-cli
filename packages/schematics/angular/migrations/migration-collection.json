@@ -1,3 +1,9 @@
 {
-  "schematics": {}
+  "schematics": {
+    "remove-browserslist-config": {
+      "version": "15.0.0",
+      "factory": "./update-15/remove-browserslist-config",
+      "description": "Remove Browserslist configuration files that matches the Angular CLI default configuration."
+    }
+  }
 }
