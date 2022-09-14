@@ -7,9 +7,6 @@ import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  // TODO(alanagius): re-enable once material version 15.0.0-next is out.
-  return;
-
   let tag = (await isPrereleaseCli()) ? '@next' : '';
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
