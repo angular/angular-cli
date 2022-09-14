@@ -78,6 +78,7 @@ ts_library(
         "//packages/angular_devkit/schematics/tasks",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
         "@npm//@types/node",
+        "@npm//browserslist",
         "@npm//jsonc-parser",
     ],
 )
