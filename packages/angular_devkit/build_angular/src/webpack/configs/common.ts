@@ -334,7 +334,16 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     watch: buildOptions.watch,
     watchOptions: {
       poll,
+      // The below is needed as when preserveSymlinks is enabled we disable `resolve.symlinks`.
+      followSymlinks: buildOptions.preserveSymlinks,
       ignored: poll === undefined ? undefined : '**/node_modules/**',
+    },
+    snapshot: {
+      module: {
+        // Use hash of content instead of timestamp because the timestamp of the symlink will be used
+        // instead of the referenced files which causes changes in symlinks not to be picked up.
+        hash: buildOptions.preserveSymlinks,
+      },
     },
     performance: {
       hints: false,
