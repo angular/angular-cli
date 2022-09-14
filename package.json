@@ -198,7 +198,7 @@
     "rxjs": "6.6.7",
     "sass": "1.54.4",
     "sass-loader": "13.0.2",
-    "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.7.1-linux.tar.gz",
+    "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz",
     "semver": "7.3.7",
     "shelljs": "^0.8.5",
     "source-map": "0.7.4",
