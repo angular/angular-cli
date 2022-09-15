@@ -1,3 +1,39 @@
+<a name="15.0.0-next.1"></a>
+
+# 15.0.0-next.1 (2022-09-15)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- server builder `bundleDependencies` option now only accept a boolean value.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [9beb878e2](https://github.com/angular/angular-cli/commit/9beb878e2eecd32e499c8af557f22f46548248fc) | feat | remove Browserslist configuration files from projects |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                              |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------- |
+| [4f8a3d258](https://github.com/angular/angular-cli/commit/4f8a3d258230d6b6645600f9d17e8582a36c8682) | fix      | correctly display error messages that contain "at" text. |
+| [2021e66a1](https://github.com/angular/angular-cli/commit/2021e66a12fb873140d54cff82968a10e3ffa010) | fix      | watch symbolic links                                     |
+| [7f1017e60](https://github.com/angular/angular-cli/commit/7f1017e60f82389568065478d666ae4be6ebfea2) | refactor | remove old `bundleDependencies` enum logic               |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [4fa8392a1](https://github.com/angular/angular-cli/commit/4fa8392a138122bc2c8ed5e433cfbf9786da8baa) | perf | avoid bootstrap conversion AST traversal where possible |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Jason Bedard, Joey Perrott and angular-robot[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.3"></a>
 
 # 14.2.3 (2022-09-15)
