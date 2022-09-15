@@ -41,6 +41,7 @@ export async function prepareProjectForE2e(name: string) {
   await git('config', 'user.email', 'angular-core+e2e@google.com');
   await git('config', 'user.name', 'Angular CLI E2E');
   await git('config', 'commit.gpgSign', 'false');
+  await git('config', 'core.longpaths', 'true');
 
   if (argv['ng-snapshots'] || argv['ng-tag']) {
     await useSha();
