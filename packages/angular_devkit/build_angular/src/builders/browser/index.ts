@@ -8,12 +8,10 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
-import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
-import { ScriptTarget } from 'typescript';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import {
@@ -43,7 +41,6 @@ import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
-import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   generateI18nBrowserWebpackConfigFromContext,
@@ -98,14 +95,13 @@ async function initialize(
   projectRoot: string;
   projectSourceRoot?: string;
   i18n: I18nOptions;
-  target: ScriptTarget;
 }> {
   const originalOutputPath = options.outputPath;
 
   // Assets are processed directly by the builder except when watching
   const adjustedOptions = options.watch ? options : { ...options, assets: [] };
 
-  const { config, projectRoot, projectSourceRoot, i18n, target } =
+  const { config, projectRoot, projectSourceRoot, i18n } =
     await generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
       getCommonConfig(wco),
       getStylesConfig(wco),
@@ -135,7 +131,7 @@ async function initialize(
     deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
-  return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n, target };
+  return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
 
 /**
@@ -170,9 +166,6 @@ export function buildWebpackBrowser(
       // Initialize builder
       const initialization = await initialize(options, context, transforms.webpackConfiguration);
 
-      // Check and warn about IE browser support
-      checkInternetExplorerSupport(initialization.projectRoot, context.logger);
-
       // Add index file to watched files.
       if (options.watch) {
         const indexInputFile = path.join(context.workspaceRoot, getIndexInputFile(options.index));
@@ -193,7 +186,7 @@ export function buildWebpackBrowser(
     }),
     switchMap(
       // eslint-disable-next-line max-lines-per-function
-      ({ config, projectRoot, projectSourceRoot, i18n, target, cacheOptions }) => {
+      ({ config, projectRoot, projectSourceRoot, i18n, cacheOptions }) => {
         const normalizedOptimization = normalizeOptimization(options.optimization);
 
         return runWebpack(config, context, {
@@ -255,7 +248,6 @@ export function buildWebpackBrowser(
                   Array.from(outputPaths.values()),
                   scriptsEntryPointName,
                   webpackOutputPath,
-                  target <= ScriptTarget.ES5,
                   options.i18nMissingTranslation,
                 );
                 if (!success) {
@@ -456,17 +448,6 @@ function mapEmittedFilesToFileInfo(files: EmittedFiles[] = []): FileInfo[] {
   }
 
   return filteredFiles;
-}
-
-function checkInternetExplorerSupport(projectRoot: string, logger: logging.LoggerApi): void {
-  const supportedBrowsers = getSupportedBrowsers(projectRoot);
-  if (supportedBrowsers.some((b) => b === 'ie 9' || b === 'ie 10' || b === 'ie 11')) {
-    logger.warn(
-      `Warning: Support was requested for Internet Explorer in the project's browserslist configuration. ` +
-        'Internet Explorer is no longer officially supported.' +
-        '\nFor more information, see https://angular.io/guide/browser-support',
-    );
-  }
 }
 
 export default createBuilder<BrowserBuilderSchema>(buildWebpackBrowser);

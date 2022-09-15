@@ -11,7 +11,6 @@ import type {
   DiagnosticHandlingStrategy,
   Diagnostics,
   makeEs2015TranslatePlugin,
-  makeEs5TranslatePlugin,
   makeLocalePlugin,
 } from '@angular/localize/tools';
 import { strict as assert } from 'assert';
@@ -28,7 +27,6 @@ export type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: s
  */
 export interface I18nPluginCreators {
   makeEs2015TranslatePlugin: typeof makeEs2015TranslatePlugin;
-  makeEs5TranslatePlugin: typeof makeEs5TranslatePlugin;
   makeLocalePlugin: typeof makeLocalePlugin;
 }
 
@@ -117,17 +115,11 @@ function createI18nPlugins(
   const diagnostics = createI18nDiagnostics(diagnosticReporter);
   const plugins = [];
 
-  const { makeEs5TranslatePlugin, makeEs2015TranslatePlugin, makeLocalePlugin } = pluginCreators;
+  const { makeEs2015TranslatePlugin, makeLocalePlugin } = pluginCreators;
 
   if (translation) {
     plugins.push(
       makeEs2015TranslatePlugin(diagnostics, translation, {
-        missingTranslation: missingTranslationBehavior,
-      }),
-    );
-
-    plugins.push(
-      makeEs5TranslatePlugin(diagnostics, translation, {
         missingTranslation: missingTranslationBehavior,
       }),
     );

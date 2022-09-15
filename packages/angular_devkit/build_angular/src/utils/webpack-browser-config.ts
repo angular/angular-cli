@@ -9,7 +9,6 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
 import * as path from 'path';
-import { ScriptTarget } from 'typescript';
 import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
@@ -44,7 +43,7 @@ export async function generateWebpackConfig(
   const tsConfig = await readTsconfig(tsConfigPath);
 
   const ts = await import('typescript');
-  const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
+  const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES2015;
 
   const buildOptions: NormalizedBrowserBuilderSchema = { ...options, ...extraBuildOptions };
   const wco: BrowserWebpackConfigOptions = {
@@ -77,16 +76,12 @@ export async function generateI18nBrowserWebpackConfigFromContext(
   projectRoot: string;
   projectSourceRoot?: string;
   i18n: I18nOptions;
-  target: ScriptTarget;
 }> {
   const { buildOptions, i18n } = await configureI18nBuild(context, options);
-  let target = ScriptTarget.ES5;
   const result = await generateBrowserWebpackConfigFromContext(
     buildOptions,
     context,
     (wco) => {
-      target = wco.scriptTarget;
-
       return webpackPartialGenerator(wco);
     },
     extraBuildOptions,
@@ -133,7 +128,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
     });
   }
 
-  return { ...result, i18n, target };
+  return { ...result, i18n };
 }
 export async function generateBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
@@ -158,6 +153,7 @@ export async function generateBrowserWebpackConfigFromContext(
     projectSourceRoot,
     options,
     projectMetadata,
+    context.logger,
   );
 
   const config = await generateWebpackConfig(

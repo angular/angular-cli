@@ -94,18 +94,22 @@ describe('Browser Builder styles', () => {
         @Component({
           selector: 'app-root',
           templateUrl: './app.component.html',
-          styles: ['div { flex: 1 }'],
+          styles: ['div { mask-composite: add; }'],
         })
         export class AppComponent {
           title = 'app';
         }
       `,
-      '.browserslistrc': 'IE 10',
+      '.browserslistrc': `
+        Safari 15.4
+        Edge 104
+        Firefox 91
+      `,
     });
 
     const { files } = await browserBuild(architect, host, target, { aot: false });
 
-    expect(await files['main.js']).toContain('-ms-flex: 1;');
+    expect(await files['main.js']).toContain('-webkit-mask-composite');
   });
 
   it('supports autoprefixer with inline component styles in AOT mode', async () => {
@@ -116,18 +120,22 @@ describe('Browser Builder styles', () => {
         @Component({
           selector: 'app-root',
           templateUrl: './app.component.html',
-          styles: ['div { flex: 1 }'],
+          styles: ['div { mask-composite: add; }'],
         })
         export class AppComponent {
           title = 'app';
         }
       `,
-      '.browserslistrc': 'IE 10',
+      '.browserslistrc': `
+        Safari 15.4
+        Edge 104
+        Firefox 91
+      `,
     });
 
     const { files } = await browserBuild(architect, host, target, { aot: true });
 
-    expect(await files['main.js']).toContain('-ms-flex: 1;');
+    expect(await files['main.js']).toContain('-webkit-mask-composite');
   });
 
   extensionsWithImportSupport.forEach((ext) => {
@@ -302,12 +310,16 @@ describe('Browser Builder styles', () => {
         @import url(imported-styles.css);
         /* normal-comment */
         /*! important-comment */
-        div { flex: 1 }`,
+        div { mask-composite: add; }`,
       'src/imported-styles.css': tags.stripIndents`
         /* normal-comment */
         /*! important-comment */
-        section { flex: 1 }`,
-      '.browserslistrc': 'IE 10',
+        section { mask-composite: add; }`,
+      '.browserslistrc': `
+        Safari 15.4
+        Edge 104
+        Firefox 91
+      `,
     });
 
     const overrides = { optimization: false };
@@ -315,10 +327,10 @@ describe('Browser Builder styles', () => {
     expect(await files['styles.css']).toContain(tags.stripIndents`
       /* normal-comment */
       /*! important-comment */
-      section { -ms-flex: 1; flex: 1 }
+      section { -webkit-mask-composite: source-over; mask-composite: add; }
       /* normal-comment */
       /*! important-comment */
-      div { -ms-flex: 1; flex: 1 }`);
+      div { -webkit-mask-composite: source-over; mask-composite: add; }`);
   });
 
   it(`minimizes css`, async () => {
@@ -332,24 +344,6 @@ describe('Browser Builder styles', () => {
     const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain('/*! important-comment */');
-  });
-
-  it('supports autoprefixer grid comments in SCSS with optimization true', async () => {
-    host.writeMultipleFiles({
-      'src/styles.scss': tags.stripIndents`
-        /* autoprefixer grid: autoplace */
-        .css-grid-container {
-          display: grid;
-          row-gap: 10px;
-          grid-template-columns: 100px;
-        }
-      `,
-      '.browserslistrc': 'IE 10',
-    });
-
-    const overrides = { optimization: true, styles: ['src/styles.scss'] };
-    const { files } = await browserBuild(architect, host, target, overrides);
-    expect(await files['styles.css']).toContain('-ms-grid-columns:100px;');
   });
 
   // TODO: consider making this a unit test in the url processing plugins.
@@ -665,10 +659,11 @@ describe('Browser Builder styles', () => {
       'src/styles.css': `
         div { box-shadow: 0 3px 10px, rgba(0, 0, 0, 0.15); }
       `,
-      '.browserslistrc': 'edge 17',
+      '.browserslistrc': `edge 18`,
     });
 
     result = await browserBuild(architect, host, target, { optimization: true });
+
     expect(await result.files['styles.css']).toContain('rgba(0,0,0,.15)');
   });
 

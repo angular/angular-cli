@@ -1,11 +1,8 @@
-import { appendToFile, replaceInFile, writeFile } from '../../utils/fs';
+import { appendToFile, replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  // Ensure an ES2015 build is used in test
-  await writeFile('.browserslistrc', 'Chrome 65');
-
   // Update the application to use a forward reference
   await replaceInFile(
     'src/app/app.component.ts',

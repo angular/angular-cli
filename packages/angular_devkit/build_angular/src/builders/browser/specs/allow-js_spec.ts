@@ -29,7 +29,11 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
-    host.replaceInFile('tsconfig.json', '"target": "es2020"', '"target": "es5", "allowJs": true');
+    host.replaceInFile(
+      'tsconfig.json',
+      '"target": "es2020"',
+      '"target": "es2020", "allowJs": true',
+    );
 
     const run = await architect.scheduleTarget(targetSpec);
     const output = (await run.result) as BrowserBuilderOutput;
@@ -39,7 +43,7 @@ describe('Browser Builder allow js', () => {
       await host.read(join(normalize(output.outputPath), 'main.js')).toPromise(),
     );
 
-    expect(content).toContain('var a = 2');
+    expect(content).toContain('const a = 2');
 
     await run.stop();
   });
@@ -50,7 +54,11 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
-    host.replaceInFile('tsconfig.json', '"target": "es2020"', '"target": "es5", "allowJs": true');
+    host.replaceInFile(
+      'tsconfig.json',
+      '"target": "es2020"',
+      '"target": "es2020", "allowJs": true',
+    );
 
     const overrides = { aot: true };
 
@@ -62,7 +70,7 @@ describe('Browser Builder allow js', () => {
       await host.read(join(normalize(output.outputPath), 'main.js')).toPromise(),
     );
 
-    expect(content).toContain('var a = 2');
+    expect(content).toContain('const a = 2');
 
     await run.stop();
   });
@@ -73,7 +81,11 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
-    host.replaceInFile('tsconfig.json', '"target": "es2020"', '"target": "es5", "allowJs": true');
+    host.replaceInFile(
+      'tsconfig.json',
+      '"target": "es2020"',
+      '"target": "es2020", "allowJs": true',
+    );
 
     const overrides = { watch: true };
 
@@ -88,13 +100,13 @@ describe('Browser Builder allow js', () => {
 
           switch (buildCount) {
             case 1:
-              expect(content).toContain('var a = 2');
+              expect(content).toContain('const a = 2');
               host.writeMultipleFiles({
                 'src/my-js-file.js': `console.log(1); export const a = 1;`,
               });
               break;
             case 2:
-              expect(content).toContain('var a = 1');
+              expect(content).toContain('const a = 1');
               break;
           }
 
