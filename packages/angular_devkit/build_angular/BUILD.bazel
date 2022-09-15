@@ -286,14 +286,7 @@ ts_library(
 LARGE_SPECS = {
     "app-shell": {
         "extra_deps": [
-            "@npm//@angular/animations",
             "@npm//@angular/platform-server",
-            "@npm//@types/express",
-            "@npm//express",
-            "@npm//jasmine-spec-reporter",
-            "@npm//protractor",
-            "@npm//puppeteer",
-            "@npm//ts-node",
         ],
         "tags": [
             # TODO: node crashes with an internal error on node16

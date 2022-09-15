@@ -7,10 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
-import express from 'express'; // eslint-disable-line import/no-extraneous-dependencies
-import * as http from 'http';
-import { AddressInfo } from 'net';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host } from '../../testing/test-utils';
 
 describe('AppShell Builder', () => {
@@ -158,124 +155,6 @@ describe('AppShell Builder', () => {
     const fileName = 'dist/index.html';
     const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
     expect(content).toContain('app-shell works!');
-  });
-
-  it('works with route and service-worker', async () => {
-    host.writeMultipleFiles(appShellRouteFiles);
-    host.writeMultipleFiles({
-      'src/ngsw-config.json': `
-        {
-          "index": "/index.html",
-          "assetGroups": [{
-            "name": "app",
-            "installMode": "prefetch",
-            "resources": {
-              "files": [
-                "/favicon.ico",
-                "/index.html",
-                "/*.css",
-                "/*.js"
-              ]
-            }
-          }, {
-            "name": "assets",
-            "installMode": "lazy",
-            "updateMode": "prefetch",
-            "resources": {
-              "files": [
-                "/assets/**"
-              ]
-            }
-          }]
-        }
-      `,
-      'src/app/app.module.ts': `
-        import { BrowserModule } from '@angular/platform-browser';
-        import { NgModule } from '@angular/core';
-
-        import { AppRoutingModule } from './app-routing.module';
-        import { AppComponent } from './app.component';
-        import { ServiceWorkerModule } from '@angular/service-worker';
-        import { environment } from '../environments/environment';
-        import { RouterModule } from '@angular/router';
-
-        @NgModule({
-          declarations: [
-            AppComponent
-          ],
-          imports: [
-            BrowserModule.withServerTransition({ appId: 'serverApp' }),
-            AppRoutingModule,
-            ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
-            RouterModule
-          ],
-          providers: [],
-          bootstrap: [AppComponent]
-        })
-        export class AppModule { }
-      `,
-      'e2e/app.e2e-spec.ts': `
-        import { browser, by, element } from 'protractor';
-
-        it('should have ngsw in normal state', () => {
-          browser.get('/');
-          // Wait for service worker to load.
-          browser.sleep(2000);
-          browser.waitForAngularEnabled(false);
-          browser.get('/ngsw/state');
-          // Should have updated, and be in normal state.
-          expect(element(by.css('pre')).getText()).not.toContain('Last update check: never');
-          expect(element(by.css('pre')).getText()).toContain('Driver state: NORMAL');
-        });
-      `,
-    });
-    // This should match the browser target prod config.
-    host.replaceInFile(
-      'angular.json',
-      '"buildOptimizer": true',
-      '"buildOptimizer": true, "serviceWorker": true',
-    );
-
-    // We're changing the workspace file so we need to recreate the Architect instance.
-    architect = (await createArchitect(host.root())).architect;
-
-    const overrides = { route: 'shell' };
-    const run = await architect.scheduleTarget(
-      { ...target, configuration: 'production' },
-      overrides,
-    );
-    const output = await run.result;
-    await run.stop();
-
-    expect(output.success).toBe(true);
-
-    // Make sure the index is pre-rendering the route.
-    const fileName = 'dist/index.html';
-    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-    expect(content).toContain('app-shell works!');
-
-    // Serve the app using a simple static server.
-    const app = express();
-    app.use('/', express.static(getSystemPath(join(host.root(), 'dist')) + '/'));
-    const server = await new Promise<http.Server>((resolve) => {
-      const innerServer = app.listen(0, 'localhost', () => resolve(innerServer));
-    });
-    try {
-      const serverPort = (server.address() as AddressInfo).port;
-      // Load app in protractor, then check service worker status.
-      const protractorRun = await architect.scheduleTarget(
-        { project: 'app-e2e', target: 'e2e' },
-        { baseUrl: `http://localhost:${serverPort}/`, devServerTarget: '' },
-      );
-
-      const protractorOutput = await protractorRun.result;
-      await protractorRun.stop();
-
-      expect(protractorOutput.success).toBe(true);
-    } finally {
-      // Close the express server.
-      await new Promise<void>((resolve) => server.close(() => resolve()));
-    }
   });
 
   it('critical CSS is inlined', async () => {
