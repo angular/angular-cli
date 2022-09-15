@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { json } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import {
   AssetPatternClass,
   Schema as BrowserBuilderSchema,
@@ -40,6 +40,7 @@ export function normalizeBrowserSchema(
   projectSourceRoot: string | undefined,
   options: BrowserBuilderSchema,
   metadata: json.JsonObject,
+  logger: logging.LoggerApi,
 ): NormalizedBrowserBuilderSchema {
   const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
 
@@ -71,6 +72,6 @@ export function normalizeBrowserSchema(
     // A value of 0 is falsy and will disable polling rather then enable
     // 500 ms is a sensible default in this case
     poll: options.poll === 0 ? 500 : options.poll,
-    supportedBrowsers: getSupportedBrowsers(projectRoot),
+    supportedBrowsers: getSupportedBrowsers(projectRoot, logger),
   };
 }

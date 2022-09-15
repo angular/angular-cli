@@ -7,7 +7,7 @@
  */
 
 import remapping from '@ampproject/remapping';
-import type { TransformFailure, TransformResult } from 'esbuild';
+import type { TransformResult } from 'esbuild';
 import { minify } from 'terser';
 import { EsbuildExecutor } from './esbuild-executor';
 
@@ -150,49 +150,23 @@ async function optimizeWithEsbuild(
     esbuild = new EsbuildExecutor(options.alwaysUseWasm);
   }
 
-  let result: TransformResult;
-  try {
-    result = await esbuild.transform(content, {
-      minifyIdentifiers: !options.keepIdentifierNames,
-      minifySyntax: true,
-      // NOTE: Disabling whitespace ensures unused pure annotations are kept
-      minifyWhitespace: false,
-      pure: ['forwardRef'],
-      legalComments: options.removeLicenses ? 'none' : 'inline',
-      sourcefile: name,
-      sourcemap: options.sourcemap && 'external',
-      define: options.define,
-      // This option should always be disabled for browser builds as we don't rely on `.name`
-      // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
-      // We enable `keepNames` only for server builds as Domino relies on `.name`.
-      // Once we no longer rely on Domino for SSR we should be able to remove this.
-      keepNames: options.keepNames,
-      target: `es${options.target}`,
-    });
-  } catch (error) {
-    const failure = error as TransformFailure;
-
-    // If esbuild fails with only ES5 support errors, fallback to just terser.
-    // This will only happen if ES5 is the output target and a global script contains ES2015+ syntax.
-    // In that case, the global script is technically already invalid for the target environment but
-    // this is and has been considered a configuration issue. Global scripts must be compatible with
-    // the target environment.
-    if (
-      failure.errors?.every((error) =>
-        error.text.includes('to the configured target environment ("es5") is not supported yet'),
-      )
-    ) {
-      result = {
-        code: content,
-        map: '',
-        warnings: [],
-      };
-    } else {
-      throw error;
-    }
-  }
-
-  return result;
+  return esbuild.transform(content, {
+    minifyIdentifiers: !options.keepIdentifierNames,
+    minifySyntax: true,
+    // NOTE: Disabling whitespace ensures unused pure annotations are kept
+    minifyWhitespace: false,
+    pure: ['forwardRef'],
+    legalComments: options.removeLicenses ? 'none' : 'inline',
+    sourcefile: name,
+    sourcemap: options.sourcemap && 'external',
+    define: options.define,
+    // This option should always be disabled for browser builds as we don't rely on `.name`
+    // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
+    // We enable `keepNames` only for server builds as Domino relies on `.name`.
+    // Once we no longer rely on Domino for SSR we should be able to remove this.
+    keepNames: options.keepNames,
+    target: `es${options.target}`,
+  });
 }
 
 /**

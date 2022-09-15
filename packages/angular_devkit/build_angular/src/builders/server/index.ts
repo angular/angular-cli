@@ -12,7 +12,6 @@ import { tags } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
-import { ScriptTarget } from 'typescript';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../../utils';
@@ -67,7 +66,7 @@ export function execute(
   let outputPaths: undefined | Map<string, string>;
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
-    concatMap(({ config, i18n, target }) => {
+    concatMap(({ config, i18n }) => {
       return runWebpack(config, context, {
         webpackFactory: require('webpack') as typeof webpack,
         logging: (stats, config) => {
@@ -94,7 +93,6 @@ export function execute(
               Array.from(outputPaths.values()),
               [],
               outputPath,
-              target <= ScriptTarget.ES5,
               options.i18nMissingTranslation,
             );
           }
@@ -136,13 +134,13 @@ async function initialize(
 ): Promise<{
   config: webpack.Configuration;
   i18n: I18nOptions;
-  target: ScriptTarget;
 }> {
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
 
+  const browserslist = (await import('browserslist')).default;
   const originalOutputPath = options.outputPath;
-  const { config, i18n, target } = await generateI18nBrowserWebpackConfigFromContext(
+  const { config, i18n } = await generateI18nBrowserWebpackConfigFromContext(
     {
       ...options,
       buildOptimizer: false,
@@ -150,17 +148,19 @@ async function initialize(
       platform: 'server',
     } as NormalizedBrowserBuilderSchema,
     context,
-    (wco) => [getCommonConfig(wco), getStylesConfig(wco)],
-  );
+    (wco) => {
+      // We use the platform to determine the JavaScript syntax output.
+      wco.buildOptions.supportedBrowsers.push(...browserslist('maintained node versions'));
 
-  let transformedConfig;
-  if (webpackConfigurationTransform) {
-    transformedConfig = await webpackConfigurationTransform(config);
-  }
+      return [getCommonConfig(wco), getStylesConfig(wco)];
+    },
+  );
 
   if (options.deleteOutputPath) {
     deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
-  return { config: transformedConfig || config, i18n, target };
+  const transformedConfig = (await webpackConfigurationTransform?.(config)) ?? config;
+
+  return { config: transformedConfig, i18n };
 }

@@ -117,15 +117,7 @@ export default custom<ApplicationPresetOptions>(() => {
       const esTarget = scriptTarget as ScriptTarget | undefined;
       const isJsFile = /\.[cm]?js$/.test(this.resourcePath);
 
-      // The below should be dropped when we no longer support ES5 TypeScript output.
-      if (esTarget === ScriptTarget.ES5) {
-        // This is needed because when target is ES5 we change the TypeScript target to ES2015
-        // because it simplifies build-optimization passes.
-        // @see https://github.com/angular/angular-cli/blob/22af6520834171d01413d4c7e4a9f13fb752252e/packages/angular_devkit/build_angular/src/webpack/plugins/typescript.ts#L51-L56
-        customOptions.forcePresetEnv = true;
-        // Comparable behavior to tsconfig target of ES5
-        customOptions.supportedBrowsers = ['IE 9'];
-      } else if (isJsFile && customOptions.supportedBrowsers?.length) {
+      if (isJsFile && customOptions.supportedBrowsers?.length) {
         // Applications code ES version can be controlled using TypeScript's `target` option.
         // However, this doesn't effect libraries and hence we use preset-env to downlevel ES fetaures
         // based on the supported browsers in browserlist.

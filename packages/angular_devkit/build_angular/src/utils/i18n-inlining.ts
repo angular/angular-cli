@@ -22,7 +22,6 @@ function emittedFilesToInlineOptions(
   scriptsEntryPointName: string[],
   emittedPath: string,
   outputPath: string,
-  es5: boolean,
   missingTranslation: 'error' | 'warning' | 'ignore' | undefined,
   context: BuilderContext,
 ): { options: InlineOptions[]; originalFiles: string[] } {
@@ -41,7 +40,6 @@ function emittedFilesToInlineOptions(
     const action: InlineOptions = {
       filename: emittedFile.file,
       code: fs.readFileSync(originalPath, 'utf8'),
-      es5,
       outputPath,
       missingTranslation,
       setLocale: emittedFile.name === 'main' || emittedFile.name === 'vendor',
@@ -75,7 +73,6 @@ export async function i18nInlineEmittedFiles(
   outputPaths: string[],
   scriptsEntryPointName: string[],
   emittedPath: string,
-  es5: boolean,
   missingTranslation: 'error' | 'warning' | 'ignore' | undefined,
 ): Promise<boolean> {
   const executor = new BundleActionExecutor({ i18n });
@@ -89,7 +86,6 @@ export async function i18nInlineEmittedFiles(
       scriptsEntryPointName,
       emittedPath,
       baseOutputPath,
-      es5,
       missingTranslation,
       context,
     );

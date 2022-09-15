@@ -16,7 +16,7 @@ export function createIvyPlugin(
   aot: boolean,
   tsconfig: string,
 ): AngularWebpackPlugin {
-  const { buildOptions } = wco;
+  const { buildOptions, tsConfig } = wco;
   const optimize = buildOptions.optimization.scripts;
 
   const compilerOptions: CompilerOptions = {
@@ -25,18 +25,14 @@ export function createIvyPlugin(
     declarationMap: false,
   };
 
-  if (buildOptions.preserveSymlinks !== undefined) {
-    compilerOptions.preserveSymlinks = buildOptions.preserveSymlinks;
+  if (tsConfig.options.target === undefined || tsConfig.options.target <= ScriptTarget.ES5) {
+    throw new Error(
+      'ES output older than ES2015 is not supported. Please update TypeScript "target" compiler option to ES2015 or later.',
+    );
   }
 
-  // Outputting ES2015 from TypeScript is the required minimum for the build optimizer passes.
-  // Downleveling to ES5 will occur after the build optimizer passes via babel which is the same
-  // as for third-party libraries. This greatly reduces the complexity of static analysis.
-  if (wco.scriptTarget < ScriptTarget.ES2015) {
-    compilerOptions.target = ScriptTarget.ES2015;
-    wco.logger.warn(
-      'DEPRECATED: ES5 output is deprecated. Please update TypeScript `target` compiler option to ES2015 or later.',
-    );
+  if (buildOptions.preserveSymlinks !== undefined) {
+    compilerOptions.preserveSymlinks = buildOptions.preserveSymlinks;
   }
 
   const fileReplacements: Record<string, string> = {};
