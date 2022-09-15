@@ -1,3 +1,26 @@
+<a name="14.2.3"></a>
+
+# 14.2.3 (2022-09-15)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [e7e0cb78f](https://github.com/angular/angular-cli/commit/e7e0cb78f4c6d684fdf25e23a11599b82807cd25) | fix  | correctly display error messages that contain "at" text. |
+| [4756d7e06](https://github.com/angular/angular-cli/commit/4756d7e0675aa9a8bed11b830b66288141fa6e16) | fix  | watch symbolic links                                     |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [1e3ecbdb1](https://github.com/angular/angular-cli/commit/1e3ecbdb138861eff550e05d9662a10d106c0990) | perf | avoid bootstrap conversion AST traversal where possible |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Jason Bedard and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.2"></a>
 
 # 14.2.2 (2022-09-08)
