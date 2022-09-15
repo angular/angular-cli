@@ -71,19 +71,20 @@ Releasing is performed using Angular's unified release tooling. Each week, two r
 
 **For a minor OR major release:**
 
-After FW releases `-rc.0` for an upcoming minor/major version, update the corresponding version in
-[`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18) **and** peer
-dependencies on FW ([here](/packages/angular_devkit/build_angular/package.json) and
-[here](/packages/ngtools/webpack/package.json)) to match. This ensures that CLI `-rc.0` depends on
-FW `-rc.0`.
+After FW releases `-rc.0` for an upcoming minor/major version, update the corresponding version in:
+
+- [`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18)
+- [`@angular-devkit/build-angular`](/packages/angular_devkit/build_angular/package.json)
+- [`@ngtools/webpack`](/packages/ngtools/webpack/package.json)
 
 The same needs to be done for a `-next.0` release, and needs to be done for both minor _and_ major
 releases.
 
 Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), these versions
-should be updated to match (remove `-rc.0` and `-next.0`). This can be done as part of the release
-PR ([example](https://github.com/angular/angular-cli/pull/22580/files#diff-53a0da39e6b029472ba808fdd567f8706e752434fa51be6009f0140532b9fe2f))
-or a separate PR after FW releases but before CLI releases.
+should be updated to match (remove `-rc.0` and `-next.0`). This **must** be done as a separate PR
+which lands after FW releases (or else CI will fail) but _before_ the CLI release PR. Releases are
+built before the PR is sent for review, so any changes after that point won't be included in the
+release.
 
 **For a major release:**
 
