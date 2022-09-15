@@ -129,7 +129,6 @@ commands:
       - run: npm install -g yarn@1.22.10
       - run: node --version
       - run: yarn --version
-      - run: git config --global core.longpaths true
 
   setup_bazel_rbe:
     parameters:
