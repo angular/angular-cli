@@ -52,7 +52,7 @@ export class CssOptimizerPlugin {
 
           logger.time('optimize css assets');
           for (const assetName of Object.keys(compilationAssets)) {
-            if (!/\.(?:css|scss|sass|less|styl)$/.test(assetName)) {
+            if (!/\.(?:css|scss|sass|less)$/.test(assetName)) {
               continue;
             }
 
