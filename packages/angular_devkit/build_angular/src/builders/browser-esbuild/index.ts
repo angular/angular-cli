@@ -249,6 +249,17 @@ async function bundleCode(
   sourcemapOptions: SourceMapClass,
   tsconfig: string,
 ) {
+  let fileReplacements: Record<string, string> | undefined;
+  if (options.fileReplacements) {
+    for (const replacement of options.fileReplacements) {
+      fileReplacements ??= {};
+      fileReplacements[path.join(workspaceRoot, replacement.replace)] = path.join(
+        workspaceRoot,
+        replacement.with,
+      );
+    }
+  }
+
   return bundle({
     absWorkingDir: workspaceRoot,
     bundle: true,
@@ -288,6 +299,7 @@ async function bundleCode(
           thirdPartySourcemaps: sourcemapOptions.vendor,
           tsconfig,
           advancedOptimizations: options.buildOptimizer,
+          fileReplacements,
         },
         // Component stylesheet options
         {

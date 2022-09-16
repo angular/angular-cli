@@ -13,7 +13,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'allowedCommonJsDependencies',
   'budgets',
   'extractLicenses',
-  'fileReplacements',
   'progress',
   'scripts',
   'statsJson',
