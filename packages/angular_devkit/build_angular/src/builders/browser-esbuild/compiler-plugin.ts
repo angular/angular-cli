@@ -128,6 +128,7 @@ export function createCompilerPlugin(
     tsconfig: string;
     advancedOptimizations?: boolean;
     thirdPartySourcemaps?: boolean;
+    fileReplacements?: Record<string, string>;
   },
   styleOptions: BundleStylesheetOptions,
 ): Plugin {
@@ -256,6 +257,13 @@ export function createCompilerPlugin(
           return { content: contents };
         };
 
+        // Augment TypeScript Host for file replacements option
+        if (pluginOptions.fileReplacements) {
+          // Temporary deep import for file replacements support
+          const { augmentHostWithReplacements } = require('@ngtools/webpack/src/ivy/host');
+          augmentHostWithReplacements(host, pluginOptions.fileReplacements);
+        }
+
         // Create the Angular specific program that contains the Angular compiler
         const angularProgram = new compilerCli.NgtscProgram(rootNames, compilerOptions, host);
         const angularCompiler = angularProgram.compiler;
@@ -316,7 +324,9 @@ export function createCompilerPlugin(
         async (args) => {
           assert.ok(fileEmitter, 'Invalid plugin execution order');
 
-          const typescriptResult = await fileEmitter(args.path);
+          const typescriptResult = await fileEmitter(
+            pluginOptions.fileReplacements?.[args.path] ?? args.path,
+          );
           if (!typescriptResult) {
             // No TS result indicates the file is not part of the TypeScript program.
             // If allowJs is enabled and the file is JS then defer to the next load hook.
