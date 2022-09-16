@@ -46,29 +46,12 @@ export function createIvyPlugin(
     }
   }
 
-  let inlineStyleFileExtension;
-  switch (buildOptions.inlineStyleLanguage) {
-    case 'less':
-      inlineStyleFileExtension = 'less';
-      break;
-    case 'sass':
-      inlineStyleFileExtension = 'sass';
-      break;
-    case 'scss':
-      inlineStyleFileExtension = 'scss';
-      break;
-    case 'css':
-    default:
-      inlineStyleFileExtension = 'css';
-      break;
-  }
-
   return new AngularWebpackPlugin({
     tsconfig,
     compilerOptions,
     fileReplacements,
     jitMode: !aot,
     emitNgModuleScope: !optimize,
-    inlineStyleFileExtension,
+    inlineStyleFileExtension: buildOptions.inlineStyleLanguage ?? 'css',
   });
 }
