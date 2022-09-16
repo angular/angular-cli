@@ -57,8 +57,6 @@
     "semver": "7.3.7",
     "source-map-loader": "4.0.0",
     "source-map-support": "0.5.21",
-    "stylus": "0.59.0",
-    "stylus-loader": "7.0.0",
     "terser": "5.15.0",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",

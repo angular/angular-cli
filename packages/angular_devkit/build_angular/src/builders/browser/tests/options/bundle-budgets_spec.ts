@@ -13,7 +13,7 @@ import { Type } from '../../schema';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
-  const CSS_EXTENSIONS = ['css', 'scss', 'less', 'styl'];
+  const CSS_EXTENSIONS = ['css', 'scss', 'less'];
   const BUDGET_NOT_MET_REGEXP = /Budget .+ was not met by/;
 
   describe('Option: "bundleBudgets"', () => {

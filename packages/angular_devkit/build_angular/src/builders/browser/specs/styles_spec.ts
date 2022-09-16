@@ -13,8 +13,8 @@ import { dirname } from 'path';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder styles', () => {
-  const extensionsWithImportSupport = ['css', 'scss', 'less', 'styl'];
-  const extensionsWithVariableSupport = ['scss', 'less', 'styl'];
+  const extensionsWithImportSupport = ['css', 'scss', 'less'];
+  const extensionsWithVariableSupport = ['scss', 'less'];
   const imgSvg = `
     <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
@@ -222,9 +222,6 @@ describe('Browser Builder styles', () => {
       let variablereference = '';
       if (ext === 'scss') {
         variableAssignment = '$primary-color:';
-        variablereference = '$primary-color';
-      } else if (ext === 'styl') {
-        variableAssignment = '$primary-color =';
         variablereference = '$primary-color';
       } else if (ext === 'less') {
         variableAssignment = '@primary-color:';

@@ -170,8 +170,6 @@ ts_library(
         "@npm//semver",
         "@npm//source-map-loader",
         "@npm//source-map-support",
-        "@npm//stylus",
-        "@npm//stylus-loader",
         "@npm//terser",
         "@npm//text-table",
         "@npm//tree-kill",

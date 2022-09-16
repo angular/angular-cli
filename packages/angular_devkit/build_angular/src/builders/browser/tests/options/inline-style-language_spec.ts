@@ -58,29 +58,6 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           harness.expectFile('dist/main.js').content.toContain('color: green');
         });
 
-        // Stylus currently does not function due to the sourcemap logic within the `stylus-loader`
-        // which tries to read each stylesheet directly from disk. In this case, each stylesheet is
-        // virtual and cannot be read from disk. This issue affects data URIs in general.
-        // xit('supports Stylus inline component styles when set to "stylus"', async () => {
-        //   harness.useTarget('build', {
-        //     ...BASE_OPTIONS,
-        //     inlineStyleLanguage: InlineStyleLanguage.Stylus,
-        //     aot,
-        //   });
-
-        //   await harness.modifyFile('src/app/app.component.ts', (content) =>
-        //     content.replace(
-        //       '__STYLE_MARKER__',
-        //       '$primary = green;\\nh1 { color: $primary; }',
-        //     ),
-        //   );
-
-        //   const { result } = await harness.executeOnce();
-
-        //   expect(result?.success).toBe(true);
-        //   harness.expectFile('dist/main.js').content.toContain('color: green');
-        // });
-
         it('supports Less inline component styles when set to "less"', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,

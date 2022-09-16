@@ -54,8 +54,8 @@ This is used for conditional loading of code at build time.
 Two types of stylesheets are used in the build system: global stylesheets and component stylesheets.
 Global stylesheets are injected into the `index.html` file, while component stylesheets are loaded directly into compiled Angular components.
 
-The build system supports plain CSS stylesheets as well as the Sass, LESS and Stylus CSS pre-processors.
-Stylesheet processing functionality is provided by `sass-loader`, `less-loader`, `stylus-loader`, `postcss-loader`, `postcss-import`, augmented in the build system by custom webpack plugins.
+The build system supports plain CSS stylesheets as well as the Sass and LESS CSS pre-processors.
+Stylesheet processing functionality is provided by `sass-loader`, `less-loader`, `postcss-loader`, `postcss-import`, augmented in the build system by custom webpack plugins.
 
 ### Assets
 

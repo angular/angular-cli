@@ -224,7 +224,7 @@ export async function execute(
         module: {
           rules: [
             {
-              test: /\.(css|scss|sass|styl|less)$/,
+              test: /\.(css|scss|sass|less)$/,
               loader: require.resolve('./empty-loader'),
             },
           ],

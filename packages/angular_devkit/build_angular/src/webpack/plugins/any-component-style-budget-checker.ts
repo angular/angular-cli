@@ -47,7 +47,7 @@ export class AnyComponentStyleBudgetChecker {
             return;
           }
 
-          const cssExtensions = ['.css', '.scss', '.less', '.styl', '.sass'];
+          const cssExtensions = ['.css', '.scss', '.less', '.sass'];
 
           const componentStyles = Object.keys(compilation.assets)
             .filter((name) => cssExtensions.includes(path.extname(name)))

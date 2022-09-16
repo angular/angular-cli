@@ -101,13 +101,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
   }
 
-  if (globalStylePaths.some((p) => p.endsWith('.styl'))) {
-    wco.logger.warn(
-      'Stylus usage is deprecated and will be removed in a future major version. ' +
-        'To opt-out of the deprecated behaviour, please migrate to another stylesheet language.',
-    );
-  }
-
   const sassImplementation = new SassWorkerImplementation();
   const sassTildeUsageMessage = new Set<string>();
 
@@ -360,22 +353,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
             sourceMap: cssSourceMap,
             lessOptions: {
               javascriptEnabled: true,
-              paths: includePaths,
-            },
-          },
-        },
-      ],
-    },
-    {
-      extensions: ['styl'],
-      use: [
-        {
-          loader: require.resolve('stylus-loader'),
-          options: {
-            sourceMap: cssSourceMap,
-            stylusOptions: {
-              compress: false,
-              sourceMap: { comment: false },
               paths: includePaths,
             },
           },

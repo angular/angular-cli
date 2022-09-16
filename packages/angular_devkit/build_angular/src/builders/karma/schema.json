@@ -76,7 +76,7 @@
               "input": {
                 "type": "string",
                 "description": "The file to include.",
-                "pattern": "\\.(?:css|scss|sass|less|styl)$"
+                "pattern": "\\.(?:css|scss|sass|less)$"
               },
               "bundleName": {
                 "type": "string",
@@ -95,7 +95,7 @@
           {
             "type": "string",
             "description": "The file to include.",
-            "pattern": "\\.(?:css|scss|sass|less|styl)$"
+            "pattern": "\\.(?:css|scss|sass|less)$"
           }
         ]
       }
