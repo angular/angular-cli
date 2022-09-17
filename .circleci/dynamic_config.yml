@@ -11,6 +11,7 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
+  devinfra: angular/dev-infra@1.0.1
 
 parameters:
   snapshot_changed:
@@ -102,19 +103,18 @@ commands:
 
   rebase_pr:
     steps:
-      - run:
-          name: Rebase PR on target branch
-          shell: bash
-          command: >
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              # User is required for rebase.
-              git config user.name "angular-ci"
-              git config user.email "angular-ci"
-              # Rebase PR on top of target branch.
-              node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
-            else
-              echo "This build is not over a PR, nothing to do."
-            fi
+      - devinfra/rebase-pr-on-target-branch:
+          base_revision: << pipeline.git.base_revision >>
+          head_revision: << pipeline.git.revision >>
+
+  rebase_pr_win:
+    steps:
+      - devinfra/rebase-pr-on-target-branch:
+          base_revision: << pipeline.git.base_revision >>
+          head_revision: << pipeline.git.revision >>
+          # Use `bash.exe` as Shell because the CircleCI-orb command is an
+          # included Bash script and expects Bash as shell.
+          shell: bash.exe
 
   custom_attach_workspace:
     description: Attach workspace at a predefined location
@@ -367,7 +367,7 @@ jobs:
     parallelism: 16
     steps:
       - checkout
-      - rebase_pr
+      - rebase_pr_win
       - setup_windows
       - restore_cache:
           keys:
