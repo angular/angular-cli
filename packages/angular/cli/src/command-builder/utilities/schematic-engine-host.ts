@@ -10,7 +10,7 @@ import { RuleFactory, SchematicsException, Tree } from '@angular-devkit/schemati
 import { FileSystemCollectionDesc, NodeModulesEngineHost } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
 import { parse as parseJson } from 'jsonc-parser';
-import nodeModule from 'module';
+import { createRequire } from 'module';
 import { dirname, resolve } from 'path';
 import { Script } from 'vm';
 import { assertIsError } from '../../utilities/error';
@@ -63,7 +63,8 @@ export class SchematicEngineHost extends NodeModulesEngineHost {
     // Mimic behavior of ExportStringRef class used in default behavior
     const fullPath = path[0] === '.' ? resolve(parentPath ?? process.cwd(), path) : path;
 
-    const schematicFile = require.resolve(fullPath, { paths: [parentPath] });
+    const referenceRequire = createRequire(__filename);
+    const schematicFile = referenceRequire.resolve(fullPath, { paths: [parentPath] });
 
     if (shouldWrapSchematic(schematicFile, !!collectionDescription?.encapsulation)) {
       const schematicPath = dirname(schematicFile);
@@ -128,8 +129,8 @@ function wrap(
   moduleCache: Map<string, unknown>,
   exportName?: string,
 ): () => unknown {
-  const hostRequire = nodeModule.createRequire(__filename);
-  const schematicRequire = nodeModule.createRequire(schematicFile);
+  const hostRequire = createRequire(__filename);
+  const schematicRequire = createRequire(schematicFile);
 
   const customRequire = function (id: string) {
     if (legacyModules[id]) {

@@ -8,6 +8,7 @@
 
 import { analytics, tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
+import { createRequire } from 'module';
 import npa from 'npm-package-arg';
 import { dirname, join } from 'path';
 import { compare, intersects, prerelease, satisfies, valid } from 'semver';
@@ -61,6 +62,7 @@ export class AddCommandModule
   longDescriptionPath = join(__dirname, 'long-description.md');
   protected override allowPrivateSchematics = true;
   private readonly schematicName = 'ng-add';
+  private rootRequire = createRequire(this.context.root + '/');
 
   override async builder(argv: Argv): Promise<Argv<AddCommandArgs>> {
     const localYargs = (await super.builder(argv))
@@ -276,9 +278,8 @@ export class AddCommandModule
         packageIdentifier.raw,
         registry ? [`--registry="${registry}"`] : undefined,
       );
-      const resolvedCollectionPath = require.resolve(join(collectionName, 'package.json'), {
-        paths: [tempNodeModules],
-      });
+      const tempRequire = createRequire(tempNodeModules + '/');
+      const resolvedCollectionPath = tempRequire.resolve(join(collectionName, 'package.json'));
 
       if (!success) {
         return 1;
@@ -341,7 +342,7 @@ export class AddCommandModule
 
   private isPackageInstalled(name: string): boolean {
     try {
-      require.resolve(join(name, 'package.json'), { paths: [this.context.root] });
+      this.rootRequire.resolve(join(name, 'package.json'));
 
       return true;
     } catch (e) {
@@ -400,9 +401,7 @@ export class AddCommandModule
     const { logger, root } = this.context;
     let installedPackage;
     try {
-      installedPackage = require.resolve(join(name, 'package.json'), {
-        paths: [root],
-      });
+      installedPackage = this.rootRequire.resolve(join(name, 'package.json'));
     } catch {}
 
     if (installedPackage) {
