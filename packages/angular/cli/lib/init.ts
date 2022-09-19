@@ -9,6 +9,7 @@
 import 'symbol-observable';
 // symbol polyfill must go first
 import { promises as fs } from 'fs';
+import { createRequire } from 'module';
 import * as path from 'path';
 import { SemVer, major } from 'semver';
 import { colors } from '../src/utilities/color';
@@ -47,7 +48,8 @@ let forceExit = false;
   try {
     // No error implies a projectLocalCli, which will load whatever
     // version of ng-cli you have installed in a local package.json
-    const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
+    const cwdRequire = createRequire(process.cwd() + '/');
+    const projectLocalCli = cwdRequire.resolve('@angular/cli');
     cli = await import(projectLocalCli);
 
     const globalVersion = new SemVer(VERSION.full);

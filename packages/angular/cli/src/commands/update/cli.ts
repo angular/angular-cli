@@ -10,6 +10,7 @@ import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { SpawnSyncReturns, execSync, spawnSync } from 'child_process';
 import { existsSync, promises as fs } from 'fs';
+import { createRequire } from 'module';
 import npa from 'npm-package-arg';
 import pickManifest from 'npm-pick-manifest';
 import * as path from 'path';
@@ -483,7 +484,8 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
       // Try to resolve from package location.
       // This avoids issues with package hoisting.
       try {
-        migrations = require.resolve(migrations, { paths: [packagePath] });
+        const packageRequire = createRequire(packagePath + '/');
+        migrations = packageRequire.resolve(migrations);
       } catch (e) {
         assertIsError(e);
         if (e.code === 'MODULE_NOT_FOUND') {
@@ -717,6 +719,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     }[];
 
     if (success && migrations) {
+      const rootRequire = createRequire(this.context.root + '/');
       for (const migration of migrations) {
         // Resolve the package from the workspace root, as otherwise it will be resolved from the temp
         // installed CLI version.
@@ -728,15 +731,13 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           try {
             packagePath = path.dirname(
               // This may fail if the `package.json` is not exported as an entry point
-              require.resolve(path.join(migration.package, 'package.json'), {
-                paths: [this.context.root],
-              }),
+              rootRequire.resolve(path.join(migration.package, 'package.json')),
             );
           } catch (e) {
             assertIsError(e);
             if (e.code === 'MODULE_NOT_FOUND') {
               // Fallback to trying to resolve the package's main entry point
-              packagePath = require.resolve(migration.package, { paths: [this.context.root] });
+              packagePath = rootRequire.resolve(migration.package);
             } else {
               throw e;
             }
@@ -768,7 +769,8 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           // Try to resolve from package location.
           // This avoids issues with package hoisting.
           try {
-            migrations = require.resolve(migration.collection, { paths: [packagePath] });
+            const packageRequire = createRequire(packagePath + '/');
+            migrations = packageRequire.resolve(migration.collection);
           } catch (e) {
             assertIsError(e);
             if (e.code === 'MODULE_NOT_FOUND') {
