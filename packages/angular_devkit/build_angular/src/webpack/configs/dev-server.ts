@@ -33,7 +33,7 @@ export async function getDevServerConfig(
   if (hmr) {
     extraRules.push({
       loader: HmrLoader,
-      include: [main].map((p) => resolve(wco.root, p)),
+      include: [resolve(wco.root, main)],
     });
   }
 

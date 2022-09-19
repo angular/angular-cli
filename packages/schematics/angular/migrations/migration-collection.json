@@ -4,6 +4,11 @@
       "version": "15.0.0",
       "factory": "./update-15/remove-browserslist-config",
       "description": "Remove Browserslist configuration files that matches the Angular CLI default configuration."
+    },
+    "remove-platform-server-exports": {
+      "version": "15.0.0",
+      "factory": "./update-15/remove-platform-server-exports",
+      "description": "Remove exported `@angular/platform-server` `renderModule` method. The `renderModule` method is now exported by the Angular CLI."
     }
   }
 }
