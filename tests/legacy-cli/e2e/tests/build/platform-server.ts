@@ -32,7 +32,8 @@ export default async function () {
     './server.ts',
     ` import 'zone.js/dist/zone-node';
         import * as fs from 'fs';
-        import { AppServerModule, renderModule } from './src/main.server';
+        import { renderModule } from '@angular/platform-server';
+        import { AppServerModule } from './src/main.server';
 
         renderModule(AppServerModule, {
           url: '/',

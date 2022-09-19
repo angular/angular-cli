@@ -21,4 +21,3 @@ if (environment.production) {
 }
 
 export { <%= rootModuleClassName %> } from './app/<%= stripTsExtension(rootModuleFileName) %>';
-export { renderModule } from '@angular/platform-server';

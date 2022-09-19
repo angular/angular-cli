@@ -8,11 +8,10 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { runWebpack } from '@angular-devkit/build-webpack';
-import { tags } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
-import webpack from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../../utils';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
@@ -20,7 +19,10 @@ import { I18nOptions } from '../../utils/i18n-options';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
-import { generateI18nBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
+import {
+  BrowserWebpackConfigOptions,
+  generateI18nBrowserWebpackConfigFromContext,
+} from '../../utils/webpack-browser-config';
 import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
 import { webpackStatsLogger } from '../../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
@@ -152,7 +154,7 @@ async function initialize(
       // We use the platform to determine the JavaScript syntax output.
       wco.buildOptions.supportedBrowsers.push(...browserslist('maintained node versions'));
 
-      return [getCommonConfig(wco), getStylesConfig(wco)];
+      return [getPlatformServerExportsConfig(wco), getCommonConfig(wco), getStylesConfig(wco)];
     },
   );
 
@@ -163,4 +165,32 @@ async function initialize(
   const transformedConfig = (await webpackConfigurationTransform?.(config)) ?? config;
 
   return { config: transformedConfig, i18n };
+}
+
+/**
+ * Add `@angular/platform-server` exports.
+ * This is needed so that DI tokens can be referenced and set at runtime outside of the bundle.
+ */
+function getPlatformServerExportsConfig(wco: BrowserWebpackConfigOptions): Partial<Configuration> {
+  // Add `@angular/platform-server` exports.
+  // This is needed so that DI tokens can be referenced and set at runtime outside of the bundle.
+  try {
+    // Only add `@angular/platform-server` exports when it is installed.
+    // In some cases this builder is used when `@angular/platform-server` is not installed.
+    // Example: when using `@nguniversal/common/clover` which does not need `@angular/platform-server`.
+    require.resolve('@angular/platform-server', { paths: [wco.root] });
+  } catch {
+    return {};
+  }
+
+  return {
+    module: {
+      rules: [
+        {
+          loader: require.resolve('./platform-server-exports-loader'),
+          include: [path.resolve(wco.root, wco.buildOptions.main)],
+        },
+      ],
+    },
+  };
 }
