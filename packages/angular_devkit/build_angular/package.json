@@ -22,7 +22,7 @@
     "@discoveryjs/json-ext": "0.5.7",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
     "ansi-colors": "4.1.3",
-    "autoprefixer": "10.4.11",
+    "autoprefixer": "10.4.12",
     "babel-loader": "8.2.5",
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "^4.9.1",
@@ -30,7 +30,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
-    "esbuild-wasm": "0.15.7",
+    "esbuild-wasm": "0.15.8",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -63,12 +63,12 @@
     "tslib": "2.4.0",
     "webpack": "5.74.0",
     "webpack-dev-middleware": "5.3.3",
-    "webpack-dev-server": "4.11.0",
+    "webpack-dev-server": "4.11.1",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.15.7"
+    "esbuild": "0.15.8"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0-next",
