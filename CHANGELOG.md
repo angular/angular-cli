@@ -1,3 +1,47 @@
+<a name="15.0.0-next.2"></a>
+
+# 15.0.0-next.2 (2022-09-21)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- Internally the Angular CLI now always sets the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
+- Producing ES5 output is no longer possible. This was needed for Internet Explorer which is no longer supported. All browsers that Angular supports work with ES2015+
+- Deprecated support for Stylus has been removed. The Stylus package has never reached a stable version and its usage in the Angular CLI is minimal. It's recommended to migrate to another CSS preprocessor that the Angular CLI supports.
+
+### @angular-devkit/core
+
+- Workspace projects with missing `root` is now an error.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [1c21e470c](https://github.com/angular/angular-cli/commit/1c21e470c76d69d08e5096b46b952dbce330f7ef) | feat | enable error on unknown properties and elements in tests |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------- |
+| [1c527a9da](https://github.com/angular/angular-cli/commit/1c527a9da5b55a8421ebca787fd322e879f6d29d) | feat     | add esbuild-based builder initial support for fileReplacements |
+| [15d3fc6dc](https://github.com/angular/angular-cli/commit/15d3fc6dc3f74462818b3745f6fb4995212a4d22) | feat     | export `@angular/platform-server` symbols in server bundle     |
+| [1e5d4a750](https://github.com/angular/angular-cli/commit/1e5d4a75084dfd2aeebb6a0c0b3039417e14bc84) | feat     | use Browserslist to determine ECMA output                      |
+| [12931ba8c](https://github.com/angular/angular-cli/commit/12931ba8c3772b1dd65846cbd6146804b08eab31) | refactor | remove deprecated ES5 support                                  |
+| [2ba44a433](https://github.com/angular/angular-cli/commit/2ba44a433c827413a53d12de0ef203f8988ddc2a) | refactor | remove support for Stylus                                      |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [ea4c0aa2e](https://github.com/angular/angular-cli/commit/ea4c0aa2e84d48be37b75e37c99ad381122297c3) | fix  | throw error when project has missing root property |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Cédric Exbrayat, Doug Parker, Jason Bedard and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.1"></a>
 
 # 15.0.0-next.1 (2022-09-15)
