@@ -8,9 +8,9 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2020",
+    "target": "es2022",
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2020", "dom"]
+    "lib": ["es2022", "dom"]
   },
   "angularCompilerOptions": {
     "enableIvy": true,

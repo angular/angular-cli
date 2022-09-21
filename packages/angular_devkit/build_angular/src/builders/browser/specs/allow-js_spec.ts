@@ -31,8 +31,8 @@ describe('Browser Builder allow js', () => {
 
     host.replaceInFile(
       'tsconfig.json',
-      '"target": "es2020"',
-      '"target": "es2020", "allowJs": true',
+      '"target": "es2022"',
+      '"target": "es2022", "allowJs": true',
     );
 
     const run = await architect.scheduleTarget(targetSpec);
@@ -56,8 +56,8 @@ describe('Browser Builder allow js', () => {
 
     host.replaceInFile(
       'tsconfig.json',
-      '"target": "es2020"',
-      '"target": "es2020", "allowJs": true',
+      '"target": "es2022"',
+      '"target": "es2022", "allowJs": true',
     );
 
     const overrides = { aot: true };
@@ -83,8 +83,8 @@ describe('Browser Builder allow js', () => {
 
     host.replaceInFile(
       'tsconfig.json',
-      '"target": "es2020"',
-      '"target": "es2020", "allowJs": true',
+      '"target": "es2022"',
+      '"target": "es2022", "allowJs": true',
     );
 
     const overrides = { watch: true };

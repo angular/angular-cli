@@ -10,6 +10,7 @@ import Piscina from 'piscina';
 import { ScriptTarget } from 'typescript';
 import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../utils/environment-options';
+import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
 import { EsbuildExecutor } from './esbuild-executor';
 import type { OptimizeRequestOptions } from './javascript-optimizer-worker';
 
@@ -48,11 +49,9 @@ export interface JavaScriptOptimizerOptions {
   sourcemap?: boolean;
 
   /**
-   * The ECMAScript version that should be used when generating output code.
-   * The optimizer will not adjust the output code with features present in newer
-   * ECMAScript versions.
+   * A list of supported browsers that is used for output code.
    */
-  target: ScriptTarget;
+  supportedBrowsers?: string[];
 
   /**
    * Enables the retention of identifier names and ensures that function and class names are
@@ -84,7 +83,13 @@ export interface JavaScriptOptimizerOptions {
  * optimizations not yet implemented by `esbuild`.
  */
 export class JavaScriptOptimizerPlugin {
-  constructor(public options: JavaScriptOptimizerOptions) {}
+  private targets: string[] | undefined;
+
+  constructor(private options: JavaScriptOptimizerOptions) {
+    if (options.supportedBrowsers) {
+      this.targets = transformSupportedBrowsersToTargets(options.supportedBrowsers);
+    }
+  }
 
   apply(compiler: Compiler) {
     const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
@@ -157,26 +162,13 @@ export class JavaScriptOptimizerPlugin {
             }
           }
 
-          let target: OptimizeRequestOptions['target'] = 2017;
-          if (this.options.target) {
-            if (this.options.target <= ScriptTarget.ES5) {
-              target = 5;
-            } else if (this.options.target === ScriptTarget.ESNext) {
-              target = 'next';
-            } else {
-              target = Number(
-                ScriptTarget[this.options.target].slice(2),
-              ) as OptimizeRequestOptions['target'];
-            }
-          }
-
           // Setup the options used by all worker tasks
           const optimizeOptions: OptimizeRequestOptions = {
             sourcemap: this.options.sourcemap,
             define,
             keepNames: this.options.keepNames,
             keepIdentifierNames: this.options.keepIdentifierNames,
-            target,
+            target: this.targets,
             removeLicenses: this.options.removeLicenses,
             advanced: this.options.advanced,
             // Perform a single native esbuild support check.

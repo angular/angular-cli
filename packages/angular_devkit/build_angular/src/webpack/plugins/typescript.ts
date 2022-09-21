@@ -25,9 +25,17 @@ export function createIvyPlugin(
     declarationMap: false,
   };
 
-  if (tsConfig.options.target === undefined || tsConfig.options.target <= ScriptTarget.ES5) {
-    throw new Error(
-      'ES output older than ES2015 is not supported. Please update TypeScript "target" compiler option to ES2015 or later.',
+  if (tsConfig.options.target === undefined || tsConfig.options.target < ScriptTarget.ES2022) {
+    tsConfig.options.target = ScriptTarget.ES2022;
+    // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
+    // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
+    // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
+    tsConfig.options.useDefineForClassFields ??= false;
+
+    wco.logger.warn(
+      'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
+        '"false" respectively by the Angular CLI. To control ECMA version and features use the Browerslist configuration. ' +
+        'For more information, see https://github.com/browserslist/browserslist',
     );
   }
 

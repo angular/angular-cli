@@ -29,8 +29,8 @@ describe('Browser Builder resolve json module', () => {
 
     host.replaceInFile(
       'tsconfig.json',
-      '"target": "es2020"',
-      '"target": "es2020", "resolveJsonModule": true',
+      '"target": "es2022"',
+      '"target": "es2022", "resolveJsonModule": true',
     );
 
     const overrides = { watch: true };

@@ -7,10 +7,10 @@
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "target": "es2020",
+    "target": "es2022",
     "module": "esnext",
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2020", "dom"]
+    "lib": ["es2022", "dom"]
   },
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true

@@ -42,9 +42,6 @@ export async function generateWebpackConfig(
   const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
   const tsConfig = await readTsconfig(tsConfigPath);
 
-  const ts = await import('typescript');
-  const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES2015;
-
   const buildOptions: NormalizedBrowserBuilderSchema = { ...options, ...extraBuildOptions };
   const wco: BrowserWebpackConfigOptions = {
     root: workspaceRoot,
@@ -55,7 +52,6 @@ export async function generateWebpackConfig(
     tsConfig,
     tsConfigPath,
     projectName,
-    scriptTarget,
   };
 
   wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);

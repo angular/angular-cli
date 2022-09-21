@@ -20,6 +20,7 @@ export interface BundleStylesheetOptions {
   outputNames?: { bundles?: string; media?: string };
   includePaths?: string[];
   externalDependencies?: string[];
+  target: string[];
 }
 
 async function bundleStylesheet(
@@ -43,6 +44,7 @@ async function bundleStylesheet(
     outdir: options.workspaceRoot,
     write: false,
     platform: 'browser',
+    target: options.target,
     preserveSymlinks: options.preserveSymlinks,
     external: options.externalDependencies,
     conditions: ['style', 'sass'],
