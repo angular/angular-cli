@@ -77,7 +77,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   const isPlatformServer = buildOptions.platform === 'server';
   const extraPlugins: { apply(compiler: Compiler): void }[] = [];
   const extraRules: RuleSetRule[] = [];
-  const entryPoints: { [key: string]: [string, ...string[]] } = {};
+  const entryPoints: Configuration['entry'] = {};
 
   // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
@@ -105,14 +105,11 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     extraPlugins.push(new ContextReplacementPlugin(/@?hapi|express[\\/]/));
   }
 
-  if (!isPlatformServer) {
-    if (buildOptions.polyfills) {
-      const projectPolyfills = path.resolve(root, buildOptions.polyfills);
-      if (entryPoints['polyfills']) {
-        entryPoints['polyfills'].push(projectPolyfills);
-      } else {
-        entryPoints['polyfills'] = [projectPolyfills];
-      }
+  if (buildOptions.polyfills.length) {
+    if (Array.isArray(entryPoints['polyfills'])) {
+      entryPoints['polyfills'].push(...buildOptions.polyfills);
+    } else {
+      entryPoints['polyfills'] = buildOptions.polyfills;
     }
   }
 

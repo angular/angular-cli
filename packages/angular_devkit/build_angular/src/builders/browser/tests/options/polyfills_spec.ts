@@ -54,5 +54,16 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/polyfills.js').toNotExist();
     });
+
+    it('resolves module specifiers in array', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        polyfills: ['zone.js', 'zone.js/testing'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('dist/polyfills.js').toExist();
+    });
   });
 });
