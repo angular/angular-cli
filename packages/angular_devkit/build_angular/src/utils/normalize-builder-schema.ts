@@ -20,6 +20,7 @@ import {
   normalizeFileReplacements,
 } from './normalize-file-replacements';
 import { NormalizedOptimizationOptions, normalizeOptimization } from './normalize-optimization';
+import { normalizePolyfills } from './normalize-polyfills';
 import { normalizeSourceMaps } from './normalize-source-maps';
 import { getSupportedBrowsers } from './supported-browsers';
 
@@ -32,6 +33,7 @@ export type NormalizedBrowserBuilderSchema = BrowserBuilderSchema &
     assets: AssetPatternClass[];
     fileReplacements: NormalizedFileReplacement[];
     optimization: NormalizedOptimizationOptions;
+    polyfills: string[];
   };
 
 export function normalizeBrowserSchema(
@@ -42,8 +44,6 @@ export function normalizeBrowserSchema(
   metadata: json.JsonObject,
   logger: logging.LoggerApi,
 ): NormalizedBrowserBuilderSchema {
-  const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
-
   return {
     ...options,
     cache: normalizeCacheOptions(metadata, workspaceRoot),
@@ -55,7 +55,8 @@ export function normalizeBrowserSchema(
     ),
     fileReplacements: normalizeFileReplacements(options.fileReplacements || [], workspaceRoot),
     optimization: normalizeOptimization(options.optimization),
-    sourceMap: normalizedSourceMapOptions,
+    sourceMap: normalizeSourceMaps(options.sourceMap || false),
+    polyfills: normalizePolyfills(options.polyfills, workspaceRoot),
     preserveSymlinks:
       options.preserveSymlinks === undefined
         ? process.execArgv.includes('--preserve-symlinks')

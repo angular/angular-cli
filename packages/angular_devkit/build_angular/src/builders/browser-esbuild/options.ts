@@ -9,6 +9,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import * as path from 'path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import { normalizePolyfills } from '../../utils/normalize-polyfills';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 
 /**
@@ -33,10 +34,21 @@ export async function normalizeOptions(
     workspaceRoot,
     (projectMetadata.sourceRoot as string | undefined) ?? 'src',
   );
-
   // Normalize options
   const mainEntryPoint = path.join(workspaceRoot, options.main);
-  const polyfillsEntryPoint = options.polyfills && path.join(workspaceRoot, options.polyfills);
+
+  // Currently esbuild do not support multiple files per entry-point
+  const [polyfillsEntryPoint, ...remainingPolyfills] = normalizePolyfills(
+    options.polyfills,
+    workspaceRoot,
+  );
+
+  if (remainingPolyfills.length) {
+    context.logger.warn(
+      `The 'polyfills' option currently does not support multiple entries by this experimental builder. The first entry will be used.`,
+    );
+  }
+
   const tsconfig = path.join(workspaceRoot, options.tsConfig);
   const outputPath = path.join(workspaceRoot, options.outputPath);
   const optimizationOptions = normalizeOptimization(options.optimization);

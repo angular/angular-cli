@@ -53,7 +53,7 @@ export interface BrowserBuilderOptions {
     outputHashing?: OutputHashing;
     outputPath: string;
     poll?: number;
-    polyfills?: string;
+    polyfills?: Polyfills;
     preserveSymlinks?: boolean;
     progress?: boolean;
     resourcesOutputPath?: string;
@@ -180,7 +180,7 @@ export interface KarmaBuilderOptions {
     karmaConfig: string;
     main: string;
     poll?: number;
-    polyfills?: string;
+    polyfills?: Polyfills_2;
     preserveSymlinks?: boolean;
     progress?: boolean;
     reporters?: string[];
