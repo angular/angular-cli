@@ -46,9 +46,10 @@ export interface OptimizeRequestOptions {
    */
   sourcemap?: boolean;
   /**
-   * Specifies the target ECMAScript version for the output code.
+   * Specifies the list of supported esbuild targets.
+   * @see: https://esbuild.github.io/api/#target
    */
-  target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 'next';
+  target?: string[];
   /**
    * Controls whether esbuild should only use the WASM-variant instead of trying to
    * use the native variant. Some platforms may not support the native-variant and
@@ -105,8 +106,6 @@ export default async function ({ asset, options }: OptimizeRequest) {
     asset.name,
     esbuildResult.code,
     options.sourcemap,
-    // Terser only supports up to ES2020.
-    options.target === 'next' ? 2020 : options.target,
     options.advanced,
   );
 
@@ -165,7 +164,7 @@ async function optimizeWithEsbuild(
     // We enable `keepNames` only for server builds as Domino relies on `.name`.
     // Once we no longer rely on Domino for SSR we should be able to remove this.
     keepNames: options.keepNames,
-    target: `es${options.target}`,
+    target: options.target,
   });
 }
 
@@ -175,7 +174,6 @@ async function optimizeWithEsbuild(
  * @param name The name of the JavaScript asset. Used to generate source maps.
  * @param code The JavaScript asset source content to optimize.
  * @param sourcemaps If true, generate an output source map for the optimized code.
- * @param target Specifies the target ECMAScript version for the output code.
  * @param advanced Controls advanced optimizations.
  * @returns A promise that resolves with the optimized code and source map.
  */
@@ -183,7 +181,6 @@ async function optimizeWithTerser(
   name: string,
   code: string,
   sourcemaps: boolean | undefined,
-  target: Exclude<OptimizeRequest['options']['target'], 'next'>,
   advanced: boolean | undefined,
 ): Promise<{ code: string; map?: object }> {
   const result = await minify(
@@ -193,7 +190,8 @@ async function optimizeWithTerser(
         passes: advanced ? 2 : 1,
         pure_getters: advanced,
       },
-      ecma: target,
+      // terser only supports up to ES2020
+      ecma: 2020,
       // esbuild in the first pass is used to minify identifiers instead of mangle here
       mangle: false,
       // esbuild in the first pass is used to minify function names

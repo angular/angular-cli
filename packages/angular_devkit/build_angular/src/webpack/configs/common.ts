@@ -40,7 +40,6 @@ import {
   externalizePackages,
   getCacheSettings,
   getInstrumentationExcludedPaths,
-  getMainFieldsAndConditionNames,
   getOutputHashFormat,
   getStatsOptions,
   globalScriptsByBundleName,
@@ -50,16 +49,7 @@ const VENDORS_TEST = /[\\/]node_modules[\\/]/;
 
 // eslint-disable-next-line max-lines-per-function
 export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration> {
-  const {
-    root,
-    projectRoot,
-    buildOptions,
-    tsConfig,
-    projectName,
-    sourceRoot,
-    tsConfigPath,
-    scriptTarget,
-  } = wco;
+  const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot, tsConfigPath } = wco;
   const {
     cache,
     codeCoverage,
@@ -270,7 +260,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       new JavaScriptOptimizerPlugin({
         define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
         sourcemap: scriptsSourceMap,
-        target: scriptTarget,
+        supportedBrowsers: buildOptions.supportedBrowsers,
         keepIdentifierNames: !allowMangle || isPlatformServer,
         keepNames: isPlatformServer,
         removeLicenses: buildOptions.extractLicenses,
@@ -300,17 +290,17 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   return {
     mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
     devtool: false,
-    target: [
-      isPlatformServer ? 'node' : 'web',
-      scriptTarget === ScriptTarget.ES5 ? 'es5' : 'es2015',
-    ],
+    target: [isPlatformServer ? 'node' : 'web', 'es2015'],
     profile: buildOptions.statsJson,
     resolve: {
       roots: [projectRoot],
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-      ...getMainFieldsAndConditionNames(scriptTarget, isPlatformServer),
+      mainFields: isPlatformServer
+        ? ['es2020', 'es2015', 'module', 'main']
+        : ['es2020', 'es2015', 'browser', 'module', 'main'],
+      conditionNames: ['es2020', 'es2015', '...'],
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
@@ -394,7 +384,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
               loader: require.resolve('../../babel/webpack-loader'),
               options: {
                 cacheDirectory: (cache.enabled && path.join(cache.path, 'babel-webpack')) || false,
-                scriptTarget,
                 aot: buildOptions.aot,
                 optimize: buildOptions.buildOptimizer,
                 supportedBrowsers: buildOptions.supportedBrowsers,

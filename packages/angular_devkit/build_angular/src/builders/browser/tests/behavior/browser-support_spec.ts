@@ -65,12 +65,12 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     });
 
     it('warns when IE is present in browserslist', async () => {
-      await harness.writeFile(
+      await harness.appendToFile(
         '.browserslistrc',
         `
-          IE 9
-          IE 11
-        `,
+           IE 9
+           IE 11
+         `,
       );
 
       harness.useTarget('build', {
@@ -84,9 +84,9 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         jasmine.objectContaining({
           level: 'warn',
           message:
-            `One or more browsers which are configured in the project's Browserslist configuration ` +
-            'will be ignored as ES5 output is not supported by the Angular CLI.\n' +
-            `Ignored browsers: ie 11, ie 9`,
+            `One or more browsers which are configured in the project's Browserslist ` +
+            'configuration will be ignored as ES5 output is not supported by the Angular CLI.\n' +
+            'Ignored browsers: ie 11, ie 9',
         }),
       );
     });
@@ -96,12 +96,12 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile(
         'src/main.ts',
         `
-         (async () => {
-           for await (const o of [1, 2, 3]) {
-             console.log("for await...of");
-           }
-         })();
-         `,
+          (async () => {
+            for await (const o of [1, 2, 3]) {
+              console.log("for await...of");
+            }
+          })();
+          `,
       );
 
       harness.useTarget('build', {

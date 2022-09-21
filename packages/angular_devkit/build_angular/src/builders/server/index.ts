@@ -152,6 +152,7 @@ async function initialize(
     context,
     (wco) => {
       // We use the platform to determine the JavaScript syntax output.
+      wco.buildOptions.supportedBrowsers ??= [];
       wco.buildOptions.supportedBrowsers.push(...browserslist('maintained node versions'));
 
       return [getPlatformServerExportsConfig(wco), getCommonConfig(wco), getStylesConfig(wco)];

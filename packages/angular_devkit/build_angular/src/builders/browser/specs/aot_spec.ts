@@ -27,11 +27,11 @@ describe('Browser Builder AOT', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides);
     const output = (await run.result) as BrowserBuilderOutput;
 
-    expect(output.success).toBe(true);
+    expect(output.success).toBeTrue();
 
-    const fileName = join(normalize(output.outputPath), 'main.js');
+    const fileName = join(normalize(output.outputs[0].path), 'main.js');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
-    expect(content).toContain('AppComponent.ɵcmp');
+    expect(content).toContain('AppComponent_Factory');
 
     await run.stop();
   });

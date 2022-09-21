@@ -182,16 +182,13 @@ export function createCompilerPlugin(
         enableResourceInlining: false,
       });
 
-      // Adjust the esbuild output target based on the tsconfig target
-      if (
-        compilerOptions.target === undefined ||
-        compilerOptions.target <= ts.ScriptTarget.ES2015
-      ) {
-        build.initialOptions.target = 'es2015';
-      } else if (compilerOptions.target >= ts.ScriptTarget.ESNext) {
-        build.initialOptions.target = 'esnext';
-      } else {
-        build.initialOptions.target = ts.ScriptTarget[compilerOptions.target].toLowerCase();
+      if (compilerOptions.target === undefined || compilerOptions.target < ts.ScriptTarget.ES2022) {
+        // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
+        // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
+        // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
+        compilerOptions.target = ts.ScriptTarget.ES2022;
+        compilerOptions.useDefineForClassFields ??= false;
+        // TODO: show warning about this override when we have access to the logger.
       }
 
       // The file emitter created during `onStart` that will be used during the build in `onLoad` callbacks for TS files

@@ -1,4 +1,9 @@
-import { expectFileMatchToExist, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
+import {
+  expectFileMatchToExist,
+  expectFileToMatch,
+  writeFile,
+  writeMultipleFiles,
+} from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile, updateTsConfig } from '../../utils/project';
 
@@ -23,17 +28,16 @@ export default async function () {
     build.configurations['production'].outputHashing = 'all';
     configJson['cli'] = { cache: { enabled: 'false' } };
   });
-  await updateTsConfig((json) => {
-    json['compilerOptions']['target'] = 'es2017';
-    json['compilerOptions']['module'] = 'es2020';
-  });
+
+  // Chrome 65 does not support optional catch in try/catch blocks.
+  await writeFile('.browserslistrc', 'Chrome 65');
+
   await ng('build', '--configuration=production');
   const filenameBuild1 = await getScriptsFilename();
   await expectFileToMatch(`dist/test-project/${filenameBuild1}`, 'try{console.log()}catch(c){}');
 
-  await updateTsConfig((json) => {
-    json['compilerOptions']['target'] = 'es2019';
-  });
+  await writeFile('.browserslistrc', 'last 1 Chrome version');
+
   await ng('build', '--configuration=production');
   const filenameBuild2 = await getScriptsFilename();
   await expectFileToMatch(`dist/test-project/${filenameBuild2}`, 'try{console.log()}catch{}');

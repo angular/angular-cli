@@ -65,8 +65,7 @@ describe('Browser Builder lazy modules', () => {
 
       const { files } = await browserBuild(architect, host, target, { aot: true });
       const data = await files['src_app_lazy_lazy_module_ts.js'];
-      expect(data).not.toBeUndefined();
-      expect(data).toContain('LazyModule.ɵmod');
+      expect(data).toContain('this.ɵmod');
     });
   });
 
@@ -126,7 +125,7 @@ describe('Browser Builder lazy modules', () => {
     });
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['src_lazy-module_ts.js']).not.toBeUndefined();
+    expect(files['src_lazy-module_ts.js']).toBeDefined();
   });
 
   it(`supports lazy bundle for dynamic import() calls`, async () => {
@@ -140,7 +139,7 @@ describe('Browser Builder lazy modules', () => {
     host.replaceInFile('src/tsconfig.app.json', '"main.ts"', `"main.ts","lazy-module.ts"`);
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['lazy-module.js']).not.toBeUndefined();
+    expect(files['lazy-module.js']).toBeDefined();
   });
 
   it(`supports making a common bundle for shared lazy modules`, async () => {
@@ -151,8 +150,8 @@ describe('Browser Builder lazy modules', () => {
     });
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['src_one_ts.js']).not.toBeUndefined();
-    expect(files['src_two_ts.js']).not.toBeUndefined();
+    expect(files['src_one_ts.js']).toBeDefined();
+    expect(files['src_two_ts.js']).toBeDefined();
     expect(files['default-node_modules_angular_common_fesm2020_http_mjs.js']).toBeDefined();
   });
 
@@ -164,8 +163,8 @@ describe('Browser Builder lazy modules', () => {
     });
 
     const { files } = await browserBuild(architect, host, target, { commonChunk: false });
-    expect(files['src_one_ts.js']).not.toBeUndefined();
-    expect(files['src_two_ts.js']).not.toBeUndefined();
+    expect(files['src_one_ts.js']).toBeDefined();
+    expect(files['src_two_ts.js']).toBeDefined();
     expect(files['default-node_modules_angular_common_fesm2020_http_mjs.js']).toBeUndefined();
   });
 });
