@@ -1,6 +1,7 @@
 // @ts-check
 // Protractor configuration file, see link for more information
 // https://github.com/angular/protractor/blob/master/lib/config.ts
+// https://saucelabs.com/platform/platform-configurator
 
 const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
 
@@ -19,20 +20,26 @@ exports.config = {
   multiCapabilities: [
     {
       browserName: 'chrome',
-      platform: 'Windows 10',
-      version: '89.0',
+      platform: 'Windows 11',
+      version: '105',
       tunnelIdentifier,
     },
     {
       browserName: 'firefox',
-      version: '86.0',
-      platform: 'Windows 10',
+      version: '104',
+      platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
       browserName: 'firefox',
-      version: '78.0', // Latest Firefox ESR version
-      platform: 'Windows 10',
+      version: '91', // Latest Firefox ESR version
+      platform: 'Windows 11',
+      tunnelIdentifier,
+    },
+    {
+      browserName: 'safari',
+      platform: 'macOS 12',
+      version: '15',
       tunnelIdentifier,
     },
     {
@@ -42,15 +49,15 @@ exports.config = {
       tunnelIdentifier,
     },
     {
-      browserName: 'safari',
-      platform: 'macOS 10.15',
-      version: '13.1',
+      browserName: 'MicrosoftEdge',
+      platform: 'Windows 11',
+      version: '103',
       tunnelIdentifier,
     },
     {
       browserName: 'MicrosoftEdge',
-      platform: 'Windows 10',
-      version: '88.0',
+      platform: 'Windows 11',
+      version: '104',
       tunnelIdentifier,
     },
   ],
@@ -68,9 +75,6 @@ exports.config = {
   },
 
   onPrepare() {
-    // Fix for Safari 12 -- https://github.com/angular/protractor/issues/4964
-    browser.resetUrl = 'about:blank';
-
     require('ts-node').register({
       project: require('path').join(__dirname, './tsconfig.json'),
     });
