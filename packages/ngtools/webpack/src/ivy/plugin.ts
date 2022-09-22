@@ -189,12 +189,11 @@ export class AngularWebpackPlugin {
       try {
         this.setupCompilation(compilation, compilationState);
       } catch (error) {
-        compilation.errors.push(
-          new WebpackError(
-            `Failed to initialize Angular compilation - ${
-              error instanceof Error ? error.message : error
-            }`,
-          ),
+        addError(
+          compilation,
+          `Failed to initialize Angular compilation - ${
+            error instanceof Error ? error.message : error
+          }`,
         );
       }
     });

@@ -10,6 +10,7 @@ import assert from 'assert';
 import * as path from 'path';
 import * as vm from 'vm';
 import type { Asset, Compilation } from 'webpack';
+import { addError } from './ivy/diagnostics';
 import { normalizePath } from './ivy/paths';
 import {
   CompilationWithInlineAngularResource,
@@ -212,7 +213,7 @@ export class WebpackResourceLoader {
           } catch (error) {
             assert(error instanceof Error, 'catch clause variable is not an Error instance');
             // Use compilation errors, as otherwise webpack will choke
-            compilation.errors.push(new WebpackError(error.message));
+            addError(compilation, error.message);
           }
         });
       },

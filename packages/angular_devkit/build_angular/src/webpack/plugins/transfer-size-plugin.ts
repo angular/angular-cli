@@ -9,6 +9,7 @@
 import { promisify } from 'util';
 import { Compiler } from 'webpack';
 import { brotliCompress } from 'zlib';
+import { addWarning } from '../../utils/webpack-diagnostics';
 
 const brotliCompressAsync = promisify(brotliCompress);
 
@@ -49,10 +50,9 @@ export class TransferSizePlugin {
                   );
                 })
                 .catch((error) => {
-                  compilation.warnings.push(
-                    new compilation.compiler.webpack.WebpackError(
-                      `Unable to calculate estimated transfer size for '${assetName}'. Reason: ${error.message}`,
-                    ),
+                  addWarning(
+                    compilation,
+                    `Unable to calculate estimated transfer size for '${assetName}'. Reason: ${error.message}`,
                   );
                 }),
             );

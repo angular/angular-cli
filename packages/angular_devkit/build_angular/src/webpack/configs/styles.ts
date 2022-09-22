@@ -9,10 +9,11 @@
 import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'path';
-import { Configuration, RuleSetUseItem, WebpackError } from 'webpack';
+import type { Configuration, RuleSetUseItem } from 'webpack';
 import { StyleElement } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { WebpackConfigOptions } from '../../utils/build-options';
+import { addWarning } from '../../utils/webpack-diagnostics';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -112,7 +113,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
 
       compiler.hooks.afterCompile.tap('sass-worker', (compilation) => {
         for (const message of sassTildeUsageMessage) {
-          compilation.warnings.push(new WebpackError(message));
+          addWarning(compilation, message);
         }
 
         sassTildeUsageMessage.clear();

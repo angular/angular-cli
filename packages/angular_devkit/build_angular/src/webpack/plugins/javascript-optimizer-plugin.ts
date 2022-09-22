@@ -7,10 +7,10 @@
  */
 
 import Piscina from 'piscina';
-import { ScriptTarget } from 'typescript';
 import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../utils/environment-options';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
+import { addError } from '../../utils/webpack-diagnostics';
 import { EsbuildExecutor } from './esbuild-executor';
 import type { OptimizeRequestOptions } from './javascript-optimizer-worker';
 
@@ -220,10 +220,10 @@ export class JavaScriptOptimizerPlugin {
                       });
                     },
                     (error) => {
-                      const optimizationError = new compiler.webpack.WebpackError(
+                      addError(
+                        compilation,
                         `Optimization error [${name}]: ${error.stack || error.message}`,
                       );
-                      compilation.errors.push(optimizationError);
                     },
                   ),
               );
