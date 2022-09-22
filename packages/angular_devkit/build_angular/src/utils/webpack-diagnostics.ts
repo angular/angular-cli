@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Compilation, WebpackError } from 'webpack';
+import type { Compilation } from 'webpack';
 
 export function addWarning(compilation: Compilation, message: string): void {
-  compilation.warnings.push(new WebpackError(message));
+  compilation.warnings.push(new compilation.compiler.webpack.WebpackError(message));
 }
 
 export function addError(compilation: Compilation, message: string): void {
-  compilation.errors.push(new WebpackError(message));
+  compilation.errors.push(new compilation.compiler.webpack.WebpackError(message));
 }
