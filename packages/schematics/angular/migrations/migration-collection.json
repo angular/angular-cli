@@ -14,6 +14,11 @@
       "version": "15.0.0",
       "factory": "./update-15/update-typescript-target",
       "description": "Update TypeScript compiler `target` and set `useDefineForClassFields`. These changes are for IDE purposes as TypeScript compiler options `target` and `useDefineForClassFields` are set to `ES2022` and `false` respectively by the Angular CLI. To control ECMA version and features use the Browerslist configuration."
+    },
+    "update-workspace-config": {
+      "version": "15.0.0",
+      "factory": "./update-15/update-workspace-config",
+      "description": "Remove options from 'angular.json' that are no longer supported by the official builders."
     }
   }
 }

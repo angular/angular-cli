@@ -181,11 +181,6 @@
       "description": "Use file name for lazy loaded chunks.",
       "default": false
     },
-    "bundleDependencies": {
-      "description": "Which external dependencies to bundle into the bundle. By default, all of node_modules will be bundled.",
-      "default": true,
-      "type": "boolean"
-    },
     "externalDependencies": {
       "description": "Exclude the listed external dependencies from being bundled into the bundle. Instead, the created bundle relies on these dependencies to be available during runtime.",
       "type": "array",
