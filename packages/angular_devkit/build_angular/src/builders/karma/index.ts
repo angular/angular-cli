@@ -7,7 +7,9 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import { Config, ConfigOptions } from 'karma';
+import { strings } from '@angular-devkit/core';
+import { Config, ConfigOptions, config, constants } from 'karma';
+import { createRequire } from 'module';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
@@ -86,9 +88,17 @@ export function execute(
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     switchMap(async ([karma, webpackConfig]) => {
-      const karmaOptions: KarmaConfigOptions = {
-        singleRun,
-      };
+      // Determine project name from builder context target
+      const projectName = context.target?.project;
+      if (!projectName) {
+        throw new Error(`The 'karma' builder requires a target to be specified.`);
+      }
+
+      const karmaOptions: KarmaConfigOptions = options.karmaConfig
+        ? {}
+        : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
+
+      karmaOptions.singleRun = singleRun;
 
       // Convert browsers from a string to an array
       if (options.browsers) {
@@ -104,11 +114,6 @@ export function execute(
         if (reporters.length > 0) {
           karmaOptions.reporters = reporters;
         }
-      }
-
-      const projectName = context.target?.project;
-      if (!projectName) {
-        throw new Error('The builder requires a target.');
       }
 
       if (!options.main) {
@@ -140,13 +145,13 @@ export function execute(
         logger: context.logger,
       };
 
-      const config = await karma.config.parseConfig(
-        path.resolve(context.workspaceRoot, options.karmaConfig),
+      const parsedKarmaConfig = await config.parseConfig(
+        options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig),
         transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
         { promiseConfig: true, throwErrors: true },
       );
 
-      return [karma, config] as [typeof karma, KarmaConfigOptions];
+      return [karma, parsedKarmaConfig] as [typeof karma, KarmaConfigOptions];
     }),
     switchMap(
       ([karma, karmaConfig]) =>
@@ -176,6 +181,48 @@ export function execute(
     ),
     defaultIfEmpty({ success: false }),
   );
+}
+
+function getBuiltInKarmaConfig(
+  workspaceRoot: string,
+  projectName: string,
+): ConfigOptions & Record<string, unknown> {
+  let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
+  if (/[A-Z]/.test(coverageFolderName)) {
+    coverageFolderName = strings.dasherize(coverageFolderName);
+  }
+
+  const workspaceRootRequire = createRequire(workspaceRoot + '/');
+
+  return {
+    basePath: '',
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
+    plugins: [
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-jasmine-html-reporter',
+      'karma-coverage',
+      '@angular-devkit/build-angular/plugins/karma',
+    ].map((p) => workspaceRootRequire(p)),
+    client: {
+      clearContext: false, // leave Jasmine Spec Runner output visible in browser
+    },
+    jasmineHtmlReporter: {
+      suppressAll: true, // removes the duplicated traces
+    },
+    coverageReporter: {
+      dir: path.join(workspaceRoot, 'coverage', coverageFolderName),
+      subdir: '.',
+      reporters: [{ type: 'html' }, { type: 'text-summary' }],
+    },
+    reporters: ['progress', 'kjhtml'],
+    port: 9876,
+    colors: true,
+    logLevel: constants.LOG_INFO,
+    autoWatch: true,
+    browsers: ['Chrome'],
+    restartOnFileChange: true,
+  };
 }
 
 export { KarmaBuilderOptions };
