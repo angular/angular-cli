@@ -252,31 +252,6 @@ export function assetPatterns(root: string, assets: AssetPatternClass[]) {
   });
 }
 
-export function externalizePackages(
-  context: string,
-  request: string | undefined,
-  callback: (error?: Error, result?: string) => void,
-): void {
-  if (!request) {
-    return;
-  }
-
-  // Absolute & Relative paths are not externals
-  if (request.startsWith('.') || path.isAbsolute(request)) {
-    callback();
-
-    return;
-  }
-
-  try {
-    require.resolve(request, { paths: [context] });
-    callback(undefined, request);
-  } catch {
-    // Node couldn't find it, so it must be user-aliased
-    callback();
-  }
-}
-
 export function getStatsOptions(verbose = false): WebpackStatsOptions {
   const webpackOutputOptions: WebpackStatsOptions = {
     all: false, // Fallback value for stats options when an option is not defined. It has precedence over local webpack defaults.

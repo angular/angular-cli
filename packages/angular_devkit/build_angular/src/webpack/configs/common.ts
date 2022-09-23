@@ -9,7 +9,6 @@
 import { AngularWebpackLoaderPath } from '@ngtools/webpack';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import { ScriptTarget } from 'typescript';
 import {
   Compiler,
   Configuration,
@@ -37,7 +36,6 @@ import { createIvyPlugin } from '../plugins/typescript';
 import { WatchFilesLogsPlugin } from '../plugins/watch-files-logs-plugin';
 import {
   assetPatterns,
-  externalizePackages,
   getCacheSettings,
   getInstrumentationExcludedPaths,
   getOutputHashFormat,
@@ -74,7 +72,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     webWorkerTsConfig,
     externalDependencies = [],
     allowedCommonJsDependencies,
-    bundleDependencies,
   } = buildOptions;
 
   const isPlatformServer = buildOptions.platform === 'server';
@@ -273,13 +270,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     extraMinimizers.push(new TransferSizePlugin());
   }
 
-  const externals: Configuration['externals'] = [...externalDependencies];
-  if (isPlatformServer && !bundleDependencies) {
-    externals.push(({ context, request }, callback) =>
-      externalizePackages(context ?? wco.projectRoot, request, callback),
-    );
-  }
-
   let crossOriginLoading: NonNullable<Configuration['output']>['crossOriginLoading'] = false;
   if (subresourceIntegrity && crossOrigin === 'none') {
     crossOriginLoading = 'anonymous';
@@ -307,7 +297,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     },
     context: root,
     entry: entryPoints,
-    externals,
+    externals: externalDependencies,
     output: {
       uniqueName: projectName,
       hashFunction: 'xxhash64', // todo: remove in webpack 6. This is part of `futureDefaults`.
