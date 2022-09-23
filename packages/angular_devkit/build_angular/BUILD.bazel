@@ -106,6 +106,7 @@ ts_library(
         "@npm//@angular/compiler-cli",
         "@npm//@angular/core",
         "@npm//@angular/localize",
+        "@npm//@angular/platform-server",
         "@npm//@angular/service-worker",
         "@npm//@babel/core",
         "@npm//@babel/generator",
@@ -282,9 +283,6 @@ ts_library(
 
 LARGE_SPECS = {
     "app-shell": {
-        "extra_deps": [
-            "@npm//@angular/platform-server",
-        ],
         "tags": [
             # TODO: node crashes with an internal error on node16
             "node16-broken",

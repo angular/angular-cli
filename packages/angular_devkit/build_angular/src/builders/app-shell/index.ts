@@ -13,6 +13,9 @@ import {
   targetFromTargetString,
 } from '@angular-devkit/architect';
 import { JsonObject } from '@angular-devkit/core';
+import type { Type } from '@angular/core';
+import type * as platformServer from '@angular/platform-server';
+import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import { normalizeOptimization } from '../../utils';
@@ -74,24 +77,28 @@ async function _renderUniversal(
       localeDirectory,
     );
 
-    const { AppServerModule, renderModule } = await import(serverBundlePath);
-
-    const renderModuleFn: ((module: unknown, options: {}) => Promise<string>) | undefined =
-      renderModule;
-
-    if (!(renderModuleFn && AppServerModule)) {
-      throw new Error(
-        `renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`,
-      );
-    }
-
-    // Load platform server module renderer
-    const renderOpts = {
-      document: indexHtml,
-      url: options.route,
+    const { AppServerModule, renderModule, ɵSERVER_CONTEXT } = (await import(serverBundlePath)) as {
+      renderModule: typeof platformServer.renderModule | undefined;
+      ɵSERVER_CONTEXT: typeof platformServer.ɵSERVER_CONTEXT | undefined;
+      AppServerModule: Type<unknown> | undefined;
     };
 
-    let html = await renderModuleFn(AppServerModule, renderOpts);
+    assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+    assert(AppServerModule, `AppServerModule was not exported from: ${serverBundlePath}.`);
+    assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported from: ${serverBundlePath}.`);
+
+    // Load platform server module renderer
+    let html = await renderModule(AppServerModule, {
+      document: indexHtml,
+      url: options.route,
+      extraProviders: [
+        {
+          provide: ɵSERVER_CONTEXT,
+          useValue: 'app-shell',
+        },
+      ],
+    });
+
     // Overwrite the client index file.
     const outputIndexPath = options.outputIndexPath
       ? path.join(root, options.outputIndexPath)
