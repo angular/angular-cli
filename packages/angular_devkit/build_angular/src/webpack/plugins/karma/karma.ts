@@ -124,10 +124,10 @@ const init: any = (config: any, emitter: any) => {
 
       logger.error(statsErrorsToString(statsJson, { colors: true }));
 
-      // Notify potential listeners of the compile error.
-      emitter.emit('compile_error', {
-        errors: statsJson.errors?.map((e) => e.message),
-      });
+      if (config.singleRun) {
+        // Notify potential listeners of the compile error.
+        emitter.emit('load_error');
+      }
 
       // Finish Karma run early in case of compilation error.
       emitter.emit('run_complete', [], { exitCode: 1 });

@@ -17,11 +17,15 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         include: ['abc.spec.ts', 'def.spec.ts'],
       });
 
-      const { error } = await harness.executeOnce({
-        outputLogsOnException: false,
-      });
-      expect(error?.message).toBe(
-        'Specified patterns: "abc.spec.ts, def.spec.ts" did not match any spec files.',
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'error',
+          message: jasmine.stringContaining(
+            'Specified patterns: "abc.spec.ts, def.spec.ts" did not match any spec files.',
+          ),
+        }),
       );
     });
 
