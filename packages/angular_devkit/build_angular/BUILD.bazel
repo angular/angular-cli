@@ -138,6 +138,7 @@ ts_library(
         "@npm//babel-plugin-istanbul",
         "@npm//browserslist",
         "@npm//cacache",
+        "@npm//chokidar",
         "@npm//copy-webpack-plugin",
         "@npm//critters",
         "@npm//css-loader",

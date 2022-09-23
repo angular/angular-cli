@@ -28,10 +28,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   // The following option has no effect until preprocessors are supported
   // 'stylePreprocessorOptions',
 
-  // * Watch mode
-  'watch',
-  'poll',
-
   // * Deprecated
   'deployUrl',
 

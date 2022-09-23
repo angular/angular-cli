@@ -28,40 +28,14 @@ import { logExperimentalWarnings } from './experimental-warnings';
 import { normalizeOptions } from './options';
 import { Schema as BrowserBuilderOptions, SourceMapClass } from './schema';
 import { bundleStylesheetText } from './stylesheets';
+import { createWatcher } from './watcher';
 
-/**
- * Main execution function for the esbuild-based application builder.
- * The options are compatible with the Webpack-based builder.
- * @param options The browser builder options to use when setting up the application build
- * @param context The Architect builder context object
- * @returns A promise with the builder result output
- */
-// eslint-disable-next-line max-lines-per-function
-export async function buildEsbuildBrowser(
+async function execute(
   options: BrowserBuilderOptions,
+  normalizedOptions: Awaited<ReturnType<typeof normalizeOptions>>,
   context: BuilderContext,
 ): Promise<BuilderOutput> {
   const startTime = Date.now();
-
-  // Only AOT is currently supported
-  if (options.aot !== true) {
-    context.logger.error(
-      'JIT mode is currently not supported by this experimental builder. AOT mode must be used.',
-    );
-
-    return { success: false };
-  }
-
-  // Inform user of experimental status of builder and options
-  logExperimentalWarnings(options, context);
-
-  // Determine project name from builder context target
-  const projectName = context.target?.project;
-  if (!projectName) {
-    context.logger.error(`The 'browser-esbuild' builder requires a target to be specified.`);
-
-    return { success: false };
-  }
 
   const {
     projectRoot,
@@ -74,22 +48,7 @@ export async function buildEsbuildBrowser(
     tsconfig,
     assets,
     outputNames,
-  } = await normalizeOptions(context, projectName, options);
-
-  // Clean output path if enabled
-  if (options.deleteOutputPath) {
-    deleteOutputDir(workspaceRoot, options.outputPath);
-  }
-
-  // Create output directory if needed
-  try {
-    await fs.mkdir(outputPath, { recursive: true });
-  } catch (e) {
-    assertIsError(e);
-    context.logger.error('Unable to create output directory: ' + e.message);
-
-    return { success: false };
-  }
+  } = normalizedOptions;
 
   const target = transformSupportedBrowsersToTargets(
     getSupportedBrowsers(projectRoot, context.logger),
@@ -408,6 +367,95 @@ async function bundleGlobalStylesheets(
   }
 
   return { outputFiles, initialFiles, errors, warnings };
+}
+
+/**
+ * Main execution function for the esbuild-based application builder.
+ * The options are compatible with the Webpack-based builder.
+ * @param initialOptions The browser builder options to use when setting up the application build
+ * @param context The Architect builder context object
+ * @returns An async iterable with the builder result output
+ */
+export async function* buildEsbuildBrowser(
+  initialOptions: BrowserBuilderOptions,
+  context: BuilderContext,
+): AsyncIterable<BuilderOutput> {
+  // Only AOT is currently supported
+  if (initialOptions.aot !== true) {
+    context.logger.error(
+      'JIT mode is currently not supported by this experimental builder. AOT mode must be used.',
+    );
+
+    return { success: false };
+  }
+
+  // Inform user of experimental status of builder and options
+  logExperimentalWarnings(initialOptions, context);
+
+  // Determine project name from builder context target
+  const projectName = context.target?.project;
+  if (!projectName) {
+    context.logger.error(`The 'browser-esbuild' builder requires a target to be specified.`);
+
+    return { success: false };
+  }
+
+  const normalizedOptions = await normalizeOptions(context, projectName, initialOptions);
+
+  // Clean output path if enabled
+  if (initialOptions.deleteOutputPath) {
+    deleteOutputDir(normalizedOptions.workspaceRoot, initialOptions.outputPath);
+  }
+
+  // Create output directory if needed
+  try {
+    await fs.mkdir(normalizedOptions.outputPath, { recursive: true });
+  } catch (e) {
+    assertIsError(e);
+    context.logger.error('Unable to create output directory: ' + e.message);
+
+    return { success: false };
+  }
+
+  // Initial build
+  yield await execute(initialOptions, normalizedOptions, context);
+
+  // Finish if watch mode is not enabled
+  if (!initialOptions.watch) {
+    return;
+  }
+
+  // Setup a watcher
+  const watcher = createWatcher({
+    polling: typeof initialOptions.poll === 'number',
+    interval: initialOptions.poll,
+    // Ignore the output path to avoid infinite rebuild cycles
+    ignored: [normalizedOptions.outputPath],
+  });
+
+  // Temporarily watch the entire project
+  watcher.add(normalizedOptions.projectRoot);
+
+  // Watch workspace root node modules
+  // Includes Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
+  watcher.add(path.join(normalizedOptions.workspaceRoot, 'node_modules'));
+  watcher.add(path.join(normalizedOptions.workspaceRoot, '.pnp.cjs'));
+  watcher.add(path.join(normalizedOptions.workspaceRoot, '.pnp.data.json'));
+
+  // Wait for changes and rebuild as needed
+  try {
+    for await (const changes of watcher) {
+      context.logger.info('Changes detected. Rebuilding...');
+
+      if (initialOptions.verbose) {
+        context.logger.info(changes.toDebugString());
+      }
+
+      yield await execute(initialOptions, normalizedOptions, context);
+    }
+  } finally {
+    await watcher.close();
+  }
 }
 
 export default createBuilder(buildEsbuildBrowser);
