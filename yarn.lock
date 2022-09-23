@@ -129,7 +129,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#6df2d555d326fe6282de28db80c49dd439b42af3":
   version "0.0.0-40aaf3831425d472965dd61e58cbd5854abd7214"
-  uid "6df2d555d326fe6282de28db80c49dd439b42af3"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#6df2d555d326fe6282de28db80c49dd439b42af3"
   dependencies:
     "@angular-devkit/build-angular" "15.0.0-next.0"
@@ -243,7 +242,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#8c3a9ec4176a7315d24977cfefb6edee22b724d9":
   version "0.0.0-40aaf3831425d472965dd61e58cbd5854abd7214"
-  uid "8c3a9ec4176a7315d24977cfefb6edee22b724d9"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#8c3a9ec4176a7315d24977cfefb6edee22b724d9"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3816,7 +3814,7 @@ chardet@^0.7.0:
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.7.0.tgz#90094849f0937f2eedc2425d0d28a9e5f0cbad9e"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
-"chokidar@>=3.0.0 <4.0.0", chokidar@^3.0.0, chokidar@^3.5.1, chokidar@^3.5.2, chokidar@^3.5.3:
+chokidar@3.5.3, "chokidar@>=3.0.0 <4.0.0", chokidar@^3.0.0, chokidar@^3.5.1, chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"
   integrity sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==
@@ -8304,7 +8302,6 @@ npm@^8.11.0:
     "@npmcli/fs" "^2.1.0"
     "@npmcli/map-workspaces" "^2.0.3"
     "@npmcli/package-json" "^2.0.0"
-    "@npmcli/promise-spawn" "^3.0.0"
     "@npmcli/run-script" "^4.2.1"
     abbrev "~1.1.1"
     archy "~1.0.0"
@@ -8315,7 +8312,6 @@ npm@^8.11.0:
     cli-table3 "^0.6.2"
     columnify "^1.6.0"
     fastest-levenshtein "^1.0.12"
-    fs-minipass "^2.1.0"
     glob "^8.0.1"
     graceful-fs "^4.2.10"
     hosted-git-info "^5.1.0"
@@ -8335,7 +8331,6 @@ npm@^8.11.0:
     libnpmteam "^4.0.4"
     libnpmversion "^3.0.7"
     make-fetch-happen "^10.2.0"
-    minimatch "^5.1.0"
     minipass "^3.1.6"
     minipass-pipeline "^1.2.4"
     mkdirp "^1.0.4"
@@ -9959,7 +9954,6 @@ sass@1.55.0, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:
