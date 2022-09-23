@@ -17,9 +17,8 @@ import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
 import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
-import { SingleTestTransformLoader } from '../../webpack/plugins/single-test-transform';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
-import { findTests } from './find-tests';
+import { FindTestsPlugin } from './find-tests-plugin';
 import { Schema as KarmaBuilderOptions } from './schema';
 
 export type KarmaConfigOptions = ConfigOptions & {
@@ -62,10 +61,7 @@ async function initialize(
 
   const karma = await import('karma');
 
-  return [
-    karma,
-    webpackConfigurationTransformer ? await webpackConfigurationTransformer(config) : config,
-  ];
+  return [karma, (await webpackConfigurationTransformer?.(config)) ?? config];
 }
 
 /**
@@ -110,45 +106,22 @@ export function execute(
         }
       }
 
-      // prepend special webpack loader that will transform test.ts
-      if (options.include?.length) {
-        const projectName = context.target?.project;
-        if (!projectName) {
-          throw new Error('The builder requires a target.');
-        }
-
-        const projectMetadata = await context.getProjectMetadata(projectName);
-        const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '') as string;
-        const projectSourceRoot = path.join(context.workspaceRoot, sourceRoot);
-
-        const files = await findTests(options.include, context.workspaceRoot, projectSourceRoot);
-        // early exit, no reason to start karma
-        if (!files.length) {
-          throw new Error(
-            `Specified patterns: "${options.include.join(', ')}" did not match any spec files.`,
-          );
-        }
-
-        // Get the rules and ensure the Webpack configuration is setup properly
-        const rules = webpackConfig.module?.rules || [];
-        if (!webpackConfig.module) {
-          webpackConfig.module = { rules };
-        } else if (!webpackConfig.module.rules) {
-          webpackConfig.module.rules = rules;
-        }
-
-        rules.unshift({
-          test: path.resolve(context.workspaceRoot, options.main),
-          use: {
-            // cannot be a simple path as it differs between environments
-            loader: SingleTestTransformLoader,
-            options: {
-              files,
-              logger: context.logger,
-            },
-          },
-        });
+      const projectName = context.target?.project;
+      if (!projectName) {
+        throw new Error('The builder requires a target.');
       }
+
+      const projectMetadata = await context.getProjectMetadata(projectName);
+      const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '') as string;
+
+      webpackConfig.plugins ??= [];
+      webpackConfig.plugins.push(
+        new FindTestsPlugin({
+          include: options.include,
+          workspaceRoot: context.workspaceRoot,
+          projectSourceRoot: path.join(context.workspaceRoot, sourceRoot),
+        }),
+      );
 
       karmaOptions.buildWebpack = {
         options,
