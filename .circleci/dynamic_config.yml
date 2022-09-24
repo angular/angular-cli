@@ -11,7 +11,7 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
-  devinfra: angular/dev-infra@1.0.2
+  devinfra: angular/dev-infra@1.0.7
 
 parameters:
   snapshot_changed:
@@ -136,18 +136,8 @@ commands:
         type: env_var_name
         default: CIRCLE_PROJECT_REPONAME
     steps:
-      - run:
-          name: 'Setup bazel RBE remote execution'
-          command: |
-            touch .bazelrc.user;
-            # We need ensure that the same default digest is used for encoding and decoding
-            # with openssl. Openssl versions might have different default digests which can
-            # cause decryption failures based on the openssl version. https://stackoverflow.com/a/39641378/4317734
-            openssl aes-256-cbc -d -in .circleci/gcp_token -md md5 -k "${<< parameters.key >>}" -out /home/circleci/.gcp_credentials;
-            sudo bash -c "echo -e 'build --google_credentials=/home/circleci/.gcp_credentials' >> .bazelrc.user";
-            # Enable remote builds
-            sudo bash -c "echo -e 'build --config=remote' >> .bazelrc.user";
-            echo "Reading from remote cache for bazel remote jobs.";
+      - devinfra/setup-bazel-remote-exec:
+          bazelrc: ./.bazelrc.user
 
   install_python:
     steps:
