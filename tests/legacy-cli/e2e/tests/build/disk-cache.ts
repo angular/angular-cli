@@ -10,7 +10,6 @@ export default async function () {
 
   // No need to include all applications code to verify disk cache existence.
   await writeFile('src/main.ts', 'console.log(1);');
-  await writeFile('src/polyfills.ts', 'console.log(1);');
 
   try {
     // Should be enabled by default.

@@ -105,11 +105,33 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     extraPlugins.push(new ContextReplacementPlugin(/@?hapi|express[\\/]/));
   }
 
-  if (buildOptions.polyfills.length) {
+  if (polyfills?.length) {
+    // `zone.js/testing` is a **special** polyfill because when not imported in the main it fails with the below errors:
+    // `Error: Expected to be running in 'ProxyZone', but it was not found.`
+    // This was also the reason why previously it was imported in `test.ts` as the first module.
+    // From Jia li:
+    // This is because the jasmine functions such as beforeEach/it will not be patched by zone.js since
+    // jasmine will not be loaded yet, so the ProxyZone will not be there. We have to load zone-testing.js after
+    // jasmine is ready.
+    // We could force loading 'zone.js/testing' prior to jasmine by changing the order of scripts in 'karma-context.html'.
+    // But this has it's own problems as zone.js needs to be loaded prior to jasmine due to patching of timing functions
+    // See: https://github.com/jasmine/jasmine/issues/1944
+    // Thus the correct order is zone.js -> jasmine -> zone.js/testing.
+    const zoneTestingEntryPoint = 'zone.js/testing';
+    const polyfillsExludingZoneTesting = polyfills.filter((p) => p !== zoneTestingEntryPoint);
+
     if (Array.isArray(entryPoints['polyfills'])) {
-      entryPoints['polyfills'].push(...buildOptions.polyfills);
+      entryPoints['polyfills'].push(...polyfillsExludingZoneTesting);
     } else {
-      entryPoints['polyfills'] = buildOptions.polyfills;
+      entryPoints['polyfills'] = polyfillsExludingZoneTesting;
+    }
+
+    if (polyfillsExludingZoneTesting.length !== polyfills.length) {
+      if (Array.isArray(entryPoints['main'])) {
+        entryPoints['main'].unshift(zoneTestingEntryPoint);
+      } else {
+        entryPoints['main'] = [zoneTestingEntryPoint, entryPoints['main'] as string];
+      }
     }
   }
 

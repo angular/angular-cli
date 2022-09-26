@@ -158,7 +158,7 @@ function addAppToWorkspaceFile(
           outputPath: `dist/${folderName}`,
           index: `${sourceRoot}/index.html`,
           main: `${sourceRoot}/main.ts`,
-          polyfills: `${sourceRoot}/polyfills.ts`,
+          polyfills: ['zone.js'],
           tsConfig: `${projectRoot}tsconfig.app.json`,
           inlineStyleLanguage,
           assets: [`${sourceRoot}/favicon.ico`, `${sourceRoot}/assets`],
@@ -211,7 +211,7 @@ function addAppToWorkspaceFile(
             builder: Builders.Karma,
             options: {
               main: `${sourceRoot}/test.ts`,
-              polyfills: `${sourceRoot}/polyfills.ts`,
+              polyfills: ['zone.js', 'zone.js/testing'],
               tsConfig: `${projectRoot}tsconfig.spec.json`,
               karmaConfig: `${projectRoot}karma.conf.js`,
               inlineStyleLanguage,
