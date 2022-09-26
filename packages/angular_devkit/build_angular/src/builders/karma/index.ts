@@ -111,6 +111,17 @@ export function execute(
         throw new Error('The builder requires a target.');
       }
 
+      if (!options.main) {
+        webpackConfig.entry ??= {};
+        if (typeof webpackConfig.entry === 'object' && !Array.isArray(webpackConfig.entry)) {
+          if (Array.isArray(webpackConfig.entry['main'])) {
+            webpackConfig.entry['main'].push(getBuiltInMainFile());
+          } else {
+            webpackConfig.entry['main'] = [getBuiltInMainFile()];
+          }
+        }
+      }
+
       const projectMetadata = await context.getProjectMetadata(projectName);
       const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '') as string;
 
@@ -169,3 +180,23 @@ export function execute(
 
 export { KarmaBuilderOptions };
 export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);
+
+function getBuiltInMainFile(): string {
+  const content = Buffer.from(
+    `
+  import { getTestBed } from '@angular/core/testing';
+  import {
+    BrowserDynamicTestingModule,
+    platformBrowserDynamicTesting,
+   } from '@angular/platform-browser-dynamic/testing';
+
+  // Initialize the Angular testing environment.
+  getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+    errorOnUnknownElements: true,
+    errorOnUnknownProperties: true
+  });
+`,
+  ).toString('base64');
+
+  return `ng-virtual-main.js!=!data:text/javascript;base64,${content}`;
+}

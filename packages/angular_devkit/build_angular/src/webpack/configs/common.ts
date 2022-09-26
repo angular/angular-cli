@@ -130,7 +130,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       if (Array.isArray(entryPoints['main'])) {
         entryPoints['main'].unshift(zoneTestingEntryPoint);
       } else {
-        entryPoints['main'] = [zoneTestingEntryPoint, entryPoints['main'] as string];
+        entryPoints['main'] = [zoneTestingEntryPoint];
       }
     }
   }
