@@ -20,7 +20,6 @@ export const KARMA_BUILDER_INFO = Object.freeze({
  * Also disables progress reporting to minimize logging output.
  */
 export const BASE_OPTIONS = Object.freeze<Schema>({
-  main: 'src/test.ts',
   polyfills: 'src/polyfills.ts',
   tsConfig: 'src/tsconfig.spec.json',
   karmaConfig: 'karma.conf.js',

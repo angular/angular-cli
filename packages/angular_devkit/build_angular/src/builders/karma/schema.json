@@ -255,7 +255,7 @@
     }
   },
   "additionalProperties": false,
-  "required": ["main", "tsConfig", "karmaConfig"],
+  "required": ["tsConfig", "karmaConfig"],
   "definitions": {
     "assetPattern": {
       "oneOf": [
