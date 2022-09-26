@@ -19,6 +19,11 @@
       "version": "15.0.0",
       "factory": "./update-15/update-workspace-config",
       "description": "Remove options from 'angular.json' that are no longer supported by the official builders."
+    },
+    "update-karma-main-file": {
+      "version": "15.0.0",
+      "factory": "./update-15/update-karma-main-file",
+      "description": "Remove no longer needed require calls in Karma builder main file."
     }
   }
 }
