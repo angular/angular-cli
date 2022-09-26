@@ -342,8 +342,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       strictExportPresence: true,
       parser: {
         javascript: {
-          // TODO(alanagius): disable the below once we have a migration to remove `require.context` from test.ts file in users projects.
-          requireContext: true,
+          requireContext: false,
           // Disable auto URL asset module creation. This doesn't effect `new Worker(new URL(...))`
           // https://webpack.js.org/guides/asset-modules/#url-assets
           url: false,
