@@ -60,7 +60,6 @@ describe('Application Schematic', () => {
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
-        '/projects/foo/src/polyfills.ts',
         '/projects/foo/src/styles.css',
         '/projects/foo/src/test.ts',
         '/projects/foo/src/app/app.module.ts',
@@ -157,7 +156,7 @@ describe('Application Schematic', () => {
       .runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
     const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
-    expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+    expect(files).toEqual(['src/main.ts']);
     expect(_extends).toBe('../../tsconfig.json');
   });
 
@@ -166,7 +165,7 @@ describe('Application Schematic', () => {
       .runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
     const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
-    expect(files).toEqual(['src/test.ts', 'src/polyfills.ts']);
+    expect(files).toEqual(['src/test.ts']);
     expect(_extends).toBe('../../tsconfig.json');
   });
 
@@ -270,7 +269,6 @@ describe('Application Schematic', () => {
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
-        '/projects/foo/src/polyfills.ts',
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.module.ts',
         '/projects/foo/src/app/app.component.ts',
@@ -300,7 +298,6 @@ describe('Application Schematic', () => {
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
-        '/projects/foo/src/polyfills.ts',
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.module.ts',
         '/projects/foo/src/app/app.component.css',
@@ -331,7 +328,6 @@ describe('Application Schematic', () => {
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
-        '/projects/foo/src/polyfills.ts',
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.module.ts',
         '/projects/foo/src/app/app.component.html',
@@ -413,7 +409,6 @@ describe('Application Schematic', () => {
           '/src/favicon.ico',
           '/src/index.html',
           '/src/main.ts',
-          '/src/polyfills.ts',
           '/src/styles.css',
           '/src/test.ts',
           '/src/app/app.module.ts',
@@ -437,7 +432,7 @@ describe('Application Schematic', () => {
       const buildOpt = prj.architect.build.options;
       expect(buildOpt.index).toEqual('src/index.html');
       expect(buildOpt.main).toEqual('src/main.ts');
-      expect(buildOpt.polyfills).toEqual('src/polyfills.ts');
+      expect(buildOpt.polyfills).toEqual(['zone.js']);
       expect(buildOpt.tsConfig).toEqual('tsconfig.app.json');
 
       const testOpt = prj.architect.test.options;
@@ -515,7 +510,7 @@ describe('Application Schematic', () => {
       expect(appTsConfig.extends).toEqual('./tsconfig.json');
       const specTsConfig = readJsonFile(tree, '/tsconfig.spec.json');
       expect(specTsConfig.extends).toEqual('./tsconfig.json');
-      expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
+      expect(specTsConfig.files).toEqual(['src/test.ts']);
     });
 
     it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
@@ -532,7 +527,7 @@ describe('Application Schematic', () => {
       const buildOpt = project.architect.build.options;
       expect(buildOpt.index).toEqual('foo/src/index.html');
       expect(buildOpt.main).toEqual('foo/src/main.ts');
-      expect(buildOpt.polyfills).toEqual('foo/src/polyfills.ts');
+      expect(buildOpt.polyfills).toEqual(['zone.js']);
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
 
       const appTsConfig = readJsonFile(tree, '/foo/tsconfig.app.json');
