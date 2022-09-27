@@ -195,11 +195,9 @@ describe('Browser Builder styles', () => {
     it(`supports material imports in ${ext} files`, async () => {
       host.writeMultipleFiles({
         [`src/styles.${ext}`]: `
-          @import "~@angular/material/prebuilt-themes/indigo-pink.css";
           @import "@angular/material/prebuilt-themes/indigo-pink.css";
         `,
         [`src/app/app.component.${ext}`]: `
-          @import "~@angular/material/prebuilt-themes/indigo-pink.css";
           @import "@angular/material/prebuilt-themes/indigo-pink.css";
         `,
       });
@@ -265,35 +263,17 @@ describe('Browser Builder styles', () => {
     });
   });
 
-  /**
-   * font-awesome mock to avoid having an extra dependency.
-   */
-  function mockFontAwesomePackage(host: TestProjectHost): void {
+  it(`supports font-awesome imports`, async () => {
+    // font-awesome mock to avoid having an extra dependency.
     host.writeMultipleFiles({
       'node_modules/font-awesome/scss/font-awesome.scss': `
-         * { color: red }
+        * { color: red }
       `,
     });
-  }
 
-  it(`supports font-awesome imports`, async () => {
-    mockFontAwesomePackage(host);
     host.writeMultipleFiles({
       'src/styles.scss': `
         @import "font-awesome/scss/font-awesome";
-      `,
-    });
-
-    const overrides = { styles: [`src/styles.scss`] };
-    await browserBuild(architect, host, target, overrides);
-  });
-
-  it(`supports font-awesome imports (tilde)`, async () => {
-    mockFontAwesomePackage(host);
-    host.writeMultipleFiles({
-      'src/styles.scss': `
-        $fa-font-path: "~font-awesome/fonts";
-        @import "~font-awesome/scss/font-awesome";
       `,
     });
 

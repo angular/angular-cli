@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { colors } from './color';
+
 function isDisabled(variable: string): boolean {
   return variable === '0' || variable.toLowerCase() === 'false';
 }
@@ -75,3 +77,19 @@ export const allowMinify = debugOptimize.minify;
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 export const maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
+
+const legacySassVariable = process.env['NG_BUILD_LEGACY_SASS'];
+export const useLegacySass: boolean = (() => {
+  if (!isPresent(legacySassVariable)) {
+    return false;
+  }
+
+  // eslint-disable-next-line no-console
+  console.warn(
+    colors.yellow(
+      `Warning: 'NG_BUILD_LEGACY_SASS' environment variable support will be removed in version 16.`,
+    ),
+  );
+
+  return isEnabled(legacySassVariable);
+})();
