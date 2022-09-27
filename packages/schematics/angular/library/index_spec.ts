@@ -57,7 +57,6 @@ describe('Library Schematic', () => {
         '/projects/foo/README.md',
         '/projects/foo/tsconfig.lib.json',
         '/projects/foo/tsconfig.lib.prod.json',
-        '/projects/foo/src/test.ts',
         '/projects/foo/src/my-index.ts',
         '/projects/foo/src/lib/foo.module.ts',
         '/projects/foo/src/lib/foo.component.spec.ts',

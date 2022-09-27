@@ -61,7 +61,6 @@ describe('Application Schematic', () => {
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
-        '/projects/foo/src/test.ts',
         '/projects/foo/src/app/app.module.ts',
         '/projects/foo/src/app/app.component.css',
         '/projects/foo/src/app/app.component.html',
@@ -164,8 +163,7 @@ describe('Application Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
-    const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
-    expect(files).toEqual(['src/test.ts']);
+    const { extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
     expect(_extends).toBe('../../tsconfig.json');
   });
 
@@ -255,7 +253,6 @@ describe('Application Schematic', () => {
     [
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/karma.conf.js',
-      '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.css',
       '/projects/foo/src/app/app.component.html',
       '/projects/foo/src/app/app.component.spec.ts',
@@ -285,7 +282,6 @@ describe('Application Schematic', () => {
     [
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/karma.conf.js',
-      '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.html',
       '/projects/foo/src/app/app.component.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
@@ -315,7 +311,6 @@ describe('Application Schematic', () => {
     [
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/karma.conf.js',
-      '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.css',
       '/projects/foo/src/app/app.component.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
@@ -410,7 +405,6 @@ describe('Application Schematic', () => {
           '/src/index.html',
           '/src/main.ts',
           '/src/styles.css',
-          '/src/test.ts',
           '/src/app/app.module.ts',
           '/src/app/app.component.css',
           '/src/app/app.component.html',
@@ -436,7 +430,6 @@ describe('Application Schematic', () => {
       expect(buildOpt.tsConfig).toEqual('tsconfig.app.json');
 
       const testOpt = prj.architect.test.options;
-      expect(testOpt.main).toEqual('src/test.ts');
       expect(testOpt.tsConfig).toEqual('tsconfig.spec.json');
       expect(testOpt.karmaConfig).toEqual('karma.conf.js');
       expect(testOpt.styles).toEqual(['src/styles.css']);
@@ -510,13 +503,13 @@ describe('Application Schematic', () => {
       expect(appTsConfig.extends).toEqual('./tsconfig.json');
       const specTsConfig = readJsonFile(tree, '/tsconfig.spec.json');
       expect(specTsConfig.extends).toEqual('./tsconfig.json');
-      expect(specTsConfig.files).toEqual(['src/test.ts']);
     });
 
     it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
       const workspaceTree = await schematicRunner
         .runSchematicAsync('workspace', { ...workspaceOptions, newProjectRoot: '' })
         .toPromise();
+
       const options = { ...defaultOptions, projectRoot: undefined };
       const tree = await schematicRunner
         .runSchematicAsync('application', options, workspaceTree)

@@ -210,7 +210,6 @@ function addAppToWorkspaceFile(
         : {
             builder: Builders.Karma,
             options: {
-              main: `${sourceRoot}/test.ts`,
               polyfills: ['zone.js', 'zone.js/testing'],
               tsConfig: `${projectRoot}tsconfig.spec.json`,
               karmaConfig: `${projectRoot}karma.conf.js`,
@@ -231,7 +230,7 @@ function addAppToWorkspaceFile(
   });
 }
 function minimalPathFilter(path: string): boolean {
-  const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js).template$/;
+  const toRemoveList = /(tsconfig.spec.json|karma.conf.js).template$/;
 
   return !toRemoveList.test(path);
 }
