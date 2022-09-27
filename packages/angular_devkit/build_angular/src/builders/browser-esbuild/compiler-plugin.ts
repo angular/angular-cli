@@ -37,7 +37,7 @@ type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
  * Converts TypeScript Diagnostic related information into an esbuild compatible note object.
  * Related information is a subset of a full TypeScript Diagnostic and also used for diagnostic
  * notes associated with the main Diagnostic.
- * @param diagnostic The TypeScript diagnostic relative information to convert.
+ * @param info The TypeScript diagnostic relative information to convert.
  * @param host A TypeScript FormatDiagnosticsHost instance to use during conversion.
  * @returns An esbuild diagnostic message as a PartialMessage object
  */
@@ -120,16 +120,18 @@ function convertTypeScriptDiagnostic(
   return message;
 }
 
+export interface CompilerPluginOptions {
+  sourcemap: boolean;
+  tsconfig: string;
+  advancedOptimizations?: boolean;
+  thirdPartySourcemaps?: boolean;
+  fileReplacements?: Record<string, string>;
+}
+
 // This is a non-watch version of the compiler code from `@ngtools/webpack` augmented for esbuild
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
-  pluginOptions: {
-    sourcemap: boolean;
-    tsconfig: string;
-    advancedOptimizations?: boolean;
-    thirdPartySourcemaps?: boolean;
-    fileReplacements?: Record<string, string>;
-  },
+  pluginOptions: CompilerPluginOptions,
   styleOptions: BundleStylesheetOptions,
 ): Plugin {
   return {
@@ -335,8 +337,7 @@ export function createCompilerPlugin(
             return {
               errors: [
                 {
-                  text: 'File is missing from the TypeScript compilation.',
-                  location: { file: args.path },
+                  text: `File '${args.path}' is missing from the TypeScript compilation.`,
                   notes: [
                     {
                       text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
@@ -347,45 +348,12 @@ export function createCompilerPlugin(
             };
           }
 
-          const data = typescriptResult.content ?? '';
-          const forceAsyncTransformation = /async\s+function\s*\*/.test(data);
-          const useInputSourcemap =
-            pluginOptions.sourcemap &&
-            (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
-
-          // If no additional transformations are needed, return the TypeScript output directly
-          if (!forceAsyncTransformation && !pluginOptions.advancedOptimizations) {
-            return {
-              // Strip sourcemaps if they should not be used
-              contents: useInputSourcemap
-                ? data
-                : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
-              loader: 'js',
-            };
-          }
-
-          const babelResult = await transformAsync(data, {
-            filename: args.path,
-            inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
-            sourceMaps: pluginOptions.sourcemap ? 'inline' : false,
-            compact: false,
-            configFile: false,
-            babelrc: false,
-            browserslistConfigFile: false,
-            plugins: [],
-            presets: [
-              [
-                angularApplicationPreset,
-                {
-                  forceAsyncTransformation,
-                  optimize: pluginOptions.advancedOptimizations && {},
-                },
-              ],
-            ],
-          });
-
           return {
-            contents: babelResult?.code ?? '',
+            contents: await transformWithBabel(
+              args.path,
+              typescriptResult.content ?? '',
+              pluginOptions,
+            ),
             loader: 'js',
           };
         },
@@ -393,62 +361,9 @@ export function createCompilerPlugin(
 
       build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
         const data = await fs.readFile(args.path, 'utf-8');
-        const forceAsyncTransformation =
-          !/[\\/][_f]?esm2015[\\/]/.test(args.path) && /async\s+function\s*\*/.test(data);
-        const shouldLink = await requiresLinking(args.path, data);
-        const useInputSourcemap =
-          pluginOptions.sourcemap &&
-          (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(args.path));
-
-        // If no additional transformations are needed, return the TypeScript output directly
-        if (!forceAsyncTransformation && !pluginOptions.advancedOptimizations && !shouldLink) {
-          return {
-            // Strip sourcemaps if they should not be used
-            contents: useInputSourcemap
-              ? data
-              : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
-            loader: 'js',
-          };
-        }
-
-        const angularPackage = /[\\/]node_modules[\\/]@angular[\\/]/.test(args.path);
-
-        const linkerPluginCreator = (
-          await loadEsmModule<typeof import('@angular/compiler-cli/linker/babel')>(
-            '@angular/compiler-cli/linker/babel',
-          )
-        ).createEs2015LinkerPlugin;
-
-        const result = await transformAsync(data, {
-          filename: args.path,
-          inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
-          sourceMaps: pluginOptions.sourcemap ? 'inline' : false,
-          compact: false,
-          configFile: false,
-          babelrc: false,
-          browserslistConfigFile: false,
-          plugins: [],
-          presets: [
-            [
-              angularApplicationPreset,
-              {
-                angularLinker: {
-                  shouldLink,
-                  jitMode: false,
-                  linkerPluginCreator,
-                },
-                forceAsyncTransformation,
-                optimize: pluginOptions.advancedOptimizations && {
-                  looseEnums: angularPackage,
-                  pureTopLevel: angularPackage,
-                },
-              },
-            ],
-          ],
-        });
 
         return {
-          contents: result?.code ?? data,
+          contents: await transformWithBabel(args.path, data, pluginOptions),
           loader: 'js',
         };
       });
@@ -490,4 +405,63 @@ function createFileEmitter(
 
     return { content, dependencies: [] };
   };
+}
+
+async function transformWithBabel(
+  filename: string,
+  data: string,
+  pluginOptions: CompilerPluginOptions,
+): Promise<string> {
+  const forceAsyncTransformation =
+    !/[\\/][_f]?esm2015[\\/]/.test(filename) && /async\s+function\s*\*/.test(data);
+  const shouldLink = await requiresLinking(filename, data);
+  const useInputSourcemap =
+    pluginOptions.sourcemap &&
+    (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+
+  // If no additional transformations are needed, return the data directly
+  if (!forceAsyncTransformation && !pluginOptions.advancedOptimizations && !shouldLink) {
+    // Strip sourcemaps if they should not be used
+    return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+  }
+
+  const angularPackage = /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
+
+  const linkerPluginCreator = shouldLink
+    ? (
+        await loadEsmModule<typeof import('@angular/compiler-cli/linker/babel')>(
+          '@angular/compiler-cli/linker/babel',
+        )
+      ).createEs2015LinkerPlugin
+    : undefined;
+
+  const result = await transformAsync(data, {
+    filename,
+    inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
+    sourceMaps: pluginOptions.sourcemap ? 'inline' : false,
+    compact: false,
+    configFile: false,
+    babelrc: false,
+    browserslistConfigFile: false,
+    plugins: [],
+    presets: [
+      [
+        angularApplicationPreset,
+        {
+          angularLinker: {
+            shouldLink,
+            jitMode: false,
+            linkerPluginCreator,
+          },
+          forceAsyncTransformation,
+          optimize: pluginOptions.advancedOptimizations && {
+            looseEnums: angularPackage,
+            pureTopLevel: angularPackage,
+          },
+        },
+      ],
+    ],
+  });
+
+  return result?.code ?? data;
 }
