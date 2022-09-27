@@ -63,16 +63,6 @@ executors:
     working_directory: ~/ng
     resource_class: small
 
-  test-executor:
-    parameters:
-      nodeversion:
-        type: string
-        default: *default_nodeversion
-    docker:
-      - image: cimg/node:<< parameters.nodeversion >>
-    working_directory: ~/ng
-    resource_class: large
-
   windows-executor:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
     working_directory: ~/ng
@@ -213,9 +203,10 @@ jobs:
         enum: *all_e2e_subsets
         default: 'npm'
     executor:
-      name: test-executor
+      name: action-executor
       nodeversion: << parameters.nodeversion >>
     parallelism: 8
+    resource_class: large
     steps:
       - custom_attach_workspace
       - browser-tools/install-chrome
@@ -249,7 +240,7 @@ jobs:
 
   test-browsers:
     executor:
-      name: test-executor
+      name: action-executor
     resource_class: medium
     steps:
       - custom_attach_workspace
@@ -285,7 +276,7 @@ jobs:
       - run: yarn bazel build //tests/legacy-cli/...
 
   unit-test:
-    executor: test-executor
+    executor: action-executor
     resource_class: xlarge
     parameters:
       nodeversion:
