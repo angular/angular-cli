@@ -117,7 +117,8 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js", "zone.js/testing", "@angular/localize/init"],
+
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "browsers": "ChromeHeadlessCI",
