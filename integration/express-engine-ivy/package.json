@@ -49,7 +49,7 @@
     "concurrently": "7.4.0",
     "jasmine-core": "4.4.0",
     "jasmine-spec-reporter": "7.0.0",
-    "karma": "6.4.0",
+    "karma": "6.4.1",
     "karma-chrome-launcher": "3.1.1",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-jasmine": "5.1.0",
