@@ -271,6 +271,7 @@ jobs:
 
   build-bazel-e2e:
     executor: action-executor
+    resource_class: medium
     steps:
       - custom_attach_workspace
       - run: yarn bazel build //tests/legacy-cli/...
