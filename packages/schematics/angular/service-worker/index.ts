@@ -22,12 +22,7 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { readWorkspace, writeWorkspace } from '../utility';
-import {
-  addSymbolToNgModuleMetadata,
-  getEnvironmentExportName,
-  insertImport,
-  isImported,
-} from '../utility/ast-utils';
+import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
@@ -61,50 +56,19 @@ function updateAppModule(mainPath: string): Rule {
     const modulePath = getAppModulePath(host, mainPath);
     context.logger.debug(`module path: ${modulePath}`);
 
-    // add import
-    let moduleSource = getTsSourceFile(host, modulePath);
-    let importModule = 'ServiceWorkerModule';
-    let importPath = '@angular/service-worker';
-    if (!isImported(moduleSource, importModule, importPath)) {
-      const change = insertImport(moduleSource, modulePath, importModule, importPath);
-      if (change) {
-        const recorder = host.beginUpdate(modulePath);
-        applyToUpdateRecorder(recorder, [change]);
-        host.commitUpdate(recorder);
-      }
-    }
-
-    // add import for environments
-    // import { environment } from '../environments/environment';
-    moduleSource = getTsSourceFile(host, modulePath);
-    const environmentExportName = getEnvironmentExportName(moduleSource);
-    // if environemnt import already exists then use the found one
-    // otherwise use the default name
-    importModule = environmentExportName || 'environment';
-    // TODO: dynamically find environments relative path
-    importPath = '../environments/environment';
-
-    if (!environmentExportName) {
-      // if environment import was not found then insert the new one
-      // with default path and default export name
-      const change = insertImport(moduleSource, modulePath, importModule, importPath);
-      if (change) {
-        const recorder = host.beginUpdate(modulePath);
-        applyToUpdateRecorder(recorder, [change]);
-        host.commitUpdate(recorder);
-      }
-    }
+    addImport(host, modulePath, 'ServiceWorkerModule', '@angular/service-worker');
+    addImport(host, modulePath, 'isDevMode', '@angular/core');
 
     // register SW in application module
     const importText = tags.stripIndent`
       ServiceWorkerModule.register('ngsw-worker.js', {
-        enabled: ${importModule}.production,
+        enabled: !isDevMode(),
         // Register the ServiceWorker as soon as the application is stable
         // or after 30 seconds (whichever comes first).
         registrationStrategy: 'registerWhenStable:30000'
       })
     `;
-    moduleSource = getTsSourceFile(host, modulePath);
+    const moduleSource = getTsSourceFile(host, modulePath);
     const metadataChanges = addSymbolToNgModuleMetadata(
       moduleSource,
       modulePath,
@@ -171,4 +135,15 @@ export default function (options: ServiceWorkerOptions): Rule {
       updateAppModule(buildOptions.main),
     ]);
   };
+}
+
+function addImport(host: Tree, filePath: string, symbolName: string, moduleName: string): void {
+  const moduleSource = getTsSourceFile(host, filePath);
+  const change = insertImport(moduleSource, filePath, symbolName, moduleName);
+
+  if (change) {
+    const recorder = host.beginUpdate(filePath);
+    applyToUpdateRecorder(recorder, [change]);
+    host.commitUpdate(recorder);
+  }
 }

@@ -12,12 +12,5 @@ import '@angular/platform-server/init';
  */
 import '@angular/localize/init';
 
-<% } %>import { enableProdMode } from '@angular/core';
-
-import { environment } from './environments/environment';
-
-if (environment.production) {
-  enableProdMode();
-}
-
+<% } %>
 export { <%= rootModuleClassName %> } from './app/<%= stripTsExtension(rootModuleFileName) %>';

@@ -168,12 +168,6 @@ function addAppToWorkspaceFile(
         configurations: {
           production: {
             budgets,
-            fileReplacements: [
-              {
-                replace: `${sourceRoot}/environments/environment.ts`,
-                with: `${sourceRoot}/environments/environment.prod.ts`,
-              },
-            ],
             outputHashing: 'all',
           },
           development: {

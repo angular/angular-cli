@@ -1,14 +1,22 @@
 import { ng } from '../../utils/process';
-import { writeFile } from '../../utils/fs';
+import { writeFile, writeMultipleFiles } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
 
 export default function () {
   // Tests run in 'dev' environment by default.
   return (
-    writeFile(
-      'src/app/environment.spec.ts',
-      `
-      import { environment } from '../environments/environment';
+    writeMultipleFiles({
+      'src/environment.prod.ts': `
+      export const environment = {
+        production: true
+      };`,
+      'src/environment.ts': `
+      export const environment = {
+        production: false
+      };
+      `,
+      'src/app/environment.spec.ts': `
+      import { environment } from '../environment';
 
       describe('Test environment', () => {
         it('should have production disabled', () => {
@@ -16,7 +24,7 @@ export default function () {
         });
       });
     `,
-    )
+    })
       .then(() => ng('test', '--watch=false'))
       .then(() =>
         updateJsonFile('angular.json', (configJson) => {
@@ -25,8 +33,8 @@ export default function () {
             production: {
               fileReplacements: [
                 {
-                  src: 'src/environments/environment.ts',
-                  replaceWith: 'src/environments/environment.prod.ts',
+                  src: 'src/environment.ts',
+                  replaceWith: 'src/environment.prod.ts',
                 },
               ],
             },
@@ -39,7 +47,7 @@ export default function () {
         writeFile(
           'src/app/environment.spec.ts',
           `
-      import { environment } from '../environments/environment';
+      import { environment } from '../environment';
 
       describe('Test environment', () => {
         it('should have production enabled', () => {

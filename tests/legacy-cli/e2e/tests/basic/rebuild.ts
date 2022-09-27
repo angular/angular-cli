@@ -73,15 +73,8 @@ export default async function () {
         export let X = '$$_E2E_GOLDEN_VALUE_2';
         `,
       'src/main.ts': `
-        import { enableProdMode } from '@angular/core';
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
         import { AppModule } from './app/app.module';
-        import { environment } from './environments/environment';
-
-        if (environment.production) {
-          enableProdMode();
-        }
 
         platformBrowserDynamic().bootstrapModule(AppModule);
 

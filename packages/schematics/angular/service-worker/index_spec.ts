@@ -73,14 +73,6 @@ describe('Service Worker Schematic', () => {
     expect(pkgText).toMatch(/import \{ ServiceWorkerModule \} from '@angular\/service-worker'/);
   });
 
-  it('should import environment', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('service-worker', defaultOptions, appTree)
-      .toPromise();
-    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(pkgText).toMatch(/import \{ environment \} from '\.\.\/environments\/environment'/);
-  });
-
   it('should add the SW import to the NgModule imports', async () => {
     const tree = await schematicRunner
       .runSchematicAsync('service-worker', defaultOptions, appTree)
@@ -89,83 +81,7 @@ describe('Service Worker Schematic', () => {
     expect(pkgText).toMatch(
       new RegExp(
         "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
-          '\\1  enabled: environment\\.production,\\n' +
-          '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
-          '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
-          "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
-          '\\1}\\)',
-      ),
-    );
-  });
-
-  it('should add the SW import to the NgModule imports with aliased environment', async () => {
-    const moduleContent = `
-      import { BrowserModule } from '@angular/platform-browser';
-      import { NgModule } from '@angular/core';
-
-      import { AppComponent } from './app.component';
-      import { environment as env } from '../environments/environment';
-
-      @NgModule({
-        declarations: [
-          AppComponent
-        ],
-        imports: [
-          BrowserModule
-        ],
-        bootstrap: [AppComponent]
-      })
-      export class AppModule {}
-    `;
-
-    appTree.overwrite('/projects/bar/src/app/app.module.ts', moduleContent);
-
-    const tree = await schematicRunner
-      .runSchematicAsync('service-worker', defaultOptions, appTree)
-      .toPromise();
-    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(pkgText).toMatch(
-      new RegExp(
-        "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
-          '\\1  enabled: env\\.production,\\n' +
-          '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
-          '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
-          "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
-          '\\1}\\)',
-      ),
-    );
-  });
-
-  it('should add the SW import to the NgModule imports with existing environment', async () => {
-    const moduleContent = `
-      import { BrowserModule } from '@angular/platform-browser';
-      import { NgModule } from '@angular/core';
-
-      import { AppComponent } from './app.component';
-      import { environment } from '../environments/environment';
-
-      @NgModule({
-        declarations: [
-          AppComponent
-        ],
-        imports: [
-          BrowserModule
-        ],
-        bootstrap: [AppComponent]
-      })
-      export class AppModule {}
-    `;
-
-    appTree.overwrite('/projects/bar/src/app/app.module.ts', moduleContent);
-
-    const tree = await schematicRunner
-      .runSchematicAsync('service-worker', defaultOptions, appTree)
-      .toPromise();
-    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(pkgText).toMatch(
-      new RegExp(
-        "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
-          '\\1  enabled: environment\\.production,\\n' +
+          '\\1  enabled: !isDevMode\\(\\),\\n' +
           '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
           '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
           "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
