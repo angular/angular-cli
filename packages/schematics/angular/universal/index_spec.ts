@@ -149,14 +149,6 @@ describe('Universal Schematic', () => {
     expect(opts.outputPath).toEqual('dist/bar/server');
     expect(opts.main).toEqual('projects/bar/src/main.server.ts');
     expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
-    const configurations = targets.server.configurations;
-    expect(configurations.production.fileReplacements.length).toEqual(1);
-    expect(configurations.production.fileReplacements[0].replace).toEqual(
-      'projects/bar/src/environments/environment.ts',
-    );
-    expect(configurations.production.fileReplacements[0].with).toEqual(
-      'projects/bar/src/environments/environment.prod.ts',
-    );
   });
 
   it('should update workspace with a build target outputPath', async () => {
@@ -193,15 +185,10 @@ describe('Universal Schematic', () => {
     appTree.overwrite(
       filePath,
       `
-      import { enableProdMode } from '@angular/core';
       import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
       import { AppModule } from './app/app.module';
       import { environment } from './environments/environment';
       import { hmrBootstrap } from './hmr';
-
-      if (environment.production) {
-        enableProdMode();
-      }
 
       const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 

@@ -37,11 +37,8 @@ describe('Browser Builder Web Worker support', () => {
       });
     `,
     'src/main.ts': `
-      import { enableProdMode } from '@angular/core';
       import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
       import { AppModule } from './app/app.module';
-      import { environment } from './environments/environment';
-      if (environment.production) { enableProdMode(); }
       platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.error(err));
 
       const worker = new Worker(new URL('./app/app.worker', import.meta.url), { type: 'module' });

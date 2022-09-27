@@ -51,7 +51,6 @@ describe('AppShell Builder', () => {
 
       import { AppRoutingModule } from './app-routing.module';
       import { AppComponent } from './app.component';
-      import { environment } from '../environments/environment';
       import { RouterModule } from '@angular/router';
 
       @NgModule({
@@ -91,15 +90,8 @@ describe('AppShell Builder', () => {
       export class AppServerModule {}
     `,
     'src/main.ts': `
-      import { enableProdMode } from '@angular/core';
       import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
       import { AppModule } from './app/app.module';
-      import { environment } from './environments/environment';
-
-      if (environment.production) {
-        enableProdMode();
-      }
 
       document.addEventListener('DOMContentLoaded', () => {
         platformBrowserDynamic().bootstrapModule(AppModule)

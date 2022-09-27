@@ -107,7 +107,6 @@ describe('Identifying third-party code in source maps', () => {
     expect(mainMap.sources.filter((_, i) => !mainMap[IGNORE_LIST].includes(i))).toEqual([
       './src/app/app.component.ts',
       './src/app/app.module.ts',
-      './src/environments/environment.ts',
       './src/main.ts',
     ]);
 

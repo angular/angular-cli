@@ -55,8 +55,6 @@ describe('Application Schematic', () => {
         '/projects/foo/karma.conf.js',
         '/projects/foo/tsconfig.app.json',
         '/projects/foo/tsconfig.spec.json',
-        '/projects/foo/src/environments/environment.ts',
-        '/projects/foo/src/environments/environment.prod.ts',
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
@@ -147,7 +145,7 @@ describe('Application Schematic', () => {
     const path = '/projects/foo/src/main.ts';
     const content = tree.readContent(path);
     expect(content).toContain('defaultEncapsulation: ViewEncapsulation.ShadowDom');
-    expect(content).toContain(`import { enableProdMode, ViewEncapsulation } from '@angular/core'`);
+    expect(content).toContain(`import { ViewEncapsulation } from '@angular/core'`);
   });
 
   it('should set the right paths in the tsconfig.app.json', async () => {
@@ -261,8 +259,6 @@ describe('Application Schematic', () => {
     expect(files).toEqual(
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
-        '/projects/foo/src/environments/environment.ts',
-        '/projects/foo/src/environments/environment.prod.ts',
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
@@ -289,8 +285,6 @@ describe('Application Schematic', () => {
     expect(files).toEqual(
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
-        '/projects/foo/src/environments/environment.ts',
-        '/projects/foo/src/environments/environment.prod.ts',
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
@@ -318,8 +312,6 @@ describe('Application Schematic', () => {
     expect(files).toEqual(
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
-        '/projects/foo/src/environments/environment.ts',
-        '/projects/foo/src/environments/environment.prod.ts',
         '/projects/foo/src/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
@@ -399,8 +391,6 @@ describe('Application Schematic', () => {
           '/karma.conf.js',
           '/tsconfig.app.json',
           '/tsconfig.spec.json',
-          '/src/environments/environment.ts',
-          '/src/environments/environment.prod.ts',
           '/src/favicon.ico',
           '/src/index.html',
           '/src/main.ts',

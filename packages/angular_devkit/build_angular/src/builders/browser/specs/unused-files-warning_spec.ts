@@ -38,11 +38,11 @@ describe('Browser Builder unused files warnings', () => {
   });
 
   it('should show warning when some files are unused', async () => {
-    host.replaceInFile(
-      'src/tsconfig.app.json',
-      '"main.ts"',
-      '"main.ts", "environments/environment.prod.ts"',
-    );
+    host.writeMultipleFiles({
+      'src/unused-file.ts': `export const unused = '1';`,
+    });
+
+    host.replaceInFile('src/tsconfig.app.json', '"main.ts"', '"main.ts", "unused-file.ts"');
 
     const logger = new logging.Logger('');
     const logs: string[] = [];
@@ -51,7 +51,7 @@ describe('Browser Builder unused files warnings', () => {
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    expect(logs.join().includes(`environment.prod.ts ${warningMessageSuffix}`)).toBe(true);
+    expect(logs.join().includes(`unused-file.ts ${warningMessageSuffix}`)).toBe(true);
 
     await run.stop();
   });

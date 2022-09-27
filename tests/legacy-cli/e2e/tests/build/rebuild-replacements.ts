@@ -1,6 +1,6 @@
-import { appendToFile } from '../../utils/fs';
+import { appendToFile, createDir, writeMultipleFiles } from '../../utils/fs';
 import { killAllProcesses, waitForAnyProcessOutputToMatch } from '../../utils/process';
-import { ngServe } from '../../utils/project';
+import { ngServe, updateJsonFile } from '../../utils/project';
 
 const webpackGoodRegEx = / Compiled successfully./;
 
@@ -9,7 +9,28 @@ export default async function () {
     return;
   }
 
+  await createDir('src/environments');
+
   try {
+    await writeMultipleFiles({
+      'src/environments/environment.ts': `export const env = 'dev';`,
+      'src/environments/environment.prod.ts': `export const env = 'prod';`,
+      'src/main.ts': `
+        import { env } from './environments/environment';
+        console.log(env);
+      `,
+    });
+
+    await updateJsonFile('angular.json', (workspaceJson) => {
+      const appArchitect = workspaceJson.projects['test-project'].architect;
+      appArchitect.build.configurations.production.fileReplacements = [
+        {
+          replace: 'src/environments/environment.ts',
+          with: 'src/environments/environment.prod.ts',
+        },
+      ];
+    });
+
     await ngServe('--configuration=production');
 
     // Should trigger a rebuild.

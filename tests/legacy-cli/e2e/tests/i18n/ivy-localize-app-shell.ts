@@ -54,20 +54,6 @@ export default async function () {
     buildOptions.optimization = true;
     buildOptions.buildOptimizer = true;
     buildOptions.aot = true;
-    buildOptions.fileReplacements = [
-      {
-        replace: 'src/environments/environment.ts',
-        with: 'src/environments/environment.prod.ts',
-      },
-    ];
-
-    serverOptions.optimization = true;
-    serverOptions.fileReplacements = [
-      {
-        replace: 'src/environments/environment.ts',
-        with: 'src/environments/environment.prod.ts',
-      },
-    ];
 
     // Enable localization for all locales
     buildOptions.localize = true;

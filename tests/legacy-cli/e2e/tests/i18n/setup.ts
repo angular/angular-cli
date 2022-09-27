@@ -216,12 +216,6 @@ export async function setupI18nConfig() {
     appArchitect['build'].options.optimization = true;
     appArchitect['build'].options.buildOptimizer = true;
     appArchitect['build'].options.aot = true;
-    appArchitect['build'].options.fileReplacements = [
-      {
-        replace: 'src/environments/environment.ts',
-        with: 'src/environments/environment.prod.ts',
-      },
-    ];
     appArchitect['build'].options.i18nMissingTranslation = 'error';
     appArchitect['build'].options.vendorChunk = true;
     appArchitect['build'].options.sourceMap = true;
