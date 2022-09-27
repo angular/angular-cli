@@ -9,11 +9,12 @@
 import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'path';
-import type { Configuration, RuleSetUseItem } from 'webpack';
+import { Configuration, RuleSetUseItem } from 'webpack';
 import { StyleElement } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
+import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
 import { WebpackConfigOptions } from '../../utils/build-options';
-import { addWarning } from '../../utils/webpack-diagnostics';
+import { useLegacySass } from '../../utils/environment-options';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -77,7 +78,7 @@ export function resolveGlobalStyles(
 
 // eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
-  const { root, buildOptions } = wco;
+  const { root, projectRoot, buildOptions } = wco;
   const extraPlugins: Configuration['plugins'] = [];
 
   extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
@@ -102,21 +103,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
   }
 
-  const sassImplementation = new SassWorkerImplementation();
-  const sassTildeUsageMessage = new Set<string>();
+  const sassImplementation = useLegacySass
+    ? new SassLegacyWorkerImplementation()
+    : new SassWorkerImplementation();
 
   extraPlugins.push({
     apply(compiler) {
       compiler.hooks.shutdown.tap('sass-worker', () => {
         sassImplementation.close();
-      });
-
-      compiler.hooks.afterCompile.tap('sass-worker', (compilation) => {
-        for (const message of sassTildeUsageMessage) {
-          addWarning(compilation, message);
-        }
-
-        sassTildeUsageMessage.clear();
       });
     },
   });
@@ -161,7 +155,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
         : undefined,
       plugins: [
         postcssImports({
-          resolve: (url: string) => (url.startsWith('~') ? url.slice(1) : url),
           load: (filename: string) => {
             return new Promise<string>((resolve, reject) => {
               loader.fs.readFile(filename, (err: Error, data: Buffer) => {
@@ -272,33 +265,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
         },
         {
           loader: require.resolve('sass-loader'),
-          options: {
-            implementation: sassImplementation,
-            sourceMap: true,
-            sassOptions: {
-              importer: (url: string, from: string) => {
-                if (url.charAt(0) === '~') {
-                  sassTildeUsageMessage.add(
-                    `'${from}' imports '${url}' with a tilde. Usage of '~' in imports is deprecated.`,
-                  );
-                }
-
-                return null;
-              },
-              // Prevent use of `fibers` package as it no longer works in newer Node.js versions
-              fiber: false,
-              // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
-              includePaths,
-              // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-              // Ex: /* autoprefixer grid: autoplace */
-              // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-              outputStyle: 'expanded',
-              // Silences compiler warnings from 3rd party stylesheets
-              quietDeps: !buildOptions.verbose,
-              verbose: buildOptions.verbose,
-            },
-          },
+          options: getSassLoaderOptions(
+            root,
+            projectRoot,
+            sassImplementation,
+            includePaths,
+            false,
+            !buildOptions.verbose,
+          ),
         },
       ],
     },
@@ -313,34 +287,14 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
         },
         {
           loader: require.resolve('sass-loader'),
-          options: {
-            implementation: sassImplementation,
-            sourceMap: true,
-            sassOptions: {
-              importer: (url: string, from: string) => {
-                if (url.charAt(0) === '~') {
-                  sassTildeUsageMessage.add(
-                    `'${from}' imports '${url}' with a tilde. Usage of '~' in imports is deprecated.`,
-                  );
-                }
-
-                return null;
-              },
-              // Prevent use of `fibers` package as it no longer works in newer Node.js versions
-              fiber: false,
-              indentedSyntax: true,
-              // bootstrap-sass requires a minimum precision of 8
-              precision: 8,
-              includePaths,
-              // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-              // Ex: /* autoprefixer grid: autoplace */
-              // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-              outputStyle: 'expanded',
-              // Silences compiler warnings from 3rd party stylesheets
-              quietDeps: !buildOptions.verbose,
-              verbose: buildOptions.verbose,
-            },
-          },
+          options: getSassLoaderOptions(
+            root,
+            projectRoot,
+            sassImplementation,
+            includePaths,
+            true,
+            !buildOptions.verbose,
+          ),
         },
       ],
     },
@@ -418,4 +372,70 @@ function getTailwindConfigPath({ projectRoot, root }: WebpackConfigOptions): str
   }
 
   return undefined;
+}
+
+function getSassLoaderOptions(
+  root: string,
+  projectRoot: string,
+  implementation: SassWorkerImplementation | SassLegacyWorkerImplementation,
+  includePaths: string[],
+  indentedSyntax: boolean,
+  verbose: boolean,
+): Record<string, unknown> {
+  return implementation instanceof SassWorkerImplementation
+    ? {
+        sourceMap: true,
+        api: 'modern',
+        implementation,
+        // Webpack importer is only implemented in the legacy API.
+        // See: https://github.com/webpack-contrib/sass-loader/blob/997f3eb41d86dd00d5fa49c395a1aeb41573108c/src/utils.js#L642-L651
+        webpackImporter: false,
+        sassOptions: {
+          loadPaths: [
+            ...includePaths,
+            // Needed to resolve node packages and retain the same behaviour of with the legacy API as sass-loader resolves
+            // scss also from the cwd and project root.
+            // See: https://github.com/webpack-contrib/sass-loader/blob/997f3eb41d86dd00d5fa49c395a1aeb41573108c/src/utils.js#L307
+            projectRoot,
+            path.join(root, 'node_modules'),
+          ],
+          // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
+          // Ex: /* autoprefixer grid: autoplace */
+          // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
+          style: 'expanded',
+          // Silences compiler warnings from 3rd party stylesheets
+          quietDeps: !verbose,
+          verbose,
+          syntax: indentedSyntax ? 'indented' : 'scss',
+        },
+      }
+    : {
+        sourceMap: true,
+        api: 'legacy',
+        implementation,
+        sassOptions: {
+          importer: (url: string, from: string) => {
+            if (url.charAt(0) === '~') {
+              throw new Error(
+                `'${from}' imports '${url}' with a tilde. Usage of '~' in imports is no longer supported.`,
+              );
+            }
+
+            return null;
+          },
+          // Prevent use of `fibers` package as it no longer works in newer Node.js versions
+          fiber: false,
+          indentedSyntax,
+          // bootstrap-sass requires a minimum precision of 8
+          precision: 8,
+          includePaths,
+          // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
+          // Ex: /* autoprefixer grid: autoplace */
+          // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
+          outputStyle: 'expanded',
+          // Silences compiler warnings from 3rd party stylesheets
+          quietDeps: !verbose,
+          verbose,
+        },
+      };
 }

@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ImporterResult, LegacyOptions as Options, renderSync } from 'sass';
+import { Exception, StringOptionsWithImporter, compileString } from 'sass';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'worker_threads';
 
 /**
@@ -19,9 +20,13 @@ interface RenderRequestMessage {
    */
   id: number;
   /**
-   * The Sass options to provide to the `dart-sass` render function.
+   * The contents to compile.
    */
-  options: Options<'sync'>;
+  source: string;
+  /**
+   * The Sass options to provide to the `dart-sass` compile function.
+   */
+  options: Omit<StringOptionsWithImporter<'sync'>, 'url'> & { url?: string };
   /**
    * Indicates the request has a custom importer function on the main thread.
    */
@@ -38,7 +43,11 @@ const { workerImporterPort, importerSignal } = workerData as {
   importerSignal: Int32Array;
 };
 
-parentPort.on('message', ({ id, hasImporter, options }: RenderRequestMessage) => {
+parentPort.on('message', ({ id, hasImporter, source, options }: RenderRequestMessage) => {
+  if (!parentPort) {
+    throw new Error('"parentPort" is not defined. Sass worker must be executed as a Worker.');
+  }
+
   try {
     if (hasImporter) {
       // When a custom importer function is present, the importer request must be proxied
@@ -46,24 +55,58 @@ parentPort.on('message', ({ id, hasImporter, options }: RenderRequestMessage) =>
       // This process must be synchronous from the perspective of dart-sass. The `Atomics`
       // functions combined with the shared memory `importSignal` and the Node.js
       // `receiveMessageOnPort` function are used to ensure synchronous behavior.
-      options.importer = function (url, prev) {
-        Atomics.store(importerSignal, 0, 0);
-        const { fromImport } = this;
-        workerImporterPort.postMessage({ id, url, prev, fromImport });
-        Atomics.wait(importerSignal, 0, 0);
+      options.importers = [
+        {
+          findFileUrl: (url, options) => {
+            Atomics.store(importerSignal, 0, 0);
+            workerImporterPort.postMessage({ id, url, options });
+            Atomics.wait(importerSignal, 0, 0);
 
-        return receiveMessageOnPort(workerImporterPort)?.message as ImporterResult;
-      };
+            const result = receiveMessageOnPort(workerImporterPort)?.message as string | null;
+
+            return result ? pathToFileURL(result) : null;
+          },
+        },
+      ];
     }
 
     // The synchronous Sass render function can be up to two times faster than the async variant
-    const result = renderSync(options);
+    const result = compileString(source, {
+      ...options,
+      // URL is not serializable so to convert to string in the parent and back to URL here.
+      url: options.url ? pathToFileURL(options.url) : undefined,
+    });
 
-    parentPort?.postMessage({ id, result });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+    parentPort.postMessage({
+      id,
+      result: {
+        ...result,
+        // URL is not serializable so to convert to string here and back to URL in the parent.
+        loadedUrls: result.loadedUrls.map((p) => fileURLToPath(p)),
+      },
+    });
+  } catch (error) {
     // Needed because V8 will only serialize the message and stack properties of an Error instance.
-    const { formatted, file, line, column, message, stack } = error;
-    parentPort?.postMessage({ id, error: { formatted, file, line, column, message, stack } });
+    if (error instanceof Exception) {
+      const { span, message, stack, sassMessage, sassStack } = error;
+      parentPort.postMessage({
+        id,
+        error: {
+          span: {
+            ...span,
+            url: span.url ? fileURLToPath(span.url) : undefined,
+          },
+          message,
+          stack,
+          sassMessage,
+          sassStack,
+        },
+      });
+    } else if (error instanceof Error) {
+      const { message, stack } = error;
+      parentPort.postMessage({ id, error: { message, stack } });
+    } else {
+      parentPort.postMessage({ id, error: { message: 'An unknown error has occurred.' } });
+    }
   }
 });

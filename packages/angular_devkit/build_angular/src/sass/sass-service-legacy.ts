@@ -8,14 +8,14 @@
 
 import { join } from 'path';
 import {
-  CompileResult,
-  Exception,
-  FileImporter,
-  Importer,
-  StringOptionsWithImporter,
-  StringOptionsWithoutImporter,
+  LegacyAsyncImporter as AsyncImporter,
+  LegacyResult as CompileResult,
+  LegacyException as Exception,
+  LegacyImporterResult as ImporterResult,
+  LegacyImporterThis as ImporterThis,
+  LegacyOptions as Options,
+  LegacySyncImporter as SyncImporter,
 } from 'sass';
-import { fileURLToPath, pathToFileURL } from 'url';
 import { MessageChannel, Worker } from 'worker_threads';
 import { maxWorkers } from '../utils/environment-options';
 
@@ -29,8 +29,6 @@ const MAX_RENDER_WORKERS = maxWorkers;
  */
 type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 
-type FileImporterOptions = Parameters<FileImporter['findFileUrl']>[1];
-
 /**
  * An object containing the contextual information for a specific render request.
  */
@@ -38,17 +36,8 @@ interface RenderRequest {
   id: number;
   workerIndex: number;
   callback: RenderCallback;
-  importers?: Importers[];
+  importers?: (SyncImporter | AsyncImporter)[];
 }
-
-/**
- * All available importer types.
- */
-type Importers =
-  | Importer<'sync'>
-  | Importer<'async'>
-  | FileImporter<'sync'>
-  | FileImporter<'async'>;
 
 /**
  * A response from the Sass render Worker containing the result of the operation.
@@ -56,7 +45,7 @@ type Importers =
 interface RenderResponseMessage {
   id: number;
   error?: Exception;
-  result?: Omit<CompileResult, 'loadedUrls'> & { loadedUrls: string[] };
+  result?: CompileResult;
 }
 
 /**
@@ -65,11 +54,11 @@ interface RenderResponseMessage {
  * with the `dart-sass` package.  The `dart-sass` synchronous render function is used within
  * the worker which can be up to two times faster than the asynchronous variant.
  */
-export class SassWorkerImplementation {
+export class SassLegacyWorkerImplementation {
   private readonly workers: Worker[] = [];
   private readonly availableWorkers: number[] = [];
   private readonly requests = new Map<number, RenderRequest>();
-  private readonly workerPath = join(__dirname, './worker.js');
+  private readonly workerPath = join(__dirname, './worker-legacy.js');
   private idCounter = 1;
   private nextWorkerIndex = 0;
 
@@ -84,77 +73,46 @@ export class SassWorkerImplementation {
   /**
    * The synchronous render function is not used by the `sass-loader`.
    */
-  compileString(): never {
-    throw new Error('Sass compileString is not supported.');
+  renderSync(): never {
+    throw new Error('Sass renderSync is not supported.');
   }
 
   /**
    * Asynchronously request a Sass stylesheet to be renderered.
    *
-   * @param source The contents to compile.
    * @param options The `dart-sass` options to use when rendering the stylesheet.
+   * @param callback The function to execute when the rendering is complete.
    */
-  compileStringAsync(
-    source: string,
-    options: StringOptionsWithImporter<'async'> | StringOptionsWithoutImporter<'async'>,
-  ): Promise<CompileResult> {
+  render(options: Options<'async'>, callback: RenderCallback): void {
     // The `functions`, `logger` and `importer` options are JavaScript functions that cannot be transferred.
     // If any additional function options are added in the future, they must be excluded as well.
-    const { functions, importers, url, logger, ...serializableOptions } = options;
+    const { functions, importer, logger, ...serializableOptions } = options;
 
     // The CLI's configuration does not use or expose the ability to defined custom Sass functions
     if (functions && Object.keys(functions).length > 0) {
       throw new Error('Sass custom functions are not supported.');
     }
 
-    return new Promise<CompileResult>((resolve, reject) => {
-      let workerIndex = this.availableWorkers.pop();
-      if (workerIndex === undefined) {
-        if (this.workers.length < MAX_RENDER_WORKERS) {
-          workerIndex = this.workers.length;
-          this.workers.push(this.createWorker());
-        } else {
-          workerIndex = this.nextWorkerIndex++;
-          if (this.nextWorkerIndex >= this.workers.length) {
-            this.nextWorkerIndex = 0;
-          }
+    let workerIndex = this.availableWorkers.pop();
+    if (workerIndex === undefined) {
+      if (this.workers.length < MAX_RENDER_WORKERS) {
+        workerIndex = this.workers.length;
+        this.workers.push(this.createWorker());
+      } else {
+        workerIndex = this.nextWorkerIndex++;
+        if (this.nextWorkerIndex >= this.workers.length) {
+          this.nextWorkerIndex = 0;
         }
       }
+    }
 
-      const callback: RenderCallback = (error, result) => {
-        if (error) {
-          const url = error?.span.url as string | undefined;
-          if (url) {
-            error.span.url = pathToFileURL(url);
-          }
+    const request = this.createRequest(workerIndex, callback, importer);
+    this.requests.set(request.id, request);
 
-          reject(error);
-
-          return;
-        }
-
-        if (!result) {
-          reject(new Error('No result.'));
-
-          return;
-        }
-
-        resolve(result);
-      };
-
-      const request = this.createRequest(workerIndex, callback, importers);
-      this.requests.set(request.id, request);
-
-      this.workers[workerIndex].postMessage({
-        id: request.id,
-        source,
-        hasImporter: !!importers?.length,
-        options: {
-          ...serializableOptions,
-          // URL is not serializable so to convert to string here and back to URL in the worker.
-          url: url ? fileURLToPath(url) : undefined,
-        },
-      });
+    this.workers[workerIndex].postMessage({
+      id: request.id,
+      hasImporter: !!importer,
+      options: serializableOptions,
     });
   }
 
@@ -190,11 +148,19 @@ export class SassWorkerImplementation {
       this.availableWorkers.push(request.workerIndex);
 
       if (response.result) {
-        request.callback(undefined, {
-          ...response.result,
-          // URL is not serializable so in the worker we convert to string and here back to URL.
-          loadedUrls: response.result.loadedUrls.map((p) => pathToFileURL(p)),
-        });
+        // The results are expected to be Node.js `Buffer` objects but will each be transferred as
+        // a Uint8Array that does not have the expected `toString` behavior of a `Buffer`.
+        const { css, map, stats } = response.result;
+        const result: CompileResult = {
+          // This `Buffer.from` override will use the memory directly and avoid making a copy
+          css: Buffer.from(css.buffer, css.byteOffset, css.byteLength),
+          stats,
+        };
+        if (map) {
+          // This `Buffer.from` override will use the memory directly and avoid making a copy
+          result.map = Buffer.from(map.buffer, map.byteOffset, map.byteLength);
+        }
+        request.callback(undefined, result);
       } else {
         request.callback(response.error);
       }
@@ -202,7 +168,17 @@ export class SassWorkerImplementation {
 
     mainImporterPort.on(
       'message',
-      ({ id, url, options }: { id: number; url: string; options: FileImporterOptions }) => {
+      ({
+        id,
+        url,
+        prev,
+        fromImport,
+      }: {
+        id: number;
+        url: string;
+        prev: string;
+        fromImport: boolean;
+      }) => {
         const request = this.requests.get(id);
         if (!request?.importers) {
           mainImporterPort.postMessage(null);
@@ -212,7 +188,7 @@ export class SassWorkerImplementation {
           return;
         }
 
-        this.processImporters(request.importers, url, options)
+        this.processImporters(request.importers, url, prev, fromImport)
           .then((result) => {
             mainImporterPort.postMessage(result);
           })
@@ -232,40 +208,44 @@ export class SassWorkerImplementation {
   }
 
   private async processImporters(
-    importers: Iterable<Importers>,
+    importers: Iterable<SyncImporter | AsyncImporter>,
     url: string,
-    options: FileImporterOptions,
-  ): Promise<string | null> {
+    prev: string,
+    fromImport: boolean,
+  ): Promise<ImporterResult> {
+    let result = null;
     for (const importer of importers) {
-      if (this.isImporter(importer)) {
-        // Importer
-        throw new Error('Only File Importers are supported.');
-      }
+      result = await new Promise<ImporterResult>((resolve) => {
+        // Importers can be both sync and async
+        const innerResult = (importer as AsyncImporter).call(
+          { fromImport } as ImporterThis,
+          url,
+          prev,
+          resolve,
+        );
+        if (innerResult !== undefined) {
+          resolve(innerResult);
+        }
+      });
 
-      // File importer (Can be sync or aync).
-      const result = await importer.findFileUrl(url, options);
       if (result) {
-        return fileURLToPath(result);
+        break;
       }
     }
 
-    return null;
+    return result;
   }
 
   private createRequest(
     workerIndex: number,
     callback: RenderCallback,
-    importers: Importers[] | undefined,
+    importer: SyncImporter | AsyncImporter | (SyncImporter | AsyncImporter)[] | undefined,
   ): RenderRequest {
     return {
       id: this.idCounter++,
       workerIndex,
       callback,
-      importers,
+      importers: !importer || Array.isArray(importer) ? importer : [importer],
     };
-  }
-
-  private isImporter(value: Importers): value is Importer {
-    return 'canonicalize' in value && 'load' in value;
   }
 }

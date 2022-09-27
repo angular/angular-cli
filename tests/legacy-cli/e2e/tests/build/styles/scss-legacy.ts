@@ -5,8 +5,9 @@ import {
   replaceInFile,
 } from '../../../utils/fs';
 import { expectToFail } from '../../../utils/utils';
-import { ng } from '../../../utils/process';
+import { execWithEnv } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
+import assert from 'assert';
 
 export default async function () {
   await writeMultipleFiles({
@@ -32,7 +33,20 @@ export default async function () {
   await deleteFile('src/app/app.component.css');
   await replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.scss');
 
-  await ng('build', '--source-map', '--configuration=development');
+  const { stderr } = await execWithEnv(
+    'ng',
+    ['build', '--source-map', '--configuration=development'],
+    {
+      ...process.env,
+      NG_BUILD_LEGACY_SASS: '1',
+    },
+  );
+
+  assert.match(
+    stderr,
+    /Warning: 'NG_BUILD_LEGACY_SASS'/,
+    `Expected stderr to contain 'NG_BUILD_LEGACY_SASS' usage warning`,
+  );
 
   await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
   await expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/);
