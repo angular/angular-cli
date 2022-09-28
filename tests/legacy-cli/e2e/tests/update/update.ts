@@ -72,8 +72,8 @@ export default async function () {
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Setup testing to use CI Chrome.
-  await useCIChrome('./');
-  await useCIChrome('./e2e/');
+  await useCIChrome('twelve-project', './');
+  await useCIChrome('twelve-project', './e2e/');
   await useCIDefaults('twelve-project');
 
   // Run CLI commands.

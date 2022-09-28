@@ -21,7 +21,7 @@ export default function () {
       )
       .then(() => ng('generate', 'application', 'app-two', '--skip-install'))
       .then(() => useCIDefaults('app-two'))
-      .then(() => useCIChrome('./projects/app-two'))
+      .then(() => useCIChrome('app-two', './projects/app-two'))
       .then(() =>
         updateJsonFile('angular.json', (configJson) => {
           configJson.projects['test-project'].schematics = {

@@ -170,6 +170,9 @@ console.log(['Tests:', ...testsToRun].join('\n '));
 
 setGlobalVariable('argv', argv);
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
+// This is needed by karma-chrome-launcher
+// https://github.com/karma-runner/karma-chrome-launcher#headless-chromium-with-puppeteer
+process.env['CHROME_BIN'] = require('puppeteer').executablePath();
 
 Promise.all([findFreePort(), findFreePort(), findPackageTars()])
   .then(async ([httpPort, httpsPort, packageTars]) => {

@@ -51,7 +51,6 @@ describe('Library Schematic', () => {
     const files = tree.files;
     expect(files).toEqual(
       jasmine.arrayContaining([
-        '/projects/foo/karma.conf.js',
         '/projects/foo/ng-package.json',
         '/projects/foo/package.json',
         '/projects/foo/README.md',
@@ -310,11 +309,6 @@ describe('Library Schematic', () => {
 
     const rootTsCfg = getJsonFileContent(tree, '/tsconfig.json');
     expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib']);
-
-    const karmaConf = getFileContent(tree, '/projects/myscope/mylib/karma.conf.js');
-    expect(karmaConf).toContain(
-      `dir: require('path').join(__dirname, '../../../coverage/myscope/mylib')`,
-    );
   });
 
   it(`should dasherize scoped libraries`, async () => {
@@ -337,14 +331,6 @@ describe('Library Schematic', () => {
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myScope/myLib']).toBeDefined();
-  });
-
-  it(`should set coverage folder to "coverage/foo"`, async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('library', defaultOptions, workspaceTree)
-      .toPromise();
-    const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');
-    expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 
   it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
