@@ -1,3 +1,66 @@
+<a name="15.0.0-next.3"></a>
+
+# 15.0.0-next.3 (2022-09-28)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- The server builder `bundleDependencies` option has been removed. This option was used pre Ivy. Currently, using this option is unlikely to produce working server bundles.
+
+  The `externalDependencies` option can be used instead to exclude specific node_module packages from the final bundle.
+
+- - Deprecated support for tilde import has been removed. Please update the imports by removing the `~`.
+
+  Before
+
+  ```scss
+  @import '~font-awesome/scss/font-awesome';
+  ```
+
+  After
+
+  ```scss
+  @import 'font-awesome/scss/font-awesome';
+  ```
+
+  - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
+
+- `require.context` are no longer parsed. Webpack specific features are not supported nor guaranteed to work in the future.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [766d4a089](https://github.com/angular/angular-cli/commit/766d4a0895e7895211e93bc73ff131c6e47613a7) | feat | add migration to remove require calls from karma builder main file |
+| [597bfea1b](https://github.com/angular/angular-cli/commit/597bfea1b29cc7b25d1f466eb313cbeeb6dffc98) | feat | drop `polyfills.ts` file from new templates                        |
+| [283b564d1](https://github.com/angular/angular-cli/commit/283b564d1de985f0af8c2fcb6192801a90baacda) | feat | remove environment files in new applications                       |
+| [56a1e8f9f](https://github.com/angular/angular-cli/commit/56a1e8f9f52658488afb9d36007e96c96d08a03b) | feat | remove test.ts file from new projects                              |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [23c233c29](https://github.com/angular/angular-cli/commit/23c233c296d4e264b36241fbba0b92ec00a00374) | fix  | add builders and schematic names as page titles in collected analytics |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                                                       |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------- |
+| [4ead45cab](https://github.com/angular/angular-cli/commit/4ead45caba08cb0b67dc7df2f6a9b304c75fff7d) | feat     | add `ng-server-context` when using app-shell builder                              |
+| [c592ec584](https://github.com/angular/angular-cli/commit/c592ec584f1c0b126a2045e5ea1b01cb1569ce4d) | feat     | amend `polyfills` option in all builders to support an array of module specifiers |
+| [05a98c029](https://github.com/angular/angular-cli/commit/05a98c02924f656be3257d5f459ae88c1ae29fba) | feat     | karma builder `main` option is now optional                                       |
+| [9c13fce16](https://github.com/angular/angular-cli/commit/9c13fce162eff8d01d1fa6a7f0e0029da2887c86) | feat     | remove `bundleDependencies` from server builder                                   |
+| [308e3a017](https://github.com/angular/angular-cli/commit/308e3a017f876bfc727e68803bfbce11e9d3396e) | feat     | switch to use Sass modern API                                                     |
+| [fb5a66ae6](https://github.com/angular/angular-cli/commit/fb5a66ae66b595602d2a8aea8e938efe5df6d13c) | fix      | fix crash when Sass error occurs                                                  |
+| [f393b0928](https://github.com/angular/angular-cli/commit/f393b09282582da47db683344e037fd1434b32a8) | refactor | disable `requireContext` parsing                                                  |
+
+## Special Thanks
+
+Alan Agius, Jason Bedard and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.4"></a>
 
 # 14.2.4 (2022-09-28)
