@@ -9,7 +9,9 @@
 import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'path';
-import { Configuration, RuleSetUseItem } from 'webpack';
+import type { FileImporter } from 'sass';
+import { pathToFileURL } from 'url';
+import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
 import { StyleElement } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
@@ -267,11 +269,11 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           loader: require.resolve('sass-loader'),
           options: getSassLoaderOptions(
             root,
-            projectRoot,
             sassImplementation,
             includePaths,
             false,
             !buildOptions.verbose,
+            !!buildOptions.preserveSymlinks,
           ),
         },
       ],
@@ -289,11 +291,11 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           loader: require.resolve('sass-loader'),
           options: getSassLoaderOptions(
             root,
-            projectRoot,
             sassImplementation,
             includePaths,
             true,
             !buildOptions.verbose,
+            !!buildOptions.preserveSymlinks,
           ),
         },
       ],
@@ -376,29 +378,23 @@ function getTailwindConfigPath({ projectRoot, root }: WebpackConfigOptions): str
 
 function getSassLoaderOptions(
   root: string,
-  projectRoot: string,
   implementation: SassWorkerImplementation | SassLegacyWorkerImplementation,
   includePaths: string[],
   indentedSyntax: boolean,
   verbose: boolean,
+  preserveSymlinks: boolean,
 ): Record<string, unknown> {
   return implementation instanceof SassWorkerImplementation
     ? {
         sourceMap: true,
         api: 'modern',
         implementation,
-        // Webpack importer is only implemented in the legacy API.
+        // Webpack importer is only implemented in the legacy API and we have our own custom Webpack importer.
         // See: https://github.com/webpack-contrib/sass-loader/blob/997f3eb41d86dd00d5fa49c395a1aeb41573108c/src/utils.js#L642-L651
         webpackImporter: false,
-        sassOptions: {
-          loadPaths: [
-            ...includePaths,
-            // Needed to resolve node packages and retain the same behaviour of with the legacy API as sass-loader resolves
-            // scss also from the cwd and project root.
-            // See: https://github.com/webpack-contrib/sass-loader/blob/997f3eb41d86dd00d5fa49c395a1aeb41573108c/src/utils.js#L307
-            projectRoot,
-            path.join(root, 'node_modules'),
-          ],
+        sassOptions: (loaderContext: LoaderContext<{}>) => ({
+          importers: [getSassResolutionImporter(loaderContext, root, preserveSymlinks)],
+          loadPaths: includePaths,
           // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
           // Ex: /* autoprefixer grid: autoplace */
           // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
@@ -407,7 +403,7 @@ function getSassLoaderOptions(
           quietDeps: !verbose,
           verbose,
           syntax: indentedSyntax ? 'indented' : 'scss',
-        },
+        }),
       }
     : {
         sourceMap: true,
@@ -438,4 +434,43 @@ function getSassLoaderOptions(
           verbose,
         },
       };
+}
+
+function getSassResolutionImporter(
+  loaderContext: LoaderContext<{}>,
+  root: string,
+  preserveSymlinks: boolean,
+): FileImporter<'async'> {
+  const commonResolverOptions: Parameters<typeof loaderContext['getResolve']>[0] = {
+    conditionNames: ['sass', 'style'],
+    mainFields: ['sass', 'style', 'main', '...'],
+    extensions: ['.scss', '.sass', '.css'],
+    restrictions: [/\.((sa|sc|c)ss)$/i],
+    preferRelative: true,
+    symlinks: !preserveSymlinks,
+  };
+
+  // Sass also supports import-only files. If you name a file <name>.import.scss, it will only be loaded for imports, not for @uses.
+  // See: https://sass-lang.com/documentation/at-rules/import#import-only-files
+  const resolveImport = loaderContext.getResolve({
+    ...commonResolverOptions,
+    dependencyType: 'sass-import',
+    mainFiles: ['_index.import', '_index', 'index.import', 'index', '...'],
+  });
+
+  const resolveModule = loaderContext.getResolve({
+    ...commonResolverOptions,
+    dependencyType: 'sass-module',
+    mainFiles: ['_index', 'index', '...'],
+  });
+
+  return {
+    findFileUrl: (url, { fromImport }): Promise<URL | null> => {
+      const resolve = fromImport ? resolveImport : resolveModule;
+
+      return resolve(root, url)
+        .then((file) => pathToFileURL(file))
+        .catch(() => null);
+    },
+  };
 }
