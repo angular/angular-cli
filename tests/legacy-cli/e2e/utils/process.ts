@@ -167,7 +167,7 @@ export function extractNpmEnv() {
 
 function extractCIEnv(): NodeJS.ProcessEnv {
   return Object.keys(process.env)
-    .filter((v) => v.startsWith('SAUCE_') || v === 'CI' || v === 'CIRCLECI')
+    .filter((v) => v.startsWith('SAUCE_') || v === 'CI' || v === 'CIRCLECI' || v === 'CHROME_BIN')
     .reduce<NodeJS.ProcessEnv>((vars, n) => {
       vars[n] = process.env[n];
       return vars;

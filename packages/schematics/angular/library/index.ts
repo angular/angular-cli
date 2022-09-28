@@ -110,7 +110,6 @@ function addLibToWorkspaceFile(
           options: {
             tsConfig: `${projectRoot}/tsconfig.spec.json`,
             polyfills: ['zone.js', 'zone.js/testing'],
-            karmaConfig: `${projectRoot}/karma.conf.js`,
           },
         },
       },

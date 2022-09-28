@@ -83,8 +83,8 @@ export async function prepareProjectForE2e(name: string) {
     await runWebdriverUpdate();
   }
 
-  await useCIChrome('e2e');
-  await useCIChrome('');
+  await useCIChrome(name, 'e2e');
+  await useCIChrome(name, '');
   await useCIDefaults(name);
 
   // Force sourcemaps to be from the root of the filesystem.
@@ -160,7 +160,7 @@ export function useSha() {
   }
 }
 
-export function useCIDefaults(projectName = 'test-project') {
+export function useCIDefaults(projectName = 'test-project'): Promise<void> {
   return updateJsonFile('angular.json', (workspaceJson) => {
     // Disable progress reporting on CI to reduce spam.
     const project = workspaceJson.projects[projectName];
@@ -182,10 +182,8 @@ export function useCIDefaults(projectName = 'test-project') {
   });
 }
 
-export async function useCIChrome(projectDir: string = ''): Promise<void> {
+export async function useCIChrome(projectName: string, projectDir = ''): Promise<void> {
   const protractorConf = path.join(projectDir, 'protractor.conf.js');
-  const karmaConf = path.join(projectDir, 'karma.conf.js');
-
   const chromePath = require('puppeteer').executablePath();
 
   // Use Puppeteer in protractor if a config is found on the project.
@@ -215,11 +213,12 @@ export async function useCIChrome(projectDir: string = ''): Promise<void> {
     );
   }
 
-  // Use Puppeteer in karma if a config is found on the project.
-  if (fs.existsSync(karmaConf)) {
-    await prependToFile(karmaConf, `process.env.CHROME_BIN = String.raw\`${chromePath}\`;`);
-    await replaceInFile(karmaConf, `browsers: ['Chrome']`, `browsers: ['ChromeHeadless']`);
-  }
+  // Use ChromeHeadless.
+  return updateJsonFile('angular.json', (workspaceJson) => {
+    const project = workspaceJson.projects[projectName];
+    const appTargets = project.targets || project.architect;
+    appTargets.test.options.browsers = 'ChromeHeadless';
+  });
 }
 
 export function getNgCLIVersion(): SemVer {

@@ -206,7 +206,6 @@ function addAppToWorkspaceFile(
             options: {
               polyfills: ['zone.js', 'zone.js/testing'],
               tsConfig: `${projectRoot}tsconfig.spec.json`,
-              karmaConfig: `${projectRoot}karma.conf.js`,
               inlineStyleLanguage,
               assets: [`${sourceRoot}/favicon.ico`, `${sourceRoot}/assets`],
               styles: [`${sourceRoot}/styles.${options.style}`],
@@ -224,9 +223,7 @@ function addAppToWorkspaceFile(
   });
 }
 function minimalPathFilter(path: string): boolean {
-  const toRemoveList = /(tsconfig.spec.json|karma.conf.js).template$/;
-
-  return !toRemoveList.test(path);
+  return !path.endsWith('tsconfig.spec.json.template');
 }
 
 export default function (options: ApplicationOptions): Rule {

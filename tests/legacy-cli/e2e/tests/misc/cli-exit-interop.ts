@@ -26,7 +26,7 @@ export default async function () {
     // Simulates issue https://github.com/angular/angular-cli/issues/23289
     await replaceInFile('angular.json', /styles\.css/g, 'styles.scss');
 
-    await useCIChrome();
+    await useCIChrome('thirteen-project');
     await useCIDefaults('thirteen-project');
     await noSilentNg('test', '--watch=false');
   } finally {
