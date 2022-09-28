@@ -1,3 +1,19 @@
+<a name="14.2.4"></a>
+
+# 14.2.4 (2022-09-28)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [05b18f4e4](https://github.com/angular/angular-cli/commit/05b18f4e4b39d73c8a3532507c4b7bba8722bf80) | fix  | add builders and schematic names as page titles in collected analytics |
+
+## Special Thanks
+
+Alan Agius, Jason Bedard and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.2"></a>
 
 # 15.0.0-next.2 (2022-09-21)
