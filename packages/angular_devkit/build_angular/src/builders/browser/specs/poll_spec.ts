@@ -46,7 +46,7 @@ describe('Browser Builder poll', () => {
 
     intervals.sort();
     const median = intervals[Math.trunc(intervals.length / 2)];
-    expect(median).toBeGreaterThan(3000);
+    expect(median).toBeGreaterThan(2950);
     expect(median).toBeLessThan(12000);
 
     await run.stop();
