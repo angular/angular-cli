@@ -93,7 +93,18 @@ parentPort.on('message', ({ id, hasImporter, source, options }: RenderRequestMes
         id,
         error: {
           span: {
-            ...span,
+            text: span.text,
+            context: span.context,
+            end: {
+              column: span.end.column,
+              offset: span.end.offset,
+              line: span.end.line,
+            },
+            start: {
+              column: span.start.column,
+              offset: span.start.offset,
+              line: span.start.line,
+            },
             url: span.url ? fileURLToPath(span.url) : undefined,
           },
           message,
