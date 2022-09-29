@@ -218,7 +218,10 @@ function parseProject(
         break;
       default:
         if (!context.unprefixedProjectExtensions.has(name) && !/^[a-z]{1,3}-.*/.test(name)) {
-          context.warn(`Project extension with invalid name (${name}) found.`, name);
+          context.warn(
+            `Project '${projectName}' contains extension with invalid name (${name}).`,
+            name,
+          );
         }
         if (extensions) {
           extensions[name] = value;
