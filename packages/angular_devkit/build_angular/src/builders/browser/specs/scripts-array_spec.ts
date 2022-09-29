@@ -145,12 +145,4 @@ describe('Browser Builder scripts array', () => {
     expect(joinedLogs).toMatch(/renamed-lazy-script.+\d+ bytes/);
     expect(joinedLogs).not.toContain('Lazy Chunks');
   });
-
-  it(`should error when a script doesn't exist`, async () => {
-    await expectAsync(
-      browserBuild(architect, host, target, {
-        scripts: ['./invalid.js'],
-      }),
-    ).toBeRejectedWithError(`Script file ./invalid.js does not exist.`);
-  });
 });

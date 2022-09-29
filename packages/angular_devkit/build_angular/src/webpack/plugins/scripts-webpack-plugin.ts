@@ -9,6 +9,8 @@
 import { interpolateName } from 'loader-utils';
 import * as path from 'path';
 import { Chunk, Compilation, Compiler, sources as webpackSources } from 'webpack';
+import { assertIsError } from '../../utils/error';
+import { addError } from '../../utils/webpack-diagnostics';
 
 const Entrypoint = require('webpack/lib/Entrypoint');
 
@@ -35,6 +37,7 @@ function addDependencies(compilation: Compilation, scripts: string[]): void {
     compilation.fileDependencies.add(script);
   }
 }
+
 export class ScriptsWebpackPlugin {
   private _lastBuildTime?: number;
   private _cachedOutput?: ScriptOutput;
@@ -88,21 +91,38 @@ export class ScriptsWebpackPlugin {
     compilation.entrypoints.set(this.options.name, entrypoint);
     compilation.chunks.add(chunk);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    compilation.assets[filename] = source as any;
+    compilation.assets[filename] = source;
     compilation.hooks.chunkAsset.call(chunk, filename);
   }
 
   apply(compiler: Compiler): void {
-    if (!this.options.scripts || this.options.scripts.length === 0) {
+    if (this.options.scripts.length === 0) {
       return;
     }
 
-    const scripts = this.options.scripts
-      .filter((script) => !!script)
-      .map((script) => path.resolve(this.options.basePath || '', script));
+    const resolver = compiler.resolverFactory.get('normal', {
+      preferRelative: true,
+      useSyncFileSystemCalls: true,
+      fileSystem: compiler.inputFileSystem,
+    });
 
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+      const scripts: string[] = [];
+
+      for (const script of this.options.scripts) {
+        try {
+          const resolvedPath = resolver.resolveSync({}, this.options.basePath, script);
+          if (resolvedPath) {
+            scripts.push(resolvedPath);
+          } else {
+            addError(compilation, `Cannot resolve '${script}'.`);
+          }
+        } catch (error) {
+          assertIsError(error);
+          addError(compilation, error.message);
+        }
+      }
+
       compilation.hooks.additionalAssets.tapPromise(PLUGIN_NAME, async () => {
         if (await this.shouldSkip(compilation, scripts)) {
           if (this._cachedOutput) {

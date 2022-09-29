@@ -21,7 +21,7 @@ import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
-import { resolveGlobalStyles } from '../../webpack/configs';
+import { normalizeGlobalStyles } from '../../webpack/utils/helpers';
 import { createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
@@ -347,13 +347,8 @@ async function bundleGlobalStylesheets(
   const warnings: Message[] = [];
 
   // resolveGlobalStyles is temporarily reused from the Webpack builder code
-  const { entryPoints: stylesheetEntrypoints, noInjectNames } = resolveGlobalStyles(
+  const { entryPoints: stylesheetEntrypoints, noInjectNames } = normalizeGlobalStyles(
     options.styles || [],
-    workspaceRoot,
-    // preserveSymlinks is always true here to allow the bundler to handle the option
-    true,
-    // skipResolution to leverage the bundler's more comprehensive resolution
-    true,
   );
 
   for (const [name, files] of Object.entries(stylesheetEntrypoints)) {

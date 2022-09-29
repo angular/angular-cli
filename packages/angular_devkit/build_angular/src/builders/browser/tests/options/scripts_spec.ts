@@ -93,18 +93,19 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           );
       });
 
-      it('throws an exception if script does not exist', async () => {
+      it('fails and shows an error if script does not exist', async () => {
         harness.useTarget('build', {
           ...BASE_OPTIONS,
           scripts: ['src/test-script-a.js'],
         });
 
-        const { result, error } = await harness.executeOnce({ outputLogsOnException: false });
+        const { result, logs } = await harness.executeOnce();
 
-        expect(result).toBeUndefined();
-        expect(error).toEqual(
+        expect(result?.success).toBeFalse();
+        expect(logs).toContain(
           jasmine.objectContaining({
-            message: jasmine.stringMatching(`Script file src/test-script-a.js does not exist.`),
+            level: 'error',
+            message: jasmine.stringMatching(`Can't resolve 'src/test-script-a.js'`),
           }),
         );
 
