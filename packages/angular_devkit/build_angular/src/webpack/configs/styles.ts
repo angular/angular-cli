@@ -24,59 +24,13 @@ import {
   SuppressExtractedTextChunksWebpackPlugin,
 } from '../plugins';
 import { CssOptimizerPlugin } from '../plugins/css-optimizer-plugin';
+import { StylesWebpackPlugin } from '../plugins/styles-webpack-plugin';
 import {
   assetNameTemplateFactory,
   getOutputHashFormat,
   normalizeExtraEntryPoints,
+  normalizeGlobalStyles,
 } from '../utils/helpers';
-
-export function resolveGlobalStyles(
-  styleEntrypoints: StyleElement[],
-  root: string,
-  preserveSymlinks: boolean,
-  skipResolution = false,
-): { entryPoints: Record<string, string[]>; noInjectNames: string[]; paths: string[] } {
-  const entryPoints: Record<string, string[]> = {};
-  const noInjectNames: string[] = [];
-  const paths: string[] = [];
-
-  if (styleEntrypoints.length === 0) {
-    return { entryPoints, noInjectNames, paths };
-  }
-
-  for (const style of normalizeExtraEntryPoints(styleEntrypoints, 'styles')) {
-    let stylesheetPath = style.input;
-    if (!skipResolution) {
-      stylesheetPath = path.resolve(root, stylesheetPath);
-      if (!fs.existsSync(stylesheetPath)) {
-        try {
-          stylesheetPath = require.resolve(style.input, { paths: [root] });
-        } catch {}
-      }
-    }
-
-    if (!preserveSymlinks) {
-      stylesheetPath = fs.realpathSync(stylesheetPath);
-    }
-
-    // Add style entry points.
-    if (entryPoints[style.bundleName]) {
-      entryPoints[style.bundleName].push(stylesheetPath);
-    } else {
-      entryPoints[style.bundleName] = [stylesheetPath];
-    }
-
-    // Add non injected styles to the list.
-    if (!style.inject) {
-      noInjectNames.push(style.bundleName);
-    }
-
-    // Add global css paths.
-    paths.push(stylesheetPath);
-  }
-
-  return { entryPoints, noInjectNames, paths };
-}
 
 // eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
@@ -95,14 +49,20 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     buildOptions.stylePreprocessorOptions?.includePaths?.map((p) => path.resolve(root, p)) ?? [];
 
   // Process global styles.
-  const {
-    entryPoints,
-    noInjectNames,
-    paths: globalStylePaths,
-  } = resolveGlobalStyles(buildOptions.styles, root, !!buildOptions.preserveSymlinks);
-  if (noInjectNames.length > 0) {
-    // Add plugin to remove hashes from lazy styles.
-    extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
+  if (buildOptions.styles.length > 0) {
+    const { entryPoints, noInjectNames } = normalizeGlobalStyles(buildOptions.styles);
+    extraPlugins.push(
+      new StylesWebpackPlugin({
+        root,
+        entryPoints,
+        preserveSymlinks: buildOptions.preserveSymlinks,
+      }),
+    );
+
+    if (noInjectNames.length > 0) {
+      // Add plugin to remove hashes from lazy styles.
+      extraPlugins.push(new RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
+    }
   }
 
   const sassImplementation = useLegacySass
@@ -319,7 +279,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   ];
 
   return {
-    entry: entryPoints,
     module: {
       rules: styleLanguages.map(({ extensions, use }) => ({
         test: new RegExp(`\\.(?:${extensions.join('|')})$`, 'i'),
@@ -330,8 +289,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
               // Global styles are only defined global styles
               {
                 use: globalStyleLoaders,
-                include: globalStylePaths,
-                resourceQuery: { not: [/\?ngResource/] },
+                resourceQuery: /\?ngGlobalStyle/,
               },
               // Component styles are all styles except defined global styles
               {

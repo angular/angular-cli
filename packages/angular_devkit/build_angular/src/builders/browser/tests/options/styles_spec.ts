@@ -121,7 +121,10 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBeFalse();
         expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching('Module not found:') }),
+          jasmine.objectContaining({
+            level: 'error',
+            message: jasmine.stringMatching(`Can't resolve 'src/test-style-a.css'`),
+          }),
         );
 
         harness.expectFile('dist/styles.css').toNotExist();

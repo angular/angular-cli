@@ -147,10 +147,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
 
   // process global scripts
   // Add a new asset for each entry.
-  for (const { bundleName, inject, paths } of globalScriptsByBundleName(
-    root,
-    buildOptions.scripts,
-  )) {
+  for (const { bundleName, inject, paths } of globalScriptsByBundleName(buildOptions.scripts)) {
     // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
     const hash = inject ? hashFormat.script : '';
 
@@ -160,7 +157,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         sourceMap: scriptsSourceMap,
         scripts: paths,
         filename: `${path.basename(bundleName)}${hash}.js`,
-        basePath: projectRoot,
+        basePath: root,
       }),
     );
   }

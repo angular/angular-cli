@@ -134,6 +134,31 @@ export function getInstrumentationExcludedPaths(
   return excluded;
 }
 
+export function normalizeGlobalStyles(styleEntrypoints: StyleElement[]): {
+  entryPoints: Record<string, string[]>;
+  noInjectNames: string[];
+} {
+  const entryPoints: Record<string, string[]> = {};
+  const noInjectNames: string[] = [];
+
+  if (styleEntrypoints.length === 0) {
+    return { entryPoints, noInjectNames };
+  }
+
+  for (const style of normalizeExtraEntryPoints(styleEntrypoints, 'styles')) {
+    // Add style entry points.
+    entryPoints[style.bundleName] ??= [];
+    entryPoints[style.bundleName].push(style.input);
+
+    // Add non injected styles to the list.
+    if (!style.inject) {
+      noInjectNames.push(style.bundleName);
+    }
+  }
+
+  return { entryPoints, noInjectNames };
+}
+
 export function getCacheSettings(
   wco: WebpackConfigOptions,
   angularVersion: string,
@@ -176,21 +201,11 @@ export function getCacheSettings(
 }
 
 export function globalScriptsByBundleName(
-  root: string,
   scripts: ScriptElement[],
 ): { bundleName: string; inject: boolean; paths: string[] }[] {
   return normalizeExtraEntryPoints(scripts, 'scripts').reduce(
     (prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {
       const { bundleName, inject, input } = curr;
-      let resolvedPath = path.resolve(root, input);
-
-      if (!existsSync(resolvedPath)) {
-        try {
-          resolvedPath = require.resolve(input, { paths: [root] });
-        } catch {
-          throw new Error(`Script file ${input} does not exist.`);
-        }
-      }
 
       const existingEntry = prev.find((el) => el.bundleName === bundleName);
       if (existingEntry) {
@@ -199,12 +214,12 @@ export function globalScriptsByBundleName(
           throw new Error(`The ${bundleName} bundle is mixing injected and non-injected scripts.`);
         }
 
-        existingEntry.paths.push(resolvedPath);
+        existingEntry.paths.push(input);
       } else {
         prev.push({
           bundleName,
           inject,
-          paths: [resolvedPath],
+          paths: [input],
         });
       }
 
