@@ -51,11 +51,8 @@ flexibility in their environments when desired.
 ## Platform support
 
 Angular CLI supports autocompletion for the Bash and Zsh shells on MacOS and Linux operating
-systems.
-
-Windows does not support autocompletion in native shells, such as Cmd and Powershell. However,
-the Angular CLI supports Git Bash and
-[Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/) using Bash or Zsh.
+systems. On Windows, Git Bash and [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/)
+using Bash or Zsh are supported.
 
 ## Global install
 
