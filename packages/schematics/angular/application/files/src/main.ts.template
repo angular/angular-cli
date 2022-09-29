@@ -1,5 +1,5 @@
-<% if(!!viewEncapsulation) { %>import { ViewEncapsulation } from '@angular/core';<% }%>
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+<% if(!!viewEncapsulation) { %>import { ViewEncapsulation } from '@angular/core';
+<% }%>import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 
@@ -7,8 +7,7 @@ import { AppModule } from './app/app.module';
 platformBrowserDynamic().bootstrapModule(AppModule, {
   defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %>
 })
-  .catch(err => console.error(err));
-<% } else { %>
+  .catch(err => console.error(err));<% } else { %>
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
 <% } %>
