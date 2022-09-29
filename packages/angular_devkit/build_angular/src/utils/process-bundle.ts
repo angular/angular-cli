@@ -139,7 +139,7 @@ export async function inlineLocales(options: InlineOptions) {
     ast = parseSync(options.code, {
       babelrc: false,
       configFile: false,
-      sourceType: 'script',
+      sourceType: 'unambiguous',
       filename: options.filename,
     });
   } catch (error) {
