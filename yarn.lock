@@ -2833,10 +2833,10 @@
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-10.2.0.tgz#e01d2bfdcfe8aa2389f31bc6b72a602628bd025b"
   integrity sha512-FaIzCnDg0x0Js5kSQn1Le3YzDHl7XxrJ0QdIw5LrDUmLsH3VXNi4/NMlSHnw5RiTTMs4UbEf98V3RJRB8exqJA==
 
-"@verdaccio/ui-theme@6.0.0-6-next.28":
-  version "6.0.0-6-next.28"
-  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-6.0.0-6-next.28.tgz#bf8ff0e90f3d292741440c7e6ab6744b97d96a98"
-  integrity sha512-1sJ28aVGMiRJrSz0e8f4t+IUgt/cyYmuDLhogXHOEjEIIEcfMNyQ5bVYqq03wLVoKWEh5D6gHo1hQnVKQl1L5g==
+"@verdaccio/ui-theme@6.0.0-6-next.48":
+  version "6.0.0-6-next.48"
+  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-6.0.0-6-next.48.tgz#23bbc8037bf9e1b27600f5160a0ff716982db48b"
+  integrity sha512-1jls+cpfEXqXc1ZzqLGGNs6YCyG6B6QwDCezEkSvgKm+9A49FnSJ2n2dNIGcQYOszwHmd8EvwN98OEIx3Bbtrw==
 
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
@@ -8060,7 +8060,17 @@ npm-normalize-package-bin@^2.0.0:
   resolved "https://registry.yarnpkg.com/npm-normalize-package-bin/-/npm-normalize-package-bin-2.0.0.tgz#9447a1adaaf89d8ad0abe24c6c84ad614a675fff"
   integrity sha512-awzfKUO7v0FscrSpRoogyNm0sajikhBWpU0QMrW09AMi9n1PoKU6WaIqUzuJSQnpciZZmJ/jMZ2Egfmb/9LiWQ==
 
-npm-package-arg@9.1.0, npm-package-arg@^9.0.0, npm-package-arg@^9.0.1, npm-package-arg@^9.1.0:
+npm-package-arg@9.1.2:
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-9.1.2.tgz#fc8acecb00235f42270dda446f36926ddd9ac2bc"
+  integrity sha512-pzd9rLEx4TfNJkovvlBSLGhq31gGu2QDexFPWT19yCDh0JgnRhlBLNo5759N0AJmBk+kQ9Y/hXoLnlgFD+ukmg==
+  dependencies:
+    hosted-git-info "^5.0.0"
+    proc-log "^2.0.1"
+    semver "^7.3.5"
+    validate-npm-package-name "^4.0.0"
+
+npm-package-arg@^9.0.0, npm-package-arg@^9.0.1, npm-package-arg@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-9.1.0.tgz#a60e9f1e7c03e4e3e4e994ea87fff8b90b522987"
   integrity sha512-4J0GL+u2Nh6OnhvUKXRr2ZMG4lR8qtLp+kv7UiV00Y+nGiSxtttCyIRHCt5L5BNkXQld/RceYItau3MDOoGiBw==
@@ -11086,16 +11096,16 @@ verdaccio-htpasswd@10.5.0:
     http-errors "2.0.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.15.3:
-  version "5.15.3"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.15.3.tgz#4953471c0130c8e88b3d5562b5c63b38b575ed3d"
-  integrity sha512-8oEtepXF1oksGVYahi2HS1Yx9u6HD/4ukBDNDfwISmlNp7HVKJL2+kjzmDJWam88BpDNxOBU/LFXWSsEAFKFCQ==
+verdaccio@5.15.4:
+  version "5.15.4"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.15.4.tgz#23b2b97b33b14ca30a6fc18b1226a1f082f7e476"
+  integrity sha512-yYMqpEQCv/BfYW5K/Nq57dbx68ICP1GfK7RJ0A3SlhKgl6idT8x4cJyLjH7C4k1Tln3LIQk1/X6ZtSl7xhzwOg==
   dependencies:
     "@verdaccio/commons-api" "10.2.0"
     "@verdaccio/local-storage" "10.3.1"
     "@verdaccio/readme" "10.4.1"
     "@verdaccio/streams" "10.2.0"
-    "@verdaccio/ui-theme" "6.0.0-6-next.28"
+    "@verdaccio/ui-theme" "6.0.0-6-next.48"
     JSONStream "1.3.5"
     async "3.2.4"
     body-parser "1.20.0"
