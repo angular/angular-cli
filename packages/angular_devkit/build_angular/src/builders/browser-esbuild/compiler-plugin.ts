@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { CompilerHost } from '@angular/compiler-cli';
+import type { CompilerHost, NgtscProgram } from '@angular/compiler-cli';
 import { transformAsync } from '@babel/core';
 import * as assert from 'assert';
 import type {
@@ -199,6 +199,10 @@ export function createCompilerPlugin(
       // The stylesheet resources from component stylesheets that will be added to the build results output files
       let stylesheetResourceFiles: OutputFile[];
 
+      let previousBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined;
+      let previousAngularProgram: NgtscProgram | undefined;
+      const babelMemoryCache = new Map<string, string>();
+
       build.onStart(async () => {
         const result: OnStartResult = {};
 
@@ -256,26 +260,43 @@ export function createCompilerPlugin(
           return { content: contents };
         };
 
+        // Temporary deep import for host augmentation support
+        const {
+          augmentHostWithReplacements,
+          augmentProgramWithVersioning,
+        } = require('@ngtools/webpack/src/ivy/host');
+
         // Augment TypeScript Host for file replacements option
         if (pluginOptions.fileReplacements) {
-          // Temporary deep import for file replacements support
-          const { augmentHostWithReplacements } = require('@ngtools/webpack/src/ivy/host');
           augmentHostWithReplacements(host, pluginOptions.fileReplacements);
         }
 
         // Create the Angular specific program that contains the Angular compiler
-        const angularProgram = new compilerCli.NgtscProgram(rootNames, compilerOptions, host);
+        const angularProgram = new compilerCli.NgtscProgram(
+          rootNames,
+          compilerOptions,
+          host,
+          previousAngularProgram,
+        );
+        previousAngularProgram = angularProgram;
         const angularCompiler = angularProgram.compiler;
         const { ignoreForDiagnostics } = angularCompiler;
         const typeScriptProgram = angularProgram.getTsProgram();
+        augmentProgramWithVersioning(typeScriptProgram);
 
-        const builder = ts.createAbstractBuilder(typeScriptProgram, host);
+        const builder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
+          typeScriptProgram,
+          host,
+          previousBuilder,
+          configurationDiagnostics,
+        );
+        previousBuilder = builder;
 
         await angularCompiler.analyzeAsync();
 
-        function* collectDiagnostics() {
+        function* collectDiagnostics(): Iterable<ts.Diagnostic> {
           // Collect program level diagnostics
-          yield* configurationDiagnostics;
+          yield* builder.getConfigFileParsingDiagnostics();
           yield* angularCompiler.getOptionDiagnostics();
           yield* builder.getOptionsDiagnostics();
           yield* builder.getGlobalDiagnostics();
@@ -312,7 +333,7 @@ export function createCompilerPlugin(
           mergeTransformers(angularCompiler.prepareEmit().transformers, {
             before: [replaceBootstrap(() => builder.getProgram().getTypeChecker())],
           }),
-          () => [],
+          (sourceFile) => angularCompiler.incrementalDriver.recordSuccessfulEmit(sourceFile),
         );
 
         return result;
@@ -349,10 +370,11 @@ export function createCompilerPlugin(
           }
 
           return {
-            contents: await transformWithBabel(
+            contents: await transformWithBabelCached(
               args.path,
               typescriptResult.content ?? '',
               pluginOptions,
+              babelMemoryCache,
             ),
             loader: 'js',
           };
@@ -363,7 +385,12 @@ export function createCompilerPlugin(
         const data = await fs.readFile(args.path, 'utf-8');
 
         return {
-          contents: await transformWithBabel(args.path, data, pluginOptions),
+          contents: await transformWithBabelCached(
+            args.path,
+            data,
+            pluginOptions,
+            babelMemoryCache,
+          ),
           loader: 'js',
         };
       });
@@ -464,4 +491,33 @@ async function transformWithBabel(
   });
 
   return result?.code ?? data;
+}
+
+/**
+ * Transforms JavaScript file data using the babel transforms setup in transformWithBabel. The
+ * supplied cache will be used to avoid repeating the transforms for data that has previously
+ * been transformed such as in a previous rebuild cycle.
+ * @param filename The file path of the data to be transformed.
+ * @param data The file data that will be transformed.
+ * @param pluginOptions Compiler plugin options that will be used to control the transformation.
+ * @param cache A cache of previously transformed data that will be used to avoid repeat transforms.
+ * @returns A promise containing the transformed data.
+ */
+async function transformWithBabelCached(
+  filename: string,
+  data: string,
+  pluginOptions: CompilerPluginOptions,
+  cache: Map<string, string>,
+): Promise<string> {
+  // The pre-transformed data is used as a cache key. Since the cache is memory only,
+  // the options cannot change and do not need to be represented in the key. If the
+  // cache is later stored to disk, then the options that affect transform output
+  // would need to be added to the key as well.
+  let result = cache.get(data);
+  if (result === undefined) {
+    result = await transformWithBabel(filename, data, pluginOptions);
+    cache.set(data, result);
+  }
+
+  return result;
 }
