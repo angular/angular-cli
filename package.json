@@ -220,7 +220,7 @@
     "webpack-dev-server": "4.11.1",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0",
-    "yargs": "17.5.1",
+    "yargs": "17.6.0",
     "yargs-parser": "21.1.1",
     "zone.js": "^0.11.3"
   }
