@@ -136,29 +136,33 @@ export default function (options: LibraryOptions): Rule {
       folderName = strings.dasherize(folderName);
     }
 
-    const projectRoot = join(normalize(newProjectRoot), folderName);
+    const libDir =
+      options.projectRoot !== undefined
+        ? normalize(options.projectRoot)
+        : join(normalize(newProjectRoot), folderName);
+
     const distRoot = `dist/${folderName}`;
-    const sourceDir = `${projectRoot}/src/lib`;
+    const sourceDir = `${libDir}/src/lib`;
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
         ...strings,
         ...options,
         packageName,
-        projectRoot,
+        libDir,
         distRoot,
-        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(projectRoot),
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(libDir),
         prefix,
         angularLatestVersion: latestVersions.Angular.replace(/~|\^/, ''),
         tsLibLatestVersion: latestVersions['tslib'].replace(/~|\^/, ''),
         folderName,
       }),
-      move(projectRoot),
+      move(libDir),
     ]);
 
     return chain([
       mergeWith(templateSource),
-      addLibToWorkspaceFile(options, projectRoot, packageName),
+      addLibToWorkspaceFile(options, libDir, packageName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
       schematic('module', {

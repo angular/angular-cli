@@ -31,6 +31,7 @@ describe('Library Schematic', () => {
     skipTsConfig: false,
     skipInstall: false,
   };
+
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',
     newProjectRoot: 'projects',
@@ -64,6 +65,48 @@ describe('Library Schematic', () => {
         '/projects/foo/src/lib/foo.service.ts',
       ]),
     );
+  });
+
+  describe('custom projectRoot', () => {
+    const customProjectRootOptions: GenerateLibrarySchema = {
+      name: 'foo',
+      entryFile: 'my-index',
+      skipPackageJson: false,
+      skipTsConfig: false,
+      skipInstall: false,
+      projectRoot: 'some/other/directory/bar',
+    };
+
+    it('should create files in /some/other/directory/bar', async () => {
+      const tree = await schematicRunner
+        .runSchematicAsync('library', customProjectRootOptions, workspaceTree)
+        .toPromise();
+      const files = tree.files;
+      expect(files).toEqual(
+        jasmine.arrayContaining([
+          '/some/other/directory/bar/ng-package.json',
+          '/some/other/directory/bar/package.json',
+          '/some/other/directory/bar/README.md',
+          '/some/other/directory/bar/tsconfig.lib.json',
+          '/some/other/directory/bar/tsconfig.lib.prod.json',
+          '/some/other/directory/bar/src/my-index.ts',
+          '/some/other/directory/bar/src/lib/foo.module.ts',
+          '/some/other/directory/bar/src/lib/foo.component.spec.ts',
+          '/some/other/directory/bar/src/lib/foo.component.ts',
+          '/some/other/directory/bar/src/lib/foo.service.spec.ts',
+          '/some/other/directory/bar/src/lib/foo.service.ts',
+        ]),
+      );
+    });
+
+    it(`should add library to workspace`, async () => {
+      const tree = await schematicRunner
+        .runSchematicAsync('library', customProjectRootOptions, workspaceTree)
+        .toPromise();
+
+      const workspace = getJsonFileContent(tree, '/angular.json');
+      expect(workspace.projects.foo).toBeDefined();
+    });
   });
 
   it('should create a package.json named "foo"', async () => {
