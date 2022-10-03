@@ -15,6 +15,8 @@ import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-brows
 import { normalizeGlobalStyles } from '../../webpack/utils/helpers';
 import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
 
+export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
@@ -125,7 +127,28 @@ export async function normalizeOptions(
     };
   }
 
+  // Initial options to keep
+  const {
+    baseHref,
+    buildOptimizer,
+    crossOrigin,
+    externalDependencies,
+    preserveSymlinks,
+    stylePreprocessorOptions,
+    subresourceIntegrity,
+    verbose,
+  } = options;
+
+  // Return all the normalized options
   return {
+    advancedOptimizations: buildOptimizer,
+    baseHref,
+    crossOrigin,
+    externalDependencies,
+    preserveSymlinks,
+    stylePreprocessorOptions,
+    subresourceIntegrity,
+    verbose,
     workspaceRoot,
     entryPoints,
     optimizationOptions,

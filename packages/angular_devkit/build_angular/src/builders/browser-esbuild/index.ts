@@ -11,7 +11,7 @@ import * as assert from 'assert';
 import type { Message, OutputFile } from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { NormalizedOptimizationOptions, deleteOutputDir } from '../../utils';
+import { deleteOutputDir } from '../../utils';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
@@ -22,14 +22,13 @@ import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
-import { normalizeOptions } from './options';
-import { Schema as BrowserBuilderOptions, SourceMapClass } from './schema';
+import { NormalizedBrowserOptions, normalizeOptions } from './options';
+import { Schema as BrowserBuilderOptions } from './schema';
 import { bundleStylesheetText } from './stylesheets';
 import { createWatcher } from './watcher';
 
 async function execute(
-  options: BrowserBuilderOptions,
-  normalizedOptions: Awaited<ReturnType<typeof normalizeOptions>>,
+  options: NormalizedBrowserOptions,
   context: BuilderContext,
 ): Promise<BuilderOutput> {
   const startTime = Date.now();
@@ -37,18 +36,12 @@ async function execute(
   const {
     projectRoot,
     workspaceRoot,
-    entryPoints,
     optimizationOptions,
     outputPath,
-    sourcemapOptions,
-    tsconfig,
     assets,
-    outputNames,
-    fileReplacements,
-    globalStyles,
     serviceWorkerOptions,
     indexHtmlOptions,
-  } = normalizedOptions;
+  } = options;
 
   const target = transformSupportedBrowsersToTargets(
     getSupportedBrowsers(projectRoot, context.logger),
@@ -56,27 +49,9 @@ async function execute(
 
   const [codeResults, styleResults] = await Promise.all([
     // Execute esbuild to bundle the application code
-    bundleCode(
-      workspaceRoot,
-      entryPoints,
-      outputNames,
-      options,
-      optimizationOptions,
-      sourcemapOptions,
-      tsconfig,
-      fileReplacements,
-      target,
-    ),
+    bundleCode(options, target),
     // Execute esbuild to bundle the global stylesheets
-    bundleGlobalStylesheets(
-      workspaceRoot,
-      outputNames,
-      globalStyles,
-      options,
-      optimizationOptions,
-      sourcemapOptions,
-      target,
-    ),
+    bundleGlobalStylesheets(options, target),
   ]);
 
   // Log all warnings and errors generated during bundling
@@ -204,17 +179,21 @@ function createOutputFileFromText(path: string, text: string): OutputFile {
   };
 }
 
-async function bundleCode(
-  workspaceRoot: string,
-  entryPoints: Record<string, string>,
-  outputNames: { bundles: string; media: string },
-  options: BrowserBuilderOptions,
-  optimizationOptions: NormalizedOptimizationOptions,
-  sourcemapOptions: SourceMapClass,
-  tsconfig: string,
-  fileReplacements: Record<string, string> | undefined,
-  target: string[],
-) {
+async function bundleCode(options: NormalizedBrowserOptions, target: string[]) {
+  const {
+    workspaceRoot,
+    entryPoints,
+    optimizationOptions,
+    sourcemapOptions,
+    tsconfig,
+    outputNames,
+    fileReplacements,
+    externalDependencies,
+    preserveSymlinks,
+    stylePreprocessorOptions,
+    advancedOptimizations,
+  } = options;
+
   return bundle({
     absWorkingDir: workspaceRoot,
     bundle: true,
@@ -242,10 +221,10 @@ async function bundleCode(
     sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
     splitting: true,
     tsconfig,
-    external: options.externalDependencies,
+    external: externalDependencies,
     write: false,
     platform: 'browser',
-    preserveSymlinks: options.preserveSymlinks,
+    preserveSymlinks,
     plugins: [
       createCompilerPlugin(
         // JS/TS options
@@ -253,7 +232,7 @@ async function bundleCode(
           sourcemap: !!sourcemapOptions.scripts,
           thirdPartySourcemaps: sourcemapOptions.vendor,
           tsconfig,
-          advancedOptimizations: options.buildOptimizer,
+          advancedOptimizations,
           fileReplacements,
         },
         // Component stylesheet options
@@ -266,8 +245,8 @@ async function bundleCode(
             // of sourcemap processing.
             !!sourcemapOptions.styles && (sourcemapOptions.hidden ? false : 'inline'),
           outputNames,
-          includePaths: options.stylePreprocessorOptions?.includePaths,
-          externalDependencies: options.externalDependencies,
+          includePaths: stylePreprocessorOptions?.includePaths,
+          externalDependencies,
           target,
         },
       ),
@@ -279,15 +258,18 @@ async function bundleCode(
   });
 }
 
-async function bundleGlobalStylesheets(
-  workspaceRoot: string,
-  outputNames: { bundles: string; media: string },
-  globalStyles: { name: string; files: string[]; initial: boolean }[],
-  options: BrowserBuilderOptions,
-  optimizationOptions: NormalizedOptimizationOptions,
-  sourcemapOptions: SourceMapClass,
-  target: string[],
-) {
+async function bundleGlobalStylesheets(options: NormalizedBrowserOptions, target: string[]) {
+  const {
+    workspaceRoot,
+    optimizationOptions,
+    sourcemapOptions,
+    outputNames,
+    globalStyles,
+    preserveSymlinks,
+    externalDependencies,
+    stylePreprocessorOptions,
+  } = options;
+
   const outputFiles: OutputFile[] = [];
   const initialFiles: FileInfo[] = [];
   const errors: Message[] = [];
@@ -305,9 +287,9 @@ async function bundleGlobalStylesheets(
         optimization: !!optimizationOptions.styles.minify,
         sourcemap: !!sourcemapOptions.styles && (sourcemapOptions.hidden ? 'external' : true),
         outputNames: initial ? outputNames : { media: outputNames.media },
-        includePaths: options.stylePreprocessorOptions?.includePaths,
-        preserveSymlinks: options.preserveSymlinks,
-        externalDependencies: options.externalDependencies,
+        includePaths: stylePreprocessorOptions?.includePaths,
+        preserveSymlinks,
+        externalDependencies,
         target,
       },
     );
@@ -401,7 +383,7 @@ export async function* buildEsbuildBrowser(
   }
 
   // Initial build
-  yield await execute(initialOptions, normalizedOptions, context);
+  yield await execute(normalizedOptions, context);
 
   // Finish if watch mode is not enabled
   if (!initialOptions.watch) {
@@ -434,7 +416,7 @@ export async function* buildEsbuildBrowser(
         context.logger.info(changes.toDebugString());
       }
 
-      yield await execute(initialOptions, normalizedOptions, context);
+      yield await execute(normalizedOptions, context);
     }
   } finally {
     await watcher.close();
