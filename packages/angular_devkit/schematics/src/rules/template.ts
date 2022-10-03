@@ -11,7 +11,6 @@ import { TextDecoder } from 'util';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
 import { chain, composeFileOperators, forEach, when } from './base';
-import { rename } from './rename';
 
 export const TEMPLATE_FILENAME_RE = /\.template$/;
 
@@ -157,10 +156,16 @@ export function pathTemplate<T extends PathTemplateData>(options: T): Rule {
  * Remove every `.template` suffix from file names.
  */
 export function renameTemplateFiles(): Rule {
-  return rename(
-    (path) => !!path.match(TEMPLATE_FILENAME_RE),
-    (path) => path.replace(TEMPLATE_FILENAME_RE, ''),
-  );
+  return forEach((entry) => {
+    if (entry.path.match(TEMPLATE_FILENAME_RE)) {
+      return {
+        content: entry.content,
+        path: normalize(entry.path.replace(TEMPLATE_FILENAME_RE, '')),
+      };
+    } else {
+      return entry;
+    }
+  });
 }
 
 export function template<T extends object>(options: T): Rule {
