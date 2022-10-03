@@ -10,7 +10,10 @@ import { BuilderContext } from '@angular-devkit/architect';
 import * as path from 'path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { normalizePolyfills } from '../../utils/normalize-polyfills';
-import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
+import { generateEntryPoints } from '../../utils/package-chunk-sort';
+import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
+import { normalizeGlobalStyles } from '../../webpack/utils/helpers';
+import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
 
 /**
  * Normalize the user provided options by creating full paths for all path based options
@@ -71,6 +74,35 @@ export async function normalizeOptions(
     outputNames.media = path.join(options.resourcesOutputPath, outputNames.media);
   }
 
+  let fileReplacements: Record<string, string> | undefined;
+  if (options.fileReplacements) {
+    for (const replacement of options.fileReplacements) {
+      fileReplacements ??= {};
+      fileReplacements[path.join(workspaceRoot, replacement.replace)] = path.join(
+        workspaceRoot,
+        replacement.with,
+      );
+    }
+  }
+
+  const globalStyles: { name: string; files: string[]; initial: boolean }[] = [];
+  if (options.styles?.length) {
+    const { entryPoints: stylesheetEntrypoints, noInjectNames } = normalizeGlobalStyles(
+      options.styles || [],
+    );
+    for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
+      globalStyles.push({ name, files, initial: !noInjectNames.includes(name) });
+    }
+  }
+
+  let serviceWorkerOptions;
+  if (options.serviceWorker) {
+    // If ngswConfigPath is not specified, the default is 'ngsw-config.json' within the project root
+    serviceWorkerOptions = options.ngswConfigPath
+      ? path.join(workspaceRoot, options.ngswConfigPath)
+      : path.join(projectRoot, 'ngsw-config.json');
+  }
+
   // Setup bundler entry points
   const entryPoints: Record<string, string> = {
     main: mainEntryPoint,
@@ -78,17 +110,24 @@ export async function normalizeOptions(
   if (polyfillsEntryPoint) {
     entryPoints['polyfills'] = polyfillsEntryPoint;
   }
-  // Create reverse lookup used during index HTML generation
-  const entryPointNameLookup: ReadonlyMap<string, string> = new Map(
-    Object.entries(entryPoints).map(
-      ([name, filePath]) => [path.relative(workspaceRoot, filePath), name] as const,
-    ),
-  );
+
+  let indexHtmlOptions;
+  if (options.index) {
+    indexHtmlOptions = {
+      input: path.join(workspaceRoot, getIndexInputFile(options.index)),
+      // The output file will be created within the configured output path
+      output: getIndexOutputFile(options.index),
+      // TODO: Use existing information from above to create the insertion order
+      insertionOrder: generateEntryPoints({
+        scripts: options.scripts ?? [],
+        styles: options.styles ?? [],
+      }),
+    };
+  }
 
   return {
     workspaceRoot,
     entryPoints,
-    entryPointNameLookup,
     optimizationOptions,
     outputPath,
     sourcemapOptions,
@@ -96,5 +135,9 @@ export async function normalizeOptions(
     projectRoot,
     assets,
     outputNames,
+    fileReplacements,
+    globalStyles,
+    serviceWorkerOptions,
+    indexHtmlOptions,
   };
 }

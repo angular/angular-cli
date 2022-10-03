@@ -93,6 +93,52 @@ export async function augmentAppWithServiceWorker(
     }
   }
 
+  return augmentAppWithServiceWorkerCore(
+    config,
+    outputPath,
+    baseHref,
+    inputputFileSystem,
+    outputFileSystem,
+  );
+}
+
+// This is currently used by the esbuild-based builder
+export async function augmentAppWithServiceWorkerEsbuild(
+  workspaceRoot: string,
+  configPath: string,
+  outputPath: string,
+  baseHref: string,
+): Promise<void> {
+  // Read the configuration file
+  let config: Config | undefined;
+  try {
+    const configurationData = await fsPromises.readFile(configPath, 'utf-8');
+    config = JSON.parse(configurationData) as Config;
+  } catch (error) {
+    assertIsError(error);
+    if (error.code === 'ENOENT') {
+      // TODO: Generate an error object that can be consumed by the esbuild-based builder
+      const message = `Service worker configuration file "${path.relative(
+        workspaceRoot,
+        configPath,
+      )}" could not be found.`;
+      throw new Error(message);
+    } else {
+      throw error;
+    }
+  }
+
+  // TODO: Return the output files and any errors/warnings
+  return augmentAppWithServiceWorkerCore(config, outputPath, baseHref);
+}
+
+export async function augmentAppWithServiceWorkerCore(
+  config: Config,
+  outputPath: string,
+  baseHref: string,
+  inputputFileSystem = fsPromises,
+  outputFileSystem = fsPromises,
+): Promise<void> {
   // Load ESM `@angular/service-worker/config` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
