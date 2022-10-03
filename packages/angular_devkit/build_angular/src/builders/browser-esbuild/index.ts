@@ -9,7 +9,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import * as assert from 'assert';
 import type { Message, OutputFile } from 'esbuild';
-import { promises as fs } from 'fs';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import { NormalizedOptimizationOptions, deleteOutputDir } from '../../utils';
 import { copyAssets } from '../../utils/copy-assets';
@@ -17,11 +17,8 @@ import { assertIsError } from '../../utils/error';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
-import { generateEntryPoints } from '../../utils/package-chunk-sort';
-import { augmentAppWithServiceWorker } from '../../utils/service-worker';
+import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
-import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
-import { normalizeGlobalStyles } from '../../webpack/utils/helpers';
 import { createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
@@ -41,13 +38,16 @@ async function execute(
     projectRoot,
     workspaceRoot,
     entryPoints,
-    entryPointNameLookup,
     optimizationOptions,
     outputPath,
     sourcemapOptions,
     tsconfig,
     assets,
     outputNames,
+    fileReplacements,
+    globalStyles,
+    serviceWorkerOptions,
+    indexHtmlOptions,
   } = normalizedOptions;
 
   const target = transformSupportedBrowsersToTargets(
@@ -64,12 +64,14 @@ async function execute(
       optimizationOptions,
       sourcemapOptions,
       tsconfig,
+      fileReplacements,
       target,
     ),
     // Execute esbuild to bundle the global stylesheets
     bundleGlobalStylesheets(
       workspaceRoot,
       outputNames,
+      globalStyles,
       options,
       optimizationOptions,
       sourcemapOptions,
@@ -102,7 +104,8 @@ async function execute(
       // An entryPoint value indicates an initial file
       initialFiles.push({
         file: outputFile.path,
-        name: entryPointNameLookup.get(entryPoint) ?? '',
+        // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
+        name: path.basename(outputFile.path).split('.')[0],
         extension: path.extname(outputFile.path),
       });
     }
@@ -119,16 +122,11 @@ async function execute(
   }
 
   // Generate index HTML file
-  if (options.index) {
-    const entrypoints = generateEntryPoints({
-      scripts: options.scripts ?? [],
-      styles: options.styles ?? [],
-    });
-
+  if (indexHtmlOptions) {
     // Create an index HTML generator that reads from the in-memory output files
     const indexHtmlGenerator = new IndexHtmlGenerator({
-      indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
-      entrypoints,
+      indexPath: indexHtmlOptions.input,
+      entrypoints: indexHtmlOptions.insertionOrder,
       sri: options.subresourceIntegrity,
       optimization: optimizationOptions,
       crossOrigin: options.crossOrigin,
@@ -161,7 +159,7 @@ async function execute(
       context.logger.warn(warning);
     }
 
-    outputFiles.push(createOutputFileFromText(getIndexOutputFile(options.index), content));
+    outputFiles.push(createOutputFileFromText(indexHtmlOptions.output, content));
   }
 
   // Copy assets
@@ -176,14 +174,13 @@ async function execute(
 
   // Augment the application with service worker support
   // TODO: This should eventually operate on the in-memory files prior to writing the output files
-  if (options.serviceWorker) {
+  if (serviceWorkerOptions) {
     try {
-      await augmentAppWithServiceWorker(
-        projectRoot,
+      await augmentAppWithServiceWorkerEsbuild(
         workspaceRoot,
+        serviceWorkerOptions,
         outputPath,
         options.baseHref || '/',
-        options.ngswConfigPath,
       );
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : `${error}`);
@@ -215,19 +212,9 @@ async function bundleCode(
   optimizationOptions: NormalizedOptimizationOptions,
   sourcemapOptions: SourceMapClass,
   tsconfig: string,
+  fileReplacements: Record<string, string> | undefined,
   target: string[],
 ) {
-  let fileReplacements: Record<string, string> | undefined;
-  if (options.fileReplacements) {
-    for (const replacement of options.fileReplacements) {
-      fileReplacements ??= {};
-      fileReplacements[path.join(workspaceRoot, replacement.replace)] = path.join(
-        workspaceRoot,
-        replacement.with,
-      );
-    }
-  }
-
   return bundle({
     absWorkingDir: workspaceRoot,
     bundle: true,
@@ -295,6 +282,7 @@ async function bundleCode(
 async function bundleGlobalStylesheets(
   workspaceRoot: string,
   outputNames: { bundles: string; media: string },
+  globalStyles: { name: string; files: string[]; initial: boolean }[],
   options: BrowserBuilderOptions,
   optimizationOptions: NormalizedOptimizationOptions,
   sourcemapOptions: SourceMapClass,
@@ -305,12 +293,7 @@ async function bundleGlobalStylesheets(
   const errors: Message[] = [];
   const warnings: Message[] = [];
 
-  // resolveGlobalStyles is temporarily reused from the Webpack builder code
-  const { entryPoints: stylesheetEntrypoints, noInjectNames } = normalizeGlobalStyles(
-    options.styles || [],
-  );
-
-  for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
+  for (const { name, files, initial } of globalStyles) {
     const virtualEntryData = files
       .map((file) => `@import '${file.replace(/\\/g, '/')}';`)
       .join('\n');
@@ -321,7 +304,7 @@ async function bundleGlobalStylesheets(
         workspaceRoot,
         optimization: !!optimizationOptions.styles.minify,
         sourcemap: !!sourcemapOptions.styles && (sourcemapOptions.hidden ? 'external' : true),
-        outputNames: noInjectNames.includes(name) ? { media: outputNames.media } : outputNames,
+        outputNames: initial ? outputNames : { media: outputNames.media },
         includePaths: options.stylePreprocessorOptions?.includePaths,
         preserveSymlinks: options.preserveSymlinks,
         externalDependencies: options.externalDependencies,
@@ -356,7 +339,7 @@ async function bundleGlobalStylesheets(
     }
     outputFiles.push(createOutputFileFromText(sheetPath, sheetContents));
 
-    if (!noInjectNames.includes(name)) {
+    if (initial) {
       initialFiles.push({
         file: sheetPath,
         name,
