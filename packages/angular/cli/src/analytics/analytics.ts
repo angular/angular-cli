@@ -7,8 +7,8 @@
  */
 
 import { analytics, json, tags } from '@angular-devkit/core';
+import { randomUUID } from 'crypto';
 import debug from 'debug';
-import { v4 as uuidV4 } from 'uuid';
 import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
 import { analyticsDisabled, analyticsShareDisabled } from '../utilities/environment-options';
@@ -78,7 +78,7 @@ export async function setAnalyticsConfig(global: boolean, value: string | boolea
     throw new Error(`Invalid config found at ${workspace.filePath}. CLI should be an object.`);
   }
 
-  cli.analytics = value === true ? uuidV4() : value;
+  cli.analytics = value === true ? randomUUID() : value;
   await workspace.save();
   analyticsDebug('done');
 }

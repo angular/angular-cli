@@ -23,9 +23,9 @@ parameters:
 ## IMPORTANT
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &cache_key v1-angular_devkit-14.19-{{ checksum "yarn.lock" }}
+var_1: &cache_key v1-angular_devkit-14.20-{{ checksum "yarn.lock" }}
 var_1_win: &cache_key_win v1-angular_devkit-win-16.10-{{ checksum "yarn.lock" }}
-var_3: &default_nodeversion '14.19'
+var_3: &default_nodeversion '14.20'
 var_3_major: &default_nodeversion_major '14'
 # The major version of node toolchains. See tools/toolchain_info.bzl
 # NOTE: entries in this array may be repeated elsewhere in the file, find them before adding more
@@ -404,7 +404,7 @@ workflows:
 
       - e2e-tests:
           name: e2e-cli-<< matrix.subset >>
-          nodeversion: '14.15'
+          nodeversion: '14.20'
           matrix:
             parameters:
               subset: *all_e2e_subsets
@@ -421,7 +421,7 @@ workflows:
           matrix:
             alias: e2e-cli
             parameters:
-              nodeversion: ['14.15', '16.10']
+              nodeversion: ['14.20', '16.10']
               subset: *all_e2e_subsets
           requires:
             - build
