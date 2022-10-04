@@ -1,4 +1,4 @@
-import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%>Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';<% if(standalone) {%>
+import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%>Component<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';<% if(standalone) {%>
 import { CommonModule } from '@angular/common';<% } %>
 
 @Component({<% if(!skipSelector) {%>
@@ -22,11 +22,6 @@ import { CommonModule } from '@angular/common';<% } %>
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
-export class <%= classify(name) %><%= classify(type) %> implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+export class <%= classify(name) %><%= classify(type) %> {
 
 }
