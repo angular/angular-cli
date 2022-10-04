@@ -8,7 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import * as assert from 'assert';
-import type { Message, OutputFile } from 'esbuild';
+import type { BuildInvalidate, BuildOptions, Message, OutputFile } from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { deleteOutputDir } from '../../utils';
@@ -19,18 +19,56 @@ import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
-import { createCompilerPlugin } from './compiler-plugin';
+import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { bundleStylesheetText } from './stylesheets';
-import { createWatcher } from './watcher';
+import { ChangedFiles, createWatcher } from './watcher';
+
+interface RebuildState {
+  codeRebuild?: BuildInvalidate;
+  codeBundleCache?: SourceFileCache;
+  fileChanges: ChangedFiles;
+}
+
+/**
+ * Represents the result of a single builder execute call.
+ */
+class ExecutionResult {
+  constructor(
+    private success: boolean,
+    private codeRebuild?: BuildInvalidate,
+    private codeBundleCache?: SourceFileCache,
+  ) {}
+
+  get output() {
+    return {
+      success: this.success,
+    };
+  }
+
+  createRebuildState(fileChanges: ChangedFiles): RebuildState {
+    this.codeBundleCache?.invalidate([...fileChanges.modified, ...fileChanges.removed]);
+
+    return {
+      codeRebuild: this.codeRebuild,
+      codeBundleCache: this.codeBundleCache,
+      fileChanges,
+    };
+  }
+
+  dispose(): void {
+    this.codeRebuild?.dispose();
+  }
+}
 
 async function execute(
   options: NormalizedBrowserOptions,
   context: BuilderContext,
-): Promise<BuilderOutput> {
+  rebuildState?: RebuildState,
+): Promise<ExecutionResult> {
   const startTime = Date.now();
 
   const {
@@ -47,9 +85,13 @@ async function execute(
     getSupportedBrowsers(projectRoot, context.logger),
   );
 
+  const codeBundleCache = options.watch
+    ? rebuildState?.codeBundleCache ?? new SourceFileCache()
+    : undefined;
+
   const [codeResults, styleResults] = await Promise.all([
     // Execute esbuild to bundle the application code
-    bundleCode(options, target),
+    bundle(rebuildState?.codeRebuild ?? createCodeBundleOptions(options, target, codeBundleCache)),
     // Execute esbuild to bundle the global stylesheets
     bundleGlobalStylesheets(options, target),
   ]);
@@ -62,7 +104,7 @@ async function execute(
 
   // Return if the bundling failed to generate output files or there are errors
   if (!codeResults.outputFiles || codeResults.errors.length) {
-    return { success: false };
+    return new ExecutionResult(false, rebuildState?.codeRebuild, codeBundleCache);
   }
 
   // Structure the code bundling output files
@@ -93,7 +135,7 @@ async function execute(
 
   // Return if the global stylesheet bundling has errors
   if (styleResults.errors.length) {
-    return { success: false };
+    return new ExecutionResult(false, codeResults.rebuild, codeBundleCache);
   }
 
   // Generate index HTML file
@@ -160,13 +202,13 @@ async function execute(
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : `${error}`);
 
-      return { success: false };
+      return new ExecutionResult(false, codeResults.rebuild, codeBundleCache);
     }
   }
 
   context.logger.info(`Complete. [${(Date.now() - startTime) / 1000} seconds]`);
 
-  return { success: true };
+  return new ExecutionResult(true, codeResults.rebuild, codeBundleCache);
 }
 
 function createOutputFileFromText(path: string, text: string): OutputFile {
@@ -179,7 +221,11 @@ function createOutputFileFromText(path: string, text: string): OutputFile {
   };
 }
 
-async function bundleCode(options: NormalizedBrowserOptions, target: string[]) {
+function createCodeBundleOptions(
+  options: NormalizedBrowserOptions,
+  target: string[],
+  sourceFileCache?: SourceFileCache,
+): BuildOptions {
   const {
     workspaceRoot,
     entryPoints,
@@ -194,9 +240,10 @@ async function bundleCode(options: NormalizedBrowserOptions, target: string[]) {
     advancedOptimizations,
   } = options;
 
-  return bundle({
+  return {
     absWorkingDir: workspaceRoot,
     bundle: true,
+    incremental: options.watch,
     format: 'esm',
     entryPoints,
     entryNames: outputNames.bundles,
@@ -234,6 +281,7 @@ async function bundleCode(options: NormalizedBrowserOptions, target: string[]) {
           tsconfig,
           advancedOptimizations,
           fileReplacements,
+          sourceFileCache,
         },
         // Component stylesheet options
         {
@@ -255,7 +303,7 @@ async function bundleCode(options: NormalizedBrowserOptions, target: string[]) {
       ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
       'ngJitMode': 'false',
     },
-  });
+  };
 }
 
 async function bundleGlobalStylesheets(options: NormalizedBrowserOptions, target: string[]) {
@@ -383,12 +431,15 @@ export async function* buildEsbuildBrowser(
   }
 
   // Initial build
-  yield await execute(normalizedOptions, context);
+  let result = await execute(normalizedOptions, context);
+  yield result.output;
 
   // Finish if watch mode is not enabled
   if (!initialOptions.watch) {
     return;
   }
+
+  context.logger.info('Watch mode enabled. Watching for file changes...');
 
   // Setup a watcher
   const watcher = createWatcher({
@@ -416,10 +467,14 @@ export async function* buildEsbuildBrowser(
         context.logger.info(changes.toDebugString());
       }
 
-      yield await execute(normalizedOptions, context);
+      result = await execute(normalizedOptions, context, result.createRebuildState(changes));
+      yield result.output;
     }
   } finally {
+    // Stop the watcher
     await watcher.close();
+    // Cleanup incremental rebuild state
+    result.dispose();
   }
 }
 

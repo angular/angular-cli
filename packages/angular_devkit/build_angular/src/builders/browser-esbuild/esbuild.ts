@@ -9,6 +9,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import {
   BuildFailure,
+  BuildInvalidate,
   BuildOptions,
   BuildResult,
   Message,
@@ -32,20 +33,25 @@ export function isEsBuildFailure(value: unknown): value is BuildFailure {
  * All builds use the `write` option with a value of `false` to allow for the output files
  * build result array to be populated.
  *
- * @param options The esbuild options object to use when building.
+ * @param optionsOrInvalidate The esbuild options object to use when building or the invalidate object
+ * returned from an incremental build to perform an additional incremental build.
  * @returns If output files are generated, the full esbuild BuildResult; if not, the
  * warnings and errors for the attempted build.
  */
 export async function bundle(
-  options: BuildOptions,
+  optionsOrInvalidate: BuildOptions | BuildInvalidate,
 ): Promise<
   (BuildResult & { outputFiles: OutputFile[] }) | (BuildFailure & { outputFiles?: never })
 > {
   try {
-    return await build({
-      ...options,
-      write: false,
-    });
+    if (typeof optionsOrInvalidate === 'function') {
+      return (await optionsOrInvalidate()) as BuildResult & { outputFiles: OutputFile[] };
+    } else {
+      return await build({
+        ...optionsOrInvalidate,
+        write: false,
+      });
+    }
   } catch (failure) {
     // Build failures will throw an exception which contains errors/warnings
     if (isEsBuildFailure(failure)) {

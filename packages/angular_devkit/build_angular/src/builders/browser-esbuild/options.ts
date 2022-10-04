@@ -133,10 +133,12 @@ export async function normalizeOptions(
     buildOptimizer,
     crossOrigin,
     externalDependencies,
+    poll,
     preserveSymlinks,
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
+    watch,
   } = options;
 
   // Return all the normalized options
@@ -145,10 +147,12 @@ export async function normalizeOptions(
     baseHref,
     crossOrigin,
     externalDependencies,
+    poll,
     preserveSymlinks,
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
+    watch,
     workspaceRoot,
     entryPoints,
     optimizationOptions,
