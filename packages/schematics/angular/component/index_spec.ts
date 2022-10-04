@@ -297,7 +297,7 @@ describe('Component Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo/foo.route.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.route.spec.ts');
-    expect(content).toContain('export class FooRoute implements OnInit');
+    expect(content).toContain('export class FooRoute');
     expect(testContent).toContain("describe('FooRoute'");
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.css');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.html');
@@ -308,7 +308,7 @@ describe('Component Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.spec.ts');
-    expect(content).toContain('export class Foo implements OnInit');
+    expect(content).toContain('export class Foo');
     expect(testContent).toContain("describe('Foo'");
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.css');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.html');
