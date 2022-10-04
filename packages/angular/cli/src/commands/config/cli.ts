@@ -7,8 +7,8 @@
  */
 
 import { JsonValue } from '@angular-devkit/core';
+import { randomUUID } from 'crypto';
 import { join } from 'path';
-import { v4 as uuidV4 } from 'uuid';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -104,7 +104,7 @@ export class ConfigCommandModule
       throw new CommandModuleError('Confguration file cannot be found.');
     }
 
-    const normalizeUUIDValue = (v: string | undefined) => (v === '' ? uuidV4() : `${v}`);
+    const normalizeUUIDValue = (v: string | undefined) => (v === '' ? randomUUID() : `${v}`);
 
     const value =
       options.jsonPath === 'cli.analyticsSharing.uuid'

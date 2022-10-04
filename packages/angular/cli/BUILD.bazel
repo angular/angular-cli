@@ -64,7 +64,6 @@ ts_library(
         "@npm//@types/pacote",
         "@npm//@types/resolve",
         "@npm//@types/semver",
-        "@npm//@types/uuid",
         "@npm//@types/yargs",
         "@npm//@types/yarnpkg__lockfile",
         "@npm//@yarnpkg/lockfile",

@@ -53,7 +53,7 @@ load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
     name = "nodejs",
-    node_version = "14.17.1",
+    node_version = "14.20.0",
 )
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
@@ -91,7 +91,7 @@ register_jq_toolchains(version = "1.6")
 
 nodejs_register_toolchains(
     name = "node14",
-    node_version = "14.17.1",
+    node_version = "14.20.0",
 )
 
 nodejs_register_toolchains(
