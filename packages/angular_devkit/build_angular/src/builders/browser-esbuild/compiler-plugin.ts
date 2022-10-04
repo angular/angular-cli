@@ -18,6 +18,7 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import { promises as fs } from 'fs';
+import { platform } from 'os';
 import * as path from 'path';
 import ts from 'typescript';
 import angularApplicationPreset from '../../babel/presets/application';
@@ -120,12 +121,33 @@ function convertTypeScriptDiagnostic(
   return message;
 }
 
+const USING_WINDOWS = platform() === 'win32';
+const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
+
+export class SourceFileCache extends Map<string, ts.SourceFile> {
+  readonly modifiedFiles = new Set<string>();
+
+  invalidate(files: Iterable<string>): void {
+    this.modifiedFiles.clear();
+    for (let file of files) {
+      // Normalize separators to allow matching TypeScript Host paths
+      if (USING_WINDOWS) {
+        file = file.replace(WINDOWS_SEP_REGEXP, path.posix.sep);
+      }
+
+      this.delete(file);
+      this.modifiedFiles.add(file);
+    }
+  }
+}
+
 export interface CompilerPluginOptions {
   sourcemap: boolean;
   tsconfig: string;
   advancedOptimizations?: boolean;
   thirdPartySourcemaps?: boolean;
   fileReplacements?: Record<string, string>;
+  sourceFileCache?: SourceFileCache;
 }
 
 // This is a non-watch version of the compiler code from `@ngtools/webpack` augmented for esbuild
@@ -262,6 +284,7 @@ export function createCompilerPlugin(
 
         // Temporary deep import for host augmentation support
         const {
+          augmentHostWithCaching,
           augmentHostWithReplacements,
           augmentProgramWithVersioning,
         } = require('@ngtools/webpack/src/ivy/host');
@@ -269,6 +292,15 @@ export function createCompilerPlugin(
         // Augment TypeScript Host for file replacements option
         if (pluginOptions.fileReplacements) {
           augmentHostWithReplacements(host, pluginOptions.fileReplacements);
+        }
+
+        // Augment TypeScript Host with source file caching if provided
+        if (pluginOptions.sourceFileCache) {
+          augmentHostWithCaching(host, pluginOptions.sourceFileCache);
+          // Allow the AOT compiler to request the set of changed templates and styles
+          (host as CompilerHost).getModifiedResourceFiles = function () {
+            return pluginOptions.sourceFileCache?.modifiedFiles;
+          };
         }
 
         // Create the Angular specific program that contains the Angular compiler
