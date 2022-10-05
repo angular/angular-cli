@@ -1,3 +1,19 @@
+<a name="14.2.5"></a>
+
+# 14.2.5 (2022-10-05)
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [17eb20c77](https://github.com/angular/angular-cli/commit/17eb20c77098841d45f0444f5f047c4d44fc614f) | fix  | throw more relevant error when Rule returns invalid null value |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.4"></a>
 
 # 14.2.4 (2022-09-28)
