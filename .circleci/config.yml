@@ -74,10 +74,12 @@ jobs:
     resource_class: xlarge
     steps:
       - custom_attach_workspace
+      - browser-tools/install-chrome
       - copy-bazel-config
+      # Install rsync which is used by the integration test launcher bash script
+      - run: sudo apt-get update -y && sudo apt-get install -y rsync
       - run: yarn bazel test //...
       - run: scripts/build-modules-dist.sh
-
       - save_cache:
           key: *cache_key
           paths:

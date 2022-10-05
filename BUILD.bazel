@@ -5,3 +5,47 @@ config_setting(
     name = "stamp",
     values = {"stamp": "true"},
 )
+
+config_setting(
+    name = "linux_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+config_setting(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+config_setting(
+    name = "macos_x86_64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+config_setting(
+    name = "macos_arm64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+filegroup(
+    name = "node_files",
+    srcs = select({
+        # We're assuming the target platform & the execution platform as the same here
+        "//:linux_x86_64": ["@nodejs_linux_amd64//:node_files"],
+        "//:linux_arm64": ["@nodejs_linux_arm64//:node_files"],
+        "//:macos_x86_64": ["@nodejs_darwin_amd64//:node_files"],
+        # Need a minimum of Node 16 for M1 support
+        # "//:macos_arm64": ["@nodejs_darwin_arm64//:node_files"],
+    }),
+)

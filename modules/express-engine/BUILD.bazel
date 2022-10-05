@@ -28,9 +28,22 @@ ng_package(
     nested_packages = ["//modules/express-engine/schematics:npm_package"],
     readme_md = ":README.md",
     tags = ["release"],
+    visibility = [
+        "//integration:__subpackages__",
+    ],
     deps = [
         ":express-engine",
         "//modules/express-engine/tokens",
+    ],
+)
+
+# work-around for ng_package not providing its output in runfiles
+filegroup(
+    name = "npm_package_runfiles",
+    srcs = [":npm_package"],
+    data = [":npm_package"],
+    visibility = [
+        "//integration:__subpackages__",
     ],
 )
 

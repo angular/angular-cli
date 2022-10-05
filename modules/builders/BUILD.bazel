@@ -46,6 +46,9 @@ pkg_npm(
     package_name = "@nguniversal/builders",
     srcs = [":builders_assets"],
     tags = ["release"],
+    visibility = [
+        "//integration:__subpackages__",
+    ],
     deps = [":builders"],
 )
 

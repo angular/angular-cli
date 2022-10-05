@@ -39,12 +39,24 @@ load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
 yarn_install(
     name = "npm",
+    all_node_modules_target_name = "node_modules_all",
     # Currently disabled due to:
     #  1. Incompatibilites with the `ts_library` rule.
     exports_directories_only = False,
+    manual_build_file_contents = """\
+# Used by integration tests
+filegroup(
+    name = "node_modules_files",
+    srcs = ["node_modules"],
+)
+""",
     package_json = "//:package.json",
     # We prefer to symlink the `node_modules` to only maintain a single install.
     # See https://github.com/angular/dev-infra/pull/446#issuecomment-1059820287 for details.
     symlink_node_modules = True,
     yarn_lock = "//:yarn.lock",
 )
+
+load("@npm//@angular/build-tooling/bazel/browsers:browser_repositories.bzl", "browser_repositories")
+
+browser_repositories()

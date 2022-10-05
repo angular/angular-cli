@@ -36,6 +36,16 @@ ng_package(
     ],
 )
 
+# work-around for ng_package not providing its output in runfiles
+filegroup(
+    name = "npm_package_runfiles",
+    srcs = [":npm_package"],
+    data = [":npm_package"],
+    visibility = [
+        "//integration:__subpackages__",
+    ],
+)
+
 ng_test_library(
     name = "unit_test_lib",
     srcs = glob([

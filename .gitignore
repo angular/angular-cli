@@ -33,6 +33,7 @@ lerna-debug.log
 /lib/
 integration/**/yarn.lock
 integration/**/built/
+integration/**/.angular/
 .yarn_local_cache
 bazel-bin
 bazel-genfiles

@@ -1,0 +1,17 @@
+sh_test(
+    name = "test",
+    srcs = ["test.sh"],
+    args = ["$(NODE_PATH)"],
+    data = glob(
+        ["**"],
+        exclude = ["BUILD.bazel"],
+    ) + [
+        "@npm//:node_modules_files",
+        "//modules/builders:npm_package",
+        "//modules/common:npm_package_runfiles",
+        "//:node_files",
+    ],
+    # e2e test runner creates a tmpdir sandbox itself so no point in double sandboxing
+    tags = ["local"],
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+)
