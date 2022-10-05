@@ -126,10 +126,13 @@ const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
 
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly modifiedFiles = new Set<string>();
+  readonly babelFileCache = new Map<string, string>();
 
   invalidate(files: Iterable<string>): void {
     this.modifiedFiles.clear();
     for (let file of files) {
+      this.babelFileCache.delete(file);
+
       // Normalize separators to allow matching TypeScript Host paths
       if (USING_WINDOWS) {
         file = file.replace(WINDOWS_SEP_REGEXP, path.posix.sep);
@@ -223,7 +226,7 @@ export function createCompilerPlugin(
 
       let previousBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined;
       let previousAngularProgram: NgtscProgram | undefined;
-      const babelMemoryCache = new Map<string, string>();
+      const babelDataCache = new Map<string, string>();
 
       build.onStart(async () => {
         const result: OnStartResult = {};
@@ -401,28 +404,38 @@ export function createCompilerPlugin(
             };
           }
 
+          const data = typescriptResult.content ?? '';
+          // The pre-transformed data is used as a cache key. Since the cache is memory only,
+          // the options cannot change and do not need to be represented in the key. If the
+          // cache is later stored to disk, then the options that affect transform output
+          // would need to be added to the key as well.
+          let contents = babelDataCache.get(data);
+          if (contents === undefined) {
+            contents = await transformWithBabel(args.path, data, pluginOptions);
+            babelDataCache.set(data, contents);
+          }
+
           return {
-            contents: await transformWithBabelCached(
-              args.path,
-              typescriptResult.content ?? '',
-              pluginOptions,
-              babelMemoryCache,
-            ),
+            contents,
             loader: 'js',
           };
         },
       );
 
       build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
-        const data = await fs.readFile(args.path, 'utf-8');
+        // The filename is currently used as a cache key. Since the cache is memory only,
+        // the options cannot change and do not need to be represented in the key. If the
+        // cache is later stored to disk, then the options that affect transform output
+        // would need to be added to the key as well as a check for any change of content.
+        let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
+        if (contents === undefined) {
+          const data = await fs.readFile(args.path, 'utf-8');
+          contents = await transformWithBabel(args.path, data, pluginOptions);
+          pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
+        }
 
         return {
-          contents: await transformWithBabelCached(
-            args.path,
-            data,
-            pluginOptions,
-            babelMemoryCache,
-          ),
+          contents,
           loader: 'js',
         };
       });
@@ -523,33 +536,4 @@ async function transformWithBabel(
   });
 
   return result?.code ?? data;
-}
-
-/**
- * Transforms JavaScript file data using the babel transforms setup in transformWithBabel. The
- * supplied cache will be used to avoid repeating the transforms for data that has previously
- * been transformed such as in a previous rebuild cycle.
- * @param filename The file path of the data to be transformed.
- * @param data The file data that will be transformed.
- * @param pluginOptions Compiler plugin options that will be used to control the transformation.
- * @param cache A cache of previously transformed data that will be used to avoid repeat transforms.
- * @returns A promise containing the transformed data.
- */
-async function transformWithBabelCached(
-  filename: string,
-  data: string,
-  pluginOptions: CompilerPluginOptions,
-  cache: Map<string, string>,
-): Promise<string> {
-  // The pre-transformed data is used as a cache key. Since the cache is memory only,
-  // the options cannot change and do not need to be represented in the key. If the
-  // cache is later stored to disk, then the options that affect transform output
-  // would need to be added to the key as well.
-  let result = cache.get(data);
-  if (result === undefined) {
-    result = await transformWithBabel(filename, data, pluginOptions);
-    cache.set(data, result);
-  }
-
-  return result;
 }
