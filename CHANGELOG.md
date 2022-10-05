@@ -1,3 +1,50 @@
+<a name="15.0.0-next.4"></a>
+
+# 15.0.0-next.4 (2022-10-05)
+
+## Breaking Changes
+
+### @angular/cli
+
+- Node.js versions older than 14.20 are no longer supported.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [b6897dbb0](https://github.com/angular/angular-cli/commit/b6897dbb0a1ef287644e117251c1c76cc8afcae0) | feat | remove `karma.conf.js` from newly generated projects |
+| [301b5669a](https://github.com/angular/angular-cli/commit/301b5669a724261d53444d5172334966903078c0) | feat | remove `ngOnInit` from component template            |
+| [84e3f7727](https://github.com/angular/angular-cli/commit/84e3f7727dc1de31484704c7c06d51ff5392a34a) | fix  | remove empty lines                                   |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [4b623461a](https://github.com/angular/angular-cli/commit/4b623461a4a938ba320b5e019f9c715d634a46c4) | feat | drop support for Node.js versions older than 14.20 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [67324b3e5](https://github.com/angular/angular-cli/commit/67324b3e5861510b1df9641bb4b10bb67e3a2325) | feat | add initial incremental code rebuilding to esbuild builder  |
+| [3d94ca21b](https://github.com/angular/angular-cli/commit/3d94ca21bbb7496a2ff588166fd93c5f2339b823) | feat | add initial watch support to esbuild-based builder          |
+| [2b6029245](https://github.com/angular/angular-cli/commit/2b602924538bf987e92f806c25c2a3d008a3f0a9) | feat | providing a karma config is now optional                    |
+| [f9a2c3a12](https://github.com/angular/angular-cli/commit/f9a2c3a1216cf9510e122df44a64ddd11d47226b) | fix  | allow both script and module sourceTypes to be localized    |
+| [b6df9c136](https://github.com/angular/angular-cli/commit/b6df9c1367ae5795a3895628ec9822d432b315bb) | fix  | handle conditional exports in `scripts` and `styles` option |
+| [8f8e02c32](https://github.com/angular/angular-cli/commit/8f8e02c3221c9477ec931bb6983daf6a2c8dc8be) | fix  | support Yarn PNP resolution in modern SASS API              |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [8eb58bdbe](https://github.com/angular/angular-cli/commit/8eb58bdbe034e2cbae9cdae058ad4633c8f2a761) | fix  | throw more relevant error when Rule returns invalid null value |
+
+## Special Thanks
+
+Alan Agius, Brent Schmidt, Charles Lyding, Cédric Exbrayat and minijus
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.5"></a>
 
 # 14.2.5 (2022-10-05)
