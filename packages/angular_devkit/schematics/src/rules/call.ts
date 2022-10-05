@@ -91,7 +91,7 @@ async function callRuleAsync(rule: Rule, tree: Tree, context: SchematicContext):
     result = await result.pipe(defaultIfEmpty(tree)).toPromise();
   }
 
-  if (TreeSymbol in result) {
+  if (result && TreeSymbol in result) {
     return result as Tree;
   }
 
