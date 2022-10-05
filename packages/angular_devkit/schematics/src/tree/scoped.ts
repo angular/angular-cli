@@ -164,7 +164,7 @@ export class ScopedTree implements Tree {
   }
 
   get actions(): Action[] {
-    const scopedActions = [];
+    const scopedActions: Action[] = [];
 
     for (const action of this._base.actions) {
       if (!action.path.startsWith(this._root.scope + '/')) {

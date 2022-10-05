@@ -152,7 +152,7 @@ export function levenshtein(a: string, b: string): number {
     return a.length;
   }
 
-  const matrix = [];
+  const matrix: number[][] = [];
 
   // increment along the first column of each row
   for (let i = 0; i <= b.length; i++) {

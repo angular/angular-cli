@@ -128,7 +128,7 @@ export type TemplateAstNode =
  * Given a source text (and a fileName), returns a TemplateAst.
  */
 export function templateParser(sourceText: string, fileName: string): TemplateAst {
-  const children = [];
+  const children: TemplateAstNode[] = [];
 
   // Compile the regexp to match each delimiter.
   const reExpressions = [kEscapeRe, kCommentRe, kInterpolateRe, kEvaluateRe];

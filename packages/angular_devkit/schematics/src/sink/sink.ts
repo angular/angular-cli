@@ -33,9 +33,8 @@ export interface Sink {
 const Noop = function () {};
 
 export abstract class SimpleSinkBase implements Sink {
-  preCommitAction: (
-    action: Action,
-  ) => void | Action | PromiseLike<Action> | Observable<Action> = Noop;
+  preCommitAction: (action: Action) => void | Action | PromiseLike<Action> | Observable<Action> =
+    Noop;
   postCommitAction: (action: Action) => void | Observable<void> = Noop;
   preCommit: () => void | Observable<void> = Noop;
   postCommit: () => void | Observable<void> = Noop;
@@ -118,7 +117,7 @@ export abstract class SimpleSinkBase implements Sink {
     return concat(
       this.validateSingleAction(action),
       new Observable<void>((observer) => {
-        let committed = null;
+        let committed: Observable<void> | null = null;
         switch (action.kind) {
           case 'o':
             committed = this._overwriteFile(action.path, action.content);

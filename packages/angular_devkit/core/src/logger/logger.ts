@@ -161,7 +161,8 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
       arguments as unknown as Parameters<Observable<LogEntry>['subscribe']>,
     );
   }
-  override forEach(next: (value: LogEntry) => void, PromiseCtor?: typeof Promise): Promise<void> {
-    return this._observable.forEach(next, PromiseCtor);
+
+  override forEach(next: (value: LogEntry) => void, promiseCtor?: typeof Promise): Promise<void> {
+    return this._observable.forEach(next, promiseCtor);
   }
 }
