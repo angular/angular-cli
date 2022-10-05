@@ -138,7 +138,7 @@ export class PartiallyOrderedSet<T> implements Set<T> {
     }
 
     while (copy.size > 0) {
-      const run = [];
+      const run: T[] = [];
       // Take the first item without dependencies.
       for (const [item, deps] of copy.entries()) {
         if (deps.size == 0) {

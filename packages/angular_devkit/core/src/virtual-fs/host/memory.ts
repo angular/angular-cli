@@ -224,7 +224,7 @@ export class SimpleMemoryHost implements Host<{}> {
       const content = this._cache.get(from);
       if (content) {
         const fragments = split(to);
-        const newDirectories = [];
+        const newDirectories: Path[] = [];
         let curr: Path = normalize('/');
         for (const fr of fragments) {
           curr = join(curr, fr);

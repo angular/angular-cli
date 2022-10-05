@@ -171,7 +171,7 @@ export function findNodes<T extends ts.Node>(
  */
 export function getSourceNodes(sourceFile: ts.SourceFile): ts.Node[] {
   const nodes: ts.Node[] = [sourceFile];
-  const result = [];
+  const result: ts.Node[] = [];
 
   while (nodes.length > 0) {
     const node = nodes.shift();
