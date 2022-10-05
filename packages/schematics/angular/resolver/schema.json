@@ -18,8 +18,7 @@
     "skipTests": {
       "type": "boolean",
       "description": "Do not create \"spec.ts\" test files for the new resolver.",
-      "default": false,
-      "x-user-analytics": 12
+      "default": false
     },
     "flat": {
       "type": "boolean",

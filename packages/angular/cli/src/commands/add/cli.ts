@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, tags } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { createRequire } from 'module';
 import npa from 'npm-package-arg';
@@ -14,7 +14,6 @@ import { dirname, join } from 'path';
 import { compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
 import { PackageManager } from '../../../lib/config/workspace-schema';
-import { isPackageNameSafeForAnalytics } from '../../analytics/analytics';
 import {
   CommandModuleImplementation,
   Options,
@@ -321,17 +320,6 @@ export class AddCommandModule
     }
 
     return validVersion;
-  }
-
-  override async reportAnalytics(options: OtherOptions, paths: string[]): Promise<void> {
-    const collection = await this.getCollectionName();
-    const dimensions: string[] = [];
-    // Add the collection if it's safe listed.
-    if (collection && isPackageNameSafeForAnalytics(collection)) {
-      dimensions[analytics.NgCliAnalyticsDimensions.NgAddCollection] = collection;
-    }
-
-    return super.reportAnalytics(options, paths, dimensions);
   }
 
   private async getCollectionName(): Promise<string> {

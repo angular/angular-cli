@@ -42,7 +42,7 @@ export interface Option extends yargs.Options {
    * Whether or not to report this option to the Angular Team, and which custom field to use.
    * If this is falsey, do not report this option.
    */
-  userAnalytics?: number;
+  userAnalytics?: string;
 }
 
 export async function parseJsonSchemaToOptions(
@@ -172,7 +172,7 @@ export async function parseJsonSchemaToOptions(
     const hidden = !!current.hidden || !visible;
 
     const xUserAnalytics = current['x-user-analytics'];
-    const userAnalytics = typeof xUserAnalytics == 'number' ? xUserAnalytics : undefined;
+    const userAnalytics = typeof xUserAnalytics === 'string' ? xUserAnalytics : undefined;
 
     // Deprecated is set only if it's true or a string.
     const xDeprecated = current['x-deprecated'];

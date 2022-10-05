@@ -27,7 +27,6 @@ function optional(variable: string | undefined): boolean | undefined {
 }
 
 export const analyticsDisabled = isDisabled(process.env['NG_CLI_ANALYTICS']);
-export const analyticsShareDisabled = isDisabled(process.env['NG_CLI_ANALYTICS_SHARE']);
 export const isCI = isEnabled(process.env['CI']);
 export const disableVersionCheck = isEnabled(process.env['NG_DISABLE_VERSION_CHECK']);
 export const ngDebug = isEnabled(process.env['NG_DEBUG']);

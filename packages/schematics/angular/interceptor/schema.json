@@ -39,8 +39,7 @@
     "skipTests": {
       "type": "boolean",
       "description": "Do not create \"spec.ts\" test files for the new interceptor.",
-      "default": false,
-      "x-user-analytics": 12
+      "default": false
     }
   },
   "required": ["name", "project"]

@@ -48,14 +48,12 @@
     "skipTests": {
       "type": "boolean",
       "description": "Do not create \"spec.ts\" test files for the new class.",
-      "default": false,
-      "x-user-analytics": 12
+      "default": false
     },
     "skipImport": {
       "type": "boolean",
       "description": "Do not import this directive into the owning NgModule.",
-      "default": false,
-      "x-user-analytics": 18
+      "default": false
     },
     "selector": {
       "type": "string",
@@ -66,7 +64,7 @@
       "description": "Whether the generated directive is standalone.",
       "type": "boolean",
       "default": false,
-      "x-user-analytics": 15
+      "x-user-analytics": "ep.ng_standalone"
     },
     "flat": {
       "type": "boolean",
@@ -81,8 +79,7 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "The declaring NgModule exports this directive.",
-      "x-user-analytics": 19
+      "description": "The declaring NgModule exports this directive."
     }
   },
   "required": ["name", "project"]

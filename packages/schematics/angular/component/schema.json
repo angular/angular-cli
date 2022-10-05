@@ -42,27 +42,26 @@
       "type": "boolean",
       "default": false,
       "alias": "s",
-      "x-user-analytics": 9
+      "x-user-analytics": "ep.ng_inline_style"
     },
     "inlineTemplate": {
       "description": "Include template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
       "alias": "t",
-      "x-user-analytics": 10
+      "x-user-analytics": "ep.ng_inline_template"
     },
     "standalone": {
       "description": "Whether the generated component is standalone.",
       "type": "boolean",
       "default": false,
-      "x-user-analytics": 15
+      "x-user-analytics": "ep.ng_standalone"
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the new component.",
       "enum": ["Emulated", "None", "ShadowDom"],
       "type": "string",
-      "alias": "v",
-      "x-user-analytics": 11
+      "alias": "v"
     },
     "changeDetection": {
       "description": "The change detection strategy to use in the new component.",
@@ -90,7 +89,7 @@
       "type": "string",
       "default": "css",
       "enum": ["css", "scss", "sass", "less", "none"],
-      "x-user-analytics": 5
+      "x-user-analytics": "ep.ng_style"
     },
     "type": {
       "type": "string",
@@ -100,8 +99,7 @@
     "skipTests": {
       "type": "boolean",
       "description": "Do not create \"spec.ts\" test files for the new component.",
-      "default": false,
-      "x-user-analytics": 12
+      "default": false
     },
     "flat": {
       "type": "boolean",
@@ -111,8 +109,7 @@
     "skipImport": {
       "type": "boolean",
       "description": "Do not import this component into the owning NgModule.",
-      "default": false,
-      "x-user-analytics": 18
+      "default": false
     },
     "selector": {
       "type": "string",
@@ -132,8 +129,7 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "The declaring NgModule exports this component.",
-      "x-user-analytics": 19
+      "description": "The declaring NgModule exports this component."
     }
   },
   "required": ["name", "project"]

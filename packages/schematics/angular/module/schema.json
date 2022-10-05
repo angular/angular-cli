@@ -35,7 +35,7 @@
       "type": "boolean",
       "description": "Create a routing module.",
       "default": false,
-      "x-user-analytics": 17
+      "x-user-analytics": "ep.ng_routing"
     },
     "routingScope": {
       "enum": ["Child", "Root"],

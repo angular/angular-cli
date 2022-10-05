@@ -74,22 +74,6 @@
           "type": ["boolean", "string"],
           "description": "Share pseudonymous usage data with the Angular Team at Google."
         },
-        "analyticsSharing": {
-          "type": "object",
-          "properties": {
-            "tracking": {
-              "description": "Analytics sharing info tracking ID.",
-              "type": "string",
-              "pattern": "^(GA|UA)?-\\d+-\\d+$"
-            },
-            "uuid": {
-              "description": "Analytics sharing info universally unique identifier.",
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "additionalProperties": false
-        },
         "cache": {
           "description": "Control disk cache.",
           "type": "object",
@@ -148,22 +132,6 @@
         "analytics": {
           "type": ["boolean", "string"],
           "description": "Share pseudonymous usage data with the Angular Team at Google."
-        },
-        "analyticsSharing": {
-          "type": "object",
-          "properties": {
-            "tracking": {
-              "description": "Analytics sharing info tracking ID.",
-              "type": "string",
-              "pattern": "^(GA|UA)?-\\d+-\\d+$"
-            },
-            "uuid": {
-              "description": "Analytics sharing info universally unique identifier.",
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "additionalProperties": false
         },
         "completion": {
           "type": "object",

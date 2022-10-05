@@ -68,19 +68,18 @@
       "description": "Include styles inline in the component TS file. By default, an external styles file is created and referenced in the component TypeScript file.",
       "type": "boolean",
       "alias": "s",
-      "x-user-analytics": 9
+      "x-user-analytics": "ep.ng_inline_style"
     },
     "inlineTemplate": {
       "description": "Include template inline in the component TS file. By default, an external template file is created and referenced in the component TypeScript file.",
       "type": "boolean",
       "alias": "t",
-      "x-user-analytics": 10
+      "x-user-analytics": "ep.ng_inline_template"
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the initial project.",
       "enum": ["Emulated", "None", "ShadowDom"],
-      "type": "string",
-      "x-user-analytics": 11
+      "type": "string"
     },
     "version": {
       "type": "string",
@@ -93,7 +92,7 @@
     "routing": {
       "type": "boolean",
       "description": "Generate a routing module for the initial project.",
-      "x-user-analytics": 17
+      "x-user-analytics": "ep.ng_routing"
     },
     "prefix": {
       "type": "string",
@@ -107,14 +106,13 @@
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
       "enum": ["css", "scss", "sass", "less"],
-      "x-user-analytics": 5
+      "x-user-analytics": "ep.ng_style"
     },
     "skipTests": {
       "description": "Do not generate \"spec.ts\" test files for the new project.",
       "type": "boolean",
       "default": false,
-      "alias": "S",
-      "x-user-analytics": 12
+      "alias": "S"
     },
     "createApplication": {
       "description": "Create a new initial application project in the 'src' folder of the new workspace. When false, creates an empty workspace with no initial application. You can then use the generate application command so that all applications are created in the projects folder.",
@@ -124,14 +122,12 @@
     "minimal": {
       "description": "Create a workspace without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
-      "default": false,
-      "x-user-analytics": 14
+      "default": false
     },
     "strict": {
       "description": "Creates a workspace with stricter type checking and stricter bundle budgets settings. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.io/guide/strict-mode",
       "type": "boolean",
-      "default": true,
-      "x-user-analytics": 7
+      "default": true
     },
     "packageManager": {
       "description": "The package manager used to install dependencies.",
