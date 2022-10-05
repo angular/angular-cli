@@ -20,11 +20,11 @@ import {
   callSource,
 } from './call';
 
-const context: SchematicContext = ({
+const context: SchematicContext = {
   engine: null,
   debug: false,
   strategy: MergeStrategy.Default,
-} as {}) as SchematicContext;
+} as {} as SchematicContext;
 
 describe('callSource', () => {
   it('errors if undefined source', (done) => {
@@ -95,34 +95,20 @@ describe('callSource', () => {
 });
 
 describe('callRule', () => {
-  it('errors if invalid source object', (done) => {
-    const tree0 = observableOf(empty());
+  it('should throw InvalidRuleResultException when rule result is non-Tree object', async () => {
     const rule0: Rule = () => ({} as Tree);
 
-    callRule(rule0, tree0, context)
-      .toPromise()
-      .then(
-        () => done.fail(),
-        (err) => {
-          expect(err).toEqual(new InvalidRuleResultException({}));
-        },
-      )
-      .then(done, done.fail);
+    await expectAsync(callRule(rule0, empty(), context).toPromise()).toBeRejectedWithError(
+      InvalidRuleResultException,
+    );
   });
 
-  it('errors if Observable of invalid source object', (done) => {
-    const tree0 = observableOf(empty());
-    const rule0: Rule = () => observableOf({} as Tree);
+  it('should throw InvalidRuleResultException when rule result is null', async () => {
+    const rule0: Rule = () => null as unknown as Tree;
 
-    callRule(rule0, tree0, context)
-      .toPromise()
-      .then(
-        () => done.fail(),
-        (err) => {
-          expect(err).toEqual(new InvalidRuleResultException({}));
-        },
-      )
-      .then(done, done.fail);
+    await expectAsync(callRule(rule0, empty(), context).toPromise()).toBeRejectedWithError(
+      InvalidRuleResultException,
+    );
   });
 
   it('works with undefined result', (done) => {
