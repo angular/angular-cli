@@ -21,7 +21,7 @@ import {
 } from '@angular-devkit/architect';
 import { WorkspaceHost } from '@angular-devkit/architect/node';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
-import { analytics, getSystemPath, join, json, logging, normalize } from '@angular-devkit/core';
+import { getSystemPath, join, json, logging, normalize } from '@angular-devkit/core';
 import { Observable, Subject, from as observableFrom, of as observableOf } from 'rxjs';
 import { catchError, finalize, first, map, mergeMap, shareReplay } from 'rxjs/operators';
 import { BuilderWatcherFactory, WatcherNotifier } from './file-watching';
@@ -377,11 +377,6 @@ class HarnessBuilderContext implements BuilderContext {
     public readonly watcherFactory: BuilderWatcherFactory | undefined,
   ) {
     this.workspaceRoot = this.currentDirectory = basePath;
-  }
-
-  get analytics(): analytics.Analytics {
-    // Can be undefined even though interface does not allow it
-    return undefined as unknown as analytics.Analytics;
   }
 
   addTeardown(teardown: () => Promise<void> | void): void {

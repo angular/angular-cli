@@ -4,7 +4,6 @@
 
 ```ts
 
-import { analytics } from '@angular-devkit/core';
 import { BaseException } from '@angular-devkit/core';
 import { json } from '@angular-devkit/core';
 import { JsonObject } from '@angular-devkit/core';
@@ -29,7 +28,6 @@ export class Architect {
 // @public
 export interface BuilderContext {
     addTeardown(teardown: () => Promise<void> | void): void;
-    readonly analytics: analytics.Analytics;
     builder: BuilderInfo;
     currentDirectory: string;
     getBuilderNameForTarget(target: Target): Promise<string>;
@@ -435,8 +433,6 @@ interface ScheduleJobOptions {
 
 // @public (undocumented)
 export interface ScheduleOptions {
-    // (undocumented)
-    analytics?: analytics.Analytics;
     // (undocumented)
     logger?: logging.Logger;
 }

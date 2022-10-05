@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, json, logging } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { Observable, SubscribableOrPromise, Subscriber, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
@@ -238,12 +238,6 @@ export interface BuilderContext {
    * @param status Update the status string. If omitted the status string is not modified.
    */
   reportProgress(current: number, total?: number, status?: string): void;
-
-  /**
-   * API to report analytics. This might be undefined if the feature is unsupported. This might
-   * not be undefined, but the backend could also not report anything.
-   */
-  readonly analytics: analytics.Analytics;
 
   /**
    * Add teardown logic to this Context, so that when it's being stopped it will execute teardown.

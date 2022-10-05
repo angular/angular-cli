@@ -28,130 +28,6 @@ class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
     protected _resolve(path: Path): Path;
 }
 
-// @public
-interface Analytics {
-    // (undocumented)
-    event(category: string, action: string, options?: EventOptions): void;
-    // (undocumented)
-    flush(): Promise<void>;
-    // (undocumented)
-    pageview(path: string, options?: PageviewOptions): void;
-    // (undocumented)
-    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
-    // (undocumented)
-    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
-}
-
-declare namespace analytics {
-    export {
-        NgCliAnalyticsDimensions,
-        NgCliAnalyticsMetrics,
-        NgCliAnalyticsDimensionsFlagInfo,
-        NgCliAnalyticsMetricsFlagInfo,
-        CustomDimensionsAndMetricsOptions,
-        EventOptions,
-        ScreenviewOptions,
-        PageviewOptions,
-        TimingOptions,
-        Analytics,
-        AnalyticsReportKind,
-        AnalyticsReportBase,
-        AnalyticsReportEvent,
-        AnalyticsReportScreenview,
-        AnalyticsReportPageview,
-        AnalyticsReportTiming,
-        AnalyticsReport,
-        AnalyticsForwarderFn,
-        ForwardingAnalytics,
-        AnalyticsReporter,
-        LoggingAnalytics,
-        MultiAnalytics,
-        NoopAnalytics
-    }
-}
-export { analytics }
-
-// @public
-type AnalyticsForwarderFn = (report: JsonObject & AnalyticsReport) => void;
-
-// @public (undocumented)
-type AnalyticsReport = AnalyticsReportEvent | AnalyticsReportScreenview | AnalyticsReportPageview | AnalyticsReportTiming;
-
-// @public (undocumented)
-interface AnalyticsReportBase extends JsonObject {
-    // (undocumented)
-    kind: AnalyticsReportKind;
-}
-
-// @public (undocumented)
-class AnalyticsReporter {
-    constructor(_analytics: Analytics);
-    // (undocumented)
-    protected _analytics: Analytics;
-    // (undocumented)
-    report(report: AnalyticsReport): void;
-}
-
-// @public (undocumented)
-interface AnalyticsReportEvent extends AnalyticsReportBase {
-    // (undocumented)
-    action: string;
-    // (undocumented)
-    category: string;
-    // (undocumented)
-    kind: AnalyticsReportKind.Event;
-    // (undocumented)
-    options: JsonObject & EventOptions;
-}
-
-// @public (undocumented)
-enum AnalyticsReportKind {
-    // (undocumented)
-    Event = "event",
-    // (undocumented)
-    Pageview = "pageview",
-    // (undocumented)
-    Screenview = "screenview",
-    // (undocumented)
-    Timing = "timing"
-}
-
-// @public (undocumented)
-interface AnalyticsReportPageview extends AnalyticsReportBase {
-    // (undocumented)
-    kind: AnalyticsReportKind.Pageview;
-    // (undocumented)
-    options: JsonObject & PageviewOptions;
-    // (undocumented)
-    path: string;
-}
-
-// @public (undocumented)
-interface AnalyticsReportScreenview extends AnalyticsReportBase {
-    // (undocumented)
-    appName: string;
-    // (undocumented)
-    kind: AnalyticsReportKind.Screenview;
-    // (undocumented)
-    options: JsonObject & ScreenviewOptions;
-    // (undocumented)
-    screenName: string;
-}
-
-// @public (undocumented)
-interface AnalyticsReportTiming extends AnalyticsReportBase {
-    // (undocumented)
-    category: string;
-    // (undocumented)
-    kind: AnalyticsReportKind.Timing;
-    // (undocumented)
-    options: JsonObject & TimingOptions;
-    // (undocumented)
-    time: string | number;
-    // (undocumented)
-    variable: string;
-}
-
 // @public (undocumented)
 export function asPosixPath(path: Path): PosixPath;
 
@@ -319,14 +195,6 @@ function createSyncHost<StatsT extends object = {}>(handler: SyncHostHandler<Sta
 function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost;
 
 // @public
-interface CustomDimensionsAndMetricsOptions {
-    // (undocumented)
-    dimensions?: (boolean | number | string)[];
-    // (undocumented)
-    metrics?: (boolean | number | string)[];
-}
-
-// @public
 function dasherize(str: string): string;
 
 // @public
@@ -365,14 +233,6 @@ class Empty implements ReadonlyHost {
 }
 
 // @public (undocumented)
-interface EventOptions extends CustomDimensionsAndMetricsOptions {
-    // (undocumented)
-    label?: string;
-    // (undocumented)
-    value?: string;
-}
-
-// @public (undocumented)
 export function extname(path: Path): string;
 
 // @public (undocumented)
@@ -395,23 +255,6 @@ function fileBufferToString(fileBuffer: FileBuffer): string;
 // @public (undocumented)
 export class FileDoesNotExistException extends BaseException {
     constructor(path: string);
-}
-
-// @public
-class ForwardingAnalytics implements Analytics {
-    constructor(_fn: AnalyticsForwarderFn);
-    // (undocumented)
-    event(category: string, action: string, options?: EventOptions): void;
-    // (undocumented)
-    flush(): Promise<void>;
-    // (undocumented)
-    protected _fn: AnalyticsForwarderFn;
-    // (undocumented)
-    pageview(path: string, options?: PageviewOptions): void;
-    // (undocumented)
-    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
-    // (undocumented)
-    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
 }
 
 // @public (undocumented)
@@ -690,23 +533,6 @@ declare namespace logging {
 }
 export { logging }
 
-// @public
-class LoggingAnalytics implements Analytics {
-    constructor(_logger: Logger);
-    // (undocumented)
-    event(category: string, action: string, options?: EventOptions): void;
-    // (undocumented)
-    flush(): Promise<void>;
-    // (undocumented)
-    protected _logger: Logger;
-    // (undocumented)
-    pageview(path: string, options?: PageviewOptions): void;
-    // (undocumented)
-    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
-    // (undocumented)
-    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
-}
-
 // @public (undocumented)
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
@@ -719,102 +545,7 @@ export class MergeConflictException extends BaseException {
 function mergeSchemas(...schemas: (JsonSchema | undefined)[]): JsonSchema;
 
 // @public
-class MultiAnalytics implements Analytics {
-    constructor(_backends?: Analytics[]);
-    // (undocumented)
-    protected _backends: Analytics[];
-    // (undocumented)
-    event(category: string, action: string, options?: EventOptions): void;
-    // (undocumented)
-    flush(): Promise<void>;
-    // (undocumented)
-    pageview(path: string, options?: PageviewOptions): void;
-    // (undocumented)
-    push(...backend: Analytics[]): void;
-    // (undocumented)
-    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
-    // (undocumented)
-    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
-}
-
-// @public
-enum NgCliAnalyticsDimensions {
-    // (undocumented)
-    AngularCLIMajorVersion = 8,
-    // (undocumented)
-    BuildErrors = 20,
-    // (undocumented)
-    CpuCount = 1,
-    // (undocumented)
-    CpuSpeed = 2,
-    // (undocumented)
-    NgAddCollection = 6,
-    // (undocumented)
-    NodeVersion = 4,
-    // (undocumented)
-    RamInGigabytes = 3
-}
-
-// @public (undocumented)
-const NgCliAnalyticsDimensionsFlagInfo: {
-    [name: string]: [string, string];
-};
-
-// @public (undocumented)
-enum NgCliAnalyticsMetrics {
-    // (undocumented)
-    AssetCount = 12,
-    // (undocumented)
-    AssetSize = 13,
-    // (undocumented)
-    BuildTime = 5,
-    // (undocumented)
-    CssSize = 15,
-    // (undocumented)
-    InitialChunkSize = 7,
-    // (undocumented)
-    LazyChunkCount = 10,
-    // (undocumented)
-    LazyChunkSize = 11,
-    // (undocumented)
-    NgComponentCount = 1,
-    // (undocumented)
-    NgOnInitCount = 6,
-    // (undocumented)
-    PolyfillSize = 14,
-    // (undocumented)
-    TotalChunkCount = 8,
-    // (undocumented)
-    TotalChunkSize = 9,
-    // (undocumented)
-    UNUSED_2 = 2,
-    // (undocumented)
-    UNUSED_3 = 3,
-    // (undocumented)
-    UNUSED_4 = 4
-}
-
-// @public (undocumented)
-const NgCliAnalyticsMetricsFlagInfo: {
-    [name: string]: [string, string];
-};
-
-// @public
 export function noCacheNormalize(path: string): Path;
-
-// @public
-class NoopAnalytics implements Analytics {
-    // (undocumented)
-    event(): void;
-    // (undocumented)
-    flush(): Promise<void>;
-    // (undocumented)
-    pageview(): void;
-    // (undocumented)
-    screenview(): void;
-    // (undocumented)
-    timing(): void;
-}
 
 // @public
 export function normalize(path: string): Path;
@@ -834,14 +565,6 @@ class NullLogger extends Logger {
 
 // @public (undocumented)
 function oneLine(strings: TemplateStringsArray, ...values: any[]): string;
-
-// @public (undocumented)
-interface PageviewOptions extends CustomDimensionsAndMetricsOptions {
-    // (undocumented)
-    hostname?: string;
-    // (undocumented)
-    title?: string;
-}
 
 // @public (undocumented)
 function parseJsonPointer(pointer: JsonPointer): string[];
@@ -1204,16 +927,6 @@ class ScopedHost<T extends object> extends ResolverHost<T> {
     protected _resolve(path: Path): Path;
     // (undocumented)
     protected _root: Path;
-}
-
-// @public (undocumented)
-interface ScreenviewOptions extends CustomDimensionsAndMetricsOptions {
-    // (undocumented)
-    appId?: string;
-    // (undocumented)
-    appInstallerId?: string;
-    // (undocumented)
-    appVersion?: string;
 }
 
 // @public (undocumented)
@@ -1589,12 +1302,6 @@ namespace test {
         from: Path;
         to: Path;
     };
-}
-
-// @public (undocumented)
-interface TimingOptions extends CustomDimensionsAndMetricsOptions {
-    // (undocumented)
-    label?: string;
 }
 
 // @public (undocumented)
