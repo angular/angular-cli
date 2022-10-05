@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, json, logging } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { EMPTY, Subscription } from 'rxjs';
 import { catchError, first, ignoreElements, map, shareReplay } from 'rxjs/operators';
 import {
@@ -33,7 +33,6 @@ export async function scheduleByName(
     logger: logging.LoggerApi;
     workspaceRoot: string | Promise<string>;
     currentDirectory: string | Promise<string>;
-    analytics?: analytics.Analytics;
   },
 ): Promise<BuilderRun> {
   const childLoggerName = options.target ? `{${targetStringFromTarget(options.target)}}` : name;
@@ -100,13 +99,6 @@ export async function scheduleByName(
     shareReplay(),
   );
 
-  // If there's an analytics object, take the job channel and report it to the analytics.
-  if (options.analytics) {
-    const reporter = new analytics.AnalyticsReporter(options.analytics);
-    job
-      .getChannel<analytics.AnalyticsReport>('analytics')
-      .subscribe((report) => reporter.report(report));
-  }
   // Start the builder.
   output.pipe(first()).subscribe({
     error() {},
@@ -144,7 +136,6 @@ export async function scheduleByTarget(
     logger: logging.LoggerApi;
     workspaceRoot: string | Promise<string>;
     currentDirectory: string | Promise<string>;
-    analytics?: analytics.Analytics;
   },
 ): Promise<BuilderRun> {
   return scheduleByName(`{${targetStringFromTarget(target)}}`, overrides, {

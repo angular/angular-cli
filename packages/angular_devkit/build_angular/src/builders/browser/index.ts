@@ -47,7 +47,7 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../../utils/webpack-browser-config';
-import { getAnalyticsConfig, getCommonConfig, getStylesConfig } from '../../webpack/configs';
+import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
 import { markAsyncChunksNonInitial } from '../../webpack/utils/async-chunks';
 import { normalizeExtraEntryPoints } from '../../webpack/utils/helpers';
 import {
@@ -105,7 +105,6 @@ async function initialize(
     await generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getAnalyticsConfig(wco, context),
     ]);
 
   // Validate asset option values if processed directly

@@ -36,12 +36,7 @@ import {
   getIndexOutputFile,
 } from '../../utils/webpack-browser-config';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
-import {
-  getAnalyticsConfig,
-  getCommonConfig,
-  getDevServerConfig,
-  getStylesConfig,
-} from '../../webpack/configs';
+import { getCommonConfig, getDevServerConfig, getStylesConfig } from '../../webpack/configs';
 import { IndexHtmlWebpackPlugin } from '../../webpack/plugins/index-html-webpack-plugin';
 import { ServiceWorkerPlugin } from '../../webpack/plugins/service-worker-plugin';
 import { createWebpackLoggingCallback } from '../../webpack/utils/stats';
@@ -167,12 +162,7 @@ export function serveWebpackBrowser(
     const { config, projectRoot, i18n } = await generateI18nBrowserWebpackConfigFromContext(
       browserOptions,
       context,
-      (wco) => [
-        getDevServerConfig(wco),
-        getCommonConfig(wco),
-        getStylesConfig(wco),
-        getAnalyticsConfig(wco, context),
-      ],
+      (wco) => [getDevServerConfig(wco), getCommonConfig(wco), getStylesConfig(wco)],
       options,
     );
 

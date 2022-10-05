@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export * from './analytics';
 export * from './common';
 export * from './dev-server';
 export * from './styles';
