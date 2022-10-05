@@ -52,7 +52,7 @@ export class AnalyticsDisableModule
 
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
     await setAnalyticsConfig(global, false);
-    process.stderr.write(await getAnalyticsInfoString());
+    process.stderr.write(await getAnalyticsInfoString(this.context));
   }
 }
 
@@ -65,7 +65,7 @@ export class AnalyticsEnableModule
   describe = 'Enables analytics gathering and reporting for the user.';
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
     await setAnalyticsConfig(global, true);
-    process.stderr.write(await getAnalyticsInfoString());
+    process.stderr.write(await getAnalyticsInfoString(this.context));
   }
 }
 
@@ -77,6 +77,6 @@ export class AnalyticsPromptModule
   describe = 'Prompts the user to set the analytics gathering status interactively.';
 
   async run({ global }: Options<AnalyticsCommandArgs>): Promise<void> {
-    await promptAnalytics(global, true);
+    await promptAnalytics(this.context, global, true);
   }
 }

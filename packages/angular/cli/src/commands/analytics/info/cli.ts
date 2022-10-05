@@ -27,6 +27,6 @@ export class AnalyticsInfoCommandModule
   }
 
   async run(_options: Options<{}>): Promise<void> {
-    this.context.logger.info(await getAnalyticsInfoString());
+    this.context.logger.info(await getAnalyticsInfoString(this.context));
   }
 }

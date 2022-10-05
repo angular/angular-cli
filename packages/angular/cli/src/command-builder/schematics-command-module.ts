@@ -16,6 +16,8 @@ import {
 import type { CheckboxQuestion, Question } from 'inquirer';
 import { relative, resolve } from 'path';
 import { Argv } from 'yargs';
+import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
+import { EventCustomDimension } from '../analytics/analytics-parameters';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { memoize } from '../utilities/memoize';
@@ -50,7 +52,6 @@ export abstract class SchematicsCommandModule
 {
   override scope = CommandScope.In;
   protected readonly allowPrivateSchematics: boolean = false;
-  protected override readonly shouldReportAnalytics = false;
 
   async builder(argv: Argv): Promise<Argv<SchematicsCommandArgs>> {
     return argv
@@ -144,15 +145,24 @@ export abstract class SchematicsCommandModule
 
     let shouldReportAnalytics = true;
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
+      // Report analytics
       if (shouldReportAnalytics) {
         shouldReportAnalytics = false;
 
-        await this.reportAnalytics(
-          options as {},
-          undefined /** paths */,
-          undefined /** dimensions */,
-          schematic.collection.name + ':' + schematic.name,
-        );
+        const {
+          collection: { name: collectionName },
+          name: schematicName,
+        } = schematic;
+
+        const analytics = isPackageNameSafeForAnalytics(collectionName)
+          ? await this.getAnalytics()
+          : undefined;
+
+        analytics?.reportSchematicRunEvent({
+          [EventCustomDimension.SchematicCollectionName]: collectionName,
+          [EventCustomDimension.SchematicName]: schematicName,
+          ...this.getAnalyticsParameters(options as unknown as {}),
+        });
       }
 
       return options;

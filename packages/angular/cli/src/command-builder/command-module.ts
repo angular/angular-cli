@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, logging, schema, strings } from '@angular-devkit/core';
+import { logging, schema, strings } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import {
+import yargs, {
   Arguments,
   ArgumentsCamelCase,
   Argv,
@@ -19,7 +19,9 @@ import {
   Options as YargsOptions,
 } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
-import { createAnalytics } from '../analytics/analytics';
+import { getAnalyticsUserId } from '../analytics/analytics';
+import { AnalyticsCollector } from '../analytics/analytics-collector';
+import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
 import { considerSettingUpAutocompletion } from '../utilities/completion';
 import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
@@ -82,7 +84,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   protected readonly shouldReportAnalytics: boolean = true;
   readonly scope: CommandScope = CommandScope.Both;
 
-  private readonly optionsWithAnalytics = new Map<string, number>();
+  private readonly optionsWithAnalytics = new Map<string, string>();
 
   constructor(protected readonly context: CommandContext) {}
 
@@ -140,20 +142,29 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
 
     // Gather and report analytics.
     const analytics = await this.getAnalytics();
-    let stopPeriodicFlushes: (() => Promise<void>) | undefined;
-
-    if (this.shouldReportAnalytics) {
-      await this.reportAnalytics(camelCasedOptions);
-      stopPeriodicFlushes = this.periodicAnalyticsFlush(analytics);
-    }
+    const stopPeriodicFlushes = analytics && analytics.periodFlush();
 
     let exitCode: number | void | undefined;
     try {
       // Run and time command.
-      const startTime = Date.now();
+      if (analytics) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const internalMethods = (yargs as any).getInternalMethods();
+        // $0 generate component [name] -> generate_component
+        // $0 add <collection> -> add
+        const fullCommand = (internalMethods.getUsageInstance().getUsage()[0][0] as string)
+          .split(' ')
+          .filter((x) => {
+            const code = x.charCodeAt(0);
+
+            return code >= 97 && code <= 122;
+          })
+          .join('_');
+
+        analytics.reportCommandRunEvent(fullCommand);
+      }
+
       exitCode = await this.run(camelCasedOptions as Options<T> & OtherOptions);
-      const endTime = Date.now();
-      analytics.timing(this.commandName, 'duration', endTime - startTime);
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
         this.context.logger.fatal(`Error: ${e.message}`);
@@ -170,35 +181,19 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     }
   }
 
-  async reportAnalytics(
-    options: (Options<T> & OtherOptions) | OtherOptions,
-    paths: string[] = [],
-    dimensions: (boolean | number | string)[] = [],
-    title?: string,
-  ): Promise<void> {
-    for (const [name, ua] of this.optionsWithAnalytics) {
-      const value = options[name];
-
-      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-        dimensions[ua] = value;
-      }
+  @memoize
+  protected async getAnalytics(): Promise<AnalyticsCollector | undefined> {
+    if (!this.shouldReportAnalytics) {
+      return undefined;
     }
 
-    const analytics = await this.getAnalytics();
-    analytics.pageview('/command/' + [this.commandName, ...paths].join('/'), {
-      dimensions,
-      metrics: [],
-      title,
-    });
-  }
-
-  @memoize
-  protected getAnalytics(): Promise<analytics.Analytics> {
-    return createAnalytics(
-      !!this.context.workspace,
+    const userId = await getAnalyticsUserId(
+      this.context,
       // Don't prompt for `ng update` and `ng analytics` commands.
       ['update', 'analytics'].includes(this.commandName),
     );
+
+    return userId ? new AnalyticsCollector(this.context, userId) : undefined;
   }
 
   /**
@@ -288,18 +283,29 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
    * @returns a method that when called will terminate the periodic
    * flush and call flush one last time.
    */
-  private periodicAnalyticsFlush(analytics: analytics.Analytics): () => Promise<void> {
-    let analyticsFlushPromise = Promise.resolve();
-    const analyticsFlushInterval = setInterval(() => {
-      analyticsFlushPromise = analyticsFlushPromise.then(() => analytics.flush());
-    }, 2000);
+  protected getAnalyticsParameters(
+    options: (Options<T> & OtherOptions) | OtherOptions,
+  ): Partial<Record<EventCustomDimension | EventCustomMetric, string | boolean | number>> {
+    const parameters: Partial<
+      Record<EventCustomDimension | EventCustomMetric, string | boolean | number>
+    > = {};
 
-    return () => {
-      clearInterval(analyticsFlushInterval);
+    const validEventCustomDimensionAndMetrics = new Set([
+      ...Object.values(EventCustomDimension),
+      ...Object.values(EventCustomMetric),
+    ]);
 
-      // Flush one last time.
-      return analyticsFlushPromise.then(() => analytics.flush());
-    };
+    for (const [name, ua] of this.optionsWithAnalytics) {
+      const value = options[name];
+      if (
+        (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') &&
+        validEventCustomDimensionAndMetrics.has(ua as EventCustomDimension | EventCustomMetric)
+      ) {
+        parameters[ua as EventCustomDimension | EventCustomMetric] = value;
+      }
+    }
+
+    return parameters;
   }
 }
 

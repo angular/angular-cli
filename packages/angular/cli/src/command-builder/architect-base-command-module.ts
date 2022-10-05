@@ -16,6 +16,7 @@ import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
+import { EventCustomDimension } from '../analytics/analytics-collector';
 import { assertIsError } from '../utilities/error';
 import { askConfirmation, askQuestion } from '../utilities/prompt';
 import { isTTY } from '../utilities/tty';
@@ -38,7 +39,6 @@ export abstract class ArchitectBaseCommandModule<T extends object>
   implements CommandModuleImplementation<T>
 {
   override scope = CommandScope.In;
-  protected override shouldReportAnalytics = false;
   protected readonly missingTargetChoices: MissingTargetChoice[] | undefined;
 
   protected async runSingleTarget(target: Target, options: OtherOptions): Promise<number> {
@@ -53,21 +53,17 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return this.onMissingTarget(e.message);
     }
 
-    await this.reportAnalytics(
-      {
-        ...(await architectHost.getOptionsForTarget(target)),
-        ...options,
-      },
-      undefined /** paths */,
-      undefined /** dimensions */,
-      builderName,
-    );
-
     const { logger } = this.context;
-
     const run = await this.getArchitect().scheduleTarget(target, options as json.JsonObject, {
       logger,
-      analytics: isPackageNameSafeForAnalytics(builderName) ? await this.getAnalytics() : undefined,
+    });
+
+    const analytics = isPackageNameSafeForAnalytics(builderName)
+      ? await this.getAnalytics()
+      : undefined;
+
+    analytics?.reportArchitectRunEvent({
+      [EventCustomDimension.BuilderTarget]: builderName,
     });
 
     const { error, success } = await run.output.toPromise();

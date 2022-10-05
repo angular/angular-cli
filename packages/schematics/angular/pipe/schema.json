@@ -39,20 +39,18 @@
     "skipTests": {
       "type": "boolean",
       "description": "Do not create \"spec.ts\" test files for the new pipe.",
-      "default": false,
-      "x-user-analytics": 12
+      "default": false
     },
     "skipImport": {
       "type": "boolean",
       "default": false,
-      "description": "Do not import this pipe into the owning NgModule.",
-      "x-user-analytics": 18
+      "description": "Do not import this pipe into the owning NgModule."
     },
     "standalone": {
       "description": "Whether the generated pipe is standalone.",
       "type": "boolean",
       "default": false,
-      "x-user-analytics": 15
+      "x-user-analytics": "ep.ng_standalone"
     },
     "module": {
       "type": "string",
@@ -62,8 +60,7 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "The declaring NgModule exports this pipe.",
-      "x-user-analytics": 19
+      "description": "The declaring NgModule exports this pipe."
     }
   },
   "required": ["name", "project"]
