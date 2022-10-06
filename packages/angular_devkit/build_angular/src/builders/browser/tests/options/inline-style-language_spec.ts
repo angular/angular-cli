@@ -32,13 +32,13 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           });
 
           await harness.modifyFile('src/app/app.component.ts', (content) =>
-            content.replace('__STYLE_MARKER__', '$primary: green;\\nh1 { color: $primary; }'),
+            content.replace('__STYLE_MARKER__', '$primary: indianred;\\nh1 { color: $primary; }'),
           );
 
           const { result } = await harness.executeOnce();
 
           expect(result?.success).toBe(true);
-          harness.expectFile('dist/main.js').content.toContain('color: green');
+          harness.expectFile('dist/main.js').content.toContain('color: indianred');
         });
 
         it('supports Sass inline component styles when set to "sass"', async () => {
@@ -49,13 +49,13 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           });
 
           await harness.modifyFile('src/app/app.component.ts', (content) =>
-            content.replace('__STYLE_MARKER__', '$primary: green\\nh1\\n\\tcolor: $primary'),
+            content.replace('__STYLE_MARKER__', '$primary: indianred\\nh1\\n\\tcolor: $primary'),
           );
 
           const { result } = await harness.executeOnce();
 
           expect(result?.success).toBe(true);
-          harness.expectFile('dist/main.js').content.toContain('color: green');
+          harness.expectFile('dist/main.js').content.toContain('color: indianred');
         });
 
         it('supports Less inline component styles when set to "less"', async () => {
@@ -66,13 +66,13 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           });
 
           await harness.modifyFile('src/app/app.component.ts', (content) =>
-            content.replace('__STYLE_MARKER__', '@primary: green;\\nh1 { color: @primary; }'),
+            content.replace('__STYLE_MARKER__', '@primary: indianred;\\nh1 { color: @primary; }'),
           );
 
           const { result } = await harness.executeOnce();
 
           expect(result?.success).toBe(true);
-          harness.expectFile('dist/main.js').content.toContain('color: green');
+          harness.expectFile('dist/main.js').content.toContain('color: indianred');
         });
 
         it('updates produced stylesheet in watch mode', async () => {
@@ -85,7 +85,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           });
 
           await harness.modifyFile('src/app/app.component.ts', (content) =>
-            content.replace('__STYLE_MARKER__', '$primary: green;\\nh1 { color: $primary; }'),
+            content.replace('__STYLE_MARKER__', '$primary: indianred;\\nh1 { color: $primary; }'),
           );
 
           const buildCount = await harness
@@ -97,18 +97,18 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
                 switch (index) {
                   case 0:
-                    harness.expectFile('dist/main.js').content.toContain('color: green');
+                    harness.expectFile('dist/main.js').content.toContain('color: indianred');
                     harness.expectFile('dist/main.js').content.not.toContain('color: aqua');
 
                     await harness.modifyFile('src/app/app.component.ts', (content) =>
                       content.replace(
-                        '$primary: green;\\nh1 { color: $primary; }',
+                        '$primary: indianred;\\nh1 { color: $primary; }',
                         '$primary: aqua;\\nh1 { color: $primary; }',
                       ),
                     );
                     break;
                   case 1:
-                    harness.expectFile('dist/main.js').content.not.toContain('color: green');
+                    harness.expectFile('dist/main.js').content.not.toContain('color: indianred');
                     harness.expectFile('dist/main.js').content.toContain('color: aqua');
 
                     await harness.modifyFile('src/app/app.component.ts', (content) =>
@@ -119,7 +119,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
                     );
                     break;
                   case 2:
-                    harness.expectFile('dist/main.js').content.not.toContain('color: green');
+                    harness.expectFile('dist/main.js').content.not.toContain('color: indianred');
                     harness.expectFile('dist/main.js').content.not.toContain('color: aqua');
                     harness.expectFile('dist/main.js').content.toContain('color: blue');
                     break;
