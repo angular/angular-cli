@@ -69,7 +69,7 @@ async function execute(
   context: BuilderContext,
   rebuildState?: RebuildState,
 ): Promise<ExecutionResult> {
-  const startTime = Date.now();
+  const startTime = process.hrtime.bigint();
 
   const {
     projectRoot,
@@ -206,7 +206,8 @@ async function execute(
     }
   }
 
-  context.logger.info(`Complete. [${(Date.now() - startTime) / 1000} seconds]`);
+  const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
+  context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
 
   return new ExecutionResult(true, codeResults.rebuild, codeBundleCache);
 }
