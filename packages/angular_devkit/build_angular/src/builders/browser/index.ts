@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
-import webpack from 'webpack';
+import webpack, { StatsCompilation } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import {
   deleteOutputDir,
@@ -51,6 +51,8 @@ import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
 import { markAsyncChunksNonInitial } from '../../webpack/utils/async-chunks';
 import { normalizeExtraEntryPoints } from '../../webpack/utils/helpers';
 import {
+  BuildEventStats,
+  generateBuildEventStats,
   statsErrorsToString,
   statsHasErrors,
   statsHasWarnings,
@@ -63,6 +65,8 @@ import { Schema as BrowserBuilderSchema } from './schema';
  * @experimental Direct usage of this type is considered experimental.
  */
 export type BrowserBuilderOutput = BuilderOutput & {
+  stats: BuildEventStats;
+
   baseOutputPath: string;
   /**
    * @deprecated in version 14. Use 'outputs' instead.
@@ -198,196 +202,231 @@ export function buildWebpackBrowser(
               }
             }),
         }).pipe(
-          concatMap(async (buildEvent) => {
-            const spinner = new Spinner();
-            spinner.enabled = options.progress !== false;
+          concatMap(
+            // eslint-disable-next-line max-lines-per-function
+            async (
+              buildEvent,
+            ): Promise<{ output: BuilderOutput; webpackStats: StatsCompilation }> => {
+              const spinner = new Spinner();
+              spinner.enabled = options.progress !== false;
 
-            const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
-            const webpackRawStats = buildEvent.webpackStats;
-            if (!webpackRawStats) {
-              throw new Error('Webpack stats build result is required.');
-            }
-
-            // Fix incorrectly set `initial` value on chunks.
-            const extraEntryPoints = [
-              ...normalizeExtraEntryPoints(options.styles || [], 'styles'),
-              ...normalizeExtraEntryPoints(options.scripts || [], 'scripts'),
-            ];
-
-            const webpackStats = {
-              ...webpackRawStats,
-              chunks: markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),
-            };
-
-            if (!success) {
-              // If using bundle downleveling then there is only one build
-              // If it fails show any diagnostic messages and bail
-              if (statsHasWarnings(webpackStats)) {
-                context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
-              }
-              if (statsHasErrors(webpackStats)) {
-                context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
+              const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
+              const webpackRawStats = buildEvent.webpackStats;
+              if (!webpackRawStats) {
+                throw new Error('Webpack stats build result is required.');
               }
 
-              return { success };
-            } else {
-              outputPaths = ensureOutputPaths(baseOutputPath, i18n);
+              // Fix incorrectly set `initial` value on chunks.
+              const extraEntryPoints = [
+                ...normalizeExtraEntryPoints(options.styles || [], 'styles'),
+                ...normalizeExtraEntryPoints(options.scripts || [], 'scripts'),
+              ];
 
-              const scriptsEntryPointName = normalizeExtraEntryPoints(
-                options.scripts || [],
-                'scripts',
-              ).map((x) => x.bundleName);
+              const webpackStats = {
+                ...webpackRawStats,
+                chunks: markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),
+              };
 
-              if (i18n.shouldInline) {
-                const success = await i18nInlineEmittedFiles(
-                  context,
-                  emittedFiles,
-                  i18n,
-                  baseOutputPath,
-                  Array.from(outputPaths.values()),
-                  scriptsEntryPointName,
-                  webpackOutputPath,
-                  options.i18nMissingTranslation,
-                );
-                if (!success) {
-                  return { success: false };
+              if (!success) {
+                // If using bundle downleveling then there is only one build
+                // If it fails show any diagnostic messages and bail
+                if (statsHasWarnings(webpackStats)) {
+                  context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
                 }
-              }
-
-              // Check for budget errors and display them to the user.
-              const budgets = options.budgets;
-              let budgetFailures: BudgetCalculatorResult[] | undefined;
-              if (budgets?.length) {
-                budgetFailures = [...checkBudgets(budgets, webpackStats)];
-                for (const { severity, message } of budgetFailures) {
-                  switch (severity) {
-                    case ThresholdSeverity.Warning:
-                      webpackStats.warnings?.push({ message });
-                      break;
-                    case ThresholdSeverity.Error:
-                      webpackStats.errors?.push({ message });
-                      break;
-                    default:
-                      assertNever(severity);
-                  }
+                if (statsHasErrors(webpackStats)) {
+                  context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
                 }
-              }
 
-              const buildSuccess = success && !statsHasErrors(webpackStats);
-              if (buildSuccess) {
-                // Copy assets
-                if (!options.watch && options.assets?.length) {
-                  spinner.start('Copying assets...');
-                  try {
-                    await copyAssets(
-                      normalizeAssetPatterns(
-                        options.assets,
-                        context.workspaceRoot,
-                        projectRoot,
-                        projectSourceRoot,
-                      ),
-                      Array.from(outputPaths.values()),
-                      context.workspaceRoot,
-                    );
-                    spinner.succeed('Copying assets complete.');
-                  } catch (err) {
-                    spinner.fail(colors.redBright('Copying of assets failed.'));
-                    assertIsError(err);
+                return {
+                  webpackStats: webpackRawStats,
+                  output: { success: false },
+                };
+              } else {
+                outputPaths = ensureOutputPaths(baseOutputPath, i18n);
 
-                    return { success: false, error: 'Unable to copy assets: ' + err.message };
+                const scriptsEntryPointName = normalizeExtraEntryPoints(
+                  options.scripts || [],
+                  'scripts',
+                ).map((x) => x.bundleName);
+
+                if (i18n.shouldInline) {
+                  const success = await i18nInlineEmittedFiles(
+                    context,
+                    emittedFiles,
+                    i18n,
+                    baseOutputPath,
+                    Array.from(outputPaths.values()),
+                    scriptsEntryPointName,
+                    webpackOutputPath,
+                    options.i18nMissingTranslation,
+                  );
+                  if (!success) {
+                    return {
+                      webpackStats: webpackRawStats,
+                      output: { success: false },
+                    };
                   }
                 }
 
-                if (options.index) {
-                  spinner.start('Generating index html...');
+                // Check for budget errors and display them to the user.
+                const budgets = options.budgets;
+                let budgetFailures: BudgetCalculatorResult[] | undefined;
+                if (budgets?.length) {
+                  budgetFailures = [...checkBudgets(budgets, webpackStats)];
+                  for (const { severity, message } of budgetFailures) {
+                    switch (severity) {
+                      case ThresholdSeverity.Warning:
+                        webpackStats.warnings?.push({ message });
+                        break;
+                      case ThresholdSeverity.Error:
+                        webpackStats.errors?.push({ message });
+                        break;
+                      default:
+                        assertNever(severity);
+                    }
+                  }
+                }
 
-                  const entrypoints = generateEntryPoints({
-                    scripts: options.scripts ?? [],
-                    styles: options.styles ?? [],
-                  });
-
-                  const indexHtmlGenerator = new IndexHtmlGenerator({
-                    cache: cacheOptions,
-                    indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
-                    entrypoints,
-                    deployUrl: options.deployUrl,
-                    sri: options.subresourceIntegrity,
-                    optimization: normalizedOptimization,
-                    crossOrigin: options.crossOrigin,
-                    postTransform: transforms.indexHtml,
-                  });
-
-                  let hasErrors = false;
-                  for (const [locale, outputPath] of outputPaths.entries()) {
+                const buildSuccess = success && !statsHasErrors(webpackStats);
+                if (buildSuccess) {
+                  // Copy assets
+                  if (!options.watch && options.assets?.length) {
+                    spinner.start('Copying assets...');
                     try {
-                      const { content, warnings, errors } = await indexHtmlGenerator.process({
-                        baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
-                        // i18nLocale is used when Ivy is disabled
-                        lang: locale || undefined,
-                        outputPath,
-                        files: mapEmittedFilesToFileInfo(emittedFiles),
-                      });
+                      await copyAssets(
+                        normalizeAssetPatterns(
+                          options.assets,
+                          context.workspaceRoot,
+                          projectRoot,
+                          projectSourceRoot,
+                        ),
+                        Array.from(outputPaths.values()),
+                        context.workspaceRoot,
+                      );
+                      spinner.succeed('Copying assets complete.');
+                    } catch (err) {
+                      spinner.fail(colors.redBright('Copying of assets failed.'));
+                      assertIsError(err);
 
-                      if (warnings.length || errors.length) {
-                        spinner.stop();
-                        warnings.forEach((m) => context.logger.warn(m));
-                        errors.forEach((m) => {
-                          context.logger.error(m);
-                          hasErrors = true;
+                      return {
+                        output: {
+                          success: false,
+                          error: 'Unable to copy assets: ' + err.message,
+                        },
+                        webpackStats: webpackRawStats,
+                      };
+                    }
+                  }
+
+                  if (options.index) {
+                    spinner.start('Generating index html...');
+
+                    const entrypoints = generateEntryPoints({
+                      scripts: options.scripts ?? [],
+                      styles: options.styles ?? [],
+                    });
+
+                    const indexHtmlGenerator = new IndexHtmlGenerator({
+                      cache: cacheOptions,
+                      indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
+                      entrypoints,
+                      deployUrl: options.deployUrl,
+                      sri: options.subresourceIntegrity,
+                      optimization: normalizedOptimization,
+                      crossOrigin: options.crossOrigin,
+                      postTransform: transforms.indexHtml,
+                    });
+
+                    let hasErrors = false;
+                    for (const [locale, outputPath] of outputPaths.entries()) {
+                      try {
+                        const { content, warnings, errors } = await indexHtmlGenerator.process({
+                          baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
+                          // i18nLocale is used when Ivy is disabled
+                          lang: locale || undefined,
+                          outputPath,
+                          files: mapEmittedFilesToFileInfo(emittedFiles),
                         });
-                        spinner.start();
-                      }
 
-                      const indexOutput = path.join(outputPath, getIndexOutputFile(options.index));
-                      await fs.promises.mkdir(path.dirname(indexOutput), { recursive: true });
-                      await fs.promises.writeFile(indexOutput, content);
-                    } catch (error) {
+                        if (warnings.length || errors.length) {
+                          spinner.stop();
+                          warnings.forEach((m) => context.logger.warn(m));
+                          errors.forEach((m) => {
+                            context.logger.error(m);
+                            hasErrors = true;
+                          });
+                          spinner.start();
+                        }
+
+                        const indexOutput = path.join(
+                          outputPath,
+                          getIndexOutputFile(options.index),
+                        );
+                        await fs.promises.mkdir(path.dirname(indexOutput), { recursive: true });
+                        await fs.promises.writeFile(indexOutput, content);
+                      } catch (error) {
+                        spinner.fail('Index html generation failed.');
+                        assertIsError(error);
+
+                        return {
+                          webpackStats: webpackRawStats,
+                          output: { success: false, error: error.message },
+                        };
+                      }
+                    }
+
+                    if (hasErrors) {
                       spinner.fail('Index html generation failed.');
 
-                      return { success: false, error: mapErrorToMessage(error) };
+                      return {
+                        webpackStats: webpackRawStats,
+                        output: { success: false },
+                      };
+                    } else {
+                      spinner.succeed('Index html generation complete.');
                     }
                   }
 
-                  if (hasErrors) {
-                    spinner.fail('Index html generation failed.');
+                  if (options.serviceWorker) {
+                    spinner.start('Generating service worker...');
+                    for (const [locale, outputPath] of outputPaths.entries()) {
+                      try {
+                        await augmentAppWithServiceWorker(
+                          projectRoot,
+                          context.workspaceRoot,
+                          outputPath,
+                          getLocaleBaseHref(i18n, locale) ?? options.baseHref ?? '/',
+                          options.ngswConfigPath,
+                        );
+                      } catch (error) {
+                        spinner.fail('Service worker generation failed.');
+                        assertIsError(error);
 
-                    return { success: false };
-                  } else {
-                    spinner.succeed('Index html generation complete.');
-                  }
-                }
-
-                if (options.serviceWorker) {
-                  spinner.start('Generating service worker...');
-                  for (const [locale, outputPath] of outputPaths.entries()) {
-                    try {
-                      await augmentAppWithServiceWorker(
-                        projectRoot,
-                        context.workspaceRoot,
-                        outputPath,
-                        getLocaleBaseHref(i18n, locale) ?? options.baseHref ?? '/',
-                        options.ngswConfigPath,
-                      );
-                    } catch (error) {
-                      spinner.fail('Service worker generation failed.');
-
-                      return { success: false, error: mapErrorToMessage(error) };
+                        return {
+                          webpackStats: webpackRawStats,
+                          output: { success: false, error: error.message },
+                        };
+                      }
                     }
-                  }
 
-                  spinner.succeed('Service worker generation complete.');
+                    spinner.succeed('Service worker generation complete.');
+                  }
                 }
+
+                webpackStatsLogger(context.logger, webpackStats, config, budgetFailures);
+
+                return {
+                  webpackStats: webpackRawStats,
+                  output: { success: buildSuccess },
+                };
               }
-
-              webpackStatsLogger(context.logger, webpackStats, config, budgetFailures);
-
-              return { success: buildSuccess };
-            }
-          }),
+            },
+          ),
           map(
-            (event) =>
+            ({ output: event, webpackStats }) =>
               ({
                 ...event,
+                stats: generateBuildEventStats(webpackStats, options),
                 baseOutputPath,
                 outputPath: baseOutputPath,
                 outputPaths: (outputPaths && Array.from(outputPaths.values())) || [baseOutputPath],
@@ -414,18 +453,6 @@ export function buildWebpackBrowser(
 
     return undefined;
   }
-}
-
-function mapErrorToMessage(error: unknown): string | undefined {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  return undefined;
 }
 
 function assertNever(input: never): never {

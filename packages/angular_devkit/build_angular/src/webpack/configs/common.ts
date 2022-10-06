@@ -30,6 +30,7 @@ import {
 } from '../plugins';
 import { DevToolsIgnorePlugin } from '../plugins/devtools-ignore-plugin';
 import { NamedChunksPlugin } from '../plugins/named-chunks-plugin';
+import { OccurrencesPlugin } from '../plugins/occurrences-plugin';
 import { ProgressPlugin } from '../plugins/progress-plugin';
 import { TransferSizePlugin } from '../plugins/transfer-size-plugin';
 import { createIvyPlugin } from '../plugins/typescript';
@@ -449,7 +450,15 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         },
       },
     },
-    plugins: [new NamedChunksPlugin(), new DedupeModuleResolvePlugin({ verbose }), ...extraPlugins],
+    plugins: [
+      new NamedChunksPlugin(),
+      new OccurrencesPlugin({
+        aot,
+        scriptsOptimization,
+      }),
+      new DedupeModuleResolvePlugin({ verbose }),
+      ...extraPlugins,
+    ],
     node: false,
   };
 }

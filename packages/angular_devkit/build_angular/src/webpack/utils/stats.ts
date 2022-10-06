@@ -8,10 +8,12 @@
 
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging, tags } from '@angular-devkit/core';
+import assert from 'assert';
 import * as path from 'path';
 import textTable from 'text-table';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
+import { normalizeOptimization } from '../../utils';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { colors as ansiColors, removeColor } from '../../utils/color';
 import { markAsyncChunksNonInitial } from './async-chunks';
@@ -42,7 +44,14 @@ export interface BundleStats {
   stats: BundleStatsData;
 }
 
-export function generateBundleStats(info: {
+function getBuildDuration(webpackStats: StatsCompilation): number {
+  assert(webpackStats.builtAt, 'buildAt cannot be undefined');
+  assert(webpackStats.time, 'time cannot be undefined');
+
+  return Date.now() - webpackStats.builtAt + webpackStats.time;
+}
+
+function generateBundleStats(info: {
   rawSize?: number;
   estimatedTransferSize?: number;
   files?: string[];
@@ -289,10 +298,8 @@ function statsToString(
   // In some cases we do things outside of webpack context
   // Such us index generation, service worker augmentation etc...
   // This will correct the time and include these.
-  let time = 0;
-  if (json.builtAt !== undefined && json.time !== undefined) {
-    time = Date.now() - json.builtAt + json.time;
-  }
+
+  const time = getBuildDuration(json);
 
   if (unchangedChunkNumber > 0) {
     return (
@@ -439,6 +446,76 @@ export function createWebpackLoggingCallback(
     };
 
     webpackStatsLogger(logger, webpackStats, config);
+  };
+}
+
+export interface BuildEventStats {
+  aot: boolean;
+  optimization: boolean;
+  allChunksCount: number;
+  lazyChunksCount: number;
+  initialChunksCount: number;
+  changedChunksCount?: number;
+  durationInMs: number;
+  cssSizeInBytes: number;
+  jsSizeInBytes: number;
+  ngComponentCount: number;
+}
+
+export function generateBuildEventStats(
+  webpackStats: StatsCompilation,
+  browserBuilderOptions: BrowserBuilderOptions,
+): BuildEventStats {
+  const { chunks = [], assets = [] } = webpackStats;
+
+  let jsSizeInBytes = 0;
+  let cssSizeInBytes = 0;
+  let initialChunksCount = 0;
+  let ngComponentCount = 0;
+  let changedChunksCount = 0;
+
+  const allChunksCount = chunks.length;
+  const isFirstRun = !runsCache.has(webpackStats.outputPath || '');
+
+  const chunkFiles = new Set<string>();
+  for (const chunk of chunks) {
+    if (!isFirstRun && chunk.rendered) {
+      changedChunksCount++;
+    }
+
+    if (chunk.initial) {
+      initialChunksCount++;
+    }
+
+    for (const file of chunk.files ?? []) {
+      chunkFiles.add(file);
+    }
+  }
+
+  for (const asset of assets) {
+    if (asset.name.endsWith('.map') || !chunkFiles.has(asset.name)) {
+      continue;
+    }
+
+    if (asset.name.endsWith('.js')) {
+      jsSizeInBytes += asset.size;
+      ngComponentCount += asset.info.ngComponentCount ?? 0;
+    } else if (asset.name.endsWith('.css')) {
+      cssSizeInBytes += asset.size;
+    }
+  }
+
+  return {
+    optimization: !!normalizeOptimization(browserBuilderOptions.optimization).scripts,
+    aot: browserBuilderOptions.aot !== false,
+    allChunksCount,
+    lazyChunksCount: allChunksCount - initialChunksCount,
+    initialChunksCount,
+    changedChunksCount,
+    durationInMs: getBuildDuration(webpackStats),
+    cssSizeInBytes,
+    jsSizeInBytes,
+    ngComponentCount,
   };
 }
 
