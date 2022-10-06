@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { normalize as devkitNormalize, isJsonObject, schema, tags } from '@angular-devkit/core';
+import { normalize as devkitNormalize, schema, tags } from '@angular-devkit/core';
 import { Collection, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
@@ -143,7 +143,6 @@ export abstract class SchematicsCommandModule
     );
 
     let shouldReportAnalytics = true;
-
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
       if (shouldReportAnalytics) {
         shouldReportAnalytics = false;
@@ -154,27 +153,6 @@ export abstract class SchematicsCommandModule
           undefined /** dimensions */,
           schematic.collection.name + ':' + schematic.name,
         );
-      }
-
-      // TODO: The below should be removed in version 15 when we change 1P schematics to use the `workingDirectory smart default`.
-      // Handle `"format": "path"` options.
-      const schema = schematic?.schemaJson;
-      if (!options || !schema || !isJsonObject(schema)) {
-        return options;
-      }
-
-      if (!('path' in options && (options as Record<string, unknown>)['path'] === undefined)) {
-        return options;
-      }
-
-      const properties = schema?.['properties'];
-      if (!properties || !isJsonObject(properties)) {
-        return options;
-      }
-
-      const property = properties['path'];
-      if (!property || !isJsonObject(property)) {
-        return options;
       }
 
       return options;
