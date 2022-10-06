@@ -292,17 +292,10 @@ export async function getNpmPackageJson(
   const { usingYarn = false, verbose = false, registry } = options;
   ensureNpmrc(logger, usingYarn, verbose);
   const { packument } = await import('pacote');
-  const resultPromise = packument(packageName, {
+  const response = packument(packageName, {
     fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),
-  });
-
-  // TODO: find some way to test this
-  const response = resultPromise.catch((err) => {
-    logger.warn(err.message || err);
-
-    return { requestedName: packageName };
   });
 
   npmPackageJsonCache.set(packageName, response);

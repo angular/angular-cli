@@ -164,7 +164,8 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
     packageManager.ensureCompatibility();
 
     // Check if the current installed CLI version is older than the latest compatible version.
-    if (!disableVersionCheck) {
+    // Skip when running `ng update` without a package name as this will not trigger an actual update.
+    if (!disableVersionCheck && options.packages?.length) {
       const cliVersionToInstall = await this.checkCLIVersion(
         options.packages,
         options.verbose,
@@ -880,7 +881,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
    * @returns the version to install or null when there is no update to install.
    */
   private async checkCLIVersion(
-    packagesToUpdate: string[] | undefined,
+    packagesToUpdate: string[],
     verbose = false,
     next = false,
   ): Promise<string | null> {
