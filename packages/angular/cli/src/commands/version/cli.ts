@@ -22,7 +22,7 @@ interface PartialPackageInfo {
 /**
  * Major versions of Node.js that are officially supported by Angular.
  */
-const SUPPORTED_NODE_MAJORS = [14, 16];
+const SUPPORTED_NODE_MAJORS = [14, 16, 18];
 
 const PACKAGE_PATTERNS = [
   /^@angular\/.*/,
@@ -118,7 +118,7 @@ export class VersionCommandModule extends CommandModule implements CommandModule
       `
       Angular CLI: ${ngCliVersion}
       Node: ${process.versions.node}${unsupportedNodeVersion ? ' (Unsupported)' : ''}
-      Package Manager: ${packageManager.name} ${packageManager.version ?? '<error>'} 
+      Package Manager: ${packageManager.name} ${packageManager.version ?? '<error>'}
       OS: ${process.platform} ${process.arch}
 
       Angular: ${angularCoreVersion}
