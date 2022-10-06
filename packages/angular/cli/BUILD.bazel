@@ -56,7 +56,6 @@ ts_library(
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tools",
         "@npm//@angular/core",
-        "@npm//@types/debug",
         "@npm//@types/ini",
         "@npm//@types/inquirer",
         "@npm//@types/node",

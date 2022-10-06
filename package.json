@@ -99,7 +99,6 @@
     "@types/babel__template": "7.4.1",
     "@types/browserslist": "^4.15.0",
     "@types/cacache": "^15.0.0",
-    "@types/debug": "^4.1.2",
     "@types/express": "^4.16.0",
     "@types/glob": "^8.0.0",
     "@types/http-proxy": "^1.17.4",
