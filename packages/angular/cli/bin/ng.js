@@ -24,7 +24,7 @@ try {
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
 var version = process.versions.node.split('.').map((part) => Number(part));
-if (version[0] % 2 === 1 && version[0] > 16) {
+if (version[0] % 2 === 1) {
   // Allow new odd numbered releases with a warning (currently v17+)
   console.warn(
     'Node.js version ' +
@@ -37,16 +37,16 @@ if (version[0] % 2 === 1 && version[0] > 16) {
   require('./bootstrap');
 } else if (
   version[0] < 14 ||
-  version[0] === 15 ||
-  (version[0] === 14 && version[1] < 15) ||
-  (version[0] === 16 && version[1] < 10)
+  (version[0] === 14 && version[1] < 20) ||
+  (version[0] === 16 && version[1] < 13) ||
+  (version[0] === 18 && version[1] < 10)
 ) {
-  // Error and exit if less than 14.20 or 15.x or less than 16.10
+  // Error and exit if less than 14.20, 16.13 or 18.10
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of either v14.20, or v16.10.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of either v14.20, v16.13 or v18.10.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
