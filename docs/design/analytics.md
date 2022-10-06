@@ -45,7 +45,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | User-scoped custom dimensions  	| 25                       	|
 | All custom metrics             	| 50                       	|
 
-### List Of User Custom Dimensions
+### List of User Custom Dimensions
 
 <!--USER_DIMENSIONS_TABLE_BEGIN-->
 | Name | Parameter | Type |
@@ -63,7 +63,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | Optimization | `ep.ng_optimization` | `string` |
 <!--USER_DIMENSIONS_TABLE_END-->
 
-### List Of Event Custom Dimensions
+### List of Event Custom Dimensions
 
 <!--DIMENSIONS_TABLE_BEGIN-->
 | Name | Parameter | Type |
@@ -81,7 +81,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | Optimization | `ep.ng_optimization` | `string` |
 <!--DIMENSIONS_TABLE_END-->
 
-### List Of Event Custom Metrics
+### List of Event Custom Metrics
 
 <!--METRICS_TABLE_BEGIN-->
 | Name | Parameter | Type |
@@ -91,6 +91,9 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | InitialChunksCount | `epn.ng_initial_chunks_count` | `number` |
 | ChangedChunksCount | `epn.ng_changed_chunks_count` | `number` |
 | DurationInMs | `epn.ng_duration_ms` | `number` |
+| CssSizeInBytes | `epn.ng_css_size_bytes` | `number` |
+| JsSizeInBytes | `epn.ng_js_size_bytes` | `number` |
+| NgComponentCount | `epn.ng_component_count` | `number` |
 <!--METRICS_TABLE_END-->
 
 ## Debugging

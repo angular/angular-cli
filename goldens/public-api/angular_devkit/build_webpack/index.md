@@ -49,6 +49,7 @@ export function runWebpack(config: webpack.Configuration, context: BuilderContex
 
 // @public (undocumented)
 export function runWebpackDevServer(config: webpack.Configuration, context: BuilderContext, options?: {
+    shouldProvideStats?: boolean;
     devServerConfig?: WebpackDevServer.Configuration;
     logging?: WebpackLoggingCallback;
     webpackFactory?: WebpackFactory;

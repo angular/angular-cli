@@ -73,6 +73,7 @@ export interface BrowserBuilderOptions {
 
 // @public
 export type BrowserBuilderOutput = BuilderOutput & {
+    stats: BuildEventStats;
     baseOutputPath: string;
     outputPaths: string[];
     outputPath: string;
@@ -112,6 +113,7 @@ export type DevServerBuilderOptions = Schema;
 // @public
 export type DevServerBuilderOutput = DevServerBuildOutput & {
     baseUrl: string;
+    stats: BuildEventStats;
 };
 
 // @public

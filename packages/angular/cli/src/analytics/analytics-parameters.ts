@@ -94,4 +94,7 @@ export enum EventCustomMetric {
   InitialChunksCount = 'epn.ng_initial_chunks_count',
   ChangedChunksCount = 'epn.ng_changed_chunks_count',
   DurationInMs = 'epn.ng_duration_ms',
+  CssSizeInBytes = 'epn.ng_css_size_bytes',
+  JsSizeInBytes = 'epn.ng_js_size_bytes',
+  NgComponentCount = 'epn.ng_component_count',
 }

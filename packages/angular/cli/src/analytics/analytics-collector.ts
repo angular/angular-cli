@@ -34,6 +34,7 @@ export class AnalyticsCollector {
     const requestParameters: Partial<Record<RequestParameter, PrimitiveTypes>> = {
       [RequestParameter.ProtocolVersion]: 2,
       [RequestParameter.ClientId]: userId,
+      [RequestParameter.UserId]: userId,
       [RequestParameter.TrackingId]:
         /^\d+\.\d+\.\d+$/.test(VERSION.full) && VERSION.full !== '0.0.0'
           ? TRACKING_ID_PROD

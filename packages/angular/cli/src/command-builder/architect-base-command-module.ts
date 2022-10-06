@@ -16,7 +16,7 @@ import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
-import { EventCustomDimension } from '../analytics/analytics-collector';
+import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
 import { assertIsError } from '../utilities/error';
 import { askConfirmation, askQuestion } from '../utilities/prompt';
 import { isTTY } from '../utilities/tty';
@@ -62,18 +62,79 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       ? await this.getAnalytics()
       : undefined;
 
-    analytics?.reportArchitectRunEvent({
-      [EventCustomDimension.BuilderTarget]: builderName,
-    });
+    let outputSubscription;
+    if (analytics) {
+      analytics.reportArchitectRunEvent({
+        [EventCustomDimension.BuilderTarget]: builderName,
+      });
 
-    const { error, success } = await run.output.toPromise();
-    await run.stop();
+      let firstRun = true;
+      outputSubscription = run.output.subscribe(({ stats }) => {
+        const parameters = this.builderStatsToAnalyticsParameters(stats, builderName);
+        if (!parameters) {
+          return;
+        }
 
-    if (error) {
-      logger.error(error);
+        if (firstRun) {
+          firstRun = false;
+          analytics.reportBuildRunEvent(parameters);
+        } else {
+          analytics.reportRebuildRunEvent(parameters);
+        }
+      });
     }
 
-    return success ? 0 : 1;
+    try {
+      const { error, success } = await run.output.toPromise();
+
+      if (error) {
+        logger.error(error);
+      }
+
+      return success ? 0 : 1;
+    } finally {
+      await run.stop();
+      outputSubscription?.unsubscribe();
+    }
+  }
+
+  private builderStatsToAnalyticsParameters(
+    stats: json.JsonValue,
+    builderName: string,
+  ): Partial<
+    | Record<EventCustomDimension & EventCustomMetric, string | number | undefined | boolean>
+    | undefined
+  > {
+    if (!stats || typeof stats !== 'object' || !('durationInMs' in stats)) {
+      return undefined;
+    }
+
+    const {
+      optimization,
+      allChunksCount,
+      aot,
+      lazyChunksCount,
+      initialChunksCount,
+      durationInMs,
+      changedChunksCount,
+      cssSizeInBytes,
+      jsSizeInBytes,
+      ngComponentCount,
+    } = stats;
+
+    return {
+      [EventCustomDimension.BuilderTarget]: builderName,
+      [EventCustomDimension.Aot]: aot,
+      [EventCustomDimension.Optimization]: optimization,
+      [EventCustomMetric.AllChunksCount]: allChunksCount,
+      [EventCustomMetric.LazyChunksCount]: lazyChunksCount,
+      [EventCustomMetric.InitialChunksCount]: initialChunksCount,
+      [EventCustomMetric.ChangedChunksCount]: changedChunksCount,
+      [EventCustomMetric.DurationInMs]: durationInMs,
+      [EventCustomMetric.JsSizeInBytes]: jsSizeInBytes,
+      [EventCustomMetric.CssSizeInBytes]: cssSizeInBytes,
+      [EventCustomMetric.NgComponentCount]: ngComponentCount,
+    };
   }
 
   private _architectHost: WorkspaceNodeModulesArchitectHost | undefined;

@@ -28,6 +28,7 @@ export function runWebpackDevServer(
   config: webpack.Configuration,
   context: BuilderContext,
   options: {
+    shouldProvideStats?: boolean;
     devServerConfig?: WebpackDevServer.Configuration;
     logging?: WebpackLoggingCallback;
     webpackFactory?: WebpackFactory;
@@ -61,6 +62,8 @@ export function runWebpackDevServer(
   const log: WebpackLoggingCallback =
     options.logging || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
+  const shouldProvideStats = options.shouldProvideStats ?? true;
+
   return createWebpack({ ...config, watch: false }).pipe(
     switchMap(
       (webpackCompiler) =>
@@ -70,11 +73,14 @@ export function runWebpackDevServer(
 
           let result: Partial<DevServerBuildOutput>;
 
+          const statsOptions = typeof config.stats === 'boolean' ? undefined : config.stats;
+
           webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
             // Log stats.
             log(stats, config);
             obs.next({
               ...result,
+              webpackStats: shouldProvideStats ? stats.toJson(statsOptions) : undefined,
               emittedFiles: getEmittedFiles(stats.compilation),
               success: !stats.hasErrors(),
               outputPath: stats.compilation.outputOptions.path,
