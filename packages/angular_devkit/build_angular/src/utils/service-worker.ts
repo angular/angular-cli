@@ -139,6 +139,7 @@ export async function augmentAppWithServiceWorkerCore(
   inputputFileSystem = fsPromises,
   outputFileSystem = fsPromises,
 ): Promise<void> {
+  console.log('STARTING augmentAppWithServiceWorkerCore');
   // Load ESM `@angular/service-worker/config` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
@@ -148,12 +149,14 @@ export async function augmentAppWithServiceWorkerCore(
     )
   ).Generator;
 
+  console.log('STARTING manifest generator');
   // Generate the manifest
   const generator = new GeneratorConstructor(
     new CliFilesystem(outputFileSystem, outputPath),
     baseHref,
   );
   const output = await generator.process(config);
+  console.log('FINISHED manifest generator');
 
   // Write the manifest
   const manifest = JSON.stringify(output, null, 2);
@@ -186,4 +189,6 @@ export async function augmentAppWithServiceWorkerCore(
       throw error;
     }
   }
+
+  console.log('FINISHED augmentAppWithServiceWorkerCore');
 }

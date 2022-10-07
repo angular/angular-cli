@@ -388,100 +388,100 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-      - lint:
-          requires:
-            - setup
-      - validate:
-          requires:
-            - setup
+      # - lint:
+      #     requires:
+      #       - setup
+      # - validate:
+      #     requires:
+      #       - setup
       - build:
           requires:
             - setup
 
-      - test-browsers:
-          requires:
-            - build
+      # - test-browsers:
+      #     requires:
+      #       - build
 
-      - e2e-tests:
-          name: e2e-cli-<< matrix.subset >>
-          nodeversion: '14.20'
-          matrix:
-            parameters:
-              subset: *all_e2e_subsets
-          filters:
-            branches:
-              ignore:
-                - main
-                - /\d+\.\d+\.x/
-          requires:
-            - build
+      # - e2e-tests:
+      #     name: e2e-cli-<< matrix.subset >>
+      #     nodeversion: '14.20'
+      #     matrix:
+      #       parameters:
+      #         subset: *all_e2e_subsets
+      #     filters:
+      #       branches:
+      #         ignore:
+      #           - main
+      #           - /\d+\.\d+\.x/
+      #     requires:
+      #       - build
 
       - e2e-tests:
           name: e2e-cli-node-<<matrix.nodeversion>>-<< matrix.subset >>
           matrix:
             alias: e2e-cli
             parameters:
-              nodeversion: ['14.20', '16.13', '18.10']
+              nodeversion: ['18.10']
               subset: *all_e2e_subsets
           requires:
             - build
-          <<: *only_release_branches
+          # <<: *only_release_branches
 
-      - e2e-tests:
-          name: e2e-snapshots-<< matrix.subset >>
-          nodeversion: '16.13'
-          matrix:
-            parameters:
-              subset: *all_e2e_subsets
-          snapshots: true
-          pre-steps:
-            - when:
-                condition:
-                  and:
-                    - not:
-                        equal: [main, << pipeline.git.branch >>]
-                    - not: << pipeline.parameters.snapshot_changed >>
-                steps:
-                  # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
-                  - run: circleci-agent step halt
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - main
-                # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
-                - /^pull\/.*/
+      # - e2e-tests:
+      #     name: e2e-snapshots-<< matrix.subset >>
+      #     nodeversion: '16.13'
+      #     matrix:
+      #       parameters:
+      #         subset: *all_e2e_subsets
+      #     snapshots: true
+      #     pre-steps:
+      #       - when:
+      #           condition:
+      #             and:
+      #               - not:
+      #                   equal: [main, << pipeline.git.branch >>]
+      #               - not: << pipeline.parameters.snapshot_changed >>
+      #           steps:
+      #             # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
+      #             - run: circleci-agent step halt
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only:
+      #           - main
+      #           # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
+      #           - /^pull\/.*/
 
-      # Bazel jobs
-      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
-      # will catch any build errors before proceeding to the more lengthy and resource intensive
-      # Bazel jobs.
-      - unit-test:
-          name: test-node<< matrix.nodeversion >>
-          matrix:
-            parameters:
-              nodeversion: *all_nodeversion_major
-          requires:
-            - build
+      # # Bazel jobs
+      # # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
+      # # will catch any build errors before proceeding to the more lengthy and resource intensive
+      # # Bazel jobs.
+      # - unit-test:
+      #     name: test-node<< matrix.nodeversion >>
+      #     matrix:
+      #       parameters:
+      #         nodeversion: *all_nodeversion_major
+      #     requires:
+      #       - build
 
-      # Compile the e2e tests with bazel to ensure the non-runtime typescript
-      # compilation completes succesfully.
-      - build-bazel-e2e:
-          requires:
-            - build
+      # # Compile the e2e tests with bazel to ensure the non-runtime typescript
+      # # compilation completes succesfully.
+      # - build-bazel-e2e:
+      #     requires:
+      #       - build
 
-      # Windows jobs
-      - e2e-cli-win
+      # # Windows jobs
+      # - e2e-cli-win
 
-      # Publish jobs
-      - snapshot_publish:
-          <<: *only_release_branches
-          requires:
-            - setup
-            - e2e-cli
+      # # Publish jobs
+      # - snapshot_publish:
+      #     <<: *only_release_branches
+      #     requires:
+      #       - setup
+      #       - e2e-cli
 
-      - publish_artifacts:
-          <<: *only_pull_requests
-          requires:
-            - build
+      # - publish_artifacts:
+      #     <<: *only_pull_requests
+      #     requires:
+      #       - build
