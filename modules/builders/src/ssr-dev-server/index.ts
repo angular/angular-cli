@@ -180,7 +180,7 @@ function startNodeServer(
   const path = join(outputPath, 'main.js');
   const env = { ...process.env, PORT: '' + port };
 
-  const args = [`"${path}"`];
+  const args = ['--enable-source-maps', `"${path}"`];
   if (inspectMode) {
     args.unshift('--inspect-brk');
   }
@@ -190,7 +190,8 @@ function startNodeServer(
     switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
     tap(({ stderr, stdout }) => {
       if (stderr) {
-        logger.error(stderr);
+        // Strip the webpack scheme (webpack://) from error log.
+        logger.error(stderr.replace(/webpack:\/\//g, '.'));
       }
 
       if (stdout && !IGNORED_STDOUT_MESSAGES.some((x) => stdout.includes(x))) {
