@@ -8256,6 +8256,13 @@ npm-packlist@^5.1.0:
     npm-bundled "^2.0.0"
     npm-normalize-package-bin "^2.0.0"
 
+npm-packlist@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-7.0.0.tgz#d451b7d797d4b05128796d9573d69be51fdf8f31"
+  integrity sha512-8GRMzWQmFdUrRmc6tPPCd9Umm9g2qDR6X6Rik+9nYvoDQTLs/0IcCKv6iUdAmgr9sgJCm24QovwozCHWMDriOg==
+  dependencies:
+    ignore-walk "^5.0.1"
+
 npm-pick-manifest@7.0.2, npm-pick-manifest@^7.0.0, npm-pick-manifest@^7.0.2:
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/npm-pick-manifest/-/npm-pick-manifest-7.0.2.tgz#1d372b4e7ea7c6712316c0e99388a73ed3496e84"
@@ -8611,7 +8618,34 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-pacote@13.6.2, pacote@^13.0.3, pacote@^13.6.1, pacote@^13.6.2:
+pacote@14.0.0:
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-14.0.0.tgz#aff1d9ac0fb420eb79187b291ecded20b370d8d3"
+  integrity sha512-SYXfAQi7Bj+suydMz7lVnEF4/xNIvP+uobXGPwIUdFPkUxoOBHYxCakMXHGQQZ9lIHLj2IXTJ6BeWSe6U/uAYg==
+  dependencies:
+    "@npmcli/git" "^3.0.0"
+    "@npmcli/installed-package-contents" "^1.0.7"
+    "@npmcli/promise-spawn" "^3.0.0"
+    "@npmcli/run-script" "^4.1.0"
+    cacache "^16.0.0"
+    chownr "^2.0.0"
+    fs-minipass "^2.1.0"
+    infer-owner "^1.0.4"
+    minipass "^3.1.6"
+    mkdirp "^1.0.4"
+    npm-package-arg "^9.0.0"
+    npm-packlist "^7.0.0"
+    npm-pick-manifest "^7.0.0"
+    npm-registry-fetch "^13.0.1"
+    proc-log "^2.0.0"
+    promise-retry "^2.0.1"
+    read-package-json "^5.0.0"
+    read-package-json-fast "^2.0.3"
+    rimraf "^3.0.2"
+    ssri "^9.0.0"
+    tar "^6.1.11"
+
+pacote@^13.0.3, pacote@^13.6.1, pacote@^13.6.2:
   version "13.6.2"
   resolved "https://registry.yarnpkg.com/pacote/-/pacote-13.6.2.tgz#0d444ba3618ab3e5cd330b451c22967bbd0ca48a"
   integrity sha512-Gu8fU3GsvOPkak2CkbojR7vjs3k3P9cA6uazKTHdsdV0gpCEQq2opelnEv30KRQWgVzP5Vd/5umjcedma3MKtg==
