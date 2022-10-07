@@ -20,7 +20,7 @@ export const KARMA_BUILDER_INFO = Object.freeze({
  * Also disables progress reporting to minimize logging output.
  */
 export const BASE_OPTIONS = Object.freeze<Schema>({
-  polyfills: ['zone.js', 'zone.js/testing', '@angular/localize/init'],
+  polyfills: ['zone.js', 'zone.js/testing'],
   tsConfig: 'src/tsconfig.spec.json',
   karmaConfig: 'karma.conf.js',
   browsers: 'ChromeHeadlessCI',
