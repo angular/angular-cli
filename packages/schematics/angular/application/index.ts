@@ -247,7 +247,6 @@ export default function (options: ApplicationOptions): Rule {
 
     const workspace = await getWorkspace(host);
     const newProjectRoot = (workspace.extensions.newProjectRoot as string | undefined) || '';
-    const isRootApp = options.projectRoot !== undefined;
 
     // If scoped project (i.e. "@foo/bar"), convert dir to "foo/bar".
     let folderName = options.name.startsWith('@') ? options.name.slice(1) : options.name;
@@ -255,9 +254,11 @@ export default function (options: ApplicationOptions): Rule {
       folderName = strings.dasherize(folderName);
     }
 
-    const appDir = isRootApp
-      ? normalize(options.projectRoot || '')
-      : join(normalize(newProjectRoot), folderName);
+    const appDir =
+      options.projectRoot === undefined
+        ? join(normalize(newProjectRoot), folderName)
+        : normalize(options.projectRoot);
+
     const sourceDir = `${appDir}/src/app`;
 
     return chain([
@@ -270,7 +271,6 @@ export default function (options: ApplicationOptions): Rule {
             ...options,
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
-            isRootApp,
             folderName,
           }),
           move(appDir),

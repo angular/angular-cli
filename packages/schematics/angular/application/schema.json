@@ -7,12 +7,11 @@
   "additionalProperties": false,
   "properties": {
     "projectRoot": {
-      "description": "The root directory of the new app.",
-      "type": "string",
-      "visible": false
+      "description": "The root directory of the new application.",
+      "type": "string"
     },
     "name": {
-      "description": "The name of the new app.",
+      "description": "The name of the new application.",
       "type": "string",
       "pattern": "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*/)?[a-zA-Z0-9-~][a-zA-Z0-9-._~]*$",
       "$default": {
