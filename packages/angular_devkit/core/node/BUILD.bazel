@@ -48,7 +48,6 @@ ts_library(
     deps = [
         ":node",
         "//packages/angular_devkit/core",
-        "//tests/angular_devkit/core/node/jobs:jobs_test_lib",
         "@npm//rxjs",
     ],
 )

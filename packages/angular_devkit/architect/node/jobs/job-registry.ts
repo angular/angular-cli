@@ -6,15 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { jobs } from '@angular-devkit/architect';
+import { JsonValue, schema } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
-import { JsonValue, experimental as core_experimental, schema } from '../../../src';
 
 export class NodeModuleJobRegistry<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
   MinimumOutputValueT extends JsonValue = JsonValue,
-> implements
-    core_experimental.jobs.Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>
+> implements jobs.Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>
 {
   protected _resolve(name: string): string | null {
     try {
@@ -34,8 +34,8 @@ export class NodeModuleJobRegistry<
    * @returns A description, or null if the job is not registered.
    */
   get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(
-    name: core_experimental.jobs.JobName,
-  ): Observable<core_experimental.jobs.JobHandler<A, I, O> | null> {
+    name: jobs.JobName,
+  ): Observable<jobs.JobHandler<A, I, O> | null> {
     const [moduleName, exportName] = name.split(/#/, 2);
 
     const resolvedPath = this._resolve(moduleName);

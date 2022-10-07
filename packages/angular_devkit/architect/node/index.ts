@@ -6,4 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as jobs from './jobs/job-registry';
+
 export * from './node-modules-architect-host';
+
+export { jobs };

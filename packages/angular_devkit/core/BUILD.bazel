@@ -87,8 +87,6 @@ pkg_npm(
         ":README.md",
         ":core",
         ":license",
-        ":src/experimental/jobs/README.md",
-        ":src/experimental/jobs/architecture.md",
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/core/node:package.json",
         "//packages/angular_devkit/core/node/testing",

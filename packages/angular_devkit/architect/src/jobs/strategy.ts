@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonObject, JsonValue, isJsonObject } from '@angular-devkit/core';
 import { Observable, Subject, concat, of } from 'rxjs';
 import { finalize, ignoreElements, share, shareReplay, tap } from 'rxjs/operators';
-import { JsonObject, JsonValue, isJsonObject } from '../../json';
 import {
   JobDescription,
   JobHandler,

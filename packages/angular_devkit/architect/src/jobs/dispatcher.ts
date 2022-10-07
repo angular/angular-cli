@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonValue } from '../../json/index';
-import { Readwrite } from '../../utils/index';
+import { JsonValue } from '@angular-devkit/core';
 import { Job, JobDescription, JobHandler, JobHandlerContext, JobName, isJobHandler } from './api';
 import { JobDoesNotExistException } from './exception';
+import { Readwrite } from './types';
 
 /**
  * A JobDispatcher can be used to dispatch between multiple jobs.
@@ -62,7 +62,7 @@ export function createDispatcher<A extends JsonValue, I extends JsonValue, O ext
     },
   );
 
-  return (Object.assign(job, {
+  return Object.assign(job, {
     setDefaultJob(name: JobName | null | JobHandler<JsonValue, JsonValue, JsonValue>) {
       if (isJobHandler(name)) {
         name = name.jobDescription.name === undefined ? null : name.jobDescription.name;
@@ -74,5 +74,5 @@ export function createDispatcher<A extends JsonValue, I extends JsonValue, O ext
       conditionalDelegateList.push([predicate, name]);
     },
     // TODO: Remove return-only generic from createDispatcher() API.
-  }) as unknown) as JobDispatcher<A, I, O>;
+  }) as unknown as JobDispatcher<A, I, O>;
 }

@@ -6,12 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { BaseException, JsonValue, isPromise, logging } from '@angular-devkit/core';
 import { Observable, Observer, Subject, Subscription, from, isObservable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { BaseException } from '../../exception';
-import { JsonValue } from '../../json/index';
-import { LoggerApi } from '../../logger';
-import { isPromise } from '../../utils/index';
 import {
   JobDescription,
   JobHandler,
@@ -182,7 +179,7 @@ export function createJobFactory<A extends JsonValue, I extends JsonValue, O ext
  */
 export function createLoggerJob<A extends JsonValue, I extends JsonValue, O extends JsonValue>(
   job: JobHandler<A, I, O>,
-  logger: LoggerApi,
+  logger: logging.LoggerApi,
 ): JobHandler<A, I, O> {
   const handler = (argument: A, context: JobHandlerContext<A, I, O>) => {
     context.inboundBus

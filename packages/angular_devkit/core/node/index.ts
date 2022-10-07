@@ -6,9 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as experimental from './experimental/jobs/job-registry';
-
 export * from './cli-logger';
 export * from './host';
-
-export { experimental };

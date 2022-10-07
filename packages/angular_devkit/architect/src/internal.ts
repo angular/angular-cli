@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { experimental, json } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import { BuilderInfo, BuilderInput, BuilderOutput, Target } from './api';
+import { JobDescription, JobHandler } from './jobs';
 
 // Internal types that should not be exported directly. These are used by the host and architect
 // itself. Host implementations should import the host.ts file.
@@ -35,14 +36,14 @@ export const BuilderVersionSymbol = Symbol.for('@angular-devkit/architect:versio
 export type BuilderJobHandler<
   A extends json.JsonObject = json.JsonObject,
   I extends BuilderInput = BuilderInput,
-  O extends BuilderOutput = BuilderOutput
-> = experimental.jobs.JobHandler<A, I, O> & { jobDescription: BuilderDescription };
+  O extends BuilderOutput = BuilderOutput,
+> = JobHandler<A, I, O> & { jobDescription: BuilderDescription };
 
 /**
  * A Builder description, which is used internally. Adds the builder info which is the
  * metadata attached to a builder in Architect.
  */
-export interface BuilderDescription extends experimental.jobs.JobDescription {
+export interface BuilderDescription extends JobDescription {
   info: BuilderInfo;
 }
 
@@ -51,7 +52,7 @@ export interface BuilderDescription extends experimental.jobs.JobDescription {
  */
 export interface Builder<OptionT extends json.JsonObject = json.JsonObject> {
   // A fully compatible job handler.
-  handler: experimental.jobs.JobHandler<json.JsonObject, BuilderInput, BuilderOutput>;
+  handler: JobHandler<json.JsonObject, BuilderInput, BuilderOutput>;
 
   // Metadata associated with this builder.
   [BuilderSymbol]: true;
