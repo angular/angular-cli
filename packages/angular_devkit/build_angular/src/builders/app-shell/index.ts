@@ -13,11 +13,9 @@ import {
   targetFromTargetString,
 } from '@angular-devkit/architect';
 import { JsonObject } from '@angular-devkit/core';
-import type { Type } from '@angular/core';
-import type * as platformServer from '@angular/platform-server';
-import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
 import { assertIsError } from '../../utils/error';
 import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
@@ -48,7 +46,6 @@ async function _renderUniversal(
   // Initialize zone.js
   const root = context.workspaceRoot;
   const zonePackage = require.resolve('zone.js', { paths: [root] });
-  await import(zonePackage);
 
   const projectName = context.target && context.target.project;
   if (!projectName) {
@@ -66,6 +63,12 @@ async function _renderUniversal(
       })
     : undefined;
 
+  const renderWorker = new Piscina({
+    filename: require.resolve('./render-worker'),
+    maxThreads: 1,
+    workerData: { zonePackage },
+  });
+
   for (const { path: outputPath, baseHref } of browserResult.outputs) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
     const browserIndexOutputPath = path.join(outputPath, 'index.html');
@@ -77,26 +80,10 @@ async function _renderUniversal(
       localeDirectory,
     );
 
-    const { AppServerModule, renderModule, ɵSERVER_CONTEXT } = (await import(serverBundlePath)) as {
-      renderModule: typeof platformServer.renderModule | undefined;
-      ɵSERVER_CONTEXT: typeof platformServer.ɵSERVER_CONTEXT | undefined;
-      AppServerModule: Type<unknown> | undefined;
-    };
-
-    assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
-    assert(AppServerModule, `AppServerModule was not exported from: ${serverBundlePath}.`);
-    assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported from: ${serverBundlePath}.`);
-
-    // Load platform server module renderer
-    let html = await renderModule(AppServerModule, {
+    let html: string = await renderWorker.run({
+      serverBundlePath,
       document: indexHtml,
       url: options.route,
-      extraProviders: [
-        {
-          provide: ɵSERVER_CONTEXT,
-          useValue: 'app-shell',
-        },
-      ],
     });
 
     // Overwrite the client index file.
@@ -130,6 +117,8 @@ async function _renderUniversal(
       );
     }
   }
+
+  await renderWorker.destroy();
 
   return browserResult;
 }
