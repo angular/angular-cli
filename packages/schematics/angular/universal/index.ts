@@ -258,7 +258,6 @@ export default function (options: UniversalOptions): Rule {
         ...strings,
         ...options,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-        hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
       }),
       move(join(normalize(clientProject.root), 'src')),
     ]);
@@ -273,6 +272,7 @@ export default function (options: UniversalOptions): Rule {
         ...options,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         tsConfigExtends,
+        hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
       }),
       move(tsConfigDirectory),

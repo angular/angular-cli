@@ -96,9 +96,22 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     extraPlugins.push(new ProgressPlugin(platform));
   }
 
+  const localizePackageInitEntryPoint = '@angular/localize/init';
+  const hasLocalizeType = tsConfig.options.types?.some(
+    (t) => t === '@angular/localize' || t === localizePackageInitEntryPoint,
+  );
+
+  if (hasLocalizeType) {
+    entryPoints['main'] = [localizePackageInitEntryPoint];
+  }
+
   if (buildOptions.main) {
     const mainPath = path.resolve(root, buildOptions.main);
-    entryPoints['main'] = [mainPath];
+    if (Array.isArray(entryPoints['main'])) {
+      entryPoints['main'].push(mainPath);
+    } else {
+      entryPoints['main'] = [mainPath];
+    }
   }
 
   if (isPlatformServer) {

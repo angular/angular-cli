@@ -5,7 +5,8 @@
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/server",
     "target": "es2019",
     "types": [
-      "node"
+      "node"<% if (hasLocalizePackage) { %>,
+      "@angular/localize/init"<% } %>
     ]
   },
   "files": [

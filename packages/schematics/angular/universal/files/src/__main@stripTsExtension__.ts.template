@@ -7,10 +7,4 @@
  */
 import '@angular/platform-server/init';
 
-<% if (hasLocalizePackage) { %>/***************************************************************************************************
- * Load `$localize` onto the global scope - used if i18n tags appear in Angular templates.
- */
-import '@angular/localize/init';
-
-<% } %>
 export { <%= rootModuleClassName %> } from './app/<%= stripTsExtension(rootModuleFileName) %>';
