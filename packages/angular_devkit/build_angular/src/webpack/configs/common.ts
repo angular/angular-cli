@@ -117,6 +117,12 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   if (isPlatformServer) {
     // Fixes Critical dependency: the request of a dependency is an expression
     extraPlugins.push(new ContextReplacementPlugin(/@?hapi|express[\\/]/));
+
+    if (Array.isArray(entryPoints['main'])) {
+      // This import must come before any imports (direct or transitive) that rely on DOM built-ins being
+      // available, such as `@angular/elements`.
+      entryPoints['main'].unshift('@angular/platform-server/init');
+    }
   }
 
   if (polyfills?.length) {
