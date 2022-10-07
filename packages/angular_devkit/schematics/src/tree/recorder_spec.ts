@@ -7,7 +7,6 @@
  */
 
 import { normalize } from '@angular-devkit/core';
-import { UpdateBuffer2, UpdateBufferBase } from '../utility/update-buffer';
 import { SimpleFileEntry } from './entry';
 import { UpdateRecorderBase, UpdateRecorderBom } from './recorder';
 
@@ -35,11 +34,6 @@ describe('UpdateRecorderBase', () => {
   it('works with multiple adjacent inserts', () => {
     const buffer = Buffer.from('Hello beautiful World');
     const entry = new SimpleFileEntry(normalize('/some/path'), buffer);
-
-    // TODO: Remove once UpdateBufferBase.create defaults to UpdateBuffer2
-    spyOn(UpdateBufferBase, 'create').and.callFake(
-      (originalContent) => new UpdateBuffer2(originalContent),
-    );
 
     const recorder = new UpdateRecorderBase(entry);
     recorder.remove(6, 9);
