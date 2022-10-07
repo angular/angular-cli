@@ -81,7 +81,7 @@ Appended \`source <(ng completion script)\` to \`${rcFile}\`. Restart your termi
     `.trim(),
   );
 
-  if ((await hasGlobalCliInstall()) === false) {
+  if (!(await hasGlobalCliInstall())) {
     logger.warn(
       'Setup completed successfully, but there does not seem to be a global install of the' +
         ' Angular CLI. For autocompletion to work, the CLI will need to be on your `$PATH`, which' +
@@ -268,27 +268,30 @@ function getShellRunCommandCandidates(shell: string, home: string): string[] | u
 }
 
 /**
- * Returns whether the user has a global CLI install or `undefined` if this can't be determined.
+ * Returns whether the user has a global CLI install.
  * Execution from `npx` is *not* considered a global CLI install.
  *
  * This does *not* mean the current execution is from a global CLI install, only that a global
  * install exists on the system.
  */
-export async function hasGlobalCliInstall(): Promise<boolean | undefined> {
+export function hasGlobalCliInstall(): Promise<boolean> {
   // List all binaries with the `ng` name on the user's `$PATH`.
-  const proc = execFile('which', ['-a', 'ng']);
-  let stdout = '';
-  proc.stdout?.addListener('data', (content) => {
-    stdout += content;
-  });
-  const exitCode = await new Promise<number | null>((resolve) => {
-    proc.addListener('exit', (exitCode) => {
-      resolve(exitCode);
-    });
-  });
+  return new Promise<boolean>((resolve) => {
+    execFile('which', ['-a', 'ng'], (error, stdout) => {
+      if (error) {
+        // No instances of `ng` on the user's `$PATH`
 
-  switch (exitCode) {
-    case 0:
+        // `which` returns exit code 2 if an invalid option is specified and `-a` doesn't appear to be
+        // supported on all systems. Other exit codes mean unknown errors occurred. Can't tell whether
+        // CLI is globally installed, so treat this as inconclusive.
+
+        // `which` was killed by a signal and did not exit gracefully. Maybe it hung or something else
+        // went very wrong, so treat this as inconclusive.
+        resolve(false);
+
+        return;
+      }
+
       // Successfully listed all `ng` binaries on the `$PATH`. Look for at least one line which is a
       // global install. We can't easily identify global installs, but local installs are typically
       // placed in `node_modules/.bin` by NPM / Yarn. `npx` also currently caches files at
@@ -303,18 +306,7 @@ export async function hasGlobalCliInstall(): Promise<boolean | undefined> {
         return !localInstall;
       });
 
-      return hasGlobalInstall;
-    case 1:
-      // No instances of `ng` on the user's `$PATH`.
-      return false;
-    case null:
-      // `which` was killed by a signal and did not exit gracefully. Maybe it hung or something else
-      // went very wrong, so treat this as inconclusive.
-      return undefined;
-    default:
-      // `which` returns exit code 2 if an invalid option is specified and `-a` doesn't appear to be
-      // supported on all systems. Other exit codes mean unknown errors occurred. Can't tell whether
-      // CLI is globally installed, so treat this as inconclusive.
-      return undefined;
-  }
+      return resolve(hasGlobalInstall);
+    });
+  });
 }
