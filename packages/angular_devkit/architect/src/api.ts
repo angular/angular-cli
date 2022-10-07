@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { analytics, json, logging } from '@angular-devkit/core';
 import { Observable, SubscribableOrPromise, Subscriber, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
+import { Registry } from './jobs';
 import { Schema as RealBuilderOutput } from './output-schema';
 import { State as BuilderProgressState, Schema as RealBuilderProgress } from './progress-schema';
 
@@ -17,11 +18,7 @@ export type Target = json.JsonObject & RealTarget;
 export { BuilderProgressState };
 
 // Type short hands.
-export type BuilderRegistry = experimental.jobs.Registry<
-  json.JsonObject,
-  BuilderInput,
-  BuilderOutput
->;
+export type BuilderRegistry = Registry<json.JsonObject, BuilderInput, BuilderOutput>;
 
 /**
  * An API typed BuilderProgress. The interface generated from the schema is too permissive,

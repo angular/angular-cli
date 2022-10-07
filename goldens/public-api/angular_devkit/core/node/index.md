@@ -6,27 +6,15 @@
 
 /// <reference types="node" />
 
-import { ErrorObject } from 'ajv';
-import { Format } from 'ajv';
 import { Observable } from 'rxjs';
-import { Observer } from 'rxjs';
 import { Operator } from 'rxjs';
 import { PartialObserver } from 'rxjs';
 import { Stats as Stats_2 } from 'fs';
 import { Subject } from 'rxjs';
-import { SubscribableOrPromise } from 'rxjs';
 import { Subscription } from 'rxjs';
-import { ValidateFunction } from 'ajv';
 
 // @public
 export function createConsoleLogger(verbose?: boolean, stdout?: ProcessOutput, stderr?: ProcessOutput, colors?: Partial<Record<logging.LogLevel, (s: string) => string>>): logging.Logger;
-
-declare namespace experimental {
-    export {
-        NodeModuleJobRegistry
-    }
-}
-export { experimental }
 
 // @public
 export class NodeJsAsyncHost implements virtualFs.Host<Stats_2> {
@@ -78,13 +66,6 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats_2> {
     watch(path: Path, _options?: virtualFs.HostWatchOptions): Observable<virtualFs.HostWatchEvent> | null;
     // (undocumented)
     write(path: Path, content: virtualFs.FileBuffer): Observable<void>;
-}
-
-// @public (undocumented)
-class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> implements experimental_2.jobs.Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
-    get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: experimental_2.jobs.JobName): Observable<experimental_2.jobs.JobHandler<A, I, O> | null>;
-    // (undocumented)
-    protected _resolve(name: string): string | null;
 }
 
 // @public (undocumented)

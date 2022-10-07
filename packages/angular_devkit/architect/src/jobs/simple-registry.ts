@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonValue, schema } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
-import { JsonValue, schema } from '../../json';
 import { JobDescription, JobHandler, JobName, Registry, isJobHandler } from './api';
 import { JobNameAlreadyRegisteredException } from './exception';
 
@@ -23,8 +23,9 @@ export interface RegisterJobOptions extends Partial<JobDescription> {}
 export class SimpleJobRegistry<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue
-> implements Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
+  MinimumOutputValueT extends JsonValue = JsonValue,
+> implements Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>
+{
   private _jobNames = new Map<
     JobName,
     JobHandler<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>
@@ -33,9 +34,9 @@ export class SimpleJobRegistry<
   get<
     A extends MinimumArgumentValueT = MinimumArgumentValueT,
     I extends MinimumInputValueT = MinimumInputValueT,
-    O extends MinimumOutputValueT = MinimumOutputValueT
+    O extends MinimumOutputValueT = MinimumOutputValueT,
   >(name: JobName): Observable<JobHandler<A, I, O> | null> {
-    return of(((this._jobNames.get(name) as unknown) as JobHandler<A, I, O> | null) || null);
+    return of((this._jobNames.get(name) as unknown as JobHandler<A, I, O> | null) || null);
   }
 
   /**
@@ -48,7 +49,7 @@ export class SimpleJobRegistry<
   register<
     A extends MinimumArgumentValueT,
     I extends MinimumInputValueT,
-    O extends MinimumOutputValueT
+    O extends MinimumOutputValueT,
   >(name: JobName, handler: JobHandler<A, I, O>, options?: RegisterJobOptions): void;
 
   /**
@@ -96,7 +97,7 @@ export class SimpleJobRegistry<
   protected _register<
     ArgumentT extends JsonValue,
     InputT extends JsonValue,
-    OutputT extends JsonValue
+    OutputT extends JsonValue,
   >(
     name: JobName,
     handler: JobHandler<ArgumentT, InputT, OutputT>,
@@ -120,9 +121,9 @@ export class SimpleJobRegistry<
       input,
     };
 
-    const jobHandler = (Object.assign(handler.bind(undefined), {
+    const jobHandler = Object.assign(handler.bind(undefined), {
       jobDescription,
-    }) as unknown) as JobHandler<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>;
+    }) as unknown as JobHandler<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>;
     this._jobNames.set(name, jobHandler);
   }
 

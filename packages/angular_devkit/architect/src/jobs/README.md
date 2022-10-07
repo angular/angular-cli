@@ -205,9 +205,7 @@ declare const scheduler: jobs.Scheduler;
 const job = scheduler.schedule('count', 0);
 job.getChannel('side').subscribe((x) => console.log(x));
 // You can type a channel too. Messages will be filtered out.
-job
-  .getChannel<number>('progress', { type: 'number' })
-  .subscribe((x) => console.log(x));
+job.getChannel<number>('progress', { type: 'number' }).subscribe((x) => console.log(x));
 ```
 
 ## <a name="Communicating"></a>Communicating With Jobs

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { analytics, json, logging } from '@angular-devkit/core';
 import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
 import { mergeMap, tap } from 'rxjs/operators';
 import {
@@ -24,13 +24,14 @@ import {
   targetStringFromTarget,
 } from './api';
 import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
+import { JobInboundMessageKind, createJobHandler } from './jobs';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
 // eslint-disable-next-line max-lines-per-function
 export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput = BuilderOutput>(
   fn: BuilderHandlerFn<OptT>,
 ): Builder<OptT & json.JsonObject> {
-  const cjh = experimental.jobs.createJobHandler;
+  const cjh = createJobHandler;
   // eslint-disable-next-line max-lines-per-function
   const handler = cjh<json.JsonObject, BuilderInput, OutT>((options, context) => {
     const scheduler = context.scheduler;
@@ -73,7 +74,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
 
       const inputSubscription = context.inboundBus.subscribe((i) => {
         switch (i.kind) {
-          case experimental.jobs.JobInboundMessageKind.Stop:
+          case JobInboundMessageKind.Stop:
             // Run teardown logic then complete.
             tearingDown = true;
             Promise.all(teardownLogics.map((fn) => fn() || Promise.resolve())).then(
@@ -81,7 +82,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
               (err) => observer.error(err),
             );
             break;
-          case experimental.jobs.JobInboundMessageKind.Input:
+          case JobInboundMessageKind.Input:
             if (!tearingDown) {
               onInput(i.value);
             }

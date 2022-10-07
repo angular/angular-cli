@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonObject, JsonValue, schema } from '@angular-devkit/core';
 import { Observable, Observer } from 'rxjs';
-import { JsonObject, JsonValue, schema } from '../../json/index';
-import { DeepReadonly } from '../../utils/index';
+import { DeepReadonly } from './types';
 
 /**
  * A job name is just a string (needs to be serializable).
@@ -21,7 +21,7 @@ export type JobName = string;
 export interface JobHandler<
   ArgT extends JsonValue,
   InputT extends JsonValue,
-  OutputT extends JsonValue
+  OutputT extends JsonValue,
 > {
   (argument: ArgT, context: JobHandlerContext<ArgT, InputT, OutputT>): Observable<
     JobOutboundMessage<OutputT>
@@ -36,7 +36,7 @@ export interface JobHandler<
 export interface JobHandlerContext<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue
+  MinimumOutputValueT extends JsonValue = JsonValue,
 > {
   readonly description: JobDescription;
   readonly scheduler: Scheduler<JsonValue, JsonValue, JsonValue>;
@@ -300,7 +300,7 @@ export enum JobState {
 export interface Job<
   ArgumentT extends JsonValue = JsonValue,
   InputT extends JsonValue = JsonValue,
-  OutputT extends JsonValue = JsonValue
+  OutputT extends JsonValue = JsonValue,
 > {
   /**
    * Description of the job. Resolving the job's description can be done asynchronously, so this
@@ -371,7 +371,7 @@ export interface ScheduleJobOptions {
 export interface Registry<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue
+  MinimumOutputValueT extends JsonValue = JsonValue,
 > {
   /**
    * Get a job handler.
@@ -388,7 +388,7 @@ export interface Registry<
 export interface Scheduler<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue
+  MinimumOutputValueT extends JsonValue = JsonValue,
 > {
   /**
    * Get a job description for a named job.
@@ -429,7 +429,7 @@ export interface Scheduler<
   schedule<
     A extends MinimumArgumentValueT,
     I extends MinimumInputValueT,
-    O extends MinimumOutputValueT
+    O extends MinimumOutputValueT,
   >(
     name: JobName,
     argument: A,

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonValue } from '../../json';
+import { JsonValue } from '@angular-devkit/core';
 import { JobHandler } from './api';
 import { createJobHandler } from './create-job-handler';
 import { createDispatcher } from './dispatcher';

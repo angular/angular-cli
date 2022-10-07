@@ -3,7 +3,9 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
+load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 
 licenses(["notice"])
 
@@ -21,7 +23,35 @@ ts_library(
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+        "//tests/angular_devkit/architect/node/jobs:jobs_test_lib",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
 )
+
+ts_library(
+    name = "node_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+        ],
+    ),
+    deps = [
+        ":node",
+        "//packages/angular_devkit/architect",
+    ],
+)
+
+[
+    jasmine_node_test(
+        name = "node_test_" + toolchain_name,
+        srcs = [":node_test_lib"],
+        tags = [toolchain_name],
+        toolchain = toolchain,
+    )
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
+    )
+]

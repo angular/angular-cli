@@ -7,7 +7,6 @@
 import { ErrorObject } from 'ajv';
 import { Format } from 'ajv';
 import { Observable } from 'rxjs';
-import { Observer } from 'rxjs';
 import { Operator } from 'rxjs';
 import { PartialObserver } from 'rxjs';
 import { Position } from 'source-map';
@@ -177,11 +176,6 @@ function camelize(str: string): string;
 function capitalize(str: string): string;
 
 // @public (undocumented)
-class ChannelAlreadyExistException extends BaseException {
-    constructor(name: string);
-}
-
-// @public (undocumented)
 export class CircularDependencyFoundException extends BaseException {
     constructor();
 }
@@ -318,18 +312,6 @@ class CoreSchemaRegistry implements SchemaRegistry {
     useXDeprecatedProvider(onUsage: (message: string) => void): void;
 }
 
-// @public
-function createDispatcher<A extends JsonValue, I extends JsonValue, O extends JsonValue>(options?: Partial<Readwrite<JobDescription>>): JobDispatcher<A, I, O>;
-
-// @public
-function createJobFactory<A extends JsonValue, I extends JsonValue, O extends JsonValue>(loader: () => Promise<JobHandler<A, I, O>>, options?: Partial<JobDescription>): JobHandler<A, I, O>;
-
-// @public
-function createJobHandler<A extends JsonValue, I extends JsonValue, O extends JsonValue>(fn: SimpleJobHandlerFn<A, I, O>, options?: Partial<JobDescription>): JobHandler<A, I, O>;
-
-// @public
-function createLoggerJob<A extends JsonValue, I extends JsonValue, O extends JsonValue>(job: JobHandler<A, I, O>, logger: LoggerApi): JobHandler<A, I, O>;
-
 // @public (undocumented)
 function createSyncHost<StatsT extends object = {}>(handler: SyncHostHandler<StatsT>): Host<StatsT>;
 
@@ -352,18 +334,6 @@ function decamelize(str: string): string;
 
 // @public
 export function deepCopy<T>(value: T): T;
-
-// @public (undocumented)
-export type DeepReadonly<T> = T extends (infer R)[] ? DeepReadonlyArray<R> : T extends Function ? T : T extends object ? DeepReadonlyObject<T> : T;
-
-// @public (undocumented)
-export interface DeepReadonlyArray<T> extends Array<DeepReadonly<T>> {
-}
-
-// @public (undocumented)
-export type DeepReadonlyObject<T> = {
-    readonly [P in keyof T]: DeepReadonly<T[P]>;
-};
 
 // @public (undocumented)
 type DefinitionCollectionListener<V extends object> = (name: string, newValue: V | undefined, collection: DefinitionCollection<V>) => void;
@@ -402,26 +372,8 @@ interface EventOptions extends CustomDimensionsAndMetricsOptions {
     value?: string;
 }
 
-declare namespace experimental {
-    export {
-        jobs
-    }
-}
-export { experimental }
-
 // @public (undocumented)
 export function extname(path: Path): string;
-
-// @public
-class FallbackRegistry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> implements Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
-    constructor(_fallbacks?: Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>[]);
-    // (undocumented)
-    addFallback(registry: Registry): void;
-    // (undocumented)
-    protected _fallbacks: Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>[];
-    // (undocumented)
-    get<A extends MinimumArgumentValueT = MinimumArgumentValueT, I extends MinimumInputValueT = MinimumInputValueT, O extends MinimumOutputValueT = MinimumOutputValueT>(name: JobName): Observable<JobHandler<A, I, O> | null>;
-}
 
 // @public (undocumented)
 export class FileAlreadyExistException extends BaseException {
@@ -541,9 +493,6 @@ export class InvalidUpdateRecordException extends BaseException {
 export function isAbsolute(p: Path): boolean;
 
 // @public (undocumented)
-function isJobHandler<A extends JsonValue, I extends JsonValue, O extends JsonValue>(value: unknown): value is JobHandler<A, I, O>;
-
-// @public (undocumented)
 export function isJsonArray(value: JsonValue): value is JsonArray;
 
 // @public (undocumented)
@@ -554,279 +503,6 @@ function isJsonSchema(value: unknown): value is JsonSchema;
 
 // @public
 export function isPromise(obj: any): obj is Promise<any>;
-
-// @public
-interface Job<ArgumentT extends JsonValue = JsonValue, InputT extends JsonValue = JsonValue, OutputT extends JsonValue = JsonValue> {
-    readonly argument: ArgumentT;
-    readonly description: Observable<JobDescription>;
-    getChannel<T extends JsonValue>(name: string, schema?: schema.JsonSchema): Observable<T>;
-    readonly inboundBus: Observer<JobInboundMessage<InputT>>;
-    readonly input: Observer<InputT>;
-    readonly outboundBus: Observable<JobOutboundMessage<OutputT>>;
-    readonly output: Observable<OutputT>;
-    ping(): Observable<never>;
-    readonly state: JobState;
-    stop(): void;
-}
-
-// @public (undocumented)
-class JobArgumentSchemaValidationError extends schema.SchemaValidationException {
-    constructor(errors?: schema.SchemaValidatorError[]);
-}
-
-// @public
-interface JobDescription extends JsonObject {
-    // (undocumented)
-    readonly argument: DeepReadonly<schema.JsonSchema>;
-    // (undocumented)
-    readonly input: DeepReadonly<schema.JsonSchema>;
-    // (undocumented)
-    readonly name: JobName;
-    // (undocumented)
-    readonly output: DeepReadonly<schema.JsonSchema>;
-}
-
-// @public
-interface JobDispatcher<A extends JsonValue, I extends JsonValue, O extends JsonValue> extends JobHandler<A, I, O> {
-    addConditionalJob(predicate: (args: A) => boolean, name: string): void;
-    setDefaultJob(name: JobName | null | JobHandler<JsonValue, JsonValue, JsonValue>): void;
-}
-
-// @public (undocumented)
-class JobDoesNotExistException extends BaseException {
-    constructor(name: JobName);
-}
-
-// @public
-interface JobHandler<ArgT extends JsonValue, InputT extends JsonValue, OutputT extends JsonValue> {
-    // (undocumented)
-    (argument: ArgT, context: JobHandlerContext<ArgT, InputT, OutputT>): Observable<JobOutboundMessage<OutputT>>;
-    // (undocumented)
-    jobDescription: Partial<JobDescription>;
-}
-
-// @public
-interface JobHandlerContext<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> {
-    // (undocumented)
-    readonly dependencies: Job<JsonValue, JsonValue, JsonValue>[];
-    // (undocumented)
-    readonly description: JobDescription;
-    // (undocumented)
-    readonly inboundBus: Observable<JobInboundMessage<MinimumInputValueT>>;
-    // (undocumented)
-    readonly scheduler: Scheduler<JsonValue, JsonValue, JsonValue>;
-}
-
-// @public (undocumented)
-type JobInboundMessage<InputT extends JsonValue> = JobInboundMessagePing | JobInboundMessageStop | JobInboundMessageInput<InputT>;
-
-// @public
-interface JobInboundMessageBase extends JsonObject {
-    readonly kind: JobInboundMessageKind;
-}
-
-// @public
-interface JobInboundMessageInput<InputT extends JsonValue> extends JobInboundMessageBase {
-    // (undocumented)
-    readonly kind: JobInboundMessageKind.Input;
-    readonly value: InputT;
-}
-
-// @public
-enum JobInboundMessageKind {
-    // (undocumented)
-    Input = "in",
-    // (undocumented)
-    Ping = "ip",
-    // (undocumented)
-    Stop = "is"
-}
-
-// @public
-interface JobInboundMessagePing extends JobInboundMessageBase {
-    readonly id: number;
-    // (undocumented)
-    readonly kind: JobInboundMessageKind.Ping;
-}
-
-// @public (undocumented)
-class JobInboundMessageSchemaValidationError extends schema.SchemaValidationException {
-    constructor(errors?: schema.SchemaValidatorError[]);
-}
-
-// @public
-interface JobInboundMessageStop extends JobInboundMessageBase {
-    // (undocumented)
-    readonly kind: JobInboundMessageKind.Stop;
-}
-
-// @public
-type JobName = string;
-
-// @public (undocumented)
-class JobNameAlreadyRegisteredException extends BaseException {
-    constructor(name: JobName);
-}
-
-// @public
-type JobOutboundMessage<OutputT extends JsonValue> = JobOutboundMessageOnReady | JobOutboundMessageStart | JobOutboundMessageOutput<OutputT> | JobOutboundMessageChannelCreate | JobOutboundMessageChannelMessage | JobOutboundMessageChannelError | JobOutboundMessageChannelComplete | JobOutboundMessageEnd | JobOutboundMessagePong;
-
-// @public
-interface JobOutboundMessageBase {
-    readonly description: JobDescription;
-    readonly kind: JobOutboundMessageKind;
-}
-
-// @public
-interface JobOutboundMessageChannelBase extends JobOutboundMessageBase {
-    readonly name: string;
-}
-
-// @public
-interface JobOutboundMessageChannelComplete extends JobOutboundMessageChannelBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.ChannelComplete;
-}
-
-// @public
-interface JobOutboundMessageChannelCreate extends JobOutboundMessageChannelBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.ChannelCreate;
-}
-
-// @public
-interface JobOutboundMessageChannelError extends JobOutboundMessageChannelBase {
-    readonly error: JsonValue;
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.ChannelError;
-}
-
-// @public
-interface JobOutboundMessageChannelMessage extends JobOutboundMessageChannelBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.ChannelMessage;
-    readonly message: JsonValue;
-}
-
-// @public
-interface JobOutboundMessageEnd extends JobOutboundMessageBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.End;
-}
-
-// @public
-enum JobOutboundMessageKind {
-    // (undocumented)
-    ChannelComplete = "cc",
-    // (undocumented)
-    ChannelCreate = "cn",
-    // (undocumented)
-    ChannelError = "ce",
-    // (undocumented)
-    ChannelMessage = "cm",
-    // (undocumented)
-    End = "e",
-    // (undocumented)
-    OnReady = "c",
-    // (undocumented)
-    Output = "o",
-    // (undocumented)
-    Pong = "p",
-    // (undocumented)
-    Start = "s"
-}
-
-// @public
-interface JobOutboundMessageOnReady extends JobOutboundMessageBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.OnReady;
-}
-
-// @public
-interface JobOutboundMessageOutput<OutputT extends JsonValue> extends JobOutboundMessageBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.Output;
-    readonly value: OutputT;
-}
-
-// @public
-interface JobOutboundMessagePong extends JobOutboundMessageBase {
-    readonly id: number;
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.Pong;
-}
-
-// @public
-interface JobOutboundMessageStart extends JobOutboundMessageBase {
-    // (undocumented)
-    readonly kind: JobOutboundMessageKind.Start;
-}
-
-// @public (undocumented)
-class JobOutputSchemaValidationError extends schema.SchemaValidationException {
-    constructor(errors?: schema.SchemaValidatorError[]);
-}
-
-declare namespace jobs {
-    export {
-        isJobHandler,
-        JobName,
-        JobHandler,
-        JobHandlerContext,
-        JobDescription,
-        JobInboundMessageKind,
-        JobInboundMessageBase,
-        JobInboundMessagePing,
-        JobInboundMessageStop,
-        JobInboundMessageInput,
-        JobInboundMessage,
-        JobOutboundMessageKind,
-        JobOutboundMessageBase,
-        JobOutboundMessageOnReady,
-        JobOutboundMessageStart,
-        JobOutboundMessageOutput,
-        JobOutboundMessageChannelBase,
-        JobOutboundMessageChannelMessage,
-        JobOutboundMessageChannelError,
-        JobOutboundMessageChannelCreate,
-        JobOutboundMessageChannelComplete,
-        JobOutboundMessageEnd,
-        JobOutboundMessagePong,
-        JobOutboundMessage,
-        JobState,
-        Job,
-        ScheduleJobOptions,
-        Registry,
-        Scheduler,
-        createJobHandler,
-        createJobFactory,
-        createLoggerJob,
-        ChannelAlreadyExistException,
-        SimpleJobHandlerContext,
-        SimpleJobHandlerFn,
-        JobNameAlreadyRegisteredException,
-        JobDoesNotExistException,
-        createDispatcher,
-        JobDispatcher,
-        FallbackRegistry,
-        RegisterJobOptions,
-        SimpleJobRegistry,
-        JobArgumentSchemaValidationError,
-        JobInboundMessageSchemaValidationError,
-        JobOutputSchemaValidationError,
-        SimpleScheduler,
-        strategy
-    }
-}
-
-// @public
-enum JobState {
-    Ended = "ended",
-    Errored = "errored",
-    Queued = "queued",
-    Ready = "ready",
-    Started = "started"
-}
 
 // @public
 export function join(p1: Path, ...others: string[]): Path;
@@ -1344,26 +1020,12 @@ function readWorkspace(path: string, host: WorkspaceHost, format?: WorkspaceForm
 }>;
 
 // @public (undocumented)
-export type Readwrite<T> = {
-    -readonly [P in keyof T]: T[P];
-};
-
-// @public (undocumented)
 interface ReferenceResolver<ContextT> {
     // (undocumented)
     (ref: string, context?: ContextT): {
         context?: ContextT;
         schema?: JsonObject;
     };
-}
-
-// @public
-interface RegisterJobOptions extends Partial<JobDescription> {
-}
-
-// @public (undocumented)
-interface Registry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> {
-    get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: JobName): Observable<JobHandler<A, I, O> | null>;
 }
 
 // @public
@@ -1426,19 +1088,6 @@ class SafeReadonlyHost<StatsT extends object = {}> implements ReadonlyHost<Stats
     read(path: Path): Observable<FileBuffer>;
     // (undocumented)
     stat(path: Path): Observable<Stats<StatsT> | null> | null;
-}
-
-// @public
-interface ScheduleJobOptions {
-    dependencies?: Job | Job[];
-}
-
-// @public
-interface Scheduler<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> {
-    getDescription(name: JobName): Observable<JobDescription | null>;
-    has(name: JobName): Observable<boolean>;
-    pause(): () => void;
-    schedule<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: JobName, argument: A, options?: ScheduleJobOptions): Job<A, I, O>;
 }
 
 declare namespace schema {
@@ -1567,30 +1216,6 @@ interface ScreenviewOptions extends CustomDimensionsAndMetricsOptions {
     appVersion?: string;
 }
 
-// @public
-interface SimpleJobHandlerContext<A extends JsonValue, I extends JsonValue, O extends JsonValue> extends JobHandlerContext<A, I, O> {
-    // (undocumented)
-    createChannel: (name: string) => Observer<JsonValue>;
-    // (undocumented)
-    input: Observable<I>;
-}
-
-// @public
-type SimpleJobHandlerFn<A extends JsonValue, I extends JsonValue, O extends JsonValue> = (input: A, context: SimpleJobHandlerContext<A, I, O>) => O | Promise<O> | Observable<O>;
-
-// @public
-class SimpleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> implements Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
-    // (undocumented)
-    get<A extends MinimumArgumentValueT = MinimumArgumentValueT, I extends MinimumInputValueT = MinimumInputValueT, O extends MinimumOutputValueT = MinimumOutputValueT>(name: JobName): Observable<JobHandler<A, I, O> | null>;
-    getJobNames(): JobName[];
-    register<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: JobName, handler: JobHandler<A, I, O>, options?: RegisterJobOptions): void;
-    register<ArgumentT extends JsonValue, InputT extends JsonValue, OutputT extends JsonValue>(handler: JobHandler<ArgumentT, InputT, OutputT>, options?: RegisterJobOptions & {
-        name: string;
-    }): void;
-    // (undocumented)
-    protected _register<ArgumentT extends JsonValue, InputT extends JsonValue, OutputT extends JsonValue>(name: JobName, handler: JobHandler<ArgumentT, InputT, OutputT>, options: RegisterJobOptions): void;
-}
-
 // @public (undocumented)
 class SimpleMemoryHost implements Host<{}> {
     constructor();
@@ -1675,21 +1300,6 @@ interface SimpleMemoryHostStats {
     readonly content: FileBuffer | null;
 }
 
-// @public
-class SimpleScheduler<MinimumArgumentT extends JsonValue = JsonValue, MinimumInputT extends JsonValue = JsonValue, MinimumOutputT extends JsonValue = JsonValue> implements Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT> {
-    constructor(_jobRegistry: Registry<MinimumArgumentT, MinimumInputT, MinimumOutputT>, _schemaRegistry?: schema.SchemaRegistry);
-    getDescription(name: JobName): Observable<JobDescription | null>;
-    has(name: JobName): Observable<boolean>;
-    // (undocumented)
-    protected _jobRegistry: Registry<MinimumArgumentT, MinimumInputT, MinimumOutputT>;
-    pause(): () => void;
-    schedule<A extends MinimumArgumentT, I extends MinimumInputT, O extends MinimumOutputT>(name: JobName, argument: A, options?: ScheduleJobOptions): Job<A, I, O>;
-    // (undocumented)
-    protected _scheduleJob<A extends MinimumArgumentT, I extends MinimumInputT, O extends MinimumOutputT>(name: JobName, argument: A, options: ScheduleJobOptions, waitable: Observable<never>): Job<A, I, O>;
-    // (undocumented)
-    protected _schemaRegistry: schema.SchemaRegistry;
-}
-
 // @public (undocumented)
 interface SmartDefaultProvider<T> {
     // (undocumented)
@@ -1709,15 +1319,6 @@ type Stats<T extends object = {}> = T & {
     readonly ctime: Date;
     readonly birthtime: Date;
 };
-
-// @public (undocumented)
-namespace strategy {
-    // (undocumented)
-    type JobStrategy<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue> = (handler: JobHandler<A, I, O>, options?: Partial<Readonly<JobDescription>>) => JobHandler<A, I, O>;
-    function memoize<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(replayMessages?: boolean): JobStrategy<A, I, O>;
-    function reuse<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(replayMessages?: boolean): JobStrategy<A, I, O>;
-    function serialize<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(): JobStrategy<A, I, O>;
-}
 
 declare namespace strings {
     export {

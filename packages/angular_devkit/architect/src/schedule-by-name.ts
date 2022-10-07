@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { analytics, json, logging } from '@angular-devkit/core';
 import { EMPTY, Subscription } from 'rxjs';
 import { catchError, first, ignoreElements, map, shareReplay } from 'rxjs/operators';
 import {
@@ -18,6 +18,7 @@ import {
   Target,
   targetStringFromTarget,
 } from './api';
+import { JobOutboundMessageKind, JobState, Scheduler } from './jobs';
 
 const progressSchema = require('./progress-schema.json');
 
@@ -28,7 +29,7 @@ export async function scheduleByName(
   buildOptions: json.JsonObject,
   options: {
     target?: Target;
-    scheduler: experimental.jobs.Scheduler;
+    scheduler: Scheduler;
     logger: logging.LoggerApi;
     workspaceRoot: string | Promise<string>;
     currentDirectory: string | Promise<string>;
@@ -57,10 +58,10 @@ export async function scheduleByName(
   };
 
   // Wait for the job to be ready.
-  if (job.state !== experimental.jobs.JobState.Started) {
+  if (job.state !== JobState.Started) {
     stateSubscription = job.outboundBus.subscribe(
       (event) => {
-        if (event.kind === experimental.jobs.JobOutboundMessageKind.Start) {
+        if (event.kind === JobOutboundMessageKind.Start) {
           job.input.next(message);
         }
       },
@@ -139,7 +140,7 @@ export async function scheduleByTarget(
   target: Target,
   overrides: json.JsonObject,
   options: {
-    scheduler: experimental.jobs.Scheduler;
+    scheduler: Scheduler;
     logger: logging.LoggerApi;
     workspaceRoot: string | Promise<string>;
     currentDirectory: string | Promise<string>;

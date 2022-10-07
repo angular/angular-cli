@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonValue } from '@angular-devkit/core';
 import { Observable, from } from 'rxjs';
 import { concatMap, first } from 'rxjs/operators';
-import { JsonValue } from '../../json';
 import { JobHandler, JobName, Registry } from './api';
 
 /**
@@ -17,8 +17,9 @@ import { JobHandler, JobName, Registry } from './api';
 export class FallbackRegistry<
   MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
-  MinimumOutputValueT extends JsonValue = JsonValue
-> implements Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
+  MinimumOutputValueT extends JsonValue = JsonValue,
+> implements Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>
+{
   constructor(
     protected _fallbacks: Registry<
       MinimumArgumentValueT,
@@ -34,7 +35,7 @@ export class FallbackRegistry<
   get<
     A extends MinimumArgumentValueT = MinimumArgumentValueT,
     I extends MinimumInputValueT = MinimumInputValueT,
-    O extends MinimumOutputValueT = MinimumOutputValueT
+    O extends MinimumOutputValueT = MinimumOutputValueT,
   >(name: JobName): Observable<JobHandler<A, I, O> | null> {
     return from(this._fallbacks).pipe(
       concatMap((fb) => fb.get<A, I, O>(name)),
