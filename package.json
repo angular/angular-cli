@@ -58,7 +58,7 @@
     "@bazel/esbuild": "5.7.0",
     "@bazel/ibazel": "0.16.2",
     "@bazel/jasmine": "5.7.0",
-    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-commonjs": "^23.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
     "@schematics/angular": "15.0.0-next.4",
     "@types/browser-sync": "^2.26.1",
