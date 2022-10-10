@@ -21,7 +21,7 @@ export function logCumulativeDurations(): void {
 
   for (const [name, duration] of cumulativeDurations) {
     // eslint-disable-next-line no-console
-    console.log(`DURATION[${name}]: ${duration} seconds`);
+    console.log(`DURATION[${name}]: ${duration.toFixed(9)} seconds`);
   }
 }
 
@@ -32,7 +32,7 @@ function recordDuration(name: string, startTime: bigint, cumulative?: boolean): 
     cumulativeDurations.set(name, (cumulativeDurations.get(name) ?? 0) + duration);
   } else {
     // eslint-disable-next-line no-console
-    console.log(`DURATION[${name}]: ${duration} seconds`);
+    console.log(`DURATION[${name}]: ${duration.toFixed(9)} seconds`);
   }
 }
 
