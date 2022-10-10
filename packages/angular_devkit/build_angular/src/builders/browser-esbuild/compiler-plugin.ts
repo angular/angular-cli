@@ -24,6 +24,12 @@ import ts from 'typescript';
 import angularApplicationPreset from '../../babel/presets/application';
 import { requiresLinking } from '../../babel/webpack-loader';
 import { loadEsmModule } from '../../utils/load-esm';
+import {
+  logCumulativeDurations,
+  profileAsync,
+  profileSync,
+  resetCumulativeDurations,
+} from './profiling';
 import { BundleStylesheetOptions, bundleStylesheetFile, bundleStylesheetText } from './stylesheets';
 
 interface EmitFileResult {
@@ -193,21 +199,23 @@ export function createCompilerPlugin(
         options: compilerOptions,
         rootNames,
         errors: configurationDiagnostics,
-      } = compilerCli.readConfiguration(pluginOptions.tsconfig, {
-        noEmitOnError: false,
-        suppressOutputPathCheck: true,
-        outDir: undefined,
-        inlineSources: pluginOptions.sourcemap,
-        inlineSourceMap: pluginOptions.sourcemap,
-        sourceMap: false,
-        mapRoot: undefined,
-        sourceRoot: undefined,
-        declaration: false,
-        declarationMap: false,
-        allowEmptyCodegenFiles: false,
-        annotationsAs: 'decorators',
-        enableResourceInlining: false,
-      });
+      } = profileSync('NG_READ_CONFIG', () =>
+        compilerCli.readConfiguration(pluginOptions.tsconfig, {
+          noEmitOnError: false,
+          suppressOutputPathCheck: true,
+          outDir: undefined,
+          inlineSources: pluginOptions.sourcemap,
+          inlineSourceMap: pluginOptions.sourcemap,
+          sourceMap: false,
+          mapRoot: undefined,
+          sourceRoot: undefined,
+          declaration: false,
+          declarationMap: false,
+          allowEmptyCodegenFiles: false,
+          annotationsAs: 'decorators',
+          enableResourceInlining: false,
+        }),
+      );
 
       if (compilerOptions.target === undefined || compilerOptions.target < ts.ScriptTarget.ES2022) {
         // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
@@ -230,6 +238,9 @@ export function createCompilerPlugin(
 
       build.onStart(async () => {
         const result: OnStartResult = {};
+
+        // Reset debug performance tracking
+        resetCumulativeDurations();
 
         // Reset stylesheet resource output files
         stylesheetResourceFiles = [];
@@ -307,11 +318,10 @@ export function createCompilerPlugin(
         }
 
         // Create the Angular specific program that contains the Angular compiler
-        const angularProgram = new compilerCli.NgtscProgram(
-          rootNames,
-          compilerOptions,
-          host,
-          previousAngularProgram,
+        const angularProgram = profileSync(
+          'NG_CREATE_PROGRAM',
+          () =>
+            new compilerCli.NgtscProgram(rootNames, compilerOptions, host, previousAngularProgram),
         );
         previousAngularProgram = angularProgram;
         const angularCompiler = angularProgram.compiler;
@@ -327,7 +337,7 @@ export function createCompilerPlugin(
         );
         previousBuilder = builder;
 
-        await angularCompiler.analyzeAsync();
+        await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
 
         function* collectDiagnostics(): Iterable<ts.Diagnostic> {
           // Collect program level diagnostics
@@ -343,25 +353,36 @@ export function createCompilerPlugin(
               continue;
             }
 
-            yield* builder.getSyntacticDiagnostics(sourceFile);
-            yield* builder.getSemanticDiagnostics(sourceFile);
+            yield* profileSync(
+              'NG_DIAGNOSTICS_SYNTACTIC',
+              () => builder.getSyntacticDiagnostics(sourceFile),
+              true,
+            );
+            yield* profileSync(
+              'NG_DIAGNOSTICS_SEMANTIC',
+              () => builder.getSemanticDiagnostics(sourceFile),
+              true,
+            );
 
-            const angularDiagnostics = angularCompiler.getDiagnosticsForFile(
-              sourceFile,
-              OptimizeFor.WholeProgram,
+            const angularDiagnostics = profileSync(
+              'NG_DIAGNOSTICS_TEMPLATE',
+              () => angularCompiler.getDiagnosticsForFile(sourceFile, OptimizeFor.WholeProgram),
+              true,
             );
             yield* angularDiagnostics;
           }
         }
 
-        for (const diagnostic of collectDiagnostics()) {
-          const message = convertTypeScriptDiagnostic(diagnostic, host);
-          if (diagnostic.category === ts.DiagnosticCategory.Error) {
-            (result.errors ??= []).push(message);
-          } else {
-            (result.warnings ??= []).push(message);
+        profileSync('NG_DIAGNOSTICS_TOTAL', () => {
+          for (const diagnostic of collectDiagnostics()) {
+            const message = convertTypeScriptDiagnostic(diagnostic, host);
+            if (diagnostic.category === ts.DiagnosticCategory.Error) {
+              (result.errors ??= []).push(message);
+            } else {
+              (result.warnings ??= []).push(message);
+            }
           }
-        }
+        });
 
         fileEmitter = createFileEmitter(
           builder,
@@ -376,74 +397,87 @@ export function createCompilerPlugin(
 
       build.onLoad(
         { filter: compilerOptions.allowJs ? /\.[cm]?[jt]sx?$/ : /\.[cm]?tsx?$/ },
-        async (args) => {
-          assert.ok(fileEmitter, 'Invalid plugin execution order');
+        (args) =>
+          profileAsync(
+            'NG_EMIT_TS*',
+            async () => {
+              assert.ok(fileEmitter, 'Invalid plugin execution order');
 
-          const typescriptResult = await fileEmitter(
-            pluginOptions.fileReplacements?.[args.path] ?? args.path,
-          );
-          if (!typescriptResult) {
-            // No TS result indicates the file is not part of the TypeScript program.
-            // If allowJs is enabled and the file is JS then defer to the next load hook.
-            if (compilerOptions.allowJs && /\.[cm]?js$/.test(args.path)) {
-              return undefined;
-            }
+              const typescriptResult = await fileEmitter(
+                pluginOptions.fileReplacements?.[args.path] ?? args.path,
+              );
+              if (!typescriptResult) {
+                // No TS result indicates the file is not part of the TypeScript program.
+                // If allowJs is enabled and the file is JS then defer to the next load hook.
+                if (compilerOptions.allowJs && /\.[cm]?js$/.test(args.path)) {
+                  return undefined;
+                }
 
-            // Otherwise return an error
-            return {
-              errors: [
-                {
-                  text: `File '${args.path}' is missing from the TypeScript compilation.`,
-                  notes: [
+                // Otherwise return an error
+                return {
+                  errors: [
                     {
-                      text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
+                      text: `File '${args.path}' is missing from the TypeScript compilation.`,
+                      notes: [
+                        {
+                          text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
+                        },
+                      ],
                     },
                   ],
-                },
-              ],
-            };
-          }
+                };
+              }
 
-          const data = typescriptResult.content ?? '';
-          // The pre-transformed data is used as a cache key. Since the cache is memory only,
-          // the options cannot change and do not need to be represented in the key. If the
-          // cache is later stored to disk, then the options that affect transform output
-          // would need to be added to the key as well.
-          let contents = babelDataCache.get(data);
-          if (contents === undefined) {
-            contents = await transformWithBabel(args.path, data, pluginOptions);
-            babelDataCache.set(data, contents);
-          }
+              const data = typescriptResult.content ?? '';
+              // The pre-transformed data is used as a cache key. Since the cache is memory only,
+              // the options cannot change and do not need to be represented in the key. If the
+              // cache is later stored to disk, then the options that affect transform output
+              // would need to be added to the key as well.
+              let contents = babelDataCache.get(data);
+              if (contents === undefined) {
+                contents = await transformWithBabel(args.path, data, pluginOptions);
+                babelDataCache.set(data, contents);
+              }
 
-          return {
-            contents,
-            loader: 'js',
-          };
-        },
+              return {
+                contents,
+                loader: 'js',
+              };
+            },
+            true,
+          ),
       );
 
-      build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
-        // The filename is currently used as a cache key. Since the cache is memory only,
-        // the options cannot change and do not need to be represented in the key. If the
-        // cache is later stored to disk, then the options that affect transform output
-        // would need to be added to the key as well as a check for any change of content.
-        let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
-        if (contents === undefined) {
-          const data = await fs.readFile(args.path, 'utf-8');
-          contents = await transformWithBabel(args.path, data, pluginOptions);
-          pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
-        }
+      build.onLoad({ filter: /\.[cm]?js$/ }, (args) =>
+        profileAsync(
+          'NG_EMIT_JS*',
+          async () => {
+            // The filename is currently used as a cache key. Since the cache is memory only,
+            // the options cannot change and do not need to be represented in the key. If the
+            // cache is later stored to disk, then the options that affect transform output
+            // would need to be added to the key as well as a check for any change of content.
+            let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
+            if (contents === undefined) {
+              const data = await fs.readFile(args.path, 'utf-8');
+              contents = await transformWithBabel(args.path, data, pluginOptions);
+              pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
+            }
 
-        return {
-          contents,
-          loader: 'js',
-        };
-      });
+            return {
+              contents,
+              loader: 'js',
+            };
+          },
+          true,
+        ),
+      );
 
       build.onEnd((result) => {
         if (stylesheetResourceFiles.length) {
           result.outputFiles?.push(...stylesheetResourceFiles);
         }
+
+        logCumulativeDurations();
       });
     },
   };
