@@ -595,7 +595,7 @@ export class AngularWebpackPlugin {
           // Collect sources that are required to be emitted
           if (
             !ignoreForEmit.has(sourceFile) &&
-            !angularCompiler.incrementalDriver.safeToSkipEmit(sourceFile)
+            !angularCompiler.incrementalCompilation.safeToSkipEmit(sourceFile)
           ) {
             this.requiredFilesToEmit.add(normalizePath(sourceFile.fileName));
 
@@ -638,7 +638,7 @@ export class AngularWebpackPlugin {
             getDependencies,
             (sourceFile) => {
               this.requiredFilesToEmit.delete(normalizePath(sourceFile.fileName));
-              angularCompiler.incrementalDriver.recordSuccessfulEmit(sourceFile);
+              angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
             },
           ),
         };
