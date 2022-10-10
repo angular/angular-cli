@@ -13,11 +13,9 @@ import {
   targetFromTargetString,
 } from '@angular-devkit/architect';
 import { JsonObject } from '@angular-devkit/core';
-import type { Type } from '@angular/core';
-import type * as platformServer from '@angular/platform-server';
-import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
 import { assertIsError } from '../../utils/error';
 import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
@@ -45,10 +43,9 @@ async function _renderUniversal(
     browserBuilderName,
   );
 
-  // Initialize zone.js
+  // Locate zone.js to load in the render worker
   const root = context.workspaceRoot;
   const zonePackage = require.resolve('zone.js', { paths: [root] });
-  await import(zonePackage);
 
   const projectName = context.target && context.target.project;
   if (!projectName) {
@@ -66,69 +63,63 @@ async function _renderUniversal(
       })
     : undefined;
 
-  for (const { path: outputPath, baseHref } of browserResult.outputs) {
-    const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
-    const browserIndexOutputPath = path.join(outputPath, 'index.html');
-    const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
-    const serverBundlePath = await _getServerModuleBundlePath(
-      options,
-      context,
-      serverResult,
-      localeDirectory,
-    );
+  const renderWorker = new Piscina({
+    filename: require.resolve('./render-worker'),
+    maxThreads: 1,
+    workerData: { zonePackage },
+  });
 
-    const { AppServerModule, renderModule, ɵSERVER_CONTEXT } = (await import(serverBundlePath)) as {
-      renderModule: typeof platformServer.renderModule | undefined;
-      ɵSERVER_CONTEXT: typeof platformServer.ɵSERVER_CONTEXT | undefined;
-      AppServerModule: Type<unknown> | undefined;
-    };
+  try {
+    for (const { path: outputPath, baseHref } of browserResult.outputs) {
+      const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
+      const browserIndexOutputPath = path.join(outputPath, 'index.html');
+      const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
+      const serverBundlePath = await _getServerModuleBundlePath(
+        options,
+        context,
+        serverResult,
+        localeDirectory,
+      );
 
-    assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
-    assert(AppServerModule, `AppServerModule was not exported from: ${serverBundlePath}.`);
-    assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported from: ${serverBundlePath}.`);
-
-    // Load platform server module renderer
-    let html = await renderModule(AppServerModule, {
-      document: indexHtml,
-      url: options.route,
-      extraProviders: [
-        {
-          provide: ɵSERVER_CONTEXT,
-          useValue: 'app-shell',
-        },
-      ],
-    });
-
-    // Overwrite the client index file.
-    const outputIndexPath = options.outputIndexPath
-      ? path.join(root, options.outputIndexPath)
-      : browserIndexOutputPath;
-
-    if (inlineCriticalCssProcessor) {
-      const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
-        outputPath,
+      let html: string = await renderWorker.run({
+        serverBundlePath,
+        document: indexHtml,
+        url: options.route,
       });
-      html = content;
 
-      if (warnings.length || errors.length) {
-        spinner.stop();
-        warnings.forEach((m) => context.logger.warn(m));
-        errors.forEach((m) => context.logger.error(m));
-        spinner.start();
+      // Overwrite the client index file.
+      const outputIndexPath = options.outputIndexPath
+        ? path.join(root, options.outputIndexPath)
+        : browserIndexOutputPath;
+
+      if (inlineCriticalCssProcessor) {
+        const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
+          outputPath,
+        });
+        html = content;
+
+        if (warnings.length || errors.length) {
+          spinner.stop();
+          warnings.forEach((m) => context.logger.warn(m));
+          errors.forEach((m) => context.logger.error(m));
+          spinner.start();
+        }
+      }
+
+      await fs.promises.writeFile(outputIndexPath, html);
+
+      if (browserOptions.serviceWorker) {
+        await augmentAppWithServiceWorker(
+          projectRoot,
+          root,
+          outputPath,
+          baseHref ?? '/',
+          browserOptions.ngswConfigPath,
+        );
       }
     }
-
-    await fs.promises.writeFile(outputIndexPath, html);
-
-    if (browserOptions.serviceWorker) {
-      await augmentAppWithServiceWorker(
-        projectRoot,
-        root,
-        outputPath,
-        baseHref ?? '/',
-        browserOptions.ngswConfigPath,
-      );
-    }
+  } finally {
+    await renderWorker.destroy();
   }
 
   return browserResult;
