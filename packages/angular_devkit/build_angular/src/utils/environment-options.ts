@@ -93,3 +93,6 @@ export const useLegacySass: boolean = (() => {
 
   return isEnabled(legacySassVariable);
 })();
+
+const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
+export const debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugPerfVariable);
