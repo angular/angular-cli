@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { Type } from '@angular/core';
+import type * as platformServer from '@angular/platform-server';
+import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadEsmModule } from '../utils/utils';
@@ -41,28 +44,39 @@ export async function render({
   const outputFolderPath = path.join(outputPath, route);
   const outputIndexPath = path.join(outputFolderPath, 'index.html');
 
-  const { renderModule, AppServerModule } = await import(serverBundlePath);
+  const { AppServerModule, renderModule, ɵSERVER_CONTEXT } = (await import(serverBundlePath)) as {
+    renderModule: typeof platformServer.renderModule | undefined;
+    ɵSERVER_CONTEXT: typeof platformServer.ɵSERVER_CONTEXT | undefined;
+    AppServerModule: Type<unknown> | undefined;
+  };
+
+  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+  assert(AppServerModule, `AppServerModule was not exported from: ${serverBundlePath}.`);
+  assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported from: ${serverBundlePath}.`);
 
   const indexBaseName = fs.existsSync(path.join(outputPath, 'index.original.html'))
     ? 'index.original.html'
     : indexFile;
   const browserIndexInputPath = path.join(outputPath, indexBaseName);
-  let indexHtml = await fs.promises.readFile(browserIndexInputPath, 'utf8');
-  indexHtml = indexHtml.replace(
-    '</html>',
-    '<!-- This page was prerendered with Angular Universal -->\n</html>',
-  );
+  let document = await fs.promises.readFile(browserIndexInputPath, 'utf8');
+
   if (inlineCriticalCss) {
     // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-    indexHtml = indexHtml.replace(
+    document = document.replace(
       / media="print" onload="this\.media='all'"><noscript><link .+?><\/noscript>/g,
       '>',
     );
   }
 
   let html = await renderModule(AppServerModule, {
-    document: indexHtml,
+    document,
     url: route,
+    extraProviders: [
+      {
+        provide: ɵSERVER_CONTEXT,
+        useValue: 'ssg',
+      },
+    ],
   });
 
   if (inlineCriticalCss) {

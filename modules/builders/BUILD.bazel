@@ -28,6 +28,8 @@ ts_library(
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/build-angular",
         "@npm//@angular-devkit/core",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-server",
         "@npm//@types/browser-sync",
         "@npm//@types/express",
         "@npm//guess-parser",

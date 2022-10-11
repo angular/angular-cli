@@ -57,7 +57,7 @@ describe('Prerender Builder', () => {
     );
 
     expect(content).toContain('foo works!');
-    expect(content).toContain('This page was prerendered with Angular Universal');
+    expect(content).toContain('ng-server-context="ssg"');
     await run.stop();
   });
 
@@ -109,13 +109,13 @@ describe('Prerender Builder', () => {
     );
 
     expect(appContent).toContain('app app is running!');
-    expect(appContent).toContain('This page was prerendered with Angular Universal');
+    expect(appContent).toContain('ng-server-context="ssg"');
 
     expect(fooContent).toContain('foo works!');
-    expect(fooContent).toContain('This page was prerendered with Angular Universal');
+    expect(fooContent).toContain('ng-server-context="ssg"');
 
     expect(fooBarContent).toContain('foo-bar works!');
-    expect(fooBarContent).toContain('This page was prerendered with Angular Universal');
+    expect(fooBarContent).toContain('ng-server-context="ssg"');
 
     await run.stop();
   });
@@ -151,13 +151,13 @@ describe('Prerender Builder', () => {
     expect(output.success).toBe(true);
 
     expect(appContent).toContain('app app is running!');
-    expect(appContent).toContain('This page was prerendered with Angular Universal');
+    expect(appContent).toContain('ng-server-context="ssg"');
 
     expect(fooContent).toContain('foo works!');
-    expect(fooContent).toContain('This page was prerendered with Angular Universal');
+    expect(fooContent).toContain('ng-server-context="ssg"');
 
     expect(fooBarContent).toContain('foo-bar works!');
-    expect(fooBarContent).toContain('This page was prerendered with Angular Universal');
+    expect(fooBarContent).toContain('ng-server-context="ssg"');
 
     await run.stop();
   });

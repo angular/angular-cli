@@ -20,5 +20,5 @@ export async function waitForAppRootElement(): Promise<boolean> {
 
 export async function isPrerendered(): Promise<boolean> {
   const src = await browser.driver.getPageSource();
-  return src.includes('This page was prerendered with Angular Universal');
+  return src.includes('ng-server-context="ssg"');
 }
