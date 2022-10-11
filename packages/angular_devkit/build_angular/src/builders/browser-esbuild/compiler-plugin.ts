@@ -169,6 +169,8 @@ export function createCompilerPlugin(
     name: 'angular-compiler',
     // eslint-disable-next-line max-lines-per-function
     async setup(build: PluginBuild): Promise<void> {
+      let setupWarnings: PartialMessage[] | undefined;
+
       // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
       // Once TypeScript provides support for retaining dynamic imports this workaround can be dropped.
       const compilerCli = await loadEsmModule<typeof import('@angular/compiler-cli')>(
@@ -223,7 +225,19 @@ export function createCompilerPlugin(
         // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
         compilerOptions.target = ts.ScriptTarget.ES2022;
         compilerOptions.useDefineForClassFields ??= false;
-        // TODO: show warning about this override when we have access to the logger.
+
+        (setupWarnings ??= []).push({
+          text:
+            'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
+            '"false" respectively by the Angular CLI.',
+          location: { file: pluginOptions.tsconfig },
+          notes: [
+            {
+              text: `To control ECMA version and features use the Browerslist configuration. ' +
+              'For more information, see https://github.com/browserslist/browserslist#queries'`,
+            },
+          ],
+        });
       }
 
       // The file emitter created during `onStart` that will be used during the build in `onLoad` callbacks for TS files
@@ -237,7 +251,12 @@ export function createCompilerPlugin(
       const babelDataCache = new Map<string, string>();
 
       build.onStart(async () => {
-        const result: OnStartResult = {};
+        const result: OnStartResult = {
+          warnings: setupWarnings,
+        };
+
+        // Reset the setup warnings so that they are only shown during the first build.
+        setupWarnings = undefined;
 
         // Reset debug performance tracking
         resetCumulativeDurations();
