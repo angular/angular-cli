@@ -28,11 +28,6 @@ export interface Schema {
    */
   serverPort?: number;
   /**
-   * The name of the application directory.
-   * @deprecated This option has no longer any effect
-   */
-  appDir?: string;
-  /**
    * The name of the root module file
    */
   rootModuleFileName?: string;
