@@ -423,12 +423,30 @@ function getSassResolutionImporter(
   });
 
   return {
-    findFileUrl: (url, { fromImport }): Promise<URL | null> => {
+    findFileUrl: async (url, { fromImport }): Promise<URL | null> => {
+      if (url.charAt(0) === '.') {
+        // Let Sass handle relative imports.
+        return null;
+      }
+
+      let file: string | undefined;
       const resolve = fromImport ? resolveImport : resolveModule;
 
-      return resolve(root, url)
-        .then((file) => pathToFileURL(file))
-        .catch(() => null);
+      try {
+        file = await resolve(root, url);
+      } catch {
+        // Try to resolve a partial file
+        // @use '@material/button/button' as mdc-button;
+        // `@material/button/button` -> `@material/button/_button`
+        const lastSlashIndex = url.lastIndexOf('/');
+        const underscoreIndex = lastSlashIndex + 1;
+        if (underscoreIndex > 0 && url.charAt(underscoreIndex) !== '_') {
+          const partialFileUrl = `${url.slice(0, underscoreIndex)}_${url.slice(underscoreIndex)}`;
+          file = await resolve(root, partialFileUrl).catch(() => undefined);
+        }
+      }
+
+      return file ? pathToFileURL(file) : null;
     },
   };
 }
