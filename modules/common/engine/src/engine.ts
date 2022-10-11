@@ -7,7 +7,7 @@
  */
 
 import type { StaticProvider, Type } from '@angular/core';
-import { INITIAL_CONFIG, renderModule } from '@angular/platform-server';
+import { INITIAL_CONFIG, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import { ɵInlineCriticalCssProcessor as InlineCriticalCssProcessor } from '@nguniversal/common/tools';
 import * as fs from 'fs';
 import { dirname, resolve } from 'path';
@@ -77,7 +77,11 @@ export class CommonEngine {
     }
 
     // if opts.document dosen't exist then opts.documentFilePath must
-    const extraProviders = [...(opts.providers || []), ...(this.providers || [])];
+    const extraProviders: StaticProvider[] = [
+      { provide: ɵSERVER_CONTEXT, useValue: 'ssr' },
+      ...(opts.providers ?? []),
+      ...this.providers,
+    ];
 
     let doc = opts.document;
     if (!doc && opts.documentFilePath) {
