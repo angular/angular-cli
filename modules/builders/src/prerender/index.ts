@@ -19,12 +19,9 @@ import * as fs from 'fs';
 import ora from 'ora';
 import * as path from 'path';
 import Piscina from 'piscina';
-import { promisify } from 'util';
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getIndexOutputFile, getRoutes } from './utils';
 import { RenderOptions, RenderResult } from './worker';
-
-export const readFile = promisify(fs.readFile);
 
 type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
