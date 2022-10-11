@@ -7,8 +7,9 @@
  */
 
 import type { PartialMessage, Plugin, PluginBuild } from 'esbuild';
+import { dirname, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { CompileResult } from 'sass';
-import { fileURLToPath } from 'url';
 
 export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: string[] }): Plugin {
   return {
@@ -40,7 +41,9 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
 
           return {
             loader: 'css',
-            contents: sourceMap ? `${css}\n${sourceMapToUrlComment(sourceMap)}` : css,
+            contents: sourceMap
+              ? `${css}\n${sourceMapToUrlComment(sourceMap, dirname(args.path))}`
+              : css,
             watchFiles: loadedUrls.map((url) => fileURLToPath(url)),
             warnings,
           };
@@ -66,7 +69,14 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
   };
 }
 
-function sourceMapToUrlComment(sourceMap: Exclude<CompileResult['sourceMap'], undefined>): string {
+function sourceMapToUrlComment(
+  sourceMap: Exclude<CompileResult['sourceMap'], undefined>,
+  root: string,
+): string {
+  // Remove `file` protocol from all sourcemap sources and adjust to be relative to the input file.
+  // This allows esbuild to correctly process the paths.
+  sourceMap.sources = sourceMap.sources.map((source) => relative(root, fileURLToPath(source)));
+
   const urlSourceMap = Buffer.from(JSON.stringify(sourceMap), 'utf-8').toString('base64');
 
   return `/*# sourceMappingURL=data:application/json;charset=utf-8;base64,${urlSourceMap} */`;
