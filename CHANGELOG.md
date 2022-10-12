@@ -1,3 +1,26 @@
+<a name="14.2.6"></a>
+
+# 14.2.6 (2022-10-12)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [1c9cf594f](https://github.com/angular/angular-cli/commit/1c9cf594f7a855ea4b462fad53acd3bf3a2e7622) | fix  | handle missing `which` binary in path                                    |
+| [28b2cd18e](https://github.com/angular/angular-cli/commit/28b2cd18e3c490cf2db64d4a6744bbd26c0aeabb) | fix  | skip downloading temp CLI when running `ng update` without package names |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [ad6928184](https://github.com/angular/angular-cli/commit/ad692818413a97afe54aee6a39f0447ee9239343) | fix  | project extension warning message should identify concerned project |
+
+## Special Thanks
+
+AgentEnder and Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.5"></a>
 
 # 15.0.0-next.5 (2022-10-12)
