@@ -7,9 +7,9 @@ import { PullRequestConfig } from '@angular/ng-dev';
 export const pullRequest: PullRequestConfig = {
   githubApiMerge: {
     default: 'rebase',
-    labels: [{ pattern: 'squash commits', method: 'squash' }],
+    labels: [{ pattern: 'merge: squash commits', method: 'squash' }],
   },
   mergeReadyLabel: 'action: merge',
-  caretakerNoteLabel: 'action: merge-assistance',
-  commitMessageFixupLabel: 'needs commit fixup',
+  caretakerNoteLabel: 'action: caretaker note',
+  commitMessageFixupLabel: 'merge: fix commit message',
 };
