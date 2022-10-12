@@ -132,6 +132,7 @@ async function findMatchingTests(
     root: projectSourceRoot,
     nomount: true,
     absolute: true,
+    ignore: ['**/node_modules/**'],
   });
 }
 
