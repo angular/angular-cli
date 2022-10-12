@@ -108,6 +108,7 @@ describe('Identifying third-party code in source maps', () => {
       './src/app/app.component.ts',
       './src/app/app.module.ts',
       './src/main.ts',
+      './src/app/app.component.css',
     ]);
 
     // Only some sources in the polyfills map are first-party.

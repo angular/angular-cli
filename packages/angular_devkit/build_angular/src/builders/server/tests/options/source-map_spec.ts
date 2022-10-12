@@ -11,7 +11,8 @@ import { BASE_OPTIONS, SERVER_BUILDER_INFO, describeBuilder } from '../setup';
 
 describeBuilder(execute, SERVER_BUILDER_INFO, (harness) => {
   describe('Option: "sourceMap"', () => {
-    const INLINE_SOURCEMAP_MARKER = '/*# sourceMappingURL=data:application/json;base64,';
+    const INLINE_SOURCEMAP_MARKER =
+      '/*# sourceMappingURL=data:application/json;charset=utf-8;base64,';
 
     beforeEach(async () => {
       await harness.writeFiles({
