@@ -132,7 +132,7 @@ const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
 
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly modifiedFiles = new Set<string>();
-  readonly babelFileCache = new Map<string, string>();
+  readonly babelFileCache = new Map<string, Uint8Array>();
 
   invalidate(files: Iterable<string>): void {
     this.modifiedFiles.clear();
@@ -247,7 +247,7 @@ export function createCompilerPlugin(
 
       let previousBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined;
       let previousAngularProgram: NgtscProgram | undefined;
-      const babelDataCache = new Map<string, string>();
+      const babelDataCache = new Map<string, Uint8Array>();
       const diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>();
 
       build.onStart(async () => {
@@ -466,7 +466,8 @@ export function createCompilerPlugin(
               // would need to be added to the key as well.
               let contents = babelDataCache.get(data);
               if (contents === undefined) {
-                contents = await transformWithBabel(args.path, data, pluginOptions);
+                const transformedData = await transformWithBabel(args.path, data, pluginOptions);
+                contents = Buffer.from(transformedData, 'utf-8');
                 babelDataCache.set(data, contents);
               }
 
@@ -490,7 +491,8 @@ export function createCompilerPlugin(
             let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
             if (contents === undefined) {
               const data = await fs.readFile(args.path, 'utf-8');
-              contents = await transformWithBabel(args.path, data, pluginOptions);
+              const transformedData = await transformWithBabel(args.path, data, pluginOptions);
+              contents = Buffer.from(transformedData, 'utf-8');
               pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
             }
 
