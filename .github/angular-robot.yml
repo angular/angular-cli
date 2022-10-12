@@ -67,21 +67,21 @@ triage:
   defaultMilestone: 12,
   # arrays of labels that determine if an issue has been triaged by the caretaker
   l1TriageLabels:
-    - - 'comp: *'
+    - - 'area: *'
   # arrays of labels that determine if an issue has been fully triaged
   l2TriageLabels:
     - - 'type: bug/fix'
       - 'severity*'
       - 'freq*'
-      - 'comp: *'
+      - 'area: *'
     - - 'type: feature'
-      - 'comp: *'
+      - 'area: *'
     - - 'type: refactor'
-      - 'comp: *'
+      - 'area: *'
     - - 'type: RFC / Discussion / question'
-      - 'comp: *'
+      - 'area: *'
     - - 'type: docs'
-      - 'comp: *'
+      - 'area: *'
 
 # Size checking
 size:
