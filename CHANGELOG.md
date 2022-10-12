@@ -1,3 +1,97 @@
+<a name="15.0.0-next.5"></a>
+
+# 15.0.0-next.5 (2022-10-12)
+
+## Breaking Changes
+
+### @angular/cli
+
+- The Angular CLI no longer supports `16.10.x`, `16.11.x` and `16.12.x`. Current supported versions of Node.js are `14.20.x`, `16.13.x` and `18.10.x`.
+
+- `analyticsSharing` option in the global angular configuration has been
+  removed without replacement. This option was used to configure the Angular CLI to access to your own users' CLI usage data.
+
+  If this option is used, it can be removed using `ng config --global cli.analyticsSharing undefined`.
+
+- analytics APIs have been removed without replacement from `@angular-devkit/core` and `@angular-devkit/architect`.
+
+### @angular-devkit/build-angular
+
+- TypeScript versions older than 4.8.2 are no longer supported.
+
+### @angular-devkit/schematics
+
+- The depracated `UpdateBuffer` has been removed and `UpdateBuffer2`
+  is renamed to `UpdateBuffer`. With this change the related and
+  deprecated symbols `ContentCannotBeRemovedException` and `Chunk`
+  have also been removed.
+
+### @ngtools/webpack
+
+- TypeScript versions older than 4.8.2 are no longer supported.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [d8bff4f1e](https://github.com/angular/angular-cli/commit/d8bff4f1e68a76da1983f9d0774f415e73dfd8c3) | feat | Added --project-root option to the library schematics            |
+| [f2a0682dc](https://github.com/angular/angular-cli/commit/f2a0682dc82afa23a3d3481df59e4aaca5e90c78) | feat | generate new projects using TypeScript 4.8.2                     |
+| [b06421d15](https://github.com/angular/angular-cli/commit/b06421d15e4b5e6daffcb73ee1c2c8703b72cb47) | feat | mark `projectRoot` as non hidden option in application schematic |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [4827d1b23](https://github.com/angular/angular-cli/commit/4827d1b23e564e4e4a8684c5e8ff035d8fa855a2) | feat | add support for Node.js version 18                                       |
+| [4fa5b526e](https://github.com/angular/angular-cli/commit/4fa5b526e53fb9b142295ef361c3709151aa17da) | fix  | handle missing `which` binary in path                                    |
+| [320241010](https://github.com/angular/angular-cli/commit/320241010eeb189de820f9abb3959b34f63a300d) | fix  | skip downloading temp CLI when running `ng update` without package names |
+
+###
+
+| Commit                                                                                              | Type     | Description                                  |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| [639a3071c](https://github.com/angular/angular-cli/commit/639a3071c3630c1ccdf7e3c015e81e9423ab2678) | refactor | migrate analytics collector to use GA4       |
+| [c969152de](https://github.com/angular/angular-cli/commit/c969152de630a9afdef44ba2342e728b9353c8e7) | refactor | remove analytics API from core and architect |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------ |
+| [a95d130ef](https://github.com/angular/angular-cli/commit/a95d130ef4249457ed2433d52eb43c94a1169782) | feat | auto include `@angular/localize/init` when found in `types`                    |
+| [979bce45e](https://github.com/angular/angular-cli/commit/979bce45e63eda9ac5402869ef3dc4c63aaca3f1) | feat | auto include `@angular/platform-server/init` during server builds              |
+| [fd4175357](https://github.com/angular/angular-cli/commit/fd41753579affa78328bfc4b6108db15ff5053f9) | feat | drop support for TypeScript 4.6 and 4.7                                        |
+| [4fcb0a82b](https://github.com/angular/angular-cli/commit/4fcb0a82b5fa8a092d8c374cdea448edd80270d4) | fix  | correctly resolve Sass partial files in node packages                          |
+| [e34bfe5eb](https://github.com/angular/angular-cli/commit/e34bfe5eb1a559cbf53449ce213503e32fa27ae4) | fix  | ignore specs in node_modules when finding specs                                |
+| [484cda5f9](https://github.com/angular/angular-cli/commit/484cda5f9ee90ab17807eb7f5cfb4a40ea6cd264) | fix  | isolate zone.js usage when rendering server bundles                            |
+| [6c3f281d9](https://github.com/angular/angular-cli/commit/6c3f281d927c9ae2d4ec76ff9f920752e2cb73d1) | fix  | show warning when using TypeScript target older then ES2022 in esbuild builder |
+| [1518133db](https://github.com/angular/angular-cli/commit/1518133db3b1c710500786f9f1fcfa05a016862e) | fix  | use relative sourcemap source paths for Sass in esbuild builder                |
+| [8c915d414](https://github.com/angular/angular-cli/commit/8c915d41496c99fb42ae3992d9c91de542260bf2) | perf | avoid extra babel file reads in esbuild builder rebuilds                       |
+| [52db3c000](https://github.com/angular/angular-cli/commit/52db3c00076dfe118cd39d7724229210c30665e0) | perf | minimize Angular diagnostics incremental analysis in esbuild-based builder     |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [86150d9dd](https://github.com/angular/angular-cli/commit/86150d9ddcbc16e35c1912754c8fb50443724074) | fix  | project extension warning message should identify concerned project |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type     | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------ |
+| [9b07b469b](https://github.com/angular/angular-cli/commit/9b07b469b622e083a9915ed3c24e1d53d8abf38f) | refactor | remove `UpdateBuffer` and rename `UpdateBuffer2` to `UpdateBuffer` |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [43bd0abc1](https://github.com/angular/angular-cli/commit/43bd0abc147cf3177e707624bf6163b3dc9e06f8) | feat | drop support for TypeScript 4.6 and 4.7 |
+
+## Special Thanks
+
+AgentEnder, Alan Agius, Charles Lyding, Cédric Exbrayat, Dariusz Ostolski, Günhan Gülsoy and Lukas Spirig
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.4"></a>
 
 # 15.0.0-next.4 (2022-10-05)
