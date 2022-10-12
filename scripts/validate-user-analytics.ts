@@ -28,9 +28,7 @@ const metricsTableRe = /<!--METRICS_TABLE_BEGIN-->([\s\S]*)<!--METRICS_TABLE_END
 
 async function _checkUserDimensions(dimensionsTable: string, logger: logging.Logger) {
   logger.info('Gathering user dimensions from @angular/cli...');
-  const eventCustomDimensionValues = new Set(Object.values(UserCustomDimension));
-
-  const data = Object.entries(EventCustomDimension).map(([key, value]) => ({
+  const data = Object.entries(UserCustomDimension).map(([key, value]) => ({
     parameter: value,
     name: key,
     type: value.charAt(2) === 'n' ? 'number' : 'string',

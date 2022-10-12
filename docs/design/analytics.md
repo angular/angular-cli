@@ -38,17 +38,14 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 <!--USER_DIMENSIONS_TABLE_BEGIN-->
 | Name | Parameter | Type |
 |:---:|:---|:---|
-| Command | `ep.ng_command` | `string` |
-| SchematicCollectionName | `ep.ng_schematic_collection_name` | `string` |
-| SchematicName | `ep.ng_schematic_name` | `string` |
-| Standalone | `ep.ng_standalone` | `string` |
-| Style | `ep.ng_style` | `string` |
-| Routing | `ep.ng_routing` | `string` |
-| InlineTemplate | `ep.ng_inline_template` | `string` |
-| InlineStyle | `ep.ng_inline_style` | `string` |
-| BuilderTarget | `ep.ng_builder_target` | `string` |
-| Aot | `ep.ng_aot` | `string` |
-| Optimization | `ep.ng_optimization` | `string` |
+| OsArchitecture | `up.ng_os_architecture` | `string` |
+| NodeVersion | `up.ng_node_version` | `string` |
+| NodeMajorVersion | `upn.ng_node_major_version` | `number` |
+| AngularCLIVersion | `up.ng_cli_version` | `string` |
+| AngularCLIMajorVersion | `upn.ng_cli_major_version` | `number` |
+| PackageManager | `up.ng_package_manager` | `string` |
+| PackageManagerVersion | `up.ng_package_manager_version` | `string` |
+| PackageManagerMajorVersion | `upn.ng_package_manager_major_version` | `number` |
 <!--USER_DIMENSIONS_TABLE_END-->
 
 ### List of Event Custom Dimensions
