@@ -163,7 +163,7 @@ describe('Universal Schematic', () => {
     expect(targets.build.options.outputPath).toEqual('dist/bar/browser');
   });
 
-  it('should add a server transition to BrowerModule import', async () => {
+  it('should add a server transition to BrowserModule import', async () => {
     const tree = await schematicRunner
       .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
@@ -226,7 +226,7 @@ describe('Universal Schematic', () => {
     expect(tree.exists(filePath)).toEqual(true);
   });
 
-  it(`should not add import to '@angular/localize' as type in 'tsconfig.server.json' when it's not a depedency`, async () => {
+  it(`should not add import to '@angular/localize' as type in 'tsconfig.server.json' when it's not a dependency`, async () => {
     const tree = await schematicRunner
       .runSchematicAsync('universal', defaultOptions, appTree)
       .toPromise();
@@ -236,7 +236,7 @@ describe('Universal Schematic', () => {
     expect(compilerOptions.types).not.toContain('@angular/localize/init');
   });
 
-  it(`should  add import to '@angular/localize' as type in 'tsconfig.server.json' when it's not a depedency`, async () => {
+  it(`should add import to '@angular/localize' as type in 'tsconfig.server.json' when it's a dependency`, async () => {
     addPackageJsonDependency(appTree, {
       name: '@angular/localize',
       type: NodeDependencyType.Default,
