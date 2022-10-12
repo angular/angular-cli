@@ -19,6 +19,13 @@
 
 - TypeScript versions older than 4.8.2 are no longer supported.
 
+### @angular-devkit/schematics
+
+- The depracated `UpdateBuffer` has been removed and `UpdateBuffer2`
+  is renamed to `UpdateBuffer`. With this change the related and
+  deprecated symbols `ContentCannotBeRemovedException` and `Chunk`
+  have also been removed.
+
 ### @ngtools/webpack
 
 - TypeScript versions older than 4.8.2 are no longer supported.
