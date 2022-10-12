@@ -4,18 +4,6 @@ This document list exactly what is gathered and how.
 
 Any change to analytics should most probably include a change to this document.
 
-## Pageview
-
-Each command creates a pageview with the path `/command/${commandName}/${subcommandName}`. IE.
-`ng generate component my-component --dryRun` would create a page view with the path
-`/command/generate/@schematics_angular/component`.
-
-We use page views to keep track of sessions more effectively, and to tag events to a page.
-
-Project names and target names will be removed.
-The command `ng run some-project:lint:some-configuration` will create a page view with the path
-`/command/run`.
-
 ## Dimensions and Metrics
 
 Google Analytics Custom Dimensions are used to track system values and flag values. These
