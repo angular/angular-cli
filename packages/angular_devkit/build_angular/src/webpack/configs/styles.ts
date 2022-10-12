@@ -12,7 +12,6 @@ import * as path from 'path';
 import type { FileImporter } from 'sass';
 import { pathToFileURL } from 'url';
 import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
-import { StyleElement } from '../../builders/browser/schema';
 import { SassWorkerImplementation } from '../../sass/sass-service';
 import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
 import { WebpackConfigOptions } from '../../utils/build-options';
@@ -28,13 +27,12 @@ import { StylesWebpackPlugin } from '../plugins/styles-webpack-plugin';
 import {
   assetNameTemplateFactory,
   getOutputHashFormat,
-  normalizeExtraEntryPoints,
   normalizeGlobalStyles,
 } from '../utils/helpers';
 
 // eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
-  const { root, projectRoot, buildOptions } = wco;
+  const { root, buildOptions } = wco;
   const extraPlugins: Configuration['plugins'] = [];
 
   extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
@@ -103,12 +101,10 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     }
   }
 
-  const postcssImports = require('postcss-import');
   const autoprefixer: typeof import('autoprefixer') = require('autoprefixer');
 
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const optionGenerator = (loader: any) => ({
+    const optionGenerator = (loader: LoaderContext<unknown>) => ({
       map: inlineSourcemaps
         ? {
             inline: true,
@@ -116,22 +112,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
           }
         : undefined,
       plugins: [
-        postcssImports({
-          load: (filename: string) => {
-            return new Promise<string>((resolve, reject) => {
-              loader.fs.readFile(filename, (err: Error, data: Buffer) => {
-                if (err) {
-                  reject(err);
-
-                  return;
-                }
-
-                const content = data.toString();
-                resolve(content);
-              });
-            });
-          },
-        }),
         PostcssCliResources({
           baseHref: buildOptions.baseHref,
           deployUrl: buildOptions.deployUrl,
@@ -179,6 +159,16 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
 
   const componentStyleLoaders: RuleSetUseItem[] = [
     {
+      loader: require.resolve('css-loader'),
+      options: {
+        url: false,
+        sourceMap: componentsSourceMap,
+        importLoaders: 1,
+        exportType: 'string',
+        esModule: false,
+      },
+    },
+    {
       loader: postCssLoaderPath,
       options: {
         implementation: postCss,
@@ -196,6 +186,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
       options: {
         url: false,
         sourceMap: !!cssSourceMap,
+        importLoaders: 1,
       },
     },
     {
@@ -294,7 +285,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
               // Component styles are all styles except defined global styles
               {
                 use: componentStyleLoaders,
-                type: 'asset/source',
                 resourceQuery: /\?ngResource/,
               },
             ],

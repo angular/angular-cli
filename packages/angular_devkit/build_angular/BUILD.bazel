@@ -162,7 +162,6 @@ ts_library(
         "@npm//parse5-html-rewriting-stream",
         "@npm//piscina",
         "@npm//postcss",
-        "@npm//postcss-import",
         "@npm//postcss-loader",
         "@npm//regenerator-runtime",
         "@npm//resolve-url-loader",

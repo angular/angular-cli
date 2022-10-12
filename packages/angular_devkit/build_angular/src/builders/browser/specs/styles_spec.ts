@@ -174,6 +174,7 @@ describe('Browser Builder styles', () => {
       };
 
       const overrides = {
+        aot: true,
         sourceMap: true,
         styles: [`src/styles.${ext}`],
       };
@@ -301,10 +302,13 @@ describe('Browser Builder styles', () => {
 
     const overrides = { optimization: false };
     const { files } = await browserBuild(architect, host, target, overrides);
-    expect(await files['styles.css']).toContain(tags.stripIndents`
+    const content = await files['styles.css'];
+    expect(content).toContain(tags.stripIndents`
       /* normal-comment */
       /*! important-comment */
-      section { -webkit-mask-composite: source-over; mask-composite: add; }
+      section { -webkit-mask-composite: source-over; mask-composite: add; }`);
+    // Check separately because Webpack may add source file comments inbetween the rules
+    expect(content).toContain(tags.stripIndents`
       /* normal-comment */
       /*! important-comment */
       div { -webkit-mask-composite: source-over; mask-composite: add; }`);
