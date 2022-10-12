@@ -44,8 +44,8 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | AngularCLIVersion | `up.ng_cli_version` | `string` |
 | AngularCLIMajorVersion | `upn.ng_cli_major_version` | `number` |
 | PackageManager | `up.ng_package_manager` | `string` |
-| PackageManagerVersion | `up.ng_package_manager_version` | `string` |
-| PackageManagerMajorVersion | `upn.ng_package_manager_major_version` | `number` |
+| PackageManagerVersion | `up.ng_pkg_manager_version` | `string` |
+| PackageManagerMajorVersion | `upn.ng_pkg_manager_major_v` | `number` |
 <!--USER_DIMENSIONS_TABLE_END-->
 
 ### List of Event Custom Dimensions

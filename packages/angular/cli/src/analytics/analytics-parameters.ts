@@ -54,8 +54,8 @@ export enum UserCustomDimension {
   AngularCLIVersion = 'up.ng_cli_version',
   AngularCLIMajorVersion = 'upn.ng_cli_major_version',
   PackageManager = 'up.ng_package_manager',
-  PackageManagerVersion = 'up.ng_package_manager_version',
-  PackageManagerMajorVersion = 'upn.ng_package_manager_major_version',
+  PackageManagerVersion = 'up.ng_pkg_manager_version',
+  PackageManagerMajorVersion = 'upn.ng_pkg_manager_major_v',
 }
 
 /**
