@@ -8,7 +8,7 @@ updates:
     commit-message:
       prefix: 'build'
     labels:
-      - 'comp: build & ci'
+      - 'area: build & ci'
       - 'target: patch'
       - 'action: merge'
     # Disable version updates
