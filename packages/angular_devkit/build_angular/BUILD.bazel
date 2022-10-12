@@ -284,10 +284,6 @@ ts_library(
 
 LARGE_SPECS = {
     "app-shell": {
-        "tags": [
-            # TODO: node crashes with an internal error on node16
-            "node16-broken",
-        ],
     },
     "dev-server": {
         "shards": 10,
@@ -328,7 +324,6 @@ LARGE_SPECS = {
     "server": {
         "extra_deps": [
             "@npm//@angular/animations",
-            "@npm//@angular/platform-server",
         ],
     },
     "ng-packagr": {},
