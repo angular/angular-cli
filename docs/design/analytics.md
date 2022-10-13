@@ -38,6 +38,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 <!--USER_DIMENSIONS_TABLE_BEGIN-->
 | Name | Parameter | Type |
 |:---:|:---|:---|
+| UserId | `up.ng_user_id` | `string` |
 | OsArchitecture | `up.ng_os_architecture` | `string` |
 | NodeVersion | `up.ng_node_version` | `string` |
 | NodeMajorVersion | `upn.ng_node_major_version` | `number` |
