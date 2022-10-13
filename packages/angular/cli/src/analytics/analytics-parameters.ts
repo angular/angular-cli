@@ -97,4 +97,7 @@ export enum EventCustomMetric {
   CssSizeInBytes = 'epn.ng_css_size_bytes',
   JsSizeInBytes = 'epn.ng_js_size_bytes',
   NgComponentCount = 'epn.ng_component_count',
+  AllProjectsCount = 'epn.all_projects_count',
+  LibraryProjectsCount = 'epn.libs_projects_count',
+  ApplicationProjectsCount = 'epn.apps_projects_count',
 }

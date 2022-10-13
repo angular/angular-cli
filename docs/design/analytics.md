@@ -79,6 +79,9 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | CssSizeInBytes | `epn.ng_css_size_bytes` | `number` |
 | JsSizeInBytes | `epn.ng_js_size_bytes` | `number` |
 | NgComponentCount | `epn.ng_component_count` | `number` |
+| AllProjectsCount | `epn.all_projects_count` | `number` |
+| LibraryProjectsCount | `epn.libs_projects_count` | `number` |
+| ApplicationProjectsCount | `epn.apps_projects_count` | `number` |
 <!--METRICS_TABLE_END-->
 
 ## Debugging
