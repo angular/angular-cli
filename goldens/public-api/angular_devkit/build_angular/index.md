@@ -7,7 +7,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import { BuildResult } from '@angular-devkit/build-webpack';
-import { ConfigOptions } from 'karma';
+import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
 import { Observable } from 'rxjs';

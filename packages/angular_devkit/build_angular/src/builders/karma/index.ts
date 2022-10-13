@@ -8,7 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { strings } from '@angular-devkit/core';
-import { Config, ConfigOptions, config, constants } from 'karma';
+import type { Config, ConfigOptions } from 'karma';
 import { createRequire } from 'module';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
@@ -96,7 +96,7 @@ export function execute(
 
       const karmaOptions: KarmaConfigOptions = options.karmaConfig
         ? {}
-        : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
+        : getBuiltInKarmaConfig(karma, context.workspaceRoot, projectName);
 
       karmaOptions.singleRun = singleRun;
 
@@ -145,7 +145,7 @@ export function execute(
         logger: context.logger,
       };
 
-      const parsedKarmaConfig = await config.parseConfig(
+      const parsedKarmaConfig = await karma.config.parseConfig(
         options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig),
         transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
         { promiseConfig: true, throwErrors: true },
@@ -184,6 +184,7 @@ export function execute(
 }
 
 function getBuiltInKarmaConfig(
+  karma: typeof import('karma'),
   workspaceRoot: string,
   projectName: string,
 ): ConfigOptions & Record<string, unknown> {
@@ -218,7 +219,7 @@ function getBuiltInKarmaConfig(
     reporters: ['progress', 'kjhtml'],
     port: 9876,
     colors: true,
-    logLevel: constants.LOG_INFO,
+    logLevel: karma.constants.LOG_INFO,
     autoWatch: true,
     browsers: ['Chrome'],
     restartOnFileChange: true,
