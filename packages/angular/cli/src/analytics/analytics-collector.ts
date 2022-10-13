@@ -60,6 +60,8 @@ export class AnalyticsCollector {
       // While architecture is being collect by GA as UserAgentArchitecture.
       // It doesn't look like there is a way to query this. Therefore we collect this as a custom user dimension too.
       [UserCustomDimension.OsArchitecture]: os.arch(),
+      // While User ID is being collected by GA, this is not visible in reports/for filtering.
+      [UserCustomDimension.UserId]: userId,
       [UserCustomDimension.NodeVersion]: nodeVersion,
       [UserCustomDimension.NodeMajorVersion]: +nodeVersion.split('.', 1)[0],
       [UserCustomDimension.PackageManager]: context.packageManager.name,

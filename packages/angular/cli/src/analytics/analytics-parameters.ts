@@ -48,6 +48,7 @@ export enum RequestParameter {
  * @see https://support.google.com/analytics/answer/10075209?hl=en
  */
 export enum UserCustomDimension {
+  UserId = 'up.ng_user_id',
   OsArchitecture = 'up.ng_os_architecture',
   NodeVersion = 'up.ng_node_version',
   NodeMajorVersion = 'upn.ng_node_major_version',
