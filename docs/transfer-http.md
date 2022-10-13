@@ -26,17 +26,17 @@ import {TransferHttpCacheModule} from '@nguniversal/common';
 export class AppBrowserModule() {}
 ```
 
-Then, import `ServerTransferStateModule` in your Server module.
+You don't have to import anything extra in your AppServerModule.
 
 ```ts
 import { NgModule } from '@angular/core';
-import { ServerModule, ServerTransferStateModule } from '@angular/platform-server';
+import { ServerModule } from '@angular/platform-server';
 
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
-  imports: [AppModule, ServerModule, ServerTransferStateModule],
+  imports: [AppModule, ServerModule],
   bootstrap: [AppComponent],
 })
 export class AppServerModule {}
