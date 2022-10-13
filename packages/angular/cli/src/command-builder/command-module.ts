@@ -146,22 +146,9 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
 
     let exitCode: number | void | undefined;
     try {
-      // Run and time command.
       if (analytics) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const internalMethods = (yargs as any).getInternalMethods();
-        // $0 generate component [name] -> generate_component
-        // $0 add <collection> -> add
-        const fullCommand = (internalMethods.getUsageInstance().getUsage()[0][0] as string)
-          .split(' ')
-          .filter((x) => {
-            const code = x.charCodeAt(0);
-
-            return code >= 97 && code <= 122;
-          })
-          .join('_');
-
-        analytics.reportCommandRunEvent(fullCommand);
+        this.reportCommandRunAnalytics(analytics);
+        this.reportWorkspaceInfoAnalytics(analytics);
       }
 
       exitCode = await this.run(camelCasedOptions as Options<T> & OtherOptions);
@@ -306,6 +293,49 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     }
 
     return parameters;
+  }
+
+  private reportCommandRunAnalytics(analytics: AnalyticsCollector): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const internalMethods = (yargs as any).getInternalMethods();
+    // $0 generate component [name] -> generate_component
+    // $0 add <collection> -> add
+    const fullCommand = (internalMethods.getUsageInstance().getUsage()[0][0] as string)
+      .split(' ')
+      .filter((x) => {
+        const code = x.charCodeAt(0);
+
+        return code >= 97 && code <= 122;
+      })
+      .join('_');
+
+    analytics.reportCommandRunEvent(fullCommand);
+  }
+
+  private reportWorkspaceInfoAnalytics(analytics: AnalyticsCollector): void {
+    const { workspace } = this.context;
+    if (!workspace) {
+      return;
+    }
+
+    let applicationProjectsCount = 0;
+    let librariesProjectsCount = 0;
+    for (const project of workspace.projects.values()) {
+      switch (project.extensions['projectType']) {
+        case 'application':
+          applicationProjectsCount++;
+          break;
+        case 'library':
+          librariesProjectsCount++;
+          break;
+      }
+    }
+
+    analytics.reportWorkspaceInfoEvent({
+      [EventCustomMetric.AllProjectsCount]: librariesProjectsCount + applicationProjectsCount,
+      [EventCustomMetric.ApplicationProjectsCount]: applicationProjectsCount,
+      [EventCustomMetric.LibraryProjectsCount]: librariesProjectsCount,
+    });
   }
 }
 

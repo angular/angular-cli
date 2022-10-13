@@ -72,6 +72,12 @@ export class AnalyticsCollector {
     };
   }
 
+  reportWorkspaceInfoEvent(
+    parameters: Partial<Record<EventCustomMetric, string | boolean | number | undefined>>,
+  ): void {
+    this.event('workspace_info', parameters);
+  }
+
   reportRebuildRunEvent(
     parameters: Partial<
       Record<EventCustomMetric & EventCustomDimension, string | boolean | number | undefined>
