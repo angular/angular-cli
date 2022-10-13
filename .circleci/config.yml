@@ -79,17 +79,12 @@ jobs:
       # Install rsync which is used by the integration test launcher bash script
       - run: sudo apt-get update -y && sudo apt-get install -y rsync
       - run: yarn bazel test //...
-      - run: scripts/build-modules-dist.sh
       - save_cache:
           key: *cache_key
           paths:
             - ~/.cache/yarn
             - ~/bazel_repository_cache
             - ~/bazel_disk_cache
-      - persist_to_workspace:
-          root: *workspace_location
-          paths:
-            - ./*
 
   lint:
     executor: action-executor
@@ -110,27 +105,6 @@ jobs:
       - run: yarn -s check-tooling-setup
       - run: yarn lint
 
-  # We run the integration tests outside of Bazel for now.
-  # They are a separate workflow job so that they can be easily re-run.
-  # When the tests are ported to bazel test targets, they should move to the "test"
-  # job above, as part of the bazel test command. That has flaky_test_attempts so the
-  # need to re-run manually should be alleviated.
-  # See comments inside the integration/run_tests.sh script.
-  integration_test:
-    executor: action-executor
-    steps:
-      - custom_attach_workspace
-      - browser-tools/install-chrome
-      # Run a step to setup an environment variable.
-      - run:
-          name: 'Setup custom environment variables'
-          # Use matching versions of Chromium (via puppeteer) and ChromeDriver.
-          # https://github.com/GoogleChrome/puppeteer/releases
-          # http://chromedriver.chromium.org/downloads
-          command: |
-            echo 'export CHROMEDRIVER_VERSION_ARG="--versions.chrome 103.0.5060.24"' >> $BASH_ENV # Redirect into $BASH_ENV
-      - run: ./integration/run_tests.sh
-
 workflows:
   version: 2
   default_workflow:
@@ -142,9 +116,6 @@ workflows:
       - lint:
           requires:
             - setup
-      - integration_test:
-          requires:
-            - build
 
 general:
   branches:
