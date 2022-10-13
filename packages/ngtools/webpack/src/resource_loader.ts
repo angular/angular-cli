@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import assert from 'assert';
-import * as path from 'path';
-import * as vm from 'vm';
+import assert from 'node:assert';
+import { Buffer } from 'node:buffer';
+import * as path from 'node:path';
+import * as vm from 'node:vm';
 import type { Asset, Compilation } from 'webpack';
 import { addError } from './ivy/diagnostics';
 import { normalizePath } from './ivy/paths';
@@ -317,7 +318,13 @@ export class WebpackResourceLoader {
 
   private _evaluate(filename: string, source: string): string | null {
     // Evaluate code
-    const context: { resource?: string | { default?: string } } = {};
+
+    // css-loader requires the btoa function to exist to correctly generate inline sourcemaps
+    const context: { btoa: (input: string) => string; resource?: string | { default?: string } } = {
+      btoa(input) {
+        return Buffer.from(input).toString('base64');
+      },
+    };
 
     try {
       vm.runInNewContext(source, context, { filename });
