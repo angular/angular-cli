@@ -23,7 +23,7 @@
   },
   "scripts": {
     "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
-    "ng-dev": "cross-env TS_NODE_PROJECT=$PWD/.ng-dev/tsconfig.json TS_NODE_TRANSPILE_ONLY=1 node --no-warnings --loader ts-node/esm node_modules/@angular/dev-infra-private/ng-dev/bundles/cli.mjs",
+    "ng-dev": "cross-env TS_NODE_PROJECT=$PWD/.ng-dev/tsconfig.json TS_NODE_TRANSPILE_ONLY=1 node --no-warnings --loader ts-node/esm node_modules/@angular/ng-dev/bundles/cli.mjs",
     "build": "npm run bazel:build",
     "bazel:build": "bazel build //modules/...",
     "test": "bazel test //modules/...",
@@ -47,7 +47,7 @@
     "@angular/compiler": "15.0.0-next.6",
     "@angular/compiler-cli": "15.0.0-next.6",
     "@angular/core": "15.0.0-next.6",
-    "@angular/dev-infra-private": "https://github.com/angular/dev-infra-private-builds.git#6d9c069f7ba8bedd07d376444d65472154026ce8",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#cfca1372f089d9d8aa675808391f7a3072fd5055",
     "@angular/platform-browser": "15.0.0-next.6",
     "@angular/platform-browser-dynamic": "15.0.0-next.6",
     "@angular/platform-server": "15.0.0-next.6",

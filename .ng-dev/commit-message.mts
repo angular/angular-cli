@@ -1,4 +1,4 @@
-import { CommitMessageConfig } from '@angular/dev-infra-private/ng-dev';
+import { CommitMessageConfig } from '@angular/ng-dev';
 import { release } from './release.mjs';
 
 /**

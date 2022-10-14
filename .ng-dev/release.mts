@@ -1,4 +1,4 @@
-import { ReleaseConfig } from '@angular/dev-infra-private/ng-dev';
+import { ReleaseConfig } from '@angular/ng-dev';
 import { join } from 'path';
 
 /** Configuration for the `ng-dev release` command. */

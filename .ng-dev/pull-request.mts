@@ -1,4 +1,4 @@
-import { PullRequestConfig } from '@angular/dev-infra-private/ng-dev';
+import { PullRequestConfig } from '@angular/ng-dev';
 
 /**
  * Configuration for the merge tool in `ng-dev`. This sets up the labels which
@@ -9,7 +9,4 @@ export const pullRequest: PullRequestConfig = {
     default: 'rebase',
     labels: [{ pattern: 'squash commits', method: 'squash' }],
   },
-  mergeReadyLabel: 'action: merge',
-  caretakerNoteLabel: 'action: merge-assistance',
-  commitMessageFixupLabel: 'needs commit fixup',
 };
