@@ -5,8 +5,6 @@
 const { SpecReporter } = require('jasmine-spec-reporter');
 const path = require('path');
 
-const isBazel = !!process.env['TEST_TARGET'];
-
 /**
  * @type { import("protractor").Config }
  */
@@ -16,9 +14,7 @@ const config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      binary: isBazel
-        ? path.resolve(process.env.CHROME_BIN)
-        : require('puppeteer').executablePath(),
+      binary: path.resolve(process.env.CHROME_BIN),
       // See /integration/README.md#browser-tests for more info on these args
       args: [
         '--no-sandbox',
@@ -46,8 +42,6 @@ const config = {
   },
 };
 
-if (isBazel) {
-  config.chromeDriver = path.resolve(process.env.CHROMEDRIVER_BIN);
-}
+config.chromeDriver = path.resolve(process.env.CHROMEDRIVER_BIN);
 
 exports.config = config;

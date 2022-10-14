@@ -7,7 +7,6 @@
     "url": "https://github.com/angular/universal.git"
   },
   "scripts": {
-    "postinstall": "webdriver-manager update --gecko false --standalone false $CHROMEDRIVER_VERSION_ARG",
     "ng": "ng",
     "start": "ng serve",
     "e2e": "ng e2e",
@@ -45,17 +44,10 @@
     "@types/node": "file:../../node_modules/@types/node",
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
     "@nguniversal/builders": "file:../../dist/modules-dist/builders",
-    "codelyzer": "6.0.2",
     "concurrently": "7.4.0",
     "jasmine-core": "4.4.0",
     "jasmine-spec-reporter": "7.0.0",
-    "karma": "6.4.1",
-    "karma-chrome-launcher": "3.1.1",
-    "karma-coverage-istanbul-reporter": "3.0.3",
-    "karma-jasmine": "5.1.0",
-    "karma-jasmine-html-reporter": "2.0.0",
     "protractor": "file:../../node_modules/protractor",
-    "puppeteer": "file:../../node_modules/puppeteer",
     "ts-node": "10.9.1",
     "typescript": "file:../../node_modules/typescript"
   }
