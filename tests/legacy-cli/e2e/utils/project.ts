@@ -162,6 +162,10 @@ export function useSha() {
 
 export function useCIDefaults(projectName = 'test-project'): Promise<void> {
   return updateJsonFile('angular.json', (workspaceJson) => {
+    // Disable analytics gathering during CI runs.
+    workspaceJson.cli ??= {};
+    workspaceJson.cli.analytics = false;
+
     // Disable progress reporting on CI to reduce spam.
     const project = workspaceJson.projects[projectName];
     const appTargets = project.targets || project.architect;

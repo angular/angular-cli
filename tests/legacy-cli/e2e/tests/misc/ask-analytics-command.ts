@@ -1,9 +1,15 @@
 import { execWithEnv } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 import { mockHome } from '../../utils/utils';
 
 const ANALYTICS_PROMPT = /Would you like to share pseudonymous usage data/;
 
 export default async function () {
+  await updateJsonFile('angular.json', (workspaceJson) => {
+    // Delete analytics config to go back to unset stage.
+    delete workspaceJson.cli.analytics;
+  });
+
   // CLI should prompt for analytics permissions.
   await mockHome(async () => {
     const { stdout } = await execWithEnv(
