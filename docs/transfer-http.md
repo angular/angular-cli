@@ -26,22 +26,6 @@ import {TransferHttpCacheModule} from '@nguniversal/common';
 export class AppBrowserModule() {}
 ```
 
-You don't have to import anything extra in your AppServerModule.
-
-```ts
-import { NgModule } from '@angular/core';
-import { ServerModule } from '@angular/platform-server';
-
-import { AppModule } from './app.module';
-import { AppComponent } from './app.component';
-
-@NgModule({
-  imports: [AppModule, ServerModule],
-  bootstrap: [AppComponent],
-})
-export class AppServerModule {}
-```
-
 Finally, in `main.ts` change this:
 
 ```ts
