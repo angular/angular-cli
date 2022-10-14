@@ -6,7 +6,7 @@
     "target": "es2019",
     "types": [
       "node"<% if (hasLocalizePackage) { %>,
-      "@angular/localize/init"<% } %>
+      "@angular/localize"<% } %>
     ]
   },
   "files": [
