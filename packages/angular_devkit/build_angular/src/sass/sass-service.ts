@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join } from 'path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { MessageChannel, Worker } from 'node:worker_threads';
 import {
   CompileResult,
   Exception,
@@ -15,8 +17,6 @@ import {
   StringOptionsWithImporter,
   StringOptionsWithoutImporter,
 } from 'sass';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { MessageChannel, Worker } from 'worker_threads';
 import { maxWorkers } from '../utils/environment-options';
 
 /**
@@ -31,6 +31,16 @@ type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 
 type FileImporterOptions = Parameters<FileImporter['findFileUrl']>[1];
 
+export interface FileImporterWithRequestContextOptions extends FileImporterOptions {
+  /**
+   * This is a custom option and is required as SASS does not provide context from which the file is being resolved.
+   * This breaks Yarn PNP as transitive deps cannot be resolved from the workspace root.
+   *
+   * Workaround until https://github.com/sass/sass/issues/3247 is addressed.
+   */
+  previousResolvedModules?: Set<string>;
+}
+
 /**
  * An object containing the contextual information for a specific render request.
  */
@@ -39,6 +49,7 @@ interface RenderRequest {
   workerIndex: number;
   callback: RenderCallback;
   importers?: Importers[];
+  previousResolvedModules?: Set<string>;
 }
 
 /**
@@ -212,8 +223,16 @@ export class SassWorkerImplementation {
           return;
         }
 
-        this.processImporters(request.importers, url, options)
+        this.processImporters(request.importers, url, {
+          ...options,
+          previousResolvedModules: request.previousResolvedModules,
+        })
           .then((result) => {
+            if (result) {
+              request.previousResolvedModules ??= new Set();
+              request.previousResolvedModules.add(dirname(result));
+            }
+
             mainImporterPort.postMessage(result);
           })
           .catch((error) => {
@@ -234,7 +253,7 @@ export class SassWorkerImplementation {
   private async processImporters(
     importers: Iterable<Importers>,
     url: string,
-    options: FileImporterOptions,
+    options: FileImporterWithRequestContextOptions,
   ): Promise<string | null> {
     for (const importer of importers) {
       if (this.isImporter(importer)) {

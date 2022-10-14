@@ -6,13 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { FileImporter } from 'sass';
-import { pathToFileURL } from 'url';
 import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
-import { SassWorkerImplementation } from '../../sass/sass-service';
+import {
+  FileImporterWithRequestContextOptions,
+  SassWorkerImplementation,
+} from '../../sass/sass-service';
 import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { useLegacySass } from '../../utils/environment-options';
@@ -413,30 +416,53 @@ function getSassResolutionImporter(
   });
 
   return {
-    findFileUrl: async (url, { fromImport }): Promise<URL | null> => {
+    findFileUrl: async (
+      url,
+      { fromImport, previousResolvedModules }: FileImporterWithRequestContextOptions,
+    ): Promise<URL | null> => {
       if (url.charAt(0) === '.') {
         // Let Sass handle relative imports.
         return null;
       }
 
-      let file: string | undefined;
       const resolve = fromImport ? resolveImport : resolveModule;
+      // Try to resolve from root of workspace
+      let result = await tryResolve(resolve, root, url);
 
-      try {
-        file = await resolve(root, url);
-      } catch {
-        // Try to resolve a partial file
-        // @use '@material/button/button' as mdc-button;
-        // `@material/button/button` -> `@material/button/_button`
-        const lastSlashIndex = url.lastIndexOf('/');
-        const underscoreIndex = lastSlashIndex + 1;
-        if (underscoreIndex > 0 && url.charAt(underscoreIndex) !== '_') {
-          const partialFileUrl = `${url.slice(0, underscoreIndex)}_${url.slice(underscoreIndex)}`;
-          file = await resolve(root, partialFileUrl).catch(() => undefined);
+      // Try to resolve from previously resolved modules.
+      if (!result && previousResolvedModules) {
+        for (const path of previousResolvedModules) {
+          result = await tryResolve(resolve, path, url);
+          if (result) {
+            break;
+          }
         }
       }
 
-      return file ? pathToFileURL(file) : null;
+      return result ? pathToFileURL(result) : null;
     },
   };
+}
+
+async function tryResolve(
+  resolve: ReturnType<LoaderContext<{}>['getResolve']>,
+  root: string,
+  url: string,
+): Promise<string | undefined> {
+  try {
+    return await resolve(root, url);
+  } catch {
+    // Try to resolve a partial file
+    // @use '@material/button/button' as mdc-button;
+    // `@material/button/button` -> `@material/button/_button`
+    const lastSlashIndex = url.lastIndexOf('/');
+    const underscoreIndex = lastSlashIndex + 1;
+    if (underscoreIndex > 0 && url.charAt(underscoreIndex) !== '_') {
+      const partialFileUrl = `${url.slice(0, underscoreIndex)}_${url.slice(underscoreIndex)}`;
+
+      return resolve(root, partialFileUrl).catch(() => undefined);
+    }
+  }
+
+  return undefined;
 }
