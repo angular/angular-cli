@@ -100,11 +100,13 @@ async function _renderUniversal(
     browserOptions.optimization,
   );
 
+  const zonePackage = require.resolve('zone.js', { paths: [context.workspaceRoot] });
+
   const { baseOutputPath = '' } = serverResult;
   const worker = new Piscina({
     filename: path.join(__dirname, 'worker.js'),
-    name: 'render',
     maxThreads: numProcesses,
+    workerData: { zonePackage },
   });
 
   try {
@@ -131,7 +133,7 @@ async function _renderUniversal(
               serverBundlePath,
             };
 
-            return worker.run(options, { name: 'render' });
+            return worker.run(options);
           }),
         )) as RenderResult[];
         let numErrors = 0;

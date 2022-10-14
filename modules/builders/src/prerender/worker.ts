@@ -8,9 +8,10 @@
 
 import type { Type } from '@angular/core';
 import type * as platformServer from '@angular/platform-server';
-import assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
+import assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { workerData } from 'node:worker_threads';
 import { loadEsmModule } from '../utils/utils';
 
 export interface RenderOptions {
@@ -28,9 +29,17 @@ export interface RenderResult {
 }
 
 /**
+ * The fully resolved path to the zone.js package that will be loaded during worker initialization.
+ * This is passed as workerData when setting up the worker via the `piscina` package.
+ */
+const { zonePackage } = workerData as {
+  zonePackage: string;
+};
+
+/**
  * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
  */
-export async function render({
+async function render({
   indexFile,
   deployUrl,
   minifyCss,
@@ -108,3 +117,23 @@ export async function render({
 
   return result;
 }
+
+/**
+ * Initializes the worker when it is first created by loading the Zone.js package
+ * into the worker instance.
+ *
+ * @returns A promise resolving to the render function of the worker.
+ */
+async function initialize() {
+  // Setup Zone.js
+  await import(zonePackage);
+
+  // Return the render function for use
+  return render;
+}
+
+/**
+ * The default export will be the promise returned by the initialize function.
+ * This is awaited by piscina prior to using the Worker.
+ */
+export default initialize();
