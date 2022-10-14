@@ -4,7 +4,7 @@
     "outDir": "../dist-server",
     "target": "es2016",
     "baseUrl": "./",
-    "types": ["@angular/localize/init"]
+    "types": ["@angular/localize"]
   },
   "files": [
     "main.server.ts"

@@ -233,7 +233,7 @@ describe('Universal Schematic', () => {
     const { compilerOptions } = tree.readJson('/projects/bar/tsconfig.server.json') as {
       compilerOptions: CompilerOptions;
     };
-    expect(compilerOptions.types).not.toContain('@angular/localize/init');
+    expect(compilerOptions.types).not.toContain('@angular/localize');
   });
 
   it(`should add import to '@angular/localize' as type in 'tsconfig.server.json' when it's a dependency`, async () => {
@@ -249,6 +249,6 @@ describe('Universal Schematic', () => {
     const { compilerOptions } = tree.readJson('/projects/bar/tsconfig.server.json') as {
       compilerOptions: CompilerOptions;
     };
-    expect(compilerOptions.types).toContain('@angular/localize/init');
+    expect(compilerOptions.types).toContain('@angular/localize');
   });
 });
