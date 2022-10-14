@@ -1,5 +1,5 @@
-import { execWithEnv } from '../../utils/process';
-import { mockHome } from '../../utils/utils';
+import { execWithEnv } from '../../../utils/process';
+import { mockHome } from '../../../utils/utils';
 
 const ANALYTICS_PROMPT = /Would you like to share pseudonymous usage data/;
 
