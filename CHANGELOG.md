@@ -1,3 +1,43 @@
+<a name="15.0.0-next.6"></a>
+
+# 15.0.0-next.6 (2022-10-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [3dea1fa71](https://github.com/angular/angular-cli/commit/3dea1fa7173e846aff5b0d15b919d9786bbf7198) | fix  | add unique user id as user parameter in GA                |
+| [af07aa340](https://github.com/angular/angular-cli/commit/af07aa340a1c3c9f3d42446981be59a73effa498) | fix  | add workspace information as part of analytics collection |
+| [22955f245](https://github.com/angular/angular-cli/commit/22955f24592df8044dbdeeb8e635beb1cc770c75) | fix  | do not collect analytics when running in non TTY mode     |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [3ff391738](https://github.com/angular/angular-cli/commit/3ff39173808f2beed97ee5deb91be541205f9a03) | fix  | account for package.json exports fields with CSS import statements |
+| [6280741ce](https://github.com/angular/angular-cli/commit/6280741ce4a89882595c834f48a45cca6f9534e0) | fix  | add `@angular/platform-server` as an optional peer dependency      |
+| [3a1970b76](https://github.com/angular/angular-cli/commit/3a1970b76e4da7424e2661664a1e9e669bd279b4) | fix  | only import karma when running karma builder                       |
+| [2105964af](https://github.com/angular/angular-cli/commit/2105964afc0285cc40c16d32c47d1eb60be5e279) | fix  | resolve transitive dependencies in Sass when using Yarn PNP        |
+| [45a94228f](https://github.com/angular/angular-cli/commit/45a94228fb23acbd0d1a9329448f07b759c8654b) | perf | use Uint8Arrays for incremental caching with esbuild-based builder |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [de467f46d](https://github.com/angular/angular-cli/commit/de467f46de63059f9c701dfe8695513c742f22b5) | fix  | update logger `forEach` `promiseCtor` type |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [1c1f985b9](https://github.com/angular/angular-cli/commit/1c1f985b9c9913f28915f101ee1717c0da540362) | fix  | support inline style sourcemaps when using css-loader for component styles |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.6"></a>
 
 # 14.2.6 (2022-10-12)
