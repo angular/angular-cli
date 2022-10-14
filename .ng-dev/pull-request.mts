@@ -9,7 +9,4 @@ export const pullRequest: PullRequestConfig = {
     default: 'rebase',
     labels: [{ pattern: 'merge: squash commits', method: 'squash' }],
   },
-  mergeReadyLabel: 'action: merge',
-  caretakerNoteLabel: 'action: caretaker note',
-  commitMessageFixupLabel: 'merge: fix commit message',
 };
