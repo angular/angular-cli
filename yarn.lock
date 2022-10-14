@@ -8268,7 +8268,14 @@ pidtree@0.6.0, pidtree@^0.6.0:
   resolved "https://registry.yarnpkg.com/pidtree/-/pidtree-0.6.0.tgz#90ad7b6d42d5841e69e0a2419ef38f8883aa057c"
   integrity sha512-eG2dWTVw5bzqGRztnHExczNxt5VGsE6OwTeCG3fdUf9KBsZzO3R5OIIIzWR+iZA0NtZ+RDVdaoE2dK1cn6jH4g==
 
-pidusage@3.0.0, pidusage@^3.0.0:
+pidusage@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-3.0.1.tgz#b8383319aca2ed810d1bcc4207c1c5c377d94f5f"
+  integrity sha512-/UlE6DQIe6yuDvm3v6756U0ErEsj60FLQTRZ4qPQF9b5yZKhf4c0llzD0tZpyE03nn8HQoLniFgKsL0ABB3nCg==
+  dependencies:
+    safe-buffer "^5.2.1"
+
+pidusage@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-3.0.0.tgz#69108079724c9afdd958644b920bc40bac964044"
   integrity sha512-8VJLToXhj+RYZGNVw8oxc7dS54iCQXUJ+MDFHezQ/fwF5B8W4OWodAMboc1wb08S/4LiHwAmkT4ohf/d3YPPsw==
@@ -8886,6 +8893,11 @@ regenerate@^1.4.2:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.2.tgz#b9346d8827e8f5a32f7ba29637d398b69014848a"
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
+
+regenerator-runtime@0.13.10:
+  version "0.13.10"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.10.tgz#ed07b19616bcbec5da6274ebc75ae95634bfc2ee"
+  integrity sha512-KepLsg4dU12hryUO7bp/axHAKvwGOCV0sGloQtpagJ12ai+ojVDqkeGSiRX1zlq+kjIMZ1t7gpze+26QqtdGqw==
 
 regenerator-runtime@0.13.9, regenerator-runtime@^0.13.4:
   version "0.13.9"
