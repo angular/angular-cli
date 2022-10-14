@@ -459,7 +459,7 @@ class Logger extends Observable<LogEntry> implements LoggerApi {
     // (undocumented)
     fatal(message: string, metadata?: JsonObject): void;
     // (undocumented)
-    forEach(next: (value: LogEntry) => void, promiseCtor?: typeof Promise): Promise<void>;
+    forEach(next: (value: LogEntry) => void, promiseCtor?: PromiseConstructorLike): Promise<void>;
     // (undocumented)
     info(message: string, metadata?: JsonObject): void;
     // (undocumented)
