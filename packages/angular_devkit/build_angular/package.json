@@ -73,6 +73,7 @@
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0-next",
     "@angular/localize": "^15.0.0-next",
+    "@angular/platform-server": "^15.0.0-next",
     "@angular/service-worker": "^15.0.0-next",
     "karma": "^6.3.0",
     "ng-packagr": "^15.0.0-next",
@@ -82,6 +83,9 @@
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
+      "optional": true
+    },
+    "@angular/platform-server": {
       "optional": true
     },
     "@angular/service-worker": {
