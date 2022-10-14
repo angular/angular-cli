@@ -4,7 +4,7 @@
     "outDir": "../out-tsc/spec",
     "types": [
       "jasmine",
-      "@angular/localize/init"
+      "@angular/localize"
     ]
   },
   "files": [
