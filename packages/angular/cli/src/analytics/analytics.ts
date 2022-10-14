@@ -184,7 +184,7 @@ export async function getAnalyticsUserId(
     }
   }
 
-  return globalConfig || randomUUID();
+  return globalConfig;
 }
 
 function analyticsConfigValueToHumanFormat(value: unknown): 'enabled' | 'disabled' | 'not set' {
