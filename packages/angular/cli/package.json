@@ -32,7 +32,7 @@
     "inquirer": "8.2.4",
     "jsonc-parser": "3.2.0",
     "npm-package-arg": "9.1.2",
-    "npm-pick-manifest": "7.0.2",
+    "npm-pick-manifest": "8.0.0",
     "open": "8.4.0",
     "ora": "5.4.1",
     "pacote": "15.0.0",
