@@ -1,3 +1,11 @@
+<a name="15.0.0-rc.0"></a>
+
+# 15.0.0-rc.0 (2022-10-20)
+
+No changes from 15.0.0-next.6, this is just updating the semver tag.
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.6"></a>
 
 # 15.0.0-next.6 (2022-10-14)
