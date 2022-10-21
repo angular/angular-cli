@@ -55,7 +55,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
               ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
               ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
           })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
-
           return ChangeDetectionStrategy;
         })();
       `,
@@ -77,7 +76,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
               ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
               ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
           })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
-
           return ChangeDetectionStrategy;
         })();
       `,
@@ -99,7 +97,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
               ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 5] = "OnPush";
               ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 8] = "Default";
           })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
-
           return ChangeDetectionStrategy;
         })();
       `,
@@ -123,7 +120,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
               NotificationKind["ERROR"] = "E";
               NotificationKind["COMPLETE"] = "C";
           })(NotificationKind || (NotificationKind = {}));
-
           return NotificationKind;
         })();
       `,
@@ -147,7 +143,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
               NotificationKind["ERROR"] = "E";
               NotificationKind["COMPLETE"] = "C";
           })(NotificationKind$1 || (NotificationKind$1 = {}));
-
           return NotificationKind$1;
         })();
       `,
@@ -187,7 +182,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
               RequestMethod[RequestMethod["Head"] = 5] = "Head";
               RequestMethod[RequestMethod["Patch"] = 6] = "Patch";
           })(RequestMethod || (RequestMethod = {}));
-
           return RequestMethod;
         })();
       `,
@@ -197,7 +191,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
   it('does not wrap TypeScript enums with side effect values', () => {
     testCaseNoChange(`
       export var ChangeDetectionStrategy;
-
       (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = console.log('foo');
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
@@ -211,11 +204,9 @@ describe('adjust-typescript-enums Babel plugin', () => {
           Important: 1,
           DashCase: 2,
       };
-
       if (typeof RendererStyleFlags3 === 'object') {
         RendererStyleFlags3[RendererStyleFlags3.Important] = 'DashCase';
       }
-
       RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
     `);
   });
@@ -259,7 +250,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
             ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
             ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
           })(ChangeDetectionStrategy$1 || (ChangeDetectionStrategy$1 = {}));
-
           return ChangeDetectionStrategy$1;
         })();
       `,
