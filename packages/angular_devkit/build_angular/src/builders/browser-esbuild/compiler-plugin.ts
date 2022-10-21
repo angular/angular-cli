@@ -8,7 +8,6 @@
 
 import type { CompilerHost, NgtscProgram } from '@angular/compiler-cli';
 import { transformAsync } from '@babel/core';
-import * as assert from 'assert';
 import type {
   OnStartResult,
   OutputFile,
@@ -17,9 +16,11 @@ import type {
   Plugin,
   PluginBuild,
 } from 'esbuild';
-import { promises as fs } from 'fs';
-import { platform } from 'os';
-import * as path from 'path';
+import * as assert from 'node:assert';
+import * as fs from 'node:fs/promises';
+import { platform } from 'node:os';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 import angularApplicationPreset from '../../babel/presets/application';
 import { requiresLinking } from '../../babel/webpack-loader';
@@ -133,11 +134,13 @@ const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly modifiedFiles = new Set<string>();
   readonly babelFileCache = new Map<string, Uint8Array>();
+  readonly typeScriptFileCache = new Map<string, Uint8Array>();
 
   invalidate(files: Iterable<string>): void {
     this.modifiedFiles.clear();
     for (let file of files) {
       this.babelFileCache.delete(file);
+      this.typeScriptFileCache.delete(pathToFileURL(file).href);
 
       // Normalize separators to allow matching TypeScript Host paths
       if (USING_WINDOWS) {
@@ -355,6 +358,17 @@ export function createCompilerPlugin(
         previousBuilder = builder;
 
         await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
+        const affectedFiles = profileSync('NG_FIND_AFFECTED', () =>
+          findAffectedFiles(builder, angularCompiler),
+        );
+
+        if (pluginOptions.sourceFileCache) {
+          for (const affected of affectedFiles) {
+            pluginOptions.sourceFileCache.typeScriptFileCache.delete(
+              pathToFileURL(affected.fileName).href,
+            );
+          }
+        }
 
         function* collectDiagnostics(): Iterable<ts.Diagnostic> {
           // Collect program level diagnostics
@@ -364,7 +378,6 @@ export function createCompilerPlugin(
           yield* builder.getGlobalDiagnostics();
 
           // Collect source file specific diagnostics
-          const affectedFiles = findAffectedFiles(builder, angularCompiler);
           const optimizeFor =
             affectedFiles.size > 1 ? OptimizeFor.WholeProgram : OptimizeFor.SingleFile;
           for (const sourceFile of builder.getSourceFiles()) {
@@ -434,41 +447,56 @@ export function createCompilerPlugin(
             async () => {
               assert.ok(fileEmitter, 'Invalid plugin execution order');
 
-              const typescriptResult = await fileEmitter(
-                pluginOptions.fileReplacements?.[args.path] ?? args.path,
-              );
-              if (!typescriptResult) {
-                // No TS result indicates the file is not part of the TypeScript program.
-                // If allowJs is enabled and the file is JS then defer to the next load hook.
-                if (compilerOptions.allowJs && /\.[cm]?js$/.test(args.path)) {
-                  return undefined;
-                }
-
-                // Otherwise return an error
-                return {
-                  errors: [
-                    {
-                      text: `File '${args.path}' is missing from the TypeScript compilation.`,
-                      notes: [
-                        {
-                          text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
-                        },
-                      ],
-                    },
-                  ],
-                };
-              }
-
-              const data = typescriptResult.content ?? '';
-              // The pre-transformed data is used as a cache key. Since the cache is memory only,
+              // The filename is currently used as a cache key. Since the cache is memory only,
               // the options cannot change and do not need to be represented in the key. If the
               // cache is later stored to disk, then the options that affect transform output
-              // would need to be added to the key as well.
-              let contents = babelDataCache.get(data);
+              // would need to be added to the key as well as a check for any change of content.
+              let contents = pluginOptions.sourceFileCache?.typeScriptFileCache.get(
+                pathToFileURL(args.path).href,
+              );
+
               if (contents === undefined) {
-                const transformedData = await transformWithBabel(args.path, data, pluginOptions);
-                contents = Buffer.from(transformedData, 'utf-8');
-                babelDataCache.set(data, contents);
+                const typescriptResult = await fileEmitter(
+                  pluginOptions.fileReplacements?.[args.path] ?? args.path,
+                );
+                if (!typescriptResult) {
+                  // No TS result indicates the file is not part of the TypeScript program.
+                  // If allowJs is enabled and the file is JS then defer to the next load hook.
+                  if (compilerOptions.allowJs && /\.[cm]?js$/.test(args.path)) {
+                    return undefined;
+                  }
+
+                  // Otherwise return an error
+                  return {
+                    errors: [
+                      {
+                        text: `File '${args.path}' is missing from the TypeScript compilation.`,
+                        notes: [
+                          {
+                            text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
+                          },
+                        ],
+                      },
+                    ],
+                  };
+                }
+
+                const data = typescriptResult.content ?? '';
+                // The pre-transformed data is used as a cache key. Since the cache is memory only,
+                // the options cannot change and do not need to be represented in the key. If the
+                // cache is later stored to disk, then the options that affect transform output
+                // would need to be added to the key as well.
+                contents = babelDataCache.get(data);
+                if (contents === undefined) {
+                  const transformedData = await transformWithBabel(args.path, data, pluginOptions);
+                  contents = Buffer.from(transformedData, 'utf-8');
+                  babelDataCache.set(data, contents);
+                }
+
+                pluginOptions.sourceFileCache?.typeScriptFileCache.set(
+                  pathToFileURL(args.path).href,
+                  contents,
+                );
               }
 
               return {
