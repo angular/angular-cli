@@ -7770,10 +7770,10 @@ next-tick@1, next-tick@^1.1.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
   integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
 
-ng-packagr@15.0.0-next.4:
-  version "15.0.0-next.4"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-15.0.0-next.4.tgz#5a00a6c99efc3946b79d9ec8f9eeb4f247f01cb2"
-  integrity sha512-6qA5Ymalhw3hDF9JDF+WUdVZE6hiyVT/8QwMALmOQ6vjh61aIfzeeFmXDf3AuahS/inprNl0l85l0jH2qP0rEA==
+ng-packagr@15.0.0-rc.0:
+  version "15.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-15.0.0-rc.0.tgz#379c49828d19a5a652b1a111a58f5c093174164f"
+  integrity sha512-EfhfrH3qFteiBpV5GBFguhVlq8RAyuud0pTmMDv/T2ckHCIQJs97GQKGj+E2lwMOi8bQKhfvcgd10uSeHDGp4w==
   dependencies:
     "@rollup/plugin-json" "^5.0.0"
     "@rollup/plugin-node-resolve" "^15.0.0"
@@ -7781,7 +7781,7 @@ ng-packagr@15.0.0-next.4:
     ansi-colors "^4.1.3"
     autoprefixer "^10.4.12"
     browserslist "^4.21.4"
-    cacache "^16.1.3"
+    cacache "^17.0.0"
     chokidar "^3.5.3"
     commander "^9.4.0"
     dependency-graph "^0.11.0"
