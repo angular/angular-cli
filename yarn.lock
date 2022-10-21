@@ -8093,6 +8093,7 @@ npm@^8.11.0:
     "@npmcli/fs" "^2.1.0"
     "@npmcli/map-workspaces" "^2.0.3"
     "@npmcli/package-json" "^2.0.0"
+    "@npmcli/promise-spawn" "^3.0.0"
     "@npmcli/run-script" "^4.2.1"
     abbrev "~1.1.1"
     archy "~1.0.0"
@@ -8103,6 +8104,7 @@ npm@^8.11.0:
     cli-table3 "^0.6.2"
     columnify "^1.6.0"
     fastest-levenshtein "^1.0.12"
+    fs-minipass "^2.1.0"
     glob "^8.0.1"
     graceful-fs "^4.2.10"
     hosted-git-info "^5.1.0"
@@ -8122,6 +8124,7 @@ npm@^8.11.0:
     libnpmteam "^4.0.4"
     libnpmversion "^3.0.7"
     make-fetch-happen "^10.2.0"
+    minimatch "^5.1.0"
     minipass "^3.1.6"
     minipass-pipeline "^1.2.4"
     mkdirp "^1.0.4"
@@ -9535,6 +9538,7 @@ sass@1.55.0, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
+  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:
