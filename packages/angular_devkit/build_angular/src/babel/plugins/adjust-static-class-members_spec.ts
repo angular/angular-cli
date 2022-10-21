@@ -89,7 +89,6 @@ describe('adjust-static-class-members Babel plugin', () => {
       expected: `
         export let SomeClass = /*#__PURE__*/ (() => {
           class SomeClass {}
-
           SomeClass.ctorParameters = 42;
           return SomeClass;
         })();
@@ -126,7 +125,6 @@ describe('adjust-static-class-members Babel plugin', () => {
       expected: `
         export let SomeClass = /*#__PURE__*/ (() => {
           class SomeClass {}
-
           SomeClass.decorators = 42;
           return SomeClass;
         })();
@@ -163,7 +161,6 @@ describe('adjust-static-class-members Babel plugin', () => {
       expected: `
         export let SomeClass = /*#__PURE__*/ (() => {
           class SomeClass {}
-
           SomeClass.propDecorators = 42;
           return SomeClass;
         })();
@@ -202,7 +199,6 @@ describe('adjust-static-class-members Babel plugin', () => {
           this.doThis = this._actions;
         }
       }
-
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
     `);
   });
@@ -226,7 +222,6 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
           return CustomComponentEffects;
         })();
@@ -253,7 +248,6 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someFieldWithSideEffects = /*@__PURE__*/ console.log('foo');
           return CustomComponentEffects;
         })();
@@ -280,10 +274,8 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someFieldWithSideEffects =
-            /**@pureOrBreakMyCode*/
-            console.log('foo');
+            /**@pureOrBreakMyCode*/ console.log('foo');
           return CustomComponentEffects;
         })();
       `,
@@ -309,10 +301,8 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someFieldWithSideEffects =
-            /* @pureOrBreakMyCode */
-            console.log('foo');
+            /* @pureOrBreakMyCode */ console.log('foo');
           return CustomComponentEffects;
         })();
       `,
@@ -338,7 +328,6 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someField = 42;
           return CustomComponentEffects;
         })();
@@ -365,7 +354,6 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someField = 42;
           return CustomComponentEffects;
         })();
@@ -386,7 +374,6 @@ describe('adjust-static-class-members Babel plugin', () => {
         const SWITCH_TEMPLATE_REF_FACTORY = SWITCH_TEMPLATE_REF_FACTORY__POST_R3__;
         let TemplateRef = /*#__PURE__*/ (() => {
           class TemplateRef {}
-
           TemplateRef.__NG_ELEMENT_ID__ = SWITCH_TEMPLATE_REF_FACTORY;
           return TemplateRef;
         })();
@@ -408,7 +395,6 @@ describe('adjust-static-class-members Babel plugin', () => {
         const SWITCH_TEMPLATE_REF_FACTORY = SWITCH_TEMPLATE_REF_FACTORY__POST_R3__;
         let TemplateRef = /*#__PURE__*/ (() => {
           class TemplateRef {}
-
           TemplateRef.__NG_ELEMENT_ID__ = SWITCH_TEMPLATE_REF_FACTORY;
           TemplateRef.someField = 42;
           return TemplateRef;
@@ -425,7 +411,6 @@ describe('adjust-static-class-members Babel plugin', () => {
           this.doThis = this._actions;
         }
       }
-
       CustomComponentEffects.someField = 42;
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
     `);
@@ -514,7 +499,6 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.foo = 42;
           }
         }
-
         __decorate([
             SomeDecorator
         ], SomeClass.prototype, "foo", void 0);
@@ -542,11 +526,9 @@ describe('adjust-static-class-members Babel plugin', () => {
                 this.foo = 42;
             }
           }
-
           __decorate([
               SomeDecorator
           ], SomeClass.prototype, "foo", void 0);
-
           return SomeClass;
         })();
       `,
@@ -565,9 +547,7 @@ describe('adjust-static-class-members Babel plugin', () => {
         let CommonModule = /*#__PURE__*/ (() => {
           class CommonModule {
           }
-
           CommonModule.ɵfac = function CommonModule_Factory(t) { return new (t || CommonModule)(); };
-
           return CommonModule;
         })();
       `,
@@ -585,7 +565,6 @@ describe('adjust-static-class-members Babel plugin', () => {
         let CommonModule = /*#__PURE__*/ (() => {
           class CommonModule {
           }
-
           CommonModule.ɵmod = /*@__PURE__*/ ɵngcc0.ɵɵdefineNgModule({ type: CommonModule });
           return CommonModule;
         })();
@@ -606,7 +585,6 @@ describe('adjust-static-class-members Babel plugin', () => {
         let CommonModule = /*#__PURE__*/ (() => {
           class CommonModule {
           }
-
           CommonModule.ɵinj = /*@__PURE__*/ ɵngcc0.ɵɵdefineInjector({ providers: [
               {
                 provide: NgLocalization,
@@ -634,16 +612,14 @@ describe('adjust-static-class-members Babel plugin', () => {
         let CommonModule = /*#__PURE__*/ (() => {
           class CommonModule {
           }
-
           CommonModule.ɵfac = function CommonModule_Factory(t) { return new (t || CommonModule)(); };
-
           CommonModule.ɵmod = /*@__PURE__*/ ɵngcc0.ɵɵdefineNgModule({ type: CommonModule });
           CommonModule.ɵinj = /*@__PURE__*/ ɵngcc0.ɵɵdefineInjector({ providers: [
                   {
                     provide: NgLocalization,
                     useClass: NgLocaleLocalization
                   },
-              ] });
+              ]});
           return CommonModule;
         })();
       `,
@@ -669,7 +645,6 @@ describe('adjust-static-class-members Babel plugin', () => {
               this.doThis = this._actions;
             }
           }
-
           CustomComponentEffects.someField = 42;
           return CustomComponentEffects;
         })();
