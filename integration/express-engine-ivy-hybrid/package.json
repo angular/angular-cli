@@ -46,7 +46,7 @@
     "@types/node": "file:../../node_modules/@types/node",
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
     "@nguniversal/builders": "file:../../dist/modules-dist/builders",
-    "concurrently": "7.4.0",
+    "concurrently": "7.5.0",
     "jasmine-core": "4.4.0",
     "jasmine-spec-reporter": "7.0.0",
     "protractor": "file:../../node_modules/protractor",
