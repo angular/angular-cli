@@ -20,6 +20,16 @@ try {
   process.title = 'ng';
 }
 
+const rawCommandName = process.argv[2];
+
+if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completion') {
+  // Skip Node.js supported checks when running ng completion.
+  // A warning at this stage could cause a broken source action (`source <(ng completion script)`) when in the shell init script.
+  require('./bootstrap');
+
+  return;
+}
+
 // This node version check ensures that extremely old versions of node are not used.
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
