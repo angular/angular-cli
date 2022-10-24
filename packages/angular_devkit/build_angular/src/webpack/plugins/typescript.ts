@@ -35,7 +35,7 @@ export function createIvyPlugin(
     wco.logger.warn(
       'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
         '"false" respectively by the Angular CLI. To control ECMA version and features use the Browerslist configuration. ' +
-        'For more information, see https://github.com/browserslist/browserslist',
+        'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
     );
   }
 

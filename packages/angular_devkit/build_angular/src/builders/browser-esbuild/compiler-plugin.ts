@@ -233,7 +233,7 @@ export function createCompilerPlugin(
           notes: [
             {
               text: `To control ECMA version and features use the Browerslist configuration. ' +
-              'For more information, see https://github.com/browserslist/browserslist#queries'`,
+              'For more information, see https://angular.io/guide/build#configuring-browser-compatibility'`,
             },
           ],
         });
