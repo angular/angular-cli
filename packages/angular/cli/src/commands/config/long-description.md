@@ -10,4 +10,4 @@ while on the command line options can be given dash-case.
 
 For further details, see [Workspace Configuration](guide/workspace-config).
 
-For configuration of CLI usage analytics, see [Gathering an Viewing CLI Usage Analytics](cli/usage-analytics-gathering).
+For configuration of CLI usage analytics, see [ng analytics](cli/analytics).

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -25,9 +26,8 @@ import {
 
 export class AnalyticsCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'analytics';
-  describe =
-    'Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering';
-  longDescriptionPath?: string;
+  describe = 'Configures the gathering of Angular CLI usage metrics.';
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv {
     const subcommands = [
