@@ -34,6 +34,7 @@ import {
 import { askConfirmation } from '../../utilities/prompt';
 import { Spinner } from '../../utilities/spinner';
 import { isTTY } from '../../utilities/tty';
+import { VERSION } from '../../utilities/version';
 
 interface AddCommandArgs extends SchematicsCommandArgs {
   collection: string;
@@ -178,11 +179,15 @@ export class AddCommandModule
         );
       } else if (!latestManifest || (await this.hasMismatchedPeer(latestManifest))) {
         // 'latest' is invalid so search for most recent matching package
+
+        // Allow prelease versions if the CLI itself is a prerelease
+        const allowPrereleases = prerelease(VERSION.full);
+
         const versionExclusions = packageVersionExclusions[packageMetadata.name];
         const versionManifests = Object.values(packageMetadata.versions).filter(
           (value: PackageManifest) => {
             // Prerelease versions are not stable and should not be considered by default
-            if (prerelease(value.version)) {
+            if (!allowPrereleases && prerelease(value.version)) {
               return false;
             }
             // Deprecated versions should not be used or considered
@@ -198,7 +203,8 @@ export class AddCommandModule
           },
         );
 
-        versionManifests.sort((a, b) => compare(a.version, b.version, true));
+        // Sort in reverse SemVer order so that the newest compatible version is chosen
+        versionManifests.sort((a, b) => compare(b.version, a.version, true));
 
         let newIdentifier;
         for (const versionManifest of versionManifests) {
