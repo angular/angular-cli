@@ -164,7 +164,7 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
 
   override forEach(
     next: (value: LogEntry) => void,
-    promiseCtor?: PromiseConstructorLike,
+    promiseCtor: PromiseConstructorLike = Promise,
   ): Promise<void> {
     return this._observable.forEach(next, promiseCtor);
   }
