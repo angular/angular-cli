@@ -50,6 +50,8 @@ interface AddCommandArgs extends SchematicsCommandArgs {
 const packageVersionExclusions: Record<string, string | undefined> = {
   // @angular/localize@9.x versions do not have peer dependencies setup
   '@angular/localize': '9.x',
+  // @angular/material@7.x versions have unbounded peer dependency ranges (>=7.0.0)
+  '@angular/material': '7.x',
 };
 
 export class AddCommandModule
