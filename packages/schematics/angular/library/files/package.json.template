@@ -7,5 +7,6 @@
   },
   "dependencies": {
     "tslib": "^<%= tsLibLatestVersion %>"
-  }
+  },
+  "sideEffects": false
 }

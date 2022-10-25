@@ -126,6 +126,14 @@ describe('Library Schematic', () => {
     expect(fileContent.peerDependencies['@angular/core']).toBe(`^${angularVersion}`);
   });
 
+  it('should add sideEffects: false flag to package.json named "foo"', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('library', defaultOptions, workspaceTree)
+      .toPromise();
+    const fileContent = getFileContent(tree, '/projects/foo/package.json');
+    expect(fileContent).toMatch(/"sideEffects": false/);
+  });
+
   it('should create a README.md named "foo"', async () => {
     const tree = await schematicRunner
       .runSchematicAsync('library', defaultOptions, workspaceTree)
