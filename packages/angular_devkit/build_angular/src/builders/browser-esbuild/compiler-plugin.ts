@@ -398,6 +398,11 @@ export function createCompilerPlugin(
               true,
             );
 
+            // Declaration files cannot have template diagnostics
+            if (sourceFile.isDeclarationFile) {
+              continue;
+            }
+
             // Only request Angular template diagnostics for affected files to avoid
             // overhead of template diagnostics for unchanged files.
             if (affectedFiles.has(sourceFile)) {
