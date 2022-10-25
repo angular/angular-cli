@@ -9,6 +9,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import * as path from 'path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { normalizePolyfills } from '../../utils/normalize-polyfills';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
@@ -39,7 +40,9 @@ export async function normalizeOptions(
     workspaceRoot,
     (projectMetadata.sourceRoot as string | undefined) ?? 'src',
   );
-  // Normalize options
+
+  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
+
   const mainEntryPoint = path.join(workspaceRoot, options.main);
 
   // Currently esbuild do not support multiple files per entry-point
@@ -145,6 +148,7 @@ export async function normalizeOptions(
   return {
     advancedOptimizations: buildOptimizer,
     baseHref,
+    cacheOptions,
     crossOrigin,
     externalDependencies,
     poll,
