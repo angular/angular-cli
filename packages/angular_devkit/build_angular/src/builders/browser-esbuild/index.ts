@@ -446,8 +446,8 @@ export async function* buildEsbuildBrowser(
   const watcher = createWatcher({
     polling: typeof initialOptions.poll === 'number',
     interval: initialOptions.poll,
-    // Ignore the output path to avoid infinite rebuild cycles
-    ignored: [normalizedOptions.outputPath],
+    // Ignore the output and cache paths to avoid infinite rebuild cycles
+    ignored: [normalizedOptions.outputPath, normalizedOptions.cacheOptions.basePath],
   });
 
   // Temporarily watch the entire project
