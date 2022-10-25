@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "node-fetch": "2.6.7",
+    "node-fetch": "3.2.10",
     "webpack": "5.74.0"
   },
   "peerDependencies": {
