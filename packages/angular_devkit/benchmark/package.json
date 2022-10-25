@@ -12,7 +12,7 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "ansi-colors": "4.1.3",
-    "pidusage": "3.0.1",
+    "pidusage": "3.0.2",
     "pidtree": "0.6.0",
     "rxjs": "6.6.7",
     "tree-kill": "^1.2.0",
