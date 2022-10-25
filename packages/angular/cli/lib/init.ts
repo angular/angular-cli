@@ -88,7 +88,11 @@ let forceExit = false;
     }
 
     // When using the completion command, don't show the warning as otherwise this will break completion.
-    if (isGlobalGreater && rawCommandName !== 'completion') {
+    if (
+      isGlobalGreater &&
+      rawCommandName !== '--get-yargs-completions' &&
+      rawCommandName !== 'completion'
+    ) {
       // If using the update command and the global version is greater, use the newer update command
       // This allows improvements in update to be used in older versions that do not have bootstrapping
       if (
