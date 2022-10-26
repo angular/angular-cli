@@ -209,7 +209,9 @@ jobs:
     resource_class: large
     steps:
       - custom_attach_workspace
-      - browser-tools/install-chrome
+        # The chrome version must match with the version needed by puppeteer
+      - browser-tools/install-browser-tools:
+          chrome-version: 108.0.5351.0
       - initialize_env
       - run: mkdir /mnt/ramdisk/e2e
       - when:
@@ -285,7 +287,9 @@ jobs:
         default: *default_nodeversion_major
     steps:
       - custom_attach_workspace
-      - browser-tools/install-chrome
+      # The chrome version must match with the version needed by puppeteer
+      - browser-tools/install-browser-tools:
+          chrome-version: 108.0.5351.0
       - setup_bazel_rbe
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - when:
