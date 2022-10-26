@@ -1,4 +1,4 @@
-import 'zone.js/dist/zone-node';
+import 'zone.js/node';
 import { CommonEngine } from '@nguniversal/common/engine';
 import * as express from 'express';
 import { join } from 'path';

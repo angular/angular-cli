@@ -1,4 +1,4 @@
-import 'zone.js/dist/zone-node';
+import 'zone.js/node';
 
 import { renderModule } from '@angular/platform-server';
 import * as express from 'express';
