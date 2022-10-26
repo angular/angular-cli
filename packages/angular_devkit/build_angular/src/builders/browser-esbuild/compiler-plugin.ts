@@ -253,6 +253,7 @@ export function createCompilerPlugin(
       const babelDataCache = new Map<string, Uint8Array>();
       const diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>();
 
+      // eslint-disable-next-line max-lines-per-function
       build.onStart(async () => {
         const result: OnStartResult = {
           warnings: setupWarnings,
@@ -346,7 +347,30 @@ export function createCompilerPlugin(
         );
         previousAngularProgram = angularProgram;
         const angularCompiler = angularProgram.compiler;
-        const typeScriptProgram = angularProgram.getTsProgram();
+
+        await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
+
+        // If there is no previous TypeScript builder program, then this is an initial build.
+        // To avoid longer first rebuilds, the Angular shims must be generated prior to creating
+        // the initial TypeScript builder program. Unfortunately, there is no direct API for this
+        // so a call to request diagnostics for a TypeScript file is used to trigger the generation.
+        if (!previousBuilder && pluginOptions.sourceFileCache) {
+          profileSync('NG_INITIALIZE_SHIMS', () => {
+            for (const sourceFile of angularProgram.getTsProgram().getSourceFiles()) {
+              // The file cannot be a declaration file to ensure the shim generation is triggered.
+              if (sourceFile.isDeclarationFile) {
+                continue;
+              }
+              angularCompiler.getDiagnosticsForFile(sourceFile, OptimizeFor.WholeProgram);
+              if (angularProgram.getTsProgram() !== angularCompiler.getCurrentProgram()) {
+                // Successful if the two programs are no longer the same
+                break;
+              }
+            }
+          });
+        }
+
+        const typeScriptProgram = angularCompiler.getCurrentProgram();
         augmentProgramWithVersioning(typeScriptProgram);
 
         const builder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
@@ -357,7 +381,6 @@ export function createCompilerPlugin(
         );
         previousBuilder = builder;
 
-        await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
         const affectedFiles = profileSync('NG_FIND_AFFECTED', () =>
           findAffectedFiles(builder, angularCompiler),
         );
@@ -677,7 +700,11 @@ function findAffectedFiles(
 
   // A file is also affected if the Angular compiler requires it to be emitted
   for (const sourceFile of builder.getSourceFiles()) {
-    if (ignoreForEmit.has(sourceFile) || incrementalCompilation.safeToSkipEmit(sourceFile)) {
+    if (
+      sourceFile.isDeclarationFile ||
+      ignoreForEmit.has(sourceFile) ||
+      incrementalCompilation.safeToSkipEmit(sourceFile)
+    ) {
       continue;
     }
 
