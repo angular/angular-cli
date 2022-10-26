@@ -94,7 +94,6 @@ describe('Universal Schematic', () => {
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: './out-tsc/server',
-        target: 'es2019',
         types: ['node'],
       },
       files: ['src/main.server.ts'],
@@ -116,7 +115,6 @@ describe('Universal Schematic', () => {
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: '../../out-tsc/server',
-        target: 'es2019',
         types: ['node'],
       },
       files: ['src/main.server.ts'],
