@@ -1,3 +1,38 @@
+<a name="15.0.0-rc.1"></a>
+
+# 15.0.0-rc.1 (2022-10-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [83524f625](https://github.com/angular/angular-cli/commit/83524f62533f9a6bda0c1dbc76c6b16e730a7397) | fix  | allow `ng add` to find prerelease versions when CLI is prerelease |
+| [948cc4da5](https://github.com/angular/angular-cli/commit/948cc4da5b85b0e788f641ce6d8a51290661c54d) | fix  | disable version check during auto completion                      |
+| [1a584364e](https://github.com/angular/angular-cli/commit/1a584364e70cafd84770ef45f3da9ad58a46083f) | fix  | exclude `@angular/material@7.x` from ng add package discovery     |
+| [952fe7fbc](https://github.com/angular/angular-cli/commit/952fe7fbcf411b6e141fa38f6b7ee6ea5e8aa2ce) | fix  | skip node.js compatibility checks when running completion         |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [4e69e8050](https://github.com/angular/angular-cli/commit/4e69e80501dd2a9394b7df4518e0d6b0f2ebb7d9) | fix  | add `@angular/localize` as type when localize package is installed |
+| [316a50d75](https://github.com/angular/angular-cli/commit/316a50d75e45962ea3efe4108aa48d9479245dd5) | fix  | remove TypeScript target from universal schematic                  |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [0ee7625d6](https://github.com/angular/angular-cli/commit/0ee7625d6b4bd84be6fca0df82f3e74e4b94728c) | fix  | ignore cache path when watching with esbuild builder                |
+| [84f1f638a](https://github.com/angular/angular-cli/commit/84f1f638addb6eaa255af48ea61e1436eb49d32e) | fix  | issue dev-server support warning when using esbuild builder         |
+| [919fe2148](https://github.com/angular/angular-cli/commit/919fe2148885c44655ce36085768b1eab2c8c246) | perf | avoid extra TypeScript emits with esbuild rebuilds                  |
+| [92145c4a7](https://github.com/angular/angular-cli/commit/92145c4a7d2c835b703319676bafd8ea3b4a19f0) | perf | avoid template diagnostics for declaration files in esbuild builder |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Günhan Gülsoy
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.7"></a>
 
 # 14.2.7 (2022-10-26)
