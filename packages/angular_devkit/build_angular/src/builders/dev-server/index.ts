@@ -141,6 +141,16 @@ export function serveWebpackBrowser(
     const cacheOptions = normalizeCacheOptions(metadata, context.workspaceRoot);
 
     const browserName = await context.getBuilderNameForTarget(browserTarget);
+
+    // Issue a warning that the dev-server does not currently support the experimental esbuild-
+    // based builder and will use Webpack.
+    if (browserName === '@angular-devkit/build-angular:browser-esbuild') {
+      logger.warn(
+        'WARNING: The experimental esbuild-based builder is not currently supported ' +
+          'by the dev-server. The stable Webpack-based builder will be used instead.',
+      );
+    }
+
     const browserOptions = (await context.validateOptions(
       {
         ...rawBrowserOptions,
