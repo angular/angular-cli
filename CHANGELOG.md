@@ -1,3 +1,26 @@
+<a name="14.2.7"></a>
+
+# 14.2.7 (2022-10-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [91b5bcbb3](https://github.com/angular/angular-cli/commit/91b5bcbb31715a3c2e183e264ebd5ec1188d5437) | fix  | disable version check during auto completion              |
+| [02a3d7b71](https://github.com/angular/angular-cli/commit/02a3d7b715f4069650389ba26a3601747e67d9c2) | fix  | skip node.js compatibility checks when running completion |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [bebed9df8](https://github.com/angular/angular-cli/commit/bebed9df834d01f72753aa0e60dc104f1781bd67) | fix  | issue dev-server support warning when using esbuild builder |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.6"></a>
 
 # 14.2.6 (2022-10-12)
