@@ -235,8 +235,9 @@ export function createCompilerPlugin(
           location: { file: pluginOptions.tsconfig },
           notes: [
             {
-              text: `To control ECMA version and features use the Browerslist configuration. ' +
-              'For more information, see https://angular.io/guide/build#configuring-browser-compatibility'`,
+              text:
+                'To control ECMA version and features use the Browerslist configuration. ' +
+                'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
             },
           ],
         });
