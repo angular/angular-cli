@@ -49,7 +49,7 @@ interface AddCommandArgs extends SchematicsCommandArgs {
  * The key is a package name and the value is a SemVer range of versions to exclude.
  */
 const packageVersionExclusions: Record<string, string | Range> = {
-  // @angular/localize@9.x and earlier versions of @angular/localize@10.x prereleases do not have peer dependencies setup.
+  // @angular/localize@9.x and earlier versions as well as @angular/localize@10.0 prereleases do not have peer dependencies setup.
   '@angular/localize': '<10.0.0',
   // @angular/material@7.x versions have unbounded peer dependency ranges (>=7.0.0).
   '@angular/material': '7.x',
