@@ -8,6 +8,7 @@
 
 import type { Type } from '@angular/core';
 import type * as platformServer from '@angular/platform-server';
+import type { ɵInlineCriticalCssProcessor } from '@nguniversal/common/tools';
 import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -89,10 +90,6 @@ async function render({
   });
 
   if (inlineCriticalCss) {
-    const { ɵInlineCriticalCssProcessor: InlineCriticalCssProcessor } = await loadEsmModule<
-      typeof import('@nguniversal/common/tools')
-    >('@nguniversal/common/tools');
-
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       deployUrl: deployUrl,
       minify: minifyCss,
@@ -118,6 +115,7 @@ async function render({
   return result;
 }
 
+let InlineCriticalCssProcessor: typeof ɵInlineCriticalCssProcessor;
 /**
  * Initializes the worker when it is first created by loading the Zone.js package
  * into the worker instance.
@@ -125,6 +123,12 @@ async function render({
  * @returns A promise resolving to the render function of the worker.
  */
 async function initialize() {
+  const { ɵInlineCriticalCssProcessor } = await loadEsmModule<
+    typeof import('@nguniversal/common/tools')
+  >('@nguniversal/common/tools');
+
+  InlineCriticalCssProcessor = ɵInlineCriticalCssProcessor;
+
   // Setup Zone.js
   await import(zonePackage);
 

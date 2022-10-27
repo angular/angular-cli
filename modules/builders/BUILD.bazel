@@ -25,6 +25,7 @@ ts_library(
     deps = [
         "//modules/common/clover/server",
         "//modules/common/engine",
+        "//modules/common/tools",
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/build-angular",
         "@npm//@angular-devkit/core",
