@@ -11,7 +11,7 @@ import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/
 import { createRequire } from 'module';
 import npa from 'npm-package-arg';
 import { dirname, join } from 'path';
-import { compare, intersects, prerelease, satisfies, valid } from 'semver';
+import { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
 import { PackageManager } from '../../../lib/config/workspace-schema';
 import {
@@ -48,10 +48,10 @@ interface AddCommandArgs extends SchematicsCommandArgs {
  * when attempting to find a compatible version for a package.
  * The key is a package name and the value is a SemVer range of versions to exclude.
  */
-const packageVersionExclusions: Record<string, string | undefined> = {
-  // @angular/localize@9.x versions do not have peer dependencies setup
-  '@angular/localize': '9.x',
-  // @angular/material@7.x versions have unbounded peer dependency ranges (>=7.0.0)
+const packageVersionExclusions: Record<string, string | Range> = {
+  // @angular/localize@9.x and earlier versions as well as @angular/localize@10.0 prereleases do not have peer dependencies setup.
+  '@angular/localize': '<10.0.0',
+  // @angular/material@7.x versions have unbounded peer dependency ranges (>=7.0.0).
   '@angular/material': '7.x',
 };
 
@@ -195,7 +195,10 @@ export class AddCommandModule
               return false;
             }
             // Excluded package versions should not be considered
-            if (versionExclusions && satisfies(value.version, versionExclusions)) {
+            if (
+              versionExclusions &&
+              satisfies(value.version, versionExclusions, { includePrerelease: true })
+            ) {
               return false;
             }
 
