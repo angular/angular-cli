@@ -23,6 +23,7 @@ import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
+import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { bundleStylesheetText } from './stylesheets';
 import { ChangedFiles, createWatcher } from './watcher';
@@ -437,6 +438,8 @@ export async function* buildEsbuildBrowser(
 
   // Finish if watch mode is not enabled
   if (!initialOptions.watch) {
+    shutdownSassWorkerPool();
+
     return;
   }
 
@@ -476,6 +479,7 @@ export async function* buildEsbuildBrowser(
     await watcher.close();
     // Cleanup incremental rebuild state
     result.dispose();
+    shutdownSassWorkerPool();
   }
 }
 

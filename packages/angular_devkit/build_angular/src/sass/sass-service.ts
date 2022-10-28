@@ -14,6 +14,8 @@ import {
   Exception,
   FileImporter,
   Importer,
+  Logger,
+  SourceSpan,
   StringOptionsWithImporter,
   StringOptionsWithoutImporter,
 } from 'sass';
@@ -48,6 +50,7 @@ interface RenderRequest {
   id: number;
   workerIndex: number;
   callback: RenderCallback;
+  logger?: Logger;
   importers?: Importers[];
   previousResolvedModules?: Set<string>;
 }
@@ -68,6 +71,12 @@ interface RenderResponseMessage {
   id: number;
   error?: Exception;
   result?: Omit<CompileResult, 'loadedUrls'> & { loadedUrls: string[] };
+  warnings?: {
+    message: string;
+    deprecation: boolean;
+    stack?: string;
+    span?: Omit<SourceSpan, 'url'> & { url?: string };
+  }[];
 }
 
 /**
@@ -153,13 +162,14 @@ export class SassWorkerImplementation {
         resolve(result);
       };
 
-      const request = this.createRequest(workerIndex, callback, importers);
+      const request = this.createRequest(workerIndex, callback, logger, importers);
       this.requests.set(request.id, request);
 
       this.workers[workerIndex].postMessage({
         id: request.id,
         source,
         hasImporter: !!importers?.length,
+        hasLogger: !!logger,
         options: {
           ...serializableOptions,
           // URL is not serializable so to convert to string here and back to URL in the worker.
@@ -199,6 +209,18 @@ export class SassWorkerImplementation {
 
       this.requests.delete(response.id);
       this.availableWorkers.push(request.workerIndex);
+
+      if (response.warnings && request.logger?.warn) {
+        for (const { message, span, ...options } of response.warnings) {
+          request.logger.warn(message, {
+            ...options,
+            span: span && {
+              ...span,
+              url: span.url ? pathToFileURL(span.url) : undefined,
+            },
+          });
+        }
+      }
 
       if (response.result) {
         request.callback(undefined, {
@@ -274,12 +296,14 @@ export class SassWorkerImplementation {
   private createRequest(
     workerIndex: number,
     callback: RenderCallback,
+    logger: Logger | undefined,
     importers: Importers[] | undefined,
   ): RenderRequest {
     return {
       id: this.idCounter++,
       workerIndex,
       callback,
+      logger,
       importers,
     };
   }
