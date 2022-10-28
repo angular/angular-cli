@@ -43,6 +43,7 @@ export function createWatcher(options?: {
 
   const nextQueue: ((value?: ChangedFiles) => void)[] = [];
   let currentChanges: ChangedFiles | undefined;
+  let nextWaitTimeout: NodeJS.Timeout | undefined;
 
   watcher.on('all', (event, path) => {
     switch (event) {
@@ -62,11 +63,18 @@ export function createWatcher(options?: {
         return;
     }
 
-    const next = nextQueue.shift();
-    if (next) {
-      const value = currentChanges;
-      currentChanges = undefined;
-      next(value);
+    // Wait 250ms from next change to better capture groups of file save operations.
+    if (!nextWaitTimeout) {
+      nextWaitTimeout = setTimeout(() => {
+        nextWaitTimeout = undefined;
+        const next = nextQueue.shift();
+        if (next) {
+          const value = currentChanges;
+          currentChanges = undefined;
+          next(value);
+        }
+      }, 250);
+      nextWaitTimeout?.unref();
     }
   });
 
@@ -99,6 +107,9 @@ export function createWatcher(options?: {
     async close() {
       try {
         await watcher.close();
+        if (nextWaitTimeout) {
+          clearTimeout(nextWaitTimeout);
+        }
       } finally {
         let next;
         while ((next = nextQueue.shift()) !== undefined) {
