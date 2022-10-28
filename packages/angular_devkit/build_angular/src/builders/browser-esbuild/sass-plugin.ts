@@ -7,33 +7,52 @@
  */
 
 import type { PartialMessage, Plugin, PluginBuild } from 'esbuild';
+import { readFile } from 'node:fs/promises';
 import { dirname, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import type { CompileResult } from 'sass';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import type { CompileResult, Exception } from 'sass';
+import { SassWorkerImplementation } from '../../sass/sass-service';
+
+let sassWorkerPool: SassWorkerImplementation;
+
+function isSassException(error: unknown): error is Exception {
+  return !!error && typeof error === 'object' && 'sassMessage' in error;
+}
+
+export function shutdownSassWorkerPool(): void {
+  sassWorkerPool?.close();
+}
 
 export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: string[] }): Plugin {
   return {
     name: 'angular-sass',
     setup(build: PluginBuild): void {
-      let sass: typeof import('sass');
-
       build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
         // Lazily load Sass when a Sass file is found
-        sass ??= await import('sass');
+        sassWorkerPool ??= new SassWorkerImplementation();
 
+        const warnings: PartialMessage[] = [];
         try {
-          const warnings: PartialMessage[] = [];
-          // Use sync version as async version is slower.
-          const { css, sourceMap, loadedUrls } = sass.compile(args.path, {
+          const data = await readFile(args.path, 'utf-8');
+          const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {
+            url: pathToFileURL(args.path),
             style: 'expanded',
             loadPaths: options.loadPaths,
             sourceMap: options.sourcemap,
             sourceMapIncludeSources: options.sourcemap,
             quietDeps: true,
             logger: {
-              warn: (text, _options) => {
+              warn: (text, { deprecation, span }) => {
                 warnings.push({
-                  text,
+                  text: deprecation ? 'Deprecation' : text,
+                  location: span && {
+                    file: span.url && fileURLToPath(span.url),
+                    lineText: span.context,
+                    // Sass line numbers are 0-based while esbuild's are 1-based
+                    line: span.start.line + 1,
+                    column: span.start.column,
+                  },
+                  notes: deprecation ? [{ text }] : undefined,
                 });
               },
             },
@@ -48,16 +67,17 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
             warnings,
           };
         } catch (error) {
-          if (error instanceof sass.Exception) {
+          if (isSassException(error)) {
             const file = error.span.url ? fileURLToPath(error.span.url) : undefined;
 
             return {
               loader: 'css',
               errors: [
                 {
-                  text: error.toString(),
+                  text: error.message,
                 },
               ],
+              warnings,
               watchFiles: file ? [file] : undefined,
             };
           }

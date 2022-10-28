@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Exception, StringOptionsWithImporter, compileString } from 'sass';
+import { Exception, SourceSpan, StringOptionsWithImporter, compileString } from 'sass';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'worker_threads';
 
@@ -31,6 +31,10 @@ interface RenderRequestMessage {
    * Indicates the request has a custom importer function on the main thread.
    */
   hasImporter: boolean;
+  /**
+   * Indicates the request has a custom logger for warning messages.
+   */
+  hasLogger: boolean;
 }
 
 if (!parentPort || !workerData) {
@@ -43,11 +47,20 @@ const { workerImporterPort, importerSignal } = workerData as {
   importerSignal: Int32Array;
 };
 
-parentPort.on('message', ({ id, hasImporter, source, options }: RenderRequestMessage) => {
+parentPort.on('message', (message: RenderRequestMessage) => {
   if (!parentPort) {
     throw new Error('"parentPort" is not defined. Sass worker must be executed as a Worker.');
   }
 
+  const { id, hasImporter, hasLogger, source, options } = message;
+  let warnings:
+    | {
+        message: string;
+        deprecation: boolean;
+        stack?: string;
+        span?: Omit<SourceSpan, 'url'> & { url?: string };
+      }[]
+    | undefined;
   try {
     if (hasImporter) {
       // When a custom importer function is present, the importer request must be proxied
@@ -75,10 +88,24 @@ parentPort.on('message', ({ id, hasImporter, source, options }: RenderRequestMes
       ...options,
       // URL is not serializable so to convert to string in the parent and back to URL here.
       url: options.url ? pathToFileURL(options.url) : undefined,
+      logger: hasLogger
+        ? {
+            warn(message, { deprecation, span, stack }) {
+              warnings ??= [];
+              warnings.push({
+                message,
+                deprecation,
+                stack,
+                span: span && convertSourceSpan(span),
+              });
+            },
+          }
+        : undefined,
     });
 
     parentPort.postMessage({
       id,
+      warnings,
       result: {
         ...result,
         // URL is not serializable so to convert to string here and back to URL in the parent.
@@ -91,22 +118,9 @@ parentPort.on('message', ({ id, hasImporter, source, options }: RenderRequestMes
       const { span, message, stack, sassMessage, sassStack } = error;
       parentPort.postMessage({
         id,
+        warnings,
         error: {
-          span: {
-            text: span.text,
-            context: span.context,
-            end: {
-              column: span.end.column,
-              offset: span.end.offset,
-              line: span.end.line,
-            },
-            start: {
-              column: span.start.column,
-              offset: span.start.offset,
-              line: span.start.line,
-            },
-            url: span.url ? fileURLToPath(span.url) : undefined,
-          },
+          span: convertSourceSpan(span),
           message,
           stack,
           sassMessage,
@@ -115,9 +129,40 @@ parentPort.on('message', ({ id, hasImporter, source, options }: RenderRequestMes
       });
     } else if (error instanceof Error) {
       const { message, stack } = error;
-      parentPort.postMessage({ id, error: { message, stack } });
+      parentPort.postMessage({ id, warnings, error: { message, stack } });
     } else {
-      parentPort.postMessage({ id, error: { message: 'An unknown error has occurred.' } });
+      parentPort.postMessage({
+        id,
+        warnings,
+        error: { message: 'An unknown error has occurred.' },
+      });
     }
   }
 });
+
+/**
+ * Converts a Sass SourceSpan object into a serializable form.
+ * The SourceSpan object contains a URL property which must be converted into a string.
+ * Also, most of the interface's properties are get accessors and are not automatically
+ * serialized when sent back from the worker.
+ *
+ * @param span The Sass SourceSpan object to convert.
+ * @returns A serializable form of the SourceSpan object.
+ */
+function convertSourceSpan(span: SourceSpan): Omit<SourceSpan, 'url'> & { url?: string } {
+  return {
+    text: span.text,
+    context: span.context,
+    end: {
+      column: span.end.column,
+      offset: span.end.offset,
+      line: span.end.line,
+    },
+    start: {
+      column: span.start.column,
+      offset: span.start.offset,
+      line: span.start.line,
+    },
+    url: span.url ? fileURLToPath(span.url) : undefined,
+  };
+}
