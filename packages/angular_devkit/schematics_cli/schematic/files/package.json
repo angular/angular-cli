@@ -20,6 +20,6 @@
   "devDependencies": {
     "@types/node": "^14.15.0",
     "@types/jasmine": "~4.3.0",
-    "jasmine": "~4.4.0"
+    "jasmine": "~4.5.0"
   }
 }
