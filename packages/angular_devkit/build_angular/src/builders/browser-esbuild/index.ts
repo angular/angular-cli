@@ -258,6 +258,11 @@ function createCodeBundleOptions(
       // loader to perform the downlevel transformation.
       // NOTE: If esbuild adds support in the future, the babel support for async generators can be disabled.
       'async-await': false,
+      // V8 currently has a performance defect involving object spread operations that can cause signficant
+      // degradation in runtime performance. By not supporting the language feature here, a downlevel form
+      // will be used instead which provides a workaround for the performance issue.
+      // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
+      'object-rest-spread': false,
     },
     mainFields: ['es2020', 'browser', 'module', 'main'],
     conditions: ['es2020', 'es2015', 'module'],
