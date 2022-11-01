@@ -23,7 +23,11 @@ export class <%= classify(name) %>Guard implements <%= implementations %> {
     nextState?: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return true;
   }
-  <% } %><% if (implements.includes('CanLoad')) { %>canLoad(
+  <% } %><% if (implements.includes('CanMatch')) { %>canMatch(
+    route: Route,
+    segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return true;
+  }<% } %><% if (implements.includes('CanLoad')) { %>canLoad(
     route: Route,
     segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return true;
