@@ -11,5 +11,7 @@ import { generateFromFiles } from '../utility/generate-from-files';
 import { Schema } from './schema';
 
 export default function (options: Schema): Rule {
-  return generateFromFiles(options);
+  return options.functional
+    ? generateFromFiles({ ...options, templateFilesDirectory: './functional-files' })
+    : generateFromFiles({ ...options, templateFilesDirectory: './class-files' });
 }

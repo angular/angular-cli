@@ -7,8 +7,10 @@
  */
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
+
 import { Schema as GuardOptions } from './schema';
 
 describe('Guard Schematic', () => {
@@ -90,6 +92,37 @@ describe('Guard Schematic', () => {
     expect(fileString).not.toContain('canLoad');
   });
 
+  it('should respect the guardType value', async () => {
+    const options = { ...defaultOptions, guardType: 'canActivate' };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
+    expect(fileString).toContain('export const fooGuard: CanActivateFn = (route, state) => {');
+    expect(fileString).not.toContain('CanActivateChild');
+    expect(fileString).not.toContain('canActivateChild');
+    expect(fileString).not.toContain('CanLoad');
+    expect(fileString).not.toContain('canLoad');
+  });
+
+  it('should generate a helper function to execute the guard in a test', async () => {
+    const options = { ...defaultOptions, guardType: 'canActivate' };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.spec.ts');
+    expect(fileString).toContain('const executeGuard: CanActivateFn = (...guardParameters) => ');
+    expect(fileString).toContain(
+      'TestBed.inject(EnvironmentInjector).runInContext(() => fooGuard(...guardParameters));',
+    );
+  });
+
+  it('should generate CanDeactivateFn with unknown guardType', async () => {
+    const options = { ...defaultOptions, guardType: 'canDeactivate' };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
+    expect(fileString).toContain(
+      'export const fooGuard: CanDeactivateFn<unknown> = ' +
+        '(component, currentRoute, currentState, nextState) => {',
+    );
+  });
+
   it('should respect the implements values', async () => {
     const implementationOptions = ['CanActivate', 'CanLoad', 'CanActivateChild'];
     const options = { ...defaultOptions, implements: implementationOptions };
@@ -102,18 +135,6 @@ describe('Guard Schematic', () => {
       const functionName = `${implementation.charAt(0).toLowerCase()}${implementation.slice(1)}`;
       expect(fileString).toContain(functionName);
     });
-  });
-
-  it('should use CanActivate if no implements value', async () => {
-    const options = { ...defaultOptions, implements: undefined };
-    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
-    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
-    expect(fileString).toContain('CanActivate');
-    expect(fileString).toContain('canActivate');
-    expect(fileString).not.toContain('CanActivateChild');
-    expect(fileString).not.toContain('canActivateChild');
-    expect(fileString).not.toContain('CanLoad');
-    expect(fileString).not.toContain('canLoad');
   });
 
   it('should add correct imports based on CanLoad implementation', async () => {
@@ -136,12 +157,30 @@ describe('Guard Schematic', () => {
     expect(fileString).toContain(expectedImports);
   });
 
+  it('should add correct imports based on canLoad guardType', async () => {
+    const options = { ...defaultOptions, guardType: 'canLoad' };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
+    const expectedImports = `import { CanLoadFn } from '@angular/router';`;
+
+    expect(fileString).toContain(expectedImports);
+  });
+
   it('should add correct imports based on CanActivate implementation', async () => {
     const implementationOptions = ['CanActivate'];
     const options = { ...defaultOptions, implements: implementationOptions };
     const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
     const expectedImports = `import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';`;
+
+    expect(fileString).toContain(expectedImports);
+  });
+
+  it('should add correct imports based on canActivate guardType', async () => {
+    const options = { ...defaultOptions, guardType: 'canActivate' };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
+    const expectedImports = `import { CanActivateFn } from '@angular/router';`;
 
     expect(fileString).toContain(expectedImports);
   });

@@ -25,6 +25,11 @@
       "description": "When true (the default), creates the new files at the top level of the current project.",
       "default": true
     },
+    "functional": {
+      "type": "boolean",
+      "description": "Creates the resolver as a `ResolveFn`.",
+      "default": false
+    },
     "path": {
       "type": "string",
       "format": "path",

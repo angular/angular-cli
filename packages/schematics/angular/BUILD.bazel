@@ -47,6 +47,10 @@ ts_library(
             # Also exclude templated files.
             "*/files/**/*.ts",
             "*/other-files/**/*.ts",
+            "*/implements-files/**/*",
+            "*/type-files/**/*",
+            "*/functional-files/**/*",
+            "*/class-files/**/*",
             # Exclude test helpers.
             "utility/test/**/*.ts",
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
@@ -65,6 +69,10 @@ ts_library(
             "*/schema.json",
             "*/files/**/*",
             "*/other-files/**/*",
+            "*/implements-files/**/*",
+            "*/type-files/**/*",
+            "*/functional-files/**/*",
+            "*/class-files/**/*",
         ],
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces

@@ -30,6 +30,7 @@ export interface GenerateFromFilesOptions {
   prefix?: string;
   project: string;
   skipTests?: boolean;
+  templateFilesDirectory?: string;
 }
 
 export function generateFromFiles(
@@ -47,7 +48,8 @@ export function generateFromFiles(
 
     validateClassName(strings.classify(options.name));
 
-    const templateSource = apply(url('./files'), [
+    const templateFilesDirectory = options.templateFilesDirectory ?? './files';
+    const templateSource = apply(url(templateFilesDirectory), [
       options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
       applyTemplates({
         ...strings,
