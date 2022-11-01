@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { <%= implementationImports %> } from '@angular/router';
+import { <%= routerImports %> } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable({

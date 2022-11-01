@@ -79,4 +79,27 @@ describe('resolver Schematic', () => {
       .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.resolver.ts');
   });
+
+  it('should create a functional resolver', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('resolver', { ...defaultOptions, functional: true }, appTree)
+      .toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.ts');
+    expect(fileString).toContain(
+      'export const fooResolver: ResolveFn<boolean> = (route, state) => {',
+    );
+  });
+
+  it('should create a helper function to run a functional resolver in a test', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('resolver', { ...defaultOptions, functional: true }, appTree)
+      .toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.spec.ts');
+    expect(fileString).toContain(
+      'const executeResolver: ResolveFn<boolean> = (...resolverParameters) => ',
+    );
+    expect(fileString).toContain(
+      'TestBed.inject(EnvironmentInjector).runInContext(() => fooResolver(...resolverParameters));',
+    );
+  });
 });
