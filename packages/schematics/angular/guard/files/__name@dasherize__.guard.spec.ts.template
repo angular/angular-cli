@@ -1,3 +1,4 @@
+<% if (implements.length > 0) { %>
 import { TestBed } from '@angular/core/testing';
 
 import { <%= classify(name) %>Guard } from './<%= dasherize(name) %>.guard';
@@ -14,3 +15,24 @@ describe('<%= classify(name) %>Guard', () => {
     expect(guard).toBeTruthy();
   });
 });
+<% } %>
+<% if (guardType) { %>
+import { EnvironmentInjector } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { <%= guardType %> } from '@angular/router';
+
+import { <%= camelize(name) %>Guard } from './<%= dasherize(name) %>.guard';
+
+describe('<%= camelize(name) %>Guard', () => {
+  const executeGuard: <%= guardType %> = (...guardParameters) => 
+      TestBed.inject(EnvironmentInjector).runInContext(() => <%= camelize(name) %>Guard(...guardParameters));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+  });
+
+  it('should be created', () => {
+    expect(<%= camelize(name) %>Guard).toBeTruthy();
+  });
+});
+<% } %>

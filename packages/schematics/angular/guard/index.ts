@@ -7,14 +7,38 @@
  */
 
 import { Rule, SchematicsException } from '@angular-devkit/schematics';
+
 import { generateFromFiles } from '../utility/generate-from-files';
+
 import { Implement as GuardInterface, Schema as GuardOptions } from './schema';
 
 export default function (options: GuardOptions): Rule {
-  if (!options.implements) {
-    throw new SchematicsException('Option "implements" is required.');
+  if (!options.implements && !options.guardType) {
+    throw new SchematicsException('Option "implements" or "guardType" is required.');
+  }
+  if (options.implements && options.implements.length > 0 && options.guardType) {
+    throw new SchematicsException(
+      `Options "implements" and "guardType" cannot be used together. ` +
+        `implements: [${options.implements}], guardType: [${options.guardType}]`,
+    );
   }
 
+  return options.guardType ? functionalGuardRule(options) : classBasedGuardRule(options);
+}
+
+function functionalGuardRule(options: GuardOptions): Rule {
+  if (!options.guardType) {
+    throw new SchematicsException('Options "implements" and "guardType" cannot be used together.');
+  }
+  const guardType = options.guardType.replace(/^can/, 'Can') + 'Fn';
+
+  return generateFromFiles(options, { guardType });
+}
+
+function classBasedGuardRule(options: GuardOptions): Rule {
+  if (!options.implements) {
+    throw new SchematicsException('Options "implements" and "guardType" cannot be used together.');
+  }
   const implementations = options.implements
     .map((implement) => (implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement))
     .join(', ');
@@ -36,10 +60,10 @@ export default function (options: GuardOptions): Rule {
 
   routerNamedImports.sort();
 
-  const implementationImports = routerNamedImports.join(', ');
+  const routerImports = routerNamedImports.join(', ');
 
   return generateFromFiles(options, {
     implementations,
-    implementationImports,
+    routerImports,
   });
 }
