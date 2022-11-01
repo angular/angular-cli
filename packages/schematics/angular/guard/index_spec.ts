@@ -126,6 +126,16 @@ describe('Guard Schematic', () => {
     expect(fileString).toContain(expectedImports);
   });
 
+  it('should add correct imports based on CanMatch implementation', async () => {
+    const implementationOptions = ['CanMatch'];
+    const options = { ...defaultOptions, implements: implementationOptions };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree).toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
+    const expectedImports = `import { CanMatch, Route, UrlSegment, UrlTree } from '@angular/router';`;
+
+    expect(fileString).toContain(expectedImports);
+  });
+
   it('should add correct imports based on CanActivate implementation', async () => {
     const implementationOptions = ['CanActivate'];
     const options = { ...defaultOptions, implements: implementationOptions };
