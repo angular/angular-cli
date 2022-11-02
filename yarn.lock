@@ -1802,10 +1802,12 @@
   dependencies:
     infer-owner "^1.0.4"
 
-"@npmcli/promise-spawn@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@npmcli/promise-spawn/-/promise-spawn-5.0.0.tgz#8cd47aa85ad206ac0e2ae6005cbfbe5340bd0134"
-  integrity sha512-q+Le2urM3NdxSFHj+VZXLTHKgmWxqHXUSqM5m9bjnV3EtThtJor64f5inmBkO9uEGZnhpjW0wL67Qf5qcgZkxw==
+"@npmcli/promise-spawn@^6.0.0", "@npmcli/promise-spawn@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@npmcli/promise-spawn/-/promise-spawn-6.0.1.tgz#2bf718579ad0ca2c5bd364c6a9de3e2fa6be2b00"
+  integrity sha512-+hcUpxgx0vEpDJI9Cn+lkTdKLoqKBXFCVps5H7FujEU2vLOp6KwqjLlxbnz8Wzgm8oEqW/u5FeNAXSFjLdCD0A==
+  dependencies:
+    which "^3.0.0"
 
 "@npmcli/query@^1.2.0":
   version "1.2.0"
@@ -1827,16 +1829,16 @@
     read-package-json-fast "^2.0.3"
     which "^2.0.2"
 
-"@npmcli/run-script@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@npmcli/run-script/-/run-script-5.0.0.tgz#39d10916b1f4a1e3ebc871e805bc5cdf05639aa4"
-  integrity sha512-AuqcoTOt7v4D2JqC7mCa+eUQHb64vWbwyu9o1hoJiq2kfZNwCB71f0s7tvUw+v+1B5XMdqcr98aGzjKIg7s6Vw==
+"@npmcli/run-script@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/run-script/-/run-script-6.0.0.tgz#f89e322c729e26ae29db6cc8cc76559074aac208"
+  integrity sha512-ql+AbRur1TeOdl1FY+RAwGW9fcr4ZwiVKabdvm93mujGREVuVLbdkXRJDrkTXSdCjaxYydr1wlA2v67jxWG5BQ==
   dependencies:
     "@npmcli/node-gyp" "^3.0.0"
-    "@npmcli/promise-spawn" "^4.0.0"
+    "@npmcli/promise-spawn" "^6.0.0"
     node-gyp "^9.0.0"
     read-package-json-fast "^3.0.0"
-    which "^2.0.2"
+    which "^3.0.0"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -8481,15 +8483,15 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-pacote@15.0.4:
-  version "15.0.4"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.4.tgz#cd95d89523f3233ab32360ee15f909186fecb7b1"
-  integrity sha512-6lSP0ly54fKrPIvXmVcmslqrcF8DL3y/RlNLwBWG1A3wd8sWcPF8hikTJDWqXUPMw6L04p6gqsJ/iLgRjth+6A==
+pacote@15.0.6:
+  version "15.0.6"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.6.tgz#8c498b5c23270da4f4c87f7eeba0248a3ae61342"
+  integrity sha512-dQwcz/sME7QIL+cdrw/jftQfMMXxSo17i2kJ/gnhBhUvvBAsxoBu1lw9B5IzCH/Ce8CvEkG/QYZ6txzKfn0bTw==
   dependencies:
     "@npmcli/git" "^4.0.0"
     "@npmcli/installed-package-contents" "^2.0.1"
-    "@npmcli/promise-spawn" "^5.0.0"
-    "@npmcli/run-script" "^5.0.0"
+    "@npmcli/promise-spawn" "^6.0.1"
+    "@npmcli/run-script" "^6.0.0"
     cacache "^17.0.0"
     fs-minipass "^2.1.0"
     minipass "^3.1.6"
@@ -11269,6 +11271,13 @@ which@^2.0.1, which@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/which/-/which-2.0.2.tgz#7c6a8dd0a636a0327e10b59c9286eee93f3f51b1"
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
+  dependencies:
+    isexe "^2.0.0"
+
+which@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/which/-/which-3.0.0.tgz#a9efd016db59728758a390d23f1687b6e8f59f8e"
+  integrity sha512-nla//68K9NU6yRiwDY/Q8aU6siKlSs64aEC7+IV56QoAuyQT2ovsJcgGYGyqMOmI/CGN1BOR6mM5EN0FBO+zyQ==
   dependencies:
     isexe "^2.0.0"
 
