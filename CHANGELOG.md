@@ -1,3 +1,34 @@
+<a name="15.0.0-rc.2"></a>
+
+# 15.0.0-rc.2 (2022-11-02)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------- |
+| [35e5f4278](https://github.com/angular/angular-cli/commit/35e5f4278145b7ef55a75f1692c8e92d6bcd59db) | fix  | exclude `@angular/localize@<10.0.0` from ng add pa… ([#24152](https://github.com/angular/angular-cli/pull/24152)) |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [c33cc0a7a](https://github.com/angular/angular-cli/commit/c33cc0a7abb224899792afaffb5dab1504178d89) | fix  | guard schematics should include all guards (CanMatch) |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------- |
+| [192e0e6d7](https://github.com/angular/angular-cli/commit/192e0e6d77d4f0f20af3f88b653c5196a2c1e052) | fix  | correct escaping of target warning text in esbuild builder                   |
+| [8b84c18ed](https://github.com/angular/angular-cli/commit/8b84c18edd01e91c7ebf4327dde8ce60f7f700ca) | fix  | provide workaround for V8 object spread performance defect                   |
+| [fb4ead2ce](https://github.com/angular/angular-cli/commit/fb4ead2ce0de824eef46ce8e27a8f6cc1d08c744) | fix  | wait during file watching to improve multi-save rebuilds for esbuild builder |
+| [9d83fb91b](https://github.com/angular/angular-cli/commit/9d83fb91b654eed79a5c9c9691d0f1c094f37771) | perf | use Sass worker pool for Sass support in esbuild builder                     |
+
+## Special Thanks
+
+Alan Agius, Andrew Scott and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.8"></a>
 
 # 14.2.8 (2022-11-02)
