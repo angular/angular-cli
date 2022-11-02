@@ -50,12 +50,13 @@
         "enum": ["CanActivate", "CanActivateChild", "CanDeactivate", "CanLoad", "CanMatch"],
         "type": "string"
       },
-      "x-prompt": "Which interfaces would you like to implement?"
+      "x-deprecated": "Use '--guardType' instead."
     },
     "guardType": {
       "type": "string",
       "description": "Specifies type of guard to generate.",
-      "enum": ["canActivate", "canActivateChild", "canDeactivate", "canLoad", "canMatch"]
+      "enum": ["canActivate", "canActivateChild", "canDeactivate", "canLoad", "canMatch"],
+      "x-prompt": "Which type of guard would you like to generate?"
     }
   },
   "required": ["name", "project"]
