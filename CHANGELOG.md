@@ -1,3 +1,19 @@
+<a name="14.2.8"></a>
+
+# 14.2.8 (2022-11-02)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [4b0ee8ad1](https://github.com/angular/angular-cli/commit/4b0ee8ad15efcb513ab5d9e38bf9b1e08857e798) | fix  | guard schematics should include all guards (CanMatch) |
+
+## Special Thanks
+
+Andrew Scott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-rc.1"></a>
 
 # 15.0.0-rc.1 (2022-10-26)
