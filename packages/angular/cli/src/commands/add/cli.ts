@@ -144,7 +144,11 @@ export class AddCommandModule
     const usingYarn = packageManager.name === PackageManager.Yarn;
     spinner.info(`Using package manager: ${colors.grey(packageManager.name)}`);
 
-    if (packageIdentifier.name && packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
+    if (
+      packageIdentifier.name &&
+      packageIdentifier.type === 'range' &&
+      packageIdentifier.rawSpec === '*'
+    ) {
       // only package name provided; search for viable version
       // plus special cases for packages that did not have peer deps setup
       spinner.start('Searching for compatible package version...');
@@ -316,21 +320,31 @@ export class AddCommandModule
       return false;
     }
 
-    let validVersion = false;
     const installedVersion = await this.findProjectVersion(packageIdentifier.name);
-    if (installedVersion) {
-      if (packageIdentifier.type === 'range' && packageIdentifier.fetchSpec) {
-        validVersion = satisfies(installedVersion, packageIdentifier.fetchSpec);
-      } else if (packageIdentifier.type === 'version') {
-        const v1 = valid(packageIdentifier.fetchSpec);
-        const v2 = valid(installedVersion);
-        validVersion = v1 !== null && v1 === v2;
-      } else if (!packageIdentifier.rawSpec) {
-        validVersion = true;
-      }
+    if (!installedVersion) {
+      return false;
     }
 
-    return validVersion;
+    if (packageIdentifier.rawSpec === '*') {
+      return true;
+    }
+
+    if (
+      packageIdentifier.type === 'range' &&
+      packageIdentifier.fetchSpec &&
+      packageIdentifier.fetchSpec !== '*'
+    ) {
+      return satisfies(installedVersion, packageIdentifier.fetchSpec);
+    }
+
+    if (packageIdentifier.type === 'version') {
+      const v1 = valid(packageIdentifier.fetchSpec);
+      const v2 = valid(installedVersion);
+
+      return v1 !== null && v1 === v2;
+    }
+
+    return false;
   }
 
   private async getCollectionName(): Promise<string> {

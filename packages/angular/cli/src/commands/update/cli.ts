@@ -201,12 +201,12 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           return 1;
         }
 
-        if (options.migrateOnly && packageIdentifier.rawSpec) {
+        if (options.migrateOnly && packageIdentifier.rawSpec !== '*') {
           logger.warn('Package specifier has no effect when using "migrate-only" option.');
         }
 
         // If next option is used and no specifier supplied, use next tag
-        if (options.next && !packageIdentifier.rawSpec) {
+        if (options.next && packageIdentifier.rawSpec === '*') {
           packageIdentifier.fetchSpec = 'next';
         }
 
