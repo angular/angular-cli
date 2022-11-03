@@ -6,9 +6,23 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Exception, SourceSpan, StringOptionsWithImporter, compileString } from 'sass';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'worker_threads';
+import { Dirent } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'node:worker_threads';
+import {
+  Exception,
+  FileImporter,
+  SourceSpan,
+  StringOptionsWithImporter,
+  compileString,
+} from 'sass';
+import {
+  LoadPathsUrlRebasingImporter,
+  ModuleUrlRebasingImporter,
+  RelativeUrlRebasingImporter,
+  sassBindWorkaround,
+} from './rebasing-importer';
 
 /**
  * A request to render a Sass stylesheet using the supplied options.
@@ -26,7 +40,7 @@ interface RenderRequestMessage {
   /**
    * The Sass options to provide to the `dart-sass` compile function.
    */
-  options: Omit<StringOptionsWithImporter<'sync'>, 'url'> & { url?: string };
+  options: Omit<StringOptionsWithImporter<'sync'>, 'url'> & { url: string };
   /**
    * Indicates the request has a custom importer function on the main thread.
    */
@@ -35,6 +49,10 @@ interface RenderRequestMessage {
    * Indicates the request has a custom logger for warning messages.
    */
   hasLogger: boolean;
+  /**
+   * Indicates paths within url() CSS functions should be rebased.
+   */
+  rebase: boolean;
 }
 
 if (!parentPort || !workerData) {
@@ -52,7 +70,8 @@ parentPort.on('message', (message: RenderRequestMessage) => {
     throw new Error('"parentPort" is not defined. Sass worker must be executed as a Worker.');
   }
 
-  const { id, hasImporter, hasLogger, source, options } = message;
+  const { id, hasImporter, hasLogger, source, options, rebase } = message;
+  const entryDirectory = dirname(options.url);
   let warnings:
     | {
         message: string;
@@ -62,32 +81,61 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       }[]
     | undefined;
   try {
+    const directoryCache = new Map<string, Dirent[]>();
     if (hasImporter) {
       // When a custom importer function is present, the importer request must be proxied
       // back to the main thread where it can be executed.
       // This process must be synchronous from the perspective of dart-sass. The `Atomics`
       // functions combined with the shared memory `importSignal` and the Node.js
       // `receiveMessageOnPort` function are used to ensure synchronous behavior.
-      options.importers = [
-        {
-          findFileUrl: (url, options) => {
-            Atomics.store(importerSignal, 0, 0);
-            workerImporterPort.postMessage({ id, url, options });
-            Atomics.wait(importerSignal, 0, 0);
+      const proxyImporter: FileImporter<'sync'> = {
+        findFileUrl: (url, options) => {
+          Atomics.store(importerSignal, 0, 0);
+          workerImporterPort.postMessage({ id, url, options });
+          Atomics.wait(importerSignal, 0, 0);
 
-            const result = receiveMessageOnPort(workerImporterPort)?.message as string | null;
+          const result = receiveMessageOnPort(workerImporterPort)?.message as string | null;
 
-            return result ? pathToFileURL(result) : null;
-          },
+          return result ? pathToFileURL(result) : null;
         },
+      };
+      options.importers = [
+        rebase
+          ? sassBindWorkaround(
+              new ModuleUrlRebasingImporter(
+                entryDirectory,
+                directoryCache,
+                proxyImporter.findFileUrl,
+              ),
+            )
+          : proxyImporter,
       ];
+    }
+
+    if (rebase && options.loadPaths?.length) {
+      options.importers ??= [];
+      options.importers.push(
+        sassBindWorkaround(
+          new LoadPathsUrlRebasingImporter(entryDirectory, directoryCache, options.loadPaths),
+        ),
+      );
+      options.loadPaths = undefined;
+    }
+
+    let relativeImporter;
+    if (rebase) {
+      relativeImporter = sassBindWorkaround(
+        new RelativeUrlRebasingImporter(entryDirectory, directoryCache),
+      );
     }
 
     // The synchronous Sass render function can be up to two times faster than the async variant
     const result = compileString(source, {
       ...options,
       // URL is not serializable so to convert to string in the parent and back to URL here.
-      url: options.url ? pathToFileURL(options.url) : undefined,
+      url: pathToFileURL(options.url),
+      // The `importer` option (singular) handles relative imports
+      importer: relativeImporter,
       logger: hasLogger
         ? {
             warn(message, { deprecation, span, stack }) {
