@@ -1,3 +1,26 @@
+<a name="15.0.0-next.1"></a>
+
+# 15.0.0-next.1 (2022-11-03)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                                                 |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------------------------------- |
+| [b7dbc25c](https://github.com/angular/universal/commit/b7dbc25c3fc7ab23c5046b07ed02fd4a7d7ca0eb) | fix  | address method Promise.prototype.then called on incompatible receiver error |
+| [654c23c8](https://github.com/angular/universal/commit/654c23c88c05bb1350411b89b2d9dcb2f65a26ca) | fix  | import `zone.js` in worker during prerendering                              |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description            |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------- |
+| [98b508ed](https://github.com/angular/universal/commit/98b508edda4e60253047289cd9ccdb2574a632bb) | fix  | replace zone.js import |
+
+## Special Thanks
+
+Alan Agius, Carlos Torrecillas and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.1"></a>
 
 # 14.2.1 (2022-11-03)
