@@ -27,10 +27,6 @@ async function bundleStylesheet(
   entry: Required<Pick<BuildOptions, 'stdin'> | Pick<BuildOptions, 'entryPoints'>>,
   options: BundleStylesheetOptions,
 ) {
-  const loadPaths = options.includePaths ?? [];
-  // Needed to resolve node packages.
-  loadPaths.push(path.join(options.workspaceRoot, 'node_modules'));
-
   // Execute esbuild
   const result = await bundle({
     ...entry,
@@ -50,7 +46,7 @@ async function bundleStylesheet(
     conditions: ['style', 'sass'],
     mainFields: ['style', 'sass'],
     plugins: [
-      createSassPlugin({ sourcemap: !!options.sourcemap, loadPaths }),
+      createSassPlugin({ sourcemap: !!options.sourcemap, loadPaths: options.includePaths }),
       createCssResourcePlugin(),
     ],
   });
