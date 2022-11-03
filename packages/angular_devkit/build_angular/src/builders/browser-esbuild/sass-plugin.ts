@@ -8,12 +8,15 @@
 
 import type { PartialMessage, Plugin, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
-import { dirname, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CompileResult, Exception } from 'sass';
-import { SassWorkerImplementation } from '../../sass/sass-service';
+import {
+  FileImporterWithRequestContextOptions,
+  SassWorkerImplementation,
+} from '../../sass/sass-service';
 
-let sassWorkerPool: SassWorkerImplementation;
+let sassWorkerPool: SassWorkerImplementation | undefined;
 
 function isSassException(error: unknown): error is Exception {
   return !!error && typeof error === 'object' && 'sassMessage' in error;
@@ -21,6 +24,7 @@ function isSassException(error: unknown): error is Exception {
 
 export function shutdownSassWorkerPool(): void {
   sassWorkerPool?.close();
+  sassWorkerPool = undefined;
 }
 
 export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: string[] }): Plugin {
@@ -41,6 +45,61 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
             sourceMap: options.sourcemap,
             sourceMapIncludeSources: options.sourcemap,
             quietDeps: true,
+            importers: [
+              {
+                findFileUrl: async (
+                  url,
+                  { previousResolvedModules }: FileImporterWithRequestContextOptions,
+                ): Promise<URL | null> => {
+                  let result = await build.resolve(url, {
+                    kind: 'import-rule',
+                    // This should ideally be the directory of the importer file from Sass
+                    // but that is not currently available from the Sass importer API.
+                    resolveDir: build.initialOptions.absWorkingDir,
+                  });
+
+                  // Workaround to support Yarn PnP without access to the importer file from Sass
+                  if (!result.path && previousResolvedModules?.size) {
+                    for (const previous of previousResolvedModules) {
+                      result = await build.resolve(url, {
+                        kind: 'import-rule',
+                        resolveDir: previous,
+                      });
+                    }
+                  }
+
+                  // Check for package deep imports
+                  if (!result.path) {
+                    const parts = url.split('/');
+                    const hasScope = parts.length > 2 && parts[0].startsWith('@');
+                    if (hasScope || parts.length > 1) {
+                      const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
+                      const packageName = hasScope
+                        ? `${nameOrScope}/${nameOrFirstPath}`
+                        : nameOrScope;
+                      const packageResult = await build.resolve(packageName + '/package.json', {
+                        kind: 'import-rule',
+                        // This should ideally be the directory of the importer file from Sass
+                        // but that is not currently available from the Sass importer API.
+                        resolveDir: build.initialOptions.absWorkingDir,
+                      });
+
+                      if (packageResult.path) {
+                        return pathToFileURL(
+                          join(
+                            dirname(packageResult.path),
+                            !hasScope ? nameOrFirstPath : '',
+                            ...pathPart,
+                          ),
+                        );
+                      }
+                    }
+                  }
+
+                  return result.path ? pathToFileURL(result.path) : null;
+                },
+              },
+            ],
             logger: {
               warn: (text, { deprecation, span }) => {
                 warnings.push({
