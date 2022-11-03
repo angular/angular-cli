@@ -33,7 +33,7 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
     setup(build: PluginBuild): void {
       build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
         // Lazily load Sass when a Sass file is found
-        sassWorkerPool ??= new SassWorkerImplementation();
+        sassWorkerPool ??= new SassWorkerImplementation(true);
 
         const warnings: PartialMessage[] = [];
         try {

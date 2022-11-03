@@ -93,6 +93,8 @@ export class SassWorkerImplementation {
   private idCounter = 1;
   private nextWorkerIndex = 0;
 
+  constructor(private rebase = false) {}
+
   /**
    * Provides information about the Sass implementation.
    * This mimics enough of the `dart-sass` value to be used with the `sass-loader`.
@@ -170,6 +172,7 @@ export class SassWorkerImplementation {
         source,
         hasImporter: !!importers?.length,
         hasLogger: !!logger,
+        rebase: this.rebase,
         options: {
           ...serializableOptions,
           // URL is not serializable so to convert to string here and back to URL in the worker.
