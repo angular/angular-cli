@@ -1,3 +1,25 @@
+<a name="14.2.1"></a>
+
+# 14.2.1 (2022-11-03)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                                                 |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------------------------------- |
+| [8f47c59e](https://github.com/angular/universal/commit/8f47c59e40da9e431967a32258a41bb5b22630fb) | fix  | address method Promise.prototype.then called on incompatible receiver error |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description            |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------- |
+| [eab35cff](https://github.com/angular/universal/commit/eab35cffa9dc2529146c8783e58a2aae651158b4) | fix  | replace zone.js import |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.0"></a>
 
 # 15.0.0-next.0 (2022-10-13)
