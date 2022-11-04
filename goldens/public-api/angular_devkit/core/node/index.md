@@ -9,7 +9,7 @@
 import { Observable } from 'rxjs';
 import { Operator } from 'rxjs';
 import { PartialObserver } from 'rxjs';
-import { Stats as Stats_2 } from 'fs';
+import { Stats as Stats_2 } from 'node:fs';
 import { Subject } from 'rxjs';
 import { Subscription } from 'rxjs';
 

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { FSWatcher as ChokidarWatcher } from 'chokidar';
-import fs, {
+import {
   PathLike,
   Stats,
   constants,
@@ -17,10 +16,11 @@ import fs, {
   readFileSync,
   readdirSync,
   renameSync,
+  rmSync,
   statSync,
   writeFileSync,
-} from 'fs';
-import { dirname as pathDirname } from 'path';
+} from 'node:fs';
+import { dirname as pathDirname } from 'node:path';
 import { Observable, from as observableFrom } from 'rxjs';
 import { map, mergeMap, publish, refCount } from 'rxjs/operators';
 import { Path, PathFragment, dirname, fragment, getSystemPath, normalize, virtualFs } from '../src';
@@ -38,11 +38,10 @@ async function exists(path: PathLike): Promise<boolean> {
 // This will only be initialized if the watch() method is called.
 // Otherwise chokidar appears only in type positions, and shouldn't be referenced
 // in the JavaScript output.
-let FSWatcher: typeof ChokidarWatcher;
+let FSWatcher: typeof import('chokidar').FSWatcher;
 function loadFSWatcher() {
   if (!FSWatcher) {
     try {
-      // eslint-disable-next-line import/no-extraneous-dependencies
       FSWatcher = require('chokidar').FSWatcher;
     } catch (e) {
       if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
@@ -176,7 +175,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
 
   delete(path: Path): Observable<void> {
     return new Observable<void>((obs) => {
-      fs.rmSync(getSystemPath(path), { force: true, recursive: true, maxRetries: 3 });
+      rmSync(getSystemPath(path), { force: true, recursive: true, maxRetries: 3 });
 
       obs.complete();
     });
