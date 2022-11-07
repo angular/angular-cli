@@ -145,7 +145,7 @@ export class SassWorkerImplementation {
 
       const callback: RenderCallback = (error, result) => {
         if (error) {
-          const url = error?.span.url as string | undefined;
+          const url = error.span?.url as string | undefined;
           if (url) {
             error.span.url = pathToFileURL(url);
           }
