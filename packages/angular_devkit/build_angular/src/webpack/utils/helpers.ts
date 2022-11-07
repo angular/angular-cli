@@ -8,7 +8,6 @@
 
 import type { ObjectPattern } from 'copy-webpack-plugin';
 import { createHash } from 'crypto';
-import { existsSync } from 'fs';
 import glob from 'glob';
 import * as path from 'path';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
@@ -305,4 +304,18 @@ export function getStatsOptions(verbose = false): WebpackStatsOptions {
   return verbose
     ? { ...webpackOutputOptions, ...verboseWebpackOutputOptions }
     : webpackOutputOptions;
+}
+
+/**
+ * @param root the workspace root
+ * @returns `true` when `@angular/platform-server` is installed.
+ */
+export function isPlatformServerInstalled(root: string): boolean {
+  try {
+    require.resolve('@angular/platform-server', { paths: [root] });
+
+    return true;
+  } catch {
+    return false;
+  }
 }
