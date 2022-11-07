@@ -24,6 +24,7 @@ import {
   generateI18nBrowserWebpackConfigFromContext,
 } from '../../utils/webpack-browser-config';
 import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
+import { isPlatformServerInstalled } from '../../webpack/utils/helpers';
 import { webpackStatsLogger } from '../../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
@@ -175,23 +176,21 @@ async function initialize(
 function getPlatformServerExportsConfig(wco: BrowserWebpackConfigOptions): Partial<Configuration> {
   // Add `@angular/platform-server` exports.
   // This is needed so that DI tokens can be referenced and set at runtime outside of the bundle.
-  try {
-    // Only add `@angular/platform-server` exports when it is installed.
-    // In some cases this builder is used when `@angular/platform-server` is not installed.
-    // Example: when using `@nguniversal/common/clover` which does not need `@angular/platform-server`.
-    require.resolve('@angular/platform-server', { paths: [wco.root] });
-  } catch {
-    return {};
-  }
 
-  return {
-    module: {
-      rules: [
-        {
-          loader: require.resolve('./platform-server-exports-loader'),
-          include: [path.resolve(wco.root, wco.buildOptions.main)],
+  // Only add `@angular/platform-server` exports when it is installed.
+  // In some cases this builder is used when `@angular/platform-server` is not installed.
+  // Example: when using `@nguniversal/common/clover` which does not need `@angular/platform-server`.
+
+  return isPlatformServerInstalled(wco.root)
+    ? {
+        module: {
+          rules: [
+            {
+              loader: require.resolve('./platform-server-exports-loader'),
+              include: [path.resolve(wco.root, wco.buildOptions.main)],
+            },
+          ],
         },
-      ],
-    },
-  };
+      }
+    : {};
 }
