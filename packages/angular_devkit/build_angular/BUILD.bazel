@@ -154,6 +154,7 @@ ts_library(
         "@npm//less-loader",
         "@npm//license-webpack-plugin",
         "@npm//loader-utils",
+        "@npm//magic-string",
         "@npm//mini-css-extract-plugin",
         "@npm//minimatch",
         "@npm//ng-packagr",

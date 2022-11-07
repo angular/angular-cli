@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { RawSourceMap } from '@ampproject/remapping';
+import MagicString from 'magic-string';
 import { Dirent, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -31,8 +33,13 @@ const URL_REGEXP = /url(?:\(\s*(['"]?))(.*?)(?:\1\s*\))/g;
 abstract class UrlRebasingImporter implements Importer<'sync'> {
   /**
    * @param entryDirectory The directory of the entry stylesheet that was passed to the Sass compiler.
+   * @param rebaseSourceMaps When provided, rebased files will have an intermediate sourcemap added to the Map
+   * which can be used to generate a final sourcemap that contains original sources.
    */
-  constructor(private entryDirectory: string) {}
+  constructor(
+    private entryDirectory: string,
+    private rebaseSourceMaps?: Map<string, RawSourceMap>,
+  ) {}
 
   abstract canonicalize(url: string, options: { fromImport: boolean }): URL | null;
 
@@ -46,6 +53,7 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
 
       let match;
       URL_REGEXP.lastIndex = 0;
+      let updatedContents;
       while ((match = URL_REGEXP.exec(contents))) {
         const originalUrl = match[2];
 
@@ -60,10 +68,21 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
         // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
         const rebasedUrl = './' + rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&');
 
-        contents =
-          contents.slice(0, match.index) +
-          `url(${rebasedUrl})` +
-          contents.slice(match.index + match[0].length);
+        updatedContents ??= new MagicString(contents);
+        updatedContents.update(match.index, match.index + match[0].length, `url(${rebasedUrl})`);
+      }
+
+      if (updatedContents) {
+        contents = updatedContents.toString();
+        if (this.rebaseSourceMaps) {
+          // Generate an intermediate source map for the rebasing changes
+          const map = updatedContents.generateMap({
+            hires: true,
+            includeContent: true,
+            source: canonicalUrl.href,
+          });
+          this.rebaseSourceMaps.set(canonicalUrl.href, map as RawSourceMap);
+        }
       }
     }
 
@@ -94,8 +113,12 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
  * the URLs in the output of the Sass compiler reflect the final filesystem location of the output CSS file.
  */
 export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
-  constructor(entryDirectory: string, private directoryCache = new Map<string, Dirent[]>()) {
-    super(entryDirectory);
+  constructor(
+    entryDirectory: string,
+    private directoryCache = new Map<string, Dirent[]>(),
+    rebaseSourceMaps?: Map<string, RawSourceMap>,
+  ) {
+    super(entryDirectory, rebaseSourceMaps);
   }
 
   canonicalize(url: string, options: { fromImport: boolean }): URL | null {
@@ -238,9 +261,10 @@ export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
   constructor(
     entryDirectory: string,
     directoryCache: Map<string, Dirent[]>,
+    rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
     private finder: FileImporter<'sync'>['findFileUrl'],
   ) {
-    super(entryDirectory, directoryCache);
+    super(entryDirectory, directoryCache, rebaseSourceMaps);
   }
 
   override canonicalize(url: string, options: { fromImport: boolean }): URL | null {
@@ -263,9 +287,10 @@ export class LoadPathsUrlRebasingImporter extends RelativeUrlRebasingImporter {
   constructor(
     entryDirectory: string,
     directoryCache: Map<string, Dirent[]>,
+    rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
     private loadPaths: Iterable<string>,
   ) {
-    super(entryDirectory, directoryCache);
+    super(entryDirectory, directoryCache, rebaseSourceMaps);
   }
 
   override canonicalize(url: string, options: { fromImport: boolean }): URL | null {

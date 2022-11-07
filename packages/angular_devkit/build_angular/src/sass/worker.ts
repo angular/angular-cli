@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import mergeSourceMaps, { RawSourceMap } from '@ampproject/remapping';
 import { Dirent } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -82,6 +83,7 @@ parentPort.on('message', (message: RenderRequestMessage) => {
     | undefined;
   try {
     const directoryCache = new Map<string, Dirent[]>();
+    const rebaseSourceMaps = options.sourceMap ? new Map<string, RawSourceMap>() : undefined;
     if (hasImporter) {
       // When a custom importer function is present, the importer request must be proxied
       // back to the main thread where it can be executed.
@@ -105,6 +107,7 @@ parentPort.on('message', (message: RenderRequestMessage) => {
               new ModuleUrlRebasingImporter(
                 entryDirectory,
                 directoryCache,
+                rebaseSourceMaps,
                 proxyImporter.findFileUrl,
               ),
             )
@@ -116,7 +119,12 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       options.importers ??= [];
       options.importers.push(
         sassBindWorkaround(
-          new LoadPathsUrlRebasingImporter(entryDirectory, directoryCache, options.loadPaths),
+          new LoadPathsUrlRebasingImporter(
+            entryDirectory,
+            directoryCache,
+            rebaseSourceMaps,
+            options.loadPaths,
+          ),
         ),
       );
       options.loadPaths = undefined;
@@ -125,7 +133,7 @@ parentPort.on('message', (message: RenderRequestMessage) => {
     let relativeImporter;
     if (rebase) {
       relativeImporter = sassBindWorkaround(
-        new RelativeUrlRebasingImporter(entryDirectory, directoryCache),
+        new RelativeUrlRebasingImporter(entryDirectory, directoryCache, rebaseSourceMaps),
       );
     }
 
@@ -150,6 +158,17 @@ parentPort.on('message', (message: RenderRequestMessage) => {
           }
         : undefined,
     });
+
+    if (result.sourceMap && rebaseSourceMaps?.size) {
+      // Merge the intermediate rebasing source maps into the final Sass generated source map.
+      // Casting is required due to small but compatible differences in typings between the packages.
+      result.sourceMap = mergeSourceMaps(
+        result.sourceMap as unknown as RawSourceMap,
+        // To prevent an infinite lookup loop, skip getting the source when the rebasing source map
+        // is referencing its original self.
+        (file, context) => (file !== context.importer ? rebaseSourceMaps.get(file) : null),
+      ) as unknown as typeof result.sourceMap;
+    }
 
     parentPort.postMessage({
       id,
