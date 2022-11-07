@@ -8,7 +8,7 @@
 
 import { json, logging } from '@angular-devkit/core';
 import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
-import { mergeMap, tap } from 'rxjs/operators';
+import { defaultIfEmpty, mergeMap, tap } from 'rxjs/operators';
 import {
   BuilderContext,
   BuilderHandlerFn,
@@ -218,6 +218,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
         subscriptions.push(
           result
             .pipe(
+              defaultIfEmpty({ success: false } as unknown),
               tap(() => {
                 progress({ state: BuilderProgressState.Running, current: total }, context);
                 progress({ state: BuilderProgressState.Stopped }, context);
