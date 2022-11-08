@@ -35,7 +35,7 @@ import {
 
 // eslint-disable-next-line max-lines-per-function
 export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
-  const { root, buildOptions } = wco;
+  const { root, buildOptions, logger } = wco;
   const extraPlugins: Configuration['plugins'] = [];
 
   extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
@@ -93,7 +93,7 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
       tailwindPackagePath = require.resolve('tailwindcss', { paths: [wco.root] });
     } catch {
       const relativeTailwindConfigPath = path.relative(wco.root, tailwindConfigPath);
-      wco.logger.warn(
+      logger.warn(
         `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
           ` but the 'tailwindcss' package is not installed.` +
           ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
@@ -137,16 +137,22 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
     return optionGenerator;
   };
 
-  // load component css as raw strings
-  const componentsSourceMap = !!(
-    cssSourceMap &&
-    // Never use component css sourcemap when style optimizations are on.
-    // It will just increase bundle size without offering good debug experience.
-    !buildOptions.optimization.styles.minify &&
-    // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
-    // for component css.
-    !buildOptions.sourceMap.hidden
-  );
+  let componentsSourceMap = !!cssSourceMap;
+  if (cssSourceMap) {
+    if (buildOptions.optimization.styles.minify) {
+      // Never use component css sourcemap when style optimizations are on.
+      // It will just increase bundle size without offering good debug experience.
+      logger.warn(
+        'Components styles sourcemaps are not generated when styles optimization is enabled.',
+      );
+      componentsSourceMap = false;
+    } else if (buildOptions.sourceMap.hidden) {
+      // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
+      // for component css.
+      logger.warn('Components styles sourcemaps are not generated when sourcemaps are hidden.');
+      componentsSourceMap = false;
+    }
+  }
 
   // extract global css from js files into own css file.
   extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
