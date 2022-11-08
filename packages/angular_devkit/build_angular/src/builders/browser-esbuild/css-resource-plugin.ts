@@ -34,6 +34,15 @@ export function createCssResourcePlugin(): Plugin {
           return null;
         }
 
+        // If root-relative, absolute or protocol relative url, mark as external to leave the
+        // path/URL in place.
+        if (/^((?:\w+:)?\/\/|data:|chrome:|#|\/)/.test(args.path)) {
+          return {
+            path: args.path,
+            external: true,
+          };
+        }
+
         const { importer, kind, resolveDir, namespace, pluginData = {} } = args;
         pluginData[CSS_RESOURCE_RESOLUTION] = true;
 
