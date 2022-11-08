@@ -13,19 +13,20 @@ import { generateFromFiles } from '../utility/generate-from-files';
 import { Implement as GuardInterface, Schema as GuardOptions } from './schema';
 
 export default function (options: GuardOptions): Rule {
-  if (options.implements && options.implements.length > 0 && options.guardType) {
-    throw new SchematicsException('Options "implements" and "guardType" cannot be used together.');
+  if (!options.implements) {
+    throw new SchematicsException('Option "implements" is required.');
+  }
+  if (options.implements.length > 1 && options.functional) {
+    throw new SchematicsException(
+      'Can only specify one value for implements when generating a functional guard.',
+    );
   }
 
-  if (options.guardType) {
-    const guardType = options.guardType.replace(/^can/, 'Can') + 'Fn';
+  if (options.functional) {
+    const guardType = options.implements[0] + 'Fn';
 
     return generateFromFiles({ ...options, templateFilesDirectory: './type-files' }, { guardType });
   } else {
-    if (!options.implements || options.implements.length < 1) {
-      options.implements = [GuardInterface.CanActivate];
-    }
-
     const implementations = options.implements
       .map((implement) => (implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement))
       .join(', ');
