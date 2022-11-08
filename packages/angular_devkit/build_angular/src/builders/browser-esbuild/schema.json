@@ -68,8 +68,7 @@
           },
           {
             "type": "string",
-            "description": "The file to include.",
-            "pattern": "\\.[cm]?jsx?$"
+            "description": "The JavaScript/TypeScript file or package containing the file to include."
           }
         ]
       }

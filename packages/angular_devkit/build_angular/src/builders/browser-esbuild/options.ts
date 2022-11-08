@@ -14,7 +14,7 @@ import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } fr
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
-import { normalizeGlobalStyles } from '../../webpack/utils/helpers';
+import { globalScriptsByBundleName, normalizeGlobalStyles } from '../../webpack/utils/helpers';
 import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
 
 export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -85,6 +85,13 @@ export async function normalizeOptions(
     );
     for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
       globalStyles.push({ name, files, initial: !noInjectNames.includes(name) });
+    }
+  }
+
+  const globalScripts: { name: string; files: string[]; initial: boolean }[] = [];
+  if (options.scripts?.length) {
+    for (const { bundleName, paths, inject } of globalScriptsByBundleName(options.scripts)) {
+      globalScripts.push({ name: bundleName, files: paths, initial: inject });
     }
   }
 
@@ -186,6 +193,7 @@ export async function normalizeOptions(
     outputNames,
     fileReplacements,
     globalStyles,
+    globalScripts,
     serviceWorkerOptions,
     indexHtmlOptions,
     tailwindConfiguration,

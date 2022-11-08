@@ -25,6 +25,7 @@ import { checkCommonJSModules } from './commonjs-checker';
 import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
 import { BundlerContext, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
+import { createGlobalScriptsBundleOptions } from './global-scripts';
 import { extractLicenses } from './license-extractor';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
@@ -124,17 +125,28 @@ async function execute(
       createGlobalStylesBundleOptions(options, target, browsers),
     );
 
-  const [codeResults, styleResults] = await Promise.all([
+  const globalScriptsBundleContext = new BundlerContext(
+    workspaceRoot,
+    !!options.watch,
+    createGlobalScriptsBundleOptions(options),
+  );
+
+  const [codeResults, styleResults, scriptResults] = await Promise.all([
     // Execute esbuild to bundle the application code
     codeBundleContext.bundle(),
     // Execute esbuild to bundle the global stylesheets
     globalStylesBundleContext.bundle(),
+    globalScriptsBundleContext.bundle(),
   ]);
 
   // Log all warnings and errors generated during bundling
   await logMessages(context, {
-    errors: [...(codeResults.errors || []), ...(styleResults.errors || [])],
-    warnings: [...codeResults.warnings, ...styleResults.warnings],
+    errors: [
+      ...(codeResults.errors || []),
+      ...(styleResults.errors || []),
+      ...(scriptResults.errors || []),
+    ],
+    warnings: [...codeResults.warnings, ...styleResults.warnings, ...scriptResults.warnings],
   });
 
   const executionResult = new ExecutionResult(
@@ -144,7 +156,7 @@ async function execute(
   );
 
   // Return if the bundling has errors
-  if (codeResults.errors || styleResults.errors) {
+  if (codeResults.errors || styleResults.errors || scriptResults.errors) {
     return executionResult;
   }
 
@@ -154,13 +166,29 @@ async function execute(
   );
 
   // Combine the bundling output files
-  const initialFiles: FileInfo[] = [...codeResults.initialFiles, ...styleResults.initialFiles];
-  executionResult.outputFiles.push(...codeResults.outputFiles, ...styleResults.outputFiles);
+  const initialFiles: FileInfo[] = [
+    ...codeResults.initialFiles,
+    ...styleResults.initialFiles,
+    ...scriptResults.initialFiles,
+  ];
+  executionResult.outputFiles.push(
+    ...codeResults.outputFiles,
+    ...styleResults.outputFiles,
+    ...scriptResults.outputFiles,
+  );
 
   // Combine metafiles used for the stats option as well as bundle budgets and console output
   const metafile = {
-    inputs: { ...codeResults.metafile?.inputs, ...styleResults.metafile?.inputs },
-    outputs: { ...codeResults.metafile?.outputs, ...styleResults.metafile?.outputs },
+    inputs: {
+      ...codeResults.metafile?.inputs,
+      ...styleResults.metafile?.inputs,
+      ...scriptResults.metafile?.inputs,
+    },
+    outputs: {
+      ...codeResults.metafile?.outputs,
+      ...styleResults.metafile?.outputs,
+      ...scriptResults.metafile?.outputs,
+    },
   };
 
   // Check metafile for CommonJS module usage if optimizing scripts
