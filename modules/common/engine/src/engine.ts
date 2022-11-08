@@ -15,7 +15,7 @@ import { URL } from 'url';
 
 /** These are the allowed options for the render */
 export interface RenderOptions {
-  bootstrap: Type<{}>;
+  bootstrap?: Type<{}>;
   providers?: StaticProvider[];
   url?: string;
   document?: string;
@@ -105,6 +105,11 @@ export class CommonEngine {
     }
 
     const moduleOrFactory = this.module || opts.bootstrap;
+
+    if (!moduleOrFactory) {
+      throw new Error('A module or bootstrap option must be provided.');
+    }
+
     const html = await renderModule(moduleOrFactory, { extraProviders });
     if (!inlineCriticalCss) {
       return html;

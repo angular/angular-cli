@@ -14,10 +14,10 @@ import type { Request, Response } from 'express';
 /**
  * These are the allowed options for the engine
  */
-export type NgSetupOptions = Pick<
-  CommonRenderOptions,
-  'bootstrap' | 'providers' | 'publicPath' | 'inlineCriticalCss'
->;
+export interface NgSetupOptions
+  extends Pick<CommonRenderOptions, 'providers' | 'publicPath' | 'inlineCriticalCss'> {
+  bootstrap: NonNullable<CommonRenderOptions['bootstrap']>;
+}
 
 /**
  * These are the allowed options for the render
