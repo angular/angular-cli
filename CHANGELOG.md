@@ -1,3 +1,19 @@
+<a name="14.2.2"></a>
+
+# 14.2.2 (2022-11-09)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                         |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------- |
+| [7f2ce670](https://github.com/angular/universal/commit/7f2ce670714c466a7ea6d747f7f22504a9fbd618) | fix  | mark `bootstrap` in `RenderOptions` as non required |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-next.1"></a>
 
 # 15.0.0-next.1 (2022-11-03)
