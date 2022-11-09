@@ -1,3 +1,30 @@
+<a name="15.0.0-rc.3"></a>
+
+# 15.0.0-rc.3 (2022-11-09)
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [24770f4e7](https://github.com/angular/angular-cli/commit/24770f4e75b4347428ef66d4171f5a73e254003e) | fix  | default to failure if no builder result is provided |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------- |
+| [001445982](https://github.com/angular/angular-cli/commit/0014459820dc1c127e93993414c154947a7f8da6) | fix  | account for package.json exports with Sass in esbuild builder                                |
+| [4cb27b803](https://github.com/angular/angular-cli/commit/4cb27b8031d0f36e687c5116538ebe473acaa149) | fix  | avoid attempted resolve of external CSS URLs with esbuild builder                            |
+| [f143171fd](https://github.com/angular/angular-cli/commit/f143171fd030fa1cc8df84ed5f0b96f5ad0f9e10) | fix  | only add `@angular/platform-server/init` when package is installed.                          |
+| [7dd122ad5](https://github.com/angular/angular-cli/commit/7dd122ad5f34a488f3784326b579b8a93511af7e) | fix  | rebase Sass url() values when using esbuild-based builder                                    |
+| [0d62157a3](https://github.com/angular/angular-cli/commit/0d62157a30a246c1e00273c2300b9251574e75ae) | fix  | update sourcemaps when rebasing Sass url() functions in esbuild builder                      |
+| [b059fc735](https://github.com/angular/angular-cli/commit/b059fc73597c12330a96fca5f6ab9b1ca226136c) | fix  | warn when components styles sourcemaps are not generated when styles optimization is enabled |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-rc.2"></a>
 
 # 15.0.0-rc.2 (2022-11-02)
