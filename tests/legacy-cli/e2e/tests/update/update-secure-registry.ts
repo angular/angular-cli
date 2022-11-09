@@ -1,7 +1,9 @@
-import { ng } from '../../utils/process';
+import { exec, ng } from '../../utils/process';
 import { createNpmConfigForAuthentication } from '../../utils/registry';
 import { expectToFail } from '../../utils/utils';
 import { isPrereleaseCli } from '../../utils/project';
+import { getActivePackageManager } from '../../utils/packages';
+import assert from 'node:assert';
 
 export default async function () {
   // The environment variable has priority over the .npmrc
@@ -32,4 +34,13 @@ export default async function () {
 
   await createNpmConfigForAuthentication(true, true);
   await expectToFail(() => ng('update', ...extraArgs));
+
+  if (getActivePackageManager() === 'yarn') {
+    // When running `ng update` using yarn (`yarn ng update`), yarn will set the `npm_config_registry` env variable to `https://registry.yarnpkg.com`
+    // Validate the the registry in the RC is used.
+    await createNpmConfigForAuthentication(true, true);
+
+    const error = await expectToFail(() => exec('yarn', 'ng', 'update', ...extraArgs));
+    assert.match(error.message, /not allowed to access package/);
+  }
 }

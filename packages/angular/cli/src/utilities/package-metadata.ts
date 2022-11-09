@@ -139,6 +139,18 @@ function readOptions(
       continue;
     }
 
+    if (
+      normalizedName === 'registry' &&
+      rcOptions['registry'] &&
+      value === 'https://registry.yarnpkg.com' &&
+      process.env['npm_config_user_agent']?.includes('yarn')
+    ) {
+      // When running `ng update` using yarn (`yarn ng update`), yarn will set the `npm_config_registry` env variable to `https://registry.yarnpkg.com`
+      // even when an RC file is present with a different repository.
+      // This causes the registry specified in the RC to always be overridden with the below logic.
+      continue;
+    }
+
     normalizedName = normalizedName.replace(/(?!^)_/g, '-'); // don't replace _ at the start of the key.s
     envVariablesOptions[normalizedName] = value;
   }
