@@ -1,3 +1,25 @@
+<a name="14.2.9"></a>
+
+# 14.2.9 (2022-11-09)
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [e3e787767](https://github.com/angular/angular-cli/commit/e3e78776782da9d933f7b0e4c6bf391a62585bee) | fix  | default to failure if no builder result is provided |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [12b2dc5a2](https://github.com/angular/angular-cli/commit/12b2dc5a2374f992df151af32cc80e2c2d7c4dee) | fix  | isolate zone.js usage when rendering server bundles |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.8"></a>
 
 # 14.2.8 (2022-11-02)
