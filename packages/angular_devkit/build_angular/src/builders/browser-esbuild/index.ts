@@ -92,7 +92,10 @@ async function execute(
 
   const [codeResults, styleResults] = await Promise.all([
     // Execute esbuild to bundle the application code
-    bundle(rebuildState?.codeRebuild ?? createCodeBundleOptions(options, target, codeBundleCache)),
+    bundle(
+      workspaceRoot,
+      rebuildState?.codeRebuild ?? createCodeBundleOptions(options, target, codeBundleCache),
+    ),
     // Execute esbuild to bundle the global stylesheets
     bundleGlobalStylesheets(options, target),
   ]);
@@ -108,31 +111,9 @@ async function execute(
     return new ExecutionResult(false, rebuildState?.codeRebuild, codeBundleCache);
   }
 
-  // Structure the code bundling output files
-  const initialFiles: FileInfo[] = [];
-  const outputFiles: OutputFile[] = [];
-  for (const outputFile of codeResults.outputFiles) {
-    // Entries in the metafile are relative to the `absWorkingDir` option which is set to the workspaceRoot
-    const relativeFilePath = path.relative(workspaceRoot, outputFile.path);
-    const entryPoint = codeResults.metafile?.outputs[relativeFilePath]?.entryPoint;
-
-    outputFile.path = relativeFilePath;
-
-    if (entryPoint) {
-      // An entryPoint value indicates an initial file
-      initialFiles.push({
-        file: outputFile.path,
-        // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
-        name: path.basename(outputFile.path).split('.')[0],
-        extension: path.extname(outputFile.path),
-      });
-    }
-    outputFiles.push(outputFile);
-  }
-
-  // Add global stylesheets output files
-  outputFiles.push(...styleResults.outputFiles);
-  initialFiles.push(...styleResults.initialFiles);
+  // Combine the bundling output files
+  const initialFiles: FileInfo[] = [...codeResults.initialFiles, ...styleResults.initialFiles];
+  const outputFiles: OutputFile[] = [...codeResults.outputFiles, ...styleResults.outputFiles];
 
   // Return if the global stylesheet bundling has errors
   if (styleResults.errors.length) {
@@ -268,7 +249,6 @@ function createCodeBundleOptions(
     conditions: ['es2020', 'es2015', 'module'],
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
     logLevel: options.verbose ? 'debug' : 'silent',
-    metafile: true,
     minify: optimizationOptions.scripts,
     pure: ['forwardRef'],
     outdir: workspaceRoot,

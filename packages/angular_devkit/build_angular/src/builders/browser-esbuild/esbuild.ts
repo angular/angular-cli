@@ -17,6 +17,8 @@ import {
   build,
   formatMessages,
 } from 'esbuild';
+import { basename, extname, relative } from 'node:path';
+import { FileInfo } from '../../utils/index-file/augment-index-html';
 
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
@@ -39,16 +41,20 @@ export function isEsBuildFailure(value: unknown): value is BuildFailure {
  * warnings and errors for the attempted build.
  */
 export async function bundle(
+  workspaceRoot: string,
   optionsOrInvalidate: BuildOptions | BuildInvalidate,
 ): Promise<
-  (BuildResult & { outputFiles: OutputFile[] }) | (BuildFailure & { outputFiles?: never })
+  | (BuildResult & { outputFiles: OutputFile[]; initialFiles: FileInfo[] })
+  | (BuildFailure & { outputFiles?: never })
 > {
+  let result;
   try {
     if (typeof optionsOrInvalidate === 'function') {
-      return (await optionsOrInvalidate()) as BuildResult & { outputFiles: OutputFile[] };
+      result = (await optionsOrInvalidate()) as BuildResult & { outputFiles: OutputFile[] };
     } else {
-      return await build({
+      result = await build({
         ...optionsOrInvalidate,
+        metafile: true,
         write: false,
       });
     }
@@ -60,6 +66,27 @@ export async function bundle(
       throw failure;
     }
   }
+
+  const initialFiles: FileInfo[] = [];
+  for (const outputFile of result.outputFiles) {
+    // Entries in the metafile are relative to the `absWorkingDir` option which is set to the workspaceRoot
+    const relativeFilePath = relative(workspaceRoot, outputFile.path);
+    const entryPoint = result.metafile?.outputs[relativeFilePath]?.entryPoint;
+
+    outputFile.path = relativeFilePath;
+
+    if (entryPoint) {
+      // An entryPoint value indicates an initial file
+      initialFiles.push({
+        file: outputFile.path,
+        // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
+        name: basename(outputFile.path).split('.')[0],
+        extension: extname(outputFile.path),
+      });
+    }
+  }
+
+  return { ...result, initialFiles };
 }
 
 export async function logMessages(

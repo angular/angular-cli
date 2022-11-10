@@ -28,7 +28,7 @@ async function bundleStylesheet(
   options: BundleStylesheetOptions,
 ) {
   // Execute esbuild
-  const result = await bundle({
+  const result = await bundle(options.workspaceRoot, {
     ...entry,
     absWorkingDir: options.workspaceRoot,
     bundle: true,
@@ -58,7 +58,6 @@ async function bundleStylesheet(
   const resourceFiles: OutputFile[] = [];
   if (result.outputFiles) {
     for (const outputFile of result.outputFiles) {
-      outputFile.path = path.relative(options.workspaceRoot, outputFile.path);
       const filename = path.basename(outputFile.path);
       if (filename.endsWith('.css')) {
         outputPath = outputFile.path;
