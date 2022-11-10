@@ -7,10 +7,10 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import * as assert from 'assert';
-import type { BuildInvalidate, BuildOptions, Message, OutputFile } from 'esbuild';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import type { BuildInvalidate, BuildOptions, OutputFile } from 'esbuild';
+import assert from 'node:assert';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { deleteOutputDir } from '../../utils';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
@@ -25,11 +25,12 @@ import { logExperimentalWarnings } from './experimental-warnings';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
-import { bundleStylesheetText } from './stylesheets';
+import { createStylesheetBundleOptions } from './stylesheets';
 import { ChangedFiles, createWatcher } from './watcher';
 
 interface RebuildState {
   codeRebuild?: BuildInvalidate;
+  globalStylesRebuild?: BuildInvalidate;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
 }
@@ -41,6 +42,7 @@ class ExecutionResult {
   constructor(
     private success: boolean,
     private codeRebuild?: BuildInvalidate,
+    private globalStylesRebuild?: BuildInvalidate,
     private codeBundleCache?: SourceFileCache,
   ) {}
 
@@ -55,6 +57,7 @@ class ExecutionResult {
 
     return {
       codeRebuild: this.codeRebuild,
+      globalStylesRebuild: this.globalStylesRebuild,
       codeBundleCache: this.codeBundleCache,
       fileChanges,
     };
@@ -97,7 +100,10 @@ async function execute(
       rebuildState?.codeRebuild ?? createCodeBundleOptions(options, target, codeBundleCache),
     ),
     // Execute esbuild to bundle the global stylesheets
-    bundleGlobalStylesheets(options, target),
+    bundle(
+      workspaceRoot,
+      rebuildState?.globalStylesRebuild ?? createGlobalStylesBundleOptions(options, target),
+    ),
   ]);
 
   // Log all warnings and errors generated during bundling
@@ -108,17 +114,32 @@ async function execute(
 
   // Return if the bundling failed to generate output files or there are errors
   if (!codeResults.outputFiles || codeResults.errors.length) {
-    return new ExecutionResult(false, rebuildState?.codeRebuild, codeBundleCache);
+    return new ExecutionResult(
+      false,
+      rebuildState?.codeRebuild,
+      (styleResults.outputFiles && styleResults.rebuild) ?? rebuildState?.globalStylesRebuild,
+      codeBundleCache,
+    );
   }
+
+  // Return if the global stylesheet bundling has errors
+  if (!styleResults.outputFiles || styleResults.errors.length) {
+    return new ExecutionResult(
+      false,
+      codeResults.rebuild,
+      rebuildState?.globalStylesRebuild,
+      codeBundleCache,
+    );
+  }
+
+  // Filter global stylesheet initial files
+  styleResults.initialFiles = styleResults.initialFiles.filter(
+    ({ name }) => options.globalStyles.find((style) => style.name === name)?.initial,
+  );
 
   // Combine the bundling output files
   const initialFiles: FileInfo[] = [...codeResults.initialFiles, ...styleResults.initialFiles];
   const outputFiles: OutputFile[] = [...codeResults.outputFiles, ...styleResults.outputFiles];
-
-  // Return if the global stylesheet bundling has errors
-  if (styleResults.errors.length) {
-    return new ExecutionResult(false, codeResults.rebuild, codeBundleCache);
-  }
 
   // Generate index HTML file
   if (indexHtmlOptions) {
@@ -184,14 +205,14 @@ async function execute(
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : `${error}`);
 
-      return new ExecutionResult(false, codeResults.rebuild, codeBundleCache);
+      return new ExecutionResult(false, codeResults.rebuild, styleResults.rebuild, codeBundleCache);
     }
   }
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
 
-  return new ExecutionResult(true, codeResults.rebuild, codeBundleCache);
+  return new ExecutionResult(true, codeResults.rebuild, styleResults.rebuild, codeBundleCache);
 }
 
 function createOutputFileFromText(path: string, text: string): OutputFile {
@@ -293,7 +314,10 @@ function createCodeBundleOptions(
   };
 }
 
-async function bundleGlobalStylesheets(options: NormalizedBrowserOptions, target: string[]) {
+function createGlobalStylesBundleOptions(
+  options: NormalizedBrowserOptions,
+  target: string[],
+): BuildOptions {
   const {
     workspaceRoot,
     optimizationOptions,
@@ -303,70 +327,54 @@ async function bundleGlobalStylesheets(options: NormalizedBrowserOptions, target
     preserveSymlinks,
     externalDependencies,
     stylePreprocessorOptions,
+    watch,
   } = options;
 
-  const outputFiles: OutputFile[] = [];
-  const initialFiles: FileInfo[] = [];
-  const errors: Message[] = [];
-  const warnings: Message[] = [];
+  const buildOptions = createStylesheetBundleOptions({
+    workspaceRoot,
+    optimization: !!optimizationOptions.styles.minify,
+    sourcemap: !!sourcemapOptions.styles,
+    preserveSymlinks,
+    target,
+    externalDependencies,
+    outputNames,
+    includePaths: stylePreprocessorOptions?.includePaths,
+  });
+  buildOptions.incremental = watch;
 
-  for (const { name, files, initial } of globalStyles) {
-    const virtualEntryData = files
-      .map((file) => `@import '${file.replace(/\\/g, '/')}';`)
-      .join('\n');
-    const sheetResult = await bundleStylesheetText(
-      virtualEntryData,
-      { virtualName: `angular:style/global;${name}`, resolvePath: workspaceRoot },
-      {
-        workspaceRoot,
-        optimization: !!optimizationOptions.styles.minify,
-        sourcemap: !!sourcemapOptions.styles && (sourcemapOptions.hidden ? 'external' : true),
-        outputNames: initial ? outputNames : { media: outputNames.media },
-        includePaths: stylePreprocessorOptions?.includePaths,
-        preserveSymlinks,
-        externalDependencies,
-        target,
-      },
-    );
-
-    errors.push(...sheetResult.errors);
-    warnings.push(...sheetResult.warnings);
-
-    if (!sheetResult.path) {
-      // Failed to process the stylesheet
-      assert.ok(
-        sheetResult.errors.length,
-        `Global stylesheet processing for '${name}' failed with no errors.`,
-      );
-
-      continue;
-    }
-
-    // The virtual stylesheets will be named `stdin` by esbuild. This must be replaced
-    // with the actual name of the global style and the leading directory separator must
-    // also be removed to make the path relative.
-    const sheetPath = sheetResult.path.replace('stdin', name);
-    let sheetContents = sheetResult.contents;
-    if (sheetResult.map) {
-      outputFiles.push(createOutputFileFromText(sheetPath + '.map', sheetResult.map));
-      sheetContents = sheetContents.replace(
-        'sourceMappingURL=stdin.css.map',
-        `sourceMappingURL=${name}.css.map`,
-      );
-    }
-    outputFiles.push(createOutputFileFromText(sheetPath, sheetContents));
-
-    if (initial) {
-      initialFiles.push({
-        file: sheetPath,
-        name,
-        extension: '.css',
-      });
-    }
-    outputFiles.push(...sheetResult.resourceFiles);
+  const namespace = 'angular:styles/global';
+  buildOptions.entryPoints = {};
+  for (const { name } of globalStyles) {
+    buildOptions.entryPoints[name] = `${namespace};${name}`;
   }
 
-  return { outputFiles, initialFiles, errors, warnings };
+  buildOptions.plugins.unshift({
+    name: 'angular-global-styles',
+    setup(build) {
+      build.onResolve({ filter: /^angular:styles\/global;/ }, (args) => {
+        if (args.kind !== 'entry-point') {
+          return null;
+        }
+
+        return {
+          path: args.path.split(';', 2)[1],
+          namespace,
+        };
+      });
+      build.onLoad({ filter: /./, namespace }, (args) => {
+        const files = globalStyles.find(({ name }) => name === args.path)?.files;
+        assert(files, `global style name should always be found [${args.path}]`);
+
+        return {
+          contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
+          loader: 'css',
+          resolveDir: workspaceRoot,
+        };
+      });
+    },
+  });
+
+  return buildOptions;
 }
 
 /**
