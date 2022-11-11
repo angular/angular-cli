@@ -47,6 +47,7 @@
       "default": false
     },
     "implements": {
+      "alias": "guardType",
       "type": "array",
       "description": "Specifies which type of guard to create.",
       "uniqueItems": true,
