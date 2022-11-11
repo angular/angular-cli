@@ -132,7 +132,7 @@
     "babel-loader": "9.1.0",
     "babel-plugin-istanbul": "6.1.1",
     "bootstrap": "^4.0.0",
-    "browserslist": "^4.9.1",
+    "browserslist": "4.21.4",
     "cacache": "17.0.2",
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
