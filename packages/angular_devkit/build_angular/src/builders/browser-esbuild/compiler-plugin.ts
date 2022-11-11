@@ -453,36 +453,33 @@ export function createCompilerPlugin(
             async () => {
               assert.ok(fileEmitter, 'Invalid plugin execution order');
 
+              const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
+
               // The filename is currently used as a cache key. Since the cache is memory only,
               // the options cannot change and do not need to be represented in the key. If the
               // cache is later stored to disk, then the options that affect transform output
               // would need to be added to the key as well as a check for any change of content.
               let contents = pluginOptions.sourceFileCache?.typeScriptFileCache.get(
-                pathToFileURL(args.path).href,
+                pathToFileURL(request).href,
               );
 
               if (contents === undefined) {
-                const typescriptResult = await fileEmitter(
-                  pluginOptions.fileReplacements?.[args.path] ?? args.path,
-                );
+                const typescriptResult = await fileEmitter(request);
                 if (!typescriptResult) {
                   // No TS result indicates the file is not part of the TypeScript program.
                   // If allowJs is enabled and the file is JS then defer to the next load hook.
-                  if (compilerOptions.allowJs && /\.[cm]?js$/.test(args.path)) {
+                  if (compilerOptions.allowJs && /\.[cm]?js$/.test(request)) {
                     return undefined;
                   }
 
                   // Otherwise return an error
                   return {
                     errors: [
-                      {
-                        text: `File '${args.path}' is missing from the TypeScript compilation.`,
-                        notes: [
-                          {
-                            text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
-                          },
-                        ],
-                      },
+                      createMissingFileError(
+                        request,
+                        args.path,
+                        build.initialOptions.absWorkingDir ?? '',
+                      ),
                     ],
                   };
                 }
@@ -494,13 +491,13 @@ export function createCompilerPlugin(
                 // would need to be added to the key as well.
                 contents = babelDataCache.get(data);
                 if (contents === undefined) {
-                  const transformedData = await transformWithBabel(args.path, data, pluginOptions);
+                  const transformedData = await transformWithBabel(request, data, pluginOptions);
                   contents = Buffer.from(transformedData, 'utf-8');
                   babelDataCache.set(data, contents);
                 }
 
                 pluginOptions.sourceFileCache?.typeScriptFileCache.set(
-                  pathToFileURL(args.path).href,
+                  pathToFileURL(request).href,
                   contents,
                 );
               }
@@ -686,4 +683,23 @@ function findAffectedFiles(
   }
 
   return affectedFiles;
+}
+
+function createMissingFileError(request: string, original: string, root: string): PartialMessage {
+  const error = {
+    text: `File '${path.relative(root, request)}' is missing from the TypeScript compilation.`,
+    notes: [
+      {
+        text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
+      },
+    ],
+  };
+
+  if (request !== original) {
+    error.notes.push({
+      text: `File is requested from a file replacement of '${path.relative(root, original)}'.`,
+    });
+  }
+
+  return error;
 }
