@@ -122,7 +122,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#fb42478534df7d48ec23a6834fea94a776cb89a0":
   version "0.0.0-7d103b83a07f132629592fc9918ce17d42a5e382"
-  uid fb42478534df7d48ec23a6834fea94a776cb89a0
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#fb42478534df7d48ec23a6834fea94a776cb89a0"
   dependencies:
     "@angular-devkit/build-angular" "15.0.0-rc.2"
@@ -237,7 +236,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#d1b5e1929c8b01f7621d65c54a52ac6a9adb22ad":
   version "0.0.0-7d103b83a07f132629592fc9918ce17d42a5e382"
-  uid d1b5e1929c8b01f7621d65c54a52ac6a9adb22ad
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#d1b5e1929c8b01f7621d65c54a52ac6a9adb22ad"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3661,7 +3659,7 @@ browser-sync@^2.27.7:
     ua-parser-js "1.0.2"
     yargs "^17.3.1"
 
-browserslist@*, browserslist@^4.14.5, browserslist@^4.21.3, browserslist@^4.21.4, browserslist@^4.9.1:
+browserslist@*, browserslist@4.21.4, browserslist@^4.14.5, browserslist@^4.21.3, browserslist@^4.21.4, browserslist@^4.9.1:
   version "4.21.4"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.21.4.tgz#e7496bbc67b9e39dd0f98565feccdcb0d4ff6987"
   integrity sha512-CBHJJdDmgjl3daYjN5Cp5kbTf1mUhZoS+beLklHIvkOWscs83YAhLlF3Wsh/lciQYAcbBJgTOD44VtG31ZM4Hw==
@@ -8333,7 +8331,6 @@ npm@^8.11.0:
     "@npmcli/fs" "^2.1.0"
     "@npmcli/map-workspaces" "^2.0.3"
     "@npmcli/package-json" "^2.0.0"
-    "@npmcli/promise-spawn" "^3.0.0"
     "@npmcli/run-script" "^4.2.1"
     abbrev "~1.1.1"
     archy "~1.0.0"
@@ -8344,7 +8341,6 @@ npm@^8.11.0:
     cli-table3 "^0.6.2"
     columnify "^1.6.0"
     fastest-levenshtein "^1.0.12"
-    fs-minipass "^2.1.0"
     glob "^8.0.1"
     graceful-fs "^4.2.10"
     hosted-git-info "^5.1.0"
@@ -8364,7 +8360,6 @@ npm@^8.11.0:
     libnpmteam "^4.0.4"
     libnpmversion "^3.0.7"
     make-fetch-happen "^10.2.0"
-    minimatch "^5.1.0"
     minipass "^3.1.6"
     minipass-pipeline "^1.2.4"
     mkdirp "^1.0.4"
@@ -9804,7 +9799,6 @@ sass@1.56.1:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:
