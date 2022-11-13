@@ -30,7 +30,7 @@
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
-    "css-loader": "6.7.1",
+    "css-loader": "6.7.2",
     "esbuild-wasm": "0.15.13",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
