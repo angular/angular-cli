@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { CompilerHost, NgtscProgram } from '@angular/compiler-cli';
+import type { NgtscProgram } from '@angular/compiler-cli';
 import { transformAsync } from '@babel/core';
 import type {
   OnStartResult,
@@ -25,6 +25,7 @@ import ts from 'typescript';
 import angularApplicationPreset from '../../babel/presets/application';
 import { requiresLinking } from '../../babel/webpack-loader';
 import { loadEsmModule } from '../../utils/load-esm';
+import { createAngularCompilerHost, ensureSourceFileVersions } from './angular-host';
 import {
   logCumulativeDurations,
   profileAsync,
@@ -268,77 +269,39 @@ export function createCompilerPlugin(
         // Reset stylesheet resource output files
         stylesheetResourceFiles = [];
 
-        // Create TypeScript compiler host
-        const host = ts.createIncrementalCompilerHost(compilerOptions);
+        // Create Angular compiler host
+        const host = createAngularCompilerHost(compilerOptions, {
+          fileReplacements: pluginOptions.fileReplacements,
+          modifiedFiles: pluginOptions.sourceFileCache?.modifiedFiles,
+          sourceFileCache: pluginOptions.sourceFileCache,
+          async transformStylesheet(data, containingFile, stylesheetFile) {
+            // Stylesheet file only exists for external stylesheets
+            const filename = stylesheetFile ?? containingFile;
 
-        // Temporarily process external resources via readResource.
-        // The AOT compiler currently requires this hook to allow for a transformResource hook.
-        // Once the AOT compiler allows only a transformResource hook, this can be reevaluated.
-        (host as CompilerHost).readResource = async function (fileName) {
-          // Template resources (.html/.svg) files are not bundled or transformed
-          if (fileName.endsWith('.html') || fileName.endsWith('.svg')) {
-            return this.readFile(fileName) ?? '';
-          }
+            // Temporary workaround for lack of virtual file support in the Sass plugin.
+            // External Sass stylesheets are transformed using the file instead of the already read content.
+            let stylesheetResult;
+            if (filename.endsWith('.scss') || filename.endsWith('.sass')) {
+              stylesheetResult = await bundleStylesheetFile(filename, styleOptions);
+            } else {
+              stylesheetResult = await bundleStylesheetText(
+                data,
+                {
+                  resolvePath: path.dirname(filename),
+                  virtualName: filename,
+                },
+                styleOptions,
+              );
+            }
 
-          const { contents, resourceFiles, errors, warnings } = await bundleStylesheetFile(
-            fileName,
-            styleOptions,
-          );
+            const { contents, resourceFiles, errors, warnings } = stylesheetResult;
+            (result.errors ??= []).push(...errors);
+            (result.warnings ??= []).push(...warnings);
+            stylesheetResourceFiles.push(...resourceFiles);
 
-          (result.errors ??= []).push(...errors);
-          (result.warnings ??= []).push(...warnings);
-          stylesheetResourceFiles.push(...resourceFiles);
-
-          return contents;
-        };
-
-        // Add an AOT compiler resource transform hook
-        (host as CompilerHost).transformResource = async function (data, context) {
-          // Only inline style resources are transformed separately currently
-          if (context.resourceFile || context.type !== 'style') {
-            return null;
-          }
-
-          // The file with the resource content will either be an actual file (resourceFile)
-          // or the file containing the inline component style text (containingFile).
-          const file = context.resourceFile ?? context.containingFile;
-
-          const { contents, resourceFiles, errors, warnings } = await bundleStylesheetText(
-            data,
-            {
-              resolvePath: path.dirname(file),
-              virtualName: file,
-            },
-            styleOptions,
-          );
-
-          (result.errors ??= []).push(...errors);
-          (result.warnings ??= []).push(...warnings);
-          stylesheetResourceFiles.push(...resourceFiles);
-
-          return { content: contents };
-        };
-
-        // Temporary deep import for host augmentation support
-        const {
-          augmentHostWithCaching,
-          augmentHostWithReplacements,
-          augmentProgramWithVersioning,
-        } = require('@ngtools/webpack/src/ivy/host');
-
-        // Augment TypeScript Host for file replacements option
-        if (pluginOptions.fileReplacements) {
-          augmentHostWithReplacements(host, pluginOptions.fileReplacements);
-        }
-
-        // Augment TypeScript Host with source file caching if provided
-        if (pluginOptions.sourceFileCache) {
-          augmentHostWithCaching(host, pluginOptions.sourceFileCache);
-          // Allow the AOT compiler to request the set of changed templates and styles
-          (host as CompilerHost).getModifiedResourceFiles = function () {
-            return pluginOptions.sourceFileCache?.modifiedFiles;
-          };
-        }
+            return contents;
+          },
+        });
 
         // Create the Angular specific program that contains the Angular compiler
         const angularProgram = profileSync(
@@ -348,7 +311,7 @@ export function createCompilerPlugin(
         previousAngularProgram = angularProgram;
         const angularCompiler = angularProgram.compiler;
         const typeScriptProgram = angularProgram.getTsProgram();
-        augmentProgramWithVersioning(typeScriptProgram);
+        ensureSourceFileVersions(typeScriptProgram);
 
         const builder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
           typeScriptProgram,
