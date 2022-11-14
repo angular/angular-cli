@@ -1,3 +1,27 @@
+<a name="15.0.0-rc.4"></a>
+
+# 15.0.0-rc.4 (2022-11-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [ff0382718](https://github.com/angular/angular-cli/commit/ff0382718af60923fe71f8b224d36a50449484e6) | fix  | respect registry in RC when running update through yarn |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [54e1c01d8](https://github.com/angular/angular-cli/commit/54e1c01d8b608ff240f7559ca176cd50e991952c) | fix  | show file replacement in TS missing file error in esbuild builder   |
+| [fc82e3bec](https://github.com/angular/angular-cli/commit/fc82e3bec3f188d449e952d9955b845b2efdcd6b) | fix  | update browerslist package                                          |
+| [9d0872fb5](https://github.com/angular/angular-cli/commit/9d0872fb5e369f714633387d9ae39c4242ba1ea1) | perf | add initial global styles incremental rebuilds with esbuild builder |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-rc.3"></a>
 
 # 15.0.0-rc.3 (2022-11-09)
