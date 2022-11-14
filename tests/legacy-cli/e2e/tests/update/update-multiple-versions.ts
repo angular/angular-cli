@@ -7,7 +7,7 @@ import { expectToFail } from '../../utils/utils';
 export default async function () {
   let restoreRegistry: (() => Promise<void>) | undefined;
   try {
-    restoreRegistry = await createProjectFromAsset('12.0-project', true);
+    restoreRegistry = await createProjectFromAsset('13.0-project', true);
     await setRegistry(true);
 
     const extraArgs = ['--force'];
@@ -17,10 +17,10 @@ export default async function () {
 
     // Update Angular from v12 to 13
     const { stdout } = await ng('update', ...extraArgs);
-    if (!/@angular\/core\s+12\.\d\.\d+ -> 13\.\d\.\d+\s+ng update @angular\/core@13/.test(stdout)) {
-      // @angular/core                      12.x.x -> 13.x.x         ng update @angular/core@13
+    if (!/@angular\/core\s+13\.\d\.\d+ -> 14\.\d\.\d+\s+ng update @angular\/core@14/.test(stdout)) {
+      // @angular/core                      13.x.x -> 14.x.x         ng update @angular/core@14
       throw new Error(
-        `Output didn't match "@angular/core                      12.x.x -> 13.x.x         ng update @angular/core@13". OUTPUT: \n` +
+        `Output didn't match "@angular/core                      13.x.x -> 14.x.x         ng update @angular/core@14". OUTPUT: \n` +
           stdout,
       );
     }
