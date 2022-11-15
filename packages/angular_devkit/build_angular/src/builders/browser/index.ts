@@ -111,20 +111,6 @@ async function initialize(
       getStylesConfig(wco),
     ]);
 
-  // Validate asset option values if processed directly
-  if (options.assets?.length && !adjustedOptions.assets?.length) {
-    normalizeAssetPatterns(
-      options.assets,
-      context.workspaceRoot,
-      projectRoot,
-      projectSourceRoot,
-    ).forEach(({ output }) => {
-      if (output.startsWith('..')) {
-        throw new Error('An asset cannot be written to a location outside of the output path.');
-      }
-    });
-  }
-
   let transformedConfig;
   if (webpackConfigurationTransform) {
     transformedConfig = await webpackConfigurationTransform(config);

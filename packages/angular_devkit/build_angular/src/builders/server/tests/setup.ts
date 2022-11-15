@@ -25,4 +25,7 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
   progress: false,
   watch: false,
   outputPath: 'dist',
+
+  // Disable optimizations
+  optimization: false,
 });

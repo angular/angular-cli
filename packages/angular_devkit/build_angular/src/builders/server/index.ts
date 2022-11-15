@@ -10,14 +10,22 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import { runWebpack } from '@angular-devkit/build-webpack';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { concatMap } from 'rxjs/operators';
 import webpack, { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
-import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../../utils';
+import {
+  NormalizedBrowserBuilderSchema,
+  deleteOutputDir,
+  normalizeAssetPatterns,
+} from '../../utils';
+import { colors } from '../../utils/color';
+import { copyAssets } from '../../utils/copy-assets';
+import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
 import { I18nOptions } from '../../utils/i18n-options';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
+import { Spinner } from '../../utils/spinner';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   BrowserWebpackConfigOptions,
@@ -69,7 +77,7 @@ export function execute(
   let outputPaths: undefined | Map<string, string>;
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
-    concatMap(({ config, i18n }) => {
+    concatMap(({ config, i18n, projectRoot, projectSourceRoot }) => {
       return runWebpack(config, context, {
         webpackFactory: require('webpack') as typeof webpack,
         logging: (stats, config) => {
@@ -84,11 +92,43 @@ export function execute(
             throw new Error('Webpack stats build result is required.');
           }
 
-          let success = output.success;
-          if (success && i18n.shouldInline) {
-            outputPaths = ensureOutputPaths(baseOutputPath, i18n);
+          if (!output.success) {
+            return output;
+          }
 
-            success = await i18nInlineEmittedFiles(
+          const spinner = new Spinner();
+          spinner.enabled = options.progress !== false;
+          outputPaths = ensureOutputPaths(baseOutputPath, i18n);
+
+          // Copy assets
+          if (!options.watch && options.assets?.length) {
+            spinner.start('Copying assets...');
+            try {
+              await copyAssets(
+                normalizeAssetPatterns(
+                  options.assets,
+                  context.workspaceRoot,
+                  projectRoot,
+                  projectSourceRoot,
+                ),
+                Array.from(outputPaths.values()),
+                context.workspaceRoot,
+              );
+              spinner.succeed('Copying assets complete.');
+            } catch (err) {
+              spinner.fail(colors.redBright('Copying of assets failed.'));
+              assertIsError(err);
+
+              return {
+                ...output,
+                success: false,
+                error: 'Unable to copy assets: ' + err.message,
+              };
+            }
+          }
+
+          if (i18n.shouldInline) {
+            const success = await i18nInlineEmittedFiles(
               context,
               emittedFiles,
               i18n,
@@ -98,15 +138,21 @@ export function execute(
               outputPath,
               options.i18nMissingTranslation,
             );
+            if (!success) {
+              return {
+                ...output,
+                success: false,
+              };
+            }
           }
 
           webpackStatsLogger(context.logger, webpackStats, config);
 
-          return { ...output, success };
+          return output;
         }),
       );
     }),
-    map((output) => {
+    concatMap(async (output) => {
       if (!output.success) {
         return output as ServerBuilderOutput;
       }
@@ -137,28 +183,34 @@ async function initialize(
 ): Promise<{
   config: webpack.Configuration;
   i18n: I18nOptions;
+  projectRoot: string;
+  projectSourceRoot?: string;
 }> {
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
 
   const browserslist = (await import('browserslist')).default;
   const originalOutputPath = options.outputPath;
-  const { config, i18n } = await generateI18nBrowserWebpackConfigFromContext(
-    {
-      ...options,
-      buildOptimizer: false,
-      aot: true,
-      platform: 'server',
-    } as NormalizedBrowserBuilderSchema,
-    context,
-    (wco) => {
-      // We use the platform to determine the JavaScript syntax output.
-      wco.buildOptions.supportedBrowsers ??= [];
-      wco.buildOptions.supportedBrowsers.push(...browserslist('maintained node versions'));
+  // Assets are processed directly by the builder except when watching
+  const adjustedOptions = options.watch ? options : { ...options, assets: [] };
 
-      return [getPlatformServerExportsConfig(wco), getCommonConfig(wco), getStylesConfig(wco)];
-    },
-  );
+  const { config, projectRoot, projectSourceRoot, i18n } =
+    await generateI18nBrowserWebpackConfigFromContext(
+      {
+        ...adjustedOptions,
+        buildOptimizer: false,
+        aot: true,
+        platform: 'server',
+      } as NormalizedBrowserBuilderSchema,
+      context,
+      (wco) => {
+        // We use the platform to determine the JavaScript syntax output.
+        wco.buildOptions.supportedBrowsers ??= [];
+        wco.buildOptions.supportedBrowsers.push(...browserslist('maintained node versions'));
+
+        return [getPlatformServerExportsConfig(wco), getCommonConfig(wco), getStylesConfig(wco)];
+      },
+    );
 
   if (options.deleteOutputPath) {
     deleteOutputDir(context.workspaceRoot, originalOutputPath);
@@ -166,7 +218,7 @@ async function initialize(
 
   const transformedConfig = (await webpackConfigurationTransform?.(config)) ?? config;
 
-  return { config: transformedConfig, i18n };
+  return { config: transformedConfig, i18n, projectRoot, projectSourceRoot };
 }
 
 /**
