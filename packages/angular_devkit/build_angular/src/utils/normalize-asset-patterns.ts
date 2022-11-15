@@ -66,11 +66,13 @@ export function normalizeAssetPatterns(
       // Output directory for both is the relative path from source root to input.
       const output = path.relative(resolvedSourceRoot, path.resolve(workspaceRoot, input));
 
-      // Return the asset pattern in object format.
-      return { glob, input, output };
-    } else {
-      // It's already an AssetPatternObject, no need to convert.
-      return assetPattern;
+      assetPattern = { glob, input, output };
     }
+
+    if (assetPattern.output.startsWith('..')) {
+      throw new Error('An asset cannot be written to a location outside of the output path.');
+    }
+
+    return assetPattern;
   });
 }

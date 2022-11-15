@@ -246,6 +246,7 @@ export interface ProtractorBuilderOptions {
 
 // @public (undocumented)
 export interface ServerBuilderOptions {
+    assets?: AssetPattern_3[];
     deleteOutputPath?: boolean;
     // @deprecated
     deployUrl?: string;

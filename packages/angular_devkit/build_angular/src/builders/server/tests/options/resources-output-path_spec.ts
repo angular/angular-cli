@@ -35,10 +35,10 @@ describeBuilder(execute, SERVER_BUILDER_INFO, (harness) => {
 
       harness
         .expectFile('dist/main.js')
-        .content.toContain(`url(/assets/component-img-absolute.png)`);
+        .content.toContain(`url('/assets/component-img-absolute.png')`);
       harness
         .expectFile('dist/main.js')
-        .content.toContain(`url(out-assets/component-img-relative.png)`);
+        .content.toContain(`url('out-assets/component-img-relative.png')`);
 
       // Assets are not emitted during a server builds.
       harness.expectFile('dist/out-assets/component-img-relative.png').toNotExist();
@@ -54,8 +54,8 @@ describeBuilder(execute, SERVER_BUILDER_INFO, (harness) => {
 
       harness
         .expectFile('dist/main.js')
-        .content.toContain(`url(/assets/component-img-absolute.png)`);
-      harness.expectFile('dist/main.js').content.toContain(`url(component-img-relative.png)`);
+        .content.toContain(`url('/assets/component-img-absolute.png')`);
+      harness.expectFile('dist/main.js').content.toContain(`url('component-img-relative.png')`);
 
       // Assets are not emitted during a server builds.
       harness.expectFile('dist/component-img-relative.png').toNotExist();
