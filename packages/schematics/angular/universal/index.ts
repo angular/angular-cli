@@ -60,6 +60,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
           preserveSymlinks: options?.preserveSymlinks,
           extractLicenses: options?.extractLicenses,
           inlineStyleLanguage: options?.inlineStyleLanguage,
+          vendorChunk: options?.vendorChunk,
         };
       };
 
