@@ -49,6 +49,9 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
                 bundleDependencies: true,
                 aot: true,
               },
+              development: {
+                bundleDependencies: true,
+              },
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
           },
@@ -82,5 +85,15 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
     expect(configurations).toBeDefined();
     expect(configurations?.one.bundleDependencies).toBeUndefined();
     expect(configurations?.two.bundleDependencies).toBeUndefined();
+  });
+
+  it(`should add 'vendorChunk: true' to development configuration`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { options, configurations } = getServerTarget(newTree);
+
+    expect(options.bundleDependencies).toBeUndefined();
+    expect(configurations).toBeDefined();
+    expect(configurations?.development.vendorChunk).toBeTrue();
+    expect(configurations?.one.vendorChunk).toBeUndefined();
   });
 });

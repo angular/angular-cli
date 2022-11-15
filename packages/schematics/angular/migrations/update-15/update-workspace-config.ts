@@ -18,8 +18,12 @@ export default function (): Rule {
           continue;
         }
 
-        for (const [, options] of allTargetOptions(target)) {
+        for (const [name, options] of allTargetOptions(target)) {
           delete options.bundleDependencies;
+
+          if (name === 'development') {
+            options.vendorChunk ??= true;
+          }
         }
       }
     }

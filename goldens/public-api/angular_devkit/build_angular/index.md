@@ -269,6 +269,7 @@ export interface ServerBuilderOptions {
     statsJson?: boolean;
     stylePreprocessorOptions?: StylePreprocessorOptions_3;
     tsConfig: string;
+    vendorChunk?: boolean;
     verbose?: boolean;
     watch?: boolean;
 }
