@@ -1,3 +1,19 @@
+<a name="15.0.0-rc.1"></a>
+
+# 15.0.0-rc.1 (2022-11-15)
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                             |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------- |
+| [6d5500d7](https://github.com/angular/universal/commit/6d5500d72d6738b1f6e282d494becbbc972c8e6e) | fix  | fix formatting in generated `server.ts` |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-rc.0"></a>
 
 # 15.0.0-rc.0 (2022-11-09)
