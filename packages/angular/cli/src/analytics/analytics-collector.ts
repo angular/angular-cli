@@ -161,6 +161,11 @@ export class AnalyticsCollector {
   }
 
   private async send(data: Record<string, PrimitiveTypes | undefined>[]): Promise<void> {
+    // Temporarily disable sending analytics.
+    if (true as boolean) {
+      return Promise.resolve();
+    }
+
     return new Promise<void>((resolve, reject) => {
       const request = https.request(
         {
