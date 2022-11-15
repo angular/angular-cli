@@ -33,17 +33,21 @@ let forceExit = false;
    * See: https://github.com/browserslist/browserslist/blob/819c4337456996d19db6ba953014579329e9c6e1/node.js#L324
    */
   process.env.BROWSERSLIST_IGNORE_OLD_DATA = '1';
+  const rawCommandName = process.argv[2];
 
   /**
    * Disable CLI version mismatch checks and forces usage of the invoked CLI
    * instead of invoking the local installed version.
+   *
+   * When running `ng new` always favor the global version. As in some
+   * cases orphan `node_modules` would cause the non global CLI to be used.
+   * @see: https://github.com/angular/angular-cli/issues/14603
    */
-  if (disableVersionCheck) {
+  if (disableVersionCheck || rawCommandName === 'new') {
     return (await import('./cli')).default;
   }
 
   let cli;
-  const rawCommandName = process.argv[2];
 
   try {
     // No error implies a projectLocalCli, which will load whatever
