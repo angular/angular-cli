@@ -1,3 +1,19 @@
+<a name="15.0.0-rc.5"></a>
+
+# 15.0.0-rc.5 (2022-11-15)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [0fe6b3b75](https://github.com/angular/angular-cli/commit/0fe6b3b75b87f6f8050b196615e1c1543b707841) | perf | add vendor chunking to server builder |
+
+## Special Thanks
+
+Alan Agius and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0-rc.4"></a>
 
 # 15.0.0-rc.4 (2022-11-14)
