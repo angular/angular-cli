@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { NgtscProgram } from '@angular/compiler-cli';
 import type {
   OnStartResult,
   OutputFile,
@@ -21,8 +20,8 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 import { maxWorkers } from '../../utils/environment-options';
-import { loadEsmModule } from '../../utils/load-esm';
-import { createAngularCompilerHost, ensureSourceFileVersions } from './angular-host';
+import { AngularCompilation, FileEmitter } from './angular-compilation';
+import { AngularHostOptions } from './angular-host';
 import { JavaScriptTransformer } from './javascript-transformer';
 import {
   logCumulativeDurations,
@@ -32,28 +31,19 @@ import {
 } from './profiling';
 import { BundleStylesheetOptions, bundleStylesheetFile, bundleStylesheetText } from './stylesheets';
 
-interface EmitFileResult {
-  content?: string;
-  map?: string;
-  dependencies: readonly string[];
-  hash?: Uint8Array;
-}
-type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
-
 /**
  * Converts TypeScript Diagnostic related information into an esbuild compatible note object.
  * Related information is a subset of a full TypeScript Diagnostic and also used for diagnostic
  * notes associated with the main Diagnostic.
  * @param info The TypeScript diagnostic relative information to convert.
- * @param host A TypeScript FormatDiagnosticsHost instance to use during conversion.
  * @returns An esbuild diagnostic message as a PartialMessage object
  */
 function convertTypeScriptDiagnosticInfo(
   info: ts.DiagnosticRelatedInformation,
-  host: ts.FormatDiagnosticsHost,
   textPrefix?: string,
 ): PartialNote {
-  let text = ts.flattenDiagnosticMessageText(info.messageText, host.getNewLine());
+  const newLine = platform() === 'win32' ? '\r\n' : '\n';
+  let text = ts.flattenDiagnosticMessageText(info.messageText, newLine);
   if (textPrefix) {
     text = textPrefix + text;
   }
@@ -97,13 +87,9 @@ function convertTypeScriptDiagnosticInfo(
 /**
  * Converts a TypeScript Diagnostic message into an esbuild compatible message object.
  * @param diagnostic The TypeScript diagnostic to convert.
- * @param host A TypeScript FormatDiagnosticsHost instance to use during conversion.
  * @returns An esbuild diagnostic message as a PartialMessage object
  */
-function convertTypeScriptDiagnostic(
-  diagnostic: ts.Diagnostic,
-  host: ts.FormatDiagnosticsHost,
-): PartialMessage {
+function convertTypeScriptDiagnostic(diagnostic: ts.Diagnostic): PartialMessage {
   let codePrefix = 'TS';
   let code = `${diagnostic.code}`;
   if (diagnostic.source === 'ngtsc') {
@@ -113,14 +99,14 @@ function convertTypeScriptDiagnostic(
   }
 
   const message: PartialMessage = {
-    ...convertTypeScriptDiagnosticInfo(diagnostic, host, `${codePrefix}${code}: `),
+    ...convertTypeScriptDiagnosticInfo(diagnostic, `${codePrefix}${code}: `),
     // Store original diagnostic for reference if needed downstream
     detail: diagnostic,
   };
 
   if (diagnostic.relatedInformation?.length) {
     message.notes = diagnostic.relatedInformation.map((info) =>
-      convertTypeScriptDiagnosticInfo(info, host),
+      convertTypeScriptDiagnosticInfo(info),
     );
   }
 
@@ -161,7 +147,6 @@ export interface CompilerPluginOptions {
   sourceFileCache?: SourceFileCache;
 }
 
-// This is a non-watch version of the compiler code from `@ngtools/webpack` augmented for esbuild
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
@@ -176,16 +161,8 @@ export function createCompilerPlugin(
       // Initialize a worker pool for JavaScript transformations
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
 
-      // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
-      // Once TypeScript provides support for retaining dynamic imports this workaround can be dropped.
-      const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT, NgtscProgram, OptimizeFor, readConfiguration } =
-        await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
-
-      // Temporary deep import for transformer support
-      const {
-        mergeTransformers,
-        replaceBootstrap,
-      } = require('@ngtools/webpack/src/ivy/transformation');
+      const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT, readConfiguration } =
+        await AngularCompilation.loadCompilerCli();
 
       // Setup defines based on the values provided by the Angular compiler-cli
       build.initialOptions.define ??= {};
@@ -251,9 +228,7 @@ export function createCompilerPlugin(
       // The stylesheet resources from component stylesheets that will be added to the build results output files
       let stylesheetResourceFiles: OutputFile[];
 
-      let previousBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined;
-      let previousAngularProgram: NgtscProgram | undefined;
-      const diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>();
+      let compilation: AngularCompilation | undefined;
 
       build.onStart(async () => {
         const result: OnStartResult = {
@@ -269,8 +244,8 @@ export function createCompilerPlugin(
         // Reset stylesheet resource output files
         stylesheetResourceFiles = [];
 
-        // Create Angular compiler host
-        const host = createAngularCompilerHost(compilerOptions, {
+        // Create Angular compiler host options
+        const hostOptions: AngularHostOptions = {
           fileReplacements: pluginOptions.fileReplacements,
           modifiedFiles: pluginOptions.sourceFileCache?.modifiedFiles,
           sourceFileCache: pluginOptions.sourceFileCache,
@@ -301,31 +276,21 @@ export function createCompilerPlugin(
 
             return contents;
           },
-        });
+        };
 
-        // Create the Angular specific program that contains the Angular compiler
-        const angularProgram = profileSync(
-          'NG_CREATE_PROGRAM',
-          () => new NgtscProgram(rootNames, compilerOptions, host, previousAngularProgram),
-        );
-        previousAngularProgram = angularProgram;
-        const angularCompiler = angularProgram.compiler;
-        const typeScriptProgram = angularProgram.getTsProgram();
-        ensureSourceFileVersions(typeScriptProgram);
+        // Create new compilation if first build; otherwise, use existing for rebuilds
+        compilation ??= new AngularCompilation();
 
-        const builder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
-          typeScriptProgram,
-          host,
-          previousBuilder,
+        // Initialize the Angular compilation for the current build.
+        // In watch mode, previous build state will be reused.
+        const { affectedFiles } = await compilation.initialize(
+          rootNames,
+          compilerOptions,
+          hostOptions,
           configurationDiagnostics,
         );
-        previousBuilder = builder;
 
-        await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
-        const affectedFiles = profileSync('NG_FIND_AFFECTED', () =>
-          findAffectedFiles(builder, angularCompiler),
-        );
-
+        // Clear affected files from the cache (if present)
         if (pluginOptions.sourceFileCache) {
           for (const affected of affectedFiles) {
             pluginOptions.sourceFileCache.typeScriptFileCache.delete(
@@ -334,61 +299,10 @@ export function createCompilerPlugin(
           }
         }
 
-        function* collectDiagnostics(): Iterable<ts.Diagnostic> {
-          // Collect program level diagnostics
-          yield* builder.getConfigFileParsingDiagnostics();
-          yield* angularCompiler.getOptionDiagnostics();
-          yield* builder.getOptionsDiagnostics();
-          yield* builder.getGlobalDiagnostics();
-
-          // Collect source file specific diagnostics
-          const optimizeFor =
-            affectedFiles.size > 1 ? OptimizeFor.WholeProgram : OptimizeFor.SingleFile;
-          for (const sourceFile of builder.getSourceFiles()) {
-            if (angularCompiler.ignoreForDiagnostics.has(sourceFile)) {
-              continue;
-            }
-
-            // TypeScript will use cached diagnostics for files that have not been
-            // changed or affected for this build when using incremental building.
-            yield* profileSync(
-              'NG_DIAGNOSTICS_SYNTACTIC',
-              () => builder.getSyntacticDiagnostics(sourceFile),
-              true,
-            );
-            yield* profileSync(
-              'NG_DIAGNOSTICS_SEMANTIC',
-              () => builder.getSemanticDiagnostics(sourceFile),
-              true,
-            );
-
-            // Declaration files cannot have template diagnostics
-            if (sourceFile.isDeclarationFile) {
-              continue;
-            }
-
-            // Only request Angular template diagnostics for affected files to avoid
-            // overhead of template diagnostics for unchanged files.
-            if (affectedFiles.has(sourceFile)) {
-              const angularDiagnostics = profileSync(
-                'NG_DIAGNOSTICS_TEMPLATE',
-                () => angularCompiler.getDiagnosticsForFile(sourceFile, optimizeFor),
-                true,
-              );
-              diagnosticCache.set(sourceFile, angularDiagnostics);
-              yield* angularDiagnostics;
-            } else {
-              const angularDiagnostics = diagnosticCache.get(sourceFile);
-              if (angularDiagnostics) {
-                yield* angularDiagnostics;
-              }
-            }
-          }
-        }
-
         profileSync('NG_DIAGNOSTICS_TOTAL', () => {
-          for (const diagnostic of collectDiagnostics()) {
-            const message = convertTypeScriptDiagnostic(diagnostic, host);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          for (const diagnostic of compilation!.collectDiagnostics()) {
+            const message = convertTypeScriptDiagnostic(diagnostic);
             if (diagnostic.category === ts.DiagnosticCategory.Error) {
               (result.errors ??= []).push(message);
             } else {
@@ -397,13 +311,7 @@ export function createCompilerPlugin(
           }
         });
 
-        fileEmitter = createFileEmitter(
-          builder,
-          mergeTransformers(angularCompiler.prepareEmit().transformers, {
-            before: [replaceBootstrap(() => builder.getProgram().getTypeChecker())],
-          }),
-          (sourceFile) => angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile),
-        );
+        fileEmitter = compilation.createFileEmitter();
 
         return result;
       });
@@ -500,85 +408,6 @@ export function createCompilerPlugin(
       });
     },
   };
-}
-
-function createFileEmitter(
-  program: ts.BuilderProgram,
-  transformers: ts.CustomTransformers = {},
-  onAfterEmit?: (sourceFile: ts.SourceFile) => void,
-): FileEmitter {
-  return async (file: string) => {
-    const sourceFile = program.getSourceFile(file);
-    if (!sourceFile) {
-      return undefined;
-    }
-
-    let content: string | undefined;
-    program.emit(
-      sourceFile,
-      (filename, data) => {
-        if (/\.[cm]?js$/.test(filename)) {
-          content = data;
-        }
-      },
-      undefined /* cancellationToken */,
-      undefined /* emitOnlyDtsFiles */,
-      transformers,
-    );
-
-    onAfterEmit?.(sourceFile);
-
-    return { content, dependencies: [] };
-  };
-}
-
-function findAffectedFiles(
-  builder: ts.EmitAndSemanticDiagnosticsBuilderProgram,
-  { ignoreForDiagnostics, ignoreForEmit, incrementalCompilation }: NgtscProgram['compiler'],
-): Set<ts.SourceFile> {
-  const affectedFiles = new Set<ts.SourceFile>();
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const result = builder.getSemanticDiagnosticsOfNextAffectedFile(undefined, (sourceFile) => {
-      // If the affected file is a TTC shim, add the shim's original source file.
-      // This ensures that changes that affect TTC are typechecked even when the changes
-      // are otherwise unrelated from a TS perspective and do not result in Ivy codegen changes.
-      // For example, changing @Input property types of a directive used in another component's
-      // template.
-      // A TTC shim is a file that has been ignored for diagnostics and has a filename ending in `.ngtypecheck.ts`.
-      if (ignoreForDiagnostics.has(sourceFile) && sourceFile.fileName.endsWith('.ngtypecheck.ts')) {
-        // This file name conversion relies on internal compiler logic and should be converted
-        // to an official method when available. 15 is length of `.ngtypecheck.ts`
-        const originalFilename = sourceFile.fileName.slice(0, -15) + '.ts';
-        const originalSourceFile = builder.getSourceFile(originalFilename);
-        if (originalSourceFile) {
-          affectedFiles.add(originalSourceFile);
-        }
-
-        return true;
-      }
-
-      return false;
-    });
-
-    if (!result) {
-      break;
-    }
-
-    affectedFiles.add(result.affected as ts.SourceFile);
-  }
-
-  // A file is also affected if the Angular compiler requires it to be emitted
-  for (const sourceFile of builder.getSourceFiles()) {
-    if (ignoreForEmit.has(sourceFile) || incrementalCompilation.safeToSkipEmit(sourceFile)) {
-      continue;
-    }
-
-    affectedFiles.add(sourceFile);
-  }
-
-  return affectedFiles;
 }
 
 function createMissingFileError(request: string, original: string, root: string): PartialMessage {
