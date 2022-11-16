@@ -3,7 +3,6 @@ import { createNpmConfigForAuthentication } from '../../utils/registry';
 import { expectToFail } from '../../utils/utils';
 import { isPrereleaseCli } from '../../utils/project';
 import { getActivePackageManager } from '../../utils/packages';
-import assert from 'node:assert';
 
 export default async function () {
   // The environment variable has priority over the .npmrc
@@ -41,6 +40,8 @@ export default async function () {
     await createNpmConfigForAuthentication(true, true);
 
     const error = await expectToFail(() => exec('yarn', 'ng', 'update', ...extraArgs));
-    assert.match(error.message, /not allowed to access package/);
+    if (!/not allowed to access package/.test(error.message)) {
+      throw new Error('Error did not match not allowed to access package.');
+    }
   }
 }
