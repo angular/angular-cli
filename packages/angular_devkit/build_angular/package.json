@@ -40,7 +40,7 @@
     "less": "4.1.2",
     "less-loader": "10.2.0",
     "license-webpack-plugin": "4.0.2",
-    "loader-utils": "3.2.0",
+    "loader-utils": "3.2.1",
     "mini-css-extract-plugin": "2.5.3",
     "minimatch": "3.0.5",
     "open": "8.4.0",
