@@ -7,7 +7,6 @@
  */
 
 import mergeSourceMaps, { RawSourceMap } from '@ampproject/remapping';
-import { Dirent } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'node:worker_threads';
@@ -19,6 +18,7 @@ import {
   compileString,
 } from 'sass';
 import {
+  DirectoryEntry,
   LoadPathsUrlRebasingImporter,
   ModuleUrlRebasingImporter,
   RelativeUrlRebasingImporter,
@@ -82,7 +82,7 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       }[]
     | undefined;
   try {
-    const directoryCache = new Map<string, Dirent[]>();
+    const directoryCache = new Map<string, DirectoryEntry>();
     const rebaseSourceMaps = options.sourceMap ? new Map<string, RawSourceMap>() : undefined;
     if (hasImporter) {
       // When a custom importer function is present, the importer request must be proxied
