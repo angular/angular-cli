@@ -16,7 +16,8 @@ export default async function () {
     }
 
     // Update Angular from v12 to 13
-    const { stdout } = await ng('update', ...extraArgs);
+    // TODO(dgp1130): Remove hard-coded `--next` after v15 release.
+    const { stdout } = await ng('update', '--next', ...extraArgs);
     if (!/@angular\/core\s+13\.\d\.\d+ -> 14\.\d\.\d+\s+ng update @angular\/core@14/.test(stdout)) {
       // @angular/core                      13.x.x -> 14.x.x         ng update @angular/core@14
       throw new Error(
