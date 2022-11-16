@@ -1,71 +1,42 @@
-<a name="15.0.0-rc.1"></a>
+<a name="15.0.0"></a>
 
-# 15.0.0-rc.1 (2022-11-15)
+# 15.0.0 (2022-11-16)
+
+## Breaking Changes
+
+### @nguniversal/common
+
+- Angular universal no longer supports Node.js versions `14.[15-19].x` and `16.[10-12].x`. Current supported versions of Node.js are `14.20.x`, `16.13.x` and `18.10.x`.
 
 ### @nguniversal/express-engine
 
-| Commit                                                                                           | Type | Description                             |
-| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------- |
-| [6d5500d7](https://github.com/angular/universal/commit/6d5500d72d6738b1f6e282d494becbbc972c8e6e) | fix  | fix formatting in generated `server.ts` |
+- deprecated `appDir` option was removed from the express-engine ng add schematic. This option was previously unused.
 
-## Special Thanks
+### @nguniversal/express-engine
 
-Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="15.0.0-rc.0"></a>
-
-# 15.0.0-rc.0 (2022-11-09)
-
-### @nguniversal/common
-
-| Commit                                                                                           | Type | Description                                         |
-| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------- |
-| [fb904948](https://github.com/angular/universal/commit/fb904948e996e9d7ea96915d6480248c999afd94) | fix  | mark `bootstrap` in `RenderOptions` as non required |
-
-## Special Thanks
-
-Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="14.2.2"></a>
-
-# 14.2.2 (2022-11-09)
-
-### @nguniversal/common
-
-| Commit                                                                                           | Type | Description                                         |
-| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------- |
-| [7f2ce670](https://github.com/angular/universal/commit/7f2ce670714c466a7ea6d747f7f22504a9fbd618) | fix  | mark `bootstrap` in `RenderOptions` as non required |
-
-## Special Thanks
-
-Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="15.0.0-next.1"></a>
-
-# 15.0.0-next.1 (2022-11-03)
+| Commit                                                                                           | Type     | Description                             |
+| ------------------------------------------------------------------------------------------------ | -------- | --------------------------------------- |
+| [6d5500d7](https://github.com/angular/universal/commit/6d5500d72d6738b1f6e282d494becbbc972c8e6e) | fix      | fix formatting in generated `server.ts` |
+| [905c0ae1](https://github.com/angular/universal/commit/905c0ae141b4fb1523550de5847b0115aa9417cb) | refactor | remove deprecated appDir option         |
 
 ### @nguniversal/builders
 
-| Commit                                                                                           | Type | Description                                                                 |
-| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------------------------------------------- |
-| [b7dbc25c](https://github.com/angular/universal/commit/b7dbc25c3fc7ab23c5046b07ed02fd4a7d7ca0eb) | fix  | address method Promise.prototype.then called on incompatible receiver error |
-| [654c23c8](https://github.com/angular/universal/commit/654c23c88c05bb1350411b89b2d9dcb2f65a26ca) | fix  | import `zone.js` in worker during prerendering                              |
+| Commit                                                                                           | Type | Description                                    |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------------------------- |
+| [fef00f90](https://github.com/angular/universal/commit/fef00f90a2196440d316549967258f3d64180539) | feat | add `ng-server-context` for SSG pages          |
+| [08979337](https://github.com/angular/universal/commit/0897933727ce6cb78134be2b98581c096bfb409f) | feat | add sourcemap mapping support for dev-server   |
+| [654c23c8](https://github.com/angular/universal/commit/654c23c88c05bb1350411b89b2d9dcb2f65a26ca) | fix  | import `zone.js` in worker during prerendering |
 
-### @nguniversal/express-engine
+### @nguniversal/common
 
-| Commit                                                                                           | Type | Description            |
-| ------------------------------------------------------------------------------------------------ | ---- | ---------------------- |
-| [98b508ed](https://github.com/angular/universal/commit/98b508edda4e60253047289cd9ccdb2574a632bb) | fix  | replace zone.js import |
+| Commit                                                                                           | Type | Description                           |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------- |
+| [a62d3d3b](https://github.com/angular/universal/commit/a62d3d3be86a9d2b6eef9856fbd2734a721f252d) | feat | add `ng-server-context` for SSR pages |
+| [78cf7b7f](https://github.com/angular/universal/commit/78cf7b7f97b3afae49ad7787a7319e5ec09cbc51) | feat | add support for Node.js version 18    |
 
 ## Special Thanks
 
-Alan Agius, Carlos Torrecillas and Doug Parker
+Alan Agius, Carlos Torrecillas, Doug Parker, Greg Magolan and angular-robot[bot]
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -88,46 +59,6 @@ Alan Agius, Carlos Torrecillas and Doug Parker
 ## Special Thanks
 
 Alan Agius
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="15.0.0-next.0"></a>
-
-# 15.0.0-next.0 (2022-10-13)
-
-## Breaking Changes
-
-### @nguniversal/common
-
-- Angular universal no longer supports Node.js versions `14.[15-19].x` and `16.[10-12].x`. Current supported versions of Node.js are `14.20.x`, `16.13.x` and `18.10.x`.
-
-### @nguniversal/express-engine
-
-- deprecated `appDir` option was removed from the express-engine ng add schematic. This option was previously unused.
-
-### @nguniversal/express-engine
-
-| Commit                                                                                           | Type     | Description                     |
-| ------------------------------------------------------------------------------------------------ | -------- | ------------------------------- |
-| [905c0ae1](https://github.com/angular/universal/commit/905c0ae141b4fb1523550de5847b0115aa9417cb) | refactor | remove deprecated appDir option |
-
-### @nguniversal/builders
-
-| Commit                                                                                           | Type | Description                                  |
-| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
-| [fef00f90](https://github.com/angular/universal/commit/fef00f90a2196440d316549967258f3d64180539) | feat | add `ng-server-context` for SSG pages        |
-| [08979337](https://github.com/angular/universal/commit/0897933727ce6cb78134be2b98581c096bfb409f) | feat | add sourcemap mapping support for dev-server |
-
-### @nguniversal/common
-
-| Commit                                                                                           | Type | Description                           |
-| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------- |
-| [a62d3d3b](https://github.com/angular/universal/commit/a62d3d3be86a9d2b6eef9856fbd2734a721f252d) | feat | add `ng-server-context` for SSR pages |
-| [78cf7b7f](https://github.com/angular/universal/commit/78cf7b7f97b3afae49ad7787a7319e5ec09cbc51) | feat | add support for Node.js version 18    |
-
-## Special Thanks
-
-Alan Agius, Greg Magolan and angular-robot[bot]
 
 <!-- CHANGELOG SPLIT MARKER -->
 
