@@ -1,3 +1,19 @@
+<a name="14.2.10"></a>
+
+# 14.2.10 (2022-11-16)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [7541e04f3](https://github.com/angular/angular-cli/commit/7541e04f36ff32118e93588be38dcbb5cc2c92a9) | fix  | respect registry in RC when running update through yarn |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.9"></a>
 
 # 14.2.9 (2022-11-09)
