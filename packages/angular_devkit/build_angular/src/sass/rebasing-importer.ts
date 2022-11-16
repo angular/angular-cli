@@ -8,7 +8,7 @@
 
 import { RawSourceMap } from '@ampproject/remapping';
 import MagicString from 'magic-string';
-import { Dirent, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { FileImporter, Importer, ImporterResult, Syntax } from 'sass';
@@ -18,6 +18,15 @@ import type { FileImporter, Importer, ImporterResult, Syntax } from 'sass';
  * From packages/angular_devkit/build_angular/src/webpack/plugins/postcss-cli-resources.ts
  */
 const URL_REGEXP = /url(?:\(\s*(['"]?))(.*?)(?:\1\s*\))/g;
+
+/**
+ * A preprocessed cache entry for the files and directories within a previously searched
+ * directory when performing Sass import resolution.
+ */
+export interface DirectoryEntry {
+  files: Set<string>;
+  directories: Set<string>;
+}
 
 /**
  * A Sass Importer base class that provides the load logic to rebase all `url()` functions
@@ -115,7 +124,7 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
 export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
   constructor(
     entryDirectory: string,
-    private directoryCache = new Map<string, Dirent[]>(),
+    private directoryCache = new Map<string, DirectoryEntry>(),
     rebaseSourceMaps?: Map<string, RawSourceMap>,
   ) {
     super(entryDirectory, rebaseSourceMaps);
@@ -149,17 +158,6 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
     // Remove the style extension if present to allow adding the `.import` suffix
     const filename = basename(stylesheetPath, hasStyleExtension ? extension : undefined);
 
-    let entries;
-    try {
-      entries = this.directoryCache.get(directory);
-      if (!entries) {
-        entries = readdirSync(directory, { withFileTypes: true });
-        this.directoryCache.set(directory, entries);
-      }
-    } catch {
-      return null;
-    }
-
     const importPotentials = new Set<string>();
     const defaultPotentials = new Set<string>();
 
@@ -187,47 +185,82 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
       defaultPotentials.add('_' + filename + '.css');
     }
 
-    const foundDefaults: string[] = [];
-    const foundImports: string[] = [];
+    let foundDefaults;
+    let foundImports;
     let hasPotentialIndex = false;
-    for (const entry of entries) {
-      // Record if the name should be checked as a directory with an index file
-      if (checkDirectory && !hasStyleExtension && entry.name === filename && entry.isDirectory()) {
-        hasPotentialIndex = true;
+
+    let cachedEntries = this.directoryCache.get(directory);
+    if (cachedEntries) {
+      // If there is a preprocessed cache of the directory, perform an intersection of the potentials
+      // and the directory files.
+      const { files, directories } = cachedEntries;
+      foundDefaults = [...defaultPotentials].filter((potential) => files.has(potential));
+      foundImports = [...importPotentials].filter((potential) => files.has(potential));
+      hasPotentialIndex = checkDirectory && !hasStyleExtension && directories.has(filename);
+    } else {
+      // If no preprocessed cache exists, get the entries from the file system and, while searching,
+      // generate the cache for later requests.
+      let entries;
+      try {
+        entries = readdirSync(directory, { withFileTypes: true });
+      } catch {
+        return null;
       }
 
-      if (!entry.isFile()) {
-        continue;
+      foundDefaults = [];
+      foundImports = [];
+      cachedEntries = { files: new Set<string>(), directories: new Set<string>() };
+      for (const entry of entries) {
+        const isDirectory = entry.isDirectory();
+        if (isDirectory) {
+          cachedEntries.directories.add(entry.name);
+        }
+
+        // Record if the name should be checked as a directory with an index file
+        if (checkDirectory && !hasStyleExtension && entry.name === filename && isDirectory) {
+          hasPotentialIndex = true;
+        }
+
+        if (!entry.isFile()) {
+          continue;
+        }
+
+        cachedEntries.files.add(entry.name);
+
+        if (importPotentials.has(entry.name)) {
+          foundImports.push(entry.name);
+        }
+
+        if (defaultPotentials.has(entry.name)) {
+          foundDefaults.push(entry.name);
+        }
       }
 
-      if (importPotentials.has(entry.name)) {
-        foundImports.push(join(directory, entry.name));
-      }
-
-      if (defaultPotentials.has(entry.name)) {
-        foundDefaults.push(join(directory, entry.name));
-      }
+      this.directoryCache.set(directory, cachedEntries);
     }
 
     // `foundImports` will only contain elements if `options.fromImport` is true
     const result = this.checkFound(foundImports) ?? this.checkFound(foundDefaults);
+    if (result !== null) {
+      return pathToFileURL(join(directory, result));
+    }
 
-    if (result === null && hasPotentialIndex) {
+    if (hasPotentialIndex) {
       // Check for index files using filename as a directory
       return this.resolveImport(url + '/index', fromImport, false);
     }
 
-    return result;
+    return null;
   }
 
   /**
    * Checks an array of potential stylesheet files to determine if there is a valid
    * stylesheet file. More than one discovered file may indicate an error.
    * @param found An array of discovered stylesheet files.
-   * @returns A fully resolved URL for a stylesheet file or `null` if not found.
+   * @returns A fully resolved path for a stylesheet file or `null` if not found.
    * @throws If there are ambiguous files discovered.
    */
-  private checkFound(found: string[]): URL | null {
+  private checkFound(found: string[]): string | null {
     if (found.length === 0) {
       // Not found
       return null;
@@ -245,10 +278,10 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
 
       // Return the non-CSS file (sass/scss files have priority)
       // https://github.com/sass/dart-sass/blob/44d6bb6ac72fe6b93f5bfec371a1fffb18e6b76d/lib/src/importer/utils.dart#L44-L47
-      return pathToFileURL(foundWithoutCss[0]);
+      return foundWithoutCss[0];
     }
 
-    return pathToFileURL(found[0]);
+    return found[0];
   }
 }
 
@@ -260,7 +293,7 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
 export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
   constructor(
     entryDirectory: string,
-    directoryCache: Map<string, Dirent[]>,
+    directoryCache: Map<string, DirectoryEntry>,
     rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
     private finder: FileImporter<'sync'>['findFileUrl'],
   ) {
@@ -286,7 +319,7 @@ export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
 export class LoadPathsUrlRebasingImporter extends RelativeUrlRebasingImporter {
   constructor(
     entryDirectory: string,
-    directoryCache: Map<string, Dirent[]>,
+    directoryCache: Map<string, DirectoryEntry>,
     rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
     private loadPaths: Iterable<string>,
   ) {
