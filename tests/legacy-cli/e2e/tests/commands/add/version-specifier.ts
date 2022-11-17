@@ -1,4 +1,5 @@
 import { appendFile } from 'fs/promises';
+import { readNgVersion } from '../../../utils/version';
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
 import { getActivePackageManager, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
@@ -25,7 +26,7 @@ export default async function () {
     throw new Error('Installation was not skipped');
   }
 
-  const output2 = await ng('add', '@angular/localize@latest', '--skip-confirmation');
+  const output2 = await ng('add', `@angular/localize@${readNgVersion()}`, '--skip-confirmation');
   if (output2.stdout.includes('Skipping installation: Package already installed')) {
     throw new Error('Installation should not have been skipped');
   }
