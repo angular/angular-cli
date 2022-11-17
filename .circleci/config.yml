@@ -324,6 +324,9 @@ jobs:
 workflows:
   version: 2
   default_workflow:
+    when:
+      not:
+        equal: [scheduled_pipeline, << pipeline.trigger_source >>]
     jobs:
       # Linux jobs
       - setup
@@ -392,16 +395,12 @@ workflows:
             - test
             - e2e-cli
 
-  nightly:
-    triggers:
-      - schedule:
-          cron: '0 0 * * *'
-          filters:
-            branches:
-              only:
-                - 13.3.x
+  daily_run_workflow:
+    when:
+      and:
+        - equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+        - equal: ['13.3.x nightly run', << pipeline.schedule.name >>]
     jobs:
-      # Linux jobs
       - setup
       - build:
           requires:
