@@ -385,6 +385,9 @@ jobs:
 workflows:
   version: 2
   default_workflow:
+    when:
+      not:
+        equal: [scheduled_pipeline, << pipeline.trigger_source >>]
     jobs:
       # Linux jobs
       - setup
@@ -483,5 +486,23 @@ workflows:
 
       - publish_artifacts:
           <<: *only_pull_requests
+          requires:
+            - build
+
+  daily_run_workflow:
+    when:
+      and:
+        - equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+        - equal: ['14.2.x nightly run', << pipeline.schedule.name >>]
+    jobs:
+      - setup
+      - build:
+          requires:
+            - setup
+      - e2e-tests:
+          name: e2e-cli-nightly
+          requires:
+            - build
+      - test-browsers:
           requires:
             - build
