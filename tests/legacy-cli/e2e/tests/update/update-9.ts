@@ -13,6 +13,8 @@ export default async function () {
     await setRegistry(false);
     await installWorkspacePackages();
 
+    process.env['NG_DISABLE_VERSION_CHECK'] = '1';
+
     // Update Angular to 10
     await installPackage('@angular/cli@9');
     const { stdout } = await ng('update', '@angular/cli@10.x', '@angular/core@10.x');
@@ -22,6 +24,8 @@ export default async function () {
 
     // Update Angular to 11
     await ng('update', '@angular/cli@11', '@angular/core@11');
+
+    delete process.env['NG_DISABLE_VERSION_CHECK'];
 
     // Update Angular to 12
     await ng('update', '@angular/cli@12', '@angular/core@12');
