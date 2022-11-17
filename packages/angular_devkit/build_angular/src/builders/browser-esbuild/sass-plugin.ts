@@ -31,6 +31,30 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
   return {
     name: 'angular-sass',
     setup(build: PluginBuild): void {
+      const resolveUrl = async (url: string, previousResolvedModules?: Set<string>) => {
+        let result = await build.resolve(url, {
+          kind: 'import-rule',
+          // This should ideally be the directory of the importer file from Sass
+          // but that is not currently available from the Sass importer API.
+          resolveDir: build.initialOptions.absWorkingDir,
+        });
+
+        // Workaround to support Yarn PnP without access to the importer file from Sass
+        if (!result.path && previousResolvedModules?.size) {
+          for (const previous of previousResolvedModules) {
+            result = await build.resolve(url, {
+              kind: 'import-rule',
+              resolveDir: previous,
+            });
+            if (result.path) {
+              break;
+            }
+          }
+        }
+
+        return result;
+      };
+
       build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
         // Lazily load Sass when a Sass file is found
         sassWorkerPool ??= new SassWorkerImplementation(true);
@@ -51,48 +75,30 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
                   url,
                   { previousResolvedModules }: FileImporterWithRequestContextOptions,
                 ): Promise<URL | null> => {
-                  let result = await build.resolve(url, {
-                    kind: 'import-rule',
-                    // This should ideally be the directory of the importer file from Sass
-                    // but that is not currently available from the Sass importer API.
-                    resolveDir: build.initialOptions.absWorkingDir,
-                  });
-
-                  // Workaround to support Yarn PnP without access to the importer file from Sass
-                  if (!result.path && previousResolvedModules?.size) {
-                    for (const previous of previousResolvedModules) {
-                      result = await build.resolve(url, {
-                        kind: 'import-rule',
-                        resolveDir: previous,
-                      });
-                    }
-                  }
+                  const result = await resolveUrl(url, previousResolvedModules);
 
                   // Check for package deep imports
                   if (!result.path) {
                     const parts = url.split('/');
-                    const hasScope = parts.length > 2 && parts[0].startsWith('@');
-                    if (hasScope || parts.length > 1) {
-                      const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
-                      const packageName = hasScope
-                        ? `${nameOrScope}/${nameOrFirstPath}`
-                        : nameOrScope;
-                      const packageResult = await build.resolve(packageName + '/package.json', {
-                        kind: 'import-rule',
-                        // This should ideally be the directory of the importer file from Sass
-                        // but that is not currently available from the Sass importer API.
-                        resolveDir: build.initialOptions.absWorkingDir,
-                      });
+                    const hasScope = parts.length >= 2 && parts[0].startsWith('@');
+                    const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
+                    const packageName = hasScope
+                      ? `${nameOrScope}/${nameOrFirstPath}`
+                      : nameOrScope;
 
-                      if (packageResult.path) {
-                        return pathToFileURL(
-                          join(
-                            dirname(packageResult.path),
-                            !hasScope ? nameOrFirstPath : '',
-                            ...pathPart,
-                          ),
-                        );
-                      }
+                    const packageResult = await resolveUrl(
+                      packageName + '/package.json',
+                      previousResolvedModules,
+                    );
+
+                    if (packageResult.path) {
+                      return pathToFileURL(
+                        join(
+                          dirname(packageResult.path),
+                          !hasScope ? nameOrFirstPath : '',
+                          ...pathPart,
+                        ),
+                      );
                     }
                   }
 
