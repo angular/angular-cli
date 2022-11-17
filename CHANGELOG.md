@@ -1,3 +1,19 @@
+<a name="13.3.10"></a>
+
+# 13.3.10 (2022-11-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| [f298ebbd5](https://github.com/angular/angular-cli/commit/f298ebbd5f86077985d994662314379df92b6771) | fix  | update `loader-utils` to `3.2.1` |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.9"></a>
 
 # 13.3.9 (2022-07-20)
