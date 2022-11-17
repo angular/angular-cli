@@ -7,7 +7,6 @@
  */
 
 import type { NgtscProgram } from '@angular/compiler-cli';
-import { transformAsync } from '@babel/core';
 import type {
   OnStartResult,
   OutputFile,
@@ -17,15 +16,14 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import * as assert from 'node:assert';
-import * as fs from 'node:fs/promises';
 import { platform } from 'node:os';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
-import angularApplicationPreset from '../../babel/presets/application';
-import { requiresLinking } from '../../babel/webpack-loader';
+import { maxWorkers } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { createAngularCompilerHost, ensureSourceFileVersions } from './angular-host';
+import { JavaScriptTransformer } from './javascript-transformer';
 import {
   logCumulativeDurations,
   profileAsync,
@@ -175,6 +173,9 @@ export function createCompilerPlugin(
     async setup(build: PluginBuild): Promise<void> {
       let setupWarnings: PartialMessage[] | undefined;
 
+      // Initialize a worker pool for JavaScript transformations
+      const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
+
       // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
       // Once TypeScript provides support for retaining dynamic imports this workaround can be dropped.
       const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT, NgtscProgram, OptimizeFor, readConfiguration } =
@@ -252,7 +253,6 @@ export function createCompilerPlugin(
 
       let previousBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined;
       let previousAngularProgram: NgtscProgram | undefined;
-      const babelDataCache = new Map<string, Uint8Array>();
       const diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>();
 
       build.onStart(async () => {
@@ -428,7 +428,7 @@ export function createCompilerPlugin(
 
               if (contents === undefined) {
                 const typescriptResult = await fileEmitter(request);
-                if (!typescriptResult) {
+                if (!typescriptResult?.content) {
                   // No TS result indicates the file is not part of the TypeScript program.
                   // If allowJs is enabled and the file is JS then defer to the next load hook.
                   if (compilerOptions.allowJs && /\.[cm]?js$/.test(request)) {
@@ -447,17 +447,11 @@ export function createCompilerPlugin(
                   };
                 }
 
-                const data = typescriptResult.content ?? '';
-                // The pre-transformed data is used as a cache key. Since the cache is memory only,
-                // the options cannot change and do not need to be represented in the key. If the
-                // cache is later stored to disk, then the options that affect transform output
-                // would need to be added to the key as well.
-                contents = babelDataCache.get(data);
-                if (contents === undefined) {
-                  const transformedData = await transformWithBabel(request, data, pluginOptions);
-                  contents = Buffer.from(transformedData, 'utf-8');
-                  babelDataCache.set(data, contents);
-                }
+                contents = await javascriptTransformer.transformData(
+                  request,
+                  typescriptResult.content,
+                  true /* skipLinker */,
+                );
 
                 pluginOptions.sourceFileCache?.typeScriptFileCache.set(
                   pathToFileURL(request).href,
@@ -484,9 +478,7 @@ export function createCompilerPlugin(
             // would need to be added to the key as well as a check for any change of content.
             let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
             if (contents === undefined) {
-              const data = await fs.readFile(args.path, 'utf-8');
-              const transformedData = await transformWithBabel(args.path, data, pluginOptions);
-              contents = Buffer.from(transformedData, 'utf-8');
+              contents = await javascriptTransformer.transformFile(args.path);
               pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
             }
 
@@ -538,65 +530,6 @@ function createFileEmitter(
 
     return { content, dependencies: [] };
   };
-}
-
-async function transformWithBabel(
-  filename: string,
-  data: string,
-  pluginOptions: CompilerPluginOptions,
-): Promise<string> {
-  const forceAsyncTransformation =
-    !/[\\/][_f]?esm2015[\\/]/.test(filename) && /async\s+function\s*\*/.test(data);
-  const shouldLink = await requiresLinking(filename, data);
-  const useInputSourcemap =
-    pluginOptions.sourcemap &&
-    (!!pluginOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
-
-  // If no additional transformations are needed, return the data directly
-  if (!forceAsyncTransformation && !pluginOptions.advancedOptimizations && !shouldLink) {
-    // Strip sourcemaps if they should not be used
-    return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
-  }
-
-  const angularPackage = /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
-
-  const linkerPluginCreator = shouldLink
-    ? (
-        await loadEsmModule<typeof import('@angular/compiler-cli/linker/babel')>(
-          '@angular/compiler-cli/linker/babel',
-        )
-      ).createEs2015LinkerPlugin
-    : undefined;
-
-  const result = await transformAsync(data, {
-    filename,
-    inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
-    sourceMaps: pluginOptions.sourcemap ? 'inline' : false,
-    compact: false,
-    configFile: false,
-    babelrc: false,
-    browserslistConfigFile: false,
-    plugins: [],
-    presets: [
-      [
-        angularApplicationPreset,
-        {
-          angularLinker: {
-            shouldLink,
-            jitMode: false,
-            linkerPluginCreator,
-          },
-          forceAsyncTransformation,
-          optimize: pluginOptions.advancedOptimizations && {
-            looseEnums: angularPackage,
-            pureTopLevel: angularPackage,
-          },
-        },
-      ],
-    ],
-  });
-
-  return result?.code ?? data;
 }
 
 function findAffectedFiles(
