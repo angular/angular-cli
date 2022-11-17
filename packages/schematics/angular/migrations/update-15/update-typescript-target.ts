@@ -13,7 +13,7 @@ import { getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
 
 export default function (): Rule {
-  return async (host) => {
+  return async (host, context) => {
     // Workspace level tsconfig
     updateTarget(host, 'tsconfig.json');
 
@@ -21,15 +21,25 @@ export default function (): Rule {
 
     // Find all tsconfig which are refereces used by builders
     for (const [, project] of workspace.projects) {
-      for (const [, target] of project.targets) {
+      for (const [targetName, target] of project.targets) {
         // Update all other known CLI builders that use a tsconfig
         const tsConfigs = [target.options || {}, ...Object.values(target.configurations || {})]
           .filter((opt) => typeof opt?.tsConfig === 'string')
           .map((opt) => (opt as { tsConfig: string }).tsConfig);
 
-        const uniqueTsConfigs = [...new Set(tsConfigs)];
+        const uniqueTsConfigs = new Set(tsConfigs);
+        for (const tsConfig of uniqueTsConfigs) {
+          if (host.exists(tsConfig)) {
+            continue;
+          }
 
-        if (uniqueTsConfigs.length < 1) {
+          uniqueTsConfigs.delete(tsConfig);
+          context.logger.warn(
+            `'${tsConfig}' referenced in the '${targetName}' target does not exist.`,
+          );
+        }
+
+        if (!uniqueTsConfigs.size) {
           continue;
         }
 
