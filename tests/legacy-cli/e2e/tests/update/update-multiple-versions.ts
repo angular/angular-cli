@@ -15,9 +15,8 @@ export default async function () {
       extraArgs.push('--next');
     }
 
-    // Update Angular from v12 to 13
-    // TODO(dgp1130): Remove hard-coded `--next` after v15 release.
-    const { stdout } = await ng('update', '--next', ...extraArgs);
+    // Update Angular from v13 to 14
+    const { stdout } = await ng('update', ...extraArgs);
     if (!/@angular\/core\s+13\.\d\.\d+ -> 14\.\d\.\d+\s+ng update @angular\/core@14/.test(stdout)) {
       // @angular/core                      13.x.x -> 14.x.x         ng update @angular/core@14
       throw new Error(
@@ -26,14 +25,14 @@ export default async function () {
       );
     }
 
-    const { message } = await expectToFail(() => ng('update', '@angular/cli', ...extraArgs));
+    const { message } = await expectToFail(() => ng('update', '@angular/core', ...extraArgs));
     if (
       !message.includes(
-        `Updating multiple major versions of '@angular/cli' at once is not supported`,
+        `Updating multiple major versions of '@angular/core' at once is not supported`,
       )
     ) {
       throw new Error(
-        `Expected error message to include "Updating multiple major versions of '@angular/cli' at once is not supported" but didn't. OUTPUT: \n` +
+        `Expected error message to include "Updating multiple major versions of '@angular/core' at once is not supported" but didn't. OUTPUT: \n` +
           message,
       );
     }
