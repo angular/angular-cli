@@ -1,3 +1,27 @@
+<a name="14.2.10"></a>
+
+# 14.2.10 (2022-11-17)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------- |
+| [9ce386caf](https://github.com/angular/angular-cli/commit/9ce386caf6037f21f422a785fec977634406d208) | fix  | exclude `@angular/localize@<10.0.0` from ng add pa… ([#24152](https://github.com/angular/angular-cli/pull/24152)) |
+| [6446091a3](https://github.com/angular/angular-cli/commit/6446091a310f327ceeb68ae85f3673f6e3e83286) | fix  | exclude `@angular/material@7.x` from ng add package discovery                                                     |
+| [7541e04f3](https://github.com/angular/angular-cli/commit/7541e04f36ff32118e93588be38dcbb5cc2c92a9) | fix  | respect registry in RC when running update through yarn                                                           |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| [21cea0b42](https://github.com/angular/angular-cli/commit/21cea0b42f08bf56990bdade82e2daa7c33011ed) | fix  | update `loader-utils` to `3.2.1` |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.9"></a>
 
 # 14.2.9 (2022-11-09)
