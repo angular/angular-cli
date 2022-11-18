@@ -10,7 +10,7 @@
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.1.3
+  browser-tools: circleci/browser-tools@1.4.0
   devinfra: angular/dev-infra@1.0.7
 
 parameters:
