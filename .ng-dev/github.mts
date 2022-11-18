@@ -8,4 +8,5 @@ export const github: GithubConfig = {
   owner: 'angular',
   name: 'angular-cli',
   mainBranchName: 'main',
+  useNgDevAuthService: true,
 };
