@@ -190,7 +190,6 @@
     "protractor": "~7.0.0",
     "puppeteer": "18.2.1",
     "quicktype-core": "6.0.69",
-    "regenerator-runtime": "0.13.10",
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
     "sass": "1.56.1",
