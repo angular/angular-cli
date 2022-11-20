@@ -212,7 +212,7 @@
     "verdaccio": "5.17.0",
     "verdaccio-auth-memory": "^10.0.0",
     "webpack": "5.75.0",
-    "webpack-dev-middleware": "5.3.3",
+    "webpack-dev-middleware": "6.0.0",
     "webpack-dev-server": "4.11.1",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0",
