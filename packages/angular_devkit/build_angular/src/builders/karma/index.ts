@@ -96,7 +96,7 @@ export function execute(
 
       const karmaOptions: KarmaConfigOptions = options.karmaConfig
         ? {}
-        : getBuiltInKarmaConfig(karma, context.workspaceRoot, projectName);
+        : getBuiltInKarmaConfig(karma, context.workspaceRoot, getCoverageFolderName(projectName));
 
       karmaOptions.singleRun = singleRun;
 
@@ -183,16 +183,20 @@ export function execute(
   );
 }
 
-function getBuiltInKarmaConfig(
-  karma: typeof import('karma'),
-  workspaceRoot: string,
-  projectName: string,
-): ConfigOptions & Record<string, unknown> {
+function getCoverageFolderName(projectName: string) {
   let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
   if (/[A-Z]/.test(coverageFolderName)) {
     coverageFolderName = strings.dasherize(coverageFolderName);
   }
 
+  return coverageFolderName;
+}
+
+export function getBuiltInKarmaConfig(
+  karma: typeof import('karma'),
+  workspaceRoot: string,
+  coverageFolderName: string,
+): ConfigOptions & Record<string, unknown> {
   const workspaceRootRequire = createRequire(workspaceRoot + '/');
 
   return {
