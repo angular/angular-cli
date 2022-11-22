@@ -16,7 +16,7 @@ import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
 import * as inquirer from 'inquirer';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
-import {existsSync} from 'fs'
+import { existsSync } from 'fs';
 import * as path from 'path';
 
 /**
@@ -134,18 +134,18 @@ function findUp(names: string | string[], from: string) {
 /**
  * return package manager' name by lock file
  */
- function getPackageManagerName() {
+function getPackageManagerName() {
   // order by check priority
   const LOCKS: Record<string, string> = {
     'package-lock.json': 'npm',
     'yarn.lock': 'yarn',
     'pnpm-lock.yaml': 'pnpm',
-  }
-  const lockPath = findUp(Object.keys(LOCKS), process.cwd())
+  };
+  const lockPath = findUp(Object.keys(LOCKS), process.cwd());
   if (lockPath) {
-    return LOCKS[path.basename(lockPath)]
+    return LOCKS[path.basename(lockPath)];
   }
-  return 'npm'
+  return 'npm';
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -195,7 +195,7 @@ export async function main({
     dryRun,
     resolvePaths: [process.cwd(), __dirname],
     schemaValidation: true,
-    packageManager: getPackageManagerName()
+    packageManager: getPackageManagerName(),
   });
 
   /** If the user wants to list schematics, we simply show all the schematic names. */
