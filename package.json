@@ -75,7 +75,7 @@
     "@angular/forms": "15.0.0",
     "@angular/localize": "15.0.0",
     "@angular/material": "15.0.0",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#d33ce23aa126d20f2b90965fb452b2daa7b4d160",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#183ef3004a595de30b14bd9b736034d9c57f20e3",
     "@angular/platform-browser": "15.0.0",
     "@angular/platform-browser-dynamic": "15.0.0",
     "@angular/platform-server": "15.0.0",
