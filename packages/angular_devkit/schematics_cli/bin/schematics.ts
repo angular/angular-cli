@@ -16,6 +16,8 @@ import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
 import * as inquirer from 'inquirer';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
+import {existsSync} from 'fs'
+import * as path from 'path';
 
 /**
  * Parse the name of schematic passed in argument, and return a {collection, schematic} named
@@ -108,6 +110,44 @@ function _createPromptProvider(): schema.PromptProvider {
   };
 }
 
+function findUp(names: string | string[], from: string) {
+  if (!Array.isArray(names)) {
+    names = [names];
+  }
+  const root = path.parse(from).root;
+
+  let currentDir = from;
+  while (currentDir && currentDir !== root) {
+    for (const name of names) {
+      const p = path.join(currentDir, name);
+      if (existsSync(p)) {
+        return p;
+      }
+    }
+
+    currentDir = path.dirname(currentDir);
+  }
+
+  return null;
+}
+
+/**
+ * return package manager' name by lock file
+ */
+ function getPackageManagerName() {
+  // order by check priority
+  const LOCKS: Record<string, string> = {
+    'package-lock.json': 'npm',
+    'yarn.lock': 'yarn',
+    'pnpm-lock.yaml': 'pnpm',
+  }
+  const lockPath = findUp(Object.keys(LOCKS), process.cwd())
+  if (lockPath) {
+    return LOCKS[path.basename(lockPath)]
+  }
+  return 'npm'
+}
+
 // eslint-disable-next-line max-lines-per-function
 export async function main({
   args,
@@ -155,6 +195,7 @@ export async function main({
     dryRun,
     resolvePaths: [process.cwd(), __dirname],
     schemaValidation: true,
+    packageManager: getPackageManagerName()
   });
 
   /** If the user wants to list schematics, we simply show all the schematic names. */
