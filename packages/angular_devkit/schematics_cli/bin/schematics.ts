@@ -14,10 +14,10 @@ import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
-import * as inquirer from 'inquirer';
-import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 import { existsSync } from 'fs';
+import * as inquirer from 'inquirer';
 import * as path from 'path';
+import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 
 /**
  * Parse the name of schematic passed in argument, and return a {collection, schematic} named
@@ -145,6 +145,7 @@ function getPackageManagerName() {
   if (lockPath) {
     return LOCKS[path.basename(lockPath)];
   }
+
   return 'npm';
 }
 
