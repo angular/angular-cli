@@ -109,7 +109,7 @@ describe('Guard Schematic', () => {
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.spec.ts');
     expect(fileString).toContain('const executeGuard: CanActivateFn = (...guardParameters) => ');
     expect(fileString).toContain(
-      'TestBed.inject(EnvironmentInjector).runInContext(() => fooGuard(...guardParameters));',
+      'TestBed.runInInjectionContext(() => fooGuard(...guardParameters));',
     );
   });
 

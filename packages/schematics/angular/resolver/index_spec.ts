@@ -99,7 +99,7 @@ describe('resolver Schematic', () => {
       'const executeResolver: ResolveFn<boolean> = (...resolverParameters) => ',
     );
     expect(fileString).toContain(
-      'TestBed.inject(EnvironmentInjector).runInContext(() => fooResolver(...resolverParameters));',
+      'TestBed.runInInjectionContext(() => fooResolver(...resolverParameters));',
     );
   });
 });
