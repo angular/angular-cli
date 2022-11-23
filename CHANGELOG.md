@@ -1,3 +1,25 @@
+<a name="14.2.3"></a>
+
+# 14.2.3 (2022-11-23)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                  |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------- |
+| [ba967baa](https://github.com/angular/universal/commit/ba967baa277a696983db5206cc37cb705bf7ebea) | fix  | Initialize zone.js once in rendering workers |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                             |
+| ------------------------------------------------------------------------------------------------ | ---- | --------------------------------------- |
+| [7ebba3cf](https://github.com/angular/universal/commit/7ebba3cf13a716078a824acf54a51cbb75ed2864) | fix  | fix formatting in generated `server.ts` |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.0"></a>
 
 # 15.0.0 (2022-11-16)
