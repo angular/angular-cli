@@ -6,7 +6,7 @@ import { <%= camelize(name) %>Guard } from './<%= dasherize(name) %>.guard';
 
 describe('<%= camelize(name) %>Guard', () => {
   const executeGuard: <%= guardType %> = (...guardParameters) => 
-      TestBed.inject(EnvironmentInjector).runInContext(() => <%= camelize(name) %>Guard(...guardParameters));
+      TestBed.runInInjectionContext(() => <%= camelize(name) %>Guard(...guardParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
