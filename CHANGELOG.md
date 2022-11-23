@@ -1,3 +1,27 @@
+<a name="15.1.0-next.0"></a>
+
+# 15.1.0-next.0 (2022-11-23)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [6c39a162b](https://github.com/angular/angular-cli/commit/6c39a162bec67083bf6c11b54e84612f1d68c384) | feat | Add schematics for generating functional router guards and resolvers |
+| [62121f89a](https://github.com/angular/angular-cli/commit/62121f89abce54e0a1c2b816cdd32b57f2b5a5d1) | feat | add sideEffects:false to library package.json                        |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [c29df6954](https://github.com/angular/angular-cli/commit/c29df695467c41feccd3846a55c91c6784af87b2) | feat | add `assets` option to server builder                        |
+| [0c01532cb](https://github.com/angular/angular-cli/commit/0c01532cb5a3072b96cd65845a38b88ed4543de6) | perf | use worker pool for JavaScript transforms in esbuild builder |
+
+## Special Thanks
+
+Alan Agius, Andrew Scott, Charles Lyding, Doug Parker, Felix Hamann and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.1"></a>
 
 # 15.0.1 (2022-11-23)
