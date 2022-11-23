@@ -343,7 +343,17 @@ export function statsWarningsToString(
     if (typeof warning === 'string') {
       output += yb(`Warning: ${warning}\n\n`);
     } else {
-      const file = warning.file || warning.moduleName;
+      let file = warning.file || warning.moduleName;
+      // Clean up warning paths
+      // Ex: ./src/app/styles.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js....
+      // to ./src/app/styles.scss.webpack
+      if (file && !statsConfig.errorDetails) {
+        const webpackPathIndex = file.indexOf('.webpack[');
+        if (webpackPathIndex !== -1) {
+          file = file.substring(0, webpackPathIndex);
+        }
+      }
+
       if (file) {
         output += c(file);
         if (warning.loc) {
