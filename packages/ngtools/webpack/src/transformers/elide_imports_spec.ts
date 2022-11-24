@@ -66,6 +66,7 @@ describe('@ngtools/webpack transformers', () => {
       `,
       'service.ts': `
         export class Service { }
+        export class Service2 { }
       `,
       'type.ts': `
         export interface OnChanges {
@@ -351,6 +352,45 @@ describe('@ngtools/webpack transformers', () => {
         const input = tags.stripIndent`
           import { Decorator } from './decorator';
           import { Service } from './service';
+
+          @Decorator()
+          export class Foo {
+            constructor(param: Service) {
+            }
+          }
+
+          ${dummyNode}
+        `;
+
+        const output = tags.stripIndent`
+          import { __decorate } from "tslib";
+          import { Decorator } from './decorator';
+
+          let Foo = class Foo { constructor(param) { } };
+          Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
+        `;
+
+        const { program, compilerHost } = createTypescriptContext(
+          input,
+          additionalFiles,
+          true,
+          extraCompilerOptions,
+        );
+        const result = transformTypescript(
+          undefined,
+          [transformer(program)],
+          program,
+          compilerHost,
+        );
+
+        expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+      });
+
+      it('should remove ctor parameter type reference and unused named import from same declaration', () => {
+        const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { Service, Service2 as ServiceUnused } from './service';
 
           @Decorator()
           export class Foo {
