@@ -326,7 +326,6 @@ function createResourceImport(
     resourceImportDeclarations.push(
       nodeFactory.createImportDeclaration(
         undefined,
-        undefined,
         nodeFactory.createImportClause(false, importName, undefined),
         urlLiteral,
       ),

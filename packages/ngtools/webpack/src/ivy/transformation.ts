@@ -97,7 +97,6 @@ export function replaceBootstrap(
             bootstrapNamespace = nodeFactory.createUniqueName('__NgCli_bootstrap_');
             bootstrapImport = nodeFactory.createImportDeclaration(
               undefined,
-              undefined,
               nodeFactory.createImportClause(
                 false,
                 undefined,
