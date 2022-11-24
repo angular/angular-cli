@@ -12,6 +12,6 @@ describe('<%= camelize(name) %>Resolver', () => {
   });
 
   it('should be created', () => {
-    expect(resolver).toBeTruthy();
+    expect(executeResolver).toBeTruthy();
   });
 });
