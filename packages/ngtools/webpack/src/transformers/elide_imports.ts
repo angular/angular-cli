@@ -54,31 +54,34 @@ export function elideImports(
       return;
     }
 
-    if (!ts.isTypeReferenceNode(node)) {
-      let symbol: ts.Symbol | undefined;
-      switch (node.kind) {
-        case ts.SyntaxKind.Identifier:
-          const parent = node.parent;
-          if (parent && ts.isShorthandPropertyAssignment(parent)) {
-            const shorthandSymbol = typeChecker.getShorthandAssignmentValueSymbol(parent);
-            if (shorthandSymbol) {
-              symbol = shorthandSymbol;
-            }
-          } else {
-            symbol = typeChecker.getSymbolAtLocation(node);
-          }
-          break;
-        case ts.SyntaxKind.ExportSpecifier:
-          symbol = typeChecker.getExportSpecifierLocalTargetSymbol(node as ts.ExportSpecifier);
-          break;
-        case ts.SyntaxKind.ShorthandPropertyAssignment:
-          symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
-          break;
-      }
+    // Type reference imports do not need to be emitted when emitDecoratorMetadata is disabled.
+    if (ts.isTypeReferenceNode(node) && !compilerOptions.emitDecoratorMetadata) {
+      return;
+    }
 
-      if (symbol) {
-        usedSymbols.add(symbol);
-      }
+    let symbol: ts.Symbol | undefined;
+    switch (node.kind) {
+      case ts.SyntaxKind.Identifier:
+        const parent = node.parent;
+        if (parent && ts.isShorthandPropertyAssignment(parent)) {
+          const shorthandSymbol = typeChecker.getShorthandAssignmentValueSymbol(parent);
+          if (shorthandSymbol) {
+            symbol = shorthandSymbol;
+          }
+        } else {
+          symbol = typeChecker.getSymbolAtLocation(node);
+        }
+        break;
+      case ts.SyntaxKind.ExportSpecifier:
+        symbol = typeChecker.getExportSpecifierLocalTargetSymbol(node as ts.ExportSpecifier);
+        break;
+      case ts.SyntaxKind.ShorthandPropertyAssignment:
+        symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
+        break;
+    }
+
+    if (symbol) {
+      usedSymbols.add(symbol);
     }
 
     ts.forEachChild(node, visit);
