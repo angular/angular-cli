@@ -40,6 +40,11 @@
       "type": "boolean",
       "description": "Do not create \"spec.ts\" test files for the new interceptor.",
       "default": false
+    },
+    "functional": {
+      "type": "boolean",
+      "description": "Creates the interceptor as a `HttpInterceptorFn`.",
+      "default": false
     }
   },
   "required": ["name", "project"]

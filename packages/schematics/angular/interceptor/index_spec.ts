@@ -74,4 +74,23 @@ describe('Interceptor Schematic', () => {
       .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.interceptor.ts');
   });
+
+  it('should create a functional interceptor', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('interceptor', { ...defaultOptions, functional: true }, appTree)
+      .toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo/foo.interceptor.ts');
+    expect(fileString).toContain(
+      'export const fooInterceptor: HttpInterceptorFn = (req, next) => {',
+    );
+  });
+
+  it('should create a helper function to run a functional interceptor in a test', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('interceptor', { ...defaultOptions, functional: true }, appTree)
+      .toPromise();
+    const fileString = tree.readContent('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
+    expect(fileString).toContain('const interceptor: HttpInterceptorFn = (req, next) => ');
+    expect(fileString).toContain('TestBed.runInInjectionContext(() => fooInterceptor(req, next));');
+  });
 });

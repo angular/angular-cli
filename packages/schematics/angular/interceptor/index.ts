@@ -14,8 +14,17 @@ export default function (options: InterceptorOptions): Rule {
   // This schematic uses an older method to implement the flat option
   const flat = options.flat;
   options.flat = true;
-
-  return generateFromFiles(options, {
+  const extraTemplateValues = {
     'if-flat': (s: string) => (flat ? '' : s),
-  });
+  };
+
+  return options.functional
+    ? generateFromFiles(
+        { ...options, templateFilesDirectory: './functional-files' },
+        extraTemplateValues,
+      )
+    : generateFromFiles(
+        { ...options, templateFilesDirectory: './class-files' },
+        extraTemplateValues,
+      );
 }
