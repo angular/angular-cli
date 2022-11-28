@@ -13,6 +13,6 @@ describe('<%= camelize(name) %>Guard', () => {
   });
 
   it('should be created', () => {
-    expect(<%= camelize(name) %>Guard).toBeTruthy();
+    expect(executeGuard).toBeTruthy();
   });
 });
