@@ -19,14 +19,10 @@ export async function createNpmRegistry(
   configContent = configContent.replace(/\$\{HTTPS_PORT\}/g, String(httpsPort));
   await writeFile(join(registryPath, 'verdaccio.yaml'), configContent);
 
-  return spawn(
-    process.execPath,
-    [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'],
-    {
-      cwd: registryPath,
-      stdio: 'inherit',
-    },
-  );
+  return spawn('node', [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'], {
+    cwd: registryPath,
+    stdio: 'inherit',
+  });
 }
 
 // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.

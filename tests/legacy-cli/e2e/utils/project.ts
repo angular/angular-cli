@@ -67,7 +67,7 @@ export async function prepareProjectForE2e(name: string) {
   // Often fails the first time so attempt twice if necessary.
   const runWebdriverUpdate = () =>
     exec(
-      process.execPath,
+      'node',
       'node_modules/protractor/bin/webdriver-manager',
       'update',
       '--standalone',
