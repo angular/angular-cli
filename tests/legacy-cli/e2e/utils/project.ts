@@ -187,6 +187,45 @@ export function useCIDefaults(projectName = 'test-project'): Promise<void> {
   });
 }
 
+const KARMA_CONF_DEFAULT = `
+  module.exports = function (config) {
+    config.set({
+      basePath: '',
+      frameworks: ['jasmine', '@angular-devkit/build-angular'],
+      plugins: [
+        require('karma-jasmine'),
+        require('karma-chrome-launcher'),
+        require('karma-jasmine-html-reporter'),
+        require('karma-coverage'),
+        require('@angular-devkit/build-angular/plugins/karma')
+      ],
+      client: {
+        jasmine: {},
+        clearContext: false // leave Jasmine Spec Runner output visible in browser
+      },
+      jasmineHtmlReporter: {
+        suppressAll: true // removes the duplicated traces
+      },
+      coverageReporter: {
+        dir: require('path').join(__dirname, './coverage/$PROJECT_NAME$'),
+        subdir: '.',
+        reporters: [
+          { type: 'html' },
+          { type: 'text-summary' }
+        ]
+      },
+      reporters: ['progress', 'kjhtml'],
+      port: 9876,
+      colors: true,
+      logLevel: config.LOG_INFO,
+      autoWatch: true,
+      browsers: ['Chrome'],
+      singleRun: false,
+      restartOnFileChange: true
+    });
+  };
+`;
+
 export async function useCIChrome(projectName: string, projectDir = ''): Promise<void> {
   const protractorConf = path.join(projectDir, 'protractor.conf.js');
   if (fs.existsSync(protractorConf)) {
@@ -206,11 +245,38 @@ export async function useCIChrome(projectName: string, projectDir = ''): Promise
     );
   }
 
+  const karmaConf = path.join(projectDir, 'karma.conf.js');
+
+  // Create one with default config if it doesn't exist
+  if (!fs.existsSync(karmaConf)) {
+    await writeFile(karmaConf, KARMA_CONF_DEFAULT.replace('$PROJECT_NAME$', projectName));
+  }
+
   // Update to use the headless sandboxed chrome
+  await replaceInFile(
+    karmaConf,
+    /browsers:.*\]\s*,/,
+    `
+      browsers: ['ChromeHeadlessNoSandbox'],
+      customLaunchers: {
+        ChromeHeadlessNoSandbox: {
+          base: 'ChromeHeadless',
+          flags: [
+            '--no-sandbox',
+            '--headless',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+          ],
+        }
+      },
+    `,
+  );
+
   return updateJsonFile('angular.json', (workspaceJson) => {
     const project = workspaceJson.projects[projectName];
     const appTargets = project.targets || project.architect;
     appTargets.test.options.browsers = 'ChromeHeadlessNoSandbox';
+    appTargets.test.options.karmaConfig = karmaConf;
   });
 }
 
