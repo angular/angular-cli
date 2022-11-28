@@ -1,4 +1,3 @@
-import { EnvironmentInjector } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { <%= guardType %> } from '@angular/router';
 
