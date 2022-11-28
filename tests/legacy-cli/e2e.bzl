@@ -28,7 +28,7 @@ TEST_TAGS = ["no-remote-exec", "requires-network"]
 # Subset of tests for yarn/esbuild
 BROWSER_TESTS = ["tests/misc/browsers.js"]
 YARN_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**"]
-ESBUILD_TESTS = ["tests/basic/**", "tests/build/prod-build.js"]
+ESBUILD_TESTS = ["tests/basic/**", "tests/build/prod-build.js", "tests/build/relative-sourcemap.js", "tests/build/styles/scss.js", "tests/build/styles/include-paths.js", "tests/commands/add/add-pwa.js"]
 
 # Tests excluded for esbuild
 ESBUILD_IGNORE_TESTS = [
@@ -145,7 +145,7 @@ def _e2e_suite(name, runner, type, data):
 
     # e2e tests of snapshot builds
     _e2e_tests(
-        name = "%s.snapshot.%s" % (name, type),
+        name = "%s.snapshots.%s" % (name, type),
         runner = runner,
         size = "enormous",
         data = data,

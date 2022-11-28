@@ -35,12 +35,19 @@ var_3_all_major: &all_nodeversion_major ['14', '16']
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
 var_4: &workspace_location .
 # Filter to only release branches on a given job.
-var_5: &only_release_branches
+var_5_only_releases: &only_release_branches
   filters:
     branches:
       only:
         - main
         - /\d+\.\d+\.x/
+var_5_only_snapshots: &only_snapshot_branches
+  filters:
+    branches:
+      only:
+        - main
+        # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
+        - /^pull\/.*/
 
 var_6: &only_pull_requests
   filters:
@@ -50,7 +57,6 @@ var_6: &only_pull_requests
 
 # All e2e test suites
 var_7: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
-var_8: &all_e2e_build_types ['e2e', 'snapshot']
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
@@ -329,10 +335,9 @@ jobs:
     executor: bazel-executor
     parallelism: 8
     parameters:
-      build_type:
-        type: enum
-        enum: *all_e2e_build_types
-        default: 'e2e'
+      snapshots:
+        type: boolean
+        default: false
       subset:
         type: enum
         enum: *all_e2e_subsets
@@ -343,8 +348,8 @@ jobs:
       - setup_bazel_rbe
       - run: mkdir /mnt/ramdisk/e2e
       - run:
-          name: Test << parameters.build_type >> << parameters.subset >>
-          command: yarn bazel test --define=E2E_TEMP=/mnt/ramdisk/e2e --define=E2E_SHARD_TOTAL=${CIRCLE_NODE_TOTAL} --define=E2E_SHARD_INDEX=${CIRCLE_NODE_INDEX} --config=<< parameters.build_type >> //tests/legacy-cli:e2e.<< parameters.subset >>
+          name: Execute CLI E2E Tests with << parameters.subset >>
+          command: yarn bazel test --define=E2E_TEMP=/mnt/ramdisk/e2e --define=E2E_SHARD_TOTAL=${CIRCLE_NODE_TOTAL} --define=E2E_SHARD_INDEX=${CIRCLE_NODE_INDEX} --config=e2e //tests/legacy-cli:e2e<<# parameters.snapshots >>.snapshots<</ parameters.snapshots >>.<< parameters.subset >>
           no_output_timeout: 40m
       - store_artifacts:
           path: dist/testlogs/tests/legacy-cli/e2e.<< parameters.subset >>
@@ -548,12 +553,7 @@ workflows:
                   - run: circleci-agent step halt
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - main
-                # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
-                - /^pull\/.*/
+          <<: *only_snapshot_branches
 
       # Bazel jobs
       # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
@@ -582,12 +582,7 @@ workflows:
           matrix:
             parameters:
               subset: *all_e2e_subsets
-          build_type: 'e2e'
-          filters:
-            branches:
-              ignore:
-                - main
-                - /\d+\.\d+\.x/
+          snapshots: false
           requires:
             - bazel-build
 
@@ -596,7 +591,7 @@ workflows:
           matrix:
             parameters:
               subset: *all_e2e_subsets
-          build_type: 'snapshot'
+          snapshots: true
           pre-steps:
             - when:
                 condition:
@@ -609,12 +604,7 @@ workflows:
                   - run: circleci-agent step halt
           requires:
             - bazel-build
-          filters:
-            branches:
-              only:
-                - main
-                # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
-                - /^pull\/.*/
+          <<: *only_snapshot_branches
 
       - bazel-test-browsers:
           requires:
