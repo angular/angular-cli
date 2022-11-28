@@ -1,7 +1,8 @@
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
+load("//tools:defaults.bzl", "ts_library")
 
-copy_to_bin(
+ts_library(
     name = "ng-snapshot",
-    srcs = ["package.json"],
+    srcs = [],
+    data = ["package.json"],
     visibility = ["//visibility:public"],
 )

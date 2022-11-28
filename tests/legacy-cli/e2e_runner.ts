@@ -8,11 +8,10 @@ import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
 import { launchTestProcess } from './e2e/utils/process';
-import { delimiter, dirname, join } from 'path';
-import { IS_BAZEL } from './e2e/utils/bazel';
+import { join } from 'path';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
-import { readFileSync, realpathSync } from 'fs';
+import { realpathSync } from 'fs';
 import { PkgInfo } from './e2e/utils/packages';
 
 Error.stackTraceLimit = Infinity;
@@ -62,16 +61,6 @@ const argv = yargsParser(process.argv.slice(2), {
   },
   default: {
     'package': ['./dist/_*.tgz'],
-
-    'debug': !!process.env.BUILD_WORKSPACE_DIRECTORY,
-    'glob': process.env.TESTBRIDGE_TEST_ONLY,
-    'nb-shards':
-      Number(process.env.E2E_SHARD_TOTAL ?? 1) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) || 1,
-    'shard':
-      process.env.E2E_SHARD_INDEX === undefined && process.env.TEST_SHARD_INDEX === undefined
-        ? undefined
-        : Number(process.env.E2E_SHARD_INDEX ?? 0) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) +
-          Number(process.env.TEST_SHARD_INDEX ?? 0),
   },
 });
 
@@ -91,20 +80,6 @@ process.exitCode = 255;
  */
 process.env.LEGACY_CLI_RUNNER = '1';
 
-/**
- * Add external git toolchain onto PATH
- */
-if (process.env.GIT_BIN) {
-  process.env.PATH = process.env.PATH! + delimiter + dirname(process.env.GIT_BIN!);
-}
-
-/**
- * Add external browser toolchains onto PATH
- */
-if (process.env.CHROME_BIN) {
-  process.env.PATH = process.env.PATH! + delimiter + dirname(process.env.CHROME_BIN!);
-}
-
 const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr, {
   info: (s) => s,
   debug: (s) => s,
@@ -118,27 +93,17 @@ function lastLogger() {
   return logStack[logStack.length - 1];
 }
 
-// Under bazel the compiled file (.js) and types (.d.ts) are available.
-// Outside bazel the source .ts files are available.
-const SRC_FILE_EXT = IS_BAZEL ? 'js' : 'ts';
-const SRC_FILE_EXT_RE = new RegExp(`\.${SRC_FILE_EXT}$`);
-
-const testGlob = argv.glob || `tests/**/*.${SRC_FILE_EXT}`;
+const testGlob = argv.glob || 'tests/**/*.ts';
 
 const e2eRoot = path.join(__dirname, 'e2e');
-const allSetups = glob.sync(`setup/**/*.${SRC_FILE_EXT}`, { nodir: true, cwd: e2eRoot }).sort();
-const allInitializers = glob
-  .sync(`initialize/**/*.${SRC_FILE_EXT}`, { nodir: true, cwd: e2eRoot })
-  .sort();
+const allSetups = glob.sync('setup/**/*.ts', { nodir: true, cwd: e2eRoot }).sort();
+const allInitializers = glob.sync('initialize/**/*.ts', { nodir: true, cwd: e2eRoot }).sort();
 const allTests = glob
   .sync(testGlob, { nodir: true, cwd: e2eRoot, ignore: argv.ignore })
   // Replace windows slashes.
   .map((name) => name.replace(/\\/g, '/'))
   .filter((name) => {
-    if (name.endsWith(`/setup.${SRC_FILE_EXT}`)) {
-      return false;
-    }
-    if (!SRC_FILE_EXT_RE.test(name)) {
+    if (name.endsWith('/setup.ts')) {
       return false;
     }
 
@@ -157,8 +122,8 @@ const allTests = glob
   })
   .sort();
 
-const shardId = argv['shard'] !== undefined ? Number(argv['shard']) : null;
-const nbShards = shardId === null ? 1 : Number(argv['nb-shards']);
+const shardId = 'shard' in argv ? argv['shard'] : null;
+const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;
 const tests = allTests.filter((name) => {
   // Check for naming tests on command line.
   if (argv._.length == 0) {
@@ -169,7 +134,7 @@ const tests = allTests.filter((name) => {
     return (
       path.join(process.cwd(), argName + '') == path.join(__dirname, 'e2e', name) ||
       argName == name ||
-      argName == name.replace(SRC_FILE_EXT_RE, '')
+      argName == name.replace(/\.ts$/, '')
     );
   });
 });
@@ -178,7 +143,7 @@ const tests = allTests.filter((name) => {
 const testsToRun = tests.filter((name, i) => shardId === null || i % nbShards == shardId);
 
 if (testsToRun.length === 0) {
-  if (shardId !== null && tests.length <= shardId) {
+  if (shardId !== null && tests.length >= shardId ? 1 : 0) {
     console.log(`No tests to run on shard ${shardId}, exiting.`);
     process.exit(0);
   } else {
@@ -205,28 +170,9 @@ console.log(['Tests:', ...testsToRun].join('\n '));
 
 setGlobalVariable('argv', argv);
 setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
-
-// Use the chrome supplied by bazel or the puppeteer chrome and webdriver-manager driver outside.
-// This is needed by karma-chrome-launcher, protractor etc.
+// This is needed by karma-chrome-launcher
 // https://github.com/karma-runner/karma-chrome-launcher#headless-chromium-with-puppeteer
-//
-// Resolve from relative paths to absolute paths within the bazel runfiles tree
-// so subprocesses spawned in a different working directory can still find them.
-process.env.CHROME_BIN = IS_BAZEL
-  ? path.resolve(process.env.CHROME_BIN!)
-  : require('puppeteer').executablePath();
-process.env.CHROMEDRIVER_BIN = IS_BAZEL
-  ? path.resolve(process.env.CHROMEDRIVER_BIN!)
-  : (function () {
-      const protractorPath = require.resolve('protractor');
-      const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
-        paths: [protractorPath],
-      });
-      const webdriverUpdate = JSON.parse(readFileSync(webdriverUpdatePath).toString()) as {
-        chrome: { last: string };
-      };
-      return webdriverUpdate.chrome.last;
-    })();
+process.env['CHROME_BIN'] = require('puppeteer').executablePath();
 
 Promise.all([findFreePort(), findFreePort(), findPackageTars()])
   .then(async ([httpPort, httpsPort, packageTars]) => {
@@ -291,12 +237,12 @@ async function runSteps(
 
   for (const [stepIndex, relativeName] of steps.entries()) {
     // Make sure this is a windows compatible path.
-    let absoluteName = path.join(e2eRoot, relativeName).replace(SRC_FILE_EXT_RE, '');
+    let absoluteName = path.join(e2eRoot, relativeName).replace(/\.ts$/, '');
     if (/^win/.test(process.platform)) {
       absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
     }
 
-    const name = relativeName.replace(SRC_FILE_EXT_RE, '');
+    const name = relativeName.replace(/\.ts$/, '');
     const start = Date.now();
 
     printHeader(relativeName, stepIndex, steps.length, type);
@@ -351,7 +297,7 @@ function printHeader(
   type: 'setup' | 'initializer' | 'test',
 ) {
   const text = `${testIndex + 1} of ${count}`;
-  const fullIndex = testIndex * nbShards + (shardId ?? 0) + 1;
+  const fullIndex = testIndex * nbShards + shardId + 1;
   const shard =
     shardId === null || type !== 'test'
       ? ''
@@ -382,16 +328,7 @@ async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
     glob.sync(p, { realpath: true }),
   );
 
-  const pkgJsons = await Promise.all(
-    pkgs.map(async (pkg) => {
-      try {
-        return await extractFile(pkg, './package/package.json');
-      } catch (e) {
-        // TODO(bazel): currently the bazel npm packaging does not contain the standard npm ./package directory
-        return await extractFile(pkg, './package.json');
-      }
-    }),
-  );
+  const pkgJsons = await Promise.all(pkgs.map((pkg) => extractFile(pkg, './package/package.json')));
 
   return pkgs.reduce((all, pkg, i) => {
     const json = pkgJsons[i].toString('utf8');
