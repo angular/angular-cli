@@ -2,9 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { prerelease, SemVer } from 'semver';
 import yargsParser from 'yargs-parser';
-import { IS_BAZEL } from './bazel';
 import { getGlobalVariable } from './env';
-import { readFile, replaceInFile, writeFile } from './fs';
+import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { findFreePort } from './network';
 import { installWorkspacePackages, PkgInfo } from './packages';
@@ -51,41 +50,37 @@ export async function prepareProjectForE2e(name: string) {
   await installWorkspacePackages();
   await ng('generate', 'e2e', '--related-app-name', name);
 
-  // bazel will use its own sandboxed browser + webdriver
-  // TODO(bazel): remove non-bazel
-  if (!IS_BAZEL) {
-    const protractorPath = require.resolve('protractor');
-    const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
-      paths: [protractorPath],
-    });
-    const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
-      chrome: { last: string };
-    };
+  const protractorPath = require.resolve('protractor');
+  const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
+    paths: [protractorPath],
+  });
+  const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
+    chrome: { last: string };
+  };
 
-    const chromeDriverVersion = webdriverUpdate.chrome.last.match(/chromedriver_([\d|\.]+)/)?.[1];
-    if (!chromeDriverVersion) {
-      throw new Error('Could not extract chrome webdriver version.');
-    }
+  const chromeDriverVersion = webdriverUpdate.chrome.last.match(/chromedriver_([\d|\.]+)/)?.[1];
+  if (!chromeDriverVersion) {
+    throw new Error('Could not extract chrome webdriver version.');
+  }
 
-    // Initialize selenium webdriver.
-    // Often fails the first time so attempt twice if necessary.
-    const runWebdriverUpdate = () =>
-      exec(
-        process.execPath,
-        'node_modules/protractor/bin/webdriver-manager',
-        'update',
-        '--standalone',
-        'false',
-        '--gecko',
-        'false',
-        '--versions.chrome',
-        chromeDriverVersion,
-      );
-    try {
-      await runWebdriverUpdate();
-    } catch {
-      await runWebdriverUpdate();
-    }
+  // Initialize selenium webdriver.
+  // Often fails the first time so attempt twice if necessary.
+  const runWebdriverUpdate = () =>
+    exec(
+      process.execPath,
+      'node_modules/protractor/bin/webdriver-manager',
+      'update',
+      '--standalone',
+      'false',
+      '--gecko',
+      'false',
+      '--versions.chrome',
+      chromeDriverVersion,
+    );
+  try {
+    await runWebdriverUpdate();
+  } catch {
+    await runWebdriverUpdate();
   }
 
   await useCIChrome(name, 'e2e');
@@ -187,96 +182,42 @@ export function useCIDefaults(projectName = 'test-project'): Promise<void> {
   });
 }
 
-const KARMA_CONF_DEFAULT = `
-  module.exports = function (config) {
-    config.set({
-      basePath: '',
-      frameworks: ['jasmine', '@angular-devkit/build-angular'],
-      plugins: [
-        require('karma-jasmine'),
-        require('karma-chrome-launcher'),
-        require('karma-jasmine-html-reporter'),
-        require('karma-coverage'),
-        require('@angular-devkit/build-angular/plugins/karma')
-      ],
-      client: {
-        jasmine: {},
-        clearContext: false // leave Jasmine Spec Runner output visible in browser
-      },
-      jasmineHtmlReporter: {
-        suppressAll: true // removes the duplicated traces
-      },
-      coverageReporter: {
-        dir: require('path').join(__dirname, './coverage/$PROJECT_NAME$'),
-        subdir: '.',
-        reporters: [
-          { type: 'html' },
-          { type: 'text-summary' }
-        ]
-      },
-      reporters: ['progress', 'kjhtml'],
-      port: 9876,
-      colors: true,
-      logLevel: config.LOG_INFO,
-      autoWatch: true,
-      browsers: ['Chrome'],
-      singleRun: false,
-      restartOnFileChange: true
-    });
-  };
-`;
-
 export async function useCIChrome(projectName: string, projectDir = ''): Promise<void> {
   const protractorConf = path.join(projectDir, 'protractor.conf.js');
+  const chromePath = require('puppeteer').executablePath();
+
+  // Use Puppeteer in protractor if a config is found on the project.
   if (fs.existsSync(protractorConf)) {
+    const protractorPath = require.resolve('protractor');
+    const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
+      paths: [protractorPath],
+    });
+    const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
+      chrome: { last: string };
+    };
+    const chromeDriverPath = webdriverUpdate.chrome.last;
+
     await replaceInFile(
       protractorConf,
       `browserName: 'chrome'`,
       `browserName: 'chrome',
       chromeOptions: {
-        args: ['--headless', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
-        binary: String.raw\`${process.env.CHROME_BIN}\`,
+        args: ['--headless'],
+        binary: String.raw\`${chromePath}\`,
       }`,
     );
     await replaceInFile(
       protractorConf,
       'directConnect: true,',
-      `directConnect: true, chromeDriver: String.raw\`${process.env.CHROMEDRIVER_BIN}\`,`,
+      `directConnect: true, chromeDriver: String.raw\`${chromeDriverPath}\`,`,
     );
   }
 
-  const karmaConf = path.join(projectDir, 'karma.conf.js');
-
-  // Create one with default config if it doesn't exist
-  if (!fs.existsSync(karmaConf)) {
-    await writeFile(karmaConf, KARMA_CONF_DEFAULT.replace('$PROJECT_NAME$', projectName));
-  }
-
-  // Update to use the headless sandboxed chrome
-  await replaceInFile(
-    karmaConf,
-    /browsers:.*\]\s*,/,
-    `
-      browsers: ['ChromeHeadlessNoSandbox'],
-      customLaunchers: {
-        ChromeHeadlessNoSandbox: {
-          base: 'ChromeHeadless',
-          flags: [
-            '--no-sandbox',
-            '--headless',
-            '--disable-gpu',
-            '--disable-dev-shm-usage',
-          ],
-        }
-      },
-    `,
-  );
-
+  // Use ChromeHeadless.
   return updateJsonFile('angular.json', (workspaceJson) => {
     const project = workspaceJson.projects[projectName];
     const appTargets = project.targets || project.architect;
-    appTargets.test.options.browsers = 'ChromeHeadlessNoSandbox';
-    appTargets.test.options.karmaConfig = karmaConf;
+    appTargets.test.options.browsers = 'ChromeHeadless';
   });
 }
 

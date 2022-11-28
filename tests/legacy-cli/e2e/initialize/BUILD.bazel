@@ -5,7 +5,7 @@ ts_library(
     testonly = True,
     srcs = glob(["**/*.ts"]),
     data = [
-        "//:config-files",
+        "//:package.json",
     ],
     visibility = ["//visibility:public"],
     deps = [
