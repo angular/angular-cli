@@ -9,7 +9,7 @@ Scaffold an Angular CLI workspace without needing to install the Angular CLI glo
 ### npm
 
 ```
-npm init @angular [project-name] -- [...options]
+npm init @angular@latest [project-name] -- [...options]
 ```
 
 ### yarn
