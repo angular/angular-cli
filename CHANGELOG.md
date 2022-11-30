@@ -1,3 +1,25 @@
+<a name="15.0.2"></a>
+
+# 15.0.2 (2022-11-30)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [2891d5bc9](https://github.com/angular/angular-cli/commit/2891d5bc9eecf7fa8e3b80906d9c56e6a49f3d15) | fix  | correctly set Sass quietDeps and verbose options |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [d9cc4b028](https://github.com/angular/angular-cli/commit/d9cc4b0289eaf382782a994a15497e9526c5a4a2) | fix  | elide unused type references |
+
+## Special Thanks
+
+Alan Agius and Juuso Valkeejärvi
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.0-next.0"></a>
 
 # 15.1.0-next.0 (2022-11-23)
