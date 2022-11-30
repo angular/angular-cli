@@ -190,8 +190,9 @@ async function optimizeWithTerser(
         passes: advanced ? 2 : 1,
         pure_getters: advanced,
       },
-      // terser only supports up to ES2020
-      ecma: 2020,
+      // Set to ES2015 to prevent higher level features from being introduced when browserslist
+      // contains older browsers. The build system requires browsers to support ES2015 at a minimum.
+      ecma: 2015,
       // esbuild in the first pass is used to minify identifiers instead of mangle here
       mangle: false,
       // esbuild in the first pass is used to minify function names
