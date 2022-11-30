@@ -1,3 +1,34 @@
+<a name="15.1.0-next.1"></a>
+
+# 15.1.0-next.1 (2022-11-30)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [9299dea64](https://github.com/angular/angular-cli/commit/9299dea6492527bcaea24c9c7f3116ee2779405b) | feat | generate functional interceptors                           |
+| [9b6d190f4](https://github.com/angular/angular-cli/commit/9b6d190f4a082c166d253b0f00162e0286238e45) | fix  | remove EnvironmentInjector import in functional guard spec |
+| [b11d3f644](https://github.com/angular/angular-cli/commit/b11d3f6442d38f609471ab19c08a1c9a871e0ae3) | fix  | use proper variable in functional guard spec               |
+| [451975f76](https://github.com/angular/angular-cli/commit/451975f7650041a83994e1308f85fe7e33a31e32) | fix  | use proper variable in resolver functional spec            |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [012393d37](https://github.com/angular/angular-cli/commit/012393d37924a2afd172bfd80ee5e4bcd1c9abdf) | fix  | correctly set Sass quietDeps and verbose options |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [856720b91](https://github.com/angular/angular-cli/commit/856720b913ec1ba82b96db2d3a61628cb3795f11) | fix  | elide unused type references |
+
+## Special Thanks
+
+Alan Agius, Andrew Scott, Cédric Exbrayat, Jason Bedard and Juuso Valkeejärvi
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.2"></a>
 
 # 15.0.2 (2022-11-30)
