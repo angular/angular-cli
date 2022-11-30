@@ -10,23 +10,23 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@angular-devkit/architect@0.1500.0":
-  version "0.1500.0"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1500.0.tgz#50e0037268b5848bef3cb9d4766b0648dba67a87"
-  integrity sha512-jruRPfGQ2IU6TALyZcNTZG0MiOg5G/0axcqAmrb/1rJt5qb1vr74HQ8v0nBNQSVnk8swU+nXOdj3lX+xY7y4WA==
+"@angular-devkit/architect@0.1501.0-next.0":
+  version "0.1501.0-next.0"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1501.0-next.0.tgz#7555582c991d2c7fcb34c9cc6f1a3ce7cf860edf"
+  integrity sha512-3H7W6ECEiBsRLIApm6yYz7RkTpGxmm1erhrNp8hFKWu+kYZNKbX8PfdPnTLbu9QO5vCJhpEnXSHkLrUpw9gIzg==
   dependencies:
-    "@angular-devkit/core" "15.0.0"
+    "@angular-devkit/core" "15.1.0-next.0"
     rxjs "6.6.7"
 
-"@angular-devkit/build-angular@15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-15.0.0.tgz#fa24acfa308eae74ff8fcd7a74663fe081e54b62"
-  integrity sha512-sF8c4oewwpKPlLkMMDBIM/qQ+LQHv308JvyWV2VKaph3IWI2TZQP4n5024/XaFvBEz0/2sHDWTMcGTKlZ7ZC0w==
+"@angular-devkit/build-angular@15.1.0-next.0":
+  version "15.1.0-next.0"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-15.1.0-next.0.tgz#20aa490ff0bed373f14904a9b4b220ede6692451"
+  integrity sha512-wX3WMWLiYgzQIb0/BLNjRbdreHPwqEGnDApPaCJBXKPATk8HUB54FOp7BwBo35wElUkeIE3p/OODiD+ZUYuZHg==
   dependencies:
     "@ampproject/remapping" "2.2.0"
-    "@angular-devkit/architect" "0.1500.0"
-    "@angular-devkit/build-webpack" "0.1500.0"
-    "@angular-devkit/core" "15.0.0"
+    "@angular-devkit/architect" "0.1501.0-next.0"
+    "@angular-devkit/build-webpack" "0.1501.0-next.0"
+    "@angular-devkit/core" "15.1.0-next.0"
     "@babel/core" "7.20.2"
     "@babel/generator" "7.20.4"
     "@babel/helper-annotate-as-pure" "7.18.6"
@@ -37,7 +37,7 @@
     "@babel/runtime" "7.20.1"
     "@babel/template" "7.18.10"
     "@discoveryjs/json-ext" "0.5.7"
-    "@ngtools/webpack" "15.0.0"
+    "@ngtools/webpack" "15.1.0-next.0"
     ansi-colors "4.1.3"
     autoprefixer "10.4.13"
     babel-loader "9.1.0"
@@ -47,8 +47,8 @@
     chokidar "3.5.3"
     copy-webpack-plugin "11.0.0"
     critters "0.0.16"
-    css-loader "6.7.1"
-    esbuild-wasm "0.15.13"
+    css-loader "6.7.2"
+    esbuild-wasm "0.15.15"
     glob "8.0.3"
     https-proxy-agent "5.0.1"
     inquirer "8.2.4"
@@ -59,14 +59,13 @@
     license-webpack-plugin "4.0.2"
     loader-utils "3.2.1"
     magic-string "0.26.7"
-    mini-css-extract-plugin "2.6.1"
+    mini-css-extract-plugin "2.7.0"
     open "8.4.0"
     ora "5.4.1"
     parse5-html-rewriting-stream "6.0.1"
     piscina "3.2.0"
     postcss "8.4.19"
     postcss-loader "7.0.1"
-    regenerator-runtime "0.13.10"
     resolve-url-loader "5.0.0"
     rxjs "6.6.7"
     sass "1.56.1"
@@ -79,36 +78,36 @@
     tree-kill "1.2.2"
     tslib "2.4.1"
     webpack "5.75.0"
-    webpack-dev-middleware "5.3.3"
+    webpack-dev-middleware "6.0.0"
     webpack-dev-server "4.11.1"
     webpack-merge "5.8.0"
     webpack-subresource-integrity "5.1.0"
   optionalDependencies:
-    esbuild "0.15.13"
+    esbuild "0.15.15"
 
-"@angular-devkit/build-webpack@0.1500.0":
-  version "0.1500.0"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-webpack/-/build-webpack-0.1500.0.tgz#e8361e510c4d0740e695e20722d837d965d65e67"
-  integrity sha512-PFLd4LrKcZosdMKZSIPsEb9AsFiTqYhspSMyKApt3mfuO0LkcW46n+KOixg+aWgiJQdlfeMSaW9IgdrgP0y8/Q==
+"@angular-devkit/build-webpack@0.1501.0-next.0":
+  version "0.1501.0-next.0"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-webpack/-/build-webpack-0.1501.0-next.0.tgz#65089e390b1d4d123f85c91adac7178dfbd4384b"
+  integrity sha512-E4VDrm5KoEWF4tR5vlxpa/0NLD5IsR+38UcPf5vfpm1/NkiWfmgTRwIR3Tt2jIINhrWCbtXr9qYFX2ppV8d3NA==
   dependencies:
-    "@angular-devkit/architect" "0.1500.0"
+    "@angular-devkit/architect" "0.1501.0-next.0"
     rxjs "6.6.7"
 
-"@angular-devkit/core@15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-15.0.0.tgz#6b6db4ca7998167f1fb58086e9b4349c7774ddc9"
-  integrity sha512-2Mg1+eyodO7od2Ax0EaArmm3rDzI2O00pBNU2Upz5hTfHcsqXlPzX5aYjWBiL1lBM0xYLY99dZqSdcQBMZy/Qg==
+"@angular-devkit/core@15.1.0-next.0":
+  version "15.1.0-next.0"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-15.1.0-next.0.tgz#60590383dfc37b1b35fe373cda94bb61bf4baf76"
+  integrity sha512-rv4c3pAw6P9A0/30psLrLPP8ATJf0Y/bifLeEblW+sbckEnk3Cu9wbw1nOWfh852dpt8XDRxcgpXdX+ysQOCvA==
   dependencies:
-    ajv "8.11.0"
+    ajv "8.11.2"
     ajv-formats "2.1.1"
     jsonc-parser "3.2.0"
     rxjs "6.6.7"
     source-map "0.7.4"
 
-"@angular/animations@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-15.0.1.tgz#6181ab315504035b981fe4db85e96bbcd3b6d660"
-  integrity sha512-GfxqpRcoRfQNS1pVA+PadcgCGJSFag07jFJIQUHX3HZkI/4PyXGn/7ptgebN3tBjy+ASk4PBOQP/ntGbrr55zw==
+"@angular/animations@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-15.0.2.tgz#13617cf4ae98b555955c474c11b4e88e6d0259b9"
+  integrity sha512-bghNrTPbRaxL1SqiKFFUdDFDClGFzES6AkGbtBj1kE6IOC3tNbTSc2ozsuVAGOi96zqumnonaA000dIIqfvYMw==
   dependencies:
     tslib "^2.3.0"
 
@@ -120,28 +119,29 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#e03dd7495dce207abd647fdde7d6918302c0b4b5":
-  version "0.0.0-361be062e6820a94ba3d7e7709dd50ba3c370c89"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#e03dd7495dce207abd647fdde7d6918302c0b4b5"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#700b1eb865783a6dc733206bd9b3eadf1a43042f":
+  version "0.0.0-3bc93449e11b733260d0294305bf57240d7e0a81"
+  uid "700b1eb865783a6dc733206bd9b3eadf1a43042f"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#700b1eb865783a6dc733206bd9b3eadf1a43042f"
   dependencies:
-    "@angular-devkit/build-angular" "15.0.0"
+    "@angular-devkit/build-angular" "15.1.0-next.0"
     "@angular/benchpress" "0.3.0"
     "@babel/core" "^7.16.0"
     "@babel/helper-annotate-as-pure" "^7.18.6"
     "@bazel/buildifier" "5.1.0"
-    "@bazel/concatjs" "5.7.1"
-    "@bazel/esbuild" "5.7.1"
-    "@bazel/protractor" "5.7.1"
-    "@bazel/runfiles" "5.7.1"
-    "@bazel/terser" "5.7.1"
-    "@bazel/typescript" "5.7.1"
+    "@bazel/concatjs" "5.7.2"
+    "@bazel/esbuild" "5.7.2"
+    "@bazel/protractor" "5.7.2"
+    "@bazel/runfiles" "5.7.2"
+    "@bazel/terser" "5.7.2"
+    "@bazel/typescript" "5.7.2"
     "@microsoft/api-extractor" "7.31.0"
     "@types/browser-sync" "^2.26.3"
     "@types/node" "16.10.9"
     "@types/selenium-webdriver" "^4.0.18"
     "@types/send" "^0.17.1"
     "@types/tmp" "^0.2.1"
-    "@types/uuid" "^8.3.1"
+    "@types/uuid" "^9.0.0"
     "@types/ws" "8.5.3"
     "@types/yargs" "^17.0.0"
     browser-sync "^2.27.7"
@@ -158,26 +158,26 @@
     uuid "^9.0.0"
     yargs "^17.0.0"
 
-"@angular/cdk@15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-15.0.0.tgz#584bc424eff1856db3f517b22a0f1cb81cb854dc"
-  integrity sha512-a4AUGfd1iNEGR5A9jmwzEfdRDpOh9KWypFqo85ivC3/KDW4+Z5AGxZpzwqAsRz2WQVdK+8biaz83VBQTMC5IOw==
+"@angular/cdk@15.0.1":
+  version "15.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-15.0.1.tgz#45208c42ab929e42104faa64c70de978788fceda"
+  integrity sha512-yV/nietivRC8JJrEt0M3RXo+4PMk8cReZVhbV0ME6MOehJ7NBw7uIBjfIbLWE9YGEHZi+TCzdxqDuWqH5RCiog==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
-    parse5 "^5.0.0"
+    parse5 "^7.1.2"
 
-"@angular/common@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/common/-/common-15.0.1.tgz#500141a1e6a900d8cc5a08748cee64329c36fa78"
-  integrity sha512-XRD1Dj2aINyp5yYueCuwLU1y84z+ZFXeO84oNfwIu0unHszuo02iIzrV+yCm/ATwt6qUkIbe6xhZNjUorZecyA==
+"@angular/common@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/common/-/common-15.0.2.tgz#386244daea7d832b28ffdbcda3cc057eacb32a27"
+  integrity sha512-BZkaUdFv6A0a8m3R/HEYmwZrULMHwRWQh+ukSQEz9reVNUiH0/mNvj9I4iYYCfYXHPiyMIRfAeu/fqdl14DBFg==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/compiler-cli@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-15.0.1.tgz#a08a24aae772afbf491aa463749c1651619bf103"
-  integrity sha512-M2VsKBw8dQMC5p3PmpM+EBZAZ9Qk/rGX+aIHYBGzsgGFqYMEcz6Nxrj4v6I3Hta7tW7QEVXf883rXiWxHlwtbw==
+"@angular/compiler-cli@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-15.0.2.tgz#2a83fb5ffb55a2bf6bd2a1e694a10288dc981fcd"
+  integrity sha512-WZCULskbuoMA0iQ36H2nGgKj017JENR+wDnwuQ+/1ECtBN2PpjJiws/m5bntBzQe96w2fue6tOLh09WESQgRHw==
   dependencies:
     "@babel/core" "^7.17.2"
     chokidar "^3.0.0"
@@ -190,17 +190,17 @@
     tslib "^2.3.0"
     yargs "^17.2.1"
 
-"@angular/compiler@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-15.0.1.tgz#7c8b748868088e6219f8c04f4c7a3e5f681854aa"
-  integrity sha512-4talkxip79XPfoj69qgY8VXV1KIBKOyZCRWHhNVqMdECyw/fceVWN4r8kDL0qOTBh1CKmhoQFXQilr9g7nFatA==
+"@angular/compiler@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-15.0.2.tgz#2e7b1c3c5e4a9c34e2f88a26d9a391955edf8b06"
+  integrity sha512-dD1Vv2txp09V7RaJK2tvGRWpM2RsDARVAGL65hfJY2txeEFRyajcle6jOI11NfGpgsZvptN7o5oc8ozQI1hgTA==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-15.0.1.tgz#5bc910a0db9579114b878fed22c1e09bebf7a69d"
-  integrity sha512-idaKf9hhguyGn/yj5KMHIUEvW4PpeYcwlRUSoEskQC1799BsXwJyV0AwZ67GH1ltnAj34gbhMhDedcCLdhOffA==
+"@angular/core@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-15.0.2.tgz#2c399e5a122a2a633093ec6d5c9ca0ce0dddd030"
+  integrity sha512-qM0T4r3Z3Qfk+5+M5JRB1qr3AUKgabbC0kARY+R+QvwbQBE6UoeWw5eRuUbTGDP70Ikeeg0xZebpkr7Oghp9/A==
   dependencies:
     tslib "^2.3.0"
 
@@ -211,117 +211,118 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/forms@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-15.0.1.tgz#8a9396990d7d5a253c8df07673fe45001de02357"
-  integrity sha512-gNj/fY7B7swczWI3jpJK4904W0WHCrYviZB8m97P4MkcxdMfQezp4VoRsj+vIkKGtUPUWje3uIjzqodhJlxIJA==
+"@angular/forms@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-15.0.2.tgz#a404c8d3f4227b1d4b56bad65a85aa3e4eed396c"
+  integrity sha512-c7t2pk1nzXIibIaIo4wsDd+VipiuDXqV1bolluAVaRjnS80BEQqOkudNNBgodx8sVkjEYI+cpLp+vE7FEOjHdg==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/localize@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/localize/-/localize-15.0.1.tgz#edbb964a00fd7bfef6ba6dc353175c5051fe0653"
-  integrity sha512-z1pNeDPZSeG++bL42uSouOcEj6YxaGd01ujNo1OiZUEgkqMRZRBHscXLFdXQ0dUm0kNWtjfAevesrI/vA9259w==
+"@angular/localize@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/localize/-/localize-15.0.2.tgz#c62bab9a94b1c842de901e1438508998bb01e6e1"
+  integrity sha512-7qZcEl9ZscCwGzmCviUQvkeGyaH58xSrW7eZ2nQPVKCwU9DGLtSXd0xTqTe6nmjigO7BG0u4D2yt1c6/Q+X8yQ==
   dependencies:
     "@babel/core" "7.19.3"
     glob "8.0.3"
     yargs "^17.2.1"
 
-"@angular/material@15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-15.0.0.tgz#f22841b73baad114f4e7dfc827dafc6458d21b25"
-  integrity sha512-DONpBABa8r0YW8uwUOR1D14vlUnKNmUhKjPHnf0iDKOK3FS0oS/gzwc49iU/o8JtovatJYGa+mcm1i55Piz7Rg==
+"@angular/material@15.0.1":
+  version "15.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-15.0.1.tgz#44e5ae2eb768c09bf16f082a3c662df7eb1ec543"
+  integrity sha512-JXMcRf27HgXwjoNOKD04YubJ14M9Y66g5Ol4R5EDShnwvvzU1OKLjaYN3SYpH5iMauZztjljsVBsLlO8n/TVFA==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/auto-init" "15.0.0-canary.ecfee946f.0"
-    "@material/banner" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/button" "15.0.0-canary.ecfee946f.0"
-    "@material/card" "15.0.0-canary.ecfee946f.0"
-    "@material/checkbox" "15.0.0-canary.ecfee946f.0"
-    "@material/chips" "15.0.0-canary.ecfee946f.0"
-    "@material/circular-progress" "15.0.0-canary.ecfee946f.0"
-    "@material/data-table" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dialog" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/drawer" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/fab" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/floating-label" "15.0.0-canary.ecfee946f.0"
-    "@material/form-field" "15.0.0-canary.ecfee946f.0"
-    "@material/icon-button" "15.0.0-canary.ecfee946f.0"
-    "@material/image-list" "15.0.0-canary.ecfee946f.0"
-    "@material/layout-grid" "15.0.0-canary.ecfee946f.0"
-    "@material/line-ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/linear-progress" "15.0.0-canary.ecfee946f.0"
-    "@material/list" "15.0.0-canary.ecfee946f.0"
-    "@material/menu" "15.0.0-canary.ecfee946f.0"
-    "@material/menu-surface" "15.0.0-canary.ecfee946f.0"
-    "@material/notched-outline" "15.0.0-canary.ecfee946f.0"
-    "@material/radio" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/segmented-button" "15.0.0-canary.ecfee946f.0"
-    "@material/select" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/slider" "15.0.0-canary.ecfee946f.0"
-    "@material/snackbar" "15.0.0-canary.ecfee946f.0"
-    "@material/switch" "15.0.0-canary.ecfee946f.0"
-    "@material/tab" "15.0.0-canary.ecfee946f.0"
-    "@material/tab-bar" "15.0.0-canary.ecfee946f.0"
-    "@material/tab-indicator" "15.0.0-canary.ecfee946f.0"
-    "@material/tab-scroller" "15.0.0-canary.ecfee946f.0"
-    "@material/textfield" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tooltip" "15.0.0-canary.ecfee946f.0"
-    "@material/top-app-bar" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/auto-init" "15.0.0-canary.7971d6ad5.0"
+    "@material/banner" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/button" "15.0.0-canary.7971d6ad5.0"
+    "@material/card" "15.0.0-canary.7971d6ad5.0"
+    "@material/checkbox" "15.0.0-canary.7971d6ad5.0"
+    "@material/chips" "15.0.0-canary.7971d6ad5.0"
+    "@material/circular-progress" "15.0.0-canary.7971d6ad5.0"
+    "@material/data-table" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dialog" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/drawer" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/fab" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/floating-label" "15.0.0-canary.7971d6ad5.0"
+    "@material/form-field" "15.0.0-canary.7971d6ad5.0"
+    "@material/icon-button" "15.0.0-canary.7971d6ad5.0"
+    "@material/image-list" "15.0.0-canary.7971d6ad5.0"
+    "@material/layout-grid" "15.0.0-canary.7971d6ad5.0"
+    "@material/line-ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/linear-progress" "15.0.0-canary.7971d6ad5.0"
+    "@material/list" "15.0.0-canary.7971d6ad5.0"
+    "@material/menu" "15.0.0-canary.7971d6ad5.0"
+    "@material/menu-surface" "15.0.0-canary.7971d6ad5.0"
+    "@material/notched-outline" "15.0.0-canary.7971d6ad5.0"
+    "@material/radio" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/segmented-button" "15.0.0-canary.7971d6ad5.0"
+    "@material/select" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/slider" "15.0.0-canary.7971d6ad5.0"
+    "@material/snackbar" "15.0.0-canary.7971d6ad5.0"
+    "@material/switch" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab-bar" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab-indicator" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab-scroller" "15.0.0-canary.7971d6ad5.0"
+    "@material/textfield" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tooltip" "15.0.0-canary.7971d6ad5.0"
+    "@material/top-app-bar" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c8a5691ccbc3eab2c364ec547c9aec24ceba2eca":
-  version "0.0.0-361be062e6820a94ba3d7e7709dd50ba3c370c89"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c8a5691ccbc3eab2c364ec547c9aec24ceba2eca"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#0fd48ee6dfc7fd00f4267794ca2a8bb08fe1e39a":
+  version "0.0.0-3bc93449e11b733260d0294305bf57240d7e0a81"
+  uid "0fd48ee6dfc7fd00f4267794ca2a8bb08fe1e39a"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#0fd48ee6dfc7fd00f4267794ca2a8bb08fe1e39a"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.8.0"
 
-"@angular/platform-browser-dynamic@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-15.0.1.tgz#06a6147f159bdde83aa70b71f013d62b1039afb2"
-  integrity sha512-GyD7BIWGiKGA9KgXmSQLEWiIZjGMacBdvJ8KsRKFpKfxA9bfaC5J6dwTqNy+l/Z9IcT2VQJ8Ba0gEHHtkfemPA==
+"@angular/platform-browser-dynamic@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-15.0.2.tgz#93026eab5b4b8956e88c69452baeef5d676cfcc3"
+  integrity sha512-OJ3WevyoR/rEYs9zqY2NzYX+2OqcWrmATFnvdFNMztjl8HO/SVak1URz8phZeSRslWjILlJ4nxPORVwV8TlW+w==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/platform-browser@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-15.0.1.tgz#dac0abb8519e434e04e277c4ba555b3cfb7e10dd"
-  integrity sha512-fH0EfRgbQC0ql8V1ZWVfF75H9lSjT2T6uGfR8cBdRAO/RWwWgx/TfFsjdWAZtjuKRZnKY3wRQ/yVYeQarC3n0Q==
+"@angular/platform-browser@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-15.0.2.tgz#eb9812b16e8f38fae03a4499c9d80269b40397a1"
+  integrity sha512-Dau9Ip5ub35lyJ+Bl2sUMQ4CoCgj8tdcNWDyQrfYynllKZfbQNaNY60To48P4u7pVGwN/Ib8Wb+jcloZJUXm4Q==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/platform-server@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/platform-server/-/platform-server-15.0.1.tgz#986bea4bae180e844c8c525c6f031959dd4ce364"
-  integrity sha512-sYbqpy6QbH8DEmykjCKes7n/rkgu7Y9Y5OliLiWj8tamZwPubod4E2Ik+FSDx6c4+G+hNVwXSCLb9abG56yrEQ==
+"@angular/platform-server@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/platform-server/-/platform-server-15.0.2.tgz#e9bbc0a72c8d15f48e6fbb10e388c5af8136bb5b"
+  integrity sha512-a25zn1puSJYAPHbdBTPWwU6xptvfjkkd5un4Mk07Twa7x9hxV6me91bV3u7Ce/t2GGYJ8shp1KHMWAxriH7O2A==
   dependencies:
     domino "^2.1.2"
     tslib "^2.3.0"
     xhr2 "^0.2.0"
 
-"@angular/router@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/router/-/router-15.0.1.tgz#cf0a006bddf928385dc3a5305d4997ef9eb20c69"
-  integrity sha512-L+GgFNAgITyyD7CTTtOjz1OgFu00+xzjANLfOMs8wGW8OsqSS68lsXF9QexbPGm+e0n+rmQjYOZcsi0Bti4sCQ==
+"@angular/router@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/router/-/router-15.0.2.tgz#20895e06c8efbc92123276341a8cb988618bfd38"
+  integrity sha512-uRf/OTGHt7Ysxw1IgrzCTvtwoYwwDPJxsZm/jXfrILPxHYqsSvYNXgcGqOp1kXY1/ByotM0P2+5CA6h2VICFHg==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/service-worker@15.0.1":
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/@angular/service-worker/-/service-worker-15.0.1.tgz#b56112cf0f6f8a14489f218bf956159d2415322b"
-  integrity sha512-kmB/aP7mkfnbdruwCB5XtuI3O3WG/CqtEgL824VXaycSlLoHprT/+YBVM+kNvmM9S7+70IxEZmqEvd/hjHUDeA==
+"@angular/service-worker@15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/service-worker/-/service-worker-15.0.2.tgz#9a6b12260e13d9279162405c65bd6a2657935990"
+  integrity sha512-r+9qS3ZoLkNutukzJLchZtr/NG16DGTcLu/Q2K84gTi/ybf88OCphL3uKwefF8BFguXoMNL+LLHEulrE1UzWaA==
   dependencies:
     tslib "^2.3.0"
 
@@ -1300,15 +1301,6 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-5.1.0.tgz#ae0b93c5d14b2b080d5a492a8bfee231101b5385"
   integrity sha512-gO0+//hkH+iE3AQ02mYttJAcWiE+rapP8IxmstDhwSqs+CmZJJI8Q1vAaIvMyJUT3NIf7lGljRNpzclkCPk89w==
 
-"@bazel/concatjs@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/concatjs/-/concatjs-5.7.1.tgz#fe76bf0064382d7640651b210a97d5af35e50e39"
-  integrity sha512-h6PHntgP8PY5DOjl73zt4zeXcbRYX1Zk3vwpP/QYUk0APlwCHE3ZU+u7whrsV3LPAhlPg1c+t9cmHBxfmb2q7w==
-  dependencies:
-    protobufjs "6.8.8"
-    source-map-support "0.5.9"
-    tsutils "3.21.0"
-
 "@bazel/concatjs@5.7.2":
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/@bazel/concatjs/-/concatjs-5.7.2.tgz#24298c5607cd670a390743c962d5f3e6dbeea5b5"
@@ -1318,10 +1310,10 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
-"@bazel/esbuild@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.7.1.tgz#3e72ad6d71ab868429a7f02f914bba8958c2e05e"
-  integrity sha512-mNi5AaXQ5h6kwIkgXCtwZIvzhf+iEgj54PS4riHyWmk3qwFa+XqgLK+b//9tdjNVtisrIoyiZ0+J2Q6dU5YQsA==
+"@bazel/esbuild@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.7.2.tgz#d3086cd8474f20f6be0689e3b8ae852a311cbc45"
+  integrity sha512-YseNk23x30bynpXOvx0BdvPX2WSuI+6sDtx+Cn7Q27cBZw41438qjciuE2UlGME26p/5VULyduOqp0a3T3ZTjQ==
 
 "@bazel/jasmine@5.7.2":
   version "5.7.2"
@@ -1331,35 +1323,35 @@
     c8 "~7.5.0"
     jasmine-reporters "~2.5.0"
 
-"@bazel/protractor@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-5.7.1.tgz#4f9e95ea7b54e02910efdc52807bfaf226cb303e"
-  integrity sha512-zskjl1yBVNTUPcdxmvi13h2+KT9YY/1+7SSaG/PkutmZVeJhp9JL2s43Rdp2DQhjVaWhTDWNHyRur6dSMImmVg==
+"@bazel/protractor@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bazel/protractor/-/protractor-5.7.2.tgz#2393cd41f0ba436d131d13783913d8340b66a71d"
+  integrity sha512-pDkTLC+3hDGtIz42N8UXMkHbTcU5U8duvpiq4xvsP36VH9H5c/wSQQ9MYZojFkrOoVd7SHr/3Ojm/d2H9qqe2w==
 
-"@bazel/runfiles@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-5.7.1.tgz#1929078bebafcea7a813a0ea8db8720dcf67a6dd"
-  integrity sha512-lMovXi/ENs+I8OWcUwAiV+0ZAv5pZJfKM70i2KdVZ5vU3Roc+pgPntH77ArEcPfFh0bJjuiSAgidr6KAMdTZiQ==
+"@bazel/runfiles@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bazel/runfiles/-/runfiles-5.7.2.tgz#18d6d69b0efced65b2b01f5bc002ac5ccf7ac260"
+  integrity sha512-vHogrmEaKVqyqB6z6m4lzBw2Ns9c3RCvw9i/LECjhimueOXOhLuTYsHoe25u3008W53ZDAkD1RyeTbvakjRIpQ==
 
-"@bazel/terser@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/terser/-/terser-5.7.1.tgz#2f247472d65fd53350f1366009b8c5245e23f705"
-  integrity sha512-WAy2LG7lU6M4CLHBe7UWAFpILCb0k4KpLnBp8uiQFCovSYgmhB7kThWGNwkx/dgmr8mI+aSZ8tBcv0CQc+C0ZQ==
+"@bazel/terser@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bazel/terser/-/terser-5.7.2.tgz#3b086bbbacd5dabb3588f60c6123248809b18ff5"
+  integrity sha512-2P/P6+ctdQHeChlUNNyuIaE3aQNknUUYrCoCRfhUHbOW/3N2N2dZV9FBjKLHhmYE+oYaYe1WB3X+lJS9/ljTjw==
 
-"@bazel/typescript@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-5.7.1.tgz#e585bcdc54a4ccb23d99c3e1206abf4853cf0682"
-  integrity sha512-MAnAtFxA2znadm81+rbYXcyWX1DEF/urzZ1F4LBq+w27EQ4PGyqIqCM5om7JcoSZJwjjMoBJc3SflRsMrZZ6+g==
+"@bazel/typescript@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-5.7.2.tgz#a341215dc93ce28794e8430b311756816140bd78"
+  integrity sha512-tarBJBEIirnq/YaeYu18vXcDxjzlq4xhCXvXUxA0lhHX5oArjEcAEn4tmO0jF+t/7cbkAdMT7daG6vIHSz0QAA==
   dependencies:
-    "@bazel/worker" "5.7.1"
+    "@bazel/worker" "5.7.2"
     semver "5.6.0"
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
-"@bazel/worker@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-5.7.1.tgz#2c4a9bd0e0ef75e496aec9599ff64a87307e7dad"
-  integrity sha512-UndmQVRqK0t0NMNl8I1P5XmxzdPvMA0X6jufszpfwy5gyzjOxeiOIzmC0ALCOx78CuJqOB/8WOI1pwTRmhd0tg==
+"@bazel/worker@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bazel/worker/-/worker-5.7.2.tgz#43d800dc1b5a3707340a4eb0102da81c53fc6f63"
+  integrity sha512-H+auDA0QKF4mtZxKkZ2OKJvD7hGXVsVKtvcf4lbb93ur0ldpb5k810PcDxngmIGBcIX5kmyxniNTIiGFNobWTg==
   dependencies:
     google-protobuf "^3.6.1"
 
@@ -1385,20 +1377,20 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@esbuild/android-arm@0.15.13":
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/@esbuild/android-arm/-/android-arm-0.15.13.tgz#ce11237a13ee76d5eae3908e47ba4ddd380af86a"
-  integrity sha512-RY2fVI8O0iFUNvZirXaQ1vMvK0xhCcl0gqRj74Z6yEiO1zAUa7hbsdwZM1kzqbxHK7LFyMizipfXT3JME+12Hw==
+"@esbuild/android-arm@0.15.15":
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/@esbuild/android-arm/-/android-arm-0.15.15.tgz#35b3cc0f9e69cb53932d44f60b99dd440335d2f0"
+  integrity sha512-JJjZjJi2eBL01QJuWjfCdZxcIgot+VoK6Fq7eKF9w4YHm9hwl7nhBR1o2Wnt/WcANk5l9SkpvrldW1PLuXxcbw==
 
 "@esbuild/android-arm@0.15.16":
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/@esbuild/android-arm/-/android-arm-0.15.16.tgz#0642926178b15e3d1545efae6eee05c4f3451d15"
   integrity sha512-nyB6CH++2mSgx3GbnrJsZSxzne5K0HMyNIWafDHqYy7IwxFc4fd/CgHVZXr8Eh+Q3KbIAcAe3vGyqIPhGblvMQ==
 
-"@esbuild/linux-loong64@0.15.13":
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/@esbuild/linux-loong64/-/linux-loong64-0.15.13.tgz#64e8825bf0ce769dac94ee39d92ebe6272020dfc"
-  integrity sha512-+BoyIm4I8uJmH/QDIH0fu7MG0AEx9OXEDXnqptXCwKOlOqZiS4iraH1Nr7/ObLMokW3sOCeBNyD68ATcV9b9Ag==
+"@esbuild/linux-loong64@0.15.15":
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/@esbuild/linux-loong64/-/linux-loong64-0.15.15.tgz#32c65517a09320b62530867345222fde7794fbe1"
+  integrity sha512-lhz6UNPMDXUhtXSulw8XlFAtSYO26WmHQnCi2Lg2p+/TMiJKNLtZCYUxV4wG6rZMzXmr8InGpNwk+DLT2Hm0PA==
 
 "@esbuild/linux-loong64@0.15.16":
   version "0.15.16"
@@ -1534,700 +1526,702 @@
     brfs "^1.4.0"
     unicode-trie "^0.3.0"
 
-"@material/animation@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/animation/-/animation-15.0.0-canary.ecfee946f.0.tgz#1e1228e28e50ddcff19163847d8011d20060da34"
-  integrity sha512-95aC/UYnCr/1g18VYPK/fX6eCNVGFBkd4JP6zT6wkh8PDL0gp52U+PCCp8bYq8i8oxrKTBa4MqFyzHB5brBFgg==
+"@material/animation@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/animation/-/animation-15.0.0-canary.7971d6ad5.0.tgz#055a797de6ef0868cc518083eac7a9fb1ed8c1cb"
+  integrity sha512-nOCOgzp/Vdgloyw/SjFCEtpcxXWtXUjvX+JCVg7o+EEtaGLBQdgjJUj5lt+RQ6e9r0eiMYKJ6l1+1TGGebsIfA==
   dependencies:
     tslib "^2.1.0"
 
-"@material/auto-init@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/auto-init/-/auto-init-15.0.0-canary.ecfee946f.0.tgz#cc683fdd30a60715f7397981543b08aac30b5fd8"
-  integrity sha512-WvmAlRrh4no3ewh3E6b+CLM6UC0w6xaFhzk7jkTFcSopDxf6cNieIM6oXlmVjN9bg33ngxEHBOfz7JYJZQOA+Q==
+"@material/auto-init@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/auto-init/-/auto-init-15.0.0-canary.7971d6ad5.0.tgz#1b143e55937e6116fef8ee20c339104d95f58500"
+  integrity sha512-JmST/NkQpdJ1+nyAU8qbV1eRXbOwvpaTRy096Y5mOK1CeUsagUyrKkCeLsO56pmvayxnOIkJCOhH/8gzIsmiJA==
   dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/banner@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/banner/-/banner-15.0.0-canary.ecfee946f.0.tgz#9cc992716b73f4518995cbad090357524f0b1f44"
-  integrity sha512-aFHC/9hHiAOw2b/1jsndV+qDlNqpGrLGGTNvxow5WQ9XbG2nVinvz/L4ZPF7+gPvRrSWiXVHOTQoaudF4eZm+w==
+"@material/banner@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/banner/-/banner-15.0.0-canary.7971d6ad5.0.tgz#0410720a25f801e34461dcfcdca1f46715aea7bd"
+  integrity sha512-OA23YGt9qTz5i+FdGgk4QpRkmby/w+k12YMlL7u+TmwWIiGom2AaOy/DbBCr2/uNJEJ6o0h+wcNBEmGe7bJutw==
   dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/button" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/button" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/base@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/base/-/base-15.0.0-canary.ecfee946f.0.tgz#a4adad19ed54bd7e1013821842ee64094efd45da"
-  integrity sha512-Es6oTUxRzeHzu3HBz0qGTheMtDj6ovGfEOr9sQmt0YnAKwleUD2i+CbWBq8R9VG6p8nkQenUm8Q+Fifb0GxaYw==
+"@material/base@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/base/-/base-15.0.0-canary.7971d6ad5.0.tgz#d467a79a81dc329edbf6cc4d5bf177caac8cfca0"
+  integrity sha512-wXgoWl8NG4BZ2U8MCg4BLQLNla3IdyxBJIMSsJ1qvP2YswmG9HXTkS8y9mHTAhzzQEFQtlwDOyp4Ntq2Ep4WZA==
   dependencies:
     tslib "^2.1.0"
 
-"@material/button@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/button/-/button-15.0.0-canary.ecfee946f.0.tgz#26d0c439e772cafde039f9998dab821a4c176e25"
-  integrity sha512-Yvy5sneKGWNXF1iuwaQT+TYKdOqCEDwmT7OLB5SPtJRqBYKiqFpMg7e1X47rf/LfogQ1mc1JU9zibwDahFBbGw==
+"@material/button@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/button/-/button-15.0.0-canary.7971d6ad5.0.tgz#98462efdc38e862e8a1c137b4c14da434d411ba6"
+  integrity sha512-lyV4unJUG/onzNSLL5TjTGJxscBReG6+lNBvGSfgCafW2bfHW278BbqPDbPr52ONe6vg5INptZJ6bZx4FStGIQ==
   dependencies:
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/card@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/card/-/card-15.0.0-canary.ecfee946f.0.tgz#a1d5b9c34f4a7c82fbda795edadef3b36518b764"
-  integrity sha512-gYcV1qWjsg2w471vC/CnHXrKYK1VEVot/ONOJXd2ahh7AbRGZ/hZ8aV4WSizgq0RHI6CJj15BAKQyCSlJzE9iA==
+"@material/card@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/card/-/card-15.0.0-canary.7971d6ad5.0.tgz#9656b5f76f1a06833dc36b5ca955dfb4ee1a8b3f"
+  integrity sha512-0YNba4Keg+a0U4JK+siLDbTyO13s40hm88kX7uQ46SmsQlY3fbMsdOpX9+y/PaOkOXIJIgX6g+c7ASM7c/6Zyw==
   dependencies:
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/checkbox@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/checkbox/-/checkbox-15.0.0-canary.ecfee946f.0.tgz#e99a601fce56de9076dffffaef09bc70b44d2814"
-  integrity sha512-gU4mUwF8rUc5s64PuIOHNQN4VwRfsZ1l7jiMQzBJu1Kp3tf9jbqsMRtEQCd+mWN5w+DFESVEnvNr2fluY1Jsww==
+"@material/checkbox@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/checkbox/-/checkbox-15.0.0-canary.7971d6ad5.0.tgz#3c82738ce8c1f36cee645a6aaeca8c71dc3bc004"
+  integrity sha512-RSFJhMtU28BhXWyQHMrThqkGMtYb16JOuKkZ54bc1AzIndQnniQoGpkb5tHx1hOCGhOUyAGVh/w8BHczWRsLbw==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/chips@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/chips/-/chips-15.0.0-canary.ecfee946f.0.tgz#a9aa3add4f6fbd82aa08b8db08a948ec97351e3d"
-  integrity sha512-iVEAM7I5AD5nYGdD0JeSkT66b2vLWk2TaH+DElwTNoURE7A6llRcWPYG7muE6+4AbWOXAI491B+qzAQqpJJHnQ==
+"@material/chips@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/chips/-/chips-15.0.0-canary.7971d6ad5.0.tgz#6e3a47bcff2dbfe1b635d3c1f9b6cd4af45af3ae"
+  integrity sha512-W8e90cxnERoP/OvsYSSkjP/HEeogYH1YJVBemKfTOQyAAMh3DmetBGdO6Gdf65/Jt7iYrvab5IPn0D7DWoMZlQ==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/checkbox" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/checkbox" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     safevalues "^0.3.4"
     tslib "^2.1.0"
 
-"@material/circular-progress@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/circular-progress/-/circular-progress-15.0.0-canary.ecfee946f.0.tgz#9224c48591a1a12616da3baf0302cc5cbc014e2a"
-  integrity sha512-qZkOtKg7Aurr66O9AHPRfhI3lpPyZF+eH7C6S94NY1DZ+CkSWecNXPlgbuTQNl34WuwnpdY1o44+ypmnM7UnEg==
+"@material/circular-progress@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/circular-progress/-/circular-progress-15.0.0-canary.7971d6ad5.0.tgz#28c2cb45c8c1bfd26fb99baefee70922400ae2bf"
+  integrity sha512-dE66rFNI9T2khLejoTyONQZqnHjUXsmdzDx1lI3qO918gtdkwdBVWvFm0U7+1VdHAB9sjP4o+mVL/3rNss2Jtg==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/progress-indicator" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/progress-indicator" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/data-table@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/data-table/-/data-table-15.0.0-canary.ecfee946f.0.tgz#a557176c4455e82e18d6e81052428654e5e3564e"
-  integrity sha512-Ncu5VpQKuT5TiqqPg9OKo2HMHa7Q8CS66Rn8P6rNsQGQXvAynpQUFTp6cySUn3ktZqXBdDUfnwyJJEfyKO2iDw==
+"@material/data-table@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/data-table/-/data-table-15.0.0-canary.7971d6ad5.0.tgz#8d908e93cc02000d5f8f05b2f1981d9d7a63dbc8"
+  integrity sha512-JIg3GqnWGoiP5OXRkM7xjpoYIcal3a2vcvx8qUBK8rJZUXXShMcrFD8bpoEK+VIo7NXp5oR3baR3g063sTmv7g==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/checkbox" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/icon-button" "15.0.0-canary.ecfee946f.0"
-    "@material/linear-progress" "15.0.0-canary.ecfee946f.0"
-    "@material/list" "15.0.0-canary.ecfee946f.0"
-    "@material/menu" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/select" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/checkbox" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/icon-button" "15.0.0-canary.7971d6ad5.0"
+    "@material/linear-progress" "15.0.0-canary.7971d6ad5.0"
+    "@material/list" "15.0.0-canary.7971d6ad5.0"
+    "@material/menu" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/select" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/density@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/density/-/density-15.0.0-canary.ecfee946f.0.tgz#c7bc8664a5c98421bc0b9118c706bf3c5fbd02ae"
-  integrity sha512-WhhAb1jt+1VCKMbHD3XDmgbEAAzVjOjJcmmA59rQA1lbXvKn7ZSDYPK5meRIFUjGBjWh11B05tdkMOHbizeI5Q==
-  dependencies:
-    tslib "^2.1.0"
-
-"@material/dialog@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/dialog/-/dialog-15.0.0-canary.ecfee946f.0.tgz#84ca883239ae09738fa270da7307b3b38eea23b4"
-  integrity sha512-rt72Z01XqIorzU9ZGEhuLAluVuu65m/4fhtCzX1+5AEZRfZdr9N27xb/RneoJ63VdjxbumixpGdZUycHNDg2WA==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/button" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/icon-button" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/dom@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/dom/-/dom-15.0.0-canary.ecfee946f.0.tgz#8aec7d9d623f7b6c83ef2a63f135cac5473880ac"
-  integrity sha512-SyT9xi+dBur0Vj1Cyrp8b5tW4j3gtuTXwz8UiHFAkZKAG0m441XQjCClhPhpdywPXYE+ycHcd1cAMhLQvopH4g==
-  dependencies:
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/drawer@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/drawer/-/drawer-15.0.0-canary.ecfee946f.0.tgz#badea3410e52f32ded2e087d5b6216a087062acd"
-  integrity sha512-26dqb8sQuQCieaUbU4g/BKneCaqtnKnAbumTnEtr/7aOn7PaiYvO11viUja2FnW5C5ZpvWDW13v7dG6ymP6Ucw==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/list" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/elevation@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/elevation/-/elevation-15.0.0-canary.ecfee946f.0.tgz#9963e80d38baf80f3711689e187386dc0ee03f84"
-  integrity sha512-IETsNzrcmagBe3RkuT4TvZHm3wjRSxqdtkuxH5DKcc7jfx9vZ//8bw8/q7G+SVKQym17entvpQfgQOgpHAxm5A==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/fab@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/fab/-/fab-15.0.0-canary.ecfee946f.0.tgz#6c96bfbd8991fd4d72f07174c528cd48f69a2a8d"
-  integrity sha512-EAQL64nL/mp9TY8c6WTRcqJQPnISZAO+0c2bvWyrG4Xj0r/QGx2NkMKy1MG+JGkcLR5K1RKneLbe92xCIujf0Q==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/feature-targeting@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/feature-targeting/-/feature-targeting-15.0.0-canary.ecfee946f.0.tgz#7b5e7e2d0b75f3639eef7af5d987e0fcdb0567a2"
-  integrity sha512-f2cvfeW6OpG+1QQgilktUKsF1vkg3x6w8R0yg3OPMzIbGVxGsgp4AY6mSLjLw23jDdRIW+J7UnZztE6PDwrFTg==
+"@material/density@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/density/-/density-15.0.0-canary.7971d6ad5.0.tgz#049319a0597296d54a3b3de97431d3df09148fbb"
+  integrity sha512-JfRRdyewKuVGDLTxm0Bn/5MFgkPHo5fZ0JU6kCqI+SdOER/ceRti6xJtNfgV/lBPqstftARcKv116nQRy2085Q==
   dependencies:
     tslib "^2.1.0"
 
-"@material/floating-label@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/floating-label/-/floating-label-15.0.0-canary.ecfee946f.0.tgz#2a8351cd96ea2a955067409a3f8deba7417e0fa7"
-  integrity sha512-3FQMYxUE1EFZzBmml5mqdHCnEoGD9FP0PEeaD15etm/gyCdaf+d6r+rZADDWe7In7qMos2W9uW4v0+sS1H34SQ==
+"@material/dialog@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/dialog/-/dialog-15.0.0-canary.7971d6ad5.0.tgz#673aead99599b9770ce6c2ba78a6d30ff3606823"
+  integrity sha512-P7+nNN1YdPISSOIECyECiYNcmAJn4ezogpkcGkGBKc0KZAzG47Y1prgLNFaHat5mE20GjLL50M7T4SU7F64dqA==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/button" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/icon-button" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/focus-ring@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/focus-ring/-/focus-ring-15.0.0-canary.ecfee946f.0.tgz#b09f64fc84e57e683aa2881e1542ffc70b63e4c8"
-  integrity sha512-pZlMdg8f4izZuAi/v6paUcrSrQwDsNJgcYf+R+hcS57sjNcOT/4uRMTe4parTaKyjgkBKBZlXpLFJaW7yzWgYw==
+"@material/dom@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/dom/-/dom-15.0.0-canary.7971d6ad5.0.tgz#43dd17a18c12c6cfee62b0712c58d70075b4ae24"
+  integrity sha512-h+KV0egRy7zniZElzDW5duh/VDZUTO9SmMeC8FFiqJMvPe3V8xcH0zB+jL67hueLqFixSSJebbdXMbVce4nwOA==
   dependencies:
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-
-"@material/form-field@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/form-field/-/form-field-15.0.0-canary.ecfee946f.0.tgz#4890093d64be7ea2203863ac99bc7f10511d7479"
-  integrity sha512-+RV+iwUVxGocOdnR03YyPcyc6scAJIqfrDH3xU9XAl6rkMDWbJvRF4ujySbLfh9FzffrwUN7QqSee7ZxZQO+WQ==
-  dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/icon-button@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/icon-button/-/icon-button-15.0.0-canary.ecfee946f.0.tgz#3a190e2278fac415e9fcc0e8bcdf412ab5b92bee"
-  integrity sha512-3RxjLPrDEFWPW2GinoaTx4Hc4jy842h8j8+2OsY1AqWm4Ejp+NblyBsRSBdZC4APs0GDXQcOskY2y1FYeA+fbQ==
+"@material/drawer@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/drawer/-/drawer-15.0.0-canary.7971d6ad5.0.tgz#420fa2a50b39770c0c3b9770434648282fb5aae1"
+  integrity sha512-LYuriNp3lecXXIj3lK22z0ym5bGHHIturofEV60BK9uHi4baBWS/ovTPAw5T8YvpADv5kyidg4mkgkPY9Ydexg==
   dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/list" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/image-list@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/image-list/-/image-list-15.0.0-canary.ecfee946f.0.tgz#5ec4b698338c55f3ea12f5a57b628c208cbf2fbf"
-  integrity sha512-O371n2xiU9HPlzRw3dNmtJJuSoTA9ZSTePWnZTWJT3O9pTEbctK2Z2Tmnk6MacDHjDRn770YdquA/dGhrWkx0A==
+"@material/elevation@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/elevation/-/elevation-15.0.0-canary.7971d6ad5.0.tgz#2a124a952c0ae5962a9428c2a8412961be247819"
+  integrity sha512-M9SZKJI5wjbOwq0o8eknDrI27YE63wLg8qJHLvJWrWXdlm6yN0INilihExzmGHXpVHQ6sUdI4oyoAx1qr+vorQ==
   dependencies:
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/layout-grid@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/layout-grid/-/layout-grid-15.0.0-canary.ecfee946f.0.tgz#010f17f1f3a92d5f46c3f7bf2c833d9457575f08"
-  integrity sha512-4ECt2uEL1OFhDnFYZsfzTbE8yabsGIwOwYdo5WtvK7Op31QKNMrgTLmu+3Zvap0H4TUsuARxsqnMQVMHLDGD5g==
+"@material/fab@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/fab/-/fab-15.0.0-canary.7971d6ad5.0.tgz#5aa91c4c058655259ecf03122927cf85b5384f3a"
+  integrity sha512-G58ZFK7M9r9xkLFP0Gufh1VKdcvRcTvYwEjBuG3+XOMDMjFzCDEMY4c54RG+tbwIiHmB8lw1Yl/dN3kFVc3kTA==
   dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/line-ripple@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/line-ripple/-/line-ripple-15.0.0-canary.ecfee946f.0.tgz#508c47ffbfb171a7878cc10692c3be2f24349087"
-  integrity sha512-ri+4VQDvlJr7nfP9DpCElqJqpXIAt5HQjzNPDpx0Wc7KOZuQ4yK6C2MGZTWV1wRZctV6WXX14bB9QUUr0r2yTg==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/linear-progress@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/linear-progress/-/linear-progress-15.0.0-canary.ecfee946f.0.tgz#b367ea9eae41bd75aa49f2dc102cece43d53897c"
-  integrity sha512-LE9capqTnH/9T2mmW3g9aZD/bdlv4bVrukehXB9EmfmC5EuM6aLpBZLoQmWtAYyt6OxMjZbYvEaZbzsQ4KBu7A==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/progress-indicator" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/list@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/list/-/list-15.0.0-canary.ecfee946f.0.tgz#fd2435a424fe92c8529ed95f9563f990557bad95"
-  integrity sha512-/kZaFahvJCz4y/zkis9NQUEGUQIk8Ptq6LGm8JYj2PXpO2Avh/neKQwas1edi7CxUf7sBZbHDZLrJeeD1CF20A==
-  dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/menu-surface@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/menu-surface/-/menu-surface-15.0.0-canary.ecfee946f.0.tgz#8ecddac781473808aa5b23f08bc77500e00dcdd5"
-  integrity sha512-Qxsh0/oQv4DPnz0NuWnZMbGfTH6LmXk41xLi6tE9y8HajzlVpec26fpIDgqWyz97WK7rqUHvsTKskruppHisEQ==
-  dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/menu@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/menu/-/menu-15.0.0-canary.ecfee946f.0.tgz#065fa0093cd7b26e571ceab8654b67f95944158e"
-  integrity sha512-AKoh4CkyA5DPXoR2ThEeVnMkKM+PYhipbviAFEmukHIOcqWOzC0/GX0XOZUHegstCEvfpsUWT/h2RN6vGamc3w==
-  dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/list" "15.0.0-canary.ecfee946f.0"
-    "@material/menu-surface" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/notched-outline@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/notched-outline/-/notched-outline-15.0.0-canary.ecfee946f.0.tgz#0a420d6b9c49fe7249e97417692925e5e30f5f1a"
-  integrity sha512-FsnzeLXRw91Yh4B0Fusu57p3rEj+5OYVkvkr7jML6/YS/4ptkIe/vjgHBxM2DThySOqjBVE7EY9gUMIedMQrNg==
-  dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/floating-label" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    tslib "^2.1.0"
-
-"@material/progress-indicator@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/progress-indicator/-/progress-indicator-15.0.0-canary.ecfee946f.0.tgz#ccda47e90ea124cec20e9b5b0d6e9ab1fe637d8a"
-  integrity sha512-19RdSUbE+rEoYPoO6qtp2W24wkGVuK14+5XrqnYdoyBnjd0CSmn1DXp27G+Bx5q6Q6Mj/esavTpwFYNWW7OenQ==
+"@material/feature-targeting@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/feature-targeting/-/feature-targeting-15.0.0-canary.7971d6ad5.0.tgz#9762b6882da5947cf793f8b694455d17ba2ae16a"
+  integrity sha512-xH8pdvB5oKO6OTY61vEs44eQJQY3GTobpzaxp+CIBH0UMobSl5KFee+j7MxpEbTkRGtMqWkzAA+vviT8hvmH+A==
   dependencies:
     tslib "^2.1.0"
 
-"@material/radio@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/radio/-/radio-15.0.0-canary.ecfee946f.0.tgz#44e368adb08633df47c5af5dd18b847cff49984b"
-  integrity sha512-jUihnBlxPpfUCD9o/77qtJZ0t0MaUs8CbdRsYjkuywnY3bH3vZuarJGnYT86HJu/zYTSHfqrnpZKwnRm47MXQg==
+"@material/floating-label@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/floating-label/-/floating-label-15.0.0-canary.7971d6ad5.0.tgz#8d7153e225df7807b9f26a9ab755a8d9c3841a69"
+  integrity sha512-Tjv2xnYr+VvsojRbRBVVmjxmut/y4hJrRCBMjU1982cTUYQlfqMaM7BUObt49jwRBKDLr2NjM+fwNIo0//YItA==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/ripple@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/ripple/-/ripple-15.0.0-canary.ecfee946f.0.tgz#62a4eb331f0015adcba817fce7db84a620baa8d6"
-  integrity sha512-midz7yzrccRXnguTpmX9tzGTOSHb2CyhAMnSvnOaSaO2LJyHD0UvFIOiBaWXwjHa5iMhbMkoUe9hosD4llQt/A==
+"@material/focus-ring@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/focus-ring/-/focus-ring-15.0.0-canary.7971d6ad5.0.tgz#becff920923ce45a35b8d08274aa37eef2634519"
+  integrity sha512-xutZrHnrfnKftU3HUS9em8wO5Nb4zbnRrwDCGi3xnFR7bFP4u2J2ZUnVpO+RZfjr3A9l8chDavlFCL5HMfzt4A==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+
+"@material/form-field@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/form-field/-/form-field-15.0.0-canary.7971d6ad5.0.tgz#13514b99c5afec61cda40487473461b3124f2585"
+  integrity sha512-N0UnlZ7j3GT4DGmMgJYMl9etOh7rsQjCjRRATWSnuAel+ir4a5HvLj9xQUyp0tlYuu9ZizB8ZOwbAz/XCiU94Q==
+  dependencies:
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/rtl@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/rtl/-/rtl-15.0.0-canary.ecfee946f.0.tgz#ca274a2dab3031a049f499a5de5f0997bc4b2b1d"
-  integrity sha512-0PHfRqm5mgaXDarQQXVvPpZVXkc7e1DXVPZR2DaPMNc+N2OWeZoA50546p691JIAEAPLQIxassGLMIngBIJl1g==
+"@material/icon-button@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/icon-button/-/icon-button-15.0.0-canary.7971d6ad5.0.tgz#773ec7e504a1532d8b9c6d7500e9fe2c0b2f8d08"
+  integrity sha512-BT+tHdRviY1o/yBgtX5NxfS7LfQtQSf7DiZfgP9eExSU5fDA6AfqJfZHyJdLmJCtFZbzlxJ0PBmt44NSlI2/DA==
   dependencies:
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/segmented-button@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/segmented-button/-/segmented-button-15.0.0-canary.ecfee946f.0.tgz#f3e12023d3d9120d07c137201ac198b9014f71fb"
-  integrity sha512-aCafnCnZel6ZOkA1y9T/OhySfqCjpmzrfNifYIuC1d1fFv7Gkfc6rMZr+ocGb2d1GdRwYCPhwvEq5/kn8Hnr9w==
+"@material/image-list@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/image-list/-/image-list-15.0.0-canary.7971d6ad5.0.tgz#b6553f4cec4864091469e94b251a8cfa7f5afb99"
+  integrity sha512-FrBosWy9VnqWYDR8XkQPt8cE6MPNq5g7oEvULImmqjRxhktTJCPfDZSWHpjLpAvU0quYZZprPDRrwM3qw69z/A==
   dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/touch-target" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/select@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/select/-/select-15.0.0-canary.ecfee946f.0.tgz#d1739379504c5e436762b7d35a98b2b9f6cb6c87"
-  integrity sha512-ASaX3bl7cu0OLirhyDd4lOmDkwHBLuWjLKK8GwDosTXf+Lb+8OPH8sVsXfAfBv6ORplQZ8B1bVnEb+O8wrBjHA==
+"@material/layout-grid@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/layout-grid/-/layout-grid-15.0.0-canary.7971d6ad5.0.tgz#068a93b5c108eaabd1a3f520bb15626a977a186b"
+  integrity sha512-H4KEhaGaIuGHd3jKJqaoZkynJjqfyti4QhG6wiTt774Lv4Uri1+ZBxQ8FAFShEvETM2pfBy4mEECi/+M4V2ZTA==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/floating-label" "15.0.0-canary.ecfee946f.0"
-    "@material/line-ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/list" "15.0.0-canary.ecfee946f.0"
-    "@material/menu" "15.0.0-canary.ecfee946f.0"
-    "@material/menu-surface" "15.0.0-canary.ecfee946f.0"
-    "@material/notched-outline" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
     tslib "^2.1.0"
 
-"@material/shape@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/shape/-/shape-15.0.0-canary.ecfee946f.0.tgz#52b32e00ca53ae5f0ab979515de3b30197ba38ef"
-  integrity sha512-eRMm29A85dFkGzcq/eIZSX2vss/YoWCh8o8ACKF0Dd2yVoSfbclWirrSL1cYAkMLnCzcJ+tLDGBLnJ+RISXU0Q==
+"@material/line-ripple@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/line-ripple/-/line-ripple-15.0.0-canary.7971d6ad5.0.tgz#9c321fe5327f33298dd7ec9d77a5782ca3c5bbef"
+  integrity sha512-f4tcd82xu1OT0wAVT/kHiWDmJy9fRt9QA5b+v81fTSVFK41mYpxy8jIQ5gdoIvY/0BWLh4HzUejG6j98AkyLEQ==
   dependencies:
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/slider@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/slider/-/slider-15.0.0-canary.ecfee946f.0.tgz#12c238943a18a29309fa6b4ef3327684278026b6"
-  integrity sha512-NwFZ8FSH5NCx4dlmNF+ReFzQcaXStRCRaTCuPNshgvAdHSYI5NuswUv1pRnECBKPK1QrT0LSuw/Pltoz2jP/lQ==
+"@material/linear-progress@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/linear-progress/-/linear-progress-15.0.0-canary.7971d6ad5.0.tgz#292f8c424c6d3fc51f9640582e848f59e63f1c86"
+  integrity sha512-3HlEEPv+RrtGPxq06QzCOAZoNJ8q6UtOOkRxh+buQy1F+Uv0n4BdmvUYsHZaSTn+kSlFMzIKDtRjUG2i7b4/hg==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/progress-indicator" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/snackbar@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/snackbar/-/snackbar-15.0.0-canary.ecfee946f.0.tgz#27ea1587db28ad5811963561f542bb9887613881"
-  integrity sha512-AllQg4iAkoCryVW9NzTK5dgyftC6po/D3ZK08IqOXxCTjw/cGE7WpXoXRDleECer9DVqQ4IK7cGsTUQrT18trw==
+"@material/list@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/list/-/list-15.0.0-canary.7971d6ad5.0.tgz#b8c033367d0bf9cc86483dc17078f83e6af6335a"
+  integrity sha512-rYg3cM41MJTSNoFOj8IzF1CpPFK9DDlTFMbERFakRHB1QsfnebxkuoAyI8j5G/pDdvkeAmDbz4tbKK8yJdifRw==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/button" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/icon-button" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/switch@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/switch/-/switch-15.0.0-canary.ecfee946f.0.tgz#7680ce935d1a436ed8316d5f33be487e243ddc87"
-  integrity sha512-ddFG+4Un+AYkQVRP62zhxcc9wd1mZIxGe/vzOzAyZYpRuZQ60cqTQItOYpysYqc9LG4QG470DJemtNFGspiypA==
+"@material/menu-surface@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/menu-surface/-/menu-surface-15.0.0-canary.7971d6ad5.0.tgz#f0e54b74d8ee9ab1ce158621ab1af71b262c1d02"
+  integrity sha512-7sRmwY7+a3gB5GM6Vl0sZzVVW3iu6QNW79vRias6nZKJMXbE/JDWnhcgkl9QkxvUolBIJ0y1ChgZyntO8Val/g==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/menu@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/menu/-/menu-15.0.0-canary.7971d6ad5.0.tgz#6ed4880637d14cedef684a615ed2ac2f2dca4705"
+  integrity sha512-Xa+tXk8kMFMhdOYrIre1ye4L23i4LzEn48FN398742m1K/VY/IxAuslyQ5CmX77CxkOqbQFqwUarUTod0rEwjw==
+  dependencies:
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/list" "15.0.0-canary.7971d6ad5.0"
+    "@material/menu-surface" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/notched-outline@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/notched-outline/-/notched-outline-15.0.0-canary.7971d6ad5.0.tgz#79de44d8d960cdf2c50fc8937e421ec336020132"
+  integrity sha512-kMUDUqZ7ztvnwqCENZukztyA0oGZhY/mqd/WIaqRhIU58Q2mnDM6Vfd9fifeM61rIMnXHER2fvjjFzim50mw4g==
+  dependencies:
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/floating-label" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/progress-indicator@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/progress-indicator/-/progress-indicator-15.0.0-canary.7971d6ad5.0.tgz#d4e4c206481f352fd49d952053a3e85546d6f585"
+  integrity sha512-CRQAM2C1weVKVr8rQeQTrOISmTupXw+l9sfpdIx8tQ14fOebZFcEbW9LRRvDAMmUNZF6W6pwL74+zk46DYIKBg==
+  dependencies:
+    tslib "^2.1.0"
+
+"@material/radio@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/radio/-/radio-15.0.0-canary.7971d6ad5.0.tgz#ca1c65484e8cf113a919e26c332accfa2fdd30a2"
+  integrity sha512-wpiLuHQtpMb846SSYvG2NQJl/wUi1NbVlCV+uGHSv5LFnbe10e537KFpjtjaDi/Y6e42bUxj8njN5cEZ3NfBUg==
+  dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/ripple@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/ripple/-/ripple-15.0.0-canary.7971d6ad5.0.tgz#5678c09a2e17043f5d7c8f04b105f60ec53c79c9"
+  integrity sha512-S9S8260lwHreEgvOqg3EM0DF0y8ThuN9fFPVb+cCOAPzCn4Z2tO1pcvPfAmY8yZA7QIx9c5pt6Ci+q44LzPEYA==
+  dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/rtl@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/rtl/-/rtl-15.0.0-canary.7971d6ad5.0.tgz#3dfecf466d64bf99e525416f110610966714ffeb"
+  integrity sha512-G02MQTQxHPhNlAIoOToCalxSba48VZ+CdrqkWr53eBb/P1I6Do0drMElqNmO5CYS5G/8AEScXmfJ0xSq92ABew==
+  dependencies:
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/segmented-button@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/segmented-button/-/segmented-button-15.0.0-canary.7971d6ad5.0.tgz#617cff84167736afe558246e7ccf4d9dbb710c80"
+  integrity sha512-qu9nfKkPAxv6YFFObZAXHgaC0qq8i4Cr2lUbOQdL0E9HmKG+IE9ILualGJrAl2LOpCSJdwA0CjOuv2IsrscpHA==
+  dependencies:
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/touch-target" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/select@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/select/-/select-15.0.0-canary.7971d6ad5.0.tgz#2f5fa93f4c0ed0f9aee01971f6704a20d6167e04"
+  integrity sha512-MgbztOBl0Y7UHVPUTuXoAAYfBh+bwbRW9lkK/EJQ4YQrmZB/0L14S7feqh52JhFXVhjFzeYPFMQg+uP2hhHSpg==
+  dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/floating-label" "15.0.0-canary.7971d6ad5.0"
+    "@material/line-ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/list" "15.0.0-canary.7971d6ad5.0"
+    "@material/menu" "15.0.0-canary.7971d6ad5.0"
+    "@material/menu-surface" "15.0.0-canary.7971d6ad5.0"
+    "@material/notched-outline" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/shape@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/shape/-/shape-15.0.0-canary.7971d6ad5.0.tgz#089fe54d52a09c365a4895821720172d36b7bea0"
+  integrity sha512-mlsNFWKOK38ECoB1onCFpi8HKRGgrElk0YioF3V0Joszp1HVV2Fn+SWoKg2LwWHaJet4iBYtNoCbQC6dH2YBeA==
+  dependencies:
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/slider@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/slider/-/slider-15.0.0-canary.7971d6ad5.0.tgz#3aab26821097a8b851b1598140799977cc62571e"
+  integrity sha512-OjbxB3vwZvhbTGP8EGLWoXyodbTMuwkvoFdblEiZtWrrPL0Us5hg/20n8VfUQ0N+c00mElsEv79Jsx+B0iTV+Q==
+  dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/snackbar@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/snackbar/-/snackbar-15.0.0-canary.7971d6ad5.0.tgz#753aaf0052ed0dd2e7931681bb52065abd2e7c7c"
+  integrity sha512-svNOI1Kwu9Mg259SNTaGgyJqETRIPwQPkxYhHvWT4vYiHQkJJJe9kFBcIKi+sdTxqqoMZxyjC2SwS/1mkU4/xg==
+  dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/button" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/icon-button" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
+    tslib "^2.1.0"
+
+"@material/switch@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/switch/-/switch-15.0.0-canary.7971d6ad5.0.tgz#8e5bc8fb5ba0ca8fb57469a21f05ee0d23b9fa9c"
+  integrity sha512-WBsTIq0NwccMAbt9YFcU1vhcmFOVpNDeZ9gNMJypk19ZiqDcZBZNDx0JmceRqTYrCxndqVwfD25qK0jFVplK9g==
+  dependencies:
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
     safevalues "^0.3.4"
     tslib "^2.1.0"
 
-"@material/tab-bar@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/tab-bar/-/tab-bar-15.0.0-canary.ecfee946f.0.tgz#ec0d79fa0fee4e6fd3c8b2b77e8e3cddddaf956e"
-  integrity sha512-1SfhxOkoyeEPq/SlhIVP/Eiuhr46jqmvYSZOugTurL3TiK6Zilk+n5fAQCwElcvK/Dyf+n5mFR2RDFWdu+CZkA==
+"@material/tab-bar@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/tab-bar/-/tab-bar-15.0.0-canary.7971d6ad5.0.tgz#ae1546378d3edf88d8054f1b8a379bb07536289d"
+  integrity sha512-hEMnb2C1yOQPbqdFCTCuyMmjcqO4QIvPKAsbquAwOZc0tz/U88tzmfuhv1k77FB2hbESwN9sPpImU0g4Lrvfhw==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/tab" "15.0.0-canary.ecfee946f.0"
-    "@material/tab-indicator" "15.0.0-canary.ecfee946f.0"
-    "@material/tab-scroller" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab-indicator" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab-scroller" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/tab-indicator@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/tab-indicator/-/tab-indicator-15.0.0-canary.ecfee946f.0.tgz#e006706455516cf1c69acc4e4bf2bc3cc2b6c38b"
-  integrity sha512-yhfU8Jhbrk4tmdYLAGWfKTmJjE8SqWnZSCFNrcEB9jz/z8CDiH5X1I8FLPNfDgQRpbPnMyDCWwc7xeG4xHcnzA==
+"@material/tab-indicator@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/tab-indicator/-/tab-indicator-15.0.0-canary.7971d6ad5.0.tgz#6dab15bb7f200cb7830a4c027243815bfcbf2d69"
+  integrity sha512-0X2tJf0E+CwL5Bx3Fqxi5Uuj1BgncKqd4yFpWE7cv8IZHphNReSOrCcSgUwUfirmee6MqkQ4Drk51Pf4ANj2OA==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/tab-scroller@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/tab-scroller/-/tab-scroller-15.0.0-canary.ecfee946f.0.tgz#7b4775fcaa908856ade88c0b858c3976458e277a"
-  integrity sha512-ZpmqxgO3yAolCz1WvBnG9t002XvpPYWnVN5fbLtGNqE5B30AJwSxoAAkNjDQEZ3TzxcYGN8PhhdG3jY4KiQfbg==
+"@material/tab-scroller@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/tab-scroller/-/tab-scroller-15.0.0-canary.7971d6ad5.0.tgz#c7fc0b171524633cb898a1eabb6de8858b6352ff"
+  integrity sha512-//Ih8ZPx92PLQwXhFzv6YCQc5xW2IH84GdIeJrdBNcQN6wgbQNsbU7h9m6jymtpWQgvvLY8E0+2qkNcnWejnag==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/tab" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/tab@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/tab/-/tab-15.0.0-canary.ecfee946f.0.tgz#4c3200e3e25cf303e977cde1d375f06dfd4b36bf"
-  integrity sha512-XASQrQ6gVmz/XpzwtqlfJtYV3QFqxToWiCJsiVwZNE35bg8MvbWQOb9xllvVjIaTvaTgplwG5xOcYOxk4jzR0Q==
+"@material/tab@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/tab/-/tab-15.0.0-canary.7971d6ad5.0.tgz#673a51a867672cce6480fc2867a960f51fc2a7fc"
+  integrity sha512-hmqRl9s7g1/8KpZ5rqANxUXrHi4PYO3GsGhASrYrB99/5ZX1ghdCGwEN1Lp9ntKIgZjd1s6qtzccBtmnW+boXA==
   dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/focus-ring" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/tab-indicator" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/focus-ring" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/tab-indicator" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/textfield@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/textfield/-/textfield-15.0.0-canary.ecfee946f.0.tgz#b7b5695565b5fb87bd06a2604cbcdfe3bf80342a"
-  integrity sha512-npbX0f3C3v46L8/O3/90ExrKNBNCos+Qe/GCgXSO+AbSciPLHhoP+FVjlxfGI1IZtwjg9pd0O78Kymv6h6f9cQ==
+"@material/textfield@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/textfield/-/textfield-15.0.0-canary.7971d6ad5.0.tgz#dcbfcd643b86051bbfebe3ede25526717eba0be8"
+  integrity sha512-n9aWMZGyE2GBTr2Tx6n4hLp08uyIo1/xNqcZ0Kx2tKK1spPgTgp+g2fEKImGnnbfiCTJPNrcJ8bQ+Vy7Dp0n3Q==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/density" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/floating-label" "15.0.0-canary.ecfee946f.0"
-    "@material/line-ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/notched-outline" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/density" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/floating-label" "15.0.0-canary.7971d6ad5.0"
+    "@material/line-ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/notched-outline" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/theme@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/theme/-/theme-15.0.0-canary.ecfee946f.0.tgz#99cf7c947dea6ffc0884be850739c18024654c85"
-  integrity sha512-H8HDrJBZp6kIUYxdfMPYpin7G18/ZI2yp7kSSJfhyir4sYgr7irNWl9DunSI2s90StYmz3m8SiK7XmMhpm2w2A==
+"@material/theme@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/theme/-/theme-15.0.0-canary.7971d6ad5.0.tgz#489b2b3047caa6f3c05e02223c8129e66e3d2803"
+  integrity sha512-4YUyQo4SOatHHH15/h2LBIyxmVxtefo+QC8bRopF13f/qq5lHpX/stK6chf1OR/z9BUxnNHZWXd2LG5SvJGs9Q==
   dependencies:
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/tokens@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/tokens/-/tokens-15.0.0-canary.ecfee946f.0.tgz#dd565b75fef287654f70620604cb4d14f5e3a939"
-  integrity sha512-hHBGM/UsqsSkmujYTe8k0VEtB0tdhF0IOnpMeRCi0CHwbJBmo4nMEhEK7uhwGfR4HwJNlrNKr2XV7EvsZgOnig==
+"@material/tokens@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/tokens/-/tokens-15.0.0-canary.7971d6ad5.0.tgz#2ea8a63cf196da16b01dd8eaa64024acf3c9acfd"
+  integrity sha512-tRa/Uki/moIP6f/QJPrad2jHbSZ5NB5TRSfAS1NZof0KNFjW8n2lJVpgcgD+f1NENin3dWM4NpfJwxulGlWE7g==
   dependencies:
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
 
-"@material/tooltip@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/tooltip/-/tooltip-15.0.0-canary.ecfee946f.0.tgz#ce0e97fa3a0dc4f9045b59d25554d749dcf1431c"
-  integrity sha512-AUp5R7RRCY6uryhNbgIx8ayBraWcXw66RHDz7SnFqqEZKT8nj3S9yAMJwGiePhw/CyCghB0yc4mYJreL+fP9qQ==
+"@material/tooltip@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/tooltip/-/tooltip-15.0.0-canary.7971d6ad5.0.tgz#145f8b8aac15645374999c58a2674d27c61b7daa"
+  integrity sha512-gidVGZOGmJUNDxm3ZorNZMAFmbeFmJ+6DH2F45hi1iU/GflfyvMfvbG2VvPFGYj84YAKHs799yAjidvk1nSZZg==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/button" "15.0.0-canary.ecfee946f.0"
-    "@material/dom" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/tokens" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/button" "15.0.0-canary.7971d6ad5.0"
+    "@material/dom" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/tokens" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     safevalues "^0.3.4"
     tslib "^2.1.0"
 
-"@material/top-app-bar@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/top-app-bar/-/top-app-bar-15.0.0-canary.ecfee946f.0.tgz#805b89acfdc1aba858525ca2f473fa392e2afaa4"
-  integrity sha512-JQiP4l9GhbQgVB3k+EsNbxXc1Uuitvi7wMRnPSwoTjw2wZsbRF5BZHdkAuMXdBHt1iWkneRq6JayMv7B56cD9Q==
+"@material/top-app-bar@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/top-app-bar/-/top-app-bar-15.0.0-canary.7971d6ad5.0.tgz#98e70513f1ebb4eeeb3f02e3be8d0c14cc75201c"
+  integrity sha512-ztvglUBK0y4LDHD8xhvNGCpbsHYoAVtI06cJHu5G241WD5wAmseEnLMY+ty86FHMzs796PzhUqUmahEHeBNlEg==
   dependencies:
-    "@material/animation" "15.0.0-canary.ecfee946f.0"
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/elevation" "15.0.0-canary.ecfee946f.0"
-    "@material/ripple" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
-    "@material/shape" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
-    "@material/typography" "15.0.0-canary.ecfee946f.0"
+    "@material/animation" "15.0.0-canary.7971d6ad5.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/elevation" "15.0.0-canary.7971d6ad5.0"
+    "@material/ripple" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
+    "@material/shape" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
+    "@material/typography" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/touch-target@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/touch-target/-/touch-target-15.0.0-canary.ecfee946f.0.tgz#f7f0fa3f1de77a4305fa9947a54f00859e0ec158"
-  integrity sha512-SfV5EIqbulciOtFoZtuiFkep8jcNcEoEe/nz2h26zZvC4ozbX6Sd4gd0gphLMrWMJajMDj/Zg+awEOfLESNnjA==
+"@material/touch-target@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/touch-target/-/touch-target-15.0.0-canary.7971d6ad5.0.tgz#86360daf890e67f34990f5118300b5528a0e5d6c"
+  integrity sha512-aT8GyRfH0TJuF53HWKga+vuwJbJ/euN6T8CS/+RP5F/rjzWwxSd8RtyBmVUzBjVzOxr6Os+El0c3TFfEDxRdAg==
   dependencies:
-    "@material/base" "15.0.0-canary.ecfee946f.0"
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/rtl" "15.0.0-canary.ecfee946f.0"
+    "@material/base" "15.0.0-canary.7971d6ad5.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/rtl" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
-"@material/typography@15.0.0-canary.ecfee946f.0":
-  version "15.0.0-canary.ecfee946f.0"
-  resolved "https://registry.yarnpkg.com/@material/typography/-/typography-15.0.0-canary.ecfee946f.0.tgz#064abfcda6102e3bb1765a54f8b06364359f25c1"
-  integrity sha512-hjX4M4Y1AuhchpkyhmMmG5ulGXqknKOQvsGq/w1fEK5xKmBEXoQK5bQ1xwcFE+NS2k3CMujCkoHe/biz/eHX4Q==
+"@material/typography@15.0.0-canary.7971d6ad5.0":
+  version "15.0.0-canary.7971d6ad5.0"
+  resolved "https://registry.yarnpkg.com/@material/typography/-/typography-15.0.0-canary.7971d6ad5.0.tgz#26b197d2384490d7e3c9bd2da57a398ac9c04dd4"
+  integrity sha512-4J5qPXbCS3wMtGl0AJIj/M9rUxHR7fRX3IKtfOyvra10lZbr4qma+4g0+t+O9cPzcCBS1NwPkJ/E4t+ijEa6gA==
   dependencies:
-    "@material/feature-targeting" "15.0.0-canary.ecfee946f.0"
-    "@material/theme" "15.0.0-canary.ecfee946f.0"
+    "@material/feature-targeting" "15.0.0-canary.7971d6ad5.0"
+    "@material/theme" "15.0.0-canary.7971d6ad5.0"
     tslib "^2.1.0"
 
 "@microsoft/api-extractor-model@7.24.0":
@@ -2277,10 +2271,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.14.2.tgz#c3ec604a0b54b9a9b87e9735dfc59e1a5da6a5fb"
   integrity sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==
 
-"@ngtools/webpack@15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-15.0.0.tgz#0ec9002c90328dff48d7fde91ec3e15f375b17d2"
-  integrity sha512-pI/Ul9mgE98bjPkUiNRLXIn3ulmUgJMD4Zj8RUUk55gTg3IJygyaag/l/C5e7StKMWygHdnvQgU63U360zqEiQ==
+"@ngtools/webpack@15.1.0-next.0":
+  version "15.1.0-next.0"
+  resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-15.1.0-next.0.tgz#aad4d20bf79eabe95ad3d624f76b8057aee053cc"
+  integrity sha512-/iwTHwvt3ne1eX75EGZ0Yvn6q1PSy3vxh5a0GhNtzswNaFRXwKh84OR20nctVXD1pFHa0ORwXS77JjSSAHPAUw==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -3156,10 +3150,10 @@
   dependencies:
     source-map "^0.6.1"
 
-"@types/uuid@^8.3.1":
-  version "8.3.4"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.3.4.tgz#bd86a43617df0594787d38b735f55c805becf1bc"
-  integrity sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==
+"@types/uuid@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.0.tgz#53ef263e5239728b56096b0a869595135b7952d2"
+  integrity sha512-kr90f+ERiQtKWMz5rP32ltJ/BtULDI5RVO0uavn1HQUOwjx0R1h0rnDYNL0CepF1zL5bSY6FISAfd9tOdDhU5Q==
 
 "@types/webpack-sources@*":
   version "3.2.0"
@@ -3589,16 +3583,6 @@ ajv-keywords@^5.0.0:
   integrity sha512-YCS/JNFAUyr5vAuhk1DWm1CBxRHW9LbJ2ozWeemrIqpbsqKjHVxYPyi5GC0rjZIT5JxJ3virVTS8wk4i/Z+krw==
   dependencies:
     fast-deep-equal "^3.1.3"
-
-ajv@8.11.0:
-  version "8.11.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.11.0.tgz#977e91dd96ca669f54a11e23e378e33b884a565f"
-  integrity sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==
-  dependencies:
-    fast-deep-equal "^3.1.1"
-    json-schema-traverse "^1.0.0"
-    require-from-string "^2.0.2"
-    uri-js "^4.2.2"
 
 ajv@8.11.2, ajv@^8.0.0, ajv@^8.11.0, ajv@^8.8.0:
   version "8.11.2"
@@ -4726,20 +4710,6 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.1, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-css-loader@6.7.1:
-  version "6.7.1"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.1.tgz#e98106f154f6e1baf3fc3bc455cb9981c1d5fd2e"
-  integrity sha512-yB5CNFa14MbPJcomwNh3wLThtkZgcNyI2bNMRt8iE5Z8Vwl7f8vQXFAzn2HDOJvtDq2NTZBUGMSUNNyrv3/+cw==
-  dependencies:
-    icss-utils "^5.1.0"
-    postcss "^8.4.7"
-    postcss-modules-extract-imports "^3.0.0"
-    postcss-modules-local-by-default "^4.0.0"
-    postcss-modules-scope "^3.0.0"
-    postcss-modules-values "^4.0.0"
-    postcss-value-parser "^4.2.0"
-    semver "^7.3.5"
-
 css-loader@6.7.2:
   version "6.7.2"
   resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.2.tgz#26bc22401b5921686a10fbeba75d124228302304"
@@ -5317,243 +5287,243 @@ es6-weak-map@^2.0.3:
     es6-iterator "^2.0.3"
     es6-symbol "^3.1.1"
 
-esbuild-android-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-android-64/-/esbuild-android-64-0.15.13.tgz#5f25864055dbd62e250f360b38b4c382224063af"
-  integrity sha512-yRorukXBlokwTip+Sy4MYskLhJsO0Kn0/Fj43s1krVblfwP+hMD37a4Wmg139GEsMLl+vh8WXp2mq/cTA9J97g==
+esbuild-android-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-android-64/-/esbuild-android-64-0.15.15.tgz#fd959b034dd761d14e13dda6214b6948841ff4ff"
+  integrity sha512-F+WjjQxO+JQOva3tJWNdVjouFMLK6R6i5gjDvgUthLYJnIZJsp1HlF523k73hELY20WPyEO8xcz7aaYBVkeg5Q==
 
 esbuild-android-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-android-64/-/esbuild-android-64-0.15.16.tgz#0d6a16fa1bea441d5183976f1633183c25a764d5"
   integrity sha512-Vwkv/sT0zMSgPSVO3Jlt1pUbnZuOgtOQJkJkyyJFAlLe7BiT8e9ESzo0zQSx4c3wW4T6kGChmKDPMbWTgtliQA==
 
-esbuild-android-arm64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-android-arm64/-/esbuild-android-arm64-0.15.13.tgz#d8820f999314efbe8e0f050653a99ff2da632b0f"
-  integrity sha512-TKzyymLD6PiVeyYa4c5wdPw87BeAiTXNtK6amWUcXZxkV51gOk5u5qzmDaYSwiWeecSNHamFsaFjLoi32QR5/w==
+esbuild-android-arm64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-android-arm64/-/esbuild-android-arm64-0.15.15.tgz#9733b71cf0229b4356f106a455b2cfdf7884aa59"
+  integrity sha512-attlyhD6Y22jNyQ0fIIQ7mnPvDWKw7k6FKnsXlBvQE6s3z6s6cuEHcSgoirquQc7TmZgVCK5fD/2uxmRN+ZpcQ==
 
 esbuild-android-arm64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-android-arm64/-/esbuild-android-arm64-0.15.16.tgz#78643bbbf396d26d20ba1f2fcdff3618c7c033e9"
   integrity sha512-lqfKuofMExL5niNV3gnhMUYacSXfsvzTa/58sDlBET/hCOG99Zmeh+lz6kvdgvGOsImeo6J9SW21rFCogNPLxg==
 
-esbuild-darwin-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-darwin-64/-/esbuild-darwin-64-0.15.13.tgz#99ae7fdaa43947b06cd9d1a1c3c2c9f245d81fd0"
-  integrity sha512-WAx7c2DaOS6CrRcoYCgXgkXDliLnFv3pQLV6GeW1YcGEZq2Gnl8s9Pg7ahValZkpOa0iE/ojRVQ87sbUhF1Cbg==
+esbuild-darwin-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-darwin-64/-/esbuild-darwin-64-0.15.15.tgz#fc3482fdf5e798dbc0b8b2fe13287d257a45efc6"
+  integrity sha512-ohZtF8W1SHJ4JWldsPVdk8st0r9ExbAOSrBOh5L+Mq47i696GVwv1ab/KlmbUoikSTNoXEhDzVpxUR/WIO19FQ==
 
 esbuild-darwin-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-darwin-64/-/esbuild-darwin-64-0.15.16.tgz#de3e91809dcd1ffb64409e2f990bb86e33e4ffd8"
   integrity sha512-wo2VWk/n/9V2TmqUZ/KpzRjCEcr00n7yahEdmtzlrfQ3lfMCf3Wa+0sqHAbjk3C6CKkR3WKK/whkMq5Gj4Da9g==
 
-esbuild-darwin-arm64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-darwin-arm64/-/esbuild-darwin-arm64-0.15.13.tgz#bafa1814354ad1a47adcad73de416130ef7f55e3"
-  integrity sha512-U6jFsPfSSxC3V1CLiQqwvDuj3GGrtQNB3P3nNC3+q99EKf94UGpsG9l4CQ83zBs1NHrk1rtCSYT0+KfK5LsD8A==
+esbuild-darwin-arm64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-darwin-arm64/-/esbuild-darwin-arm64-0.15.15.tgz#e922ec387c00fa84d664e14b5722fe13613f4adc"
+  integrity sha512-P8jOZ5zshCNIuGn+9KehKs/cq5uIniC+BeCykvdVhx/rBXSxmtj3CUIKZz4sDCuESMbitK54drf/2QX9QHG5Ag==
 
 esbuild-darwin-arm64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-darwin-arm64/-/esbuild-darwin-arm64-0.15.16.tgz#bc9cc8d51109d8e9db4ffe2c064dd53d1eb5a2a6"
   integrity sha512-fMXaUr5ou0M4WnewBKsspMtX++C1yIa3nJ5R2LSbLCfJT3uFdcRoU/NZjoM4kOMKyOD9Sa/2vlgN8G07K3SJnw==
 
-esbuild-freebsd-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-freebsd-64/-/esbuild-freebsd-64-0.15.13.tgz#84ef85535c5cc38b627d1c5115623b088d1de161"
-  integrity sha512-whItJgDiOXaDG/idy75qqevIpZjnReZkMGCgQaBWZuKHoElDJC1rh7MpoUgupMcdfOd+PgdEwNQW9DAE6i8wyA==
+esbuild-freebsd-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-freebsd-64/-/esbuild-freebsd-64-0.15.15.tgz#69a42d79137d7d3ea718414c432bc10e8bb97c68"
+  integrity sha512-KkTg+AmDXz1IvA9S1gt8dE24C8Thx0X5oM0KGF322DuP+P3evwTL9YyusHAWNsh4qLsR80nvBr/EIYs29VSwuA==
 
 esbuild-freebsd-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-freebsd-64/-/esbuild-freebsd-64-0.15.16.tgz#f8c54c679c16e9b20a1bf860ca91ba700d6c9c5d"
   integrity sha512-UzIc0xlRx5x9kRuMr+E3+hlSOxa/aRqfuMfiYBXu2jJ8Mzej4lGL7+o6F5hzhLqWfWm1GWHNakIdlqg1ayaTNQ==
 
-esbuild-freebsd-arm64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-0.15.13.tgz#033f21de434ec8e0c478054b119af8056763c2d8"
-  integrity sha512-6pCSWt8mLUbPtygv7cufV0sZLeylaMwS5Fznj6Rsx9G2AJJsAjQ9ifA+0rQEIg7DwJmi9it+WjzNTEAzzdoM3Q==
+esbuild-freebsd-arm64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-0.15.15.tgz#63b6d0dd492f7394f8d07a0e2b931151eb9d60c4"
+  integrity sha512-FUcML0DRsuyqCMfAC+HoeAqvWxMeq0qXvclZZ/lt2kLU6XBnDA5uKTLUd379WYEyVD4KKFctqWd9tTuk8C/96g==
 
 esbuild-freebsd-arm64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-0.15.16.tgz#dd28a55df0f062e2c1628266008434c32ddc7adf"
   integrity sha512-8xyiYuGc0DLZphFQIiYaLHlfoP+hAN9RHbE+Ibh8EUcDNHAqbQgUrQg7pE7Bo00rXmQ5Ap6KFgcR0b4ALZls1g==
 
-esbuild-linux-32@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-32/-/esbuild-linux-32-0.15.13.tgz#54290ea8035cba0faf1791ce9ae6693005512535"
-  integrity sha512-VbZdWOEdrJiYApm2kkxoTOgsoCO1krBZ3quHdYk3g3ivWaMwNIVPIfEE0f0XQQ0u5pJtBsnk2/7OPiCFIPOe/w==
+esbuild-linux-32@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-32/-/esbuild-linux-32-0.15.15.tgz#7f295795fd7e61ea57d1135f717424a6771a7472"
+  integrity sha512-q28Qn5pZgHNqug02aTkzw5sW9OklSo96b5nm17Mq0pDXrdTBcQ+M6Q9A1B+dalFeynunwh/pvfrNucjzwDXj+Q==
 
 esbuild-linux-32@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-32/-/esbuild-linux-32-0.15.16.tgz#41eb0b9b49b3430b9cc4577f1ad3d414ef70f806"
   integrity sha512-iGijUTV+0kIMyUVoynK0v+32Oi8yyp0xwMzX69GX+5+AniNy/C/AL1MjFTsozRp/3xQPl7jVux/PLe2ds10/2w==
 
-esbuild-linux-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-64/-/esbuild-linux-64-0.15.13.tgz#4264249281ea388ead948614b57fb1ddf7779a2c"
-  integrity sha512-rXmnArVNio6yANSqDQlIO4WiP+Cv7+9EuAHNnag7rByAqFVuRusLbGi2697A5dFPNXoO//IiogVwi3AdcfPC6A==
+esbuild-linux-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-64/-/esbuild-linux-64-0.15.15.tgz#11a430a86403b0411ca0a355b891f1cb8c4c4ec6"
+  integrity sha512-217KPmWMirkf8liO+fj2qrPwbIbhNTGNVtvqI1TnOWJgcMjUWvd677Gq3fTzXEjilkx2yWypVnTswM2KbXgoAg==
 
 esbuild-linux-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-64/-/esbuild-linux-64-0.15.16.tgz#b2fb0c7d49b7a579b2de26fbf4c7afb1835f2073"
   integrity sha512-tuSOjXdLw7VzaUj89fIdAaQT7zFGbKBcz4YxbWrOiXkwscYgE7HtTxUavreBbnRkGxKwr9iT/gmeJWNm4djy/g==
 
-esbuild-linux-arm64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-arm64/-/esbuild-linux-arm64-0.15.13.tgz#9323c333924f97a02bdd2ae8912b36298acb312d"
-  integrity sha512-alEMGU4Z+d17U7KQQw2IV8tQycO6T+rOrgW8OS22Ua25x6kHxoG6Ngry6Aq6uranC+pNWNMB6aHFPh7aTQdORQ==
+esbuild-linux-arm64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-arm64/-/esbuild-linux-arm64-0.15.15.tgz#b65f9a2c60e8e5b62f6cfd392cd0410f22e8c390"
+  integrity sha512-/ltmNFs0FivZkYsTzAsXIfLQX38lFnwJTWCJts0IbCqWZQe+jjj0vYBNbI0kmXLb3y5NljiM5USVAO1NVkdh2g==
 
 esbuild-linux-arm64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-arm64/-/esbuild-linux-arm64-0.15.16.tgz#78fed3745b20251fc3bdc8db35ea0781e9b0e7c6"
   integrity sha512-mPYksnfHnemNrvjrDhZyixL/AfbJN0Xn9S34ZOHYdh6/jJcNd8iTsv3JwJoEvTJqjMggjMhGUPJAdjnFBHoH8A==
 
-esbuild-linux-arm@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-arm/-/esbuild-linux-arm-0.15.13.tgz#b407f47b3ae721fe4e00e19e9f19289bef87a111"
-  integrity sha512-Ac6LpfmJO8WhCMQmO253xX2IU2B3wPDbl4IvR0hnqcPrdfCaUa2j/lLMGTjmQ4W5JsJIdHEdW12dG8lFS0MbxQ==
+esbuild-linux-arm@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-arm/-/esbuild-linux-arm-0.15.15.tgz#c8e13e45a0a6f0cb145ce13ae26ce1d2551d9bcc"
+  integrity sha512-RYVW9o2yN8yM7SB1yaWr378CwrjvGCyGybX3SdzPHpikUHkME2AP55Ma20uNwkNyY2eSYFX9D55kDrfQmQBR4w==
 
 esbuild-linux-arm@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-arm/-/esbuild-linux-arm-0.15.16.tgz#6963f061a2b778aad7df2bfb6fa32d1904313f7f"
   integrity sha512-XKcrxCEXDTOuoRj5l12tJnkvuxXBMKwEC5j0JISw3ziLf0j4zIwXbKbTmUrKFWbo6ZgvNpa7Y5dnbsjVvH39bQ==
 
-esbuild-linux-mips64le@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-mips64le/-/esbuild-linux-mips64le-0.15.13.tgz#bdf905aae5c0bcaa8f83567fe4c4c1bdc1f14447"
-  integrity sha512-47PgmyYEu+yN5rD/MbwS6DxP2FSGPo4Uxg5LwIdxTiyGC2XKwHhHyW7YYEDlSuXLQXEdTO7mYe8zQ74czP7W8A==
+esbuild-linux-mips64le@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-mips64le/-/esbuild-linux-mips64le-0.15.15.tgz#d4c24d47e43966fcac748c90621be7edd53456c0"
+  integrity sha512-PksEPb321/28GFFxtvL33yVPfnMZihxkEv5zME2zapXGp7fA1X2jYeiTUK+9tJ/EGgcNWuwvtawPxJG7Mmn86A==
 
 esbuild-linux-mips64le@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-mips64le/-/esbuild-linux-mips64le-0.15.16.tgz#e2aed3527e551f8182c6b0fc8a045726fd98ad87"
   integrity sha512-kSJO2PXaxfm0pWY39+YX+QtpFqyyrcp0ZeI8QPTrcFVQoWEPiPVtOfTZeS3ZKedfH+Ga38c4DSzmKMQJocQv6A==
 
-esbuild-linux-ppc64le@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-0.15.13.tgz#2911eae1c90ff58a3bd3259cb557235df25aa3b4"
-  integrity sha512-z6n28h2+PC1Ayle9DjKoBRcx/4cxHoOa2e689e2aDJSaKug3jXcQw7mM+GLg+9ydYoNzj8QxNL8ihOv/OnezhA==
+esbuild-linux-ppc64le@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-0.15.15.tgz#2eba53fe2282438ceca5471bdb57ba2e00216ed6"
+  integrity sha512-ek8gJBEIhcpGI327eAZigBOHl58QqrJrYYIZBWQCnH3UnXoeWMrMZLeeZL8BI2XMBhP+sQ6ERctD5X+ajL/AIA==
 
 esbuild-linux-ppc64le@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-0.15.16.tgz#fa3095b24950f63408f46f34b6d9a073ed88d53f"
   integrity sha512-NimPikwkBY0yGABw6SlhKrtT35sU4O23xkhlrTT/O6lSxv3Pm5iSc6OYaqVAHWkLdVf31bF4UDVFO+D990WpAA==
 
-esbuild-linux-riscv64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-riscv64/-/esbuild-linux-riscv64-0.15.13.tgz#1837c660be12b1d20d2a29c7189ea703f93e9265"
-  integrity sha512-+Lu4zuuXuQhgLUGyZloWCqTslcCAjMZH1k3Xc9MSEJEpEFdpsSU0sRDXAnk18FKOfEjhu4YMGaykx9xjtpA6ow==
+esbuild-linux-riscv64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-riscv64/-/esbuild-linux-riscv64-0.15.15.tgz#1afa8dfe55a6c312f1904ee608b81417205f5027"
+  integrity sha512-H5ilTZb33/GnUBrZMNJtBk7/OXzDHDXjIzoLXHSutwwsLxSNaLxzAaMoDGDd/keZoS+GDBqNVxdCkpuiRW4OSw==
 
 esbuild-linux-riscv64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-riscv64/-/esbuild-linux-riscv64-0.15.16.tgz#19c012dcc55c9d6d2a3855aa77c2c5217182cd1e"
   integrity sha512-ty2YUHZlwFOwp7pR+J87M4CVrXJIf5ZZtU/umpxgVJBXvWjhziSLEQxvl30SYfUPq0nzeWKBGw5i/DieiHeKfw==
 
-esbuild-linux-s390x@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-linux-s390x/-/esbuild-linux-s390x-0.15.13.tgz#d52880ece229d1bd10b2d936b792914ffb07c7fc"
-  integrity sha512-BMeXRljruf7J0TMxD5CIXS65y7puiZkAh+s4XFV9qy16SxOuMhxhVIXYLnbdfLrsYGFzx7U9mcdpFWkkvy/Uag==
+esbuild-linux-s390x@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-linux-s390x/-/esbuild-linux-s390x-0.15.15.tgz#1f7b3c4429c8ca99920ba6bf356ccc5b38fabd34"
+  integrity sha512-jKaLUg78mua3rrtrkpv4Or2dNTJU7bgHN4bEjT4OX4GR7nLBSA9dfJezQouTxMmIW7opwEC5/iR9mpC18utnxQ==
 
 esbuild-linux-s390x@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-linux-s390x/-/esbuild-linux-s390x-0.15.16.tgz#aa61f64740e5b983cc3ebb4183a03df4b435a873"
   integrity sha512-VkZaGssvPDQtx4fvVdZ9czezmyWyzpQhEbSNsHZZN0BHvxRLOYAQ7sjay8nMQwYswP6O2KlZluRMNPYefFRs+w==
 
-esbuild-netbsd-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-netbsd-64/-/esbuild-netbsd-64-0.15.13.tgz#de14da46f1d20352b43e15d97a80a8788275e6ed"
-  integrity sha512-EHj9QZOTel581JPj7UO3xYbltFTYnHy+SIqJVq6yd3KkCrsHRbapiPb0Lx3EOOtybBEE9EyqbmfW1NlSDsSzvQ==
+esbuild-netbsd-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-netbsd-64/-/esbuild-netbsd-64-0.15.15.tgz#d72c7155686c938c1aff126209b689c22823347c"
+  integrity sha512-aOvmF/UkjFuW6F36HbIlImJTTx45KUCHJndtKo+KdP8Dhq3mgLRKW9+6Ircpm8bX/RcS3zZMMmaBLkvGY06Gvw==
 
 esbuild-netbsd-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-netbsd-64/-/esbuild-netbsd-64-0.15.16.tgz#dffdc104c1f2bafc42be3faa21376c0a092f5702"
   integrity sha512-ElQ9rhdY51et6MJTWrCPbqOd/YuPowD7Cxx3ee8wlmXQQVW7UvQI6nSprJ9uVFQISqSF5e5EWpwWqXZsECLvXg==
 
-esbuild-openbsd-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.15.13.tgz#45e8a5fd74d92ad8f732c43582369c7990f5a0ac"
-  integrity sha512-nkuDlIjF/sfUhfx8SKq0+U+Fgx5K9JcPq1mUodnxI0x4kBdCv46rOGWbuJ6eof2n3wdoCLccOoJAbg9ba/bT2w==
+esbuild-openbsd-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.15.15.tgz#761bd87ecab97386948eaf667a065cb0ecaa0f76"
+  integrity sha512-HFFX+WYedx1w2yJ1VyR1Dfo8zyYGQZf1cA69bLdrHzu9svj6KH6ZLK0k3A1/LFPhcEY9idSOhsB2UyU0tHPxgQ==
 
 esbuild-openbsd-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.15.16.tgz#e5987f8eda55ea5f6ef6258afb1a838158f890bb"
   integrity sha512-KgxMHyxMCT+NdLQE1zVJEsLSt2QQBAvJfmUGDmgEq8Fvjrf6vSKB00dVHUEDKcJwMID6CdgCpvYNt999tIYhqA==
 
-esbuild-sunos-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-sunos-64/-/esbuild-sunos-64-0.15.13.tgz#f646ac3da7aac521ee0fdbc192750c87da697806"
-  integrity sha512-jVeu2GfxZQ++6lRdY43CS0Tm/r4WuQQ0Pdsrxbw+aOrHQPHV0+LNOLnvbN28M7BSUGnJnHkHm2HozGgNGyeIRw==
+esbuild-sunos-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-sunos-64/-/esbuild-sunos-64-0.15.15.tgz#07e04cbf9747f281a967d09230a158a1be5b530c"
+  integrity sha512-jOPBudffG4HN8yJXcK9rib/ZTFoTA5pvIKbRrt3IKAGMq1EpBi4xoVoSRrq/0d4OgZLaQbmkHp8RO9eZIn5atA==
 
 esbuild-sunos-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-sunos-64/-/esbuild-sunos-64-0.15.16.tgz#60a085aa4b74d900e4de8c00a9fce207937320a2"
   integrity sha512-exSAx8Phj7QylXHlMfIyEfNrmqnLxFqLxdQF6MBHPdHAjT7fsKaX6XIJn+aQEFiOcE4X8e7VvdMCJ+WDZxjSRQ==
 
-esbuild-wasm@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.15.13.tgz#c4d7f771679b2e14f7a456403751d908db1c07d1"
-  integrity sha512-0am8fvHKACwofWQxtZLTMv4mDiDwUrdt0DyRaQ2r7YWIpkmpg4GWYy0EyW+gPjiPHzkZKqN9d3UYsZGgvaAASw==
+esbuild-wasm@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.15.15.tgz#410abc538e8091c6dbb0e373b54738f4505351aa"
+  integrity sha512-B8OfZ0cm/zvbznYXbHnLRRp31hBObFiDAKnbTeUMHOZkyAbEClHETxSgZ/0fjm4XdkZGcBI/ZTpCa5JSTZVA7A==
 
 esbuild-wasm@0.15.16, esbuild-wasm@^0.15.9:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.15.16.tgz#a5f97f126e17da182cfa53f56815cc13677ef3f9"
   integrity sha512-xMriF73R3nZE9/DcxZ85mvWcfnmYzk5RssMpE0GScZYKH3aJQyTutZgDFKGgGlLHvD/HmmTy1dlX1GNw6K8g7w==
 
-esbuild-windows-32@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-windows-32/-/esbuild-windows-32-0.15.13.tgz#fb4fe77c7591418880b3c9b5900adc4c094f2401"
-  integrity sha512-XoF2iBf0wnqo16SDq+aDGi/+QbaLFpkiRarPVssMh9KYbFNCqPLlGAWwDvxEVz+ywX6Si37J2AKm+AXq1kC0JA==
+esbuild-windows-32@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-windows-32/-/esbuild-windows-32-0.15.15.tgz#130d1982cc41fb67461e9f8a65c6ebd13a1f35bb"
+  integrity sha512-MDkJ3QkjnCetKF0fKxCyYNBnOq6dmidcwstBVeMtXSgGYTy8XSwBeIE4+HuKiSsG6I/mXEb++px3IGSmTN0XiA==
 
 esbuild-windows-32@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-windows-32/-/esbuild-windows-32-0.15.16.tgz#24f94e5fb243d211c7db9a12985fd2880ba98ca3"
   integrity sha512-zQgWpY5pUCSTOwqKQ6/vOCJfRssTvxFuEkpB4f2VUGPBpdddZfdj8hbZuFRdZRPIVHvN7juGcpgCA/XCF37mAQ==
 
-esbuild-windows-64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-windows-64/-/esbuild-windows-64-0.15.13.tgz#1fca8c654392c0c31bdaaed168becfea80e20660"
-  integrity sha512-Et6htEfGycjDrtqb2ng6nT+baesZPYQIW+HUEHK4D1ncggNrDNk3yoboYQ5KtiVrw/JaDMNttz8rrPubV/fvPQ==
+esbuild-windows-64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-windows-64/-/esbuild-windows-64-0.15.15.tgz#638bdf495c109c1882e8b0529cb8e2fea11383fb"
+  integrity sha512-xaAUIB2qllE888SsMU3j9nrqyLbkqqkpQyWVkfwSil6BBPgcPk3zOFitTTncEKCLTQy3XV9RuH7PDj3aJDljWA==
 
 esbuild-windows-64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-windows-64/-/esbuild-windows-64-0.15.16.tgz#71d24d68d8b652bf5a93a6c7453c334584fa2211"
   integrity sha512-HjW1hHRLSncnM3MBCP7iquatHVJq9l0S2xxsHHj4yzf4nm9TU4Z7k4NkeMlD/dHQ4jPlQQhwcMvwbJiOefSuZw==
 
-esbuild-windows-arm64@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild-windows-arm64/-/esbuild-windows-arm64-0.15.13.tgz#4ffd01b6b2888603f1584a2fe96b1f6a6f2b3dd8"
-  integrity sha512-3bv7tqntThQC9SWLRouMDmZnlOukBhOCTlkzNqzGCmrkCJI7io5LLjwJBOVY6kOUlIvdxbooNZwjtBvj+7uuVg==
+esbuild-windows-arm64@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild-windows-arm64/-/esbuild-windows-arm64-0.15.15.tgz#5a277ce10de999d2a6465fc92a8c2a2d207ebd31"
+  integrity sha512-ttuoCYCIJAFx4UUKKWYnFdrVpoXa3+3WWkXVI6s09U+YjhnyM5h96ewTq/WgQj9LFSIlABQvadHSOQyAVjW5xQ==
 
 esbuild-windows-arm64@0.15.16:
   version "0.15.16"
   resolved "https://registry.yarnpkg.com/esbuild-windows-arm64/-/esbuild-windows-arm64-0.15.16.tgz#77e804d60dec0390fe8f21401e39b435d5d1b863"
   integrity sha512-oCcUKrJaMn04Vxy9Ekd8x23O8LoU01+4NOkQ2iBToKgnGj5eo1vU9i27NQZ9qC8NFZgnQQZg5oZWAejmbsppNA==
 
-esbuild@0.15.13:
-  version "0.15.13"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.15.13.tgz#7293480038feb2bafa91d3f6a20edab3ba6c108a"
-  integrity sha512-Cu3SC84oyzzhrK/YyN4iEVy2jZu5t2fz66HEOShHURcjSkOSAVL8C/gfUT+lDJxkVHpg8GZ10DD0rMHRPqMFaQ==
+esbuild@0.15.15:
+  version "0.15.15"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.15.15.tgz#503b70bdc18d72d8fc2962ed3ab9219249e58bbe"
+  integrity sha512-TEw/lwK4Zzld9x3FedV6jy8onOUHqcEX3ADFk4k+gzPUwrxn8nWV62tH0udo8jOtjFodlEfc4ypsqX3e+WWO6w==
   optionalDependencies:
-    "@esbuild/android-arm" "0.15.13"
-    "@esbuild/linux-loong64" "0.15.13"
-    esbuild-android-64 "0.15.13"
-    esbuild-android-arm64 "0.15.13"
-    esbuild-darwin-64 "0.15.13"
-    esbuild-darwin-arm64 "0.15.13"
-    esbuild-freebsd-64 "0.15.13"
-    esbuild-freebsd-arm64 "0.15.13"
-    esbuild-linux-32 "0.15.13"
-    esbuild-linux-64 "0.15.13"
-    esbuild-linux-arm "0.15.13"
-    esbuild-linux-arm64 "0.15.13"
-    esbuild-linux-mips64le "0.15.13"
-    esbuild-linux-ppc64le "0.15.13"
-    esbuild-linux-riscv64 "0.15.13"
-    esbuild-linux-s390x "0.15.13"
-    esbuild-netbsd-64 "0.15.13"
-    esbuild-openbsd-64 "0.15.13"
-    esbuild-sunos-64 "0.15.13"
-    esbuild-windows-32 "0.15.13"
-    esbuild-windows-64 "0.15.13"
-    esbuild-windows-arm64 "0.15.13"
+    "@esbuild/android-arm" "0.15.15"
+    "@esbuild/linux-loong64" "0.15.15"
+    esbuild-android-64 "0.15.15"
+    esbuild-android-arm64 "0.15.15"
+    esbuild-darwin-64 "0.15.15"
+    esbuild-darwin-arm64 "0.15.15"
+    esbuild-freebsd-64 "0.15.15"
+    esbuild-freebsd-arm64 "0.15.15"
+    esbuild-linux-32 "0.15.15"
+    esbuild-linux-64 "0.15.15"
+    esbuild-linux-arm "0.15.15"
+    esbuild-linux-arm64 "0.15.15"
+    esbuild-linux-mips64le "0.15.15"
+    esbuild-linux-ppc64le "0.15.15"
+    esbuild-linux-riscv64 "0.15.15"
+    esbuild-linux-s390x "0.15.15"
+    esbuild-netbsd-64 "0.15.15"
+    esbuild-openbsd-64 "0.15.15"
+    esbuild-sunos-64 "0.15.15"
+    esbuild-windows-32 "0.15.15"
+    esbuild-windows-64 "0.15.15"
+    esbuild-windows-arm64 "0.15.15"
 
 esbuild@0.15.16, esbuild@^0.15.9:
   version "0.15.16"
@@ -8097,10 +8067,10 @@ mimic-fn@^2.1.0:
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
 
-mini-css-extract-plugin@2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-2.6.1.tgz#9a1251d15f2035c342d99a468ab9da7a0451b71e"
-  integrity sha512-wd+SD57/K6DiV7jIR34P+s3uckTRuQvx0tKPcvjFlrEylk6P4mQ2KSWk1hblj1Kxaqok7LogKOieygXqBczNlg==
+mini-css-extract-plugin@2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-2.7.0.tgz#d7d9ba0c5b596d155e36e2b174082fc7f010dd64"
+  integrity sha512-auqtVo8KhTScMsba7MbijqZTfibbXiBNlPAQbsVt7enQfcDYLdgG57eGxMqwVU3mfeWANY4F1wUg+rMF+ycZgw==
   dependencies:
     schema-utils "^4.0.0"
 
@@ -9066,17 +9036,12 @@ parse5-sax-parser@^6.0.1:
   dependencies:
     parse5 "^6.0.1"
 
-parse5@*:
+parse5@*, parse5@^7.1.2:
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.2.tgz#0736bebbfd77793823240a23b7fc5e010b7f8e32"
   integrity sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==
   dependencies:
     entities "^4.4.0"
-
-parse5@^5.0.0:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/parse5/-/parse5-5.1.1.tgz#f68e4e5ba1852ac2cadc00f4555fff6c2abb6178"
-  integrity sha512-ugq4DFI0Ptb+WWjAdOK16+u/nHfiIrcE+sh8kZMaM0WllQKLI9rOUq6c2b7cwPkXdzfQESqvoqK6ug7U/Yyzug==
 
 parse5@^6.0.1:
   version "6.0.1"
@@ -9310,7 +9275,7 @@ postcss-value-parser@^4.1.0, postcss-value-parser@^4.2.0:
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@8.4.19, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.16, postcss@^8.4.18, postcss@^8.4.7:
+postcss@8.4.19, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.16, postcss@^8.4.18:
   version "8.4.19"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.19.tgz#61178e2add236b17351897c8bcc0b4c8ecab56fc"
   integrity sha512-h+pbPsyhlYj6N2ozBmHhHrs9DzGmbaarbLvWipMRO7RLS+v4onj26MPFXA5OBYFxyqYhUJK456SwDcY9H2/zsA==
@@ -9766,11 +9731,6 @@ regenerate@^1.4.2:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.2.tgz#b9346d8827e8f5a32f7ba29637d398b69014848a"
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
-
-regenerator-runtime@0.13.10:
-  version "0.13.10"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.10.tgz#ed07b19616bcbec5da6274ebc75ae95634bfc2ee"
-  integrity sha512-KepLsg4dU12hryUO7bp/axHAKvwGOCV0sGloQtpagJ12ai+ojVDqkeGSiRX1zlq+kjIMZ1t7gpze+26QqtdGqw==
 
 regenerator-runtime@^0.13.10, regenerator-runtime@^0.13.11:
   version "0.13.11"
@@ -11503,13 +11463,13 @@ webidl-conversions@^3.0.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"
   integrity sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==
 
-webpack-dev-middleware@5.3.3, webpack-dev-middleware@^5.3.1:
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-5.3.3.tgz#efae67c2793908e7311f1d9b06f2a08dcc97e51f"
-  integrity sha512-hj5CYrY0bZLB+eTO+x/j67Pkrquiy7kWepMHmUMoPsmcUaeEnQJqFzHJOyxgWlq746/wUuA64p9ta34Kyb01pA==
+webpack-dev-middleware@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-6.0.0.tgz#e860862f04e364348a3483da7bb9f0b957147bbb"
+  integrity sha512-A7jSXBifCJsJqUCVISlcbx9pkmCuP0KriMRcOJ13pOb6/xMXZvh4/ygeJeSArjRd50IT5IVbBFuejGDA/zWrNQ==
   dependencies:
     colorette "^2.0.10"
-    memfs "^3.4.3"
+    memfs "^3.4.12"
     mime-types "^2.1.31"
     range-parser "^1.2.1"
     schema-utils "^4.0.0"
@@ -11521,6 +11481,17 @@ webpack-dev-middleware@6.0.1:
   dependencies:
     colorette "^2.0.10"
     memfs "^3.4.12"
+    mime-types "^2.1.31"
+    range-parser "^1.2.1"
+    schema-utils "^4.0.0"
+
+webpack-dev-middleware@^5.3.1:
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-5.3.3.tgz#efae67c2793908e7311f1d9b06f2a08dcc97e51f"
+  integrity sha512-hj5CYrY0bZLB+eTO+x/j67Pkrquiy7kWepMHmUMoPsmcUaeEnQJqFzHJOyxgWlq746/wUuA64p9ta34Kyb01pA==
+  dependencies:
+    colorette "^2.0.10"
+    memfs "^3.4.3"
     mime-types "^2.1.31"
     range-parser "^1.2.1"
     schema-utils "^4.0.0"
