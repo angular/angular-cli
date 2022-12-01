@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpInterceptorFn } from '@angular/common/http';
 
 import { <%= camelize(name) %>Interceptor } from './<%= dasherize(name) %>.interceptor';
 
