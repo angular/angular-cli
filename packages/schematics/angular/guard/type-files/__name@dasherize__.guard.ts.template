@@ -6,4 +6,4 @@ export const <%= camelize(name) %>Guard: <%= guardType %><% if (guardType === 'C
   %><% if (guardType === 'CanActivateChildFn') { %>(childRoute, state)<% }
   %><% if (guardType === 'CanDeactivateFn') { %>(component, currentRoute, currentState, nextState)<% } %> => {
   return true;
-}
+};
