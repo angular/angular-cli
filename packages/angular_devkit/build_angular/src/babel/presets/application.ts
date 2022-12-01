@@ -14,8 +14,25 @@ import type {
   makeLocalePlugin,
 } from '@angular/localize/tools';
 import { strict as assert } from 'assert';
+import browserslist from 'browserslist';
 import * as fs from 'fs';
 import * as path from 'path';
+
+/**
+ * List of browsers which are affected by a WebKit bug where class field
+ * initializers might have incorrect variable scopes.
+ *
+ * See: https://github.com/angular/angular-cli/issues/24355#issuecomment-1333477033
+ * See: https://github.com/WebKit/WebKit/commit/e8788a34b3d5f5b4edd7ff6450b80936bff396f2
+ */
+const safariClassFieldScopeBugBrowsers = new Set(
+  browserslist([
+    // Safari <15 is technically not supported via https://angular.io/guide/browser-support,
+    // but we apply the workaround if forcibly selected.
+    'Safari <=15',
+    'iOS <=15',
+  ]),
+);
 
 export type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
 
@@ -45,7 +62,6 @@ export interface ApplicationPresetOptions {
     linkerPluginCreator: typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin;
   };
 
-  forcePresetEnv?: boolean;
   forceAsyncTransformation?: boolean;
   instrumentCode?: {
     includedBasePath: string;
@@ -171,13 +187,26 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     );
   }
 
-  if (options.forcePresetEnv) {
+  // Applications code ES version can be controlled using TypeScript's `target` option.
+  // However, this doesn't effect libraries and hence we use preset-env to downlevel ES features
+  // based on the supported browsers in browserslist.
+  if (options.supportedBrowsers) {
+    const includePlugins: string[] = [];
+
+    // If a Safari browser affected by the class field scope bug is selected, we
+    // downlevel class properties by ensuring the class properties Babel plugin
+    // is always included- regardless of the preset-env targets.
+    if (options.supportedBrowsers.some((b) => safariClassFieldScopeBugBrowsers.has(b))) {
+      includePlugins.push('@babel/plugin-proposal-class-properties');
+    }
+
     presets.push([
       require('@babel/preset-env').default,
       {
         bugfixes: true,
         modules: false,
         targets: options.supportedBrowsers,
+        include: includePlugins,
         exclude: ['transform-typeof-symbol'],
       },
     ]);
