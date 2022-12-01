@@ -14,10 +14,19 @@ export function transformSupportedBrowsersToTargets(supportedBrowsers: string[])
   const transformed: string[] = [];
 
   // https://esbuild.github.io/api/#target
-  const esBuildSupportedBrowsers = new Set(['safari', 'firefox', 'edge', 'chrome', 'ios', 'node']);
+  const esBuildSupportedBrowsers = new Set([
+    'chrome',
+    'edge',
+    'firefox',
+    'ie',
+    'ios',
+    'node',
+    'opera',
+    'safari',
+  ]);
 
   for (const browser of supportedBrowsers) {
-    let [browserName, version] = browser.split(' ');
+    let [browserName, version] = browser.toLowerCase().split(' ');
 
     // browserslist uses the name `ios_saf` for iOS Safari whereas esbuild uses `ios`
     if (browserName === 'ios_saf') {
@@ -33,6 +42,11 @@ export function transformSupportedBrowsersToTargets(supportedBrowsers: string[])
         // esbuild only supports numeric versions so `TP` is converted to a high number (999) since
         // a Technology Preview (TP) of Safari is assumed to support all currently known features.
         version = '999';
+      } else if (!version.includes('.')) {
+        // A lone major version is considered by esbuild to include all minor versions. However,
+        // browserslist does not and is also inconsistent in its `.0` version naming. For example,
+        // Safari 15.0 is named `safari 15` but Safari 16.0 is named `safari 16.0`.
+        version += '.0';
       }
 
       transformed.push(browserName + version);
