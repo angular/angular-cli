@@ -79,7 +79,6 @@ export default custom<ApplicationPresetOptions>(() => {
 
       const customOptions: ApplicationPresetOptions = {
         forceAsyncTransformation: false,
-        forcePresetEnv: false,
         angularLinker: undefined,
         i18n: undefined,
         instrumentCode: undefined,
@@ -105,14 +104,6 @@ export default custom<ApplicationPresetOptions>(() => {
         shouldProcess = true;
       }
 
-      // Analyze for ES target processing
-      if (customOptions.supportedBrowsers?.length) {
-        // Applications code ES version can be controlled using TypeScript's `target` option.
-        // However, this doesn't effect libraries and hence we use preset-env to downlevel ES fetaures
-        // based on the supported browsers in browserlist.
-        customOptions.forcePresetEnv = true;
-      }
-
       // Application code (TS files) will only contain native async if target is ES2017+.
       // However, third-party libraries can regardless of the target option.
       // APF packages with code in [f]esm2015 directories is downlevelled to ES2015 and
@@ -121,7 +112,9 @@ export default custom<ApplicationPresetOptions>(() => {
         !/[\\/][_f]?esm2015[\\/]/.test(this.resourcePath) && source.includes('async');
 
       shouldProcess ||=
-        customOptions.forceAsyncTransformation || customOptions.forcePresetEnv || false;
+        customOptions.forceAsyncTransformation ||
+        customOptions.supportedBrowsers !== undefined ||
+        false;
 
       // Analyze for i18n inlining
       if (
