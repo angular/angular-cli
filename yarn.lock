@@ -8506,7 +8506,17 @@ npm-normalize-package-bin@^3.0.0:
   resolved "https://registry.yarnpkg.com/npm-normalize-package-bin/-/npm-normalize-package-bin-3.0.0.tgz#6097436adb4ef09e2628b59a7882576fe53ce485"
   integrity sha512-g+DPQSkusnk7HYXr75NtzkIP4+N81i3RPsGFidF3DzHd9MT9wWngmqoeg/fnHFz5MNdtG4w03s+QnhewSLTT2Q==
 
-npm-package-arg@10.0.0, npm-package-arg@^10.0.0:
+npm-package-arg@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-10.1.0.tgz#827d1260a683806685d17193073cc152d3c7e9b1"
+  integrity sha512-uFyyCEmgBfZTtrKk/5xDfHp6+MdrqGotX/VoOyEEl3mBwiEE5FlBaePanazJSVMPT7vKepcjYBY2ztg9A3yPIA==
+  dependencies:
+    hosted-git-info "^6.0.0"
+    proc-log "^3.0.0"
+    semver "^7.3.5"
+    validate-npm-package-name "^5.0.0"
+
+npm-package-arg@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-10.0.0.tgz#a34f4a4208a937074b1fff0943a684fbacc83977"
   integrity sha512-7dkh8mRp7s0KwVHKIVJnFCJQ2B34gOGnzgBjDGyprycmARq/82SX/lhilQ95ZuacP/G/1gsS345iAkKmxWBQ2Q==
