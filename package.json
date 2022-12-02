@@ -175,7 +175,7 @@
     "ng-packagr": "15.0.1",
     "node-fetch": "^2.2.0",
     "npm": "^8.11.0",
-    "npm-package-arg": "10.0.0",
+    "npm-package-arg": "10.1.0",
     "open": "8.4.0",
     "ora": "5.4.1",
     "pacote": "15.0.6",
