@@ -183,7 +183,7 @@ export async function augmentIndexHtml(
       rewriter.emitEndTag(tag);
     });
 
-  const content = await transformedContent;
+  const content = await transformedContent();
 
   return {
     content:

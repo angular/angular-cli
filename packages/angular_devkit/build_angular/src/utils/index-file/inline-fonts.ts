@@ -48,7 +48,8 @@ export class InlineFontsProcessor {
     const existingPreconnect = new Set<string>();
 
     // Collector link tags with href
-    const { rewriter: collectorStream } = await htmlRewritingStream(content);
+    const { rewriter: collectorStream, transformedContent: initCollectorStream } =
+      await htmlRewritingStream(content);
 
     collectorStream.on('startTag', (tag) => {
       const { tagName, attrs } = tag;
@@ -86,6 +87,11 @@ export class InlineFontsProcessor {
           return;
         }
       }
+    });
+
+    initCollectorStream().catch(() => {
+      // We don't really care about any errors here because it just initializes
+      // the rewriting stream, as we are waiting for `finish` below.
     });
 
     await new Promise((resolve) => collectorStream.on('finish', resolve));
@@ -151,7 +157,7 @@ export class InlineFontsProcessor {
       }
     });
 
-    return transformedContent;
+    return transformedContent();
   }
 
   private async getResponse(url: URL): Promise<string> {
