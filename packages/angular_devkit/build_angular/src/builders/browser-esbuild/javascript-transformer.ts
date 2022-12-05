@@ -26,12 +26,21 @@ export interface JavaScriptTransformerOptions {
  */
 export class JavaScriptTransformer {
   #workerPool: Piscina;
+  #commonOptions: Required<JavaScriptTransformerOptions>;
 
-  constructor(private options: JavaScriptTransformerOptions, maxThreads?: number) {
+  constructor(options: JavaScriptTransformerOptions, maxThreads?: number) {
     this.#workerPool = new Piscina({
       filename: require.resolve('./javascript-transformer-worker'),
       maxThreads,
     });
+
+    // Extract options to ensure only the named options are serialized and sent to the worker
+    const { sourcemap, thirdPartySourcemaps = false, advancedOptimizations = false } = options;
+    this.#commonOptions = {
+      sourcemap,
+      thirdPartySourcemaps,
+      advancedOptimizations,
+    };
   }
 
   /**
@@ -45,7 +54,7 @@ export class JavaScriptTransformer {
     // they may need linking. The data is also not yet available to perform most transformation checks.
     return this.#workerPool.run({
       filename,
-      ...this.options,
+      ...this.#commonOptions,
     });
   }
 
@@ -61,7 +70,7 @@ export class JavaScriptTransformer {
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
     let forceAsyncTransformation;
-    if (skipLinker && !this.options.advancedOptimizations) {
+    if (skipLinker && !this.#commonOptions.advancedOptimizations) {
       // If the linker is being skipped and no optimizations are needed, only async transformation is left.
       // This checks for async generator functions. All other async transformation is handled by esbuild.
       forceAsyncTransformation = data.includes('async') && /async\s+function\s*\*/.test(data);
@@ -77,7 +86,7 @@ export class JavaScriptTransformer {
       // Send the async check result if present to avoid rechecking in the worker
       forceAsyncTransformation,
       skipLinker,
-      ...this.options,
+      ...this.#commonOptions,
     });
   }
 
