@@ -152,7 +152,8 @@ export async function normalizeOptions(
     crossOrigin,
     externalDependencies,
     poll,
-    preserveSymlinks,
+    // If not explicitly set, default to the Node.js process argument
+    preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
