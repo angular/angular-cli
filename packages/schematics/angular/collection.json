@@ -115,6 +115,11 @@
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",
       "description": "Create a Web Worker."
+    },
+    "environments": {
+      "factory": "./environments",
+      "schema": "./environments/schema.json",
+      "description": "Generate project environment files."
     }
   }
 }
