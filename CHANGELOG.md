@@ -1,3 +1,22 @@
+<a name="15.0.3"></a>
+
+# 15.0.3 (2022-12-07)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [3d9971edb](https://github.com/angular/angular-cli/commit/3d9971edb05e9b8de24bafc1b4381cbf4bad8dbf) | fix  | default preserve symlinks to Node.js value for esbuild      |
+| [24f4b51d2](https://github.com/angular/angular-cli/commit/24f4b51d22a0debc8ff853cf9040a15273654f7a) | fix  | downlevel class fields with Safari <= v15 for esbuild       |
+| [45afc42db](https://github.com/angular/angular-cli/commit/45afc42db86e58357d1618d9984dcf03bffea957) | fix  | downlevel class properties when targeting Safari <=v15      |
+| [e6461badf](https://github.com/angular/angular-cli/commit/e6461badf7959ff8b8d9a3824a4a081f44e0b237) | fix  | prevent optimization adding unsupported ECMASCript features |
+
+## Special Thanks
+
+Charles Lyding, Dominic Elm and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.0-next.1"></a>
 
 # 15.1.0-next.1 (2022-11-30)
