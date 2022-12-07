@@ -29,7 +29,12 @@ import {
   profileSync,
   resetCumulativeDurations,
 } from './profiling';
-import { BundleStylesheetOptions, bundleStylesheetFile, bundleStylesheetText } from './stylesheets';
+import { BundleStylesheetOptions, bundleComponentStylesheet } from './stylesheets';
+
+/**
+ * A counter for component styles used to generate unique build-time identifiers for each stylesheet.
+ */
+let componentStyleCounter = 0;
 
 /**
  * Converts TypeScript Diagnostic related information into an esbuild compatible note object.
@@ -150,7 +155,7 @@ export interface CompilerPluginOptions {
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
-  styleOptions: BundleStylesheetOptions,
+  styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
 ): Plugin {
   return {
     name: 'angular-compiler',
@@ -253,21 +258,15 @@ export function createCompilerPlugin(
             // Stylesheet file only exists for external stylesheets
             const filename = stylesheetFile ?? containingFile;
 
-            // Temporary workaround for lack of virtual file support in the Sass plugin.
-            // External Sass stylesheets are transformed using the file instead of the already read content.
-            let stylesheetResult;
-            if (filename.endsWith('.scss') || filename.endsWith('.sass')) {
-              stylesheetResult = await bundleStylesheetFile(filename, styleOptions);
-            } else {
-              stylesheetResult = await bundleStylesheetText(
-                data,
-                {
-                  resolvePath: path.dirname(filename),
-                  virtualName: filename,
-                },
-                styleOptions,
-              );
-            }
+            const stylesheetResult = await bundleComponentStylesheet(
+              // TODO: Evaluate usage of a fast hash instead
+              `${++componentStyleCounter}`,
+              styleOptions.inlineStyleLanguage,
+              data,
+              filename,
+              !stylesheetFile,
+              styleOptions,
+            );
 
             const { contents, resourceFiles, errors, warnings } = stylesheetResult;
             (result.errors ??= []).push(...errors);
