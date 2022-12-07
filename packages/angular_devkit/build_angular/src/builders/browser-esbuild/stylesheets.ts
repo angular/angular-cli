@@ -7,7 +7,7 @@
  */
 
 import type { BuildOptions, OutputFile } from 'esbuild';
-import * as path from 'path';
+import * as path from 'node:path';
 import { createCssResourcePlugin } from './css-resource-plugin';
 import { bundle } from './esbuild';
 import { createSassPlugin } from './sass-plugin';
@@ -25,6 +25,7 @@ export interface BundleStylesheetOptions {
 
 export function createStylesheetBundleOptions(
   options: BundleStylesheetOptions,
+  inlineComponentData?: Record<string, string>,
 ): BuildOptions & { plugins: NonNullable<BuildOptions['plugins']> } {
   return {
     absWorkingDir: options.workspaceRoot,
@@ -43,21 +44,74 @@ export function createStylesheetBundleOptions(
     conditions: ['style', 'sass'],
     mainFields: ['style', 'sass'],
     plugins: [
-      createSassPlugin({ sourcemap: !!options.sourcemap, loadPaths: options.includePaths }),
+      createSassPlugin({
+        sourcemap: !!options.sourcemap,
+        loadPaths: options.includePaths,
+        inlineComponentData,
+      }),
       createCssResourcePlugin(),
     ],
   };
 }
 
-async function bundleStylesheet(
-  entry: Required<Pick<BuildOptions, 'stdin'> | Pick<BuildOptions, 'entryPoints'>>,
+/**
+ * Bundles a component stylesheet. The stylesheet can be either an inline stylesheet that
+ * is contained within the Component's metadata definition or an external file referenced
+ * from the Component's metadata definition.
+ *
+ * @param identifier A unique string identifier for the component stylesheet.
+ * @param language The language of the stylesheet such as `css` or `scss`.
+ * @param data The string content of the stylesheet.
+ * @param filename The filename representing the source of the stylesheet content.
+ * @param inline If true, the stylesheet source is within the component metadata;
+ * if false, the source is a stylesheet file.
+ * @param options An object containing the stylesheet bundling options.
+ * @returns An object containing the output of the bundling operation.
+ */
+export async function bundleComponentStylesheet(
+  identifier: string,
+  language: string,
+  data: string,
+  filename: string,
+  inline: boolean,
   options: BundleStylesheetOptions,
 ) {
-  // Execute esbuild
-  const result = await bundle(options.workspaceRoot, {
-    ...createStylesheetBundleOptions(options),
-    ...entry,
+  const namespace = 'angular:styles/component';
+  const entry = [namespace, language, identifier, filename].join(';');
+
+  const buildOptions = createStylesheetBundleOptions(options, { [entry]: data });
+  buildOptions.entryPoints = [entry];
+  buildOptions.plugins.push({
+    name: 'angular-component-styles',
+    setup(build) {
+      build.onResolve({ filter: /^angular:styles\/component;/ }, (args) => {
+        if (args.kind !== 'entry-point') {
+          return null;
+        }
+
+        if (inline) {
+          return {
+            path: args.path,
+            namespace,
+          };
+        } else {
+          return {
+            path: filename,
+          };
+        }
+      });
+      build.onLoad({ filter: /^angular:styles\/component;css;/, namespace }, async () => {
+        return {
+          contents: data,
+          loader: 'css',
+          resolveDir: path.dirname(filename),
+        };
+      });
+    },
   });
+
+  // Execute esbuild
+  const result = await bundle(options.workspaceRoot, buildOptions);
 
   // Extract the result of the bundling from the output files
   let contents = '';
@@ -87,43 +141,4 @@ async function bundleStylesheet(
     path: outputPath,
     resourceFiles,
   };
-}
-
-/**
- * Bundle a stylesheet that exists as a file on the filesystem.
- *
- * @param filename The path to the file to bundle.
- * @param options The stylesheet bundling options to use.
- * @returns The bundle result object.
- */
-export async function bundleStylesheetFile(filename: string, options: BundleStylesheetOptions) {
-  return bundleStylesheet({ entryPoints: [filename] }, options);
-}
-
-/**
- * Bundle stylesheet text data from a string.
- *
- * @param data The string content of a stylesheet to bundle.
- * @param dataOptions The options to use to resolve references and name output of the stylesheet data.
- * @param bundleOptions  The stylesheet bundling options to use.
- * @returns The bundle result object.
- */
-export async function bundleStylesheetText(
-  data: string,
-  dataOptions: { resolvePath: string; virtualName?: string },
-  bundleOptions: BundleStylesheetOptions,
-) {
-  const result = bundleStylesheet(
-    {
-      stdin: {
-        contents: data,
-        sourcefile: dataOptions.virtualName,
-        resolveDir: dataOptions.resolvePath,
-        loader: 'css',
-      },
-    },
-    bundleOptions,
-  );
-
-  return result;
 }

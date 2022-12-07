@@ -6,15 +6,22 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { PartialMessage, Plugin, PluginBuild } from 'esbuild';
+import type { OnLoadResult, PartialMessage, Plugin, PluginBuild, ResolveResult } from 'esbuild';
+import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { dirname, join, relative } from 'node:path';
+import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CompileResult, Exception } from 'sass';
+import type { CompileResult, Exception, Syntax } from 'sass';
 import {
   FileImporterWithRequestContextOptions,
   SassWorkerImplementation,
 } from '../../sass/sass-service';
+
+export interface SassPluginOptions {
+  sourcemap: boolean;
+  loadPaths?: string[];
+  inlineComponentData?: Record<string, string>;
+}
 
 let sassWorkerPool: SassWorkerImplementation | undefined;
 
@@ -27,7 +34,7 @@ export function shutdownSassWorkerPool(): void {
   sassWorkerPool = undefined;
 }
 
-export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: string[] }): Plugin {
+export function createSassPlugin(options: SassPluginOptions): Plugin {
   return {
     name: 'angular-sass',
     setup(build: PluginBuild): void {
@@ -55,103 +62,121 @@ export function createSassPlugin(options: { sourcemap: boolean; loadPaths?: stri
         return result;
       };
 
+      build.onLoad(
+        { filter: /^angular:styles\/component;s[ac]ss;/, namespace: 'angular:styles/component' },
+        async (args) => {
+          const data = options.inlineComponentData?.[args.path];
+          assert(data, `component style name should always be found [${args.path}]`);
+
+          const [, language, , filePath] = args.path.split(';', 4);
+          const syntax = language === 'sass' ? 'indented' : 'scss';
+
+          return compileString(data, filePath, syntax, options, resolveUrl);
+        },
+      );
+
       build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
-        // Lazily load Sass when a Sass file is found
-        sassWorkerPool ??= new SassWorkerImplementation(true);
+        const data = await readFile(args.path, 'utf-8');
+        const syntax = extname(args.path).toLowerCase() === '.sass' ? 'indented' : 'scss';
 
-        const warnings: PartialMessage[] = [];
-        try {
-          const data = await readFile(args.path, 'utf-8');
-          const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {
-            url: pathToFileURL(args.path),
-            style: 'expanded',
-            loadPaths: options.loadPaths,
-            sourceMap: options.sourcemap,
-            sourceMapIncludeSources: options.sourcemap,
-            quietDeps: true,
-            importers: [
-              {
-                findFileUrl: async (
-                  url,
-                  { previousResolvedModules }: FileImporterWithRequestContextOptions,
-                ): Promise<URL | null> => {
-                  const result = await resolveUrl(url, previousResolvedModules);
-
-                  // Check for package deep imports
-                  if (!result.path) {
-                    const parts = url.split('/');
-                    const hasScope = parts.length >= 2 && parts[0].startsWith('@');
-                    const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
-                    const packageName = hasScope
-                      ? `${nameOrScope}/${nameOrFirstPath}`
-                      : nameOrScope;
-
-                    const packageResult = await resolveUrl(
-                      packageName + '/package.json',
-                      previousResolvedModules,
-                    );
-
-                    if (packageResult.path) {
-                      return pathToFileURL(
-                        join(
-                          dirname(packageResult.path),
-                          !hasScope ? nameOrFirstPath : '',
-                          ...pathPart,
-                        ),
-                      );
-                    }
-                  }
-
-                  return result.path ? pathToFileURL(result.path) : null;
-                },
-              },
-            ],
-            logger: {
-              warn: (text, { deprecation, span }) => {
-                warnings.push({
-                  text: deprecation ? 'Deprecation' : text,
-                  location: span && {
-                    file: span.url && fileURLToPath(span.url),
-                    lineText: span.context,
-                    // Sass line numbers are 0-based while esbuild's are 1-based
-                    line: span.start.line + 1,
-                    column: span.start.column,
-                  },
-                  notes: deprecation ? [{ text }] : undefined,
-                });
-              },
-            },
-          });
-
-          return {
-            loader: 'css',
-            contents: sourceMap
-              ? `${css}\n${sourceMapToUrlComment(sourceMap, dirname(args.path))}`
-              : css,
-            watchFiles: loadedUrls.map((url) => fileURLToPath(url)),
-            warnings,
-          };
-        } catch (error) {
-          if (isSassException(error)) {
-            const file = error.span.url ? fileURLToPath(error.span.url) : undefined;
-
-            return {
-              loader: 'css',
-              errors: [
-                {
-                  text: error.message,
-                },
-              ],
-              warnings,
-              watchFiles: file ? [file] : undefined,
-            };
-          }
-
-          throw error;
-        }
+        return compileString(data, args.path, syntax, options, resolveUrl);
       });
     },
   };
+}
+
+async function compileString(
+  data: string,
+  filePath: string,
+  syntax: Syntax,
+  options: SassPluginOptions,
+  resolveUrl: (url: string, previousResolvedModules?: Set<string>) => Promise<ResolveResult>,
+): Promise<OnLoadResult> {
+  // Lazily load Sass when a Sass file is found
+  sassWorkerPool ??= new SassWorkerImplementation(true);
+
+  const warnings: PartialMessage[] = [];
+  try {
+    const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {
+      url: pathToFileURL(filePath),
+      style: 'expanded',
+      syntax,
+      loadPaths: options.loadPaths,
+      sourceMap: options.sourcemap,
+      sourceMapIncludeSources: options.sourcemap,
+      quietDeps: true,
+      importers: [
+        {
+          findFileUrl: async (
+            url,
+            { previousResolvedModules }: FileImporterWithRequestContextOptions,
+          ): Promise<URL | null> => {
+            const result = await resolveUrl(url, previousResolvedModules);
+
+            // Check for package deep imports
+            if (!result.path) {
+              const parts = url.split('/');
+              const hasScope = parts.length >= 2 && parts[0].startsWith('@');
+              const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
+              const packageName = hasScope ? `${nameOrScope}/${nameOrFirstPath}` : nameOrScope;
+
+              const packageResult = await resolveUrl(
+                packageName + '/package.json',
+                previousResolvedModules,
+              );
+
+              if (packageResult.path) {
+                return pathToFileURL(
+                  join(dirname(packageResult.path), !hasScope ? nameOrFirstPath : '', ...pathPart),
+                );
+              }
+            }
+
+            return result.path ? pathToFileURL(result.path) : null;
+          },
+        },
+      ],
+      logger: {
+        warn: (text, { deprecation, span }) => {
+          warnings.push({
+            text: deprecation ? 'Deprecation' : text,
+            location: span && {
+              file: span.url && fileURLToPath(span.url),
+              lineText: span.context,
+              // Sass line numbers are 0-based while esbuild's are 1-based
+              line: span.start.line + 1,
+              column: span.start.column,
+            },
+            notes: deprecation ? [{ text }] : undefined,
+          });
+        },
+      },
+    });
+
+    return {
+      loader: 'css',
+      contents: sourceMap ? `${css}\n${sourceMapToUrlComment(sourceMap, dirname(filePath))}` : css,
+      watchFiles: loadedUrls.map((url) => fileURLToPath(url)),
+      warnings,
+    };
+  } catch (error) {
+    if (isSassException(error)) {
+      const file = error.span.url ? fileURLToPath(error.span.url) : undefined;
+
+      return {
+        loader: 'css',
+        errors: [
+          {
+            text: error.message,
+          },
+        ],
+        warnings,
+        watchFiles: file ? [file] : undefined,
+      };
+    }
+
+    throw error;
+  }
 }
 
 function sourceMapToUrlComment(

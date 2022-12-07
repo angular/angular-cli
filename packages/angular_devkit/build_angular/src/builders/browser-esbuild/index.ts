@@ -242,6 +242,7 @@ function createCodeBundleOptions(
     preserveSymlinks,
     stylePreprocessorOptions,
     advancedOptimizations,
+    inlineStyleLanguage,
   } = options;
 
   return {
@@ -292,6 +293,7 @@ function createCodeBundleOptions(
           includePaths: stylePreprocessorOptions?.includePaths,
           externalDependencies,
           target,
+          inlineStyleLanguage,
         },
       ),
     ],

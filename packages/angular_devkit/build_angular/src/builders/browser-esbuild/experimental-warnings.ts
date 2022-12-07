@@ -23,11 +23,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   // 'i18nDuplicateTranslation',
   // 'i18nMissingTranslation',
 
-  // * Stylesheet preprocessor support
-  'inlineStyleLanguage',
-  // The following option has no effect until preprocessors are supported
-  // 'stylePreprocessorOptions',
-
   // * Deprecated
   'deployUrl',
 
@@ -60,12 +55,13 @@ export function logExperimentalWarnings(options: BrowserBuilderOptions, context:
     if (typeof value === 'object' && Object.keys(value).length === 0) {
       continue;
     }
-    if (unsupportedOption === 'inlineStyleLanguage' && value === 'css') {
-      continue;
-    }
 
     context.logger.warn(
       `The '${unsupportedOption}' option is currently unsupported by this experimental builder and will be ignored.`,
     );
+  }
+
+  if (options.inlineStyleLanguage === 'less') {
+    context.logger.warn('The less stylesheet preprocessor is not currently supported.');
   }
 }
