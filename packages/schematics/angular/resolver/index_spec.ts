@@ -37,16 +37,12 @@ describe('resolver Schematic', () => {
   };
   let appTree: UnitTestTree;
   beforeEach(async () => {
-    appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner
-      .runSchematicAsync('application', appOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
   it('should create a resolver', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('resolver', defaultOptions, appTree)
-      .toPromise();
+    const tree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.resolver.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.resolver.ts');
@@ -55,7 +51,7 @@ describe('resolver Schematic', () => {
   it('should respect the skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
-    const tree = await schematicRunner.runSchematicAsync('resolver', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('resolver', options, appTree);
     const files = tree.files;
     expect(files).not.toContain('/projects/bar/src/app/foo.resolver.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.resolver.ts');
@@ -64,7 +60,7 @@ describe('resolver Schematic', () => {
   it('should respect the flat flag', async () => {
     const options = { ...defaultOptions, flat: false };
 
-    const tree = await schematicRunner.runSchematicAsync('resolver', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('resolver', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.resolver.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.resolver.ts');
@@ -74,16 +70,16 @@ describe('resolver Schematic', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = await schematicRunner
-      .runSchematicAsync('resolver', defaultOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.resolver.ts');
   });
 
   it('should create a functional resolver', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('resolver', { ...defaultOptions, functional: true }, appTree)
-      .toPromise();
+    const tree = await schematicRunner.runSchematic(
+      'resolver',
+      { ...defaultOptions, functional: true },
+      appTree,
+    );
     const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.ts');
     expect(fileString).toContain(
       'export const fooResolver: ResolveFn<boolean> = (route, state) => {',
@@ -91,9 +87,11 @@ describe('resolver Schematic', () => {
   });
 
   it('should create a helper function to run a functional resolver in a test', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('resolver', { ...defaultOptions, functional: true }, appTree)
-      .toPromise();
+    const tree = await schematicRunner.runSchematic(
+      'resolver',
+      { ...defaultOptions, functional: true },
+      appTree,
+    );
     const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.spec.ts');
     expect(fileString).toContain(
       'const executeResolver: ResolveFn<boolean> = (...resolverParameters) => ',

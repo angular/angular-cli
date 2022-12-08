@@ -10,15 +10,13 @@ describe('my-full-schematic', () => {
     // We test that
     const runner = new SchematicTestRunner('schematics', collectionPath);
     await expectAsync(
-      runner.runSchematicAsync('my-full-schematic', {}, Tree.empty()).toPromise(),
+      runner.runSchematic('my-full-schematic', {}, Tree.empty())
     ).toBeRejected();
   });
 
   it('works', async () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    const tree = await runner
-      .runSchematicAsync('my-full-schematic', { name: 'str' }, Tree.empty())
-      .toPromise();
+    const tree = await runner.runSchematic('my-full-schematic', { name: 'str' }, Tree.empty());
 
     // Listing files
     expect(tree.files.sort()).toEqual(['/allo', '/hola', '/test1', '/test2']);

@@ -35,7 +35,7 @@ describe('Migration to delete platform-server exports', () => {
         `,
       );
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       const content = newTree.readText(testTypeScriptFilePath);
       expect(content).not.toContain('@angular/platform-server');
       expect(content).toContain(`import { Path, join } from '@angular-devkit/core';`);
@@ -50,7 +50,7 @@ describe('Migration to delete platform-server exports', () => {
         `,
       );
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       const content = newTree.readContent(testTypeScriptFilePath);
       expect(content).toContain(`import { Path, join } from '@angular-devkit/core';`);
       expect(content).toContain(`export { ServerModule } from '@angular/platform-server';`);
@@ -64,7 +64,7 @@ describe('Migration to delete platform-server exports', () => {
         `,
       );
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       const content = newTree.readText(testTypeScriptFilePath);
       expect(content).toContain(`export { renderModule } from '@angular/core';`);
     });
@@ -77,7 +77,7 @@ describe('Migration to delete platform-server exports', () => {
         `,
       );
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       const content = newTree.readText(testTypeScriptFilePath);
       expect(content).toContain(`import { renderModule } from '@angular/platform-server'`);
     });

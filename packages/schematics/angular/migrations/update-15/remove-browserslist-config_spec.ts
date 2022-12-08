@@ -29,7 +29,7 @@ describe('Migration to delete Browserslist configurations', () => {
       tree.create('/src/app/.browserslistrc', DEFAULT_BROWSERS.join('\n'));
       expect(tree.exists('/src/app/.browserslistrc')).toBeTrue();
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       expect(newTree.exists('/src/app/.browserslistrc')).toBeFalse();
     });
 
@@ -37,7 +37,7 @@ describe('Migration to delete Browserslist configurations', () => {
       tree.create('/node_modules/browserslist', DEFAULT_BROWSERS.join('\n'));
       tree.create('/node_modules/.browserslistrc', DEFAULT_BROWSERS.join('\n'));
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       expect(newTree.exists('/node_modules/browserslist')).toBeTrue();
       expect(newTree.exists('/node_modules/.browserslistrc')).toBeTrue();
     });
@@ -47,14 +47,14 @@ describe('Migration to delete Browserslist configurations', () => {
     it('should not delete "browserslist"', async () => {
       tree.create('/src/app/browserslist', 'last 1 Chrome version');
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       expect(newTree.exists('/src/app/browserslist')).toBeTrue();
     });
 
     it('should not delete ".browserslistrc"', async () => {
       tree.create('/src/app/.browserslistrc', 'last 1 Chrome version');
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       expect(newTree.exists('/src/app/.browserslistrc')).toBeTrue();
     });
 
@@ -62,7 +62,7 @@ describe('Migration to delete Browserslist configurations', () => {
       tree.create('/src/app/.browserslistrc', [...DEFAULT_BROWSERS, 'IE 10'].join('\n'));
       expect(tree.exists('/src/app/.browserslistrc')).toBeTrue();
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       expect(newTree.exists('/src/app/.browserslistrc')).toBeFalse();
     });
 
@@ -77,7 +77,7 @@ describe('Migration to delete Browserslist configurations', () => {
       );
       expect(tree.exists('/src/app/.browserslistrc')).toBeTrue();
 
-      const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
       expect(newTree.exists('/src/app/.browserslistrc')).toBeTrue();
     });
   });

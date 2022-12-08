@@ -116,7 +116,7 @@ describe(`Migration to karma builder main file (test.ts)`, () => {
   });
 
   it(`should remove 'declare const require' and 'require.context' usages`, async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     expect(newTree.readText('test.ts')).toBe(tags.stripIndents`
       import { getTestBed } from '@angular/core/testing';
       import {
@@ -133,7 +133,7 @@ describe(`Migration to karma builder main file (test.ts)`, () => {
   });
 
   it(`should remove multiple 'require.context' usages`, async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     expect(newTree.readText('test-multiple-context.ts')).toBe(tags.stripIndents`
       import { getTestBed } from '@angular/core/testing';
       import {

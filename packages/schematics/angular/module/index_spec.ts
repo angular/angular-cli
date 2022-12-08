@@ -39,16 +39,14 @@ describe('Module Schematic', () => {
   };
   let appTree: UnitTestTree;
   beforeEach(async () => {
-    appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner
-      .runSchematicAsync('application', appOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
   it('should create a module', async () => {
     const options = { ...defaultOptions };
 
-    const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('module', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
   });
@@ -56,7 +54,7 @@ describe('Module Schematic', () => {
   it('should import into another module', async () => {
     const options = { ...defaultOptions, module: 'app.module.ts' };
 
-    const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('module', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(content).toMatch(/import { FooModule } from '.\/foo\/foo.module'/);
     expect(content).toMatch(/imports: \[[^\]]*FooModule[^\]]*\]/m);
@@ -65,7 +63,7 @@ describe('Module Schematic', () => {
   it('should import into another module when using flat', async () => {
     const options = { ...defaultOptions, flat: true, module: 'app.module.ts' };
 
-    const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('module', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(content).toMatch(/import { FooModule } from '.\/foo.module'/);
     expect(content).toMatch(/imports: \[[^\]]*FooModule[^\]]*\]/m);
@@ -74,7 +72,7 @@ describe('Module Schematic', () => {
   it('should import into another module when using flat', async () => {
     const options = { ...defaultOptions, flat: true, module: 'app.module.ts' };
 
-    const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('module', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(content).toMatch(/import { FooModule } from '.\/foo.module'/);
     expect(content).toMatch(/imports: \[[^\]]*FooModule[^\]]*\]/m);
@@ -83,29 +81,25 @@ describe('Module Schematic', () => {
   it('should import into another module (deep)', async () => {
     let tree = appTree;
 
-    tree = await schematicRunner
-      .runSchematicAsync(
-        'module',
-        {
-          ...defaultOptions,
-          path: 'projects/bar/src/app/sub1',
-          name: 'test1',
-        },
-        tree,
-      )
-      .toPromise();
-    tree = await schematicRunner
-      .runSchematicAsync(
-        'module',
-        {
-          ...defaultOptions,
-          path: 'projects/bar/src/app/sub2',
-          name: 'test2',
-          module: '../sub1/test1',
-        },
-        tree,
-      )
-      .toPromise();
+    tree = await schematicRunner.runSchematic(
+      'module',
+      {
+        ...defaultOptions,
+        path: 'projects/bar/src/app/sub1',
+        name: 'test1',
+      },
+      tree,
+    );
+    tree = await schematicRunner.runSchematic(
+      'module',
+      {
+        ...defaultOptions,
+        path: 'projects/bar/src/app/sub2',
+        name: 'test2',
+        module: '../sub1/test1',
+      },
+      tree,
+    );
 
     const content = tree.readContent('/projects/bar/src/app/sub1/test1/test1.module.ts');
     expect(content).toMatch(/import { Test2Module } from '..\/..\/sub2\/test2\/test2.module'/);
@@ -114,7 +108,7 @@ describe('Module Schematic', () => {
   it('should create a routing module', async () => {
     const options = { ...defaultOptions, routing: true };
 
-    const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('module', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo-routing.module.ts');
@@ -129,7 +123,7 @@ describe('Module Schematic', () => {
   it('should dasherize a name', async () => {
     const options = { ...defaultOptions, name: 'TwoWord' };
 
-    const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('module', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/two-word/two-word.module.ts');
   });
@@ -138,9 +132,7 @@ describe('Module Schematic', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = await schematicRunner
-      .runSchematicAsync('module', defaultOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematic('module', defaultOptions, appTree);
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.module.ts');
   });
 
@@ -152,7 +144,7 @@ describe('Module Schematic', () => {
     };
 
     it('should generate a lazy loaded module with a routing module', async () => {
-      const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+      const tree = await schematicRunner.runSchematic('module', options, appTree);
       const files = tree.files;
 
       expect(files).toEqual(
@@ -204,7 +196,7 @@ describe('Module Schematic', () => {
       );
       appTree.delete('/projects/bar/src/app/app-routing.module.ts');
 
-      const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
+      const tree = await schematicRunner.runSchematic('module', options, appTree);
       const files = tree.files;
 
       expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
@@ -226,9 +218,11 @@ describe('Module Schematic', () => {
     });
 
     it('should generate a lazy loaded module when "flat" flag is true', async () => {
-      const tree = await schematicRunner
-        .runSchematicAsync('module', { ...options, flat: true }, appTree)
-        .toPromise();
+      const tree = await schematicRunner.runSchematic(
+        'module',
+        { ...options, flat: true },
+        appTree,
+      );
       const files = tree.files;
 
       expect(files).toEqual(
@@ -250,31 +244,26 @@ describe('Module Schematic', () => {
     });
 
     it('should generate a lazy loaded module and add route in another parallel routing module', async () => {
-      await schematicRunner
-        .runSchematicAsync(
-          'module',
-          {
-            ...defaultOptions,
-            name: 'foo',
-            routing: true,
-          },
-          appTree,
-        )
-        .toPromise();
+      await schematicRunner.runSchematic(
+        'module',
+        {
+          ...defaultOptions,
+          name: 'foo',
+          routing: true,
+        },
+        appTree,
+      );
 
-      const tree = await schematicRunner
-        .runSchematicAsync(
-          'module',
-          {
-            ...defaultOptions,
-            name: 'bar',
-            module: 'foo',
-            route: 'new-route',
-          },
-          appTree,
-        )
-        .toPromise();
-
+      const tree = await schematicRunner.runSchematic(
+        'module',
+        {
+          ...defaultOptions,
+          name: 'bar',
+          module: 'foo',
+          route: 'new-route',
+        },
+        appTree,
+      );
       expect(tree.files).toEqual(
         jasmine.arrayContaining([
           '/projects/bar/src/app/foo/foo-routing.module.ts',
@@ -320,20 +309,17 @@ describe('Module Schematic', () => {
       `,
       );
 
-      const tree = await schematicRunner
-        .runSchematicAsync(
-          'module',
-          {
-            ...defaultOptions,
-            name: 'bar',
-            route: 'bar',
-            routing: true,
-            module: 'app.module.ts',
-          },
-          appTree,
-        )
-        .toPromise();
-
+      const tree = await schematicRunner.runSchematic(
+        'module',
+        {
+          ...defaultOptions,
+          name: 'bar',
+          route: 'bar',
+          routing: true,
+          module: 'app.module.ts',
+        },
+        appTree,
+      );
       const content = tree.readContent('/projects/bar/src/app/bar/bar.module.ts');
       expect(content).toContain('RouterModule.forChild(routes)');
       expect(content).not.toContain('BarRoutingModule');
