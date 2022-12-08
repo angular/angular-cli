@@ -28,6 +28,13 @@ export interface SchemaValidatorOptions {
 }
 
 export interface SchemaValidator {
+  (data: JsonValue, options?: SchemaValidatorOptions): Promise<SchemaValidatorResult>;
+}
+
+/**
+ * @deprecated since 15.2 use the SchemaValidator instead.
+ */
+export interface SchemaValidatorObservable {
   (data: JsonValue, options?: SchemaValidatorOptions): Observable<SchemaValidatorResult>;
 }
 
@@ -72,7 +79,15 @@ export type PromptProvider = (
 ) => SubscribableOrPromise<{ [id: string]: JsonValue }>;
 
 export interface SchemaRegistry {
-  compile(schema: Object): Observable<SchemaValidator>;
+  /**
+   * @deprecated since 15.2 use `compileAsync` instead.
+   */
+  compile(schema: Object): Observable<SchemaValidatorObservable>;
+
+  compileAsync(schema: Object): Promise<SchemaValidator>;
+
+  /** @private */
+  ɵflatten(schema: JsonObject | string): Promise<JsonObject>;
   /**
    * @deprecated since 11.2 without replacement.
    * Producing a flatten schema document does not in all cases produce a schema with identical behavior to the original.

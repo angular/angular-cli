@@ -197,7 +197,7 @@ export async function parseJsonSchemaToOptions(
     options.push(option);
   }
 
-  const flattenedSchema = await registry.flatten(schema).toPromise();
+  const flattenedSchema = await registry.ɵflatten(schema);
   json.schema.visitJsonSchema(flattenedSchema, visitor);
 
   // Sort by positional and name.

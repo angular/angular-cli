@@ -65,9 +65,9 @@ export class JobOutputSchemaValidationError extends schema.SchemaValidationExcep
 interface JobHandlerWithExtra extends JobHandler<JsonValue, JsonValue, JsonValue> {
   jobDescription: JobDescription;
 
-  argumentV: Observable<schema.SchemaValidator>;
-  outputV: Observable<schema.SchemaValidator>;
-  inputV: Observable<schema.SchemaValidator>;
+  argumentV: Observable<schema.SchemaValidatorObservable>;
+  outputV: Observable<schema.SchemaValidatorObservable>;
+  inputV: Observable<schema.SchemaValidatorObservable>;
 }
 
 function _jobShare<T>(): MonoTypeOperatorFunction<T> {

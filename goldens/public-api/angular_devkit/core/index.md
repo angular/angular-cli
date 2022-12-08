@@ -172,7 +172,9 @@ class CoreSchemaRegistry implements SchemaRegistry {
     addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void;
     // (undocumented)
     addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
-    compile(schema: JsonSchema): Observable<SchemaValidator>;
+    // @deprecated
+    compile(schema: JsonSchema): Observable<SchemaValidatorObservable>;
+    compileAsync(schema: JsonSchema): Promise<SchemaValidator>;
     // @deprecated
     flatten(schema: JsonObject): Observable<JsonObject>;
     // (undocumented)
@@ -186,6 +188,8 @@ class CoreSchemaRegistry implements SchemaRegistry {
     usePromptProvider(provider: PromptProvider): void;
     // (undocumented)
     useXDeprecatedProvider(onUsage: (message: string) => void): void;
+    // (undocumented)
+    ɵflatten(schema: JsonObject): Promise<JsonObject>;
 }
 
 // @public (undocumented)
@@ -821,6 +825,7 @@ declare namespace schema {
         SchemaValidatorError,
         SchemaValidatorOptions,
         SchemaValidator,
+        SchemaValidatorObservable,
         SchemaFormatter,
         SchemaFormat,
         SmartDefaultProvider,
@@ -872,14 +877,18 @@ interface SchemaRegistry {
     addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void;
     // (undocumented)
     addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
+    // @deprecated (undocumented)
+    compile(schema: Object): Observable<SchemaValidatorObservable>;
     // (undocumented)
-    compile(schema: Object): Observable<SchemaValidator>;
+    compileAsync(schema: Object): Promise<SchemaValidator>;
     // @deprecated (undocumented)
     flatten(schema: JsonObject | string): Observable<JsonObject>;
     // (undocumented)
     usePromptProvider(provider: PromptProvider): void;
     // (undocumented)
     useXDeprecatedProvider(onUsage: (message: string) => void): void;
+    // (undocumented)
+    ɵflatten(schema: JsonObject | string): Promise<JsonObject>;
 }
 
 // @public (undocumented)
@@ -894,11 +903,17 @@ class SchemaValidationException extends BaseException {
 // @public (undocumented)
 interface SchemaValidator {
     // (undocumented)
-    (data: JsonValue, options?: SchemaValidatorOptions): Observable<SchemaValidatorResult>;
+    (data: JsonValue, options?: SchemaValidatorOptions): Promise<SchemaValidatorResult>;
 }
 
 // @public (undocumented)
 type SchemaValidatorError = Partial<ErrorObject>;
+
+// @public @deprecated (undocumented)
+interface SchemaValidatorObservable {
+    // (undocumented)
+    (data: JsonValue, options?: SchemaValidatorOptions): Observable<SchemaValidatorResult>;
+}
 
 // @public (undocumented)
 interface SchemaValidatorOptions {

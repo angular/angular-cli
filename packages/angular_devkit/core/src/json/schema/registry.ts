@@ -25,6 +25,7 @@ import {
   SchemaRegistry,
   SchemaValidator,
   SchemaValidatorError,
+  SchemaValidatorObservable,
   SchemaValidatorOptions,
   SchemaValidatorResult,
   SmartDefaultProvider,
@@ -231,6 +232,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     return from(this._flatten(schema));
   }
 
+  /** @private */
+  ɵflatten(schema: JsonObject): Promise<JsonObject> {
+    return this._flatten(schema);
+  }
+
   private async _flatten(schema: JsonObject): Promise<JsonObject> {
     this._ajv.removeSchema(schema);
 
@@ -273,10 +279,23 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    *
    * @param schema The schema to validate. If a string, will fetch the schema before compiling it
    * (using schema as a URI).
-   * @returns An Observable of the Validation function.
    */
-  compile(schema: JsonSchema): Observable<SchemaValidator> {
-    return from(this._compile(schema)).pipe(
+  async compileAsync(schema: JsonSchema): Promise<SchemaValidator> {
+    const validate = await this._compile(schema);
+
+    return (value, options) => validate(value, options);
+  }
+
+  /**
+   * Compile and return a validation function for the Schema.
+   *
+   * @param schema The schema to validate. If a string, will fetch the schema before compiling it
+   * (using schema as a URI).
+   *
+   * @deprecated since 15.2 use `compileAsync` instead.
+   */
+  compile(schema: JsonSchema): Observable<SchemaValidatorObservable> {
+    return from(this.compileAsync(schema)).pipe(
       map((validate) => (value, options) => from(validate(value, options))),
     );
   }

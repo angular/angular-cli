@@ -22,7 +22,7 @@ import {
 import { WorkspaceHost } from '@angular-devkit/architect/node';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { getSystemPath, join, json, logging, normalize } from '@angular-devkit/core';
-import { Observable, Subject, from as observableFrom, of as observableOf } from 'rxjs';
+import { Observable, Subject, from, from as observableFrom, of as observableOf } from 'rxjs';
 import { catchError, finalize, first, map, mergeMap, shareReplay } from 'rxjs/operators';
 import { BuilderWatcherFactory, WatcherNotifier } from './file-watching';
 
@@ -207,8 +207,8 @@ export class BuilderHarness<T> {
           }
         }
 
-        const validator = await this.schemaRegistry.compile(schema ?? true).toPromise();
-        const { data } = await validator(options).toPromise();
+        const validator = await this.schemaRegistry.compileAsync(schema ?? true);
+        const { data } = await validator(options);
 
         return data as json.JsonObject;
       },
@@ -230,7 +230,7 @@ export class BuilderHarness<T> {
     const logs: logging.LogEntry[] = [];
     context.logger.subscribe((e) => logs.push(e));
 
-    return this.schemaRegistry.compile(this.builderInfo.optionSchema).pipe(
+    return from(this.schemaRegistry.compileAsync(this.builderInfo.optionSchema)).pipe(
       mergeMap((validator) => validator(targetOptions)),
       map((validationResult) => validationResult.data),
       mergeMap((data) =>
