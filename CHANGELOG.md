@@ -1,3 +1,31 @@
+<a name="15.1.0-next.2"></a>
+
+# 15.1.0-next.2 (2022-12-08)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [5b18ce154](https://github.com/angular/angular-cli/commit/5b18ce1545d047d49851a64e81a1f8ef59624ef7) | feat | add `guardType` as an alias of `implements` in guard schematic |
+| [49b313f27](https://github.com/angular/angular-cli/commit/49b313f27adef6300063c9d6817d1454a8657fe2) | fix  | add missing import for functional interceptor spec             |
+| [2f92fe7e5](https://github.com/angular/angular-cli/commit/2f92fe7e589705b282102271897454ea852c4814) | fix  | add missing semicolon in functional guard/resolver/interceptor |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [97716969c](https://github.com/angular/angular-cli/commit/97716969c243d65e385dcd78f5035d2c13f0258b) | fix  | default preserve symlinks to Node.js value for esbuild      |
+| [cf2f30afc](https://github.com/angular/angular-cli/commit/cf2f30afc0ad0ceae34c457955a22186bc5ce60d) | fix  | downlevel class fields with Safari <= v15 for esbuild       |
+| [25eaaa24b](https://github.com/angular/angular-cli/commit/25eaaa24b51af400262b97b4d4be2391ebd4a82d) | fix  | downlevel class properties when targeting Safari <=v15      |
+| [7a063238b](https://github.com/angular/angular-cli/commit/7a063238b83eea8b5b3237fed12db5528d1f6912) | fix  | explicitly send options to JS transformer workers           |
+| [ef99a68b4](https://github.com/angular/angular-cli/commit/ef99a68b46c992c1988c5ca4c6fb066e89762d64) | fix  | prevent optimization adding unsupported ECMASCript features |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Cédric Exbrayat, Dominic Elm, Doug Parker and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.3"></a>
 
 # 15.0.3 (2022-12-07)
