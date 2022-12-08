@@ -26,12 +26,12 @@
     "babel-loader": "9.1.0",
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "4.21.4",
-    "cacache": "17.0.2",
+    "cacache": "17.0.3",
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.2",
-    "esbuild-wasm": "0.15.16",
+    "esbuild-wasm": "0.16.2",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -41,8 +41,8 @@
     "less-loader": "11.1.0",
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.2.1",
-    "magic-string": "0.26.7",
-    "mini-css-extract-plugin": "2.7.1",
+    "magic-string": "0.27.0",
+    "mini-css-extract-plugin": "2.7.2",
     "open": "8.4.0",
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
@@ -56,7 +56,7 @@
     "semver": "7.3.8",
     "source-map-loader": "4.0.1",
     "source-map-support": "0.5.21",
-    "terser": "5.16.0",
+    "terser": "5.16.1",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.4.1",
@@ -67,7 +67,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.15.16"
+    "esbuild": "0.16.2"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0-next",
