@@ -39,18 +39,23 @@ describe('PWA Schematic', () => {
   };
 
   beforeEach(async () => {
-    appTree = await schematicRunner
-      .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-      .toPromise();
-    appTree = await schematicRunner
-      .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runExternalSchematic(
+      '@schematics/angular',
+      'workspace',
+      workspaceOptions,
+    );
+    appTree = await schematicRunner.runExternalSchematic(
+      '@schematics/angular',
+      'application',
+      appOptions,
+      appTree,
+    );
   });
 
   it('should run the service worker schematic', (done) => {
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         const configText = tree.readContent('/angular.json');
         const config = JSON.parse(configText);
@@ -64,8 +69,8 @@ describe('PWA Schematic', () => {
     const dimensions = [72, 96, 128, 144, 152, 192, 384, 512];
     const iconPath = '/projects/bar/src/assets/icons/icon-';
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         dimensions.forEach((d) => {
           const path = `${iconPath}${d}x${d}.png`;
@@ -77,8 +82,8 @@ describe('PWA Schematic', () => {
 
   it('should create a manifest file', (done) => {
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         expect(tree.exists('/projects/bar/src/manifest.webmanifest')).toEqual(true);
         done();
@@ -87,8 +92,8 @@ describe('PWA Schematic', () => {
 
   it('should set the name & short_name in the manifest file', (done) => {
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         const manifestText = tree.readContent('/projects/bar/src/manifest.webmanifest');
         const manifest = JSON.parse(manifestText);
@@ -102,8 +107,8 @@ describe('PWA Schematic', () => {
   it('should set the name & short_name in the manifest file when no title provided', (done) => {
     const options = { ...defaultOptions, title: undefined };
     schematicRunner
-      .runSchematicAsync('ng-add', options, appTree)
-      .toPromise()
+      .runSchematic('ng-add', options, appTree)
+
       .then((tree) => {
         const manifestText = tree.readContent('/projects/bar/src/manifest.webmanifest');
         const manifest = JSON.parse(manifestText);
@@ -116,8 +121,8 @@ describe('PWA Schematic', () => {
 
   it('should update the index file', (done) => {
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         const content = tree.readContent('projects/bar/src/index.html');
 
@@ -135,8 +140,8 @@ describe('PWA Schematic', () => {
     index = index.replace('</body>', '<noscript>NO JAVASCRIPT</noscript></body>');
     appTree.overwrite('projects/bar/src/index.html', index);
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         const content = tree.readContent('projects/bar/src/index.html');
 
@@ -152,8 +157,8 @@ describe('PWA Schematic', () => {
 
   it('should update the build and test assets configuration', (done) => {
     schematicRunner
-      .runSchematicAsync('ng-add', defaultOptions, appTree)
-      .toPromise()
+      .runSchematic('ng-add', defaultOptions, appTree)
+
       .then((tree) => {
         const configText = tree.readContent('/angular.json');
         const config = JSON.parse(configText);

@@ -7,8 +7,7 @@
  */
 
 import { logging, schema } from '@angular-devkit/core';
-import { Observable, of as observableOf } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from, of as observableOf } from 'rxjs';
 import {
   Collection,
   DelegateTree,
@@ -78,34 +77,57 @@ export class SchematicTestRunner {
     this._engineHost.registerCollection(collectionName, collectionPath);
   }
 
+  async runSchematic<SchematicSchemaT extends object>(
+    schematicName: string,
+    opts?: SchematicSchemaT,
+    tree?: Tree,
+  ): Promise<UnitTestTree> {
+    const schematic = this._collection.createSchematic(schematicName, true);
+    const host = observableOf(tree || new HostTree());
+    this._engineHost.clearTasks();
+
+    const newTree = await schematic.call(opts || {}, host, { logger: this._logger }).toPromise();
+
+    return new UnitTestTree(newTree);
+  }
+
+  /**
+   * @deprecated since version 15.1. Use `runSchematic` instead.
+   */
   runSchematicAsync<SchematicSchemaT extends object>(
     schematicName: string,
     opts?: SchematicSchemaT,
     tree?: Tree,
   ): Observable<UnitTestTree> {
-    const schematic = this._collection.createSchematic(schematicName, true);
+    return from(this.runSchematic(schematicName, opts, tree));
+  }
+
+  async runExternalSchematic<SchematicSchemaT extends object>(
+    collectionName: string,
+    schematicName: string,
+    opts?: SchematicSchemaT,
+    tree?: Tree,
+  ): Promise<UnitTestTree> {
+    const externalCollection = this._engine.createCollection(collectionName);
+    const schematic = externalCollection.createSchematic(schematicName, true);
     const host = observableOf(tree || new HostTree());
     this._engineHost.clearTasks();
 
-    return schematic
-      .call(opts || {}, host, { logger: this._logger })
-      .pipe(map((tree) => new UnitTestTree(tree)));
+    const newTree = await schematic.call(opts || {}, host, { logger: this._logger }).toPromise();
+
+    return new UnitTestTree(newTree);
   }
 
+  /**
+   * @deprecated since version 15.1. Use `runExternalSchematic` instead.
+   */
   runExternalSchematicAsync<SchematicSchemaT extends object>(
     collectionName: string,
     schematicName: string,
     opts?: SchematicSchemaT,
     tree?: Tree,
   ): Observable<UnitTestTree> {
-    const externalCollection = this._engine.createCollection(collectionName);
-    const schematic = externalCollection.createSchematic(schematicName, true);
-    const host = observableOf(tree || new HostTree());
-    this._engineHost.clearTasks();
-
-    return schematic
-      .call(opts || {}, host, { logger: this._logger })
-      .pipe(map((tree) => new UnitTestTree(tree)));
+    return from(this.runExternalSchematic(collectionName, schematicName, opts, tree));
   }
 
   callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {

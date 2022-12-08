@@ -176,7 +176,9 @@ export function execute(
           const karmaStart = karmaServer.start();
 
           // Cleanup, signal Karma to exit.
-          return () => karmaStart.then(() => karmaServer.stop());
+          return () => {
+            void karmaStart.then(() => karmaServer.stop());
+          };
         }),
     ),
     defaultIfEmpty({ success: false }),

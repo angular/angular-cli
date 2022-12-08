@@ -9,7 +9,6 @@
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { map } from 'rxjs/operators';
 import * as semver from 'semver';
 import { angularMajorCompatGuarantee } from './index';
 
@@ -51,8 +50,8 @@ describe('@schematics/update', () => {
     appTree = new UnitTestTree(new HostTree(host));
   });
 
-  it('ignores dependencies not hosted on the NPM registry', (done) => {
-    const tree = new UnitTestTree(
+  it('ignores dependencies not hosted on the NPM registry', async () => {
+    let newTree = new UnitTestTree(
       new HostTree(
         new virtualFs.test.TestHost({
           '/package.json': `{
@@ -65,22 +64,15 @@ describe('@schematics/update', () => {
       ),
     );
 
-    schematicRunner
-      .runSchematicAsync('update', undefined, tree)
-      .pipe(
-        map((t) => {
-          const packageJson = JSON.parse(t.readContent('/package.json'));
-          expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe(
-            'file:update-base-1.0.0.tgz',
-          );
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    newTree = await schematicRunner.runSchematic('update', undefined, newTree);
+    const packageJson = JSON.parse(newTree.readContent('/package.json'));
+    expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe(
+      'file:update-base-1.0.0.tgz',
+    );
   }, 45000);
 
   it('should not error with yarn 2.0 protocols', async () => {
-    const tree = new UnitTestTree(
+    let newTree = new UnitTestTree(
       new HostTree(
         new virtualFs.test.TestHost({
           '/package.json': `{
@@ -94,20 +86,18 @@ describe('@schematics/update', () => {
       ),
     );
 
-    const newTree = await schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular-devkit-tests/update-base'],
-        },
-        tree,
-      )
-      .toPromise();
+    newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit-tests/update-base'],
+      },
+      newTree,
+    );
     const { dependencies } = JSON.parse(newTree.readContent('/package.json'));
     expect(dependencies['@angular-devkit-tests/update-base']).toBe('1.1.0');
   });
 
-  it('updates Angular as compatible with Angular N-1', (done) => {
+  it('updates Angular as compatible with Angular N-1', async () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
@@ -121,25 +111,18 @@ describe('@schematics/update', () => {
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
     );
 
-    schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular/core@^6.0.0'],
-        },
-        appTree,
-      )
-      .pipe(
-        map((tree) => {
-          const packageJson = JSON.parse(tree.readContent('/package.json'));
-          expect(packageJson['dependencies']['@angular/core'][0]).toBe('6');
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    const newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular/core@^6.0.0'],
+      },
+      appTree,
+    );
+    const newPpackageJson = JSON.parse(newTree.readContent('/package.json'));
+    expect(newPpackageJson['dependencies']['@angular/core'][0]).toBe('6');
   }, 45000);
 
-  it('updates Angular as compatible with Angular N-1 (2)', (done) => {
+  it('updates Angular as compatible with Angular N-1 (2)', async () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
@@ -159,25 +142,19 @@ describe('@schematics/update', () => {
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
     );
 
-    schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular/core@^6.0.0'],
-        },
-        appTree,
-      )
-      .pipe(
-        map((tree) => {
-          const packageJson = JSON.parse(tree.readContent('/package.json'));
-          expect(packageJson['dependencies']['@angular/core'][0]).toBe('6');
-          expect(packageJson['dependencies']['rxjs'][0]).toBe('6');
-          expect(packageJson['dependencies']['typescript'][0]).toBe('2');
-          expect(packageJson['dependencies']['typescript'][2]).not.toBe('4');
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    const newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular/core@^6.0.0'],
+      },
+      appTree,
+    );
+
+    const newPackageJson = JSON.parse(newTree.readContent('/package.json'));
+    expect(newPackageJson['dependencies']['@angular/core'][0]).toBe('6');
+    expect(newPackageJson['dependencies']['rxjs'][0]).toBe('6');
+    expect(newPackageJson['dependencies']['typescript'][0]).toBe('2');
+    expect(newPackageJson['dependencies']['typescript'][2]).not.toBe('4');
   }, 45000);
 
   it('uses packageGroup for versioning', async () => {
@@ -192,26 +169,19 @@ describe('@schematics/update', () => {
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
     );
 
-    await schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular-devkit-tests/update-package-group-1'],
-        },
-        appTree,
-      )
-      .pipe(
-        map((tree) => {
-          const packageJson = JSON.parse(tree.readContent('/package.json'));
-          const deps = packageJson['dependencies'];
-          expect(deps['@angular-devkit-tests/update-package-group-1']).toBe('1.2.0');
-          expect(deps['@angular-devkit-tests/update-package-group-2']).toBe('2.0.0');
-        }),
-      )
-      .toPromise();
+    const newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit-tests/update-package-group-1'],
+      },
+      appTree,
+    );
+    const { dependencies: deps } = JSON.parse(newTree.readContent('/package.json'));
+    expect(deps['@angular-devkit-tests/update-package-group-1']).toBe('1.2.0');
+    expect(deps['@angular-devkit-tests/update-package-group-2']).toBe('2.0.0');
   }, 45000);
 
-  it('can migrate only', (done) => {
+  it('can migrate only', async () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
@@ -221,29 +191,21 @@ describe('@schematics/update', () => {
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
     );
 
-    schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular-devkit-tests/update-migrations'],
-          migrateOnly: true,
-        },
-        appTree,
-      )
-      .pipe(
-        map((tree) => {
-          const packageJson = JSON.parse(tree.readContent('/package.json'));
-          expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('1.0.0');
-          expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe(
-            '1.0.0',
-          );
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    const newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit-tests/update-migrations'],
+        migrateOnly: true,
+      },
+      appTree,
+    );
+
+    const newPackageJson = JSON.parse(newTree.readContent('/package.json'));
+    expect(newPackageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('1.0.0');
+    expect(newPackageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe('1.0.0');
   }, 45000);
 
-  it('can migrate from only', (done) => {
+  it('can migrate from only', async () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
@@ -253,29 +215,20 @@ describe('@schematics/update', () => {
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
     );
 
-    schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular-devkit-tests/update-migrations'],
-          migrateOnly: true,
-          from: '0.1.2',
-        },
-        appTree,
-      )
-      .pipe(
-        map((tree) => {
-          const packageJson = JSON.parse(tree.readContent('/package.json'));
-          expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe(
-            '1.6.0',
-          );
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    const newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit-tests/update-migrations'],
+        migrateOnly: true,
+        from: '0.1.2',
+      },
+      appTree,
+    );
+    const { dependencies } = JSON.parse(newTree.readContent('/package.json'));
+    expect(dependencies['@angular-devkit-tests/update-migrations']).toBe('1.6.0');
   }, 45000);
 
-  it('can install and migrate with --from (short version number)', (done) => {
+  it('can install and migrate with --from (short version number)', async () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
@@ -285,29 +238,20 @@ describe('@schematics/update', () => {
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
     );
 
-    schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular-devkit-tests/update-migrations'],
-          migrateOnly: true,
-          from: '0',
-        },
-        appTree,
-      )
-      .pipe(
-        map((tree) => {
-          const packageJson = JSON.parse(tree.readContent('/package.json'));
-          expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations']).toBe(
-            '1.6.0',
-          );
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    const newTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit-tests/update-migrations'],
+        migrateOnly: true,
+        from: '0',
+      },
+      appTree,
+    );
+    const { dependencies } = JSON.parse(newTree.readContent('/package.json'));
+    expect(dependencies['@angular-devkit-tests/update-migrations']).toBe('1.6.0');
   }, 45000);
 
-  it('validates peer dependencies', (done) => {
+  it('validates peer dependencies', async () => {
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
     const dependencies = packageJson['dependencies'];
@@ -326,27 +270,16 @@ describe('@schematics/update', () => {
     const hasPeerdepMsg = (dep: string) =>
       messages.some((str) => str.includes(`missing peer dependency of "${dep}"`));
 
-    schematicRunner
-      .runSchematicAsync(
-        'update',
-        {
-          packages: ['@angular-devkit/build-angular'],
-          next: true,
-        },
-        appTree,
-      )
-      .pipe(
-        map(() => {
-          expect(hasPeerdepMsg('@angular/compiler-cli')).toBeTruthy(
-            `Should show @angular/compiler-cli message.`,
-          );
-          expect(hasPeerdepMsg('typescript')).toBeTruthy(`Should show typescript message.`);
-          expect(hasPeerdepMsg('@angular/localize')).toBeFalsy(
-            `Should not show @angular/localize message.`,
-          );
-        }),
-      )
-      .toPromise()
-      .then(done, done.fail);
+    await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit/build-angular'],
+        next: true,
+      },
+      appTree,
+    );
+    expect(hasPeerdepMsg('@angular/compiler-cli')).toBeTruthy();
+    expect(hasPeerdepMsg('typescript')).toBeTruthy();
+    expect(hasPeerdepMsg('@angular/localize')).toBeFalsy();
   }, 45000);
 });

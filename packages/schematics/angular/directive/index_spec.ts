@@ -41,16 +41,14 @@ describe('Directive Schematic', () => {
   };
   let appTree: UnitTestTree;
   beforeEach(async () => {
-    appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
-    appTree = await schematicRunner
-      .runSchematicAsync('application', appOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
   it('should create a directive', async () => {
     const options = { ...defaultOptions };
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.directive.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.directive.ts');
@@ -62,7 +60,7 @@ describe('Directive Schematic', () => {
   it('should create respect the flat flag', async () => {
     const options = { ...defaultOptions, flat: false };
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.directive.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.directive.ts');
@@ -84,7 +82,7 @@ describe('Directive Schematic', () => {
     `,
     );
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const fooModuleContent = tree.readContent(fooModule);
     expect(fooModuleContent).toMatch(/import { FooDirective } from '.\/foo.directive'/);
   });
@@ -92,7 +90,7 @@ describe('Directive Schematic', () => {
   it('should export the directive', async () => {
     const options = { ...defaultOptions, export: true };
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}FooDirective\n\1\]/);
   });
@@ -100,7 +98,7 @@ describe('Directive Schematic', () => {
   it('should import into a specified module', async () => {
     const options = { ...defaultOptions, module: 'app.module.ts' };
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const appModule = tree.readContent('/projects/bar/src/app/app.module.ts');
 
     expect(appModule).toMatch(/import { FooDirective } from '.\/foo.directive'/);
@@ -109,22 +107,20 @@ describe('Directive Schematic', () => {
   it('should fail if specified module does not exist', async () => {
     const options = { ...defaultOptions, module: '/projects/bar/src/app/app.moduleXXX.ts' };
 
-    await expectAsync(
-      schematicRunner.runSchematicAsync('directive', options, appTree).toPromise(),
-    ).toBeRejected();
+    await expectAsync(schematicRunner.runSchematic('directive', options, appTree)).toBeRejected();
   });
 
   it('should converts dash-cased-name to a camelCasedSelector', async () => {
     const options = { ...defaultOptions, name: 'my-dir' };
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/my-dir.directive.ts');
     expect(content).toMatch(/selector: '\[appMyDir\]'/);
   });
 
   it('should create the right selector with a path in the name', async () => {
     const options = { ...defaultOptions, name: 'sub/test' };
-    appTree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    appTree = await schematicRunner.runSchematic('directive', options, appTree);
 
     const content = appTree.readContent('/projects/bar/src/app/sub/test.directive.ts');
     expect(content).toMatch(/selector: '\[appTest\]'/);
@@ -132,7 +128,7 @@ describe('Directive Schematic', () => {
 
   it('should use the prefix', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
 
     const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
     expect(content).toMatch(/selector: '\[preFoo\]'/);
@@ -140,7 +136,7 @@ describe('Directive Schematic', () => {
 
   it('should use the default project prefix if none is passed', async () => {
     const options = { ...defaultOptions, prefix: undefined };
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
 
     const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
     expect(content).toMatch(/selector: '\[appFoo\]'/);
@@ -148,7 +144,7 @@ describe('Directive Schematic', () => {
 
   it('should use the supplied prefix if it is ""', async () => {
     const options = { ...defaultOptions, prefix: '' };
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
 
     const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
     expect(content).toMatch(/selector: '\[foo\]'/);
@@ -161,21 +157,20 @@ describe('Directive Schematic', () => {
 
     // should fail without a module in that dir
     await expectAsync(
-      schematicRunner.runSchematicAsync('directive', defaultOptions, appTree).toPromise(),
+      schematicRunner.runSchematic('directive', defaultOptions, appTree),
     ).toBeRejected();
 
     // move the module
     appTree.rename('/projects/bar/src/app/app.module.ts', '/projects/bar/custom/app/app.module.ts');
-    appTree = await schematicRunner
-      .runSchematicAsync('directive', defaultOptions, appTree)
-      .toPromise();
+    appTree = await schematicRunner.runSchematic('directive', defaultOptions, appTree);
+
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.directive.ts');
   });
 
   it('should respect skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.directive.ts');
     expect(files).not.toContain('/projects/bar/src/app/foo.directive.spec.ts');
@@ -183,7 +178,7 @@ describe('Directive Schematic', () => {
 
   it('should create a standalone directive', async () => {
     const options = { ...defaultOptions, standalone: true };
-    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree).toPromise();
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     const directiveContent = tree.readContent('/projects/bar/src/app/foo.directive.ts');
     expect(directiveContent).toContain('standalone: true');

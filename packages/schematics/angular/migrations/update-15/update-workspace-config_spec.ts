@@ -78,7 +78,7 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
   });
 
   it(`should remove 'bundleDependencies'`, async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     const { options, configurations } = getServerTarget(newTree);
 
     expect(options.bundleDependencies).toBeUndefined();
@@ -88,7 +88,7 @@ describe(`Migration to update 'angular.json'. ${schematicName}`, () => {
   });
 
   it(`should add 'vendorChunk: true' to development configuration`, async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     const { options, configurations } = getServerTarget(newTree);
 
     expect(options.bundleDependencies).toBeUndefined();

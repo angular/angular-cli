@@ -94,7 +94,7 @@ describe('Migration to update target and add useDefineForClassFields', () => {
   });
 
   it(`should update target and add useDefineForClassFields in workspace 'tsconfig.json'`, async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     const compilerOptions = getCompilerOptionsValue(newTree, 'tsconfig.json');
     expect(compilerOptions).toEqual(
       jasmine.objectContaining({
@@ -105,7 +105,7 @@ describe('Migration to update target and add useDefineForClassFields', () => {
   });
 
   it(`should remove target value from tsconfig referenced in options and configuration`, async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     {
       const compilerOptions = getCompilerOptionsValue(newTree, 'src/tsconfig.app.prod.json');
       expect(compilerOptions['target']).toBeUndefined();
@@ -119,7 +119,7 @@ describe('Migration to update target and add useDefineForClassFields', () => {
   });
 
   it('should add target and useDefineForClassFields when tsconfig is not extended', async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     const compilerOptions = getCompilerOptionsValue(newTree, 'src/tsconfig.spec.json');
     expect(compilerOptions).toEqual(
       jasmine.objectContaining({
@@ -131,7 +131,7 @@ describe('Migration to update target and add useDefineForClassFields', () => {
 
   it('should not add useDefineForClassFields when tsconfig target is ES2022', async () => {
     createJsonFile(tree, 'tsconfig.json', { compilerOptions: { 'target': 'es2022' } });
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
 
     const compilerOptions = getCompilerOptionsValue(newTree, 'tsconfig.json');
     expect(compilerOptions).toEqual({ target: 'es2022' });
@@ -139,7 +139,7 @@ describe('Migration to update target and add useDefineForClassFields', () => {
 
   it('should not add useDefineForClassFields when tsconfig target is ESNEXT', async () => {
     createJsonFile(tree, 'tsconfig.json', { compilerOptions: { 'target': 'esnext' } });
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
 
     const compilerOptions = getCompilerOptionsValue(newTree, 'tsconfig.json');
     expect(compilerOptions).toEqual({ target: 'esnext' });

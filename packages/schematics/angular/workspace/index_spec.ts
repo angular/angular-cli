@@ -24,7 +24,7 @@ describe('Workspace Schematic', () => {
   it('should create all files of a workspace', async () => {
     const options = { ...defaultOptions };
 
-    const tree = await schematicRunner.runSchematicAsync('workspace', options).toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', options);
     const files = tree.files;
     expect(files).toEqual(
       jasmine.arrayContaining([
@@ -42,19 +42,19 @@ describe('Workspace Schematic', () => {
   });
 
   it('should set the name in package.json', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.name).toEqual('foo');
   });
 
   it('should set the CLI version in package.json', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.devDependencies['@angular/cli']).toMatch('6.0.0');
   });
 
   it('should use the latest known versions in package.json', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
     expect(pkg.dependencies['rxjs']).toEqual(latestVersions['rxjs']);
@@ -63,9 +63,10 @@ describe('Workspace Schematic', () => {
   });
 
   it('should create correct files when using minimal', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('workspace', { ...defaultOptions, minimal: true })
-      .toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      minimal: true,
+    });
     const files = tree.files;
     expect(files).toEqual(
       jasmine.arrayContaining([
@@ -84,15 +85,16 @@ describe('Workspace Schematic', () => {
   });
 
   it('should set the `enableI18nLegacyMessageIdFormat` Angular compiler option', async () => {
-    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const { angularCompilerOptions } = parseJson(tree.readContent('tsconfig.json').toString());
     expect(angularCompilerOptions.enableI18nLegacyMessageIdFormat).toBe(false);
   });
 
   it('should not add strict compiler options when false', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('workspace', { ...defaultOptions, strict: false })
-      .toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      strict: false,
+    });
     const { compilerOptions, angularCompilerOptions } = parseJson(
       tree.readContent('tsconfig.json').toString(),
     );
@@ -103,9 +105,10 @@ describe('Workspace Schematic', () => {
   });
 
   it('should add strict compiler options when true', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('workspace', { ...defaultOptions, strict: true })
-      .toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      strict: true,
+    });
     const { compilerOptions, angularCompilerOptions } = parseJson(
       tree.readContent('tsconfig.json').toString(),
     );
@@ -114,9 +117,7 @@ describe('Workspace Schematic', () => {
   });
 
   it('should add vscode testing configuration', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('workspace', { ...defaultOptions })
-      .toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', { ...defaultOptions });
     const { configurations } = parseJson(tree.readContent('.vscode/launch.json').toString());
     expect(configurations).toContain(jasmine.objectContaining({ name: 'ng test' }));
     const { tasks } = parseJson(tree.readContent('.vscode/tasks.json').toString());
@@ -124,9 +125,10 @@ describe('Workspace Schematic', () => {
   });
 
   it('should not add vscode testing configuration when using minimal', async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync('workspace', { ...defaultOptions, minimal: true })
-      .toPromise();
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      minimal: true,
+    });
     const { configurations } = parseJson(tree.readContent('.vscode/launch.json').toString());
     expect(configurations).not.toContain(jasmine.objectContaining({ name: 'ng test' }));
     const { tasks } = parseJson(tree.readContent('.vscode/tasks.json').toString());
