@@ -360,6 +360,7 @@ function getSassLoaderOptions(
           quietDeps: !verbose,
           verbose,
           syntax: indentedSyntax ? 'indented' : 'scss',
+          sourceMapIncludeSources: true,
         }),
       }
     : {
