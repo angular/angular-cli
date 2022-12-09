@@ -272,7 +272,7 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
 
     let outputSource: import('webpack').sources.Source = content;
     if (options.setLocale) {
-      const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});\n`;
+      const setLocaleText = `globalThis.$localize=Object.assign(globalThis.$localize || {},{locale:"${locale}"});\n`;
 
       // If locale data is provided, load it and prepend to file
       let localeDataSource;
