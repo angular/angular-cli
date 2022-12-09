@@ -1347,20 +1347,34 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
+"@bazel/concatjs@5.7.3":
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/@bazel/concatjs/-/concatjs-5.7.3.tgz#a1111713e3e33d3e4ffc4fb5119ef478d2c9916e"
+  integrity sha512-fhqIwX3DT5p9Gy1K6gzBNXHxUmcERKampdsHE2ew5dbXSCFrShwvur3sIuMnp6YVYbHZBUGnx7HtUw5Z34q8mg==
+  dependencies:
+    protobufjs "6.8.8"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
+
 "@bazel/esbuild@5.7.2":
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.7.2.tgz#d3086cd8474f20f6be0689e3b8ae852a311cbc45"
   integrity sha512-YseNk23x30bynpXOvx0BdvPX2WSuI+6sDtx+Cn7Q27cBZw41438qjciuE2UlGME26p/5VULyduOqp0a3T3ZTjQ==
+
+"@bazel/esbuild@5.7.3":
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.7.3.tgz#98a82b69bafd9b68dcf9aba340d67727a777bcbc"
+  integrity sha512-SzOmPlvI3rzYz73tHNVl3GlvfSo+NFZzuQQeJWhUq3JMHLYjUU14A9nY0WhBKTamD4MatJg9mUJOdOnXvOVtxQ==
 
 "@bazel/ibazel@0.16.2":
   version "0.16.2"
   resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.16.2.tgz#05dd7f06659759fda30f87b15534f1e42f1201bb"
   integrity sha512-KgqAWMH0emL6f3xH6nqyTryoBMqlJ627LBIe9PT1PRRQPz2FtHib3FIHJPukp1slzF3hJYZvdiVwgPnHbaSOOA==
 
-"@bazel/jasmine@5.7.2":
-  version "5.7.2"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-5.7.2.tgz#438f272e66e939106cbdd58db709cd6aa008131b"
-  integrity sha512-RJruOB6S9e0efTNIE2JVdaslguUXh5KcmLUCq/xLCt0zENP44ssp9OooDIrZ8H+Sp4mLDNBX7CMMA9WTsbsxTQ==
+"@bazel/jasmine@5.7.3":
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-5.7.3.tgz#1ff86f5391e4a0509f94befaf6ef0f354b9be7cf"
+  integrity sha512-5U01yBW1vL7hBpkAZt1ZouzszL2QIw8yfkEfnprfnKlYAGqK48hpxmYV7bZy1UV5PCKlLRfwtY0bADY1ah7I1Q==
   dependencies:
     c8 "~7.5.0"
     jasmine-reporters "~2.5.0"
