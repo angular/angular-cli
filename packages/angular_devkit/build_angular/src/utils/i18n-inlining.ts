@@ -42,7 +42,7 @@ function emittedFilesToInlineOptions(
       code: fs.readFileSync(originalPath, 'utf8'),
       outputPath,
       missingTranslation,
-      setLocale: emittedFile.name === 'main' || emittedFile.name === 'vendor',
+      setLocale: emittedFile.name === 'main',
     };
     originalFiles.push(originalPath);
 
