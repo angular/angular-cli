@@ -12,6 +12,7 @@ import * as http from 'http';
 import * as path from 'path';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
+import { merge as webpackMerge } from 'webpack-merge';
 
 import { statsErrorsToString } from '../../utils/stats';
 import { createConsoleLogger } from '@angular-devkit/core/node';
@@ -71,16 +72,23 @@ const init: any = (config: any, emitter: any) => {
   }
 
   // Add webpack config.
-  const webpackConfig = config.buildWebpack.webpackConfig;
-  const webpackMiddlewareConfig = {
+  let webpackConfig = config.buildWebpack.webpackConfig;
+  let webpackMiddlewareConfig = {
     // Hide webpack output because its noisy.
     stats: false,
     publicPath: `/${KARMA_APPLICATION_PATH}/`,
   };
 
-  // Use existing config if any.
-  config.webpack = { ...webpackConfig, ...config.webpack };
-  config.webpackMiddleware = { ...webpackMiddlewareConfig, ...config.webpackMiddleware };
+  // Merge with existing config, if any.
+  if (config.webpack) {
+    config.webpack = webpackConfig = webpackMerge(webpackConfig, config.webpack);
+  }
+  if (config.webpackMiddleware) {
+    config.webpackMiddleware = webpackMiddlewareConfig = webpackMerge(
+      webpackMiddlewareConfig,
+      config.webpackMiddleware,
+    );
+  }
 
   // Our custom context and debug files list the webpack bundles directly instead of using
   // the karma files array.
