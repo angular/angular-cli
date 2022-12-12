@@ -31,7 +31,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.2",
-    "esbuild-wasm": "0.16.2",
+    "esbuild-wasm": "0.16.4",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -47,11 +47,11 @@
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
     "piscina": "3.2.0",
-    "postcss": "8.4.19",
+    "postcss": "8.4.20",
     "postcss-loader": "7.0.2",
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
-    "sass": "1.56.1",
+    "sass": "1.56.2",
     "sass-loader": "13.2.0",
     "semver": "7.3.8",
     "source-map-loader": "4.0.1",
@@ -67,7 +67,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.16.2"
+    "esbuild": "0.16.4"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0-next",
