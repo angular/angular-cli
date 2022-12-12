@@ -197,7 +197,10 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     // downlevel class properties by ensuring the class properties Babel plugin
     // is always included- regardless of the preset-env targets.
     if (options.supportedBrowsers.some((b) => safariClassFieldScopeBugBrowsers.has(b))) {
-      includePlugins.push('@babel/plugin-proposal-class-properties');
+      includePlugins.push(
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-private-methods',
+      );
     }
 
     presets.push([
