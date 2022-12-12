@@ -192,6 +192,10 @@ export function createCompilerPlugin(
           // Skip keys that have been manually provided
           continue;
         }
+        if (key === 'ngDevMode') {
+          // ngDevMode is already set based on the builder's script optimization option
+          continue;
+        }
         // esbuild requires values to be a string (actual strings need to be quoted).
         // In this case, all provided values are booleans.
         build.initialOptions.define[key] = value.toString();
