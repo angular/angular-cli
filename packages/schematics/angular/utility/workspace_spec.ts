@@ -19,7 +19,7 @@ const TEST_WORKSPACE_CONTENT = JSON.stringify({
 });
 
 async function testRule(rule: Rule, tree: Tree): Promise<void> {
-  await callRule(rule, tree, {} as unknown as SchematicContext).toPromise();
+  await callRule(rule, tree, {} as unknown as SchematicContext);
 }
 
 describe('readWorkspace', () => {

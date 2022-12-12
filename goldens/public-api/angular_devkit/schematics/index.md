@@ -139,10 +139,10 @@ interface BaseWorkflowOptions {
 export function branchAndMerge(rule: Rule, strategy?: MergeStrategy): Rule;
 
 // @public (undocumented)
-export function callRule(rule: Rule, input: Tree_2 | Observable<Tree_2>, context: SchematicContext): Observable<Tree_2>;
+export function callRule(rule: Rule, tree: Tree_2, context: SchematicContext): Promise<Tree_2>;
 
 // @public (undocumented)
-export function callSource(source: Source, context: SchematicContext): Observable<Tree_2>;
+export function callSource(source: Source, context: SchematicContext): Promise<Tree_2>;
 
 // @public
 export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule;
@@ -720,7 +720,7 @@ interface RequiredWorkflowExecutionContext {
 }
 
 // @public (undocumented)
-export type Rule = (tree: Tree_2, context: SchematicContext) => Tree_2 | Observable<Tree_2> | Rule | Promise<void | Rule> | void;
+export type Rule = (tree: Tree_2, context: SchematicContext) => void | Rule | Tree_2 | Promise<void | Rule | Tree_2>;
 
 // @public
 export type RuleFactory<T extends object> = (options: T) => Rule;
@@ -728,7 +728,7 @@ export type RuleFactory<T extends object> = (options: T) => Rule;
 // @public
 export interface Schematic<CollectionMetadataT extends object, SchematicMetadataT extends object> {
     // (undocumented)
-    call<OptionT extends object>(options: OptionT, host: Observable<Tree_2>, parentContext?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>, executionOptions?: Partial<ExecutionOptions>): Observable<Tree_2>;
+    call<OptionT extends object>(options: OptionT, host: Tree_2, parentContext?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>, executionOptions?: Partial<ExecutionOptions>): Promise<Tree_2>;
     // (undocumented)
     readonly collection: Collection<CollectionMetadataT, SchematicMetadataT>;
     // (undocumented)
@@ -783,7 +783,7 @@ export class SchematicEngineConflictingException extends BaseException {
 export class SchematicImpl<CollectionT extends object, SchematicT extends object> implements Schematic<CollectionT, SchematicT> {
     constructor(_description: SchematicDescription<CollectionT, SchematicT>, _factory: RuleFactory<{}>, _collection: Collection<CollectionT, SchematicT>, _engine: Engine<CollectionT, SchematicT>);
     // (undocumented)
-    call<OptionT extends object>(options: OptionT, host: Observable<Tree_2>, parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): Observable<Tree_2>;
+    call<OptionT extends object>(options: OptionT, host: Tree_2, parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): Promise<Tree_2>;
     // (undocumented)
     get collection(): Collection<CollectionT, SchematicT>;
     // (undocumented)
@@ -843,7 +843,7 @@ export interface Sink {
 }
 
 // @public
-export type Source = (context: SchematicContext) => Tree_2 | Observable<Tree_2>;
+export type Source = (context: SchematicContext) => Tree_2 | Promise<Tree_2>;
 
 // @public
 export function source(tree: Tree_2): Source;

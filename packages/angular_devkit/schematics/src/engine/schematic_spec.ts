@@ -8,7 +8,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { logging } from '@angular-devkit/core';
-import { lastValueFrom, of as observableOf } from 'rxjs';
+import { of as observableOf } from 'rxjs';
 import { chain } from '../rules/base';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch, empty } from '../tree/static';
@@ -64,7 +64,8 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty())))
+    schematic
+      .call({}, empty())
       .then((x) => {
         expect(files(inner!)).toEqual([]);
         expect(files(x)).toEqual(['/a/b/c']);
@@ -82,12 +83,13 @@ describe('Schematic', () => {
       factory: () => (fem: Tree) => {
         inner = fem;
 
-        return observableOf(empty());
+        return empty();
       },
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty())))
+    schematic
+      .call({}, empty())
       .then((x) => {
         expect(files(inner!)).toEqual([]);
         expect(files(x)).toEqual([]);
@@ -137,7 +139,8 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty())))
+    schematic
+      .call({}, empty())
       .then((_x) => {
         expect(chainCount).toBe(1);
         expect(oneCount).toBe(1);
@@ -159,7 +162,8 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty()), {}, { scope: 'base' }))
+    schematic
+      .call({}, empty(), {}, { scope: 'base' })
       .then((x) => {
         expect(files(x)).toEqual(['/base/a/b/c']);
       })

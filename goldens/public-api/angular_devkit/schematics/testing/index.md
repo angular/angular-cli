@@ -17,7 +17,7 @@ import { Url } from 'url';
 export class SchematicTestRunner {
     constructor(_collectionName: string, collectionPath: string);
     // (undocumented)
-    callRule(rule: Rule, tree: Tree_2, parentContext?: Partial<SchematicContext>): Observable<Tree_2>;
+    callRule(rule: Rule, tree: Tree_2, parentContext?: Partial<SchematicContext>): Promise<Tree_2>;
     // (undocumented)
     get engine(): SchematicEngine<{}, {}>;
     // (undocumented)

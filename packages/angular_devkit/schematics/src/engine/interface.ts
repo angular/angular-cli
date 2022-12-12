@@ -178,10 +178,10 @@ export interface Schematic<CollectionMetadataT extends object, SchematicMetadata
 
   call<OptionT extends object>(
     options: OptionT,
-    host: Observable<Tree>,
+    host: Tree,
     parentContext?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>,
     executionOptions?: Partial<ExecutionOptions>,
-  ): Observable<Tree>;
+  ): Promise<Tree>;
 }
 
 /**
@@ -232,8 +232,8 @@ export type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntry | null
  * We obfuscate the context of Source and Rule because the schematic implementation should not
  * know which types is the schematic or collection metadata, as they are both tooling specific.
  */
-export type Source = (context: SchematicContext) => Tree | Observable<Tree>;
+export type Source = (context: SchematicContext) => Tree | Promise<Tree>;
 export type Rule = (
   tree: Tree,
   context: SchematicContext,
-) => Tree | Observable<Tree> | Rule | Promise<void | Rule> | void;
+) => void | Rule | Tree | Promise<void | Rule | Tree>;

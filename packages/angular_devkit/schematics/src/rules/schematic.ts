@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { last, map, of as observableOf } from 'rxjs';
 import { ExecutionOptions, Rule, SchematicContext } from '../engine/interface';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch } from '../tree/static';
@@ -24,21 +23,16 @@ export function externalSchematic<OptionT extends object>(
   options: OptionT,
   executionOptions?: Partial<ExecutionOptions>,
 ): Rule {
-  return (input: Tree, context: SchematicContext) => {
+  return async (input: Tree, context: SchematicContext) => {
     const collection = context.engine.createCollection(
       collectionName,
       context.schematic.collection,
     );
     const schematic = collection.createSchematic(schematicName);
+    const tree = await schematic.call(options, branch(input), context, executionOptions);
+    input.merge(tree, MergeStrategy.AllowOverwriteConflict);
 
-    return schematic.call(options, observableOf(branch(input)), context, executionOptions).pipe(
-      last(),
-      map((x) => {
-        input.merge(x, MergeStrategy.AllowOverwriteConflict);
-
-        return input;
-      }),
-    );
+    return input;
   };
 }
 
@@ -53,19 +47,13 @@ export function schematic<OptionT extends object>(
   options: OptionT,
   executionOptions?: Partial<ExecutionOptions>,
 ): Rule {
-  return (input: Tree, context: SchematicContext) => {
+  return async (input: Tree, context: SchematicContext) => {
     const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName, true);
 
-    return schematic.call(options, observableOf(branch(input)), context, executionOptions).pipe(
-      last(),
-      map((x) => {
-        // We allow overwrite conflict here because they're the only merge conflict we particularly
-        // don't want to deal with; the input tree might have an OVERWRITE which the sub
-        input.merge(x, MergeStrategy.AllowOverwriteConflict);
+    const tree = await schematic.call(options, branch(input), context, executionOptions);
+    input.merge(tree, MergeStrategy.AllowOverwriteConflict);
 
-        return input;
-      }),
-    );
+    return input;
   };
 }

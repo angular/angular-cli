@@ -171,44 +171,44 @@ export abstract class BaseWorkflow implements Workflow {
     };
     this._context.push(context);
 
-    return schematic
-      .call(options.options, of(new HostTree(this._host)), { logger: context.logger })
-      .pipe(
-        concatMap((tree: Tree) => {
-          // Process all sinks.
-          return concat(
-            from(sinks).pipe(
-              concatMap((sink) => sink.commit(tree)),
-              ignoreElements(),
-            ),
-            of(tree),
+    return from(
+      schematic.call(options.options, new HostTree(this._host), { logger: context.logger }),
+    ).pipe(
+      concatMap((tree: Tree) => {
+        // Process all sinks.
+        return concat(
+          from(sinks).pipe(
+            concatMap((sink) => sink.commit(tree)),
+            ignoreElements(),
+          ),
+          of(tree),
+        );
+      }),
+      concatMap(() => {
+        if (this._dryRun) {
+          return EMPTY;
+        }
+
+        this._lifeCycle.next({ kind: 'post-tasks-start' });
+
+        return this._engine
+          .executePostTasks()
+          .pipe(
+            tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
+            defaultIfEmpty(undefined),
+            last(),
           );
-        }),
-        concatMap(() => {
-          if (this._dryRun) {
-            return EMPTY;
+      }),
+      tap({
+        complete: () => {
+          this._lifeCycle.next({ kind: 'workflow-end' });
+          this._context.pop();
+
+          if (this._context.length == 0) {
+            this._lifeCycle.next({ kind: 'end' });
           }
-
-          this._lifeCycle.next({ kind: 'post-tasks-start' });
-
-          return this._engine
-            .executePostTasks()
-            .pipe(
-              tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
-              defaultIfEmpty(undefined),
-              last(),
-            );
-        }),
-        tap({
-          complete: () => {
-            this._lifeCycle.next({ kind: 'workflow-end' });
-            this._context.pop();
-
-            if (this._context.length == 0) {
-              this._lifeCycle.next({ kind: 'end' });
-            }
-          },
-        }),
-      );
+        },
+      }),
+    );
   }
 }

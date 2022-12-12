@@ -39,7 +39,7 @@ async function testRule(
     },
   };
 
-  await callRule(rule, tree, context as unknown as SchematicContext).toPromise();
+  await callRule(rule, tree, context as unknown as SchematicContext);
 
   return { tasks, logs };
 }

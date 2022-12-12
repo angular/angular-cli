@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable, concat, map, mapTo, toArray } from 'rxjs';
 import { FileOperator, Rule, Source } from '../engine/interface';
 import { SchematicsException } from '../exception/exception';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
@@ -34,9 +33,9 @@ export function empty(): Source {
  */
 export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule {
   return async (initialTree, context) => {
-    let intermediateTree: Observable<Tree> | undefined;
+    let intermediateTree: Tree | undefined;
     for await (const rule of rules) {
-      intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+      intermediateTree = await callRule(rule, intermediateTree ?? initialTree, context);
     }
 
     return () => intermediateTree;
@@ -47,18 +46,16 @@ export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule {
  * Apply multiple rules to a source, and returns the source transformed.
  */
 export function apply(source: Source, rules: Rule[]): Source {
-  return (context) => callRule(chain(rules), callSource(source, context), context);
+  return async (context) => callRule(chain(rules), await callSource(source, context), context);
 }
 
 /**
  * Merge an input tree with the source passed in.
  */
 export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrategy.Default): Rule {
-  return (tree, context) => {
-    return callSource(source, context).pipe(
-      map((sourceTree) => tree.merge(sourceTree, strategy || context.strategy)),
-      mapTo(tree),
-    );
+  return async (tree, context) => {
+    const sourceTree = await callSource(source, context);
+    tree.merge(sourceTree, strategy || context.strategy);
   };
 }
 
@@ -81,11 +78,9 @@ export function asSource(rule: Rule): Source {
 }
 
 export function branchAndMerge(rule: Rule, strategy = MergeStrategy.Default): Rule {
-  return (tree, context) => {
-    return callRule(rule, tree.branch(), context).pipe(
-      map((branch) => tree.merge(branch, strategy || context.strategy)),
-      mapTo(tree),
-    );
+  return async (tree, context) => {
+    const branch = await callRule(rule, tree.branch(), context);
+    tree.merge(branch, strategy || context.strategy);
   };
 }
 
@@ -104,17 +99,16 @@ export function partitionApplyMerge(
   ruleYes: Rule,
   ruleNo?: Rule,
 ): Rule {
-  return (tree, context) => {
+  return async (tree, context) => {
     const [yes, no] = partition(tree, predicate);
+    const [yesTree, noTree] = await Promise.all([
+      callRule(ruleYes, yes, context),
+      callRule(ruleNo || noop(), no, context),
+    ]);
 
-    return concat(callRule(ruleYes, yes, context), callRule(ruleNo || noop(), no, context)).pipe(
-      toArray(),
-      map(([yesTree, noTree]) => {
-        yesTree.merge(noTree, context.strategy);
+    yesTree.merge(noTree, context.strategy);
 
-        return yesTree;
-      }),
-    );
+    return yesTree;
   };
 }
 
@@ -160,19 +154,15 @@ export function composeFileOperators(operators: FileOperator[]): FileOperator {
 }
 
 export function applyToSubtree(path: string, rules: Rule[]): Rule {
-  return (tree, context) => {
+  return async (tree, context) => {
     const scoped = new ScopedTree(tree, path);
+    const result = await callRule(chain(rules), scoped, context);
 
-    return callRule(chain(rules), scoped, context).pipe(
-      map((result) => {
-        if (result === scoped) {
-          return tree;
-        } else {
-          throw new SchematicsException(
-            'Original tree must be returned from all rules when using "applyToSubtree".',
-          );
-        }
-      }),
+    if (result === scoped) {
+      return tree;
+    }
+    throw new SchematicsException(
+      'Original tree must be returned from all rules when using "applyToSubtree".',
     );
   };
 }

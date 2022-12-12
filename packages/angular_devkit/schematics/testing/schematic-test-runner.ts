@@ -7,7 +7,7 @@
  */
 
 import { logging, schema } from '@angular-devkit/core';
-import { Observable, from, lastValueFrom, of as observableOf } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import {
   Collection,
   DelegateTree,
@@ -83,10 +83,10 @@ export class SchematicTestRunner {
     tree?: Tree,
   ): Promise<UnitTestTree> {
     const schematic = this._collection.createSchematic(schematicName, true);
-    const host = observableOf(tree || new HostTree());
+    const host = tree || new HostTree();
     this._engineHost.clearTasks();
 
-    const newTree = await lastValueFrom(schematic.call(opts || {}, host, { logger: this._logger }));
+    const newTree = await schematic.call(opts || {}, host, { logger: this._logger });
 
     return new UnitTestTree(newTree);
   }
@@ -110,10 +110,10 @@ export class SchematicTestRunner {
   ): Promise<UnitTestTree> {
     const externalCollection = this._engine.createCollection(collectionName);
     const schematic = externalCollection.createSchematic(schematicName, true);
-    const host = observableOf(tree || new HostTree());
+    const host = tree || new HostTree();
     this._engineHost.clearTasks();
 
-    const newTree = await lastValueFrom(schematic.call(opts || {}, host, { logger: this._logger }));
+    const newTree = await schematic.call(opts || {}, host, { logger: this._logger });
 
     return new UnitTestTree(newTree);
   }
@@ -130,9 +130,9 @@ export class SchematicTestRunner {
     return from(this.runExternalSchematic(collectionName, schematicName, opts, tree));
   }
 
-  callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {
+  callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Promise<Tree> {
     const context = this._engine.createContext({} as Schematic<{}, {}>, parentContext);
 
-    return callRule(rule, observableOf(tree), context);
+    return callRule(rule, tree, context);
   }
 }

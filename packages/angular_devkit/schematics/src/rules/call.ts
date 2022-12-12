@@ -7,7 +7,6 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import { Observable, defaultIfEmpty, defer, isObservable, lastValueFrom, mergeMap } from 'rxjs';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
 
@@ -46,35 +45,17 @@ export class InvalidSourceResultException extends BaseException {
   }
 }
 
-export function callSource(source: Source, context: SchematicContext): Observable<Tree> {
-  return defer(async () => {
-    let result: Tree | Observable<Tree> | undefined = source(context);
+export async function callSource(source: Source, context: SchematicContext): Promise<Tree> {
+  const result = await source(context);
 
-    if (isObservable(result)) {
-      result = await lastValueFrom(result.pipe(defaultIfEmpty(undefined)));
-    }
-
-    if (result && TreeSymbol in result) {
-      return result as Tree;
-    }
-
-    throw new InvalidSourceResultException(result);
-  });
-}
-
-export function callRule(
-  rule: Rule,
-  input: Tree | Observable<Tree>,
-  context: SchematicContext,
-): Observable<Tree> {
-  if (isObservable(input)) {
-    return input.pipe(mergeMap((inputTree) => callRuleAsync(rule, inputTree, context)));
-  } else {
-    return defer(() => callRuleAsync(rule, input, context));
+  if (result && TreeSymbol in result) {
+    return result;
   }
+
+  throw new InvalidSourceResultException(result);
 }
 
-async function callRuleAsync(rule: Rule, tree: Tree, context: SchematicContext): Promise<Tree> {
+export async function callRule(rule: Rule, tree: Tree, context: SchematicContext): Promise<Tree> {
   let result = await rule(tree, context);
 
   while (typeof result === 'function') {
@@ -84,10 +65,6 @@ async function callRuleAsync(rule: Rule, tree: Tree, context: SchematicContext):
 
   if (typeof result === 'undefined') {
     return tree;
-  }
-
-  if (isObservable(result)) {
-    result = await lastValueFrom(result.pipe(defaultIfEmpty(tree)));
   }
 
   if (result && TreeSymbol in result) {
