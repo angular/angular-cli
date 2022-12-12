@@ -7,7 +7,6 @@
  */
 
 import assert from 'assert';
-import { pluginName } from 'mini-css-extract-plugin';
 import type { Compilation, Compiler } from 'webpack';
 import { assertIsError } from '../../utils/error';
 import { addError } from '../../utils/webpack-diagnostics';
@@ -30,10 +29,6 @@ export class StylesWebpackPlugin {
 
   apply(compiler: Compiler): void {
     const { entryPoints, preserveSymlinks, root } = this.options;
-    const webpackOptions = compiler.options;
-    const entry =
-      typeof webpackOptions.entry === 'function' ? webpackOptions.entry() : webpackOptions.entry;
-
     const resolver = compiler.resolverFactory.get('global-styles', {
       conditionNames: ['sass', 'less', 'style'],
       mainFields: ['sass', 'less', 'style', 'main', '...'],
@@ -45,32 +40,38 @@ export class StylesWebpackPlugin {
       fileSystem: compiler.inputFileSystem,
     });
 
-    webpackOptions.entry = async () => {
-      const entrypoints = await entry;
+    const webpackOptions = compiler.options;
+    compiler.hooks.environment.tap(PLUGIN_NAME, () => {
+      const entry =
+        typeof webpackOptions.entry === 'function' ? webpackOptions.entry() : webpackOptions.entry;
 
-      for (const [bundleName, paths] of Object.entries(entryPoints)) {
-        entrypoints[bundleName] ??= {};
-        const entryImport = (entrypoints[bundleName].import ??= []);
+      webpackOptions.entry = async () => {
+        const entrypoints = await entry;
 
-        for (const path of paths) {
-          try {
-            const resolvedPath = resolver.resolveSync({}, root, path);
-            if (resolvedPath) {
-              entryImport.push(`${resolvedPath}?ngGlobalStyle`);
-            } else {
+        for (const [bundleName, paths] of Object.entries(entryPoints)) {
+          entrypoints[bundleName] ??= {};
+          const entryImport = (entrypoints[bundleName].import ??= []);
+
+          for (const path of paths) {
+            try {
+              const resolvedPath = resolver.resolveSync({}, root, path);
+              if (resolvedPath) {
+                entryImport.push(`${resolvedPath}?ngGlobalStyle`);
+              } else {
+                assert(this.compilation, 'Compilation cannot be undefined.');
+                addError(this.compilation, `Cannot resolve '${path}'.`);
+              }
+            } catch (error) {
               assert(this.compilation, 'Compilation cannot be undefined.');
-              addError(this.compilation, `Cannot resolve '${path}'.`);
+              assertIsError(error);
+              addError(this.compilation, error.message);
             }
-          } catch (error) {
-            assert(this.compilation, 'Compilation cannot be undefined.');
-            assertIsError(error);
-            addError(this.compilation, error.message);
           }
         }
-      }
 
-      return entrypoints;
-    };
+        return entrypoints;
+      };
+    });
 
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
       this.compilation = compilation;
