@@ -42,7 +42,7 @@ async function transformWithBabel({
 }: JavaScriptTransformRequest): Promise<string> {
   const forceAsyncTransformation =
     options.forceAsyncTransformation ??
-    (!/[\\/][_f]?esm2015[\\/]/.test(filename) && /async\s+function\s*\*/.test(data));
+    (!/[\\/][_f]?esm2015[\\/]/.test(filename) && /async(?:\s+function)?\s*\*/.test(data));
   const shouldLink = !options.skipLinker && (await requiresLinking(filename, data));
   const useInputSourcemap =
     options.sourcemap &&

@@ -72,8 +72,8 @@ export class JavaScriptTransformer {
     let forceAsyncTransformation;
     if (skipLinker && !this.#commonOptions.advancedOptimizations) {
       // If the linker is being skipped and no optimizations are needed, only async transformation is left.
-      // This checks for async generator functions. All other async transformation is handled by esbuild.
-      forceAsyncTransformation = data.includes('async') && /async\s+function\s*\*/.test(data);
+      // This checks for async generator functions and class methods. All other async transformation is handled by esbuild.
+      forceAsyncTransformation = data.includes('async') && /async(?:\s+function)?\s*\*/.test(data);
 
       if (!forceAsyncTransformation) {
         return Buffer.from(data, 'utf-8');
