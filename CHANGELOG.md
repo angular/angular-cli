@@ -1,3 +1,24 @@
+<a name="15.0.4"></a>
+
+# 15.0.4 (2022-12-14)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [ccc8e0350](https://github.com/angular/angular-cli/commit/ccc8e0350810d123269f55de29acd7964e663f7e) | fix  | display actionable error when a style does not exist in Karma builder |
+| [507f756c3](https://github.com/angular/angular-cli/commit/507f756c34171db842365398150460e1e29f531a) | fix  | downlevel class private methods when targeting Safari <=v15           |
+| [a0da91dba](https://github.com/angular/angular-cli/commit/a0da91dba3d9b4c4a86102668f52ab933406e5da) | fix  | include sources in generated Sass source maps                         |
+| [9fd356234](https://github.com/angular/angular-cli/commit/9fd356234210734ec5f44ae18f055308b7acc963) | fix  | only set ngDevMode when script optimizations are enabled              |
+| [8e85f4728](https://github.com/angular/angular-cli/commit/8e85f47284472f9df49f2ca6c59057ad28240e9c) | fix  | update `css-loader` to `6.7.3`                                        |
+| [b2d4415ca](https://github.com/angular/angular-cli/commit/b2d4415caa486bebe55e6147a153f120cf08b070) | fix  | update locale setting snippet to use `globalThis`.                    |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.3"></a>
 
 # 15.0.3 (2022-12-07)
