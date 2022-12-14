@@ -33,10 +33,7 @@ export default function (options: GuardOptions): Rule {
     const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
     const routerNamedImports: string[] = [...options.implements, 'UrlTree'];
 
-    if (
-      options.implements.includes(GuardInterface.CanLoad) ||
-      options.implements.includes(GuardInterface.CanMatch)
-    ) {
+    if (options.implements.includes(GuardInterface.CanMatch)) {
       routerNamedImports.push('Route', 'UrlSegment');
 
       if (options.implements.length > 1) {

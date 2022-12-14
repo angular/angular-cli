@@ -53,7 +53,7 @@
       "uniqueItems": true,
       "minItems": 1,
       "items": {
-        "enum": ["CanActivate", "CanActivateChild", "CanDeactivate", "CanLoad", "CanMatch"],
+        "enum": ["CanActivate", "CanActivateChild", "CanDeactivate", "CanMatch"],
         "type": "string"
       },
       "default": ["CanActivate"],

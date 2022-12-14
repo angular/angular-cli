@@ -27,9 +27,5 @@ export class <%= classify(name) %>Guard implements <%= implementations %> {
     route: Route,
     segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return true;
-  }<% } %><% if (implements.includes('CanLoad')) { %>canLoad(
-    route: Route,
-    segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return true;
   }<% } %>
 }
