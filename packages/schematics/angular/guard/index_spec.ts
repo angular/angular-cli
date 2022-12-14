@@ -85,8 +85,8 @@ describe('Guard Schematic', () => {
     expect(fileString).toContain('canActivate');
     expect(fileString).not.toContain('CanActivateChild');
     expect(fileString).not.toContain('canActivateChild');
-    expect(fileString).not.toContain('CanLoad');
-    expect(fileString).not.toContain('canLoad');
+    expect(fileString).not.toContain('CanMatch');
+    expect(fileString).not.toContain('canMatch');
   });
 
   it('should respect the functional guard value', async () => {
@@ -96,8 +96,8 @@ describe('Guard Schematic', () => {
     expect(fileString).toContain('export const fooGuard: CanActivateFn = (route, state) => {');
     expect(fileString).not.toContain('CanActivateChild');
     expect(fileString).not.toContain('canActivateChild');
-    expect(fileString).not.toContain('CanLoad');
-    expect(fileString).not.toContain('canLoad');
+    expect(fileString).not.toContain('CanMatch');
+    expect(fileString).not.toContain('canMatch');
   });
 
   it('should generate a helper function to execute the guard in a test', async () => {
@@ -121,7 +121,7 @@ describe('Guard Schematic', () => {
   });
 
   it('should respect the implements values', async () => {
-    const implementationOptions = ['CanActivate', 'CanLoad', 'CanActivateChild'];
+    const implementationOptions = ['CanActivate', 'CanDeactivate', 'CanActivateChild'];
     const options = { ...defaultOptions, implements: implementationOptions };
     const tree = await schematicRunner.runSchematic('guard', options, appTree);
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
@@ -134,31 +134,12 @@ describe('Guard Schematic', () => {
     });
   });
 
-  it('should add correct imports based on CanLoad implementation', async () => {
-    const implementationOptions = ['CanLoad'];
-    const options = { ...defaultOptions, implements: implementationOptions };
-    const tree = await schematicRunner.runSchematic('guard', options, appTree);
-    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
-    const expectedImports = `import { CanLoad, Route, UrlSegment, UrlTree } from '@angular/router';`;
-
-    expect(fileString).toContain(expectedImports);
-  });
-
   it('should add correct imports based on CanMatch implementation', async () => {
     const implementationOptions = ['CanMatch'];
     const options = { ...defaultOptions, implements: implementationOptions };
     const tree = await schematicRunner.runSchematic('guard', options, appTree);
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
     const expectedImports = `import { CanMatch, Route, UrlSegment, UrlTree } from '@angular/router';`;
-
-    expect(fileString).toContain(expectedImports);
-  });
-
-  it('should add correct imports based on canLoad functional guard', async () => {
-    const options = { ...defaultOptions, implements: ['CanLoad'], functional: true };
-    const tree = await schematicRunner.runSchematic('guard', options, appTree);
-    const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
-    const expectedImports = `import { CanLoadFn } from '@angular/router';`;
 
     expect(fileString).toContain(expectedImports);
   });
@@ -183,13 +164,13 @@ describe('Guard Schematic', () => {
   });
 
   it('should add correct imports if multiple implementations was selected', async () => {
-    const implementationOptions = ['CanActivate', 'CanLoad', 'CanActivateChild'];
+    const implementationOptions = ['CanActivate', 'CanMatch', 'CanActivateChild'];
     const options = { ...defaultOptions, implements: implementationOptions };
     const tree = await schematicRunner.runSchematic('guard', options, appTree);
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
     const expectedImports =
       `import ` +
-      `{ ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, RouterStateSnapshot, UrlSegment, UrlTree } ` +
+      `{ ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanMatch, Route, RouterStateSnapshot, UrlSegment, UrlTree } ` +
       `from '@angular/router';`;
 
     expect(fileString).toContain(expectedImports);

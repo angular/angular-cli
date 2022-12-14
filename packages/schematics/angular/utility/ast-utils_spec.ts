@@ -502,7 +502,7 @@ describe('ast utils', () => {
         import { AppComponent } from './app.component';
 
         const routes = [
-          { path: 'foo', component: FooComponent, canLoad: [Guard] }
+          { path: 'foo', component: FooComponent, canMatch: [Guard] }
         ];
 
         @NgModule({
@@ -527,7 +527,7 @@ describe('ast utils', () => {
       const output = applyChanges(modulePath, moduleContent, [changes]);
       /* eslint-disable max-len */
       expect(output).toMatch(
-        /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent, canLoad: \[Guard\] },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
+        /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent, canMatch: \[Guard\] },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
       );
       /* eslint-enable max-len */
     });
