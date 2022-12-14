@@ -138,7 +138,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "cross-env": "^7.0.3",
-    "css-loader": "6.7.1",
+    "css-loader": "6.7.3",
     "debug": "^4.1.1",
     "esbuild": "0.15.13",
     "esbuild-wasm": "0.15.13",
