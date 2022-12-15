@@ -65,11 +65,11 @@ describe('strategy.serialize()', () => {
     expect(finished).toBe(0);
 
     await Promise.all([
-      job1.output.toPromise().then((s) => {
+      job1.result.then((s) => {
         expect(finished).toBe(1);
         expect(s).toBe(10);
       }),
-      job2.output.toPromise().then((s) => {
+      job2.result.then((s) => {
         expect(finished).toBe(2);
         expect(s).toBe(15);
       }),
@@ -142,11 +142,11 @@ describe('strategy.serialize()', () => {
     expect(finished).toBe(0);
 
     await Promise.all([
-      job1.output.toPromise().then((s) => {
+      job1.result.then((s) => {
         expect(finished).toBe(1);
         expect(s).toBe(10);
       }),
-      job2.output.toPromise().then((s) => {
+      job2.result.then((s) => {
         expect(finished).toBe(2);
         expect(s).toBe(115);
       }),
@@ -205,7 +205,7 @@ describe('strategy.reuse()', () => {
     expect(started).toBe(1); // job2 is reusing job1.
     expect(finished).toBe(0);
 
-    let result = await job1.output.toPromise();
+    let result = await job1.result;
     expect(result).toBe(10);
     expect(started).toBe(1);
     expect(finished).toBe(1);
@@ -223,7 +223,7 @@ describe('strategy.reuse()', () => {
     expect(started).toBe(2); // job4 is reusing job3.
     expect(finished).toBe(1);
 
-    result = await job3.output.toPromise();
+    result = await job3.result;
     expect(result).toBe(15);
     expect(started).toBe(2);
     expect(finished).toBe(2);
@@ -292,24 +292,24 @@ describe('strategy.memoize()', () => {
     expect(finished).toBe(0);
 
     await Promise.all([
-      job1.output.toPromise().then((s) => {
+      job1.result.then((s) => {
         // This is hard since job3 and job1 might finish out of order.
         expect(finished).toBeGreaterThanOrEqual(1);
         expect(s).toBe(10);
       }),
-      job2.output.toPromise().then((s) => {
+      job2.result.then((s) => {
         // This is hard since job3 and job1 might finish out of order.
         expect(finished).toBeGreaterThanOrEqual(1);
         expect(job1.state).toBe(JobState.Ended);
         expect(job2.state).toBe(JobState.Ended);
         expect(s).toBe(10);
       }),
-      job3.output.toPromise().then((s) => {
+      job3.result.then((s) => {
         // This is hard since job3 and job1 might finish out of order.
         expect(finished).toBeGreaterThanOrEqual(1);
         expect(s).toBe(15);
       }),
-      job4.output.toPromise().then((s) => {
+      job4.result.then((s) => {
         expect(job3.state).toBe(JobState.Ended);
         expect(job4.state).toBe(JobState.Ended);
         // This is hard since job3 and job1 might finish out of order.

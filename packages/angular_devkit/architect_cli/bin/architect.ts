@@ -150,7 +150,7 @@ async function _executeTarget(
 
   // Wait for full completion of the builder.
   try {
-    const result = await run.output.toPromise();
+    const result = await run.result;
     if (result.success) {
       parentLogger.info(colors.green('SUCCESS'));
     } else {

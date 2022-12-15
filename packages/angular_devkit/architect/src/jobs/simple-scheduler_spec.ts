@@ -40,7 +40,7 @@ describe('SimpleScheduler', () => {
       },
     );
 
-    const sum = await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
+    const sum = await scheduler.schedule('add', [1, 2, 3, 4]).result;
     expect(sum).toBe(10);
   });
 
@@ -70,11 +70,11 @@ describe('SimpleScheduler', () => {
     const job2 = scheduler.schedule('add', [1, 2, 3, 4, 5]);
     expect(started).toBe(0);
 
-    const p1 = job1.output.toPromise();
+    const p1 = job1.result;
     await flush();
     expect(started).toBe(1);
 
-    const p2 = job2.output.toPromise();
+    const p2 = job2.result;
     await flush();
     expect(started).toBe(2);
     expect(finished).toBe(0);
@@ -97,10 +97,10 @@ describe('SimpleScheduler', () => {
       },
     );
 
-    await scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise();
-    await expectAsync(
-      scheduler.schedule('add', ['1', 2, 3, 4]).output.toPromise(),
-    ).toBeRejectedWithError(JobArgumentSchemaValidationError);
+    await scheduler.schedule('add', [1, 2, 3, 4]).result;
+    await expectAsync(scheduler.schedule('add', ['1', 2, 3, 4]).result).toBeRejectedWithError(
+      JobArgumentSchemaValidationError,
+    );
   });
 
   it('validates outputs', async () => {
@@ -112,9 +112,9 @@ describe('SimpleScheduler', () => {
       },
     );
 
-    await expectAsync(
-      scheduler.schedule('add', [1, 2, 3, 4]).output.toPromise(),
-    ).toBeRejectedWithError(JobOutputSchemaValidationError);
+    await expectAsync(scheduler.schedule('add', [1, 2, 3, 4]).result).toBeRejectedWithError(
+      JobOutputSchemaValidationError,
+    );
   });
 
   it('works with dependencies', async () => {
@@ -152,19 +152,19 @@ describe('SimpleScheduler', () => {
 
     expect(done.length).toBe(0);
 
-    await job1.output.toPromise();
+    await job1.result;
     expect(done).toContain(1);
     expect(done).not.toContain(4);
     expect(done).not.toContain(7);
 
-    await job5.output.toPromise();
+    await job5.result;
     expect(done).toContain(1);
     expect(done).toContain(2);
     expect(done).not.toContain(4);
     expect(done).toContain(5);
     expect(done).not.toContain(7);
 
-    await job7.output.toPromise();
+    await job7.result;
     expect(done.length).toBe(7);
     // Might be out of order.
     expect(done).toEqual(jasmine.arrayContaining([1, 2, 3, 4, 5, 6, 7]));
@@ -214,30 +214,30 @@ describe('SimpleScheduler', () => {
     // Expect the first one to start.
     expect(started).toEqual([1]);
     // Wait for the first one to finish.
-    await job1.output.toPromise();
+    await job1.result;
     await flush();
     // Expect the second one to have started, and the first one to be done.
     expect(started).toEqual([1, 2]);
     expect(done).toEqual([1]);
 
     // Rinse and repeat.
-    await job2.output.toPromise();
+    await job2.result;
     await flush();
     expect(started).toEqual([1, 2, 3]);
     expect(done).toEqual([1, 2]);
 
-    await job3.output.toPromise();
+    await job3.result;
     await flush();
     expect(started).toEqual([1, 2, 3, 4]);
     expect(done).toEqual([1, 2, 3]);
 
-    await job4.output.toPromise();
+    await job4.result;
     await flush();
     expect(started).toEqual([1, 2, 3, 4, 5]);
     expect(done).toEqual([1, 2, 3, 4]);
 
     // Just skip job 5.
-    await job6.output.toPromise();
+    await job6.result;
     await flush();
     expect(done).toEqual(started);
   });
@@ -259,11 +259,11 @@ describe('SimpleScheduler', () => {
 
     // Run the job once. Wait for it to finish. We should have a `resume()` and the scheduler will
     // be paused.
-    const p0 = scheduler.schedule('job', 0).output.toPromise();
+    const p0 = scheduler.schedule('job', 0).result;
     expect(await p0).toBe(0);
 
     // This will wait.
-    const p1 = scheduler.schedule('job', 1).output.toPromise();
+    const p1 = scheduler.schedule('job', 1).result;
     await Promise.resolve();
 
     expect(resume).not.toBeNull();
@@ -274,7 +274,7 @@ describe('SimpleScheduler', () => {
     expect(await p1).toBe(1);
     expect(resume).not.toBeNull();
 
-    const p2 = scheduler.schedule('job', 2).output.toPromise();
+    const p2 = scheduler.schedule('job', 2).result;
 
     await Promise.resolve();
     resume!();
@@ -301,9 +301,9 @@ describe('SimpleScheduler', () => {
 
     // Pause manually.
     const resume = scheduler.pause();
-    const p10 = scheduler.schedule('jobA', 10).output.toPromise();
-    const p11 = scheduler.schedule('jobA', 11).output.toPromise();
-    const p12 = scheduler.schedule('jobA', 12).output.toPromise();
+    const p10 = scheduler.schedule('jobA', 10).result;
+    const p11 = scheduler.schedule('jobA', 11).result;
+    const p12 = scheduler.schedule('jobA', 12).result;
     await flush();
 
     expect(done).toEqual([]);
@@ -373,7 +373,7 @@ describe('SimpleScheduler', () => {
     resolves[2]();
 
     job.stop();
-    await job.output.toPromise();
+    await job.result;
     expect(keepGoing).toBe(false);
     expect(done).toEqual([0, 1, 2, -1]);
     expect(job.state).toBe(JobState.Ended);
@@ -465,7 +465,7 @@ describe('SimpleScheduler', () => {
       const c = job.getChannel('any') as Observable<string>;
       c.subscribe((x) => (sideValue = x));
 
-      expect(await job.output.toPromise()).toBe(0);
+      expect(await job.result).toBe(0);
       expect(sideValue).toBe('hello world');
     });
 
@@ -494,7 +494,7 @@ describe('SimpleScheduler', () => {
         c.subscribe((x) => (sideValue = x));
       }
 
-      expect(await job.output.toPromise()).toBe(0);
+      expect(await job.result).toBe(0);
       expect(sideValue).not.toBe('hello world');
     });
   });
@@ -578,7 +578,7 @@ describe('SimpleScheduler', () => {
       job.input.next(3);
       job.input.next(null);
 
-      expect(await job.output.toPromise()).toBe(103);
+      expect(await job.result).toBe(103);
       expect(outputs).toEqual([101, 102, 103]);
     });
 
@@ -612,7 +612,7 @@ describe('SimpleScheduler', () => {
       job.input.next(3);
       job.input.next(null);
 
-      expect(await job.output.toPromise()).toBe(103);
+      expect(await job.result).toBe(103);
       expect(outputs).toEqual([101, 103]);
     });
 
@@ -643,7 +643,7 @@ describe('SimpleScheduler', () => {
       job.input.next(3);
       job.input.next(null);
 
-      expect(await job.output.toPromise()).toBe(103);
+      expect(await job.result).toBe(103);
       expect(outputs).toEqual(jasmine.arrayWithExactContents([101, 102, 103]));
     });
   });
@@ -659,7 +659,7 @@ describe('SimpleScheduler', () => {
     const job = scheduler.schedule('job', 0);
 
     try {
-      await job.output.toPromise();
+      await job.result;
       expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
     } catch (error) {
       expect(error).toBe(1);

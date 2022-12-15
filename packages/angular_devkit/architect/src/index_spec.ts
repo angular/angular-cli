@@ -325,7 +325,7 @@ describe('architect', () => {
     );
 
     const run = await architect.scheduleBuilder('package:getTargetOptions', {});
-    const output = await run.output.toPromise();
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(options).toEqual(goldenOptions);
     await run.stop();
@@ -339,7 +339,7 @@ describe('architect', () => {
 
     // But this should.
     try {
-      await run2.output.toPromise();
+      await run2.result;
       expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
     } catch {}
     await run2.stop();
@@ -369,7 +369,7 @@ describe('architect', () => {
     );
 
     const run = await architect.scheduleBuilder('package:do-it', {});
-    const output = await run.output.toPromise();
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(actualBuilderName).toEqual(builderName);
     await run.stop();
@@ -383,7 +383,7 @@ describe('architect', () => {
 
     // But this should.
     try {
-      await run2.output.toPromise();
+      await run2.result;
       expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
     } catch {}
     await run2.stop();
@@ -416,7 +416,7 @@ describe('architect', () => {
     );
 
     const run = await architect.scheduleBuilder('package:do-it', { p1: 'hello' });
-    const output = await run.output.toPromise();
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(actualOptions).toEqual({
       p0: 123,
@@ -427,7 +427,7 @@ describe('architect', () => {
     // Should also error.
     const run2 = await architect.scheduleBuilder('package:do-it', {});
 
-    await expectAsync(run2.output.toPromise()).toBeRejectedWith(
+    await expectAsync(run2.result).toBeRejectedWith(
       jasmine.objectContaining({ message: jasmine.stringMatching('p1') }),
     );
 

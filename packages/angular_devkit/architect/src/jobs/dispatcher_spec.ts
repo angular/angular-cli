@@ -36,6 +36,6 @@ describe('createDispatcher', () => {
 
     dispatcher.setDefaultJob(add0 as JobHandler<JsonValue, JsonValue, number>);
     const sum = scheduler.schedule('add', [1, 2, 3, 4]);
-    expect(await sum.output.toPromise()).toBe(10);
+    expect(await sum.result).toBe(10);
   });
 });

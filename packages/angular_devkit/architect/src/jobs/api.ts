@@ -324,6 +324,11 @@ export interface Job<
   readonly output: Observable<OutputT>;
 
   /**
+   * The first output of the job.
+   */
+  readonly result: Promise<OutputT>;
+
+  /**
    * The current state of the job.
    */
   readonly state: JobState;

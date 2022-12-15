@@ -141,33 +141,31 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
             return run;
           },
           async getTargetOptions(target: Target) {
-            return scheduler
-              .schedule<Target, json.JsonValue, json.JsonObject>('..getTargetOptions', target)
-              .output.toPromise();
+            return scheduler.schedule<Target, json.JsonValue, json.JsonObject>(
+              '..getTargetOptions',
+              target,
+            ).result;
           },
           async getProjectMetadata(target: Target | string) {
-            return scheduler
-              .schedule<Target | string, json.JsonValue, json.JsonObject>(
-                '..getProjectMetadata',
-                target,
-              )
-              .output.toPromise();
+            return scheduler.schedule<Target | string, json.JsonValue, json.JsonObject>(
+              '..getProjectMetadata',
+              target,
+            ).result;
           },
           async getBuilderNameForTarget(target: Target) {
-            return scheduler
-              .schedule<Target, json.JsonValue, string>('..getBuilderNameForTarget', target)
-              .output.toPromise();
+            return scheduler.schedule<Target, json.JsonValue, string>(
+              '..getBuilderNameForTarget',
+              target,
+            ).result;
           },
           async validateOptions<T extends json.JsonObject = json.JsonObject>(
             options: json.JsonObject,
             builderName: string,
           ) {
-            return scheduler
-              .schedule<[string, json.JsonObject], json.JsonValue, T>('..validateOptions', [
-                builderName,
-                options,
-              ])
-              .output.toPromise();
+            return scheduler.schedule<[string, json.JsonObject], json.JsonValue, T>(
+              '..validateOptions',
+              [builderName, options],
+            ).result;
           },
           reportRunning() {
             switch (currentState) {

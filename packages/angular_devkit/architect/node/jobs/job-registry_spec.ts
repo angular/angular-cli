@@ -18,6 +18,6 @@ describe('NodeModuleJobScheduler', () => {
     const scheduler = new jobs.SimpleScheduler(registry);
 
     const job = scheduler.schedule(path.join(root, 'add'), [1, 2, 3]);
-    expect(await job.output.toPromise()).toBe(6);
+    expect(await job.result).toBe(6);
   });
 });

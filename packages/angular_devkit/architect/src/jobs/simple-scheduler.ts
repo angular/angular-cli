@@ -284,6 +284,7 @@ export class SimpleScheduler<
    * Create the job.
    * @private
    */
+  // eslint-disable-next-line max-lines-per-function
   private _createJob<A extends MinimumArgumentT, I extends MinimumInputT, O extends MinimumOutputT>(
     name: JobName,
     argument: A,
@@ -440,6 +441,9 @@ export class SimpleScheduler<
           }
         }),
       ),
+      get result() {
+        return output.pipe(first()).toPromise();
+      },
       output,
       getChannel<T extends JsonValue>(
         name: JobName,
