@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'lib',
@@ -17,6 +17,11 @@ import { Component } from '@angular/core';
   `,
   styles: []
 })
-export class LibComponent {
+export class LibComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
 
 }
