@@ -3,7 +3,7 @@
   "$id": "SchematicsAngularDirective",
   "title": "Angular Directive Options Schema",
   "type": "object",
-  "description": "Creates a new, generic directive definition in the given or default project.",
+  "description": "Creates a new, generic directive definition in the given project.",
   "additionalProperties": false,
   "properties": {
     "name": {

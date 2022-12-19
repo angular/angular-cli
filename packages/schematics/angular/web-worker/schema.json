@@ -4,7 +4,7 @@
   "title": "Angular Web Worker Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Creates a new, generic web worker definition in the given or default project.",
+  "description": "Creates a new, generic web worker definition in the given project.",
   "properties": {
     "path": {
       "type": "string",
