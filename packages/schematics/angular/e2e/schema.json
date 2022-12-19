@@ -4,7 +4,7 @@
   "title": "Angular e2e Application Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates a new, generic end-to-end test definition for the given or default project.",
+  "description": "Generates a new, generic end-to-end test definition in the given project.",
   "properties": {
     "rootSelector": {
       "description": "The HTML selector for the root component of the test app.",

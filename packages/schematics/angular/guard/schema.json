@@ -3,7 +3,7 @@
   "$id": "SchematicsAngularGuard",
   "title": "Angular Guard Options Schema",
   "type": "object",
-  "description": "Generates a new, generic route guard definition in the given or default project.",
+  "description": "Generates a new, generic route guard definition in the given project.",
   "additionalProperties": false,
   "properties": {
     "name": {

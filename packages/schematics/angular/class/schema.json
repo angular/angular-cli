@@ -3,7 +3,7 @@
   "$id": "SchematicsAngularClass",
   "title": "Angular Class Options Schema",
   "type": "object",
-  "description": "Creates a new, generic class definition in the given or default project.",
+  "description": "Creates a new, generic class definition in the given project.",
   "additionalProperties": false,
   "properties": {
     "name": {
