@@ -3,7 +3,7 @@
   "$id": "SchematicsAngularEnum",
   "title": "Angular Enum Options Schema",
   "type": "object",
-  "description": "Generates a new, generic enum definition for the given or default project.",
+  "description": "Generates a new, generic enum definition in the given project.",
   "additionalProperties": false,
   "properties": {
     "name": {

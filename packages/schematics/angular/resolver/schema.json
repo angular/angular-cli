@@ -4,7 +4,7 @@
   "title": "Angular resolver Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates a new, generic resolver definition in the given or default project.",
+  "description": "Generates a new, generic resolver definition in the given project.",
   "properties": {
     "name": {
       "type": "string",
