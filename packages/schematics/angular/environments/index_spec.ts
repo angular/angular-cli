@@ -37,15 +37,12 @@ describe('Application Schematic', () => {
   };
 
   let applicationTree: UnitTestTree;
-  const messages: string[] = [];
-  schematicRunner.logger.subscribe((x) => messages.push(x.message));
 
   function runEnvironmentsSchematic(): Promise<UnitTestTree> {
     return schematicRunner.runSchematic('environments', defaultOptions, applicationTree);
   }
 
   beforeEach(async () => {
-    messages.length = 0;
     const workspaceTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
     applicationTree = await schematicRunner.runSchematic(
       'application',
