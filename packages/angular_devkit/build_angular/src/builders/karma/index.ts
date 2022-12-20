@@ -219,10 +219,6 @@ function getBuiltInKarmaConfig(
       reporters: [{ type: 'html' }, { type: 'text-summary' }],
     },
     reporters: ['progress', 'kjhtml'],
-    port: 9876,
-    colors: true,
-    logLevel: karma.constants.LOG_INFO,
-    autoWatch: true,
     browsers: ['Chrome'],
     restartOnFileChange: true,
   };
