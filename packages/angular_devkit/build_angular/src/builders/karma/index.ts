@@ -96,7 +96,7 @@ export function execute(
 
       const karmaOptions: KarmaConfigOptions = options.karmaConfig
         ? {}
-        : getBuiltInKarmaConfig(karma, context.workspaceRoot, projectName);
+        : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
 
       karmaOptions.singleRun = singleRun;
 
@@ -186,7 +186,6 @@ export function execute(
 }
 
 function getBuiltInKarmaConfig(
-  karma: typeof import('karma'),
   workspaceRoot: string,
   projectName: string,
 ): ConfigOptions & Record<string, unknown> {
@@ -197,6 +196,7 @@ function getBuiltInKarmaConfig(
 
   const workspaceRootRequire = createRequire(workspaceRoot + '/');
 
+  // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
   return {
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
