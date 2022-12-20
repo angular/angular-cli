@@ -139,6 +139,7 @@ export async function normalizeOptions(
     inlineStyleLanguage = 'css',
     poll,
     preserveSymlinks,
+    statsJson,
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
@@ -153,6 +154,7 @@ export async function normalizeOptions(
     crossOrigin,
     externalDependencies,
     inlineStyleLanguage,
+    stats: !!statsJson,
     poll,
     // If not explicitly set, default to the Node.js process argument
     preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
