@@ -7,6 +7,7 @@
  */
 
 import type {
+  Metafile,
   OnStartResult,
   OutputFile,
   PartialMessage,
@@ -237,6 +238,8 @@ export function createCompilerPlugin(
       // The stylesheet resources from component stylesheets that will be added to the build results output files
       let stylesheetResourceFiles: OutputFile[];
 
+      let stylesheetMetafiles: Metafile[];
+
       let compilation: AngularCompilation | undefined;
 
       build.onStart(async () => {
@@ -252,6 +255,7 @@ export function createCompilerPlugin(
 
         // Reset stylesheet resource output files
         stylesheetResourceFiles = [];
+        stylesheetMetafiles = [];
 
         // Create Angular compiler host options
         const hostOptions: AngularHostOptions = {
@@ -276,6 +280,9 @@ export function createCompilerPlugin(
             (result.errors ??= []).push(...errors);
             (result.warnings ??= []).push(...warnings);
             stylesheetResourceFiles.push(...resourceFiles);
+            if (stylesheetResult.metafile) {
+              stylesheetMetafiles.push(stylesheetResult.metafile);
+            }
 
             return contents;
           },
@@ -403,8 +410,17 @@ export function createCompilerPlugin(
       );
 
       build.onEnd((result) => {
+        // Add any component stylesheet resource files to the output files
         if (stylesheetResourceFiles.length) {
           result.outputFiles?.push(...stylesheetResourceFiles);
+        }
+
+        // Combine component stylesheet metafiles with main metafile
+        if (result.metafile && stylesheetMetafiles.length) {
+          for (const metafile of stylesheetMetafiles) {
+            result.metafile.inputs = { ...result.metafile.inputs, ...metafile.inputs };
+            result.metafile.outputs = { ...result.metafile.outputs, ...metafile.outputs };
+          }
         }
 
         logCumulativeDurations();

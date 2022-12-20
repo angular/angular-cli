@@ -34,6 +34,7 @@ export function createStylesheetBundleOptions(
     assetNames: options.outputNames?.media,
     logLevel: 'silent',
     minify: options.optimization,
+    metafile: true,
     sourcemap: options.sourcemap,
     outdir: options.workspaceRoot,
     write: false,
@@ -140,5 +141,6 @@ export async function bundleComponentStylesheet(
     map,
     path: outputPath,
     resourceFiles,
+    metafile: result.outputFiles && result.metafile,
   };
 }

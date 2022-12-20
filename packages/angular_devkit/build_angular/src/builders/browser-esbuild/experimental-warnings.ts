@@ -15,7 +15,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'extractLicenses',
   'progress',
   'scripts',
-  'statsJson',
 
   // * i18n support
   'localize',

@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { BuildInvalidate, BuildOptions, OutputFile } from 'esbuild';
+import type { BuildInvalidate, BuildOptions, Metafile, OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
@@ -141,6 +141,12 @@ async function execute(
   const initialFiles: FileInfo[] = [...codeResults.initialFiles, ...styleResults.initialFiles];
   const outputFiles: OutputFile[] = [...codeResults.outputFiles, ...styleResults.outputFiles];
 
+  // Combine metafiles used for the stats option as well as bundle budgets and console output
+  const metafile = {
+    inputs: { ...codeResults.metafile?.inputs, ...styleResults.metafile?.inputs },
+    outputs: { ...codeResults.metafile?.outputs, ...styleResults.metafile?.outputs },
+  };
+
   // Generate index HTML file
   if (indexHtmlOptions) {
     // Create an index HTML generator that reads from the in-memory output files
@@ -191,6 +197,10 @@ async function execute(
   await Promise.all(
     outputFiles.map((file) => fs.writeFile(path.join(outputPath, file.path), file.contents)),
   );
+  // Write metafile if stats option is enabled
+  if (options.stats) {
+    await fs.writeFile(path.join(outputPath, 'stats.json'), JSON.stringify(metafile, null, 2));
+  }
 
   // Augment the application with service worker support
   // TODO: This should eventually operate on the in-memory files prior to writing the output files
@@ -258,6 +268,7 @@ function createCodeBundleOptions(
     mainFields: ['es2020', 'browser', 'module', 'main'],
     conditions: ['es2020', 'es2015', 'module'],
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
+    metafile: true,
     logLevel: options.verbose ? 'debug' : 'silent',
     minify: optimizationOptions.scripts,
     pure: ['forwardRef'],
