@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularConfig",
+  "title": "Angular Config File Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Generates a configuration file in the given project.",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "type": {
+      "type": "string",
+      "description": "Specifies which type of configuration file to create.",
+      "enum": ["karma", "browserslist"],
+      "x-prompt": "Which type of configuration file would you like to create?",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    }
+  },
+  "required": ["project", "type"]
+}

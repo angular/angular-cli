@@ -120,6 +120,11 @@
       "factory": "./environments",
       "schema": "./environments/schema.json",
       "description": "Generate project environment files."
+    },
+    "config": {
+      "factory": "./config",
+      "schema": "./config/schema.json",
+      "description": "Generates a configuration file."
     }
   }
 }
