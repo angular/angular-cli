@@ -128,7 +128,7 @@ async function getAnalyticsUserIdForLevel(
   }
 
   const workspace = await getWorkspace(level);
-  const analyticsConfig: string | undefined | null | { uid?: string } =
+  const analyticsConfig: string | undefined | null | { uid?: string } | boolean =
     workspace?.getCli()?.['analytics'];
 
   if (analyticsConfig === false) {
