@@ -204,7 +204,15 @@ export class JavaScriptOptimizerPlugin {
                     options: optimizeOptions,
                   })
                   .then(
-                    ({ code, name, map }) => {
+                    async ({ code, name, map, errors }) => {
+                      if (errors?.length) {
+                        for (const error of errors) {
+                          addError(compilation, `Optimization error [${name}]: ${error}`);
+                        }
+
+                        return;
+                      }
+
                       const optimizedAsset = map
                         ? new SourceMapSource(code, name, map)
                         : new OriginalSource(code, name);

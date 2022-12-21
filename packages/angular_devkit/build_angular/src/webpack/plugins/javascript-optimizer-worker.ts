@@ -7,7 +7,7 @@
  */
 
 import remapping from '@ampproject/remapping';
-import type { TransformResult } from 'esbuild';
+import type { BuildFailure, TransformResult } from 'esbuild';
 import { minify } from 'terser';
 import { EsbuildExecutor } from './esbuild-executor';
 
@@ -100,6 +100,13 @@ let esbuild: EsbuildExecutor | undefined;
 export default async function ({ asset, options }: OptimizeRequest) {
   // esbuild is used as a first pass
   const esbuildResult = await optimizeWithEsbuild(asset.code, asset.name, options);
+  if (isEsBuildFailure(esbuildResult)) {
+    return {
+      name: asset.name,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      errors: await esbuild!.formatMessages(esbuildResult.errors, { kind: 'error' }),
+    };
+  }
 
   // terser is used as a second pass
   const terserResult = await optimizeWithTerser(
@@ -144,28 +151,36 @@ async function optimizeWithEsbuild(
   content: string,
   name: string,
   options: OptimizeRequest['options'],
-): Promise<TransformResult> {
+): Promise<TransformResult | BuildFailure> {
   if (!esbuild) {
     esbuild = new EsbuildExecutor(options.alwaysUseWasm);
   }
 
-  return esbuild.transform(content, {
-    minifyIdentifiers: !options.keepIdentifierNames,
-    minifySyntax: true,
-    // NOTE: Disabling whitespace ensures unused pure annotations are kept
-    minifyWhitespace: false,
-    pure: ['forwardRef'],
-    legalComments: options.removeLicenses ? 'none' : 'inline',
-    sourcefile: name,
-    sourcemap: options.sourcemap && 'external',
-    define: options.define,
-    // This option should always be disabled for browser builds as we don't rely on `.name`
-    // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
-    // We enable `keepNames` only for server builds as Domino relies on `.name`.
-    // Once we no longer rely on Domino for SSR we should be able to remove this.
-    keepNames: options.keepNames,
-    target: options.target,
-  });
+  try {
+    return await esbuild.transform(content, {
+      minifyIdentifiers: !options.keepIdentifierNames,
+      minifySyntax: true,
+      // NOTE: Disabling whitespace ensures unused pure annotations are kept
+      minifyWhitespace: false,
+      pure: ['forwardRef'],
+      legalComments: options.removeLicenses ? 'none' : 'inline',
+      sourcefile: name,
+      sourcemap: options.sourcemap && 'external',
+      define: options.define,
+      // This option should always be disabled for browser builds as we don't rely on `.name`
+      // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
+      // We enable `keepNames` only for server builds as Domino relies on `.name`.
+      // Once we no longer rely on Domino for SSR we should be able to remove this.
+      keepNames: options.keepNames,
+      target: options.target,
+    });
+  } catch (error) {
+    if (isEsBuildFailure(error)) {
+      return error;
+    }
+
+    throw error;
+  }
 }
 
 /**
@@ -217,4 +232,13 @@ async function optimizeWithTerser(
   }
 
   return { code: result.code, map: result.map as object };
+}
+
+/**
+ * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
+ * @param value A potential esbuild BuildFailure error object.
+ * @returns `true` if the object is determined to be a BuildFailure object; otherwise, `false`.
+ */
+function isEsBuildFailure(value: unknown): value is BuildFailure {
+  return !!value && typeof value === 'object' && 'errors' in value && 'warnings' in value;
 }
