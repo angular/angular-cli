@@ -7,6 +7,9 @@ import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
+  // TODO(crisbeto): temporarily disabled until Material is updated
+  return;
+
   let tag = (await isPrereleaseCli()) ? '@next' : '';
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 

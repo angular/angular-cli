@@ -70,15 +70,15 @@
     "esbuild": "0.16.7"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^15.0.0-next",
-    "@angular/localize": "^15.0.0-next",
-    "@angular/platform-server": "^15.0.0-next",
-    "@angular/service-worker": "^15.0.0-next",
+    "@angular/compiler-cli": "^15.0.0-next || ^15.1.0-next",
+    "@angular/localize": "^15.0.0-next || ^15.1.0-next",
+    "@angular/platform-server": "^15.0.0-next || ^15.1.0-next",
+    "@angular/service-worker": "^15.0.0-next || ^15.1.0-next",
     "karma": "^6.3.0",
-    "ng-packagr": "^15.0.0-next",
+    "ng-packagr": "^15.0.0-next || ^15.1.0-next",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
-    "typescript": "~4.8.2"
+    "typescript": ">=4.8.2 <5.0"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
