@@ -22,6 +22,7 @@ import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
+import { extractLicenses } from './license-extractor';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
@@ -197,9 +198,18 @@ async function execute(
   await Promise.all(
     outputFiles.map((file) => fs.writeFile(path.join(outputPath, file.path), file.contents)),
   );
+
   // Write metafile if stats option is enabled
   if (options.stats) {
     await fs.writeFile(path.join(outputPath, 'stats.json'), JSON.stringify(metafile, null, 2));
+  }
+
+  // Extract and write licenses for used packages
+  if (options.extractLicenses) {
+    await fs.writeFile(
+      path.join(outputPath, '3rdpartylicenses.txt'),
+      await extractLicenses(metafile, workspaceRoot),
+    );
   }
 
   // Augment the application with service worker support
@@ -269,6 +279,7 @@ function createCodeBundleOptions(
     conditions: ['es2020', 'es2015', 'module'],
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
     metafile: true,
+    legalComments: options.extractLicenses ? 'none' : 'eof',
     logLevel: options.verbose ? 'debug' : 'silent',
     minify: optimizationOptions.scripts,
     pure: ['forwardRef'],
@@ -397,6 +408,7 @@ function createGlobalStylesBundleOptions(
     includePaths: stylePreprocessorOptions?.includePaths,
   });
   buildOptions.incremental = watch;
+  buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
 
   const namespace = 'angular:styles/global';
   buildOptions.entryPoints = {};
