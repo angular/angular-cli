@@ -62,18 +62,15 @@ export function createSassPlugin(options: SassPluginOptions): Plugin {
         return result;
       };
 
-      build.onLoad(
-        { filter: /^angular:styles\/component;s[ac]ss;/, namespace: 'angular:styles/component' },
-        async (args) => {
-          const data = options.inlineComponentData?.[args.path];
-          assert(data, `component style name should always be found [${args.path}]`);
+      build.onLoad({ filter: /^s[ac]ss;/, namespace: 'angular:styles/component' }, async (args) => {
+        const data = options.inlineComponentData?.[args.path];
+        assert(data, `component style name should always be found [${args.path}]`);
 
-          const [, language, , filePath] = args.path.split(';', 4);
-          const syntax = language === 'sass' ? 'indented' : 'scss';
+        const [language, , filePath] = args.path.split(';', 3);
+        const syntax = language === 'sass' ? 'indented' : 'scss';
 
-          return compileString(data, filePath, syntax, options, resolveUrl);
-        },
-      );
+        return compileString(data, filePath, syntax, options, resolveUrl);
+      });
 
       build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
         const data = await readFile(args.path, 'utf-8');

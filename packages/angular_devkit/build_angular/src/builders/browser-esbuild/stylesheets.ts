@@ -77,10 +77,10 @@ export async function bundleComponentStylesheet(
   options: BundleStylesheetOptions,
 ) {
   const namespace = 'angular:styles/component';
-  const entry = [namespace, language, identifier, filename].join(';');
+  const entry = [language, identifier, filename].join(';');
 
   const buildOptions = createStylesheetBundleOptions(options, { [entry]: data });
-  buildOptions.entryPoints = [entry];
+  buildOptions.entryPoints = [`${namespace};${entry}`];
   buildOptions.plugins.push({
     name: 'angular-component-styles',
     setup(build) {
@@ -91,7 +91,7 @@ export async function bundleComponentStylesheet(
 
         if (inline) {
           return {
-            path: args.path,
+            path: entry,
             namespace,
           };
         } else {
@@ -100,7 +100,7 @@ export async function bundleComponentStylesheet(
           };
         }
       });
-      build.onLoad({ filter: /^angular:styles\/component;css;/, namespace }, async () => {
+      build.onLoad({ filter: /^css;/, namespace }, async () => {
         return {
           contents: data,
           loader: 'css',
