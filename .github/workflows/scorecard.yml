@@ -7,20 +7,18 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Declare default permissions as read only.
 permissions:
+  actions: read
   contents: read
+  # Needed to upload the results to code-scanning dashboard.
+  security-events: write
+  # Needed for signing and publishing of results for the badge.
+  id-token: write
 
 jobs:
   analysis:
     name: Scorecards analysis
     runs-on: ubuntu-latest
-    permissions:
-      # Needed to upload the results to code-scanning dashboard.
-      security-events: write
-      actions: read
-      contents: read
-
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # tag=v3.2.0
