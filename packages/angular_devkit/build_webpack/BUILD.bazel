@@ -120,6 +120,7 @@ pkg_npm(
     pkg_deps = [
         "//packages/angular_devkit/architect:package.json",
     ],
+    tags = ["release-package"],
     deps = [
         ":README.md",
         ":build_webpack",

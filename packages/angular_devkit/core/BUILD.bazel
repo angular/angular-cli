@@ -83,6 +83,7 @@ genrule(
 
 pkg_npm(
     name = "npm_package",
+    tags = ["release-package"],
     deps = [
         ":README.md",
         ":core",

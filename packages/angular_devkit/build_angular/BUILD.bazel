@@ -233,6 +233,7 @@ pkg_npm(
         "//packages/angular_devkit/core:package.json",
         "//packages/ngtools/webpack:package.json",
     ],
+    tags = ["release-package"],
     deps = [
         ":README.md",
         ":build_angular",

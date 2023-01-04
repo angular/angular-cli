@@ -112,6 +112,7 @@ pkg_npm(
     pkg_deps = [
         "//packages/angular_devkit/core:package.json",
     ],
+    tags = ["release-package"],
     deps = [
         ":README.md",
         ":architect",

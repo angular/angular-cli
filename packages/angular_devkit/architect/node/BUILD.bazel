@@ -23,7 +23,6 @@ ts_library(
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "//tests/angular_devkit/architect/node/jobs:jobs_test_lib",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
@@ -40,6 +39,7 @@ ts_library(
     deps = [
         ":node",
         "//packages/angular_devkit/architect",
+        "//tests/angular_devkit/architect/node/jobs:jobs_test_lib",
     ],
 )
 
