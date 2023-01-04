@@ -121,7 +121,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#0940d31b019e41ca5283c1758d74fd648afd6a42":
   version "0.0.0-f7d207b79899e466f312ae4fea2804f7978278ad"
-  uid "0940d31b019e41ca5283c1758d74fd648afd6a42"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#0940d31b019e41ca5283c1758d74fd648afd6a42"
   dependencies:
     "@angular-devkit/build-angular" "15.1.0-next.3"
@@ -284,7 +283,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#9dccce65ac86e8bb222f600d978b713f8e19c2f8":
   version "0.0.0-f7d207b79899e466f312ae4fea2804f7978278ad"
-  uid "9dccce65ac86e8bb222f600d978b713f8e19c2f8"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#9dccce65ac86e8bb222f600d978b713f8e19c2f8"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3088,7 +3086,7 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/glob@^8.0.0":
+"@types/glob@*", "@types/glob@^8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-8.0.0.tgz#321607e9cbaec54f687a0792b2d1d370739455d2"
   integrity sha512-l6NQsDDyQUVeoTynNpC9uRvCUint/gSUXQA2euwmTuWGvPY5LSDUu6tkCtJB2SvGQlJQzLaKqcGZP4//7EDveA==
@@ -3354,6 +3352,14 @@
   integrity sha512-z5xyF6uh8CbjAu9760KDKsH2FcDxZ2tFCsA4HIMWE6IkiYMXfVoa+4f9KX+FN0ZLsaMw1WNG2ETLA6N+/YA+cg==
   dependencies:
     "@types/mime" "*"
+    "@types/node" "*"
+
+"@types/shelljs@^0.8.11":
+  version "0.8.11"
+  resolved "https://registry.yarnpkg.com/@types/shelljs/-/shelljs-0.8.11.tgz#17a5696c825974e96828e96e89585d685646fcb8"
+  integrity sha512-x9yaMvEh5BEaZKeVQC4vp3l+QoFj3BXcd4aYfuKSzIIyihjdVARAadYy3SMNIz0WCCdS2vB9JL/U6GQk5PaxQw==
+  dependencies:
+    "@types/glob" "*"
     "@types/node" "*"
 
 "@types/sockjs@^0.3.33":
@@ -10164,7 +10170,6 @@ sass@1.56.2, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:

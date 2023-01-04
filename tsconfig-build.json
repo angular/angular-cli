@@ -21,6 +21,7 @@
     "tests/**/*",
     "tools/**/*",
     ".ng-dev/**/*",
-    "**/*_spec.ts"
+    "**/*_spec.ts",
+    "scripts/**/*.mts"
   ]
 }

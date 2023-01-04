@@ -332,6 +332,7 @@ jobs:
 
   publish_artifacts:
     executor: action-executor
+    resource_class: medium
     environment:
     steps:
       - custom_attach_workspace
@@ -342,7 +343,7 @@ jobs:
           name: Copy tarballs to folder
           command: |
             mkdir -p dist/artifacts/
-            cp dist/*.tgz dist/artifacts/
+            cp dist/releases/*.tgz dist/artifacts/
       - store_artifacts:
           path: dist/artifacts/
           destination: angular

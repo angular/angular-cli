@@ -32,6 +32,7 @@ genrule(
 
 pkg_npm(
     name = "npm_package",
+    tags = ["release-package"],
     visibility = ["//visibility:public"],
     deps = [
         ":README.md",

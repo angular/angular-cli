@@ -1,8 +1,5 @@
-import '../lib/bootstrap-local.js';
-
 import { ReleaseConfig } from '@angular/ng-dev';
 import packages from '../lib/packages.js';
-import buildPackages from '../scripts/build.js';
 
 const npmPackages = Object.entries(packages.releasePackages).map(([name, { experimental }]) => ({
   name,
@@ -13,7 +10,12 @@ const npmPackages = Object.entries(packages.releasePackages).map(([name, { exper
 export const release: ReleaseConfig = {
   representativeNpmPackage: '@angular/cli',
   npmPackages,
-  buildPackages: () => buildPackages.default(),
+  buildPackages: async () => {
+    // The `performNpmReleaseBuild` function is loaded at runtime to avoid loading additional
+    // files and dependencies unless a build is required.
+    const { performNpmReleaseBuild } = await import('../scripts/build-packages-dist.mjs');
+    return performNpmReleaseBuild();
+  },
   releaseNotes: {
     groupOrder: [
       '@angular/cli',

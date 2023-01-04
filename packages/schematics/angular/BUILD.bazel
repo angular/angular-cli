@@ -166,6 +166,7 @@ pkg_npm(
         "//packages/angular_devkit/schematics:package.json",
         "//packages/angular_devkit/core:package.json",
     ],
+    tags = ["release-package"],
     deps = [
         ":README.md",
         ":angular",
