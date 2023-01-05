@@ -130,7 +130,6 @@ async function _publishSnapshot(
 
 export interface SnapshotsOptions {
   force?: boolean;
-  githubTokenFile?: string;
   githubToken?: string;
   branch?: string;
 }
@@ -151,11 +150,7 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
     branch = '' + process.env['CIRCLE_BRANCH'];
   }
 
-  const githubToken = (
-    opts.githubToken ||
-    (opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8')) ||
-    ''
-  ).trim();
+  const githubToken = (opts.githubToken || process.env.SNAPSHOT_BUILDS_GITHUB_TOKEN || '').trim();
 
   if (githubToken) {
     logger.info('Setting up global git name.');
