@@ -318,16 +318,8 @@ jobs:
       - custom_attach_workspace
       - install_python
       - run:
-          name: Decrypt Credentials
-          # Note: when changing the image, you might have to re-encrypt the credentials with a
-          # matching version of openssl.
-          # See https://stackoverflow.com/a/43847627/2116927 for more info.
-          command: |
-            openssl aes-256-cbc -d -in .circleci/github_token -k "${KEY}" -out ~/github_token -md md5
-      - run:
           name: Deployment to Snapshot
-          command: |
-            yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
+          command: yarn admin snapshots --verbose
       - fail_fast
 
   publish_artifacts:
