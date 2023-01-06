@@ -1,3 +1,27 @@
+<a name="15.1.0-rc.0"></a>
+
+# 15.1.0-rc.0 (2023-01-06)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [dd2b65943](https://github.com/angular/angular-cli/commit/dd2b65943d706833f449f76cf8c7278d0a5399ad) | feat | add configuration files generation schematic |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [839d0cb57](https://github.com/angular/angular-cli/commit/839d0cb57ad42896578c235354ffb918ea8bb146) | feat | implement stats-json option for esbuild builder           |
+| [7c87ce47c](https://github.com/angular/angular-cli/commit/7c87ce47c66a6426b6b7fbb2edd38d8da729221f) | fix  | ensure Sass load paths are resolved from workspace root   |
+| [e91734ff8](https://github.com/angular/angular-cli/commit/e91734ff89402b4e2b654ce470fdd2d894759c64) | fix  | format esbuild error messages to include more information |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Kristiyan Kostadinov, Paul Gschwendtner, aanchal and angular-robot[bot]
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.0.5"></a>
 
 # 15.0.5 (2023-01-06)
