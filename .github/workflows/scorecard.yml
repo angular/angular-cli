@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # tag=v3.2.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # tag=v3.3.0
         with:
           persist-credentials: false
 
@@ -38,7 +38,7 @@ jobs:
 
       # Upload the results as artifacts.
       - name: 'Upload artifact'
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3.1.1
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # tag=v3.1.2
         with:
           name: SARIF file
           path: results.sarif
