@@ -1,3 +1,19 @@
+<a name="15.0.5"></a>
+
+# 15.0.5 (2023-01-06)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [c2030dec7](https://github.com/angular/angular-cli/commit/c2030dec7d9fecf42cca2de37cc3f7adaaa45e7f) | fix  | format esbuild error messages to include more information |
+
+## Special Thanks
+
+Alan Agius, Kristiyan Kostadinov, Paul Gschwendtner and aanchal
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.0-next.3"></a>
 
 # 15.1.0-next.3 (2022-12-14)
