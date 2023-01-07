@@ -7,7 +7,8 @@
  */
 
 import type { Plugin, PluginBuild } from 'esbuild';
-import { readFile } from 'fs/promises';
+import { readFile } from 'node:fs/promises';
+import { join, relative } from 'node:path';
 
 /**
  * Symbol marker used to indicate CSS resource resolution is being attempted.
@@ -54,15 +55,25 @@ export function createCssResourcePlugin(): Plugin {
           resolveDir,
         });
 
+        // Return results that are not files since these are most likely specific to another plugin
+        // and cannot be loaded by this plugin.
+        if (result.namespace !== 'file' || !result.path) {
+          return result;
+        }
+
+        // All file results are considered CSS resources and will be loaded via the file loader
         return {
           ...result,
+          // Use a relative path to prevent fully resolved paths in the metafile (JSON stats file).
+          // This is only necessary for custom namespaces. esbuild will handle the file namespace.
+          path: relative(build.initialOptions.absWorkingDir ?? '', result.path),
           namespace: 'css-resource',
         };
       });
 
       build.onLoad({ filter: /.*/, namespace: 'css-resource' }, async (args) => {
         return {
-          contents: await readFile(args.path),
+          contents: await readFile(join(build.initialOptions.absWorkingDir ?? '', args.path)),
           loader: 'file',
         };
       });
