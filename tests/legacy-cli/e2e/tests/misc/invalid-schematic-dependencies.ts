@@ -4,9 +4,6 @@ import { installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 
 export default async function () {
-  // TODO(crisbeto): temporarily disabled until Material is updated
-  return;
-
   // Must publish old version to local registry to allow install. This is especially important
   // for release commits as npm will try to request tooling packages that are not on the npm registry yet
   await publishOutdated('@schematics/angular@7');
