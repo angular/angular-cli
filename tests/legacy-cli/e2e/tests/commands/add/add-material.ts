@@ -5,9 +5,6 @@ import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
 
 export default async function () {
-  // TODO(crisbeto): temporarily disabled until Material is updated
-  return;
-
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/material');
 
