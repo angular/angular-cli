@@ -134,6 +134,7 @@ export function execute(
       webpackConfig.plugins.push(
         new FindTestsPlugin({
           include: options.include,
+          exclude: options.exclude,
           workspaceRoot: context.workspaceRoot,
           projectSourceRoot: path.join(context.workspaceRoot, sourceRoot),
         }),
