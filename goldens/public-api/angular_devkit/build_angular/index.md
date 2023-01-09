@@ -176,6 +176,7 @@ export interface KarmaBuilderOptions {
     browsers?: string;
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
+    exclude?: string[];
     fileReplacements?: FileReplacement_2[];
     include?: string[];
     inlineStyleLanguage?: InlineStyleLanguage_2;
