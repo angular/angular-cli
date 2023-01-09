@@ -59,6 +59,8 @@ export function execute(
     serviceWorker: false,
     watch: true,
     progress: options.progress,
+    // Disable bundle budgets are these are not meant to be used with a dev-server as this will add extra JavaScript for live-reloading.
+    budgets: [],
   });
 
   const serverTargetRun = context.scheduleTarget(serverTarget, {
