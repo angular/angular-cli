@@ -23,6 +23,7 @@ const PLUGIN_NAME = 'angular-find-tests-plugin';
 
 export interface FindTestsPluginOptions {
   include?: string[];
+  exclude?: string[];
   workspaceRoot: string;
   projectSourceRoot: string;
 }
@@ -33,7 +34,12 @@ export class FindTestsPlugin {
   constructor(private options: FindTestsPluginOptions) {}
 
   apply(compiler: Compiler): void {
-    const { include = ['**/*.spec.ts'], projectSourceRoot, workspaceRoot } = this.options;
+    const {
+      include = ['**/*.spec.ts'],
+      exclude = [],
+      projectSourceRoot,
+      workspaceRoot,
+    } = this.options;
     const webpackOptions = compiler.options;
     const entry =
       typeof webpackOptions.entry === 'function' ? webpackOptions.entry() : webpackOptions.entry;
@@ -42,7 +48,7 @@ export class FindTestsPlugin {
 
     // Add tests files are part of the entry-point.
     webpackOptions.entry = async () => {
-      const specFiles = await findTests(include, workspaceRoot, projectSourceRoot);
+      const specFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
 
       if (!specFiles.length) {
         assert(this.compilation, 'Compilation cannot be undefined.');
@@ -73,12 +79,13 @@ export class FindTestsPlugin {
 
 // go through all patterns and find unique list of files
 async function findTests(
-  patterns: string[],
+  include: string[],
+  exclude: string[],
   workspaceRoot: string,
   projectSourceRoot: string,
 ): Promise<string[]> {
-  const matchingTestsPromises = patterns.map((pattern) =>
-    findMatchingTests(pattern, workspaceRoot, projectSourceRoot),
+  const matchingTestsPromises = include.map((pattern) =>
+    findMatchingTests(pattern, exclude, workspaceRoot, projectSourceRoot),
   );
   const files = await Promise.all(matchingTestsPromises);
 
@@ -90,6 +97,7 @@ const normalizePath = (path: string): string => path.replace(/\\/g, '/');
 
 async function findMatchingTests(
   pattern: string,
+  ignore: string[],
   workspaceRoot: string,
   projectSourceRoot: string,
 ): Promise<string[]> {
@@ -132,7 +140,7 @@ async function findMatchingTests(
     root: projectSourceRoot,
     nomount: true,
     absolute: true,
-    ignore: ['**/node_modules/**'],
+    ignore: ['**/node_modules/**', ...ignore],
   });
 }
 
