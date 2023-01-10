@@ -132,6 +132,7 @@ export async function normalizeOptions(
 
   // Initial options to keep
   const {
+    allowedCommonJsDependencies,
     baseHref,
     buildOptimizer,
     crossOrigin,
@@ -150,6 +151,7 @@ export async function normalizeOptions(
   // Return all the normalized options
   return {
     advancedOptimizations: buildOptimizer,
+    allowedCommonJsDependencies,
     baseHref,
     cacheOptions,
     crossOrigin,
