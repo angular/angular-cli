@@ -10,7 +10,6 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 
 const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
-  'allowedCommonJsDependencies',
   'budgets',
   'progress',
   'scripts',

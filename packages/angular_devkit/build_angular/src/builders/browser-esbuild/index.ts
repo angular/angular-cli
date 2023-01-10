@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { BuildInvalidate, BuildOptions, Metafile, OutputFile } from 'esbuild';
+import type { BuildInvalidate, BuildOptions, OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
@@ -19,6 +19,7 @@ import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
+import { checkCommonJSModules } from './commonjs-checker';
 import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
 import { bundle, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
@@ -147,6 +148,12 @@ async function execute(
     inputs: { ...codeResults.metafile?.inputs, ...styleResults.metafile?.inputs },
     outputs: { ...codeResults.metafile?.outputs, ...styleResults.metafile?.outputs },
   };
+
+  // Check metafile for CommonJS module usage if optimizing scripts
+  if (optimizationOptions.scripts) {
+    const messages = checkCommonJSModules(metafile, options.allowedCommonJsDependencies);
+    await logMessages(context, { errors: [], warnings: messages });
+  }
 
   // Generate index HTML file
   if (indexHtmlOptions) {

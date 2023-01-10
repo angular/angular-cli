@@ -12,8 +12,8 @@ import {
   BuildInvalidate,
   BuildOptions,
   BuildResult,
-  Message,
   OutputFile,
+  PartialMessage,
   build,
   formatMessages,
 } from 'esbuild';
@@ -91,7 +91,7 @@ export async function bundle(
 
 export async function logMessages(
   context: BuilderContext,
-  { errors, warnings }: { errors: Message[]; warnings: Message[] },
+  { errors, warnings }: { errors: PartialMessage[]; warnings: PartialMessage[] },
 ): Promise<void> {
   if (warnings.length) {
     const warningMessages = await formatMessages(warnings, { kind: 'warning', color: true });
