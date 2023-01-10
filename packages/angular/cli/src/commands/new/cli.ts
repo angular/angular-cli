@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModuleImplementation,
@@ -35,7 +36,7 @@ export class NewCommandModule
   command = 'new [name]';
   aliases = 'n';
   describe = 'Creates a new Angular workspace.';
-  longDescriptionPath?: string | undefined;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   override async builder(argv: Argv): Promise<Argv<NewCommandArgs>> {
     const localYargs = (await super.builder(argv)).option('collection', {
