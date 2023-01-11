@@ -1,24 +1,52 @@
-<a name="15.1.0-rc.0"></a>
+<a name="15.1.0"></a>
 
-# 15.1.0-rc.0 (2023-01-06)
+# 15.1.0 (2023-01-11)
+
+## Deprecations
+
+### @angular-devkit/schematics
+
+- The Observable based `SchematicTestRunner.runSchematicAsync` and `SchematicTestRunner.runExternalSchematicAsync` method have been deprecated in favor of the Promise based `SchematicTestRunner.runSchematic` and `SchematicTestRunner.runExternalSchematic`.
 
 ### @schematics/angular
 
-| Commit                                                                                              | Type | Description                                  |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
-| [dd2b65943](https://github.com/angular/angular-cli/commit/dd2b65943d706833f449f76cf8c7278d0a5399ad) | feat | add configuration files generation schematic |
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [5b18ce154](https://github.com/angular/angular-cli/commit/5b18ce1545d047d49851a64e81a1f8ef59624ef7) | feat | add `guardType` as an alias of `implements` in guard schematic       |
+| [dd2b65943](https://github.com/angular/angular-cli/commit/dd2b65943d706833f449f76cf8c7278d0a5399ad) | feat | add configuration files generation schematic                         |
+| [8d000d156](https://github.com/angular/angular-cli/commit/8d000d1563684f9a9b6869e549e265f0997187c4) | feat | add environments generation schematic                                |
+| [6c39a162b](https://github.com/angular/angular-cli/commit/6c39a162bec67083bf6c11b54e84612f1d68c384) | feat | Add schematics for generating functional router guards and resolvers |
+| [62121f89a](https://github.com/angular/angular-cli/commit/62121f89abce54e0a1c2b816cdd32b57f2b5a5d1) | feat | add sideEffects:false to library package.json                        |
+| [9299dea64](https://github.com/angular/angular-cli/commit/9299dea6492527bcaea24c9c7f3116ee2779405b) | feat | generate functional interceptors                                     |
+| [49b313f27](https://github.com/angular/angular-cli/commit/49b313f27adef6300063c9d6817d1454a8657fe2) | fix  | add missing import for functional interceptor spec                   |
+| [2f92fe7e5](https://github.com/angular/angular-cli/commit/2f92fe7e589705b282102271897454ea852c4814) | fix  | add missing semicolon in functional guard/resolver/interceptor       |
+| [9b6d190f4](https://github.com/angular/angular-cli/commit/9b6d190f4a082c166d253b0f00162e0286238e45) | fix  | remove EnvironmentInjector import in functional guard spec           |
+| [b11d3f644](https://github.com/angular/angular-cli/commit/b11d3f6442d38f609471ab19c08a1c9a871e0ae3) | fix  | use proper variable in functional guard spec                         |
+| [451975f76](https://github.com/angular/angular-cli/commit/451975f7650041a83994e1308f85fe7e33a31e32) | fix  | use proper variable in resolver functional spec                      |
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
-| [839d0cb57](https://github.com/angular/angular-cli/commit/839d0cb57ad42896578c235354ffb918ea8bb146) | feat | implement stats-json option for esbuild builder           |
-| [7c87ce47c](https://github.com/angular/angular-cli/commit/7c87ce47c66a6426b6b7fbb2edd38d8da729221f) | fix  | ensure Sass load paths are resolved from workspace root   |
-| [e91734ff8](https://github.com/angular/angular-cli/commit/e91734ff89402b4e2b654ce470fdd2d894759c64) | fix  | format esbuild error messages to include more information |
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [c29df6954](https://github.com/angular/angular-cli/commit/c29df695467c41feccd3846a55c91c6784af87b2) | feat | add `assets` option to server builder                        |
+| [839d0cb57](https://github.com/angular/angular-cli/commit/839d0cb57ad42896578c235354ffb918ea8bb146) | feat | implement stats-json option for esbuild builder              |
+| [216991b9d](https://github.com/angular/angular-cli/commit/216991b9d9ca1d8f09992880a5fa92e7c98813fa) | feat | support inline component Sass styles with esbuild builder    |
+| [7c87ce47c](https://github.com/angular/angular-cli/commit/7c87ce47c66a6426b6b7fbb2edd38d8da729221f) | fix  | ensure Sass load paths are resolved from workspace root      |
+| [7a063238b](https://github.com/angular/angular-cli/commit/7a063238b83eea8b5b3237fed12db5528d1f6912) | fix  | explicitly send options to JS transformer workers            |
+| [22cba7937](https://github.com/angular/angular-cli/commit/22cba79370ed60a27f932acda363ffd87f5d9983) | fix  | provide an option to `exclude` specs in Karma builder        |
+| [20376649c](https://github.com/angular/angular-cli/commit/20376649c5e3003b0aa99b9328e2b61699ccba78) | fix  | transform async generator class methods for Zone.js support  |
+| [0520608f6](https://github.com/angular/angular-cli/commit/0520608f68f1768a13a46fbdb9ecb65310492460) | fix  | use relative css resource paths in esbuild JSON stats        |
+| [0c01532cb](https://github.com/angular/angular-cli/commit/0c01532cb5a3072b96cd65845a38b88ed4543de6) | perf | use worker pool for JavaScript transforms in esbuild builder |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [207358afb](https://github.com/angular/angular-cli/commit/207358afb89e6515cb8d73f5a3a63d9101e80d97) | feat | add `runSchematic` and `runExternalSchematic` methods |
 
 ## Special Thanks
 
-Alan Agius, Charles Lyding, Kristiyan Kostadinov, Paul Gschwendtner, aanchal and angular-robot[bot]
+Alan Agius, Andrew Scott, Charles Lyding, Cédric Exbrayat, Doug Parker, Felix Hamann, Jason Bedard, Joey Perrott and Kristiyan Kostadinov
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -35,46 +63,6 @@ Alan Agius, Charles Lyding, Kristiyan Kostadinov, Paul Gschwendtner, aanchal and
 ## Special Thanks
 
 Alan Agius, Kristiyan Kostadinov, Paul Gschwendtner and aanchal
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="15.1.0-next.3"></a>
-
-# 15.1.0-next.3 (2022-12-14)
-
-## Deprecations
-
-### @angular-devkit/schematics
-
-- The Observable based `SchematicTestRunner.runSchematicAsync` and `SchematicTestRunner.runExternalSchematicAsync` methods have been deprecated in favor of the Promise based `SchematicTestRunner.runSchematic` and `SchematicTestRunner.runExternalSchematic`.
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
-| [8d000d156](https://github.com/angular/angular-cli/commit/8d000d1563684f9a9b6869e549e265f0997187c4) | feat | add environments generation schematic |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
-| [216991b9d](https://github.com/angular/angular-cli/commit/216991b9d9ca1d8f09992880a5fa92e7c98813fa) | feat | support inline component Sass styles with esbuild builder             |
-| [8fd08491a](https://github.com/angular/angular-cli/commit/8fd08491a88bc2b088dcb3ac68a6c328167e38c3) | fix  | display actionable error when a style does not exist in Karma builder |
-| [97373016c](https://github.com/angular/angular-cli/commit/97373016cfe2635125015b2fec390f43d22ebf31) | fix  | downlevel class private methods when targeting Safari <=v15           |
-| [27b22b02d](https://github.com/angular/angular-cli/commit/27b22b02dccef2e2d4f2f1f03910f4b70c676f84) | fix  | include sources in generated                                          |
-| [310144d32](https://github.com/angular/angular-cli/commit/310144d324bd773aa6026f47b345827d5fe48332) | fix  | only set ngDevMode when script optimizations are enabled              |
-| [20376649c](https://github.com/angular/angular-cli/commit/20376649c5e3003b0aa99b9328e2b61699ccba78) | fix  | transform async generator class methods for Zone.js support           |
-| [afe9feaa4](https://github.com/angular/angular-cli/commit/afe9feaa45913cbebe7f22c678d693d96f38584a) | fix  | update locale setting snippet to use `globalThis`.                    |
-
-### @angular-devkit/schematics
-
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [207358afb](https://github.com/angular/angular-cli/commit/207358afb89e6515cb8d73f5a3a63d9101e80d97) | feat | add `runSchematic` and `runExternalSchematic` methods |
-
-## Special Thanks
-
-Alan Agius and Charles Lyding
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -99,34 +87,6 @@ Alan Agius and Charles Lyding
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="15.1.0-next.2"></a>
-
-# 15.1.0-next.2 (2022-12-08)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                    |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [5b18ce154](https://github.com/angular/angular-cli/commit/5b18ce1545d047d49851a64e81a1f8ef59624ef7) | feat | add `guardType` as an alias of `implements` in guard schematic |
-| [49b313f27](https://github.com/angular/angular-cli/commit/49b313f27adef6300063c9d6817d1454a8657fe2) | fix  | add missing import for functional interceptor spec             |
-| [2f92fe7e5](https://github.com/angular/angular-cli/commit/2f92fe7e589705b282102271897454ea852c4814) | fix  | add missing semicolon in functional guard/resolver/interceptor |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [97716969c](https://github.com/angular/angular-cli/commit/97716969c243d65e385dcd78f5035d2c13f0258b) | fix  | default preserve symlinks to Node.js value for esbuild      |
-| [cf2f30afc](https://github.com/angular/angular-cli/commit/cf2f30afc0ad0ceae34c457955a22186bc5ce60d) | fix  | downlevel class fields with Safari <= v15 for esbuild       |
-| [25eaaa24b](https://github.com/angular/angular-cli/commit/25eaaa24b51af400262b97b4d4be2391ebd4a82d) | fix  | downlevel class properties when targeting Safari <=v15      |
-| [7a063238b](https://github.com/angular/angular-cli/commit/7a063238b83eea8b5b3237fed12db5528d1f6912) | fix  | explicitly send options to JS transformer workers           |
-| [ef99a68b4](https://github.com/angular/angular-cli/commit/ef99a68b46c992c1988c5ca4c6fb066e89762d64) | fix  | prevent optimization adding unsupported ECMASCript features |
-
-## Special Thanks
-
-Alan Agius, Charles Lyding, Cédric Exbrayat, Dominic Elm, Doug Parker and Paul Gschwendtner
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="15.0.3"></a>
 
 # 15.0.3 (2022-12-07)
@@ -143,37 +103,6 @@ Alan Agius, Charles Lyding, Cédric Exbrayat, Dominic Elm, Doug Parker and Paul 
 ## Special Thanks
 
 Charles Lyding, Dominic Elm and Paul Gschwendtner
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="15.1.0-next.1"></a>
-
-# 15.1.0-next.1 (2022-11-30)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [9299dea64](https://github.com/angular/angular-cli/commit/9299dea6492527bcaea24c9c7f3116ee2779405b) | feat | generate functional interceptors                           |
-| [9b6d190f4](https://github.com/angular/angular-cli/commit/9b6d190f4a082c166d253b0f00162e0286238e45) | fix  | remove EnvironmentInjector import in functional guard spec |
-| [b11d3f644](https://github.com/angular/angular-cli/commit/b11d3f6442d38f609471ab19c08a1c9a871e0ae3) | fix  | use proper variable in functional guard spec               |
-| [451975f76](https://github.com/angular/angular-cli/commit/451975f7650041a83994e1308f85fe7e33a31e32) | fix  | use proper variable in resolver functional spec            |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
-| [012393d37](https://github.com/angular/angular-cli/commit/012393d37924a2afd172bfd80ee5e4bcd1c9abdf) | fix  | correctly set Sass quietDeps and verbose options |
-
-### @ngtools/webpack
-
-| Commit                                                                                              | Type | Description                  |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
-| [856720b91](https://github.com/angular/angular-cli/commit/856720b913ec1ba82b96db2d3a61628cb3795f11) | fix  | elide unused type references |
-
-## Special Thanks
-
-Alan Agius, Andrew Scott, Cédric Exbrayat, Jason Bedard and Juuso Valkeejärvi
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -196,30 +125,6 @@ Alan Agius, Andrew Scott, Cédric Exbrayat, Jason Bedard and Juuso Valkeejärvi
 ## Special Thanks
 
 Alan Agius and Juuso Valkeejärvi
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="15.1.0-next.0"></a>
-
-# 15.1.0-next.0 (2022-11-23)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
-| [6c39a162b](https://github.com/angular/angular-cli/commit/6c39a162bec67083bf6c11b54e84612f1d68c384) | feat | Add schematics for generating functional router guards and resolvers |
-| [62121f89a](https://github.com/angular/angular-cli/commit/62121f89abce54e0a1c2b816cdd32b57f2b5a5d1) | feat | add sideEffects:false to library package.json                        |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                  |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
-| [c29df6954](https://github.com/angular/angular-cli/commit/c29df695467c41feccd3846a55c91c6784af87b2) | feat | add `assets` option to server builder                        |
-| [0c01532cb](https://github.com/angular/angular-cli/commit/0c01532cb5a3072b96cd65845a38b88ed4543de6) | perf | use worker pool for JavaScript transforms in esbuild builder |
-
-## Special Thanks
-
-Alan Agius, Andrew Scott, Charles Lyding, Doug Parker, Felix Hamann and Joey Perrott
 
 <!-- CHANGELOG SPLIT MARKER -->
 
