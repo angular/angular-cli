@@ -102,7 +102,7 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
           'Version from which to migrate from. ' +
           `Only available with a single package being updated, and only with 'migrate-only'.`,
         type: 'string',
-        implies: ['to', 'migrate-only'],
+        implies: ['migrate-only'],
         conflicts: ['name'],
       })
       .option('to', {
