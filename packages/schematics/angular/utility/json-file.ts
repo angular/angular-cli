@@ -22,7 +22,7 @@ import {
 export type InsertionIndex = (properties: string[]) => number;
 export type JSONPath = (string | number)[];
 
-/** @internal */
+/** @private */
 export class JSONFile {
   content: string;
 
