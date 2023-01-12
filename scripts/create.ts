@@ -7,8 +7,8 @@
  */
 
 /* eslint-disable import/no-extraneous-dependencies, no-prototype-builtins */
-import { logging } from '@angular-devkit/core';
 import cli from '@angular/cli/lib/cli';
+import { logging } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';

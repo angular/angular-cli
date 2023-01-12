@@ -146,7 +146,7 @@
     "eslint": "8.31.0",
     "eslint-config-prettier": "8.6.0",
     "eslint-plugin-header": "3.1.1",
-    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-import": "2.27.4",
     "express": "4.18.2",
     "glob": "8.0.3",
     "http-proxy": "^1.18.1",
