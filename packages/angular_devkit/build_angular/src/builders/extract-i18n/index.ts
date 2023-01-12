@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
+import type { Diagnostics } from '@angular/localize/tools';
 import { BuilderContext, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import { BuildResult, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
-import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
-import type { Diagnostics } from '@angular/localize/tools';
 import * as fs from 'fs';
 import * as path from 'path';
 import webpack, { Configuration } from 'webpack';
