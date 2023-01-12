@@ -20,6 +20,7 @@ import templateBuilder from '@babel/template';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { workerData } from 'worker_threads';
+import { InlineOptions } from './bundle-inline-options';
 import { allowMinify, shouldBeautify } from './environment-options';
 import { assertIsError } from './error';
 import { I18nOptions } from './i18n-options';
@@ -65,7 +66,7 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
   return loadEsmModule('@angular/localize/tools');
 }
 
-export async function createI18nPlugins(
+async function createI18nPlugins(
   locale: string,
   translation: unknown | undefined,
   missingTranslation: 'error' | 'warning' | 'ignore',
@@ -99,15 +100,6 @@ export async function createI18nPlugins(
   }
 
   return { diagnostics, plugins };
-}
-
-export interface InlineOptions {
-  filename: string;
-  code: string;
-  map?: string;
-  outputPath: string;
-  missingTranslation?: 'warning' | 'error' | 'ignore';
-  setLocale?: boolean;
 }
 
 interface LocalizePosition {
