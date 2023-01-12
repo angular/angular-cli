@@ -6,5 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-require('../../../../../lib/bootstrap-local');
-module.exports = require('./process-bundle.ts');
+export interface InlineOptions {
+  filename: string;
+  code: string;
+  map?: string;
+  outputPath: string;
+  missingTranslation?: 'warning' | 'error' | 'ignore';
+  setLocale?: boolean;
+}
