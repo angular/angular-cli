@@ -46,14 +46,8 @@ def ts_library(
         **kwargs
     )
 
-NG_VERSION = "^15.0.0-next.0"
-RXJS_VERSION = "^6.5.5"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
-DEVKIT_CORE_VERSION = "^15.0.0-next.0"
-DEVKIT_ARCHITECT_VERSION = "^0.1500.0-next.0"
-DEVKIT_BUILD_ANGULAR_VERSION = "^15.0.0-next.0"
-TSLIB_VERSION = "^2.3.0"
 
 NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
     "builders",
@@ -67,12 +61,6 @@ PKG_GROUP_REPLACEMENTS = {
     ]""" % ",\n      ".join(["\"%s\"" % s for s in NGUNIVERSAL_SCOPED_PACKAGES]),
     "EXPRESS_VERSION": EXPRESS_VERSION,
     "EXPRESS_TYPES_VERSION": EXPRESS_TYPES_VERSION,
-    "NG_VERSION": NG_VERSION,
-    "RXJS_VERSION": RXJS_VERSION,
-    "DEVKIT_CORE_VERSION": DEVKIT_CORE_VERSION,
-    "DEVKIT_ARCHITECT_VERSION": DEVKIT_ARCHITECT_VERSION,
-    "DEVKIT_BUILD_ANGULAR_VERSION": DEVKIT_BUILD_ANGULAR_VERSION,
-    "TSLIB_VERSION": TSLIB_VERSION,
 }
 
 def ng_module(name, package_name, module_name = None, tsconfig = None, testonly = False, deps = [], **kwargs):

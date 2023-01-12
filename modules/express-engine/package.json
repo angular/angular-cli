@@ -12,14 +12,14 @@
     "node": "^14.20.0 || ^16.13.0 || >=18.10.0"
   },
   "peerDependencies": {
-    "@angular/common": "NG_VERSION",
-    "@angular/core": "NG_VERSION",
-    "@angular/platform-server": "NG_VERSION",
+    "@angular/common": "^15.0.0",
+    "@angular/core": "^15.0.0",
+    "@angular/platform-server": "^15.0.0",
     "express": "EXPRESS_VERSION"
   },
   "dependencies": {
     "@nguniversal/common": "0.0.0-PLACEHOLDER",
-    "tslib": "TSLIB_VERSION"
+    "tslib": "^2.3.0"
   },
   "schematics": "./schematics/collection.json",
   "ng-update": {
