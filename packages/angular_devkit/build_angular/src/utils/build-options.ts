@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
 import type { ParsedConfiguration } from '@angular/compiler-cli';
+import { logging } from '@angular-devkit/core';
 import {
   AssetPatternClass,
   Budget,
