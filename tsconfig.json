@@ -8,18 +8,13 @@
     "experimentalDecorators": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
-    "noUnusedParameters": false,
-    "noUnusedLocals": false,
     "outDir": "./dist",
-    "rootDir": ".",
     "skipLibCheck": true,
     "strict": true,
     "target": "es2019",
     "lib": ["es2020"],
-    "baseUrl": "",
-    "rootDirs": [".", "./dist-schema/", "./bazel-bin/"],
-    "typeRoots": ["./node_modules/@types"],
-    "types": ["node", "jasmine"],
+    "rootDir": ".",
+    "rootDirs": [".", "./dist-schema/"],
     "paths": {
       "@angular-devkit/core": ["./packages/angular_devkit/core/src/index"],
       "@angular-devkit/core/node": ["./packages/angular_devkit/core/node/index"],
@@ -50,8 +45,7 @@
     "suppressTsconfigOverrideWarnings": true
   },
   "exclude": [
-    "packages/angular_devkit/build_angular/src/bazel-babel.d.ts",
-    "bazel-out/**/*",
+    "packages/angular_devkit/build_angular/src/babel-bazel.d.ts",
     "dist/**/*",
     "dist-schema/**",
     "goldens/**/*",
@@ -60,9 +54,7 @@
     "packages/angular_devkit/schematics_cli/blank/*-files/**/*",
     "packages/angular_devkit/schematics_cli/schematic/files/**/*",
     "packages/angular_devkit/*/test/**/*",
-    "packages/schematics/*/*/*files/**/*",
     "tests/**/*",
-    "tools/**/*",
     ".ng-dev/**/*"
   ]
 }
