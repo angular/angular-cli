@@ -1,3 +1,19 @@
+<a name="15.1.0-rc.0"></a>
+
+# 15.1.0-rc.0 (2023-01-12)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                      |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------------------ |
+| [98d7837b](https://github.com/angular/universal/commit/98d7837bf67c047cb8358ba6394b6180453bc420) | fix  | disable bundle budgets when using the dev-server |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker, Mark Pieszak and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.3"></a>
 
 # 14.2.3 (2022-11-23)
