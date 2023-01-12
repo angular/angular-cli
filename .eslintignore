@@ -1,6 +1,7 @@
 /bazel-out/
 /dist-schema/
 /goldens/public-api
+/packages/angular_devkit/build_angular/src/babel-bazel.d.ts
 /packages/angular_devkit/build_angular/test/
 /packages/angular_devkit/build_webpack/test/
 /packages/angular_devkit/schematics_cli/blank/project-files/
