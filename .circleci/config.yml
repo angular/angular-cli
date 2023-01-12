@@ -25,7 +25,7 @@ var_5: &workspace_location .
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.0.1
+  browser-tools: circleci/browser-tools@1.4.0
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
