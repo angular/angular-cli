@@ -1,5 +1,5 @@
 import { expectFileToMatch } from '../../utils/fs';
-import { execWithEnv, extractNpmEnv, silentNpm } from '../../utils/process';
+import { execWithEnv, extractNpmEnv, ng, silentNpm } from '../../utils/process';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 
@@ -13,23 +13,8 @@ export default async function () {
   // Install outdated and incompatible version
   await installPackage('@schematics/angular@7');
 
-  const isPrerelease = await isPrereleaseCli();
-  const tag = isPrerelease ? '@next' : '';
-
-  await execWithEnv(
-    'ng',
-    ['add', `@angular/material${tag}`, '--skip-confirmation'],
-    // `@angular/material` pre-release may not support the current version of `@angular/core` pre-release.
-    // due to the order of releases FW -> CLI -> Material
-    // In this case peer dependency ranges may not resolve causing npm 7+ to fail during tests.
-    {
-      ...process.env,
-      'NPM_CONFIG_legacy_peer_deps': isPrerelease
-        ? 'true'
-        : process.env['NPM_CONFIG_legacy_peer_deps'],
-    },
-  );
-
+  const tag = (await isPrereleaseCli()) ? '@next' : '';
+  await ng('add', `@angular/material${tag}`, '--skip-confirmation');
   await expectFileToMatch('package.json', /@angular\/material/);
 
   // Clean up existing cdk package
