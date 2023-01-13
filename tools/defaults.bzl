@@ -141,7 +141,7 @@ def ng_package(deps = [], **kwargs):
         "0.0.0-PLACEHOLDER": "0.0.0",
     })
     stamped_substitutions = dict(common_substitutions, **{
-        "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
+        "0.0.0-PLACEHOLDER": "{STABLE_PROJECT_VERSION}",
     })
 
     _ng_package(
@@ -167,7 +167,7 @@ def pkg_npm(name, **kwargs):
         "0.0.0-PLACEHOLDER": "0.0.0",
     })
     stamped_substitutions = dict(common_substitutions, **{
-        "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
+        "0.0.0-PLACEHOLDER": "{STABLE_PROJECT_VERSION}",
     })
 
     _pkg_npm(
