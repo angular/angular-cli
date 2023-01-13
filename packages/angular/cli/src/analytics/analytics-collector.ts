@@ -10,6 +10,7 @@ import { randomUUID } from 'crypto';
 import * as https from 'https';
 import * as os from 'os';
 import * as querystring from 'querystring';
+import * as semver from 'semver';
 import type { CommandContext } from '../command-builder/command-module';
 import { ngDebug } from '../utilities/environment-options';
 import { assertIsError } from '../utilities/error';
@@ -52,8 +53,7 @@ export class AnalyticsCollector {
 
     this.requestParameterStringified = querystring.stringify(requestParameters);
 
-    // Remove the `v` at the beginning.
-    const nodeVersion = process.version.substring(1);
+    const parsedVersion = semver.parse(process.version);
     const packageManagerVersion = context.packageManager.version;
 
     this.userParameters = {
@@ -62,8 +62,10 @@ export class AnalyticsCollector {
       [UserCustomDimension.OsArchitecture]: os.arch(),
       // While User ID is being collected by GA, this is not visible in reports/for filtering.
       [UserCustomDimension.UserId]: userId,
-      [UserCustomDimension.NodeVersion]: nodeVersion,
-      [UserCustomDimension.NodeMajorVersion]: +nodeVersion.split('.', 1)[0],
+      [UserCustomDimension.NodeVersion]: parsedVersion
+        ? `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`
+        : 'other',
+      [UserCustomDimension.NodeMajorVersion]: parsedVersion?.major,
       [UserCustomDimension.PackageManager]: context.packageManager.name,
       [UserCustomDimension.PackageManagerVersion]: packageManagerVersion,
       [UserCustomDimension.PackageManagerMajorVersion]: packageManagerVersion
