@@ -7,51 +7,36 @@ import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  // `@angular/material` pre-release may not support the current version of `@angular/core` pre-release.
-  // due to the order of releases FW -> CLI -> Material
-  // In this case peer dependency ranges may not resolve causing npm 7+ to fail during tests.
-  const original_NPM_CONFIG_legacy_peer_deps = process.env['NPM_CONFIG_legacy_peer_deps'];
-  const isPrerelease = await isPrereleaseCli();
+  let tag = (await isPrereleaseCli()) ? '@next' : '';
+  await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
-  let tag = isPrerelease ? '@next' : '';
-
-  try {
-    process.env['NPM_CONFIG_legacy_peer_deps'] = isPrerelease
-      ? 'true'
-      : original_NPM_CONFIG_legacy_peer_deps;
-
-    await ng('add', `@angular/material${tag}`, '--skip-confirmation');
-
-    const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
-    if (isSnapshotBuild) {
-      await updateJsonFile('package.json', (packageJson) => {
-        const dependencies = packageJson['dependencies'];
-        // Angular material adds dependencies on other Angular packages
-        // Iterate over all of the packages to update them to the snapshot version.
-        for (const [name, version] of Object.entries(snapshots.dependencies)) {
-          if (name in dependencies) {
-            dependencies[name] = version;
-          }
+  const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
+  if (isSnapshotBuild) {
+    await updateJsonFile('package.json', (packageJson) => {
+      const dependencies = packageJson['dependencies'];
+      // Angular material adds dependencies on other Angular packages
+      // Iterate over all of the packages to update them to the snapshot version.
+      for (const [name, version] of Object.entries(snapshots.dependencies)) {
+        if (name in dependencies) {
+          dependencies[name] = version;
         }
-
-        dependencies['@angular/material-moment-adapter'] =
-          snapshots.dependencies['@angular/material-moment-adapter'];
-      });
-      await installWorkspacePackages();
-    } else {
-      if (!tag) {
-        const installedMaterialVersion = JSON.parse(await readFile('package.json'))['dependencies'][
-          '@angular/material'
-        ];
-        tag = `@${installedMaterialVersion}`;
       }
-      await installPackage(`@angular/material-moment-adapter${tag}`);
-    }
 
-    await installPackage('moment');
-  } finally {
-    process.env['NPM_CONFIG_legacy_peer_deps'] = original_NPM_CONFIG_legacy_peer_deps;
+      dependencies['@angular/material-moment-adapter'] =
+        snapshots.dependencies['@angular/material-moment-adapter'];
+    });
+    await installWorkspacePackages();
+  } else {
+    if (!tag) {
+      const installedMaterialVersion = JSON.parse(await readFile('package.json'))['dependencies'][
+        '@angular/material'
+      ];
+      tag = `@${installedMaterialVersion}`;
+    }
+    await installPackage(`@angular/material-moment-adapter${tag}`);
   }
+
+  await installPackage('moment');
 
   await ng('build');
 
