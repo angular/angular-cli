@@ -469,7 +469,7 @@ export async function* buildEsbuildBrowser(
       'JIT mode is currently not supported by this experimental builder. AOT mode must be used.',
     );
 
-    return { success: false };
+    return;
   }
 
   // Inform user of experimental status of builder and options
@@ -480,7 +480,7 @@ export async function* buildEsbuildBrowser(
   if (!projectName) {
     context.logger.error(`The 'browser-esbuild' builder requires a target to be specified.`);
 
-    return { success: false };
+    return;
   }
 
   const normalizedOptions = await normalizeOptions(context, projectName, initialOptions);
@@ -497,18 +497,24 @@ export async function* buildEsbuildBrowser(
     assertIsError(e);
     context.logger.error('Unable to create output directory: ' + e.message);
 
-    return { success: false };
+    return;
   }
 
   // Initial build
-  let result = await execute(normalizedOptions, context);
-  yield result.output;
+  let result: ExecutionResult;
+  try {
+    result = await execute(normalizedOptions, context);
+    yield result.output;
 
-  // Finish if watch mode is not enabled
-  if (!initialOptions.watch) {
-    shutdownSassWorkerPool();
-
-    return;
+    // Finish if watch mode is not enabled
+    if (!initialOptions.watch) {
+      return;
+    }
+  } finally {
+    // Ensure Sass workers are shutdown if not watching
+    if (!initialOptions.watch) {
+      shutdownSassWorkerPool();
+    }
   }
 
   context.logger.info('Watch mode enabled. Watching for file changes...');
