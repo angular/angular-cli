@@ -70,8 +70,8 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
 
     NPM_PACKAGE_SUBSTITUTIONS = {
         # Version of the local package being built, generated via the `--workspace_status_command` flag.
-        "0.0.0-PLACEHOLDER": "{BUILD_SCM_VERSION}",
-        "0.0.0-EXPERIMENTAL-PLACEHOLDER": "{BUILD_SCM_EXPERIMENTAL_VERSION}",
+        "0.0.0-PLACEHOLDER": "{STABLE_PROJECT_VERSION}",
+        "0.0.0-EXPERIMENTAL-PLACEHOLDER": "{STABLE_PROJECT_EXPERIMENTAL_VERSION}",
         "BUILD_SCM_HASH-PLACEHOLDER": "{BUILD_SCM_ABBREV_HASH}",
         "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
         "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
