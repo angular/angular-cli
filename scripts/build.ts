@@ -14,7 +14,7 @@ import * as path from 'path';
 import { packages } from '../lib/packages';
 import buildSchema from './build-schema';
 
-const minimatch = require('minimatch');
+const { minimatch } = require('minimatch');
 const tar = require('tar');
 
 const gitIgnoreFiles = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8').split('\n');
