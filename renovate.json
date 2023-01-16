@@ -12,7 +12,7 @@
   "dependencyDashboard": true,
   "schedule": ["after 10:00pm every weekday", "before 4:00am every weekday", "every weekend"],
   "baseBranches": ["main"],
-  "ignoreDeps": ["@types/node", "quicktype-core"],
+  "ignoreDeps": ["@types/node"],
   "includePaths": [
     "WORKSPACE",
     "package.json",

@@ -193,9 +193,7 @@
           "$ref": "../../../../schematics/angular/web-worker/schema.json"
         }
       },
-      "additionalProperties": {
-        "type": "object"
-      }
+      "additionalProperties": true
     },
     "fileVersion": {
       "type": "integer",
