@@ -172,7 +172,7 @@
     "loader-utils": "3.2.1",
     "magic-string": "0.27.0",
     "mini-css-extract-plugin": "2.7.2",
-    "minimatch": "5.1.2",
+    "minimatch": "~6.0.4",
     "ng-packagr": "15.1.1",
     "node-fetch": "^2.2.0",
     "npm": "^8.11.0",
