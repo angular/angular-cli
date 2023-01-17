@@ -9,7 +9,7 @@
 import type { BuildOptions, OutputFile } from 'esbuild';
 import * as path from 'node:path';
 import { createCssResourcePlugin } from './css-resource-plugin';
-import { bundle } from './esbuild';
+import { BundlerContext } from './esbuild';
 import { createSassPlugin } from './sass-plugin';
 
 export interface BundleStylesheetOptions {
@@ -115,14 +115,15 @@ export async function bundleComponentStylesheet(
   });
 
   // Execute esbuild
-  const result = await bundle(options.workspaceRoot, buildOptions);
+  const context = new BundlerContext(options.workspaceRoot, false, buildOptions);
+  const result = await context.bundle();
 
   // Extract the result of the bundling from the output files
   let contents = '';
   let map;
   let outputPath;
   const resourceFiles: OutputFile[] = [];
-  if (result.outputFiles) {
+  if (!result.errors) {
     for (const outputFile of result.outputFiles) {
       const filename = path.basename(outputFile.path);
       if (filename.endsWith('.css')) {
@@ -144,6 +145,6 @@ export async function bundleComponentStylesheet(
     map,
     path: outputPath,
     resourceFiles,
-    metafile: result.outputFiles && result.metafile,
+    metafile: result.errors ? undefined : result.metafile,
   };
 }
