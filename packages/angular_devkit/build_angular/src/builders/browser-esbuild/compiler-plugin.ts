@@ -277,7 +277,9 @@ export function createCompilerPlugin(
             );
 
             const { contents, resourceFiles, errors, warnings } = stylesheetResult;
-            (result.errors ??= []).push(...errors);
+            if (errors) {
+              (result.errors ??= []).push(...errors);
+            }
             (result.warnings ??= []).push(...warnings);
             stylesheetResourceFiles.push(...resourceFiles);
             if (stylesheetResult.metafile) {

@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { BuildInvalidate, BuildOptions, OutputFile } from 'esbuild';
+import type { BuildOptions, OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
@@ -21,7 +21,7 @@ import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { checkCommonJSModules } from './commonjs-checker';
 import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
-import { bundle, logMessages } from './esbuild';
+import { BundlerContext, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
 import { extractLicenses } from './license-extractor';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
@@ -31,8 +31,8 @@ import { createStylesheetBundleOptions } from './stylesheets';
 import { ChangedFiles, createWatcher } from './watcher';
 
 interface RebuildState {
-  codeRebuild?: BuildInvalidate;
-  globalStylesRebuild?: BuildInvalidate;
+  codeRebuild?: BundlerContext;
+  globalStylesRebuild?: BundlerContext;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
 }
@@ -43,8 +43,8 @@ interface RebuildState {
 class ExecutionResult {
   constructor(
     private success: boolean,
-    private codeRebuild?: BuildInvalidate,
-    private globalStylesRebuild?: BuildInvalidate,
+    private codeRebuild?: BundlerContext,
+    private globalStylesRebuild?: BundlerContext,
     private codeBundleCache?: SourceFileCache,
   ) {}
 
@@ -65,8 +65,8 @@ class ExecutionResult {
     };
   }
 
-  dispose(): void {
-    this.codeRebuild?.dispose();
+  async dispose(): Promise<void> {
+    await Promise.all([this.codeRebuild?.dispose(), this.globalStylesRebuild?.dispose()]);
   }
 }
 
@@ -91,45 +91,54 @@ async function execute(
     getSupportedBrowsers(projectRoot, context.logger),
   );
 
+  // Reuse rebuild state or create new bundle contexts for code and global stylesheets
   const codeBundleCache = options.watch
     ? rebuildState?.codeBundleCache ?? new SourceFileCache()
     : undefined;
+  const codeBundleContext =
+    rebuildState?.codeRebuild ??
+    new BundlerContext(
+      workspaceRoot,
+      !!options.watch,
+      createCodeBundleOptions(options, target, codeBundleCache),
+    );
+  const globalStylesBundleContext =
+    rebuildState?.globalStylesRebuild ??
+    new BundlerContext(
+      workspaceRoot,
+      !!options.watch,
+      createGlobalStylesBundleOptions(options, target),
+    );
 
   const [codeResults, styleResults] = await Promise.all([
     // Execute esbuild to bundle the application code
-    bundle(
-      workspaceRoot,
-      rebuildState?.codeRebuild ?? createCodeBundleOptions(options, target, codeBundleCache),
-    ),
+    codeBundleContext.bundle(),
     // Execute esbuild to bundle the global stylesheets
-    bundle(
-      workspaceRoot,
-      rebuildState?.globalStylesRebuild ?? createGlobalStylesBundleOptions(options, target),
-    ),
+    globalStylesBundleContext.bundle(),
   ]);
 
   // Log all warnings and errors generated during bundling
   await logMessages(context, {
-    errors: [...codeResults.errors, ...styleResults.errors],
+    errors: [...(codeResults.errors || []), ...(styleResults.errors || [])],
     warnings: [...codeResults.warnings, ...styleResults.warnings],
   });
 
   // Return if the bundling failed to generate output files or there are errors
-  if (!codeResults.outputFiles || codeResults.errors.length) {
+  if (codeResults.errors) {
     return new ExecutionResult(
       false,
-      rebuildState?.codeRebuild,
-      (styleResults.outputFiles && styleResults.rebuild) ?? rebuildState?.globalStylesRebuild,
+      codeBundleContext,
+      globalStylesBundleContext,
       codeBundleCache,
     );
   }
 
   // Return if the global stylesheet bundling has errors
-  if (!styleResults.outputFiles || styleResults.errors.length) {
+  if (styleResults.errors) {
     return new ExecutionResult(
       false,
-      codeResults.rebuild,
-      rebuildState?.globalStylesRebuild,
+      codeBundleContext,
+      globalStylesBundleContext,
       codeBundleCache,
     );
   }
@@ -152,7 +161,7 @@ async function execute(
   // Check metafile for CommonJS module usage if optimizing scripts
   if (optimizationOptions.scripts) {
     const messages = checkCommonJSModules(metafile, options.allowedCommonJsDependencies);
-    await logMessages(context, { errors: [], warnings: messages });
+    await logMessages(context, { warnings: messages });
   }
 
   // Generate index HTML file
@@ -232,14 +241,19 @@ async function execute(
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : `${error}`);
 
-      return new ExecutionResult(false, codeResults.rebuild, styleResults.rebuild, codeBundleCache);
+      return new ExecutionResult(
+        false,
+        codeBundleContext,
+        globalStylesBundleContext,
+        codeBundleCache,
+      );
     }
   }
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
 
-  return new ExecutionResult(true, codeResults.rebuild, styleResults.rebuild, codeBundleCache);
+  return new ExecutionResult(true, codeBundleContext, globalStylesBundleContext, codeBundleCache);
 }
 
 function createOutputFileFromText(path: string, text: string): OutputFile {
@@ -275,7 +289,6 @@ function createCodeBundleOptions(
   return {
     absWorkingDir: workspaceRoot,
     bundle: true,
-    incremental: options.watch,
     format: 'esm',
     entryPoints,
     entryNames: outputNames.bundles,
@@ -414,7 +427,6 @@ function createGlobalStylesBundleOptions(
     outputNames,
     includePaths: stylePreprocessorOptions?.includePaths,
   });
-  buildOptions.incremental = watch;
   buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
 
   const namespace = 'angular:styles/global';
@@ -552,7 +564,7 @@ export async function* buildEsbuildBrowser(
     // Stop the watcher
     await watcher.close();
     // Cleanup incremental rebuild state
-    result.dispose();
+    await result.dispose();
     shutdownSassWorkerPool();
   }
 }
