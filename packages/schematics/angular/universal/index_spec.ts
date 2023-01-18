@@ -158,6 +158,39 @@ describe('Universal Schematic', () => {
     expect(contents).toMatch(/BrowserModule\.withServerTransition\({ appId: 'serverApp' }\)/);
   });
 
+  it('should replace existing `withServerTransition` in BrowserModule import', async () => {
+    const filePath = '/projects/bar/src/app/app.module.ts';
+    appTree.overwrite(
+      filePath,
+      `
+      import { NgModule } from '@angular/core';
+      import { BrowserModule } from '@angular/platform-browser';
+
+      import { AppRoutingModule } from './app-routing.module';
+      import { AppComponent } from './app.component';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule.withServerTransition({ appId: 'foo' }),
+          AppRoutingModule
+        ],
+        providers: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `,
+    );
+    const tree = await schematicRunner.runSchematic('universal', defaultOptions, appTree);
+    const contents = tree.readContent(filePath);
+    console.log(contents);
+
+    expect(contents).toContain(`BrowserModule.withServerTransition({ appId: 'serverApp' }),`);
+    expect(contents).not.toContain(`withServerTransition({ appId: 'foo' })`);
+  });
+
   it('should wrap the bootstrap call in a DOMContentLoaded event handler', async () => {
     const tree = await schematicRunner.runSchematic('universal', defaultOptions, appTree);
     const filePath = '/projects/bar/src/main.ts';
