@@ -43,7 +43,7 @@ function createTestCaseHost(inputData = '') {
           require.resolve(join(__dirname, 'test', 'cases', path) + '.json'),
           'utf8',
         );
-        expect(data).toEqual(testCase);
+        expect(data.trim()).toEqual(testCase.trim());
       } catch (e) {
         fail(`Unable to load test case '${path}': ${e instanceof Error ? e.message : e}`);
       }
@@ -186,7 +186,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('retains comments and formatting when modifying the workspace', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-baz'] = 10;
@@ -196,7 +195,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('adds a project to workspace without any projects', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.projects.add({
@@ -209,7 +207,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('adds a project to workspace with existing projects', async () => {
     const host = createTestCaseHost(representativeFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.projects.add({
@@ -220,9 +217,20 @@ describe('writeJsonWorkpaceFile', () => {
     await writeJsonWorkspace(workspace, host, 'AddProject2');
   });
 
+  it('adds a project to workspace with existing projects when name is number like', async () => {
+    const host = createTestCaseHost(representativeFile);
+    const workspace = await readJsonWorkspace('', host);
+
+    workspace.projects.add({
+      name: '1',
+      root: 'src',
+    });
+
+    await writeJsonWorkspace(workspace, host, 'AddProject3');
+  });
+
   it('adds a project with targets', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.projects.add({
@@ -246,7 +254,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('adds a project with targets using reference to workspace', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.projects.add({
@@ -278,7 +285,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it("modifies a project's properties", async () => {
     const host = createTestCaseHost(representativeFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const project = workspace.projects.get('my-app');
@@ -295,7 +301,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it("sets a project's properties", async () => {
     const host = createTestCaseHost(representativeFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const project = workspace.projects.get('my-app');
@@ -312,7 +317,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('adds a target to an existing project', async () => {
     const host = createTestCaseHost(representativeFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const project = workspace.projects.get('my-app');
@@ -332,7 +336,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('deletes a target from an existing project', async () => {
     const host = createTestCaseHost(representativeFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const project = workspace.projects.get('my-app');
@@ -349,7 +352,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports adding an empty array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-array'] = [];
@@ -359,7 +361,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports adding an array with values', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-array'] = [5, 'a', false, null, true, 9.9];
@@ -369,7 +370,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports adding an empty array then pushing as an extension', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-array'] = [];
@@ -380,7 +380,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports pushing to an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -391,7 +390,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports unshifting to an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -402,7 +400,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports shifting from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -413,7 +410,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports splicing an existing array without new values', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -424,7 +420,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports splicing an existing array with new values', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -435,7 +430,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports popping from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -446,7 +440,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('supports sorting from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -457,7 +450,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces a value at zero index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -468,7 +460,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces a value at inner index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -479,7 +470,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces a value at last index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -490,7 +480,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('deletes a value at zero index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -501,7 +490,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('deletes a value at inner index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -512,7 +500,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('deletes and then adds a value at inner index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -524,7 +511,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('deletes a value at last index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -535,7 +521,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('deletes and then adds a value at last index from an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     const array = (workspace.extensions['x-foo'] as JsonObject)['is'] as JsonArray;
@@ -547,7 +532,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces an existing array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     (workspace.extensions['x-foo'] as JsonObject)['is'] = ['value'];
@@ -557,7 +541,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces an existing array with an empty array', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     (workspace.extensions['x-foo'] as JsonObject)['is'] = [];
@@ -567,7 +550,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces an existing object with a new object', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-foo'] = { replacement: true };
@@ -577,7 +559,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces an existing object with an empty object', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-foo'] = {};
@@ -587,7 +568,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('replaces an existing object with a different value type', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-foo'] = null;
@@ -597,7 +577,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('removes a property when property value is set to undefined', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     workspace.extensions['x-baz'] = undefined;
@@ -607,7 +586,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('removes a property when using delete operator', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     delete workspace.extensions['x-baz'];
@@ -617,7 +595,6 @@ describe('writeJsonWorkpaceFile', () => {
 
   it('removes multiple properties when using delete operator', async () => {
     const host = createTestCaseHost(basicFile);
-
     const workspace = await readJsonWorkspace('', host);
 
     delete workspace.extensions['x-baz'];

@@ -156,12 +156,10 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
       jsonPath[2] = 'architect';
     }
 
-    // modify
-    const newJsonPath = jsonPath.map((v) => (isFinite(+v) ? +v : v));
     // TODO: `modify` re-parses the content every time.
     // See: https://github.com/microsoft/node-jsonc-parser/blob/35d94cd71bd48f9784453b2439262c938e21d49b/src/impl/edit.ts#L18
     // Ideally this should accept a string or an AST to avoid the potentially expensive repeat parsing operation.
-    const edits = modify(content, newJsonPath, normalizeValue(value, type), {
+    const edits = modify(content, jsonPath, normalizeValue(value, type), {
       formattingOptions: {
         insertSpaces: true,
         tabSize: 2,
