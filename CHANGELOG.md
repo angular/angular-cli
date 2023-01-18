@@ -1,3 +1,32 @@
+<a name="15.1.2"></a>
+
+# 15.1.2 (2023-01-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [387472a95](https://github.com/angular/angular-cli/commit/387472a956b71eaca89e210e64f4d75969abc9d3) | fix  | register schematic aliases when providing collection name in `ng generate`  |
+| [5d9fd788a](https://github.com/angular/angular-cli/commit/5d9fd788a997066dea1b2d69dced865a7c60f5c1) | fix  | remove `--to` option from being required when using `--from` in `ng update` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------- |
+| [0f5fb7e59](https://github.com/angular/angular-cli/commit/0f5fb7e5944e3a521758c67f403d71928f93f7ac) | fix  | replace existing `BrowserModule.withServerTransition` calls when running universal schematic |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [bf4639a6e](https://github.com/angular/angular-cli/commit/bf4639a6e97670972c3d5b137230e2f08467010e) | fix  | prevent hanging initial build during exception with esbuild |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.0-next.0"></a>
 
 # 15.2.0-next.0 (2023-01-12)
