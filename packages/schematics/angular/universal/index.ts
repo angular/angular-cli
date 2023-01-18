@@ -23,7 +23,6 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
 import {
   NodeDependencyType,
   addPackageJsonDependency,
@@ -202,13 +201,22 @@ function addServerTransition(
     );
 
     const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
-    const appId = options.appId;
-    const transitionCall = `.withServerTransition({ appId: '${appId}' })`;
-    const position = browserModuleImport.pos + browserModuleImport.getFullText().length;
-    const transitionCallChange = new InsertChange(bootstrapModulePath, position, transitionCall);
-
     const transitionCallRecorder = host.beginUpdate(bootstrapModulePath);
-    transitionCallRecorder.insertLeft(transitionCallChange.pos, transitionCallChange.toAdd);
+    const position = browserModuleImport.pos + browserModuleImport.getFullWidth();
+    const browserModuleFullImport = browserModuleImport.parent;
+
+    if (browserModuleFullImport.getText() === 'BrowserModule.withServerTransition') {
+      // Remove any existing withServerTransition as otherwise we might have incorrect configuration.
+      transitionCallRecorder.remove(
+        position,
+        browserModuleFullImport.parent.getFullWidth() - browserModuleImport.getFullWidth(),
+      );
+    }
+
+    transitionCallRecorder.insertLeft(
+      position,
+      `.withServerTransition({ appId: '${options.appId}' })`,
+    );
     host.commitUpdate(transitionCallRecorder);
   };
 }
