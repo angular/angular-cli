@@ -1,3 +1,33 @@
+<a name="15.2.0-next.1"></a>
+
+# 15.2.0-next.1 (2023-01-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [3ebb19552](https://github.com/angular/angular-cli/commit/3ebb19552527fdd69c6e8db55aea5bf5157cdb06) | fix  | register schematic aliases when providing collection name in `ng generate`  |
+| [697df4f6e](https://github.com/angular/angular-cli/commit/697df4f6e562ae1f1465970694c8b26652af033f) | fix  | remove `--to` option from being required when using `--from` in `ng update` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------- |
+| [c8a3b3000](https://github.com/angular/angular-cli/commit/c8a3b30000c407937bff4bdeeda8a109fd27259c) | fix  | replace existing `BrowserModule.withServerTransition` calls when running universal schematic |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [bbc1a4f0d](https://github.com/angular/angular-cli/commit/bbc1a4f0dc93437fe97a53a35f68d978cc50bb9e) | feat | support CommonJS dependency checking in esbuild             |
+| [c3447e364](https://github.com/angular/angular-cli/commit/c3447e3640b059b62e4c2c5d18543195b0d6c820) | fix  | prevent hanging initial build during exception with esbuild |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.2"></a>
 
 # 15.1.2 (2023-01-18)
