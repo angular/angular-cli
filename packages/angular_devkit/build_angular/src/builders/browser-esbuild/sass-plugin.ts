@@ -124,7 +124,11 @@ async function compileString(
 
               if (packageResult.path) {
                 return pathToFileURL(
-                  join(dirname(packageResult.path), !hasScope ? nameOrFirstPath : '', ...pathPart),
+                  join(
+                    dirname(packageResult.path),
+                    !hasScope && nameOrFirstPath ? nameOrFirstPath : '',
+                    ...pathPart,
+                  ),
                 );
               }
             }
