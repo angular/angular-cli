@@ -12,6 +12,11 @@ import { createCssResourcePlugin } from './css-resource-plugin';
 import { BundlerContext } from './esbuild';
 import { createSassPlugin } from './sass-plugin';
 
+/**
+ * A counter for component styles used to generate unique build-time identifiers for each stylesheet.
+ */
+let componentStyleCounter = 0;
+
 export interface BundleStylesheetOptions {
   workspaceRoot: string;
   optimization: boolean;
@@ -73,7 +78,6 @@ export function createStylesheetBundleOptions(
  * @returns An object containing the output of the bundling operation.
  */
 export async function bundleComponentStylesheet(
-  identifier: string,
   language: string,
   data: string,
   filename: string,
@@ -81,7 +85,7 @@ export async function bundleComponentStylesheet(
   options: BundleStylesheetOptions,
 ) {
   const namespace = 'angular:styles/component';
-  const entry = [language, identifier, filename].join(';');
+  const entry = [language, componentStyleCounter++, filename].join(';');
 
   const buildOptions = createStylesheetBundleOptions(options, { [entry]: data });
   buildOptions.entryPoints = [`${namespace};${entry}`];

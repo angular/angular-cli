@@ -21,6 +21,8 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 import { maxWorkers } from '../../utils/environment-options';
+import { JitCompilation } from './angular/jit-compilation';
+import { setupJitPluginCallbacks } from './angular/jit-plugin-callbacks';
 import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
 import { JavaScriptTransformer } from './javascript-transformer';
@@ -31,11 +33,6 @@ import {
   resetCumulativeDurations,
 } from './profiling';
 import { BundleStylesheetOptions, bundleComponentStylesheet } from './stylesheets';
-
-/**
- * A counter for component styles used to generate unique build-time identifiers for each stylesheet.
- */
-let componentStyleCounter = 0;
 
 /**
  * Converts TypeScript Diagnostic related information into an esbuild compatible note object.
@@ -147,6 +144,7 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
 export interface CompilerPluginOptions {
   sourcemap: boolean;
   tsconfig: string;
+  jit?: boolean;
   advancedOptimizations?: boolean;
   thirdPartySourcemaps?: boolean;
   fileReplacements?: Record<string, string>;
@@ -236,7 +234,7 @@ export function createCompilerPlugin(
       let fileEmitter: FileEmitter | undefined;
 
       // The stylesheet resources from component stylesheets that will be added to the build results output files
-      let stylesheetResourceFiles: OutputFile[];
+      let stylesheetResourceFiles: OutputFile[] = [];
 
       let stylesheetMetafiles: Metafile[];
 
@@ -267,8 +265,6 @@ export function createCompilerPlugin(
             const filename = stylesheetFile ?? containingFile;
 
             const stylesheetResult = await bundleComponentStylesheet(
-              // TODO: Evaluate usage of a fast hash instead
-              `${++componentStyleCounter}`,
               styleOptions.inlineStyleLanguage,
               data,
               filename,
@@ -291,7 +287,11 @@ export function createCompilerPlugin(
         };
 
         // Create new compilation if first build; otherwise, use existing for rebuilds
-        compilation ??= new AngularCompilation();
+        if (pluginOptions.jit) {
+          compilation ??= new JitCompilation();
+        } else {
+          compilation ??= new AngularCompilation();
+        }
 
         // Initialize the Angular compilation for the current build.
         // In watch mode, previous build state will be reused.
@@ -410,6 +410,11 @@ export function createCompilerPlugin(
           true,
         ),
       );
+
+      // Setup bundling of component templates and stylesheets when in JIT mode
+      if (pluginOptions.jit) {
+        setupJitPluginCallbacks(build, styleOptions, stylesheetResourceFiles);
+      }
 
       build.onEnd((result) => {
         // Add any component stylesheet resource files to the output files

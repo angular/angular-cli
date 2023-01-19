@@ -284,6 +284,7 @@ function createCodeBundleOptions(
     stylePreprocessorOptions,
     advancedOptimizations,
     inlineStyleLanguage,
+    jit,
   } = options;
 
   return {
@@ -318,6 +319,7 @@ function createCodeBundleOptions(
           sourcemap: !!sourcemapOptions.scripts,
           thirdPartySourcemaps: sourcemapOptions.vendor,
           tsconfig,
+          jit,
           advancedOptimizations,
           fileReplacements,
           sourceFileCache,
@@ -344,8 +346,7 @@ function createCodeBundleOptions(
       // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
       // which a constant true value would break.
       ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
-      // Only AOT mode is supported currently
-      'ngJitMode': 'false',
+      'ngJitMode': jit ? 'true' : 'false',
     },
   };
 }
@@ -475,15 +476,6 @@ export async function* buildEsbuildBrowser(
   initialOptions: BrowserBuilderOptions,
   context: BuilderContext,
 ): AsyncIterable<BuilderOutput> {
-  // Only AOT is currently supported
-  if (initialOptions.aot !== true) {
-    context.logger.error(
-      'JIT mode is currently not supported by this experimental builder. AOT mode must be used.',
-    );
-
-    return;
-  }
-
   // Inform user of experimental status of builder and options
   logExperimentalWarnings(initialOptions, context);
 

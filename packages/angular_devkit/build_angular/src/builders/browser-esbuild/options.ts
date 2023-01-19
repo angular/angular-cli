@@ -133,6 +133,7 @@ export async function normalizeOptions(
   // Initial options to keep
   const {
     allowedCommonJsDependencies,
+    aot,
     baseHref,
     buildOptimizer,
     crossOrigin,
@@ -158,6 +159,7 @@ export async function normalizeOptions(
     externalDependencies,
     extractLicenses,
     inlineStyleLanguage,
+    jit: !aot,
     stats: !!statsJson,
     poll,
     // If not explicitly set, default to the Node.js process argument
