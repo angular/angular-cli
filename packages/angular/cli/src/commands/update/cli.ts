@@ -387,16 +387,29 @@ export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
         logger.info('  ' + description.join('.\n  '));
       }
 
-      const result = await this.executeSchematic(
+      const { success, files } = await this.executeSchematic(
         workflow,
         migration.collection.name,
         migration.name,
       );
-      if (!result.success) {
+      if (!success) {
         return 1;
       }
 
-      logger.info('  Migration completed.');
+      let modifiedFilesText: string;
+      switch (files.size) {
+        case 0:
+          modifiedFilesText = 'No changes made';
+          break;
+        case 1:
+          modifiedFilesText = '1 file modified';
+          break;
+        default:
+          modifiedFilesText = `${files.size} files modified`;
+          break;
+      }
+
+      logger.info(`  Migration completed (${modifiedFilesText}).`);
 
       // Commit migration
       if (commit) {
