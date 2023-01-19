@@ -20,6 +20,7 @@ interface JavaScriptTransformRequest {
   advancedOptimizations: boolean;
   forceAsyncTransformation?: boolean;
   skipLinker: boolean;
+  jit: boolean;
 }
 
 export default async function transformJavaScript(
@@ -80,7 +81,7 @@ async function transformWithBabel({
         {
           angularLinker: linkerPluginCreator && {
             shouldLink,
-            jitMode: false,
+            jitMode: options.jit,
             linkerPluginCreator,
           },
           forceAsyncTransformation,

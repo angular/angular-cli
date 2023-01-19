@@ -15,6 +15,7 @@ export interface JavaScriptTransformerOptions {
   sourcemap: boolean;
   thirdPartySourcemaps?: boolean;
   advancedOptimizations?: boolean;
+  jit?: boolean;
 }
 
 /**
@@ -35,11 +36,17 @@ export class JavaScriptTransformer {
     });
 
     // Extract options to ensure only the named options are serialized and sent to the worker
-    const { sourcemap, thirdPartySourcemaps = false, advancedOptimizations = false } = options;
+    const {
+      sourcemap,
+      thirdPartySourcemaps = false,
+      advancedOptimizations = false,
+      jit = false,
+    } = options;
     this.#commonOptions = {
       sourcemap,
       thirdPartySourcemaps,
       advancedOptimizations,
+      jit,
     };
   }
 
