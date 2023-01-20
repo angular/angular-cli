@@ -12,7 +12,7 @@ import {
   FileSystemCollectionDescription,
   FileSystemSchematicDescription,
 } from '@angular-devkit/schematics/tools';
-import { Argv } from 'yargs';
+import { ArgumentsCamelCase, Argv } from 'yargs';
 import {
   CommandModuleError,
   CommandModuleImplementation,
@@ -40,7 +40,7 @@ export class GenerateCommandModule
   longDescriptionPath?: string | undefined;
 
   override async builder(argv: Argv): Promise<Argv<GenerateCommandArgs>> {
-    let localYargs = (await super.builder(argv)).command<GenerateCommandArgs>({
+    let localYargs = (await super.builder(argv)).command({
       command: '$0 <schematic>',
       describe: 'Run the provided schematic.',
       builder: (localYargs) =>
@@ -51,7 +51,7 @@ export class GenerateCommandModule
             demandOption: true,
           })
           .strict(),
-      handler: (options) => this.handler(options),
+      handler: (options) => this.handler(options as ArgumentsCamelCase<GenerateCommandArgs>),
     });
 
     for (const [schematicName, collectionName] of await this.getSchematicsToRegister()) {
@@ -88,7 +88,14 @@ export class GenerateCommandModule
           : undefined,
         builder: (localYargs) => this.addSchemaOptionsToCommand(localYargs, options).strict(),
         handler: (options) =>
-          this.handler({ ...options, schematic: `${collectionName}:${schematicName}` }),
+          this.handler({
+            ...options,
+            schematic: `${collectionName}:${schematicName}`,
+          } as ArgumentsCamelCase<
+            SchematicsCommandArgs & {
+              schematic: string;
+            }
+          >),
       });
     }
 
