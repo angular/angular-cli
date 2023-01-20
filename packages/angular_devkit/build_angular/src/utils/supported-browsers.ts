@@ -11,7 +11,7 @@ import browserslist from 'browserslist';
 
 export function getSupportedBrowsers(projectRoot: string, logger: logging.LoggerApi): string[] {
   browserslist.defaults = [
-    'last 1 Chrome version',
+    'last 2 Chrome versions',
     'last 1 Firefox version',
     'last 2 Edge major versions',
     'last 2 Safari major versions',
