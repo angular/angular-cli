@@ -44,7 +44,7 @@
     "functional": {
       "type": "boolean",
       "description": "Specifies whether to generate a guard as a function.",
-      "default": false
+      "default": true
     },
     "implements": {
       "alias": "guardType",

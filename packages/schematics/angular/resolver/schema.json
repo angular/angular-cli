@@ -28,7 +28,7 @@
     "functional": {
       "type": "boolean",
       "description": "Creates the resolver as a `ResolveFn`.",
-      "default": false
+      "default": true
     },
     "path": {
       "type": "string",
