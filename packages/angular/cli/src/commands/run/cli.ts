@@ -38,7 +38,8 @@ export class RunCommandModule
 
     const localYargs: Argv<RunCommandArgs> = argv
       .positional('target', {
-        describe: 'The Architect target to run.',
+        describe:
+          'The Architect target to run provided in the the following format `project:target[:configuration]`.',
         type: 'string',
         demandOption: true,
         // Show only in when using --help and auto completion because otherwise comma seperated configuration values will be invalid.
