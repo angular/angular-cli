@@ -41,11 +41,17 @@ describe('resolver Schematic', () => {
     appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a resolver', async () => {
-    const tree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
+  it('should create a (deprecated) class-based resolver with --no-functional', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'resolver',
+      { ...defaultOptions, functional: false },
+      appTree,
+    );
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.resolver.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.resolver.ts');
+    const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.ts');
+    expect(fileString).toContain('export class FooResolver implements Resolve<boolean>');
   });
 
   it('should respect the skipTests flag', async () => {
@@ -75,11 +81,7 @@ describe('resolver Schematic', () => {
   });
 
   it('should create a functional resolver', async () => {
-    const tree = await schematicRunner.runSchematic(
-      'resolver',
-      { ...defaultOptions, functional: true },
-      appTree,
-    );
+    const tree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
     const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.ts');
     expect(fileString).toContain(
       'export const fooResolver: ResolveFn<boolean> = (route, state) => {',
@@ -87,11 +89,7 @@ describe('resolver Schematic', () => {
   });
 
   it('should create a helper function to run a functional resolver in a test', async () => {
-    const tree = await schematicRunner.runSchematic(
-      'resolver',
-      { ...defaultOptions, functional: true },
-      appTree,
-    );
+    const tree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
     const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.spec.ts');
     expect(fileString).toContain(
       'const executeResolver: ResolveFn<boolean> = (...resolverParameters) => ',

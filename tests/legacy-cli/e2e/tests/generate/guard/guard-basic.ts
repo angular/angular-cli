@@ -9,7 +9,10 @@ export default async function () {
   await ng('generate', 'guard', 'test-guard');
   await expectFileToExist(guardDir);
   await expectFileToExist(join(guardDir, 'test-guard.guard.ts'));
-  await expectFileToMatch(join(guardDir, 'test-guard.guard.ts'), /implements CanActivate/);
+  await expectFileToMatch(
+    join(guardDir, 'test-guard.guard.ts'),
+    /export const testGuardGuard: CanActivateFn/,
+  );
   await expectFileToExist(join(guardDir, 'test-guard.guard.spec.ts'));
   await ng('test', '--watch=false');
 }

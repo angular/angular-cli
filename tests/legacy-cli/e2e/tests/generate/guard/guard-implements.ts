@@ -9,7 +9,7 @@ export default async function () {
   await ng('generate', 'guard', 'match', '--implements=CanMatch');
   await expectFileToExist(guardDir);
   await expectFileToExist(join(guardDir, 'match.guard.ts'));
-  await expectFileToMatch(join(guardDir, 'match.guard.ts'), /implements CanMatch/);
+  await expectFileToMatch(join(guardDir, 'match.guard.ts'), /export const matchGuard: CanMatch/);
   await expectFileToExist(join(guardDir, 'match.guard.spec.ts'));
   await ng('test', '--watch=false');
 }
