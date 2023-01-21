@@ -190,6 +190,7 @@ export function useCIDefaults(projectName = 'test-project'): Promise<void> {
 export async function useCIChrome(projectName: string, projectDir = ''): Promise<void> {
   const protractorConf = path.join(projectDir, 'protractor.conf.js');
   if (fs.existsSync(protractorConf)) {
+    // Ensure the headless sandboxed chrome is configured in the protractor config
     await replaceInFile(
       protractorConf,
       `browserName: 'chrome'`,
@@ -203,6 +204,22 @@ export async function useCIChrome(projectName: string, projectDir = ''): Promise
       protractorConf,
       'directConnect: true,',
       `directConnect: true, chromeDriver: String.raw\`${process.env.CHROMEDRIVER_BIN}\`,`,
+    );
+  }
+
+  const karmaConf = path.join(projectDir, 'karma.conf.js');
+  if (fs.existsSync(karmaConf)) {
+    // Ensure the headless sandboxed chrome is configured in the karma config
+    await replaceInFile(
+      karmaConf,
+      `browsers: ['Chrome'],`,
+      `browsers: ['ChromeHeadlessNoSandbox'],
+      customLaunchers: {
+        ChromeHeadlessNoSandbox: {
+          base: 'ChromeHeadless',
+          flags: ['--no-sandbox', '--headless', '--disable-gpu', '--disable-dev-shm-usage'],
+        },
+      },`,
     );
   }
 
