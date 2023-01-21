@@ -543,13 +543,13 @@ workflows:
           snapshots: true
           pre-steps:
             - when:
+                # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
                 condition:
                   and:
                     - not:
                         equal: [main, << pipeline.git.branch >>]
                     - not: << pipeline.parameters.snapshot_changed >>
                 steps:
-                  # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
                   - run: circleci-agent step halt
           requires:
             - build
@@ -594,13 +594,13 @@ workflows:
           snapshots: true
           pre-steps:
             - when:
+                # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
                 condition:
                   and:
                     - not:
                         equal: [main, << pipeline.git.branch >>]
                     - not: << pipeline.parameters.snapshot_changed >>
                 steps:
-                  # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
                   - run: circleci-agent step halt
           requires:
             - bazel-build
