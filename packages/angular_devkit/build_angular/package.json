@@ -17,7 +17,7 @@
     "@babel/plugin-transform-async-to-generator": "7.20.7",
     "@babel/plugin-transform-runtime": "7.19.6",
     "@babel/preset-env": "7.20.2",
-    "@babel/runtime": "7.20.7",
+    "@babel/runtime": "7.20.13",
     "@babel/template": "7.20.7",
     "@discoveryjs/json-ext": "0.5.7",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
@@ -31,7 +31,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.3",
-    "esbuild-wasm": "0.17.3",
+    "esbuild-wasm": "0.17.4",
     "glob": "8.1.0",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -67,7 +67,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.17.3"
+    "esbuild": "0.17.4"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0 || ^15.2.0-next",
