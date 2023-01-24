@@ -15,3 +15,361 @@ workflows:
           mapping: |
             tests/legacy-cli/e2e/ng-snapshot/package.json snapshot_changed true
           config-path: '.circleci/dynamic_config.yml'
+{
+  "name": "@angular/devkit-repo",
+  "version": "15.2.0-next.1",
+  "private": true,
+  "description": "Software Development Kit for Angular",
+  "bin": {
+    "architect": "./bin/architect",
+    "benchmark": "./bin/benchmark",
+    "devkit-admin": "./bin/devkit-admin",
+    "ng": "./bin/ng",
+    "schematics": "./bin/schematics"
+  },
+  "keywords": [
+    "angular",
+    "Angular CLI",
+    "devkit",
+    "sdk",
+    "Angular DevKit"
+  ],
+  "scripts": {
+    "admin": "node ./bin/devkit-admin",
+    "bazel:test": "bazel test //packages/...",
+    "build": "node ./bin/devkit-admin build",
+    "build:bazel": "node ./bin/devkit-admin build-bazel",
+    "build-tsc": "tsc -p tsconfig.json",
+    "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
+    "ng-dev": "cross-env TS_NODE_PROJECT=$PWD/.ng-dev/tsconfig.json TS_NODE_TRANSPILE_ONLY=1 node --no-warnings --loader ts-node/esm node_modules/@angular/ng-dev/bundles/cli.mjs",
+    "templates": "node ./bin/devkit-admin templates",
+    "validate": "node ./bin/devkit-admin validate",
+    "postinstall": "yarn webdriver-update && yarn husky install",
+    "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
+    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
+    "public-api:check": "node goldens/public-api/manage.js test",
+    "public-api:update": "node goldens/public-api/manage.js accept",
+    "ts-circular-deps:check": "yarn -s ng-dev ts-circular-deps check --config ./packages/circular-deps-test.conf.js",
+    "ts-circular-deps:approve": "yarn -s ng-dev ts-circular-deps approve --config ./packages/circular-deps-test.conf.js",
+    "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "engines": {
+    "node": "^14.20.0 || ^16.13.0 || ^18.10.0",
+    "yarn": ">=1.21.1 <2",
+    "npm": "Please use yarn instead of NPM to install dependencies"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "workspaces": {
+    "packages": [
+      "packages/angular/*",
+      "packages/angular_devkit/*",
+      "packages/ngtools/*",
+      "packages/schematics/*"
+    ]
+  },
+  "resolutions": {
+    "**/ajv-formats/ajv": "8.12.0",
+    "@types/parse5-html-rewriting-stream/@types/parse5-sax-parser": "^5.0.2"
+  },
+  "devDependencies": {
+    "@ampproject/remapping": "2.2.0",
+    "@angular/animations": "15.2.0-next.1",
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#5854dda71b14fd9032ca67125b902464ebb7b228",
+    "@angular/cdk": "15.1.1",
+    "@angular/common": "15.2.0-next.1",
+    "@angular/compiler": "15.2.0-next.1",
+    "@angular/compiler-cli": "15.2.0-next.1",
+    "@angular/core": "15.2.0-next.1",
+    "@angular/forms": "15.2.0-next.1",
+    "@angular/localize": "15.2.0-next.1",
+    "@angular/material": "15.1.1",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#9abd9ebd6280363e722044539d056804fe6f3235",
+    "@angular/platform-browser": "15.2.0-next.1",
+    "@angular/platform-browser-dynamic": "15.2.0-next.1",
+    "@angular/platform-server": "15.2.0-next.1",
+    "@angular/router": "15.2.0-next.1",
+    "@angular/service-worker": "15.2.0-next.1",
+    "@babel/core": "7.20.12",
+    "@babel/generator": "7.20.7",
+    "@babel/helper-annotate-as-pure": "7.18.6",
+    "@babel/plugin-proposal-async-generator-functions": "7.20.7",
+    "@babel/plugin-transform-async-to-generator": "7.20.7",
+    "@babel/plugin-transform-runtime": "7.19.6",
+    "@babel/preset-env": "7.20.2",
+    "@babel/runtime": "7.20.7",
+    "@babel/template": "7.20.7",
+    "@bazel/bazelisk": "1.12.1",
+    "@bazel/buildifier": "6.0.0",
+    "@bazel/concatjs": "5.7.3",
+    "@bazel/jasmine": "5.7.3",
+    "@discoveryjs/json-ext": "0.5.7",
+    "@types/babel__core": "7.20.0",
+    "@types/babel__template": "7.4.1",
+    "@types/browserslist": "^4.15.0",
+    "@types/cacache": "^15.0.0",
+    "@types/express": "^4.16.0",
+    "@types/glob": "^8.0.0",
+    "@types/http-proxy": "^1.17.4",
+    "@types/ini": "^1.3.31",
+    "@types/inquirer": "^8.0.0",
+    "@types/jasmine": "~4.3.0",
+    "@types/karma": "^6.3.0",
+    "@types/loader-utils": "^2.0.0",
+    "@types/minimatch": "5.1.2",
+    "@types/node": "^14.15.0",
+    "@types/node-fetch": "^2.1.6",
+    "@types/npm-package-arg": "^6.1.0",
+    "@types/pacote": "^11.1.3",
+    "@types/parse5-html-rewriting-stream": "^5.1.2",
+    "@types/pidusage": "^2.0.1",
+    "@types/progress": "^2.0.3",
+    "@types/resolve": "^1.17.1",
+    "@types/semver": "^7.3.12",
+    "@types/shelljs": "^0.8.11",
+    "@types/tar": "^6.1.2",
+    "@types/text-table": "^0.2.1",
+    "@types/yargs": "^17.0.20",
+    "@types/yargs-parser": "^21.0.0",
+    "@types/yarnpkg__lockfile": "^1.1.5",
+    "@typescript-eslint/eslint-plugin": "5.48.2",
+    "@typescript-eslint/parser": "5.48.2",
+    "@yarnpkg/lockfile": "1.1.0",
+    "ajv": "8.12.0",
+    "ajv-formats": "2.1.1",
+    "ansi-colors": "4.1.3",
+    "autoprefixer": "10.4.13",
+    "babel-loader": "9.1.2",
+    "babel-plugin-istanbul": "6.1.1",
+    "bootstrap": "^4.0.0",
+    "browserslist": "4.21.4",
+    "cacache": "17.0.4",
+    "chokidar": "3.5.3",
+    "copy-webpack-plugin": "11.0.0",
+    "critters": "0.0.16",
+    "cross-env": "^7.0.3",
+    "css-loader": "6.7.3",
+    "debug": "^4.1.1",
+    "esbuild": "0.17.3",
+    "esbuild-wasm": "0.17.3",
+    "eslint": "8.32.0",
+    "eslint-config-prettier": "8.6.0",
+    "eslint-plugin-header": "3.1.1",
+    "eslint-plugin-import": "2.27.5",
+    "express": "4.18.2",
+    "glob": "8.1.0",
+    "http-proxy": "^1.18.1",
+    "https-proxy-agent": "5.0.1",
+    "husky": "8.0.3",
+    "ini": "3.0.1",
+    "inquirer": "8.2.4",
+    "jasmine": "^4.0.0",
+    "jasmine-core": "~4.5.0",
+    "jasmine-spec-reporter": "~7.0.0",
+    "jquery": "^3.3.1",
+    "jsonc-parser": "3.2.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.0.0",
+    "karma-source-map-support": "1.4.0",
+    "less": "4.1.3",
+    "less-loader": "11.1.0",
+    "license-checker": "^25.0.0",
+    "license-webpack-plugin": "4.0.2",
+    "loader-utils": "3.2.1",
+    "magic-string": "0.27.0",
+    "mini-css-extract-plugin": "2.7.2",
+    "minimatch": "~6.1.0",
+    "ng-packagr": "15.1.1",
+    "node-fetch": "^2.2.0",
+    "npm": "^8.11.0",
+    "npm-package-arg": "10.1.0",
+    "open": "8.4.0",
+    "ora": "5.4.1",
+    "pacote": "15.0.8",
+    "parse5-html-rewriting-stream": "6.0.1",
+    "pidtree": "^0.6.0",
+    "pidusage": "^3.0.0",
+    "piscina": "3.2.0",
+    "popper.js": "^1.14.1",
+    "postcss": "8.4.21",
+    "postcss-loader": "7.0.2",
+    "prettier": "^2.0.0",
+    "protractor": "~7.0.0",
+    "puppeteer": "18.2.1",
+    "quicktype-core": "20.0.15",
+    "resolve-url-loader": "5.0.0",
+    "rxjs": "6.6.7",
+    "sass": "1.57.1",
+    "sass-loader": "13.2.0",
+    "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz",
+    "semver": "7.3.8",
+    "shelljs": "^0.8.5",
+    "source-map": "0.7.4",
+    "source-map-loader": "4.0.1",
+    "source-map-support": "0.5.21",
+    "spdx-satisfies": "^5.0.0",
+    "symbol-observable": "4.0.0",
+    "tar": "^6.1.6",
+    "terser": "5.16.1",
+    "text-table": "0.2.0",
+    "tree-kill": "1.2.2",
+    "ts-node": "^10.0.0",
+    "tslib": "2.4.1",
+    "typescript": "4.9.4",
+    "verdaccio": "5.19.1",
+    "verdaccio-auth-memory": "^10.0.0",
+    "webpack": "5.75.0",
+    "webpack-dev-middleware": "6.0.1",
+    "webpack-dev-server": "4.11.1",
+    "webpack-merge": "5.8.0",
+    "webpack-subresource-integrity": "5.1.0",
+    "yargs": "17.6.2",
+    "yargs-parser": "21.1.1",
+    "zone.js": "^0.12.0"
+  }
+}
+# Welcome to GitHub docs contributing guide <!-- omit in toc -->
+
+Thank you for investing your time in contributing to our project! Any contribution you make will be reflected on [docs.github.com](https://docs.github.com/en) :sparkles:. 
+
+Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectable.
+
+In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
+
+Use the table of contents icon <img src="./assets/images/table-of-contents.png" width="25" height="25" /> on the top left corner of this document to get to a specific section of this guide quickly.
+
+## New contributor guide
+
+To get an overview of the project, read the [README](README.md). Here are some resources to help you get started with open source contributions:
+
+- [Finding ways to contribute to open source on GitHub](https://docs.github.com/en/get-started/exploring-projects-on-github/finding-ways-to-contribute-to-open-source-on-github)
+- [Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
+- [GitHub flow](https://docs.github.com/en/get-started/quickstart/github-flow)
+- [Collaborating with pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests)
+
+
+## Getting started
+
+To navigate our codebase with confidence, see [the introduction to working in the docs repository](/contributing/working-in-docs-repository.md) :confetti_ball:. For more information on how we write our markdown files, see [the GitHub Markdown reference](contributing/content-markup-reference.md).
+
+Check to see what [types of contributions](/contributing/types-of-contributions.md) we accept before making changes. Some of them don't even require writing a single line of code :sparkles:.
+
+### Issues
+
+#### Create a new issue
+
+If you spot a problem with the docs, [search if an issue already exists](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/searching-issues-and-pull-requests#search-by-the-title-body-or-comments). If a related issue doesn't exist, you can open a new issue using a relevant [issue form](https://github.com/github/docs/issues/new/choose). 
+
+#### Solve an issue
+
+Scan through our [existing issues](https://github.com/github/docs/issues) to find one that interests you. You can narrow down the search using `labels` as filters. See [Labels](/contributing/how-to-use-labels.md) for more information. As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix.
+
+### Make Changes
+
+#### Make changes in the UI
+
+Click **Make a contribution** at the bottom of any docs page to make small changes such as a typo, sentence fix, or a broken link. This takes you to the `.md` file where you can make your changes and [create a pull request](#pull-request) for a review. 
+
+ <img src="./assets/images/contribution_cta.png" width="300" height="150" /> 
+
+#### Make changes in a codespace
+
+For more information about using a codespace for working on GitHub documentation, see "[Working in a codespace](https://github.com/github/docs/blob/main/contributing/codespace.md)."
+
+#### Make changes locally
+
+1. Fork the repository.
+- Using GitHub Desktop:
+  - [Getting started with GitHub Desktop](https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/getting-started-with-github-desktop) will guide you through setting up Desktop.
+  - Once Desktop is set up, you can use it to [fork the repo](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/cloning-and-forking-repositories-from-github-desktop)!
+
+- Using the command line:
+  - [Fork the repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so that you can make your changes without affecting the original project until you're ready to merge them.
+
+2. Install or update to **Node.js**, at the version specified in `.node-version`. For more information, see [the development guide](contributing/development.md).
+
+3. Create a working branch and start with your changes!
+
+### Commit your update
+
+Commit the changes once you are happy with them. Don't forget to [self-review](/contributing/self-review.md) to speed up the review process:zap:.
+
+### Pull Request
+
+When you're finished with the changes, create a pull request, also known as a PR.
+- Fill the "Ready for review" template so that we can review your PR. This template helps reviewers understand your changes as well as the purpose of your pull request. 
+- Don't forget to [link PR to issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) if you are solving one.
+- Enable the checkbox to [allow maintainer edits](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) so the branch can be updated for a merge.
+Once you submit your PR, a Docs team member will review your proposal. We may ask questions or request additional information.
+- We may ask for changes to be made before a PR can be merged, either using [suggested changes](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/incorporating-feedback-in-your-pull-request) or pull request comments. You can apply suggested changes directly through the UI. You can make any other changes in your fork, then commit them to your branch.
+- As you update your PR and apply changes, mark each conversation as [resolved](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/commenting-on-a-pull-request#resolving-conversations).
+- If you run into any merge issues, checkout this [git tutorial](https://github.com/skills/resolve-merge-conflicts) to help you resolve merge conflicts and other issues.
+
+### Your PR is merged!
+
+Congratulations :tada::tada: The GitHub team thanks you :sparkles:. 
+
+Once your PR is merged, your contributions will be publicly visible on the [GitHub docs](https://docs.github.com/en). 
+
+Now that you are part of the GitHub docs community, see how else you can [contribute to the docs](/contributing/types-of-contributions.md).
+
+## Windows
+
+This site can be developed on Windows, however a few potential gotchas need to be kept in mind:
+
+1. Regular Expressions: Windows uses `\r\n` for line endings, while Unix-based systems use `\n`. Therefore, when working on Regular Expressions, use `\r?\n` instead of `\n` in order to support both environments. The Node.js [`os.EOL`](https://nodejs.org/api/os.html#os_os_eol) property can be used to get an OS-specific end-of-line marker.
+2. Paths: Windows systems use `\` for the path separator, which would be returned by `path.join` and others. You could use `path.posix`, `path.posix.join` etc and the [slash](https://ghub.io/slash) module, if you need forward slashes - like for constructing URLs - or ensure your code works with either.
+3. Bash: Not every Windows developer has a terminal that fully supports Bash, so it's generally preferred to write [scripts](/script) in JavaScript instead of Bash.
+4. Filename too long error: There is a 260 character limit for a filename when Git is compiled with `msys`. While the suggestions below are not guaranteed to work and could cause other issues, a few workarounds include:
+    - Update Git configuration: `git config --system core.longpaths true`
+    - Consider using a different Git client on Windows
+on:
+  push:
+    branches: master
+  pull_request: 
+    run-on: ubuntu-latest
+    steps:
+    - name: Set up Git repository
+      uses: actions/checkout@v3
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+    - name: Set up Node
+      uses: actions/setup-node@v3
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Tests
+      run: script/test 
+<?xml version="1.0" encoding="utf-8"?>
+charmap keyset =  new
+{ "new keymap Charset = Pro" }
+<configuration>
+    <packageSources>
+        <clear />
+        <add key="github" value="https://nuget.pkg.github.com/OWNER/index.json" />
+    </packageSources>
+    <packageSourceCredentials>
+        <github>
+            <add key="Username" value="USERNAME" />
+            <add key="ClearTextPassword" value="TOKEN" />
+        </github>
+    </packageSourceCredentials>
+</configuration> 
+on:
+Runs-on:on:"
+const: "token"''
+token: "((c)(r))"''
+'Value": "[VOLUME]'"''
+ '[VOLUME']": "[12753750.[00]m]BITORE_34173.1337_18893":,
