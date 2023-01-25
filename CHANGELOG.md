@@ -1,3 +1,45 @@
+<a name="15.2.0-next.2"></a>
+
+# 15.2.0-next.2 (2023-01-25)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [0f58a17c4](https://github.com/angular/angular-cli/commit/0f58a17c4ce92495d96721bc3f2b632a890bbab4) | feat | log number of files update during `ng update`      |
+| [b5737efae](https://github.com/angular/angular-cli/commit/b5737efae8448084af319fd077863ff6922d651e) | fix  | handle extended schematics when retrieving aliases |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [7b0c1ce0c](https://github.com/angular/angular-cli/commit/7b0c1ce0ca10bbb3a2099dc97f7d87afa07a2eef) | fix  | update browserslist config to include last 2 Chrome version |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------- |
+| [ecf43090d](https://github.com/angular/angular-cli/commit/ecf43090d110f996f45a259c279f1b83dcab3fd8) | feat | auto detect package manager ([#24305](https://github.com/angular/angular-cli/pull/24305)) |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [d19f260ba](https://github.com/angular/angular-cli/commit/d19f260baa8bb55142d69c9c71440b3c444d4b92) | fix  | avoid undefined module path for Sass imports in esbuild      |
+| [97907addf](https://github.com/angular/angular-cli/commit/97907addfce1e630e71c186e836ab6a0ceec548b) | fix  | update browserslist config to include last 2 Chrome versions |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [f6f5d7919](https://github.com/angular/angular-cli/commit/f6f5d79199613b9f9fa82680cdafd4a622ff4be0) | fix  | handle number like strings in workspace writer |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Doug Parker and Marvin
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.3"></a>
 
 # 15.1.3 (2023-01-25)
