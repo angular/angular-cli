@@ -1,3 +1,38 @@
+<a name="15.1.3"></a>
+
+# 15.1.3 (2023-01-25)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [de15ec576](https://github.com/angular/angular-cli/commit/de15ec5763afe231439c3f1ace35cbacefad2ca7) | fix  | handle extended schematics when retrieving aliases |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [2c04f4a8f](https://github.com/angular/angular-cli/commit/2c04f4a8f493781fda65f31e81ad86cdd3e510c0) | fix  | update browserslist config to include last 2 Chrome version |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [f31bf300b](https://github.com/angular/angular-cli/commit/f31bf300b9f226d9574060b0e4401c4da88c0ee3) | fix  | avoid undefined module path for Sass imports in esbuild      |
+| [c152a4a13](https://github.com/angular/angular-cli/commit/c152a4a13f482948c6aedbbc99d1423f2cf43aea) | fix  | update browserslist config to include last 2 Chrome versions |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [9de99202e](https://github.com/angular/angular-cli/commit/9de99202e9427973c7983940fcdea9e4580a79bd) | fix  | handle number like strings in workspace writer |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Doug Parker
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.0-next.1"></a>
 
 # 15.2.0-next.1 (2023-01-18)
