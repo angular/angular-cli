@@ -12,14 +12,14 @@ import { BASE_OPTIONS, SERVER_BUILDER_INFO, describeBuilder } from '../setup';
 describeBuilder(execute, SERVER_BUILDER_INFO, (harness) => {
   describe('Behavior: "Errors"', () => {
     it('should not try to resolve web-workers', async () => {
-      harness.useTarget('test', {
+      harness.useTarget('server', {
         ...BASE_OPTIONS,
       });
 
       await harness.writeFiles({
         'src/app/app.worker.ts': `
           /// <reference lib="webworker" />
-  
+
           const foo: string = 'hello world';
           addEventListener('message', ({ data }) => {
             postMessage(foo);
