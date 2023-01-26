@@ -33,7 +33,13 @@ import {
 } from '../../utils/webpack-browser-config';
 import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
 import { isPlatformServerInstalled } from '../../webpack/utils/helpers';
-import { webpackStatsLogger } from '../../webpack/utils/stats';
+import {
+  statsErrorsToString,
+  statsHasErrors,
+  statsHasWarnings,
+  statsWarningsToString,
+  webpackStatsLogger,
+} from '../../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
 /**
@@ -87,12 +93,19 @@ export function execute(
         },
       }).pipe(
         concatMap(async (output) => {
-          const { emittedFiles = [], outputPath, webpackStats } = output;
+          const { emittedFiles = [], outputPath, webpackStats, success } = output;
           if (!webpackStats) {
             throw new Error('Webpack stats build result is required.');
           }
 
-          if (!output.success) {
+          if (!success) {
+            if (statsHasWarnings(webpackStats)) {
+              context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
+            }
+            if (statsHasErrors(webpackStats)) {
+              context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
+            }
+
             return output;
           }
 
