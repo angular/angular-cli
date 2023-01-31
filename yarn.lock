@@ -7435,10 +7435,10 @@ jquery@^3.3.1:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.3.tgz#23ed2ffed8a19e048814f13391a19afcdba160e6"
   integrity sha512-bZ5Sy3YzKo9Fyc8wH2iIQK4JImJ6R0GWI9kL1/k7Z91ZBNgkRXE6U0JfHIizZbort8ZunhSI3jw9I6253ahKfg==
 
-js-base64@^2.4.3:
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.6.4.tgz#f4e686c5de1ea1f867dbcad3d46d969428df98c4"
-  integrity sha512-pZe//GGmwJndub7ZghVHz7vjb2LgC1m8B07Au3eYqeqv9emhESByMXxaEgkUkEqJe87oBbSniGYoQNIBklc7IQ==
+js-base64@^3.7.4:
+  version "3.7.4"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.4.tgz#af95b20f23efc8034afd2d1cc5b9d0adf7419037"
+  integrity sha512-wpM/wi20Tl+3ifTyi0RdDckS4YTD4Lf953mBRrpG8547T7hInHNPEj8+ck4gB8VDcGyeAWFK++Wb/fU1BeavKQ==
 
 js-sdsl@^4.1.4:
   version "4.3.0"
@@ -9629,10 +9629,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@21.0.4:
-  version "21.0.4"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-21.0.4.tgz#df4c8920ac27b9a5a53ca54c9d388e8b1c80d2b6"
-  integrity sha512-JJiJ8dzBTh/l/gTNnVwKFx0g2A0CfLNzXlUxTHjdvyldXi/Jjckr+Z04calGXxlG8KunpE4G5vV+EtuFjoTIPQ==
+quicktype-core@21.0.9:
+  version "21.0.9"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-21.0.9.tgz#16c7c3acfac879ddd0421bf5d1a5cbb9e357fb90"
+  integrity sha512-lXLJdo00KMSXaWOH49vDLGyfIEiqu9leevyNyYxNYvhCpPMon6zaAqXHIc1V3ByRN4ErCUkpsnzruuIQ3+OeKQ==
   dependencies:
     "@glideapps/ts-necessities" "2.1.2"
     "@types/urijs" "^1.19.19"
@@ -9640,7 +9640,7 @@ quicktype-core@21.0.4:
     collection-utils "^1.0.1"
     cross-fetch "^3.1.5"
     is-url "^1.2.4"
-    js-base64 "^2.4.3"
+    js-base64 "^3.7.4"
     lodash "^4.17.21"
     pako "^1.0.6"
     pluralize "^8.0.0"
