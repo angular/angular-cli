@@ -1,3 +1,20 @@
+<a name="15.1.4"></a>
+
+# 15.1.4 (2023-02-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [6c8fdfc69](https://github.com/angular/angular-cli/commit/6c8fdfc6985c5b5017a0b6ab6fa38daf4cb9a775) | fix  | load JavaScript bundles as modules in karma |
+| [317452e3b](https://github.com/angular/angular-cli/commit/317452e3b7e25080132b7f7a069696d1c5054f69) | fix  | print server builder errors and warnings    |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.3"></a>
 
 # 15.1.3 (2023-01-25)
