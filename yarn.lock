@@ -121,7 +121,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#ffd5dec0bf78a2c8ff068482ad3c8434c21b54c7":
   version "0.0.0-fb077c1937f280aac6327969fa3ab50f98b4d25a"
-  uid ffd5dec0bf78a2c8ff068482ad3c8434c21b54c7
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#ffd5dec0bf78a2c8ff068482ad3c8434c21b54c7"
   dependencies:
     "@angular-devkit/build-angular" "15.2.0-next.3"
@@ -307,7 +306,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#f4601b680d6d0017880115cc8ee99249c34f0c12":
   version "0.0.0-fb077c1937f280aac6327969fa3ab50f98b4d25a"
-  uid f4601b680d6d0017880115cc8ee99249c34f0c12
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#f4601b680d6d0017880115cc8ee99249c34f0c12"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3059,6 +3057,11 @@
   dependencies:
     "@types/node" "*"
     log4js "^6.4.1"
+
+"@types/less@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@types/less/-/less-3.0.3.tgz#f9451dbb9548d25391107d65d6401a0cfb15db92"
+  integrity sha512-1YXyYH83h6We1djyoUEqTlVyQtCfJAFXELSKW2ZRtjHD4hQ82CC4lvrv5D0l0FLcKBaiPbXyi3MpMsI9ZRgKsw==
 
 "@types/loader-utils@^2.0.0":
   version "2.0.3"
@@ -9964,7 +9967,6 @@ sass@1.58.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:

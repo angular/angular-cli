@@ -57,8 +57,4 @@ export function logExperimentalWarnings(options: BrowserBuilderOptions, context:
       `The '${unsupportedOption}' option is currently unsupported by this experimental builder and will be ignored.`,
     );
   }
-
-  if (options.inlineStyleLanguage === 'less') {
-    context.logger.warn('The less stylesheet preprocessor is not currently supported.');
-  }
 }

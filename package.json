@@ -106,6 +106,7 @@
     "@types/inquirer": "^8.0.0",
     "@types/jasmine": "~4.3.0",
     "@types/karma": "^6.3.0",
+    "@types/less": "^3.0.3",
     "@types/loader-utils": "^2.0.0",
     "@types/minimatch": "5.1.2",
     "@types/node": "^14.15.0",
