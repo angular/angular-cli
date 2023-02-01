@@ -125,6 +125,7 @@ ts_library(
         "@npm//@types/glob",
         "@npm//@types/inquirer",
         "@npm//@types/karma",
+        "@npm//@types/less",
         "@npm//@types/loader-utils",
         "@npm//@types/node",
         "@npm//@types/parse5-html-rewriting-stream",

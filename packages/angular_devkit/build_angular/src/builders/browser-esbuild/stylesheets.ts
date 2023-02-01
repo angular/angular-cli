@@ -10,6 +10,7 @@ import type { BuildOptions, OutputFile } from 'esbuild';
 import * as path from 'node:path';
 import { createCssResourcePlugin } from './css-resource-plugin';
 import { BundlerContext } from './esbuild';
+import { createLessPlugin } from './less-plugin';
 import { createSassPlugin } from './sass-plugin';
 
 /**
@@ -32,6 +33,11 @@ export function createStylesheetBundleOptions(
   options: BundleStylesheetOptions,
   inlineComponentData?: Record<string, string>,
 ): BuildOptions & { plugins: NonNullable<BuildOptions['plugins']> } {
+  // Ensure preprocessor include paths are absolute based on the workspace root
+  const includePaths = options.includePaths?.map((includePath) =>
+    path.resolve(options.workspaceRoot, includePath),
+  );
+
   return {
     absWorkingDir: options.workspaceRoot,
     bundle: true,
@@ -52,10 +58,12 @@ export function createStylesheetBundleOptions(
     plugins: [
       createSassPlugin({
         sourcemap: !!options.sourcemap,
-        // Ensure Sass load paths are absolute based on the workspace root
-        loadPaths: options.includePaths?.map((includePath) =>
-          path.resolve(options.workspaceRoot, includePath),
-        ),
+        loadPaths: includePaths,
+        inlineComponentData,
+      }),
+      createLessPlugin({
+        sourcemap: !!options.sourcemap,
+        includePaths,
         inlineComponentData,
       }),
       createCssResourcePlugin(),
