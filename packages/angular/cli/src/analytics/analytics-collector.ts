@@ -46,10 +46,11 @@ export class AnalyticsCollector {
       [RequestParameter.UserAgentArchitecture]: os.arch(),
       [RequestParameter.UserAgentPlatform]: os.platform(),
       [RequestParameter.UserAgentPlatformVersion]: os.version(),
-
-      // Set undefined to disable debug view.
-      [RequestParameter.DebugView]: ngDebug ? 1 : undefined,
     };
+
+    if (ngDebug) {
+      requestParameters[RequestParameter.DebugView] = 1;
+    }
 
     this.requestParameterStringified = querystring.stringify(requestParameters);
 
