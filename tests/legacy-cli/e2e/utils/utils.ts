@@ -24,8 +24,8 @@ export function wait(msecs: number): Promise<void> {
   });
 }
 
-export async function mktempd(prefix: string): Promise<string> {
-  return realpath(await mkdtemp(path.join(tmpdir(), prefix)));
+export async function mktempd(prefix: string, tempRoot?: string): Promise<string> {
+  return realpath(await mkdtemp(path.join(tempRoot ?? tmpdir(), prefix)));
 }
 
 export async function mockHome(cb: (home: string) => Promise<void>): Promise<void> {

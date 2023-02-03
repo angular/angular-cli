@@ -3,6 +3,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,6 +16,14 @@ exports_files([
     "tsconfig-build.json",
     "package.json",
 ])
+
+# Files required by e2e tests
+copy_to_bin(
+    name = "config-files",
+    srcs = [
+        "package.json",
+    ],
+)
 
 # Detect if the build is running under --stamp
 config_setting(

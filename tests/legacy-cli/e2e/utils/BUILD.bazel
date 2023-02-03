@@ -4,9 +4,11 @@ ts_library(
     name = "utils",
     testonly = True,
     srcs = glob(["**/*.ts"]),
+    data = [
+        "//tests/legacy-cli/e2e/ng-snapshot",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        "//tests/legacy-cli/e2e/ng-snapshot",
         "@npm//@types/glob",
         "@npm//@types/node-fetch",
         "@npm//@types/semver",
@@ -16,7 +18,6 @@ ts_library(
         "@npm//glob",
         "@npm//npm",
         "@npm//protractor",
-        "@npm//puppeteer",
         "@npm//rxjs",
         "@npm//semver",
         "@npm//tar",
