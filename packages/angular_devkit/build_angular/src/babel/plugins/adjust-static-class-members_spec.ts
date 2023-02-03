@@ -191,7 +191,7 @@ describe('adjust-static-class-members Babel plugin', () => {
     `);
   });
 
-  it('does wrap not class with only side effect fields', () => {
+  it('does not wrap class with only side effect fields', () => {
     testCaseNoChange(`
       class CustomComponentEffects {
         constructor(_actions) {
@@ -200,6 +200,30 @@ describe('adjust-static-class-members Babel plugin', () => {
         }
       }
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
+    `);
+  });
+
+  it('does not wrap class with only side effect native fields', () => {
+    testCaseNoChange(`
+      class CustomComponentEffects {
+        static someFieldWithSideEffects = console.log('foo');
+        constructor(_actions) {
+          this._actions = _actions;
+          this.doThis = this._actions;
+        }
+      }
+    `);
+  });
+
+  it('does not wrap class with only instance native fields', () => {
+    testCaseNoChange(`
+      class CustomComponentEffects {
+        someFieldWithSideEffects = console.log('foo');
+        constructor(_actions) {
+          this._actions = _actions;
+          this.doThis = this._actions;
+        }
+      }
     `);
   });
 
@@ -223,6 +247,32 @@ describe('adjust-static-class-members Babel plugin', () => {
             }
           }
           CustomComponentEffects.someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
+          return CustomComponentEffects;
+        })();
+      `,
+    });
+  });
+
+  it('wraps class with pure annotated side effect native fields (#__PURE__)', () => {
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          static someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+      `,
+      expected: `
+        let CustomComponentEffects = /*#__PURE__*/ (() => {
+          class CustomComponentEffects {
+            static someFieldWithSideEffects = /*#__PURE__*/ console.log('foo');
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+          }
           return CustomComponentEffects;
         })();
       `,
@@ -335,6 +385,32 @@ describe('adjust-static-class-members Babel plugin', () => {
     });
   });
 
+  it('wraps exported class with a pure native static field', () => {
+    testCase({
+      input: `
+        export class CustomComponentEffects {
+          static someField = 42;
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+      `,
+      expected: `
+        export let CustomComponentEffects = /*#__PURE__*/ (() => {
+          class CustomComponentEffects {
+            static someField = 42;
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+          }
+          return CustomComponentEffects;
+        })();
+      `,
+    });
+  });
+
   it('wraps class with a basic literal static field', () => {
     testCase({
       input: `
@@ -413,6 +489,32 @@ describe('adjust-static-class-members Babel plugin', () => {
       }
       CustomComponentEffects.someField = 42;
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
+    `);
+  });
+
+  it('does not wrap class with only pure native static fields and some side effect static fields', () => {
+    testCaseNoChange(`
+      class CustomComponentEffects {
+        static someField = 42;
+        constructor(_actions) {
+          this._actions = _actions;
+          this.doThis = this._actions;
+        }
+      }
+      CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
+    `);
+  });
+
+  it('does not wrap class with only some pure native static fields', () => {
+    testCaseNoChange(`
+      class CustomComponentEffects {
+        static someField = 42;
+        static someFieldWithSideEffects = console.log('foo');
+        constructor(_actions) {
+          this._actions = _actions;
+          this.doThis = this._actions;
+        }
+      }
     `);
   });
 
@@ -597,7 +699,7 @@ describe('adjust-static-class-members Babel plugin', () => {
     });
   });
 
-  it('wraps class with multiple Angular static field', () => {
+  it('wraps class with multiple Angular static fields', () => {
     testCase({
       input: `
         class CommonModule {
@@ -620,6 +722,41 @@ describe('adjust-static-class-members Babel plugin', () => {
                     useClass: NgLocaleLocalization
                   },
               ]});
+          return CommonModule;
+        })();
+      `,
+    });
+  });
+
+  it('wraps class with multiple Angular native static fields', () => {
+    testCase({
+      input: `
+        class CommonModule {
+          static ɵfac = function CommonModule_Factory(t) { return new (t || CommonModule)(); };
+          static ɵmod = /*@__PURE__*/ ɵngcc0.ɵɵdefineNgModule({ type: CommonModule });
+          static ɵinj = /*@__PURE__*/ ɵngcc0.ɵɵdefineInjector({ providers: [
+                  { provide: NgLocalization, useClass: NgLocaleLocalization },
+              ] });
+        }
+      `,
+      expected: `
+        let CommonModule = /*#__PURE__*/ (() => {
+          class CommonModule {
+            static ɵfac = function CommonModule_Factory(t) {
+              return new (t || CommonModule)();
+            };
+            static ɵmod = /*@__PURE__*/ ɵngcc0.ɵɵdefineNgModule({
+              type: CommonModule,
+            });
+            static ɵinj = /*@__PURE__*/ ɵngcc0.ɵɵdefineInjector({
+              providers: [
+                {
+                  provide: NgLocalization,
+                  useClass: NgLocaleLocalization,
+                },
+              ],
+            });
+          }
           return CommonModule;
         })();
       `,
