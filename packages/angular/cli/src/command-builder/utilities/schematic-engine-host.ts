@@ -12,6 +12,7 @@ import { readFileSync } from 'fs';
 import { parse as parseJson } from 'jsonc-parser';
 import { createRequire } from 'module';
 import { dirname, resolve } from 'path';
+import { TextEncoder } from 'util';
 import { Script } from 'vm';
 import { assertIsError } from '../../utilities/error';
 
@@ -211,6 +212,12 @@ function wrap(
     __dirname: schematicDirectory,
     __filename: schematicFile,
     Buffer,
+    // TextEncoder is used by the compiler to generate i18n message IDs. See:
+    // https://github.com/angular/angular/blob/main/packages/compiler/src/i18n/digest.ts#L17
+    // It is referenced globally, because it may be run either on the browser or the server.
+    // Usually Node exposes it globally, but in order for it to work, our custom context
+    // has to expose it too. Issue context: https://github.com/angular/angular/issues/48940.
+    TextEncoder,
     console,
     process,
     get global() {
