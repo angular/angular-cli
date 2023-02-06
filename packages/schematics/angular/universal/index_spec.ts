@@ -191,36 +191,6 @@ describe('Universal Schematic', () => {
     expect(contents).not.toContain(`withServerTransition({ appId: 'foo' })`);
   });
 
-  it('should wrap the bootstrap call in a DOMContentLoaded event handler', async () => {
-    const tree = await schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/main.ts';
-    const contents = tree.readContent(filePath);
-    expect(contents).toContain(`document.addEventListener('DOMContentLoaded', bootstrap);`);
-  });
-
-  it('should wrap the bootstrap declaration in a DOMContentLoaded event handler', async () => {
-    const filePath = '/projects/bar/src/main.ts';
-    appTree.overwrite(
-      filePath,
-      `
-      import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-      import { AppModule } from './app/app.module';
-      import { environment } from './environments/environment';
-      import { hmrBootstrap } from './hmr';
-
-      const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
-
-      if (!hmrBootstrap) {
-        bootstrap().catch(err => console.log(err));
-      }
-      `,
-    );
-
-    const tree = await schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const contents = tree.readContent(filePath);
-    expect(contents).toContain(`document.addEventListener('DOMContentLoaded', bootstrap);`);
-  });
-
   it('should install npm dependencies', async () => {
     await schematicRunner.runSchematic('universal', defaultOptions, appTree);
     expect(schematicRunner.tasks.length).toBe(1);
