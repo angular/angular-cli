@@ -21,7 +21,10 @@ import {
 } from '@angular-devkit/architect';
 import { WorkspaceHost } from '@angular-devkit/architect/node';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
-import { getSystemPath, join, json, logging, normalize } from '@angular-devkit/core';
+import { getSystemPath, json, logging } from '@angular-devkit/core';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import fs from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import { Observable, Subject, from as observableFrom, of as observableOf } from 'rxjs';
 import { catchError, finalize, first, map, mergeMap, shareReplay } from 'rxjs/operators';
 import { BuilderWatcherFactory, WatcherNotifier } from './file-watching';
@@ -83,6 +86,10 @@ export class BuilderHarness<T> {
     };
 
     this.schemaRegistry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+  }
+
+  private resolvePath(path: string): string {
+    return join(getSystemPath(this.host.root()), path);
   }
 
   useProject(name: string, metadata: Record<string, unknown> = {}): this {
@@ -215,7 +222,7 @@ export class BuilderHarness<T> {
     };
     const context = new HarnessBuilderContext(
       this.builderInfo,
-      getSystemPath(this.host.root()),
+      this.resolvePath('.'),
       contextHost,
       useNativeFileWatching ? undefined : this.watcherNotifier,
     );
@@ -282,13 +289,12 @@ export class BuilderHarness<T> {
   }
 
   async writeFile(path: string, content: string | Buffer): Promise<void> {
-    this.host
-      .scopedSync()
-      .write(normalize(path), typeof content === 'string' ? Buffer.from(content) : content);
+    const fullPath = this.resolvePath(path);
 
-    this.watcherNotifier?.notify([
-      { path: getSystemPath(join(this.host.root(), path)), type: 'modified' },
-    ]);
+    await fs.mkdir(dirname(fullPath), { recursive: true });
+    await fs.writeFile(fullPath, content, 'utf-8');
+
+    this.watcherNotifier?.notify([{ path: fullPath, type: 'modified' }]);
   }
 
   async writeFiles(files: Record<string, string | Buffer>): Promise<void> {
@@ -297,11 +303,12 @@ export class BuilderHarness<T> {
       : undefined;
 
     for (const [path, content] of Object.entries(files)) {
-      this.host
-        .scopedSync()
-        .write(normalize(path), typeof content === 'string' ? Buffer.from(content) : content);
+      const fullPath = this.resolvePath(path);
 
-      watchEvents?.push({ path: getSystemPath(join(this.host.root(), path)), type: 'modified' });
+      await fs.mkdir(dirname(fullPath), { recursive: true });
+      await fs.writeFile(fullPath, content, 'utf-8');
+
+      watchEvents?.push({ path: fullPath, type: 'modified' });
     }
 
     if (watchEvents) {
@@ -310,11 +317,11 @@ export class BuilderHarness<T> {
   }
 
   async removeFile(path: string): Promise<void> {
-    this.host.scopedSync().delete(normalize(path));
+    const fullPath = this.resolvePath(path);
 
-    this.watcherNotifier?.notify([
-      { path: getSystemPath(join(this.host.root(), path)), type: 'deleted' },
-    ]);
+    await fs.unlink(fullPath);
+
+    this.watcherNotifier?.notify([{ path: fullPath, type: 'deleted' }]);
   }
 
   async modifyFile(
@@ -323,27 +330,24 @@ export class BuilderHarness<T> {
   ): Promise<void> {
     const content = this.readFile(path);
     await this.writeFile(path, await modifier(content));
-
-    this.watcherNotifier?.notify([
-      { path: getSystemPath(join(this.host.root(), path)), type: 'modified' },
-    ]);
   }
 
   hasFile(path: string): boolean {
-    return this.host.scopedSync().exists(normalize(path));
+    const fullPath = this.resolvePath(path);
+
+    return existsSync(fullPath);
   }
 
   hasFileMatch(directory: string, pattern: RegExp): boolean {
-    return this.host
-      .scopedSync()
-      .list(normalize(directory))
-      .some((name) => pattern.test(name));
+    const fullPath = this.resolvePath(directory);
+
+    return readdirSync(fullPath).some((name) => pattern.test(name));
   }
 
   readFile(path: string): string {
-    const content = this.host.scopedSync().read(normalize(path));
+    const fullPath = this.resolvePath(path);
 
-    return Buffer.from(content).toString('utf8');
+    return readFileSync(fullPath, 'utf-8');
   }
 
   private validateProjectName(name: string): void {
