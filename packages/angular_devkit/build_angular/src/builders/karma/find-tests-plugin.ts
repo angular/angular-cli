@@ -9,10 +9,10 @@
 import assert from 'assert';
 import { PathLike, constants, promises as fs } from 'fs';
 import glob, { hasMagic } from 'glob';
+import { pluginName } from 'mini-css-extract-plugin';
 import { basename, dirname, extname, join, relative } from 'path';
 import { promisify } from 'util';
 import type { Compilation, Compiler } from 'webpack';
-import { addError } from '../../utils/webpack-diagnostics';
 
 const globPromise = promisify(glob);
 
@@ -49,23 +49,21 @@ export class FindTestsPlugin {
     // Add tests files are part of the entry-point.
     webpackOptions.entry = async () => {
       const specFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
-
-      if (!specFiles.length) {
-        assert(this.compilation, 'Compilation cannot be undefined.');
-        addError(
-          this.compilation,
-          `Specified patterns: "${include.join(', ')}" did not match any spec files.`,
-        );
-      }
-
       const entrypoints = await entry;
       const entrypoint = entrypoints['main'];
       if (!entrypoint.import) {
         throw new Error(`Cannot find 'main' entrypoint.`);
       }
 
-      originalImport ??= entrypoint.import;
-      entrypoint.import = [...originalImport, ...specFiles];
+      if (specFiles.length) {
+        originalImport ??= entrypoint.import;
+        entrypoint.import = [...originalImport, ...specFiles];
+      } else {
+        assert(this.compilation, 'Compilation cannot be undefined.');
+        this.compilation
+          .getLogger(pluginName)
+          .error(`Specified patterns: "${include.join(', ')}" did not match any spec files.`);
+      }
 
       return entrypoints;
     };
