@@ -29,7 +29,7 @@ import {
   getPackageJsonDependency,
 } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
-import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
+import { findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
@@ -107,84 +107,6 @@ function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
   }
 
   return browserModuleNode;
-}
-
-function wrapBootstrapCall(mainFile: string): Rule {
-  return (host: Tree) => {
-    const mainPath = normalize('/' + mainFile);
-    let bootstrapCall: ts.Node | null = findBootstrapModuleCall(host, mainPath);
-    if (bootstrapCall === null) {
-      throw new SchematicsException('Bootstrap module not found.');
-    }
-
-    let bootstrapCallExpression: ts.Node | null = null;
-    let currentCall = bootstrapCall;
-    while (bootstrapCallExpression === null && currentCall.parent) {
-      currentCall = currentCall.parent;
-      if (ts.isExpressionStatement(currentCall) || ts.isVariableStatement(currentCall)) {
-        bootstrapCallExpression = currentCall;
-      }
-    }
-    bootstrapCall = currentCall;
-
-    // In case the bootstrap code is a variable statement
-    // we need to determine it's usage
-    if (bootstrapCallExpression && ts.isVariableStatement(bootstrapCallExpression)) {
-      const declaration = bootstrapCallExpression.declarationList.declarations[0];
-      const bootstrapVar = (declaration.name as ts.Identifier).text;
-      const sf = bootstrapCallExpression.getSourceFile();
-      bootstrapCall = findCallExpressionNode(sf, bootstrapVar) || currentCall;
-    }
-
-    // indent contents
-    const triviaWidth = bootstrapCall.getLeadingTriviaWidth();
-    const beforeText =
-      `function bootstrap() {\n` + ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
-    const afterText =
-      `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''}};\n` +
-      `
-
- if (document.readyState === 'complete') {
-   bootstrap();
- } else {
-   document.addEventListener('DOMContentLoaded', bootstrap);
- }
- `;
-
-    // in some cases we need to cater for a trailing semicolon such as;
-    // bootstrap().catch(err => console.log(err));
-    const lastToken = bootstrapCall.parent.getLastToken();
-    let endPos = bootstrapCall.getEnd();
-    if (lastToken && lastToken.kind === ts.SyntaxKind.SemicolonToken) {
-      endPos = lastToken.getEnd();
-    }
-
-    const recorder = host.beginUpdate(mainPath);
-    recorder.insertLeft(bootstrapCall.getStart(), beforeText);
-    recorder.insertRight(endPos, afterText);
-    host.commitUpdate(recorder);
-  };
-}
-
-function findCallExpressionNode(node: ts.Node, text: string): ts.Node | null {
-  if (
-    ts.isCallExpression(node) &&
-    ts.isIdentifier(node.expression) &&
-    node.expression.text === text
-  ) {
-    return node;
-  }
-
-  let foundNode: ts.Node | null = null;
-  ts.forEachChild(node, (childNode) => {
-    foundNode = findCallExpressionNode(childNode, text);
-
-    if (foundNode) {
-      return true;
-    }
-  });
-
-  return foundNode;
 }
 
 function addServerTransition(
@@ -292,7 +214,6 @@ export default function (options: UniversalOptions): Rule {
       mergeWith(rootSource),
       addDependencies(),
       updateConfigFile(options, tsConfigDirectory),
-      wrapBootstrapCall(clientBuildOptions.main),
       addServerTransition(options, clientBuildOptions.main, clientProject.root),
     ]);
   };
