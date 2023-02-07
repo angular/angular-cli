@@ -524,4 +524,85 @@ describe('Application Schematic', () => {
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myscope/myapp']).toBeDefined();
   });
+
+  describe('standalone', () => {
+    it('should create all files of a standalone application', async () => {
+      const options = { ...defaultOptions, standalone: true };
+
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+      const files = tree.files;
+      expect(files).toEqual(
+        jasmine.arrayContaining([
+          '/projects/foo/tsconfig.app.json',
+          '/projects/foo/tsconfig.spec.json',
+          '/projects/foo/src/favicon.ico',
+          '/projects/foo/src/index.html',
+          '/projects/foo/src/main.ts',
+          '/projects/foo/src/styles.css',
+          '/projects/foo/src/app/app.config.ts',
+          '/projects/foo/src/app/app.component.css',
+          '/projects/foo/src/app/app.component.html',
+          '/projects/foo/src/app/app.component.spec.ts',
+          '/projects/foo/src/app/app.component.ts',
+        ]),
+      );
+    });
+
+    it('should not create any module files', async () => {
+      const options = { ...defaultOptions, standalone: true };
+
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+      const moduleFiles = tree.files.filter((file) => file.endsWith('.module.ts'));
+      expect(moduleFiles.length).toEqual(0);
+    });
+
+    it('should create a standalone component', async () => {
+      const options = { ...defaultOptions, standalone: true };
+
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+      const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+      expect(component).toMatch(/standalone: true/);
+    });
+
+    it('should create routing information when routing is true', async () => {
+      const options = { ...defaultOptions, standalone: true, routing: true };
+
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+      expect(tree.files).toContain('/projects/foo/src/app/app.routes.ts');
+
+      const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+      expect(component).toContain(`import { RouterOutlet } from '@angular/router';`);
+      expect(component).toContain(`imports: [CommonModule, RouterOutlet]`);
+
+      const config = tree.readContent('/projects/foo/src/app/app.config.ts');
+      expect(config).toContain(`import { provideRouter } from '@angular/router';`);
+      expect(config).toContain(`import { routes } from './app.routes';`);
+      expect(config).toContain('provideRouter(routes)');
+    });
+
+    it('should create a main.ts', async () => {
+      const options = { ...defaultOptions, standalone: true };
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+      const main = tree.readContent('/projects/foo/src/main.ts');
+      expect(main).toContain('bootstrapApplication');
+    });
+
+    it('should set the default schematic options to be standalone', async () => {
+      const options = { ...defaultOptions, standalone: true };
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+      const workspace = JSON.parse(tree.readContent('/angular.json'));
+      expect(workspace.projects.foo.schematics).toEqual(
+        jasmine.objectContaining({
+          '@schematics/angular:component': { standalone: true },
+          '@schematics/angular:directive': { standalone: true },
+          '@schematics/angular:pipe': { standalone: true },
+        }),
+      );
+    });
+  });
 });

@@ -56,6 +56,7 @@ export default function (options: NgNewOptions): Rule {
     skipInstall: true,
     strict: options.strict,
     minimal: options.minimal,
+    standalone: options.standalone,
   };
 
   return chain([

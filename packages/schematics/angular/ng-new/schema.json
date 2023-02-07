@@ -133,6 +133,12 @@
       "description": "The package manager used to install dependencies.",
       "type": "string",
       "enum": ["npm", "yarn", "pnpm", "cnpm"]
+    },
+    "standalone": {
+      "description": "Creates an application based upon the standalone API, without NgModules.",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": "ep.ng_standalone"
     }
   },
   "required": ["name", "version"]

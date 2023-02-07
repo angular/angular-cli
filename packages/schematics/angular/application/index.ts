@@ -32,6 +32,187 @@ import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
 
+export default function (options: ApplicationOptions): Rule {
+  return async (host: Tree) => {
+    const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
+      await getAppOptions(host, options);
+
+    const appTypeRules = options.standalone
+      ? getStandaloneAppRules(
+          options,
+          appDir,
+          folderName,
+          sourceDir,
+          appRootSelector,
+          componentOptions,
+        )
+      : getModuleAppRules(
+          options,
+          appDir,
+          folderName,
+          sourceDir,
+          appRootSelector,
+          componentOptions,
+        );
+
+    return chain([
+      addAppToWorkspaceFile(options, appDir, folderName),
+      mergeWith(
+        apply(url('./files/common-files'), [
+          options.minimal ? filter(minimalPathFilter) : noop(),
+          applyTemplates({
+            utils: strings,
+            ...options,
+            selector: appRootSelector,
+            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
+            appName: options.name,
+            folderName,
+          }),
+          move(appDir),
+        ]),
+        MergeStrategy.Overwrite,
+      ),
+      ...appTypeRules,
+      mergeWith(
+        apply(url('./files/common-other-files'), [
+          options.strict ? noop() : filter((path) => path !== '/package.json.template'),
+          componentOptions.inlineTemplate
+            ? filter((path) => !path.endsWith('.html.template'))
+            : noop(),
+          componentOptions.skipTests
+            ? filter((path) => !path.endsWith('.spec.ts.template'))
+            : noop(),
+          applyTemplates({
+            utils: strings,
+            ...options,
+            selector: appRootSelector,
+            ...componentOptions,
+          }),
+          move(sourceDir),
+        ]),
+        MergeStrategy.Overwrite,
+      ),
+      options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
+    ]);
+  };
+}
+
+function getModuleAppRules(
+  options: ApplicationOptions,
+  appDir: string,
+  folderName: string,
+  sourceDir: string,
+  appRootSelector: string,
+  componentOptions: Partial<ComponentOptions>,
+): Rule[] {
+  return [
+    mergeWith(
+      apply(url('./files/module-files'), [
+        options.minimal ? filter(minimalPathFilter) : noop(),
+        applyTemplates({
+          utils: strings,
+          ...options,
+          relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
+          appName: options.name,
+          folderName,
+        }),
+        move(appDir),
+      ]),
+      MergeStrategy.Overwrite,
+    ),
+    schematic('module', {
+      name: 'app',
+      commonModule: false,
+      flat: true,
+      routing: options.routing,
+      routingScope: 'Root',
+      path: sourceDir,
+      project: options.name,
+    }),
+    schematic('component', {
+      name: 'app',
+      selector: appRootSelector,
+      flat: true,
+      path: sourceDir,
+      skipImport: true,
+      project: options.name,
+      ...componentOptions,
+    }),
+    mergeWith(
+      apply(url('./files/other-module-files'), [
+        options.strict ? noop() : filter((path) => path !== '/package.json.template'),
+        componentOptions.inlineTemplate
+          ? filter((path) => !path.endsWith('.html.template'))
+          : noop(),
+        componentOptions.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
+        applyTemplates({
+          utils: strings,
+          ...options,
+          selector: appRootSelector,
+          ...componentOptions,
+        }),
+        move(sourceDir),
+      ]),
+      MergeStrategy.Overwrite,
+    ),
+  ];
+}
+
+function getStandaloneAppRules(
+  options: ApplicationOptions,
+  appDir: string,
+  folderName: string,
+  sourceDir: string,
+  appRootSelector: string,
+  componentOptions: Partial<ComponentOptions>,
+): Rule[] {
+  return [
+    mergeWith(
+      apply(url('./files/standalone-files'), [
+        options.minimal ? filter(minimalPathFilter) : noop(),
+        options.routing ? noop() : filter((path) => !path.endsWith('app.routes.ts.template')),
+        applyTemplates({
+          utils: strings,
+          ...options,
+          selector: appRootSelector,
+          relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
+          appName: options.name,
+          folderName,
+        }),
+        move(appDir),
+      ]),
+      MergeStrategy.Overwrite,
+    ),
+    schematic('component', {
+      name: 'app',
+      selector: appRootSelector,
+      flat: true,
+      path: sourceDir,
+      skipImport: true,
+      project: options.name,
+      standalone: true,
+      ...componentOptions,
+    }),
+    mergeWith(
+      apply(url('./files/other-standalone-files'), [
+        options.strict ? noop() : filter((path) => path !== '/package.json.template'),
+        componentOptions.inlineTemplate
+          ? filter((path) => !path.endsWith('.html.template'))
+          : noop(),
+        componentOptions.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
+        applyTemplates({
+          utils: strings,
+          ...options,
+          selector: appRootSelector,
+          ...componentOptions,
+        }),
+        move(sourceDir),
+      ]),
+      MergeStrategy.Overwrite,
+    ),
+  ];
+}
+
 function addDependenciesToPackageJson(options: ApplicationOptions) {
   return (host: Tree, context: SchematicContext) => {
     [
@@ -109,6 +290,16 @@ function addAppToWorkspaceFile(
         schematics[`@schematics/angular:${type}`] = {};
       }
       (schematics[`@schematics/angular:${type}`] as JsonObject).skipTests = true;
+    });
+  }
+
+  if (options.standalone) {
+    const schematicsWithStandalone = ['component', 'directive', 'pipe'];
+    schematicsWithStandalone.forEach((type) => {
+      if (!(`@schematics/angular:${type}` in schematics)) {
+        schematics[`@schematics/angular:${type}`] = {};
+      }
+      (schematics[`@schematics/angular:${type}`] as JsonObject).standalone = true;
     });
   }
 
@@ -222,99 +413,65 @@ function addAppToWorkspaceFile(
     });
   });
 }
+
 function minimalPathFilter(path: string): boolean {
   return !path.endsWith('tsconfig.spec.json.template');
 }
 
-export default function (options: ApplicationOptions): Rule {
-  return async (host: Tree) => {
-    const appRootSelector = `${options.prefix}-root`;
-    const componentOptions: Partial<ComponentOptions> = !options.minimal
-      ? {
-          inlineStyle: options.inlineStyle,
-          inlineTemplate: options.inlineTemplate,
-          skipTests: options.skipTests,
-          style: options.style,
-          viewEncapsulation: options.viewEncapsulation,
-        }
-      : {
-          inlineStyle: options.inlineStyle ?? true,
-          inlineTemplate: options.inlineTemplate ?? true,
-          skipTests: true,
-          style: options.style,
-          viewEncapsulation: options.viewEncapsulation,
-        };
+async function getAppOptions(
+  host: Tree,
+  options: ApplicationOptions,
+): Promise<{
+  appDir: string;
+  appRootSelector: string;
+  componentOptions: Partial<ComponentOptions>;
+  folderName: string;
+  sourceDir: string;
+}> {
+  const appRootSelector = `${options.prefix}-root`;
+  const componentOptions = getComponentOptions(options);
 
-    const workspace = await getWorkspace(host);
-    const newProjectRoot = (workspace.extensions.newProjectRoot as string | undefined) || '';
+  const workspace = await getWorkspace(host);
+  const newProjectRoot = (workspace.extensions.newProjectRoot as string | undefined) || '';
 
-    // If scoped project (i.e. "@foo/bar"), convert dir to "foo/bar".
-    let folderName = options.name.startsWith('@') ? options.name.slice(1) : options.name;
-    if (/[A-Z]/.test(folderName)) {
-      folderName = strings.dasherize(folderName);
-    }
+  // If scoped project (i.e. "@foo/bar"), convert dir to "foo/bar".
+  let folderName = options.name.startsWith('@') ? options.name.slice(1) : options.name;
+  if (/[A-Z]/.test(folderName)) {
+    folderName = strings.dasherize(folderName);
+  }
 
-    const appDir =
-      options.projectRoot === undefined
-        ? join(normalize(newProjectRoot), folderName)
-        : normalize(options.projectRoot);
+  const appDir =
+    options.projectRoot === undefined
+      ? join(normalize(newProjectRoot), folderName)
+      : normalize(options.projectRoot);
 
-    const sourceDir = `${appDir}/src/app`;
+  const sourceDir = `${appDir}/src/app`;
 
-    return chain([
-      addAppToWorkspaceFile(options, appDir, folderName),
-      mergeWith(
-        apply(url('./files'), [
-          options.minimal ? filter(minimalPathFilter) : noop(),
-          applyTemplates({
-            utils: strings,
-            ...options,
-            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
-            appName: options.name,
-            folderName,
-          }),
-          move(appDir),
-        ]),
-        MergeStrategy.Overwrite,
-      ),
-      schematic('module', {
-        name: 'app',
-        commonModule: false,
-        flat: true,
-        routing: options.routing,
-        routingScope: 'Root',
-        path: sourceDir,
-        project: options.name,
-      }),
-      schematic('component', {
-        name: 'app',
-        selector: appRootSelector,
-        flat: true,
-        path: sourceDir,
-        skipImport: true,
-        project: options.name,
-        ...componentOptions,
-      }),
-      mergeWith(
-        apply(url('./other-files'), [
-          options.strict ? noop() : filter((path) => path !== '/package.json.template'),
-          componentOptions.inlineTemplate
-            ? filter((path) => !path.endsWith('.html.template'))
-            : noop(),
-          componentOptions.skipTests
-            ? filter((path) => !path.endsWith('.spec.ts.template'))
-            : noop(),
-          applyTemplates({
-            utils: strings,
-            ...options,
-            selector: appRootSelector,
-            ...componentOptions,
-          }),
-          move(sourceDir),
-        ]),
-        MergeStrategy.Overwrite,
-      ),
-      options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
-    ]);
+  return {
+    appDir,
+    appRootSelector,
+    componentOptions,
+    folderName,
+    sourceDir,
   };
+}
+
+function getComponentOptions(options: ApplicationOptions): Partial<ComponentOptions> {
+  const componentOptions: Partial<ComponentOptions> = !options.minimal
+    ? {
+        inlineStyle: options.inlineStyle,
+        inlineTemplate: options.inlineTemplate,
+        skipTests: options.skipTests,
+        style: options.style,
+        viewEncapsulation: options.viewEncapsulation,
+      }
+    : {
+        inlineStyle: options.inlineStyle ?? true,
+        inlineTemplate: options.inlineTemplate ?? true,
+        skipTests: true,
+        style: options.style,
+        viewEncapsulation: options.viewEncapsulation,
+      };
+
+  return componentOptions;
 }
