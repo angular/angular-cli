@@ -102,6 +102,12 @@
       "description": "Creates an application with stricter bundle budgets settings.",
       "type": "boolean",
       "default": true
+    },
+    "standalone": {
+      "description": "Creates an application based upon the standalone API, without NgModules.",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": "ep.ng_standalone"
     }
   },
   "required": ["name"]

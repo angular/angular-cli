@@ -1,0 +1,8 @@
+import { ApplicationConfig } from '@angular/core';<% if (routing) { %>
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';<% } %>
+
+export const appConfig: ApplicationConfig = {
+  providers: [<% if (routing) { %>provideRouter(routes) <% } %>],
+};

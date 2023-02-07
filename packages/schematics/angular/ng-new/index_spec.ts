@@ -42,6 +42,21 @@ describe('Ng New Schematic', () => {
     );
   });
 
+  it('should create files of a standalone application', async () => {
+    const options = { ...defaultOptions, standalone: true };
+
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/bar/tsconfig.app.json',
+        '/bar/src/main.ts',
+        '/bar/src/app/app.config.ts',
+      ]),
+    );
+    expect(files).not.toEqual(jasmine.arrayContaining(['/bar/src/app/app.module.ts']));
+  });
+
   it('should should set the prefix in angular.json and in app.component.ts', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
