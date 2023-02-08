@@ -1,0 +1,5 @@
+# Import config items common to both Linux and Windows setups.
+# https://docs.bazel.build/versions/master/guide.html#bazelrc-syntax-and-semantics
+import %workspace%/.circleci/bazel.common.rc
+
+build --config=remote
