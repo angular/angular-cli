@@ -1,3 +1,35 @@
+<a name="15.1.5"></a>
+
+# 15.1.5 (2023-02-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [b8bbe9688](https://github.com/angular/angular-cli/commit/b8bbe9688e0e684245636e7d58d50c51719039c8) | fix  | error if Angular compiler is used in a schematic |
+| [fabbb8a93](https://github.com/angular/angular-cli/commit/fabbb8a936f3b3b1cee8ea5cbdb7bb7832cb02a7) | fix  | only set `DebugView` when `NG_DEBUG` is passed   |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [499173b5d](https://github.com/angular/angular-cli/commit/499173b5d197f14377203b92b49ff3cbbf55b260) | fix  | remove bootstrapping wrapping in universal schematic |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [e87134fe9](https://github.com/angular/angular-cli/commit/e87134fe94831df76698fe0e90fe556da0011511) | fix  | build optimizer support for spec-compliant downlevel class properties |
+| [d80adde2f](https://github.com/angular/angular-cli/commit/d80adde2fec53e6513983a89dd194a35c426b8aa) | fix  | do not fail compilation when spec pattern does not match              |
+| [11be502e7](https://github.com/angular/angular-cli/commit/11be502e7cc2544371d55c8b3d32b7bcbbf8066e) | fix  | fix support of Safari TP versions                                     |
+| [14e317d85](https://github.com/angular/angular-cli/commit/14e317d85429c83e6285c5cec4a1c4483d8a1c8f) | fix  | load polyfills and runtime as scripts instead of modules              |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Kristiyan Kostadinov and Ricardo
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.4"></a>
 
 # 15.1.4 (2023-02-01)
