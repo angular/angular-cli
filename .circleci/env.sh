@@ -41,3 +41,11 @@ setPublicVar HUSKY 0
 # Bazel from a node modules directoy that might be modified by the Bazel Yarn install then.
 setPublicVar BAZELISK_VERSION \
     "$(cd ${PROJECT_ROOT}; node -p 'require("./package.json").devDependencies["@bazel/bazelisk"]')"
+
+# Conditionally, copy bazel configuration based on the current VM
+# operating system running. We detect Windows by checking for `%AppData%`.
+if [[ -n "${APPDATA}" ]]; then
+  cp "${PROJECT_ROOT}/.circleci/bazel.windows.rc" ".bazelrc.user";
+else
+  cp "${PROJECT_ROOT}/.circleci/bazel.linux.rc" ".bazelrc.user";
+fi
