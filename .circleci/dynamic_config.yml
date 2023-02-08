@@ -144,9 +144,7 @@ commands:
         type: env_var_name
         default: CIRCLE_PROJECT_REPONAME
     steps:
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - devinfra/setup-bazel-remote-exec:
-          bazelrc: ./.bazelrc.user
+      - devinfra/setup-bazel-remote-exec
 
   install_python:
     steps:
@@ -454,6 +452,12 @@ jobs:
       - checkout
       - rebase_pr_win
       - setup_windows
+      - setup_bazel_rbe
+      - run:
+          name: 'Setup Bazel HTTP Caching'
+          shell: bash
+          command: |
+            echo "build --remote_upload_local_results=true" >> ./.bazelrc.user
       - restore_cache:
           keys:
             - *cache_key_win
@@ -568,7 +572,7 @@ workflows:
             - bazel-build
 
       # Windows jobs
-      - e2e-cli-win
+      # - e2e-cli-win
 
       - bazel-e2e-cli-win
 

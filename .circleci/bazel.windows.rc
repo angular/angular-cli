@@ -1,0 +1,9 @@
+# Import config items common to both Linux and Windows setups.
+# https://docs.bazel.build/versions/master/guide.html#bazelrc-syntax-and-semantics
+try-import %workspace%/.circleci/bazel.common.rc
+
+# All windows jobs run on release branches should use http caching
+build --remote_cache=https://storage.googleapis.com/angular-team-cache
+build --remote_accept_cached=true
+build --remote_upload_local_results=false
+build --google_default_credentials
