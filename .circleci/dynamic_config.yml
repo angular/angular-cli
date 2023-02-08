@@ -144,9 +144,19 @@ commands:
         type: env_var_name
         default: CIRCLE_PROJECT_REPONAME
     steps:
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
+      - run:
+          name: 'Copy Bazel RC'
+          shell: bash
+          command: |
+            # Conditionally, copy bazel configuration based on the current VM
+            # operating system running. We detect Windows by checking for `%AppData%`.
+            if [[ -n "${APPDATA}" ]]; then
+              cp "./.circleci/bazel.windows.rc" ".bazelrc.user";
+            else
+              cp "./.circleci/bazel.linux.rc" ".bazelrc.user";
+            fi
       - devinfra/setup-bazel-remote-exec:
-          bazelrc: ./.bazelrc.user
+          shell: bash
 
   install_python:
     steps:
@@ -307,7 +317,6 @@ jobs:
     steps:
       - custom_attach_workspace
       - setup_bazel_rbe
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - when:
           # The default nodeversion runs all *excluding* other versions
           condition:
@@ -454,6 +463,7 @@ jobs:
       - checkout
       - rebase_pr_win
       - setup_windows
+      - setup_bazel_rbe
       - restore_cache:
           keys:
             - *cache_key_win
