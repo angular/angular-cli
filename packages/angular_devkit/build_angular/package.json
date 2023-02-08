@@ -43,7 +43,7 @@
     "loader-utils": "3.2.1",
     "magic-string": "0.27.0",
     "mini-css-extract-plugin": "2.7.2",
-    "open": "8.4.0",
+    "open": "8.4.1",
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
     "piscina": "3.2.0",
