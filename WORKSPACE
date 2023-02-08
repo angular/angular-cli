@@ -32,8 +32,8 @@ build_bazel_rules_nodejs_dependencies()
 
 http_archive(
     name = "rules_pkg",
-    sha256 = "eea0f59c28a9241156a47d7a8e32db9122f3d50b505fae0f33de6ce4d9b61834",
-    urls = ["https://github.com/bazelbuild/rules_pkg/releases/download/0.8.0/rules_pkg-0.8.0.tar.gz"],
+    sha256 = "8c20f74bca25d2d442b327ae26768c02cf3c99e93fad0381f32be9aab1967675",
+    urls = ["https://github.com/bazelbuild/rules_pkg/releases/download/0.8.1/rules_pkg-0.8.1.tar.gz"],
 )
 
 load("@bazel_tools//tools/sh:sh_configure.bzl", "sh_configure")
