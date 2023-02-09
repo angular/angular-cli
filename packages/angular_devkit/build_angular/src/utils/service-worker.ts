@@ -167,7 +167,7 @@ export async function augmentAppWithServiceWorkerCore(
 
     return inputputFileSystem === outputFileSystem
       ? // Native FS (Builder).
-        inputputFileSystem.copyFile(workerPath, resolvedDest, fsConstants.COPYFILE_FICLONE)
+        inputputFileSystem.copyFile(src, resolvedDest, fsConstants.COPYFILE_FICLONE)
       : // memfs (Webpack): Read the file from the input FS (disk) and write it to the output FS (memory).
         outputFileSystem.writeFile(resolvedDest, await inputputFileSystem.readFile(src));
   };
