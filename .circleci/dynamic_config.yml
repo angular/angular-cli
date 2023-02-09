@@ -85,7 +85,7 @@ executors:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
     working_directory: ~/ng
     resource_class: windows.large
-    shell: powershell.exe -ExecutionPolicy Bypass
+    shell: bash.exe
     machine:
       # Contents of this image:
       # https://circleci.com/docs/2.0/hello-world-windows/#software-pre-installed-in-the-windows-image
@@ -98,7 +98,6 @@ commands:
     steps:
       - run:
           name: 'Cancel workflow on fail'
-          shell: bash
           when: on_fail
           command: |
             curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
@@ -120,9 +119,6 @@ commands:
       - devinfra/rebase-pr-on-target-branch:
           base_revision: << pipeline.git.base_revision >>
           head_revision: << pipeline.git.revision >>
-          # Use `bash.exe` as Shell because the CircleCI-orb command is an
-          # included Bash script and expects Bash as shell.
-          shell: bash.exe
 
   custom_attach_workspace:
     description: Attach workspace at a predefined location
@@ -134,7 +130,7 @@ commands:
       - initialize_env
       - run: nvm install 16.13
       - run: nvm use 16.13
-      - run: npm install -g yarn@1.22.10 @bazel/bazelisk@${BAZELISK_VERSION}
+      - run: sudo npm install -g yarn@1.22.10 @bazel/bazelisk@${BAZELISK_VERSION}
       - run: node --version
       - run: yarn --version
 
@@ -146,7 +142,6 @@ commands:
     steps:
       - run:
           name: 'Copy Bazel RC'
-          shell: bash
           command: |
             # Conditionally, copy bazel configuration based on the current VM
             # operating system running. We detect Windows by checking for `%AppData%`.
@@ -155,8 +150,7 @@ commands:
             else
               cp "./.circleci/bazel.linux.rc" ".bazelrc.user";
             fi
-      - devinfra/setup-bazel-remote-exec:
-          shell: bash
+      - devinfra/setup-bazel-remote-exec
 
   install_python:
     steps:
