@@ -581,7 +581,7 @@
   dependencies:
     "@babel/types" "^7.20.0"
 
-"@babel/helper-split-export-declaration@^7.18.6":
+"@babel/helper-split-export-declaration@7.18.6", "@babel/helper-split-export-declaration@^7.18.6":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/helper-split-export-declaration/-/helper-split-export-declaration-7.18.6.tgz#7367949bc75b20c6d5a5d4a97bba2824ae8ef075"
   integrity sha512-bde1etTx6ZyTmobl9LLMMQsaizFVZrquTEHOqKeQESMKo4PlObf+8+JA25ZsIpZhT/WEd39+vOdLXAFG/nELpA==
