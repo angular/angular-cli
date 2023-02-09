@@ -22,9 +22,6 @@ ng_package(
     name = "npm_package",
     package_name = "@nguniversal/common",
     srcs = [":package.json"],
-    nested_packages = [
-        "//modules/common/schematics:npm_package",
-    ],
     readme_md = ":README.md",
     tags = ["release"],
     deps = [

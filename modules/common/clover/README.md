@@ -1,5 +1,7 @@
 # Angular SSR project Clover
 
+** NOTE: This experimental project will be removed in version 16. **
+
 - What if Angular SSR didn't require the complex `@nguniversal` and `@angular/platform-server` packages for onboarding?
 - What if we `Window is undefined` error was a thing of the past?
 - What if you don't need multiple builds for an SSR/prerender application?

@@ -34,6 +34,10 @@ export interface NGRenderModeAPI {
 
 export type NGRenderMode = boolean | undefined | NGRenderModeAPI;
 declare let ngRenderMode: NGRenderMode;
+/**
+ * @deprecated This experimental API will be removed in version 16.
+ * @experimental
+ */
 
 @NgModule({
   exports: [BrowserModule],

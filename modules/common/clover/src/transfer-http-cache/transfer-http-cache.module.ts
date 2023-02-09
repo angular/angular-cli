@@ -11,6 +11,10 @@ import { NgModule } from '@angular/core';
 import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { TransferHttpCacheInterceptor } from './transfer-http-cache.interceptor';
 
+/**
+ * @deprecated This experimental API will be removed in version 16.
+ * @experimental
+ */
 @NgModule({
   imports: [BrowserTransferStateModule],
   providers: [

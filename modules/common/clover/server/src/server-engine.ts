@@ -18,6 +18,11 @@ import { CustomResourceLoader } from './custom-resource-loader';
 import { InlineCriticalCssProcessor } from './inline-css-processor';
 import { augmentWindowWithStubs } from './stubs';
 
+/**
+ * @deprecated This experimental API will be removed in version 16.
+ * @experimental
+ */
+
 export interface RenderOptions {
   headers?: Record<string, string | undefined | string[]>;
   url: string;
@@ -25,6 +30,10 @@ export interface RenderOptions {
   htmlFilename?: string;
   publicPath: string;
 }
+/**
+ * @deprecated This experimental API will be removed in version 16.
+ * @experimental
+ */
 
 export class Engine {
   private readonly fileExistsCache = new Map<string, boolean>();
