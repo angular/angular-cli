@@ -169,14 +169,27 @@ describe('adjust-static-class-members Babel plugin', () => {
   });
 
   it('does not wrap default exported class with no connected siblings', () => {
-    testCaseNoChange(`
-      export default class CustomComponentEffects {
-        constructor(_actions) {
-          this._actions = _actions;
-          this.doThis = this._actions;
+    // NOTE: This could technically have no changes but the default export splitting detection
+    // does not perform class property analysis currently.
+    testCase({
+      input: `
+        export default class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
         }
-      }
-    `);
+      `,
+      expected: `
+        class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        export { CustomComponentEffects as default };
+      `,
+    });
   });
 
   it('does wrap not default exported class with only side effect fields', () => {

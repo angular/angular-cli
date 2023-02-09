@@ -8,6 +8,7 @@
 
 import { NodePath, PluginObj, PluginPass, types } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
+import splitExportDeclaration from '@babel/helper-split-export-declaration';
 
 /**
  * The name of the Typescript decorator helper function created by the TypeScript compiler.
@@ -183,11 +184,17 @@ function analyzeClassSiblings(
 }
 
 /**
- * The set of classed already visited and analyzed during the plugin's execution.
+ * The set of classes already visited and analyzed during the plugin's execution.
  * This is used to prevent adjusted classes from being repeatedly analyzed which can lead
  * to an infinite loop.
  */
 const visitedClasses = new WeakSet<types.Class>();
+
+/**
+ * A map of classes that have already been analyzed during the default export splitting step.
+ * This is used to avoid analyzing a class declaration twice if it is a direct default export.
+ */
+const exportDefaultAnalysis = new WeakMap<types.Class, ReturnType<typeof analyzeClassSiblings>>();
 
 /**
  * A babel plugin factory function for adjusting classes; primarily with Angular metadata.
@@ -201,6 +208,25 @@ const visitedClasses = new WeakSet<types.Class>();
 export default function (): PluginObj {
   return {
     visitor: {
+      // When a class is converted to a variable declaration, the default export must be moved
+      // to a subsequent statement to prevent a JavaScript syntax error.
+      ExportDefaultDeclaration(path: NodePath<types.ExportDefaultDeclaration>, state: PluginPass) {
+        const declaration = path.get('declaration');
+        if (!declaration.isClassDeclaration()) {
+          return;
+        }
+
+        const { wrapDecorators } = state.opts as { wrapDecorators: boolean };
+        const analysis = analyzeClassSiblings(path, declaration.node.id, wrapDecorators);
+        exportDefaultAnalysis.set(declaration.node, analysis);
+
+        // Splitting the export declaration is not needed if the class will not be wrapped
+        if (analysis.hasPotentialSideEffects) {
+          return;
+        }
+
+        splitExportDeclaration(path);
+      },
       ClassDeclaration(path: NodePath<types.ClassDeclaration>, state: PluginPass) {
         const { node: classNode, parentPath } = path;
         const { wrapDecorators } = state.opts as { wrapDecorators: boolean };
@@ -210,14 +236,10 @@ export default function (): PluginObj {
         }
 
         // Analyze sibling statements for elements of the class that were downleveled
-        const hasExport =
-          parentPath.isExportNamedDeclaration() || parentPath.isExportDefaultDeclaration();
-        const origin = hasExport ? parentPath : path;
-        const { wrapStatementPaths, hasPotentialSideEffects } = analyzeClassSiblings(
-          origin,
-          classNode.id,
-          wrapDecorators,
-        );
+        const origin = parentPath.isExportNamedDeclaration() ? parentPath : path;
+        const { wrapStatementPaths, hasPotentialSideEffects } =
+          exportDefaultAnalysis.get(classNode) ??
+          analyzeClassSiblings(origin, classNode.id, wrapDecorators);
 
         visitedClasses.add(classNode);
 
@@ -288,18 +310,7 @@ export default function (): PluginObj {
         const declaration = types.variableDeclaration('let', [
           types.variableDeclarator(types.cloneNode(classNode.id), replacementInitializer),
         ]);
-        if (parentPath.isExportDefaultDeclaration()) {
-          // When converted to a variable declaration, the default export must be moved
-          // to a subsequent statement to prevent a JavaScript syntax error.
-          parentPath.replaceWithMultiple([
-            declaration,
-            types.exportNamedDeclaration(undefined, [
-              types.exportSpecifier(types.cloneNode(classNode.id), types.identifier('default')),
-            ]),
-          ]);
-        } else {
-          path.replaceWith(declaration);
-        }
+        path.replaceWith(declaration);
       },
       ClassExpression(path: NodePath<types.ClassExpression>, state: PluginPass) {
         const { node: classNode, parentPath } = path;
