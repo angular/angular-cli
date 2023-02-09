@@ -212,6 +212,10 @@ function normalizeOptions(
           } catch {}
         }
         break;
+      case 'before':
+        options['before'] =
+          typeof substitutedValue === 'string' ? new Date(substitutedValue) : substitutedValue;
+        break;
       default:
         options[key] = substitutedValue;
         break;
