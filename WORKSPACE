@@ -99,6 +99,11 @@ nodejs_register_toolchains(
     node_version = "16.13.1",
 )
 
+nodejs_register_toolchains(
+    name = "node18",
+    node_version = "18.10.0",
+)
+
 register_toolchains(
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_linux_toolchain",
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_macos_x86_toolchain",
