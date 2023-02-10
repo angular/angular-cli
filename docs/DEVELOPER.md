@@ -86,8 +86,8 @@ You can find more info about debugging [tests with Bazel in the docs.](https://g
 ### End to end tests
 
 - For a complete list of test targets use the following Bazel query: `yarn bazel query "tests(//tests/...)"`
-- Run a subset of the tests: `yarn bazel test //tests/legacy-cli:e2e --test_filter="tests/i18n/ivy-localize-*"`
-- Use `bazel run` to debug failing tests debugging: `yarn bazel run //tests/legacy-cli:e2e --test_arg="--glob=tests/basic/aot.ts"`
+- Run a subset of the tests: `yarn bazel test //tests/legacy-cli:e2e_node16 --test_filter="tests/i18n/ivy-localize-*"`
+- Use `bazel run` to debug failing tests debugging: `yarn bazel run //tests/legacy-cli:e2e_node16 --test_arg="--glob=tests/basic/aot.ts"`
 - Provide additional `e2e_runner` using `--test_arg`: `--test_arg="--yarn"`
 
 When running the debug commands, Node will stop and wait for a debugger to attach.

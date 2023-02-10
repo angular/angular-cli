@@ -1,4 +1,5 @@
 load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_test")
+load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 
 # bazel query --output=label "kind('pkg_tar', //packages/...)"
 TESTED_PACKAGES = [
@@ -54,14 +55,19 @@ def e2e_suites(name, runner, data):
         data: runtime deps such as tests and test data
     """
 
-    # Default target meant to be run manually for debugging, customizing test cli via bazel
-    _e2e_tests(name, runner = runner, data = data, tags = ["manual"])
-
     # Pre-configured test suites
-    # TODO: add node 14 + 16
-    _e2e_suite(name, runner, "npm", data)
-    _e2e_suite(name, runner, "yarn", data)
-    _e2e_suite(name, runner, "esbuild", data)
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
+    ):
+        # Default target meant to be run manually for debugging, customizing test cli via bazel
+        _e2e_tests(name + "_" + toolchain_name, runner, data = data, toolchain = toolchain, tags = ["manual"])
+
+        _e2e_suite(name, runner, "npm", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain)
+
+    # Saucelabs tests are only run on the default toolchain
     _e2e_suite(name, runner, "saucelabs", data)
 
 def _e2e_tests(name, runner, **kwargs):
@@ -107,13 +113,16 @@ def _e2e_tests(name, runner, **kwargs):
         **kwargs
     )
 
-def _e2e_suite(name, runner, type, data):
+def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     """
     Setup a predefined test suite (yarn|esbuild|saucelabs|npm).
     """
     args = []
     tests = None
     ignore = None
+
+    if toolchain_name:
+        toolchain_name = "_" + toolchain_name
 
     if type == "yarn":
         args.append("--yarn")
@@ -132,10 +141,11 @@ def _e2e_suite(name, runner, type, data):
 
     # Standard e2e tests
     _e2e_tests(
-        name = "%s.%s" % (name, type),
+        name = "%s.%s%s" % (name, type, toolchain_name),
         runner = runner,
         size = "enormous",
         data = data,
+        toolchain = toolchain,
         shard_count = TEST_SHARD_COUNT,
         templated_args = [
             "--glob=%s" % _to_glob(tests) if tests else "",
@@ -145,10 +155,11 @@ def _e2e_suite(name, runner, type, data):
 
     # e2e tests of snapshot builds
     _e2e_tests(
-        name = "%s.snapshots.%s" % (name, type),
+        name = "%s.snapshots.%s%s" % (name, type, toolchain_name),
         runner = runner,
         size = "enormous",
         data = data,
+        toolchain = toolchain,
         shard_count = TEST_SHARD_COUNT,
         templated_args = [
             "--ng-snapshots",
