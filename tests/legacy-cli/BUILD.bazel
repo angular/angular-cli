@@ -4,7 +4,9 @@ load(":e2e.bzl", "e2e_suites")
 ts_library(
     name = "runner",
     testonly = True,
-    srcs = glob(["**/*.ts"]),
+    srcs = [
+        "e2e_runner.ts",
+    ],
     data = [
         "verdaccio.yaml",
         "verdaccio_auth.yaml",

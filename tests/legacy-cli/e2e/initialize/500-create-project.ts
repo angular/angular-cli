@@ -1,10 +1,9 @@
 import { join } from 'path';
 import yargsParser from 'yargs-parser';
-import { IS_BAZEL } from '../utils/bazel';
 import { getGlobalVariable } from '../utils/env';
 import { expectFileToExist } from '../utils/fs';
 import { gitClean } from '../utils/git';
-import { installPackage, setRegistry as setNPMConfigRegistry } from '../utils/packages';
+import { setRegistry as setNPMConfigRegistry } from '../utils/packages';
 import { ng } from '../utils/process';
 import { prepareProjectForE2e, updateJsonFile } from '../utils/project';
 
@@ -21,16 +20,6 @@ export default async function () {
   } else {
     // Ensure local test registry is used when outside a project
     await setNPMConfigRegistry(true);
-
-    // Install puppeteer in the parent directory for use by the CLI within any test project.
-    // Align the version with the primary project package.json.
-    // Bazel has own browser toolchains
-    // TODO(bazel): remove non-bazel
-    if (!IS_BAZEL) {
-      const puppeteerVersion =
-        require('../../../../package.json').devDependencies.puppeteer.replace(/^[\^~]/, '');
-      await installPackage(`puppeteer@${puppeteerVersion}`);
-    }
 
     await ng('new', 'test-project', '--skip-install');
     await expectFileToExist(join(process.cwd(), 'test-project'));

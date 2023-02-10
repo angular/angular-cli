@@ -1,10 +1,9 @@
 import { join } from 'path';
-import { IS_BAZEL } from '../../utils/bazel';
 import { execWithEnv } from '../../utils/process';
 
 export default async function () {
   // TODO(bazel): fails with bazel on windows
-  if (IS_BAZEL && process.platform.startsWith('win')) {
+  if (process.platform.startsWith('win')) {
     return;
   }
 

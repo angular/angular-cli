@@ -2,13 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { prerelease, SemVer } from 'semver';
 import yargsParser from 'yargs-parser';
-import { IS_BAZEL } from './bazel';
 import { getGlobalVariable } from './env';
 import { readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { findFreePort } from './network';
 import { installWorkspacePackages, PkgInfo } from './packages';
-import { exec, execAndWaitForOutputToMatch, git, ng } from './process';
+import { execAndWaitForOutputToMatch, git, ng } from './process';
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath).then((tsConfigJson) => {
@@ -50,43 +49,6 @@ export async function prepareProjectForE2e(name: string) {
   console.log(`Project ${name} created... Installing packages.`);
   await installWorkspacePackages();
   await ng('generate', 'e2e', '--related-app-name', name);
-
-  // bazel will use its own sandboxed browser + webdriver
-  // TODO(bazel): remove non-bazel
-  if (!IS_BAZEL) {
-    const protractorPath = require.resolve('protractor');
-    const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
-      paths: [protractorPath],
-    });
-    const webdriverUpdate = JSON.parse(await readFile(webdriverUpdatePath)) as {
-      chrome: { last: string };
-    };
-
-    const chromeDriverVersion = webdriverUpdate.chrome.last.match(/chromedriver_([\d|\.]+)/)?.[1];
-    if (!chromeDriverVersion) {
-      throw new Error('Could not extract chrome webdriver version.');
-    }
-
-    // Initialize selenium webdriver.
-    // Often fails the first time so attempt twice if necessary.
-    const runWebdriverUpdate = () =>
-      exec(
-        process.execPath,
-        'node_modules/protractor/bin/webdriver-manager',
-        'update',
-        '--standalone',
-        'false',
-        '--gecko',
-        'false',
-        '--versions.chrome',
-        chromeDriverVersion,
-      );
-    try {
-      await runWebdriverUpdate();
-    } catch {
-      await runWebdriverUpdate();
-    }
-  }
 
   await useCIChrome(name, 'e2e');
   await useCIChrome(name, '');
