@@ -1,4 +1,3 @@
-import { logging } from '../../packages/angular_devkit/core/src';
 import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
 import * as colors from 'ansi-colors';
 import glob from 'glob';
@@ -9,10 +8,9 @@ import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
 import { launchTestProcess } from './e2e/utils/process';
 import { delimiter, dirname, join } from 'path';
-import { IS_BAZEL } from './e2e/utils/bazel';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
-import { readFileSync, realpathSync } from 'fs';
+import { realpathSync } from 'fs';
 import { PkgInfo } from './e2e/utils/packages';
 
 Error.stackTraceLimit = Infinity;
@@ -57,12 +55,11 @@ const argv = yargsParser(process.argv.slice(2), {
   number: ['nb-shards', 'shard'],
   array: ['package'],
   configuration: {
-    'dot-notation': false,
     'camel-case-expansion': false,
+    'dot-notation': false,
   },
   default: {
     'package': ['./dist/_*.tgz'],
-
     'debug': !!process.env.BUILD_WORKSPACE_DIRECTORY,
     'glob': process.env.TESTBRIDGE_TEST_ONLY,
     'nb-shards':
@@ -119,23 +116,19 @@ function lastLogger() {
 }
 
 // Under bazel the compiled file (.js) and types (.d.ts) are available.
-// Outside bazel the source .ts files are available.
-const SRC_FILE_EXT = IS_BAZEL ? 'js' : 'ts';
-const SRC_FILE_EXT_RE = new RegExp(`\.${SRC_FILE_EXT}$`);
-
-const testGlob = argv.glob || `tests/**/*.${SRC_FILE_EXT}`;
+const SRC_FILE_EXT_RE = /\.js$/;
+const testGlob = argv.glob?.replace(/\.ts$/, '.js') || `tests/**/*.js`;
 
 const e2eRoot = path.join(__dirname, 'e2e');
-const allSetups = glob.sync(`setup/**/*.${SRC_FILE_EXT}`, { nodir: true, cwd: e2eRoot }).sort();
-const allInitializers = glob
-  .sync(`initialize/**/*.${SRC_FILE_EXT}`, { nodir: true, cwd: e2eRoot })
-  .sort();
+const allSetups = glob.sync(`setup/**/*.js`, { nodir: true, cwd: e2eRoot }).sort();
+const allInitializers = glob.sync(`initialize/**/*.js`, { nodir: true, cwd: e2eRoot }).sort();
+
 const allTests = glob
   .sync(testGlob, { nodir: true, cwd: e2eRoot, ignore: argv.ignore })
   // Replace windows slashes.
   .map((name) => name.replace(/\\/g, '/'))
   .filter((name) => {
-    if (name.endsWith(`/setup.${SRC_FILE_EXT}`)) {
+    if (name.endsWith('/setup.js')) {
       return false;
     }
     if (!SRC_FILE_EXT_RE.test(name)) {
@@ -212,21 +205,8 @@ setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 //
 // Resolve from relative paths to absolute paths within the bazel runfiles tree
 // so subprocesses spawned in a different working directory can still find them.
-process.env.CHROME_BIN = IS_BAZEL
-  ? path.resolve(process.env.CHROME_BIN!)
-  : require('puppeteer').executablePath();
-process.env.CHROMEDRIVER_BIN = IS_BAZEL
-  ? path.resolve(process.env.CHROMEDRIVER_BIN!)
-  : (function () {
-      const protractorPath = require.resolve('protractor');
-      const webdriverUpdatePath = require.resolve('webdriver-manager/selenium/update-config.json', {
-        paths: [protractorPath],
-      });
-      const webdriverUpdate = JSON.parse(readFileSync(webdriverUpdatePath).toString()) as {
-        chrome: { last: string };
-      };
-      return webdriverUpdate.chrome.last;
-    })();
+process.env.CHROME_BIN = path.resolve(process.env.CHROME_BIN!);
+process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
 
 Promise.all([findFreePort(), findFreePort(), findPackageTars()])
   .then(async ([httpPort, httpsPort, packageTars]) => {
@@ -299,7 +279,7 @@ async function runSteps(
     const name = relativeName.replace(SRC_FILE_EXT_RE, '');
     const start = Date.now();
 
-    printHeader(relativeName, stepIndex, steps.length, type);
+    printHeader(name, stepIndex, steps.length, type);
 
     // Run the test function with the current file on the logStack.
     logStack.push(lastLogger().createChild(absoluteName));

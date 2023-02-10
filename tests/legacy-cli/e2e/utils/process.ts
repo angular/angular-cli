@@ -7,7 +7,6 @@ import { getGlobalVariable, getGlobalVariablesEnv } from './env';
 import { catchError } from 'rxjs/operators';
 import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'path';
-import { IS_BAZEL } from './bazel';
 
 interface ExecOptions {
   silent?: boolean;
@@ -420,11 +419,7 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
     .filter((p) => p.startsWith(tempRoot) || p.startsWith(TEMP) || !p.includes('angular-cli'))
     .join(delimiter);
 
-  const testProcessArgs = [
-    resolve(__dirname, IS_BAZEL ? 'test_process' : 'run_test_process'),
-    entry,
-    ...args,
-  ];
+  const testProcessArgs = [resolve(__dirname, 'test_process'), entry, ...args];
 
   return new Promise<void>((resolve, reject) => {
     spawn(process.execPath, testProcessArgs, {
