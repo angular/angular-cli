@@ -218,7 +218,8 @@ export function createCompilerPlugin(
         (setupWarnings ??= []).push({
           text:
             'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
-            '"false" respectively by the Angular CLI.',
+            '"false" respectively by the Angular CLI.\n' +
+            `NOTE: You can set the "target" to "ES2022" in the project's tsconfig to remove this warning.`,
           location: { file: pluginOptions.tsconfig },
           notes: [
             {
