@@ -37,6 +37,10 @@ export function checkCommonJSModules(
   // Ignore Angular locale definitions which are currently UMD
   allowedRequests.add('@angular/common/locales');
 
+  // Ignore zone.js due to it currently being built with a UMD like structure.
+  // Once the build output is updated to be fully ESM, this can be removed.
+  allowedRequests.add('zone.js');
+
   // Find all entry points that contain code (JS/TS)
   const files: string[] = [];
   for (const { entryPoint } of Object.values(metafile.outputs)) {

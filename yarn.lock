@@ -121,7 +121,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#f7d26a0b0d6bd2043f2d32c2a99db903539d0c07":
   version "0.0.0-07b0f6423e0c5266b3792d8f4af43b8fd3f3d41b"
-  uid f7d26a0b0d6bd2043f2d32c2a99db903539d0c07
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#f7d26a0b0d6bd2043f2d32c2a99db903539d0c07"
   dependencies:
     "@angular-devkit/build-angular" "15.2.0-next.3"
@@ -307,7 +306,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#8aa60413b3e14daf2f33a29fe9d09faa3e5bcb75":
   version "0.0.0-07b0f6423e0c5266b3792d8f4af43b8fd3f3d41b"
-  uid "8aa60413b3e14daf2f33a29fe9d09faa3e5bcb75"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#8aa60413b3e14daf2f33a29fe9d09faa3e5bcb75"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -4499,6 +4497,14 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
+buffer@6.0.3, buffer@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
+  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.2.1"
+
 buffer@^5.2.1, buffer@^5.5.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.1.tgz#ba62e7c13133053582197160851a8f648e99eed0"
@@ -4506,14 +4512,6 @@ buffer@^5.2.1, buffer@^5.5.0:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
-
-buffer@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
-  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.2.1"
 
 builtin-modules@^3.3.0:
   version "3.3.0"

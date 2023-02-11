@@ -339,7 +339,11 @@ LARGE_SPECS = {
             "@npm//popper.js",
         ],
     },
-    "browser-esbuild": {},
+    "browser-esbuild": {
+        "extra_deps": [
+            "@npm//buffer",
+        ],
+    },
 }
 
 [
