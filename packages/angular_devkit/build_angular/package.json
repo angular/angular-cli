@@ -32,7 +32,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.3",
-    "esbuild-wasm": "0.17.7",
+    "esbuild-wasm": "0.17.8",
     "glob": "8.1.0",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -42,7 +42,7 @@
     "less-loader": "11.1.0",
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.2.1",
-    "magic-string": "0.27.0",
+    "magic-string": "0.29.0",
     "mini-css-extract-plugin": "2.7.2",
     "open": "8.4.1",
     "ora": "5.4.1",
@@ -68,7 +68,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.17.7"
+    "esbuild": "0.17.8"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0 || ^15.2.0-next",
