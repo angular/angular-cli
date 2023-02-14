@@ -100,13 +100,17 @@ export class ScriptsWebpackPlugin {
       return;
     }
 
-    const resolver = compiler.resolverFactory.get('normal', {
-      preferRelative: true,
-      useSyncFileSystemCalls: true,
-      fileSystem: compiler.inputFileSystem,
-    });
-
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+      // Use the resolver from the compilation instead of compiler.
+      // Using the latter will causes a lot of `DescriptionFileUtils.loadDescriptionFile` calls.
+      // See: https://github.com/angular/angular-cli/issues/24634#issuecomment-1425782668
+      const resolver = compilation.resolverFactory.get('normal', {
+        preferRelative: true,
+        useSyncFileSystemCalls: true,
+        // Caching must be disabled because it causes the resolver to become async after a rebuild.
+        cache: false,
+      });
+
       const scripts: string[] = [];
 
       for (const script of this.options.scripts) {
