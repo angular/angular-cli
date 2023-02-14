@@ -46,6 +46,7 @@ export class AnalyticsCollector {
       [RequestParameter.UserAgentArchitecture]: os.arch(),
       [RequestParameter.UserAgentPlatform]: os.platform(),
       [RequestParameter.UserAgentPlatformVersion]: os.version(),
+      [RequestParameter.SessionEngaged]: 1,
     };
 
     if (ngDebug) {
