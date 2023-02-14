@@ -129,7 +129,6 @@ ts_library(
         "@npm//@types/less",
         "@npm//@types/loader-utils",
         "@npm//@types/node",
-        "@npm//@types/parse5-html-rewriting-stream",
         "@npm//@types/semver",
         "@npm//@types/text-table",
         "@npm//ajv",

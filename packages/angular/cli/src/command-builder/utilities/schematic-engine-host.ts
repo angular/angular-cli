@@ -44,6 +44,13 @@ function shouldWrapSchematic(schematicFile: string, schematicEncapsulation: bool
     return false;
   }
 
+  // @angular/pwa uses dynamic imports which causes `[1]    2468039 segmentation fault` when wrapped.
+  // We should remove this when make `importModuleDynamically` work.
+  // See: https://nodejs.org/docs/latest-v14.x/api/vm.html
+  if (normalizedSchematicFile.includes('@angular/pwa')) {
+    return false;
+  }
+
   // Check for first-party Angular schematic packages
   // Angular schematics are safe to use in the wrapped VM context
   if (/\/node_modules\/@(?:angular|schematics|nguniversal)\//.test(normalizedSchematicFile)) {

@@ -7,13 +7,17 @@
  */
 
 import { Readable, Writable } from 'stream';
+import { loadEsmModule } from '../load-esm';
 
 export async function htmlRewritingStream(content: string): Promise<{
-  rewriter: import('parse5-html-rewriting-stream');
+  rewriter: import('parse5-html-rewriting-stream').RewritingStream;
   transformedContent: () => Promise<string>;
 }> {
+  const { RewritingStream } = await loadEsmModule<typeof import('parse5-html-rewriting-stream')>(
+    'parse5-html-rewriting-stream',
+  );
   const chunks: Buffer[] = [];
-  const rewriter = new (await import('parse5-html-rewriting-stream')).default();
+  const rewriter = new RewritingStream();
 
   return {
     rewriter,

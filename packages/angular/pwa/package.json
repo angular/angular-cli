@@ -14,7 +14,7 @@
   "dependencies": {
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
     "@schematics/angular": "0.0.0-PLACEHOLDER",
-    "parse5-html-rewriting-stream": "6.0.1"
+    "parse5-html-rewriting-stream": "7.0.0"
   },
   "peerDependencies": {
     "@angular/cli": "^15.0.0 || ^15.2.0-next"

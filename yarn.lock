@@ -121,7 +121,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#3e4d95e36cbb0230de1f3eabed91d260caa7ddde":
   version "0.0.0-7ed99e1d1b65cfc98021691d1c2ac92f44076190"
-  uid "3e4d95e36cbb0230de1f3eabed91d260caa7ddde"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#3e4d95e36cbb0230de1f3eabed91d260caa7ddde"
   dependencies:
     "@angular-devkit/build-angular" "15.2.0-next.3"
@@ -307,7 +306,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#8a87efa35da0ff50d7515511617d4ce5ac5cea2f":
   version "0.0.0-7ed99e1d1b65cfc98021691d1c2ac92f44076190"
-  uid "8a87efa35da0ff50d7515511617d4ce5ac5cea2f"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#8a87efa35da0ff50d7515511617d4ce5ac5cea2f"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3178,14 +3176,7 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/parse5-html-rewriting-stream@^5.1.2":
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/@types/parse5-html-rewriting-stream/-/parse5-html-rewriting-stream-5.1.2.tgz#919d5bbf69ef61e11d873e7195891c3811491a03"
-  integrity sha512-7CHY6QlayurvYRST5xatE/ipIueph5V+EW2xU12P0CsNucuwygnuiE4foYsdQUEkhnKrTU62KmikANPnoxiGrg==
-  dependencies:
-    "@types/parse5-sax-parser" "*"
-
-"@types/parse5-sax-parser@*", "@types/parse5-sax-parser@^5.0.2":
+"@types/parse5-sax-parser@^5.0.2":
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/@types/parse5-sax-parser/-/parse5-sax-parser-5.0.2.tgz#4cdca0f8bc0ce71b17e27b96e7ca9b5f79e861ff"
   integrity sha512-EQtGoduLbdMmS4N27g6wcXdCCJ70dWYemfogWuumYg+JmzRqwYvTRAbGOYFortSHtS/qRzRCFwcP3ixy62RsdA==
@@ -5407,7 +5398,7 @@ entities@^2.0.0:
   resolved "https://registry.yarnpkg.com/entities/-/entities-2.2.0.tgz#098dc90ebb83d8dffa089d55256b351d34c4da55"
   integrity sha512-p92if5Nz619I0w+akJrLZH0MX0Pb5DX39XOwQTtXSdQQOaYH03S1uIQp4mhOZtAXrxq4ViO67YTiLBo2638o9A==
 
-entities@^4.4.0:
+entities@^4.3.0, entities@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/entities/-/entities-4.4.0.tgz#97bdaba170339446495e653cfd2db78962900174"
   integrity sha512-oYp7156SP8LkeGD0GF85ad1X9Ai79WtRsZ2gxJqtBuzH+98YUV6jkHEKlZkMbcrjJjIVJNIDP/3WL9wQkoPbWA==
@@ -8975,6 +8966,15 @@ parse5-html-rewriting-stream@6.0.1:
     parse5 "^6.0.1"
     parse5-sax-parser "^6.0.1"
 
+parse5-html-rewriting-stream@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/parse5-html-rewriting-stream/-/parse5-html-rewriting-stream-7.0.0.tgz#e376d3e762d2950ccbb6bb59823fc1d7e9fdac36"
+  integrity sha512-mazCyGWkmCRWDI15Zp+UiCqMp/0dgEmkZRvhlsqqKYr4SsVm/TvnSpD9fCvqCA2zoWJcfRym846ejWBBHRiYEg==
+  dependencies:
+    entities "^4.3.0"
+    parse5 "^7.0.0"
+    parse5-sax-parser "^7.0.0"
+
 parse5-htmlparser2-tree-adapter@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-6.0.1.tgz#2cdf9ad823321140370d4dbf5d3e92c7c8ddc6e6"
@@ -8989,7 +8989,14 @@ parse5-sax-parser@^6.0.1:
   dependencies:
     parse5 "^6.0.1"
 
-parse5@*, parse5@^7.1.2:
+parse5-sax-parser@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/parse5-sax-parser/-/parse5-sax-parser-7.0.0.tgz#4c05064254f0488676aca75fb39ca069ec96dee5"
+  integrity sha512-5A+v2SNsq8T6/mG3ahcz8ZtQ0OUFTatxPbeidoMB7tkJSGDY3tdfl4MHovtLQHkEn5CGxijNWRQHhRQ6IRpXKg==
+  dependencies:
+    parse5 "^7.0.0"
+
+parse5@*, parse5@^7.0.0, parse5@^7.1.2:
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.2.tgz#0736bebbfd77793823240a23b7fc5e010b7f8e32"
   integrity sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==
@@ -9976,7 +9983,6 @@ sass@1.58.0, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:
