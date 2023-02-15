@@ -1,3 +1,30 @@
+<a name="15.1.6"></a>
+
+# 15.1.6 (2023-02-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [3d1f48fa2](https://github.com/angular/angular-cli/commit/3d1f48fa2991ded75da3a1b3a431480710a8ce15) | fix  | add set `SessionEngaged` in GA              |
+| [df07ab113](https://github.com/angular/angular-cli/commit/df07ab11351d6f2d82922ae251ccd17b23d9d0a9) | fix  | convert `before` option in `.npmrc` to Date |
+| [c787cc780](https://github.com/angular/angular-cli/commit/c787cc7803598eb67260cbd2112d411384d518cc) | fix  | replace `os.version` with `os.release`.     |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [34a4a1bbf](https://github.com/angular/angular-cli/commit/34a4a1bbf608eb54b0a33b3aa3a6be3e2a576770) | fix  | correctly copy `safety-worker.js` contents                   |
+| [88a33155d](https://github.com/angular/angular-cli/commit/88a33155d4bc00077d32bef42588427fb2ed49f4) | fix  | update the ECMA output warning message to be more actionable |
+| [384ad29c9](https://github.com/angular/angular-cli/commit/384ad29c9a66d78e545ed7e48bf962e4df9d0549) | fix  | use babel default export helper in build optimizer           |
+| [59aa1cdbd](https://github.com/angular/angular-cli/commit/59aa1cdbdf3e2712f988790f68bacc174d070b0c) | perf | reduce rebuilt times when using the `scripts` option         |
+
+## Special Thanks
+
+Alan Agius and Charles Lyding
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.5"></a>
 
 # 15.1.5 (2023-02-08)
