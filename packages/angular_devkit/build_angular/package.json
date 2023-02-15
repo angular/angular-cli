@@ -52,7 +52,7 @@
     "postcss-loader": "7.0.2",
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
-    "sass": "1.58.0",
+    "sass": "1.58.1",
     "sass-loader": "13.2.0",
     "semver": "7.3.8",
     "source-map-loader": "4.0.1",

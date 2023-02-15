@@ -35,7 +35,7 @@
     "npm-pick-manifest": "8.0.1",
     "open": "8.4.1",
     "ora": "5.4.1",
-    "pacote": "15.0.8",
+    "pacote": "15.1.0",
     "resolve": "1.22.1",
     "semver": "7.3.8",
     "symbol-observable": "4.0.0",
