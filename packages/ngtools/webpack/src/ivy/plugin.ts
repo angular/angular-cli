@@ -10,7 +10,6 @@ import type { CompilerHost, CompilerOptions, NgtscProgram } from '@angular/compi
 import { strict as assert } from 'assert';
 import * as ts from 'typescript';
 import type { Compilation, Compiler, Module, NormalModule } from 'webpack';
-import { NgccProcessor } from '../ngcc_processor';
 import { TypeScriptPathsPlugin } from '../paths-plugin';
 import { WebpackResourceLoader } from '../resource_loader';
 import { SourceFileCache } from './cache';
@@ -23,7 +22,6 @@ import {
 import {
   augmentHostWithCaching,
   augmentHostWithDependencyCollection,
-  augmentHostWithNgcc,
   augmentHostWithReplacements,
   augmentHostWithResources,
   augmentHostWithSubstitutions,
@@ -57,46 +55,9 @@ export interface AngularWebpackPluginOptions {
  * The Angular compilation state that is maintained across each Webpack compilation.
  */
 interface AngularCompilationState {
-  ngccProcessor?: NgccProcessor;
   resourceLoader?: WebpackResourceLoader;
   previousUnused?: Set<string>;
   pathsPlugin: TypeScriptPathsPlugin;
-}
-
-function initializeNgccProcessor(
-  compiler: Compiler,
-  tsconfig: string,
-  compilerNgccModule: typeof import('@angular/compiler-cli/ngcc') | undefined,
-): { processor: NgccProcessor; errors: string[]; warnings: string[] } {
-  const { inputFileSystem, options: webpackOptions } = compiler;
-  const mainFields = webpackOptions.resolve?.mainFields?.flat() ?? [];
-
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  const resolver = compiler.resolverFactory.get('normal', {
-    // Caching must be disabled because it causes the resolver to become async after a rebuild
-    cache: false,
-    extensions: ['.json'],
-    useSyncFileSystemCalls: true,
-  });
-
-  // The compilerNgccModule field is guaranteed to be defined during a compilation
-  // due to the `beforeCompile` hook. Usage of this property accessor prior to the
-  // hook execution is an implementation error.
-  assert.ok(compilerNgccModule, `'@angular/compiler-cli/ngcc' used prior to Webpack compilation.`);
-
-  const processor = new NgccProcessor(
-    compilerNgccModule,
-    mainFields,
-    warnings,
-    errors,
-    compiler.context,
-    tsconfig,
-    inputFileSystem,
-    resolver,
-  );
-
-  return { processor, errors, warnings };
 }
 
 const PLUGIN_NAME = 'angular-compiler';
@@ -110,7 +71,6 @@ interface FileEmitHistoryItem {
 export class AngularWebpackPlugin {
   private readonly pluginOptions: AngularWebpackPluginOptions;
   private compilerCliModule?: typeof import('@angular/compiler-cli');
-  private compilerNgccModule?: typeof import('@angular/compiler-cli/ngcc');
   private watchMode?: boolean;
   private ngtscNextProgram?: NgtscProgram;
   private builder?: ts.EmitAndSemanticDiagnosticsBuilderProgram;
@@ -163,21 +123,13 @@ export class AngularWebpackPlugin {
     // Set resolver options
     const pathsPlugin = new TypeScriptPathsPlugin();
     compiler.hooks.afterResolvers.tap(PLUGIN_NAME, (compiler) => {
-      // When Ivy is enabled we need to add the fields added by NGCC
-      // to take precedence over the provided mainFields.
-      // NGCC adds fields in package.json suffixed with '_ivy_ngcc'
-      // Example: module -> module__ivy_ngcc
       compiler.resolverFactory.hooks.resolveOptions
         .for('normal')
         .tap(PLUGIN_NAME, (resolveOptions) => {
-          const originalMainFields = resolveOptions.mainFields;
-          const ivyMainFields = originalMainFields?.flat().map((f) => `${f}_ivy_ngcc`) ?? [];
-
           resolveOptions.plugins ??= [];
           resolveOptions.plugins.push(pathsPlugin);
 
-          // https://github.com/webpack/webpack/issues/11635#issuecomment-707016779
-          return util.cleverMerge(resolveOptions, { mainFields: [...ivyMainFields, '...'] });
+          return resolveOptions;
         });
     });
 
@@ -214,21 +166,6 @@ export class AngularWebpackPlugin {
     // Initialize the resource loader if not already setup
     if (!state.resourceLoader) {
       state.resourceLoader = new WebpackResourceLoader(this.watchMode);
-    }
-
-    // Initialize and process eager ngcc if not already setup
-    if (!state.ngccProcessor) {
-      const { processor, errors, warnings } = initializeNgccProcessor(
-        compiler,
-        this.pluginOptions.tsconfig,
-        this.compilerNgccModule,
-      );
-
-      processor.process();
-      warnings.forEach((warning) => addWarning(compilation, warning));
-      errors.forEach((error) => addError(compilation, error));
-
-      state.ngccProcessor = processor;
     }
 
     // Setup and read TypeScript and Angular compiler configuration
@@ -283,9 +220,6 @@ export class AngularWebpackPlugin {
 
     // Setup source file dependency collection
     augmentHostWithDependencyCollection(host, this.fileDependencies, moduleResolutionCache);
-
-    // Setup on demand ngcc
-    augmentHostWithNgcc(host, state.ngccProcessor, moduleResolutionCache);
 
     // Setup resource loading
     state.resourceLoader.update(compilation, changedFiles);
@@ -760,7 +694,6 @@ export class AngularWebpackPlugin {
     // Once TypeScript provides support for keeping the dynamic import this workaround can
     // be dropped.
     this.compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
-    this.compilerNgccModule = await new Function(`return import('@angular/compiler-cli/ngcc');`)();
   }
 
   private async addFileEmitHistory(
