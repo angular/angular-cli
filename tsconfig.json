@@ -14,7 +14,7 @@
     "target": "es2019",
     "lib": ["es2020"],
     "rootDir": ".",
-    "rootDirs": [".", "./dist-schema/"],
+    "rootDirs": [".", "./dist-schema/bin/"],
     "paths": {
       "@angular-devkit/core": ["./packages/angular_devkit/core/src/index"],
       "@angular-devkit/core/node": ["./packages/angular_devkit/core/node/index"],

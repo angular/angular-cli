@@ -7,53 +7,78 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import * as fs from 'fs';
-import glob from 'glob';
-import * as path from 'path';
+import { spawn } from 'child_process';
+import fs from 'fs';
+import { join, resolve } from 'path';
 
-export default async function (argv: {}, logger: logging.Logger) {
-  const allJsonFiles = glob.sync('packages/**/*.json', {
-    ignore: ['**/node_modules/**', '**/files/**', '**/*-files/**', '**/package.json'],
-  });
-  const dist = path.join(__dirname, '../dist-schema');
+const baseDir = resolve(`${__dirname}/..`);
+const bazelCmd = process.env.BAZEL ?? `yarn --silent bazel`;
+const distRoot = join(baseDir, '/dist-schema/');
 
-  const quicktypeRunner = require('../tools/quicktype_runner');
-  logger.info('Removing dist-schema/...');
-  fs.rmSync(dist, { force: true, recursive: true, maxRetries: 3 });
+function rimraf(location: string) {
+  fs.rmSync(location, { force: true, recursive: true, maxRetries: 3 });
+}
 
-  logger.info('Generating JSON Schema....');
+function _clean(logger: logging.Logger) {
+  logger.info('Cleaning...');
+  logger.info('  Removing dist-schema/...');
+  rimraf(join(__dirname, '../dist-schema'));
+}
 
-  for (const fileName of allJsonFiles) {
-    if (
-      fs.existsSync(fileName.replace(/\.json$/, '.ts')) ||
-      fs.existsSync(fileName.replace(/\.json$/, '.d.ts'))
-    ) {
-      // Skip files that already exist.
-      continue;
-    }
-    const content = fs.readFileSync(fileName, 'utf-8');
+function _exec(cmd: string, captureStdout: boolean, logger: logging.Logger): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(cmd, {
+      stdio: 'pipe',
+      shell: true,
+      env: {
+        HOME: process.env.HOME,
+        PATH: process.env.PATH,
+      },
+    });
 
-    let json;
-    try {
-      json = JSON.parse(content);
-      if (typeof json.$schema !== 'string' || !json.$schema.startsWith('http://json-schema.org/')) {
-        // Skip non-schema files.
-        continue;
+    let output = '';
+    proc.stdout.on('data', (data) => {
+      logger.info(data.toString().trim());
+      if (captureStdout) {
+        output += data.toString().trim();
       }
-    } catch {
-      // malformed or JSON5
-      continue;
-    }
-    const tsContent = await quicktypeRunner.generate(fileName);
-    const tsPath = path.join(dist, fileName.replace(/\.json$/, '.ts'));
+    });
+    proc.stderr.on('data', (data) => logger.info(data.toString().trim()));
 
-    fs.mkdirSync(path.dirname(tsPath), { recursive: true });
-    fs.writeFileSync(tsPath, tsContent, 'utf-8');
-  }
+    proc.on('error', (error) => {
+      logger.error(error.message);
+    });
 
-  // Angular CLI config schema
-  const cliJsonSchema = require('../tools/ng_cli_schema_generator');
-  const inputPath = 'packages/angular/cli/lib/config/workspace-schema.json';
-  const outputPath = path.join(dist, inputPath.replace('workspace-schema.json', 'schema.json'));
-  cliJsonSchema.generate(inputPath, outputPath);
+    proc.on('exit', (status) => {
+      if (status !== 0) {
+        reject(`Command failed: ${cmd}`);
+      } else {
+        resolve(output);
+      }
+    });
+  });
+}
+
+async function _buildSchemas(logger: logging.Logger): Promise<void> {
+  logger.info(`Building schemas...`);
+
+  const queryLogger = logger.createChild('query');
+  const queryTargetsCmd = `${bazelCmd} query --output=label "attr(name, .*_schema, //packages/...)"`;
+  const targets = (await _exec(queryTargetsCmd, true, queryLogger)).split(/\r?\n/);
+  const buildLogger = logger.createChild('build');
+
+  await _exec(
+    `${bazelCmd} build ${targets.join(' ')} --symlink_prefix=${distRoot}`,
+    false,
+    buildLogger,
+  );
+}
+
+export default async function (
+  argv: {},
+  logger: logging.Logger = new logging.Logger('build-schema-logger'),
+): Promise<void> {
+  _clean(logger);
+
+  await _buildSchemas(logger);
 }
