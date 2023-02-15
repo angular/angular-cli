@@ -192,7 +192,7 @@
     "prettier": "^2.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "18.2.1",
-    "quicktype-core": "21.0.16",
+    "quicktype-core": "22.0.0",
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
     "sass": "1.58.1",
