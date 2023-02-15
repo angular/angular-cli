@@ -7,8 +7,20 @@
  */
 
 import { logging, schema, virtualFs } from '@angular-devkit/core';
-import { EMPTY, Observable, Subject, concat, from, of, throwError } from 'rxjs';
-import { concatMap, defaultIfEmpty, ignoreElements, last, tap } from 'rxjs/operators';
+import {
+  EMPTY,
+  Observable,
+  Subject,
+  concat,
+  concatMap,
+  defaultIfEmpty,
+  from,
+  ignoreElements,
+  last,
+  of,
+  tap,
+  throwError,
+} from 'rxjs';
 import { Engine, EngineHost, SchematicEngine } from '../engine';
 import { UnsuccessfulWorkflowExecution } from '../exception/exception';
 import { standardFormats } from '../formats';
@@ -183,7 +195,7 @@ export abstract class BaseWorkflow implements Workflow {
             .executePostTasks()
             .pipe(
               tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
-              defaultIfEmpty(),
+              defaultIfEmpty(undefined),
               last(),
             );
         }),

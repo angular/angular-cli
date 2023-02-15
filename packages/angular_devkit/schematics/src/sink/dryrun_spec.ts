@@ -7,7 +7,7 @@
  */
 
 import { Path, normalize, virtualFs } from '@angular-devkit/core';
-import { toArray } from 'rxjs/operators';
+import { lastValueFrom, toArray } from 'rxjs';
 import { HostCreateTree, HostTree } from '../tree/host-tree';
 import { DryRunSink } from './dryrun';
 
@@ -36,8 +36,8 @@ describe('DryRunSink', () => {
     const sink = new DryRunSink(new virtualFs.SimpleMemoryHost());
 
     const [infos] = await Promise.all([
-      sink.reporter.pipe(toArray()).toPromise(),
-      sink.commit(tree).toPromise(),
+      lastValueFrom(sink.reporter.pipe(toArray())),
+      lastValueFrom(sink.commit(tree)),
     ]);
 
     expect(infos.length).toBe(4);
@@ -68,8 +68,8 @@ describe('DryRunSink', () => {
 
     const sink = new DryRunSink(outputHost);
     const [infos] = await Promise.all([
-      sink.reporter.pipe(toArray()).toPromise(),
-      sink.commit(tree).toPromise(),
+      lastValueFrom(sink.reporter.pipe(toArray())),
+      lastValueFrom(sink.commit(tree)),
     ]);
 
     expect(infos.map((x) => x.kind)).toEqual(['create', 'update']);

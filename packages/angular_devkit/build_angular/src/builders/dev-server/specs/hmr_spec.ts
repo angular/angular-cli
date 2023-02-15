@@ -9,7 +9,7 @@
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { debounceTime, switchMap, take } from 'rxjs/operators';
+import { debounceTime, switchMap, take } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

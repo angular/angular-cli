@@ -9,8 +9,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { runWebpack } from '@angular-devkit/build-webpack';
 import * as path from 'path';
-import { Observable, from } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { Observable, concatMap, from } from 'rxjs';
 import webpack, { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import {

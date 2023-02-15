@@ -8,7 +8,7 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import fetch from 'node-fetch';
-import { concatMap, count, take, timeout } from 'rxjs/operators';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { serveWebpackBrowser } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
 import {

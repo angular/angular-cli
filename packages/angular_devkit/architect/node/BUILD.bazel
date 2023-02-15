@@ -40,6 +40,7 @@ ts_library(
         ":node",
         "//packages/angular_devkit/architect",
         "//tests/angular_devkit/architect/node/jobs:jobs_test_lib",
+        "@npm//rxjs",
     ],
 )
 

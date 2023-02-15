@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { concatMap, count, debounceTime, take, timeout } from 'rxjs/operators';
+import { concatMap, count, debounceTime, take, timeout } from 'rxjs';
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
 

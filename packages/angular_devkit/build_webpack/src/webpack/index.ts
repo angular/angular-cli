@@ -8,8 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { resolve as pathResolve } from 'path';
-import { Observable, from, isObservable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
 import { EmittedFiles, getEmittedFiles, getWebpackConfig } from '../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';

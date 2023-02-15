@@ -21,8 +21,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname as pathDirname } from 'node:path';
-import { Observable, from as observableFrom } from 'rxjs';
-import { map, mergeMap, publish, refCount } from 'rxjs/operators';
+import { Observable, map, mergeMap, from as observableFrom, publish, refCount } from 'rxjs';
 import { Path, PathFragment, dirname, fragment, getSystemPath, normalize, virtualFs } from '../src';
 
 async function exists(path: PathLike): Promise<boolean> {
@@ -142,7 +141,9 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
           });
         });
 
-      return () => watcher.close();
+      return () => {
+        void watcher.close();
+      };
     }).pipe(publish(), refCount());
   }
 }
@@ -257,7 +258,9 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
           });
         });
 
-      return () => watcher.close();
+      return () => {
+        void watcher.close();
+      };
     }).pipe(publish(), refCount());
   }
 }

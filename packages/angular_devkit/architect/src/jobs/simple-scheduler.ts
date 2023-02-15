@@ -15,20 +15,18 @@ import {
   Subject,
   Subscription,
   concat,
-  from,
-  merge,
-  of,
-} from 'rxjs';
-import {
   concatMap,
   filter,
   first,
+  from,
   ignoreElements,
   map,
+  merge,
+  of,
   shareReplay,
   switchMap,
   tap,
-} from 'rxjs/operators';
+} from 'rxjs';
 import {
   Job,
   JobDescription,

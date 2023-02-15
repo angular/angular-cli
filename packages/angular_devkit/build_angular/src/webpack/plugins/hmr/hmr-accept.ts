@@ -14,7 +14,7 @@ import {
   isDevMode,
   ɵresetCompiledComponents,
 } from '@angular/core';
-import { filter, take } from 'rxjs/operators';
+import { filter, take } from 'rxjs';
 
 // For the time being we cannot use the DOM lib because it conflicts with @types/node,
 // In future when we remove `yarn admin build` we should have this as a seperate compilation unit

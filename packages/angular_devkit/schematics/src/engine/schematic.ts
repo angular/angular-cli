@@ -7,8 +7,7 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
-import { concatMap, first, map } from 'rxjs/operators';
+import { Observable, concatMap, first, map } from 'rxjs';
 import { callRule } from '../rules/call';
 import { Tree } from '../tree/interface';
 import { ScopedTree } from '../tree/scoped';

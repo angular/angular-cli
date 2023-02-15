@@ -12,7 +12,7 @@ import { createServer } from 'http';
 import { createProxyServer } from 'http-proxy';
 import { AddressInfo } from 'net';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs/operators';
+import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs';
 import { serveWebpackBrowser } from '../../index';
 import {
   BASE_OPTIONS,

@@ -9,8 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
+import { Observable, lastValueFrom, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder allow js', () => {
@@ -40,7 +39,7 @@ describe('Browser Builder allow js', () => {
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
-      await host.read(join(normalize(output.outputPath), 'main.js')).toPromise(),
+      await lastValueFrom(host.read(join(normalize(output.outputPath), 'main.js'))),
     );
 
     expect(content).toContain('const a = 2');
@@ -67,7 +66,7 @@ describe('Browser Builder allow js', () => {
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
-      await host.read(join(normalize(output.outputPath), 'main.js')).toPromise(),
+      await lastValueFrom(host.read(join(normalize(output.outputPath), 'main.js'))),
     );
 
     expect(content).toContain('const a = 2');
@@ -92,8 +91,8 @@ describe('Browser Builder allow js', () => {
     let buildCount = 1;
     const run = await architect.scheduleTarget(targetSpec, overrides);
 
-    await (run.output as Observable<BrowserBuilderOutput>)
-      .pipe(
+    await lastValueFrom(
+      (run.output as Observable<BrowserBuilderOutput>).pipe(
         tap((output) => {
           const path = relative(host.root(), join(normalize(output.outputPath), 'main.js'));
           const content = virtualFs.fileBufferToString(host.scopedSync().read(path));
@@ -114,8 +113,8 @@ describe('Browser Builder allow js', () => {
         }),
         tap((buildEvent) => expect(buildEvent.success).toBe(true)),
         take(2),
-      )
-      .toPromise();
+      ),
+    );
 
     await run.stop();
   });

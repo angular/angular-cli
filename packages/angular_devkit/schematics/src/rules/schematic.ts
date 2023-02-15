@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { of as observableOf } from 'rxjs';
-import { last, map } from 'rxjs/operators';
+import { last, map, of as observableOf } from 'rxjs';
 import { ExecutionOptions, Rule, SchematicContext } from '../engine/interface';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch } from '../tree/static';

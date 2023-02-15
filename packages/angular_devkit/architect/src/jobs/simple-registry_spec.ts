@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { lastValueFrom } from 'rxjs';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
 
@@ -26,7 +27,7 @@ describe('SimpleJobRegistry', () => {
       },
     );
 
-    expect(await registry.get('add').toPromise()).not.toBeNull();
-    expect(await registry.get('add2').toPromise()).toBeNull();
+    expect(await lastValueFrom(registry.get('add'))).not.toBeNull();
+    expect(await lastValueFrom(registry.get('add2'))).toBeNull();
   });
 });

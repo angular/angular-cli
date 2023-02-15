@@ -7,8 +7,17 @@
  */
 
 import { json, logging } from '@angular-devkit/core';
-import { EMPTY, Subscription } from 'rxjs';
-import { catchError, first, ignoreElements, map, shareReplay } from 'rxjs/operators';
+import {
+  EMPTY,
+  Subscription,
+  catchError,
+  first,
+  firstValueFrom,
+  ignoreElements,
+  lastValueFrom,
+  map,
+  shareReplay,
+} from 'rxjs';
 import {
   BuilderInfo,
   BuilderInput,
@@ -43,7 +52,7 @@ export async function scheduleByName(
   const workspaceRoot = await options.workspaceRoot;
   const currentDirectory = await options.currentDirectory;
 
-  const description = await job.description.toPromise();
+  const description = await firstValueFrom(job.description);
   const info = description.info as BuilderInfo;
   const id = ++_uniqueId;
 
@@ -58,33 +67,31 @@ export async function scheduleByName(
 
   // Wait for the job to be ready.
   if (job.state !== JobState.Started) {
-    stateSubscription = job.outboundBus.subscribe(
-      (event) => {
+    stateSubscription = job.outboundBus.subscribe({
+      next: (event) => {
         if (event.kind === JobOutboundMessageKind.Start) {
           job.input.next(message);
         }
       },
-      () => {},
-    );
+      error: () => {},
+    });
   } else {
     job.input.next(message);
   }
 
-  const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe(
-    (entry) => {
+  const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe({
+    next: (entry) => {
       logger.next(entry);
     },
-    () => {},
-  );
+    error: () => {},
+  });
 
-  const s = job.outboundBus.subscribe({
+  const outboundBusSub = job.outboundBus.subscribe({
     error() {},
     complete() {
-      s.unsubscribe();
+      outboundBusSub.unsubscribe();
       logChannelSub.unsubscribe();
-      if (stateSubscription) {
-        stateSubscription.unsubscribe();
-      }
+      stateSubscription.unsubscribe();
     },
   });
   const output = job.output.pipe(
@@ -101,7 +108,7 @@ export async function scheduleByName(
 
   // Start the builder.
   output.pipe(first()).subscribe({
-    error() {},
+    error: () => {},
   });
 
   return {
@@ -109,7 +116,10 @@ export async function scheduleByName(
     info,
     // This is a getter so that it always returns the next output, and not the same one.
     get result() {
-      return output.pipe(first()).toPromise();
+      return firstValueFrom(output);
+    },
+    get lastOutput() {
+      return lastValueFrom(output);
     },
     output,
     progress: job

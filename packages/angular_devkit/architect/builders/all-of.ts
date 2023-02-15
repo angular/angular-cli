@@ -7,8 +7,7 @@
  */
 
 import { json } from '@angular-devkit/core';
-import { EMPTY, from, of } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { EMPTY, from, map, mergeMap, of } from 'rxjs';
 import { BuilderOutput, BuilderRun, createBuilder } from '../src';
 import { Schema as OperatorSchema } from './operator-schema';
 

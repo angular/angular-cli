@@ -1,10 +1,8 @@
 import * as ansiColors from 'ansi-colors';
 import { spawn, SpawnOptions } from 'child_process';
 import * as child_process from 'child_process';
-import { concat, defer, EMPTY, from } from 'rxjs';
-import { repeat, takeLast } from 'rxjs/operators';
+import { concat, defer, EMPTY, from, lastValueFrom, catchError, repeat } from 'rxjs';
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
-import { catchError } from 'rxjs/operators';
 import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'path';
 
@@ -299,15 +297,15 @@ export function execAndWaitForOutputToMatch(
     // happened just before the build (e.g. `git clean`).
     // This seems to be due to host file system differences, see
     // https://nodejs.org/docs/latest/api/fs.html#fs_caveats
-    return concat(
-      from(_exec({ waitForMatch: match, env }, cmd, args)),
-      defer(() => waitForAnyProcessOutputToMatch(match, 2500)).pipe(
-        repeat(20),
-        catchError(() => EMPTY),
+    return lastValueFrom(
+      concat(
+        from(_exec({ waitForMatch: match, env }, cmd, args)),
+        defer(() => waitForAnyProcessOutputToMatch(match, 2500)).pipe(
+          repeat(20),
+          catchError(() => EMPTY),
+        ),
       ),
-    )
-      .pipe(takeLast(1))
-      .toPromise();
+    );
   } else {
     return _exec({ waitForMatch: match, env }, cmd, args);
   }

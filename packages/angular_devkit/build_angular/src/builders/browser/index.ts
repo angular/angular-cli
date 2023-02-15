@@ -10,8 +10,7 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable, from } from 'rxjs';
-import { concatMap, map, switchMap } from 'rxjs/operators';
+import { Observable, concatMap, from, map, switchMap } from 'rxjs';
 import webpack, { StatsCompilation } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import {

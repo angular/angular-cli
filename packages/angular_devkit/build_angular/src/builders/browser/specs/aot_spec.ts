@@ -9,6 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
+import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder AOT', () => {
@@ -30,7 +31,9 @@ describe('Browser Builder AOT', () => {
     expect(output.success).toBeTrue();
 
     const fileName = join(normalize(output.outputs[0].path), 'main.js');
-    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    const content = virtualFs.fileBufferToString(
+      await lastValueFrom(host.read(normalize(fileName))),
+    );
     expect(content).toContain('AppComponent_Factory');
 
     await run.stop();

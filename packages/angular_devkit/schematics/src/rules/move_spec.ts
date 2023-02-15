@@ -7,7 +7,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { of as observableOf } from 'rxjs';
+import { lastValueFrom, of as observableOf } from 'rxjs';
 import { SchematicContext } from '../engine/interface';
 import { HostTree } from '../tree/host-tree';
 import { callRule } from './call';
@@ -22,8 +22,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move('sub'), observableOf(tree), context)
-      .toPromise()
+    lastValueFrom(callRule(move('sub'), observableOf(tree), context))
       .then((result) => {
         expect(result.exists('sub/a/b/file1')).toBe(true);
         expect(result.exists('sub/a/b/file2')).toBe(true);
@@ -38,8 +37,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move('a/b', 'sub'), observableOf(tree), context)
-      .toPromise()
+    lastValueFrom(callRule(move('a/b', 'sub'), observableOf(tree), context))
       .then((result) => {
         expect(result.exists('sub/file1')).toBe(true);
         expect(result.exists('sub/file2')).toBe(true);
@@ -54,8 +52,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move('a/b', 'a/b/c'), observableOf(tree), context)
-      .toPromise()
+    lastValueFrom(callRule(move('a/b', 'a/b/c'), observableOf(tree), context))
       .then((result) => {
         expect(result.exists('a/b/c/file1')).toBe(true);
         expect(result.exists('a/b/c/file2')).toBe(true);
@@ -70,8 +67,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move('a/b', 'a'), observableOf(tree), context)
-      .toPromise()
+    lastValueFrom(callRule(move('a/b', 'a'), observableOf(tree), context))
       .then((result) => {
         expect(result.exists('file1')).toBe(false);
         expect(result.exists('file2')).toBe(false);
@@ -88,8 +84,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move(''), observableOf(tree), context)
-      .toPromise()
+    lastValueFrom(callRule(move(''), observableOf(tree), context))
       .then((result) => {
         expect(result.exists('a/b/file1')).toBe(true);
         expect(result.exists('a/b/file2')).toBe(true);

@@ -20,6 +20,7 @@ import {
   virtualFs,
   workspaces,
 } from '@angular-devkit/core';
+import { firstValueFrom } from 'rxjs';
 
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
@@ -87,7 +88,7 @@ export async function browserBuild(
   expect(path).toBeTruthy();
   const outputPath = normalize(path);
 
-  const fileNames = await host.list(outputPath).toPromise();
+  const fileNames = await firstValueFrom(host.list(outputPath));
   const files = fileNames.reduce((acc: { [name: string]: Promise<string> }, path) => {
     let cache: Promise<string> | null = null;
     Object.defineProperty(acc, path, {
@@ -99,11 +100,9 @@ export async function browserBuild(
         if (!fileNames.includes(path)) {
           return Promise.reject('No file named ' + path);
         }
-
-        cache = host
-          .read(join(outputPath, path))
-          .toPromise()
-          .then((content) => virtualFs.fileBufferToString(content));
+        cache = firstValueFrom(host.read(join(outputPath, path))).then((content) =>
+          virtualFs.fileBufferToString(content),
+        );
 
         return cache;
       },

@@ -7,8 +7,18 @@
  */
 
 import { json, logging } from '@angular-devkit/core';
-import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
-import { defaultIfEmpty, mergeMap, tap } from 'rxjs/operators';
+import {
+  Observable,
+  Subscription,
+  defaultIfEmpty,
+  firstValueFrom,
+  from,
+  isObservable,
+  mergeMap,
+  of,
+  tap,
+  throwError,
+} from 'rxjs';
 import {
   BuilderContext,
   BuilderHandlerFn,
@@ -141,33 +151,39 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
             return run;
           },
           async getTargetOptions(target: Target) {
-            return scheduler
-              .schedule<Target, json.JsonValue, json.JsonObject>('..getTargetOptions', target)
-              .output.toPromise();
+            return firstValueFrom(
+              scheduler.schedule<Target, json.JsonValue, json.JsonObject>(
+                '..getTargetOptions',
+                target,
+              ).output,
+            );
           },
           async getProjectMetadata(target: Target | string) {
-            return scheduler
-              .schedule<Target | string, json.JsonValue, json.JsonObject>(
+            return firstValueFrom(
+              scheduler.schedule<Target | string, json.JsonValue, json.JsonObject>(
                 '..getProjectMetadata',
                 target,
-              )
-              .output.toPromise();
+              ).output,
+            );
           },
           async getBuilderNameForTarget(target: Target) {
-            return scheduler
-              .schedule<Target, json.JsonValue, string>('..getBuilderNameForTarget', target)
-              .output.toPromise();
+            return firstValueFrom(
+              scheduler.schedule<Target, json.JsonValue, string>(
+                '..getBuilderNameForTarget',
+                target,
+              ).output,
+            );
           },
           async validateOptions<T extends json.JsonObject = json.JsonObject>(
             options: json.JsonObject,
             builderName: string,
           ) {
-            return scheduler
-              .schedule<[string, json.JsonObject], json.JsonValue, T>('..validateOptions', [
-                builderName,
-                options,
-              ])
-              .output.toPromise();
+            return firstValueFrom(
+              scheduler.schedule<[string, json.JsonObject], json.JsonValue, T>(
+                '..validateOptions',
+                [builderName, options],
+              ).output,
+            );
           },
           reportRunning() {
             switch (currentState) {

@@ -9,6 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder deploy url', () => {
@@ -40,10 +41,12 @@ describe('Browser Builder deploy url', () => {
 
     const fileName = join(outputPath, 'index.html');
     const runtimeFileName = join(outputPath, 'runtime.js');
-    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    const content = virtualFs.fileBufferToString(
+      await lastValueFrom(host.read(normalize(fileName))),
+    );
     expect(content).toContain('deployUrl/main.js');
     const runtimeContent = virtualFs.fileBufferToString(
-      await host.read(normalize(runtimeFileName)).toPromise(),
+      await lastValueFrom(host.read(normalize(runtimeFileName))),
     );
     expect(runtimeContent).toContain('deployUrl/');
 
@@ -51,7 +54,9 @@ describe('Browser Builder deploy url', () => {
     const output2 = (await run2.result) as BrowserBuilderOutput;
     expect(output2.outputPath).toEqual(outputPath); // These should be the same.
 
-    const content2 = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    const content2 = virtualFs.fileBufferToString(
+      await lastValueFrom(host.read(normalize(fileName))),
+    );
     expect(content2).toContain('http://example.com/some/path/main.js');
 
     await run.stop();

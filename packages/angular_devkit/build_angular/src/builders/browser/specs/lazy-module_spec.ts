@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { logging } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { debounceTime, take, tap } from 'rxjs';
 import {
   browserBuild,
   createArchitect,

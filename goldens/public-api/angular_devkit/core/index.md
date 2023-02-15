@@ -7,11 +7,11 @@
 import { ErrorObject } from 'ajv';
 import { Format } from 'ajv';
 import { Observable } from 'rxjs';
+import { ObservableInput } from 'rxjs';
 import { Operator } from 'rxjs';
 import { PartialObserver } from 'rxjs';
 import { Position } from 'source-map';
 import { Subject } from 'rxjs';
-import { SubscribableOrPromise } from 'rxjs';
 import { Subscription } from 'rxjs';
 import { ValidateFunction } from 'ajv';
 
@@ -714,7 +714,7 @@ interface PromptDefinition {
 }
 
 // @public (undocumented)
-type PromptProvider = (definitions: Array<PromptDefinition>) => SubscribableOrPromise<{
+type PromptProvider = (definitions: Array<PromptDefinition>) => ObservableInput<{
     [id: string]: JsonValue;
 }>;
 

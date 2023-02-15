@@ -7,7 +7,7 @@
  */
 
 import { logging, schema } from '@angular-devkit/core';
-import { Observable, from, of as observableOf } from 'rxjs';
+import { Observable, from, lastValueFrom, of as observableOf } from 'rxjs';
 import {
   Collection,
   DelegateTree,
@@ -86,7 +86,7 @@ export class SchematicTestRunner {
     const host = observableOf(tree || new HostTree());
     this._engineHost.clearTasks();
 
-    const newTree = await schematic.call(opts || {}, host, { logger: this._logger }).toPromise();
+    const newTree = await lastValueFrom(schematic.call(opts || {}, host, { logger: this._logger }));
 
     return new UnitTestTree(newTree);
   }
@@ -113,7 +113,7 @@ export class SchematicTestRunner {
     const host = observableOf(tree || new HostTree());
     this._engineHost.clearTasks();
 
-    const newTree = await schematic.call(opts || {}, host, { logger: this._logger }).toPromise();
+    const newTree = await lastValueFrom(schematic.call(opts || {}, host, { logger: this._logger }));
 
     return new UnitTestTree(newTree);
   }

@@ -8,8 +8,7 @@
 
 import { BuilderContext, createBuilder } from '@angular-devkit/architect';
 import { resolve as pathResolve } from 'path';
-import { Observable, from, isObservable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import { getEmittedFiles, getWebpackConfig } from '../utils';

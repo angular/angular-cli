@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs/operators';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 

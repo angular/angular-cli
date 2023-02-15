@@ -10,7 +10,7 @@ import Ajv, { SchemaObjCxt, ValidateFunction } from 'ajv';
 import ajvAddFormats from 'ajv-formats';
 import * as http from 'http';
 import * as https from 'https';
-import { Observable, from, isObservable } from 'rxjs';
+import { Observable, from, isObservable, lastValueFrom } from 'rxjs';
 import * as Url from 'url';
 import { BaseException } from '../../exception';
 import { PartiallyOrderedSet, deepCopy } from '../../utils';
@@ -130,7 +130,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       if (isObservable(handlerResult)) {
-        handlerResult = handlerResult.toPromise();
+        handlerResult = lastValueFrom(handlerResult);
       }
 
       const value = await handlerResult;
@@ -320,13 +320,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       // Apply pre-validation transforms
       if (validationOptions.applyPreTransforms) {
         for (const visitor of this._pre.values()) {
-          data = await visitJson(
-            data,
-            visitor,
-            schema,
-            this._resolver.bind(this),
-            validator,
-          ).toPromise();
+          data = await lastValueFrom(
+            visitJson(data, visitor, schema, this._resolver.bind(this), validator),
+          );
         }
       }
 
@@ -343,7 +339,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           return value;
         };
         if (typeof schema === 'object') {
-          await visitJson(data, visitor, schema, this._resolver.bind(this), validator).toPromise();
+          await lastValueFrom(
+            visitJson(data, visitor, schema, this._resolver.bind(this), validator),
+          );
         }
 
         const definitions = schemaInfo.promptDefinitions.filter(
@@ -373,13 +371,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       // Apply post-validation transforms
       if (validationOptions.applyPostTransforms) {
         for (const visitor of this._post.values()) {
-          data = await visitJson(
-            data,
-            visitor,
-            schema,
-            this._resolver.bind(this),
-            validator,
-          ).toPromise();
+          data = await lastValueFrom(
+            visitJson(data, visitor, schema, this._resolver.bind(this), validator),
+          );
         }
       }
 
@@ -579,7 +573,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       return;
     }
 
-    const answers = await from(provider(prompts)).toPromise();
+    const answers = await lastValueFrom(from(provider(prompts)));
     for (const path in answers) {
       const pathFragments = path.split('/').slice(1);
 
@@ -643,8 +637,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       let value = source(schema);
-      if (isObservable<{}>(value)) {
-        value = await value.toPromise();
+      if (isObservable(value)) {
+        value = (await lastValueFrom(value)) as {};
       }
 
       CoreSchemaRegistry._set(data, fragments, value);

@@ -7,7 +7,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { filter, map, toArray } from 'rxjs/operators';
+import { filter, lastValueFrom, map, toArray } from 'rxjs';
 import { LogEntry } from './logger';
 import { TransformLogger } from './transform-logger';
 
@@ -19,9 +19,7 @@ describe('TransformLogger', () => {
         map((entry) => ((entry.message += '1'), entry)),
       );
     });
-    logger
-      .pipe(toArray())
-      .toPromise()
+    lastValueFrom(logger.pipe(toArray()))
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([
           jasmine.objectContaining({ message: 'world1', level: 'info', name: 'test' }) as any,

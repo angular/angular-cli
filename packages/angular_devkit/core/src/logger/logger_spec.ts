@@ -7,16 +7,14 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { toArray } from 'rxjs/operators';
+import { lastValueFrom, toArray } from 'rxjs';
 import { JsonValue } from '../json/utils';
 import { Logger } from './logger';
 
 describe('Logger', () => {
   it('works', (done: DoneFn) => {
     const logger = new Logger('test');
-    logger
-      .pipe(toArray())
-      .toPromise()
+    lastValueFrom(logger.pipe(toArray()))
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
           jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'test' }),
@@ -36,9 +34,7 @@ describe('Logger', () => {
   it('works with children', (done: DoneFn) => {
     const logger = new Logger('test');
     let hasCompleted = false;
-    logger
-      .pipe(toArray())
-      .toPromise()
+    lastValueFrom(logger.pipe(toArray()))
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
           jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'child' }) as any,
@@ -62,9 +58,7 @@ describe('Logger', () => {
     const logger = new Logger('test');
     logger.debug('woah');
 
-    logger
-      .pipe(toArray())
-      .toPromise()
+    lastValueFrom(logger.pipe(toArray()))
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
           jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'test' }) as any,

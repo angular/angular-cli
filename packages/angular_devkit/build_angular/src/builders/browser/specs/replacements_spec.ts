@@ -8,8 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { logging, normalize, virtualFs } from '@angular-devkit/core';
-import { of, race } from 'rxjs';
-import { delay, filter, map, take, takeUntil, takeWhile, tap, timeout } from 'rxjs/operators';
+import { delay, filter, map, of, race, take, takeUntil, takeWhile, tap, timeout } from 'rxjs';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder file replacements', () => {
@@ -182,7 +181,7 @@ describe('Browser Builder file replacements', () => {
     const logger = new logging.Logger('');
 
     // Race between a timeout and the expected log entry.
-    const stop$ = race<null | string>(
+    const stop$ = race(
       of(null).pipe(delay((45000 * 2) / 3)),
       logger.pipe(
         filter((entry) => entry.message.includes(expectedError)),

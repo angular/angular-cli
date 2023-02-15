@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { concatMap, count, take, timeout } from 'rxjs/operators';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { BUILD_TIMEOUT, buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 

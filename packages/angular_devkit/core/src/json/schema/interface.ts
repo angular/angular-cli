@@ -7,7 +7,7 @@
  */
 
 import { ErrorObject, Format } from 'ajv';
-import { Observable, SubscribableOrPromise } from 'rxjs';
+import { Observable, ObservableInput } from 'rxjs';
 import { JsonArray, JsonObject, JsonValue } from '../utils';
 
 export type JsonPointer = string & {
@@ -69,7 +69,7 @@ export interface PromptDefinition {
 
 export type PromptProvider = (
   definitions: Array<PromptDefinition>,
-) => SubscribableOrPromise<{ [id: string]: JsonValue }>;
+) => ObservableInput<{ [id: string]: JsonValue }>;
 
 export interface SchemaRegistry {
   compile(schema: Object): Promise<SchemaValidator>;

@@ -7,16 +7,20 @@
  */
 
 import { json, logging } from '@angular-devkit/core';
-import { Observable, from, merge, of, onErrorResumeNext } from 'rxjs';
 import {
+  Observable,
   concatMap,
   first,
+  from,
   ignoreElements,
   last,
   map,
+  merge,
+  of,
+  onErrorResumeNext,
   shareReplay,
   takeUntil,
-} from 'rxjs/operators';
+} from 'rxjs';
 import {
   BuilderInfo,
   BuilderInput,

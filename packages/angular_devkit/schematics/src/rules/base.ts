@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable, concat } from 'rxjs';
-import { map, mapTo, toArray } from 'rxjs/operators';
+import { Observable, concat, map, mapTo, toArray } from 'rxjs';
 import { FileOperator, Rule, Source } from '../engine/interface';
 import { SchematicsException } from '../exception/exception';
 import { FilterHostTree, HostTree } from '../tree/host-tree';

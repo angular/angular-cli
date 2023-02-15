@@ -10,11 +10,12 @@ import { Path, virtualFs } from '@angular-devkit/core';
 import {
   EMPTY,
   Observable,
+  concatMap,
   concat as concatObservables,
   from as observableFrom,
   of as observableOf,
+  reduce,
 } from 'rxjs';
-import { concatMap, reduce } from 'rxjs/operators';
 import { CreateFileAction } from '../tree/action';
 import { UpdateBufferBase } from '../utility/update-buffer';
 import { SimpleSinkBase } from './sink';

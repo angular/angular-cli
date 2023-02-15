@@ -9,6 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize } from '@angular-devkit/core';
+import { lastValueFrom } from 'rxjs';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder build optimizer', () => {
@@ -43,7 +44,7 @@ describe('Browser Builder build optimizer', () => {
 
     expect(output.success).toBe(true);
 
-    const noBoStats = await host.stat(join(normalize(output.outputPath), 'main.js')).toPromise();
+    const noBoStats = await lastValueFrom(host.stat(join(normalize(output.outputPath), 'main.js')));
     if (!noBoStats) {
       throw new Error('Main file has no stats');
     }
@@ -54,7 +55,9 @@ describe('Browser Builder build optimizer', () => {
     const boOutput = (await run.result) as BrowserBuilderOutput;
     expect(boOutput.success).toBe(true);
 
-    const boStats = await host.stat(join(normalize(output.outputPath), 'main.js')).toPromise();
+    const boStats = await await lastValueFrom(
+      host.stat(join(normalize(output.outputPath), 'main.js')),
+    );
     if (!boStats) {
       throw new Error('Main file has no stats');
     }

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable } from 'rxjs';
-import { map, reduce } from 'rxjs/operators';
+import { Observable, map, reduce } from 'rxjs';
 import { AggregatedProcessStats, Capture, MetricGroup } from './interfaces';
 import { cumulativeMovingAverage, max } from './utils';
 

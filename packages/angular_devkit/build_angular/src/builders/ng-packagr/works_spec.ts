@@ -17,7 +17,7 @@ import {
   virtualFs,
   workspaces,
 } from '@angular-devkit/core';
-import { debounceTime, map, take, tap } from 'rxjs/operators';
+import { debounceTime, map, take, tap } from 'rxjs';
 
 // Default timeout for large specs is 2.5 minutes.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;

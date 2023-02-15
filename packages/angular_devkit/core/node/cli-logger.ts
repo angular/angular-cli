@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { filter } from 'rxjs/operators';
+import { filter } from 'rxjs';
 import { logging } from '../src';
 
 export interface ProcessOutput {

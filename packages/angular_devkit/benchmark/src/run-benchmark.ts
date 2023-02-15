@@ -7,8 +7,18 @@
  */
 
 import { BaseException, logging } from '@angular-devkit/core';
-import { Observable, forkJoin, of, throwError } from 'rxjs';
-import { concatMap, map, retryWhen, take, tap, throwIfEmpty } from 'rxjs/operators';
+import {
+  Observable,
+  concatMap,
+  forkJoin,
+  map,
+  of,
+  retryWhen,
+  take,
+  tap,
+  throwError,
+  throwIfEmpty,
+} from 'rxjs';
 import { Command } from './command';
 import { BenchmarkReporter, Capture, MetricGroup } from './interfaces';
 import { LocalMonitoredProcess } from './monitored-process';
