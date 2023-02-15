@@ -65,9 +65,9 @@ export class JobOutputSchemaValidationError extends schema.SchemaValidationExcep
 interface JobHandlerWithExtra extends JobHandler<JsonValue, JsonValue, JsonValue> {
   jobDescription: JobDescription;
 
-  argumentV: Observable<schema.SchemaValidator>;
-  outputV: Observable<schema.SchemaValidator>;
-  inputV: Observable<schema.SchemaValidator>;
+  argumentV: Promise<schema.SchemaValidator>;
+  outputV: Promise<schema.SchemaValidator>;
+  inputV: Promise<schema.SchemaValidator>;
 }
 
 function _jobShare<T>(): MonoTypeOperatorFunction<T> {
@@ -159,9 +159,9 @@ export class SimpleScheduler<
 
         const handlerWithExtra = Object.assign(handler.bind(undefined), {
           jobDescription: description,
-          argumentV: this._schemaRegistry.compile(description.argument).pipe(shareReplay(1)),
-          inputV: this._schemaRegistry.compile(description.input).pipe(shareReplay(1)),
-          outputV: this._schemaRegistry.compile(description.output).pipe(shareReplay(1)),
+          argumentV: this._schemaRegistry.compile(description.argument),
+          inputV: this._schemaRegistry.compile(description.input),
+          outputV: this._schemaRegistry.compile(description.output),
         }) as JobHandlerWithExtra;
         this._internalJobDescriptionMap.set(name, handlerWithExtra);
 
@@ -284,6 +284,7 @@ export class SimpleScheduler<
    * Create the job.
    * @private
    */
+  // eslint-disable-next-line max-lines-per-function
   private _createJob<A extends MinimumArgumentT, I extends MinimumInputT, O extends MinimumOutputT>(
     name: JobName,
     argument: A,
@@ -305,12 +306,14 @@ export class SimpleScheduler<
       .pipe(
         concatMap((message) =>
           handler.pipe(
-            switchMap((handler) => {
+            switchMap(async (handler) => {
               if (handler === null) {
                 throw new JobDoesNotExistException(name);
-              } else {
-                return handler.inputV.pipe(switchMap((validate) => validate(message)));
               }
+
+              const validator = await handler.inputV;
+
+              return validator(message);
             }),
           ),
         ),
@@ -395,24 +398,20 @@ export class SimpleScheduler<
         }
 
         return handler.pipe(
-          switchMap((handler) => {
+          switchMap(async (handler) => {
             if (handler === null) {
               throw new JobDoesNotExistException(name);
-            } else {
-              return handler.outputV.pipe(
-                switchMap((validate) => validate(message.value)),
-                switchMap((output) => {
-                  if (!output.success) {
-                    throw new JobOutputSchemaValidationError(output.errors);
-                  }
-
-                  return of({
-                    ...message,
-                    output: output.data as O,
-                  } as JobOutboundMessageOutput<O>);
-                }),
-              );
             }
+            const validate = await handler.outputV;
+            const output = await validate(message.value);
+            if (!output.success) {
+              throw new JobOutputSchemaValidationError(output.errors);
+            }
+
+            return {
+              ...message,
+              output: output.data as O,
+            } as JobOutboundMessageOutput<O>;
           }),
         ) as Observable<JobOutboundMessage<O>>;
       }),
@@ -457,7 +456,7 @@ export class SimpleScheduler<
         return maybeObservable.pipe(
           // Keep the order of messages.
           concatMap((message) => {
-            return schemaRegistry.compile(schema).pipe(
+            return from(schemaRegistry.compile(schema)).pipe(
               switchMap((validate) => validate(message)),
               filter((x) => x.success),
               map((x) => x.data as T),
@@ -518,7 +517,7 @@ export class SimpleScheduler<
               }
 
               // Validate the argument.
-              return handler.argumentV
+              return from(handler.argumentV)
                 .pipe(
                   switchMap((validate) => validate(argument)),
                   switchMap((output) => {

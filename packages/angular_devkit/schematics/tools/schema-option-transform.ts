@@ -7,7 +7,7 @@
  */
 
 import { deepCopy, schema } from '@angular-devkit/core';
-import { Observable, of as observableOf } from 'rxjs';
+import { Observable, from, of as observableOf } from 'rxjs';
 import { first, map, mergeMap } from 'rxjs/operators';
 import { FileSystemSchematicContext, FileSystemSchematicDescription } from './description';
 
@@ -34,7 +34,7 @@ export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
 
     if (schematic.schema && schematic.schemaJson) {
       // Make a deep copy of options.
-      return registry.compile(schematic.schemaJson).pipe(
+      return from(registry.compile(schematic.schemaJson)).pipe(
         mergeMap((validator) => validator(options, { withPrompts })),
         first(),
         map((result) => {

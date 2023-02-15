@@ -172,9 +172,7 @@ class CoreSchemaRegistry implements SchemaRegistry {
     addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void;
     // (undocumented)
     addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
-    compile(schema: JsonSchema): Observable<SchemaValidator>;
-    // @deprecated
-    flatten(schema: JsonObject): Observable<JsonObject>;
+    compile(schema: JsonSchema): Promise<SchemaValidator>;
     // (undocumented)
     registerUriHandler(handler: UriHandler): void;
     // (undocumented)
@@ -186,6 +184,7 @@ class CoreSchemaRegistry implements SchemaRegistry {
     usePromptProvider(provider: PromptProvider): void;
     // (undocumented)
     useXDeprecatedProvider(onUsage: (message: string) => void): void;
+    ɵflatten(schema: JsonObject): Promise<JsonObject>;
 }
 
 // @public (undocumented)
@@ -873,13 +872,13 @@ interface SchemaRegistry {
     // (undocumented)
     addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
     // (undocumented)
-    compile(schema: Object): Observable<SchemaValidator>;
-    // @deprecated (undocumented)
-    flatten(schema: JsonObject | string): Observable<JsonObject>;
+    compile(schema: Object): Promise<SchemaValidator>;
     // (undocumented)
     usePromptProvider(provider: PromptProvider): void;
     // (undocumented)
     useXDeprecatedProvider(onUsage: (message: string) => void): void;
+    // (undocumented)
+    ɵflatten(schema: JsonObject | string): Promise<JsonObject>;
 }
 
 // @public (undocumented)
@@ -894,7 +893,7 @@ class SchemaValidationException extends BaseException {
 // @public (undocumented)
 interface SchemaValidator {
     // (undocumented)
-    (data: JsonValue, options?: SchemaValidatorOptions): Observable<SchemaValidatorResult>;
+    (data: JsonValue, options?: SchemaValidatorOptions): Promise<SchemaValidatorResult>;
 }
 
 // @public (undocumented)

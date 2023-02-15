@@ -7,7 +7,6 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 
 describe('Prompt Provider', () => {
@@ -19,22 +18,17 @@ describe('Prompt Provider', () => {
       return { [definitions[0].id]: true };
     });
 
-    await registry
-      .compile({
-        properties: {
-          test: {
-            type: 'boolean',
-            'x-prompt': 'test-message',
-          },
+    const validator = await registry.compile({
+      properties: {
+        test: {
+          type: 'boolean',
+          'x-prompt': 'test-message',
         },
-      })
-      .pipe(
-        mergeMap((validator) => validator(data)),
-        map(() => {
-          expect(data.test).toBe(true);
-        }),
-      )
-      .toPromise();
+      },
+    });
+
+    await validator(data);
+    expect(data.test).toBe(true);
   });
 
   it('supports mixed schema references', async () => {
@@ -49,53 +43,48 @@ describe('Prompt Provider', () => {
       };
     });
 
-    await registry
-      .compile({
-        properties: {
-          bool: {
-            $ref: '#/definitions/example',
+    const validator = await registry.compile({
+      properties: {
+        bool: {
+          $ref: '#/definitions/example',
+        },
+        test: {
+          type: 'string',
+          enum: ['one', 'two', 'three'],
+          'x-prompt': {
+            type: 'list',
+            'message': 'other-message',
           },
-          test: {
-            type: 'string',
-            enum: ['one', 'two', 'three'],
-            'x-prompt': {
-              type: 'list',
-              'message': 'other-message',
-            },
-          },
-          obj: {
-            properties: {
-              deep: {
-                properties: {
-                  three: {
-                    $ref: '#/definitions/test3',
-                  },
+        },
+        obj: {
+          properties: {
+            deep: {
+              properties: {
+                three: {
+                  $ref: '#/definitions/test3',
                 },
               },
             },
           },
         },
-        definitions: {
-          example: {
-            type: 'boolean',
-            'x-prompt': 'example-message',
-          },
-          test3: {
-            type: 'string',
-            'x-prompt': 'test3-message',
-          },
+      },
+      definitions: {
+        example: {
+          type: 'boolean',
+          'x-prompt': 'example-message',
         },
-      })
-      .pipe(
-        mergeMap((validator) => validator(data)),
-        map((result) => {
-          expect(result.success).toBe(true);
-          expect(data.bool).toBe(true);
-          expect(data.test).toBe('two');
-          expect(data.obj.deep.three).toEqual('test3-answer');
-        }),
-      )
-      .toPromise();
+        test3: {
+          type: 'string',
+          'x-prompt': 'test3-message',
+        },
+      },
+    });
+
+    const result = await validator(data);
+    expect(result.success).toBe(true);
+    expect(data.bool).toBe(true);
+    expect(data.test).toBe('two');
+    expect(data.obj.deep.three).toEqual('test3-answer');
   });
 
   describe('with shorthand', () => {
@@ -110,17 +99,16 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'string',
-              'x-prompt': 'test-message',
-            },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'string',
+            'x-prompt': 'test-message',
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+
+      await validator(data);
     });
 
     it('analyzes enums', async () => {
@@ -135,18 +123,16 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'string',
-              enum: ['one', 'two', 'three'],
-              'x-prompt': 'test-message',
-            },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'string',
+            enum: ['one', 'two', 'three'],
+            'x-prompt': 'test-message',
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes boolean properties', async () => {
@@ -161,17 +147,15 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'boolean',
-              'x-prompt': 'test-message',
-            },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'boolean',
+            'x-prompt': 'test-message',
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
   });
 
@@ -187,19 +171,17 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'string',
-              'x-prompt': {
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'string',
+            'x-prompt': {
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes enums WITH explicit list type', async () => {
@@ -214,21 +196,19 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: 'one' };
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'string',
-              enum: ['one', 'two', 'three'],
-              'x-prompt': {
-                'type': 'list',
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'string',
+            enum: ['one', 'two', 'three'],
+            'x-prompt': {
+              'type': 'list',
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes list with true multiselect option and object items', async () => {
@@ -247,25 +227,23 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: { 'value': 'one', 'label': 'one' } };
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'array',
-              'x-prompt': {
-                'type': 'list',
-                'multiselect': true,
-                'items': [
-                  { 'value': 'one', 'label': 'one' },
-                  { 'value': 'two', 'label': 'two' },
-                ],
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'array',
+            'x-prompt': {
+              'type': 'list',
+              'multiselect': true,
+              'items': [
+                { 'value': 'one', 'label': 'one' },
+                { 'value': 'two', 'label': 'two' },
+              ],
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes list with false multiselect option and object items', async () => {
@@ -284,25 +262,23 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: { 'value': 'one', 'label': 'one' } };
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'array',
-              'x-prompt': {
-                'type': 'list',
-                'multiselect': false,
-                'items': [
-                  { 'value': 'one', 'label': 'one' },
-                  { 'value': 'two', 'label': 'two' },
-                ],
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'array',
+            'x-prompt': {
+              'type': 'list',
+              'multiselect': false,
+              'items': [
+                { 'value': 'one', 'label': 'one' },
+                { 'value': 'two', 'label': 'two' },
+              ],
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes list without multiselect option and object items', async () => {
@@ -321,24 +297,22 @@ describe('Prompt Provider', () => {
         return { [definitions[0].id]: { 'value': 'two', 'label': 'two' } };
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'array',
-              'x-prompt': {
-                'type': 'list',
-                'items': [
-                  { 'value': 'one', 'label': 'one' },
-                  { 'value': 'two', 'label': 'two' },
-                ],
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'array',
+            'x-prompt': {
+              'type': 'list',
+              'items': [
+                { 'value': 'one', 'label': 'one' },
+                { 'value': 'two', 'label': 'two' },
+              ],
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes enums WITHOUT explicit list type', async () => {
@@ -353,21 +327,18 @@ describe('Prompt Provider', () => {
 
         return {};
       });
-
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'string',
-              enum: ['one', 'two', 'three'],
-              'x-prompt': {
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'string',
+            enum: ['one', 'two', 'three'],
+            'x-prompt': {
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes enums WITHOUT explicit list type and multiselect', async () => {
@@ -383,20 +354,18 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'array',
-              items: {
-                enum: ['one', 'two', 'three'],
-              },
-              'x-prompt': 'test-message',
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'array',
+            items: {
+              enum: ['one', 'two', 'three'],
             },
+            'x-prompt': 'test-message',
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('analyzes boolean properties', async () => {
@@ -411,19 +380,17 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'boolean',
-              'x-prompt': {
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'boolean',
+            'x-prompt': {
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
 
     it('allows prompt type override', async () => {
@@ -438,20 +405,18 @@ describe('Prompt Provider', () => {
         return {};
       });
 
-      await registry
-        .compile({
-          properties: {
-            test: {
-              type: 'boolean',
-              'x-prompt': {
-                'type': 'input',
-                'message': 'test-message',
-              },
+      const validator = await registry.compile({
+        properties: {
+          test: {
+            type: 'boolean',
+            'x-prompt': {
+              'type': 'input',
+              'message': 'test-message',
             },
           },
-        })
-        .pipe(mergeMap((validator) => validator(data)))
-        .toPromise();
+        },
+      });
+      await validator(data);
     });
   });
 });

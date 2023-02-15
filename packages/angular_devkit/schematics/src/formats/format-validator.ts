@@ -7,19 +7,19 @@
  */
 
 import { JsonObject, JsonValue, schema } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
 
-export function formatValidator(
+export async function formatValidator(
   data: JsonValue,
   dataSchema: JsonObject,
   formats: schema.SchemaFormat[],
-): Observable<schema.SchemaValidatorResult> {
+): Promise<schema.SchemaValidatorResult> {
   const registry = new schema.CoreSchemaRegistry();
 
   for (const format of formats) {
     registry.addFormat(format);
   }
 
-  return registry.compile(dataSchema).pipe(mergeMap((validator) => validator(data)));
+  const validator = await registry.compile(dataSchema);
+
+  return validator(data);
 }

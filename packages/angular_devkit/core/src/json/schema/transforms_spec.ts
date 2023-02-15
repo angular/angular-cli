@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 import { addUndefinedDefaults } from './transforms';
 
@@ -16,37 +15,36 @@ describe('addUndefinedDefaults', () => {
     registry.addPreTransform(addUndefinedDefaults);
     const data: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const result = await registry
-      .compile({
-        properties: {
-          bool: { type: 'boolean' },
-          str: { type: 'string', default: 'someString' },
-          obj: {
-            properties: {
-              num: { type: 'number' },
-              other: { type: 'number', default: 0 },
-            },
-          },
-          objAllOk: {
-            allOf: [{ type: 'object' }],
-          },
-          objAllBad: {
-            allOf: [{ type: 'object' }, { type: 'number' }],
-          },
-          objOne: {
-            oneOf: [{ type: 'object' }],
-          },
-          objNotOk: {
-            not: { not: { type: 'object' } },
-          },
-          objNotBad: {
-            type: 'object',
-            not: { type: 'object' },
+    const validator = await registry.compile({
+      properties: {
+        bool: { type: 'boolean' },
+        str: { type: 'string', default: 'someString' },
+        obj: {
+          properties: {
+            num: { type: 'number' },
+            other: { type: 'number', default: 0 },
           },
         },
-      })
-      .pipe(mergeMap((validator) => validator(data)))
-      .toPromise();
+        objAllOk: {
+          allOf: [{ type: 'object' }],
+        },
+        objAllBad: {
+          allOf: [{ type: 'object' }, { type: 'number' }],
+        },
+        objOne: {
+          oneOf: [{ type: 'object' }],
+        },
+        objNotOk: {
+          not: { not: { type: 'object' } },
+        },
+        objNotBad: {
+          type: 'object',
+          not: { type: 'object' },
+        },
+      },
+    });
+
+    const result = await validator(data);
 
     expect(result.success).toBeTrue();
     expect(data.bool).toBeUndefined();
@@ -72,20 +70,19 @@ describe('addUndefinedDefaults', () => {
       },
     };
 
-    const result = await registry
-      .compile({
-        properties: {
-          bool: { type: 'boolean', default: true },
-          str: { type: 'string', default: 'someString' },
-          obj: {
-            properties: {
-              num: { type: 'number', default: 0 },
-            },
+    const validator = await registry.compile({
+      properties: {
+        bool: { type: 'boolean', default: true },
+        str: { type: 'string', default: 'someString' },
+        obj: {
+          properties: {
+            num: { type: 'number', default: 0 },
           },
         },
-      })
-      .pipe(mergeMap((validator) => validator(data)))
-      .toPromise();
+      },
+    });
+
+    const result = await validator(data);
 
     expect(result.success).toBeTrue();
     expect(data.bool).toBeTrue();
@@ -108,7 +105,7 @@ describe('addUndefinedDefaults', () => {
       },
     };
 
-    const validator = registry.compile({
+    const validator = await registry.compile({
       properties: {
         bool: { type: 'boolean', default: true },
         obj: {
@@ -145,15 +142,13 @@ describe('addUndefinedDefaults', () => {
       },
     });
 
-    const result1 = await validator.pipe(mergeMap((validator) => validator(dataNoObj))).toPromise();
-
+    const result1 = await validator(dataNoObj);
     expect(result1.success).toBeTrue();
     expect(dataNoObj.bool).toBeTrue();
     expect(dataNoObj.obj).toBeTrue();
     expect(dataNoObj.noDefaultOneOf).toBeUndefined();
 
-    const result2 = await validator.pipe(mergeMap((validator) => validator(dataObj))).toPromise();
-
+    const result2 = await validator(dataObj);
     expect(result2.success).toBeTrue();
     expect(dataObj.bool).toBeTrue();
     expect(dataObj.obj.a).toBeFalse();
@@ -176,7 +171,7 @@ describe('addUndefinedDefaults', () => {
       },
     };
 
-    const validator = registry.compile({
+    const validator = await registry.compile({
       properties: {
         bool: { type: 'boolean', default: true },
         obj: {
@@ -204,14 +199,12 @@ describe('addUndefinedDefaults', () => {
       },
     });
 
-    const result1 = await validator.pipe(mergeMap((validator) => validator(dataNoObj))).toPromise();
-
+    const result1 = await validator(dataNoObj);
     expect(result1.success).toBeTrue();
     expect(dataNoObj.bool).toBeTrue();
     expect(dataNoObj.obj).toBeTrue();
 
-    const result2 = await validator.pipe(mergeMap((validator) => validator(dataObj))).toPromise();
-
+    const result2 = await validator(dataObj);
     expect(result2.success).toBeTrue();
     expect(dataObj.bool).toBeTrue();
     expect(dataObj.obj.a).toBeFalse();
@@ -228,7 +221,7 @@ describe('addUndefinedDefaults', () => {
       boolRef: true,
     };
 
-    const validator = registry.compile({
+    const validator = await registry.compile({
       definitions: {
         boolRef: {
           default: false,
@@ -246,12 +239,12 @@ describe('addUndefinedDefaults', () => {
       },
     });
 
-    const result1 = await validator.pipe(mergeMap((validator) => validator(dataNoObj))).toPromise();
+    const result1 = await validator(dataNoObj);
     expect(result1.success).toBeTrue();
     expect(dataNoObj['bool']).toBeFalse();
     expect(dataNoObj['boolRef']).toBeFalse();
 
-    const result2 = await validator.pipe(mergeMap((validator) => validator(dataObj))).toPromise();
+    const result2 = await validator(dataObj);
     expect(result2.success).toBeTrue();
     expect(dataObj['bool']).toBeFalse();
     expect(dataObj['boolRef']).toBeTrue();
