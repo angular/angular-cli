@@ -253,9 +253,8 @@ export async function validateWorkspace(data: json.JsonObject, isGlobal: boolean
 
   const { formats } = await import('@angular-devkit/schematics');
   const registry = new json.schema.CoreSchemaRegistry(formats.standardFormats);
-  const validator = await registry.compile(schemaToValidate).toPromise();
-
-  const { success, errors } = await validator(data).toPromise();
+  const validator = await registry.compile(schemaToValidate);
+  const { success, errors } = await validator(data);
   if (!success) {
     throw new json.schema.SchemaValidationException(errors);
   }

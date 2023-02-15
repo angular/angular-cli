@@ -214,8 +214,8 @@ export class BuilderHarness<T> {
           }
         }
 
-        const validator = await this.schemaRegistry.compile(schema ?? true).toPromise();
-        const { data } = await validator(options).toPromise();
+        const validator = await this.schemaRegistry.compile(schema ?? true);
+        const { data } = await validator(options);
 
         return data as json.JsonObject;
       },
@@ -237,7 +237,7 @@ export class BuilderHarness<T> {
     const logs: logging.LogEntry[] = [];
     context.logger.subscribe((e) => logs.push(e));
 
-    return this.schemaRegistry.compile(this.builderInfo.optionSchema).pipe(
+    return observableFrom(this.schemaRegistry.compile(this.builderInfo.optionSchema)).pipe(
       mergeMap((validator) => validator(targetOptions)),
       map((validationResult) => validationResult.data),
       mergeMap((data) =>

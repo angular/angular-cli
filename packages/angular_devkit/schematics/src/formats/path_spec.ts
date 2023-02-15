@@ -6,32 +6,27 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { map } from 'rxjs/operators';
 import { formatValidator } from './format-validator';
 import { pathFormat } from './path';
 
 describe('Schematics Path format', () => {
-  it('accepts correct Paths', (done) => {
+  it('accepts correct Paths', async () => {
     const data = { path: 'a/b/c' };
     const dataSchema = {
       properties: { path: { type: 'string', format: 'path' } },
     };
 
-    formatValidator(data, dataSchema, [pathFormat])
-      .pipe(map((result) => expect(result.success).toBe(true)))
-      .toPromise()
-      .then(done, done.fail);
+    const result = await formatValidator(data, dataSchema, [pathFormat]);
+    expect(result.success).toBeTrue();
   });
 
-  it('rejects Paths that are not normalized', (done) => {
+  it('rejects Paths that are not normalized', async () => {
     const data = { path: 'a/b/c/../' };
     const dataSchema = {
       properties: { path: { type: 'string', format: 'path' } },
     };
 
-    formatValidator(data, dataSchema, [pathFormat])
-      .pipe(map((result) => expect(result.success).toBe(false)))
-      .toPromise()
-      .then(done, done.fail);
+    const result = await formatValidator(data, dataSchema, [pathFormat]);
+    expect(result.success).toBeFalse();
   });
 });

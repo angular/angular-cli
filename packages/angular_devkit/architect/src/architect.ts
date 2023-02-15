@@ -15,7 +15,6 @@ import {
   last,
   map,
   shareReplay,
-  switchMap,
   takeUntil,
 } from 'rxjs/operators';
 import {
@@ -65,7 +64,7 @@ function _createJobHandlerFromBuilderInfo(
   function handler(argument: json.JsonObject, context: JobHandlerContext) {
     // Add input validation to the inbound bus.
     const inboundBusWithInputValidation = context.inboundBus.pipe(
-      concatMap((message) => {
+      concatMap(async (message) => {
         if (message.kind === JobInboundMessageKind.Input) {
           const v = message.value as BuilderInput;
           const options = {
@@ -74,20 +73,17 @@ function _createJobHandlerFromBuilderInfo(
           };
 
           // Validate v against the options schema.
-          return registry.compile(info.optionSchema).pipe(
-            concatMap((validation) => validation(options)),
-            map((validationResult: json.schema.SchemaValidatorResult) => {
-              const { data, success, errors } = validationResult;
-              if (success) {
-                return { ...v, options: data } as BuilderInput;
-              }
+          const validation = await registry.compile(info.optionSchema);
+          const validationResult = await validation(options);
+          const { data, success, errors } = validationResult;
 
-              throw new json.schema.SchemaValidationException(errors);
-            }),
-            map((value) => ({ ...message, value })),
-          );
+          if (!success) {
+            throw new json.schema.SchemaValidationException(errors);
+          }
+
+          return { ...message, value: { ...v, options: data } } as JobInboundMessage<BuilderInput>;
         } else {
-          return of(message as JobInboundMessage<BuilderInput>);
+          return message as JobInboundMessage<BuilderInput>;
         }
       }),
       // Using a share replay because the job might be synchronously sending input, but
@@ -335,19 +331,14 @@ function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.Sche
         throw new Error(`No builder info were found for builder ${JSON.stringify(builderName)}.`);
       }
 
-      return registry
-        .compile(builderInfo.optionSchema)
-        .pipe(
-          concatMap((validation) => validation(options)),
-          switchMap(({ data, success, errors }) => {
-            if (success) {
-              return of(data as json.JsonObject);
-            }
+      const validation = await registry.compile(builderInfo.optionSchema);
+      const { data, success, errors } = await validation(options);
 
-            throw new json.schema.SchemaValidationException(errors);
-          }),
-        )
-        .toPromise();
+      if (!success) {
+        throw new json.schema.SchemaValidationException(errors);
+      }
+
+      return data as json.JsonObject;
     },
     {
       name: '..validateOptions',
