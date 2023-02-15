@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { PackageInfo, packages } from '../lib/packages';
-import build from './build-bazel';
+import build from './build';
 import jsonHelp, { createTemporaryProject } from './json-help';
 
 // Added to the README.md of the snapshot. This is markdown.
