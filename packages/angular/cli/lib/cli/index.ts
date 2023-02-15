@@ -16,19 +16,19 @@ import { writeErrorToLogFile } from '../../src/utilities/log-file';
 
 export { VERSION } from '../../src/utilities/version';
 
-const MIN_NODEJS_VERISON = [14, 15] as const;
+const MIN_NODEJS_VERSION = [16, 13] as const;
 
 /* eslint-disable no-console */
 export default async function (options: { cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
   const [major, minor] = process.versions.node.split('.').map((part) => Number(part));
   if (
-    major < MIN_NODEJS_VERISON[0] ||
-    (major === MIN_NODEJS_VERISON[0] && minor < MIN_NODEJS_VERISON[1])
+    major < MIN_NODEJS_VERSION[0] ||
+    (major === MIN_NODEJS_VERSION[0] && minor < MIN_NODEJS_VERSION[1])
   ) {
     process.stderr.write(
       `Node.js version ${process.version} detected.\n` +
-        `The Angular CLI requires a minimum of v${MIN_NODEJS_VERISON[0]}.${MIN_NODEJS_VERISON[1]}.\n\n` +
+        `The Angular CLI requires a minimum of v${MIN_NODEJS_VERSION[0]}.${MIN_NODEJS_VERSION[1]}.\n\n` +
         'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
     );
 
