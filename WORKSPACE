@@ -52,8 +52,13 @@ rules_pkg_dependencies()
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
-    name = "nodejs",
-    node_version = "14.20.0",
+    name = "node16",
+    node_version = "16.13.1",
+)
+
+nodejs_register_toolchains(
+    name = "node18",
+    node_version = "18.10.0",
 )
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
@@ -88,21 +93,6 @@ load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies",
 aspect_bazel_lib_dependencies()
 
 register_jq_toolchains(version = "1.6")
-
-nodejs_register_toolchains(
-    name = "node14",
-    node_version = "14.20.0",
-)
-
-nodejs_register_toolchains(
-    name = "node16",
-    node_version = "16.13.1",
-)
-
-nodejs_register_toolchains(
-    name = "node18",
-    node_version = "18.10.0",
-)
 
 register_toolchains(
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_linux_toolchain",
