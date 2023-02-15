@@ -8,8 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { join, logging, virtualFs } from '@angular-devkit/core';
-import { timer } from 'rxjs';
-import { debounceTime, map, switchMap, takeWhile, tap } from 'rxjs/operators';
+import { debounceTime, lastValueFrom, map, switchMap, takeWhile, tap, timer } from 'rxjs';
 import { browserBuild, createArchitect, host, outputPath } from '../../../testing/test-utils';
 
 describe('Browser Builder Web Worker support', () => {
@@ -150,8 +149,8 @@ describe('Browser Builder Web Worker support', () => {
     // The current linux-based CI environments may not fully settled in regards to filesystem
     // changes from previous tests which reuse the same directory and fileset.
     // The initial delay helps mitigate false positive rebuild triggers in such scenarios.
-    const { run } = await timer(1000)
-      .pipe(
+    const { run } = await lastValueFrom(
+      timer(1000).pipe(
         switchMap(() => architect.scheduleTarget(target, overrides)),
         switchMap((run) => run.output.pipe(map((output) => ({ run, output })))),
         debounceTime(1000),
@@ -176,8 +175,8 @@ describe('Browser Builder Web Worker support', () => {
           }
         }),
         takeWhile(() => phase < 3),
-      )
-      .toPromise();
+      ),
+    );
     await run.stop();
   });
 });

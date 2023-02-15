@@ -6,8 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { EMPTY, Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
-import { concatMap, map, reduce, switchMap, toArray } from 'rxjs/operators';
+import {
+  EMPTY,
+  Observable,
+  concat,
+  concatMap,
+  map,
+  from as observableFrom,
+  of,
+  reduce,
+  switchMap,
+  throwError,
+  toArray,
+} from 'rxjs';
 import {
   FileAlreadyExistException,
   FileDoesNotExistException,

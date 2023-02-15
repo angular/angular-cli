@@ -7,7 +7,7 @@
  */
 
 import { tags } from '@angular-devkit/core';
-import { last, tap } from 'rxjs/operators';
+import { last, tap } from 'rxjs';
 import { promisify } from 'util';
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
@@ -95,7 +95,7 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
           `title = 'app'`,
           tags.stripIndents`
           title = 'app';
-  
+
           async foo() {
             return 'foo';
           }

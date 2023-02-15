@@ -7,16 +7,14 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { toArray } from 'rxjs/operators';
+import { lastValueFrom, toArray } from 'rxjs';
 import { IndentLogger } from './indent';
 import { LogEntry, Logger } from './logger';
 
 describe('IndentSpec', () => {
   it('works', (done: DoneFn) => {
     const logger = new IndentLogger('test');
-    logger
-      .pipe(toArray())
-      .toPromise()
+    lastValueFrom(logger.pipe(toArray()))
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([
           jasmine.objectContaining({ message: 'test', level: 'info', name: 'test' }) as any,

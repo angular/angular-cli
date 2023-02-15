@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { join, virtualFs } from '@angular-devkit/core';
-import { take, tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs';
 import { createArchitect, host, outputPath } from '../../../testing/test-utils';
 
 describe('Browser Builder resolve json module', () => {

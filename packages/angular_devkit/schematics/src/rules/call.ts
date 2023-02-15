@@ -7,8 +7,7 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import { Observable, defer, isObservable } from 'rxjs';
-import { defaultIfEmpty, mergeMap } from 'rxjs/operators';
+import { Observable, defaultIfEmpty, defer, isObservable, lastValueFrom, mergeMap } from 'rxjs';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
 
@@ -49,10 +48,10 @@ export class InvalidSourceResultException extends BaseException {
 
 export function callSource(source: Source, context: SchematicContext): Observable<Tree> {
   return defer(async () => {
-    let result = source(context);
+    let result: Tree | Observable<Tree> | undefined = source(context);
 
     if (isObservable(result)) {
-      result = await result.pipe(defaultIfEmpty()).toPromise();
+      result = await lastValueFrom(result.pipe(defaultIfEmpty(undefined)));
     }
 
     if (result && TreeSymbol in result) {
@@ -88,7 +87,7 @@ async function callRuleAsync(rule: Rule, tree: Tree, context: SchematicContext):
   }
 
   if (isObservable(result)) {
-    result = await result.pipe(defaultIfEmpty(tree)).toPromise();
+    result = await lastValueFrom(result.pipe(defaultIfEmpty(tree)));
   }
 
   if (result && TreeSymbol in result) {

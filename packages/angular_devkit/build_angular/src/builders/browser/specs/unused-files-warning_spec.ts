@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { logging } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { debounceTime, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder unused files warnings', () => {

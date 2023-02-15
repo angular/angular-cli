@@ -7,8 +7,7 @@
  */
 
 import { json, logging, schema } from '@angular-devkit/core';
-import { timer } from 'rxjs';
-import { map, take, tap, toArray } from 'rxjs/operators';
+import { firstValueFrom, lastValueFrom, map, take, tap, timer, toArray } from 'rxjs';
 import { promisify } from 'util';
 import { TestingArchitectHost } from '../testing/testing-architect-host';
 import { BuilderOutput, BuilderRun } from './api';
@@ -173,7 +172,7 @@ describe('architect', () => {
     expect(called).toBe(1);
     expect(results).toBe(1);
 
-    const all = await run.output.pipe(toArray()).toPromise();
+    const all = await lastValueFrom(run.output.pipe(toArray()));
     expect(called).toBe(1);
     expect(results).toBe(10);
     expect(all.length).toBe(10);
@@ -200,7 +199,7 @@ describe('architect', () => {
     expect(called).toBe(1);
     expect(results).toBe(1);
 
-    const all = await run.output.pipe(toArray()).toPromise();
+    const all = await lastValueFrom(run.output.pipe(toArray()));
     expect(called).toBe(1);
     expect(results).toBe(10);
     expect(all.length).toBe(10);
@@ -325,7 +324,7 @@ describe('architect', () => {
     );
 
     const run = await architect.scheduleBuilder('package:getTargetOptions', {});
-    const output = await run.output.toPromise();
+    const output = await lastValueFrom(run.output);
     expect(output.success).toBe(true);
     expect(options).toEqual(goldenOptions);
     await run.stop();
@@ -339,7 +338,7 @@ describe('architect', () => {
 
     // But this should.
     try {
-      await run2.output.toPromise();
+      await lastValueFrom(run2.output);
       expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
     } catch {}
     await run2.stop();
@@ -369,7 +368,7 @@ describe('architect', () => {
     );
 
     const run = await architect.scheduleBuilder('package:do-it', {});
-    const output = await run.output.toPromise();
+    const output = await lastValueFrom(run.output);
     expect(output.success).toBe(true);
     expect(actualBuilderName).toEqual(builderName);
     await run.stop();
@@ -383,7 +382,7 @@ describe('architect', () => {
 
     // But this should.
     try {
-      await run2.output.toPromise();
+      await lastValueFrom(run2.output);
       expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
     } catch {}
     await run2.stop();
@@ -416,7 +415,7 @@ describe('architect', () => {
     );
 
     const run = await architect.scheduleBuilder('package:do-it', { p1: 'hello' });
-    const output = await run.output.toPromise();
+    const output = await firstValueFrom(run.output);
     expect(output.success).toBe(true);
     expect(actualOptions).toEqual({
       p0: 123,
@@ -427,7 +426,7 @@ describe('architect', () => {
     // Should also error.
     const run2 = await architect.scheduleBuilder('package:do-it', {});
 
-    await expectAsync(run2.output.toPromise()).toBeRejectedWith(
+    await expectAsync(lastValueFrom(run2.output)).toBeRejectedWith(
       jasmine.objectContaining({ message: jasmine.stringMatching('p1') }),
     );
 

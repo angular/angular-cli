@@ -8,8 +8,7 @@
 
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { Observable, from, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, catchError, from, throwError } from 'rxjs';
 import { RuleFactory, TaskExecutor, UnregisteredTaskException } from '../src';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
 import { ExportStringRef } from './export-ref';

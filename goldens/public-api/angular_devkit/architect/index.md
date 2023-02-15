@@ -10,9 +10,9 @@ import { JsonObject } from '@angular-devkit/core';
 import { JsonValue } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
+import { ObservableInput } from 'rxjs';
 import { Observer } from 'rxjs';
 import { schema } from '@angular-devkit/core';
-import { SubscribableOrPromise } from 'rxjs';
 
 // @public (undocumented)
 export class Architect {
@@ -67,7 +67,7 @@ export type BuilderInput = json.JsonObject & Schema;
 export type BuilderOutput = json.JsonObject & Schema_2;
 
 // @public
-export type BuilderOutputLike = AsyncIterable<BuilderOutput> | SubscribableOrPromise<BuilderOutput> | BuilderOutput;
+export type BuilderOutputLike = ObservableInput<BuilderOutput> | BuilderOutput;
 
 // @public (undocumented)
 export type BuilderProgress = json.JsonObject & Schema_3 & TypedBuilderProgress;
@@ -97,6 +97,7 @@ export type BuilderRegistry = Registry<json.JsonObject, BuilderInput, BuilderOut
 export interface BuilderRun {
     id: number;
     info: BuilderInfo;
+    lastOutput: Promise<BuilderOutput>;
     output: Observable<BuilderOutput>;
     progress: Observable<BuilderProgressReport>;
     result: Promise<BuilderOutput>;

@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { debounceTime, take, tap, timeout } from 'rxjs/operators';
+import { debounceTime, take, tap, timeout } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { BUILD_TIMEOUT } from '../index';
 

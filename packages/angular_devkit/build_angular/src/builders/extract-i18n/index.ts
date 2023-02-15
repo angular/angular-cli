@@ -13,6 +13,7 @@ import { BuildResult, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
+import { lastValueFrom } from 'rxjs';
 import webpack, { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { createI18nOptions } from '../../utils/i18n-options';
@@ -242,14 +243,12 @@ export async function execute(
   const localizeToolsModule = await loadEsmModule<typeof import('@angular/localize/tools')>(
     '@angular/localize/tools',
   );
-  const webpackResult = await runWebpack(
-    (await transforms?.webpackConfiguration?.(config)) || config,
-    context,
-    {
+  const webpackResult = await lastValueFrom(
+    runWebpack((await transforms?.webpackConfiguration?.(config)) || config, context, {
       logging: createWebpackLoggingCallback(builderOptions, context.logger),
       webpackFactory: webpack,
-    },
-  ).toPromise();
+    }),
+  );
 
   // Set the outputPath to the extraction output location for downstream consumers
   webpackResult.outputPath = outFile;

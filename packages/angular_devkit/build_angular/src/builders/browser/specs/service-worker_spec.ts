@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { debounceTime, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder service worker', () => {

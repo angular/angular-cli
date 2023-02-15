@@ -41,9 +41,6 @@
     "symbol-observable": "4.0.0",
     "yargs": "17.6.2"
   },
-  "devDependencies": {
-    "rxjs": "6.6.7"
-  },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
     "packageGroup": {

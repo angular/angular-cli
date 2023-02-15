@@ -18,8 +18,7 @@ import {
   virtualFs,
 } from '@angular-devkit/core';
 import { ParseError, parse as jsoncParse, printParseErrorCode } from 'jsonc-parser';
-import { EMPTY, Observable } from 'rxjs';
-import { concatMap, map, mergeMap } from 'rxjs/operators';
+import { EMPTY, Observable, concatMap, map, mergeMap } from 'rxjs';
 import { TextDecoder } from 'util';
 import {
   ContentHasMutatedException,

@@ -8,7 +8,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { logging } from '@angular-devkit/core';
-import { of as observableOf } from 'rxjs';
+import { lastValueFrom, of as observableOf } from 'rxjs';
 import { chain } from '../rules/base';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch, empty } from '../tree/static';
@@ -30,11 +30,11 @@ const context = {
   logger: new logging.NullLogger(),
   strategy: MergeStrategy.Default,
 };
-const engine: Engine<CollectionT, SchematicT> = ({
+const engine: Engine<CollectionT, SchematicT> = {
   createContext: (schematic: Schematic<{}, {}>) => ({ engine, schematic, ...context }),
   transformOptions: (_: {}, options: {}) => observableOf(options),
   defaultMergeStrategy: MergeStrategy.Default,
-} as {}) as Engine<CollectionT, SchematicT>;
+} as {} as Engine<CollectionT, SchematicT>;
 const collection = {
   name: 'collection',
   description: 'description',
@@ -64,9 +64,7 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    schematic
-      .call({}, observableOf(empty()))
-      .toPromise()
+    lastValueFrom(schematic.call({}, observableOf(empty())))
       .then((x) => {
         expect(files(inner!)).toEqual([]);
         expect(files(x)).toEqual(['/a/b/c']);
@@ -89,9 +87,7 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    schematic
-      .call({}, observableOf(empty()))
-      .toPromise()
+    lastValueFrom(schematic.call({}, observableOf(empty())))
       .then((x) => {
         expect(files(inner!)).toEqual([]);
         expect(files(x)).toEqual([]);
@@ -141,9 +137,7 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    schematic
-      .call({}, observableOf(empty()))
-      .toPromise()
+    lastValueFrom(schematic.call({}, observableOf(empty())))
       .then((_x) => {
         expect(chainCount).toBe(1);
         expect(oneCount).toBe(1);
@@ -165,9 +159,7 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    schematic
-      .call({}, observableOf(empty()), {}, { scope: 'base' })
-      .toPromise()
+    lastValueFrom(schematic.call({}, observableOf(empty()), {}, { scope: 'base' }))
       .then((x) => {
         expect(files(x)).toEqual(['/base/a/b/c']);
       })

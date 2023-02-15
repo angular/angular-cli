@@ -10,7 +10,7 @@ import { BaseException, JsonObject, normalize, virtualFs } from '@angular-devkit
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, statSync } from 'fs';
 import { dirname, isAbsolute, join, resolve } from 'path';
-import { Observable, isObservable, from as observableFrom, throwError } from 'rxjs';
+import { Observable, isObservable, lastValueFrom, from as observableFrom, throwError } from 'rxjs';
 import { Url } from 'url';
 import {
   HostCreateTree,
@@ -307,7 +307,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
       for (const transformer of this._transforms) {
         const transformerResult = transformer(schematic, transformedOptions, context);
         transformedOptions = await (isObservable(transformerResult)
-          ? transformerResult.toPromise()
+          ? lastValueFrom(transformerResult)
           : transformerResult);
       }
 

@@ -7,8 +7,7 @@
  */
 
 import { JsonValue } from '@angular-devkit/core';
-import { Observable, from } from 'rxjs';
-import { concatMap, first } from 'rxjs/operators';
+import { Observable, concatMap, first, from } from 'rxjs';
 import { JobHandler, JobName, Registry } from './api';
 
 /**

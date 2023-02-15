@@ -142,7 +142,6 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/testing",
         "@npm//@types/semver",
-        "@npm//rxjs",
     ],
 )
 

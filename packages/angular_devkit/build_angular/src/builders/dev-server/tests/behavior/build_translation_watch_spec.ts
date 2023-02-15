@@ -8,7 +8,7 @@
 
 /* eslint-disable max-len */
 import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
-import { concatMap, count, take, timeout } from 'rxjs/operators';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { URL } from 'url';
 import { serveWebpackBrowser } from '../../index';
 import {

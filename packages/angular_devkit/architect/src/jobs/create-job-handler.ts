@@ -7,8 +7,17 @@
  */
 
 import { BaseException, JsonValue, isPromise, logging } from '@angular-devkit/core';
-import { Observable, Observer, Subject, Subscription, from, isObservable, of } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import {
+  Observable,
+  Observer,
+  Subject,
+  Subscription,
+  from,
+  isObservable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import {
   JobDescription,
   JobHandler,

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable, of as observableOf, throwError } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, mergeMap, of as observableOf, throwError } from 'rxjs';
 import { Url } from 'url';
 import {
   CollectionDescription,

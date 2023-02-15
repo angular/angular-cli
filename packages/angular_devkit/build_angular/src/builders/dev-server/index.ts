@@ -14,8 +14,7 @@ import {
 } from '@angular-devkit/build-webpack';
 import { json, tags } from '@angular-devkit/core';
 import * as path from 'path';
-import { Observable, from } from 'rxjs';
-import { concatMap, switchMap } from 'rxjs/operators';
+import { Observable, concatMap, from, switchMap } from 'rxjs';
 import * as url from 'url';
 import webpack from 'webpack';
 import webpackDevServer from 'webpack-dev-server';

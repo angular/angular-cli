@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, catchError, of } from 'rxjs';
 import { Path, PathFragment } from '../path';
 import { FileBuffer, HostCapabilities, ReadonlyHost, Stats } from './interface';
 

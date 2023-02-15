@@ -35,7 +35,7 @@ let logger = null;
 try {
   logger = new (require('@angular-devkit/core').logging.IndentLogger)('root');
   const colors = require('ansi-colors').create();
-  const filter = require('rxjs/operators').filter;
+  const filter = require('rxjs').filter;
 
   logger
     .pipe(filter(entry => (entry.level !== 'debug' || args.verbose)))

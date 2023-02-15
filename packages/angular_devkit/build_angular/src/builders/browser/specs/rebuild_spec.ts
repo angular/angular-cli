@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
-import { debounceTime, take, takeWhile, tap, timeout } from 'rxjs/operators';
+import { debounceTime, take, takeWhile, tap, timeout } from 'rxjs';
 import {
   createArchitect,
   host,

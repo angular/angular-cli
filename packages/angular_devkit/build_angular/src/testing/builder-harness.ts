@@ -25,8 +25,19 @@ import { getSystemPath, json, logging } from '@angular-devkit/core';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { Observable, Subject, from as observableFrom, of as observableOf } from 'rxjs';
-import { catchError, finalize, first, map, mergeMap, shareReplay } from 'rxjs/operators';
+import {
+  Observable,
+  Subject,
+  catchError,
+  finalize,
+  firstValueFrom,
+  lastValueFrom,
+  map,
+  mergeMap,
+  from as observableFrom,
+  of as observableOf,
+  shareReplay,
+} from 'rxjs';
 import { BuilderWatcherFactory, WatcherNotifier } from './file-watching';
 
 export interface BuilderHarnessExecutionResult<T extends BuilderOutput = BuilderOutput> {
@@ -281,7 +292,7 @@ export class BuilderHarness<T> {
     options?: Partial<BuilderHarnessExecutionOptions>,
   ): Promise<BuilderHarnessExecutionResult> {
     // Return the first result
-    return this.execute(options).pipe(first()).toPromise();
+    return firstValueFrom(this.execute(options));
   }
 
   async appendToFile(path: string, content: string): Promise<void> {
@@ -451,7 +462,10 @@ class HarnessBuilderContext implements BuilderContext {
       },
       output: output.pipe(shareReplay()),
       get result() {
-        return this.output.pipe(first()).toPromise();
+        return firstValueFrom(this.output);
+      },
+      get lastOutput() {
+        return lastValueFrom(this.output);
       },
     };
 

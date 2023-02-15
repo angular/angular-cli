@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable } from 'rxjs';
-import { toArray } from 'rxjs/operators';
+import { Observable, toArray } from 'rxjs';
 import { defaultStatsCapture } from './default-stats-capture';
 import { AggregatedProcessStats } from './interfaces';
 

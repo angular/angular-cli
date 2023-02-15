@@ -7,7 +7,7 @@
  */
 
 import fetch, { RequestInit, Response } from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
-import { mergeMap, take, timeout } from 'rxjs/operators';
+import { lastValueFrom, mergeMap, take, timeout } from 'rxjs';
 import { URL } from 'url';
 import {
   BuilderHarness,
@@ -20,9 +20,8 @@ export async function executeOnceAndFetch<T>(
   url: string,
   options?: Partial<BuilderHarnessExecutionOptions> & { request?: RequestInit },
 ): Promise<BuilderHarnessExecutionResult & { response?: Response }> {
-  return harness
-    .execute()
-    .pipe(
+  return lastValueFrom(
+    harness.execute().pipe(
       timeout(30000),
       mergeMap(async (executionResult) => {
         let response = undefined;
@@ -36,6 +35,6 @@ export async function executeOnceAndFetch<T>(
         return { ...executionResult, response };
       }),
       take(1),
-    )
-    .toPromise();
+    ),
+  );
 }

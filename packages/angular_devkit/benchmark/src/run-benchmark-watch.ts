@@ -8,11 +8,14 @@
 
 import { BaseException, logging } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
-import { Observable, combineLatest, forkJoin, of, throwError } from 'rxjs';
 import {
+  Observable,
+  combineLatest,
   concatMap,
   filter,
   first,
+  forkJoin,
+  of,
   reduce,
   repeat,
   retryWhen,
@@ -20,9 +23,10 @@ import {
   take,
   takeUntil,
   tap,
+  throwError,
   throwIfEmpty,
   timeout,
-} from 'rxjs/operators';
+} from 'rxjs';
 import { Command } from './command';
 import { MetricGroup } from './interfaces';
 import { LocalMonitoredProcess } from './monitored-process';

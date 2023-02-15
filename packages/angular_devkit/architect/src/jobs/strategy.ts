@@ -7,8 +7,17 @@
  */
 
 import { JsonObject, JsonValue, isJsonObject } from '@angular-devkit/core';
-import { Observable, Subject, concat, of } from 'rxjs';
-import { finalize, ignoreElements, share, shareReplay, tap } from 'rxjs/operators';
+import {
+  Observable,
+  Subject,
+  concat,
+  finalize,
+  ignoreElements,
+  of,
+  share,
+  shareReplay,
+  tap,
+} from 'rxjs';
 import {
   JobDescription,
   JobHandler,

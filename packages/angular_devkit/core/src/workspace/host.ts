@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { lastValueFrom } from 'rxjs';
 import { normalize, virtualFs } from '../virtual-fs';
 
 export interface WorkspaceHost {
@@ -22,16 +23,16 @@ export interface WorkspaceHost {
 export function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost {
   const workspaceHost: WorkspaceHost = {
     async readFile(path: string): Promise<string> {
-      const data = await host.read(normalize(path)).toPromise();
+      const data = await lastValueFrom(host.read(normalize(path)));
 
       return virtualFs.fileBufferToString(data);
     },
     async writeFile(path: string, data: string): Promise<void> {
-      return host.write(normalize(path), virtualFs.stringToFileBuffer(data)).toPromise();
+      return lastValueFrom(host.write(normalize(path), virtualFs.stringToFileBuffer(data)));
     },
     async isDirectory(path: string): Promise<boolean> {
       try {
-        return await host.isDirectory(normalize(path)).toPromise();
+        return await lastValueFrom(host.isDirectory(normalize(path)));
       } catch {
         // some hosts throw if path does not exist
         return false;
@@ -39,7 +40,7 @@ export function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost {
     },
     async isFile(path: string): Promise<boolean> {
       try {
-        return await host.isFile(normalize(path)).toPromise();
+        return await lastValueFrom(host.isFile(normalize(path)));
       } catch {
         // some hosts throw if path does not exist
         return false;

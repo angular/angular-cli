@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { TimeoutError } from 'rxjs';
-import { concatMap, count, take, timeout } from 'rxjs/operators';
+import { TimeoutError, concatMap, count, take, timeout } from 'rxjs';
 import { serveWebpackBrowser } from '../../index';
 import {
   BASE_OPTIONS,

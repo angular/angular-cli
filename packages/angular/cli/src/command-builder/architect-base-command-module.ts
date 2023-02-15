@@ -85,8 +85,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     }
 
     try {
-      const { error, success } = await run.output.toPromise();
-
+      const { error, success } = await run.lastOutput;
       if (error) {
         logger.error(error);
       }

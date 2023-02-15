@@ -7,8 +7,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { EMPTY, Observable, of, timer } from 'rxjs';
-import { map, take, toArray } from 'rxjs/operators';
+import { EMPTY, Observable, lastValueFrom, map, of, take, timer, toArray } from 'rxjs';
 import { promisify } from 'util';
 import { JobHandlerContext, JobOutboundMessage, JobOutboundMessageKind, JobState } from './api';
 import { createJobHandler } from './create-job-handler';
@@ -511,7 +510,9 @@ describe('SimpleScheduler', () => {
       };
 
       registry.register('job', Object.assign(fn, { jobDescription: {} }));
-      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(toArray()).toPromise();
+      const allOutput = await lastValueFrom(
+        scheduler.schedule('job', 0).outboundBus.pipe(toArray()),
+      );
 
       expect(allOutput.map((x) => ({ ...x, description: null }))).toEqual([
         { kind: JobOutboundMessageKind.OnReady, description: null },
@@ -524,7 +525,9 @@ describe('SimpleScheduler', () => {
       const fn = () => EMPTY;
 
       registry.register('job', Object.assign(fn, { jobDescription: {} }));
-      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(toArray()).toPromise();
+      const allOutput = await lastValueFrom(
+        scheduler.schedule('job', 0).outboundBus.pipe(toArray()),
+      );
 
       expect(allOutput.map((x) => ({ ...x, description: null }))).toEqual([
         { kind: JobOutboundMessageKind.OnReady, description: null },
@@ -542,7 +545,9 @@ describe('SimpleScheduler', () => {
       };
 
       registry.register('job', Object.assign(fn, { jobDescription: {} }));
-      const allOutput = await scheduler.schedule('job', 0).outboundBus.pipe(toArray()).toPromise();
+      const allOutput = await lastValueFrom(
+        scheduler.schedule('job', 0).outboundBus.pipe(toArray()),
+      );
 
       expect(allOutput.map((x) => ({ ...x, description: null }))).toEqual([
         { kind: JobOutboundMessageKind.OnReady, description: null },

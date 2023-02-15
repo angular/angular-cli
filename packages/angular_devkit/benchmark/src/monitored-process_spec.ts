@@ -7,7 +7,7 @@
  */
 
 import { dirname } from 'path';
-import { toArray } from 'rxjs/operators';
+import { toArray } from 'rxjs';
 import { Command } from './command';
 import { LocalMonitoredProcess } from './monitored-process';
 

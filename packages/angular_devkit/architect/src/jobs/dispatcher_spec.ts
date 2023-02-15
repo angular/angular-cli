@@ -7,6 +7,7 @@
  */
 
 import { JsonValue } from '@angular-devkit/core';
+import { lastValueFrom } from 'rxjs';
 import { JobHandler } from './api';
 import { createJobHandler } from './create-job-handler';
 import { createDispatcher } from './dispatcher';
@@ -36,6 +37,6 @@ describe('createDispatcher', () => {
 
     dispatcher.setDefaultJob(add0 as JobHandler<JsonValue, JsonValue, number>);
     const sum = scheduler.schedule('add', [1, 2, 3, 4]);
-    expect(await sum.output.toPromise()).toBe(10);
+    expect(await lastValueFrom(sum.output)).toBe(10);
   });
 });
