@@ -9565,10 +9565,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@22.0.0:
-  version "22.0.0"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-22.0.0.tgz#12931778a8812086e693f6c4c9ebbb8c67956773"
-  integrity sha512-fDhIJiHcmxP018QYqX/zlSPd9wBia12DaY7DkaNoPRXTK6P6L7wvQ7fVAoXwExG3g9IM/alP+/NN6p3mzY/4RA==
+quicktype-core@23.0.0:
+  version "23.0.0"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.0.tgz#52fa4742b056aedc5af66d07da868669095d15e5"
+  integrity sha512-+Y6X5FJps6/PNyrS6kggA/OySuCroCiXA2OzGTCDD3f5iwi4Lq2Yo7Jm464iT1BFm0Pj6AZhFl8lCcC5nMxpDQ==
   dependencies:
     "@glideapps/ts-necessities" "2.1.2"
     "@types/urijs" "^1.19.19"
