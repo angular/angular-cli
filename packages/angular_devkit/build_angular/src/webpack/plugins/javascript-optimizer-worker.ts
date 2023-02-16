@@ -227,7 +227,7 @@ async function optimizeWithTerser(
     },
   );
 
-  if (!result.code) {
+  if (typeof result.code !== 'string') {
     throw new Error('Terser failed for unknown reason.');
   }
 
