@@ -74,7 +74,8 @@ let forceExit = false;
     }
 
     // Ensure older versions of the CLI fully exit
-    if (major(localVersion) < 14) {
+    const localMajorVersion = major(localVersion);
+    if (localMajorVersion > 0 && localMajorVersion < 14) {
       forceExit = true;
 
       // Versions prior to 14 didn't implement completion command.
@@ -85,7 +86,7 @@ let forceExit = false;
 
     let isGlobalGreater = false;
     try {
-      isGlobalGreater = !!localVersion && globalVersion.compare(localVersion) > 0;
+      isGlobalGreater = localVersion > 0 && globalVersion.compare(localVersion) > 0;
     } catch (error) {
       // eslint-disable-next-line  no-console
       console.error('Version mismatch check skipped. Unable to compare local version: ' + error);
