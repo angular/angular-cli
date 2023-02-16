@@ -36,7 +36,7 @@ def ts_library(
     if not devmode_module:
         devmode_module = "commonjs"
     if not devmode_target:
-        devmode_target = "es2018"
+        devmode_target = "es2020"
 
     _ts_library(
         name = name,
@@ -46,6 +46,7 @@ def ts_library(
         tsconfig = tsconfig,
         devmode_module = devmode_module,
         devmode_target = devmode_target,
+        prodmode_target = "es2020",
         # @external_end
         **kwargs
     )

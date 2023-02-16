@@ -61,6 +61,12 @@ nodejs_register_toolchains(
     node_version = "18.10.0",
 )
 
+# Set the default nodejs toolchain to the latest supported major version
+nodejs_register_toolchains(
+    name = "nodejs",
+    node_version = "18.10.0",
+)
+
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
 yarn_install(

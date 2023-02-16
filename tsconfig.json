@@ -11,7 +11,7 @@
     "outDir": "./dist",
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2019",
+    "target": "es2020",
     "lib": ["es2020"],
     "rootDir": ".",
     "rootDirs": [".", "./dist-schema/"],
