@@ -22,6 +22,10 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": ["quicktype-core"],
+      "schedule": ["schedule:monthly"]
+    },
+    {
       "groupName": "angular",
       "matchPackagePatterns": ["^@angular/.*", "angular/dev-infra"]
     },
