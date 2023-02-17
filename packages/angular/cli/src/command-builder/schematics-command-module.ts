@@ -261,11 +261,9 @@ export abstract class SchematicsCommandModule
         return undefined;
       }
 
-      const { schematicCollections, defaultCollection } = configSection;
+      const { schematicCollections } = configSection;
       if (Array.isArray(schematicCollections)) {
         return new Set(schematicCollections.map((c) => resolveRelativeCollection(c)));
-      } else if (typeof defaultCollection === 'string') {
-        return new Set([resolveRelativeCollection(defaultCollection)]);
       }
 
       return undefined;

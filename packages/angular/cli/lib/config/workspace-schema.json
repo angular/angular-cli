@@ -36,11 +36,6 @@
     "cliOptions": {
       "type": "object",
       "properties": {
-        "defaultCollection": {
-          "description": "The default schematics collection to use.",
-          "type": "string",
-          "x-deprecated": "Use 'schematicCollections' instead."
-        },
         "schematicCollections": {
           "type": "array",
           "description": "The list of schematic collections to use.",
@@ -95,11 +90,6 @@
     "cliGlobalOptions": {
       "type": "object",
       "properties": {
-        "defaultCollection": {
-          "description": "The default schematics collection to use.",
-          "type": "string",
-          "x-deprecated": "Use 'schematicCollections' instead."
-        },
         "schematicCollections": {
           "type": "array",
           "description": "The list of schematic collections to use.",
@@ -199,11 +189,6 @@
       "type": "object",
       "properties": {
         "cli": {
-          "defaultCollection": {
-            "description": "The default schematics collection to use.",
-            "type": "string",
-            "x-deprecated": "Use 'schematicCollections' instead."
-          },
           "schematicCollections": {
             "type": "array",
             "description": "The list of schematic collections to use.",

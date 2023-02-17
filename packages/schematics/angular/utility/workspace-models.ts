@@ -138,7 +138,6 @@ export type E2EBuilderTarget = BuilderTarget<Builders.Protractor, E2EOptions>;
 interface WorkspaceCLISchema {
   warnings?: Record<string, boolean>;
   schematicCollections?: string[];
-  defaultCollection?: string;
 }
 export interface WorkspaceSchema {
   version: 1;
