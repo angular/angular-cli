@@ -1,5 +1,9 @@
 {
   "schematics": {
-
+    "remove-default-project-option": {
+      "version": "16.0.0",
+      "factory": "./update-16/remove-default-project-option",
+      "description": "Remove 'defaultProject' option from workspace configuration. The project to use will be determined from the current working directory."
+    }
   }
 }

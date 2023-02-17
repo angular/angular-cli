@@ -142,7 +142,6 @@ interface WorkspaceCLISchema {
 }
 export interface WorkspaceSchema {
   version: 1;
-  defaultProject?: string;
   cli?: WorkspaceCLISchema;
   projects: {
     [key: string]: WorkspaceProject<ProjectType.Application | ProjectType.Library>;

@@ -20,11 +20,6 @@
       "type": "string",
       "description": "Path where new projects will be created."
     },
-    "defaultProject": {
-      "type": "string",
-      "description": "Default project name used in commands.",
-      "x-deprecated": "The project to use will be determined from the current working directory."
-    },
     "projects": {
       "type": "object",
       "patternProperties": {
