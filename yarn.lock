@@ -1304,15 +1304,24 @@
     source-map-support "0.5.9"
     tsutils "3.21.0"
 
+"@bazel/concatjs@5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@bazel/concatjs/-/concatjs-5.8.1.tgz#dd20882429e382cae79c08cbd3238dfc680d2d67"
+  integrity sha512-TkARsNUxgi3bjFeGwIGlffmQglNhuR9qK9uE7uKhdBZvQE5caAWVCjYiMTzo3viKDhwKn5QNRcHY5huuJMVFfA==
+  dependencies:
+    protobufjs "6.8.8"
+    source-map-support "0.5.9"
+    tsutils "3.21.0"
+
 "@bazel/esbuild@5.7.3":
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/@bazel/esbuild/-/esbuild-5.7.3.tgz#98a82b69bafd9b68dcf9aba340d67727a777bcbc"
   integrity sha512-SzOmPlvI3rzYz73tHNVl3GlvfSo+NFZzuQQeJWhUq3JMHLYjUU14A9nY0WhBKTamD4MatJg9mUJOdOnXvOVtxQ==
 
-"@bazel/jasmine@5.7.3":
-  version "5.7.3"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-5.7.3.tgz#1ff86f5391e4a0509f94befaf6ef0f354b9be7cf"
-  integrity sha512-5U01yBW1vL7hBpkAZt1ZouzszL2QIw8yfkEfnprfnKlYAGqK48hpxmYV7bZy1UV5PCKlLRfwtY0bADY1ah7I1Q==
+"@bazel/jasmine@5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-5.8.1.tgz#c549f10806474ff742f37544733fbfdccf78ba66"
+  integrity sha512-052veW5EbJRH+5hL4l9Sf99bTmdKQ5WXXMF0QiBOZcA3ZHYMAaKfYNO+brutiWoX6FrBloiskLrMzF8OiHBqyw==
   dependencies:
     c8 "~7.5.0"
     jasmine-reporters "~2.5.0"
@@ -9564,10 +9573,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@23.0.0:
-  version "23.0.0"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.0.tgz#52fa4742b056aedc5af66d07da868669095d15e5"
-  integrity sha512-+Y6X5FJps6/PNyrS6kggA/OySuCroCiXA2OzGTCDD3f5iwi4Lq2Yo7Jm464iT1BFm0Pj6AZhFl8lCcC5nMxpDQ==
+quicktype-core@23.0.1:
+  version "23.0.1"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.1.tgz#539f539ceeb7c53a27f1576041c260a1491f5ef5"
+  integrity sha512-ztnb07ZO9QCrzcXXGQ+mYvEcJ6X6Y61prcByiAkn0a5nYTgCGdHqJs2k6E/T+abFkcZdnbsX5kHnUc/wbgbRMA==
   dependencies:
     "@glideapps/ts-necessities" "2.1.2"
     "@types/urijs" "^1.19.19"
@@ -10070,7 +10079,16 @@ sass@1.57.1:
     immutable "^4.0.0"
     source-map-js ">=0.6.2 <2.0.0"
 
-sass@1.58.1, sass@^1.55.0:
+sass@1.58.2:
+  version "1.58.2"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.58.2.tgz#ef3c5098a02dd006f09a2350b114f1ac445e38ce"
+  integrity sha512-2mbyOWOv/lhEXD6nVrQZQ4KT2DlwcODbTskM42EyqBAFUWOhiiYtAXZqjZz1ygzapYf+N+2GwfIH9M5FM4GUMg==
+  dependencies:
+    chokidar ">=3.0.0 <4.0.0"
+    immutable "^4.0.0"
+    source-map-js ">=0.6.2 <2.0.0"
+
+sass@^1.55.0:
   version "1.58.1"
   resolved "https://registry.yarnpkg.com/sass/-/sass-1.58.1.tgz#17ab0390076a50578ed0733f1cc45429e03405f6"
   integrity sha512-bnINi6nPXbP1XNRaranMFEBZWUfdW/AF16Ql5+ypRxfTvCRTTKrLsMIakyDcayUt2t/RZotmL4kgJwNH5xO+bg==
@@ -10813,7 +10831,17 @@ terser@5.16.2:
     commander "^2.20.0"
     source-map-support "~0.5.20"
 
-terser@5.16.3, terser@^5.14.1:
+terser@5.16.4:
+  version "5.16.4"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.4.tgz#51284b440b93242291a98f2a9903c024cfb70e6e"
+  integrity sha512-5yEGuZ3DZradbogeYQ1NaGz7rXVBDWujWlx1PT8efXO6Txn+eWbfKqB2bTDVmFXmePFkoLU6XI8UektMIEA0ug==
+  dependencies:
+    "@jridgewell/source-map" "^0.3.2"
+    acorn "^8.5.0"
+    commander "^2.20.0"
+    source-map-support "~0.5.20"
+
+terser@^5.14.1:
   version "5.16.3"
   resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.3.tgz#3266017a9b682edfe019b8ecddd2abaae7b39c6b"
   integrity sha512-v8wWLaS/xt3nE9dgKEWhNUFP6q4kngO5B8eYFUuebsu7Dw/UNAnpUod6UHo04jSSkv8TzKHjZDSd7EXdDQAl8Q==
@@ -11781,10 +11809,10 @@ yargs@17.1.1:
     y18n "^5.0.5"
     yargs-parser "^20.2.2"
 
-yargs@17.6.2, yargs@^17.0.0, yargs@^17.2.1, yargs@^17.3.1:
-  version "17.6.2"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.6.2.tgz#2e23f2944e976339a1ee00f18c77fedee8332541"
-  integrity sha512-1/9UrdHjDZc0eOU0HxOHoS78C69UD3JRMvzlJ7S79S2nTaWRA/whGCTV8o9e/N/1Va9YIV7Q4sOxD8VV4pCWOw==
+yargs@17.7.0:
+  version "17.7.0"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.7.0.tgz#b21e9af1e0a619a2a9c67b1133219b2975a07985"
+  integrity sha512-dwqOPg5trmrre9+v8SUo2q/hAwyKoVfu8OC1xPHKJGNdxAvPl4sKxL4vBnh3bQz/ZvvGAFeA5H3ou2kcOY8sQQ==
   dependencies:
     cliui "^8.0.1"
     escalade "^3.1.1"
@@ -11823,6 +11851,19 @@ yargs@^16.0.0, yargs@^16.1.1:
     string-width "^4.2.0"
     y18n "^5.0.5"
     yargs-parser "^20.2.2"
+
+yargs@^17.0.0, yargs@^17.2.1, yargs@^17.3.1:
+  version "17.6.2"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.6.2.tgz#2e23f2944e976339a1ee00f18c77fedee8332541"
+  integrity sha512-1/9UrdHjDZc0eOU0HxOHoS78C69UD3JRMvzlJ7S79S2nTaWRA/whGCTV8o9e/N/1Va9YIV7Q4sOxD8VV4pCWOw==
+  dependencies:
+    cliui "^8.0.1"
+    escalade "^3.1.1"
+    get-caller-file "^2.0.5"
+    require-directory "^2.1.1"
+    string-width "^4.2.3"
+    y18n "^5.0.5"
+    yargs-parser "^21.1.1"
 
 yauzl@^2.10.0:
   version "2.10.0"
