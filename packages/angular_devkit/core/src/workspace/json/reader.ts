@@ -20,12 +20,7 @@ import { WorkspaceHost } from '../host';
 import { JsonWorkspaceMetadata, JsonWorkspaceSymbol } from './metadata';
 import { createVirtualAstObject } from './utilities';
 
-const ANGULAR_WORKSPACE_EXTENSIONS = Object.freeze([
-  'cli',
-  'defaultProject',
-  'newProjectRoot',
-  'schematics',
-]);
+const ANGULAR_WORKSPACE_EXTENSIONS = Object.freeze(['cli', 'newProjectRoot', 'schematics']);
 const ANGULAR_PROJECT_EXTENSIONS = Object.freeze(['cli', 'schematics', 'projectType', 'i18n']);
 
 interface ParserContext {
