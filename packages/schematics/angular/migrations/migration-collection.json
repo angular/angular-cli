@@ -1,29 +1,5 @@
 {
   "schematics": {
-    "remove-browserslist-config": {
-      "version": "15.0.0",
-      "factory": "./update-15/remove-browserslist-config",
-      "description": "Remove Browserslist configuration files that matches the Angular CLI default configuration."
-    },
-    "remove-platform-server-exports": {
-      "version": "15.0.0",
-      "factory": "./update-15/remove-platform-server-exports",
-      "description": "Remove exported `@angular/platform-server` `renderModule` method. The `renderModule` method is now exported by the Angular CLI."
-    },
-    "update-typescript-target": {
-      "version": "15.0.0",
-      "factory": "./update-15/update-typescript-target",
-      "description": "Update TypeScript compiler `target` and set `useDefineForClassFields`. These changes are for IDE purposes as TypeScript compiler options `target` and `useDefineForClassFields` are set to `ES2022` and `false` respectively by the Angular CLI. To control ECMA version and features use the Browerslist configuration."
-    },
-    "update-workspace-config": {
-      "version": "15.0.0",
-      "factory": "./update-15/update-workspace-config",
-      "description": "Remove options from 'angular.json' that are no longer supported by the official builders."
-    },
-    "update-karma-main-file": {
-      "version": "15.0.0",
-      "factory": "./update-15/update-karma-main-file",
-      "description": "Remove no longer needed require calls in Karma builder main file."
-    }
+
   }
 }
