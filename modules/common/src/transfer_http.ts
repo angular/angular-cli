@@ -17,14 +17,9 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { ApplicationRef, Injectable, NgModule } from '@angular/core';
-import {
-  BrowserTransferStateModule,
-  StateKey,
-  TransferState,
-  makeStateKey,
-} from '@angular/platform-browser';
+import { StateKey, TransferState, makeStateKey } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
-import { filter, take, tap } from 'rxjs/operators';
+import { defaultIfEmpty, first, tap } from 'rxjs/operators';
 
 type ResponseType = HttpRequest<unknown>['responseType'];
 
@@ -53,12 +48,6 @@ function getHeadersMap(headers: HttpHeaders): Record<string, string[]> {
 export class TransferHttpCacheInterceptor implements HttpInterceptor {
   private isCacheActive = true;
 
-  private invalidateCacheEntry(url: string) {
-    Object.keys(this.transferState['store']).forEach((key) =>
-      key.includes(url) ? this.transferState.remove(makeStateKey(key)) : null,
-    );
-  }
-
   private makeCacheKey(
     method: string,
     url: string,
@@ -82,8 +71,8 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     // complete.
     appRef.isStable
       .pipe(
-        filter((isStable: boolean) => isStable),
-        take(1),
+        first((isStable) => isStable),
+        defaultIfEmpty(false),
       )
       .subscribe(() => {
         this.isCacheActive = false;
@@ -91,14 +80,9 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Stop using the cache if there is a mutating call.
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-      this.isCacheActive = false;
-      this.invalidateCacheEntry(req.url);
-    }
-
-    if (!this.isCacheActive) {
-      // Cache is no longer active. Pass the request through.
+    if (!this.isCacheActive || (req.method !== 'GET' && req.method !== 'HEAD')) {
+      // Cache is no longer active or method is not HEAD or GET.
+      // Pass the request through.
       return next.handle(req);
     }
 
@@ -154,8 +138,9 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
  * calls from the server to the client application.
  */
 @NgModule({
-  imports: [BrowserTransferStateModule],
   providers: [
+    ApplicationRef,
+    TransferState,
     TransferHttpCacheInterceptor,
     { provide: HTTP_INTERCEPTORS, useExisting: TransferHttpCacheInterceptor, multi: true },
   ],
