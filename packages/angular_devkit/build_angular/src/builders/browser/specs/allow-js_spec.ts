@@ -39,7 +39,7 @@ describe('Browser Builder allow js', () => {
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(join(normalize(output.outputPath), 'main.js'))),
+      await lastValueFrom(host.read(join(normalize(output.outputs[0].path), 'main.js'))),
     );
 
     expect(content).toContain('const a = 2');
@@ -66,7 +66,7 @@ describe('Browser Builder allow js', () => {
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(join(normalize(output.outputPath), 'main.js'))),
+      await lastValueFrom(host.read(join(normalize(output.outputs[0].path), 'main.js'))),
     );
 
     expect(content).toContain('const a = 2');
@@ -94,7 +94,7 @@ describe('Browser Builder allow js', () => {
     await lastValueFrom(
       (run.output as Observable<BrowserBuilderOutput>).pipe(
         tap((output) => {
-          const path = relative(host.root(), join(normalize(output.outputPath), 'main.js'));
+          const path = relative(host.root(), join(normalize(output.outputs[0].path), 'main.js'));
           const content = virtualFs.fileBufferToString(host.scopedSync().read(path));
 
           switch (buildCount) {
