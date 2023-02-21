@@ -35,7 +35,7 @@ describe('Browser Builder crossOrigin', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );
@@ -55,7 +55,7 @@ describe('Browser Builder crossOrigin', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );
@@ -76,7 +76,7 @@ describe('Browser Builder crossOrigin', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );
@@ -103,7 +103,7 @@ describe('Browser Builder crossOrigin', () => {
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
 
-    const fileName = join(normalize(output.outputPath), 'runtime.js');
+    const fileName = join(normalize(output.outputs[0].path), 'runtime.js');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );

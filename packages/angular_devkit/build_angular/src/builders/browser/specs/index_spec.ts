@@ -33,7 +33,7 @@ describe('Browser Builder index HTML processing', () => {
     const run = await architect.scheduleTarget(targetSpec);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );
@@ -58,7 +58,7 @@ describe('Browser Builder index HTML processing', () => {
     const run = await architect.scheduleTarget(targetSpec);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );
@@ -83,7 +83,7 @@ describe('Browser Builder index HTML processing', () => {
     const run = await architect.scheduleTarget(targetSpec);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );
@@ -107,7 +107,7 @@ describe('Browser Builder index HTML processing', () => {
     const run = await architect.scheduleTarget(targetSpec);
     const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-    const fileName = join(normalize(output.outputPath), 'index.html');
+    const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
       await lastValueFrom(host.read(normalize(fileName))),
     );

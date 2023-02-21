@@ -44,7 +44,9 @@ describe('Browser Builder build optimizer', () => {
 
     expect(output.success).toBe(true);
 
-    const noBoStats = await lastValueFrom(host.stat(join(normalize(output.outputPath), 'main.js')));
+    const noBoStats = await lastValueFrom(
+      host.stat(join(normalize(output.outputs[0].path), 'main.js')),
+    );
     if (!noBoStats) {
       throw new Error('Main file has no stats');
     }
@@ -56,7 +58,7 @@ describe('Browser Builder build optimizer', () => {
     expect(boOutput.success).toBe(true);
 
     const boStats = await await lastValueFrom(
-      host.stat(join(normalize(output.outputPath), 'main.js')),
+      host.stat(join(normalize(output.outputs[0].path), 'main.js')),
     );
     if (!boStats) {
       throw new Error('Main file has no stats');

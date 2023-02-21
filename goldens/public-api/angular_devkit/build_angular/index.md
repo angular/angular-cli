@@ -75,8 +75,6 @@ export interface BrowserBuilderOptions {
 export type BrowserBuilderOutput = BuilderOutput & {
     stats: BuildEventStats;
     baseOutputPath: string;
-    outputPaths: string[];
-    outputPath: string;
     outputs: {
         locale?: string;
         path: string;
@@ -279,7 +277,6 @@ export interface ServerBuilderOptions {
 // @public
 export type ServerBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
-    outputPaths: string[];
     outputPath: string;
     outputs: {
         locale?: string;

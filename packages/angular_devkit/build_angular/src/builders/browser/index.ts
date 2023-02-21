@@ -65,17 +65,7 @@ import { Schema as BrowserBuilderSchema } from './schema';
  */
 export type BrowserBuilderOutput = BuilderOutput & {
   stats: BuildEventStats;
-
   baseOutputPath: string;
-  /**
-   * @deprecated in version 14. Use 'outputs' instead.
-   */
-  outputPaths: string[];
-  /**
-   * @deprecated in version 9. Use 'outputs' instead.
-   */
-  outputPath: string;
-
   outputs: {
     locale?: string;
     path: string;
@@ -413,8 +403,6 @@ export function buildWebpackBrowser(
                 ...event,
                 stats: generateBuildEventStats(webpackStats, options),
                 baseOutputPath,
-                outputPath: baseOutputPath,
-                outputPaths: (outputPaths && Array.from(outputPaths.values())) || [baseOutputPath],
                 outputs: (outputPaths &&
                   [...outputPaths.entries()].map(([locale, path]) => ({
                     locale,
