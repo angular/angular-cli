@@ -111,20 +111,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
 
       switch (response.responseType) {
         case 'arraybuffer':
-          {
-            // If we're in Node...
-            if (typeof Buffer !== 'undefined') {
-              const buf = Buffer.from(response.body);
-              body = new ArrayBuffer(buf.length);
-              const view = new Uint8Array(body);
-              for (let i = 0; i < buf.length; ++i) {
-                view[i] = buf[i];
-              }
-            } else if (typeof TextEncoder !== 'undefined') {
-              // Modern browsers implement TextEncode.
-              body = new TextEncoder().encode(response.body).buffer;
-            }
-          }
+          body = new TextEncoder().encode(response.body).buffer;
           break;
         case 'blob':
           body = new Blob([response.body]);
