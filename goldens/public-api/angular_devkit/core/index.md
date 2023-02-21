@@ -59,11 +59,6 @@ export class CircularDependencyFoundException extends BaseException {
 // @public
 function classify(str: string): string;
 
-// @public @deprecated (undocumented)
-export class ContentHasMutatedException extends BaseException {
-    constructor(path: string);
-}
-
 // @public
 class CordHost extends SimpleMemoryHost {
     constructor(_back: ReadonlyHost);
@@ -326,11 +321,6 @@ export class InvalidPathException extends BaseException {
     constructor(path: string);
 }
 
-// @public @deprecated (undocumented)
-export class InvalidUpdateRecordException extends BaseException {
-    constructor();
-}
-
 // @public
 export function isAbsolute(p: Path): boolean;
 
@@ -534,11 +524,6 @@ export { logging }
 
 // @public (undocumented)
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
-
-// @public @deprecated (undocumented)
-export class MergeConflictException extends BaseException {
-    constructor(path: string);
-}
 
 // @public
 function mergeSchemas(...schemas: (JsonSchema | undefined)[]): JsonSchema;
@@ -1320,19 +1305,9 @@ function trimNewlines(strings: TemplateStringsArray, ...values: any[]): string;
 // @public
 function underscore(str: string): string;
 
-// @public @deprecated (undocumented)
-export class UnimplementedException extends BaseException {
-    constructor();
-}
-
 // @public (undocumented)
 export class UnknownException extends BaseException {
     constructor(message: string);
-}
-
-// @public @deprecated (undocumented)
-export class UnsupportedPlatformException extends BaseException {
-    constructor();
 }
 
 // @public (undocumented)
