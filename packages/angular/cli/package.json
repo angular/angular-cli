@@ -35,11 +35,11 @@
     "npm-pick-manifest": "8.0.1",
     "open": "8.4.2",
     "ora": "5.4.1",
-    "pacote": "15.1.0",
+    "pacote": "15.1.1",
     "resolve": "1.22.1",
     "semver": "7.3.8",
     "symbol-observable": "4.0.0",
-    "yargs": "17.7.0"
+    "yargs": "17.7.1"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
