@@ -59,6 +59,7 @@ export function execute(
     serviceWorker: false,
     watch: true,
     progress: options.progress,
+    verbose: options.verbose,
     // Disable bundle budgets are these are not meant to be used with a dev-server as this will add extra JavaScript for live-reloading.
     budgets: [],
   });
@@ -66,6 +67,7 @@ export function execute(
   const serverTargetRun = context.scheduleTarget(serverTarget, {
     watch: true,
     progress: options.progress,
+    verbose: options.verbose,
   });
 
   const bsInstance = browserSync.create();
@@ -239,7 +241,7 @@ async function initBrowserSync(
     server: false,
     notify: false,
     ghostMode: false,
-    logLevel: 'silent',
+    logLevel: options.verbose ? 'debug' : 'silent',
     open,
     https: getSslConfig(context.workspaceRoot, options),
   };

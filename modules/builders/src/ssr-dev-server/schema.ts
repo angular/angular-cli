@@ -45,4 +45,7 @@ export interface Schema {
 
   /** Proxy configuration file */
   proxyConfig?: string;
+
+  /** Adds more details to output logging */
+  verbose: boolean;
 }

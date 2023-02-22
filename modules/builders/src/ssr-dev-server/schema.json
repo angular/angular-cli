@@ -59,6 +59,10 @@
     "proxyConfig": {
       "type": "string",
       "description": "Proxy configuration file."
+    },
+    "verbose": {
+      "type": "boolean",
+      "description": "Adds more details to output logging."
     }
   },
   "additionalProperties": false,
