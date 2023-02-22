@@ -1,3 +1,95 @@
+<a name="16.0.0-next.0"></a>
+
+# 16.0.0-next.0 (2023-02-22)
+
+## Breaking Changes
+
+### @angular/cli
+
+- The deprecated `defaultCollection` workspace option has been removed. Use `schematicCollections` instead.
+
+  Before
+
+  ```json
+  "defaultCollection": "@angular/material"
+  ```
+
+  After
+
+  ```json
+  "schematicCollections": ["@angular/material"]
+  ```
+
+- The deprecated `defaultProject` workspace option has been removed. The project to use will be determined from the current working directory.
+- Node.js v14 support has been removed
+
+  Node.js v14 is planned to be End-of-Life on 2023-04-30. Angular will stop supporting Node.js v14 in Angular v16.
+  Angular v16 will continue to officially support Node.js versions v16 and v18.
+
+### @schematics/angular
+
+- `ng g resolver` and `ng g guard` now generate a functional resolver or guard by default. It is still possible to generate a (deprecated) class-based resolver or guard by using `ng g resolver --no-functional` or `ng g guard --no-functional`.
+- The CLI no longer allows to generate `CanLoad` guards. Use `CanMatch` instead.
+
+### @angular-devkit/core
+
+- Several changes to the `SchemaRegistry`.
+  - `compile` method now returns a `Promise`.
+  - Deprecated `flatten` has been removed without replacement.
+- - `ContentHasMutatedException`, `InvalidUpdateRecordException`, `UnimplementedException` and `MergeConflictException` API from `@angular-devkit/core` have been removed in favor of the API from `@angular-devkit/schematics`.
+  - `UnsupportedPlatformException` - A custom error exception should be created instead.
+
+### @angular-devkit/schematics
+
+- The depracated `UpdateBuffer` has been removed and `UpdateBuffer2`
+  is renamed to `UpdateBuffer`. With this change the related and
+  deprecated symbols `ContentCannotBeRemovedException` and `Chunk`
+  have also been removed.
+
+### @ngtools/webpack
+
+- NGCC integration has been removed and as a result Angular View Engine libraries will no longer work.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [22fdd7da9](https://github.com/angular/angular-cli/commit/22fdd7da97c832048410ca89622712d097490c5d) | feat | generate functional resolvers and guards by default |
+| [5ceedcb11](https://github.com/angular/angular-cli/commit/5ceedcb11e3ca5bdad4248c7c76ca2562fab43f2) | feat | remove deprecated CanLoad option for guards         |
+
+### @angular/cli
+
+| Commit                                                                                              | Type     | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------ |
+| [68024234e](https://github.com/angular/angular-cli/commit/68024234edcb942d5a177d6bd7567e77d7e40245) | feat     | remove deprecated `defaultCollection` from workspace configuration |
+| [d58428d3d](https://github.com/angular/angular-cli/commit/d58428d3dbdb7275e2e4f6d271fcc5fdda5c489e) | feat     | remove deprecated `defaultProject` from workspace configuration    |
+| [c29c8e18d](https://github.com/angular/angular-cli/commit/c29c8e18d84096e2f72af12643c31bde51010548) | refactor | remove Node.js v14 support                                         |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type     | Description                                         |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------- |
+| [f6624b974](https://github.com/angular/angular-cli/commit/f6624b974faf13fa718d304e1a473260c16f0c1d) | feat     | update SchemaRegistry `compile` to return `Promise` |
+| [0ad81cdbc](https://github.com/angular/angular-cli/commit/0ad81cdbc72e80ca75d9d5cc2bc0c6163267a0bb) | refactor | remove deprecated exceptions                        |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type     | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------ |
+| [d2ef386f4](https://github.com/angular/angular-cli/commit/d2ef386f46131af904ca800cc77388c03239cd9d) | refactor | remove `UpdateBuffer` and rename `UpdateBuffer2` to `UpdateBuffer` |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type     | Description             |
+| --------------------------------------------------------------------------------------------------- | -------- | ----------------------- |
+| [c8ac660d8](https://github.com/angular/angular-cli/commit/c8ac660d8b13922be7ebcc92dfd5b18392602c40) | refactor | remove NGCC integration |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Cédric Exbrayat, Doug Parker and Lukas Spirig
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.0"></a>
 
 # 15.2.0 (2023-02-22)
