@@ -1,3 +1,26 @@
+<a name="15.2.0-rc.0"></a>
+
+# 15.2.0-rc.0 (2023-02-23)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                        |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------------------- |
+| [78dc17db](https://github.com/angular/universal/commit/78dc17dbc9a1ae844737c029deaef10c1d77ebba) | feat | add removal notice for Clover APIs                 |
+| [93c8a38d](https://github.com/angular/universal/commit/93c8a38debbc2763d69d4557371750a0e96c1b6a) | fix  | avoid invalidating cache when using a post request |
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                              |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------------------- |
+| [0e7dd9ac](https://github.com/angular/universal/commit/0e7dd9ac2e05c76af3828cacc7631863bff71c6c) | feat | add `--verbose` option to SSR Dev Server |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.1.0"></a>
 
 # 15.1.0 (2023-01-12)
