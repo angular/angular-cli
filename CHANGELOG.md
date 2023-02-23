@@ -1,3 +1,19 @@
+<a name="16.0.0-next.1"></a>
+
+# 16.0.0-next.1 (2023-02-23)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [759ae92aa](https://github.com/angular/angular-cli/commit/759ae92aaa595fe3f6000f3aae0e6bb8d025db3a) | fix  | update peer dependencies to support version 16 |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.0"></a>
 
 # 16.0.0-next.0 (2023-02-22)
