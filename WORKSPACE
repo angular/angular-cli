@@ -89,9 +89,9 @@ yarn_install(
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "f8fa3193009232ca989de21964ea860c8b3279ec73ba6eff456d8bf61fb3ab1f",
-    strip_prefix = "bazel-lib-1.27.0",
-    url = "https://github.com/aspect-build/bazel-lib/archive/v1.27.0.tar.gz",
+    sha256 = "b4cd1114874ab15f794134eefbc254eb89d3e1de640bf4a11f2f402e886ad29e",
+    strip_prefix = "bazel-lib-1.27.2",
+    url = "https://github.com/aspect-build/bazel-lib/archive/v1.27.2.tar.gz",
 )
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_jq_toolchains")
