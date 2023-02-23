@@ -376,9 +376,9 @@ jobs:
           no_output_timeout: 40m
       - fail_fast
       - store_artifacts:
-          path: dist/testlogs/tests/legacy-cli/e2e.npm
+          path: dist/testlogs/tests/legacy-cli/e2e.npm_node16
       - store_test_results:
-          path: dist/testlogs/tests/legacy-cli/e2e.npm
+          path: dist/testlogs/tests/legacy-cli/e2e.npm_node16
 
 workflows:
   version: 2
