@@ -28,8 +28,8 @@
     "@angular-devkit/build-angular": "^15.0.0"
   },
   "dependencies": {
-    "@angular-devkit/architect": "~0.1501.0",
-    "@angular-devkit/core": "~15.1.0",
+    "@angular-devkit/architect": "~0.1502.0",
+    "@angular-devkit/core": "~15.2.0",
     "@nguniversal/common": "0.0.0-PLACEHOLDER",
     "browser-sync": "^2.27.10",
     "express": "^4.18.2",
