@@ -8202,10 +8202,10 @@ minimatch@~3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@~7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.0.0.tgz#20a8df098715e228c918b2bd81f34d9543767a75"
-  integrity sha512-Wog4y1P2q/0sF+0vw+6dWgqVmo/XPJg+2OtVmR6IVvNGDhcfAPjFacjZCUlGCoU/tbzH6EOeSt2P3llRAqRNiA==
+minimatch@~7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.1.0.tgz#8d3b0a361b02b4420c89fb2b8295621429c340ea"
+  integrity sha512-ZRvZsrVXiuB/QDlJx7WPymFyOHQUntQOEH3vFIwCzs/fDnH/siHZQAmI6Zamx1J9u9S66ucgKXU0CnqHfi8Z4g==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -10882,7 +10882,17 @@ terser@5.16.2:
     commander "^2.20.0"
     source-map-support "~0.5.20"
 
-terser@5.16.4, terser@^5.14.1:
+terser@5.16.5:
+  version "5.16.5"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.5.tgz#1c285ca0655f467f92af1bbab46ab72d1cb08e5a"
+  integrity sha512-qcwfg4+RZa3YvlFh0qjifnzBHjKGNbtDo9yivMqMFDy9Q6FSaQWSB/j1xKhsoUFJIqDOM3TsN6D5xbrMrFcHbg==
+  dependencies:
+    "@jridgewell/source-map" "^0.3.2"
+    acorn "^8.5.0"
+    commander "^2.20.0"
+    source-map-support "~0.5.20"
+
+terser@^5.14.1:
   version "5.16.4"
   resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.4.tgz#51284b440b93242291a98f2a9903c024cfb70e6e"
   integrity sha512-5yEGuZ3DZradbogeYQ1NaGz7rXVBDWujWlx1PT8efXO6Txn+eWbfKqB2bTDVmFXmePFkoLU6XI8UektMIEA0ug==
