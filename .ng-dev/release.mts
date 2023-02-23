@@ -1,3 +1,4 @@
+import semver from 'semver';
 import { ReleaseConfig } from '@angular/ng-dev';
 import packages from '../lib/packages.js';
 
@@ -15,6 +16,14 @@ export const release: ReleaseConfig = {
     // files and dependencies unless a build is required.
     const { performNpmReleaseBuild } = await import('../scripts/build-packages-dist.mjs');
     return performNpmReleaseBuild();
+  },
+  prereleaseCheck: async (newVersionStr: string) => {
+    const newVersion = new semver.SemVer(newVersionStr);
+    const { assertValidDependencyRanges } = await import(
+      '../scripts/release-checks/dependency-ranges/index.mjs'
+    );
+
+    await assertValidDependencyRanges(newVersion, packages.releasePackages);
   },
   releaseNotes: {
     groupOrder: [
