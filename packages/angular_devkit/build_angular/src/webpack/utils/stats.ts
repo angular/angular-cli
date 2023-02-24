@@ -412,9 +412,9 @@ export function statsErrorsToString(
       // In most cases webpack will add stack traces to error messages.
       // This below cleans up the error from stacks.
       // See: https://github.com/webpack/webpack/issues/15980
-      const message = statsConfig.errorStack
-        ? error.message
-        : /[\s\S]+?(?=\n+\s+at\s)/.exec(error.message)?.[0] ?? error.message;
+      const index = error.message.search(/[\n\s]+at /);
+      const message =
+        statsConfig.errorStack || index === -1 ? error.message : error.message.substring(0, index);
 
       if (!/^error/i.test(message)) {
         output += r('Error: ');
