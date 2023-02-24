@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { packages } = require('../lib/packages');
 
 module.exports = {
   baseDir: '../',
@@ -22,26 +23,14 @@ module.exports = {
  * Custom module resolver that maps specifiers for local packages folder.
  * This ensures that cross package/entry-point dependencies can be detected.
  */
-const LOCAL_MAPPINGS = [
-  ['@angular-devkit/build-angular', 'angular_devkit/build_angular'],
-  ['@angular-devkit/architect', 'angular_devkit/architect'],
-  ['@angular-devkit/architect-cli', 'angular_devkit/architect_cli'],
-  ['@angular-devkit/benchmark', 'angular_devkit/benchmark'],
-  ['@angular-devkit/build-webpack', 'angular_devkit/build_webpack'],
-  ['@angular-devkit/core', 'angular_devkit/core'],
-  ['@angular-devkit/schematics', 'angular_devkit/schematics'],
-  ['@angular-devkit/schematics-cli', 'angular_devkit/schematics_cli'],
-  ['@angular/cli', 'angular/cli'],
-  ['@schematics/angular', 'schematics/angular'],
-  ['@ngtools/webpack', 'ngtools/webpack'],
-];
+const LOCAL_MAPPINGS = Object.entries(packages).map(([name, pkg]) => [name, pkg.root]);
 
 function resolveModule(specifier) {
   let localSpecifierPath;
 
   for (const [key, value] of LOCAL_MAPPINGS) {
     if (specifier.startsWith(key)) {
-      localSpecifierPath = path.join(__dirname, specifier.replace(key, value));
+      localSpecifierPath = specifier.replace(key, value);
       break;
     }
   }
