@@ -18,6 +18,8 @@ import {
   addRouteDeclarationToModule,
   addSymbolToNgModuleMetadata,
   findNodes,
+  getModuleDeclarationByName,
+  getRouterModuleDeclaration,
   insertAfterLastOccurrence,
 } from './ast-utils';
 
@@ -292,7 +294,74 @@ describe('ast utils', () => {
       expect(output).toMatch(/const arr = \['bar'\];/);
     });
   });
+  describe('getRouterModuleDeclaration', () => {
+    it('should get the RouterModule declaration', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
 
+        const routes = [];
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(routes)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+      const source = getTsSource(modulePath, moduleContent);
+      const routerModuleExpr = getRouterModuleDeclaration(source);
+      expect(routerModuleExpr?.getText().startsWith('RouterModule')).toBeTruthy();
+    });
+  });
+  describe('getModuleDeclarationByName', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      import { AppComponent } from './app.component';
+      import {NgxsModule} from '@ngxs/store';
+
+      const routes = [];
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule,
+          NgxsModule.forRoot([HelloState]),
+          RouterModule.forRoot(routes)
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+    let source: ts.SourceFile;
+
+    beforeEach(() => {
+      source = getTsSource(modulePath, moduleContent);
+    });
+
+    it('should get the RouterModule declaration', () => {
+      const routerModuleDeclaration = getModuleDeclarationByName(source, 'RouterModule');
+      expect(routerModuleDeclaration?.getText().startsWith('RouterModule')).toBeTruthy();
+    });
+    it('should get the NgxsModule declaration', () => {
+      const ngxsModuleDeclaration = getModuleDeclarationByName(source, 'NgxsModule');
+      expect(ngxsModuleDeclaration?.getText().startsWith('NgxsModule')).toBeTruthy();
+    });
+
+    it('should not find nonexistent module declaration', () => {
+      const nonExistentModule = getModuleDeclarationByName(source, 'HelloWorldModule');
+      expect(nonExistentModule).toBeUndefined();
+    });
+  });
   describe('addRouteDeclarationToModule', () => {
     it('should throw an error when there is no router module', () => {
       const moduleContent = `

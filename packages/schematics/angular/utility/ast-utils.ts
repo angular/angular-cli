@@ -554,9 +554,15 @@ export function isImported(
 }
 
 /**
- * Returns the RouterModule declaration from NgModule metadata, if any.
+ * Returns the module declaration from NgModule metadata, by name, if exists.
+ * @param source the source object
+ * @param moduleName name of the module declaration to get
+ * @return module declaration
  */
-export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
+export function getModuleDeclarationByName(
+  source: ts.SourceFile,
+  moduleName: string,
+): ts.Expression | undefined {
   const result = getDecoratorMetadata(source, 'NgModule', '@angular/core');
   const node = result[0];
   if (!node || !ts.isObjectLiteralExpression(node)) {
@@ -578,7 +584,14 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
 
   return arrLiteral.elements
     .filter((el) => el.kind === ts.SyntaxKind.CallExpression)
-    .find((el) => (el as ts.Identifier).getText().startsWith('RouterModule'));
+    .find((el) => (el as ts.Identifier).getText().startsWith(moduleName));
+}
+
+/**
+ * Returns the RouterModule declaration from NgModule metadata, if exists.
+ */
+export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
+  return getModuleDeclarationByName(source, 'RouterModule');
 }
 
 /**
