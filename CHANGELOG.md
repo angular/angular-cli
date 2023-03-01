@@ -1,3 +1,28 @@
+<a name="16.0.0-next.2"></a>
+
+# 16.0.0-next.2 (2023-03-01)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- Deprecated `outputPath` and `outputPaths` from the server and browser builder have been removed from the builder output. Use `outputs` instead.
+
+  Note: this change does not effect application developers.
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------- |
+| [d4c450829](https://github.com/angular/angular-cli/commit/d4c450829dc6d91bf0adc157b3628c00a87f7c5d) | fix      | improve parsing of error messages                               |
+| [a99018cd7](https://github.com/angular/angular-cli/commit/a99018cd7bb66ee53026e06deae6a14455023910) | refactor | remove deprecated `outputPaths` and `outputPath` Builder output |
+
+## Special Thanks
+
+Alan Agius, Doug Parker and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.1"></a>
 
 # 15.2.1 (2023-03-01)
