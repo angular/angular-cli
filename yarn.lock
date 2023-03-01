@@ -8033,10 +8033,10 @@ minimatch@~3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@~7.3.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.3.0.tgz#cfb7337e7460308e7147c58250fa0dee3da7929c"
-  integrity sha512-WaMDuhKa7a6zKiwplR1AOz+zGvJba24k5VU1Cy6NhEguavT2YRlHxuINUgTas4wiS6fwBpYq4TcA1XIECSntyw==
+minimatch@~7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.4.0.tgz#d43ecc64c434fc9622d3fe447db71c7caed8e1a5"
+  integrity sha512-Co6cQqQPyou/311vxtcfit/RKf+MbRN6qa5K3Zfh2Fo9+Pvfg8C1LeaAXcoRfwhxfZIe8sBc/kLXdkR88xJGBg==
   dependencies:
     brace-expansion "^2.0.1"
 
