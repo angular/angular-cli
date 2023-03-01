@@ -1,3 +1,19 @@
+<a name="15.2.1"></a>
+
+# 15.2.1 (2023-03-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [9a5609a44](https://github.com/angular/angular-cli/commit/9a5609a440fc49b3f7ddf88efb73618b7eede1ea) | fix  | improve parsing of error messages |
+
+## Special Thanks
+
+Alan Agius and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.0"></a>
 
 # 15.2.0 (2023-02-22)
