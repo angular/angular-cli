@@ -60,7 +60,7 @@ export function replaceResources(
         return sourceFile;
       }
 
-      const updatedSourceFile = ts.visitNode(sourceFile, visitNode);
+      const updatedSourceFile = ts.visitNode(sourceFile, visitNode) as ts.SourceFile;
       if (resourceImportDeclarations.length) {
         // Add resource imports
         return context.factory.updateSourceFile(
@@ -118,7 +118,7 @@ function visitDecorator(
           inlineStyleFileExtension,
         )
       : node,
-  );
+  ) as ts.NodeArray<ts.ObjectLiteralElementLike>;
 
   // replace properties with updated properties
   if (styleReplacements.length > 0) {
@@ -214,7 +214,7 @@ function visitComponentMetadata(
         }
 
         return createResourceImport(nodeFactory, url, resourceImportDeclarations, moduleKind);
-      });
+      }) as ts.NodeArray<ts.Expression>;
 
       // Styles should be placed first
       if (isInlineStyle) {

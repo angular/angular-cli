@@ -819,7 +819,7 @@ describe('@ngtools/webpack transformers', () => {
             return ts.visitEachChild(node, (child) => visit(child), context);
           };
 
-          return (node) => ts.visitNode(node, visit);
+          return (node) => ts.visitNode(node, visit) as ts.SourceFile;
         };
 
         it('should not elide import when ShorthandPropertyAssignment is transformed to PropertyAssignment', () => {

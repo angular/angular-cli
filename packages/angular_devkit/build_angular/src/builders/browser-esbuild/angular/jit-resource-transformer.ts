@@ -107,7 +107,7 @@ function visitDecorator(
     ts.isObjectLiteralElementLike(node)
       ? visitComponentMetadata(nodeFactory, node, styleReplacements, resourceImportDeclarations)
       : node,
-  );
+  ) as ts.NodeArray<ts.ObjectLiteralElementLike>;
 
   // replace properties with updated properties
   if (styleReplacements.length > 0) {
@@ -185,7 +185,7 @@ function visitComponentMetadata(
           generateJitInlineUri(contents, 'style'),
           resourceImportDeclarations,
         );
-      });
+      }) as ts.NodeArray<ts.Expression>;
 
       // Inline styles should be placed first
       styleReplacements.unshift(...inlineStyles);
@@ -212,7 +212,7 @@ function visitComponentMetadata(
           generateJitFileUri(url, 'style'),
           resourceImportDeclarations,
         );
-      });
+      }) as ts.NodeArray<ts.Expression>;
 
       // External styles are applied after any inline styles
       styleReplacements.push(...externalStyles);
