@@ -25,7 +25,7 @@ export function createTypescriptContext(
     noEmitOnError: useLibs,
     allowJs: true,
     newLine: ts.NewLineKind.LineFeed,
-    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    moduleResolution: ts.ModuleResolutionKind.Node10,
     module: ts.ModuleKind.ES2020,
     target: ts.ScriptTarget.ES2020,
     skipLibCheck: true,

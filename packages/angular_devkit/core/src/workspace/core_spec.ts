@@ -216,7 +216,7 @@ describe('readWorkspace', () => {
       },
     };
 
-    _test_addWorkspaceFile('wrong.format', 99);
+    _test_addWorkspaceFile('wrong.format', 99 as WorkspaceFormat);
     try {
       await readWorkspace(requestedPath, host, WorkspaceFormat.JSON);
     } finally {
