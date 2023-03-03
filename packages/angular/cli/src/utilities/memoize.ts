@@ -13,41 +13,34 @@
  *
  * @see https://en.wikipedia.org/wiki/Memoization
  */
-export function memoize<T>(
-  target: Object,
-  propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>,
-): TypedPropertyDescriptor<T> {
-  const descriptorPropertyName = descriptor.get ? 'get' : 'value';
-  const originalMethod: unknown = descriptor[descriptorPropertyName];
-
-  if (typeof originalMethod !== 'function') {
+export function memoize<This, Args extends unknown[], Return>(
+  target: (this: This, ...args: Args) => Return,
+  context: ClassMemberDecoratorContext,
+) {
+  if (context.kind !== 'method' && context.kind !== 'getter') {
     throw new Error('Memoize decorator can only be used on methods or get accessors.');
   }
 
-  const cache = new Map<string, unknown>();
+  const cache = new Map<string, Return>();
 
-  return {
-    ...descriptor,
-    [descriptorPropertyName]: function (this: unknown, ...args: unknown[]) {
-      for (const arg of args) {
-        if (!isJSONSerializable(arg)) {
-          throw new Error(
-            `Argument ${isNonPrimitive(arg) ? arg.toString() : arg} is JSON serializable.`,
-          );
-        }
+  return function (this: This, ...args: Args): Return {
+    for (const arg of args) {
+      if (!isJSONSerializable(arg)) {
+        throw new Error(
+          `Argument ${isNonPrimitive(arg) ? arg.toString() : arg} is JSON serializable.`,
+        );
       }
+    }
 
-      const key = JSON.stringify(args);
-      if (cache.has(key)) {
-        return cache.get(key);
-      }
+    const key = JSON.stringify(args);
+    if (cache.has(key)) {
+      return cache.get(key) as Return;
+    }
 
-      const result = originalMethod.apply(this, args);
-      cache.set(key, result);
+    const result = target.apply(this, args);
+    cache.set(key, result);
 
-      return result;
-    },
+    return result;
   };
 }
 
