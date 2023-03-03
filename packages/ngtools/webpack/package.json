@@ -30,7 +30,7 @@
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular/compiler": "15.2.0",
     "@angular/compiler-cli": "15.2.0",
-    "typescript": "5.0.0-beta",
+    "typescript": "5.0.0-dev.20230226",
     "webpack": "5.75.0"
   }
 }
