@@ -175,10 +175,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/compiler-cli@15.2.0":
-  version "15.2.0"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-15.2.0.tgz#790ce61bd411321ab7f9e0a8b3901709be8c9547"
-  integrity sha512-ETnRBdY/LGcmDRQ9GQc9KyCd1kuRnj+Y9luq2dCTMysP+NgylmYoGDsJOsDKm6SzPo+B4PSAyHX2J4CVQFHpPg==
+"@angular/compiler-cli@15.2.1":
+  version "15.2.1"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-15.2.1.tgz#fc17dd30d851b5d891a49104d7801537b7c5db44"
+  integrity sha512-IoS3IovbnY4hLWzeym5Kul/dJuncggMHuPnyrMbAnR6+eCZCLyRqQ5MykXDCsgfnRuVm8+PEZc0voA/5st2Vhw==
   dependencies:
     "@babel/core" "7.19.3"
     "@jridgewell/sourcemap-codec" "^1.4.14"
@@ -205,10 +205,10 @@
     tslib "^2.3.0"
     yargs "^17.2.1"
 
-"@angular/compiler@15.2.0":
-  version "15.2.0"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-15.2.0.tgz#d54bf21e542c78f21cbd05c217ebc1f2fb0233c1"
-  integrity sha512-bGMc8xBs/3l5Ab2PmGGifuWVLxCzmYQPXeBYrwpmy+aYCwGzuVKxQp6L1UjA0OZNra7Am8bu4mOsLSR9ENdX6w==
+"@angular/compiler@15.2.1":
+  version "15.2.1"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-15.2.1.tgz#3724e472cfcded0b95dbb59e7dd8bc23ab3dfe54"
+  integrity sha512-eOA09iQWPEOJXig6W+out8MyZL2wdVu62Z79PWGQG8RWDSPV8XUFMAPfTOC8B43PT4hn/Avy/aauXl6O9l3vXw==
   dependencies:
     tslib "^2.3.0"
 
