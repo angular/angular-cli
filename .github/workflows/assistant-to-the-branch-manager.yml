@@ -16,6 +16,6 @@ jobs:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # tag=v3.3.0
         with:
           persist-credentials: false
-      - uses: angular/dev-infra/github-actions/branch-manager@be8740e7694c0a6467b569687627b42fe32010d5
+      - uses: angular/dev-infra/github-actions/branch-manager@fc4d34a1a8d30c197533a51c9af1bb52c9356094
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
