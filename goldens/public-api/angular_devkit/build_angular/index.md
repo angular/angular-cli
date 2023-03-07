@@ -105,8 +105,29 @@ export enum CrossOrigin {
     UseCredentials = "use-credentials"
 }
 
-// @public (undocumented)
-export type DevServerBuilderOptions = Schema;
+// @public
+export interface DevServerBuilderOptions {
+    allowedHosts?: string[];
+    browserTarget: string;
+    disableHostCheck?: boolean;
+    headers?: {
+        [key: string]: string;
+    };
+    hmr?: boolean;
+    host?: string;
+    liveReload?: boolean;
+    open?: boolean;
+    poll?: number;
+    port?: number;
+    proxyConfig?: string;
+    publicHost?: string;
+    servePath?: string;
+    ssl?: boolean;
+    sslCert?: string;
+    sslKey?: string;
+    verbose?: boolean;
+    watch?: boolean;
+}
 
 // @public
 export type DevServerBuilderOutput = DevServerBuildOutput & {
@@ -122,7 +143,7 @@ export function executeBrowserBuilder(options: BrowserBuilderOptions, context: B
 }): Observable<BrowserBuilderOutput>;
 
 // @public
-export function executeDevServerBuilder(options: DevServerBuilderOptions, context: BuilderContext, transforms?: {
+export function executeDevServerBuilder(options: DevServerBuilderOptions_2, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
@@ -154,7 +175,7 @@ export function executeServerBuilder(options: ServerBuilderOptions, context: Bui
 export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 
 // @public (undocumented)
-export type ExtractI18nBuilderOptions = Schema_2;
+export type ExtractI18nBuilderOptions = Schema;
 
 // @public (undocumented)
 export interface FileReplacement {
