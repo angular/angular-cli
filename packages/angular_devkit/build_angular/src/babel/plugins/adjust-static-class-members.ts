@@ -205,6 +205,7 @@ const exportDefaultAnalysis = new WeakMap<types.Class, ReturnType<typeof analyze
  *
  * @returns A babel plugin object instance.
  */
+// eslint-disable-next-line max-lines-per-function
 export default function (): PluginObj {
   return {
     visitor: {
@@ -277,6 +278,47 @@ export default function (): PluginObj {
                 // Not safe to wrap
                 shouldWrap = false;
                 break;
+              }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } else if ((element as any).isStaticBlock()) {
+              // Only need to analyze static blocks
+              const body = element.get('body');
+
+              if (Array.isArray(body) && body.length > 1) {
+                // Not safe to wrap
+                shouldWrap = false;
+                break;
+              }
+
+              const expression = body.find((n: NodePath<types.Node>) =>
+                n.isExpressionStatement(),
+              ) as NodePath<types.ExpressionStatement> | undefined;
+
+              const assignmentExpression = expression?.get('expression');
+              if (assignmentExpression?.isAssignmentExpression()) {
+                const left = assignmentExpression.get('left');
+                if (!left.isMemberExpression()) {
+                  continue;
+                }
+
+                if (!left.get('object').isThisExpression()) {
+                  // Not safe to wrap
+                  shouldWrap = false;
+                  break;
+                }
+
+                const element = left.get('property');
+                const right = assignmentExpression.get('right');
+                if (
+                  element.isIdentifier() &&
+                  (!right.isExpression() || canWrapProperty(element.node.name, right))
+                ) {
+                  shouldWrap = true;
+                } else {
+                  // Not safe to wrap
+                  shouldWrap = false;
+                  break;
+                }
               }
             }
           }

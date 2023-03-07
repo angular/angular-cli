@@ -669,6 +669,42 @@ describe('adjust-static-class-members Babel plugin', () => {
     });
   });
 
+  it('wraps class with Angular ɵfac static block (ES2022 + useDefineForClassFields: false)', () => {
+    testCase({
+      input: `
+        class CommonModule {
+          static { this.ɵfac = function CommonModule_Factory(t) { return new (t || CommonModule)(); }; }
+          static { this.ɵmod = ɵngcc0.ɵɵdefineNgModule({ type: CommonModule }); }
+        }
+      `,
+      expected: `
+        let CommonModule = /*#__PURE__*/ (() => {
+          class CommonModule {
+            static {
+              this.ɵfac = function CommonModule_Factory(t) {
+                return new (t || CommonModule)();
+              };
+            }
+            static {
+              this.ɵmod = ɵngcc0.ɵɵdefineNgModule({
+                type: CommonModule,
+              });
+            }
+          }
+          return CommonModule;
+        })();
+      `,
+    });
+  });
+
+  it('does not wrap class with side effect full static block (ES2022 + useDefineForClassFields: false)', () => {
+    testCaseNoChange(`
+        class CommonModule {
+          static { globalThis.bar = 1 }
+        }
+      `);
+  });
+
   it('wraps class with Angular ɵmod static field', () => {
     testCase({
       input: `
