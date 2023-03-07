@@ -79,6 +79,32 @@ function _createPromptProvider(): schema.PromptProvider {
       const validator = definition.validator;
       if (validator) {
         question.validate = (input) => validator(input);
+
+        // Filter allows transformation of the value prior to validation
+        question.filter = async (input) => {
+          for (const type of definition.propertyTypes) {
+            let value;
+            switch (type) {
+              case 'string':
+                value = String(input);
+                break;
+              case 'integer':
+              case 'number':
+                value = Number(input);
+                break;
+              default:
+                value = input;
+                break;
+            }
+            // Can be a string if validation fails
+            const isValid = (await validator(value)) === true;
+            if (isValid) {
+              return value;
+            }
+          }
+
+          return input;
+        };
       }
 
       switch (definition.type) {
