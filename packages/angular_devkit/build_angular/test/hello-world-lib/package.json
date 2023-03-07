@@ -1,0 +1,8 @@
+{
+  "name": "hello-world-lib",
+  "version": "1.0.0",
+  "dependencies": {
+    "@types/jasmine": "^4.3.1",
+    "@types/node": "^18.14.6"
+  }
+}
