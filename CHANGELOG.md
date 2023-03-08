@@ -1,3 +1,25 @@
+<a name="15.2.2"></a>
+
+# 15.2.2 (2023-03-08)
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [dfd03aa7c](https://github.com/angular/angular-cli/commit/dfd03aa7c262f4425fa680e205a46792bd7b8451) | fix  | correctly transform numbers from prompts |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [eb22f634f](https://github.com/angular/angular-cli/commit/eb22f634f2ec7a5b0bc2f5300682ed8e718b1424) | fix  | build optimizer support for non spec-compliant ES2022 class static properties |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.2"></a>
 
 # 16.0.0-next.2 (2023-03-01)
