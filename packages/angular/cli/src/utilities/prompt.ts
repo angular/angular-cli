@@ -6,7 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { ListChoiceOptions, ListQuestion, Question } from 'inquirer';
+import type {
+  CheckboxChoiceOptions,
+  CheckboxQuestion,
+  ListChoiceOptions,
+  ListQuestion,
+  Question,
+} from 'inquirer';
 import { isTTY } from './tty';
 
 export async function askConfirmation(
@@ -17,6 +23,7 @@ export async function askConfirmation(
   if (!isTTY()) {
     return noTTYResponse ?? defaultResponse;
   }
+
   const question: Question = {
     type: 'confirm',
     name: 'confirmation',
@@ -40,6 +47,7 @@ export async function askQuestion(
   if (!isTTY()) {
     return noTTYResponse;
   }
+
   const question: ListQuestion = {
     type: 'list',
     name: 'answer',
@@ -47,6 +55,29 @@ export async function askQuestion(
     message,
     choices,
     default: defaultResponseIndex,
+  };
+
+  const { prompt } = await import('inquirer');
+  const answers = await prompt([question]);
+
+  return answers['answer'];
+}
+
+export async function askChoices(
+  message: string,
+  choices: CheckboxChoiceOptions[],
+  noTTYResponse: string[] | null,
+): Promise<string[] | null> {
+  if (!isTTY()) {
+    return noTTYResponse;
+  }
+
+  const question: CheckboxQuestion = {
+    type: 'checkbox',
+    name: 'answer',
+    prefix: '',
+    message,
+    choices,
   };
 
   const { prompt } = await import('inquirer');
