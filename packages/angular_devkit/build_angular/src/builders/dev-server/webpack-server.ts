@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
+import { BuilderContext } from '@angular-devkit/architect';
 import {
   DevServerBuildOutput,
   WebpackLoggingCallback,
@@ -20,14 +20,12 @@ import webpack from 'webpack';
 import webpackDevServer from 'webpack-dev-server';
 import { ExecutionTransformer } from '../../transforms';
 import { normalizeOptimization } from '../../utils';
-import { checkPort } from '../../utils/check-port';
 import { colors } from '../../utils/color';
 import { I18nOptions, loadTranslations } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { createTranslationLoader } from '../../utils/load-translations';
-import { NormalizedCachedOptions, normalizeCacheOptions } from '../../utils/normalize-cache';
+import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
-import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   generateI18nBrowserWebpackConfigFromContext,
@@ -44,9 +42,7 @@ import {
   generateBuildEventStats,
 } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
-import { Schema } from './schema';
-
-export type DevServerBuilderOptions = Schema;
+import { NormalizedDevServerOptions } from './options';
 
 /**
  * @experimental Direct usage of this type is considered experimental.
@@ -59,15 +55,15 @@ export type DevServerBuilderOutput = DevServerBuildOutput & {
 /**
  * Reusable implementation of the Angular Webpack development server builder.
  * @param options Dev Server options.
+ * @param builderName The name of the builder used to build the application.
  * @param context The build context.
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  *     transforming webpack configuration before passing it to webpack).
- *
- * @experimental Direct usage of this function is considered experimental.
  */
 // eslint-disable-next-line max-lines-per-function
 export function serveWebpackBrowser(
-  options: DevServerBuilderOptions,
+  options: NormalizedDevServerOptions,
+  builderName: string,
   context: BuilderContext,
   transforms: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
@@ -79,75 +75,25 @@ export function serveWebpackBrowser(
   const { logger, workspaceRoot } = context;
   assertCompatibleAngularVersion(workspaceRoot);
 
-  const browserTarget = targetFromTargetString(options.browserTarget);
-
   async function setup(): Promise<{
     browserOptions: BrowserBuilderSchema;
     webpackConfig: webpack.Configuration;
-    projectRoot: string;
   }> {
-    const projectName = context.target?.project;
-    if (!projectName) {
-      throw new Error('The builder requires a target.');
-    }
-
-    // Purge old build disk cache.
-    await purgeStaleBuildCache(context);
-
-    options.port = await checkPort(options.port ?? 4200, options.host || 'localhost');
-
     if (options.hmr) {
       logger.warn(tags.stripIndents`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
     }
 
-    if (
-      !options.disableHostCheck &&
-      options.host &&
-      !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
-      options.host !== 'localhost'
-    ) {
-      logger.warn(tags.stripIndent`
-        Warning: This is a simple server for use in testing or debugging Angular applications
-        locally. It hasn't been reviewed for security issues.
-
-        Binding this server to an open connection can result in compromising your application or
-        computer. Using a different host than the one passed to the "--host" flag might result in
-        websocket connection issues. You might need to use "--disable-host-check" if that's the
-        case.
-      `);
-    }
-
-    if (options.disableHostCheck) {
-      logger.warn(tags.oneLine`
-        Warning: Running a server with --disable-host-check is a security risk.
-        See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
-        for more information.
-      `);
-    }
     // Get the browser configuration from the target name.
-    const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as json.JsonObject &
-      BrowserBuilderSchema;
+    const rawBrowserOptions = (await context.getTargetOptions(
+      options.browserTarget,
+    )) as json.JsonObject & BrowserBuilderSchema;
 
     if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== OutputHashing.None) {
       // Disable output hashing for dev build as this can cause memory leaks
       // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
       rawBrowserOptions.outputHashing = OutputHashing.None;
       logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
-    }
-
-    const metadata = await context.getProjectMetadata(projectName);
-    const cacheOptions = normalizeCacheOptions(metadata, context.workspaceRoot);
-
-    const browserName = await context.getBuilderNameForTarget(browserTarget);
-
-    // Issue a warning that the dev-server does not currently support the experimental esbuild-
-    // based builder and will use Webpack.
-    if (browserName === '@angular-devkit/build-angular:browser-esbuild') {
-      logger.warn(
-        'WARNING: The experimental esbuild-based builder is not currently supported ' +
-          'by the dev-server. The stable Webpack-based builder will be used instead.',
-      );
     }
 
     const browserOptions = (await context.validateOptions(
@@ -158,7 +104,7 @@ export function serveWebpackBrowser(
         // In dev server we should not have budgets because of extra libs such as socks-js
         budgets: undefined,
       } as json.JsonObject & BrowserBuilderSchema,
-      browserName,
+      builderName,
     )) as json.JsonObject & BrowserBuilderSchema;
 
     const { styles, scripts } = normalizeOptimization(browserOptions.optimization);
@@ -173,7 +119,7 @@ export function serveWebpackBrowser(
       `);
     }
 
-    const { config, projectRoot, i18n } = await generateI18nBrowserWebpackConfigFromContext(
+    const { config, i18n } = await generateI18nBrowserWebpackConfigFromContext(
       browserOptions,
       context,
       (wco) => [getDevServerConfig(wco), getCommonConfig(wco), getStylesConfig(wco)],
@@ -203,7 +149,14 @@ export function serveWebpackBrowser(
         );
       }
 
-      await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions, context);
+      await setupLocalize(
+        locale,
+        i18n,
+        browserOptions,
+        webpackConfig,
+        options.cacheOptions,
+        context,
+      );
     }
 
     if (transforms.webpackConfiguration) {
@@ -231,7 +184,7 @@ export function serveWebpackBrowser(
           entrypoints,
           deployUrl: browserOptions.deployUrl,
           sri: browserOptions.subresourceIntegrity,
-          cache: cacheOptions,
+          cache: options.cacheOptions,
           postTransform: transforms.indexHtml,
           optimization: normalizeOptimization(browserOptions.optimization),
           crossOrigin: browserOptions.crossOrigin,
@@ -245,7 +198,7 @@ export function serveWebpackBrowser(
         new ServiceWorkerPlugin({
           baseHref: browserOptions.baseHref,
           root: context.workspaceRoot,
-          projectRoot,
+          projectRoot: options.projectRoot,
           ngswConfigPath: browserOptions.ngswConfigPath,
         }),
       );
@@ -254,7 +207,6 @@ export function serveWebpackBrowser(
     return {
       browserOptions,
       webpackConfig,
-      projectRoot,
     };
   }
 

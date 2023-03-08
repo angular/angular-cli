@@ -143,8 +143,8 @@ export function executeBrowserBuilder(options: BrowserBuilderOptions, context: B
 }): Observable<BrowserBuilderOutput>;
 
 // @public
-export function executeDevServerBuilder(options: DevServerBuilderOptions_2, context: BuilderContext, transforms?: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+export function executeDevServerBuilder(options: DevServerBuilderOptions, context: BuilderContext, transforms?: {
+    webpackConfiguration?: ExecutionTransformer<Configuration>;
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
 }): Observable<DevServerBuilderOutput>;

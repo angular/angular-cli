@@ -30,7 +30,7 @@ export {
 } from './builders/browser';
 
 export {
-  serveWebpackBrowser as executeDevServerBuilder,
+  executeDevServerBuilder,
   DevServerBuilderOptions,
   DevServerBuilderOutput,
 } from './builders/dev-server';

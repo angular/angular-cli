@@ -7,8 +7,12 @@
  */
 
 import { createBuilder } from '@angular-devkit/architect';
+import { execute } from './builder';
 import { Schema as DevServerBuilderOptions } from './schema';
-import { DevServerBuilderOutput, serveWebpackBrowser } from './webpack-server';
+import { DevServerBuilderOutput } from './webpack-server';
 
-export { DevServerBuilderOptions, DevServerBuilderOutput, serveWebpackBrowser };
-export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);
+export { DevServerBuilderOptions, DevServerBuilderOutput, execute as executeDevServerBuilder };
+export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(execute);
+
+// Temporary export to support specs
+export { execute as serveWebpackBrowser };
