@@ -31,6 +31,6 @@
     "@angular/compiler": "15.2.1",
     "@angular/compiler-cli": "15.2.1",
     "typescript": "5.0.0-beta",
-    "webpack": "5.75.0"
+    "webpack": "5.76.0"
   }
 }
