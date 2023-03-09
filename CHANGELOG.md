@@ -1,3 +1,31 @@
+<a name="16.0.0-next.3"></a>
+
+# 16.0.0-next.3 (2023-03-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [7cb5689e0](https://github.com/angular/angular-cli/commit/7cb5689e02c30c0ef53adef92d0e9969e1a1536b) | feat | show optional migrations during update process |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [d15d44d3a](https://github.com/angular/angular-cli/commit/d15d44d3a4fcc7727fb87a005fa383b58cefae91) | fix  | correctly transform numbers from prompts |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [3978891a4](https://github.com/angular/angular-cli/commit/3978891a46e680412d50d670f06c94aa0921f294) | fix  | build optimizer support for non spec-compliant ES2022 class static properties |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.2"></a>
 
 # 15.2.2 (2023-03-08)
