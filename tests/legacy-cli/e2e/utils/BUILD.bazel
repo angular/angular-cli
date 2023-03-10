@@ -9,7 +9,6 @@ ts_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@npm//@types/glob",
         "@npm//@types/node-fetch",
         "@npm//@types/semver",
         "@npm//@types/tar",

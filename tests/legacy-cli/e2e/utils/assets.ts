@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { chmod } from 'fs/promises';
-import glob from 'glob';
+import { globSync } from 'glob';
 import { getGlobalVariable } from './env';
 import { resolve } from 'path';
 import { copyFile } from './fs';
@@ -26,7 +26,7 @@ export function copyAssets(assetName: string, to?: string) {
 
   return Promise.resolve()
     .then(() => {
-      const allFiles = glob.sync('**/*', { dot: true, nodir: true, cwd: root });
+      const allFiles = globSync('**/*', { dot: true, nodir: true, cwd: root });
 
       return allFiles.reduce((promise, filePath) => {
         const toPath =

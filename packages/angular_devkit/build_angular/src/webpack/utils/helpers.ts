@@ -8,7 +8,7 @@
 
 import type { ObjectPattern } from 'copy-webpack-plugin';
 import { createHash } from 'crypto';
-import glob from 'glob';
+import { globSync } from 'glob';
 import * as path from 'path';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
 import {
@@ -125,9 +125,9 @@ export function getInstrumentationExcludedPaths(
   const excluded = new Set<string>();
 
   for (const excludeGlob of excludedPaths) {
-    glob
-      .sync(excludeGlob, { nodir: true, cwd: root, root, nomount: true })
-      .forEach((p) => excluded.add(path.join(root, p)));
+    globSync(excludeGlob, { nodir: true, cwd: root, root }).forEach((p) =>
+      excluded.add(path.join(root, p)),
+    );
   }
 
   return excluded;

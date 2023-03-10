@@ -123,7 +123,6 @@ ts_library(
         "@npm//@types/babel__template",
         "@npm//@types/browserslist",
         "@npm//@types/cacache",
-        "@npm//@types/glob",
         "@npm//@types/inquirer",
         "@npm//@types/karma",
         "@npm//@types/less",
