@@ -271,7 +271,7 @@ export default function (): PluginObj {
               if (
                 elementKey.isIdentifier() &&
                 (!elementValue.isExpression() ||
-                  canWrapProperty(elementKey.get('name'), elementValue))
+                  canWrapProperty(elementKey.node.name, elementValue))
               ) {
                 shouldWrap = true;
               } else {

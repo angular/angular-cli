@@ -783,9 +783,9 @@ describe('adjust-static-class-members Babel plugin', () => {
         class CommonModule {
           static ɵfac = function CommonModule_Factory(t) { return new (t || CommonModule)(); };
           static ɵmod = /*@__PURE__*/ ɵngcc0.ɵɵdefineNgModule({ type: CommonModule });
-          static ɵinj = /*@__PURE__*/ ɵngcc0.ɵɵdefineInjector({ providers: [
-                  { provide: NgLocalization, useClass: NgLocaleLocalization },
-              ] });
+          static ɵinj = ɵngcc0.ɵɵdefineInjector({ providers: [
+            { provide: NgLocalization, useClass: NgLocaleLocalization },
+        ] });
         }
       `,
       expected: `
@@ -797,7 +797,7 @@ describe('adjust-static-class-members Babel plugin', () => {
             static ɵmod = /*@__PURE__*/ ɵngcc0.ɵɵdefineNgModule({
               type: CommonModule,
             });
-            static ɵinj = /*@__PURE__*/ ɵngcc0.ɵɵdefineInjector({
+            static ɵinj = ɵngcc0.ɵɵdefineInjector({
               providers: [
                 {
                   provide: NgLocalization,
