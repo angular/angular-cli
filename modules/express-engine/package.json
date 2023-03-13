@@ -9,7 +9,7 @@
     "universal"
   ],
   "engines": {
-    "node": "^14.20.0 || ^16.13.0 || >=18.10.0"
+    "node": "^16.13.0 || >=18.10.0"
   },
   "peerDependencies": {
     "@angular/common": "^15.0.0",
