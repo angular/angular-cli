@@ -12,7 +12,11 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
+import {
+  BrowserBuilderOptions,
+  BrowserBuilderOutput,
+  ServerBuilderOutput,
+} from '@angular-devkit/build-angular';
 import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
 import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
 import * as fs from 'fs';
@@ -23,24 +27,18 @@ import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getIndexOutputFile, getRoutes } from './utils';
 import { RenderOptions, RenderResult } from './worker';
 
-type BuildBuilderOutput = BuilderOutput & {
-  baseOutputPath: string;
-  outputPaths: string[];
-  outputPath: string;
-};
-
-type ScheduleBuildsOutput = BuilderOutput & {
-  serverResult?: BuildBuilderOutput;
-  browserResult?: BuildBuilderOutput;
-};
-
 /**
  * Schedules the server and browser builds and returns their results if both builds are successful.
  */
 async function _scheduleBuilds(
   options: PrerenderBuilderOptions,
   context: BuilderContext,
-): Promise<ScheduleBuildsOutput> {
+): Promise<
+  BuilderOutput & {
+    serverResult?: ServerBuilderOutput;
+    browserResult?: BrowserBuilderOutput;
+  }
+> {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
 
@@ -55,8 +53,8 @@ async function _scheduleBuilds(
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as unknown as BuildBuilderOutput,
-      serverTargetRun.result as unknown as BuildBuilderOutput,
+      browserTargetRun.result as unknown as BrowserBuilderOutput,
+      serverTargetRun.result as unknown as ServerBuilderOutput,
     ]);
 
     const success =
@@ -78,8 +76,8 @@ async function _scheduleBuilds(
 async function _renderUniversal(
   routes: string[],
   context: BuilderContext,
-  browserResult: BuildBuilderOutput,
-  serverResult: BuildBuilderOutput,
+  browserResult: BrowserBuilderOutput,
+  serverResult: ServerBuilderOutput,
   browserOptions: BrowserBuilderOptions,
   numProcesses?: number,
 ): Promise<PrerenderBuilderOutput> {
@@ -111,7 +109,7 @@ async function _renderUniversal(
 
   try {
     // We need to render the routes for each locale from the browser output.
-    for (const outputPath of browserResult.outputPaths) {
+    for (const { path: outputPath } of browserResult.outputs) {
       const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
       const serverBundlePath = path.join(baseOutputPath, localeDirectory, 'main.js');
       if (!fs.existsSync(serverBundlePath)) {

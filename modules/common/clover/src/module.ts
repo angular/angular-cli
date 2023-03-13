@@ -21,7 +21,6 @@ import {
   ɵDomSharedStylesHost as DomSharedStylesHost,
   ɵSharedStylesHost as SharedStylesHost,
   TransferState,
-  ɵescapeHtml as escapeHtml,
 } from '@angular/platform-browser';
 import { filter, mapTo, take } from 'rxjs/operators';
 import { SSRStylesHost } from './styles_host';
@@ -82,4 +81,16 @@ export class RendererModule {
       ],
     };
   }
+}
+
+function escapeHtml(text: string): string {
+  const escapedText: { [k: string]: string } = {
+    '&': '&a;',
+    '"': '&q;',
+    "'": '&s;',
+    '<': '&l;',
+    '>': '&g;',
+  };
+
+  return text.replace(/[&"'<>]/g, (s) => escapedText[s]);
 }

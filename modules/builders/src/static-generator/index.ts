@@ -51,7 +51,7 @@ export async function execute(
     serviceWorker: false,
   });
 
-  const { success, error, outputPaths } = (await result) as BrowserBuilderOutput;
+  const { success, error, outputs } = (await result) as BrowserBuilderOutput;
   if (!success) {
     return { success, error } as BuilderOutput;
   }
@@ -62,7 +62,7 @@ export async function execute(
 
   const worker = createWorker();
   try {
-    for (const outputPath of outputPaths) {
+    for (const { path: outputPath } of outputs) {
       const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
 
       const staticServer = await createStaticServer(outputPath);

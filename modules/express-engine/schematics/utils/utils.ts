@@ -134,23 +134,23 @@ export function addInitialNavigation(node: ts.CallExpression): ts.CallExpression
     return node;
   }
 
-  const enabledLiteral = ts.createStringLiteral('enabledBlocking');
+  const enabledLiteral = ts.factory.createStringLiteral('enabledBlocking');
   // TypeScript will emit the Node with double quotes.
   // In schematics we usually write code with a single quotes
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (enabledLiteral as any).singleQuote = true;
 
-  const initialNavigationProperty = ts.createPropertyAssignment(
+  const initialNavigationProperty = ts.factory.createPropertyAssignment(
     'initialNavigation',
     enabledLiteral,
   );
   const routerOptions = existingOptions
-    ? ts.updateObjectLiteral(
+    ? ts.factory.updateObjectLiteralExpression(
         existingOptions,
-        ts.createNodeArray([...existingOptions.properties, initialNavigationProperty]),
+        ts.factory.createNodeArray([...existingOptions.properties, initialNavigationProperty]),
       )
-    : ts.createObjectLiteral([initialNavigationProperty], true);
+    : ts.factory.createObjectLiteralExpression([initialNavigationProperty], true);
   const args = [node.arguments[0], routerOptions];
 
-  return ts.createCall(node.expression, node.typeArguments, args);
+  return ts.factory.createCallExpression(node.expression, node.typeArguments, args);
 }
