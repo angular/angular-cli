@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { Type } from '@angular/core';
-import type * as platformServer from '@angular/platform-server';
+import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
+import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import type { ɵInlineCriticalCssProcessor } from '@nguniversal/common/tools';
 import assert from 'node:assert';
 import * as fs from 'node:fs';
@@ -27,6 +27,23 @@ export interface RenderOptions {
 export interface RenderResult {
   errors?: string[];
   warnings?: string[];
+}
+
+interface ServerBundleExports {
+  /** An internal token that allows providing extra information about the server context. */
+  ɵSERVER_CONTEXT?: typeof ɵSERVER_CONTEXT;
+
+  /** Render an NgModule application. */
+  renderModule?: typeof renderModule;
+
+  /** NgModule to render. */
+  AppServerModule?: Type<unknown>;
+
+  /** Method to render a standalone application. */
+  renderApplication?: typeof renderApplication;
+
+  /** Standalone application bootstrapping function. */
+  default?: () => Promise<ApplicationRef>;
 }
 
 /**
@@ -54,14 +71,14 @@ async function render({
   const outputFolderPath = path.join(outputPath, route);
   const outputIndexPath = path.join(outputFolderPath, 'index.html');
 
-  const { AppServerModule, renderModule, ɵSERVER_CONTEXT } = (await import(serverBundlePath)) as {
-    renderModule: typeof platformServer.renderModule | undefined;
-    ɵSERVER_CONTEXT: typeof platformServer.ɵSERVER_CONTEXT | undefined;
-    AppServerModule: Type<unknown> | undefined;
-  };
+  const {
+    ɵSERVER_CONTEXT,
+    AppServerModule,
+    renderModule,
+    renderApplication,
+    default: bootstrapAppFn,
+  } = (await import(serverBundlePath)) as ServerBundleExports;
 
-  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
-  assert(AppServerModule, `AppServerModule was not exported from: ${serverBundlePath}.`);
   assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported from: ${serverBundlePath}.`);
 
   const indexBaseName = fs.existsSync(path.join(outputPath, 'index.original.html'))
@@ -78,16 +95,34 @@ async function render({
     );
   }
 
-  let html = await renderModule(AppServerModule, {
-    document,
-    url: route,
-    extraProviders: [
-      {
-        provide: ɵSERVER_CONTEXT,
-        useValue: 'ssg',
-      },
-    ],
-  });
+  const platformProviders: StaticProvider[] = [
+    {
+      provide: ɵSERVER_CONTEXT,
+      useValue: 'ssg',
+    },
+  ];
+
+  let html: undefined | string;
+  if (bootstrapAppFn) {
+    assert(renderApplication, `renderApplication was not exported from: ${serverBundlePath}.`);
+    html = await renderApplication(bootstrapAppFn, {
+      document,
+      url: route,
+      platformProviders,
+    });
+  } else {
+    assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+    assert(
+      AppServerModule,
+      `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`,
+    );
+
+    html = await renderModule(AppServerModule, {
+      document,
+      url: route,
+      extraProviders: platformProviders,
+    });
+  }
 
   if (inlineCriticalCss) {
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
