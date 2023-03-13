@@ -6,16 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { StaticProvider, Type } from '@angular/core';
-import { INITIAL_CONFIG, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
+import { ApplicationRef, StaticProvider, Type } from '@angular/core';
+import {
+  INITIAL_CONFIG,
+  renderApplication,
+  renderModule,
+  ɵSERVER_CONTEXT,
+} from '@angular/platform-server';
 import { ɵInlineCriticalCssProcessor as InlineCriticalCssProcessor } from '@nguniversal/common/tools';
 import * as fs from 'fs';
 import { dirname, resolve } from 'path';
 import { URL } from 'url';
 
-/** These are the allowed options for the render */
 export interface RenderOptions {
-  bootstrap?: Type<{}>;
+  bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
   providers?: StaticProvider[];
   url?: string;
   document?: string;
@@ -42,7 +46,10 @@ export class CommonEngine {
   private readonly inlineCriticalCssProcessor: InlineCriticalCssProcessor;
   private readonly pageExists = new Map<string, boolean>();
 
-  constructor(private module?: Type<{}>, private providers: StaticProvider[] = []) {
+  constructor(
+    private bootstrap?: Type<{}> | (() => Promise<ApplicationRef>),
+    private providers: StaticProvider[] = [],
+  ) {
     this.inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       minify: true,
     });
@@ -104,13 +111,15 @@ export class CommonEngine {
       });
     }
 
-    const moduleOrFactory = this.module || opts.bootstrap;
-
+    const moduleOrFactory = this.bootstrap || opts.bootstrap;
     if (!moduleOrFactory) {
       throw new Error('A module or bootstrap option must be provided.');
     }
 
-    const html = await renderModule(moduleOrFactory, { extraProviders });
+    const html = await (isBootstrapFn(moduleOrFactory)
+      ? renderApplication(moduleOrFactory, { platformProviders: extraProviders })
+      : renderModule(moduleOrFactory, { extraProviders }));
+
     if (!inlineCriticalCss) {
       return html;
     }
@@ -148,4 +157,9 @@ async function exists(path: fs.PathLike): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
+  // We can differentiate between a module and a bootstrap function by reading `cmp`:
+  return typeof value === 'function' && !('ɵmod' in value);
 }
