@@ -17,7 +17,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/main.ts', 'console.log("TEST");');
 
       // Add a global stylesheet to test link elements
-      await harness.writeFile('src/styles.css', '// Global styles');
+      await harness.writeFile('src/styles.css', '/* Global styles */');
 
       // Reduce the input index HTML to a single line to simplify comparing
       await harness.writeFile(

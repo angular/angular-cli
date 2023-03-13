@@ -87,9 +87,8 @@ async function execute(
     indexHtmlOptions,
   } = options;
 
-  const target = transformSupportedBrowsersToTargets(
-    getSupportedBrowsers(projectRoot, context.logger),
-  );
+  const browsers = getSupportedBrowsers(projectRoot, context.logger);
+  const target = transformSupportedBrowsersToTargets(browsers);
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
   const codeBundleCache = options.watch
@@ -100,14 +99,14 @@ async function execute(
     new BundlerContext(
       workspaceRoot,
       !!options.watch,
-      createCodeBundleOptions(options, target, codeBundleCache),
+      createCodeBundleOptions(options, target, browsers, codeBundleCache),
     );
   const globalStylesBundleContext =
     rebuildState?.globalStylesRebuild ??
     new BundlerContext(
       workspaceRoot,
       !!options.watch,
-      createGlobalStylesBundleOptions(options, target),
+      createGlobalStylesBundleOptions(options, target, browsers),
     );
 
   const [codeResults, styleResults] = await Promise.all([
@@ -269,6 +268,7 @@ function createOutputFileFromText(path: string, text: string): OutputFile {
 function createCodeBundleOptions(
   options: NormalizedBrowserOptions,
   target: string[],
+  browsers: string[],
   sourceFileCache?: SourceFileCache,
 ): BuildOptions {
   const {
@@ -338,6 +338,7 @@ function createCodeBundleOptions(
           externalDependencies,
           target,
           inlineStyleLanguage,
+          browsers,
         },
       ),
     ],
@@ -405,6 +406,7 @@ function getFeatureSupport(target: string[]): BuildOptions['supported'] {
 function createGlobalStylesBundleOptions(
   options: NormalizedBrowserOptions,
   target: string[],
+  browsers: string[],
 ): BuildOptions {
   const {
     workspaceRoot,
@@ -415,7 +417,6 @@ function createGlobalStylesBundleOptions(
     preserveSymlinks,
     externalDependencies,
     stylePreprocessorOptions,
-    watch,
   } = options;
 
   const buildOptions = createStylesheetBundleOptions({
@@ -427,6 +428,7 @@ function createGlobalStylesBundleOptions(
     externalDependencies,
     outputNames,
     includePaths: stylePreprocessorOptions?.includePaths,
+    browsers,
   });
   buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
 

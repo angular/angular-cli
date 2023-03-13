@@ -7,7 +7,8 @@
  */
 
 import type { BuildOptions, OutputFile } from 'esbuild';
-import * as path from 'node:path';
+import path from 'node:path';
+import { createCssPlugin } from './css-plugin';
 import { createCssResourcePlugin } from './css-resource-plugin';
 import { BundlerContext } from './esbuild';
 import { createLessPlugin } from './less-plugin';
@@ -27,6 +28,7 @@ export interface BundleStylesheetOptions {
   includePaths?: string[];
   externalDependencies?: string[];
   target: string[];
+  browsers: string[];
 }
 
 export function createStylesheetBundleOptions(
@@ -65,6 +67,11 @@ export function createStylesheetBundleOptions(
         sourcemap: !!options.sourcemap,
         includePaths,
         inlineComponentData,
+      }),
+      createCssPlugin({
+        sourcemap: !!options.sourcemap,
+        inlineComponentData,
+        browsers: options.browsers,
       }),
       createCssResourcePlugin(),
     ],
