@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { Type } from '@angular/core';
-import type * as platformServer from '@angular/platform-server';
+import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
+import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
 
@@ -18,6 +18,23 @@ import { workerData } from 'node:worker_threads';
 const { zonePackage } = workerData as {
   zonePackage: string;
 };
+
+interface ServerBundleExports {
+  /** An internal token that allows providing extra information about the server context. */
+  ɵSERVER_CONTEXT?: typeof ɵSERVER_CONTEXT;
+
+  /** Render an NgModule application. */
+  renderModule?: typeof renderModule;
+
+  /** NgModule to render. */
+  AppServerModule?: Type<unknown>;
+
+  /** Method to render a standalone application. */
+  renderApplication?: typeof renderApplication;
+
+  /** Standalone application bootstrapping function. */
+  default?: () => Promise<ApplicationRef>;
+}
 
 /**
  * A request to render a Server bundle generate by the universal server builder.
@@ -43,29 +60,45 @@ interface RenderRequest {
  * @returns A promise that resolves to the render HTML document for the application.
  */
 async function render({ serverBundlePath, document, url }: RenderRequest): Promise<string> {
-  const { AppServerModule, renderModule, ɵSERVER_CONTEXT } = (await import(serverBundlePath)) as {
-    renderModule: typeof platformServer.renderModule | undefined;
-    ɵSERVER_CONTEXT: typeof platformServer.ɵSERVER_CONTEXT | undefined;
-    AppServerModule: Type<unknown> | undefined;
-  };
+  const {
+    ɵSERVER_CONTEXT,
+    AppServerModule,
+    renderModule,
+    renderApplication,
+    default: bootstrapAppFn,
+  } = (await import(serverBundlePath)) as ServerBundleExports;
 
-  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
-  assert(AppServerModule, `AppServerModule was not exported from: ${serverBundlePath}.`);
   assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported from: ${serverBundlePath}.`);
 
+  const platformProviders: StaticProvider[] = [
+    {
+      provide: ɵSERVER_CONTEXT,
+      useValue: 'app-shell',
+    },
+  ];
+
   // Render platform server module
-  const html = await renderModule(AppServerModule, {
+  if (bootstrapAppFn) {
+    assert(renderApplication, `renderApplication was not exported from: ${serverBundlePath}.`);
+
+    return renderApplication(bootstrapAppFn, {
+      document,
+      url,
+      platformProviders,
+    });
+  }
+
+  assert(
+    AppServerModule,
+    `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`,
+  );
+  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+
+  return renderModule(AppServerModule, {
     document,
     url,
-    extraProviders: [
-      {
-        provide: ɵSERVER_CONTEXT,
-        useValue: 'app-shell',
-      },
-    ],
+    extraProviders: platformProviders,
   });
-
-  return html;
 }
 
 /**
