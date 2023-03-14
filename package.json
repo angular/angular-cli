@@ -100,7 +100,7 @@
     "ts-node": "10.9.1",
     "tslib": "~2.5.0",
     "tsutils": "^3.0.0",
-    "typescript": "5.0.0-beta",
+    "typescript": "5.0.0-dev.20230226",
     "xhr2": "^0.2.0",
     "zone.js": "^0.13.0"
   }
