@@ -19,7 +19,7 @@ export default function (
   const source = `${content}
 
   // EXPORTS added by @angular-devkit/build-angular
-  export { renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
+  export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
   `;
 
   this.callback(null, source, map);
