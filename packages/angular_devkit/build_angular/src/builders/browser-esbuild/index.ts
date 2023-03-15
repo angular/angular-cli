@@ -19,6 +19,7 @@ import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
+import { Spinner } from '../../utils/spinner';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { BundleStats, generateBuildStatsTable } from '../../webpack/utils/stats';
 import { checkCommonJSModules } from './commonjs-checker';
@@ -575,6 +576,21 @@ function createGlobalStylesBundleOptions(
   return buildOptions;
 }
 
+async function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T> {
+  const spinner = new Spinner(text);
+  spinner.start();
+
+  try {
+    return await action();
+  } finally {
+    spinner.stop();
+  }
+}
+
+async function withNoProgress<T>(test: string, action: () => T | Promise<T>): Promise<T> {
+  return action();
+}
+
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.
@@ -626,10 +642,14 @@ export async function* buildEsbuildBrowser(
     }
   }
 
+  const withProgress: typeof withSpinner = normalizedOptions.progress
+    ? withSpinner
+    : withNoProgress;
+
   // Initial build
   let result: ExecutionResult;
   try {
-    result = await execute(normalizedOptions, context);
+    result = await withProgress('Building...', () => execute(normalizedOptions, context));
 
     if (shouldWriteResult) {
       // Write output files
@@ -653,7 +673,9 @@ export async function* buildEsbuildBrowser(
     }
   }
 
-  context.logger.info('Watch mode enabled. Watching for file changes...');
+  if (normalizedOptions.progress) {
+    context.logger.info('Watch mode enabled. Watching for file changes...');
+  }
 
   // Setup a watcher
   const watcher = createWatcher({
@@ -675,13 +697,13 @@ export async function* buildEsbuildBrowser(
   // Wait for changes and rebuild as needed
   try {
     for await (const changes of watcher) {
-      context.logger.info('Changes detected. Rebuilding...');
-
       if (userOptions.verbose) {
         context.logger.info(changes.toDebugString());
       }
 
-      result = await execute(normalizedOptions, context, result.createRebuildState(changes));
+      result = await withProgress('Changes detected. Rebuilding...', () =>
+        execute(normalizedOptions, context, result.createRebuildState(changes)),
+      );
 
       if (shouldWriteResult) {
         // Write output files
