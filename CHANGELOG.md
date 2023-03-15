@@ -1,3 +1,22 @@
+<a name="16.0.0-next.4"></a>
+
+# 16.0.0-next.4 (2023-03-15)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------- |
+| [f04859d16](https://github.com/angular/angular-cli/commit/f04859d16117a41b6e8ad698a449aca73456b9d7) | feat | initial autoprefixer support for CSS in esbuild builder                                             |
+| [290802060](https://github.com/angular/angular-cli/commit/2908020601e627b7c76c6fe8d53e19e8858cd325) | feat | support standalone app-shell generation                                                             |
+| [4d82e0d10](https://github.com/angular/angular-cli/commit/4d82e0d1043df7da56e9ffb4d91fe90dbff29077) | fix  | correct wrap ES2022 classes with static properties                                                  |
+| [04274afc1](https://github.com/angular/angular-cli/commit/04274afc15084ead2916e11055aa8f1d2f61951d) | fix  | set public class fields as properties ([#24849](https://github.com/angular/angular-cli/pull/24849)) |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.3"></a>
 
 # 15.2.3 (2023-03-15)
