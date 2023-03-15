@@ -1,3 +1,19 @@
+<a name="15.2.3"></a>
+
+# 15.2.3 (2023-03-15)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [a93680585](https://github.com/angular/angular-cli/commit/a9368058517509b277236d6e7db4abc6248817fa) | fix  | correct wrap ES2022 classes with static properties |
+
+## Special Thanks
+
+Alan Agius and Paul Gschwendtner
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.2"></a>
 
 # 15.2.2 (2023-03-08)
