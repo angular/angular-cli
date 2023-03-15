@@ -160,6 +160,7 @@ export async function normalizeOptions(
     subresourceIntegrity,
     verbose,
     watch,
+    progress,
   } = options;
 
   // Return all the normalized options
@@ -176,6 +177,7 @@ export async function normalizeOptions(
     stats: !!statsJson,
     polyfills: polyfills === undefined || Array.isArray(polyfills) ? polyfills : [polyfills],
     poll,
+    progress: progress ?? true,
     // If not explicitly set, default to the Node.js process argument
     preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
     stylePreprocessorOptions,
