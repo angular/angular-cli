@@ -1,0 +1,4 @@
+# We want to run tests large with ever green browser so that 
+# we never trigger differential loading as this will slow down the tests.
+
+last 2 Chrome versions

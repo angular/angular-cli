@@ -6,3 +6,4 @@ integration/common-engine/dist
 integration/common-engine/node_modules
 integration/express-engine-ivy/node_modules
 integration/express-engine-hybrid/node_modules
+integration/express-engine-standalone/node_modules
