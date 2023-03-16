@@ -1,3 +1,19 @@
+<a name="14.2.11"></a>
+
+# 14.2.11 (2023-03-16)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [ddd33bf38](https://github.com/angular/angular-cli/commit/ddd33bf38d7d76e816ebc0459559917da514477d) | fix  | update webpack dependency to `5.76.1` |
+
+## Special Thanks
+
+Alan Agius and Joey Perrott
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="13.3.11"></a>
 
 # 13.3.11 (2023-03-16)
