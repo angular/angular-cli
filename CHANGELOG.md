@@ -1,3 +1,19 @@
+<a name="15.2.4"></a>
+
+# 15.2.4 (2023-03-16)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [f74bfea24](https://github.com/angular/angular-cli/commit/f74bfea241b189f261ec81a8561aea7a56774ae8) | fix  | update `webpack` dependency to `5.76.1` |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.11"></a>
 
 # 14.2.11 (2023-03-16)
