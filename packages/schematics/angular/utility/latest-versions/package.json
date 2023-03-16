@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/jasmine": "~4.3.0",
     "@types/node": "^14.15.0",
-    "jasmine-core": "~4.5.0",
+    "jasmine-core": "~4.6.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.2.0",

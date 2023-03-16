@@ -61,7 +61,7 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.5.0",
-    "webpack": "5.76.1",
+    "webpack": "5.76.2",
     "webpack-dev-middleware": "6.0.1",
     "webpack-dev-server": "4.12.0",
     "webpack-merge": "5.8.0",
