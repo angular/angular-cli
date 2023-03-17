@@ -8,7 +8,8 @@
 
 import type { Config, Filesystem } from '@angular/service-worker/config';
 import * as crypto from 'crypto';
-import { constants as fsConstants, promises as fsPromises } from 'fs';
+import type { OutputFile } from 'esbuild';
+import { existsSync, constants as fsConstants, promises as fsPromises } from 'node:fs';
 import * as path from 'path';
 import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
@@ -61,6 +62,49 @@ class CliFilesystem implements Filesystem {
   }
 }
 
+class ResultFilesystem implements Filesystem {
+  private readonly fileReaders = new Map<string, () => Promise<string>>();
+
+  constructor(outputFiles: OutputFile[], assetFiles: { source: string; destination: string }[]) {
+    for (const file of outputFiles) {
+      this.fileReaders.set('/' + file.path.replace(/\\/g, '/'), async () => file.text);
+    }
+    for (const file of assetFiles) {
+      this.fileReaders.set('/' + file.destination.replace(/\\/g, '/'), () =>
+        fsPromises.readFile(file.source, 'utf-8'),
+      );
+    }
+  }
+
+  async list(dir: string): Promise<string[]> {
+    if (dir !== '/') {
+      throw new Error('Serviceworker manifest generator should only list files from root.');
+    }
+
+    return [...this.fileReaders.keys()];
+  }
+
+  read(file: string): Promise<string> {
+    const reader = this.fileReaders.get(file);
+    if (reader === undefined) {
+      throw new Error('File does not exist.');
+    }
+
+    return reader();
+  }
+
+  async hash(file: string): Promise<string> {
+    return crypto
+      .createHash('sha1')
+      .update(await this.read(file))
+      .digest('hex');
+  }
+
+  write(): never {
+    throw new Error('Serviceworker manifest generator should not attempted to write.');
+  }
+}
+
 export async function augmentAppWithServiceWorker(
   appRoot: string,
   workspaceRoot: string,
@@ -93,22 +137,37 @@ export async function augmentAppWithServiceWorker(
     }
   }
 
-  return augmentAppWithServiceWorkerCore(
+  const result = await augmentAppWithServiceWorkerCore(
     config,
-    outputPath,
+    new CliFilesystem(outputFileSystem, outputPath),
     baseHref,
-    inputputFileSystem,
-    outputFileSystem,
   );
+
+  const copy = async (src: string, dest: string): Promise<void> => {
+    const resolvedDest = path.join(outputPath, dest);
+
+    return inputputFileSystem === outputFileSystem
+      ? // Native FS (Builder).
+        inputputFileSystem.copyFile(src, resolvedDest, fsConstants.COPYFILE_FICLONE)
+      : // memfs (Webpack): Read the file from the input FS (disk) and write it to the output FS (memory).
+        outputFileSystem.writeFile(resolvedDest, await inputputFileSystem.readFile(src));
+  };
+
+  await outputFileSystem.writeFile(path.join(outputPath, 'ngsw.json'), result.manifest);
+
+  for (const { source, destination } of result.assetFiles) {
+    await copy(source, destination);
+  }
 }
 
 // This is currently used by the esbuild-based builder
 export async function augmentAppWithServiceWorkerEsbuild(
   workspaceRoot: string,
   configPath: string,
-  outputPath: string,
   baseHref: string,
-): Promise<void> {
+  outputFiles: OutputFile[],
+  assetFiles: { source: string; destination: string }[],
+): Promise<{ manifest: string; assetFiles: { source: string; destination: string }[] }> {
   // Read the configuration file
   let config: Config | undefined;
   try {
@@ -128,17 +187,18 @@ export async function augmentAppWithServiceWorkerEsbuild(
     }
   }
 
-  // TODO: Return the output files and any errors/warnings
-  return augmentAppWithServiceWorkerCore(config, outputPath, baseHref);
+  return augmentAppWithServiceWorkerCore(
+    config,
+    new ResultFilesystem(outputFiles, assetFiles),
+    baseHref,
+  );
 }
 
 export async function augmentAppWithServiceWorkerCore(
   config: Config,
-  outputPath: string,
+  serviceWorkerFilesystem: Filesystem,
   baseHref: string,
-  inputputFileSystem = fsPromises,
-  outputFileSystem = fsPromises,
-): Promise<void> {
+): Promise<{ manifest: string; assetFiles: { source: string; destination: string }[] }> {
   // Load ESM `@angular/service-worker/config` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
@@ -149,41 +209,27 @@ export async function augmentAppWithServiceWorkerCore(
   ).Generator;
 
   // Generate the manifest
-  const generator = new GeneratorConstructor(
-    new CliFilesystem(outputFileSystem, outputPath),
-    baseHref,
-  );
+  const generator = new GeneratorConstructor(serviceWorkerFilesystem, baseHref);
   const output = await generator.process(config);
 
   // Write the manifest
   const manifest = JSON.stringify(output, null, 2);
-  await outputFileSystem.writeFile(path.join(outputPath, 'ngsw.json'), manifest);
 
   // Find the service worker package
   const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js');
 
-  const copy = async (src: string, dest: string): Promise<void> => {
-    const resolvedDest = path.join(outputPath, dest);
-
-    return inputputFileSystem === outputFileSystem
-      ? // Native FS (Builder).
-        inputputFileSystem.copyFile(src, resolvedDest, fsConstants.COPYFILE_FICLONE)
-      : // memfs (Webpack): Read the file from the input FS (disk) and write it to the output FS (memory).
-        outputFileSystem.writeFile(resolvedDest, await inputputFileSystem.readFile(src));
+  const result = {
+    manifest,
+    // Main worker code
+    assetFiles: [{ source: workerPath, destination: 'ngsw-worker.js' }],
   };
 
-  // Write the worker code
-  await copy(workerPath, 'ngsw-worker.js');
-
   // If present, write the safety worker code
-  try {
-    const safetyPath = path.join(path.dirname(workerPath), 'safety-worker.js');
-    await copy(safetyPath, 'worker-basic.min.js');
-    await copy(safetyPath, 'safety-worker.js');
-  } catch (error) {
-    assertIsError(error);
-    if (error.code !== 'ENOENT') {
-      throw error;
-    }
+  const safetyPath = path.join(path.dirname(workerPath), 'safety-worker.js');
+  if (existsSync(safetyPath)) {
+    result.assetFiles.push({ source: safetyPath, destination: 'worker-basic.min.js' });
+    result.assetFiles.push({ source: safetyPath, destination: 'safety-worker.js' });
   }
+
+  return result;
 }
