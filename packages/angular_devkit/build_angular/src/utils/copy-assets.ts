@@ -28,6 +28,8 @@ export async function copyAssets(
 ) {
   const defaultIgnore = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'];
 
+  const outputFiles: { source: string; destination: string }[] = [];
+
   for (const entry of entries) {
     const cwd = path.resolve(root, entry.input);
     const files = await globPromise(entry.glob, {
@@ -49,6 +51,9 @@ export async function copyAssets(
       }
 
       const filePath = entry.flatten ? path.basename(file) : file;
+
+      outputFiles.push({ source: src, destination: path.join(entry.output, filePath) });
+
       for (const base of basePaths) {
         const dest = path.join(base, entry.output, filePath);
         const dir = path.dirname(dest);
@@ -62,4 +67,6 @@ export async function copyAssets(
       }
     }
   }
+
+  return outputFiles;
 }

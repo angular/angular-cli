@@ -9,8 +9,9 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { BuildOptions, OutputFile } from 'esbuild';
 import assert from 'node:assert';
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
+import { constants as fsConstants } from 'node:fs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { deleteOutputDir } from '../../utils';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
@@ -205,38 +206,41 @@ async function execute(
   }
 
   // Copy assets
+  let assetFiles;
   if (assets) {
-    await copyAssets(assets, [outputPath], workspaceRoot);
+    // The webpack copy assets helper is used with no base paths defined. This prevents the helper
+    // from directly writing to disk. This should eventually be replaced with a more optimized helper.
+    assetFiles = await copyAssets(assets, [], workspaceRoot);
   }
-
-  // Write output files
-  await Promise.all(
-    outputFiles.map((file) => fs.writeFile(path.join(outputPath, file.path), file.contents)),
-  );
 
   // Write metafile if stats option is enabled
   if (options.stats) {
-    await fs.writeFile(path.join(outputPath, 'stats.json'), JSON.stringify(metafile, null, 2));
+    outputFiles.push(createOutputFileFromText('stats.json', JSON.stringify(metafile, null, 2)));
   }
 
   // Extract and write licenses for used packages
   if (options.extractLicenses) {
-    await fs.writeFile(
-      path.join(outputPath, '3rdpartylicenses.txt'),
-      await extractLicenses(metafile, workspaceRoot),
+    outputFiles.push(
+      createOutputFileFromText(
+        '3rdpartylicenses.txt',
+        await extractLicenses(metafile, workspaceRoot),
+      ),
     );
   }
 
   // Augment the application with service worker support
-  // TODO: This should eventually operate on the in-memory files prior to writing the output files
   if (serviceWorkerOptions) {
     try {
-      await augmentAppWithServiceWorkerEsbuild(
+      const serviceWorkerResult = await augmentAppWithServiceWorkerEsbuild(
         workspaceRoot,
         serviceWorkerOptions,
-        outputPath,
         options.baseHref || '/',
+        outputFiles,
+        assetFiles || [],
       );
+      outputFiles.push(createOutputFileFromText('ngsw.json', serviceWorkerResult.manifest));
+      assetFiles ??= [];
+      assetFiles.push(...serviceWorkerResult.assetFiles);
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : `${error}`);
 
@@ -249,10 +253,53 @@ async function execute(
     }
   }
 
+  // Write output files
+  await writeResultFiles(outputFiles, assetFiles, outputPath);
+
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
 
   return new ExecutionResult(true, codeBundleContext, globalStylesBundleContext, codeBundleCache);
+}
+
+async function writeResultFiles(
+  outputFiles: OutputFile[],
+  assetFiles: { source: string; destination: string }[] | undefined,
+  outputPath: string,
+) {
+  const directoryExists = new Set<string>();
+  await Promise.all(
+    outputFiles.map(async (file) => {
+      // Ensure output subdirectories exist
+      const basePath = path.dirname(file.path);
+      if (basePath && !directoryExists.has(basePath)) {
+        await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
+        directoryExists.add(basePath);
+      }
+      // Write file contents
+      await fs.writeFile(path.join(outputPath, file.path), file.contents);
+    }),
+  );
+
+  if (assetFiles?.length) {
+    await Promise.all(
+      assetFiles.map(async ({ source, destination }) => {
+        // Ensure output subdirectories exist
+        const basePath = path.dirname(destination);
+        if (basePath && !directoryExists.has(basePath)) {
+          await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
+          directoryExists.add(basePath);
+        }
+        // Copy file contents
+        await fs.copyFile(
+          source,
+          path.join(outputPath, destination),
+          // This is not yet available from `fs/promises` in Node.js v16.13
+          fsConstants.COPYFILE_FICLONE,
+        );
+      }),
+    );
+  }
 }
 
 function createOutputFileFromText(path: string, text: string): OutputFile {
