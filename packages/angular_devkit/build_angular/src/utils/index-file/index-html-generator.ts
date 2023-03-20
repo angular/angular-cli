@@ -14,6 +14,7 @@ import { stripBom } from '../strip-bom';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
 import { InlineCriticalCssProcessor } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
+import { addStyleNonce } from './style-nonce';
 
 type IndexHtmlGeneratorPlugin = (
   html: string,
@@ -59,7 +60,14 @@ export class IndexHtmlGenerator {
       extraPlugins.push(inlineCriticalCssPlugin(this));
     }
 
-    this.plugins = [augmentIndexHtmlPlugin(this), ...extraPlugins, postTransformPlugin(this)];
+    this.plugins = [
+      augmentIndexHtmlPlugin(this),
+      ...extraPlugins,
+      // Runs after the `extraPlugins` to capture any nonce or
+      // `style` tags that might've been added by them.
+      addStyleNoncePlugin(),
+      postTransformPlugin(this),
+    ];
   }
 
   async process(options: IndexHtmlGeneratorProcessOptions): Promise<IndexHtmlTransformResult> {
@@ -137,6 +145,10 @@ function inlineCriticalCssPlugin(generator: IndexHtmlGenerator): IndexHtmlGenera
 
   return async (html, options) =>
     inlineCriticalCssProcessor.process(html, { outputPath: options.outputPath });
+}
+
+function addStyleNoncePlugin(): IndexHtmlGeneratorPlugin {
+  return (html) => addStyleNonce(html);
 }
 
 function postTransformPlugin({ options }: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
