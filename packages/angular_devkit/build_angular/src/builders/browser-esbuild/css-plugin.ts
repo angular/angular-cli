@@ -37,6 +37,8 @@ export interface CssPluginOptions {
    * of the esbuild formatted target.
    */
   browsers: string[];
+
+  tailwindConfiguration?: { file: string; package: string };
 }
 
 /**
@@ -61,12 +63,19 @@ export function createCssPlugin(options: CssPluginOptions): Plugin {
       const autoprefixerInfo = autoprefixer.info({ from: build.initialOptions.absWorkingDir });
       const skipAutoprefixer = autoprefixerInfo.includes('Awesome!');
 
-      if (skipAutoprefixer) {
+      if (skipAutoprefixer && !options.tailwindConfiguration) {
         return;
       }
 
       postcss ??= (await import('postcss')).default;
-      const postcssProcessor = postcss([autoprefixer]);
+      const postcssProcessor = postcss();
+      if (options.tailwindConfiguration) {
+        const tailwind = await import(options.tailwindConfiguration.package);
+        postcssProcessor.use(tailwind({ config: options.tailwindConfiguration.file }));
+      }
+      if (!skipAutoprefixer) {
+        postcssProcessor.use(autoprefixer);
+      }
 
       // Add a load callback to support inline Component styles
       build.onLoad({ filter: /^css;/, namespace: 'angular:styles/component' }, async (args) => {

@@ -29,6 +29,7 @@ export interface BundleStylesheetOptions {
   externalDependencies?: string[];
   target: string[];
   browsers: string[];
+  tailwindConfiguration?: { file: string; package: string };
 }
 
 export function createStylesheetBundleOptions(
@@ -72,6 +73,7 @@ export function createStylesheetBundleOptions(
         sourcemap: !!options.sourcemap,
         inlineComponentData,
         browsers: options.browsers,
+        tailwindConfiguration: options.tailwindConfiguration,
       }),
       createCssResourcePlugin(),
     ],
