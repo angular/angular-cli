@@ -285,6 +285,7 @@ function createCodeBundleOptions(
     advancedOptimizations,
     inlineStyleLanguage,
     jit,
+    tailwindConfiguration,
   } = options;
 
   return {
@@ -339,6 +340,7 @@ function createCodeBundleOptions(
           target,
           inlineStyleLanguage,
           browsers,
+          tailwindConfiguration,
         },
       ),
     ],
@@ -417,6 +419,7 @@ function createGlobalStylesBundleOptions(
     preserveSymlinks,
     externalDependencies,
     stylePreprocessorOptions,
+    tailwindConfiguration,
   } = options;
 
   const buildOptions = createStylesheetBundleOptions({
@@ -429,6 +432,7 @@ function createGlobalStylesBundleOptions(
     outputNames,
     includePaths: stylePreprocessorOptions?.includePaths,
     browsers,
+    tailwindConfiguration,
   });
   buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
 

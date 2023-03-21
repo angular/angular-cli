@@ -29,7 +29,15 @@ TEST_TAGS = ["no-remote-exec", "requires-network"]
 # Subset of tests for yarn/esbuild
 BROWSER_TESTS = ["tests/misc/browsers.js"]
 YARN_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**"]
-ESBUILD_TESTS = ["tests/basic/**", "tests/build/prod-build.js", "tests/build/relative-sourcemap.js", "tests/build/styles/scss.js", "tests/build/styles/include-paths.js", "tests/commands/add/add-pwa.js"]
+ESBUILD_TESTS = [
+    "tests/basic/**",
+    "tests/build/prod-build.js",
+    "tests/build/relative-sourcemap.js",
+    "tests/build/styles/scss.js",
+    "tests/build/styles/include-paths.js",
+    "tests/build/styles/tailwind*.js",
+    "tests/commands/add/add-pwa.js",
+]
 
 # Tests excluded for esbuild
 ESBUILD_IGNORE_TESTS = [

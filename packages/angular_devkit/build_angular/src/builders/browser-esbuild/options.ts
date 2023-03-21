@@ -7,7 +7,9 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import * as path from 'path';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { normalizePolyfills } from '../../utils/normalize-polyfills';
@@ -100,6 +102,25 @@ export async function normalizeOptions(
     }
   }
 
+  let tailwindConfiguration: { file: string; package: string } | undefined;
+  const tailwindConfigurationPath = findTailwindConfigurationFile(workspaceRoot, projectRoot);
+  if (tailwindConfigurationPath) {
+    const resolver = createRequire(projectRoot);
+    try {
+      tailwindConfiguration = {
+        file: tailwindConfigurationPath,
+        package: resolver.resolve('tailwindcss'),
+      };
+    } catch {
+      const relativeTailwindConfigPath = path.relative(workspaceRoot, tailwindConfigurationPath);
+      context.logger.warn(
+        `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
+          ` but the 'tailwindcss' package is not installed.` +
+          ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
+      );
+    }
+  }
+
   let serviceWorkerOptions;
   if (options.serviceWorker) {
     // If ngswConfigPath is not specified, the default is 'ngsw-config.json' within the project root
@@ -181,5 +202,27 @@ export async function normalizeOptions(
     globalStyles,
     serviceWorkerOptions,
     indexHtmlOptions,
+    tailwindConfiguration,
   };
+}
+
+function findTailwindConfigurationFile(
+  workspaceRoot: string,
+  projectRoot: string,
+): string | undefined {
+  // A configuration file can exist in the project or workspace root
+  // The list of valid config files can be found:
+  // https://github.com/tailwindlabs/tailwindcss/blob/8845d112fb62d79815b50b3bae80c317450b8b92/src/util/resolveConfigPath.js#L46-L52
+  const tailwindConfigFiles = ['tailwind.config.js', 'tailwind.config.cjs'];
+  for (const basePath of [projectRoot, workspaceRoot]) {
+    for (const configFile of tailwindConfigFiles) {
+      // Project level configuration should always take precedence.
+      const fullPath = path.join(basePath, configFile);
+      if (fs.existsSync(fullPath)) {
+        return fullPath;
+      }
+    }
+  }
+
+  return undefined;
 }
