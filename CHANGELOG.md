@@ -1,3 +1,38 @@
+<a name="16.0.0-next.5"></a>
+
+# 16.0.0-next.5 (2023-03-22)
+
+## Breaking Changes
+
+###
+
+- - TypeScript 4.8 is no longer supported.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [a832c2028](https://github.com/angular/angular-cli/commit/a832c202828a1caa425e1a0c5ff8d2ebb77c4667) | feat | Implement a standalone flag for new applications |
+
+###
+
+| Commit                                                                                              | Type  | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ----- | ---------------------------------------------------------- |
+| [5a171ddff](https://github.com/angular/angular-cli/commit/5a171ddff66ff366089616736baf7545fe44f570) | build | update to TypeScript 5 and drop support for TypeScript 4.8 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [ff5ebf9b1](https://github.com/angular/angular-cli/commit/ff5ebf9b1244c5a01961cd3dba6bb345392aa57c) | feat | add CSP support for inline styles                      |
+| [52969db6b](https://github.com/angular/angular-cli/commit/52969db6bdaf42ec7d7f28274eba518ed1a794b7) | feat | initial tailwindcss support for CSS in esbuild builder |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Kristiyan Kostadinov and Mike Brocchi
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.4"></a>
 
 # 15.2.4 (2023-03-16)
