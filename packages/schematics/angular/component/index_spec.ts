@@ -427,11 +427,11 @@ describe('Component Schematic', () => {
     expect(componentContent).toContain('imports: [CommonModule]');
   });
 
-  it('should declare standalone components in the `imports` of a test', async () => {
+  it('should not declare standalone components in the `imports` or `declarations` of a test', async () => {
     const options = { ...defaultOptions, standalone: true };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
-    expect(testContent).toContain('imports: [ FooComponent ]');
+    expect(testContent).not.toContain('imports');
     expect(testContent).not.toContain('declarations');
   });
 });
