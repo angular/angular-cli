@@ -122,7 +122,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#4c7d40592a36f061c23dd08f437f734081f9979d":
   version "0.0.0-462f716ef571b2b41fff90aaa5bb10897693efcc"
-  uid "4c7d40592a36f061c23dd08f437f734081f9979d"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#4c7d40592a36f061c23dd08f437f734081f9979d"
   dependencies:
     "@angular-devkit/build-angular" "16.0.0-next.4"
@@ -176,22 +175,6 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/compiler-cli@15.2.4":
-  version "15.2.4"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-15.2.4.tgz#9572eca21514c65327e8a94b87f27e57a4240bec"
-  integrity sha512-FCRNZ60PIKRt3rmjab7ca1E5Mc8Zt2izwD+VrzWeyBc51g5dVD+T/CRamJbmqRGw1hnn6BBM/VP9oDRcMVwGlg==
-  dependencies:
-    "@babel/core" "7.19.3"
-    "@jridgewell/sourcemap-codec" "^1.4.14"
-    chokidar "^3.0.0"
-    convert-source-map "^1.5.1"
-    dependency-graph "^0.11.0"
-    magic-string "^0.27.0"
-    reflect-metadata "^0.1.2"
-    semver "^7.0.0"
-    tslib "^2.3.0"
-    yargs "^17.2.1"
-
 "@angular/compiler-cli@16.0.0-next.4":
   version "16.0.0-next.4"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.0.0-next.4.tgz#ba744ae0ba4f58a580bf63537392ca001c1e9635"
@@ -205,13 +188,6 @@
     semver "^7.0.0"
     tslib "^2.3.0"
     yargs "^17.2.1"
-
-"@angular/compiler@15.2.4":
-  version "15.2.4"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-15.2.4.tgz#9c68fdd8b46ea09ae5c5f7cf52ad2e48a20c73bf"
-  integrity sha512-M4zqNCiSsNH2tc12yux9ZpGfSQ4vJ08iYxq6RJmS3CFJtDIw0SFc14ycHX+8rXYfLw92j0UTaDEAhjruAM51Zw==
-  dependencies:
-    tslib "^2.3.0"
 
 "@angular/compiler@16.0.0-next.4":
   version "16.0.0-next.4"
@@ -306,7 +282,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#052850d27f6c36226e1a62ab04af799746decd9a":
   version "0.0.0-462f716ef571b2b41fff90aaa5bb10897693efcc"
-  uid "052850d27f6c36226e1a62ab04af799746decd9a"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#052850d27f6c36226e1a62ab04af799746decd9a"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -7989,13 +7964,6 @@ magic-string@0.30.0:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.13"
 
-magic-string@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.27.0.tgz#e4a3413b4bab6d98d2becffd48b4a257effdbbf3"
-  integrity sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==
-  dependencies:
-    "@jridgewell/sourcemap-codec" "^1.4.13"
-
 make-dir@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"
@@ -10099,7 +10067,6 @@ sass@1.59.3, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:
