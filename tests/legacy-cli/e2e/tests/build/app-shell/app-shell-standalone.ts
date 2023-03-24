@@ -68,7 +68,7 @@ export default async function () {
 
       export default () => bootstrapApplication(AppComponent, {
         providers: [
-          importProvidersFrom(BrowserModule.withServerTransition({ appId: 'app' })),
+          importProvidersFrom(BrowserModule),
           importProvidersFrom(ServerModule),
           provideRouter([{ path: 'shell', component: AppShellComponent }]),
         ],
