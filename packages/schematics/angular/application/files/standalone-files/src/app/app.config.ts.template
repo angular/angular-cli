@@ -4,5 +4,5 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';<% } %>
 
 export const appConfig: ApplicationConfig = {
-  providers: [<% if (routing) { %>provideRouter(routes) <% } %>],
+  providers: [<% if (routing) { %>provideRouter(routes) <% } %>]
 };
