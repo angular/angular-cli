@@ -21,15 +21,12 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import {
   NodeDependencyType,
   addPackageJsonDependency,
   getPackageJsonDependency,
 } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
-import { findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
@@ -93,54 +90,6 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       });
     }
   });
-}
-
-function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
-  const moduleFileText = host.readText(modulePath);
-  const source = ts.createSourceFile(modulePath, moduleFileText, ts.ScriptTarget.Latest, true);
-
-  const decoratorMetadata = getDecoratorMetadata(source, 'NgModule', '@angular/core')[0];
-  const browserModuleNode = findNode(decoratorMetadata, ts.SyntaxKind.Identifier, 'BrowserModule');
-
-  if (browserModuleNode === null) {
-    throw new SchematicsException(`Cannot find BrowserModule import in ${modulePath}`);
-  }
-
-  return browserModuleNode;
-}
-
-function addServerTransition(
-  options: UniversalOptions,
-  mainFile: string,
-  clientProjectRoot: string,
-): Rule {
-  return (host: Tree) => {
-    const mainPath = normalize('/' + mainFile);
-
-    const bootstrapModuleRelativePath = findBootstrapModulePath(host, mainPath);
-    const bootstrapModulePath = normalize(
-      `/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`,
-    );
-
-    const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
-    const transitionCallRecorder = host.beginUpdate(bootstrapModulePath);
-    const position = browserModuleImport.pos + browserModuleImport.getFullWidth();
-    const browserModuleFullImport = browserModuleImport.parent;
-
-    if (browserModuleFullImport.getText() === 'BrowserModule.withServerTransition') {
-      // Remove any existing withServerTransition as otherwise we might have incorrect configuration.
-      transitionCallRecorder.remove(
-        position,
-        browserModuleFullImport.parent.getFullWidth() - browserModuleImport.getFullWidth(),
-      );
-    }
-
-    transitionCallRecorder.insertLeft(
-      position,
-      `.withServerTransition({ appId: '${options.appId}' })`,
-    );
-    host.commitUpdate(transitionCallRecorder);
-  };
 }
 
 function addDependencies(): Rule {
@@ -214,7 +163,6 @@ export default function (options: UniversalOptions): Rule {
       mergeWith(rootSource),
       addDependencies(),
       updateConfigFile(options, tsConfigDirectory),
-      addServerTransition(options, clientBuildOptions.main, clientProject.root),
     ]);
   };
 }

@@ -46,7 +46,7 @@ export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallEx
   return bootstrapCall;
 }
 
-export function findBootstrapModulePath(host: Tree, mainPath: string): string {
+function findBootstrapModulePath(host: Tree, mainPath: string): string {
   const bootstrapCall = findBootstrapModuleCall(host, mainPath);
   if (!bootstrapCall) {
     throw new SchematicsException('Bootstrap call not found');

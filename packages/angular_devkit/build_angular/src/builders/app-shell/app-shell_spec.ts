@@ -58,7 +58,7 @@ describe('AppShell Builder', () => {
           AppComponent
         ],
         imports: [
-          BrowserModule.withServerTransition({ appId: 'serverApp' }),
+          BrowserModule,
           AppRoutingModule,
           RouterModule
         ],
@@ -116,14 +116,6 @@ describe('AppShell Builder', () => {
   };
 
   it('works (basic)', async () => {
-    host.replaceInFile(
-      'src/app/app.module.ts',
-      / {4}BrowserModule/,
-      `
-      BrowserModule.withServerTransition({ appId: 'some-app' })
-    `,
-    );
-
     const run = await architect.scheduleTarget(target);
     const output = await run.result;
     await run.stop();
