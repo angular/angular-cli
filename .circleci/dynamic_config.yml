@@ -462,7 +462,8 @@ workflows:
             - build
 
       # Windows jobs
-      - e2e-cli-win
+      - e2e-cli-win:
+          <<: *only_release_branches
 
       # Publish jobs
       - snapshot_publish:
