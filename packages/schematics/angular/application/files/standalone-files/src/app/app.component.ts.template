@@ -32,7 +32,7 @@ import { RouterOutlet } from '@angular/router';<% } %>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: [],<% } else { %>
-  styleUrls: ['./app.component.<%= style %>'], <% } %>
+  styleUrls: ['./app.component.<%= style %>'],<% } %>
   imports: [CommonModule<% if(routing) { %>, RouterOutlet<% } %>]
 })
 export class AppComponent {
