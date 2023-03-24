@@ -42,16 +42,30 @@ interface RebuildState {
  * Represents the result of a single builder execute call.
  */
 class ExecutionResult {
+  readonly outputFiles: OutputFile[] = [];
+  readonly assetFiles: { source: string; destination: string }[] = [];
+
   constructor(
-    private success: boolean,
     private codeRebuild?: BundlerContext,
     private globalStylesRebuild?: BundlerContext,
     private codeBundleCache?: SourceFileCache,
   ) {}
 
+  addOutputFile(path: string, content: string): void {
+    this.outputFiles.push(createOutputFileFromText(path, content));
+  }
+
   get output() {
     return {
-      success: this.success,
+      success: this.outputFiles.length > 0,
+    };
+  }
+
+  get outputWithFiles() {
+    return {
+      success: this.outputFiles.length > 0,
+      outputFiles: this.outputFiles,
+      assetFiles: this.assetFiles,
     };
   }
 
@@ -67,7 +81,7 @@ class ExecutionResult {
   }
 
   async dispose(): Promise<void> {
-    await Promise.all([this.codeRebuild?.dispose(), this.globalStylesRebuild?.dispose()]);
+    await Promise.allSettled([this.codeRebuild?.dispose(), this.globalStylesRebuild?.dispose()]);
   }
 }
 
@@ -82,7 +96,6 @@ async function execute(
     projectRoot,
     workspaceRoot,
     optimizationOptions,
-    outputPath,
     assets,
     serviceWorkerOptions,
     indexHtmlOptions,
@@ -123,24 +136,15 @@ async function execute(
     warnings: [...codeResults.warnings, ...styleResults.warnings],
   });
 
-  // Return if the bundling failed to generate output files or there are errors
-  if (codeResults.errors) {
-    return new ExecutionResult(
-      false,
-      codeBundleContext,
-      globalStylesBundleContext,
-      codeBundleCache,
-    );
-  }
+  const executionResult = new ExecutionResult(
+    codeBundleContext,
+    globalStylesBundleContext,
+    codeBundleCache,
+  );
 
-  // Return if the global stylesheet bundling has errors
-  if (styleResults.errors) {
-    return new ExecutionResult(
-      false,
-      codeBundleContext,
-      globalStylesBundleContext,
-      codeBundleCache,
-    );
+  // Return if the bundling has errors
+  if (codeResults.errors || styleResults.errors) {
+    return executionResult;
   }
 
   // Filter global stylesheet initial files
@@ -150,7 +154,7 @@ async function execute(
 
   // Combine the bundling output files
   const initialFiles: FileInfo[] = [...codeResults.initialFiles, ...styleResults.initialFiles];
-  const outputFiles: OutputFile[] = [...codeResults.outputFiles, ...styleResults.outputFiles];
+  executionResult.outputFiles.push(...codeResults.outputFiles, ...styleResults.outputFiles);
 
   // Combine metafiles used for the stats option as well as bundle budgets and console output
   const metafile = {
@@ -180,7 +184,7 @@ async function execute(
     indexHtmlGenerator.readAsset = async function (filePath: string): Promise<string> {
       // Remove leading directory separator
       const relativefilePath = path.relative(virtualOutputPath, filePath);
-      const file = outputFiles.find((file) => file.path === relativefilePath);
+      const file = executionResult.outputFiles.find((file) => file.path === relativefilePath);
       if (file) {
         return file.text;
       }
@@ -202,29 +206,26 @@ async function execute(
       context.logger.warn(warning);
     }
 
-    outputFiles.push(createOutputFileFromText(indexHtmlOptions.output, content));
+    executionResult.addOutputFile(indexHtmlOptions.output, content);
   }
 
   // Copy assets
-  let assetFiles;
   if (assets) {
     // The webpack copy assets helper is used with no base paths defined. This prevents the helper
     // from directly writing to disk. This should eventually be replaced with a more optimized helper.
-    assetFiles = await copyAssets(assets, [], workspaceRoot);
+    executionResult.assetFiles.push(...(await copyAssets(assets, [], workspaceRoot)));
   }
 
   // Write metafile if stats option is enabled
   if (options.stats) {
-    outputFiles.push(createOutputFileFromText('stats.json', JSON.stringify(metafile, null, 2)));
+    executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2));
   }
 
   // Extract and write licenses for used packages
   if (options.extractLicenses) {
-    outputFiles.push(
-      createOutputFileFromText(
-        '3rdpartylicenses.txt',
-        await extractLicenses(metafile, workspaceRoot),
-      ),
+    executionResult.addOutputFile(
+      '3rdpartylicenses.txt',
+      await extractLicenses(metafile, workspaceRoot),
     );
   }
 
@@ -235,31 +236,22 @@ async function execute(
         workspaceRoot,
         serviceWorkerOptions,
         options.baseHref || '/',
-        outputFiles,
-        assetFiles || [],
+        executionResult.outputFiles,
+        executionResult.assetFiles,
       );
-      outputFiles.push(createOutputFileFromText('ngsw.json', serviceWorkerResult.manifest));
-      assetFiles ??= [];
-      assetFiles.push(...serviceWorkerResult.assetFiles);
+      executionResult.addOutputFile('ngsw.json', serviceWorkerResult.manifest);
+      executionResult.assetFiles.push(...serviceWorkerResult.assetFiles);
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : `${error}`);
 
-      return new ExecutionResult(
-        false,
-        codeBundleContext,
-        globalStylesBundleContext,
-        codeBundleCache,
-      );
+      return executionResult;
     }
   }
-
-  // Write output files
-  await writeResultFiles(outputFiles, assetFiles, outputPath);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
 
-  return new ExecutionResult(true, codeBundleContext, globalStylesBundleContext, codeBundleCache);
+  return executionResult;
 }
 
 async function writeResultFiles(
@@ -521,16 +513,19 @@ function createGlobalStylesBundleOptions(
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.
- * @param initialOptions The browser builder options to use when setting up the application build
+ * @param userOptions The browser builder options to use when setting up the application build
  * @param context The Architect builder context object
  * @returns An async iterable with the builder result output
  */
 export async function* buildEsbuildBrowser(
-  initialOptions: BrowserBuilderOptions,
+  userOptions: BrowserBuilderOptions,
   context: BuilderContext,
-): AsyncIterable<BuilderOutput> {
+  infrastructureSettings?: {
+    write?: boolean;
+  },
+): AsyncIterable<BuilderOutput & { outputFiles?: OutputFile[] }> {
   // Inform user of experimental status of builder and options
-  logExperimentalWarnings(initialOptions, context);
+  logExperimentalWarnings(userOptions, context);
 
   // Determine project name from builder context target
   const projectName = context.target?.project;
@@ -540,36 +535,50 @@ export async function* buildEsbuildBrowser(
     return;
   }
 
-  const normalizedOptions = await normalizeOptions(context, projectName, initialOptions);
+  const normalizedOptions = await normalizeOptions(context, projectName, userOptions);
+  // Writing the result to the filesystem is the default behavior
+  const shouldWriteResult = infrastructureSettings?.write !== false;
 
-  // Clean output path if enabled
-  if (initialOptions.deleteOutputPath) {
-    deleteOutputDir(normalizedOptions.workspaceRoot, initialOptions.outputPath);
-  }
+  if (shouldWriteResult) {
+    // Clean output path if enabled
+    if (userOptions.deleteOutputPath) {
+      deleteOutputDir(normalizedOptions.workspaceRoot, userOptions.outputPath);
+    }
 
-  // Create output directory if needed
-  try {
-    await fs.mkdir(normalizedOptions.outputPath, { recursive: true });
-  } catch (e) {
-    assertIsError(e);
-    context.logger.error('Unable to create output directory: ' + e.message);
+    // Create output directory if needed
+    try {
+      await fs.mkdir(normalizedOptions.outputPath, { recursive: true });
+    } catch (e) {
+      assertIsError(e);
+      context.logger.error('Unable to create output directory: ' + e.message);
 
-    return;
+      return;
+    }
   }
 
   // Initial build
   let result: ExecutionResult;
   try {
     result = await execute(normalizedOptions, context);
-    yield result.output;
+
+    if (shouldWriteResult) {
+      // Write output files
+      await writeResultFiles(result.outputFiles, result.assetFiles, normalizedOptions.outputPath);
+
+      yield result.output;
+    } else {
+      // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      yield result.outputWithFiles as any;
+    }
 
     // Finish if watch mode is not enabled
-    if (!initialOptions.watch) {
+    if (!userOptions.watch) {
       return;
     }
   } finally {
     // Ensure Sass workers are shutdown if not watching
-    if (!initialOptions.watch) {
+    if (!userOptions.watch) {
       shutdownSassWorkerPool();
     }
   }
@@ -578,8 +587,8 @@ export async function* buildEsbuildBrowser(
 
   // Setup a watcher
   const watcher = createWatcher({
-    polling: typeof initialOptions.poll === 'number',
-    interval: initialOptions.poll,
+    polling: typeof userOptions.poll === 'number',
+    interval: userOptions.poll,
     // Ignore the output and cache paths to avoid infinite rebuild cycles
     ignored: [normalizedOptions.outputPath, normalizedOptions.cacheOptions.basePath],
   });
@@ -598,12 +607,22 @@ export async function* buildEsbuildBrowser(
     for await (const changes of watcher) {
       context.logger.info('Changes detected. Rebuilding...');
 
-      if (initialOptions.verbose) {
+      if (userOptions.verbose) {
         context.logger.info(changes.toDebugString());
       }
 
       result = await execute(normalizedOptions, context, result.createRebuildState(changes));
-      yield result.output;
+
+      if (shouldWriteResult) {
+        // Write output files
+        await writeResultFiles(result.outputFiles, result.assetFiles, normalizedOptions.outputPath);
+
+        yield result.output;
+      } else {
+        // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        yield result.outputWithFiles as any;
+      }
     }
   } finally {
     // Stop the watcher
