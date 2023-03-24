@@ -4,7 +4,8 @@ import { RouterOutlet } from '@angular/router';<% } %>
 
 @Component({
   selector: '<%= selector %>',
-  standalone: true,<% if(inlineTemplate) { %>
+  standalone: true,
+  imports: [CommonModule<% if(routing) { %>, RouterOutlet<% } %>],<% if(inlineTemplate) { %>
   template: `
     <!--The content below is only a placeholder and can be replaced.-->
     <div style="text-align:center" class="content">
@@ -32,8 +33,7 @@ import { RouterOutlet } from '@angular/router';<% } %>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: [],<% } else { %>
-  styleUrls: ['./app.component.<%= style %>'], <% } %>
-  imports: [CommonModule<% if(routing) { %>, RouterOutlet<% } %>]
+  styleUrls: ['./app.component.<%= style %>']<% } %>
 })
 export class AppComponent {
   title = '<%= name %>';
