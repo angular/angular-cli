@@ -560,7 +560,12 @@ export async function* buildEsbuildBrowser(
   infrastructureSettings?: {
     write?: boolean;
   },
-): AsyncIterable<BuilderOutput & { outputFiles?: OutputFile[] }> {
+): AsyncIterable<
+  BuilderOutput & {
+    outputFiles?: OutputFile[];
+    assetFiles?: { source: string; destination: string }[];
+  }
+> {
   // Inform user of experimental status of builder and options
   logExperimentalWarnings(userOptions, context);
 

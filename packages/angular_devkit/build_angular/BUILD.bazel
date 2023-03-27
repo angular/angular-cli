@@ -175,6 +175,7 @@ ts_library(
         "@npm//tree-kill",
         "@npm//tslib",
         "@npm//typescript",
+        "@npm//vite",
         "@npm//webpack",
         "@npm//webpack-dev-middleware",
         "@npm//webpack-dev-server",
