@@ -6,15 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import type { BuilderContext } from '@angular-devkit/architect';
 import { EMPTY, Observable, defer, switchMap } from 'rxjs';
-import { ExecutionTransformer } from '../../transforms';
+import type { ExecutionTransformer } from '../../transforms';
 import { checkPort } from '../../utils/check-port';
-import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
+import type { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { normalizeOptions } from './options';
-import { Schema as DevServerBuilderOptions } from './schema';
-import { DevServerBuilderOutput, serveWebpackBrowser } from './webpack-server';
+import type { Schema as DevServerBuilderOptions } from './schema';
+import type { DevServerBuilderOutput } from './webpack-server';
 
 /**
  * A Builder that executes a development server based on the provided browser target option.
@@ -44,16 +44,19 @@ export function execute(
 
   return defer(() => initialize(options, projectName, context)).pipe(
     switchMap(({ builderName, normalizedOptions }) => {
-      // Issue a warning that the dev-server does not currently support the experimental esbuild-
-      // based builder and will use Webpack.
+      // Use vite-based development server for esbuild-based builds
       if (builderName === '@angular-devkit/build-angular:browser-esbuild') {
-        context.logger.warn(
-          'WARNING: The experimental esbuild-based builder is not currently supported ' +
-            'by the dev-server. The stable Webpack-based builder will be used instead.',
+        return defer(() => import('./vite-server')).pipe(
+          switchMap(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context)),
         );
       }
 
-      return serveWebpackBrowser(normalizedOptions, builderName, context, transforms);
+      // Use Webpack for all other browser targets
+      return defer(() => import('./webpack-server')).pipe(
+        switchMap(({ serveWebpackBrowser }) =>
+          serveWebpackBrowser(normalizedOptions, builderName, context, transforms),
+        ),
+      );
     }),
   );
 }
