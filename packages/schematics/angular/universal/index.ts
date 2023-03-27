@@ -17,6 +17,7 @@ import {
   chain,
   mergeWith,
   move,
+  noop,
   strings,
   url,
 } from '@angular-devkit/schematics';
@@ -27,6 +28,7 @@ import {
   getPackageJsonDependency,
 } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
+import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
@@ -133,7 +135,9 @@ export default function (options: UniversalOptions): Rule {
       context.addTask(new NodePackageInstallTask());
     }
 
-    const templateSource = apply(url('./files/src'), [
+    const isStandalone = isStandaloneApp(host, clientBuildOptions.main);
+
+    const templateSource = apply(url(isStandalone ? './files/standalone-src' : './files/src'), [
       applyTemplates({
         ...strings,
         ...options,
