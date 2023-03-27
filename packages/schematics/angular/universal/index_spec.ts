@@ -188,4 +188,55 @@ describe('Universal Schematic', () => {
     };
     expect(compilerOptions.types).toContain('@angular/localize');
   });
+
+  describe('standalone application', () => {
+    let standaloneAppOptions;
+    let defaultStandaloneOptions: UniversalOptions;
+    beforeEach(async () => {
+      const standaloneAppName = 'baz';
+      standaloneAppOptions = {
+        ...appOptions,
+        name: standaloneAppName,
+        standalone: true,
+      };
+      defaultStandaloneOptions = {
+        project: standaloneAppName,
+      };
+      appTree = await schematicRunner.runSchematic('application', standaloneAppOptions, appTree);
+    });
+
+    it('should create not root module file', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'universal',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      const filePath = '/projects/baz/src/app/app.server.module.ts';
+      expect(tree.exists(filePath)).toEqual(false);
+    });
+
+    it('should create a main file', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'universal',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      const filePath = '/projects/baz/src/main.server.ts';
+      expect(tree.exists(filePath)).toEqual(true);
+      const contents = tree.readContent(filePath);
+      expect(contents).toContain(`bootstrapApplication(AppComponent, config)`);
+    });
+
+    it('should create server app config file', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'universal',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      const filePath = '/projects/baz/src/app/app.config.server.ts';
+      expect(tree.exists(filePath)).toEqual(true);
+      const contents = tree.readContent(filePath);
+      expect(contents).toContain(`const serverConfig: ApplicationConfig = {`);
+    });
+  });
 });
