@@ -1,5 +1,5 @@
 import { getGlobalVariable } from '../../../utils/env';
-import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../../utils/fs';
+import { expectFileToMatch } from '../../../utils/fs';
 import { installPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
@@ -7,8 +7,8 @@ import { updateJsonFile } from '../../../utils/project';
 const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
-  await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
-  await ng('generate', 'app-shell', '--project', 'test-project');
+  await ng('generate', 'app', 'test-project-two', '--routing', '--standalone', '--skip-install');
+  await ng('generate', 'app-shell', '--project', 'test-project-two');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
@@ -30,55 +30,9 @@ export default async function () {
     }
   }
 
-  // TODO(alanagius): update the below once we have a standalone schematic.
-  await writeMultipleFiles({
-    'src/app/app.component.ts': `
-      import { Component } from '@angular/core';
-      import { RouterOutlet } from '@angular/router';
+  await ng('run', 'test-project-two:app-shell:development');
+  await expectFileToMatch('dist/test-project-two/browser/index.html', 'app-shell works!');
 
-      @Component({
-        selector: 'app-root',
-        standalone: true,
-        template: '<router-outlet></router-outlet>',
-        imports: [RouterOutlet],
-      })
-      export class AppComponent {}
-  `,
-    'src/main.ts': `
-      import { bootstrapApplication } from '@angular/platform-browser';
-      import { provideRouter } from '@angular/router';
-
-      import { AppComponent } from './app/app.component';
-
-      bootstrapApplication(AppComponent, {
-        providers: [
-          provideRouter([]),
-        ],
-      });
-  `,
-    'src/main.server.ts': `
-      import { importProvidersFrom } from '@angular/core';
-      import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
-      import { ServerModule } from '@angular/platform-server';
-
-      import { provideRouter } from '@angular/router';
-
-      import { AppShellComponent } from './app/app-shell/app-shell.component';
-      import { AppComponent } from './app/app.component';
-
-      export default () => bootstrapApplication(AppComponent, {
-        providers: [
-          importProvidersFrom(BrowserModule),
-          importProvidersFrom(ServerModule),
-          provideRouter([{ path: 'shell', component: AppShellComponent }]),
-        ],
-      });
-  `,
-  });
-
-  await ng('run', 'test-project:app-shell:development');
-  await expectFileToMatch('dist/test-project/browser/index.html', /app-shell works!/);
-
-  await ng('run', 'test-project:app-shell');
-  await expectFileToMatch('dist/test-project/browser/index.html', /app-shell works!/);
+  await ng('run', 'test-project-two:app-shell');
+  await expectFileToMatch('dist/test-project-two/browser/index.html', 'app-shell works!');
 }
