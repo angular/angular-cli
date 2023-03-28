@@ -30,14 +30,14 @@ describe('InlineCriticalCssProcessor', () => {
     throw new Error('Cannot read asset.');
   };
 
-  const getContent = (deployUrl: string): string => {
+  const getContent = (deployUrl: string, bodyContent = ''): string => {
     return `
       <html>
       <head>
         <link href="${deployUrl}styles.css" rel="stylesheet">
         <link href="${deployUrl}theme.css" rel="stylesheet">
       </head>
-      <body></body>
+      <body>${bodyContent}</body>
     </html>`;
   };
 
@@ -104,5 +104,33 @@ describe('InlineCriticalCssProcessor', () => {
       `<link href="theme.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(content).toContain('<style>body{margin:0}html{color:white}</style>');
+  });
+
+  it('should process the inline `onload` handlers if a CSP nonce is specified', async () => {
+    const inlineCssProcessor = new InlineCriticalCssProcessor({
+      readAsset,
+    });
+
+    const { content } = await inlineCssProcessor.process(
+      getContent('', '<app ngCspNonce="{% nonce %}"></app>'),
+      {
+        outputPath: '/dist/',
+      },
+    );
+
+    expect(content).toContain(
+      '<link href="styles.css" rel="stylesheet" media="print" ngCspMedia="all">',
+    );
+    expect(content).toContain(
+      '<link href="theme.css" rel="stylesheet" media="print" ngCspMedia="all">',
+    );
+    // Nonces shouldn't be added inside the `noscript` tags.
+    expect(content).toContain('<noscript><link rel="stylesheet" href="theme.css"></noscript>');
+    expect(content).toContain('<script nonce="{% nonce %}">');
+    expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
+    <style nonce="{% nonce %}">
+    body { margin: 0; }
+    html { color: white; }
+    </style>`);
   });
 });
