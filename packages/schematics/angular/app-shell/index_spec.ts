@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { tags } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -184,5 +185,88 @@ describe('App Shell Schematic', () => {
     expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
     const content = tree.readContent('/projects/bar/src/app/app.server.module.ts');
     expect(content).toMatch(/app-shell\.component/);
+  });
+
+  describe('standalone application', () => {
+    const standaloneAppName = 'baz';
+    const standaloneAppOptions: ApplicationOptions = {
+      ...appOptions,
+      name: standaloneAppName,
+      standalone: true,
+    };
+    const defaultStandaloneOptions: AppShellOptions = {
+      project: standaloneAppName,
+    };
+
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic('application', standaloneAppOptions, appTree);
+    });
+
+    it('should ensure the client app has a router-outlet', async () => {
+      appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...standaloneAppOptions, routing: false },
+        appTree,
+      );
+      await expectAsync(
+        schematicRunner.runSchematic('app-shell', defaultStandaloneOptions, appTree),
+      ).toBeRejected();
+    });
+
+    it('should create the shell component', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'app-shell',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      expect(tree.exists('/projects/baz/src/app/app-shell/app-shell.component.ts')).toBe(true);
+      const content = tree.readContent('/projects/baz/src/app/app.config.server.ts');
+      expect(content).toMatch(/app-shell\.component/);
+    });
+
+    it('should define a server route', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'app-shell',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      const filePath = '/projects/baz/src/app/app.config.server.ts';
+      const content = tree.readContent(filePath);
+      expect(tags.oneLine`${content}`).toContain(tags.oneLine`{
+        provide: ROUTES,
+        multi: true,
+        useValue: [
+          {
+            path: 'shell',
+            component: AppShellComponent
+          }
+        ]
+      }`);
+    });
+
+    it(`should add import to 'ROUTES' token from '@angular/router'`, async () => {
+      const tree = await schematicRunner.runSchematic(
+        'app-shell',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      const filePath = '/projects/baz/src/app/app.config.server.ts';
+      const content = tree.readContent(filePath);
+      expect(content).toContain(`import { ROUTES } from '@angular/router';`);
+    });
+
+    it(`should add import to 'AppShellComponent'`, async () => {
+      const tree = await schematicRunner.runSchematic(
+        'app-shell',
+        defaultStandaloneOptions,
+        appTree,
+      );
+      const filePath = '/projects/baz/src/app/app.config.server.ts';
+      const content = tree.readContent(filePath);
+      expect(content).toContain(
+        `import { AppShellComponent } from './app-shell/app-shell.component';`,
+      );
+    });
   });
 });
