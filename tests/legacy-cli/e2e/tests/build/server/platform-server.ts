@@ -1,11 +1,11 @@
 import { normalize } from 'path';
-import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
-import { installPackage } from '../../utils/packages';
-import { exec, ng } from '../../utils/process';
-import { updateJsonFile } from '../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
+import { expectFileToMatch, replaceInFile, writeFile } from '../../../utils/fs';
+import { installPackage } from '../../../utils/packages';
+import { exec, ng } from '../../../utils/process';
+import { updateJsonFile } from '../../../utils/project';
 
-const snapshots = require('../../ng-snapshot/package.json');
+const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
   await ng('generate', 'universal', '--project', 'test-project');
@@ -40,7 +40,7 @@ export default async function () {
           document: '<app-root></app-root>'
         }).then(html => {
           fs.writeFileSync('dist/test-project/server/index.html', html);
-        });
+        })
         `,
   );
 
