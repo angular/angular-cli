@@ -163,4 +163,30 @@ describe('AppShell Builder', () => {
       /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" onload="this\.media='all'">/,
     );
   });
+
+  it('applies CSP nonce to critical CSS', async () => {
+    host.writeMultipleFiles(appShellRouteFiles);
+    host.replaceInFile('src/index.html', /<app-root/g, '<app-root ngCspNonce="{% nonce %}" ');
+    const overrides = {
+      route: 'shell',
+      browserTarget: 'app:build:production,inline-critical-css',
+    };
+
+    const run = await architect.scheduleTarget(target, overrides);
+    const output = await run.result;
+    await run.stop();
+
+    expect(output.success).toBe(true);
+    const fileName = 'dist/index.html';
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+
+    expect(content).toContain('app-shell works!');
+    expect(content).toContain('<style nonce="{% nonce %}">p{color:#000}</style>');
+    expect(content).toContain('<style ng-app-id="ng" nonce="{% nonce %}">');
+    expect(content).toContain('<app-root ngcspnonce="{% nonce %}"');
+    expect(content).toContain('<script nonce="{% nonce %}">');
+    expect(content).toMatch(
+      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" ngCspMedia="all">/,
+    );
+  });
 });
