@@ -182,7 +182,7 @@ describe('AppShell Builder', () => {
 
     expect(content).toContain('app-shell works!');
     expect(content).toContain('<style nonce="{% nonce %}">p{color:#000}</style>');
-    expect(content).toContain('<style ng-app-id="ng" nonce="{% nonce %}">');
+    expect(content).toContain('<style nonce="{% nonce %}" ng-app-id="ng">');
     expect(content).toContain('<app-root ngcspnonce="{% nonce %}"');
     expect(content).toContain('<script nonce="{% nonce %}">');
     expect(content).toMatch(
