@@ -105,7 +105,8 @@ export async function normalizeOptions(
   let tailwindConfiguration: { file: string; package: string } | undefined;
   const tailwindConfigurationPath = findTailwindConfigurationFile(workspaceRoot, projectRoot);
   if (tailwindConfigurationPath) {
-    const resolver = createRequire(projectRoot);
+    // Create a node resolver at the project root as a directory
+    const resolver = createRequire(projectRoot + '/');
     try {
       tailwindConfiguration = {
         file: tailwindConfigurationPath,
