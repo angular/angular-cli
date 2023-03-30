@@ -105,7 +105,7 @@ export class JSONFile {
   }
 
   save(): void {
-    writeFileSync(this.path, this.content);
+    writeFileSync(this.path, this.content.endsWith('\n') ? this.content : this.content + '\n');
   }
 }
 
