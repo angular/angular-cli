@@ -25,7 +25,7 @@ describe('Hello world E2E Tests', () => {
     // Load the page without waiting for Angular since it is not bootstrapped automatically.
     await browser.driver.get(browser.baseUrl);
 
-    const style = browser.driver.findElement(by.css('style[ng-transition="ng"]'));
+    const style = browser.driver.findElement(by.css('style[ng-app-id="ng"]'));
     expect(style.getText()).not.toBeNull();
 
     // Test the contents from the server.
@@ -39,7 +39,7 @@ describe('Hello world E2E Tests', () => {
     expect(element(by.css('div')).getText()).toMatch('Hello world!');
 
     // Make sure the server styles got replaced by client side ones.
-    expect(element(by.css('style[ng-transition="ng"]')).isPresent()).toBeFalsy();
+    expect(element(by.css('style[ng-app-id="ng"]')).isPresent()).toBeFalsy();
     expect(element(by.css('style')).getText()).toMatch('');
 
     // Make sure there were no client side errors.

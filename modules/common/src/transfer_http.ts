@@ -16,8 +16,14 @@ import {
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
-import { ApplicationRef, Injectable, NgModule } from '@angular/core';
-import { StateKey, TransferState, makeStateKey } from '@angular/platform-browser';
+import {
+  ApplicationRef,
+  Injectable,
+  NgModule,
+  StateKey,
+  TransferState,
+  makeStateKey,
+} from '@angular/core';
 import { Observable, of as observableOf } from 'rxjs';
 import { defaultIfEmpty, first, tap } from 'rxjs/operators';
 

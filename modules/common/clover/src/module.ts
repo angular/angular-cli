@@ -15,13 +15,9 @@ import {
   NgModule,
   Optional,
   PLATFORM_ID,
-} from '@angular/core';
-import {
-  BrowserModule,
-  ɵDomSharedStylesHost as DomSharedStylesHost,
-  ɵSharedStylesHost as SharedStylesHost,
   TransferState,
-} from '@angular/platform-browser';
+} from '@angular/core';
+import { BrowserModule, ɵSharedStylesHost as SharedStylesHost } from '@angular/platform-browser';
 import { filter, mapTo, take } from 'rxjs/operators';
 import { SSRStylesHost } from './styles_host';
 
@@ -77,7 +73,6 @@ export class RendererModule {
             ]
           : [{ provide: SSRStylesHost, useClass: SSRStylesHost, deps: [DOCUMENT] }]),
         { provide: SharedStylesHost, useExisting: SSRStylesHost },
-        { provide: DomSharedStylesHost, useClass: SSRStylesHost },
       ],
     };
   }

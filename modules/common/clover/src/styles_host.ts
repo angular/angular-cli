@@ -19,12 +19,12 @@ export class SSRStylesHost extends SharedStylesHost implements OnDestroy {
   private _styleNodesInDOM: Map<string | null, HTMLElement> | undefined;
 
   constructor(
-    @Inject(DOCUMENT) private doc: Document,
-    @Optional() @Inject(APP_ID) private appId?: string,
+    @Inject(DOCUMENT) private readonly document: Document,
+    @Optional() @Inject(APP_ID) private readonly applicationId: string = '',
   ) {
-    super();
-    this.head = this.doc.querySelector('head');
-    const styles = this.head?.querySelectorAll(`style[ng-style='${this.appId}']`);
+    super(document, applicationId);
+    this.head = this.document.querySelector('head');
+    const styles = this.head?.querySelectorAll(`style[ng-style='${this.applicationId}']`);
     if (styles?.length) {
       const items = Array.from(styles) as HTMLElement[];
       this._styleNodesInDOM = new Map(items.map((el) => [el.textContent, el]));
@@ -47,8 +47,8 @@ export class SSRStylesHost extends SharedStylesHost implements OnDestroy {
     const el = getDOM().createElement('style');
     el.textContent = style;
 
-    if (this.appId) {
-      el.setAttribute('ng-style', this.appId);
+    if (this.applicationId) {
+      el.setAttribute('ng-style', this.applicationId);
     }
 
     if (this.head) {
