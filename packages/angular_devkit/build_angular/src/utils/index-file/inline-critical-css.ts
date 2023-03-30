@@ -20,6 +20,27 @@ const MEDIA_SET_HANDLER_PATTERN = /^this\.media=["'](.*)["'];?$/;
  */
 const CSP_MEDIA_ATTR = 'ngCspMedia';
 
+/**
+ * Script text used to change the media value of the link tags.
+ */
+const LINK_LOAD_SCRIPT_CONTENT = [
+  `(() => {`,
+  // Save the `children` in a variable since they're a live DOM node collection.
+  // We iterate over the direct descendants, instead of going through a `querySelectorAll`,
+  // because we know that the tags will be directly inside the `head`.
+  `  const children = document.head.children;`,
+  // Declare `onLoad` outside the loop to avoid leaking memory.
+  // Can't be an arrow function, because we need `this` to refer to the DOM node.
+  `  function onLoad() {this.media = this.getAttribute('${CSP_MEDIA_ATTR}');}`,
+  // Has to use a plain for loop, because some browsers don't support
+  // `forEach` on `children` which is a `HTMLCollection`.
+  `  for (let i = 0; i < children.length; i++) {`,
+  `    const child = children[i];`,
+  `    child.hasAttribute('${CSP_MEDIA_ATTR}') && child.addEventListener('load', onLoad);`,
+  `  }`,
+  `})();`,
+].join('\n');
+
 export interface InlineCriticalCssProcessOptions {
   outputPath: string;
 }
@@ -40,6 +61,8 @@ interface PartialHTMLElement {
   textContent: string;
   tagName: string | null;
   children: PartialHTMLElement[];
+  next: PartialHTMLElement | null;
+  prev: PartialHTMLElement | null;
 }
 
 /** Partial representation of an HTML `Document`. */
@@ -123,15 +146,7 @@ class CrittersExtended extends Critters {
         this.conditionallyInsertCspLoadingScript(document, cspNonce);
       }
 
-      // Ideally we would hook in at the time Critters inserts the `style` tags, but there isn't
-      // a way of doing that at the moment so we fall back to doing it any time a `link` tag is
-      // inserted. We mitigate it by only iterating the direct children of the `<head>` which
-      // should be pretty shallow.
-      document.head.children.forEach((child) => {
-        if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
-          child.setAttribute('nonce', cspNonce);
-        }
-      });
+      link.prev?.setAttribute('nonce', cspNonce);
     }
 
     return returnValue;
@@ -142,7 +157,8 @@ class CrittersExtended extends Critters {
    */
   private findCspNonce(document: PartialDocument): string | null {
     if (this.documentNonces.has(document)) {
-      return this.documentNonces.get(document) ?? null;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return this.documentNonces.get(document)!;
     }
 
     // HTML attribute are case-insensitive, but the parser used by Critters is case-sensitive.
@@ -159,30 +175,14 @@ class CrittersExtended extends Critters {
    * Inserts the `script` tag that swaps the critical CSS at runtime,
    * if one hasn't been inserted into the document already.
    */
-  private conditionallyInsertCspLoadingScript(document: PartialDocument, nonce: string) {
+  private conditionallyInsertCspLoadingScript(document: PartialDocument, nonce: string): void {
     if (this.addedCspScriptsDocuments.has(document)) {
       return;
     }
 
     const script = document.createElement('script');
     script.setAttribute('nonce', nonce);
-    script.textContent = [
-      `(() => {`,
-      // Save the `children` in a variable since they're a live DOM node collection.
-      // We iterate over the direct descendants, instead of going through a `querySelectorAll`,
-      // because we know that the tags will be directly inside the `head`.
-      `  const children = document.head.children;`,
-      // Declare `onLoad` outside the loop to avoid leaking memory.
-      // Can't be an arrow function, because we need `this` to refer to the DOM node.
-      `  function onLoad() {this.media = this.getAttribute('${CSP_MEDIA_ATTR}');}`,
-      // Has to use a plain for loop, because some browsers don't support
-      // `forEach` on `children` which is a `HTMLCollection`.
-      `  for (let i = 0; i < children.length; i++) {`,
-      `    const child = children[i];`,
-      `    child.hasAttribute('${CSP_MEDIA_ATTR}') && child.addEventListener('load', onLoad);`,
-      `  }`,
-      `})();`,
-    ].join('\n');
+    script.textContent = LINK_LOAD_SCRIPT_CONTENT;
     // Append the script to the head since it needs to
     // run as early as possible, after the `link` tags.
     document.head.appendChild(script);
