@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { BuildOptions, OutputFile } from 'esbuild';
+import type { BuildOptions, Metafile, OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
@@ -20,6 +20,7 @@ import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
+import { BundleStats, generateBuildStatsTable } from '../../webpack/utils/stats';
 import { checkCommonJSModules } from './commonjs-checker';
 import { SourceFileCache, createCompilerPlugin } from './compiler-plugin';
 import { BundlerContext, logMessages } from './esbuild';
@@ -247,6 +248,8 @@ async function execute(
       return executionResult;
     }
   }
+
+  logBuildStats(context, metafile);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
@@ -668,3 +671,17 @@ export async function* buildEsbuildBrowser(
 }
 
 export default createBuilder(buildEsbuildBrowser);
+
+function logBuildStats(context: BuilderContext, metafile: Metafile) {
+  const stats: BundleStats[] = [];
+  for (const [file, { bytes, entryPoint }] of Object.entries(metafile.outputs)) {
+    stats.push({
+      initial: !!entryPoint,
+      stats: [file, '', bytes, ''],
+    });
+  }
+
+  const tableText = generateBuildStatsTable(stats, true, true, false, undefined);
+
+  context.logger.info('\n' + tableText + '\n');
+}

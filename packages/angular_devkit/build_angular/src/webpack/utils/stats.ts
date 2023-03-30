@@ -76,7 +76,7 @@ function generateBundleStats(info: {
   };
 }
 
-function generateBuildStatsTable(
+export function generateBuildStatsTable(
   data: BundleStats[],
   colors: boolean,
   showTotalSize: boolean,
