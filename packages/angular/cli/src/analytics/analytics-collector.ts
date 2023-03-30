@@ -46,7 +46,11 @@ export class AnalyticsCollector {
       [RequestParameter.UserAgentArchitecture]: os.arch(),
       [RequestParameter.UserAgentPlatform]: os.platform(),
       [RequestParameter.UserAgentPlatformVersion]: os.release(),
+      [RequestParameter.UserAgentMobile]: 0,
       [RequestParameter.SessionEngaged]: 1,
+      // The below is needed for tech details to be collected.
+      [RequestParameter.UserAgentFullVersionList]:
+        'Google%20Chrome;111.0.5563.64|Not(A%3ABrand;8.0.0.0|Chromium;111.0.5563.64',
     };
 
     if (ngDebug) {
@@ -171,6 +175,11 @@ export class AnalyticsCollector {
           host: 'www.google-analytics.com',
           method: 'POST',
           path: '/g/collect?' + this.requestParameterStringified,
+          headers: {
+            // The below is needed for tech details to be collected even though we provide our own information from the OS Node.js module
+            'user-agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+          },
         },
         (response) => {
           if (response.statusCode !== 200 && response.statusCode !== 204) {
