@@ -1,3 +1,32 @@
+<a name="16.0.0-next.6"></a>
+
+# 16.0.0-next.6 (2023-03-30)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [c9e84d024](https://github.com/angular/angular-cli/commit/c9e84d0243b4e9191f6cfcd72ebf8288de2b6f2d) | feat | remove generation of `BrowserModule.withServerTransition`     |
+| [50b9e59a5](https://github.com/angular/angular-cli/commit/50b9e59a50b737e34ee12ee48ab83d17c2b8744a) | feat | update app-shell schematic to support standalone applications |
+| [dc5cc893d](https://github.com/angular/angular-cli/commit/dc5cc893d6c3d4e5e6f6c4b19bee632b66a94fc0) | feat | Update universal schematic to support standalone applications |
+| [ba4414b2c](https://github.com/angular/angular-cli/commit/ba4414b2cfb7a040393f314d87ab823bcad75f26) | fix  | reformat app.config.ts                                        |
+| [202e9a50f](https://github.com/angular/angular-cli/commit/202e9a50f62b7927c0900469b21d323b3010762d) | fix  | remove compileComponents from component test schematic        |
+| [85fe820b0](https://github.com/angular/angular-cli/commit/85fe820b081b73b229084882e98e65b5c57f9d0f) | fix  | use same property order in standalone AppComponent            |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [cdfa7ca88](https://github.com/angular/angular-cli/commit/cdfa7ca88c2e79564192d4b7fdafb53d97f2607d) | fix  | allow multiple polyfills with esbuild-based builder |
+| [955b493b1](https://github.com/angular/angular-cli/commit/955b493b13e0a8956706c486d31d9e4338bf41c5) | fix  | support CSP on critical CSS link tags.              |
+| [458400b7b](https://github.com/angular/angular-cli/commit/458400b7b1a435e2febe2c4e1a9fd1ca4eda58d0) | perf | avoid unnecessary iterations                        |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding, Cédric Exbrayat, Joey Perrott, Kristiyan Kostadinov and Mike Brocchi
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.5"></a>
 
 # 16.0.0-next.5 (2023-03-22)
