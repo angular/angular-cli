@@ -313,6 +313,7 @@ function createCodeBundleOptions(
   const {
     workspaceRoot,
     entryPoints,
+    polyfills,
     optimizationOptions,
     sourcemapOptions,
     tsconfig,
@@ -327,7 +328,7 @@ function createCodeBundleOptions(
     tailwindConfiguration,
   } = options;
 
-  return {
+  const buildOptions: BuildOptions = {
     absWorkingDir: workspaceRoot,
     bundle: true,
     format: 'esm',
@@ -391,6 +392,39 @@ function createCodeBundleOptions(
       'ngJitMode': jit ? 'true' : 'false',
     },
   };
+
+  if (polyfills?.length) {
+    const namespace = 'angular:polyfills';
+    buildOptions.entryPoints = {
+      ...buildOptions.entryPoints,
+      ['polyfills']: namespace,
+    };
+
+    buildOptions.plugins?.unshift({
+      name: 'angular-polyfills',
+      setup(build) {
+        build.onResolve({ filter: /^angular:polyfills$/ }, (args) => {
+          if (args.kind !== 'entry-point') {
+            return null;
+          }
+
+          return {
+            path: 'entry',
+            namespace,
+          };
+        });
+        build.onLoad({ filter: /./, namespace }, () => {
+          return {
+            contents: polyfills.map((file) => `import '${file.replace(/\\/g, '/')}';`).join('\n'),
+            loader: 'js',
+            resolveDir: workspaceRoot,
+          };
+        });
+      },
+    });
+  }
+
+  return buildOptions;
 }
 
 /**
