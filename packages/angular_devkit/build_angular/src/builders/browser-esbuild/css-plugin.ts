@@ -71,7 +71,7 @@ export function createCssPlugin(options: CssPluginOptions): Plugin {
       const postcssProcessor = postcss();
       if (options.tailwindConfiguration) {
         const tailwind = await import(options.tailwindConfiguration.package);
-        postcssProcessor.use(tailwind({ config: options.tailwindConfiguration.file }));
+        postcssProcessor.use(tailwind.default({ config: options.tailwindConfiguration.file }));
       }
       if (!skipAutoprefixer) {
         postcssProcessor.use(autoprefixer);

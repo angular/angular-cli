@@ -29,7 +29,7 @@ export default async function () {
   // Check for Tailwind output
   await expectFileToMatch('dist/test-project/styles.css', /::placeholder/);
   await expectToFail(() =>
-    expectFileToMatch('dist/test-project/styles.css', '@tailwind base; @tailwind components;'),
+    expectFileToMatch('dist/test-project/styles.css', /@tailwind base;\s+@tailwind components;/),
   );
 
   // Uninstall Tailwind
