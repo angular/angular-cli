@@ -674,10 +674,20 @@ export default createBuilder(buildEsbuildBrowser);
 
 function logBuildStats(context: BuilderContext, metafile: Metafile) {
   const stats: BundleStats[] = [];
-  for (const [file, { bytes, entryPoint }] of Object.entries(metafile.outputs)) {
+  for (const [file, output] of Object.entries(metafile.outputs)) {
+    // Skip sourcemaps
+    if (file.endsWith('.map')) {
+      continue;
+    }
+    // Skip internal component resources
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((output as any)['ng-component']) {
+      continue;
+    }
+
     stats.push({
-      initial: !!entryPoint,
-      stats: [file, '', bytes, ''],
+      initial: !!output.entryPoint,
+      stats: [file, '', output.bytes, ''],
     });
   }
 
