@@ -40,7 +40,10 @@ export function createLessPlugin(options: LessPluginOptions): Plugin {
       // Add a load callback to support inline Component styles
       build.onLoad({ filter: /^less;/, namespace: 'angular:styles/component' }, async (args) => {
         const data = options.inlineComponentData?.[args.path];
-        assert(data, `component style name should always be found [${args.path}]`);
+        assert(
+          typeof data === 'string',
+          `component style name should always be found [${args.path}]`,
+        );
 
         const [, , filePath] = args.path.split(';', 3);
 
