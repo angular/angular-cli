@@ -64,7 +64,10 @@ export function createSassPlugin(options: SassPluginOptions): Plugin {
 
       build.onLoad({ filter: /^s[ac]ss;/, namespace: 'angular:styles/component' }, async (args) => {
         const data = options.inlineComponentData?.[args.path];
-        assert(data, `component style name should always be found [${args.path}]`);
+        assert(
+          typeof data === 'string',
+          `component style name should always be found [${args.path}]`,
+        );
 
         const [language, , filePath] = args.path.split(';', 3);
         const syntax = language === 'sass' ? 'indented' : 'scss';
