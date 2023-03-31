@@ -159,6 +159,18 @@ export async function bundleComponentStylesheet(
     }
   }
 
+  let metafile;
+  if (!result.errors) {
+    metafile = result.metafile;
+    // Remove entryPoint fields from outputs to prevent the internal component styles from being
+    // treated as initial files. Also mark the entry as a component resource for stat reporting.
+    Object.values(metafile.outputs).forEach((output) => {
+      delete output.entryPoint;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (output as any)['ng-component'] = true;
+    });
+  }
+
   return {
     errors: result.errors,
     warnings: result.warnings,
@@ -166,6 +178,6 @@ export async function bundleComponentStylesheet(
     map,
     path: outputPath,
     resourceFiles,
-    metafile: result.errors ? undefined : result.metafile,
+    metafile,
   };
 }
