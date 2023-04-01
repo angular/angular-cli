@@ -8,6 +8,8 @@
 
 export {
   addModuleImportToStandaloneBootstrap,
+  addFunctionalProvidersToStandaloneBootstrap,
+  callsProvidersFunction,
   findBootstrapApplicationCall,
   importsProvidersFrom,
 } from './standalone';
