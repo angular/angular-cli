@@ -12,7 +12,7 @@ import { readFile } from 'node:fs/promises';
 import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CompileResult, Exception, Syntax } from 'sass';
-import {
+import type {
   FileImporterWithRequestContextOptions,
   SassWorkerImplementation,
 } from '../../sass/sass-service';
@@ -93,7 +93,10 @@ async function compileString(
   resolveUrl: (url: string, previousResolvedModules?: Set<string>) => Promise<ResolveResult>,
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
-  sassWorkerPool ??= new SassWorkerImplementation(true);
+  if (sassWorkerPool === undefined) {
+    const sassService = await import('../../sass/sass-service');
+    sassWorkerPool = new sassService.SassWorkerImplementation(true);
+  }
 
   const warnings: PartialMessage[] = [];
   try {
