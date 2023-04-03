@@ -23,6 +23,9 @@ import {
 import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
 import { DependencyType, addDependency, updateWorkspace } from '@schematics/angular/utility';
 import { JSONFile } from '@schematics/angular/utility/json-file';
+import { isStandaloneApp } from '@schematics/angular/utility/ng-ast-utils';
+import { targetBuildNotFoundError } from '@schematics/angular/utility/project-targets';
+import { BrowserBuilderOptions } from '@schematics/angular/utility/workspace-models';
 import * as ts from 'typescript';
 
 import {
@@ -276,7 +279,7 @@ function addDependencies(): Rule {
   };
 }
 
-function addServerFile(options: UniversalOptions): Rule {
+function addServerFile(options: UniversalOptions, isStandalone: boolean): Rule {
   return async (host) => {
     const project = await getProject(host, options.project);
     const browserDistDirectory = await getOutputPath(host, options.project, 'build');
@@ -288,6 +291,7 @@ function addServerFile(options: UniversalOptions): Rule {
           ...options,
           stripTsExtension,
           browserDistDirectory,
+          isStandalone,
         }),
         move(project.root),
       ]),
@@ -302,6 +306,15 @@ export default function (options: AddUniversalOptions): Rule {
       ...options,
       skipInstall: true,
     };
+    const clientBuildTarget = project.targets.get('build');
+    if (!clientBuildTarget) {
+      throw targetBuildNotFoundError();
+    }
+
+    const clientBuildOptions = (clientBuildTarget.options ||
+      {}) as unknown as BrowserBuilderOptions;
+
+    const isStandalone = isStandaloneApp(host, clientBuildOptions.main);
 
     delete universalOptions.serverFileName;
     delete universalOptions.serverPort;
@@ -313,8 +326,8 @@ export default function (options: AddUniversalOptions): Rule {
       addScriptsRule(options),
       updateServerTsConfigRule(options),
       updateWorkspaceConfigRule(options),
-      routingInitialNavigationRule(options),
-      addServerFile(options),
+      isStandalone ? noop() : routingInitialNavigationRule(options),
+      addServerFile(options, isStandalone),
       addDependencies(),
     ]);
   };
