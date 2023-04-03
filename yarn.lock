@@ -120,16 +120,17 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#4c7d40592a36f061c23dd08f437f734081f9979d":
-  version "0.0.0-462f716ef571b2b41fff90aaa5bb10897693efcc"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#4c7d40592a36f061c23dd08f437f734081f9979d"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1bd47a37185746a38fa3371d9af080075d26d4c6":
+  version "0.0.0-0189d650ac2efbf2ecf59ae3dcfe16c230ff4d41"
+  uid "1bd47a37185746a38fa3371d9af080075d26d4c6"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1bd47a37185746a38fa3371d9af080075d26d4c6"
   dependencies:
     "@angular-devkit/build-angular" "16.0.0-next.4"
     "@angular/benchpress" "0.3.0"
     "@babel/core" "^7.16.0"
     "@babel/helper-annotate-as-pure" "^7.18.6"
     "@babel/plugin-proposal-async-generator-functions" "^7.20.1"
-    "@bazel/buildifier" "6.0.1"
+    "@bazel/buildifier" "6.1.0"
     "@bazel/concatjs" "5.8.1"
     "@bazel/esbuild" "5.8.1"
     "@bazel/protractor" "5.8.1"
@@ -280,9 +281,10 @@
     "@material/typography" "15.0.0-canary.684e33d25.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#052850d27f6c36226e1a62ab04af799746decd9a":
-  version "0.0.0-462f716ef571b2b41fff90aaa5bb10897693efcc"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#052850d27f6c36226e1a62ab04af799746decd9a"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#80af881963d5518fc4c843e833e2061bafe784f5":
+  version "0.0.0-0189d650ac2efbf2ecf59ae3dcfe16c230ff4d41"
+  uid "80af881963d5518fc4c843e833e2061bafe784f5"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#80af881963d5518fc4c843e833e2061bafe784f5"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -1270,6 +1272,11 @@
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.0.1.tgz#3ef5ce4f807db2ec0838ac889775a081fe9208f8"
   integrity sha512-PKOx5srLU7K1x0BQhiqu78lrxwvgimx+JRe5JXgiPfyA2/iMB1aNn41BozVMmWnEF/DUKbls6DOaNk83kgraag==
+
+"@bazel/buildifier@6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.1.0.tgz#0c0e395c8881040d42e7e28b700a3e64becdc31a"
+  integrity sha512-LBfdMpGe9tmDJ6jOMaFWtrnKpNqKfUxIp1P+O3E2rb/jmSrP2ZTO9JRXqlghVhDy3fMDUkUVKkIZy9KAAfZJnQ==
 
 "@bazel/concatjs@5.8.1":
   version "5.8.1"
