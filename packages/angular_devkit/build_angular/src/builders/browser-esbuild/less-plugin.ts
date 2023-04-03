@@ -47,14 +47,14 @@ export function createLessPlugin(options: LessPluginOptions): Plugin {
 
         const [, , filePath] = args.path.split(';', 3);
 
-        return compileString(data, filePath, options);
+        return compileString(data, filePath, options, build.resolve.bind(build));
       });
 
       // Add a load callback to support files from disk
       build.onLoad({ filter: /\.less$/ }, async (args) => {
         const data = await readFile(args.path, 'utf-8');
 
-        return compileString(data, args.path, options);
+        return compileString(data, args.path, options, build.resolve.bind(build));
       });
     },
   };
@@ -64,13 +64,59 @@ async function compileString(
   data: string,
   filename: string,
   options: LessPluginOptions,
+  resolver: PluginBuild['resolve'],
 ): Promise<OnLoadResult> {
   const less = (lessPreprocessor ??= (await import('less')).default);
+
+  const resolverPlugin: Less.Plugin = {
+    install({ FileManager }, pluginManager): void {
+      const resolverFileManager = new (class extends FileManager {
+        override supportsSync(): boolean {
+          return false;
+        }
+
+        override supports(): boolean {
+          return true;
+        }
+
+        override async loadFile(
+          filename: string,
+          currentDirectory: string,
+          options: Less.LoadFileOptions,
+          environment: Less.Environment,
+        ): Promise<Less.FileLoadResult> {
+          // Attempt direct loading as a relative path to avoid resolution overhead
+          const directResult = this.loadFileSync(filename, currentDirectory, options, environment);
+          if ('contents' in directResult) {
+            return directResult;
+          }
+
+          // Attempt a full resolution if not found
+          const fullResult = await resolver(filename, {
+            kind: 'import-rule',
+            resolveDir: currentDirectory,
+          });
+          if (fullResult.path) {
+            return {
+              filename: fullResult.path,
+              contents: await readFile(fullResult.path, 'utf-8'),
+            };
+          }
+
+          // Otherwise error by throwing the failing direct result
+          throw directResult.error;
+        }
+      })();
+
+      pluginManager.addFileManager(resolverFileManager);
+    },
+  };
 
   try {
     const result = await less.render(data, {
       filename,
       paths: options.includePaths,
+      plugins: [resolverPlugin],
       rewriteUrls: 'all',
       sourceMap: options.sourcemap
         ? {
