@@ -148,7 +148,14 @@ export async function* serveWithVite(
     yield { success: true, port: listeningAddress?.port } as unknown as DevServerBuilderOutput;
   }
 
-  await server?.close();
+  if (server) {
+    let deferred: () => void;
+    context.addTeardown(async () => {
+      await server?.close();
+      deferred?.();
+    });
+    await new Promise<void>((resolve) => (deferred = resolve));
+  }
 }
 
 async function setupServer(
