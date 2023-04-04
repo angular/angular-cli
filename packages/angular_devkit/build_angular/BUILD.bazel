@@ -340,6 +340,7 @@ LARGE_SPECS = {
         ],
     },
     "browser-esbuild": {
+        "shards": 10,
         "extra_deps": [
             "@npm//buffer",
         ],
