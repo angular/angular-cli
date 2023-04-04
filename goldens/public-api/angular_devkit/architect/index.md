@@ -452,6 +452,8 @@ export function scheduleTargetAndForget(context: BuilderContext, target: Target,
 // @public
 interface SimpleJobHandlerContext<A extends JsonValue, I extends JsonValue, O extends JsonValue> extends JobHandlerContext<A, I, O> {
     // (undocumented)
+    addTeardown(teardown: () => Promise<void> | void): void;
+    // (undocumented)
     createChannel: (name: string) => Observer<JsonValue>;
     // (undocumented)
     input: Observable<I>;
