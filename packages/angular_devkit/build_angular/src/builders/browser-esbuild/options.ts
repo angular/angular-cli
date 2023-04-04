@@ -207,7 +207,7 @@ function findTailwindConfigurationFile(
   // A configuration file can exist in the project or workspace root
   // The list of valid config files can be found:
   // https://github.com/tailwindlabs/tailwindcss/blob/8845d112fb62d79815b50b3bae80c317450b8b92/src/util/resolveConfigPath.js#L46-L52
-  const tailwindConfigFiles = ['tailwind.config.js', 'tailwind.config.cjs'];
+  const tailwindConfigFiles = ['tailwind.config.js', 'tailwind.config.cjs', 'tailwind.config.ts'];
   for (const basePath of [projectRoot, workspaceRoot]) {
     for (const configFile of tailwindConfigFiles) {
       // Project level configuration should always take precedence.
