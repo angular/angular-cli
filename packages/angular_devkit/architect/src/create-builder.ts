@@ -47,9 +47,8 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
     const scheduler = context.scheduler;
     const progressChannel = context.createChannel('progress');
     const logChannel = context.createChannel('log');
+    const addTeardown = context.addTeardown.bind(context);
     let currentState: BuilderProgressState = BuilderProgressState.Stopped;
-    const teardownLogics: Array<() => PromiseLike<void> | void> = [];
-    let tearingDown = false;
     let current = 0;
     let status = '';
     let total = 1;
@@ -83,18 +82,8 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
 
       const inputSubscription = context.inboundBus.subscribe((i) => {
         switch (i.kind) {
-          case JobInboundMessageKind.Stop:
-            // Run teardown logic then complete.
-            tearingDown = true;
-            Promise.all(teardownLogics.map((fn) => fn() || Promise.resolve())).then(
-              () => observer.complete(),
-              (err) => observer.error(err),
-            );
-            break;
           case JobInboundMessageKind.Input:
-            if (!tearingDown) {
-              onInput(i.value);
-            }
+            onInput(i.value);
             break;
         }
       });
@@ -209,9 +198,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
                 progress({ state: currentState, current, total, status }, context);
             }
           },
-          addTeardown(teardown: () => Promise<void> | void): void {
-            teardownLogics.push(teardown);
-          },
+          addTeardown,
         };
 
         context.reportRunning();
