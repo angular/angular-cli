@@ -163,6 +163,7 @@ export function addModuleImportToStandaloneBootstrap(
  * @param functionName Name of the function that should be called.
  * @param importPath Path from which to import the function.
  * @param args Arguments to use when calling the function.
+ * @returns The file path that the provider was added to.
  */
 export function addFunctionalProvidersToStandaloneBootstrap(
   tree: Tree,
@@ -170,7 +171,7 @@ export function addFunctionalProvidersToStandaloneBootstrap(
   functionName: string,
   importPath: string,
   args: ts.Expression[] = [],
-) {
+): string {
   const sourceFile = createSourceFile(tree, filePath);
   const bootstrapCall = findBootstrapApplicationCall(sourceFile);
   const addImports = (file: ts.SourceFile, recorder: UpdateRecorder) => {
@@ -198,7 +199,7 @@ export function addFunctionalProvidersToStandaloneBootstrap(
     addImports(sourceFile, recorder);
     tree.commitUpdate(recorder);
 
-    return;
+    return filePath;
   }
 
   // If the config is a `mergeApplicationProviders` call, add another config to it.
@@ -208,7 +209,7 @@ export function addFunctionalProvidersToStandaloneBootstrap(
     addImports(sourceFile, recorder);
     tree.commitUpdate(recorder);
 
-    return;
+    return filePath;
   }
 
   // Otherwise attempt to merge into the current config.
@@ -235,6 +236,8 @@ export function addFunctionalProvidersToStandaloneBootstrap(
   }
 
   tree.commitUpdate(recorder);
+
+  return configFilePath;
 }
 
 /** Finds the call to `bootstrapApplication` within a file. */

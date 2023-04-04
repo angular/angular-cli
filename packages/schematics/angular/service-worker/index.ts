@@ -20,12 +20,13 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { addFunctionalProvidersToStandaloneBootstrap } from '../private/standalone';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { readWorkspace, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
-import { getAppModulePath } from '../utility/ng-ast-utils';
+import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { BrowserBuilderOptions } from '../utility/workspace-models';
@@ -85,6 +86,44 @@ function updateAppModule(mainPath: string): Rule {
   };
 }
 
+function addProvideServiceWorker(mainPath: string): Rule {
+  return (host: Tree) => {
+    const updatedFilePath = addFunctionalProvidersToStandaloneBootstrap(
+      host,
+      mainPath,
+      'provideServiceWorker',
+      '@angular/service-worker',
+      [
+        ts.factory.createStringLiteral('ngsw-worker.js', true),
+        ts.factory.createObjectLiteralExpression(
+          [
+            ts.factory.createPropertyAssignment(
+              ts.factory.createIdentifier('enabled'),
+              ts.factory.createPrefixUnaryExpression(
+                ts.SyntaxKind.ExclamationToken,
+                ts.factory.createCallExpression(
+                  ts.factory.createIdentifier('isDevMode'),
+                  undefined,
+                  [],
+                ),
+              ),
+            ),
+            ts.factory.createPropertyAssignment(
+              ts.factory.createIdentifier('registrationStrategy'),
+              ts.factory.createStringLiteral('registerWhenStable:30000', true),
+            ),
+          ],
+          true,
+        ),
+      ],
+    );
+
+    addImport(host, updatedFilePath, 'isDevMode', '@angular/core');
+
+    return host;
+  };
+}
+
 function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
   const content = host.readText(path);
   const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
@@ -116,23 +155,25 @@ export default function (options: ServiceWorkerOptions): Rule {
       resourcesOutputPath = normalize(`/${resourcesOutputPath}`);
     }
 
-    const templateSource = apply(url('./files'), [
-      applyTemplates({
-        ...options,
-        resourcesOutputPath,
-        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(project.root),
-      }),
-      move(project.root),
-    ]);
-
     context.addTask(new NodePackageInstallTask());
 
     await writeWorkspace(host, workspace);
 
+    const { main } = buildOptions;
+
     return chain([
-      mergeWith(templateSource),
+      mergeWith(
+        apply(url('./files'), [
+          applyTemplates({
+            ...options,
+            resourcesOutputPath,
+            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(project.root),
+          }),
+          move(project.root),
+        ]),
+      ),
       addDependencies(),
-      updateAppModule(buildOptions.main),
+      isStandaloneApp(host, main) ? addProvideServiceWorker(main) : updateAppModule(main),
     ]);
   };
 }

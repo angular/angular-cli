@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { tags } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -163,5 +164,57 @@ describe('Service Worker Schematic', () => {
 
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
     expect(projects.foo.architect.build.options.ngswConfigPath).toBe('ngsw-config.json');
+  });
+
+  describe('standalone', () => {
+    const name = 'buz';
+    const standaloneAppOptions: ApplicationOptions = {
+      ...appOptions,
+      name,
+      standalone: true,
+    };
+    const standaloneSWOptions: ServiceWorkerOptions = {
+      ...defaultOptions,
+      project: name,
+    };
+
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic('application', standaloneAppOptions, appTree);
+    });
+
+    it(`should add the 'provideServiceWorker' to providers`, async () => {
+      const tree = await schematicRunner.runSchematic(
+        'service-worker',
+        standaloneSWOptions,
+        appTree,
+      );
+      const content = tree.readContent('/projects/buz/src/app/app.config.ts');
+      expect(tags.oneLine`${content}`).toContain(tags.oneLine`
+        providers: [provideServiceWorker('ngsw-worker.js', {
+          enabled: !isDevMode(),
+          registrationStrategy: 'registerWhenStable:30000'
+        })]
+      `);
+    });
+
+    it(`should import 'isDevMode' from '@angular/core'`, async () => {
+      const tree = await schematicRunner.runSchematic(
+        'service-worker',
+        standaloneSWOptions,
+        appTree,
+      );
+      const content = tree.readContent('/projects/buz/src/app/app.config.ts');
+      expect(content).toContain(`import { ApplicationConfig, isDevMode } from '@angular/core';`);
+    });
+
+    it(`should import 'provideServiceWorker' from '@angular/service-worker'`, async () => {
+      const tree = await schematicRunner.runSchematic(
+        'service-worker',
+        standaloneSWOptions,
+        appTree,
+      );
+      const content = tree.readContent('/projects/buz/src/app/app.config.ts');
+      expect(content).toContain(`import { provideServiceWorker } from '@angular/service-worker';`);
+    });
   });
 });
