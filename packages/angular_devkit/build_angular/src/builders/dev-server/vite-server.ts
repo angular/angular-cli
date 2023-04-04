@@ -10,6 +10,7 @@ import type { BuilderContext } from '@angular-devkit/architect';
 import type { json } from '@angular-devkit/core';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
+import type { AddressInfo } from 'node:net';
 import path from 'node:path';
 import { InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
 import { buildEsbuildBrowser } from '../browser-esbuild';
@@ -51,6 +52,7 @@ export async function* serveWithVite(
   )) as json.JsonObject & BrowserBuilderOptions;
 
   let server: ViteDevServer | undefined;
+  let listeningAddress: AddressInfo | undefined;
   const outputFiles = new Map<string, OutputFileRecord>();
   const assets = new Map<string, string>();
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
@@ -136,13 +138,14 @@ export async function* serveWithVite(
       server = await setupServer(serverOptions, outputFiles, assets);
 
       await server.listen();
+      listeningAddress = server.httpServer?.address() as AddressInfo;
 
       // log connection information
       server.printUrls();
     }
 
     // TODO: adjust output typings to reflect both development servers
-    yield { success: true } as unknown as DevServerBuilderOutput;
+    yield { success: true, port: listeningAddress?.port } as unknown as DevServerBuilderOutput;
   }
 
   await server?.close();
