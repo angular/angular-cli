@@ -12,6 +12,7 @@ import { createCssPlugin } from './css-plugin';
 import { createCssResourcePlugin } from './css-resource-plugin';
 import { BundlerContext } from './esbuild';
 import { createLessPlugin } from './less-plugin';
+import { LoadResultCache } from './load-result-cache';
 import { createSassPlugin } from './sass-plugin';
 
 /**
@@ -34,6 +35,7 @@ export interface BundleStylesheetOptions {
 
 export function createStylesheetBundleOptions(
   options: BundleStylesheetOptions,
+  cache?: LoadResultCache,
   inlineComponentData?: Record<string, string>,
 ): BuildOptions & { plugins: NonNullable<BuildOptions['plugins']> } {
   // Ensure preprocessor include paths are absolute based on the workspace root
@@ -59,11 +61,14 @@ export function createStylesheetBundleOptions(
     conditions: ['style', 'sass'],
     mainFields: ['style', 'sass'],
     plugins: [
-      createSassPlugin({
-        sourcemap: !!options.sourcemap,
-        loadPaths: includePaths,
-        inlineComponentData,
-      }),
+      createSassPlugin(
+        {
+          sourcemap: !!options.sourcemap,
+          loadPaths: includePaths,
+          inlineComponentData,
+        },
+        cache,
+      ),
       createLessPlugin({
         sourcemap: !!options.sourcemap,
         includePaths,
@@ -100,11 +105,12 @@ export async function bundleComponentStylesheet(
   filename: string,
   inline: boolean,
   options: BundleStylesheetOptions,
+  cache?: LoadResultCache,
 ) {
   const namespace = 'angular:styles/component';
   const entry = [language, componentStyleCounter++, filename].join(';');
 
-  const buildOptions = createStylesheetBundleOptions(options, { [entry]: data });
+  const buildOptions = createStylesheetBundleOptions(options, cache, { [entry]: data });
   buildOptions.entryPoints = [`${namespace};${entry}`];
   buildOptions.plugins.push({
     name: 'angular-component-styles',

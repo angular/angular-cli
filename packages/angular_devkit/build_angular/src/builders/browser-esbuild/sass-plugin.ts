@@ -16,6 +16,7 @@ import type {
   FileImporterWithRequestContextOptions,
   SassWorkerImplementation,
 } from '../../sass/sass-service';
+import type { LoadResultCache } from './load-result-cache';
 
 export interface SassPluginOptions {
   sourcemap: boolean;
@@ -34,7 +35,7 @@ export function shutdownSassWorkerPool(): void {
   sassWorkerPool = undefined;
 }
 
-export function createSassPlugin(options: SassPluginOptions): Plugin {
+export function createSassPlugin(options: SassPluginOptions, cache?: LoadResultCache): Plugin {
   return {
     name: 'angular-sass',
     setup(build: PluginBuild): void {
@@ -69,17 +70,35 @@ export function createSassPlugin(options: SassPluginOptions): Plugin {
           `component style name should always be found [${args.path}]`,
         );
 
-        const [language, , filePath] = args.path.split(';', 3);
-        const syntax = language === 'sass' ? 'indented' : 'scss';
+        let result = cache?.get(data);
+        if (result === undefined) {
+          const [language, , filePath] = args.path.split(';', 3);
+          const syntax = language === 'sass' ? 'indented' : 'scss';
 
-        return compileString(data, filePath, syntax, options, resolveUrl);
+          result = await compileString(data, filePath, syntax, options, resolveUrl);
+          if (result.errors === undefined) {
+            // Cache the result if there were no errors
+            await cache?.put(data, result);
+          }
+        }
+
+        return result;
       });
 
       build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
-        const data = await readFile(args.path, 'utf-8');
-        const syntax = extname(args.path).toLowerCase() === '.sass' ? 'indented' : 'scss';
+        let result = cache?.get(args.path);
+        if (result === undefined) {
+          const data = await readFile(args.path, 'utf-8');
+          const syntax = extname(args.path).toLowerCase() === '.sass' ? 'indented' : 'scss';
 
-        return compileString(data, args.path, syntax, options, resolveUrl);
+          result = await compileString(data, args.path, syntax, options, resolveUrl);
+          if (result.errors === undefined) {
+            // Cache the result if there were no errors
+            await cache?.put(args.path, result);
+          }
+        }
+
+        return result;
       });
     },
   };

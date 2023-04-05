@@ -22,6 +22,7 @@ import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 import { maxWorkers } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
+import { LoadResultCache, MemoryLoadResultCache } from '../load-result-cache';
 import {
   logCumulativeDurations,
   profileAsync,
@@ -124,12 +125,14 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly modifiedFiles = new Set<string>();
   readonly babelFileCache = new Map<string, Uint8Array>();
   readonly typeScriptFileCache = new Map<string, Uint8Array>();
+  readonly loadResultCache = new MemoryLoadResultCache();
 
   invalidate(files: Iterable<string>): void {
     this.modifiedFiles.clear();
     for (let file of files) {
       this.babelFileCache.delete(file);
       this.typeScriptFileCache.delete(pathToFileURL(file).href);
+      this.loadResultCache.invalidate(file);
 
       // Normalize separators to allow matching TypeScript Host paths
       if (USING_WINDOWS) {
@@ -150,6 +153,7 @@ export interface CompilerPluginOptions {
   thirdPartySourcemaps?: boolean;
   fileReplacements?: Record<string, string>;
   sourceFileCache?: SourceFileCache;
+  loadResultCache?: LoadResultCache;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -272,6 +276,7 @@ export function createCompilerPlugin(
               filename,
               !stylesheetFile,
               styleOptions,
+              pluginOptions.loadResultCache,
             );
 
             const { contents, resourceFiles, errors, warnings } = stylesheetResult;
@@ -415,7 +420,12 @@ export function createCompilerPlugin(
 
       // Setup bundling of component templates and stylesheets when in JIT mode
       if (pluginOptions.jit) {
-        setupJitPluginCallbacks(build, styleOptions, stylesheetResourceFiles);
+        setupJitPluginCallbacks(
+          build,
+          styleOptions,
+          stylesheetResourceFiles,
+          pluginOptions.loadResultCache,
+        );
       }
 
       build.onEnd((result) => {
