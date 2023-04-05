@@ -33,9 +33,16 @@ import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
 
 export default function (options: ApplicationOptions): Rule {
-  return async (host: Tree) => {
+  return async (host: Tree, context: SchematicContext) => {
     const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
       await getAppOptions(host, options);
+
+    if (options.standalone) {
+      context.logger.warn(
+        'Standalone application structure is new and not yet supported by many existing' +
+          ` 'ng add' and 'ng update' integrations with community libraries.`,
+      );
+    }
 
     return chain([
       addAppToWorkspaceFile(options, appDir, folderName),
