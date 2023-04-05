@@ -1,3 +1,19 @@
+<a name="15.2.5"></a>
+
+# 15.2.5 (2023-04-05)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [db173d7ed](https://github.com/angular/angular-cli/commit/db173d7edf685df67b782d81d1bacb84b8debf9a) | fix  | collect tech information |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.6"></a>
 
 # 16.0.0-next.6 (2023-03-30)
