@@ -126,6 +126,7 @@
     "@typescript-eslint/eslint-plugin": "5.57.1",
     "@typescript-eslint/parser": "5.57.1",
     "@yarnpkg/lockfile": "1.1.0",
+    "@vitejs/plugin-basic-ssl": "1.0.1",
     "ajv": "8.12.0",
     "ajv-formats": "2.1.1",
     "ansi-colors": "4.1.3",

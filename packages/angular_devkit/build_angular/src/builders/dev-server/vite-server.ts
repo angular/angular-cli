@@ -10,6 +10,7 @@ import type { BuilderContext } from '@angular-devkit/architect';
 import type { json } from '@angular-devkit/core';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import type { AddressInfo } from 'node:net';
 import path from 'node:path';
 import { InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
@@ -186,7 +187,6 @@ async function setupServer(
       host: serverOptions.host,
       open: serverOptions.open,
       headers: serverOptions.headers,
-      https: serverOptions.ssl,
       proxy,
       // Currently does not appear to be a way to disable file watching directly so ignore all files
       watch: {
@@ -270,6 +270,21 @@ async function setupServer(
       disabled: true,
     },
   };
+
+  if (serverOptions.ssl) {
+    if (serverOptions.sslCert && serverOptions.sslKey) {
+      // server configuration is defined above
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      configuration.server!.https = {
+        cert: await readFile(serverOptions.sslCert),
+        key: await readFile(serverOptions.sslKey),
+      };
+    } else {
+      const { default: basicSslPlugin } = await import('@vitejs/plugin-basic-ssl');
+      configuration.plugins ??= [];
+      configuration.plugins.push(basicSslPlugin());
+    }
+  }
 
   const server = await createServer(configuration);
 
