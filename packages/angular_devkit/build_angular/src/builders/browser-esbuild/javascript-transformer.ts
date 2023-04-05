@@ -54,13 +54,15 @@ export class JavaScriptTransformer {
    * Performs JavaScript transformations on a file from the filesystem.
    * If no transformations are required, the data for the original file will be returned.
    * @param filename The full path to the file.
+   * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
-  transformFile(filename: string): Promise<Uint8Array> {
+  transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array> {
     // Always send the request to a worker. Files are almost always from node modules which measn
     // they may need linking. The data is also not yet available to perform most transformation checks.
     return this.#workerPool.run({
       filename,
+      skipLinker,
       ...this.#commonOptions,
     });
   }

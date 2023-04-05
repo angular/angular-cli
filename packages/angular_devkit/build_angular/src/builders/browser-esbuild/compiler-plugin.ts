@@ -399,7 +399,7 @@ export function createCompilerPlugin(
             // would need to be added to the key as well as a check for any change of content.
             let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
             if (contents === undefined) {
-              contents = await javascriptTransformer.transformFile(args.path);
+              contents = await javascriptTransformer.transformFile(args.path, pluginOptions.jit);
               pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
             }
 
