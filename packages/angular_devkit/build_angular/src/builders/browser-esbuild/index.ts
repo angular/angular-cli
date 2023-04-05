@@ -27,6 +27,7 @@ import { BundlerContext, logMessages } from './esbuild';
 import { logExperimentalWarnings } from './experimental-warnings';
 import { createGlobalScriptsBundleOptions } from './global-scripts';
 import { extractLicenses } from './license-extractor';
+import { LoadResultCache } from './load-result-cache';
 import { NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
@@ -122,7 +123,7 @@ async function execute(
     new BundlerContext(
       workspaceRoot,
       !!options.watch,
-      createGlobalStylesBundleOptions(options, target, browsers),
+      createGlobalStylesBundleOptions(options, target, browsers, codeBundleCache?.loadResultCache),
     );
 
   const globalScriptsBundleContext = new BundlerContext(
@@ -390,6 +391,7 @@ function createCodeBundleOptions(
           advancedOptimizations,
           fileReplacements,
           sourceFileCache,
+          loadResultCache: sourceFileCache?.loadResultCache,
         },
         // Component stylesheet options
         {
@@ -508,6 +510,7 @@ function createGlobalStylesBundleOptions(
   options: NormalizedBrowserOptions,
   target: string[],
   browsers: string[],
+  cache?: LoadResultCache,
 ): BuildOptions {
   const {
     workspaceRoot,
@@ -521,18 +524,21 @@ function createGlobalStylesBundleOptions(
     tailwindConfiguration,
   } = options;
 
-  const buildOptions = createStylesheetBundleOptions({
-    workspaceRoot,
-    optimization: !!optimizationOptions.styles.minify,
-    sourcemap: !!sourcemapOptions.styles,
-    preserveSymlinks,
-    target,
-    externalDependencies,
-    outputNames,
-    includePaths: stylePreprocessorOptions?.includePaths,
-    browsers,
-    tailwindConfiguration,
-  });
+  const buildOptions = createStylesheetBundleOptions(
+    {
+      workspaceRoot,
+      optimization: !!optimizationOptions.styles.minify,
+      sourcemap: !!sourcemapOptions.styles,
+      preserveSymlinks,
+      target,
+      externalDependencies,
+      outputNames,
+      includePaths: stylePreprocessorOptions?.includePaths,
+      browsers,
+      tailwindConfiguration,
+    },
+    cache,
+  );
   buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
 
   const namespace = 'angular:styles/global';
