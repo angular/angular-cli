@@ -1,3 +1,42 @@
+<a name="16.0.0-next.0"></a>
+
+# 16.0.0-next.0 (2023-04-05)
+
+## Breaking Changes
+
+### @nguniversal/common
+
+- Node.js v14 support has been removed
+
+  Node.js v14 is planned to be End-of-Life on 2023-04-30. Angular will stop supporting Node.js v14 in Angular v16. Angular v16 will continue to officially support Node.js versions v16 and v18.
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                              |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------------------- |
+| [3af1451a](https://github.com/angular/universal/commit/3af1451abac574f5e57c5f8b45192532bec2b23a) | feat | add standalone support to `ng add`       |
+| [1e2b9385](https://github.com/angular/universal/commit/1e2b9385bb294d36a126319c0b8d1b81e2cc8ed3) | feat | support rendering standalone application |
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                                           |
+| ------------------------------------------------------------------------------------------------ | ---- | ----------------------------------------------------- |
+| [0481bde7](https://github.com/angular/universal/commit/0481bde7e2597baa352ce3f05b5aa12da3df0347) | feat | add support for prerendering a standalone application |
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type     | Description                              |
+| ------------------------------------------------------------------------------------------------ | -------- | ---------------------------------------- |
+| [9fbdb23c](https://github.com/angular/universal/commit/9fbdb23c528baffa4cb1cda737382b4cab590269) | feat     | add CSP support for inline styles        |
+| [010546e5](https://github.com/angular/universal/commit/010546e56873eb25febff91a4b8e3cff25959598) | feat     | support rendering standalone application |
+| [ae96fbc4](https://github.com/angular/universal/commit/ae96fbc43434c98f2289e17216b0760f627b9459) | refactor | remove Node.js v14 support               |
+
+## Special Thanks
+
+Alan Agius
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.0"></a>
 
 # 15.2.0 (2023-02-23)
