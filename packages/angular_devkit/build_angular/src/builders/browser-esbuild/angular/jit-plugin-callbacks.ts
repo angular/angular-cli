@@ -9,6 +9,7 @@
 import type { OutputFile, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { LoadResultCache } from '../load-result-cache';
 import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets';
 import {
   JIT_NAMESPACE_REGEXP,
@@ -65,6 +66,7 @@ export function setupJitPluginCallbacks(
   build: PluginBuild,
   styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
   stylesheetResourceFiles: OutputFile[],
+  cache?: LoadResultCache,
 ): void {
   const root = build.initialOptions.absWorkingDir ?? '';
 
@@ -110,6 +112,7 @@ export function setupJitPluginCallbacks(
       entry.path,
       entry.contents !== undefined,
       styleOptions,
+      cache,
     );
 
     stylesheetResourceFiles.push(...resourceFiles);
