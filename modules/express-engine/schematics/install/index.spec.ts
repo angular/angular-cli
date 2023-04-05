@@ -84,7 +84,7 @@ describe('Universal Schematic', () => {
 
     const filePath = '/projects/test-app/server.ts';
     const content = tree.readContent(filePath);
-    expect(content).toContain(`import { AppServerModule } from './src/main.server;`);
+    expect(content).toContain(`import { AppServerModule } from './src/main.server';`);
   });
 
   it(`should pass 'AppServerModule' in the bootstrap parameter.`, async () => {
@@ -109,7 +109,7 @@ describe('Universal Schematic', () => {
 
       const filePath = '/projects/test-app/server.ts';
       const content = tree.readContent(filePath);
-      expect(content).toContain(`import bootstrap from './src/main.server;`);
+      expect(content).toContain(`import bootstrap from './src/main.server';`);
     });
 
     it(`should pass 'AppServerModule' in the bootstrap parameter.`, async () => {

@@ -5,7 +5,7 @@ import { ngExpressEngine } from '@nguniversal/express-engine';
 import * as express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import <% if (isStandalone) { %>bootstrap<% } else { %>{ AppServerModule }<% } %> from './src/<%= stripTsExtension(main) %>;
+import <% if (isStandalone) { %>bootstrap<% } else { %>{ AppServerModule }<% } %> from './src/<%= stripTsExtension(main) %>';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
