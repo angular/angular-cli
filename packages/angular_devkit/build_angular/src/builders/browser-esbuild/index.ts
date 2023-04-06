@@ -677,18 +677,33 @@ export async function* buildEsbuildBrowser(
   const watcher = createWatcher({
     polling: typeof userOptions.poll === 'number',
     interval: userOptions.poll,
-    // Ignore the output and cache paths to avoid infinite rebuild cycles
-    ignored: [normalizedOptions.outputPath, normalizedOptions.cacheOptions.basePath],
+    ignored: [
+      // Ignore the output and cache paths to avoid infinite rebuild cycles
+      normalizedOptions.outputPath,
+      normalizedOptions.cacheOptions.basePath,
+      // Ignore all node modules directories to avoid excessive file watchers.
+      // Package changes are handled below by watching manifest and lock files.
+      '**/node_modules/**',
+    ],
   });
 
   // Temporarily watch the entire project
   watcher.add(normalizedOptions.projectRoot);
 
-  // Watch workspace root node modules
-  // Includes Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
-  watcher.add(path.join(normalizedOptions.workspaceRoot, 'node_modules'));
-  watcher.add(path.join(normalizedOptions.workspaceRoot, '.pnp.cjs'));
-  watcher.add(path.join(normalizedOptions.workspaceRoot, '.pnp.data.json'));
+  // Watch workspace for package manager changes
+  const packageWatchFiles = [
+    // manifest can affect module resolution
+    'package.json',
+    // npm lock file
+    'package-lock.json',
+    // pnpm lock file
+    'pnpm-lock.yaml',
+    // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
+    'yarn.lock',
+    '.pnp.cjs',
+    '.pnp.data.json',
+  ];
+  watcher.add(packageWatchFiles.map((file) => path.join(normalizedOptions.workspaceRoot, file)));
 
   // Wait for changes and rebuild as needed
   try {
