@@ -119,6 +119,19 @@ export function generateBuildStatsTable(
     }
   }
 
+  // Sort descending by raw size
+  data.sort((a, b) => {
+    if (a.stats[2] > b.stats[2]) {
+      return -1;
+    }
+
+    if (a.stats[2] < b.stats[2]) {
+      return 1;
+    }
+
+    return 0;
+  });
+
   for (const { initial, stats } of data) {
     const [files, names, rawSize, estimatedTransferSize] = stats;
     const getRawSizeColor = getSizeColor(names, files);
@@ -273,19 +286,6 @@ function statsToString(
   unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
 
   runsCache.add(json.outputPath || '');
-
-  // Sort chunks by size in descending order
-  changedChunksStats.sort((a, b) => {
-    if (a.stats[2] > b.stats[2]) {
-      return -1;
-    }
-
-    if (a.stats[2] < b.stats[2]) {
-      return 1;
-    }
-
-    return 0;
-  });
 
   const statsTable = generateBuildStatsTable(
     changedChunksStats,
