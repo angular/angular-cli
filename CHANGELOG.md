@@ -1,3 +1,50 @@
+<a name="16.0.0-next.7"></a>
+
+# 16.0.0-next.7 (2023-04-06)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [fb19f5f3d](https://github.com/angular/angular-cli/commit/fb19f5f3d3ebcf1efe94114c6702bb91341288d0) | fix  | collect tech information |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [c2d2da41b](https://github.com/angular/angular-cli/commit/c2d2da41b15143e11f597192eef755c5e3fb4c5d) | feat | add support to add service worker to standalone application                   |
+| [f98c9de80](https://github.com/angular/angular-cli/commit/f98c9de80952593e0294538d96bdac7136629f77) | fix  | add experimental message when using standalone application schematic.         |
+| [de6d30102](https://github.com/angular/angular-cli/commit/de6d30102978eebda7edbdda43ca50f18c4c8aaf) | fix  | replace `provideServerSupport` with `provideServerRendering`                  |
+| [bff634fe0](https://github.com/angular/angular-cli/commit/bff634fe0938ecb4a316064ba3f1b9c2c1f208fe) | fix  | update private Components utilities to work with standalone project structure |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [48871381a](https://github.com/angular/angular-cli/commit/48871381a169888f1d29275ab25915b0d815d1c1) | fix  | allow registered builder teardowns to execute |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [ee8013f66](https://github.com/angular/angular-cli/commit/ee8013f66f7587ba85ed76fb0c662168fd850c47) | feat | display build output table with esbuild                            |
+| [0eac98f61](https://github.com/angular/angular-cli/commit/0eac98f6176bde662d7d7e9532b5a988b8e7ece2) | feat | implement progress option for esbuild builder                      |
+| [8c550302c](https://github.com/angular/angular-cli/commit/8c550302cc046e649f1245007e0e26550a61f931) | feat | initial development server for esbuild-based builder               |
+| [ce46ecae0](https://github.com/angular/angular-cli/commit/ce46ecae011595c86fea265e121ea313bb3cb030) | feat | support module resolution with less stylesheets in esbuild builder |
+| [584b51907](https://github.com/angular/angular-cli/commit/584b51907c3b3f60db5478994fff3f800b70c3f2) | feat | support scripts option with esbuild builder                        |
+| [e4883b0ee](https://github.com/angular/angular-cli/commit/e4883b0ee1d1ee7cd57e6cb374944021a100fd3b) | feat | support SSL options with esbuild development server                |
+| [005ba4276](https://github.com/angular/angular-cli/commit/005ba427661f0e5907020aea10c432a324b528a8) | fix  | ensure empty component styles compile with esbuild                 |
+| [4822b3ba5](https://github.com/angular/angular-cli/commit/4822b3ba55ec824913e895e76cf83e2b36ec99f9) | fix  | keep esbuild server active until builder fully stops               |
+| [67670b612](https://github.com/angular/angular-cli/commit/67670b612e2397e26a974cd337cdce1a9c6a0f21) | fix  | pass listening port in result for esbuild dev server               |
+| [b8c9667f9](https://github.com/angular/angular-cli/commit/b8c9667f9292d3829bfcac10a98acd859301c3c7) | fix  | remove unintended files in esbuild output stats table              |
+| [aae34fc02](https://github.com/angular/angular-cli/commit/aae34fc02dc774d59ecac6483288f47074ee8c2d) | perf | fully lazy load sass in esbuild builder                            |
+
+## Special Thanks
+
+Alan Agius, Charles Lyding and Kristiyan Kostadinov
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.5"></a>
 
 # 15.2.5 (2023-04-05)
