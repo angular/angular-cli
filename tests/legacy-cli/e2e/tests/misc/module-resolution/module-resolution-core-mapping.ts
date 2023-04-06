@@ -12,12 +12,12 @@ export default async function () {
   await ng('build', '--configuration=development');
 
   await createDir('xyz');
-  await moveFile('node_modules/@angular/common', 'xyz/common');
+  await moveFile('node_modules/@angular/platform-browser', 'xyz/platform-browser');
   await expectToFail(() => ng('build', '--configuration=development'));
 
   await updateJsonFile('tsconfig.json', (tsconfig) => {
     tsconfig.compilerOptions.paths = {
-      '@angular/common': ['./xyz/common'],
+      '@angular/platform-browser': ['./xyz/platform-browser'],
     };
   });
   await ng('build', '--configuration=development');
@@ -25,17 +25,17 @@ export default async function () {
   await updateJsonFile('tsconfig.json', (tsconfig) => {
     tsconfig.compilerOptions.paths = {
       '*': ['./node_modules/*'],
-      '@angular/common': ['./xyz/common'],
+      '@angular/platform-browser': ['./xyz/platform-browser'],
     };
   });
   await ng('build', '--configuration=development');
 
   await updateJsonFile('tsconfig.json', (tsconfig) => {
     tsconfig.compilerOptions.paths = {
-      '@angular/common': ['./xyz/common'],
+      '@angular/platform-browser': ['./xyz/platform-browser'],
       '*': ['./node_modules/*'],
     };
   });
   await ng('build', '--configuration=development');
-  await moveFile('xyz/common', 'node_modules/@angular/common');
+  await moveFile('xyz/platform-browser', 'node_modules/@angular/platform-browser');
 }
