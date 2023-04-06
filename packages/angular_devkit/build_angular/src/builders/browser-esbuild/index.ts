@@ -278,7 +278,7 @@ async function execute(
     }
   }
 
-  logBuildStats(context, metafile);
+  logBuildStats(context, metafile, initialFiles);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
@@ -723,11 +723,12 @@ export async function* buildEsbuildBrowser(
 
 export default createBuilder(buildEsbuildBrowser);
 
-function logBuildStats(context: BuilderContext, metafile: Metafile) {
+function logBuildStats(context: BuilderContext, metafile: Metafile, initialFiles: FileInfo[]) {
+  const initial = new Map(initialFiles.map((info) => [info.file, info.name]));
   const stats: BundleStats[] = [];
   for (const [file, output] of Object.entries(metafile.outputs)) {
-    // Skip sourcemaps
-    if (file.endsWith('.map')) {
+    // Only display JavaScript and CSS files
+    if (!file.endsWith('.js') && !file.endsWith('.css')) {
       continue;
     }
     // Skip internal component resources
@@ -737,8 +738,8 @@ function logBuildStats(context: BuilderContext, metafile: Metafile) {
     }
 
     stats.push({
-      initial: !!output.entryPoint,
-      stats: [file, '', output.bytes, ''],
+      initial: initial.has(file),
+      stats: [file, initial.get(file) ?? '', output.bytes, ''],
     });
   }
 
