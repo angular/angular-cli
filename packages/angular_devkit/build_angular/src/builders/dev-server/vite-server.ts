@@ -8,6 +8,7 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { json } from '@angular-devkit/core';
+import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -21,7 +22,7 @@ import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
 
 interface OutputFileRecord {
-  text: string;
+  contents: Uint8Array;
   size: number;
   hash?: Buffer;
   updated: boolean;
@@ -69,7 +70,7 @@ export async function* serveWithVite(
       // Skip analysis of sourcemaps
       if (filePath.endsWith('.map')) {
         outputFiles.set(filePath, {
-          text: file.text,
+          contents: file.contents,
           size: file.contents.byteLength,
           updated: false,
         });
@@ -82,7 +83,7 @@ export async function* serveWithVite(
       if (existingRecord && existingRecord.size === file.contents.byteLength) {
         // Only hash existing file when needed
         if (existingRecord.hash === undefined) {
-          existingRecord.hash = hashContent(existingRecord.text);
+          existingRecord.hash = hashContent(existingRecord.contents);
         }
 
         // Compare against latest result output
@@ -95,7 +96,7 @@ export async function* serveWithVite(
       }
 
       outputFiles.set(filePath, {
-        text: file.text,
+        contents: file.contents,
         size: file.contents.byteLength,
         hash: fileHash,
         updated: true,
@@ -213,25 +214,59 @@ async function setupServer(
         },
         load(id) {
           const [file] = id.split('?', 1);
-          const code = outputFiles.get(file)?.text;
+          const code = outputFiles.get(file)?.contents;
+          const map = outputFiles.get(file + '.map')?.contents;
 
           return (
             code && {
-              code,
-              map: outputFiles.get(file + '.map')?.text,
+              code: code && Buffer.from(code).toString('utf-8'),
+              map: map && Buffer.from(map).toString('utf-8'),
             }
           );
         },
         configureServer(server) {
-          // Assets get handled first
+          // Assets and resources get handled first
           server.middlewares.use(function angularAssetsMiddleware(req, res, next) {
-            if (req.url) {
-              // Rewrite all build assets to a vite raw fs URL
-              const assetSource = assets.get(req.url);
-              if (assetSource !== undefined) {
-                req.url = `/@fs/${assetSource}`;
+            if (req.url === undefined || res.writableEnded) {
+              return;
+            }
+
+            // Parse the incoming request.
+            // The base of the URL is unused but required to parse the URL.
+            const parsedUrl = new URL(req.url, 'http://localhost');
+            const extension = path.extname(parsedUrl.pathname);
+
+            // Rewrite all build assets to a vite raw fs URL
+            const assetSourcePath = assets.get(parsedUrl.pathname);
+            if (assetSourcePath !== undefined) {
+              req.url = `/@fs/${assetSourcePath}`;
+              next();
+
+              return;
+            }
+
+            // Resource files are handled directly.
+            // Global stylesheets (CSS files) are currently considered resources to workaround
+            // dev server sourcemap issues with stylesheets.
+            if (extension !== '.js' && extension !== '.html') {
+              const outputFile = outputFiles.get(parsedUrl.pathname);
+              if (outputFile) {
+                const mimeType = lookupMimeType(extension);
+                if (mimeType) {
+                  res.setHeader('Content-Type', mimeType);
+                }
+                res.setHeader('Cache-Control', 'no-cache');
+                if (serverOptions.headers) {
+                  Object.entries(serverOptions.headers).forEach(([name, value]) =>
+                    res.setHeader(name, value),
+                  );
+                }
+                res.end(outputFile.contents);
+
+                return;
               }
             }
+
             next();
           });
 
@@ -240,10 +275,14 @@ async function setupServer(
           return () =>
             server.middlewares.use(function angularIndexMiddleware(req, res, next) {
               if (req.url === '/' || req.url === `/index.html`) {
-                const rawHtml = outputFiles.get('/index.html')?.text;
+                const rawHtml = outputFiles.get('/index.html')?.contents;
                 if (rawHtml) {
                   server
-                    .transformIndexHtml(req.url, rawHtml, req.originalUrl)
+                    .transformIndexHtml(
+                      req.url,
+                      Buffer.from(rawHtml).toString('utf-8'),
+                      req.originalUrl,
+                    )
                     .then((processedHtml) => {
                       res.setHeader('Content-Type', 'text/html');
                       res.setHeader('Cache-Control', 'no-cache');
