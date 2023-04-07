@@ -157,6 +157,7 @@ ts_library(
         "@npm//loader-utils",
         "@npm//magic-string",
         "@npm//mini-css-extract-plugin",
+        "@npm//mrmime",
         "@npm//ng-packagr",
         "@npm//open",
         "@npm//ora",
