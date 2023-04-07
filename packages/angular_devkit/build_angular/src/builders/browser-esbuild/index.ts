@@ -32,7 +32,7 @@ import { NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { createStylesheetBundleOptions } from './stylesheets';
-import { ChangedFiles, createWatcher } from './watcher';
+import type { ChangedFiles } from './watcher';
 
 interface RebuildState {
   codeRebuild?: BundlerContext;
@@ -678,6 +678,7 @@ export async function* buildEsbuildBrowser(
   }
 
   // Setup a watcher
+  const { createWatcher } = await import('./watcher');
   const watcher = createWatcher({
     polling: typeof userOptions.poll === 'number',
     interval: userOptions.poll,
