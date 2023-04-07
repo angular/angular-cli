@@ -36,17 +36,18 @@ export async function normalizeOptions(
 ) {
   const workspaceRoot = context.workspaceRoot;
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
-  const projectSourceRoot = path.join(
-    workspaceRoot,
-    (projectMetadata.sourceRoot as string | undefined) ?? 'src',
+  const projectRoot = normalizeDirectoryPath(
+    path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? ''),
+  );
+  const projectSourceRoot = normalizeDirectoryPath(
+    path.join(workspaceRoot, (projectMetadata.sourceRoot as string | undefined) ?? 'src'),
   );
 
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
   const mainEntryPoint = path.join(workspaceRoot, options.main);
   const tsconfig = path.join(workspaceRoot, options.tsConfig);
-  const outputPath = path.join(workspaceRoot, options.outputPath);
+  const outputPath = normalizeDirectoryPath(path.join(workspaceRoot, options.outputPath));
   const optimizationOptions = normalizeOptimization(options.optimization);
   const sourcemapOptions = normalizeSourceMaps(options.sourceMap ?? false);
   const assets = options.assets?.length
@@ -221,4 +222,19 @@ function findTailwindConfigurationFile(
   }
 
   return undefined;
+}
+
+/**
+ * Normalize a directory path string.
+ * Currently only removes a trailing slash if present.
+ * @param path A path string.
+ * @returns A normalized path string.
+ */
+function normalizeDirectoryPath(path: string): string {
+  const last = path[path.length - 1];
+  if (last === '/' || last === '\\') {
+    return path.slice(0, -1);
+  }
+
+  return path;
 }
