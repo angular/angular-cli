@@ -67,6 +67,8 @@ export function normalizeAssetPatterns(
       const output = path.relative(resolvedSourceRoot, path.resolve(workspaceRoot, input));
 
       assetPattern = { glob, input, output };
+    } else {
+      assetPattern.output = path.join('.', assetPattern.output);
     }
 
     if (assetPattern.output.startsWith('..')) {
