@@ -53,7 +53,7 @@ load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
     name = "node16",
-    node_version = "16.13.1",
+    node_version = "16.14.2",
 )
 
 nodejs_register_toolchains(
