@@ -129,8 +129,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         harness.expectFile('dist/styles.css').toNotExist();
       });
 
-      // TODO: Re-enable once output logging is implemented for esbuild builder
-      xit('shows the output style as a chunk entry in the logging output', async () => {
+      it('shows the output style as a chunk entry in the logging output', async () => {
         await harness.writeFile('src/test-style-a.css', '.test-a {color: red}');
 
         harness.useTarget('build', {
@@ -401,8 +400,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
           .content.not.toContain('<link rel="stylesheet" href="extra.css">');
       });
 
-      // TODO: Re-enable once output logging is implemented for esbuild builder
-      xit('shows the output style as a chunk entry in the logging output', async () => {
+      it('shows the output style as a chunk entry in the logging output', async () => {
         await harness.writeFile('src/test-style-a.css', '.test-a {color: red}');
 
         harness.useTarget('build', {
@@ -419,8 +417,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         );
       });
 
-      // TODO: Re-enable once output logging is implemented for esbuild builder
-      xit('shows the output style as a chunk entry with bundleName in the logging output', async () => {
+      it('shows the output style as a chunk entry with bundleName in the logging output', async () => {
         await harness.writeFile('src/test-style-a.css', '.test-a {color: red}');
 
         harness.useTarget('build', {
