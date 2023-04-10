@@ -8,9 +8,9 @@
 
 import assert from 'node:assert';
 import ts from 'typescript';
-import { AngularCompilation } from '../angular-compilation';
-import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { profileSync } from '../profiling';
+import { AngularCompilation } from './angular-compilation';
+import { AngularHostOptions, createAngularCompilerHost } from './angular-host';
 import { createJitResourceTransformer } from './jit-resource-transformer';
 
 class JitCompilationState {

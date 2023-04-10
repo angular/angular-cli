@@ -9,13 +9,13 @@
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { loadEsmModule } from '../../utils/load-esm';
+import { loadEsmModule } from '../../../utils/load-esm';
+import { profileAsync, profileSync } from '../profiling';
 import {
   AngularHostOptions,
   createAngularCompilerHost,
   ensureSourceFileVersions,
 } from './angular-host';
-import { profileAsync, profileSync } from './profiling';
 
 // Temporary deep import for transformer support
 // TODO: Move these to a private exports location or move the implementation into this package.
@@ -42,7 +42,7 @@ export interface EmitFileResult {
 }
 export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
 
-export class AngularCompilation {
+export class AotCompilation {
   static #angularCompilerCliModule?: typeof ng;
 
   #state?: AngularCompilationState;
@@ -64,7 +64,7 @@ export class AngularCompilation {
     configurationDiagnostics?: ts.Diagnostic[],
   ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile> }> {
     // Dynamically load the Angular compiler CLI package
-    const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
+    const { NgtscProgram, OptimizeFor } = await AotCompilation.loadCompilerCli();
 
     // Create Angular compiler host
     const host = createAngularCompilerHost(compilerOptions, hostOptions);
