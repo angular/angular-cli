@@ -8,7 +8,6 @@
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { TransferHttpCacheInterceptor } from './transfer-http-cache.interceptor';
 
 /**
@@ -16,7 +15,6 @@ import { TransferHttpCacheInterceptor } from './transfer-http-cache.interceptor'
  * @experimental
  */
 @NgModule({
-  imports: [BrowserTransferStateModule],
   providers: [
     TransferHttpCacheInterceptor,
     { provide: HTTP_INTERCEPTORS, useExisting: TransferHttpCacheInterceptor, multi: true },
