@@ -114,32 +114,54 @@ async function compileString(
             url,
             { previousResolvedModules }: FileImporterWithRequestContextOptions,
           ): Promise<URL | null> => {
-            const result = await resolveUrl(url, previousResolvedModules);
-
-            // Check for package deep imports
-            if (!result.path) {
-              const parts = url.split('/');
-              const hasScope = parts.length >= 2 && parts[0].startsWith('@');
-              const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
-              const packageName = hasScope ? `${nameOrScope}/${nameOrFirstPath}` : nameOrScope;
-
-              const packageResult = await resolveUrl(
-                packageName + '/package.json',
-                previousResolvedModules,
-              );
-
-              if (packageResult.path) {
-                return pathToFileURL(
-                  join(
-                    dirname(packageResult.path),
-                    !hasScope && nameOrFirstPath ? nameOrFirstPath : '',
-                    ...pathPart,
-                  ),
-                );
-              }
+            let result = await resolveUrl(url);
+            if (result.path) {
+              return pathToFileURL(result.path);
             }
 
-            return result.path ? pathToFileURL(result.path) : null;
+            // Check for package deep imports
+            const parts = url.split('/');
+            const hasScope = parts.length >= 2 && parts[0].startsWith('@');
+            const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
+            const packageName = hasScope ? `${nameOrScope}/${nameOrFirstPath}` : nameOrScope;
+
+            let packageResult = await resolveUrl(packageName + '/package.json');
+
+            if (packageResult.path) {
+              return pathToFileURL(
+                join(
+                  dirname(packageResult.path),
+                  !hasScope && nameOrFirstPath ? nameOrFirstPath : '',
+                  ...pathPart,
+                ),
+              );
+            }
+
+            // Check with Yarn PnP workaround using previous resolved modules.
+            // This is done last to avoid a performance penalty for common cases.
+
+            result = await resolveUrl(url, previousResolvedModules);
+            if (result.path) {
+              return pathToFileURL(result.path);
+            }
+
+            packageResult = await resolveUrl(
+              packageName + '/package.json',
+              previousResolvedModules,
+            );
+
+            if (packageResult.path) {
+              return pathToFileURL(
+                join(
+                  dirname(packageResult.path),
+                  !hasScope && nameOrFirstPath ? nameOrFirstPath : '',
+                  ...pathPart,
+                ),
+              );
+            }
+
+            // Not found
+            return null;
           },
         },
       ],
