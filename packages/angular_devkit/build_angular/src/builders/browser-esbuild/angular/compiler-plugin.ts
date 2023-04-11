@@ -29,8 +29,9 @@ import {
   resetCumulativeDurations,
 } from '../profiling';
 import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets';
+import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
-import { AotCompilation, FileEmitter } from './aot-compilation';
+import { AotCompilation } from './aot-compilation';
 import { JitCompilation } from './jit-compilation';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 
@@ -166,7 +167,7 @@ export function createCompilerPlugin(
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
 
       const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT, readConfiguration } =
-        await AotCompilation.loadCompilerCli();
+        await AngularCompilation.loadCompilerCli();
 
       // Setup defines based on the values provided by the Angular compiler-cli
       build.initialOptions.define ??= {};
@@ -239,7 +240,7 @@ export function createCompilerPlugin(
 
       let stylesheetMetafiles: Metafile[];
 
-      let compilation: AotCompilation | undefined;
+      let compilation: AngularCompilation | undefined;
 
       build.onStart(async () => {
         const result: OnStartResult = {
