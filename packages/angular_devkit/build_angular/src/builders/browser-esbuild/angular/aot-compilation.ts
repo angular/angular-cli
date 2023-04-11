@@ -9,8 +9,8 @@
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { loadEsmModule } from '../../../utils/load-esm';
 import { profileAsync, profileSync } from '../profiling';
+import { AngularCompilation, FileEmitter } from './angular-compilation';
 import {
   AngularHostOptions,
   createAngularCompilerHost,
@@ -35,27 +35,8 @@ class AngularCompilationState {
   }
 }
 
-export interface EmitFileResult {
-  content?: string;
-  map?: string;
-  dependencies: readonly string[];
-}
-export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
-
-export class AotCompilation {
-  static #angularCompilerCliModule?: typeof ng;
-
+export class AotCompilation extends AngularCompilation {
   #state?: AngularCompilationState;
-
-  static async loadCompilerCli(): Promise<typeof ng> {
-    // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
-    // Once TypeScript provides support for retaining dynamic imports this workaround can be dropped.
-    this.#angularCompilerCliModule ??= await loadEsmModule<typeof ng>('@angular/compiler-cli');
-
-    return this.#angularCompilerCliModule;
-  }
-
-  constructor() {}
 
   async initialize(
     rootNames: string[],
@@ -64,7 +45,7 @@ export class AotCompilation {
     configurationDiagnostics?: ts.Diagnostic[],
   ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile> }> {
     // Dynamically load the Angular compiler CLI package
-    const { NgtscProgram, OptimizeFor } = await AotCompilation.loadCompilerCli();
+    const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
 
     // Create Angular compiler host
     const host = createAngularCompilerHost(compilerOptions, hostOptions);

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import ng from '@angular/compiler-cli';
+import type ng from '@angular/compiler-cli';
 import ts from 'typescript';
 
 export type AngularCompilerOptions = ng.CompilerOptions;

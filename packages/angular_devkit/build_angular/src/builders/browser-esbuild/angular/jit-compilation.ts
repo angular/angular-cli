@@ -9,7 +9,7 @@
 import assert from 'node:assert';
 import ts from 'typescript';
 import { profileSync } from '../profiling';
-import { AngularCompilation } from './angular-compilation';
+import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions, createAngularCompilerHost } from './angular-host';
 import { createJitResourceTransformer } from './jit-resource-transformer';
 
@@ -21,14 +21,7 @@ class JitCompilationState {
   ) {}
 }
 
-export interface EmitFileResult {
-  content?: string;
-  map?: string;
-  dependencies: readonly string[];
-}
-export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
-
-export class JitCompilation {
+export class JitCompilation extends AngularCompilation {
   #state?: JitCompilationState;
 
   async initialize(
