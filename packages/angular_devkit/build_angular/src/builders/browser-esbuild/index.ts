@@ -12,7 +12,6 @@ import assert from 'node:assert';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { deleteOutputDir } from '../../utils';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
@@ -623,7 +622,13 @@ export async function* buildEsbuildBrowser(
   if (shouldWriteResult) {
     // Clean output path if enabled
     if (userOptions.deleteOutputPath) {
-      deleteOutputDir(normalizedOptions.workspaceRoot, userOptions.outputPath);
+      if (normalizedOptions.outputPath === normalizedOptions.workspaceRoot) {
+        context.logger.error('Output path MUST not be workspace root directory!');
+
+        return;
+      }
+
+      await fs.rm(normalizedOptions.outputPath, { force: true, recursive: true, maxRetries: 3 });
     }
 
     // Create output directory if needed
