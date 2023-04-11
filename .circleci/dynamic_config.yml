@@ -88,8 +88,8 @@ executors:
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
       # Contents of this image:
-      # https://circleci.com/docs/2.0/hello-world-windows/#software-pre-installed-in-the-windows-image
-      image: windows-server-2019-vs2019:stable
+      # https://circleci.com/developer/machine/image/windows-server-2022-gui
+      image: 'windows-server-2022-gui:current'
 
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
@@ -133,8 +133,8 @@ commands:
   setup_windows:
     steps:
       - initialize_env
-      - run: nvm install 16.14
-      - run: nvm use 16.14
+      - run: nvm install 16.14.2
+      - run: nvm use 16.14.2
       - run: npm install -g yarn@1.22.10 @bazel/bazelisk@${BAZELISK_VERSION}
       - run: node --version
       - run: yarn --version
@@ -342,8 +342,8 @@ jobs:
     parallelism: 12
     steps:
       - checkout
-      - rebase_pr_win
       - setup_windows
+      - rebase_pr_win
       - setup_bazel_rbe
       - restore_cache:
           keys:
