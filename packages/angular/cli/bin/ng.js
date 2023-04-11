@@ -48,15 +48,15 @@ if (version[0] % 2 === 1) {
 } else if (
   version[0] < 14 ||
   (version[0] === 14 && version[1] < 20) ||
-  (version[0] === 16 && version[1] < 13) ||
+  (version[0] === 16 && version[1] < 14) ||
   (version[0] === 18 && version[1] < 10)
 ) {
-  // Error and exit if less than 14.20, 16.13 or 18.10
+  // Error and exit if less than 14.20, 16.14 or 18.10
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of either v14.20, v16.13 or v18.10.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of either v14.20, v16.14 or v18.10.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
