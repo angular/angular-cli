@@ -315,12 +315,7 @@ async function writeResultFiles(
           directoryExists.add(basePath);
         }
         // Copy file contents
-        await fs.copyFile(
-          source,
-          path.join(outputPath, destination),
-          // This is not yet available from `fs/promises` in Node.js v16.13
-          fsConstants.COPYFILE_FICLONE,
-        );
+        await fs.copyFile(source, path.join(outputPath, destination), fsConstants.COPYFILE_FICLONE);
       }),
     );
   }
