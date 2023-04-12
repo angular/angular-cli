@@ -1,3 +1,15 @@
+<a name="15.2.6"></a>
+
+# 15.2.6 (2023-04-12)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [f0b257ef4](https://github.com/angular/angular-cli/commit/f0b257ef4ae62f92d70bfd2a4e9912d4ceff9c78) | fix  | ignore hidden directories when running browserlist migration |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.7"></a>
 
 # 16.0.0-next.7 (2023-04-06)
