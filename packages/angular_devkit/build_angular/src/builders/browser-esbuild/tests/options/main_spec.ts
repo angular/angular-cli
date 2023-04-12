@@ -59,5 +59,17 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/main.js').toNotExist();
       harness.expectFile('dist/index.html').toNotExist();
     });
+
+    it('throws an error when given an empty string', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        main: '',
+      });
+
+      const { result, error } = await harness.executeOnce();
+      expect(result).toBeUndefined();
+
+      expect(error?.message).toContain('cannot be an empty string');
+    });
   });
 });

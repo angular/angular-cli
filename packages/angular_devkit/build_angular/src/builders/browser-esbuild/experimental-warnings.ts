@@ -8,7 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
-import { Schema as BrowserEsbuildOptions } from './schema';
+import { BrowserEsbuildOptions } from './options';
 
 const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'budgets',

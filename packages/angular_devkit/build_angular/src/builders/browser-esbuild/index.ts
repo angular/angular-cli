@@ -28,7 +28,7 @@ import { logExperimentalWarnings } from './experimental-warnings';
 import { createGlobalScriptsBundleOptions } from './global-scripts';
 import { extractLicenses } from './license-extractor';
 import { LoadResultCache } from './load-result-cache';
-import { NormalizedBrowserOptions, normalizeOptions } from './options';
+import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { createStylesheetBundleOptions } from './stylesheets';
@@ -584,8 +584,30 @@ async function withNoProgress<T>(test: string, action: () => T | Promise<T>): Pr
  * @param context The Architect builder context object
  * @returns An async iterable with the builder result output
  */
-export async function* buildEsbuildBrowser(
+export function buildEsbuildBrowser(
   userOptions: BrowserBuilderOptions,
+  context: BuilderContext,
+  infrastructureSettings?: {
+    write?: boolean;
+  },
+): AsyncIterable<
+  BuilderOutput & {
+    outputFiles?: OutputFile[];
+    assetFiles?: { source: string; destination: string }[];
+  }
+> {
+  return buildEsbuildBrowserInternal(userOptions, context, infrastructureSettings);
+}
+
+/**
+ * Internal version of the main execution function for the esbuild-based application builder.
+ * Exposes some additional "private" options in addition to those exposed by the schema.
+ * @param userOptions The browser-esbuild builder options to use when setting up the application build
+ * @param context The Architect builder context object
+ * @returns An async iterable with the builder result output
+ */
+export async function* buildEsbuildBrowserInternal(
+  userOptions: BrowserEsbuildOptions,
   context: BuilderContext,
   infrastructureSettings?: {
     write?: boolean;
