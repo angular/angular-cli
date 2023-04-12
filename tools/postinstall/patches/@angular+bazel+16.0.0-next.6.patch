@@ -1,0 +1,101 @@
+diff --git a/node_modules/@angular/bazel/src/ng_module/ng_module.bzl b/node_modules/@angular/bazel/src/ng_module/ng_module.bzl
+index 99d7f6d..3ea60ea 100755
+--- a/node_modules/@angular/bazel/src/ng_module/ng_module.bzl
++++ b/node_modules/@angular/bazel/src/ng_module/ng_module.bzl
+@@ -18,6 +18,7 @@ load(
+     "TsConfigInfo",
+     "compile_ts",
+     "js_ecma_script_module_info",
++    "js_named_module_info",
+     "js_module_info",
+     "node_modules_aspect",
+     "ts_providers_dict_to_struct",
+@@ -151,9 +152,9 @@ def _ngc_tsconfig(ctx, files, srcs, **kwargs):
+     is_devmode = "devmode_manifest" in kwargs
+     outs = _expected_outs(ctx)
+     if is_devmode:
+-        expected_outs = outs.devmode_js
++        expected_outs = outs.devmode_js + outs.declarations
+     else:
+-        expected_outs = outs.closure_js + outs.declarations
++        expected_outs = outs.closure_js
+
+     if not ctx.attr.type_check and ctx.attr.strict_templates:
+         fail("Cannot set type_check = False and strict_templates = True for ng_module()")
+@@ -359,11 +360,11 @@ def _compile_action(
+
+ def _prodmode_compile_action(ctx, inputs, outputs, tsconfig_file, node_opts):
+     outs = _expected_outs(ctx)
+-    return _compile_action(ctx, inputs, outputs + outs.closure_js + outs.prod_perf_files + outs.declarations, tsconfig_file, node_opts, "prodmode")
++    return _compile_action(ctx, inputs, outputs + outs.closure_js + outs.prod_perf_files, tsconfig_file, node_opts, "prodmode")
+
+ def _devmode_compile_action(ctx, inputs, outputs, tsconfig_file, node_opts):
+     outs = _expected_outs(ctx)
+-    compile_action_outputs = outputs + outs.devmode_js + outs.dev_perf_files
++    compile_action_outputs = outputs + outs.devmode_js + outs.dev_perf_files + outs.declarations
+     _compile_action(ctx, inputs, compile_action_outputs, tsconfig_file, node_opts, "devmode")
+
+ # Note: We need to define `label` and `srcs_files` as `tsc_wrapped` passes
+@@ -417,9 +418,13 @@ def _ng_module_impl(ctx):
+     # and issue https://github.com/bazelbuild/rules_nodejs/issues/57 for more details.
+     ts_providers["providers"].extend([
+         js_module_info(
+-            sources = ts_providers["typescript"]["es6_sources"],
++            sources = ts_providers["typescript"]["es5_sources"],
+             deps = ctx.attr.deps,
+         ),
++        js_named_module_info(
++           sources = ts_providers["typescript"]["es5_sources"],
++           deps = ctx.attr.deps,
++        ),
+         js_ecma_script_module_info(
+             sources = ts_providers["typescript"]["es6_sources"],
+             deps = ctx.attr.deps,
+@@ -435,7 +440,7 @@ def _ng_module_impl(ctx):
+             package_name = ctx.attr.package_name,
+             package_path = ctx.attr.package_path,
+             path = path,
+-            files = ts_providers["typescript"]["es6_sources"],
++            files = ts_providers["typescript"]["es5_sources"],
+         ))
+
+     return ts_providers_dict_to_struct(ts_providers)
+diff --git a/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs b/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs
+index 8681a4c..e3b497a 100755
+--- a/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs
++++ b/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs
+@@ -13,7 +13,7 @@ import * as fs from 'fs';
+ import * as path from 'path';
+ import * as tsickle from 'tsickle';
+ import ts from 'typescript';
+-import { EXT, patchNgHostWithFileNameToModuleName as patchNgHost, relativeToRootDirs } from './utils';
++import { EXT, patchNgHostWithFileNameToModuleName as patchNgHost, relativeToRootDirs } from './utils.mjs';
+ // FIXME: we should be able to add the assets to the tsconfig so FileLoader
+ // knows about them
+ const NGC_ASSETS = /\.(css|html)$/;
+@@ -351,6 +351,12 @@ function gatherDiagnosticsForInputsOnly(options, bazelOpts, ngProgram) {
+     }
+     return diagnostics;
+ }
++
++main(process.argv.slice(2)).then(exitCode => process.exitCode = exitCode).catch(e => {
++  console.error(e);
++  process.exitCode = 1;
++});
++
+ /**
+  * @deprecated
+  * Kept here just for compatibility with 1P tools. To be removed soon after 1P update.
+diff --git a/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs b/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs
+index 3649c11..0f4af3c 100755
+--- a/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs
++++ b/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs
+@@ -5,7 +5,7 @@
+  * Use of this source code is governed by an MIT-style license that can be
+  * found in the LICENSE file at https://angular.io/license
+  */
+-import { main } from './index';
++import { main } from './index.mjs';
+ main(process.argv.slice(2)).then(exitCode => process.exitCode = exitCode).catch(e => {
+     console.error(e);
+     process.exitCode = 1;

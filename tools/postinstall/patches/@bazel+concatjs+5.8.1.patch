@@ -1,0 +1,13 @@
+diff --git a/node_modules/@bazel/concatjs/internal/build_defs.bzl b/node_modules/@bazel/concatjs/internal/build_defs.bzl
+index 9e5cda6..851c8b7 100755
+--- a/node_modules/@bazel/concatjs/internal/build_defs.bzl
++++ b/node_modules/@bazel/concatjs/internal/build_defs.bzl
+@@ -76,7 +76,7 @@ _TYPESCRIPT_TYPINGS = Label(
+     "//typescript:typescript__typings",
+ )
+ 
+-_TYPESCRIPT_SCRIPT_TARGETS = ["es3", "es5", "es2015", "es2016", "es2017", "es2018", "es2019", "es2020", "esnext"]
++_TYPESCRIPT_SCRIPT_TARGETS = ["es3", "es5", "es2015", "es2016", "es2017", "es2018", "es2019", "es2020", "es2022", "esnext"]
+ _TYPESCRIPT_MODULE_KINDS = ["none", "commonjs", "amd", "umd", "system", "es2015", "esnext"]
+ 
+ _DEVMODE_TARGET_DEFAULT = "es2015"

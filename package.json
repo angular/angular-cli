@@ -22,6 +22,7 @@
     "npm": "Please use yarn instead of NPM to install dependencies"
   },
   "scripts": {
+    "postinstall": "patch-package --patch-dir tools/postinstall/patches",
     "lint": "eslint --cache --max-warnings=0 \"**/*.ts\"",
     "ng-dev": "cross-env TS_NODE_PROJECT=$PWD/.ng-dev/tsconfig.json TS_NODE_TRANSPILE_ONLY=1 node --no-warnings --loader ts-node/esm node_modules/@angular/ng-dev/bundles/cli.mjs",
     "build": "npm run bazel:build",
@@ -40,7 +41,7 @@
     "@angular-devkit/core": "16.0.0-next.6",
     "@angular-devkit/schematics": "16.0.0-next.6",
     "@angular/animations": "16.0.0-next.5",
-    "@angular/bazel": "15.0.4",
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#bac9c1abe1e6ac1801fbbccb53353a1ed7126469",
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1bd47a37185746a38fa3371d9af080075d26d4c6",
     "@angular/cli": "16.0.0-next.6",
     "@angular/common": "16.0.0-next.5",
@@ -87,6 +88,7 @@
     "jsdom": "21.1.1",
     "node-fetch": "^2.6.1",
     "ora": "^5.1.0",
+    "patch-package": "^6.5.1",
     "piscina": "~3.2.0",
     "prettier": "^2.2.1",
     "protractor": "7.0.0",

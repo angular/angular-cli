@@ -16,7 +16,7 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSources": true,
-    "target": "es2019",
+    "target": "es2022",
     "lib": ["es2018", "dom"],
     "skipLibCheck": true,
     "types": ["tslib", "node"],

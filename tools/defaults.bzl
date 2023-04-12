@@ -23,7 +23,6 @@ def ts_library(
         testonly = False,
         deps = [],
         devmode_module = None,
-        devmode_target = None,
         **kwargs):
     deps = deps + ["@npm//tslib", "@npm//@types/node"]
     if testonly:
@@ -34,14 +33,13 @@ def ts_library(
 
     if not devmode_module:
         devmode_module = "commonjs"
-    if not devmode_target:
-        devmode_target = "es2019"
 
     _ts_library(
         tsconfig = tsconfig,
         testonly = testonly,
         devmode_module = devmode_module,
-        devmode_target = devmode_target,
+        devmode_target = "es2022",
+        prodmode_target = "es2022",
         deps = deps,
         **kwargs
     )

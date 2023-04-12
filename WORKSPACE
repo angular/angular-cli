@@ -40,6 +40,10 @@ load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 yarn_install(
     name = "npm",
     all_node_modules_target_name = "node_modules_all",
+    data = [
+        "//:tools/postinstall/patches/@angular+bazel+16.0.0-next.6.patch",
+        "//:tools/postinstall/patches/@bazel+concatjs+5.8.1.patch",
+    ],
     # Currently disabled due to:
     #  1. Incompatibilites with the `ts_library` rule.
     exports_directories_only = False,
