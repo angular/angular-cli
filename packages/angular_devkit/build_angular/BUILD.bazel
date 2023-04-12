@@ -39,6 +39,11 @@ ts_json_schema(
 )
 
 ts_json_schema(
+    name = "jest_schema",
+    src = "src/builders/jest/schema.json",
+)
+
+ts_json_schema(
     name = "karma_schema",
     src = "src/builders/karma/schema.json",
 )
@@ -79,6 +84,7 @@ ts_library(
         "//packages/angular_devkit/build_angular:src/builders/browser/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/extract-i18n/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/jest/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/karma/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/ng-packagr/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/protractor/schema.ts",
@@ -267,7 +273,7 @@ ts_library(
             "src/**/tests/*.ts",
         ],
         exclude = [
-            "src/testing/**/*_spec.ts",
+            "src/**/*_spec.ts",
         ],
     ),
     data = glob(["test/**/*"]),
@@ -345,6 +351,12 @@ LARGE_SPECS = {
         "shards": 10,
         "extra_deps": [
             "@npm//buffer",
+        ],
+    },
+    "jest": {
+        "extra_deps": [
+            "@npm//glob",
+            "@npm//@types/glob",
         ],
     },
 }
