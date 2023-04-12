@@ -28,7 +28,7 @@ function* visit(directory: DirEntry): IterableIterator<Path> {
   }
 
   for (const path of directory.subdirs) {
-    if (path === 'node_modules') {
+    if (path === 'node_modules' || path.charAt(0) === '.') {
       continue;
     }
 
