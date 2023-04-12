@@ -26,6 +26,11 @@
       "schema": "./src/builders/extract-i18n/schema.json",
       "description": "Extract i18n strings from a browser application."
     },
+    "jest": {
+      "implementation": "./src/builders/jest",
+      "schema": "./src/builders/jest/schema.json",
+      "description": "Run unit tests using Jest."
+    },
     "karma": {
       "implementation": "./src/builders/karma",
       "schema": "./src/builders/karma/schema.json",
