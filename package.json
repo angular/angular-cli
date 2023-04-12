@@ -176,7 +176,7 @@
     "node-fetch": "^2.2.0",
     "npm": "^8.11.0",
     "npm-package-arg": "10.1.0",
-    "open": "8.4.2",
+    "open": "9.1.0",
     "ora": "5.4.1",
     "pacote": "15.1.1",
     "parse5-html-rewriting-stream": "7.0.0",
