@@ -1,3 +1,22 @@
+<a name="16.0.0-rc.0"></a>
+
+# 16.0.0-rc.0 (2023-04-12)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [ff8a89cbf](https://github.com/angular/angular-cli/commit/ff8a89cbfd308a0312d16956d55c30e2425e2d33) | fix  | ensure all build resources are served in esbuild dev server |
+| [f76a8358e](https://github.com/angular/angular-cli/commit/f76a8358ea07a0d00fb0eb1c62dfaccf056531be) | fix  | ensure directories are properly ignored in esbuild builder  |
+| [adbf2c8a1](https://github.com/angular/angular-cli/commit/adbf2c8a1ed67f505ea27921c00f957509e9a958) | fix  | normalize long-form asset option output to relative path    |
+| [a778fe6c2](https://github.com/angular/angular-cli/commit/a778fe6c2e7b9ca0c0995e1350460e97085b39a1) | fix  | show lazy files in stat table correctly with esbuild        |
+| [28c27567c](https://github.com/angular/angular-cli/commit/28c27567cf90712e6c8f4d483bcc0e0fc683ee9b) | perf | asynchronously delete output path in esbuild builder        |
+| [b2ece91b7](https://github.com/angular/angular-cli/commit/b2ece91b7488a01b6ddfcba1e68f97416c8b05f7) | perf | enhance Sass package resolution in esbuild builder          |
+| [9ea3e8e34](https://github.com/angular/angular-cli/commit/9ea3e8e349dd1765d5935517999a1879a7a0227d) | perf | only import esbuild watcher when in watch mode              |
+| [f88ac6fdf](https://github.com/angular/angular-cli/commit/f88ac6fdfee6abf406720c9bc72aa9ddadb112f9) | perf | skip Angular linker in JIT mode with esbuild                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.7"></a>
 
 # 16.0.0-next.7 (2023-04-06)
