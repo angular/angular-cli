@@ -71,13 +71,13 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     }
 
     const storeKey = this.makeCacheKey(req.method, req.url, req.params, req.responseType);
+    const response = this.transferState.get(storeKey, null);
 
-    if (this.transferState.hasKey(storeKey)) {
+    if (response) {
       // Request found in cache. Respond using it.
-      const response = this.transferState.get(storeKey, null);
-      let body: ArrayBuffer | Blob | string | undefined = response?.body;
+      let body: ArrayBuffer | Blob | string | undefined = response.body;
 
-      switch (response?.responseType) {
+      switch (response.responseType) {
         case 'arraybuffer':
           {
             // If we're in Node...
@@ -102,10 +102,10 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
       return of(
         new HttpResponse<any>({
           body,
-          headers: new HttpHeaders(response?.headers),
-          status: response?.status,
-          statusText: response?.statusText,
-          url: response?.url,
+          headers: new HttpHeaders(response.headers),
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
         }),
       );
     }
