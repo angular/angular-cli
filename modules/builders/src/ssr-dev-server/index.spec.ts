@@ -106,6 +106,35 @@ describe('Serve SSR Builder', () => {
     expect(await response.text()).toContain('<title>App</title>');
   });
 
+  it('works with service-worker', async () => {
+    const manifest = {
+      index: '/index.html',
+      assetGroups: [
+        {
+          name: 'app',
+          installMode: 'prefetch',
+          resources: {
+            files: ['/index.html'],
+          },
+        },
+      ],
+    };
+
+    host.writeMultipleFiles({
+      'ngsw-config.json': JSON.stringify(manifest),
+    });
+
+    const run = await architect.scheduleTarget(target, {
+      port: 7003,
+      browserTarget: 'app:build:sw',
+    });
+    runs.push(run);
+    const output = await run.result;
+    expect(output.success).toBe(true);
+    const response = await fetch('http://localhost:7003/ngsw.json');
+    expect(await response?.text()).toContain('installMode');
+  });
+
   // todo: alan-agius4: Investigate why this tests passed locally but fails in CI.
   // this is currenty disabled but still useful locally
   xit('works with rebuilds with fetch', async () => {
