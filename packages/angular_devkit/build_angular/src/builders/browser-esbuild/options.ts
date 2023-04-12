@@ -20,6 +20,23 @@ import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
 
 export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
+/** Internal options hidden from builder schema but available when invoked programmatically. */
+interface InternalOptions {
+  /**
+   * Entry points to use for the compilation. Incompatible with `main`, which must not be provided. May be relative or absolute paths.
+   * If given a relative path, it is resolved relative to the current workspace and will generate an output at the same relative location
+   * in the output directory. If given an absolute path, the output will be generated in the root of the output directory with the same base
+   * name.
+   */
+  entryPoints?: Set<string>;
+}
+
+/** Full set of options for `browser-esbuild` builder. */
+export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions, 'main'> & {
+  // `main` can be `undefined` if `entryPoints` is used.
+  main?: string;
+};
+
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
@@ -33,7 +50,7 @@ export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOption
 export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
-  options: BrowserBuilderOptions,
+  options: BrowserEsbuildOptions,
 ) {
   const workspaceRoot = context.workspaceRoot;
   const projectMetadata = await context.getProjectMetadata(projectName);
@@ -46,7 +63,7 @@ export async function normalizeOptions(
 
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
-  const mainEntryPoint = path.join(workspaceRoot, options.main);
+  const entryPoints = normalizeEntryPoints(workspaceRoot, options.main, options.entryPoints);
   const tsconfig = path.join(workspaceRoot, options.tsConfig);
   const outputPath = normalizeDirectoryPath(path.join(workspaceRoot, options.outputPath));
   const optimizationOptions = normalizeOptimization(options.optimization);
@@ -125,11 +142,6 @@ export async function normalizeOptions(
       : path.join(projectRoot, 'ngsw-config.json');
   }
 
-  // Setup bundler entry points
-  const entryPoints: Record<string, string> = {
-    main: mainEntryPoint,
-  };
-
   let indexHtmlOptions;
   if (options.index) {
     indexHtmlOptions = {
@@ -202,6 +214,57 @@ export async function normalizeOptions(
     indexHtmlOptions,
     tailwindConfiguration,
   };
+}
+
+/**
+ * Normalize entry point options. To maintain compatibility with the legacy browser builder, we need a single `main` option which defines a
+ * single entry point. However, we also want to support multiple entry points as an internal option. The two options are mutually exclusive
+ * and if `main` is provided it will be used as the sole entry point. If `entryPoints` are provided, they will be used as the set of entry
+ * points.
+ *
+ * @param workspaceRoot Path to the root of the Angular workspace.
+ * @param main The `main` option pointing at the application entry point. While required per the schema file, it may be omitted by
+ *     programmatic usages of `browser-esbuild`.
+ * @param entryPoints Set of entry points to use if provided.
+ * @returns An object mapping entry point names to their file paths.
+ */
+function normalizeEntryPoints(
+  workspaceRoot: string,
+  main: string | undefined,
+  entryPoints: Set<string> = new Set(),
+): Record<string, string> {
+  if (main === '') {
+    throw new Error('`main` option cannot be an empty string.');
+  }
+
+  // `main` and `entryPoints` are mutually exclusive.
+  if (main && entryPoints.size > 0) {
+    throw new Error('Only one of `main` or `entryPoints` may be provided.');
+  }
+  if (!main && entryPoints.size === 0) {
+    // Schema should normally reject this case, but programmatic usages of the builder might make this mistake.
+    throw new Error('Either `main` or at least one `entryPoints` value must be provided.');
+  }
+
+  // Schema types force `main` to always be provided, but it may be omitted when the builder is invoked programmatically.
+  if (main) {
+    // Use `main` alone.
+    return { 'main': path.join(workspaceRoot, main) };
+  } else {
+    // Use `entryPoints` alone.
+    return Object.fromEntries(
+      Array.from(entryPoints).map((entryPoint) => {
+        const parsedEntryPoint = path.parse(entryPoint);
+
+        return [
+          // File path without extension.
+          path.join(parsedEntryPoint.dir, parsedEntryPoint.name),
+          // Full file path.
+          path.join(workspaceRoot, entryPoint),
+        ];
+      }),
+    );
+  }
 }
 
 /**
