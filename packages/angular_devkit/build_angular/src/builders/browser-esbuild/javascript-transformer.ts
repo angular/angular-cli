@@ -85,7 +85,14 @@ export class JavaScriptTransformer {
       forceAsyncTransformation = data.includes('async') && /async(?:\s+function)?\s*\*/.test(data);
 
       if (!forceAsyncTransformation) {
-        return Buffer.from(data, 'utf-8');
+        const keepSourcemap =
+          this.#commonOptions.sourcemap &&
+          (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+
+        return Buffer.from(
+          keepSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
+          'utf-8',
+        );
       }
     }
 

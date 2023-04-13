@@ -69,7 +69,7 @@ async function transformWithBabel({
   const result = await transformAsync(data, {
     filename,
     inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
-    sourceMaps: options.sourcemap ? 'inline' : false,
+    sourceMaps: useInputSourcemap ? 'inline' : false,
     compact: false,
     configFile: false,
     babelrc: false,
@@ -94,5 +94,11 @@ async function transformWithBabel({
     ],
   });
 
-  return result?.code ?? data;
+  const outputCode = result?.code ?? data;
+
+  // Strip sourcemaps if they should not be used.
+  // Babel will keep the original comments even if sourcemaps are disabled.
+  return useInputSourcemap
+    ? outputCode
+    : outputCode.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
 }
