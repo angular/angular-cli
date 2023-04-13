@@ -1,3 +1,15 @@
+<a name="15.2.1"></a>
+
+# 15.2.1 (2023-04-13)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                          |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------ |
+| [15a46b89](https://github.com/angular/universal/commit/15a46b8916391290ed08100209169d040467e80c) | fix  | add support to serve service workers |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-next.0"></a>
 
 # 16.0.0-next.0 (2023-04-05)
