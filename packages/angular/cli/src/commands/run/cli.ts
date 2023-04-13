@@ -22,7 +22,7 @@ export interface RunCommandArgs {
   target: string;
 }
 
-export class RunCommandModule
+export default class RunCommandModule
   extends ArchitectBaseCommandModule<RunCommandArgs>
   implements CommandModuleImplementation<RunCommandArgs>
 {

@@ -76,7 +76,7 @@ interface MigrationSchematicDescriptionWithVersion extends MigrationSchematicDes
 const ANGULAR_PACKAGES_REGEXP = /^@(?:angular|nguniversal)\//;
 const UPDATE_SCHEMATIC_COLLECTION = path.join(__dirname, 'schematic/collection.json');
 
-export class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
+export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
   override scope = CommandScope.In;
   protected override shouldReportAnalytics = false;
 

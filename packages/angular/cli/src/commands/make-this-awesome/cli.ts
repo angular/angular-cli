@@ -10,7 +10,10 @@ import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { colors } from '../../utilities/color';
 
-export class AwesomeCommandModule extends CommandModule implements CommandModuleImplementation {
+export default class AwesomeCommandModule
+  extends CommandModule
+  implements CommandModuleImplementation
+{
   command = 'make-this-awesome';
   describe = false as const;
   deprecated = false;

@@ -25,7 +25,7 @@ interface ConfigCommandArgs {
   global?: boolean;
 }
 
-export class ConfigCommandModule
+export default class ConfigCommandModule
   extends CommandModule<ConfigCommandArgs>
   implements CommandModuleImplementation<ConfigCommandArgs>
 {
