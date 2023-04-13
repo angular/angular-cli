@@ -1,3 +1,27 @@
+<a name="16.0.0-rc.0"></a>
+
+# 16.0.0-rc.0 (2023-04-13)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                                            |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------------------------ |
+| [71c2cef8](https://github.com/angular/universal/commit/71c2cef8dd8f424e5939e50d90face621d11ac5b) | fix  | update TransferHttpResponse requiring body and headers |
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description                          |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------------------------ |
+| [fdb08953](https://github.com/angular/universal/commit/fdb089534f1f163bf9cd9479135bb1537a4f43f4) | fix  | add support to serve service workers |
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                            |
+| ------------------------------------------------------------------------------------------------ | ---- | -------------------------------------- |
+| [66021f10](https://github.com/angular/universal/commit/66021f102f8ee5260d3f13efe5e229c6c42aebc1) | fix  | update import for template server file |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.1"></a>
 
 # 15.2.1 (2023-04-13)
