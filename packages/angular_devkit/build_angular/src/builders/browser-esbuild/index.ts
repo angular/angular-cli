@@ -765,7 +765,7 @@ function logBuildStats(context: BuilderContext, metafile: Metafile, initialFiles
 
     stats.push({
       initial: initial.has(file),
-      stats: [file, initial.get(file) ?? '', output.bytes, ''],
+      stats: [file, initial.get(file) ?? '-', output.bytes, ''],
     });
   }
 
