@@ -9,14 +9,15 @@
 import { join } from 'path';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
+import { RootCommands } from '../command-config';
 
-export class TestCommandModule
+export default class TestCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {
   multiTarget = true;
   command = 'test [project]';
-  aliases = ['t'];
+  aliases = RootCommands['test'].aliases;
   describe = 'Runs unit tests in a project.';
   longDescriptionPath = join(__dirname, 'long-description.md');
 }

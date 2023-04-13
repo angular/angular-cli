@@ -20,12 +20,13 @@ import {
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
 import { VERSION } from '../../utilities/version';
+import { RootCommands } from '../command-config';
 
 interface NewCommandArgs extends SchematicsCommandArgs {
   collection?: string;
 }
 
-export class NewCommandModule
+export default class NewCommandModule
   extends SchematicsCommandModule
   implements CommandModuleImplementation<NewCommandArgs>
 {
@@ -34,7 +35,7 @@ export class NewCommandModule
   protected override allowPrivateSchematics = true;
 
   command = 'new [name]';
-  aliases = 'n';
+  aliases = RootCommands['new'].aliases;
   describe = 'Creates a new Angular workspace.';
   longDescriptionPath = join(__dirname, 'long-description.md');
 

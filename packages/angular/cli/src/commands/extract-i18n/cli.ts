@@ -9,7 +9,7 @@
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
 
-export class ExtractI18nCommandModule
+export default class ExtractI18nCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {

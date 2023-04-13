@@ -22,7 +22,10 @@ import { CacheCleanModule } from './clean/cli';
 import { CacheInfoCommandModule } from './info/cli';
 import { CacheDisableModule, CacheEnableModule } from './settings/cli';
 
-export class CacheCommandModule extends CommandModule implements CommandModuleImplementation {
+export default class CacheCommandModule
+  extends CommandModule
+  implements CommandModuleImplementation
+{
   command = 'cache';
   describe = 'Configure persistent disk cache and retrieve cache statistics.';
   longDescriptionPath = join(__dirname, 'long-description.md');
