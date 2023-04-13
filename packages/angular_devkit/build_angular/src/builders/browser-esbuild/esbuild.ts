@@ -103,13 +103,19 @@ export class BundlerContext {
       outputFile.path = relativeFilePath;
 
       if (entryPoint) {
-        // An entryPoint value indicates an initial file
-        initialFiles.push({
-          file: outputFile.path,
-          // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
-          name: basename(outputFile.path).split('.')[0],
-          extension: extname(outputFile.path),
-        });
+        // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
+        const name = basename(outputFile.path).split('.', 1)[0];
+
+        // Only entrypoints with an entry in the options are initial files.
+        // Dynamic imports also have an entryPoint value in the meta file.
+        if ((this.#esbuildOptions.entryPoints as Record<string, string>)?.[name]) {
+          // An entryPoint value indicates an initial file
+          initialFiles.push({
+            file: outputFile.path,
+            name,
+            extension: extname(outputFile.path),
+          });
+        }
       }
     }
 
