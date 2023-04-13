@@ -55,7 +55,7 @@ const packageVersionExclusions: Record<string, string | Range> = {
   '@angular/material': '7.x',
 };
 
-export class AddCommandModule
+export default class AddCommadModule
   extends SchematicsCommandModule
   implements CommandModuleImplementation<AddCommandArgs>
 {

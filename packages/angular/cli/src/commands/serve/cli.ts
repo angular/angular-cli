@@ -8,14 +8,15 @@
 
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
+import { RootCommands } from '../command-config';
 
-export class ServeCommandModule
+export default class ServeCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {
   multiTarget = false;
   command = 'serve [project]';
-  aliases = ['s'];
+  aliases = RootCommands['serve'].aliases;
   describe = 'Builds and serves your application, rebuilding on file changes.';
   longDescriptionPath?: string | undefined;
 }

@@ -9,8 +9,9 @@
 import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
+import { RootCommands } from '../command-config';
 
-export class E2eCommandModule
+export default class E2eCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {
@@ -31,7 +32,7 @@ export class E2eCommandModule
 
   multiTarget = true;
   command = 'e2e [project]';
-  aliases = ['e'];
+  aliases = RootCommands['e2e'].aliases;
   describe = 'Builds and serves an Angular application, then runs end-to-end tests.';
   longDescriptionPath?: string;
 }

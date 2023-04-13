@@ -14,7 +14,10 @@ import { colors } from '../../utilities/color';
 import { hasGlobalCliInstall, initializeAutocomplete } from '../../utilities/completion';
 import { assertIsError } from '../../utilities/error';
 
-export class CompletionCommandModule extends CommandModule implements CommandModuleImplementation {
+export default class CompletionCommandModule
+  extends CommandModule
+  implements CommandModuleImplementation
+{
   command = 'completion';
   describe = 'Set up Angular CLI autocompletion for your terminal.';
   longDescriptionPath = join(__dirname, 'long-description.md');

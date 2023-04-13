@@ -16,13 +16,15 @@ import {
 } from '../command-module';
 
 export const demandCommandFailureMessage = `You need to specify a command before moving on. Use '--help' to view the available commands.`;
+export type CommandModuleConstructor = Partial<CommandModuleImplementation> & {
+  new (context: CommandContext): Partial<CommandModuleImplementation> & CommandModule;
+};
 
-export function addCommandModuleToYargs<
-  T extends object,
-  U extends Partial<CommandModuleImplementation> & {
-    new (context: CommandContext): Partial<CommandModuleImplementation> & CommandModule;
-  },
->(localYargs: Argv<T>, commandModule: U, context: CommandContext): Argv<T> {
+export function addCommandModuleToYargs<T extends object, U extends CommandModuleConstructor>(
+  localYargs: Argv<T>,
+  commandModule: U,
+  context: CommandContext,
+): Argv<T> {
   const cmd = new commandModule(context);
   const {
     args: {

@@ -9,55 +9,24 @@
 import { logging } from '@angular-devkit/core';
 import yargs from 'yargs';
 import { Parser } from 'yargs/helpers';
-import { AddCommandModule } from '../commands/add/cli';
-import { AnalyticsCommandModule } from '../commands/analytics/cli';
-import { BuildCommandModule } from '../commands/build/cli';
-import { CacheCommandModule } from '../commands/cache/cli';
-import { CompletionCommandModule } from '../commands/completion/cli';
-import { ConfigCommandModule } from '../commands/config/cli';
-import { DeployCommandModule } from '../commands/deploy/cli';
-import { DocCommandModule } from '../commands/doc/cli';
-import { E2eCommandModule } from '../commands/e2e/cli';
-import { ExtractI18nCommandModule } from '../commands/extract-i18n/cli';
-import { GenerateCommandModule } from '../commands/generate/cli';
-import { LintCommandModule } from '../commands/lint/cli';
-import { AwesomeCommandModule } from '../commands/make-this-awesome/cli';
-import { NewCommandModule } from '../commands/new/cli';
-import { RunCommandModule } from '../commands/run/cli';
-import { ServeCommandModule } from '../commands/serve/cli';
-import { TestCommandModule } from '../commands/test/cli';
-import { UpdateCommandModule } from '../commands/update/cli';
-import { VersionCommandModule } from '../commands/version/cli';
+import {
+  CommandConfig,
+  CommandNames,
+  RootCommands,
+  RootCommandsAliases,
+} from '../commands/command-config';
 import { colors } from '../utilities/color';
 import { AngularWorkspace, getWorkspace } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { PackageManagerUtils } from '../utilities/package-manager';
 import { CommandContext, CommandModuleError } from './command-module';
-import { addCommandModuleToYargs, demandCommandFailureMessage } from './utilities/command';
+import {
+  CommandModuleConstructor,
+  addCommandModuleToYargs,
+  demandCommandFailureMessage,
+} from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
 import { normalizeOptionsMiddleware } from './utilities/normalize-options-middleware';
-
-const COMMANDS = [
-  VersionCommandModule,
-  DocCommandModule,
-  AwesomeCommandModule,
-  ConfigCommandModule,
-  AnalyticsCommandModule,
-  AddCommandModule,
-  GenerateCommandModule,
-  BuildCommandModule,
-  E2eCommandModule,
-  TestCommandModule,
-  ServeCommandModule,
-  ExtractI18nCommandModule,
-  DeployCommandModule,
-  LintCommandModule,
-  NewCommandModule,
-  UpdateCommandModule,
-  RunCommandModule,
-  CacheCommandModule,
-  CompletionCommandModule,
-].sort(); // Will be sorted by class name.
 
 const yargsParser = Parser as unknown as typeof Parser.default;
 
@@ -111,7 +80,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   };
 
   let localYargs = yargs(args);
-  for (const CommandModule of COMMANDS) {
+  for (const CommandModule of await getCommandsToRegister(positional[0])) {
     localYargs = addCommandModuleToYargs(localYargs, CommandModule, context);
   }
 
@@ -167,4 +136,24 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .parseAsync();
 
   return process.exitCode ?? 0;
+}
+
+/**
+ * Get the commands that need to be registered.
+ * @returns One or more command factories that needs to be registered.
+ */
+async function getCommandsToRegister(
+  commandName: string | number,
+): Promise<CommandModuleConstructor[]> {
+  const commands: CommandConfig[] = [];
+  if (commandName in RootCommands) {
+    commands.push(RootCommands[commandName as CommandNames]);
+  } else if (commandName in RootCommandsAliases) {
+    commands.push(RootCommandsAliases[commandName]);
+  } else {
+    // Unknown command, register every possible command.
+    Object.values(RootCommands).forEach((c) => commands.push(c));
+  }
+
+  return Promise.all(commands.map((command) => command.factory().then((m) => m.default)));
 }
