@@ -11,7 +11,7 @@ import { MissingTargetChoice } from '../../command-builder/architect-base-comman
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
 
-export class DeployCommandModule
+export default class DeployCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {

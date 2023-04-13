@@ -25,17 +25,18 @@ import {
 } from '../../command-builder/schematics-command-module';
 import { demandCommandFailureMessage } from '../../command-builder/utilities/command';
 import { Option } from '../../command-builder/utilities/json-schema';
+import { RootCommands } from '../command-config';
 
 interface GenerateCommandArgs extends SchematicsCommandArgs {
   schematic?: string;
 }
 
-export class GenerateCommandModule
+export default class GenerateCommandModule
   extends SchematicsCommandModule
   implements CommandModuleImplementation<GenerateCommandArgs>
 {
   command = 'generate';
-  aliases = 'g';
+  aliases = RootCommands['generate'].aliases;
   describe = 'Generates and/or modifies files based on a schematic.';
   longDescriptionPath?: string | undefined;
 

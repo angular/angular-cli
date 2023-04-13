@@ -13,6 +13,7 @@ import {
   CommandModuleImplementation,
   Options,
 } from '../../command-builder/command-module';
+import { RootCommands } from '../command-config';
 
 interface DocCommandArgs {
   keyword: string;
@@ -20,12 +21,12 @@ interface DocCommandArgs {
   version?: string;
 }
 
-export class DocCommandModule
+export default class DocCommandModule
   extends CommandModule<DocCommandArgs>
   implements CommandModuleImplementation<DocCommandArgs>
 {
   command = 'doc <keyword>';
-  aliases = ['d'];
+  aliases = RootCommands['doc'].aliases;
   describe =
     'Opens the official Angular documentation (angular.io) in a browser, and searches for a given keyword.';
   longDescriptionPath?: string;

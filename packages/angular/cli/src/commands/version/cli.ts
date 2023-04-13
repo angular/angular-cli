@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { colors } from '../../utilities/color';
+import { RootCommands } from '../command-config';
 
 interface PartialPackageInfo {
   name: string;
@@ -37,9 +38,12 @@ const PACKAGE_PATTERNS = [
   /^webpack$/,
 ];
 
-export class VersionCommandModule extends CommandModule implements CommandModuleImplementation {
+export default class VersionCommandModule
+  extends CommandModule
+  implements CommandModuleImplementation
+{
   command = 'version';
-  aliases = ['v'];
+  aliases = RootCommands['version'].aliases;
   describe = 'Outputs Angular CLI version.';
   longDescriptionPath?: string | undefined;
 

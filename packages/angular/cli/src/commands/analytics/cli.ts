@@ -24,7 +24,10 @@ import {
   AnalyticsPromptModule,
 } from './settings/cli';
 
-export class AnalyticsCommandModule extends CommandModule implements CommandModuleImplementation {
+export default class AnalyticsCommandModule
+  extends CommandModule
+  implements CommandModuleImplementation
+{
   command = 'analytics';
   describe = 'Configures the gathering of Angular CLI usage metrics.';
   longDescriptionPath = join(__dirname, 'long-description.md');
