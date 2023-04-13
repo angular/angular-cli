@@ -66,7 +66,7 @@ export const RootCommands: Record<
   },
   'e2e': {
     factory: () => import('./e2e/cli'),
-    aliases: ['e2e'],
+    aliases: ['e'],
   },
   'extract-i18n': {
     factory: () => import('./extract-i18n/cli'),
