@@ -41,10 +41,6 @@ ESBUILD_TESTS = [
 
 # Tests excluded for esbuild
 ESBUILD_IGNORE_TESTS = [
-    "tests/basic/environment.js",
-    "tests/basic/rebuild.js",
-    "tests/basic/serve.js",
-    "tests/basic/scripts-array.js",
 ]
 
 def _to_glob(patterns):
