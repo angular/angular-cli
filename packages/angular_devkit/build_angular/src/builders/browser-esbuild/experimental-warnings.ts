@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Schema as BrowserEsbuildOptions } from './schema';
 
 const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'budgets',
@@ -30,7 +31,7 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'webWorkerTsConfig',
 ];
 
-export function logExperimentalWarnings(options: BrowserBuilderOptions, context: BuilderContext) {
+export function logExperimentalWarnings(options: BrowserEsbuildOptions, context: BuilderContext) {
   // Warn about experimental status of this builder
   context.logger.warn(
     `The esbuild browser application builder ('browser-esbuild') is currently experimental.`,
@@ -39,7 +40,7 @@ export function logExperimentalWarnings(options: BrowserBuilderOptions, context:
   // Validate supported options
   // Currently only a subset of the Webpack-based browser builder options are supported.
   for (const unsupportedOption of UNSUPPORTED_OPTIONS) {
-    const value = options[unsupportedOption];
+    const value = (options as unknown as BrowserBuilderOptions)[unsupportedOption];
 
     if (value === undefined || value === false) {
       continue;
