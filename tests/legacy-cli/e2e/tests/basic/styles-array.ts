@@ -1,4 +1,3 @@
-import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -39,13 +38,9 @@ export default async function () {
     '<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="renamed-style.css">',
   );
 
-  if (getGlobalVariable('argv')['esbuild']) {
-    // EXPERIMENTAL_ESBUILD: esbuild does not yet output build stats
-    return;
-  }
-
   // Non injected styles should be listed under lazy chunk files
-  if (!/Lazy Chunk Files.*\srenamed-lazy-style\.css/m.test(stdout)) {
+  if (!/Lazy Chunk Files[\s\S]+renamed-lazy-style\.css/m.test(stdout)) {
+    console.log(stdout);
     throw new Error(`Expected "renamed-lazy-style.css" to be listed under "Lazy Chunk Files".`);
   }
 }

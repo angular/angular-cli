@@ -26,10 +26,13 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 export async function ngServe(...args: string[]) {
   const port = await findFreePort();
 
+  const esbuild = getGlobalVariable('argv')['esbuild'];
+  const validBundleRegEx = esbuild ? /Complete\./ : /Compiled successfully\./;
+
   await execAndWaitForOutputToMatch(
     'ng',
     ['serve', '--port', String(port), ...args],
-    / Compiled successfully./,
+    validBundleRegEx,
   );
 
   return port;
