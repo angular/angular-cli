@@ -29,6 +29,9 @@ interface InternalOptions {
    * name.
    */
   entryPoints?: Set<string>;
+
+  /** File extension to use for the generated output files. */
+  outExtension?: 'js' | 'mjs';
 }
 
 /** Full set of options for `browser-esbuild` builder. */
@@ -166,6 +169,7 @@ export async function normalizeOptions(
     externalDependencies,
     extractLicenses,
     inlineStyleLanguage = 'css',
+    outExtension,
     poll,
     polyfills,
     preserveSymlinks,
@@ -202,6 +206,7 @@ export async function normalizeOptions(
     entryPoints,
     optimizationOptions,
     outputPath,
+    outExtension,
     sourcemapOptions,
     tsconfig,
     projectRoot,
