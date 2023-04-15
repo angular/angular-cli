@@ -163,4 +163,26 @@ describe('augment-index-html', () => {
       <app-root></app-root>
     `);
   });
+
+  it('should add `.mjs` script tags', async () => {
+    const { content } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      files: [{ file: 'main.mjs', extension: '.mjs', name: 'main' }],
+      entrypoints: [['main', true /* isModule */]],
+    });
+
+    expect(content).toContain('<script src="main.mjs" type="module"></script>');
+  });
+
+  it('should reject non-module `.mjs` scripts', async () => {
+    const options: AugmentIndexHtmlOptions = {
+      ...indexGeneratorOptions,
+      files: [{ file: 'main.mjs', extension: '.mjs', name: 'main' }],
+      entrypoints: [['main', false /* isModule */]],
+    };
+
+    await expectAsync(augmentIndexHtml(options)).toBeRejectedWithError(
+      '`.mjs` files *must* set `isModule` to `true`.',
+    );
+  });
 });
