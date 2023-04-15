@@ -79,6 +79,14 @@ export async function augmentIndexHtml(
           // Also, non entrypoints need to be loaded as no module as they can contain problematic code.
           scripts.set(file, isModule);
           break;
+        case '.mjs':
+          if (!isModule) {
+            // It would be very confusing to link an `*.mjs` file in a non-module script context,
+            // so we disallow it entirely.
+            throw new Error('`.mjs` files *must* set `isModule` to `true`.');
+          }
+          scripts.set(file, true /* isModule */);
+          break;
         case '.css':
           stylesheets.add(file);
           break;
