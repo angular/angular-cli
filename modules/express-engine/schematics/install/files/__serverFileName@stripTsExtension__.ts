@@ -56,4 +56,4 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
   run();
 }
 
-export * from './src/<%= stripTsExtension(main) %>';
+<% if (isStandalone) { %>export default bootstrap;<% } else { %>export * from './src/<%= stripTsExtension(main) %>';<% } %>
