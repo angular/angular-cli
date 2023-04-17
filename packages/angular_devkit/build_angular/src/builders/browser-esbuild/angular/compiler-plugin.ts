@@ -165,15 +165,13 @@ export function createCompilerPlugin(
     name: 'angular-compiler',
     // eslint-disable-next-line max-lines-per-function
     async setup(build: PluginBuild): Promise<void> {
-      let setupWarnings: PartialMessage[] | undefined;
+      let setupWarnings: PartialMessage[] | undefined = [];
 
       // Initialize a worker pool for JavaScript transformations
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
 
-      const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT, readConfiguration } =
-        await AngularCompilation.loadCompilerCli();
-
       // Setup defines based on the values provided by the Angular compiler-cli
+      const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await AngularCompilation.loadCompilerCli();
       build.initialOptions.define ??= {};
       for (const [key, value] of Object.entries(GLOBAL_DEFS_FOR_TERSER_WITH_AOT)) {
         if (key in build.initialOptions.define) {
@@ -189,70 +187,25 @@ export function createCompilerPlugin(
         build.initialOptions.define[key] = value.toString();
       }
 
-      // The tsconfig is loaded in setup instead of in start to allow the esbuild target build option to be modified.
-      // esbuild build options can only be modified in setup prior to starting the build.
-      const {
-        options: compilerOptions,
-        rootNames,
-        errors: configurationDiagnostics,
-      } = profileSync('NG_READ_CONFIG', () =>
-        readConfiguration(pluginOptions.tsconfig, {
-          noEmitOnError: false,
-          suppressOutputPathCheck: true,
-          outDir: undefined,
-          inlineSources: pluginOptions.sourcemap,
-          inlineSourceMap: pluginOptions.sourcemap,
-          sourceMap: false,
-          mapRoot: undefined,
-          sourceRoot: undefined,
-          declaration: false,
-          declarationMap: false,
-          allowEmptyCodegenFiles: false,
-          annotationsAs: 'decorators',
-          enableResourceInlining: false,
-        }),
-      );
-
-      if (compilerOptions.target === undefined || compilerOptions.target < ts.ScriptTarget.ES2022) {
-        // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
-        // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
-        // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
-        compilerOptions.target = ts.ScriptTarget.ES2022;
-        compilerOptions.useDefineForClassFields ??= false;
-
-        (setupWarnings ??= []).push({
-          text:
-            'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
-            '"false" respectively by the Angular CLI.\n' +
-            `NOTE: You can set the "target" to "ES2022" in the project's tsconfig to remove this warning.`,
-          location: { file: pluginOptions.tsconfig },
-          notes: [
-            {
-              text:
-                'To control ECMA version and features use the Browerslist configuration. ' +
-                'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
-            },
-          ],
-        });
-      }
-
       // The file emitter created during `onStart` that will be used during the build in `onLoad` callbacks for TS files
       let fileEmitter: FileEmitter | undefined;
 
       // The stylesheet resources from component stylesheets that will be added to the build results output files
       let stylesheetResourceFiles: OutputFile[] = [];
-
       let stylesheetMetafiles: Metafile[];
 
-      let compilation: AngularCompilation | undefined;
+      // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
+      const compilation: AngularCompilation = pluginOptions.jit
+        ? new JitCompilation()
+        : new AotCompilation();
+
+      // Determines if TypeScript should process JavaScript files based on tsconfig `allowJs` option
+      let shouldTsIgnoreJs = true;
 
       build.onStart(async () => {
         const result: OnStartResult = {
           warnings: setupWarnings,
         };
-
-        // Reset the setup warnings so that they are only shown during the first build.
-        setupWarnings = undefined;
 
         // Reset debug performance tracking
         resetCumulativeDurations();
@@ -293,21 +246,48 @@ export function createCompilerPlugin(
           },
         };
 
-        // Create new compilation if first build; otherwise, use existing for rebuilds
-        if (pluginOptions.jit) {
-          compilation ??= new JitCompilation();
-        } else {
-          compilation ??= new AotCompilation();
-        }
-
         // Initialize the Angular compilation for the current build.
         // In watch mode, previous build state will be reused.
-        const { affectedFiles } = await compilation.initialize(
-          rootNames,
-          compilerOptions,
-          hostOptions,
-          configurationDiagnostics,
-        );
+        const {
+          affectedFiles,
+          compilerOptions: { allowJs },
+        } = await compilation.initialize(pluginOptions.tsconfig, hostOptions, (compilerOptions) => {
+          if (
+            compilerOptions.target === undefined ||
+            compilerOptions.target < ts.ScriptTarget.ES2022
+          ) {
+            // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
+            // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
+            // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
+            compilerOptions.target = ts.ScriptTarget.ES2022;
+            compilerOptions.useDefineForClassFields ??= false;
+
+            // Only add the warning on the initial build
+            setupWarnings?.push({
+              text:
+                'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
+                '"false" respectively by the Angular CLI.',
+              location: { file: pluginOptions.tsconfig },
+              notes: [
+                {
+                  text:
+                    'To control ECMA version and features use the Browerslist configuration. ' +
+                    'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
+                },
+              ],
+            });
+          }
+
+          return {
+            ...compilerOptions,
+            noEmitOnError: false,
+            inlineSources: pluginOptions.sourcemap,
+            inlineSourceMap: pluginOptions.sourcemap,
+            mapRoot: undefined,
+            sourceRoot: undefined,
+          };
+        });
+        shouldTsIgnoreJs = !allowJs;
 
         // Clear affected files from the cache (if present)
         if (pluginOptions.sourceFileCache) {
@@ -319,8 +299,7 @@ export function createCompilerPlugin(
         }
 
         profileSync('NG_DIAGNOSTICS_TOTAL', () => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          for (const diagnostic of compilation!.collectDiagnostics()) {
+          for (const diagnostic of compilation.collectDiagnostics()) {
             const message = convertTypeScriptDiagnostic(diagnostic);
             if (diagnostic.category === ts.DiagnosticCategory.Error) {
               (result.errors ??= []).push(message);
@@ -332,67 +311,73 @@ export function createCompilerPlugin(
 
         fileEmitter = compilation.createFileEmitter();
 
+        // Reset the setup warnings so that they are only shown during the first build.
+        setupWarnings = undefined;
+
         return result;
       });
 
-      build.onLoad(
-        { filter: compilerOptions.allowJs ? /\.[cm]?[jt]sx?$/ : /\.[cm]?tsx?$/ },
-        (args) =>
-          profileAsync(
-            'NG_EMIT_TS*',
-            async () => {
-              assert.ok(fileEmitter, 'Invalid plugin execution order');
+      build.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, (args) =>
+        profileAsync(
+          'NG_EMIT_TS*',
+          async () => {
+            assert.ok(fileEmitter, 'Invalid plugin execution order');
 
-              const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
+            const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
 
-              // The filename is currently used as a cache key. Since the cache is memory only,
-              // the options cannot change and do not need to be represented in the key. If the
-              // cache is later stored to disk, then the options that affect transform output
-              // would need to be added to the key as well as a check for any change of content.
-              let contents = pluginOptions.sourceFileCache?.typeScriptFileCache.get(
-                pathToFileURL(request).href,
-              );
+            // Skip TS load attempt if JS TypeScript compilation not enabled and file is JS
+            if (shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+              return undefined;
+            }
 
-              if (contents === undefined) {
-                const typescriptResult = await fileEmitter(request);
-                if (!typescriptResult?.content) {
-                  // No TS result indicates the file is not part of the TypeScript program.
-                  // If allowJs is enabled and the file is JS then defer to the next load hook.
-                  if (compilerOptions.allowJs && /\.[cm]?js$/.test(request)) {
-                    return undefined;
-                  }
+            // The filename is currently used as a cache key. Since the cache is memory only,
+            // the options cannot change and do not need to be represented in the key. If the
+            // cache is later stored to disk, then the options that affect transform output
+            // would need to be added to the key as well as a check for any change of content.
+            let contents = pluginOptions.sourceFileCache?.typeScriptFileCache.get(
+              pathToFileURL(request).href,
+            );
 
-                  // Otherwise return an error
-                  return {
-                    errors: [
-                      createMissingFileError(
-                        request,
-                        args.path,
-                        build.initialOptions.absWorkingDir ?? '',
-                      ),
-                    ],
-                  };
+            if (contents === undefined) {
+              const typescriptResult = await fileEmitter(request);
+              if (!typescriptResult?.content) {
+                // No TS result indicates the file is not part of the TypeScript program.
+                // If allowJs is enabled and the file is JS then defer to the next load hook.
+                if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+                  return undefined;
                 }
 
-                contents = await javascriptTransformer.transformData(
-                  request,
-                  typescriptResult.content,
-                  true /* skipLinker */,
-                );
-
-                pluginOptions.sourceFileCache?.typeScriptFileCache.set(
-                  pathToFileURL(request).href,
-                  contents,
-                );
+                // Otherwise return an error
+                return {
+                  errors: [
+                    createMissingFileError(
+                      request,
+                      args.path,
+                      build.initialOptions.absWorkingDir ?? '',
+                    ),
+                  ],
+                };
               }
 
-              return {
+              contents = await javascriptTransformer.transformData(
+                request,
+                typescriptResult.content,
+                true /* skipLinker */,
+              );
+
+              pluginOptions.sourceFileCache?.typeScriptFileCache.set(
+                pathToFileURL(request).href,
                 contents,
-                loader: 'js',
-              };
-            },
-            true,
-          ),
+              );
+            }
+
+            return {
+              contents,
+              loader: 'js',
+            };
+          },
+          true,
+        ),
       );
 
       build.onLoad({ filter: /\.[cm]?js$/ }, (args) =>

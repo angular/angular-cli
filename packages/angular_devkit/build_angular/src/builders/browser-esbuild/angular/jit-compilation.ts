@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
 import { profileSync } from '../profiling';
@@ -25,13 +26,21 @@ export class JitCompilation extends AngularCompilation {
   #state?: JitCompilationState;
 
   async initialize(
-    rootNames: string[],
-    compilerOptions: ts.CompilerOptions,
+    tsconfig: string,
     hostOptions: AngularHostOptions,
-    configurationDiagnostics?: ts.Diagnostic[],
-  ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile> }> {
+    compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
+  ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile>; compilerOptions: ng.CompilerOptions }> {
     // Dynamically load the Angular compiler CLI package
     const { constructorParametersDownlevelTransform } = await AngularCompilation.loadCompilerCli();
+
+    // Load the compiler configuration and transform as needed
+    const {
+      options: originalCompilerOptions,
+      rootNames,
+      errors: configurationDiagnostics,
+    } = await this.loadConfiguration(tsconfig);
+    const compilerOptions =
+      compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
 
     // Create Angular compiler host
     const host = createAngularCompilerHost(compilerOptions, hostOptions);
@@ -57,7 +66,7 @@ export class JitCompilation extends AngularCompilation {
       createJitResourceTransformer(() => typeScriptProgram.getProgram().getTypeChecker()),
     );
 
-    return { affectedFiles };
+    return { affectedFiles, compilerOptions };
   }
 
   *collectDiagnostics(): Iterable<ts.Diagnostic> {
