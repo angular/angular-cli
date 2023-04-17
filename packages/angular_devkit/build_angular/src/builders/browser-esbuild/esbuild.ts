@@ -22,6 +22,16 @@ import {
 import { basename, extname, relative } from 'node:path';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 
+export type BundleContextResult =
+  | { errors: Message[]; warnings: Message[] }
+  | {
+      errors: undefined;
+      warnings: Message[];
+      metafile: Metafile;
+      outputFiles: OutputFile[];
+      initialFiles: FileInfo[];
+    };
+
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
  * @param value A potential esbuild BuildFailure error object.
@@ -43,6 +53,50 @@ export class BundlerContext {
     };
   }
 
+  static async bundleAll(contexts: Iterable<BundlerContext>): Promise<BundleContextResult> {
+    const individualResults = await Promise.all([...contexts].map((context) => context.bundle()));
+
+    // Return directly if only one result
+    if (individualResults.length === 1) {
+      return individualResults[0];
+    }
+
+    let errors: Message[] | undefined;
+    const warnings: Message[] = [];
+    const metafile: Metafile = { inputs: {}, outputs: {} };
+    const initialFiles = [];
+    const outputFiles = [];
+    for (const result of individualResults) {
+      warnings.push(...result.warnings);
+      if (result.errors) {
+        errors ??= [];
+        errors.push(...result.errors);
+        continue;
+      }
+
+      // Combine metafiles used for the stats option as well as bundle budgets and console output
+      if (result.metafile) {
+        metafile.inputs = { ...metafile.inputs, ...result.metafile.inputs };
+        metafile.outputs = { ...metafile.outputs, ...result.metafile.outputs };
+      }
+
+      initialFiles.push(...result.initialFiles);
+      outputFiles.push(...result.outputFiles);
+    }
+
+    if (errors !== undefined) {
+      return { errors, warnings };
+    }
+
+    return {
+      errors,
+      warnings,
+      metafile,
+      initialFiles,
+      outputFiles,
+    };
+  }
+
   /**
    * Executes the esbuild build function and normalizes the build result in the event of a
    * build failure that results in no output being generated.
@@ -52,16 +106,7 @@ export class BundlerContext {
    * @returns If output files are generated, the full esbuild BuildResult; if not, the
    * warnings and errors for the attempted build.
    */
-  async bundle(): Promise<
-    | { errors: Message[]; warnings: Message[] }
-    | {
-        errors: undefined;
-        warnings: Message[];
-        metafile: Metafile;
-        outputFiles: OutputFile[];
-        initialFiles: FileInfo[];
-      }
-  > {
+  async bundle(): Promise<BundleContextResult> {
     let result;
     try {
       if (this.#esbuildContext) {

@@ -108,6 +108,9 @@ async function execute(
   const target = transformSupportedBrowsersToTargets(browsers);
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
+  const bundlerContexts = [];
+
+  // Application code
   const codeBundleCache = options.watch
     ? rebuildState?.codeBundleCache ?? new SourceFileCache()
     : undefined;
@@ -118,37 +121,38 @@ async function execute(
       !!options.watch,
       createCodeBundleOptions(options, target, browsers, codeBundleCache),
     );
-  const globalStylesBundleContext =
-    rebuildState?.globalStylesRebuild ??
-    new BundlerContext(
+  bundlerContexts.push(codeBundleContext);
+  // Global Stylesheets
+  let globalStylesBundleContext;
+  if (options.globalStyles.length > 0) {
+    globalStylesBundleContext =
+      rebuildState?.globalStylesRebuild ??
+      new BundlerContext(
+        workspaceRoot,
+        !!options.watch,
+        createGlobalStylesBundleOptions(
+          options,
+          target,
+          browsers,
+          codeBundleCache?.loadResultCache,
+        ),
+      );
+    bundlerContexts.push(globalStylesBundleContext);
+  }
+  // Global Scripts
+  if (options.globalScripts.length > 0) {
+    const globalScriptsBundleContext = new BundlerContext(
       workspaceRoot,
       !!options.watch,
-      createGlobalStylesBundleOptions(options, target, browsers, codeBundleCache?.loadResultCache),
+      createGlobalScriptsBundleOptions(options),
     );
+    bundlerContexts.push(globalScriptsBundleContext);
+  }
 
-  const globalScriptsBundleContext = new BundlerContext(
-    workspaceRoot,
-    !!options.watch,
-    createGlobalScriptsBundleOptions(options),
-  );
-
-  const [codeResults, styleResults, scriptResults] = await Promise.all([
-    // Execute esbuild to bundle the application code
-    codeBundleContext.bundle(),
-    // Execute esbuild to bundle the global stylesheets
-    globalStylesBundleContext.bundle(),
-    globalScriptsBundleContext.bundle(),
-  ]);
+  const bundlingResult = await BundlerContext.bundleAll(bundlerContexts);
 
   // Log all warnings and errors generated during bundling
-  await logMessages(context, {
-    errors: [
-      ...(codeResults.errors || []),
-      ...(styleResults.errors || []),
-      ...(scriptResults.errors || []),
-    ],
-    warnings: [...codeResults.warnings, ...styleResults.warnings, ...scriptResults.warnings],
-  });
+  await logMessages(context, bundlingResult);
 
   const executionResult = new ExecutionResult(
     codeBundleContext,
@@ -157,40 +161,22 @@ async function execute(
   );
 
   // Return if the bundling has errors
-  if (codeResults.errors || styleResults.errors || scriptResults.errors) {
+  if (bundlingResult.errors) {
     return executionResult;
   }
 
-  // Filter global stylesheet initial files
-  styleResults.initialFiles = styleResults.initialFiles.filter(
-    ({ name }) => options.globalStyles.find((style) => style.name === name)?.initial,
-  );
+  // Filter global stylesheet initial files. Currently all initial CSS files are from the global styles option.
+  if (options.globalScripts.length > 0) {
+    bundlingResult.initialFiles = bundlingResult.initialFiles.filter(
+      ({ file, name }) =>
+        !file.endsWith('.css') ||
+        options.globalStyles.find((style) => style.name === name)?.initial,
+    );
+  }
 
-  // Combine the bundling output files
-  const initialFiles: FileInfo[] = [
-    ...codeResults.initialFiles,
-    ...styleResults.initialFiles,
-    ...scriptResults.initialFiles,
-  ];
-  executionResult.outputFiles.push(
-    ...codeResults.outputFiles,
-    ...styleResults.outputFiles,
-    ...scriptResults.outputFiles,
-  );
+  const { metafile, initialFiles, outputFiles } = bundlingResult;
 
-  // Combine metafiles used for the stats option as well as bundle budgets and console output
-  const metafile = {
-    inputs: {
-      ...codeResults.metafile?.inputs,
-      ...styleResults.metafile?.inputs,
-      ...scriptResults.metafile?.inputs,
-    },
-    outputs: {
-      ...codeResults.metafile?.outputs,
-      ...styleResults.metafile?.outputs,
-      ...scriptResults.metafile?.outputs,
-    },
-  };
+  executionResult.outputFiles.push(...outputFiles);
 
   // Check metafile for CommonJS module usage if optimizing scripts
   if (optimizationOptions.scripts) {
