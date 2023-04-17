@@ -9,6 +9,7 @@
 import type ng from '@angular/compiler-cli';
 import type ts from 'typescript';
 import { loadEsmModule } from '../../../utils/load-esm';
+import { profileSync } from '../profiling';
 import type { AngularHostOptions } from './angular-host';
 
 export interface EmitFileResult {
@@ -32,12 +33,29 @@ export abstract class AngularCompilation {
     return AngularCompilation.#angularCompilerCliModule;
   }
 
+  protected async loadConfiguration(tsconfig: string): Promise<ng.CompilerOptions> {
+    const { readConfiguration } = await AngularCompilation.loadCompilerCli();
+
+    return profileSync('NG_READ_CONFIG', () =>
+      readConfiguration(tsconfig, {
+        // Angular specific configuration defaults and overrides to ensure a functioning compilation.
+        suppressOutputPathCheck: true,
+        outDir: undefined,
+        sourceMap: false,
+        declaration: false,
+        declarationMap: false,
+        allowEmptyCodegenFiles: false,
+        annotationsAs: 'decorators',
+        enableResourceInlining: false,
+      }),
+    );
+  }
+
   abstract initialize(
-    rootNames: string[],
-    compilerOptions: ts.CompilerOptions,
+    tsconfig: string,
     hostOptions: AngularHostOptions,
-    configurationDiagnostics?: ts.Diagnostic[],
-  ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile> }>;
+    compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
+  ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile>; compilerOptions: ng.CompilerOptions }>;
 
   abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
 
