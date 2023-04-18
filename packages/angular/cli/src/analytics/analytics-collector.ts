@@ -182,6 +182,9 @@ export class AnalyticsCollector {
           },
         },
         (response) => {
+          // The below is needed as otherwise the response will never close which will cause the CLI not to terminate.
+          response.on('data', () => {});
+
           if (response.statusCode !== 200 && response.statusCode !== 204) {
             reject(
               new Error(`Analytics reporting failed with status code: ${response.statusCode}.`),
