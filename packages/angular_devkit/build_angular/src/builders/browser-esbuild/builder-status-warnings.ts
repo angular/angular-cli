@@ -25,20 +25,22 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   // * Always enabled with esbuild
   // 'commonChunk',
 
-  // * Currently unsupported by esbuild
+  // * Unused by builder and will be removed in a future release
   'namedChunks',
   'vendorChunk',
+
+  // * Currently unsupported by esbuild
   'webWorkerTsConfig',
 ];
 
-export function logExperimentalWarnings(options: BrowserEsbuildOptions, context: BuilderContext) {
-  // Warn about experimental status of this builder
+export function logBuilderStatusWarnings(options: BrowserEsbuildOptions, context: BuilderContext) {
   context.logger.warn(
-    `The esbuild browser application builder ('browser-esbuild') is currently experimental.`,
+    `The esbuild-based browser application builder ('browser-esbuild') is currently in developer preview` +
+      ' and is not yet recommended for production use.' +
+      ' For additional information, please see https://angular.io/guide/esbuild',
   );
 
   // Validate supported options
-  // Currently only a subset of the Webpack-based browser builder options are supported.
   for (const unsupportedOption of UNSUPPORTED_OPTIONS) {
     const value = (options as unknown as BrowserBuilderOptions)[unsupportedOption];
 
@@ -52,8 +54,17 @@ export function logExperimentalWarnings(options: BrowserEsbuildOptions, context:
       continue;
     }
 
-    context.logger.warn(
-      `The '${unsupportedOption}' option is currently unsupported by this experimental builder and will be ignored.`,
-    );
+    if (
+      unsupportedOption === 'namedChunks' ||
+      unsupportedOption === 'vendorChunk' ||
+      unsupportedOption === 'deployUrl'
+    ) {
+      context.logger.warn(
+        `The '${unsupportedOption}' option is not used by this builder and will be ignored.`,
+      );
+      continue;
+    }
+
+    context.logger.warn(`The '${unsupportedOption}' option is not yet supported by this builder.`);
   }
 }
