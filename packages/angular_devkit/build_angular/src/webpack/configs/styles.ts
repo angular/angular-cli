@@ -7,7 +7,6 @@
  */
 
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { FileImporter } from 'sass';
@@ -19,6 +18,7 @@ import {
 import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
 import { WebpackConfigOptions } from '../../utils/build-options';
 import { useLegacySass } from '../../utils/environment-options';
+import { findTailwindConfigurationFile } from '../../utils/tailwind';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -34,8 +34,8 @@ import {
 } from '../utils/helpers';
 
 // eslint-disable-next-line max-lines-per-function
-export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
-  const { root, buildOptions, logger } = wco;
+export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Configuration> {
+  const { root, buildOptions, logger, projectRoot } = wco;
   const extraPlugins: Configuration['plugins'] = [];
 
   extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
@@ -86,13 +86,13 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   // Only load Tailwind CSS plugin if configuration file was found.
   // This acts as a guard to ensure the project actually wants to use Tailwind CSS.
   // The package may be unknowningly present due to a third-party transitive package dependency.
-  const tailwindConfigPath = getTailwindConfigPath(wco);
+  const tailwindConfigPath = await findTailwindConfigurationFile(root, projectRoot);
   if (tailwindConfigPath) {
     let tailwindPackagePath;
     try {
-      tailwindPackagePath = require.resolve('tailwindcss', { paths: [wco.root] });
+      tailwindPackagePath = require.resolve('tailwindcss', { paths: [root] });
     } catch {
-      const relativeTailwindConfigPath = path.relative(wco.root, tailwindConfigPath);
+      const relativeTailwindConfigPath = path.relative(root, tailwindConfigPath);
       logger.warn(
         `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
           ` but the 'tailwindcss' package is not installed.` +
@@ -315,24 +315,6 @@ export function getStylesConfig(wco: WebpackConfigOptions): Configuration {
   };
 }
 
-function getTailwindConfigPath({ projectRoot, root }: WebpackConfigOptions): string | undefined {
-  // A configuration file can exist in the project or workspace root
-  // The list of valid config files can be found:
-  // https://github.com/tailwindlabs/tailwindcss/blob/8845d112fb62d79815b50b3bae80c317450b8b92/src/util/resolveConfigPath.js#L46-L52
-  const tailwindConfigFiles = ['tailwind.config.js', 'tailwind.config.cjs'];
-  for (const basePath of [projectRoot, root]) {
-    for (const configFile of tailwindConfigFiles) {
-      // Irrespective of the name project level configuration should always take precedence.
-      const fullPath = path.join(basePath, configFile);
-      if (fs.existsSync(fullPath)) {
-        return fullPath;
-      }
-    }
-  }
-
-  return undefined;
-}
-
 function getSassLoaderOptions(
   root: string,
   implementation: SassWorkerImplementation | SassLegacyWorkerImplementation,
@@ -399,7 +381,7 @@ function getSassResolutionImporter(
   root: string,
   preserveSymlinks: boolean,
 ): FileImporter<'async'> {
-  const commonResolverOptions: Parameters<typeof loaderContext['getResolve']>[0] = {
+  const commonResolverOptions: Parameters<(typeof loaderContext)['getResolve']>[0] = {
     conditionNames: ['sass', 'style'],
     mainFields: ['sass', 'style', 'main', '...'],
     extensions: ['.scss', '.sass', '.css'],
