@@ -13,6 +13,7 @@ import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
+import { findTailwindConfigurationFile } from '../../utils/tailwind';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { globalScriptsByBundleName, normalizeGlobalStyles } from '../../webpack/utils/helpers';
 import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
@@ -97,7 +98,7 @@ export async function normalizeOptions(
   }
 
   let tailwindConfiguration: { file: string; package: string } | undefined;
-  const tailwindConfigurationPath = findTailwindConfigurationFile(workspaceRoot, projectRoot);
+  const tailwindConfigurationPath = await findTailwindConfigurationFile(workspaceRoot, projectRoot);
   if (tailwindConfigurationPath) {
     // Create a node resolver at the project root as a directory
     const resolver = createRequire(projectRoot + '/');
@@ -201,27 +202,6 @@ export async function normalizeOptions(
     indexHtmlOptions,
     tailwindConfiguration,
   };
-}
-
-function findTailwindConfigurationFile(
-  workspaceRoot: string,
-  projectRoot: string,
-): string | undefined {
-  // A configuration file can exist in the project or workspace root
-  // The list of valid config files can be found:
-  // https://github.com/tailwindlabs/tailwindcss/blob/8845d112fb62d79815b50b3bae80c317450b8b92/src/util/resolveConfigPath.js#L46-L52
-  const tailwindConfigFiles = ['tailwind.config.js', 'tailwind.config.cjs'];
-  for (const basePath of [projectRoot, workspaceRoot]) {
-    for (const configFile of tailwindConfigFiles) {
-      // Project level configuration should always take precedence.
-      const fullPath = path.join(basePath, configFile);
-      if (fs.existsSync(fullPath)) {
-        return fullPath;
-      }
-    }
-  }
-
-  return undefined;
 }
 
 /**
