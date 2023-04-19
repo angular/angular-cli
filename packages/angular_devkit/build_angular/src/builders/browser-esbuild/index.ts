@@ -166,7 +166,7 @@ async function execute(
   }
 
   // Filter global stylesheet initial files. Currently all initial CSS files are from the global styles option.
-  if (options.globalScripts.length > 0) {
+  if (options.globalStyles.length > 0) {
     bundlingResult.initialFiles = bundlingResult.initialFiles.filter(
       ({ file, name }) =>
         !file.endsWith('.css') ||
