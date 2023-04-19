@@ -1,3 +1,27 @@
+<a name="16.0.0-rc.1"></a>
+
+# 16.0.0-rc.1 (2023-04-19)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [bae6b2822](https://github.com/angular/angular-cli/commit/bae6b282284234ed26b071f32855d1fc2b84a515) | fix  | process keeps running when analytics are enabled |
+| [19f9d351c](https://github.com/angular/angular-cli/commit/19f9d351c2cad0e94dc5983475c937ff742bd66a) | perf | register CLI commands lazily                     |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------ |
+| [dcf60d2be](https://github.com/angular/angular-cli/commit/dcf60d2be26fdbc1efaec1c506188cb166ffbdf0) | fix  | correctly filter lazy global styles in esbuild builder                                           |
+| [342a4ea30](https://github.com/angular/angular-cli/commit/342a4ea30e1ab9cbdbe5d6de339c21bdcff1a2c1) | fix  | correctly show initial files in stat table with esbuild builder                                  |
+| [107851ae4](https://github.com/angular/angular-cli/commit/107851ae45d8399782cbc73d3fa09b3f779e1e02) | fix  | display warning when `preserveWhitespaces` is set in the tsconfig provided to the server builder |
+| [f72155bc7](https://github.com/angular/angular-cli/commit/f72155bc7025f4e0b23eb58a92e422bd341720f6) | fix  | fully remove third-party sourcemaps when disabled in esbuild builder                             |
+| [0b450578a](https://github.com/angular/angular-cli/commit/0b450578a74e2b46488ae2e97c7f76389baa5271) | fix  | update list of known tailwind configuration files                                                |
+| [a710a262a](https://github.com/angular/angular-cli/commit/a710a262aed8a6c4a6af48e0ad7f479f0a23212e) | perf | cache Sass in memory with esbuild watch mode                                                     |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-rc.0"></a>
 
 # 16.0.0-rc.0 (2023-04-12)
