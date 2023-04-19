@@ -8,7 +8,8 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { runWebpack } from '@angular-devkit/build-webpack';
-import * as path from 'path';
+import { readFile } from 'node:fs/promises';
+import * as path from 'node:path';
 import { Observable, concatMap, from } from 'rxjs';
 import webpack, { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
@@ -191,6 +192,8 @@ async function initialize(
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
 
+  await checkTsConfigForPreserveWhitespacesSetting(context, options.tsConfig);
+
   const browserslist = (await import('browserslist')).default;
   const originalOutputPath = options.outputPath;
   // Assets are processed directly by the builder except when watching
@@ -221,6 +224,32 @@ async function initialize(
   const transformedConfig = (await webpackConfigurationTransform?.(config)) ?? config;
 
   return { config: transformedConfig, i18n, projectRoot, projectSourceRoot };
+}
+
+async function checkTsConfigForPreserveWhitespacesSetting(
+  context: BuilderContext,
+  tsConfigPath: string,
+): Promise<void> {
+  // We don't use the `readTsConfig` method on purpose here.
+  // To only catch cases were `preserveWhitespaces` is set directly in the `tsconfig.server.json`,
+  // which in the majority of cases will cause a mistmatch between client and server builds.
+  // Technically we should check if `tsconfig.server.json` and `tsconfig.app.json` values match.
+
+  // But:
+  // 1. It is not guaranteed that `tsconfig.app.json` is used to build the client side of this app.
+  // 2. There is no easy way to access the build build config from the server builder.
+  // 4. This will no longer be an issue with a single compilation model were the same tsconfig is used for both browser and server builds.
+  const content = await readFile(path.join(context.workspaceRoot, tsConfigPath), 'utf-8');
+  const { parse } = await import('jsonc-parser');
+  const tsConfig = parse(content, [], { allowTrailingComma: true });
+  if (tsConfig.angularCompilerOptions?.preserveWhitespaces !== undefined) {
+    context.logger.warn(
+      `"preserveWhitespaces" was set in "${tsConfigPath}". ` +
+        'Make sure that this setting is set consistently in both "tsconfig.server.json" for your server side ' +
+        'and "tsconfig.app.json" for your client side. A mismatched value will cause hydration to break.\n' +
+        'For more information see: https://angular.io/guide/hydration#preserve-whitespaces',
+    );
+  }
 }
 
 /**
