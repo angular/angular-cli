@@ -96,6 +96,7 @@ ts_library(
             "builders.json",
             "src/**/schema.json",
             "src/**/*.js",
+            "src/**/*.mjs",
             "src/**/*.html",
         ],
     ),

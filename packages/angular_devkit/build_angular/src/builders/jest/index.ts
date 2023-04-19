@@ -56,10 +56,13 @@ export default createBuilder(
 
     // Build all the test files.
     const testFiles = await findTestFiles(options, context.workspaceRoot);
+    const jestGlobal = path.join(__dirname, 'jest-global.mjs');
+    const initTestBed = path.join(__dirname, 'init-test-bed.mjs');
     const buildResult = await build(context, {
-      entryPoints: testFiles,
+      // Build all the test files and also the `jest-global` and `init-test-bed` scripts.
+      entryPoints: new Set([...testFiles, jestGlobal, initTestBed]),
       tsConfig: options.tsConfig,
-      polyfills: options.polyfills,
+      polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
       outputPath: testOut,
       aot: false,
       index: null,
@@ -83,21 +86,32 @@ export default createBuilder(
       '--experimental-vm-modules',
       jest,
 
-      `--rootDir=${testOut}`,
+      `--rootDir="${testOut}"`,
       '--testEnvironment=jsdom',
 
       // TODO(dgp1130): Enable cache once we have a mechanism for properly clearing / disabling it.
       '--no-cache',
 
       // Run basically all files in the output directory, any excluded files were already dropped by the build.
-      `--testMatch=${path.join('<rootDir>', '**', '*.mjs')}`,
+      `--testMatch="<rootDir>/**/*.mjs"`,
 
-      // Load polyfills before each test, and don't run them directly as a test.
-      `--setupFilesAfterEnv=${path.join('<rootDir>', 'polyfills.mjs')}`,
-      `--testPathIgnorePatterns=${path.join('<rootDir>', 'polyfills\\.mjs')}`,
+      // Load polyfills and initialize the environment before executing each test file.
+      // IMPORTANT: Order matters here.
+      // First, we execute `jest-global.mjs` to initialize the `jest` global variable.
+      // Second, we execute user polyfills, including `zone.js` and `zone.js/testing`. This is dependent on the Jest global so it can patch
+      // the environment for fake async to work correctly.
+      // Third, we initialize `TestBed`. This is dependent on fake async being set up correctly beforehand.
+      `--setupFilesAfterEnv="<rootDir>/jest-global.mjs"`,
+      ...(options.polyfills ? [`--setupFilesAfterEnv="<rootDir>/polyfills.mjs"`] : []),
+      `--setupFilesAfterEnv="<rootDir>/init-test-bed.mjs"`,
+
+      // Don't run any infrastructure files as tests, they are manually loaded where needed.
+      `--testPathIgnorePatterns="<rootDir>/jest-global\\.mjs"`,
+      ...(options.polyfills ? [`--testPathIgnorePatterns="<rootDir>/polyfills\\.mjs"`] : []),
+      `--testPathIgnorePatterns="<rootDir>/init-test-bed\\.mjs"`,
 
       // Skip shared chunks, as they are not entry points to tests.
-      `--testPathIgnorePatterns=${path.join('<rootDir>', 'chunk-.*\\.mjs')}`,
+      `--testPathIgnorePatterns="<rootDir>/chunk-.*\\.mjs"`,
 
       // Optionally enable color.
       ...(colors.enabled ? ['--colors'] : []),
