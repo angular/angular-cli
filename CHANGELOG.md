@@ -1,3 +1,15 @@
+<a name="16.0.0-rc.1"></a>
+
+# 16.0.0-rc.1 (2023-04-20)
+
+### @nguniversal/express-engine
+
+| Commit                                                                                           | Type | Description                                                |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------------------------------------- |
+| [500f5e54](https://github.com/angular/universal/commit/500f5e5415142372a3933af3988f9826c1879688) | fix  | export default bootstrap in server template for standalone |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-rc.0"></a>
 
 # 16.0.0-rc.0 (2023-04-13)
