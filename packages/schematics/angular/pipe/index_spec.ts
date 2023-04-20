@@ -151,6 +151,13 @@ describe('Pipe Schematic', () => {
     expect(moduleContent).not.toContain('FooPipe');
   });
 
+  it('should create a pure pipe', async () => {
+    const options = { ...defaultOptions, pure: true };
+    const tree = await schematicRunner.runSchematic('pipe', options, appTree);
+    const pipeContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+    expect(pipeContent).toContain('pure: true');
+  });
+
   it('should error when class name contains invalid characters', async () => {
     const options = { ...defaultOptions, name: '1Clazz' };
 
