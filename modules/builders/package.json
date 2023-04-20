@@ -37,7 +37,7 @@
     "http-proxy-middleware": "^2.0.6",
     "ora": "^5.1.0",
     "piscina": "~3.2.0",
-    "rxjs": "^6.5.5",
+    "rxjs": "^7.0.0",
     "tree-kill": "^1.2.2"
   }
 }

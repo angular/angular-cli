@@ -94,7 +94,7 @@
     "protractor": "7.0.0",
     "rollup": "~3.20.0",
     "rollup-plugin-sourcemaps": "^0.6.0",
-    "rxjs": "^6.5.3",
+    "rxjs": "^7.0.0",
     "shelljs": "^0.8.3",
     "source-map-support": "^0.5.9",
     "terser": "^5.0.0",
