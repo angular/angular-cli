@@ -252,18 +252,36 @@ function normalizeEntryPoints(
     return { 'main': path.join(workspaceRoot, main) };
   } else {
     // Use `entryPoints` alone.
-    return Object.fromEntries(
-      Array.from(entryPoints).map((entryPoint) => {
-        const parsedEntryPoint = path.parse(entryPoint);
+    const entryPointPaths: Record<string, string> = {};
+    for (const entryPoint of entryPoints) {
+      const parsedEntryPoint = path.parse(entryPoint);
 
-        return [
-          // File path without extension.
-          path.join(parsedEntryPoint.dir, parsedEntryPoint.name),
-          // Full file path.
-          path.join(workspaceRoot, entryPoint),
-        ];
-      }),
-    );
+      // Use the input file path without an extension as the "name" of the entry point dictating its output location.
+      // Relative entry points are generated at the same relative path in the output directory.
+      // Absolute entry points are always generated with the same file name in the root of the output directory. This includes absolute
+      // paths pointing at files actually within the workspace root.
+      const entryPointName = path.isAbsolute(entryPoint)
+        ? parsedEntryPoint.name
+        : path.join(parsedEntryPoint.dir, parsedEntryPoint.name);
+
+      // Get the full file path to the entry point input.
+      const entryPointPath = path.isAbsolute(entryPoint)
+        ? entryPoint
+        : path.join(workspaceRoot, entryPoint);
+
+      // Check for conflicts with previous entry points.
+      const existingEntryPointPath = entryPointPaths[entryPointName];
+      if (existingEntryPointPath) {
+        throw new Error(
+          `\`${existingEntryPointPath}\` and \`${entryPointPath}\` both output to the same location \`${entryPointName}\`.` +
+            ' Rename or move one of the files to fix the conflict.',
+        );
+      }
+
+      entryPointPaths[entryPointName] = entryPointPath;
+    }
+
+    return entryPointPaths;
   }
 }
 
