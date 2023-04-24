@@ -16,6 +16,7 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import * as assert from 'node:assert';
+import { realpath } from 'node:fs/promises';
 import { platform } from 'node:os';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -167,6 +168,16 @@ export function createCompilerPlugin(
     async setup(build: PluginBuild): Promise<void> {
       let setupWarnings: PartialMessage[] | undefined = [];
 
+      const preserveSymlinks = build.initialOptions.preserveSymlinks;
+      let tsconfigPath = pluginOptions.tsconfig;
+      if (!preserveSymlinks) {
+        // Use the real path of the tsconfig if not preserving symlinks.
+        // This ensures the TS source file paths are based on the real path of the configuration.
+        try {
+          tsconfigPath = await realpath(tsconfigPath);
+        } catch {}
+      }
+
       // Initialize a worker pool for JavaScript transformations
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
 
@@ -251,7 +262,7 @@ export function createCompilerPlugin(
         const {
           affectedFiles,
           compilerOptions: { allowJs },
-        } = await compilation.initialize(pluginOptions.tsconfig, hostOptions, (compilerOptions) => {
+        } = await compilation.initialize(tsconfigPath, hostOptions, (compilerOptions) => {
           if (
             compilerOptions.target === undefined ||
             compilerOptions.target < ts.ScriptTarget.ES2022
@@ -285,6 +296,7 @@ export function createCompilerPlugin(
             inlineSourceMap: pluginOptions.sourcemap,
             mapRoot: undefined,
             sourceRoot: undefined,
+            preserveSymlinks,
           };
         });
         shouldTsIgnoreJs = !allowJs;
