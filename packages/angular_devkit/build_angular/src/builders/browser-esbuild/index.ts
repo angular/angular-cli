@@ -395,6 +395,7 @@ function createCodeBundleOptions(
           externalDependencies,
           target,
           inlineStyleLanguage,
+          preserveSymlinks,
           browsers,
           tailwindConfiguration,
         },
