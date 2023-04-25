@@ -27,7 +27,7 @@ export async function ngServe(...args: string[]) {
   const port = await findFreePort();
 
   const esbuild = getGlobalVariable('argv')['esbuild'];
-  const validBundleRegEx = esbuild ? /Complete\./ : /Compiled successfully\./;
+  const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
 
   await execAndWaitForOutputToMatch(
     'ng',

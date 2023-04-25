@@ -267,7 +267,7 @@ async function execute(
   logBuildStats(context, metafile, initialFiles);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
-  context.logger.info(`Complete. [${buildTime.toFixed(3)} seconds]`);
+  context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
 
   return executionResult;
 }
