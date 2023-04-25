@@ -33,7 +33,7 @@
     "rootModuleFileName": {
       "type": "string",
       "description": "The name of the root module file",
-      "default": "app.server.module.ts"
+      "default": "app.module.server.ts"
     },
     "rootModuleClassName": {
       "type": "string",

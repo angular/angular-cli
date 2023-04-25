@@ -67,7 +67,7 @@ describe('Universal Schematic', () => {
 
   it('should create a root module file', async () => {
     const tree = await schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.server.ts';
     expect(tree.exists(filePath)).toEqual(true);
   });
 
@@ -76,7 +76,7 @@ describe('Universal Schematic', () => {
     const filePath = '/projects/bar/src/main.server.ts';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/export { AppServerModule } from '\.\/app\/app\.server\.module'/);
+    expect(contents).toMatch(/export { AppServerModule } from '\.\/app\/app\.module\.server'/);
   });
 
   it('should create a tsconfig file for the workspace project', async () => {
@@ -211,7 +211,7 @@ describe('Universal Schematic', () => {
         defaultStandaloneOptions,
         appTree,
       );
-      const filePath = '/projects/baz/src/app/app.server.module.ts';
+      const filePath = '/projects/baz/src/app/app.module.server.ts';
       expect(tree.exists(filePath)).toEqual(false);
     });
 
