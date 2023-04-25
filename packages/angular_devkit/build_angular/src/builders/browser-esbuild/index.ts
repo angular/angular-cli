@@ -29,10 +29,10 @@ import { createGlobalScriptsBundleOptions } from './global-scripts';
 import { extractLicenses } from './license-extractor';
 import { LoadResultCache } from './load-result-cache';
 import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } from './options';
-import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
-import { createStylesheetBundleOptions } from './stylesheets';
+import { createStylesheetBundleOptions } from './stylesheets/bundle-options';
+import { shutdownSassWorkerPool } from './stylesheets/sass-plugin';
 import type { ChangedFiles } from './watcher';
 
 interface RebuildState {
