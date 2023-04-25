@@ -67,7 +67,7 @@ describe('AppShell Builder', () => {
       })
       export class AppModule { }
     `,
-    'src/app/app.server.module.ts': `
+    'src/app/app.module.server.ts': `
       import { NgModule } from '@angular/core';
       import { ServerModule } from '@angular/platform-server';
 

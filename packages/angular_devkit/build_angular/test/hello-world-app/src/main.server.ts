@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export { AppServerModule } from './app/app.server.module';
+export { AppServerModule } from './app/app.module.server';
