@@ -8,11 +8,11 @@
 
 import type { BuildOptions, OutputFile } from 'esbuild';
 import path from 'node:path';
+import { BundlerContext } from '../esbuild';
+import { LoadResultCache } from '../load-result-cache';
 import { createCssPlugin } from './css-plugin';
 import { createCssResourcePlugin } from './css-resource-plugin';
-import { BundlerContext } from './esbuild';
 import { createLessPlugin } from './less-plugin';
-import { LoadResultCache } from './load-result-cache';
 import { createSassPlugin } from './sass-plugin';
 
 /**

@@ -15,8 +15,8 @@ import type { CompileResult, Exception, Syntax } from 'sass';
 import type {
   FileImporterWithRequestContextOptions,
   SassWorkerImplementation,
-} from '../../sass/sass-service';
-import type { LoadResultCache } from './load-result-cache';
+} from '../../../sass/sass-service';
+import type { LoadResultCache } from '../load-result-cache';
 
 export interface SassPluginOptions {
   sourcemap: boolean;
@@ -113,7 +113,7 @@ async function compileString(
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
   if (sassWorkerPool === undefined) {
-    const sassService = await import('../../sass/sass-service');
+    const sassService = await import('../../../sass/sass-service');
     sassWorkerPool = new sassService.SassWorkerImplementation(true);
   }
 

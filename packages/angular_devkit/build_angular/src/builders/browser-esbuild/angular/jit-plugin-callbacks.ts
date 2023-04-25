@@ -10,7 +10,7 @@ import type { OutputFile, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { LoadResultCache } from '../load-result-cache';
-import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets';
+import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
 import {
   JIT_NAMESPACE_REGEXP,
   JIT_STYLE_NAMESPACE,
