@@ -11,6 +11,7 @@ import MagicString, { Bundle } from 'magic-string';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { NormalizedBrowserOptions } from './options';
+import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 
 /**
  * Create an esbuild 'build' options object for all global scripts defined in the user provied
@@ -53,6 +54,7 @@ export function createGlobalScriptsBundleOptions(options: NormalizedBrowserOptio
     platform: 'neutral',
     preserveSymlinks,
     plugins: [
+      createSourcemapIngorelistPlugin(),
       {
         name: 'angular-global-scripts',
         setup(build) {
