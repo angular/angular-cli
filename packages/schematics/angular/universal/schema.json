@@ -30,7 +30,7 @@
       "type": "string",
       "format": "path",
       "description": "The name of the root NgModule file.",
-      "default": "app.server.module.ts"
+      "default": "app.module.server.ts"
     },
     "rootModuleClassName": {
       "type": "string",

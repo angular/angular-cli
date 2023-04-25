@@ -56,7 +56,7 @@ describe('App Shell Schematic', () => {
 
   it('should add a universal app', async () => {
     const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.server.ts';
     expect(tree.exists(filePath)).toEqual(true);
   });
 
@@ -145,7 +145,7 @@ describe('App Shell Schematic', () => {
 
   it('should add router imports to server module', async () => {
     const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.server.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/import { Routes, RouterModule } from '@angular\/router';/);
   });
@@ -158,21 +158,21 @@ describe('App Shell Schematic', () => {
     appTree.overwrite('angular.json', JSON.stringify(workspace, undefined, 2));
 
     tree = await schematicRunner.runSchematic('app-shell', defaultOptions, tree);
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.server.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/import { Routes, RouterModule } from '@angular\/router';/);
   });
 
   it('should define a server route', async () => {
     const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.server.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/const routes: Routes = \[/);
   });
 
   it('should import RouterModule with forRoot', async () => {
     const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.server.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(
       /const routes: Routes = \[ { path: 'shell', component: AppShellComponent }\];/,
@@ -183,7 +183,7 @@ describe('App Shell Schematic', () => {
   it('should create the shell component', async () => {
     const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
     expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
-    const content = tree.readContent('/projects/bar/src/app/app.server.module.ts');
+    const content = tree.readContent('/projects/bar/src/app/app.module.server.ts');
     expect(content).toMatch(/app-shell\.component/);
   });
 
