@@ -123,5 +123,18 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/main.js.map').content.toContain('/core/index.ts');
       harness.expectFile('dist/main.js.map').content.toContain('/common/index.ts');
     });
+
+    it('should add "x_google_ignoreList" extension to script sourcemap files when true', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        sourceMap: true,
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+
+      harness.expectFile('dist/main.js.map').content.toContain('"x_google_ignoreList"');
+    });
   });
 });
