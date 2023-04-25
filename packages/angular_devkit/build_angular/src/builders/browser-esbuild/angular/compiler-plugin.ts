@@ -29,7 +29,7 @@ import {
   profileSync,
   resetCumulativeDurations,
 } from '../profiling';
-import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets';
+import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
 import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
 import { AotCompilation } from './aot-compilation';
