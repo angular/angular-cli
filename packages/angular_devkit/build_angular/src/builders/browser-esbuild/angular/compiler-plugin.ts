@@ -11,7 +11,6 @@ import type {
   OnStartResult,
   OutputFile,
   PartialMessage,
-  PartialNote,
   Plugin,
   PluginBuild,
 } from 'esbuild';
@@ -34,90 +33,9 @@ import { BundleStylesheetOptions, bundleComponentStylesheet } from '../styleshee
 import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
 import { AotCompilation } from './aot-compilation';
+import { convertTypeScriptDiagnostic } from './diagnostics';
 import { JitCompilation } from './jit-compilation';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
-
-/**
- * Converts TypeScript Diagnostic related information into an esbuild compatible note object.
- * Related information is a subset of a full TypeScript Diagnostic and also used for diagnostic
- * notes associated with the main Diagnostic.
- * @param info The TypeScript diagnostic relative information to convert.
- * @returns An esbuild diagnostic message as a PartialMessage object
- */
-function convertTypeScriptDiagnosticInfo(
-  info: ts.DiagnosticRelatedInformation,
-  textPrefix?: string,
-): PartialNote {
-  const newLine = platform() === 'win32' ? '\r\n' : '\n';
-  let text = ts.flattenDiagnosticMessageText(info.messageText, newLine);
-  if (textPrefix) {
-    text = textPrefix + text;
-  }
-
-  const note: PartialNote = { text };
-
-  if (info.file) {
-    note.location = {
-      file: info.file.fileName,
-      length: info.length,
-    };
-
-    // Calculate the line/column location and extract the full line text that has the diagnostic
-    if (info.start) {
-      const { line, character } = ts.getLineAndCharacterOfPosition(info.file, info.start);
-      note.location.line = line + 1;
-      note.location.column = character;
-
-      // The start position for the slice is the first character of the error line
-      const lineStartPosition = ts.getPositionOfLineAndCharacter(info.file, line, 0);
-
-      // The end position for the slice is the first character of the next line or the length of
-      // the entire file if the line is the last line of the file (getPositionOfLineAndCharacter
-      // will error if a nonexistent line is passed).
-      const { line: lastLineOfFile } = ts.getLineAndCharacterOfPosition(
-        info.file,
-        info.file.text.length - 1,
-      );
-      const lineEndPosition =
-        line < lastLineOfFile
-          ? ts.getPositionOfLineAndCharacter(info.file, line + 1, 0)
-          : info.file.text.length;
-
-      note.location.lineText = info.file.text.slice(lineStartPosition, lineEndPosition).trimEnd();
-    }
-  }
-
-  return note;
-}
-
-/**
- * Converts a TypeScript Diagnostic message into an esbuild compatible message object.
- * @param diagnostic The TypeScript diagnostic to convert.
- * @returns An esbuild diagnostic message as a PartialMessage object
- */
-function convertTypeScriptDiagnostic(diagnostic: ts.Diagnostic): PartialMessage {
-  let codePrefix = 'TS';
-  let code = `${diagnostic.code}`;
-  if (diagnostic.source === 'ngtsc') {
-    codePrefix = 'NG';
-    // Remove `-99` Angular prefix from diagnostic code
-    code = code.slice(3);
-  }
-
-  const message: PartialMessage = {
-    ...convertTypeScriptDiagnosticInfo(diagnostic, `${codePrefix}${code}: `),
-    // Store original diagnostic for reference if needed downstream
-    detail: diagnostic,
-  };
-
-  if (diagnostic.relatedInformation?.length) {
-    message.notes = diagnostic.relatedInformation.map((info) =>
-      convertTypeScriptDiagnosticInfo(info),
-    );
-  }
-
-  return message;
-}
 
 const USING_WINDOWS = platform() === 'win32';
 const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
