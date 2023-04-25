@@ -31,6 +31,7 @@ import { LoadResultCache } from './load-result-cache';
 import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } from './options';
 import { shutdownSassWorkerPool } from './sass-plugin';
 import { Schema as BrowserBuilderOptions } from './schema';
+import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { createStylesheetBundleOptions } from './stylesheets';
 import type { ChangedFiles } from './watcher';
 
@@ -369,6 +370,7 @@ function createCodeBundleOptions(
     platform: 'browser',
     preserveSymlinks,
     plugins: [
+      createSourcemapIngorelistPlugin(),
       createCompilerPlugin(
         // JS/TS options
         {
