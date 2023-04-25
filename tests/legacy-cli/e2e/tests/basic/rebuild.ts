@@ -6,7 +6,7 @@ import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
   const esbuild = getGlobalVariable('argv')['esbuild'];
-  const validBundleRegEx = esbuild ? /Complete\./ : /Compiled successfully\./;
+  const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
   const lazyBundleRegEx = esbuild ? /lazy\.module/ : /lazy_module_ts\.js/;
 
   const port = await ngServe();
