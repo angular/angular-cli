@@ -165,13 +165,15 @@ export default function (options: LibraryOptions): Rule {
       addLibToWorkspaceFile(options, libDir, packageName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
-      schematic('module', {
-        name: options.name,
-        commonModule: false,
-        flat: true,
-        path: sourceDir,
-        project: packageName,
-      }),
+      options.standalone
+        ? noop()
+        : schematic('module', {
+            name: options.name,
+            commonModule: false,
+            flat: true,
+            path: sourceDir,
+            project: packageName,
+          }),
       schematic('component', {
         name: options.name,
         selector: `${prefix}-${options.name}`,
@@ -180,6 +182,7 @@ export default function (options: LibraryOptions): Rule {
         flat: true,
         path: sourceDir,
         export: true,
+        standalone: options.standalone,
         project: packageName,
       }),
       schematic('service', {

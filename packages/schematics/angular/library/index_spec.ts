@@ -390,4 +390,51 @@ describe('Library Schematic', () => {
       '@angular-devkit/build-angular:ng-packagr',
     );
   });
+
+  describe('standalone', () => {
+    const defaultStandaloneOptions = { ...defaultOptions, standalone: true };
+
+    it('should create correct files', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'library',
+        defaultStandaloneOptions,
+        workspaceTree,
+      );
+
+      const files = tree.files;
+      expect(files).toEqual(
+        jasmine.arrayContaining([
+          '/projects/foo/ng-package.json',
+          '/projects/foo/package.json',
+          '/projects/foo/README.md',
+          '/projects/foo/tsconfig.lib.json',
+          '/projects/foo/tsconfig.lib.prod.json',
+          '/projects/foo/src/my-index.ts',
+          '/projects/foo/src/lib/foo.component.spec.ts',
+          '/projects/foo/src/lib/foo.component.ts',
+          '/projects/foo/src/lib/foo.service.spec.ts',
+          '/projects/foo/src/lib/foo.service.ts',
+        ]),
+      );
+    });
+
+    it('should not add reference to module file in entry-file', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'library',
+        defaultStandaloneOptions,
+        workspaceTree,
+      );
+      expect(tree.readContent('/projects/foo/src/my-index.ts')).not.toContain('foo.module');
+    });
+
+    it('should create a standalone component', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'library',
+        defaultStandaloneOptions,
+        workspaceTree,
+      );
+      const componentContent = tree.readContent('/projects/foo/src/lib/foo.component.ts');
+      expect(componentContent).toContain('standalone: true');
+    });
+  });
 });
