@@ -214,15 +214,20 @@ async function setupServer(
         },
         load(id) {
           const [file] = id.split('?', 1);
-          const code = outputFiles.get(file)?.contents;
-          const map = outputFiles.get(file + '.map')?.contents;
+          const codeContents = outputFiles.get(file)?.contents;
+          if (codeContents === undefined) {
+            return;
+          }
 
-          return (
-            code && {
-              code: code && Buffer.from(code).toString('utf-8'),
-              map: map && Buffer.from(map).toString('utf-8'),
-            }
-          );
+          const code = Buffer.from(codeContents).toString('utf-8');
+          const mapContents = outputFiles.get(file + '.map')?.contents;
+
+          return {
+            // Remove source map URL comments from the code if a sourcemap is present.
+            // Vite will inline and add an additional sourcemap URL for the sourcemap.
+            code: mapContents ? code.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '') : code,
+            map: mapContents && Buffer.from(mapContents).toString('utf-8'),
+          };
         },
         configureServer(server) {
           // Assets and resources get handled first
