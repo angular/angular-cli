@@ -1,3 +1,22 @@
+<a name="15.2.7"></a>
+
+# 15.2.7 (2023-04-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [f4a6dac87](https://github.com/angular/angular-cli/commit/f4a6dac8782808e564678b4484f3ce87e59f6c8f) | fix  | process keeps running when analytics are enabled |
+| [f9b2fb1c4](https://github.com/angular/angular-cli/commit/f9b2fb1c4981ff138992a502d3aba4f6a3886df4) | perf | register CLI commands lazily                     |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [d9aefd6da](https://github.com/angular/angular-cli/commit/d9aefd6da5bd6ea244da3a8d5ea3dcbbadd31f99) | fix  | replace vscode launch type from `pwa-chrome` to `chrome` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-rc.1"></a>
 
 # 16.0.0-rc.1 (2023-04-19)
