@@ -203,7 +203,6 @@ async function initialize(
     await generateI18nBrowserWebpackConfigFromContext(
       {
         ...adjustedOptions,
-        buildOptimizer: false,
         aot: true,
         platform: 'server',
       } as NormalizedBrowserBuilderSchema,
