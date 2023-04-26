@@ -193,7 +193,7 @@
     "quicktype-core": "23.0.27",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.0",
-    "sass": "1.62.0",
+    "sass": "1.62.1",
     "sass-loader": "13.2.2",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz",
     "semver": "7.5.0",
