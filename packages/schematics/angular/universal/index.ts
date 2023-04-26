@@ -46,6 +46,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       // One for the server which will be unhashed, and other on the client which will be hashed.
       const getServerOptions = (options: Record<string, JsonValue | undefined> = {}): {} => {
         return {
+          buildOptimizer: options?.buildOptimizer,
           outputHashing: options?.outputHashing === 'all' ? 'media' : options?.outputHashing,
           fileReplacements: options?.fileReplacements,
           optimization: options?.optimization === undefined ? undefined : !!options?.optimization,

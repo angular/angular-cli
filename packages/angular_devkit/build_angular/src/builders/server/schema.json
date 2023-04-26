@@ -189,6 +189,11 @@
       "description": "Extract all licenses in a separate file, in the case of production builds only.",
       "default": true
     },
+    "buildOptimizer": {
+      "type": "boolean",
+      "description": "Enables advanced build optimizations.",
+      "default": true
+    },
     "namedChunks": {
       "type": "boolean",
       "description": "Use file name for lazy loaded chunks.",
