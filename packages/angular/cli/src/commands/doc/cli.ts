@@ -46,7 +46,7 @@ export default class DocCommandModule
       })
       .option('version', {
         description:
-          'Contains the version of Angular to use for the documentation. ' +
+          'The version of Angular to use for the documentation. ' +
           'If not provided, the command uses your current Angular core version.',
         type: 'string',
       })
