@@ -8,6 +8,7 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { json } from '@angular-devkit/core';
+import type { OutputFile } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
@@ -55,71 +56,25 @@ export async function* serveWithVite(
 
   let server: ViteDevServer | undefined;
   let listeningAddress: AddressInfo | undefined;
-  const outputFiles = new Map<string, OutputFileRecord>();
-  const assets = new Map<string, string>();
+  const generatedFiles = new Map<string, OutputFileRecord>();
+  const assetFiles = new Map<string, string>();
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
   for await (const result of buildEsbuildBrowser(browserOptions, context, { write: false })) {
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // Analyze result files for changes
-    const seen = new Set<string>(['/index.html']);
-    for (const file of result.outputFiles) {
-      const filePath = '/' + normalizePath(file.path);
-      seen.add(filePath);
+    analyzeResultFiles(result.outputFiles, generatedFiles);
 
-      // Skip analysis of sourcemaps
-      if (filePath.endsWith('.map')) {
-        outputFiles.set(filePath, {
-          contents: file.contents,
-          size: file.contents.byteLength,
-          updated: false,
-        });
-
-        continue;
-      }
-
-      let fileHash: Buffer | undefined;
-      const existingRecord = outputFiles.get(filePath);
-      if (existingRecord && existingRecord.size === file.contents.byteLength) {
-        // Only hash existing file when needed
-        if (existingRecord.hash === undefined) {
-          existingRecord.hash = hashContent(existingRecord.contents);
-        }
-
-        // Compare against latest result output
-        fileHash = hashContent(file.contents);
-        if (fileHash.equals(existingRecord.hash)) {
-          // Same file
-          existingRecord.updated = false;
-          continue;
-        }
-      }
-
-      outputFiles.set(filePath, {
-        contents: file.contents,
-        size: file.contents.byteLength,
-        hash: fileHash,
-        updated: true,
-      });
-    }
-
-    // Clear stale output files
-    for (const file of outputFiles.keys()) {
-      if (!seen.has(file)) {
-        outputFiles.delete(file);
-      }
-    }
-
-    assets.clear();
+    assetFiles.clear();
     if (result.assetFiles) {
       for (const asset of result.assetFiles) {
-        assets.set('/' + normalizePath(asset.destination), asset.source);
+        assetFiles.set('/' + normalizePath(asset.destination), asset.source);
       }
     }
 
     if (server) {
       // Invalidate any updated files
-      for (const [file, record] of outputFiles) {
+      for (const [file, record] of generatedFiles) {
         if (record.updated) {
           const updatedModules = server.moduleGraph.getModulesByFile(file);
           updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
@@ -137,7 +92,8 @@ export async function* serveWithVite(
       }
     } else {
       // Setup server and start listening
-      server = await setupServer(serverOptions, outputFiles, assets);
+      const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles);
+      server = await createServer(serverConfiguration);
 
       await server.listen();
       listeningAddress = server.httpServer?.address() as AddressInfo;
@@ -160,11 +116,64 @@ export async function* serveWithVite(
   }
 }
 
-async function setupServer(
+function analyzeResultFiles(
+  resultFiles: OutputFile[],
+  generatedFiles: Map<string, OutputFileRecord>,
+) {
+  const seen = new Set<string>(['/index.html']);
+  for (const file of resultFiles) {
+    const filePath = '/' + normalizePath(file.path);
+    seen.add(filePath);
+
+    // Skip analysis of sourcemaps
+    if (filePath.endsWith('.map')) {
+      generatedFiles.set(filePath, {
+        contents: file.contents,
+        size: file.contents.byteLength,
+        updated: false,
+      });
+
+      continue;
+    }
+
+    let fileHash: Buffer | undefined;
+    const existingRecord = generatedFiles.get(filePath);
+    if (existingRecord && existingRecord.size === file.contents.byteLength) {
+      // Only hash existing file when needed
+      if (existingRecord.hash === undefined) {
+        existingRecord.hash = hashContent(existingRecord.contents);
+      }
+
+      // Compare against latest result output
+      fileHash = hashContent(file.contents);
+      if (fileHash.equals(existingRecord.hash)) {
+        // Same file
+        existingRecord.updated = false;
+        continue;
+      }
+    }
+
+    generatedFiles.set(filePath, {
+      contents: file.contents,
+      size: file.contents.byteLength,
+      hash: fileHash,
+      updated: true,
+    });
+  }
+
+  // Clear stale output files
+  for (const file of generatedFiles.keys()) {
+    if (!seen.has(file)) {
+      generatedFiles.delete(file);
+    }
+  }
+}
+
+export async function setupServer(
   serverOptions: NormalizedDevServerOptions,
   outputFiles: Map<string, OutputFileRecord>,
   assets: Map<string, string>,
-): Promise<ViteDevServer> {
+): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
     serverOptions.proxyConfig,
@@ -330,7 +339,5 @@ async function setupServer(
     }
   }
 
-  const server = await createServer(configuration);
-
-  return server;
+  return configuration;
 }
