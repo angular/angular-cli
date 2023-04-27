@@ -8,7 +8,7 @@
   "builders": "builders.json",
   "dependencies": {
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "rxjs": "7.8.0"
+    "rxjs": "7.8.1"
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
