@@ -55,7 +55,10 @@ async function transformWithBabel({
     return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
   }
 
-  const angularPackage = /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
+  // @angular/platform-server/init entry-point has side-effects.
+  const safeAngularPackage =
+    /[\\/]node_modules[\\/]@angular[\\/]/.test(filename) &&
+    !/@angular[\\/]platform-server[\\/]f?esm2022[\\/]init/.test(filename);
 
   // Lazy load the linker plugin only when linking is required
   if (shouldLink) {
@@ -86,7 +89,7 @@ async function transformWithBabel({
           },
           forceAsyncTransformation,
           optimize: options.advancedOptimizations && {
-            pureTopLevel: angularPackage,
+            pureTopLevel: safeAngularPackage,
           },
         },
       ],
