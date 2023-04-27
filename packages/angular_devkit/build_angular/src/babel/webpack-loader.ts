@@ -154,12 +154,15 @@ export default custom<ApplicationPresetOptions>(() => {
       }
 
       if (optimize) {
-        const angularPackage = /[\\/]node_modules[\\/]@angular[\\/]/.test(this.resourcePath);
+        // @angular/platform-server/init entry-point has side-effects.
+        const safeAngularPackage =
+          /[\\/]node_modules[\\/]@angular[\\/]/.test(this.resourcePath) &&
+          !/@angular[\\/]platform-server[\\/]f?esm2022[\\/]init/.test(this.resourcePath);
         customOptions.optimize = {
           // Angular packages provide additional tested side effects guarantees and can use
           // otherwise unsafe optimizations.
-          looseEnums: angularPackage,
-          pureTopLevel: angularPackage,
+          looseEnums: safeAngularPackage,
+          pureTopLevel: safeAngularPackage,
           // JavaScript modules that are marked as side effect free are considered to have
           // no decorators that contain non-local effects.
           wrapDecorators: !!this._module?.factoryMeta?.sideEffectFree,
