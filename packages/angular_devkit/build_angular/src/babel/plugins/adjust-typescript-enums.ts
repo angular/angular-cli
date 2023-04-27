@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { NodePath, PluginObj, PluginPass, types } from '@babel/core';
+import { NodePath, PluginObj, types } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
 
 /**
@@ -27,10 +27,8 @@ export function getKeywords(): Iterable<string> {
 export default function (): PluginObj {
   return {
     visitor: {
-      VariableDeclaration(path: NodePath<types.VariableDeclaration>, state: PluginPass) {
+      VariableDeclaration(path: NodePath<types.VariableDeclaration>) {
         const { parentPath, node } = path;
-        const { loose } = state.opts as { loose: boolean };
-
         if (node.kind !== 'var' || node.declarations.length !== 1) {
           return;
         }
@@ -80,13 +78,8 @@ export default function (): PluginObj {
         const isEnumCalleeMatching =
           types.isIdentifier(enumCalleeParam) && enumCalleeParam.name === declarationId.name;
 
-        // Loose mode rewrites the enum to a shorter but less TypeScript-like form
-        // Note: We only can apply the `loose` mode transformation if the callee parameter matches
-        // with the declaration identifier name. This is necessary in case the the declaration id has
-        // been renamed to avoid collisions, as the loose transform would then break the enum assignments
-        // which rely on the differently-named callee identifier name.
         let enumAssignments: types.ExpressionStatement[] | undefined;
-        if (loose && isEnumCalleeMatching) {
+        if (isEnumCalleeMatching) {
           enumAssignments = [];
         }
 

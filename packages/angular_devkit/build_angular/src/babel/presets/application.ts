@@ -68,7 +68,6 @@ export interface ApplicationPresetOptions {
     inputSourceMap: unknown;
   };
   optimize?: {
-    looseEnums: boolean;
     pureTopLevel: boolean;
     wrapDecorators: boolean;
   };
@@ -245,10 +244,7 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
 
     plugins.push(
       require('../plugins/elide-angular-metadata').default,
-      [
-        require('../plugins/adjust-typescript-enums').default,
-        { loose: options.optimize.looseEnums },
-      ],
+      [require('../plugins/adjust-typescript-enums').default, { loose: true }],
       [
         require('../plugins/adjust-static-class-members').default,
         { wrapDecorators: options.optimize.wrapDecorators },
