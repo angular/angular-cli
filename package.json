@@ -88,7 +88,7 @@
     "jsdom": "21.1.1",
     "node-fetch": "^2.6.1",
     "ora": "^5.1.0",
-    "patch-package": "^6.5.1",
+    "patch-package": "^7.0.0",
     "piscina": "~3.2.0",
     "prettier": "^2.2.1",
     "protractor": "7.0.0",
