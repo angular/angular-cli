@@ -9,6 +9,11 @@
       "version": "16.0.0",
       "factory": "./update-16/replace-default-collection-option",
       "description": "Replace removed 'defaultCollection' option in workspace configuration with 'schematicCollections'."
+    },
+    "update-server-builder-config": {
+      "version": "16.0.0",
+      "factory": "./update-16/update-server-builder-config",
+      "description": "Update the '@angular-devkit/build-angular:server' builder configuration to disable 'buildOptimizer' for non optimized builds."
     }
   }
 }
