@@ -1276,6 +1276,11 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.1.0.tgz#0c0e395c8881040d42e7e28b700a3e64becdc31a"
   integrity sha512-LBfdMpGe9tmDJ6jOMaFWtrnKpNqKfUxIp1P+O3E2rb/jmSrP2ZTO9JRXqlghVhDy3fMDUkUVKkIZy9KAAfZJnQ==
 
+"@bazel/buildifier@6.1.1":
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.1.1.tgz#2025d9e633b1e2adf4da4140fb1505883aaaf916"
+  integrity sha512-J70MYmR/yReRQRUvNsXRu+827ilyN7RaXvCslBZyZlhoLQwq3P9TJ4DGNjkfEwD8JUfA6mAoeCpFTvYDt90d0g==
+
 "@bazel/concatjs@5.8.1":
   version "5.8.1"
   resolved "https://registry.yarnpkg.com/@bazel/concatjs/-/concatjs-5.8.1.tgz#dd20882429e382cae79c08cbd3238dfc680d2d67"
@@ -9488,7 +9493,7 @@ postcss@8.4.21:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postcss@8.4.23, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.16, postcss@^8.4.19, postcss@^8.4.21:
+postcss@8.4.23, postcss@^8.2.14, postcss@^8.3.7, postcss@^8.4.16, postcss@^8.4.19, postcss@^8.4.21, postcss@^8.4.23:
   version "8.4.23"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.23.tgz#df0aee9ac7c5e53e1075c24a3613496f9e6552ab"
   integrity sha512-bQ3qMcpF6A/YjR55xtoTr0jGOlnPOKAIMdOWiv0EIT6HVPEaJiJB4NLljSbiHoC2RX7DN5Uvjtpbg1NPdwv1oA==
@@ -9733,10 +9738,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@23.0.27:
-  version "23.0.27"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.27.tgz#56036b27a852f306347a0092036b97867b960022"
-  integrity sha512-NFX7PzQTJmPLxFSKFHhy+kK+JyawVCfBbkQXomcY7ncAQQx6aBLUAzt7YEBOHFso200xyiyMj+hw7Td/bHmprg==
+quicktype-core@23.0.30:
+  version "23.0.30"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.30.tgz#b2078b0b91ff215dae3c3b087cc1a95153b2bcaa"
+  integrity sha512-OpUSZz84i1GUL/1AVbb7URr21polZ3775QAiHaSjull0AQe13Yh5Sc5zEiH15nDr3cgc0ik4Rq3F0EdIZxLJQQ==
   dependencies:
     "@glideapps/ts-necessities" "2.1.2"
     "@types/urijs" "^1.19.19"
@@ -9752,7 +9757,7 @@ quicktype-core@23.0.27:
     unicode-properties "^1.4.1"
     urijs "^1.19.1"
     wordwrap "^1.0.0"
-    yaml "^2.2.1"
+    yaml "^2.2.2"
 
 randombytes@^2.1.0:
   version "2.1.0"
@@ -11538,13 +11543,13 @@ vite@4.2.1:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vite@4.3.2:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.3.2.tgz#95a5e0ebee80ae218849312019318aa9e3a05c26"
-  integrity sha512-9R53Mf+TBoXCYejcL+qFbZde+eZveQLDYd9XgULILLC1a5ZwPaqgmdVpL8/uvw2BM/1TzetWjglwm+3RO+xTyw==
+vite@4.3.3:
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.3.3.tgz#26adb4aa01439fc4546c480ea547674d87289396"
+  integrity sha512-MwFlLBO4udZXd+VBcezo3u8mC77YQk+ik+fbc0GZWGgzfbPP+8Kf0fldhARqvSYmtIWoAJ5BXPClUbMTlqFxrA==
   dependencies:
     esbuild "^0.17.5"
-    postcss "^8.4.21"
+    postcss "^8.4.23"
     rollup "^3.21.0"
   optionalDependencies:
     fsevents "~2.3.2"
@@ -11755,10 +11760,10 @@ webpack@5.79.0:
     watchpack "^2.4.0"
     webpack-sources "^3.2.3"
 
-webpack@5.80.0:
-  version "5.80.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.80.0.tgz#3e660b4ab572be38c5e954bdaae7e2bf76010fdc"
-  integrity sha512-OIMiq37XK1rWO8mH9ssfFKZsXg4n6klTEDL7S8/HqbAOBBaiy8ABvXvz0dDCXeEF9gqwxSvVk611zFPjS8hJxA==
+webpack@5.81.0:
+  version "5.81.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.81.0.tgz#27a2e8466c8b4820d800a8d90f06ef98294f9956"
+  integrity sha512-AAjaJ9S4hYCVODKLQTgG5p5e11hiMawBwV2v8MYLE0C/6UAGLuAF4n1qa9GOwdxnicaP+5k6M5HrLmD4+gIB8Q==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.0"
@@ -11974,7 +11979,7 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml@^2.2.1:
+yaml@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.2.2.tgz#ec551ef37326e6d42872dad1970300f8eb83a073"
   integrity sha512-CBKFWExMn46Foo4cldiChEzn7S7SRV+wqiluAb6xmueD/fGyRHIhX8m14vVGgeFWjN540nKCNVj6P21eQjgTuA==
