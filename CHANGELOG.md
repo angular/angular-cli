@@ -1,3 +1,27 @@
+<a name="16.0.0-rc.2"></a>
+
+# 16.0.0-rc.2 (2023-04-26)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [a5cb46124](https://github.com/angular/angular-cli/commit/a5cb46124234ec2c47f6288914ad3ed9564f3a72) | fix  | add standalone option to library library                 |
+| [0d58f73c5](https://github.com/angular/angular-cli/commit/0d58f73c50ce496dd3a0166533069f450f83a461) | fix  | rename `app.server.module.ts` to `app.module.server.ts`  |
+| [b21a0e733](https://github.com/angular/angular-cli/commit/b21a0e73330161160247141f742170885dedf4d9) | fix  | replace vscode launch type from `pwa-chrome` to `chrome` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [766c14698](https://github.com/angular/angular-cli/commit/766c14698473fe333168c06e3b88c7303e868acf) | fix  | add sourcemap `x_google_ignoreList` support for esbuild builder |
+| [135ab4c36](https://github.com/angular/angular-cli/commit/135ab4c363d5d247342c4bc123a17eb66de17752) | fix  | avoid double sourcemap comments with esbuild dev-server         |
+| [1a8833b21](https://github.com/angular/angular-cli/commit/1a8833b211cbf2535d3deed1029591050bc995b8) | fix  | provide option to run build-optimizer on server bundles         |
+| [c272172c8](https://github.com/angular/angular-cli/commit/c272172c84bef35f63038f1fc5fa184b1e2d99bf) | fix  | update esbuild builder complete log                             |
+| [eca366a84](https://github.com/angular/angular-cli/commit/eca366a843be1fcc8d949bc335cac4cdcbdea41c) | fix  | use preserveSymlinks option for tsconfigs in esbuild builder    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.7"></a>
 
 # 15.2.7 (2023-04-26)
