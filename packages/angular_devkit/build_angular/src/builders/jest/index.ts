@@ -82,7 +82,7 @@ export default createBuilder(
     }
 
     // Execute Jest on the built output directory.
-    const jestProc = execFile('node', [
+    const jestProc = execFile(process.execPath, [
       '--experimental-vm-modules',
       jest,
 
