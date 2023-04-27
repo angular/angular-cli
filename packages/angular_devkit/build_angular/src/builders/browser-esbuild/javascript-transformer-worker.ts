@@ -86,7 +86,6 @@ async function transformWithBabel({
           },
           forceAsyncTransformation,
           optimize: options.advancedOptimizations && {
-            looseEnums: angularPackage,
             pureTopLevel: angularPackage,
           },
         },
