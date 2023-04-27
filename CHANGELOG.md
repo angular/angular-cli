@@ -1,3 +1,23 @@
+<a name="16.0.0-rc.3"></a>
+
+# 16.0.0-rc.3 (2023-04-27)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [b2ed7bd10](https://github.com/angular/angular-cli/commit/b2ed7bd100bfe77dca81c590b827870fd496075f) | fix  | provide migration that disables build optimizer on dev server builds |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [e690b7cbd](https://github.com/angular/angular-cli/commit/e690b7cbde470b69b3c23fa9af1ecfca4c8e3a7e) | fix  | always enable `looseEnums` build optimizer rule                   |
+| [f74151baa](https://github.com/angular/angular-cli/commit/f74151baab740df15a5cc80255d97d0320147b2a) | fix  | exclude `@angular/platform-server/init` from unsafe optimizations |
+| [e1398d333](https://github.com/angular/angular-cli/commit/e1398d333e86b6caad8b5cfef7048fefd77a9e22) | perf | do not inline sourcemap when using vite dev-server                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-rc.2"></a>
 
 # 16.0.0-rc.2 (2023-04-26)
