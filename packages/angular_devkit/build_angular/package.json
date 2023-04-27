@@ -28,7 +28,7 @@
     "babel-loader": "9.1.2",
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "4.21.5",
-    "cacache": "17.0.5",
+    "cacache": "17.0.6",
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
