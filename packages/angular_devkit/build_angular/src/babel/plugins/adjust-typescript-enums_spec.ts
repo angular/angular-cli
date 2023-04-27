@@ -43,10 +43,9 @@ describe('adjust-typescript-enums Babel plugin', () => {
       `,
       expected: `
         var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          (function (ChangeDetectionStrategy) {
-              ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
-              ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
-          })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
           return ChangeDetectionStrategy;
         })();
       `,
@@ -64,10 +63,9 @@ describe('adjust-typescript-enums Babel plugin', () => {
       `,
       expected: `
         export var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          (function (ChangeDetectionStrategy) {
-              ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
-              ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
-          })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
           return ChangeDetectionStrategy;
         })();
       `,
@@ -85,10 +83,9 @@ describe('adjust-typescript-enums Babel plugin', () => {
       `,
       expected: `
         export var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          (function (ChangeDetectionStrategy) {
-              ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 5] = "OnPush";
-              ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 8] = "Default";
-          })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 5)] = "OnPush";
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 8)] = "Default";
           return ChangeDetectionStrategy;
         })();
       `,
@@ -98,20 +95,19 @@ describe('adjust-typescript-enums Babel plugin', () => {
   it('wraps string-based TypeScript enums', () => {
     testCase({
       input: `
-        var NotificationKind;
-        (function (NotificationKind) {
-            NotificationKind["NEXT"] = "N";
-            NotificationKind["ERROR"] = "E";
-            NotificationKind["COMPLETE"] = "C";
-        })(NotificationKind || (NotificationKind = {}));
+      var NotificationKind;
+      (function (NotificationKind) {
+          NotificationKind["NEXT"] = "N";
+          NotificationKind["ERROR"] = "E";
+          NotificationKind["COMPLETE"] = "C";
+      })(NotificationKind || (NotificationKind = {}));
       `,
       expected: `
         var NotificationKind = /*#__PURE__*/ (() => {
-          (function (NotificationKind) {
-              NotificationKind["NEXT"] = "N";
-              NotificationKind["ERROR"] = "E";
-              NotificationKind["COMPLETE"] = "C";
-          })(NotificationKind || (NotificationKind = {}));
+          NotificationKind = NotificationKind || {};
+          NotificationKind["NEXT"] = "N";
+          NotificationKind["ERROR"] = "E";
+          NotificationKind["COMPLETE"] = "C";
           return NotificationKind;
         })();
       `,
@@ -165,15 +161,14 @@ describe('adjust-typescript-enums Babel plugin', () => {
          * @deprecated use @angular/common/http instead
          */
         var RequestMethod = /*#__PURE__*/ (() => {
-          (function (RequestMethod) {
-              RequestMethod[RequestMethod["Get"] = 0] = "Get";
-              RequestMethod[RequestMethod["Post"] = 1] = "Post";
-              RequestMethod[RequestMethod["Put"] = 2] = "Put";
-              RequestMethod[RequestMethod["Delete"] = 3] = "Delete";
-              RequestMethod[RequestMethod["Options"] = 4] = "Options";
-              RequestMethod[RequestMethod["Head"] = 5] = "Head";
-              RequestMethod[RequestMethod["Patch"] = 6] = "Patch";
-          })(RequestMethod || (RequestMethod = {}));
+          RequestMethod = RequestMethod || {};
+          RequestMethod[(RequestMethod["Get"] = 0)] = "Get";
+          RequestMethod[(RequestMethod["Post"] = 1)] = "Post";
+          RequestMethod[(RequestMethod["Put"] = 2)] = "Put";
+          RequestMethod[(RequestMethod["Delete"] = 3)] = "Delete";
+          RequestMethod[(RequestMethod["Options"] = 4)] = "Options";
+          RequestMethod[(RequestMethod["Head"] = 5)] = "Head";
+          RequestMethod[(RequestMethod["Patch"] = 6)] = "Patch";
           return RequestMethod;
         })();
       `,
