@@ -327,7 +327,6 @@ function createCodeBundleOptions(
   const {
     workspaceRoot,
     entryPoints,
-    polyfills,
     optimizationOptions,
     sourcemapOptions,
     tsconfig,
@@ -411,6 +410,11 @@ function createCodeBundleOptions(
       'ngJitMode': jit ? 'true' : 'false',
     },
   };
+
+  const polyfills = options.polyfills ? [...options.polyfills] : [];
+  if (jit) {
+    polyfills.push('@angular/compiler');
+  }
 
   if (polyfills?.length) {
     const namespace = 'angular:polyfills';
