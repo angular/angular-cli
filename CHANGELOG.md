@@ -1,3 +1,15 @@
+<a name="16.0.0-rc.4"></a>
+
+# 16.0.0-rc.4 (2023-04-28)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [26dced95c](https://github.com/angular/angular-cli/commit/26dced95c5612f6386b3179fce50904f178ee569) | fix  | JIT support for standalone applications |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-rc.3"></a>
 
 # 16.0.0-rc.3 (2023-04-27)
