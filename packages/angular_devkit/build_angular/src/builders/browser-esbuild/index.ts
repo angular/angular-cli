@@ -8,7 +8,6 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { BuildOptions, Metafile, OutputFile } from 'esbuild';
-import assert from 'node:assert';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -26,18 +25,16 @@ import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { checkCommonJSModules } from './commonjs-checker';
 import { BundlerContext, logMessages } from './esbuild';
 import { createGlobalScriptsBundleOptions } from './global-scripts';
+import { createGlobalStylesBundleOptions } from './global-styles';
 import { extractLicenses } from './license-extractor';
-import { LoadResultCache } from './load-result-cache';
 import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } from './options';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
-import { createStylesheetBundleOptions } from './stylesheets/bundle-options';
 import { shutdownSassWorkerPool } from './stylesheets/sass-plugin';
 import type { ChangedFiles } from './watcher';
 
 interface RebuildState {
-  codeRebuild?: BundlerContext;
-  globalStylesRebuild?: BundlerContext;
+  rebuildContexts: BundlerContext[];
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
 }
@@ -50,8 +47,7 @@ class ExecutionResult {
   readonly assetFiles: { source: string; destination: string }[] = [];
 
   constructor(
-    private codeRebuild?: BundlerContext,
-    private globalStylesRebuild?: BundlerContext,
+    private rebuildContexts: BundlerContext[],
     private codeBundleCache?: SourceFileCache,
   ) {}
 
@@ -77,15 +73,14 @@ class ExecutionResult {
     this.codeBundleCache?.invalidate([...fileChanges.modified, ...fileChanges.removed]);
 
     return {
-      codeRebuild: this.codeRebuild,
-      globalStylesRebuild: this.globalStylesRebuild,
+      rebuildContexts: this.rebuildContexts,
       codeBundleCache: this.codeBundleCache,
       fileChanges,
     };
   }
 
   async dispose(): Promise<void> {
-    await Promise.allSettled([this.codeRebuild?.dispose(), this.globalStylesRebuild?.dispose()]);
+    await Promise.allSettled(this.rebuildContexts.map((context) => context.dispose()));
   }
 }
 
@@ -109,45 +104,47 @@ async function execute(
   const target = transformSupportedBrowsersToTargets(browsers);
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
-  const bundlerContexts = [];
-
-  // Application code
+  let bundlerContexts = rebuildState?.rebuildContexts;
   const codeBundleCache = options.watch
     ? rebuildState?.codeBundleCache ?? new SourceFileCache()
     : undefined;
-  const codeBundleContext =
-    rebuildState?.codeRebuild ??
-    new BundlerContext(
-      workspaceRoot,
-      !!options.watch,
-      createCodeBundleOptions(options, target, browsers, codeBundleCache),
-    );
-  bundlerContexts.push(codeBundleContext);
-  // Global Stylesheets
-  let globalStylesBundleContext;
-  if (options.globalStyles.length > 0) {
-    globalStylesBundleContext =
-      rebuildState?.globalStylesRebuild ??
+  if (bundlerContexts === undefined) {
+    bundlerContexts = [];
+
+    // Application code
+    bundlerContexts.push(
       new BundlerContext(
         workspaceRoot,
         !!options.watch,
-        createGlobalStylesBundleOptions(
+        createCodeBundleOptions(options, target, browsers, codeBundleCache),
+      ),
+    );
+
+    // Global Stylesheets
+    if (options.globalStyles.length > 0) {
+      for (const initial of [true, false]) {
+        const bundleOptions = createGlobalStylesBundleOptions(
           options,
           target,
           browsers,
+          initial,
           codeBundleCache?.loadResultCache,
-        ),
-      );
-    bundlerContexts.push(globalStylesBundleContext);
-  }
-  // Global Scripts
-  if (options.globalScripts.length > 0) {
-    const globalScriptsBundleContext = new BundlerContext(
-      workspaceRoot,
-      !!options.watch,
-      createGlobalScriptsBundleOptions(options),
-    );
-    bundlerContexts.push(globalScriptsBundleContext);
+        );
+        if (bundleOptions) {
+          bundlerContexts.push(new BundlerContext(workspaceRoot, !!options.watch, bundleOptions));
+        }
+      }
+    }
+
+    // Global Scripts
+    if (options.globalScripts.length > 0) {
+      for (const initial of [true, false]) {
+        const bundleOptions = createGlobalScriptsBundleOptions(options, initial);
+        if (bundleOptions) {
+          bundlerContexts.push(new BundlerContext(workspaceRoot, !!options.watch, bundleOptions));
+        }
+      }
+    }
   }
 
   const bundlingResult = await BundlerContext.bundleAll(bundlerContexts);
@@ -155,11 +152,7 @@ async function execute(
   // Log all warnings and errors generated during bundling
   await logMessages(context, bundlingResult);
 
-  const executionResult = new ExecutionResult(
-    codeBundleContext,
-    globalStylesBundleContext,
-    codeBundleCache,
-  );
+  const executionResult = new ExecutionResult(bundlerContexts, codeBundleCache);
 
   // Return if the bundling has errors
   if (bundlingResult.errors) {
@@ -499,76 +492,6 @@ function getFeatureSupport(target: string[]): BuildOptions['supported'] {
   }
 
   return supported;
-}
-
-function createGlobalStylesBundleOptions(
-  options: NormalizedBrowserOptions,
-  target: string[],
-  browsers: string[],
-  cache?: LoadResultCache,
-): BuildOptions {
-  const {
-    workspaceRoot,
-    optimizationOptions,
-    sourcemapOptions,
-    outputNames,
-    globalStyles,
-    preserveSymlinks,
-    externalDependencies,
-    stylePreprocessorOptions,
-    tailwindConfiguration,
-  } = options;
-
-  const buildOptions = createStylesheetBundleOptions(
-    {
-      workspaceRoot,
-      optimization: !!optimizationOptions.styles.minify,
-      sourcemap: !!sourcemapOptions.styles,
-      preserveSymlinks,
-      target,
-      externalDependencies,
-      outputNames,
-      includePaths: stylePreprocessorOptions?.includePaths,
-      browsers,
-      tailwindConfiguration,
-    },
-    cache,
-  );
-  buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
-
-  const namespace = 'angular:styles/global';
-  buildOptions.entryPoints = {};
-  for (const { name } of globalStyles) {
-    buildOptions.entryPoints[name] = `${namespace};${name}`;
-  }
-
-  buildOptions.plugins.unshift({
-    name: 'angular-global-styles',
-    setup(build) {
-      build.onResolve({ filter: /^angular:styles\/global;/ }, (args) => {
-        if (args.kind !== 'entry-point') {
-          return null;
-        }
-
-        return {
-          path: args.path.split(';', 2)[1],
-          namespace,
-        };
-      });
-      build.onLoad({ filter: /./, namespace }, (args) => {
-        const files = globalStyles.find(({ name }) => name === args.path)?.files;
-        assert(files, `global style name should always be found [${args.path}]`);
-
-        return {
-          contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
-          loader: 'css',
-          resolveDir: workspaceRoot,
-        };
-      });
-    },
-  });
-
-  return buildOptions;
 }
 
 async function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T> {

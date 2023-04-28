@@ -19,7 +19,10 @@ import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
  * @param options The builder's user-provider normalized options.
  * @returns An esbuild BuildOptions object.
  */
-export function createGlobalScriptsBundleOptions(options: NormalizedBrowserOptions): BuildOptions {
+export function createGlobalScriptsBundleOptions(
+  options: NormalizedBrowserOptions,
+  initial: boolean,
+): BuildOptions | undefined {
   const {
     globalScripts,
     optimizationOptions,
@@ -31,8 +34,17 @@ export function createGlobalScriptsBundleOptions(options: NormalizedBrowserOptio
 
   const namespace = 'angular:script/global';
   const entryPoints: Record<string, string> = {};
-  for (const { name } of globalScripts) {
-    entryPoints[name] = `${namespace}:${name}`;
+  let found = false;
+  for (const script of globalScripts) {
+    if (script.initial === initial) {
+      found = true;
+      entryPoints[script.name] = `${namespace}:${script.name}`;
+    }
+  }
+
+  // Skip if there are no entry points for the style loading type
+  if (found === false) {
+    return;
   }
 
   return {
@@ -40,7 +52,7 @@ export function createGlobalScriptsBundleOptions(options: NormalizedBrowserOptio
     bundle: false,
     splitting: false,
     entryPoints,
-    entryNames: outputNames.bundles,
+    entryNames: initial ? outputNames.bundles : '[name]',
     assetNames: outputNames.media,
     mainFields: ['script', 'browser', 'main'],
     conditions: ['script'],
