@@ -58,7 +58,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     aot = true,
     codeCoverageExclude = [],
     main,
-    polyfills,
     sourceMap: {
       styles: stylesSourceMap,
       scripts: scriptsSourceMap,
@@ -126,7 +125,12 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
     }
   }
 
-  if (polyfills?.length) {
+  const polyfills = [...buildOptions.polyfills];
+  if (!aot) {
+    polyfills.push('@angular/compiler');
+  }
+
+  if (polyfills.length) {
     // `zone.js/testing` is a **special** polyfill because when not imported in the main it fails with the below errors:
     // `Error: Expected to be running in 'ProxyZone', but it was not found.`
     // This was also the reason why previously it was imported in `test.ts` as the first module.
