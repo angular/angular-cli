@@ -31,6 +31,12 @@ interface InternalOptions {
 
   /** File extension to use for the generated output files. */
   outExtension?: 'js' | 'mjs';
+
+  /**
+   * Indicates whether all node packages should be marked as external.
+   * Currently used by the dev-server to support prebundling.
+   */
+  externalPackages?: boolean;
 }
 
 /** Full set of options for `browser-esbuild` builder. */
@@ -180,6 +186,7 @@ export async function normalizeOptions(
     verbose,
     watch,
     progress,
+    externalPackages,
   } = options;
 
   // Return all the normalized options
@@ -197,6 +204,7 @@ export async function normalizeOptions(
     polyfills: polyfills === undefined || Array.isArray(polyfills) ? polyfills : [polyfills],
     poll,
     progress: progress ?? true,
+    externalPackages,
     // If not explicitly set, default to the Node.js process argument
     preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
     stylePreprocessorOptions,
