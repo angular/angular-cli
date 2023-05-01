@@ -16,7 +16,9 @@ import { readFile } from 'node:fs/promises';
 import type { AddressInfo } from 'node:net';
 import path from 'node:path';
 import { InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
-import { buildEsbuildBrowser } from '../browser-esbuild';
+import { buildEsbuildBrowserInternal } from '../browser-esbuild';
+import { JavaScriptTransformer } from '../browser-esbuild/javascript-transformer';
+import { BrowserEsbuildOptions } from '../browser-esbuild/options';
 import type { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration, normalizeProxyConfiguration } from './load-proxy-config';
 import type { NormalizedDevServerOptions } from './options';
@@ -52,7 +54,9 @@ export async function* serveWithVite(
       verbose: serverOptions.verbose,
     } as json.JsonObject & BrowserBuilderOptions,
     builderName,
-  )) as json.JsonObject & BrowserBuilderOptions;
+  )) as json.JsonObject & BrowserEsbuildOptions;
+  // Set all packages as external to support Vite's prebundle caching
+  browserOptions.externalPackages = serverOptions.cacheOptions.enabled;
 
   if (serverOptions.servePath === undefined && browserOptions.baseHref !== undefined) {
     serverOptions.servePath = browserOptions.baseHref;
@@ -63,7 +67,9 @@ export async function* serveWithVite(
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-  for await (const result of buildEsbuildBrowser(browserOptions, context, { write: false })) {
+  for await (const result of buildEsbuildBrowserInternal(browserOptions, context, {
+    write: false,
+  })) {
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // Analyze result files for changes
@@ -96,7 +102,13 @@ export async function* serveWithVite(
       }
     } else {
       // Setup server and start listening
-      const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles);
+      const serverConfiguration = await setupServer(
+        serverOptions,
+        generatedFiles,
+        assetFiles,
+        browserOptions.preserveSymlinks,
+        browserOptions.externalDependencies,
+      );
       server = await createServer(serverConfiguration);
 
       await server.listen();
@@ -173,10 +185,13 @@ function analyzeResultFiles(
   }
 }
 
+// eslint-disable-next-line max-lines-per-function
 export async function setupServer(
   serverOptions: NormalizedDevServerOptions,
   outputFiles: Map<string, OutputFileRecord>,
   assets: Map<string, string>,
+  preserveSymlinks: boolean | undefined,
+  prebundleExclude: string[] | undefined,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -199,6 +214,10 @@ export async function setupServer(
       devSourcemap: true,
     },
     base: serverOptions.servePath,
+    resolve: {
+      mainFields: ['es2020', 'browser', 'module', 'main'],
+      preserveSymlinks,
+    },
     server: {
       port: serverOptions.port,
       strictPort: true,
@@ -236,12 +255,13 @@ export async function setupServer(
             return;
           }
 
+          const code = Buffer.from(codeContents).toString('utf-8');
           const mapContents = outputFiles.get(file + '.map')?.contents;
 
           return {
             // Remove source map URL comments from the code if a sourcemap is present.
             // Vite will inline and add an additional sourcemap URL for the sourcemap.
-            code: Buffer.from(codeContents).toString('utf-8'),
+            code: mapContents ? code.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '') : code,
             map: mapContents && Buffer.from(mapContents).toString('utf-8'),
           };
         },
@@ -276,7 +296,7 @@ export async function setupServer(
             // Resource files are handled directly.
             // Global stylesheets (CSS files) are currently considered resources to workaround
             // dev server sourcemap issues with stylesheets.
-            if (extension !== '.html') {
+            if (extension !== '.js' && extension !== '.html') {
               const outputFile = outputFiles.get(pathname);
               if (outputFile) {
                 const mimeType = lookupMimeType(extension);
@@ -345,8 +365,34 @@ export async function setupServer(
       },
     ],
     optimizeDeps: {
-      // TODO: Consider enabling for known safe dependencies (@angular/* ?)
-      disabled: true,
+      // Only enable with caching since it causes prebundle dependencies to be cached
+      disabled: !serverOptions.cacheOptions.enabled,
+      // Exclude any provided dependencies (currently build defined externals)
+      exclude: prebundleExclude,
+      // Skip automatic file-based entry point discovery
+      include: [],
+      // Add an esbuild plugin to run the Angular linker on dependencies
+      esbuildOptions: {
+        plugins: [
+          {
+            name: 'angular-vite-optimize-deps',
+            setup(build) {
+              const transformer = new JavaScriptTransformer(
+                { sourcemap: !!build.initialOptions.sourcemap },
+                1,
+              );
+
+              build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+                return {
+                  contents: await transformer.transformFile(args.path),
+                  loader: 'js',
+                };
+              });
+              build.onEnd(() => transformer.close());
+            },
+          },
+        ],
+      },
     },
   };
 
