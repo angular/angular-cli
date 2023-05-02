@@ -31,11 +31,10 @@ BROWSER_TESTS = ["tests/misc/browsers.js"]
 YARN_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**"]
 ESBUILD_TESTS = [
     "tests/basic/**",
+    "tests/build/library/**",
     "tests/build/prod-build.js",
     "tests/build/relative-sourcemap.js",
-    "tests/build/styles/scss.js",
-    "tests/build/styles/include-paths.js",
-    "tests/build/styles/tailwind*.js",
+    "tests/build/styles/**",
     "tests/commands/add/add-pwa.js",
 ]
 
