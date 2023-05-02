@@ -86,25 +86,23 @@ async function compileString(
           environment: Less.Environment,
         ): Promise<Less.FileLoadResult> {
           // Attempt direct loading as a relative path to avoid resolution overhead
-          const directResult = this.loadFileSync(filename, currentDirectory, options, environment);
-          if ('contents' in directResult) {
-            return directResult;
+          try {
+            return await super.loadFile(filename, currentDirectory, options, environment);
+          } catch (error) {
+            // Attempt a full resolution if not found
+            const fullResult = await resolver(filename, {
+              kind: 'import-rule',
+              resolveDir: currentDirectory,
+            });
+            if (fullResult.path) {
+              return {
+                filename: fullResult.path,
+                contents: await readFile(fullResult.path, 'utf-8'),
+              };
+            }
+            // Otherwise error by throwing the failing direct result
+            throw error;
           }
-
-          // Attempt a full resolution if not found
-          const fullResult = await resolver(filename, {
-            kind: 'import-rule',
-            resolveDir: currentDirectory,
-          });
-          if (fullResult.path) {
-            return {
-              filename: fullResult.path,
-              contents: await readFile(fullResult.path, 'utf-8'),
-            };
-          }
-
-          // Otherwise error by throwing the failing direct result
-          throw directResult.error;
         }
       })();
 
