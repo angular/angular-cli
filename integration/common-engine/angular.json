@@ -140,6 +140,7 @@
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
+            "buildOptimizer": false,
             "progress": false,
             "outputPath": "dist/common/server",
             "main": "server.ts",
@@ -147,6 +148,7 @@
           },
           "configurations": {
             "production": {
+              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

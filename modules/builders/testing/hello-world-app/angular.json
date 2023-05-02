@@ -126,7 +126,8 @@
             "outputPath": "dist/app/server",
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
-            "preserveSymlinks": true
+            "preserveSymlinks": true,
+            "buildOptimizer": false
           },
           "configurations": {
             "production": {

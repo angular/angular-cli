@@ -136,6 +136,7 @@
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
+            "buildOptimizer": false,
             "progress": false,
             "outputPath": "dist/express-engine-ivy-prerender/server",
             "main": "server.ts",
@@ -143,6 +144,7 @@
           },
           "configurations": {
             "production": {
+              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
