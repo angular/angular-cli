@@ -1,3 +1,15 @@
+<a name="15.2.8"></a>
+
+# 15.2.8 (2023-05-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [069dcdf0c](https://github.com/angular/angular-cli/commit/069dcdf0c4e614fea83af61d4496bdd8a96920ca) | docs | improve wording in doc command version description |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0-rc.4"></a>
 
 # 16.0.0-rc.4 (2023-04-28)
