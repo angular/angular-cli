@@ -75,6 +75,7 @@ After FW releases `-rc.0` for an upcoming minor/major version, update the corres
 
 - [`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18)
 - [`latest-versions/package.json`](/packages/schematics/angular/utility/latest-versions/package.json)
+- [`@angular/pwa`](/packages/angular/pwa/package.json)
 - [`@angular-devkit/build-angular`](/packages/angular_devkit/build_angular/package.json)
 - [`@ngtools/webpack`](/packages/ngtools/webpack/package.json)
 
