@@ -67,11 +67,9 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 # Release
 
-Releasing is performed using Angular's unified release tooling. Each week, two releases are expected, `latest` and `next` on npm.
-
-**For a minor OR major release:**
-
-After FW releases `-rc.0` for an upcoming minor/major version, update the corresponding version in:
+Releasing is performed using Angular's unified release tooling. Each week, two releases are expected, `latest` and `next` on npm. For major
+and minor releases, some dependencies need to be manually bumped. The following files contain all the version numbers which need to be
+manually updated:
 
 - [`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18)
 - [`latest-versions/package.json`](/packages/schematics/angular/utility/latest-versions/package.json)
@@ -79,26 +77,22 @@ After FW releases `-rc.0` for an upcoming minor/major version, update the corres
 - [`@angular-devkit/build-angular`](/packages/angular_devkit/build_angular/package.json)
 - [`@ngtools/webpack`](/packages/ngtools/webpack/package.json)
 
-The same needs to be done for a `-next.0` release, and needs to be done for both minor _and_ major
-releases.
+**DURING a minor OR major CLI release:**
 
-Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), these versions
-should be updated to match (remove `-rc.0` and `-next.0`). This **must** be done as a separate PR
-which lands after FW releases (or else CI will fail) but _before_ the CLI release PR. Releases are
-built before the PR is sent for review, so any changes after that point won't be included in the
-release.
+Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), the above versions should be updated to match (remove
+`-rc.0` and `-next.0`). This **must** be done as a separate PR which lands _after_ FW releases (or else CI will fail) but _before_ the CLI
+release PR. Releases are built before the PR is sent for review, so any changes after that point won't be included in the release.
 
-**Following a major release:**
+**AFTER a major CLI release:**
 
-When a release is transitioning from a prerelease to a stable release, the semver ranges for Angular
-dependencies within the packages' `package.json` files will need to be updated to remove the
-prerelease version segment. For example, `"@angular/compiler-cli": "^13.0.0 || ^13.0.0-next"` in a
-prerelease should become `"@angular/compiler-cli": "^13.0.0"` in the stable release. This can happen
-as a follow-up item _after_ the release PR and the stable release, actually shipped in the `13.0.1`
-release. The current packages that require adjustment are:
+Once a major release is complete, peer dependencies in the above files will need to be updated to "undo" the above change and add the
+prerelease version segment on `main`. For example, `"@angular/compiler-cli": "^13.0.0-next.0"` should become
+`"@angular/compiler-cli": "^13.0.0 || ^13.1.0-next.0"`. This should be done for all the peer deps in the above files.
 
-- `@angular-devkit/build-angular`: [packages/angular_devkit/build_angular/package.json](/packages/angular_devkit/build_angular/package.json)
-- `@ngtools/webpack`: [packages/ngtools/webpack/package.json](/packages/ngtools/webpack/package.json)
+**AFTER a minor OR major CLI release:**
+
+`latest-versions.ts` also needs to be updated to use `-next.0` after a major or minor release. However this needs to happen _after_ FW
+publishes the initial `-next.0` release, which will happen 1 week after the major or minor release.
 
 ## Releasing the CLI
 
